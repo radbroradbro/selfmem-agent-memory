@@ -19,7 +19,7 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `f51346f`
+- Latest public-draft baseline inspected before this audit refresh: `e043d6b`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -51,6 +51,8 @@ complete or publish a public live update.
 - Brain UI Benchmark Dashboard follow-up: `d0113c0`, CI run `26302442423`
   passed
 - Brain UI Canary Rollout follow-up: `f51346f`, CI run `26302990767` passed
+- Brain UI Research Source Lock follow-up: `e043d6b`, CI run `26304465466`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -114,7 +116,7 @@ complete or publish a public live update.
 | Brain UI research source lock release gate | `packages/bench/release-readiness-check.mjs` now requires Research Source Lock browser evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally |
 | Brain UI context preview release gate | `packages/bench/release-readiness-check.mjs` now requires Context Preview DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26300784883` |
 | Brain UI release readiness gate | `packages/bench/release-readiness-check.mjs` now requires Release Readiness DOM evidence, screenshot, Gemini review, release-doc references, conservative `FAIL` verdict, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26301888111` |
-| GitHub Actions | CI run `26302990767` on `f51346f` passed Test, Full smoke, and Release readiness check | Proven |
+| GitHub Actions | CI run `26304465466` on `e043d6b` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |

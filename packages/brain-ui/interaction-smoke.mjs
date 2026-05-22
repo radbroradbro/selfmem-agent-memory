@@ -299,7 +299,7 @@ try {
   assert.equal(releaseReadiness.publicLaunchVerdict, "FAIL");
   assert.equal(releaseReadiness.productionReady, false);
   assert.equal(releaseReadiness.pullRequest.number, 5);
-  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.shortSha, "0ec4396");
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.shortSha, "e043d6b");
   assert.equal(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion, "success");
   assert.equal(releaseReadiness.latestVerifiedCodeBaseline.secretScan, "zero_hits");
   assert.equal(releaseReadiness.latestDocumentationBaseline.ciConclusion, "success");

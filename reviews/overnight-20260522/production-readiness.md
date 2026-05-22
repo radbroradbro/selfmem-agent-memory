@@ -194,6 +194,12 @@ Controller follow-up after that sandbox run:
   rollback and dry-run steps visible, zero console errors, and no
   private/key-shaped visible text. GitHub Actions CI run `26302990767` passed
   on `f51346f`.
+- Brain UI Research Source Lock local verification passed fresh Brain UI smoke,
+  interaction smoke, browser evidence, release readiness check, and GitHub
+  Actions CI run `26304465466` on `e043d6b`. Browser evidence reports 11
+  public sources, 8 implementation rules, dashboard-to-cluster zoom,
+  topic/subtopic path and stale-supersession rules, zero console errors, and no
+  private/key-shaped visible text.
 
 ## UI Evidence
 

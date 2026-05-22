@@ -310,6 +310,8 @@ Known limits:
   commit `d0113c0`, including Test, Full smoke, and Release readiness check.
 - GitHub Actions CI run `26302990767` passed on Brain UI Canary Rollout commit
   `f51346f`, including Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26304465466` passed on Brain UI Research Source Lock
+  commit `e043d6b`, including Test, Full smoke, and Release readiness check.
 - GitHub Actions CI run `26300784883` passed on Brain UI Context Preview
   commit `0ec4396`.
 - GitHub Actions CI run `26301888111` passed on Brain UI Release Readiness

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T17:42:43Z",
+  "generatedAt": "2026-05-22T18:15:34Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "f51346ff6872863425741658ec31222516d8c622",
-    "ciRunId": 26302990767,
+    "headSha": "e043d6b122773b7dabbe09a5aabfd34649b197dc",
+    "ciRunId": 26304465466,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the Brain UI Canary Rollout slice. GitHub Actions run 26302990767 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after the Brain UI Research Source Lock slice. GitHub Actions run 26304465466 passed Test, Full smoke, and Release readiness check."
   },
   "releaseStateGuard": {
     "enabled": true,

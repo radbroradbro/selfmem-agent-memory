@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "head": "pending-local-source-lock-slice",
+  "head": "e043d6b122773b7dabbe09a5aabfd34649b197dc",
   "mode": "fixture-brain-ui-release-readiness",
   "writesRealFiles": false,
   "evidence": {
@@ -12,7 +12,7 @@
     "metricsOnly": true,
     "productionReady": false,
     "codeCiConclusion": "success",
-    "codeShortSha": "0ec4396",
+    "codeShortSha": "e043d6b",
     "blockerCount": 5,
     "surfaceCount": 16,
     "manualActionCount": 5,
