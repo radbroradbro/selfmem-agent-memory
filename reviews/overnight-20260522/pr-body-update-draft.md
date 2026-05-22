@@ -151,6 +151,11 @@ Latest local verification includes the release handoff gate slice.
   required blocker packets, token-free remote verification, blocked Claude and
   GitHub route evidence, and manual next-action commands. It reports public
   launch as still blocked.
+- Current-head live browser evidence: the in-app browser rendered the Brain UI
+  on `ac480db`, captured a 1280 by 1223 screenshot, showed Nucleus, wiki/vault
+  sync, Model Matrix, Context Preview, Release Readiness, Compaction Audit,
+  Benchmark Dashboard, Canary Rollout, and Research Source Lock, with zero
+  console errors or warnings and zero private/key-shaped visible text hits.
 - Local Context Preview evidence: 642 of 900 fixture context tokens used, 258
   remaining, 3 selected memories, 3 context sections, 2 omitted candidates,
   hosted read-through as read-only, local-only writes, zero privacy leaks, zero
@@ -181,7 +186,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26306469240` passed on `ff6f343`, the Brain UI Model Matrix commit.
 - GitHub Actions CI: run `26306827655` passed on `4cee083`, the clean consumer smoke gate commit.
 - GitHub Actions CI: run `26307335652` passed on `d93d781`, the release blocker doctor gate commit.
-- Gemini focused reviews: sync report, wiki sync audit log, update command, clean consumer smoke, release blocker doctor, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
+- Gemini focused reviews: sync report, wiki sync audit log, update command, clean consumer smoke, release blocker doctor, current-head live browser evidence, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
 

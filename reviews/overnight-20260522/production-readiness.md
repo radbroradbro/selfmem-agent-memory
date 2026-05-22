@@ -298,6 +298,11 @@ evidence for:
   route evidence, and manual next actions. It keeps `publicLaunchAllowed:
   false` and `productionReady: false`. GitHub Actions CI run `26307335652`
   passed on `d93d781`.
+- current-head live browser evidence with a fresh rendered Brain UI screenshot
+  on `ac480db`, Nucleus graph visibility, wiki/vault sync visibility, model
+  matrix visibility, context preview visibility, release readiness visibility,
+  zero console errors or warnings, zero private/key-shaped visible text hits,
+  and public launch still `FAIL`.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI

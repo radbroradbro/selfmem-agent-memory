@@ -131,6 +131,11 @@ Latest verified head before this draft refresh:
   conservative release-state assertions, GitHub/Claude blocked-route evidence,
   token-free remote verification, and manual next actions. It keeps public
   launch blocked. GitHub Actions CI run `26307335652` passed on `d93d781`.
+- Current-head live browser evidence: fresh rendered Brain UI screenshot on
+  `ac480db` with Nucleus, wiki/vault sync, Model Matrix, Context Preview,
+  Release Readiness, Compaction Audit, Benchmark Dashboard, Canary Rollout, and
+  Research Source Lock visible; zero console errors or warnings; zero
+  private/key-shaped visible text hits.
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
 - Completion audit: not complete, with public launch still blocked on human

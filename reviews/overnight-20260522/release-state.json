@@ -56,6 +56,7 @@
     "brain-ui-model-matrix",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
+    "brain-ui-current-head-live-browser",
     "model-autoresearch-matrix",
     "session-compaction-benchmark",
     "session-compaction-local-audit",

@@ -226,6 +226,11 @@ Latest local verification before this summary:
   It reports `publicLaunchAllowed: false` and `productionReady: false` by
   design, so green CI cannot be mistaken for public-launch approval. GitHub
   Actions CI run `26307335652` passed on `d93d781`.
+- Current-head live browser evidence: the in-app browser rendered the Brain UI
+  on `ac480db` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
+  graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,
+  browser console error/warning count is 0, private/key-shaped visible text
+  hits are 0, and the public launch verdict remains `FAIL`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -319,6 +324,10 @@ Sanitized fixture evidence exists under
 - release blocker doctor evidence records the same blocker list in
   machine-readable form, confirms no raw memories or credentials are needed,
   and prints the manual commands needed before public launch can be reconsidered
+- current-head live browser evidence records a fresh rendered Brain UI
+  screenshot and DOM-derived checks for Nucleus, wiki/vault sync, model matrix,
+  context preview, release readiness, compaction audit, benchmark dashboard,
+  canary rollout, and research source lock
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -375,6 +384,7 @@ local memory contents.
 - Gemini release-handoff review: `CLEAN`.
 - Gemini clean consumer smoke review: `CLEAN`.
 - Gemini release blocker doctor review: `CLEAN`.
+- Gemini current-head live browser review: `CLEAN`.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.

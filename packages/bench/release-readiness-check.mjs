@@ -57,6 +57,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-context-preview-review.md`,
   `${reviewDir}/brain-ui-release-readiness-evidence.md`,
   `${reviewDir}/gemini-brain-ui-release-readiness-review.md`,
+  `${reviewDir}/brain-ui-current-head-live-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-current-head-live-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-evidence.md`,
   `${reviewDir}/gemini-brain-ui-lifecycle-policy-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-apply-evidence.md`,
@@ -136,6 +138,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-context-preview.png`,
   `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-release-readiness.png`,
+  `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-current-head-live.png`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
   `${reviewDir}/ui-evidence/brain-ui-review-queue-dom-evidence.json`,
@@ -553,6 +557,27 @@ check("dom evidence is sane", () => {
   assert.equal(releaseReadinessEvidence.evidence.hasPrivateOrKeyText, false);
   assert.equal(releaseReadinessEvidence.consoleErrorCount, 0);
 
+  const currentHeadLiveEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-current-head-live-evidence.json"), "utf8"),
+  );
+  assert.equal(currentHeadLiveEvidence.ok, true);
+  assert.equal(currentHeadLiveEvidence.mode, "current-head-live-browser");
+  assert.match(currentHeadLiveEvidence.head ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(currentHeadLiveEvidence.title, "RecallWeave Brain");
+  assert.equal(currentHeadLiveEvidence.writesRealFiles, false);
+  assert.equal(currentHeadLiveEvidence.fixtureOnly, true);
+  assert.equal(currentHeadLiveEvidence.consoleErrorOrWarningCount, 0);
+  assert.equal(currentHeadLiveEvidence.privateLeakCount, 0);
+  assert.ok(currentHeadLiveEvidence.screenshotPixels?.width >= 1000);
+  assert.ok(currentHeadLiveEvidence.screenshotPixels?.height >= 900);
+  for (const [name, value] of Object.entries(currentHeadLiveEvidence.checks)) {
+    if (name === "hasPrivateOrKeyText") {
+      assert.equal(value, false, "current-head browser evidence must not show private or key-shaped text");
+    } else {
+      assert.equal(value, true, `current-head browser evidence missing ${name}`);
+    }
+  }
+
   const policyEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json"), "utf8"),
   );
@@ -707,6 +732,7 @@ check("release state is conservative", () => {
     "brain-ui-model-matrix",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
+    "brain-ui-current-head-live-browser",
     "model-autoresearch-matrix",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
@@ -755,6 +781,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
+    assert.match(text, /current-head live|fresh.*browser|live browser/i, `${file} missing current-head live browser evidence`);
     assert.match(text, /clean consumer|consumer smoke|clean checkout/i, `${file} missing clean consumer smoke`);
     assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);

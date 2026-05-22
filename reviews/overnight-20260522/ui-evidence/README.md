@@ -135,6 +135,14 @@
   `FAIL`, `productionReady: false`, 16 proven preview surfaces, 5 blockers, 5
   manual actions, hosted write-back disabled, zero privacy leaks, zero console
   errors, and no private/key-shaped visible text.
+- The Current-Head Live Browser slice was verified in the in-app browser on
+  head `ac480db`. A fixture-only screenshot was captured at
+  `brain-ui-current-head-live.png`, and
+  `brain-ui-current-head-live-evidence.json` reports Nucleus, wiki/vault sync,
+  Model Matrix, Context Preview, Release Readiness, Compaction Audit, Benchmark
+  Dashboard, Canary Rollout, and Research Source Lock visible, with public
+  launch still `FAIL`, zero console errors or warnings, and no
+  private/key-shaped visible text.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.
