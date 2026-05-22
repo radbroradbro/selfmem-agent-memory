@@ -10,6 +10,8 @@ Scope:
   release readiness, and UI evidence when relevant.
 - Made the review evidence directory dynamic, with `RECALLWEAVE_REVIEW_DIR`
   available for pinned review packets.
+- Added Brain UI interaction smoke coverage to the release gate so derived
+  model behavior is tested directly, not only through static DOM evidence.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -21,6 +23,7 @@ What `release:check` verifies:
 - package scripts for build, tests, smokes, and release check exist,
 - Brain UI vault preview DOM evidence is sane,
 - a fresh Brain UI smoke passes against the current source,
+- a fresh Brain UI interaction smoke passes against the current source,
 - `git diff --check` passes,
 - remote URL has no embedded token,
 - `npm pack --dry-run` passes for `packages/core`,
@@ -42,9 +45,10 @@ Verification:
 
 - `pnpm release:check`: passed.
 - `pnpm smoke`: passed.
-- `pnpm test`: 14 tests passed.
+- `pnpm test`: 18 tests passed.
 - `git diff --check`: covered by `release:check`.
 - Fresh Brain UI smoke: covered by `release:check`.
+- Fresh Brain UI interaction smoke: covered by `release:check`.
 - Core package dry-run: covered by `release:check`.
 - Broadened secret-pattern scan: covered by `release:check`.
 - Broadened forbidden runtime file scan: covered by `release:check`.
@@ -75,6 +79,10 @@ Cold review response:
 - Accepted residual note: recorded DOM screenshots remain evidence artifacts,
   while `release:check` performs a fresh Brain UI smoke against current source
   to catch obvious runtime drift.
+- Interaction smoke now covers search filtering, retrieval trace visibility,
+  private/key-shaped edit rejection, draft export, Nucleus export, research
+  lineage, vault path selection, dry-run sync reporting, and public-safe
+  serialization.
 
 Known limits:
 

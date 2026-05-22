@@ -1,3 +1,12 @@
+import {
+  buildEditExport,
+  buildNucleusExport,
+  buildResearchLineage,
+  containsPrivateLikeText,
+  filteredNodes as selectFilteredNodes,
+  preferredVaultPath,
+} from "./model.js";
+
 const state = {
   snapshot: null,
   filter: "all",
@@ -46,9 +55,6 @@ const exportStatus = document.querySelector("#exportStatus");
 const editExport = document.querySelector("#editExport");
 const timelineList = document.querySelector("#timelineList");
 
-const privateLikePattern =
-  /<private>[\s\S]*?(?:<\/private>|$)|pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|Bearer [A-Za-z0-9._-]{20,}/gi;
-
 const [response, vaultResponse, syncResponse] = await Promise.all([
   fetch("/fixtures/nucleus.fixture.json"),
   fetch("/fixtures/wiki-vault.json"),
@@ -59,7 +65,7 @@ state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
 state.query = searchInput.value;
 state.selectedId = state.snapshot.nodes[0]?.id ?? null;
-state.selectedVaultPath = preferredVaultPath();
+state.selectedVaultPath = preferredVaultPath(state.vault?.vault);
 
 render();
 
@@ -200,7 +206,7 @@ function renderDetails(node) {
 }
 
 function renderNucleusSnapshot() {
-  const snapshot = buildNucleusExport();
+  const snapshot = buildNucleusExport(state.snapshot);
   snapshotSummary.replaceChildren(
     stat("Mode", "fixture"),
     stat("Nodes", snapshot.counts.nodes),
@@ -210,40 +216,8 @@ function renderNucleusSnapshot() {
   snapshotExport.textContent = JSON.stringify(snapshot, null, 2);
 }
 
-function buildNucleusExport() {
-  const kindCounts = state.snapshot.nodes.reduce((counts, node) => {
-    const kind = safeExportText(node.kind);
-    counts[kind] = (counts[kind] ?? 0) + 1;
-    return counts;
-  }, {});
-  return {
-    schemaVersion: state.snapshot.schemaVersion,
-    mode: "fixture-nucleus-snapshot",
-    writesRealFiles: false,
-    counts: {
-      nodes: state.snapshot.nodes.length,
-      edges: state.snapshot.edges.length,
-      editable: state.snapshot.nodes.filter((node) => node.editable).length,
-      kinds: kindCounts,
-    },
-    nodes: state.snapshot.nodes.map((node) => ({
-      id: safeExportText(node.id),
-      kind: safeExportText(node.kind),
-      title: safeExportText(node.title),
-      editable: Boolean(node.editable),
-      tags: (node.tags ?? []).map(safeExportText),
-    })),
-    edges: state.snapshot.edges.map((edge) => ({
-      id: safeExportText(edge.id),
-      kind: safeExportText(edge.kind),
-      from: safeExportText(edge.from),
-      to: safeExportText(edge.to),
-    })),
-  };
-}
-
 function renderResearchLineage() {
-  const packet = buildResearchLineage();
+  const packet = buildResearchLineage(state.snapshot);
   researchLineage.replaceChildren();
   if (packet.trails.length === 0) {
     const empty = document.createElement("p");
@@ -269,45 +243,6 @@ function renderResearchLineage() {
   }
 }
 
-function buildResearchLineage() {
-  const nodesById = new Map(state.snapshot.nodes.map((node) => [node.id, node]));
-  const queryNodes = state.snapshot.nodes.filter((node) => node.kind === "research_query");
-  return {
-    schemaVersion: state.snapshot.schemaVersion,
-    mode: "fixture-research-lineage",
-    writesRealFiles: false,
-    trails: queryNodes.map((query) => ({
-      query: nodeSummary(query),
-      steps: collectLineageSteps(query.id, nodesById),
-    })),
-  };
-}
-
-function collectLineageSteps(startId, nodesById) {
-  const lineageKinds = new Set(["research_query", "hypothesis", "decision", "source"]);
-  const steps = [];
-  const visited = new Set([startId]);
-  let frontier = [startId];
-  for (let depth = 0; depth < 4; depth += 1) {
-    const nextFrontier = [];
-    for (const from of frontier) {
-      for (const edge of state.snapshot.edges.filter((candidate) => candidate.from === from)) {
-        if (visited.has(edge.to)) continue;
-        const node = nodesById.get(edge.to);
-        if (!node) continue;
-        visited.add(edge.to);
-        if (lineageKinds.has(node.kind) || (node.tags ?? []).includes("research")) {
-          steps.push({ edgeKind: safeExportText(edge.kind), node: nodeSummary(node) });
-        }
-        nextFrontier.push(edge.to);
-      }
-    }
-    frontier = nextFrontier;
-    if (frontier.length === 0) break;
-  }
-  return steps;
-}
-
 function appendLineageStep(list, label, node) {
   const item = document.createElement("li");
   const strong = document.createElement("strong");
@@ -319,7 +254,7 @@ function appendLineageStep(list, label, node) {
 }
 
 function renderEditExport() {
-  const draft = buildEditExport();
+  const draft = buildEditExport(state.snapshot, state.edits);
   if (draft.edits.length === 0) {
     exportStatus.textContent = "No saved fixture edits.";
     editExport.textContent = "";
@@ -327,27 +262,6 @@ function renderEditExport() {
   }
   exportStatus.textContent = `${draft.edits.length} saved fixture edit${draft.edits.length === 1 ? "" : "s"}.`;
   editExport.textContent = JSON.stringify(draft, null, 2);
-}
-
-function buildEditExport() {
-  const editableNodes = new Map(state.snapshot.nodes.filter((node) => node.editable).map((node) => [node.id, node]));
-  const edits = Object.entries(state.edits)
-    .filter(([nodeId, contents]) => editableNodes.has(nodeId) && typeof contents === "string" && contents.trim().length > 0)
-    .map(([nodeId, contents]) => {
-      const node = editableNodes.get(nodeId);
-      return {
-        nodeId,
-        title: node.title,
-        kind: node.kind,
-        contents: redactPrivateLikeText(contents),
-      };
-    });
-  return {
-    schemaVersion: 1,
-    mode: "fixture-draft",
-    writesRealFiles: false,
-    edits,
-  };
 }
 
 function renderVaultControls(node) {
@@ -360,7 +274,7 @@ function renderVaultControls(node) {
   }
 
   const files = state.vault.vault.files;
-  const preferred = preferredVaultPath(node);
+  const preferred = preferredVaultPath(state.vault?.vault, node);
   const nextPath = files.some((file) => file.path === state.selectedVaultPath) ? state.selectedVaultPath : preferred;
   state.selectedVaultPath = nextPath;
   vaultFileSelect.replaceChildren(
@@ -470,22 +384,7 @@ function currentSelected(nodes) {
 }
 
 function filteredNodes() {
-  const query = state.query.trim().toLowerCase();
-  return state.snapshot.nodes.filter((node) => {
-    const matchesKind = state.filter === "all" || node.kind === state.filter;
-    const haystack = JSON.stringify(node).toLowerCase();
-    const matchesQuery = query.length === 0 || query.split(/\s+/).every((token) => haystack.includes(token));
-    return matchesKind && matchesQuery;
-  });
-}
-
-function preferredVaultPath(node) {
-  const files = state.vault?.vault?.files ?? [];
-  if (node) {
-    const direct = files.find((file) => file.nodeId === node.id);
-    if (direct) return direct.path;
-  }
-  return files.find((file) => file.path === "wiki/index.md")?.path ?? files[0]?.path ?? "";
+  return selectFilteredNodes(state.snapshot, state.filter, state.query);
 }
 
 function fact(label, value) {
@@ -496,16 +395,6 @@ function fact(label, value) {
   const fragment = document.createDocumentFragment();
   fragment.append(dt, dd);
   return fragment;
-}
-
-function nodeSummary(node) {
-  return {
-    id: safeExportText(node.id),
-    kind: safeExportText(node.kind),
-    title: safeExportText(node.title),
-    confidence: typeof node.confidence === "number" ? node.confidence : null,
-    tags: (node.tags ?? []).map(safeExportText),
-  };
 }
 
 function edgeSummary(id) {
@@ -550,20 +439,6 @@ function escapeHtml(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
-}
-
-function containsPrivateLikeText(value) {
-  privateLikePattern.lastIndex = 0;
-  return privateLikePattern.test(String(value));
-}
-
-function redactPrivateLikeText(value) {
-  privateLikePattern.lastIndex = 0;
-  return String(value).replace(privateLikePattern, "[REDACTED_PRIVATE]");
-}
-
-function safeExportText(value) {
-  return redactPrivateLikeText(value ?? "");
 }
 
 export { buildEditExport, buildNucleusExport, buildResearchLineage, renderGraph };

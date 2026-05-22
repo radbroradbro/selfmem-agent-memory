@@ -60,6 +60,7 @@ export function createBrainUiServer() {
 function routePath(pathname) {
   if (pathname === "/" || pathname === "/index.html") return "src/index.html";
   if (pathname === "/app.js") return "src/app.js";
+  if (pathname === "/model.js") return "src/model.js";
   if (pathname === "/styles.css") return "src/styles.css";
   if (pathname === "/fixtures/nucleus.fixture.json") return "fixtures/nucleus.fixture.json";
   if (pathname === "/fixtures/wiki-vault.json") return "__wiki_vault_fixture";

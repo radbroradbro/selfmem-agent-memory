@@ -9,9 +9,10 @@ try {
   const address = server.address();
   assert(address && typeof address === "object");
   const base = `http://127.0.0.1:${address.port}`;
-  const [index, app, styles, fixture, vault, syncReport, health] = await Promise.all([
+  const [index, app, model, styles, fixture, vault, syncReport, health] = await Promise.all([
     text(`${base}/`),
     text(`${base}/app.js`),
+    text(`${base}/model.js`),
     text(`${base}/styles.css`),
     json(`${base}/fixtures/nucleus.fixture.json`),
     json(`${base}/fixtures/wiki-vault.json`),
@@ -28,11 +29,13 @@ try {
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
   assert.match(app, /buildNucleusExport/);
-  assert.match(app, /const kind = safeExportText\(node\.kind\)/);
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /renderVaultPreview/);
   assert.match(app, /renderSyncReport/);
   assert.match(app, /buildEditExport/);
+  assert.match(model, /const kind = safeExportText\(node\.kind\)/);
+  assert.match(model, /function filteredNodes/);
+  assert.match(model, /function preferredVaultPath/);
   assert.match(styles, /nucleus-shell/);
   assert.match(styles, /snapshot-export/);
   assert.match(styles, /research-lineage/);
@@ -59,7 +62,11 @@ try {
   const serialized = JSON.stringify({ fixture, vault, syncReport });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
-    JSON.stringify({ ok: true, checked: ["index", "app", "styles", "fixture", "wiki-vault", "wiki-sync-report", "healthz"] }, null, 2),
+    JSON.stringify(
+      { ok: true, checked: ["index", "app", "model", "styles", "fixture", "wiki-vault", "wiki-sync-report", "healthz"] },
+      null,
+      2,
+    ),
   );
 } finally {
   await new Promise((resolve) => server.close(resolve));

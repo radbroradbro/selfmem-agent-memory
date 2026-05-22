@@ -34,6 +34,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-edit-export-review.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
   `${reviewDir}/gemini-brain-ui-sync-report-review.md`,
+  `${reviewDir}/brain-ui-interaction-smoke-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-interaction-smoke-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
   `${reviewDir}/production-readiness.md`,
@@ -70,6 +72,8 @@ const requiredScripts = [
   "smoke:hermes",
   "brain:smoke",
   "brain:smoke:built",
+  "brain:interaction",
+  "brain:interaction:built",
   "compaction:smoke",
   "compaction:smoke:built",
   "compaction:benchmark",
@@ -203,6 +207,10 @@ check("dom evidence is sane", () => {
 
 check("fresh brain UI smoke passes", () => {
   run("node", ["packages/brain-ui/smoke.mjs"]);
+});
+
+check("fresh brain UI interaction smoke passes", () => {
+  run("node", ["packages/brain-ui/interaction-smoke.mjs"]);
 });
 
 check("git diff check passes", () => {

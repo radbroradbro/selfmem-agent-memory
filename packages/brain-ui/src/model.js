@@ -1,0 +1,148 @@
+const privateLikePattern =
+  /<private>[\s\S]*?(?:<\/private>|$)|pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|Bearer [A-Za-z0-9._-]{20,}/gi;
+
+function filteredNodes(snapshot, filter, query) {
+  const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return snapshot.nodes.filter((node) => {
+    const matchesKind = filter === "all" || node.kind === filter;
+    const haystack = JSON.stringify(node).toLowerCase();
+    const matchesQuery = tokens.length === 0 || tokens.every((token) => haystack.includes(token));
+    return matchesKind && matchesQuery;
+  });
+}
+
+function buildNucleusExport(snapshot) {
+  const kindCounts = snapshot.nodes.reduce((counts, node) => {
+    const kind = safeExportText(node.kind);
+    counts[kind] = (counts[kind] ?? 0) + 1;
+    return counts;
+  }, {});
+  return {
+    schemaVersion: snapshot.schemaVersion,
+    mode: "fixture-nucleus-snapshot",
+    writesRealFiles: false,
+    counts: {
+      nodes: snapshot.nodes.length,
+      edges: snapshot.edges.length,
+      editable: snapshot.nodes.filter((node) => node.editable).length,
+      kinds: kindCounts,
+    },
+    nodes: snapshot.nodes.map((node) => ({
+      id: safeExportText(node.id),
+      kind: safeExportText(node.kind),
+      title: safeExportText(node.title),
+      editable: Boolean(node.editable),
+      tags: (node.tags ?? []).map(safeExportText),
+    })),
+    edges: snapshot.edges.map((edge) => ({
+      id: safeExportText(edge.id),
+      kind: safeExportText(edge.kind),
+      from: safeExportText(edge.from),
+      to: safeExportText(edge.to),
+    })),
+  };
+}
+
+function buildResearchLineage(snapshot) {
+  const nodesById = new Map(snapshot.nodes.map((node) => [node.id, node]));
+  const queryNodes = snapshot.nodes.filter((node) => node.kind === "research_query");
+  return {
+    schemaVersion: snapshot.schemaVersion,
+    mode: "fixture-research-lineage",
+    writesRealFiles: false,
+    trails: queryNodes.map((query) => ({
+      query: nodeSummary(query),
+      steps: collectLineageSteps(snapshot, query.id, nodesById),
+    })),
+  };
+}
+
+function buildEditExport(snapshot, edits) {
+  const editableNodes = new Map(snapshot.nodes.filter((node) => node.editable).map((node) => [node.id, node]));
+  const exportEdits = Object.entries(edits)
+    .filter(([nodeId, contents]) => editableNodes.has(nodeId) && typeof contents === "string" && contents.trim().length > 0)
+    .map(([nodeId, contents]) => {
+      const node = editableNodes.get(nodeId);
+      return {
+        nodeId: safeExportText(nodeId),
+        title: safeExportText(node.title),
+        kind: safeExportText(node.kind),
+        contents: redactPrivateLikeText(contents),
+      };
+    });
+  return {
+    schemaVersion: 1,
+    mode: "fixture-draft",
+    writesRealFiles: false,
+    edits: exportEdits,
+  };
+}
+
+function preferredVaultPath(vault, node) {
+  const files = vault?.files ?? [];
+  if (node) {
+    const direct = files.find((file) => file.nodeId === node.id);
+    if (direct) return direct.path;
+  }
+  return files.find((file) => file.path === "wiki/index.md")?.path ?? files[0]?.path ?? "";
+}
+
+function containsPrivateLikeText(value) {
+  privateLikePattern.lastIndex = 0;
+  return privateLikePattern.test(String(value));
+}
+
+function redactPrivateLikeText(value) {
+  privateLikePattern.lastIndex = 0;
+  return String(value).replace(privateLikePattern, "[REDACTED_PRIVATE]");
+}
+
+function safeExportText(value) {
+  return redactPrivateLikeText(value ?? "");
+}
+
+function collectLineageSteps(snapshot, startId, nodesById) {
+  const lineageKinds = new Set(["research_query", "hypothesis", "decision", "source"]);
+  const steps = [];
+  const visited = new Set([startId]);
+  let frontier = [startId];
+  for (let depth = 0; depth < 4; depth += 1) {
+    const nextFrontier = [];
+    for (const from of frontier) {
+      for (const edge of snapshot.edges.filter((candidate) => candidate.from === from)) {
+        if (visited.has(edge.to)) continue;
+        const node = nodesById.get(edge.to);
+        if (!node) continue;
+        visited.add(edge.to);
+        if (lineageKinds.has(node.kind) || (node.tags ?? []).includes("research")) {
+          steps.push({ edgeKind: safeExportText(edge.kind), node: nodeSummary(node) });
+        }
+        nextFrontier.push(edge.to);
+      }
+    }
+    frontier = nextFrontier;
+    if (frontier.length === 0) break;
+  }
+  return steps;
+}
+
+function nodeSummary(node) {
+  return {
+    id: safeExportText(node.id),
+    kind: safeExportText(node.kind),
+    title: safeExportText(node.title),
+    confidence: typeof node.confidence === "number" ? node.confidence : null,
+    tags: (node.tags ?? []).map(safeExportText),
+  };
+}
+
+export {
+  buildEditExport,
+  buildNucleusExport,
+  buildResearchLineage,
+  containsPrivateLikeText,
+  filteredNodes,
+  preferredVaultPath,
+  redactPrivateLikeText,
+  safeExportText,
+};
