@@ -296,7 +296,8 @@ evidence for:
 - release blocker doctor evidence with conservative release-state checks,
   required blocker files, token-free remote verification, Claude/GitHub blocked
   route evidence, and manual next actions. It keeps `publicLaunchAllowed:
-  false` and `productionReady: false`.
+  false` and `productionReady: false`. GitHub Actions CI run `26307335652`
+  passed on `d93d781`.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI

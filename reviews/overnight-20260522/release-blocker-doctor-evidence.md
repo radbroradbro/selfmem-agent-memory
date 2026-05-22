@@ -15,7 +15,7 @@ Result:
 - Public launch allowed: false
 - Production ready: false
 - Branch: `feat/nucleus-wiki-native-contract`
-- Head checked: `750f37e36e2659263c0867a2b5f3b444e81e6860`
+- Head checked: `d93d781d2d77794b729da92c72bcffc5bc80d14e`
 - Required evidence files present: true
 - Remote has no token: true
 
@@ -33,6 +33,8 @@ Live retry results:
 - Blocker issue creation retry after `750f37e`: blocked with GitHub 403.
 - Claude CLI is installed, but blocked review evidence still reports
   `Not logged in`.
+- GitHub Actions CI run `26307335652` passed on `d93d781` with Test, Full
+  smoke, and Release readiness check.
 
 Manual next actions:
 

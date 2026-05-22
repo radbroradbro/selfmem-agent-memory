@@ -224,7 +224,8 @@ Latest local verification before this summary:
   conservative release state, required blocker evidence, token-free remote URL,
   blocked Claude route packet, GitHub 403 packet, and manual next-action list.
   It reports `publicLaunchAllowed: false` and `productionReady: false` by
-  design, so green CI cannot be mistaken for public-launch approval.
+  design, so green CI cannot be mistaken for public-launch approval. GitHub
+  Actions CI run `26307335652` passed on `d93d781`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
