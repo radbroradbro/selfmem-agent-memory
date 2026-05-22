@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { redactPrivate } from "../redaction/private.js";
 import type { MemoryScope, ProvenanceRef, RetrievalTrace } from "../types.js";
 
@@ -283,21 +284,26 @@ export function createResearchLineageNodes(record: ResearchLineageRecord): {
 }
 
 export function sanitizeNucleusSnapshot(snapshot: NucleusIndexSnapshot): NucleusIndexSnapshot {
+  const nodeIdMap = new Map(snapshot.nodes.map((node) => [node.id, publicId("node", node.id)]));
   return {
     ...snapshot,
-    roots: sanitizeUnknown(snapshot.roots) as NucleusIndexSnapshot["roots"],
-    nodes: snapshot.nodes.map(sanitizeNucleusNode),
-    edges: snapshot.edges.map(sanitizeNucleusEdge),
+    generatedAt: redactText(snapshot.generatedAt),
+    roots: sanitizeRoots(snapshot.roots, nodeIdMap),
+    nodes: snapshot.nodes.map((node) => sanitizeNucleusNode(node, nodeIdMap)),
+    edges: snapshot.edges.map((edge) => sanitizeNucleusEdge(edge, nodeIdMap)),
   };
 }
 
-export function sanitizeNucleusNode(node: NucleusNode): NucleusNode {
+export function sanitizeNucleusNode(node: NucleusNode, nodeIdMap?: Map<string, string>): NucleusNode {
   const sanitized: NucleusNode = {
     ...node,
+    id: nodeIdMap?.get(node.id) ?? publicId("node", node.id),
     title: redactText(node.title),
+    createdAt: redactText(node.createdAt),
+    updatedAt: redactText(node.updatedAt),
   };
 
-  if (node.containerTag) sanitized.containerTag = redactText(node.containerTag);
+  if (node.containerTag) sanitized.containerTag = publicId("container", node.containerTag);
   if (node.tags) sanitized.tags = node.tags.map(redactText);
   if (node.aliases) sanitized.aliases = node.aliases.map(redactText);
   if (node.provenance) sanitized.provenance = node.provenance.map(sanitizeProvenance);
@@ -306,20 +312,39 @@ export function sanitizeNucleusNode(node: NucleusNode): NucleusNode {
   return sanitized;
 }
 
-export function sanitizeNucleusEdge(edge: NucleusEdge): NucleusEdge {
+export function sanitizeNucleusEdge(edge: NucleusEdge, nodeIdMap?: Map<string, string>): NucleusEdge {
   const sanitized: NucleusEdge = {
     ...edge,
+    id: publicId("edge", edge.id),
+    from: nodeIdMapValue(edge.from),
+    to: nodeIdMapValue(edge.to),
+    createdAt: redactText(edge.createdAt),
   };
 
   if (edge.metadata) sanitized.metadata = sanitizeUnknown(edge.metadata) as Record<string, unknown>;
 
+  return sanitized;
+
+  function nodeIdMapValue(id: string): string {
+    return publicId("node", nodeIdMap?.get(id) ?? id);
+  }
+}
+
+function sanitizeRoots(
+  roots: NucleusIndexSnapshot["roots"],
+  nodeIdMap: Map<string, string>,
+): NucleusIndexSnapshot["roots"] {
+  const sanitized: NucleusIndexSnapshot["roots"] = {};
+  if (roots.indexPageId) sanitized.indexPageId = nodeIdMap.get(roots.indexPageId) ?? publicId("node", roots.indexPageId);
+  if (roots.methodologyPageId) sanitized.methodologyPageId = nodeIdMap.get(roots.methodologyPageId) ?? publicId("node", roots.methodologyPageId);
+  if (roots.activeSessionId) sanitized.activeSessionId = publicId("session", roots.activeSessionId);
   return sanitized;
 }
 
 function sanitizeProvenance(provenance: ProvenanceRef): ProvenanceRef {
   const sanitized: ProvenanceRef = {
     ...provenance,
-    sourceId: redactText(provenance.sourceId),
+    sourceId: publicId("source", provenance.sourceId),
   };
 
   if (provenance.quote) sanitized.quote = redactText(provenance.quote);
@@ -339,4 +364,9 @@ function sanitizeUnknown(value: unknown): unknown {
 
 function redactText(text: string): string {
   return redactPrivate(text).text;
+}
+
+function publicId(prefix: string, value: string): string {
+  if (new RegExp(`^${prefix}:[a-f0-9]{16}$`).test(value)) return value;
+  return `${prefix}:${createHash("sha256").update(value).digest("hex").slice(0, 16)}`;
 }

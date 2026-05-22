@@ -119,6 +119,6 @@ export declare function createResearchLineageNodes(record: ResearchLineageRecord
     edges: NucleusEdge[];
 };
 export declare function sanitizeNucleusSnapshot(snapshot: NucleusIndexSnapshot): NucleusIndexSnapshot;
-export declare function sanitizeNucleusNode(node: NucleusNode): NucleusNode;
-export declare function sanitizeNucleusEdge(edge: NucleusEdge): NucleusEdge;
+export declare function sanitizeNucleusNode(node: NucleusNode, nodeIdMap?: Map<string, string>): NucleusNode;
+export declare function sanitizeNucleusEdge(edge: NucleusEdge, nodeIdMap?: Map<string, string>): NucleusEdge;
 //# sourceMappingURL=index.d.ts.map

@@ -69,6 +69,33 @@ the page without creating a conflict note.
   and contradicted claims.
 - Keep raw private session history outside the public vault.
 
+## Compiler
+
+The current public-safe compiler lives in `@recallweave/core`:
+
+```ts
+import { compileNucleusWikiVault, lintCompiledWikiVault } from "@recallweave/core";
+```
+
+`compileNucleusWikiVault(snapshot)` returns files in memory. It does not write
+to a real vault by itself. This keeps tests, screenshots, and agent handoffs
+safe until a maintainer explicitly applies an update.
+
+The compiler emits:
+
+- `wiki/index.md`,
+- `wiki/log.md`,
+- `wiki/methodology.md`,
+- one markdown page per editable Nucleus node,
+- `nucleus.json`,
+- `.manifest.json`.
+
+Run the fixture gate with:
+
+```bash
+pnpm wiki:smoke
+```
+
 ## Editing Flow
 
 The self-hosted UI should edit derived docs and wiki pages, not raw transcripts.

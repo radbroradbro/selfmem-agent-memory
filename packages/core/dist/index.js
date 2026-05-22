@@ -10,4 +10,5 @@ export * from "./hybrid/export-cache.js";
 export * from "./hybrid/distill.js";
 export * from "./nucleus/index.js";
 export * from "./compaction/session.js";
+export * from "./wiki/compiler.js";
 //# sourceMappingURL=index.js.map

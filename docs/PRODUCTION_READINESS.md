@@ -30,6 +30,7 @@ Before a public live update or release note:
 - UI launches on localhost if a UI exists,
 - UI evidence uses sanitized fixture data only,
 - wiki lint passes if wiki sync changed,
+- wiki vault compiler smoke passes if wiki sync changed,
 - Nucleus snapshot redaction tests pass,
 - research-lineage examples link queries, hypotheses, pros, cons, sources, and
   decisions without leaking private evidence,
@@ -108,6 +109,7 @@ The release must document and test:
 - wikilinks,
 - central index,
 - methodology log,
+- a clean `compileNucleusWikiVault()` and `lintCompiledWikiVault()` result,
 - provenance,
 - conflict handling for reviewed manual edits,
 - lint for broken links and stale claims.

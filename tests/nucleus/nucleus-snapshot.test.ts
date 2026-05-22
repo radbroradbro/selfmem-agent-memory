@@ -16,7 +16,7 @@ describe("nucleus index", () => {
       },
       nodes: [
         {
-          id: "memory-1",
+          id: "memory sm_" + "F".repeat(42),
           kind: "memory",
           title: "public title <private>secret title</private>",
           createdAt: "2026-05-22T08:00:00.000Z",
@@ -39,8 +39,8 @@ describe("nucleus index", () => {
       edges: [
         {
           id: "edge-1",
-          from: "memory-1",
-          to: "wiki-1",
+          from: "memory sm_" + "F".repeat(42),
+          to: "wiki sm_" + "G".repeat(42),
           kind: "derived_from",
           createdAt: "2026-05-22T08:00:00.000Z",
           metadata: {
@@ -62,6 +62,10 @@ describe("nucleus index", () => {
     expect(serialized).not.toMatch(/pa-C/);
     expect(serialized).not.toMatch(/nvapi-D/);
     expect(serialized).not.toMatch(/jina_E/);
+    expect(serialized).not.toMatch(/sm_F/);
+    expect(serialized).not.toMatch(/sm_G/);
+    expect(sanitized.nodes[0]?.id).toMatch(/^node:[a-f0-9]{16}$/);
+    expect(sanitized.edges[0]?.from).toBe(sanitized.nodes[0]?.id);
   });
 
   it("creates retrieval trace nodes that expose hybrid channel coverage", () => {

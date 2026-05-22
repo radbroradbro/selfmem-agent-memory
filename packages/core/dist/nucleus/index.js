@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { redactPrivate } from "../redaction/private.js";
 export const DEFAULT_BRAIN_UI_EVIDENCE_SPEC = {
     fixtureOnly: true,
@@ -95,20 +96,25 @@ export function createResearchLineageNodes(record) {
         : { queryNode, hypothesisNode, edges };
 }
 export function sanitizeNucleusSnapshot(snapshot) {
+    const nodeIdMap = new Map(snapshot.nodes.map((node) => [node.id, publicId("node", node.id)]));
     return {
         ...snapshot,
-        roots: sanitizeUnknown(snapshot.roots),
-        nodes: snapshot.nodes.map(sanitizeNucleusNode),
-        edges: snapshot.edges.map(sanitizeNucleusEdge),
+        generatedAt: redactText(snapshot.generatedAt),
+        roots: sanitizeRoots(snapshot.roots, nodeIdMap),
+        nodes: snapshot.nodes.map((node) => sanitizeNucleusNode(node, nodeIdMap)),
+        edges: snapshot.edges.map((edge) => sanitizeNucleusEdge(edge, nodeIdMap)),
     };
 }
-export function sanitizeNucleusNode(node) {
+export function sanitizeNucleusNode(node, nodeIdMap) {
     const sanitized = {
         ...node,
+        id: nodeIdMap?.get(node.id) ?? publicId("node", node.id),
         title: redactText(node.title),
+        createdAt: redactText(node.createdAt),
+        updatedAt: redactText(node.updatedAt),
     };
     if (node.containerTag)
-        sanitized.containerTag = redactText(node.containerTag);
+        sanitized.containerTag = publicId("container", node.containerTag);
     if (node.tags)
         sanitized.tags = node.tags.map(redactText);
     if (node.aliases)
@@ -119,18 +125,35 @@ export function sanitizeNucleusNode(node) {
         sanitized.metadata = sanitizeUnknown(node.metadata);
     return sanitized;
 }
-export function sanitizeNucleusEdge(edge) {
+export function sanitizeNucleusEdge(edge, nodeIdMap) {
     const sanitized = {
         ...edge,
+        id: publicId("edge", edge.id),
+        from: nodeIdMapValue(edge.from),
+        to: nodeIdMapValue(edge.to),
+        createdAt: redactText(edge.createdAt),
     };
     if (edge.metadata)
         sanitized.metadata = sanitizeUnknown(edge.metadata);
+    return sanitized;
+    function nodeIdMapValue(id) {
+        return publicId("node", nodeIdMap?.get(id) ?? id);
+    }
+}
+function sanitizeRoots(roots, nodeIdMap) {
+    const sanitized = {};
+    if (roots.indexPageId)
+        sanitized.indexPageId = nodeIdMap.get(roots.indexPageId) ?? publicId("node", roots.indexPageId);
+    if (roots.methodologyPageId)
+        sanitized.methodologyPageId = nodeIdMap.get(roots.methodologyPageId) ?? publicId("node", roots.methodologyPageId);
+    if (roots.activeSessionId)
+        sanitized.activeSessionId = publicId("session", roots.activeSessionId);
     return sanitized;
 }
 function sanitizeProvenance(provenance) {
     const sanitized = {
         ...provenance,
-        sourceId: redactText(provenance.sourceId),
+        sourceId: publicId("source", provenance.sourceId),
     };
     if (provenance.quote)
         sanitized.quote = redactText(provenance.quote);
@@ -147,5 +170,10 @@ function sanitizeUnknown(value) {
 }
 function redactText(text) {
     return redactPrivate(text).text;
+}
+function publicId(prefix, value) {
+    if (new RegExp(`^${prefix}:[a-f0-9]{16}$`).test(value))
+        return value;
+    return `${prefix}:${createHash("sha256").update(value).digest("hex").slice(0, 16)}`;
 }
 //# sourceMappingURL=index.js.map

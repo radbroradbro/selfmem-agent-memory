@@ -8,7 +8,8 @@ Core TypeScript utilities for RecallWeave:
 - query-expansion boundary helpers,
 - context compilation,
 - Nucleus Index contracts for the brain UI, LLM-wiki sync, lifecycle events,
-  and retrieval traces.
+  and retrieval traces,
+- fixture-safe Nucleus-to-wiki vault compilation.
 
 Build before publishing:
 

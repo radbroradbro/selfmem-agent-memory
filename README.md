@@ -51,8 +51,8 @@ must run before making quality claims.
   retrieval traces, and editable derived docs.
 - Research lineage contracts for source-backed hypotheses, pros, cons, tests,
   decisions, and follow-up questions.
-- LLM-wiki sync rules for Obsidian-compatible vaults and the self-hosted brain
-  UI.
+- LLM-wiki sync compiler rules for Obsidian-compatible vaults and the
+  self-hosted brain UI.
 - Fixture-safe session compaction benchmark for chronological durable memory
   extraction.
 - Lifecycle logs for recall, writes, compression checkpoints, provider errors,
