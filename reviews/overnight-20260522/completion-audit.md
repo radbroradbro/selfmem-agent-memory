@@ -19,9 +19,9 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest code-changing head inspected before this audit refresh: `9e6554c`
+- Latest code-changing head inspected before this audit refresh: `6ae816d`
 - PR state from GitHub connector: open, not draft, mergeable
-- GitHub Actions on `9e6554c`: `CI / Verify` run #43 passed
+- GitHub Actions on `6ae816d`: CI run `26287666832` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -41,6 +41,8 @@ complete or publish a public live update.
 | Brain UI local-audit preview evidence | `brain-ui-local-audit-*`, `brain-ui-local-audit-preview-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI selected local-audit evidence | `brain-ui-selected-local-audit-*`, `brain-ui-selected-local-audit-evidence.md`, Gemini review | Proven as read-only selected preview |
 | Brain UI selected audit-history evidence | `brain-ui-selected-audit-history-*`, `brain-ui-selected-audit-history-evidence.md`, Gemini review | Proven as browser-local content-free history |
+| Brain UI selected vault sync dry-run evidence | `brain-ui-selected-sync-dry-run-*`, `brain-ui-selected-sync-dry-run-evidence.md`, Gemini review | Proven as disabled-by-default read-only dry-run |
+| Brain UI lifecycle policy evidence | `brain-ui-lifecycle-policy-*`, `brain-ui-lifecycle-policy-evidence.md`, Gemini review | Proven as fixture-only no-write draft export |
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
@@ -54,7 +56,7 @@ complete or publish a public live update.
 | PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment |
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
-| GitHub Actions | `CI / Verify` run #43 on `9e6554c` passed Test, Full smoke, and Release readiness check | Proven |
+| GitHub Actions | CI run `26287666832` on `6ae816d` passed Test, Full smoke, and Release readiness check | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |
 | Hosted Supermemory write-back disabled | Docs and safety notes state read-through only; no committed evidence enables write-back | Proven in repo scope |
@@ -70,10 +72,12 @@ complete or publish a public live update.
    issue with its current permissions.
 4. The public launch verdict remains `FAIL`. Human approval is required before
    making a live update or changing repository visibility.
-5. The Brain UI has read-only selected local-container audit preview and
-   browser-local audit history. Real local-container browse/edit/sync still
-   needs write confirmation and UI wiring. The sync helper now has wiki lint and
-   optional content-free pre-write audit logging when `auditLogPath` is supplied.
+5. The Brain UI has read-only selected local-container audit preview,
+   browser-local audit history, selected vault sync dry-run, and lifecycle
+   policy draft export. Real local-container browse/edit/sync and real policy
+   apply still need explicit write confirmation and UI wiring. The sync helper
+   now has wiki lint and optional content-free pre-write audit logging when
+   `auditLogPath` is supplied.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

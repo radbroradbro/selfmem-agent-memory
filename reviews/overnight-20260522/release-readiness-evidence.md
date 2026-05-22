@@ -29,6 +29,12 @@ Scope:
 - Added Brain UI selected audit history evidence to the release gate so
   browser-local history is content-free, bounded, and does not expose raw local
   paths or private/key-shaped text.
+- Added Brain UI selected vault sync dry-run evidence to the release gate so
+  real-path sync previews remain disabled by default, require read-only
+  confirmation, clear the typed path, show only a redacted root label, and
+  write no wiki files.
+- Added Brain UI lifecycle policy evidence to the release gate so policy
+  changes are staged as fixture-only `writesRealFiles: false` draft exports.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -43,6 +49,8 @@ What `release:check` verifies:
 - Brain UI Local Audit Preflight DOM evidence is sane,
 - Brain UI selected local-container audit DOM evidence is sane,
 - Brain UI selected audit history DOM evidence is sane,
+- Brain UI selected vault sync dry-run DOM evidence is sane,
+- Brain UI lifecycle policy DOM evidence is sane,
 - a fresh local-container audit smoke passes against current source,
 - a fresh Brain UI smoke passes against the current source,
 - a fresh Brain UI interaction smoke passes against the current source,
@@ -104,12 +112,12 @@ Cold review response:
   to catch obvious runtime drift.
 - Interaction smoke now covers search filtering, retrieval trace visibility,
   private/key-shaped edit rejection, draft export, Nucleus export, research
-  lineage, vault path selection, dry-run sync reporting, and public-safe
-  serialization.
+  lineage, lifecycle policy draft export, vault path selection, selected vault
+  sync dry-run, dry-run sync reporting, and public-safe serialization.
 
 Known limits:
 
 - Private-name scans remain an operator-side release step because putting
   private names in public source would itself leak them.
-- GitHub Actions `CI / Verify` run #43 passed on `9e6554c` after the latest
+- GitHub Actions CI run `26287666832` passed on `6ae816d` after the latest
   code-changing push. Reinspect Actions after any later branch push.
