@@ -37,6 +37,8 @@ Retry note:
   `26298491296` passed on `2175c6e`; it still returned the same 403.
 - It was refreshed again after the metrics-only local session compaction audit
   passed GitHub Actions CI run `26298965544` on `be08302`.
+- It was refreshed again after the Brain UI Compaction Audit slice passed
+  GitHub Actions CI run `26299756374` on `fb466db`.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -90,6 +92,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26297876735` passed on `62367a1`, the graph navigation controls commit.
 - GitHub Actions CI: run `26298339106` passed on `aebd205`, the release handoff gate commit.
 - GitHub Actions CI: run `26298965544` passed on `be08302`, the metrics-only local session compaction audit commit.
+- GitHub Actions CI: run `26299756374` passed on `fb466db`, the Brain UI Compaction Audit commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

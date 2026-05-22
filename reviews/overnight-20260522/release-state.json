@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T16:15:42Z",
+  "generatedAt": "2026-05-22T16:32:14Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "be083027c8f3517be3706f782143523187334270",
-    "ciRunId": 26298965544,
+    "headSha": "fb466dbcb0a0604b3939d6517781363855d49a25",
+    "ciRunId": 26299756374,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the metrics-only local session compaction audit slice. GitHub Actions run 26298965544 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after the Brain UI Compaction Audit slice. GitHub Actions run 26299756374 passed Test, Full smoke, and Release readiness check."
   },
   "releaseStateGuard": {
     "enabled": true,

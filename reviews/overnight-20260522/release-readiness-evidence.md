@@ -186,6 +186,8 @@ Verification:
 - Broadened secret-pattern scan: covered by `release:check`.
 - Broadened forbidden runtime file scan: covered by `release:check`.
 - Remote URL token check: covered by `release:check`.
+- GitHub Actions CI run `26299756374` passed on `fb466db` after the Brain UI
+  Compaction Audit slice.
 
 Cold review response:
 

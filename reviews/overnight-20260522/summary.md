@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `be08302`, run `26298965544`, success.
+  `fb466db`, run `26299756374`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -33,6 +33,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26297876735` on `62367a1`: success.
 - GitHub Actions CI run `26298339106` on `aebd205`: success.
 - GitHub Actions CI run `26298965544` on `be08302`: success.
+- GitHub Actions CI run `26299756374` on `fb466db`: success.
 
 ## Shipped Overnight Slices
 
@@ -139,6 +140,11 @@ Latest local verification before this summary:
   `session-compaction-local-audit-evidence.md`, the local audit script, and
   the `session-compaction-local-audit` release-state surface.
   GitHub Actions CI run `26298965544` passed on `be08302`.
+- Brain UI Compaction Audit verification: release gate now requires
+  `brain-ui-compaction-audit-evidence.md`, the screenshot, Browser DOM
+  evidence, Gemini review evidence, the `brain-ui-session-compaction-audit`
+  release-state surface, and fresh Brain UI smoke and interaction smoke
+  coverage. GitHub Actions CI run `26299756374` passed on `fb466db`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture

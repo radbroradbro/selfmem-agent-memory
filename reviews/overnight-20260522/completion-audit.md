@@ -19,7 +19,7 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `be08302`
+- Latest public-draft baseline inspected before this audit refresh: `fb466db`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -42,6 +42,8 @@ complete or publish a public live update.
 - Release handoff gate follow-up: `aebd205`, CI run `26298339106` passed
 - Metrics-only local session compaction audit follow-up: `be08302`, CI run
   `26298965544` passed
+- Brain UI Compaction Audit follow-up: `fb466db`, CI run `26299756374`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -94,8 +96,8 @@ complete or publish a public live update.
 | Graph navigation release gate | `packages/bench/release-readiness-check.mjs` now requires graph navigation evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297876735` |
 | Release handoff gate | `packages/bench/release-readiness-check.mjs` now requires `docs/RELEASE_HANDOFF.md`, release-handoff evidence, and Gemini review evidence | Proven locally and in CI run `26298339106` |
 | Metrics-only local session compaction audit gate | `packages/bench/release-readiness-check.mjs` now requires local-session compaction audit evidence, Gemini review evidence, and a fresh metrics-only audit run | Proven locally and in CI run `26298965544` |
-| Brain UI compaction audit release gate | `packages/bench/release-readiness-check.mjs` now requires Compaction Audit DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally with sanitized fixture metrics |
-| GitHub Actions | CI run `26298965544` on `be08302` passed Test, Full smoke, and Release readiness check | Proven |
+| Brain UI compaction audit release gate | `packages/bench/release-readiness-check.mjs` now requires Compaction Audit DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26299756374` |
+| GitHub Actions | CI run `26299756374` on `fb466db` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |

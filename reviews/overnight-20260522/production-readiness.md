@@ -142,6 +142,12 @@ Controller follow-up after that sandbox run:
   evidence reports neighborhood scope, 3 visible fixture nodes, 9 jump options,
   selected-node visibility, zero console errors, and no private/key-shaped
   visible text.
+- GitHub Actions CI run `26299756374` on Brain UI Compaction Audit commit
+  `fb466db` passed Test, Full smoke, and Release readiness check. Browser
+  evidence reports metrics-only mode, 6 fixture input events, 4 candidate
+  fingerprints, 2 redactions, chronological output, 1 exact-identifier
+  candidate, zero privacy leaks, zero console errors, and no raw candidate
+  text.
 
 ## UI Evidence
 
