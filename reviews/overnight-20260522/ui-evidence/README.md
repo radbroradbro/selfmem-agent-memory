@@ -136,7 +136,7 @@
   manual actions, hosted write-back disabled, zero privacy leaks, zero console
   errors, and no private/key-shaped visible text.
 - The Current-Head Live Browser slice was verified in the in-app browser on
-  head `ac480db`. A fixture-only screenshot was captured at
+  head `733c1e6`. A fixture-only screenshot was captured at
   `brain-ui-current-head-live.png`, and
   `brain-ui-current-head-live-evidence.json` reports Nucleus, wiki/vault sync,
   Model Matrix, Context Preview, Release Readiness, Compaction Audit, Benchmark

@@ -227,7 +227,7 @@ Latest local verification before this summary:
   design, so green CI cannot be mistaken for public-launch approval. GitHub
   Actions CI run `26307335652` passed on `d93d781`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
-  on `ac480db` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
+  on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,
   browser console error/warning count is 0, private/key-shaped visible text
   hits are 0, and the public launch verdict remains `FAIL`.

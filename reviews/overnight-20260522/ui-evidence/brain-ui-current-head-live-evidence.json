@@ -1,9 +1,9 @@
 {
   "ok": true,
   "mode": "current-head-live-browser",
-  "generatedAt": "2026-05-22T19:24:55Z",
-  "head": "ac480db2020042c1f3c6fdccea36b13202f506fc",
-  "ciRunId": 26307415802,
+  "generatedAt": "2026-05-22T19:31:15Z",
+  "head": "733c1e6e38a546e8e37b5ecffcfc262e9fae59da",
+  "ciRunId": 26307824017,
   "url": "http://127.0.0.1:4187/",
   "title": "RecallWeave Brain",
   "h1": "Nucleus",

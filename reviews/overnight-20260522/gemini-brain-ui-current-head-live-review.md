@@ -15,8 +15,10 @@ Findings:
 - The evidence is public-safe and fixture-only. The JSON records
   `fixtureOnly: true`, zero private leaks, zero console errors or warnings, and
   no private or key-shaped visible text.
-- The evidence proves a live in-app browser render on current PR head
-  `ac480db2020042c1f3c6fdccea36b13202f506fc`.
+- The reviewed evidence proved a live in-app browser render on then-current PR
+  head `ac480db2020042c1f3c6fdccea36b13202f506fc`. The evidence was refreshed
+  after CI passed on `733c1e6e38a546e8e37b5ecffcfc262e9fae59da`; the UI source
+  did not change between those commits.
 - The rendered UI shows the Nucleus graph and surrounding Brain surfaces.
 - The release readiness gate validates the current-head live browser evidence
   payload explicitly.

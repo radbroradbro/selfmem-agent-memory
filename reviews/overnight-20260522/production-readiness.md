@@ -299,7 +299,7 @@ evidence for:
   false` and `productionReady: false`. GitHub Actions CI run `26307335652`
   passed on `d93d781`.
 - current-head live browser evidence with a fresh rendered Brain UI screenshot
-  on `ac480db`, Nucleus graph visibility, wiki/vault sync visibility, model
+  on `733c1e6`, Nucleus graph visibility, wiki/vault sync visibility, model
   matrix visibility, context preview visibility, release readiness visibility,
   zero console errors or warnings, zero private/key-shaped visible text hits,
   and public launch still `FAIL`.

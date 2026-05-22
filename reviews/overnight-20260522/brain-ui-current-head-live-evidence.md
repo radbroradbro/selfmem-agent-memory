@@ -6,8 +6,8 @@ Scope:
 
 - Fresh in-app browser render of the Brain UI on the current PR head.
 - Local URL: `http://127.0.0.1:4187/`
-- Head checked: `ac480db2020042c1f3c6fdccea36b13202f506fc`
-- GitHub Actions CI run already passing for that head: `26307415802`
+- Head checked: `733c1e6e38a546e8e37b5ecffcfc262e9fae59da`
+- GitHub Actions CI run already passing for that head: `26307824017`
 
 Evidence:
 
