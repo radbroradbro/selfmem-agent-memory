@@ -15,6 +15,11 @@ These are the intended repository rules for RecallWeave.
 - branch deletion disabled,
 - CI should pass before merge once GitHub Actions is active.
 
+Current caveat: GitHub may block branch protection on a private repository
+unless the owner has the required plan. If protection is unavailable, enforce
+these rules through CODEOWNERS, pull-request review, and maintainer discipline
+until the repo becomes public or the plan supports protected branches.
+
 ## Agent Permissions
 
 Agents may:
