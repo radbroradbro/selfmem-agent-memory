@@ -45,6 +45,8 @@ Retry note:
   Actions CI run `26300784883` on `0ec4396`.
 - A top-level PR comment retry after docs/evidence refresh commit `1074bfd` and
   CI run `26300868065` still returned the same 403.
+- A top-level PR review comment retry after docs/blocker refresh commit
+  `8927df0` and CI run `26301206074` still returned the same 403.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 

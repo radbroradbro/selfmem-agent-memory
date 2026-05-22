@@ -114,7 +114,8 @@ complete or publish a public live update.
 2. PR #5 body is stale. A paste-ready replacement exists, but the GitHub app
    cannot update the PR body or add a top-level PR status comment with its
    current permissions. The PR comment retry after `1074bfd` and CI run
-   `26300868065` still returned 403.
+   `26300868065` still returned 403. A PR review comment retry after
+   `8927df0` and CI run `26301206074` also returned 403.
 3. A GitHub blocker issue draft exists, but the GitHub app cannot create the
    issue with its current permissions. The issue-creation retry after
    `1074bfd` and CI run `26300868065` still returned 403.
