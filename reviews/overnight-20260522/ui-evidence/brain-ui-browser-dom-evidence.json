@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "capturedAt": "2026-05-22T13:06:21.912Z",
-  "head": "b87c7fcbc9aaa4e4a8ad6ec3b3dcf0f6b65cdd35",
+  "capturedAt": "2026-05-22T13:22:21.629Z",
+  "head": "96ae9ccd0ab6813025e2d5bf1d185a9b2cc6b340",
   "evidence": {
-    "bodyLength": 13061,
+    "bodyLength": 13136,
     "buttons": [
       "All",
       "Memory",
@@ -16,6 +16,7 @@
       "Stage policy",
       "Stage review",
       "Preview sync",
+      "Apply sync",
       "Audit",
       "Save fixture edit",
       "Reset"
@@ -31,10 +32,12 @@
       "hasResearchLineage": true,
       "hasReviewQueue": true,
       "hasSelectedAuditForm": true,
+      "hasSelectedSyncApplyForm": true,
       "hasSelectedSyncForm": true,
       "hasSyncReport": true,
       "hasVaultPreview": true,
-      "hasWriteDisabledLanguage": true
+      "hasWriteDisabledLanguage": true,
+      "pathInputsAreVisibleText": true
     },
     "h1": "Nucleus",
     "inputs": [
@@ -42,6 +45,7 @@
         "ariaLabel": "Search Nucleus graph",
         "id": "searchInput",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "input",
         "type": "search"
       },
@@ -49,6 +53,7 @@
         "ariaLabel": null,
         "id": "policyForceRecall",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "input",
         "type": "checkbox"
       },
@@ -56,6 +61,7 @@
         "ariaLabel": null,
         "id": "policyPreCompress",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "input",
         "type": "checkbox"
       },
@@ -63,6 +69,7 @@
         "ariaLabel": null,
         "id": "policyMaxWrites",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "input",
         "type": "number"
       },
@@ -70,6 +77,7 @@
         "ariaLabel": "Low-confidence write action",
         "id": "policyLowConfidence",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "select",
         "type": null
       },
@@ -77,6 +85,7 @@
         "ariaLabel": null,
         "id": "review-candidate-maintenance-noise",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "select",
         "type": null
       },
@@ -84,6 +93,7 @@
         "ariaLabel": null,
         "id": "review-candidate-duplicate-recallweave-decision",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "select",
         "type": null
       },
@@ -91,6 +101,7 @@
         "ariaLabel": null,
         "id": "review-candidate-high-value-policy",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "select",
         "type": null
       },
@@ -98,6 +109,7 @@
         "ariaLabel": "Compiled wiki vault file",
         "id": "vaultFileSelect",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "select",
         "type": null
       },
@@ -105,27 +117,55 @@
         "ariaLabel": "Selected local vault path",
         "id": "selectedSyncPath",
         "placeholder": null,
+        "spellcheck": "false",
         "tag": "input",
-        "type": "password"
+        "type": "text"
       },
       {
         "ariaLabel": null,
         "id": "selectedSyncConfirm",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "input",
         "type": "checkbox"
+      },
+      {
+        "ariaLabel": "Selected local vault apply path",
+        "id": "selectedSyncApplyPath",
+        "placeholder": null,
+        "spellcheck": "false",
+        "tag": "input",
+        "type": "text"
+      },
+      {
+        "ariaLabel": null,
+        "id": "selectedSyncApplyConfirm",
+        "placeholder": null,
+        "spellcheck": null,
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "ariaLabel": "Selected local vault apply confirmation phrase",
+        "id": "selectedSyncApplyPhrase",
+        "placeholder": null,
+        "spellcheck": null,
+        "tag": "input",
+        "type": "text"
       },
       {
         "ariaLabel": "Selected local container path",
         "id": "selectedAuditPath",
         "placeholder": null,
+        "spellcheck": "false",
         "tag": "input",
-        "type": "password"
+        "type": "text"
       },
       {
         "ariaLabel": null,
         "id": "selectedAuditConfirm",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "input",
         "type": "checkbox"
       },
@@ -133,6 +173,7 @@
         "ariaLabel": "Derived document editor",
         "id": "docEditor",
         "placeholder": null,
+        "spellcheck": null,
         "tag": "textarea",
         "type": null
       }
@@ -143,6 +184,6 @@
   },
   "screenshot": {
     "ok": false,
-    "reason": "in-app browser Page.captureScreenshot timed out twice during this browser DOM pass; existing fixture screenshots remain in ui-evidence"
+    "reason": "in-app browser Page.captureScreenshot timed out in the prior browser DOM pass; existing fixture screenshots remain in ui-evidence"
   }
 }

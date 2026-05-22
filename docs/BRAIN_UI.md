@@ -68,7 +68,8 @@ Required visual review path:
 14. compiled wiki/vault preview,
 15. fixture vault sync report with conflict handling,
 16. selected local vault sync dry-run,
-17. fixture local-container audit preflight.
+17. selected local vault sync apply confirmation,
+18. fixture local-container audit preflight.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -116,6 +117,14 @@ read-only confirmation, clears the typed path after submit, runs
 `.../container` label plus relative action counts and conflicts. It writes no
 wiki files.
 
+Selected local vault sync apply is disabled unless
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY=1` is set. When enabled, it requires a
+write checkbox and the exact confirmation phrase `APPLY LOCAL WIKI SYNC`. It
+writes compiled, lint-clean wiki files only, records a content-free
+`.recallweave/wiki-sync-audit.jsonl` intent log before writes, clears typed
+paths after submit, and returns only a redacted `.../container` label, relative
+actions, summary counts, and audit counts.
+
 ## Production Path
 
 Before connecting real local containers, the UI needs:
@@ -129,7 +138,6 @@ Before connecting real local containers, the UI needs:
 - lifecycle policy apply path with explicit config confirmation,
 - memory review queue apply path with explicit confirmation,
 - Nucleus snapshot export against a selected redacted local container,
-- explicit vault sync apply confirmation,
 - screenshot/recording safety guardrails,
 - accessibility review.
 

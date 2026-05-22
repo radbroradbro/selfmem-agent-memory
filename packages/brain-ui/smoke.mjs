@@ -31,6 +31,7 @@ try {
   assert.match(index, /Wiki Vault Preview/);
   assert.match(index, /Vault Sync Report/);
   assert.match(index, /Selected local vault sync dry run/);
+  assert.match(index, /Selected local vault sync apply/);
   assert.match(index, /Local Audit Preflight/);
   assert.match(index, /Selected local container audit/);
   assert.match(index, /Draft Export/);
@@ -111,8 +112,24 @@ try {
   assert.equal(disabledSelectedSync.status, 403);
   assert.equal(disabledSelectedSync.body.ok, false);
   assert.equal(disabledSelectedSync.body.code, "local_sync_disabled");
+  const disabledSelectedSyncApply = await postJson(`${base}/wiki/sync/apply`, {
+    rootDir: "/tmp/recallweave-disabled-sync-apply-fixture",
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL WIKI SYNC",
+  });
+  assert.equal(disabledSelectedSyncApply.status, 403);
+  assert.equal(disabledSelectedSyncApply.body.ok, false);
+  assert.equal(disabledSelectedSyncApply.body.code, "local_sync_apply_disabled");
 
-  const serialized = JSON.stringify({ fixture, vault, syncReport, localAudit, disabledLocalAudit, disabledSelectedSync });
+  const serialized = JSON.stringify({
+    fixture,
+    vault,
+    syncReport,
+    localAudit,
+    disabledLocalAudit,
+    disabledSelectedSync,
+    disabledSelectedSyncApply,
+  });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
     JSON.stringify(
@@ -129,6 +146,7 @@ try {
           "wiki-vault",
           "wiki-sync-report",
           "selected-wiki-sync-disabled",
+          "selected-wiki-sync-apply-disabled",
           "local-container-audit",
           "selected-local-audit-disabled",
           "healthz",

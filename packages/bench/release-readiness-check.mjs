@@ -52,6 +52,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-selected-audit-history-review.md`,
   `${reviewDir}/brain-ui-selected-sync-dry-run-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-sync-dry-run-review.md`,
+  `${reviewDir}/gemini-selected-sync-apply-review.md`,
   `${reviewDir}/brain-ui-interaction-smoke-evidence.md`,
   `${reviewDir}/gemini-brain-ui-interaction-smoke-review.md`,
   `${reviewDir}/gemini-browser-evidence-gate-review.md`,
@@ -368,6 +369,7 @@ check("dom evidence is sane", () => {
   }
   assert.ok(browserEvidence.evidence.sectionCount >= 10);
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedSyncPath"));
+  assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedSyncApplyPath"));
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedAuditPath"));
 });
 
@@ -393,6 +395,7 @@ check("release state is conservative", () => {
   assert.equal(releaseState.safetyBoundary?.enablesHostedWriteBack, false);
   for (const surface of [
     "brain-ui-selected-vault-sync-dry-run",
+    "brain-ui-selected-vault-sync-apply",
     "brain-ui-lifecycle-policy-preview",
     "brain-ui-memory-review-queue",
     "session-compaction-benchmark",
@@ -421,6 +424,7 @@ check("release docs mention current preview surfaces", () => {
   for (const file of files) {
     const text = readFileSync(join(root, reviewDir, file), "utf8");
     assert.match(text, /selected vault sync dry-run|selected local vault sync dry-run/i, `${file} missing selected sync`);
+    assert.match(text, /selected vault sync apply|selected local vault sync apply/i, `${file} missing selected sync apply`);
     assert.match(text, /lifecycle policy/i, `${file} missing lifecycle policy`);
     assert.match(text, /memory review queue/i, `${file} missing memory review queue`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);

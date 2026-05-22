@@ -58,9 +58,12 @@
   `brain-ui-review-queue-dom-evidence.json`.
 - Chrome DevTools captured the memory review queue panel in
   `brain-ui-review-queue.png`.
-- Codex Browser loaded the current evidence baseline at `b87c7fc` and captured fresh
+- Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.
+- That browser DOM evidence now includes selected local vault sync apply
+  controls, including the password path field, write checkbox, and confirmation
+  phrase field.
 - Codex Browser screenshot capture timed out twice for that browser pass,
   so the browser artifact records DOM evidence only. Existing screenshot
   artifacts remain fixture-only visual evidence.

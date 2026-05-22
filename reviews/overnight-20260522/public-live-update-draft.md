@@ -17,7 +17,7 @@ The current PR adds:
 - a fixture-only Brain UI for graph browsing, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
   lineage, vault preview, sync-report inspection, selected vault sync dry-run,
-  lifecycle policy preview, and memory review queue;
+  selected vault sync apply, lifecycle policy preview, and memory review queue;
 - a dry-run-first `selfmem_update` command for agent update workflows;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.

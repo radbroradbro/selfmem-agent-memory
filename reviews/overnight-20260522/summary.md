@@ -38,6 +38,8 @@ is still required before any public live update.
 | Brain UI container health | `reviews/overnight-20260522/brain-ui-container-health-evidence.md` |
 | Brain UI local audit preview | `reviews/overnight-20260522/brain-ui-local-audit-preview-evidence.md` |
 | Brain UI selected vault sync dry-run | `reviews/overnight-20260522/brain-ui-selected-sync-dry-run-evidence.md` |
+| Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
+| Selected vault sync apply review | `reviews/overnight-20260522/gemini-selected-sync-apply-review.md` |
 | Brain UI lifecycle policy preview | `reviews/overnight-20260522/brain-ui-lifecycle-policy-evidence.md` |
 | Brain UI memory review queue | `reviews/overnight-20260522/brain-ui-review-queue-evidence.md` |
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
@@ -101,8 +103,11 @@ Sanitized fixture evidence exists under
   selected local-container audit, selected audit history, selected vault sync
   dry-run, lifecycle policy, memory review queue, and research-lineage previews
 - `brain-ui-browser-dom-evidence.json`, captured by Codex Browser
-  against PR head `b87c7fc`; screenshot capture timed out and is recorded in
+  against browser evidence baseline `96ae9cc`; screenshot capture timed out and is recorded in
   the artifact
+- selected vault sync apply controls are present in browser DOM evidence and
+  interaction smoke proves writes require `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY`
+  plus the exact `APPLY LOCAL WIKI SYNC` phrase
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -123,6 +128,8 @@ local memory contents.
 - Gemini Brain UI selected local-audit review: `CLEAN`.
 - Gemini Brain UI selected audit-history review: `CLEAN`.
 - Gemini Brain UI selected vault sync dry-run review: `CLEAN`.
+- Gemini selected vault sync apply review: first `BLOCK`, then final `CLEAN`
+  after explicit lint checking and visible path fields were added.
 - Gemini Brain UI lifecycle policy review: `CLEAN`.
 - Gemini Brain UI review queue review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
@@ -165,6 +172,9 @@ local memory contents.
 - Brain UI selected vault sync dry-run is disabled by default, requires
   read-only confirmation, clears the typed path, returns only a redacted root
   label plus relative action counts, and writes no wiki files.
+- Brain UI selected vault sync apply is disabled by default, requires the local
+  apply environment flag, requires write confirmation plus an exact phrase,
+  writes only compiled wiki files, and emits content-free audit-log entries.
 - Brain UI lifecycle policy preview is fixture-only. It stages recall/write
   settings as `writesRealFiles: false` draft output and does not edit host
   config files.
@@ -182,9 +192,9 @@ local memory contents.
 
 - Claude review is blocked until Claude CLI is logged in.
 - The Brain UI has read-only selected local-container audit preview and
-  browser-local audit history, but real local-container browse, edit, and sync
-  still need write confirmation and UI wiring. The sync helper now has wiki lint
-  and optional content-free pre-write audit logging.
+  browser-local audit history plus write-confirmed selected vault sync apply,
+  but real local-container browse/edit, lifecycle policy apply, and review-queue
+  apply still need write confirmation and UI wiring.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

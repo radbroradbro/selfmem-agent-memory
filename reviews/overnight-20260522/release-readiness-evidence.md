@@ -33,6 +33,11 @@ Scope:
   real-path sync previews remain disabled by default, require read-only
   confirmation, clear the typed path, show only a redacted root label, and
   write no wiki files.
+- Added Brain UI selected vault sync apply coverage so real-path sync applies
+  remain disabled by default, require `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY`,
+  require the exact `APPLY LOCAL WIKI SYNC` phrase, write content-free audit-log
+  entries, and return only redacted root labels plus relative actions and
+  counts.
 - Added Brain UI lifecycle policy evidence to the release gate so policy
   changes are staged as fixture-only `writesRealFiles: false` draft exports.
 - Added Brain UI memory review queue evidence to the release gate so noisy,
@@ -46,7 +51,7 @@ Scope:
 - Added Gemini review for the release-state guard and made that review packet a
   required release-readiness artifact.
 - Added Codex Browser DOM evidence to the release gate. This pass
-  loaded PR head `b87c7fc` in the in-app browser and verifies the main Brain UI
+  loaded browser evidence baseline `96ae9cc` in the in-app browser and verifies the main Brain UI
   surfaces without private or key-shaped visible text. Screenshot capture timed
   out and is recorded as such.
 - Added Gemini review for the browser evidence gate and made that review packet
@@ -66,6 +71,8 @@ What `release:check` verifies:
 - Brain UI selected local-container audit DOM evidence is sane,
 - Brain UI selected audit history DOM evidence is sane,
 - Brain UI selected vault sync dry-run DOM evidence is sane,
+- Brain UI selected vault sync apply controls are present in Browser DOM
+  evidence,
 - Brain UI lifecycle policy DOM evidence is sane,
 - Brain UI memory review queue DOM evidence is sane,
 - Codex Browser DOM evidence is sane,
@@ -133,8 +140,9 @@ Cold review response:
 - Interaction smoke now covers search filtering, retrieval trace visibility,
   private/key-shaped edit rejection, draft export, Nucleus export, research
   lineage, lifecycle policy draft export, memory review queue draft export,
-  vault path selection, selected vault sync dry-run, dry-run sync reporting,
-  and public-safe serialization.
+  vault path selection, selected vault sync dry-run, write-confirmed selected
+  vault sync apply, dry-run sync reporting, audit-log write intent coverage, and
+  public-safe serialization.
 
 Known limits:
 

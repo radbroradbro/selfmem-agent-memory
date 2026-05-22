@@ -21,7 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
-const server = createBrainUiServer({ enableLocalAudit: true });
+const server = createBrainUiServer({ enableLocalAudit: true, enableLocalApply: true });
 
 await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
 await writeFile(join(selectedRoot, "trace.jsonl"), "{\"event\":\"search\",\"count\":3}\n", "utf8");
@@ -186,6 +186,38 @@ try {
   assert.equal(selectedSync.auditTrail.event, "wiki_vault_sync_dry_run");
   assert.equal(selectedSync.auditTrail.writesRealFiles, false);
   await assert.rejects(readFile(join(selectedSyncRoot, selectedSyncConflict.conflictPath), "utf8"));
+  const missingApplyConfirmation = await postJson(`${base}/wiki/sync/apply`, {
+    rootDir: selectedSyncRoot,
+    confirmWrite: false,
+    confirmationPhrase: "APPLY LOCAL WIKI SYNC",
+  });
+  assert.equal(missingApplyConfirmation.ok, false);
+  assert.equal(missingApplyConfirmation.code, "write_confirmation_required");
+  const selectedSyncApply = await postJson(`${base}/wiki/sync/apply`, {
+    rootDir: selectedSyncRoot,
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL WIKI SYNC",
+  });
+  assert.equal(selectedSyncApply.ok, true);
+  assert.equal(selectedSyncApply.mode, "selected-wiki-sync-apply");
+  assert.equal(selectedSyncApply.writesRealFiles, true);
+  assert.equal(selectedSyncApply.report.dryRun, false);
+  assert.equal(selectedSyncApply.selection.rootPathRedacted, true);
+  assert.match(selectedSyncApply.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedSyncApply.selection.rootDisplay.includes(selectedSyncRoot), false);
+  assert.equal(selectedSyncApply.report.rootDir.includes(selectedSyncRoot), false);
+  assert.ok(selectedSyncApply.report.summary.write > 0);
+  assert.ok(selectedSyncApply.report.summary.write_conflict_note >= 1);
+  assert.equal(selectedSyncApply.auditTrail.event, "wiki_vault_sync_apply");
+  assert.equal(selectedSyncApply.auditTrail.writesRealFiles, true);
+  assert.ok(selectedSyncApply.report.auditLog.entriesWritten > 0);
+  const selectedApplyConflict = selectedSyncApply.report.actions.find((action) => action.action === "write_conflict_note" && action.conflictPath);
+  assert.ok(selectedApplyConflict);
+  await assert.doesNotReject(readFile(join(selectedSyncRoot, "wiki/index.md"), "utf8"));
+  await assert.doesNotReject(readFile(join(selectedSyncRoot, selectedApplyConflict.conflictPath), "utf8"));
+  const applyAuditLog = await readFile(join(selectedSyncRoot, ".recallweave/wiki-sync-audit.jsonl"), "utf8");
+  assert.match(applyAuditLog, /wiki_vault_sync_write_intent/);
+  assert.equal(applyAuditLog.includes(selectedSyncRoot), false);
   assert.equal(localAudit.ok, true);
   assert.equal(localAudit.report.mode, "local-container-audit");
   assert.equal(localAudit.report.writesRealFiles, false);
@@ -251,6 +283,9 @@ try {
     syncReport,
     missingSyncConfirmation,
     selectedSync,
+    missingApplyConfirmation,
+    selectedSyncApply,
+    applyAuditLog,
     localAudit,
     missingConfirmation,
     selectedAudit,
@@ -258,6 +293,7 @@ try {
   });
   assert.equal(containsPrivateLikeText(serialized), false, "serialized interaction outputs must stay public-safe");
   assert.equal(serialized.includes(selectedRoot), false, "selected local root path must stay redacted");
+  assert.equal(serialized.includes(selectedSyncRoot), false, "selected sync root path must stay redacted");
   assert.equal(serialized.includes(selectedSyncRoot), false, "selected wiki sync root path must stay redacted");
   assert.equal(serialized.includes("/Users/private/profile"), false, "dirty prior history paths must be collapsed");
 
@@ -279,6 +315,7 @@ try {
           "vault-path",
           "sync-report",
           "selected-wiki-sync-dry-run",
+          "selected-wiki-sync-apply",
           "local-container-audit",
           "selected-local-audit",
           "selected-audit-history",

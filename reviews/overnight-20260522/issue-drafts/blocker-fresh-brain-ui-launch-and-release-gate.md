@@ -51,8 +51,8 @@ local-container mode, and a public release note that does not overclaim.
 - Browser or Playwright evidence covers search, graph/index navigation,
   provenance, lifecycle/retrieval trace, derived doc edit, save/cancel behavior,
   Nucleus snapshot preview, research lineage, wiki/vault preview, sync conflict
-  view, selected vault sync dry-run, lifecycle policy preview, and memory review
-  queue preview.
+  view, selected vault sync dry-run, selected vault sync apply, lifecycle policy
+  preview, and memory review queue preview.
 - `npm run release:check` passes without special private machine state or CI
   passes the same release-readiness gate.
 - Reviewer packet records Claude and Gemini as either completed with verdicts or

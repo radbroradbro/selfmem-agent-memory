@@ -43,12 +43,13 @@ complete or publish a public live update.
 | Brain UI selected local-audit evidence | `brain-ui-selected-local-audit-*`, `brain-ui-selected-local-audit-evidence.md`, Gemini review | Proven as read-only selected preview |
 | Brain UI selected audit-history evidence | `brain-ui-selected-audit-history-*`, `brain-ui-selected-audit-history-evidence.md`, Gemini review | Proven as browser-local content-free history |
 | Brain UI selected vault sync dry-run evidence | `brain-ui-selected-sync-dry-run-*`, `brain-ui-selected-sync-dry-run-evidence.md`, Gemini review | Proven as disabled-by-default read-only dry-run |
+| Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-browser-dom-evidence.json` | Proven as disabled-by-default write-confirmed apply with content-free audit log |
 | Brain UI lifecycle policy evidence | `brain-ui-lifecycle-policy-*`, `brain-ui-lifecycle-policy-evidence.md`, Gemini review | Proven as fixture-only no-write draft export |
 | Brain UI memory review queue evidence | `brain-ui-review-queue-*`, `brain-ui-review-queue-evidence.md`, Gemini review | Proven as fixture-only no-write memory-quality draft export |
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
-| Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` loaded PR head `b87c7fc` in Codex Browser and checked main surfaces plus no private/key-shaped visible text | Proven for DOM; screenshot timed out |
+| Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` loaded browser evidence baseline `96ae9cc` in Codex Browser and checked main surfaces plus no private/key-shaped visible text | Proven for DOM; screenshot timed out |
 | Update flow | `bin/selfmem_update`, `packages/bench/update-flow-smoke.py`, `reviews/overnight-20260522/update-flow-evidence.md` | Proven by smoke and review |
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `tests/local-container/audit.test.ts`, `local-container-audit-evidence.md`, Gemini review | Proven as read-only preflight |
 | Local-only compaction benchmarking | `packages/core/src/compaction/session.ts`, `packages/bench/session-compaction-smoke.mjs`, `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` | Proven with public fixtures |
@@ -77,12 +78,10 @@ complete or publish a public live update.
 4. The public launch verdict remains `FAIL`. Human approval is required before
    making a live update or changing repository visibility.
 5. The Brain UI has read-only selected local-container audit preview,
-   browser-local audit history, selected vault sync dry-run, lifecycle policy
-   draft export, and memory review queue draft export. Real local-container
-   browse/edit/sync, real policy apply, and real review-queue apply still need
-   explicit write confirmation and UI wiring. The sync helper now has wiki lint
-   and optional content-free pre-write audit logging when `auditLogPath` is
-   supplied.
+   browser-local audit history, selected vault sync dry-run, write-confirmed
+   selected vault sync apply, lifecycle policy draft export, and memory review
+   queue draft export. Real local-container browse/edit, real policy apply, and
+   real review-queue apply still need explicit write confirmation and UI wiring.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

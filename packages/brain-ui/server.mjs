@@ -1,13 +1,12 @@
 import { createServer as createHttpServer } from "node:http";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { basename, dirname, extname, join, normalize, relative, resolve } from "node:path";
+import { dirname, extname, join, normalize, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   auditLocalContainer,
   compileNucleusWikiVault,
   lintCompiledWikiVault,
-  redactPrivate,
   syncCompiledWikiVault,
 } from "../core/dist/index.js";
 
@@ -23,6 +22,7 @@ const contentTypes = new Map([
 
 export function createBrainUiServer(options = {}) {
   const enableLocalAudit = options.enableLocalAudit ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT === "1";
+  const enableLocalApply = options.enableLocalApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY === "1";
 
   return createHttpServer(async (request, response) => {
     try {
@@ -106,6 +106,29 @@ export function createBrainUiServer(options = {}) {
         return;
       }
 
+      if (path === "__wiki_sync_apply") {
+        if (!enableLocalApply) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "local_sync_apply_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY=1 to apply selected local vault sync.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await applySelectedWikiSync(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -128,6 +151,7 @@ function routePath(pathname) {
   if (pathname === "/fixtures/local-container-audit.json") return "__local_container_audit_fixture";
   if (pathname === "/local-container/audit") return "__local_container_audit";
   if (pathname === "/wiki/sync/dry-run") return "__wiki_sync_dry_run";
+  if (pathname === "/wiki/sync/apply") return "__wiki_sync_apply";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -267,6 +291,67 @@ async function dryRunSelectedWikiSync(request) {
   };
 }
 
+async function applySelectedWikiSync(request) {
+  const body = await readJsonBody(request, 20_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+  const confirmationPhrase = typeof body.confirmationPhrase === "string" ? body.confirmationPhrase.trim() : "";
+
+  if (body.confirmWrite !== true || confirmationPhrase !== "APPLY LOCAL WIKI SYNC") {
+    return {
+      ok: false,
+      code: "write_confirmation_required",
+      message: "Confirm write apply and type APPLY LOCAL WIKI SYNC before writing selected local vault files.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local vault directory first." };
+  }
+
+  const fixture = JSON.parse(await readFile(join(root, "fixtures/nucleus.fixture.json"), "utf8"));
+  const vault = compileNucleusWikiVault(fixture);
+  const lint = lintCompiledWikiVault(vault);
+  if (lint.length > 0) {
+    return {
+      ok: false,
+      code: "vault_lint_failed",
+      message: "Selected local vault sync apply requires a lint-clean compiled wiki vault.",
+      lint: lint.map((issue) => ({ code: issue.code, path: issue.path })),
+    };
+  }
+  const report = await syncCompiledWikiVault(vault, {
+    rootDir,
+    dryRun: false,
+    auditLogPath: ".recallweave/wiki-sync-audit.jsonl",
+  });
+  const summary = summarizeSyncActions(report.actions);
+
+  return {
+    ok: true,
+    mode: "selected-wiki-sync-apply",
+    writesRealFiles: true,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+    },
+    auditTrail: {
+      event: "wiki_vault_sync_apply",
+      writesRealFiles: true,
+      actionCount: report.actions.length,
+      summary,
+      auditLog: report.auditLog,
+    },
+    report: {
+      ok: report.ok,
+      dryRun: false,
+      rootDir: redactPathForDisplay(rootDir),
+      summary,
+      actions: report.actions,
+      auditLog: report.auditLog,
+    },
+  };
+}
+
 async function readJsonBody(request, maxBytes) {
   let body = "";
   for await (const chunk of request) {
@@ -277,9 +362,8 @@ async function readJsonBody(request, maxBytes) {
   return JSON.parse(body);
 }
 
-function redactPathForDisplay(rootDir) {
-  const redacted = redactPrivate(basename(rootDir)).text.trim();
-  return `.../${redacted || "selected-local-container"}`;
+function redactPathForDisplay(_rootDir) {
+  return ".../selected-local-container";
 }
 
 function resolveUnderRoot(rootDir, relativePath) {

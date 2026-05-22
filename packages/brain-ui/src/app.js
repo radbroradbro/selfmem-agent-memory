@@ -26,6 +26,7 @@ const state = {
   selectedAudit: null,
   selectedAuditHistory: readSelectedAuditHistory(),
   selectedSync: null,
+  selectedSyncApply: null,
   lifecyclePolicyDraft: null,
   reviewQueueDraft: null,
 };
@@ -80,6 +81,13 @@ const selectedSyncConfirm = document.querySelector("#selectedSyncConfirm");
 const selectedSyncStatus = document.querySelector("#selectedSyncStatus");
 const selectedSyncSummary = document.querySelector("#selectedSyncSummary");
 const selectedSyncActions = document.querySelector("#selectedSyncActions");
+const selectedSyncApplyForm = document.querySelector("#selectedSyncApplyForm");
+const selectedSyncApplyPath = document.querySelector("#selectedSyncApplyPath");
+const selectedSyncApplyConfirm = document.querySelector("#selectedSyncApplyConfirm");
+const selectedSyncApplyPhrase = document.querySelector("#selectedSyncApplyPhrase");
+const selectedSyncApplyStatus = document.querySelector("#selectedSyncApplyStatus");
+const selectedSyncApplySummary = document.querySelector("#selectedSyncApplySummary");
+const selectedSyncApplyActions = document.querySelector("#selectedSyncApplyActions");
 const localAuditSummary = document.querySelector("#localAuditSummary");
 const localAuditFiles = document.querySelector("#localAuditFiles");
 const localAuditReasons = document.querySelector("#localAuditReasons");
@@ -199,6 +207,30 @@ selectedSyncForm.addEventListener("submit", async (event) => {
   }
 });
 
+selectedSyncApplyForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.selectedSyncApply = { ok: false, code: "loading", message: "Applying selected local vault sync." };
+  renderSelectedSyncApply();
+  try {
+    const response = await fetch("/wiki/sync/apply", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: selectedSyncApplyPath.value,
+        confirmWrite: selectedSyncApplyConfirm.checked,
+        confirmationPhrase: selectedSyncApplyPhrase.value,
+      }),
+    });
+    state.selectedSyncApply = await response.json();
+  } catch (error) {
+    state.selectedSyncApply = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    selectedSyncApplyPath.value = "";
+    selectedSyncApplyPhrase.value = "";
+    renderSelectedSyncApply();
+  }
+});
+
 selectedAuditForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   state.selectedAudit = { ok: false, code: "loading", message: "Checking selected local container." };
@@ -241,6 +273,7 @@ function render() {
   renderVaultControls(selected);
   renderSyncReport();
   renderSelectedSync();
+  renderSelectedSyncApply();
   renderLocalAudit();
   renderSelectedAudit();
   renderSelectedAuditHistory();
@@ -598,6 +631,47 @@ function renderSelectedSync() {
       item.append(conflict);
     }
     selectedSyncActions.append(item);
+  }
+}
+
+function renderSelectedSyncApply() {
+  selectedSyncApplySummary.replaceChildren();
+  selectedSyncApplyActions.replaceChildren();
+  const payload = state.selectedSyncApply;
+  if (!payload) {
+    selectedSyncApplyStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    selectedSyncApplyStatus.textContent = payload.message ?? payload.code ?? "Selected vault apply unavailable.";
+    return;
+  }
+
+  const summary = payload.report?.summary ?? {};
+  selectedSyncApplyStatus.textContent = `${payload.selection.rootDisplay} applied with audit log.`;
+  selectedSyncApplySummary.replaceChildren(
+    stat("Dry run", payload.report?.dryRun ? "yes" : "no"),
+    stat("Writes", summary.write ?? 0),
+    stat("Conflicts", summary.write_conflict_note ?? 0),
+    stat("Audit entries", payload.report?.auditLog?.entriesWritten ?? 0),
+  );
+
+  const actions = [...(payload.report?.actions ?? [])].sort((a, b) => actionRank(a.action) - actionRank(b.action)).slice(0, 8);
+  for (const action of actions) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const path = document.createElement("span");
+    item.dataset.action = action.action;
+    label.textContent = action.action.replaceAll("_", " ");
+    path.textContent = action.path;
+    item.append(label, path);
+    if (action.conflictPath) {
+      const conflict = document.createElement("small");
+      conflict.textContent = action.conflictPath;
+      item.append(conflict);
+    }
+    selectedSyncApplyActions.append(item);
   }
 }
 

@@ -38,6 +38,7 @@
     "brain-ui-selected-local-audit",
     "brain-ui-selected-audit-history",
     "brain-ui-selected-vault-sync-dry-run",
+    "brain-ui-selected-vault-sync-apply",
     "brain-ui-lifecycle-policy-preview",
     "brain-ui-memory-review-queue",
     "session-compaction-benchmark",

@@ -59,13 +59,17 @@ Release impact:
 - A follow-up Codex Browser pass loaded the current evidence baseline and saved
   `ui-evidence/brain-ui-browser-dom-evidence.json`. It verifies
   Nucleus, container health, vault preview, sync report, lifecycle policy,
-  memory review queue, selected sync/audit forms, draft export, and the absence
-  of private or key-shaped visible text.
+  memory review queue, selected sync/audit forms, selected sync apply controls,
+  draft export, and the absence of private or key-shaped visible text.
 - Browser screenshot capture timed out during that browser pass. The
   timeout is recorded in the DOM evidence file rather than treated as approval.
+- The interaction smoke now starts the server with local apply enabled and
+  proves selected vault sync apply rejects missing write confirmation, writes
+  compiled wiki files only after the exact confirmation phrase, creates a
+  content-free audit log, and keeps selected root paths redacted.
 
 Known limits:
 
-- This is still fixture mode. Live local-container browsing, editing, and vault
-  sync need a separate security-reviewed path picker, redacted path display,
-  write confirmation, and audit trail before real agent state can be exposed.
+- This is still fixture mode for memory browsing and editing. Live local
+  container browsing, derived-doc apply, lifecycle policy apply, and review
+  queue apply still need separate security-reviewed write paths.

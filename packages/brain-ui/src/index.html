@@ -145,7 +145,7 @@
           <form id="selectedSyncForm" class="selected-sync" aria-label="Selected local vault sync dry run">
             <label>
               <span>Local vault path</span>
-              <input id="selectedSyncPath" name="selectedSyncPath" type="password" autocomplete="off" aria-label="Selected local vault path" />
+              <input id="selectedSyncPath" name="selectedSyncPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local vault path" />
             </label>
             <label class="check-row">
               <input id="selectedSyncConfirm" name="selectedSyncConfirm" type="checkbox" />
@@ -156,6 +156,24 @@
             <div id="selectedSyncSummary" class="sync-summary" aria-label="Selected local vault sync dry-run summary"></div>
             <ol id="selectedSyncActions" class="sync-actions" aria-label="Selected local vault sync dry-run actions"></ol>
           </form>
+          <form id="selectedSyncApplyForm" class="selected-sync apply-sync" aria-label="Selected local vault sync apply">
+            <label>
+              <span>Apply vault path</span>
+              <input id="selectedSyncApplyPath" name="selectedSyncApplyPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local vault apply path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedSyncApplyConfirm" name="selectedSyncApplyConfirm" type="checkbox" />
+              <span>Write compiled wiki files</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="selectedSyncApplyPhrase" name="selectedSyncApplyPhrase" type="text" autocomplete="off" aria-label="Selected local vault apply confirmation phrase" />
+            </label>
+            <button id="runSelectedSyncApply" type="submit">Apply sync</button>
+            <p id="selectedSyncApplyStatus" role="status"></p>
+            <div id="selectedSyncApplySummary" class="sync-summary" aria-label="Selected local vault sync apply summary"></div>
+            <ol id="selectedSyncApplyActions" class="sync-actions" aria-label="Selected local vault sync apply actions"></ol>
+          </form>
         </section>
         <section>
           <h3>Local Audit Preflight</h3>
@@ -165,7 +183,7 @@
           <form id="selectedAuditForm" class="selected-audit" aria-label="Selected local container audit">
             <label>
               <span>Local container path</span>
-              <input id="selectedAuditPath" name="selectedAuditPath" type="password" autocomplete="off" aria-label="Selected local container path" />
+              <input id="selectedAuditPath" name="selectedAuditPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local container path" />
             </label>
             <label class="check-row">
               <input id="selectedAuditConfirm" name="selectedAuditConfirm" type="checkbox" />
