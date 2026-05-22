@@ -43,6 +43,8 @@ is still required before any public live update.
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
+| Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
+| Browser evidence gate review | `reviews/overnight-20260522/gemini-browser-evidence-gate-review.md` |
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `reviews/overnight-20260522/local-container-audit-evidence.md` |
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
@@ -98,6 +100,9 @@ Sanitized fixture evidence exists under
   draft export, plus Container Health, Local Audit Preflight, Nucleus snapshot,
   selected local-container audit, selected audit history, selected vault sync
   dry-run, lifecycle policy, memory review queue, and research-lineage previews
+- `brain-ui-browser-dom-evidence.json`, captured by Codex Browser
+  against PR head `b87c7fc`; screenshot capture timed out and is recorded in
+  the artifact
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -124,6 +129,7 @@ local memory contents.
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
 - Gemini Brain UI interaction-smoke review: `CLEAN`.
+- Gemini browser evidence gate review: `CLEAN`.
 - Gemini local-container audit review: `CLEAN`.
 - Gemini public live-update copy review: `CLEAN`.
 - Gemini completion-audit review: first `BLOCK` because the audit was untracked

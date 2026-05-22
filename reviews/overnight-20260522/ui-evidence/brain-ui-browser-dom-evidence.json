@@ -1,0 +1,148 @@
+{
+  "ok": true,
+  "capturedAt": "2026-05-22T13:06:21.912Z",
+  "head": "b87c7fcbc9aaa4e4a8ad6ec3b3dcf0f6b65cdd35",
+  "evidence": {
+    "bodyLength": 13061,
+    "buttons": [
+      "All",
+      "Memory",
+      "Docs",
+      "Trace",
+      "Research",
+      "Lifecycle",
+      "retrieval traceRetrieval trace for native memory optimization",
+      "derived docNative Memory Optimization Plan88% confidence",
+      "Stage policy",
+      "Stage review",
+      "Preview sync",
+      "Audit",
+      "Save fixture edit",
+      "Reset"
+    ],
+    "checks": {
+      "hasContainer": true,
+      "hasDraftExport": true,
+      "hasFixtureLanguage": true,
+      "hasLifecyclePolicy": true,
+      "hasLocalAudit": true,
+      "hasNucleus": true,
+      "hasPrivateOrKeyText": false,
+      "hasResearchLineage": true,
+      "hasReviewQueue": true,
+      "hasSelectedAuditForm": true,
+      "hasSelectedSyncForm": true,
+      "hasSyncReport": true,
+      "hasVaultPreview": true,
+      "hasWriteDisabledLanguage": true
+    },
+    "h1": "Nucleus",
+    "inputs": [
+      {
+        "ariaLabel": "Search Nucleus graph",
+        "id": "searchInput",
+        "placeholder": null,
+        "tag": "input",
+        "type": "search"
+      },
+      {
+        "ariaLabel": null,
+        "id": "policyForceRecall",
+        "placeholder": null,
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "ariaLabel": null,
+        "id": "policyPreCompress",
+        "placeholder": null,
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "ariaLabel": null,
+        "id": "policyMaxWrites",
+        "placeholder": null,
+        "tag": "input",
+        "type": "number"
+      },
+      {
+        "ariaLabel": "Low-confidence write action",
+        "id": "policyLowConfidence",
+        "placeholder": null,
+        "tag": "select",
+        "type": null
+      },
+      {
+        "ariaLabel": null,
+        "id": "review-candidate-maintenance-noise",
+        "placeholder": null,
+        "tag": "select",
+        "type": null
+      },
+      {
+        "ariaLabel": null,
+        "id": "review-candidate-duplicate-recallweave-decision",
+        "placeholder": null,
+        "tag": "select",
+        "type": null
+      },
+      {
+        "ariaLabel": null,
+        "id": "review-candidate-high-value-policy",
+        "placeholder": null,
+        "tag": "select",
+        "type": null
+      },
+      {
+        "ariaLabel": "Compiled wiki vault file",
+        "id": "vaultFileSelect",
+        "placeholder": null,
+        "tag": "select",
+        "type": null
+      },
+      {
+        "ariaLabel": "Selected local vault path",
+        "id": "selectedSyncPath",
+        "placeholder": null,
+        "tag": "input",
+        "type": "password"
+      },
+      {
+        "ariaLabel": null,
+        "id": "selectedSyncConfirm",
+        "placeholder": null,
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "ariaLabel": "Selected local container path",
+        "id": "selectedAuditPath",
+        "placeholder": null,
+        "tag": "input",
+        "type": "password"
+      },
+      {
+        "ariaLabel": null,
+        "id": "selectedAuditConfirm",
+        "placeholder": null,
+        "tag": "input",
+        "type": "checkbox"
+      },
+      {
+        "ariaLabel": "Derived document editor",
+        "id": "docEditor",
+        "placeholder": null,
+        "tag": "textarea",
+        "type": null
+      }
+    ],
+    "sectionCount": 17,
+    "title": "RecallWeave Brain",
+    "url": "http://127.0.0.1:4177/"
+  },
+  "screenshot": {
+    "ok": false,
+    "reason": "in-app browser Page.captureScreenshot timed out twice during this browser DOM pass; existing fixture screenshots remain in ui-evidence"
+  }
+}

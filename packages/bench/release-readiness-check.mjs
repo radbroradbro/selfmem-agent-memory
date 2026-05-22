@@ -54,6 +54,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-selected-sync-dry-run-review.md`,
   `${reviewDir}/brain-ui-interaction-smoke-evidence.md`,
   `${reviewDir}/gemini-brain-ui-interaction-smoke-review.md`,
+  `${reviewDir}/gemini-browser-evidence-gate-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
   `${reviewDir}/release-state.json`,
@@ -95,6 +96,7 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-selected-audit-history.png`,
   `${reviewDir}/ui-evidence/brain-ui-selected-sync-dry-run-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-selected-sync-dry-run.png`,
+  `${reviewDir}/ui-evidence/brain-ui-browser-dom-evidence.json`,
 ];
 
 const requiredScripts = [
@@ -351,6 +353,22 @@ check("dom evidence is sane", () => {
   assert.ok(syncEvidence.evidence.conflictActionCount >= 1);
   assert.equal(syncEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(syncEvidence.consoleMessages.length, 0);
+
+  const browserEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-browser-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(browserEvidence.ok, true);
+  assert.match(browserEvidence.head ?? "", /^[a-f0-9]{40}$/);
+  for (const [name, value] of Object.entries(browserEvidence.evidence.checks)) {
+    if (name === "hasPrivateOrKeyText") {
+      assert.equal(value, false, "browser evidence must not show private or key-shaped text");
+    } else {
+      assert.equal(value, true, `browser evidence missing ${name}`);
+    }
+  }
+  assert.ok(browserEvidence.evidence.sectionCount >= 10);
+  assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedSyncPath"));
+  assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedAuditPath"));
 });
 
 check("release state is conservative", () => {

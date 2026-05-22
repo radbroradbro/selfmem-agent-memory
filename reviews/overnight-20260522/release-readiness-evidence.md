@@ -45,6 +45,12 @@ Scope:
   a new runtime evidence claim.
 - Added Gemini review for the release-state guard and made that review packet a
   required release-readiness artifact.
+- Added Codex Browser DOM evidence to the release gate. This pass
+  loaded PR head `b87c7fc` in the in-app browser and verifies the main Brain UI
+  surfaces without private or key-shaped visible text. Screenshot capture timed
+  out and is recorded as such.
+- Added Gemini review for the browser evidence gate and made that review packet
+  a required release-readiness artifact.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -62,6 +68,7 @@ What `release:check` verifies:
 - Brain UI selected vault sync dry-run DOM evidence is sane,
 - Brain UI lifecycle policy DOM evidence is sane,
 - Brain UI memory review queue DOM evidence is sane,
+- Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,
 - a fresh local-container audit smoke passes against current source,

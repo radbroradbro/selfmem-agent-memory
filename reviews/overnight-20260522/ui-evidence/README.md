@@ -58,6 +58,12 @@
   `brain-ui-review-queue-dom-evidence.json`.
 - Chrome DevTools captured the memory review queue panel in
   `brain-ui-review-queue.png`.
+- Codex Browser loaded the current evidence baseline at `b87c7fc` and captured fresh
+  Browser DOM evidence in
+  `brain-ui-browser-dom-evidence.json`.
+- Codex Browser screenshot capture timed out twice for that browser pass,
+  so the browser artifact records DOM evidence only. Existing screenshot
+  artifacts remain fixture-only visual evidence.
 
 Early Chrome DevTools MCP capture was unavailable because no debug Chrome was
 listening on port `9222`. The Container Health capture used a temporary

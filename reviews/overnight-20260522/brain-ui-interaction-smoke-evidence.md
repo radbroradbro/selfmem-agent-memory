@@ -56,6 +56,13 @@ Release impact:
   Brain UI smoke.
 - The release-readiness check requires this evidence file, the Gemini review
   file, both scripts, and a fresh interaction smoke run.
+- A follow-up Codex Browser pass loaded the current evidence baseline and saved
+  `ui-evidence/brain-ui-browser-dom-evidence.json`. It verifies
+  Nucleus, container health, vault preview, sync report, lifecycle policy,
+  memory review queue, selected sync/audit forms, draft export, and the absence
+  of private or key-shaped visible text.
+- Browser screenshot capture timed out during that browser pass. The
+  timeout is recorded in the DOM evidence file rather than treated as approval.
 
 Known limits:
 

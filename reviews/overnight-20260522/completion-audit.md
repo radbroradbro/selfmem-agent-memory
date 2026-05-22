@@ -48,6 +48,7 @@ complete or publish a public live update.
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
+| Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` loaded PR head `b87c7fc` in Codex Browser and checked main surfaces plus no private/key-shaped visible text | Proven for DOM; screenshot timed out |
 | Update flow | `bin/selfmem_update`, `packages/bench/update-flow-smoke.py`, `reviews/overnight-20260522/update-flow-evidence.md` | Proven by smoke and review |
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `tests/local-container/audit.test.ts`, `local-container-audit-evidence.md`, Gemini review | Proven as read-only preflight |
 | Local-only compaction benchmarking | `packages/core/src/compaction/session.ts`, `packages/bench/session-compaction-smoke.mjs`, `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` | Proven with public fixtures |

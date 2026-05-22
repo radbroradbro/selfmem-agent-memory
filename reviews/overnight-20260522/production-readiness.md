@@ -107,6 +107,7 @@ evidence for:
 - selected vault sync dry-run,
 - lifecycle policy preview.
 - memory review queue preview.
+- Codex Browser DOM evidence for the main Brain UI surfaces.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
