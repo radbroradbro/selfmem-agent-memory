@@ -11,7 +11,7 @@ or explicitly accepted.
 ## Evidence
 
 - `npm run build`: passed.
-- `npm run test`: passed, 5 files and 18 tests.
+- `npm run test`: passed, 6 files and 20 tests.
 - `npm run typecheck`: passed.
 - `npm run privacy:test`: passed.
 - `npm run smoke:openclaw`: passed with `privacyLeakCount: 0`.
@@ -29,8 +29,8 @@ or explicitly accepted.
 - Initial cron `npm run release:check`: failed because the fresh Brain UI smoke
   could not bind to localhost in that sandbox.
 - Controller follow-up: `pnpm brain:smoke` and `pnpm release:check` passed.
-- GitHub Actions `Verify` run #43 on `9e6554c`: passed, including Test, Full smoke, and
-  Release readiness check.
+- GitHub Actions CI run `26288254580` on `13af176`: passed, including Test,
+  Full smoke, and Release readiness check.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was
@@ -48,8 +48,9 @@ local-container mode, and a public release note that does not overclaim.
 - Fresh `brain:serve` or `brain:smoke` passes on localhost with fixture data.
 - Browser or Playwright evidence covers search, graph/index navigation,
   provenance, lifecycle/retrieval trace, derived doc edit, save/cancel behavior,
-  Nucleus snapshot preview, research lineage, wiki/vault preview, and sync
-  conflict view.
+  Nucleus snapshot preview, research lineage, wiki/vault preview, sync conflict
+  view, selected vault sync dry-run, lifecycle policy preview, and memory review
+  queue preview.
 - `npm run release:check` passes without special private machine state or CI
   passes the same release-readiness gate.
 - Reviewer packet records Claude and Gemini as either completed with verdicts or
