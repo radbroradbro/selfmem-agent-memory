@@ -59,6 +59,11 @@ Retry note:
   same 403.
 - A GitHub blocker issue creation retry after `13cbe8d` also returned the same
   403.
+- The release gate itself was hardened in `22e17b1` to require
+  `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, conservative
+  Apple Silicon defaults, NVIDIA NIM wording, query expansion off by default,
+  env-only credential handling, and matched-canary-only public score claims.
+- GitHub Actions CI run `26305635737` passed on `22e17b1`.
 - A top-level PR comment retry after docs/evidence refresh commit `1074bfd` and
   CI run `26300868065` still returned the same 403.
 - A top-level PR review comment retry after docs/blocker refresh commit
@@ -149,6 +154,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26302990767` passed on `f51346f`, the Brain UI Canary Rollout commit.
 - GitHub Actions CI: run `26304465466` passed on `e043d6b`, the Brain UI Research Source Lock commit.
 - GitHub Actions CI: run `26305284384` passed on `13cbe8d`, the May 2026 model/autoresearch matrix gate commit.
+- GitHub Actions CI: run `26305635737` passed on `22e17b1`, the release gate hardening commit for the model/autoresearch matrix.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

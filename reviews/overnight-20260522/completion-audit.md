@@ -55,6 +55,8 @@ complete or publish a public live update.
   passed
 - May 2026 model/autoresearch matrix gate follow-up: `13cbe8d`, CI run
   `26305284384` passed
+- Model/autoresearch release-gate hardening follow-up: `22e17b1`, CI run
+  `26305635737` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -89,7 +91,7 @@ complete or publish a public live update.
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research source lock evidence | `brain-ui-research-source-lock-*`, `brain-ui-research-source-lock-evidence.md`, Gemini review | Proven locally with 11 public sources, 8 implementation rules, topic/subtopic paths, stale-memory supersession, budgeted lifecycle frequency, dashboard-to-cluster zoom, collapsed technical export, zero privacy leaks, and no private/key-shaped text |
-| Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml`, CI run `26305284384` on `13cbe8d` | Proven as a conservative gate: Apple Silicon local default uses Qwen3 0.6B through Hugging Face/llama.cpp/Metal, Voyage/Gemini/NVIDIA are controlled cloud arms, query expansion is disabled by default, and public score claims require matched canary evidence plus Opus 4.7 and Codex 5.5 setup review |
+| Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml`, CI run `26305635737` on `22e17b1` | Proven as a conservative release gate: Apple Silicon local default uses Qwen3 0.6B through Hugging Face/llama.cpp/Metal, Voyage/Gemini/NVIDIA are controlled cloud arms, query expansion is disabled by default, public score claims require matched canary evidence plus Opus 4.7 and Codex 5.5 setup review, and the gate scans these docs/configs for key-shaped secrets |
 | Brain UI compaction audit evidence | `brain-ui-compaction-audit-*`, `brain-ui-compaction-audit-evidence.md`, Gemini review | Proven with sanitized metrics-only fixtures |
 | Brain UI benchmark dashboard evidence | `brain-ui-benchmark-dashboard-*`, `brain-ui-benchmark-dashboard-evidence.md`, Gemini review | Proven locally with fixture local-only compaction benchmark metrics, 5 of 5 scenarios passed, zero privacy leaks, exact-identifier accuracy 1, average noise reduction 0.307, and hosted-baseline caveat |
 | Brain UI canary rollout evidence | `brain-ui-canary-rollout-*`, `brain-ui-canary-rollout-evidence.md`, Gemini review | Proven locally with fixture one-agent rollout status, dry-run/apply/observe/rollback path, metrics to collect, public launch still blocked, zero privacy leaks, and no private/key-shaped text |

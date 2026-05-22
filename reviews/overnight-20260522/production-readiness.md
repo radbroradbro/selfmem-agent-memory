@@ -209,6 +209,10 @@ Controller follow-up after that sandbox run:
   Silicon local default to Qwen3 0.6B through Hugging Face/llama.cpp/Metal,
   treats Voyage/Gemini/NVIDIA as controlled benchmark arms, and leaves query
   expansion disabled until a matched canary proves value.
+- Model/autoresearch release-gate hardening passed GitHub Actions CI run
+  `26305635737` on `22e17b1`. The release readiness check now requires the
+  model matrix and autoresearch plan, verifies conservative local/cloud/query
+  expansion defaults, and scans those docs/configs for key-shaped secrets.
 
 ## UI Evidence
 

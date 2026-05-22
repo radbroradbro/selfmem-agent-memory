@@ -55,6 +55,9 @@ or explicitly accepted.
   model/autoresearch matrix gate was added. The gate keeps Apple Silicon local
   setup, cloud provider challengers, and query expansion behind controlled
   canary evidence and env-only credentials.
+- GitHub Actions CI run `26305635737` on `22e17b1`: passed after the release
+  readiness check began enforcing the model/autoresearch matrix and scanning
+  those docs/configs for key-shaped secrets.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - GitHub issue creation from this draft was retried after `13cbe8d` and was

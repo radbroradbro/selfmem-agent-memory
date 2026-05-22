@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `13cbe8d`, run `26305284384`, success.
+  `22e17b1`, run `26305635737`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -40,6 +40,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26302990767` on `f51346f`: success.
 - GitHub Actions CI run `26304465466` on `e043d6b`: success.
 - GitHub Actions CI run `26305284384` on `13cbe8d`: success.
+- GitHub Actions CI run `26305635737` on `22e17b1`: success.
 
 ## Shipped Overnight Slices
 
@@ -197,6 +198,10 @@ Latest local verification before this summary:
   challenger arms, env-only provider credentials, clean local runtime rules,
   query expansion disabled by default, and matched-canary-only public benchmark
   claims.
+- Model/autoresearch release-gate hardening verification: GitHub Actions CI run
+  `26305635737` passed on `22e17b1`. The release check now requires the model
+  matrix and autoresearch plan and validates conservative provider, query
+  expansion, local runtime, and no-secret guardrails.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
