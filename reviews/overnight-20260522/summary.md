@@ -16,10 +16,10 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest CI-inspected head before the blocker-permission refresh:
-  `79dbd76`
+- Latest CI-inspected code head after the Brain UI interaction-smoke slice:
+  `2c730f1`
 - PR API state when checked: open, not draft, mergeable, clean.
-- GitHub Actions `Verify` on `79dbd76`: success.
+- GitHub Actions `Verify` on `2c730f1`: success.
 
 ## Shipped Overnight Slices
 
@@ -59,7 +59,7 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions `Verify`: success on `d9d264c`.
+- GitHub Actions `Verify`: success on `2c730f1`.
 
 ## UI Evidence
 
