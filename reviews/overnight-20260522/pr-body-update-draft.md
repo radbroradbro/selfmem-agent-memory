@@ -23,6 +23,8 @@ Retry note:
   `26292772262` passed on `19f2577`.
 - It was refreshed again after guarded local memory edit overlay CI run
   `26293533847` passed on `72ab902`.
+- It was refreshed again after guarded local edit overlay browse CI run
+  `26294323086` passed on `b5352a0`.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -44,7 +46,7 @@ The code, fixture UI, release gate, and GitHub Actions pass. Public launch shoul
 
 ## Verification
 
-Latest local verification includes the guarded local memory edit overlay slice.
+Latest local verification includes the guarded local edit overlay browse slice.
 
 - Local `npm run test`: 6 files, 21 tests passed.
 - Local `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
@@ -57,7 +59,8 @@ Latest local verification includes the guarded local memory edit overlay slice.
 - GitHub Actions CI: run `26292137539` passed on `3b5e140`, the guarded lifecycle policy apply commit.
 - GitHub Actions CI: run `26292772262` passed on `19f2577`, the guarded review queue apply commit.
 - GitHub Actions CI: run `26293533847` passed on `72ab902`, the guarded local memory edit overlay commit.
-- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, and public live-update copy are `CLEAN` after fixes.
+- GitHub Actions CI: run `26294323086` passed on `b5352a0`, the guarded local edit overlay browse commit.
+- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, and public live-update copy are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
 

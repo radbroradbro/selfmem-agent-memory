@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `72ab902`, run `26293533847`, success.
+  `b5352a0`, run `26294323086`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -27,6 +27,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26292137539` on `3b5e140`: success.
 - GitHub Actions CI run `26292772262` on `19f2577`: success.
 - GitHub Actions CI run `26293533847` on `72ab902`: success.
+- GitHub Actions CI run `26294323086` on `b5352a0`: success.
 
 ## Shipped Overnight Slices
 
@@ -91,7 +92,7 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions CI: success on the latest inspected baseline, `19f2577`.
+- GitHub Actions CI: success on the latest inspected baseline, `b5352a0`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
@@ -104,6 +105,16 @@ Latest local verification before this summary:
   `19f2577`, run `26292772262`.
 - GitHub Actions CI: success on guarded selected local memory edit overlay
   commit `72ab902`, run `26293533847`.
+- GitHub Actions CI: success on guarded local edit overlay browse commit
+  `b5352a0`, run `26294323086`.
+
+Automation rerun evidence from 2026-05-22T14:42Z is recorded in
+`automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
+smokes, tests, syntax checks, `git diff --check`, and a core package dry-run
+with a repo-local npm cache. Fresh Brain UI server/browser checks remain
+blocked in this automation sandbox by loopback `listen EPERM` and Browser
+`file://` policy, so the packet continues to rely on the existing sanitized
+fixture screenshots and DOM evidence for visual review.
 
 ## UI Evidence
 

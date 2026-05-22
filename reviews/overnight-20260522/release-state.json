@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T14:27:02Z",
+  "generatedAt": "2026-05-22T14:41:58Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "72ab902f55012694c26cd592cb02f5c55a34a039",
-    "ciRunId": 26293533847,
+    "headSha": "b5352a0916ce7419bf1679326ceb2e205b30906f",
+    "ciRunId": 26294323086,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the guarded selected local memory edit overlay slice. Later evidence-only guard/docs commits must pass CI but do not change runtime behavior."
+    "note": "This is the latest inspected code/product baseline after the guarded local edit overlay browse slice. Later evidence-only guard/docs commits must pass CI but do not change runtime behavior."
   },
   "releaseStateGuard": {
     "enabled": true,

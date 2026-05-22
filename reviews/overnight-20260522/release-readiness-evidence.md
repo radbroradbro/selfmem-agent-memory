@@ -208,3 +208,5 @@ Known limits:
   apply commit `19f2577`.
 - GitHub Actions CI run `26293533847` passed on guarded selected local memory
   edit overlay commit `72ab902`.
+- GitHub Actions CI run `26294323086` passed on guarded local edit overlay
+  browse commit `b5352a0`.

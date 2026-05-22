@@ -39,6 +39,8 @@ or explicitly accepted.
   selected review queue apply slice became required.
 - GitHub Actions CI run `26293533847` on `72ab902`: passed after the guarded
   selected local memory edit overlay slice became required.
+- GitHub Actions CI run `26294323086` on `b5352a0`: passed after the guarded
+  local edit overlay browse slice became required.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was
