@@ -127,6 +127,10 @@ Latest verified head before this draft refresh:
   `productionReady: false`, blocker list, manual actions, hosted write-back
   disabled, zero privacy leaks, zero console errors, and no private/key-shaped
   visible text
+- Release blocker doctor evidence: machine-readable blocker check with
+  conservative release-state assertions, GitHub/Claude blocked-route evidence,
+  token-free remote verification, and manual next actions. It keeps public
+  launch blocked.
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
 - Completion audit: not complete, with public launch still blocked on human

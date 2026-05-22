@@ -22,6 +22,7 @@ const requiredFiles = [
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   "packages/brain-ui/fixtures/model-matrix.json",
+  "packages/bench/release-blocker-doctor.mjs",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
   `${reviewDir}/claude-pr5-review-blocked.md`,
@@ -98,6 +99,8 @@ const requiredFiles = [
   `${reviewDir}/release-readiness-evidence.md`,
   `${reviewDir}/release-handoff-evidence.md`,
   `${reviewDir}/gemini-release-handoff-review.md`,
+  `${reviewDir}/release-blocker-doctor-evidence.md`,
+  `${reviewDir}/gemini-release-blocker-doctor-review.md`,
   `${reviewDir}/release-state.json`,
   `${reviewDir}/gemini-release-state-guard-review.md`,
   `${reviewDir}/production-readiness.md`,
@@ -186,6 +189,7 @@ const requiredScripts = [
   "wiki:sync:smoke:built",
   "update:smoke",
   "consumer:smoke",
+  "release:doctor",
   "smoke",
   "release:check",
 ];
@@ -707,6 +711,7 @@ check("release state is conservative", () => {
     "session-compaction-benchmark",
     "session-compaction-local-audit",
     "clean-consumer-smoke",
+    "release-blocker-doctor",
     "selfmem-update",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
@@ -751,6 +756,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
     assert.match(text, /clean consumer|consumer smoke|clean checkout/i, `${file} missing clean consumer smoke`);
+    assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });
@@ -812,6 +818,10 @@ check("fresh local container audit smoke passes", () => {
 
 check("fresh clean consumer smoke passes", () => {
   run("node", ["packages/bench/consumer-install-smoke.mjs"]);
+});
+
+check("fresh release blocker doctor passes", () => {
+  run("node", ["packages/bench/release-blocker-doctor.mjs"]);
 });
 
 check("git diff check passes", () => {

@@ -35,6 +35,19 @@ repo files below as the source of truth.
 Do not paste private diagnostics, raw memories, session transcripts, local agent
 paths, provider keys, or private container names into GitHub.
 
+## Blocker Doctor
+
+Run this before merge or visibility changes:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- release:doctor
+```
+
+The doctor is intentionally conservative. It should report
+`publicLaunchAllowed: false` until Claude review, GitHub handoff, human
+approval, and hosted-baseline blockers are resolved or explicitly accepted.
+Use its `manualCommands` list as the next-action checklist for agents.
+
 ## Reviewer Route Choices
 
 Before merge, choose one path:
@@ -87,4 +100,3 @@ For each deployed agent:
 
 Do not roll the same change to every agent until one-agent canary evidence is
 clean.
-

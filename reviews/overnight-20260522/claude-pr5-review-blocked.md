@@ -17,6 +17,9 @@ Reason:
 - The route was retried after the Brain UI Context Preview code and docs CI
   passed on 2026-05-22T17:01Z. Claude CLI still returned
   `Not logged in · Please run /login`.
+- The release blocker doctor confirmed the Claude command is installed and the
+  blocked-review packet remains the authoritative launch blocker. No fresh
+  approval was produced.
 
 Command class attempted:
 

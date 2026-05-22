@@ -127,6 +127,7 @@ complete or publish a public live update.
 | Brain UI context preview release gate | `packages/bench/release-readiness-check.mjs` now requires Context Preview DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26300784883` |
 | Brain UI release readiness gate | `packages/bench/release-readiness-check.mjs` now requires Release Readiness DOM evidence, screenshot, Gemini review, release-doc references, conservative `FAIL` verdict, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26301888111` |
 | Clean consumer smoke release gate | `packages/bench/release-readiness-check.mjs` now requires the clean consumer smoke script, evidence, Gemini review, release-doc references, and a fresh consumer-style checkout run | Proven locally |
+| Release blocker doctor gate | `packages/bench/release-readiness-check.mjs` now requires `packages/bench/release-blocker-doctor.mjs`, release blocker evidence, Gemini review evidence, release-doc references, and a fresh conservative blocker-doctor run | Proven locally |
 | GitHub Actions | CI run `26304465466` on `e043d6b` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |

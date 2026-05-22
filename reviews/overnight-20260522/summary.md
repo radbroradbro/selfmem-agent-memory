@@ -220,6 +220,11 @@ Latest local verification before this summary:
   files, built core runtime, Brain UI model-matrix fixture, zero forbidden
   runtime files, and zero key-shaped hits. GitHub Actions CI run
   `26306827655` passed on `4cee083`.
+- Release blocker doctor verification: local `release:doctor` now checks the
+  conservative release state, required blocker evidence, token-free remote URL,
+  blocked Claude route packet, GitHub 403 packet, and manual next-action list.
+  It reports `publicLaunchAllowed: false` and `productionReady: false` by
+  design, so green CI cannot be mistaken for public-launch approval.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -310,6 +315,9 @@ Sanitized fixture evidence exists under
   `productionReady: false`, verified CI status, 16 proven preview surfaces, 5
   blockers, 5 manual actions, hosted write-back disabled, zero privacy leaks,
   zero console errors, and no private/key-shaped visible text
+- release blocker doctor evidence records the same blocker list in
+  machine-readable form, confirms no raw memories or credentials are needed,
+  and prints the manual commands needed before public launch can be reconsidered
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -365,6 +373,7 @@ local memory contents.
 - Gemini release-state guard review: `CLEAN`.
 - Gemini release-handoff review: `CLEAN`.
 - Gemini clean consumer smoke review: `CLEAN`.
+- Gemini release blocker doctor review: `CLEAN`.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.

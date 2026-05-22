@@ -23,6 +23,9 @@ Scope:
 - Retried the PR body update and blocker issue creation after the May 2026
   model/autoresearch matrix gate commit `13cbe8d` passed CI run `26305284384`.
   The permission failure remained the same.
+- Retried the PR body update and blocker issue creation after the clean
+  consumer smoke gate commit `4cee083` passed CI run `26306827655`. The
+  permission failure remained the same.
 
 Result:
 
@@ -44,6 +47,9 @@ release-state pointers, and public blocker summaries.
 The post-`13cbe8d` retry used only public commit IDs, CI run IDs, release-state
 pointers, and public blocker summaries. No provider keys, raw memories, raw
 diagnostics, or private paths were sent.
+The post-`4cee083` retry used only public commit IDs, CI run IDs,
+release-state pointers, and public blocker summaries. No provider keys, raw
+memories, raw diagnostics, or private paths were sent.
 
 Follow-up:
 

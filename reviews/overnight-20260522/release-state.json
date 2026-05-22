@@ -60,6 +60,7 @@
     "session-compaction-benchmark",
     "session-compaction-local-audit",
     "clean-consumer-smoke",
+    "release-blocker-doctor",
     "selfmem-update"
   ],
   "remainingBlockers": [
