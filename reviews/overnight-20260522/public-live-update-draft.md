@@ -78,9 +78,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `6a33e62`
-- GitHub Actions: CI run `26308475033` passed for the GitHub handoff packet
-  gate
+- Latest verified code baseline: `8efe4d0`
+- GitHub Actions: CI run `26308588261` passed for the dynamic GitHub handoff
+  packet gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits

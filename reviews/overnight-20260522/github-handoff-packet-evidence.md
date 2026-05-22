@@ -70,3 +70,6 @@ auditable and repeatable while keeping `publicLaunchVerdict: "FAIL"` and
 - `git diff --check`: passed.
 - GitHub Actions CI run `26308475033` passed on `6a33e62`, including Test,
   Full smoke, and Release readiness check.
+- GitHub Actions CI run `26308588261` passed on `8efe4d0`, including Test,
+  Full smoke, and Release readiness check after the handoff packet gate was
+  made dynamic.

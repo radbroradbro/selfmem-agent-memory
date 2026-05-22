@@ -306,8 +306,8 @@ evidence for:
 - generated GitHub handoff packet evidence with paste-ready PR body, status
   comment, blocker issue title/body, labels, and manual GitHub steps. The
   packet writes no files, uses fixture/public release metadata only, reports
-  zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI run
-  `26308475033` passed on `6a33e62`.
+  zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI
+  runs `26308475033` on `6a33e62` and `26308588261` on `8efe4d0` passed.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
