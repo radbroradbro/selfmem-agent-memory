@@ -23,6 +23,8 @@ const files = {
   claudeBlocked: `${reviewDir}/claude-pr5-review-blocked.md`,
   handoffPacketEvidence: `${reviewDir}/github-handoff-packet-evidence.md`,
   handoffPacketReview: `${reviewDir}/gemini-github-handoff-packet-review.md`,
+  hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
+  hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
   browserEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
   releaseReadinessEvidence: `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
@@ -114,6 +116,11 @@ const requirements = [
     files.handoffPacketEvidence,
     files.handoffPacketReview,
   ]),
+  proven("hosted-baseline-preflight", "Hosted baseline comparison has a metrics-only preflight that keeps public claims blocked by default", [
+    "packages/bench/hosted-baseline-preflight.mjs",
+    files.hostedBaselinePreflightEvidence,
+    files.hostedBaselinePreflightReview,
+  ]),
   blocked("claude-council-review", "Claude/Opus reviewer route remains blocked by missing login", [
     files.claudeBlocked,
   ]),
@@ -130,7 +137,7 @@ const requirements = [
     "docs/PUBLIC_RELEASE_CHECKLIST.md",
   ]),
   blocked("hosted-supermemory-baseline", "Hosted Supermemory benchmark claims require a fresh metrics-only baseline", [
-    files.productionReadiness,
+    files.hostedBaselinePreflightEvidence,
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [

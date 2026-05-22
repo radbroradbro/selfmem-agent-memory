@@ -26,6 +26,21 @@ A publishable canary must use:
 If RecallWeave does not win, write a private gap report and keep iterating. Do
 not market the score.
 
+Run the hosted baseline preflight before any live comparison:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:preflight
+```
+
+The preflight is offline by default. It must report `callsHostedProvider:
+false`, `metricsOnly: true`, and `benchmarkClaimsAllowed: false` unless a
+fresh sanitized hosted-baseline result is supplied with `--result`. A live run
+needs explicit environment opt-in, `RECALLWEAVE_BASELINE_NO_RAW_TEXT=1`, and a
+metrics-only output file. The output may include run ids, source commits, model
+ids, aggregate scores, cost, latency, and hashes. It must not include raw
+memories, raw transcripts, private prompts, private answers, credentials,
+cookies, or bearer tokens.
+
 Allowed public wording after a win:
 
 > On this source-locked canary, RecallWeave beat the matched baseline with the

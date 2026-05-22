@@ -27,6 +27,7 @@ const paths = {
   issueDraft: join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"),
   githubBlocked: join(root, reviewDir, "github-issue-create-blocked.md"),
   claudeBlocked: join(root, reviewDir, "claude-pr5-review-blocked.md"),
+  hostedBaselinePreflight: join(root, reviewDir, "hosted-baseline-preflight-evidence.md"),
   releaseHandoff: join(root, "docs/RELEASE_HANDOFF.md"),
 };
 
@@ -70,6 +71,7 @@ for (const blocker of requiredBlockers) {
 
 assert.match(prBody, /Current-head live browser evidence/i);
 assert.match(prBody, /release blocker doctor/i);
+assert.match(prBody, /hosted baseline preflight|baseline:preflight/i);
 assert.match(prBody, new RegExp(String(latestCiRunId)));
 assert.match(prBody, /public launch.*blocked|Public launch should still wait/i);
 assert.match(prBody, /Not production ready for public launch yet/i);
@@ -91,7 +93,7 @@ const statusComment = [
   "- Current production readiness: false.",
   `- Latest verified code baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
   "- Current head has a generated GitHub handoff packet so a maintainer can paste the PR body, create the blocker issue, and keep the blocker list visible while app permissions are read-only.",
-  "- Remaining blockers: Claude reviewer route blocked by login, GitHub write routes blocked by integration permissions, human public-launch approval required, and hosted Supermemory baseline not current.",
+  "- Remaining blockers: Claude reviewer route blocked by login, GitHub write routes blocked by integration permissions, human public-launch approval required, and hosted Supermemory baseline not current. Use baseline:preflight before any comparison claim.",
   "",
   "Do not treat green CI as public launch approval. The repo evidence is fixture-only and contains no raw memories, transcripts, credentials, or private diagnostics.",
 ].join("\n");

@@ -62,6 +62,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - May 2026 model/autoresearch matrix gate that keeps Apple Silicon local model
   support, Voyage/Gemini/NVIDIA cloud challengers, and query expansion behind
   matched canary evidence instead of public benchmark claims.
+- Hosted baseline preflight that makes the Supermemory comparison path
+  explicit while calling no hosted provider by default and keeping public
+  benchmark claims blocked.
 - Brain UI Model Matrix panel that renders the guarded cloud/local model
   matrix, Apple Silicon local lane, query-expansion status, credential mode,
   reviewer gates, and hosted-baseline blockers without touching private memory
@@ -309,10 +312,15 @@ evidence for:
   zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI
   runs `26308475033` on `6a33e62` and `26308588261` on `8efe4d0` passed.
 - goal completion audit evidence with `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 10 proven requirements, 5 blocked
+  `mayCallUpdateGoalComplete: false`, 11 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement. This keeps production readiness
   separate from the native thread goal completion claim. GitHub Actions CI run
   `26308994908` passed on `13efb18`.
+- hosted baseline preflight evidence with `callsHostedProvider: false`,
+  `metricsOnly: true`, `hostedBaselineFresh: false`, and
+  `benchmarkClaimsAllowed: false`. The preflight accepts only aggregate
+  metrics and hashes for later live results, never raw memory text or
+  credentials.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
@@ -328,6 +336,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
 | UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Benchmark Dashboard shows fixture local-only compaction quality metrics and caveats, Canary Rollout shows the one-agent dry-run/apply/observe/rollback path, Research Source Lock shows methodology sources, Model Matrix shows guarded provider choices and local Apple Silicon defaults, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| Benchmark readiness | PASS WITH CONCERNS | Hosted baseline preflight is now explicit and reviewed, but the live hosted Supermemory baseline and matched RecallWeave run have not been completed on this release branch. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |

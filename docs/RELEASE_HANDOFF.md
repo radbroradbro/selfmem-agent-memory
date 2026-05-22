@@ -62,6 +62,20 @@ The doctor is intentionally conservative. It should report
 approval, and hosted-baseline blockers are resolved or explicitly accepted.
 Use its `manualCommands` list as the next-action checklist for agents.
 
+## Hosted Baseline Preflight
+
+Run this before any hosted Supermemory comparison claim:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:preflight
+```
+
+The preflight is offline by default. It should report `callsHostedProvider:
+false` and `benchmarkClaimsAllowed: false` until a fresh metrics-only hosted
+baseline result is supplied. Live baseline outputs must contain aggregate
+metrics only. Do not include raw memory text, transcripts, prompts, answers,
+credentials, cookies, or bearer tokens.
+
 ## Goal Completion Audit
 
 Run this before anyone claims the active goal is complete:

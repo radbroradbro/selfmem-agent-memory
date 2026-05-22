@@ -56,6 +56,7 @@ is still required before any public live update.
 | Brain UI dynamic graph layout | `packages/brain-ui/src/model.js`, `reviews/overnight-20260522/brain-ui-dynamic-layout-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-dynamic-layout-review.md` |
 | Brain UI graph navigation controls | `packages/brain-ui/src/model.js`, `packages/brain-ui/src/app.js`, `reviews/overnight-20260522/brain-ui-graph-navigation-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-graph-navigation-review.md` |
 | Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml` |
+| Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md` |
 | Brain UI model matrix | `packages/brain-ui/fixtures/model-matrix.json`, `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
@@ -235,10 +236,15 @@ Latest local verification before this summary:
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 10 proven requirements, 5 blocked
+  `mayCallUpdateGoalComplete: false`, 11 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement, preserving the reviewer, GitHub,
   human approval, hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.
+- Hosted baseline preflight verification: local `baseline:preflight` now checks
+  the live Supermemory comparison contract without calling a hosted provider by
+  default. It reports `callsHostedProvider: false`, `metricsOnly: true`,
+  `hostedBaselineFresh: false`, and `benchmarkClaimsAllowed: false`, so future
+  comparison claims need a sanitized live result plus reviewer approval.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,
@@ -485,8 +491,8 @@ local memory contents.
   reusable tooling. The local-session compaction audit now provides that
   metrics-only path without candidate text.
 - Benchmark comparison against hosted Supermemory is not a release claim. The
-  current public docs correctly require a fresh valid baseline before quality
-  marketing.
+  current public docs correctly require a fresh valid metrics-only baseline
+  accepted by the hosted baseline preflight before quality marketing.
 - The post-12-hour production-ready verdict remains `FAIL` for public launch.
   Fresh controller and CI checks pass, but Claude remains blocked, the GitHub
   app cannot update the PR body, add a PR status comment, or create the blocker

@@ -7,6 +7,7 @@ Scope:
 - Machine-readable release blocker status for PR #5.
 - Manual next-action checklist for agents and the owner.
 - Conservative launch boundary after the clean consumer smoke passed.
+- Hosted baseline preflight status folded into the blocker report.
 
 Result:
 
@@ -18,6 +19,8 @@ Result:
 - Head checked: `d93d781d2d77794b729da92c72bcffc5bc80d14e`
 - Required evidence files present: true
 - Remote has no token: true
+- Hosted baseline preflight: ok true, calls hosted provider false, benchmark
+  claims allowed false
 
 Current blockers:
 
@@ -43,8 +46,9 @@ Manual next actions:
 - Paste `reviews/overnight-20260522/pr-body-update-draft.md` into PR #5.
 - Create an issue from
   `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`.
-- Run a fresh metrics-only hosted Supermemory baseline before any public
-  head-to-head benchmark claim.
+- Run `baseline:preflight` with a sanitized live result after a fresh
+  metrics-only hosted Supermemory baseline and before any public head-to-head
+  benchmark claim.
 
 Notes:
 

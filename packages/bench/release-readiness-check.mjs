@@ -22,6 +22,7 @@ const requiredFiles = [
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   "packages/brain-ui/fixtures/model-matrix.json",
+  "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/goal-completion-audit.mjs",
@@ -105,6 +106,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-release-handoff-review.md`,
   `${reviewDir}/release-blocker-doctor-evidence.md`,
   `${reviewDir}/gemini-release-blocker-doctor-review.md`,
+  `${reviewDir}/hosted-baseline-preflight-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
   `${reviewDir}/gemini-github-handoff-packet-review.md`,
   `${reviewDir}/goal-completion-audit-evidence.md`,
@@ -199,6 +202,7 @@ const requiredScripts = [
   "wiki:sync:smoke:built",
   "update:smoke",
   "consumer:smoke",
+  "baseline:preflight",
   "goal:audit",
   "release:doctor",
   "release:handoff",
@@ -746,6 +750,7 @@ check("release state is conservative", () => {
     "session-compaction-local-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
+    "hosted-baseline-preflight",
     "github-handoff-packet",
     "goal-completion-audit",
     "selfmem-update",
@@ -795,6 +800,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /current-head live|fresh.*browser|live browser/i, `${file} missing current-head live browser evidence`);
     assert.match(text, /clean consumer|consumer smoke|clean checkout/i, `${file} missing clean consumer smoke`);
     assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
+    assert.match(text, /hosted baseline preflight|baseline preflight/i, `${file} missing hosted baseline preflight`);
     assert.match(text, /github handoff|handoff packet|manual GitHub/i, `${file} missing GitHub handoff packet`);
     assert.match(text, /goal completion audit|goal:audit|completion audit/i, `${file} missing goal completion audit`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
@@ -866,6 +872,27 @@ check("fresh release blocker doctor passes", () => {
   run("node", ["packages/bench/release-blocker-doctor.mjs"]);
 });
 
+check("fresh hosted baseline preflight passes", () => {
+  const result = run("node", ["packages/bench/hosted-baseline-preflight.mjs"]);
+  const report = JSON.parse(result.stdout);
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "hosted-baseline-preflight");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.callsHostedProvider, false);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.releaseBlockerPresent, true);
+  assert.equal(report.hostedBaselineFresh, false);
+  assert.equal(report.benchmarkClaimsAllowed, false);
+  assert.equal(report.publicBenchmarkClaimsAllowed, false);
+  assert.equal(report.safety?.permitsHostedWriteBack, false);
+  assert.equal(report.safety?.permitsRawMemoryOutput, false);
+  assert.ok(report.liveRunContract?.requiredMetrics?.includes("P@1"));
+  assert.ok(report.liveRunContract?.requiredComparability?.includes("same dataset slice"));
+  assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.doesNotMatch(geminiReview, /pending external review/i);
+});
+
 check("fresh GitHub handoff packet passes", () => {
   const result = run("node", ["packages/bench/github-handoff-packet.mjs"]);
   const packet = JSON.parse(result.stdout);
@@ -885,6 +912,7 @@ check("fresh GitHub handoff packet passes", () => {
   assert.equal(packet.safety?.fixtureOnly, true);
   assert.match(packet.prBody, /Current-head live browser evidence/i);
   assert.match(packet.prBody, /release blocker doctor/i);
+  assert.match(packet.prBody, /hosted baseline preflight|baseline:preflight/i);
   assert.match(packet.prBody, new RegExp(String(releaseState.latestVerifiedCodeBaseline?.ciRunId)));
   assert.match(packet.statusComment, /public launch verdict: FAIL/i);
   assert.match(packet.issueBody, /Acceptance Criteria/);

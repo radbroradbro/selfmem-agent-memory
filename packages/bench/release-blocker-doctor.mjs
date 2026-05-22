@@ -25,6 +25,8 @@ const requiredFiles = {
   issueDraft: "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md",
   githubBlocked: "github-issue-create-blocked.md",
   claudeBlocked: "claude-pr5-review-blocked.md",
+  hostedBaselinePreflight: "hosted-baseline-preflight-evidence.md",
+  hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
   releaseHandoff: "../../docs/RELEASE_HANDOFF.md",
 };
 
@@ -69,6 +71,9 @@ assert.doesNotMatch(remote, /(ghp_|github_pat_|[?&]token=)/);
 const live = process.argv.includes("--live");
 const claude = inspectCommand("claude", ["--version"]);
 const gh = inspectCommand("gh", ["auth", "status"]);
+const hostedBaselinePreflight = JSON.parse(run("node", ["packages/bench/hosted-baseline-preflight.mjs"]).stdout);
+assert.equal(hostedBaselinePreflight.callsHostedProvider, false);
+assert.equal(hostedBaselinePreflight.publicBenchmarkClaimsAllowed, false);
 
 const blockerReport = [
   {
@@ -98,8 +103,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "production-readiness.md",
-    nextAction: "Run a fresh metrics-only hosted Supermemory baseline before making head-to-head benchmark claims.",
+    evidence: "hosted-baseline-preflight-evidence.md",
+    nextAction: "Run `baseline:preflight` with a sanitized live result after a fresh metrics-only hosted Supermemory baseline.",
   },
 ];
 
@@ -141,6 +146,11 @@ console.log(
         releaseStateConservative: true,
         requiredEvidenceFilesPresent: true,
         remoteHasNoToken: true,
+        hostedBaselinePreflight: {
+          ok: hostedBaselinePreflight.ok,
+          callsHostedProvider: hostedBaselinePreflight.callsHostedProvider,
+          benchmarkClaimsAllowed: hostedBaselinePreflight.benchmarkClaimsAllowed,
+        },
         claudeCommand: claude,
         githubCli: gh,
       },
@@ -148,6 +158,7 @@ console.log(
         "claude /login",
         "npm exec --yes pnpm@10.23.0 -- release:check",
         "npm exec --yes pnpm@10.23.0 -- smoke",
+        "npm exec --yes pnpm@10.23.0 -- baseline:preflight",
         "Copy reviews/overnight-20260522/pr-body-update-draft.md into PR #5",
         "Create an issue from reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md",
       ],

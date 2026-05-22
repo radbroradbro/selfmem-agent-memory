@@ -17,7 +17,7 @@ complete or publish a public live update.
 
 Machine-readable follow-up: `goal:audit` now runs
 `packages/bench/goal-completion-audit.mjs` and returns `goalComplete: false`,
-`mayCallUpdateGoalComplete: false`, 10 proven requirements, 5 blocked
+`mayCallUpdateGoalComplete: false`, 11 proven requirements, 5 blocked
 requirements, and 1 incomplete requirement. The release gate requires this
 audit so future agents cannot treat green CI as native-goal completion.
 
@@ -119,6 +119,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Public launch messaging | `reviews/overnight-20260522/public-live-update-draft.md`, `dummy-brain-demo-storyboard.md`, Gemini copy review | Proven as draft only |
 | Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md`, `reviews/overnight-20260522/gemini-release-handoff-review.md` | Proven locally as a public-safe manual path for PR body update, blocker issue creation, blocked reviewer route, visibility approval, and one-agent canary rollout; Gemini focused review returned `CLEAN` |
 | GitHub handoff packet | `packages/bench/github-handoff-packet.mjs`, `release:handoff`, `github-handoff-packet-evidence.md`, Gemini review | Proven locally and in CI runs `26308475033` and `26308588261` as a generated manual GitHub packet for PR body, status comment, blocker issue, labels, and manual steps; writes no files and keeps production readiness false |
+| Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `baseline:preflight`, `hosted-baseline-preflight-evidence.md`, Gemini review | Proven locally as an offline metrics-only contract that calls no hosted provider by default, prints no credential values, forbids raw memory/transcript output, and keeps benchmark claims blocked until a fresh hosted baseline, matched RecallWeave run, RecallWeave win, and two reviewer approvals exist |
 | Goal completion audit gate | `packages/bench/goal-completion-audit.mjs`, `goal:audit`, `goal-completion-audit-evidence.md`, Gemini review | Proven locally and in CI run `26308994908` as a machine-readable requirement audit that keeps `goalComplete: false` while reviewer, GitHub, human approval, hosted baseline, and real rollout requirements remain unresolved |
 | PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment; retry after `13cbe8d` also returned 403 |
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue; retry after `13cbe8d` also returned 403 |
@@ -171,8 +172,9 @@ audit so future agents cannot treat green CI as native-goal completion.
    memory materialize with backup. The graph now uses a dynamic layout and
    fixture-safe navigation controls; real-container clustering and pagination
    remain future work.
-6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
-   valid, metrics-only baseline is run.
+6. Hosted Supermemory benchmark claims remain out of scope until the hosted
+   baseline preflight accepts a fresh, valid, metrics-only result and the
+   matched RecallWeave run receives reviewer approval.
 
 ## Next Human Decision
 

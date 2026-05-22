@@ -90,6 +90,9 @@ Retry note:
   `goal:audit`; it reports `goalComplete: false` and blocks any native goal
   completion claim until reviewer, GitHub, human approval, hosted-baseline, and
   real-rollout requirements are resolved.
+- A hosted baseline preflight is now available through `baseline:preflight`;
+  it calls no hosted provider by default, keeps benchmark claims blocked, and
+  defines the metrics-only contract for a later live Supermemory baseline.
 - GitHub Actions CI run `26308475033` passed on `6a33e62`, the GitHub handoff
   packet gate commit.
 - GitHub Actions CI run `26308588261` passed on `8efe4d0`, the dynamic handoff
@@ -110,6 +113,9 @@ Retry note:
 - Adds a clean consumer smoke that copies a public-style checkout and proves updater help, update smoke, Brain UI smoke, Brain UI interaction smoke, local audit, compaction audit, and package dry-run from that copy.
 - Adds a metrics-only local-session compaction audit path for private Codex, Claude, Hermes, and OpenClaw exports without printing candidate memory text.
 - Adds the May 2026 model/autoresearch matrix with Voyage, Gemini, NVIDIA NIM challenger arms, an Apple Silicon local default using Qwen3 0.6B through Hugging Face/llama.cpp/Metal, and query expansion disabled until a matched canary proves it helps.
+- Adds a hosted baseline preflight so a future Supermemory comparison must be
+  explicit, metrics-only, no-raw-text, and reviewer-gated before any public
+  score claim.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
 - Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and run a one-agent canary with `selfmem_update`.
 - Adds a generated GitHub handoff packet so blocked GitHub write routes have one audited source for PR body, status comment, blocker issue, labels, and manual GitHub steps.
@@ -129,6 +135,8 @@ Latest local verification includes the release handoff gate slice.
 - Local `node packages/bench/release-readiness-check.mjs`: passed.
 - Local `node packages/bench/github-handoff-packet.mjs`: passed.
 - Local `node packages/bench/goal-completion-audit.mjs`: passed.
+- Local `node packages/bench/hosted-baseline-preflight.mjs`: passed with
+  `callsHostedProvider: false` and `benchmarkClaimsAllowed: false`.
 - Local `node packages/bench/session-compaction-local-audit.mjs --strict`: passed.
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
@@ -178,8 +186,11 @@ Latest local verification includes the release handoff gate slice.
   `writesRealFiles: false`, `privateLeakCount: 0`, and `hasSecretPattern:
   false`.
 - Local goal completion audit evidence: machine-readable requirement matrix
-  with `goalComplete: false`, 10 proven requirements, 5 blocked requirements,
+  with `goalComplete: false`, 11 proven requirements, 5 blocked requirements,
   and 1 incomplete requirement.
+- Local hosted baseline preflight evidence: offline metrics-only contract,
+  no hosted provider call by default, hosted write-back disabled, raw memory
+  output forbidden, and public benchmark claims still blocked.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6`, captured a 1280 by 1223 screenshot, showed Nucleus, wiki/vault
   sync, Model Matrix, Context Preview, Release Readiness, Compaction Audit,
@@ -230,6 +241,8 @@ Latest local verification includes the release handoff gate slice.
 - Hosted Supermemory is documented as read-through history only. Hosted write-back is not enabled.
 - Provider credentials are environment-only. The public repo includes placeholders only.
 - Public benchmark claims stay blocked unless RecallWeave beats a matched source-locked canary with the same dataset slice, query set, judge, answer model, scoring code, privacy scan, and reviewer sign-off.
+- Hosted baseline preflight must accept a fresh metrics-only hosted baseline
+  result before any comparison language becomes eligible for review.
 - Real session-history compaction remains local-only and out of git.
 
 ## Key Evidence Files
@@ -265,6 +278,8 @@ Latest local verification includes the release handoff gate slice.
 - `reviews/overnight-20260522/gemini-brain-ui-release-readiness-review.md`
 - `reviews/overnight-20260522/github-handoff-packet-evidence.md`
 - `reviews/overnight-20260522/gemini-github-handoff-packet-review.md`
+- `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`
+- `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md`
 - `reviews/overnight-20260522/session-compaction-local-audit-evidence.md`
 - `packages/bench/release-readiness-check.mjs`
 ```

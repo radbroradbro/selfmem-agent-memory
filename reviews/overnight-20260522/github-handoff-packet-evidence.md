@@ -18,6 +18,8 @@ steps without reconstructing the release state from scattered notes.
 - Updated `packages/bench/release-readiness-check.mjs` so the release gate now
   requires the handoff packet script, evidence, Gemini review, package script,
   release-state surface, and a fresh packet run.
+- Updated the packet so the status comment points maintainers to
+  `baseline:preflight` before any hosted Supermemory comparison claim.
 
 ## Fresh Blocked Routes
 
@@ -38,8 +40,8 @@ steps without reconstructing the release state from scattered notes.
 - PR number `5`
 - public launch blocked
 - production readiness false
-- latest verified code baseline `733c1e6`
-- CI run `26307824017`
+- latest verified code baseline `13efb18`
+- CI run `26308994908`
 - PR body from `pr-body-update-draft.md`
 - status comment text
 - blocker issue title and body
@@ -48,6 +50,7 @@ steps without reconstructing the release state from scattered notes.
 - `privateLeakCount: 0`
 - `hasSecretPattern: false`
 - fixture-only safety boundary
+- hosted baseline preflight reminder in the status comment
 
 The packet does not call GitHub, write files, include provider keys, include raw
 memories, include raw transcripts, include diagnostics zips, or expose private

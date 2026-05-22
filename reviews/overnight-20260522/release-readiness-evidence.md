@@ -123,6 +123,10 @@ Scope:
   maps the full active objective to current evidence and must keep
   `goalComplete: false` while reviewer, GitHub write-route, human approval,
   hosted-baseline, or real-rollout blockers remain unresolved.
+- Added hosted baseline preflight evidence to the release gate. The preflight
+  checks the future hosted Supermemory comparison contract, calls no hosted
+  provider by default, keeps `benchmarkClaimsAllowed: false`, and requires
+  metrics-only no-raw-text output before any comparison result can be reviewed.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -187,6 +191,9 @@ What `release:check` verifies:
   `FAIL`, `productionReady: false`, blocker count, manual actions, fixture-only
   evidence, hosted write-back disabled, zero privacy leaks, zero console
   errors, and no private/key-shaped visible text,
+- Hosted baseline preflight evidence exists and a fresh preflight reports
+  `callsHostedProvider: false`, `metricsOnly: true`,
+  `hostedBaselineFresh: false`, and `publicBenchmarkClaimsAllowed: false`,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,

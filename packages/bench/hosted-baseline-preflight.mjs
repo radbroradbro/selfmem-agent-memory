@@ -1,0 +1,288 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { isAbsolute, join, relative, resolve } from "node:path";
+import { readdir } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+
+const root = fileURLToPath(new URL("../..", import.meta.url));
+const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir());
+const resultPath = readArgValue("--result") ?? process.env.RECALLWEAVE_BASELINE_RESULT_JSON;
+const liveRequested = process.argv.includes("--live") || process.env.RECALLWEAVE_BASELINE_LIVE === "1";
+
+const secretPattern =
+  /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
+
+const releaseStatePath = join(root, reviewDir, "release-state.json");
+const productionReadinessPath = join(root, reviewDir, "production-readiness.md");
+const benchmarkPlanPath = join(root, "docs/AUTORESEARCH_BENCHMARK_PLAN.md");
+const benchmarkSummaryPath = join(root, "docs/BENCHMARK_SUMMARY.md");
+
+const releaseState = JSON.parse(readFileSync(releaseStatePath, "utf8"));
+const productionReadiness = readFileSync(productionReadinessPath, "utf8");
+const benchmarkPlan = readFileSync(benchmarkPlanPath, "utf8");
+const benchmarkSummary = readFileSync(benchmarkSummaryPath, "utf8");
+
+assert.equal(releaseState.goalStatus, "active");
+assert.equal(releaseState.publicLaunchVerdict, "FAIL");
+assert.equal(releaseState.productionReady, false);
+assert.ok(
+  releaseState.remainingBlockers?.includes("hosted-supermemory-baseline-not-current"),
+  "release-state must keep the hosted baseline blocker until a live metrics-only baseline is reviewed",
+);
+assert.match(productionReadiness, /hosted[- ]baseline|Supermemory baseline|fresh.*baseline/i);
+assert.match(benchmarkPlan, /same dataset slice/i);
+assert.match(benchmarkPlan, /same judge and answer model/i);
+assert.match(benchmarkSummary, /valid Supermemory baseline/i);
+
+const head = run("git", ["rev-parse", "HEAD"]).stdout.trim();
+const branch = run("git", ["branch", "--show-current"]).stdout.trim();
+
+const liveEnv = [
+  {
+    name: "RECALLWEAVE_BASELINE_LIVE",
+    purpose: "Must be 1 before any hosted provider call is allowed.",
+    sensitive: false,
+    required: true,
+  },
+  {
+    name: "SUPERMEMORY_API_KEY",
+    purpose: "Hosted Supermemory read/search credential. Never print the value.",
+    sensitive: true,
+    required: true,
+  },
+  {
+    name: "RECALLWEAVE_BASELINE_CONTAINER",
+    purpose: "Isolated hosted container or explicit read-only source container.",
+    sensitive: false,
+    required: true,
+  },
+  {
+    name: "RECALLWEAVE_BASELINE_QUERYSET",
+    purpose: "Source-locked query-set path or benchmark slice id.",
+    sensitive: false,
+    required: true,
+  },
+  {
+    name: "RECALLWEAVE_BASELINE_RUN_ID",
+    purpose: "Unique run id used in aggregate metric output.",
+    sensitive: false,
+    required: true,
+  },
+  {
+    name: "RECALLWEAVE_BASELINE_JUDGE_MODEL",
+    purpose: "Judge model id. Must match the RecallWeave arm.",
+    sensitive: false,
+    required: true,
+  },
+  {
+    name: "RECALLWEAVE_BASELINE_ANSWER_MODEL",
+    purpose: "Answer model id. Must match the RecallWeave arm.",
+    sensitive: false,
+    required: true,
+  },
+  {
+    name: "RECALLWEAVE_BASELINE_OUTPUT_JSON",
+    purpose: "Aggregate metrics-only output path. Do not write raw memory text.",
+    sensitive: false,
+    required: true,
+  },
+  {
+    name: "RECALLWEAVE_BASELINE_NO_RAW_TEXT",
+    purpose: "Must be 1 to confirm reports contain metrics and hashes only.",
+    sensitive: false,
+    required: true,
+  },
+];
+
+const envPresence = new Map(liveEnv.map((item) => [item.name, process.env[item.name] != null && process.env[item.name] !== ""]));
+const envStatus = liveEnv.map((item) => ({
+  name: item.name,
+  present: item.sensitive ? "redacted" : envPresence.get(item.name),
+  required: item.required,
+  sensitive: item.sensitive,
+  purpose: item.purpose,
+}));
+const missingLiveEnv = liveEnv.filter((item) => item.required && !envPresence.get(item.name)).map((item) => item.name);
+const liveInputReady = liveRequested && missingLiveEnv.length === 0 && process.env.RECALLWEAVE_BASELINE_NO_RAW_TEXT === "1";
+
+let baselineResult = null;
+if (resultPath) {
+  baselineResult = inspectBaselineResult(resultPath);
+}
+
+const hostedBaselineFresh = Boolean(baselineResult?.fresh);
+const matchedRecallWeaveRunPresent = Boolean(baselineResult?.matchedRecallWeaveRunPresent);
+const reviewerApprovalCount = Number(baselineResult?.reviewerApprovalCount ?? 0);
+const recallWeaveWin = Boolean(baselineResult?.recallWeaveWin);
+const benchmarkClaimsAllowed =
+  hostedBaselineFresh && matchedRecallWeaveRunPresent && reviewerApprovalCount >= 2 && recallWeaveWin;
+
+const report = {
+  ok: true,
+  mode: "hosted-baseline-preflight",
+  writesRealFiles: false,
+  callsHostedProvider: false,
+  metricsOnly: true,
+  reviewDir,
+  branch,
+  head,
+  releaseBlockerPresent: true,
+  liveRequested,
+  liveInputReady,
+  missingLiveEnv,
+  hostedBaselineFresh,
+  matchedRecallWeaveRunPresent,
+  reviewerApprovalCount,
+  recallWeaveWin,
+  benchmarkClaimsAllowed,
+  publicBenchmarkClaimsAllowed: benchmarkClaimsAllowed,
+  resultInspection: baselineResult,
+  envContract: envStatus,
+  safety: {
+    printsCredentialValues: false,
+    permitsHostedWriteBack: false,
+    permitsRawMemoryOutput: false,
+    permitsRawTranscriptOutput: false,
+    requiresPrivacyLeakCountZero: true,
+    requiresSameHarnessSettings: true,
+    requiresTwoReviewerApprovalsForClaims: true,
+  },
+  liveRunContract: {
+    provider: "hosted-supermemory",
+    writeMode: "read-and-measure-only",
+    hostedWriteBack: false,
+    requiredComparability: [
+      "same dataset slice",
+      "same query set",
+      "same judge model",
+      "same answer model",
+      "same scoring code",
+      "same redaction policy",
+      "same latency and cost accounting",
+    ],
+    requiredMetrics: [
+      "accuracy or benchmark-native quality",
+      "P@1",
+      "recall@5",
+      "recall@10",
+      "NDCG@10 when available",
+      "latency p50",
+      "latency p95",
+      "context tokens",
+      "ingest cost",
+      "query cost",
+      "redaction failure count",
+    ],
+    allowedOutput: "aggregate metrics, run ids, timestamps, source commits, model ids, cost, latency, and hashes only",
+    forbiddenOutput: "raw memories, raw transcripts, raw prompts, raw answers from private containers, credentials, cookies, and bearer tokens",
+  },
+  nextActions: [
+    "Choose an isolated source-locked query set or explicit read-only hosted container.",
+    "Run the hosted Supermemory baseline with RECALLWEAVE_BASELINE_LIVE=1 and RECALLWEAVE_BASELINE_NO_RAW_TEXT=1.",
+    "Store only aggregate metrics and hashes in RECALLWEAVE_BASELINE_OUTPUT_JSON.",
+    "Run this preflight again with --result pointing at that metrics-only JSON.",
+    "Run the matched RecallWeave arm with the same harness settings.",
+    "Get two independent reviewer approvals before publishing any comparison score.",
+  ],
+};
+
+const serialized = JSON.stringify(report, null, 2);
+assert.doesNotMatch(serialized, secretPattern);
+console.log(serialized);
+
+function inspectBaselineResult(inputPath) {
+  const path = isAbsolute(inputPath) ? inputPath : resolve(root, inputPath);
+  assert.ok(existsSync(path), `baseline result missing: ${inputPath}`);
+  assert.ok(statSync(path).size > 0, `baseline result empty: ${inputPath}`);
+  const result = JSON.parse(readFileSync(path, "utf8"));
+  const serializedResult = JSON.stringify(result);
+  assert.doesNotMatch(serializedResult, secretPattern, "baseline result contains a key-shaped secret");
+
+  const privacyLeakCount = Number(result.privacyLeakCount ?? result.privacy?.leakCount ?? NaN);
+  const redactionFailureCount = Number(result.redactionFailureCount ?? result.redactionFailures ?? NaN);
+  const rawMemoryIncluded = Boolean(result.rawMemoryIncluded ?? result.includesRawMemoryText ?? false);
+  const rawTranscriptIncluded = Boolean(result.rawTranscriptIncluded ?? result.includesRawTranscriptText ?? false);
+  const metricsOnly = result.metricsOnly === true;
+  const provider = String(result.provider ?? result.baselineProvider ?? "");
+  const runAt = String(result.runAt ?? result.generatedAt ?? "");
+  const ageHours = runAt ? (Date.now() - Date.parse(runAt)) / 36e5 : Number.POSITIVE_INFINITY;
+  const sameHarness = result.sameHarness === true || result.comparability?.sameHarness === true;
+  const sameDataset = result.sameDataset === true || result.comparability?.sameDataset === true;
+  const sameJudge = result.sameJudge === true || result.comparability?.sameJudge === true;
+  const sameAnswerModel = result.sameAnswerModel === true || result.comparability?.sameAnswerModel === true;
+  const hasCostLatency =
+    isFiniteNumber(result.latencyP50Ms ?? result.metrics?.latencyP50Ms) &&
+    isFiniteNumber(result.latencyP95Ms ?? result.metrics?.latencyP95Ms) &&
+    isFiniteNumber(result.queryCostUsd ?? result.cost?.queryUsd ?? 0);
+  const hasRetrievalMetric =
+    isFiniteNumber(result.pAt1 ?? result.metrics?.pAt1) ||
+    isFiniteNumber(result.recallAt5 ?? result.metrics?.recallAt5) ||
+    isFiniteNumber(result.ndcgAt10 ?? result.metrics?.ndcgAt10);
+  const fresh =
+    provider === "hosted-supermemory" &&
+    metricsOnly &&
+    privacyLeakCount === 0 &&
+    redactionFailureCount === 0 &&
+    rawMemoryIncluded === false &&
+    rawTranscriptIncluded === false &&
+    sameHarness &&
+    sameDataset &&
+    sameJudge &&
+    sameAnswerModel &&
+    hasCostLatency &&
+    hasRetrievalMetric &&
+    ageHours >= 0 &&
+    ageHours <= 168;
+
+  return {
+    path: relative(root, path).replaceAll("\\", "/"),
+    provider,
+    metricsOnly,
+    privacyLeakCount,
+    redactionFailureCount,
+    rawMemoryIncluded,
+    rawTranscriptIncluded,
+    sameHarness,
+    sameDataset,
+    sameJudge,
+    sameAnswerModel,
+    hasCostLatency,
+    hasRetrievalMetric,
+    ageHours: Number.isFinite(ageHours) ? Number(ageHours.toFixed(2)) : null,
+    fresh,
+    matchedRecallWeaveRunPresent: Boolean(result.matchedRecallWeaveRunPresent ?? result.matchedRecallWeaveRun?.present),
+    reviewerApprovalCount: Number(result.reviewerApprovalCount ?? result.reviewers?.approvedCount ?? 0),
+    recallWeaveWin: Boolean(result.recallWeaveWin ?? result.comparison?.recallWeaveWin),
+  };
+}
+
+function readArgValue(name) {
+  const index = process.argv.indexOf(name);
+  if (index === -1) return null;
+  return process.argv[index + 1] ?? null;
+}
+
+function isFiniteNumber(value) {
+  return typeof Number(value) === "number" && Number.isFinite(Number(value));
+}
+
+function run(command, args) {
+  const result = spawnSync(command, args, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
+  return result;
+}
+
+async function latestReviewDir() {
+  const entries = await readdir(join(root, "reviews"), { withFileTypes: true });
+  const dirs = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => `reviews/${entry.name}`)
+    .sort();
+  assert.ok(dirs.length > 0, "no review evidence directories found");
+  return dirs.at(-1);
+}

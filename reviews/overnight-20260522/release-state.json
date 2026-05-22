@@ -62,6 +62,7 @@
     "session-compaction-local-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
+    "hosted-baseline-preflight",
     "github-handoff-packet",
     "goal-completion-audit",
     "selfmem-update"

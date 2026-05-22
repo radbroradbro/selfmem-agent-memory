@@ -18,6 +18,8 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - Added `packages/bench/goal-completion-audit.mjs`.
 - Added `goal:audit` to `package.json`.
 - Added `goal-completion-audit` to `release-state.json` proven surfaces.
+- Added `hosted-baseline-preflight` as a proven surface while preserving the
+  hosted Supermemory baseline as a blocker.
 - Updated `packages/bench/release-readiness-check.mjs` so release readiness now
   requires the audit script, evidence file, Gemini review, package script, and
   a fresh audit run.
@@ -31,7 +33,7 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 10 proven requirements
+- 11 proven requirements
 - 5 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
@@ -44,7 +46,9 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - External blocker issue creation remains blocked by GitHub integration 403.
 - Human approval is still required for merge, public visibility, and live
   update.
-- Hosted Supermemory benchmark claims need a fresh metrics-only baseline.
+- Hosted Supermemory benchmark claims need a fresh metrics-only baseline that
+  passes `baseline:preflight` and is reviewed against a matched RecallWeave
+  run.
 - Real-container production rollout is still a canary step, not complete.
 
 ## Verification

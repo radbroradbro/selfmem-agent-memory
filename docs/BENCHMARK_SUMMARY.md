@@ -6,6 +6,17 @@ This repository includes metrics-only benchmark notes. It does not include agent
 
 RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. Quality claims require a matched, source-locked canary win before any public score, then a fuller benchmark before broad superiority language.
 
+The current branch includes a hosted baseline preflight:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:preflight
+```
+
+That command does not call hosted Supermemory by default. It keeps public
+benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
+RecallWeave run, a RecallWeave win, and two independent reviewer approvals are
+present. Reports may contain aggregate metrics and hashes only.
+
 ## Historical Controlled Local Baseline
 
 | Setup | Evidence type | P@1 | Recall@5 | Recall@10 | Redaction failures | Boundary |

@@ -26,6 +26,9 @@ The current PR adds:
 - a dry-run-first `selfmem_update` command for agent update workflows;
 - a generated GitHub handoff packet for manual GitHub updates while connector
   write routes are blocked;
+- a hosted baseline preflight for future Supermemory comparisons, offline by
+  default and blocked from public score claims until a metrics-only live result
+  is reviewed;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
@@ -84,9 +87,12 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 10 proven
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 11 proven
   requirements, 5 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
+- Hosted baseline preflight: `baseline:preflight` passes offline with
+  `callsHostedProvider: false`, `metricsOnly: true`, and
+  `benchmarkClaimsAllowed: false`
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
@@ -158,5 +164,6 @@ Latest verified head before this draft refresh:
   phrase, backup, and content-free audit log; selected local memory edits still
   start as append-only overlays before they are materialized.
 - The benchmark evidence is fixture-focused. Hosted Supermemory comparison
-  claims require a fresh, valid, metrics-only baseline.
+  claims require a fresh, valid, metrics-only baseline accepted by the hosted
+  baseline preflight and reviewed against a matched RecallWeave run.
 - The public release should stay conservative until the owner approves it.
