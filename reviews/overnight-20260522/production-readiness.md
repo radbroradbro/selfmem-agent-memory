@@ -365,7 +365,7 @@ could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
 now prove the fixture UI and release gate can pass, but public release should
 still wait for the remaining reviewer and human-approval gates.
 
-## Current Automation Recheck
+## Sandbox Automation Recheck
 
 Run time: 2026-05-22 18:02:04 EDT.
 
@@ -427,10 +427,14 @@ Still blocked in this automation environment:
 - `pnpm` is not installed globally, and `npm exec --package pnpm@10.23.0`
   cannot download it because the shell cannot resolve `registry.npmjs.org`.
 
+Controller follow-up after this sandbox recheck passed `release:github-sync`,
+`release:doctor`, and `release:check`, and GitHub Actions run `26314102283`
+passed on `3578802`. The sandbox failures above remain useful because they show
+where constrained shells can still produce false negatives.
+
 These blockers do not justify a public PASS. They reinforce the existing FAIL
-verdict until a normal networked CI/controller environment, Claude reviewer
-route, hosted-baseline run, human approval, and real one-agent canary are all
-complete.
+verdict until the Claude reviewer route, hosted-baseline run, human approval,
+and real one-agent canary are all complete.
 
 ## Readiness Grades
 
