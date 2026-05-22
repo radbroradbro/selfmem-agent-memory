@@ -6,6 +6,8 @@ systems. It defines how RecallWeave is allowed to prove or disprove that claim.
 
 ## Rule For Public Scores
 
+Use a matched source-locked canary before any public score.
+
 Do not publish a GitHub benchmark score unless RecallWeave beats the matched
 baseline on a source-locked canary.
 

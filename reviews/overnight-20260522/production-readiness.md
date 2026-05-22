@@ -59,6 +59,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Brain UI Release Readiness panel that renders the current fixture public
   launch verdict, production-ready flag, verified CI status, proven surfaces,
   blockers, manual actions, hosted write-back status, and safety counters.
+- May 2026 model/autoresearch matrix gate that keeps Apple Silicon local model
+  support, Voyage/Gemini/NVIDIA cloud challengers, and query expansion behind
+  matched canary evidence instead of public benchmark claims.
 - Session compaction fixture benchmark.
 - Dry-run-first updater wrapper and updater smoke.
 - Release-readiness gate.
@@ -200,6 +203,12 @@ Controller follow-up after that sandbox run:
   public sources, 8 implementation rules, dashboard-to-cluster zoom,
   topic/subtopic path and stale-supersession rules, zero console errors, and no
   private/key-shaped visible text.
+- May 2026 model/autoresearch matrix gate verification passed local release
+  readiness check, local full smoke, and GitHub Actions CI run `26305284384` on
+  `13cbe8d`. The gate keeps provider credentials env-only, sets the Apple
+  Silicon local default to Qwen3 0.6B through Hugging Face/llama.cpp/Metal,
+  treats Voyage/Gemini/NVIDIA as controlled benchmark arms, and leaves query
+  expansion disabled until a matched canary proves value.
 
 ## UI Evidence
 

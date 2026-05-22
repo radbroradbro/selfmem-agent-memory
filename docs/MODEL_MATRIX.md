@@ -11,7 +11,7 @@ index must be rebuilt or stored separately.
 | Cloud quality | Voyage `voyage-4-large` plus `rerank-2.5` | Strong text and code memory path with same-provider embedding and rerank. Voyage documents `rerank-2.5` as the highest-accuracy reranker and `rerank-2.5-lite` as the latency option. |
 | Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus Qwen3 Reranker 0.6B | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. |
 | Multimodal challenger | Gemini Embedding 2 or current Gemini embedding model | Useful for PDFs, images, audio, video, and storage-sensitive dimension tests. Do not make it the default until a matched canary wins. |
-| NVIDIA challenger | NVIDIA NeMo Retriever embedding plus rerank pairs | Useful for hosted latency and retrieval comparisons. Keep this as a benchmark arm until measured on RecallWeave canaries. |
+| NVIDIA NIM challenger | NVIDIA NeMo Retriever embedding plus rerank pairs | Useful for hosted latency and retrieval comparisons. Keep this as a benchmark arm until measured on RecallWeave canaries. |
 | Query expansion | Off by default | Enable only when a canary proves better quality without unacceptable latency or exact-identifier damage. |
 
 ## Apple Silicon Local Lane
@@ -74,13 +74,15 @@ diagnostics, screenshots from real agent memory, or exported user data.
 
 ## Query Expansion
 
+Query expansion is off by default.
+
 Query expansion must preserve exact identifiers and private boundaries. It may
 send the user query, but not stored memories, raw transcripts, provider keys, or
 `<private>` content.
 
 Candidate routes:
 
-- NVIDIA hosted LLM sweep for fast query rewrites.
+- NVIDIA NIM hosted LLM sweep for fast query rewrites.
 - Gemini Flash-class model for low-friction AI Studio testing.
 - Small local OpenAI-compatible model for zero-spend Apple Silicon smoke tests.
 

@@ -20,6 +20,9 @@ Scope:
   docs refresh passed CI. The permission failure remained the same.
 - Retried a top-level PR review comment after the external blocker retry docs
   commit passed CI. The permission failure remained the same.
+- Retried the PR body update and blocker issue creation after the May 2026
+  model/autoresearch matrix gate commit `13cbe8d` passed CI run `26305284384`.
+  The permission failure remained the same.
 
 Result:
 
@@ -38,6 +41,9 @@ The 2026-05-22T17:01Z PR comment and issue-creation retries used only public
 commit IDs, CI run IDs, release-state pointers, and public blocker summaries.
 The PR review comment retry used only public commit IDs, CI run IDs,
 release-state pointers, and public blocker summaries.
+The post-`13cbe8d` retry used only public commit IDs, CI run IDs, release-state
+pointers, and public blocker summaries. No provider keys, raw memories, raw
+diagnostics, or private paths were sent.
 
 Follow-up:
 

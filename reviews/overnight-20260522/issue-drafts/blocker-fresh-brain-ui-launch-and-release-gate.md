@@ -51,8 +51,14 @@ or explicitly accepted.
   navigation controls slice became required. Fixture browser evidence reports
   neighborhood scope, 3 visible fixture nodes, 9 jump options, selected-node
   visibility, zero console errors, and no private/key-shaped visible text.
+- GitHub Actions CI run `26305284384` on `13cbe8d`: passed after the May 2026
+  model/autoresearch matrix gate was added. The gate keeps Apple Silicon local
+  setup, cloud provider challengers, and query expansion behind controlled
+  canary evidence and env-only credentials.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
+- GitHub issue creation from this draft was retried after `13cbe8d` and was
+  still blocked by the same 403.
 - A top-level PR status comment was also attempted after CI run #44 and was
   blocked by the same GitHub integration permissions.
 

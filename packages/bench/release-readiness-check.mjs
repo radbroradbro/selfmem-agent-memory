@@ -19,6 +19,8 @@ const requiredFiles = [
   "docs/PRODUCTION_READINESS.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
   "docs/RELEASE_HANDOFF.md",
+  "docs/MODEL_MATRIX.md",
+  "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
   `${reviewDir}/claude-pr5-review-blocked.md`,
@@ -660,6 +662,7 @@ check("release state is conservative", () => {
     "brain-ui-research-source-lock",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
+    "model-autoresearch-matrix",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
     "selfmem-update",
@@ -718,6 +721,33 @@ check("release handoff documents blocked launch path", () => {
   assert.match(text, /selfmem_update/);
   assert.match(text, /one-agent canary/i);
   assert.match(text, /Do not paste private diagnostics/);
+});
+
+check("model matrix and autoresearch gate stay conservative", () => {
+  const modelMatrix = readFileSync(join(root, "docs/MODEL_MATRIX.md"), "utf8");
+  const autoresearchPlan = readFileSync(join(root, "docs/AUTORESEARCH_BENCHMARK_PLAN.md"), "utf8");
+  const providerMatrix = readFileSync(join(root, "configs/provider-matrix.yaml"), "utf8");
+  const budget = readFileSync(join(root, "configs/bench-budget.yaml"), "utf8");
+
+  assert.match(modelMatrix, /Qwen3-Embedding-0\.6B-GGUF/);
+  assert.match(modelMatrix, /llama\.cpp/);
+  assert.match(modelMatrix, /Apple Silicon/i);
+  assert.match(modelMatrix, /NVIDIA NIM/i);
+  assert.match(modelMatrix, /Query expansion is off by default/i);
+  assert.match(modelMatrix, /Opus 4\.7/i);
+  assert.match(modelMatrix, /Codex GPT-5\.5/i);
+  assert.match(autoresearchPlan, /matched source-locked canary/i);
+  assert.match(autoresearchPlan, /Do not publish/i);
+  assert.match(autoresearchPlan, /same dataset slice/i);
+  assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
+  assert.match(providerMatrix, /cloud-nvidia-nemotron-1b/);
+  assert.match(providerMatrix, /cloud-gemini2-cohere4pro/);
+  assert.match(providerMatrix, /defaultProvider: none/);
+  assert.match(budget, /requireCleanLocalModelRuntimeForLatency: true/);
+  assert.match(budget, /stopOnlyRecallWeaveOwnedProcesses: true/);
+  for (const text of [modelMatrix, autoresearchPlan, providerMatrix, budget]) {
+    assert.doesNotMatch(text, secretPattern);
+  }
 });
 
 check("fresh local session compaction audit passes", () => {

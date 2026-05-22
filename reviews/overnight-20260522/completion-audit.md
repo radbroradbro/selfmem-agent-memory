@@ -53,6 +53,8 @@ complete or publish a public live update.
 - Brain UI Canary Rollout follow-up: `f51346f`, CI run `26302990767` passed
 - Brain UI Research Source Lock follow-up: `e043d6b`, CI run `26304465466`
   passed
+- May 2026 model/autoresearch matrix gate follow-up: `13cbe8d`, CI run
+  `26305284384` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -87,6 +89,7 @@ complete or publish a public live update.
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research source lock evidence | `brain-ui-research-source-lock-*`, `brain-ui-research-source-lock-evidence.md`, Gemini review | Proven locally with 11 public sources, 8 implementation rules, topic/subtopic paths, stale-memory supersession, budgeted lifecycle frequency, dashboard-to-cluster zoom, collapsed technical export, zero privacy leaks, and no private/key-shaped text |
+| Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml`, CI run `26305284384` on `13cbe8d` | Proven as a conservative gate: Apple Silicon local default uses Qwen3 0.6B through Hugging Face/llama.cpp/Metal, Voyage/Gemini/NVIDIA are controlled cloud arms, query expansion is disabled by default, and public score claims require matched canary evidence plus Opus 4.7 and Codex 5.5 setup review |
 | Brain UI compaction audit evidence | `brain-ui-compaction-audit-*`, `brain-ui-compaction-audit-evidence.md`, Gemini review | Proven with sanitized metrics-only fixtures |
 | Brain UI benchmark dashboard evidence | `brain-ui-benchmark-dashboard-*`, `brain-ui-benchmark-dashboard-evidence.md`, Gemini review | Proven locally with fixture local-only compaction benchmark metrics, 5 of 5 scenarios passed, zero privacy leaks, exact-identifier accuracy 1, average noise reduction 0.307, and hosted-baseline caveat |
 | Brain UI canary rollout evidence | `brain-ui-canary-rollout-*`, `brain-ui-canary-rollout-evidence.md`, Gemini review | Proven locally with fixture one-agent rollout status, dry-run/apply/observe/rollback path, metrics to collect, public launch still blocked, zero privacy leaks, and no private/key-shaped text |
@@ -103,8 +106,8 @@ complete or publish a public live update.
 | Production-readiness review | `reviews/overnight-20260522/production-readiness.md` | Completed with verdict `FAIL` |
 | Public launch messaging | `reviews/overnight-20260522/public-live-update-draft.md`, `dummy-brain-demo-storyboard.md`, Gemini copy review | Proven as draft only |
 | Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md`, `reviews/overnight-20260522/gemini-release-handoff-review.md` | Proven locally as a public-safe manual path for PR body update, blocker issue creation, blocked reviewer route, visibility approval, and one-agent canary rollout; Gemini focused review returned `CLEAN` |
-| PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment |
-| External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
+| PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment; retry after `13cbe8d` also returned 403 |
+| External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue; retry after `13cbe8d` also returned 403 |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
 | Dynamic graph layout release gate | `packages/bench/release-readiness-check.mjs` now requires dynamic layout evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297064340` |
 | Graph navigation release gate | `packages/bench/release-readiness-check.mjs` now requires graph navigation evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297876735` |
@@ -130,10 +133,12 @@ complete or publish a public live update.
    cannot update the PR body or add a top-level PR status comment with its
    current permissions. The PR comment retry after `1074bfd` and CI run
    `26300868065` still returned 403. A PR review comment retry after
-   `8927df0` and CI run `26301206074` also returned 403.
+   `8927df0` and CI run `26301206074` also returned 403. A direct PR body
+   update retry after `13cbe8d` also returned 403.
 3. A GitHub blocker issue draft exists, but the GitHub app cannot create the
    issue with its current permissions. The issue-creation retry after
-   `1074bfd` and CI run `26300868065` still returned 403.
+   `1074bfd` and CI run `26300868065` still returned 403. An issue creation
+   retry after `13cbe8d` also returned 403.
 4. The public launch verdict remains `FAIL`. Human approval is required before
    making a live update or changing repository visibility.
 5. The Brain UI has read-only selected local-container audit and browse

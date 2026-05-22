@@ -53,6 +53,12 @@ Retry note:
   local smoke, interaction smoke, browser evidence, and Gemini focused review.
 - It was refreshed again after the Brain UI Research Source Lock slice passed
   GitHub Actions CI run `26304465466` on `e043d6b`.
+- It was refreshed again after the May 2026 model/autoresearch matrix gate
+  passed GitHub Actions CI run `26305284384` on `13cbe8d`.
+- A direct PR body update was retried after `13cbe8d` and still returned the
+  same 403.
+- A GitHub blocker issue creation retry after `13cbe8d` also returned the same
+  403.
 - A top-level PR comment retry after docs/evidence refresh commit `1074bfd` and
   CI run `26300868065` still returned the same 403.
 - A top-level PR review comment retry after docs/blocker refresh commit
@@ -69,6 +75,7 @@ Retry note:
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
 - Adds a metrics-only local-session compaction audit path for private Codex, Claude, Hermes, and OpenClaw exports without printing candidate memory text.
+- Adds the May 2026 model/autoresearch matrix with Voyage, Gemini, NVIDIA NIM challenger arms, an Apple Silicon local default using Qwen3 0.6B through Hugging Face/llama.cpp/Metal, and query expansion disabled until a matched canary proves it helps.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
 - Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and run a one-agent canary with `selfmem_update`.
 
@@ -141,6 +148,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26302442423` passed on `d0113c0`, the Brain UI Benchmark Dashboard commit.
 - GitHub Actions CI: run `26302990767` passed on `f51346f`, the Brain UI Canary Rollout commit.
 - GitHub Actions CI: run `26304465466` passed on `e043d6b`, the Brain UI Research Source Lock commit.
+- GitHub Actions CI: run `26305284384` passed on `13cbe8d`, the May 2026 model/autoresearch matrix gate commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
@@ -150,6 +158,8 @@ Latest local verification includes the release handoff gate slice.
 - No credentials, raw memories, raw transcripts, private diagnostics, private agent logs, diagnostics zips, or private screenshots are committed.
 - Public UI screenshots and DOM evidence use bundled fixture data only.
 - Hosted Supermemory is documented as read-through history only. Hosted write-back is not enabled.
+- Provider credentials are environment-only. The public repo includes placeholders only.
+- Public benchmark claims stay blocked unless RecallWeave beats a matched source-locked canary with the same dataset slice, query set, judge, answer model, scoring code, privacy scan, and reviewer sign-off.
 - Real session-history compaction remains local-only and out of git.
 
 ## Key Evidence Files
@@ -160,6 +170,8 @@ Latest local verification includes the release handoff gate slice.
 - `reviews/overnight-20260522/public-live-update-draft.md`
 - `reviews/overnight-20260522/dummy-brain-demo-storyboard.md`
 - `docs/RELEASE_HANDOFF.md`
+- `docs/MODEL_MATRIX.md`
+- `docs/AUTORESEARCH_BENCHMARK_PLAN.md`
 - `reviews/overnight-20260522/release-handoff-evidence.md`
 - `reviews/overnight-20260522/completion-audit.md`
 - `reviews/overnight-20260522/ui-evidence/README.md`

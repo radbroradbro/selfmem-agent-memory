@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `e043d6b`, run `26304465466`, success.
+  `13cbe8d`, run `26305284384`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -39,6 +39,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26302442423` on `d0113c0`: success.
 - GitHub Actions CI run `26302990767` on `f51346f`: success.
 - GitHub Actions CI run `26304465466` on `e043d6b`: success.
+- GitHub Actions CI run `26305284384` on `13cbe8d`: success.
 
 ## Shipped Overnight Slices
 
@@ -51,6 +52,7 @@ is still required before any public live update.
 | Brain UI graph and editor | `packages/brain-ui/`, `reviews/overnight-20260522/ui-evidence/README.md` |
 | Brain UI dynamic graph layout | `packages/brain-ui/src/model.js`, `reviews/overnight-20260522/brain-ui-dynamic-layout-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-dynamic-layout-review.md` |
 | Brain UI graph navigation controls | `packages/brain-ui/src/model.js`, `packages/brain-ui/src/app.js`, `reviews/overnight-20260522/brain-ui-graph-navigation-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-graph-navigation-review.md` |
+| Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
 | Brain UI draft export | `reviews/overnight-20260522/brain-ui-edit-export-evidence.md` |
@@ -189,6 +191,12 @@ Latest local verification before this summary:
   dashboard-to-cluster zoom, collapsed technical export, human-readable
   container labels, zero console errors, and no private/key-shaped visible
   text. GitHub Actions CI run `26304465466` passed on `e043d6b`.
+- May 2026 model/autoresearch matrix gate verification: local release check,
+  local full smoke, and GitHub Actions CI run `26305284384` passed on
+  `13cbe8d`. The gate records Apple Silicon local defaults, Voyage/Gemini/NVIDIA
+  challenger arms, env-only provider credentials, clean local runtime rules,
+  query expansion disabled by default, and matched-canary-only public benchmark
+  claims.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture

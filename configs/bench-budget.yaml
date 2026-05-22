@@ -56,6 +56,7 @@ providerCallPolicy:
     targetHardware: "Apple Silicon 24GB unified memory"
     requireSourceLockedModelArtifacts: true
     preferHuggingFaceOrOfficialModelCards: true
+    stopOnlyRecallWeaveOwnedProcesses: true
     staleProcessPolicy: "Stop only RecallWeave-owned model processes; block when ownership is unclear."
     quantizationPolicy: "No experimental quantization in the default lane; test quantization as a labeled canary arm only."
   queryExpansion:

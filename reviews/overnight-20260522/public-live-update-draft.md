@@ -76,11 +76,15 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Head: `e043d6b`
-- GitHub Actions: CI run `26304465466` passed
+- Head: `13cbe8d`
+- GitHub Actions: CI run `26305284384` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
 - Local release gate: `node packages/bench/release-readiness-check.mjs` passed
   in the controller run
+- Model/autoresearch matrix gate: Apple Silicon local default is Qwen3 0.6B
+  through Hugging Face/llama.cpp/Metal, Voyage/Gemini/NVIDIA are benchmark
+  challengers, query expansion is off by default, and public benchmark claims
+  require a matched source-locked canary win with reviewer sign-off
 - Dynamic graph layout evidence: 9 fixture nodes, 9 fixture edges, 2 columns,
   5 rows, zero overlaps, zero console errors, and no private/key-shaped visible
   text
