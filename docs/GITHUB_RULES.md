@@ -4,7 +4,7 @@ These are the intended repository rules for RecallWeave.
 
 ## Main Branch
 
-`main` should be protected:
+`main` is protected:
 
 - pull request required before merge,
 - one approving review required,
@@ -13,12 +13,7 @@ These are the intended repository rules for RecallWeave.
 - conversation resolution required,
 - force pushes disabled,
 - branch deletion disabled,
-- CI should pass before merge once GitHub Actions is active.
-
-Current caveat: GitHub may block branch protection on a private repository
-unless the owner has the required plan. If protection is unavailable, enforce
-these rules through CODEOWNERS, pull-request review, and maintainer discipline
-until the repo becomes public or the plan supports protected branches.
+- CI must pass before merge.
 
 ## Agent Permissions
 
@@ -56,6 +51,5 @@ Useful labels:
 
 ## Public Release
 
-The repository should stay private until the owner explicitly approves public
-visibility. Public release needs the checklist in
+The repository is public. Future release changes still need the checklist in
 `docs/PUBLIC_RELEASE_CHECKLIST.md`.
