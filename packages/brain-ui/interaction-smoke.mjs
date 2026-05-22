@@ -7,6 +7,7 @@ import {
   buildContainerHealth,
   buildEditExport,
   buildLifecyclePolicyDraft,
+  buildMemoryReviewQueue,
   buildNucleusExport,
   buildResearchLineage,
   containsPrivateLikeText,
@@ -127,6 +128,28 @@ try {
   assert.equal(clampedPolicyDraft.recall.rerankTokenBudget, 6400);
   assert.equal(clampedPolicyDraft.writes.lowConfidenceAction, "review_queue");
 
+  const reviewQueue = buildMemoryReviewQueue(fixture, {
+    "candidate:maintenance-noise": "suppress",
+    "candidate:duplicate-recallweave-decision": "merge",
+    "candidate:high-value-policy": "approve",
+  });
+  assert.equal(reviewQueue.mode, "fixture-memory-review-queue");
+  assert.equal(reviewQueue.writesRealFiles, false);
+  assert.equal(reviewQueue.summary.candidates, 3);
+  assert.equal(reviewQueue.summary.suppress, 1);
+  assert.equal(reviewQueue.summary.merge, 1);
+  assert.equal(reviewQueue.summary.approve, 1);
+  assert.equal(reviewQueue.summary.changed, 0);
+  assert.ok(reviewQueue.items.some((item) => item.reason === "maintenance_noise" && item.action === "suppress"));
+  const changedReviewQueue = buildMemoryReviewQueue(fixture, {
+    "candidate:maintenance-noise": "approve",
+    "candidate:duplicate-recallweave-decision": "unsafe",
+    "candidate:high-value-policy": `suppress ${"sm_" + "D".repeat(42)}`,
+  });
+  assert.equal(changedReviewQueue.summary.changed, 2);
+  assert.ok(changedReviewQueue.items.some((item) => item.id === "candidate:maintenance-noise" && item.action === "approve"));
+  assert.equal(changedReviewQueue.items.find((item) => item.id === "candidate:duplicate-recallweave-decision")?.action, "approve");
+
   assert.equal(vault.ok, true);
   assert.equal(vault.lint.length, 0);
   assert.ok(vault.vault.files.some((file) => file.path === "wiki/index.md"));
@@ -222,6 +245,8 @@ try {
     lineage,
     policyDraft,
     clampedPolicyDraft,
+    reviewQueue,
+    changedReviewQueue,
     vault,
     syncReport,
     missingSyncConfirmation,
@@ -250,6 +275,7 @@ try {
           "nucleus-export",
           "research-lineage",
           "lifecycle-policy-draft",
+          "review-queue-draft",
           "vault-path",
           "sync-report",
           "selected-wiki-sync-dry-run",

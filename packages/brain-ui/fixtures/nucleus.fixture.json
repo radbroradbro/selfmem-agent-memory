@@ -50,6 +50,37 @@
           "compression_checkpoint": "enabled"
         }
       }
+    },
+    "reviewQueue": {
+      "candidates": [
+        {
+          "id": "candidate:maintenance-noise",
+          "kind": "conversation",
+          "text": "The nightly watchdog ping completed without a user-facing memory change.",
+          "reason": "maintenance_noise",
+          "confidence": 0.36,
+          "sourceNodeId": "event:hermes-pre-compress",
+          "recommendedAction": "suppress"
+        },
+        {
+          "id": "candidate:duplicate-recallweave-decision",
+          "kind": "decision",
+          "text": "RecallWeave should keep local writes and hosted read-through separate.",
+          "reason": "possible_duplicate",
+          "confidence": 0.74,
+          "sourceNodeId": "doc:native-memory-plan",
+          "recommendedAction": "merge"
+        },
+        {
+          "id": "candidate:high-value-policy",
+          "kind": "procedure",
+          "text": "Run privacy tests, adapter smoke, Brain UI smoke, release readiness, and secret scans before public release.",
+          "reason": "high_value_procedure",
+          "confidence": 0.9,
+          "sourceNodeId": "decision:ui-fixture-first",
+          "recommendedAction": "approve"
+        }
+      ]
     }
   },
   "nodes": [

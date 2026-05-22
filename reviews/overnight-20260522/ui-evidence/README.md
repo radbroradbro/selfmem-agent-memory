@@ -54,6 +54,10 @@
   `brain-ui-lifecycle-policy-dom-evidence.json`.
 - Chrome DevTools captured the lifecycle policy draft panel in
   `brain-ui-lifecycle-policy.png`.
+- Chrome DevTools captured memory review queue DOM evidence in
+  `brain-ui-review-queue-dom-evidence.json`.
+- Chrome DevTools captured the memory review queue panel in
+  `brain-ui-review-queue.png`.
 
 Early Chrome DevTools MCP capture was unavailable because no debug Chrome was
 listening on port `9222`. The Container Health capture used a temporary

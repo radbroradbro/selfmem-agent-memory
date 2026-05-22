@@ -24,6 +24,8 @@ This roadmap tracks useful user-facing features without mixing them into the cur
   confirmation and redacted `.../container` path display.
 - Fixture-safe lifecycle policy preview that stages recall/write settings as a
   no-write draft export.
+- Fixture-safe memory review queue preview that stages approve, suppress, and
+  merge decisions for candidate memories as a no-write draft export.
 
 ## Brain UI
 

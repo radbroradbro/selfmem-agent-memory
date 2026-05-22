@@ -36,6 +36,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-evidence.md`,
   `${reviewDir}/gemini-brain-ui-lifecycle-policy-review.md`,
+  `${reviewDir}/brain-ui-review-queue-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-review-queue-review.md`,
   `${reviewDir}/brain-ui-edit-export-evidence.md`,
   `${reviewDir}/gemini-brain-ui-edit-export-review.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
@@ -75,6 +77,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-research-lineage.png`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
+  `${reviewDir}/ui-evidence/brain-ui-review-queue-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-review-queue.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -305,6 +309,26 @@ check("dom evidence is sane", () => {
   assert.equal(policyEvidence.evidence.draftTextHasWritesRealFilesFalse, true);
   assert.equal(policyEvidence.evidence.noRealApplyLanguage, true);
   assert.equal(policyEvidence.consoleMessages.length, 0);
+
+  const reviewQueueEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-review-queue-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(reviewQueueEvidence.ok, true);
+  assert.equal(reviewQueueEvidence.evidence.hasReviewQueueHeading, true);
+  assert.equal(reviewQueueEvidence.evidence.hasReviewControls, true);
+  assert.equal(reviewQueueEvidence.evidence.controlsHaveName, true);
+  assert.equal(reviewQueueEvidence.evidence.draftMode, "fixture-memory-review-queue");
+  assert.equal(reviewQueueEvidence.evidence.writesRealFiles, false);
+  assert.equal(reviewQueueEvidence.evidence.candidateCount, 3);
+  assert.equal(reviewQueueEvidence.evidence.changedCount, 1);
+  assert.equal(reviewQueueEvidence.evidence.maintenanceAction, "needs_more_evidence");
+  assert.equal(reviewQueueEvidence.evidence.duplicateAction, "merge");
+  assert.equal(reviewQueueEvidence.evidence.highValueAction, "approve");
+  assert.equal(reviewQueueEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(reviewQueueEvidence.evidence.draftTextHasPrivate, false);
+  assert.equal(reviewQueueEvidence.evidence.draftTextHasWritesRealFilesFalse, true);
+  assert.equal(reviewQueueEvidence.evidence.noRealApplyLanguage, true);
+  assert.equal(reviewQueueEvidence.consoleMessages.length, 0);
 
   const editEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-edit-export-dom-evidence.json"), "utf8"),

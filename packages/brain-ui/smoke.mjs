@@ -27,6 +27,7 @@ try {
   assert.match(index, /Nucleus Snapshot/);
   assert.match(index, /Research Lineage/);
   assert.match(index, /Lifecycle Policy/);
+  assert.match(index, /Review Queue/);
   assert.match(index, /Wiki Vault Preview/);
   assert.match(index, /Vault Sync Report/);
   assert.match(index, /Selected local vault sync dry run/);
@@ -38,7 +39,9 @@ try {
   assert.match(app, /buildNucleusExport/);
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /buildLifecyclePolicyDraft/);
+  assert.match(app, /buildMemoryReviewQueue/);
   assert.match(app, /renderLifecyclePolicy/);
+  assert.match(app, /renderReviewQueue/);
   assert.match(app, /renderVaultPreview/);
   assert.match(app, /renderSyncReport/);
   assert.match(app, /renderSelectedSync/);
@@ -49,6 +52,7 @@ try {
   assert.match(model, /const kind = safeExportText\(node\.kind\)/);
   assert.match(model, /function buildContainerHealth/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
+  assert.match(model, /function buildMemoryReviewQueue/);
   assert.match(model, /function mergeSelectedAuditTrail/);
   assert.match(model, /function filteredNodes/);
   assert.match(model, /function preferredVaultPath/);
@@ -57,6 +61,7 @@ try {
   assert.match(styles, /snapshot-export/);
   assert.match(styles, /research-lineage/);
   assert.match(styles, /policy-draft/);
+  assert.match(styles, /review-candidate/);
   assert.match(styles, /vault-preview/);
   assert.match(styles, /sync-summary/);
   assert.match(styles, /selected-sync/);
@@ -69,6 +74,7 @@ try {
   assert.equal(fixture.roots.container.privacyLeakCount, 0);
   assert.equal(fixture.roots.lifecyclePolicy.writes.lowConfidenceAction, "review_queue");
   assert.equal(fixture.roots.lifecyclePolicy.lifecycle.hermes.on_pre_compress, "enabled");
+  assert.equal(fixture.roots.reviewQueue.candidates.length, 3);
   assert.ok(fixture.nodes.length >= 8);
   assert.ok(fixture.edges.length >= 8);
   assert.ok(fixture.nodes.some((node) => node.kind === "retrieval_trace"));
@@ -119,6 +125,7 @@ try {
           "styles",
           "fixture",
           "lifecycle-policy",
+          "review-queue",
           "wiki-vault",
           "wiki-sync-report",
           "selected-wiki-sync-disabled",

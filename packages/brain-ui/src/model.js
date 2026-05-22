@@ -141,6 +141,44 @@ function buildLifecyclePolicyDraft(snapshot, overrides = {}) {
   return draft;
 }
 
+function buildMemoryReviewQueue(snapshot, decisions = {}) {
+  const candidates = Array.isArray(snapshot.roots?.reviewQueue?.candidates) ? snapshot.roots.reviewQueue.candidates : [];
+  const items = candidates.map((candidate) => {
+    const id = safeExportText(candidate.id);
+    const action = safeChoice(decisions[id] ?? candidate.recommendedAction, [
+      "approve",
+      "suppress",
+      "merge",
+      "needs_more_evidence",
+    ]);
+    return {
+      id,
+      kind: safeExportText(candidate.kind ?? "memory"),
+      text: safeExportText(candidate.text ?? ""),
+      reason: safeExportText(candidate.reason ?? "review_required"),
+      confidence: score(candidate.confidence),
+      sourceNodeId: safeExportText(candidate.sourceNodeId ?? ""),
+      recommendedAction: safeChoice(candidate.recommendedAction, ["approve", "suppress", "merge", "needs_more_evidence"]),
+      action,
+      changed: action !== safeChoice(candidate.recommendedAction, ["approve", "suppress", "merge", "needs_more_evidence"]),
+    };
+  });
+  return {
+    schemaVersion: 1,
+    mode: "fixture-memory-review-queue",
+    writesRealFiles: false,
+    summary: {
+      candidates: items.length,
+      approve: items.filter((item) => item.action === "approve").length,
+      suppress: items.filter((item) => item.action === "suppress").length,
+      merge: items.filter((item) => item.action === "merge").length,
+      needsMoreEvidence: items.filter((item) => item.action === "needs_more_evidence").length,
+      changed: items.filter((item) => item.changed).length,
+    },
+    items,
+  };
+}
+
 function buildEditExport(snapshot, edits) {
   const editableNodes = new Map(snapshot.nodes.filter((node) => node.editable).map((node) => [node.id, node]));
   const exportEdits = Object.entries(edits)
@@ -305,6 +343,10 @@ function numeric(value) {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
+function score(value) {
+  return Math.min(1, Math.max(0, numeric(value)));
+}
+
 function collectLineageSteps(snapshot, startId, nodesById) {
   const lineageKinds = new Set(["research_query", "hypothesis", "decision", "source"]);
   const steps = [];
@@ -344,6 +386,7 @@ export {
   buildEditExport,
   buildContainerHealth,
   buildLifecyclePolicyDraft,
+  buildMemoryReviewQueue,
   buildNucleusExport,
   buildResearchLineage,
   buildSelectedAuditTrailEntry,

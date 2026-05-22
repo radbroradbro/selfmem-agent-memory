@@ -18,7 +18,7 @@
         </div>
         <label class="search">
           <span>Search</span>
-          <input id="searchInput" type="search" value="native memory" aria-label="Search Nucleus graph" />
+          <input id="searchInput" name="searchInput" type="search" value="native memory" aria-label="Search Nucleus graph" />
         </label>
         <nav class="kind-filter" aria-label="Filter by node kind">
           <button data-filter="all" class="active">All</button>
@@ -93,20 +93,20 @@
           <div id="policySummary" class="policy-summary" aria-label="Fixture lifecycle policy summary"></div>
           <form id="policyForm" class="policy-form" aria-label="Fixture lifecycle policy draft">
             <label class="check-row">
-              <input id="policyForceRecall" type="checkbox" />
+              <input id="policyForceRecall" name="policyForceRecall" type="checkbox" />
               <span>Recall every turn</span>
             </label>
             <label class="check-row">
-              <input id="policyPreCompress" type="checkbox" />
+              <input id="policyPreCompress" name="policyPreCompress" type="checkbox" />
               <span>Store pre-compress checkpoints</span>
             </label>
             <label>
               <span>Max auto writes</span>
-              <input id="policyMaxWrites" type="number" min="0" max="200" step="1" />
+              <input id="policyMaxWrites" name="policyMaxWrites" type="number" min="0" max="200" step="1" />
             </label>
             <label>
               <span>Low-confidence writes</span>
-              <select id="policyLowConfidence" aria-label="Low-confidence write action">
+              <select id="policyLowConfidence" name="policyLowConfidence" aria-label="Low-confidence write action">
                 <option value="review_queue">Review queue</option>
                 <option value="suppress">Suppress</option>
                 <option value="write_with_low_confidence_flag">Write with flag</option>
@@ -118,11 +118,21 @@
           <pre id="policyDraft" class="policy-draft" aria-label="Fixture lifecycle policy draft export"></pre>
         </section>
         <section>
+          <h3>Review Queue</h3>
+          <div id="reviewQueueSummary" class="review-summary" aria-label="Fixture memory review queue summary"></div>
+          <form id="reviewQueueForm" class="review-queue" aria-label="Fixture memory review queue">
+            <div id="reviewQueueItems" class="review-queue-items"></div>
+            <button id="stageReviewQueue" type="submit">Stage review</button>
+            <p id="reviewQueueStatus" role="status"></p>
+          </form>
+          <pre id="reviewQueueDraft" class="policy-draft" aria-label="Fixture memory review queue draft export"></pre>
+        </section>
+        <section>
           <h3>Wiki Vault Preview</h3>
           <div class="vault-controls">
             <label>
               <span>Compiled file</span>
-              <select id="vaultFileSelect" aria-label="Compiled wiki vault file"></select>
+              <select id="vaultFileSelect" name="vaultFileSelect" aria-label="Compiled wiki vault file"></select>
             </label>
             <p id="vaultStatus" role="status"></p>
           </div>
@@ -135,10 +145,10 @@
           <form id="selectedSyncForm" class="selected-sync" aria-label="Selected local vault sync dry run">
             <label>
               <span>Local vault path</span>
-              <input id="selectedSyncPath" type="password" autocomplete="off" aria-label="Selected local vault path" />
+              <input id="selectedSyncPath" name="selectedSyncPath" type="password" autocomplete="off" aria-label="Selected local vault path" />
             </label>
             <label class="check-row">
-              <input id="selectedSyncConfirm" type="checkbox" />
+              <input id="selectedSyncConfirm" name="selectedSyncConfirm" type="checkbox" />
               <span>Read-only dry run</span>
             </label>
             <button id="runSelectedSync" type="submit">Preview sync</button>
@@ -155,10 +165,10 @@
           <form id="selectedAuditForm" class="selected-audit" aria-label="Selected local container audit">
             <label>
               <span>Local container path</span>
-              <input id="selectedAuditPath" type="password" autocomplete="off" aria-label="Selected local container path" />
+              <input id="selectedAuditPath" name="selectedAuditPath" type="password" autocomplete="off" aria-label="Selected local container path" />
             </label>
             <label class="check-row">
-              <input id="selectedAuditConfirm" type="checkbox" />
+              <input id="selectedAuditConfirm" name="selectedAuditConfirm" type="checkbox" />
               <span>Read-only</span>
             </label>
             <button id="runSelectedAudit" type="submit">Audit</button>
@@ -170,7 +180,7 @@
         </section>
         <section>
           <h3>Derived Doc Editor</h3>
-          <textarea id="docEditor" aria-label="Derived document editor"></textarea>
+          <textarea id="docEditor" name="docEditor" aria-label="Derived document editor"></textarea>
           <div class="editor-actions">
             <button id="saveEdit">Save fixture edit</button>
             <button id="resetEdit">Reset</button>

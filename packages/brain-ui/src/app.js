@@ -2,6 +2,7 @@ import {
   buildContainerHealth,
   buildEditExport,
   buildLifecyclePolicyDraft,
+  buildMemoryReviewQueue,
   buildNucleusExport,
   buildResearchLineage,
   containsPrivateLikeText,
@@ -26,6 +27,7 @@ const state = {
   selectedAuditHistory: readSelectedAuditHistory(),
   selectedSync: null,
   lifecyclePolicyDraft: null,
+  reviewQueueDraft: null,
 };
 
 const positions = {
@@ -62,6 +64,11 @@ const policyMaxWrites = document.querySelector("#policyMaxWrites");
 const policyLowConfidence = document.querySelector("#policyLowConfidence");
 const policyStatus = document.querySelector("#policyStatus");
 const policyDraft = document.querySelector("#policyDraft");
+const reviewQueueSummary = document.querySelector("#reviewQueueSummary");
+const reviewQueueForm = document.querySelector("#reviewQueueForm");
+const reviewQueueItems = document.querySelector("#reviewQueueItems");
+const reviewQueueStatus = document.querySelector("#reviewQueueStatus");
+const reviewQueueDraft = document.querySelector("#reviewQueueDraft");
 const vaultFileSelect = document.querySelector("#vaultFileSelect");
 const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
@@ -105,6 +112,7 @@ state.query = searchInput.value;
 state.selectedId = state.snapshot.nodes[0]?.id ?? null;
 state.selectedVaultPath = preferredVaultPath(state.vault?.vault);
 hydratePolicyControls();
+hydrateReviewQueue();
 
 render();
 
@@ -157,6 +165,16 @@ policyForm.addEventListener("submit", (event) => {
   });
   policyStatus.textContent = `${state.lifecyclePolicyDraft.changedFields.length} staged change${state.lifecyclePolicyDraft.changedFields.length === 1 ? "" : "s"}.`;
   renderLifecyclePolicy();
+});
+
+reviewQueueForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const decisions = Object.fromEntries(
+    [...reviewQueueForm.querySelectorAll("[data-review-action]")].map((select) => [select.dataset.reviewAction, select.value]),
+  );
+  state.reviewQueueDraft = buildMemoryReviewQueue(state.snapshot, decisions);
+  reviewQueueStatus.textContent = `${state.reviewQueueDraft.summary.changed} changed review decision${state.reviewQueueDraft.summary.changed === 1 ? "" : "s"}.`;
+  renderReviewQueue();
 });
 
 selectedSyncForm.addEventListener("submit", async (event) => {
@@ -219,6 +237,7 @@ function render() {
   renderNucleusSnapshot();
   renderResearchLineage();
   renderLifecyclePolicy();
+  renderReviewQueue();
   renderVaultControls(selected);
   renderSyncReport();
   renderSelectedSync();
@@ -349,6 +368,11 @@ function hydratePolicyControls() {
   policyStatus.textContent = "Fixture policy loaded.";
 }
 
+function hydrateReviewQueue() {
+  state.reviewQueueDraft = buildMemoryReviewQueue(state.snapshot);
+  reviewQueueStatus.textContent = "Fixture review queue loaded.";
+}
+
 function renderResearchLineage() {
   const packet = buildResearchLineage(state.snapshot);
   researchLineage.replaceChildren();
@@ -397,6 +421,48 @@ function renderLifecyclePolicy() {
     null,
     2,
   );
+}
+
+function renderReviewQueue() {
+  const draft = state.reviewQueueDraft ?? buildMemoryReviewQueue(state.snapshot);
+  reviewQueueSummary.replaceChildren(
+    stat("Candidates", draft.summary.candidates),
+    stat("Approve", draft.summary.approve),
+    stat("Suppress", draft.summary.suppress),
+    stat("Changed", draft.summary.changed),
+  );
+  reviewQueueItems.replaceChildren();
+  for (const candidate of draft.items) {
+    const article = document.createElement("article");
+    const title = document.createElement("h4");
+    const text = document.createElement("p");
+    const meta = document.createElement("small");
+    const label = document.createElement("label");
+    const labelText = document.createElement("span");
+    const select = document.createElement("select");
+    const selectId = `review-${candidate.id.replaceAll(/[^a-z0-9_-]/gi, "-")}`;
+    article.className = "review-candidate";
+    article.dataset.reason = candidate.reason;
+    title.textContent = `${candidate.kind}: ${candidate.reason.replaceAll("_", " ")}`;
+    text.textContent = candidate.text;
+    meta.textContent = `${Math.round(candidate.confidence * 100)}% confidence | source ${candidate.sourceNodeId}`;
+    labelText.textContent = "Decision";
+    label.htmlFor = selectId;
+    select.id = selectId;
+    select.name = selectId;
+    select.dataset.reviewAction = candidate.id;
+    for (const action of ["approve", "suppress", "merge", "needs_more_evidence"]) {
+      const option = document.createElement("option");
+      option.value = action;
+      option.textContent = action.replaceAll("_", " ");
+      option.selected = action === candidate.action;
+      select.append(option);
+    }
+    label.append(labelText, select);
+    article.append(title, text, meta, label);
+    reviewQueueItems.append(article);
+  }
+  reviewQueueDraft.textContent = JSON.stringify(draft, null, 2);
 }
 
 function appendLineageStep(list, label, node) {
@@ -738,4 +804,12 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
-export { buildContainerHealth, buildEditExport, buildLifecyclePolicyDraft, buildNucleusExport, buildResearchLineage, renderGraph };
+export {
+  buildContainerHealth,
+  buildEditExport,
+  buildLifecyclePolicyDraft,
+  buildMemoryReviewQueue,
+  buildNucleusExport,
+  buildResearchLineage,
+  renderGraph,
+};
