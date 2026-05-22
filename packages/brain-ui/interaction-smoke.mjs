@@ -8,6 +8,7 @@ import {
   buildEditExport,
   buildGraphNavigation,
   buildGraphLayout,
+  buildLifecycleTrail,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildModelMatrix,
@@ -206,6 +207,15 @@ try {
   assert.ok(lineageKinds.has("research_query"));
   assert.ok(lineageKinds.has("hypothesis"));
   assert.ok(lineageKinds.has("decision"));
+  const lifecycleTrail = buildLifecycleTrail(fixture, "memory:hybrid-recall");
+  assert.equal(lifecycleTrail.mode, "fixture-lifecycle-trail");
+  assert.equal(lifecycleTrail.writesRealFiles, false);
+  assert.equal(lifecycleTrail.selected.kind, "memory");
+  assert.ok(lifecycleTrail.summary.connectedRetrievalTraces >= 1);
+  assert.ok(lifecycleTrail.summary.connectedLifecycleEvents >= 1);
+  assert.ok(lifecycleTrail.trail.some((item) => item.kind === "lifecycle_event" && item.phase === "pre_compress"));
+  assert.ok(lifecycleTrail.trail.every((item) => item.distance <= 3));
+  assert.doesNotMatch(JSON.stringify(lifecycleTrail), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const sessionCompactionAudit = buildSessionCompactionAudit(sessionCompactionFixture);
   assert.equal(sessionCompactionAudit.mode, "fixture-local-session-compaction-audit");
@@ -820,6 +830,7 @@ try {
           "draft-export",
           "nucleus-export",
           "research-lineage",
+          "lifecycle-trail",
           "session-compaction-audit",
           "benchmark-dashboard",
           "canary-rollout",

@@ -54,6 +54,7 @@ try {
   assert.match(index, /Container/);
   assert.match(index, /Nucleus Snapshot/);
   assert.match(index, /Research Lineage/);
+  assert.match(index, /Lifecycle Trail/);
   assert.match(index, /Compaction Audit/);
   assert.match(index, /Benchmark Dashboard/);
   assert.match(index, /Canary Rollout/);
@@ -82,6 +83,8 @@ try {
   assert.match(app, /buildGraphLayout/);
   assert.match(app, /buildNucleusExport/);
   assert.match(app, /buildResearchLineage/);
+  assert.match(app, /buildLifecycleTrail/);
+  assert.match(app, /renderLifecycleTrail/);
   assert.match(app, /buildSessionCompactionAudit/);
   assert.match(app, /buildBenchmarkDashboard/);
   assert.match(app, /buildCanaryRollout/);
@@ -118,6 +121,7 @@ try {
   assert.match(model, /function buildCanaryRollout/);
   assert.match(model, /function buildResearchSourceLock/);
   assert.match(model, /function buildModelMatrix/);
+  assert.match(model, /function buildLifecycleTrail/);
   assert.match(model, /function buildPromptContextPreview/);
   assert.match(model, /function buildReleaseReadinessConsole/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
@@ -130,6 +134,7 @@ try {
   assert.match(styles, /container-health/);
   assert.match(styles, /snapshot-export/);
   assert.match(styles, /research-lineage/);
+  assert.match(styles, /lifecycle-trail/);
   assert.match(styles, /policy-draft/);
   assert.match(styles, /review-candidate/);
   assert.match(styles, /vault-preview/);

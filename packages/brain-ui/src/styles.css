@@ -587,6 +587,7 @@ button.active {
 .snapshot-summary,
 .sync-summary,
 .audit-summary,
+.lifecycle-trail,
 .context-summary,
 .release-summary,
 .source-lock-summary,
@@ -604,6 +605,7 @@ button.active {
 .snapshot-summary div,
 .sync-summary div,
 .audit-summary div,
+.lifecycle-trail > div,
 .context-summary div,
 .release-summary div,
 .source-lock-summary div,
@@ -626,6 +628,8 @@ button.active {
 .sync-summary span,
 .audit-summary strong,
 .audit-summary span,
+.lifecycle-trail > div strong,
+.lifecycle-trail > div span,
 .context-summary strong,
 .context-summary span,
 .release-summary strong,
@@ -650,6 +654,7 @@ button.active {
 .snapshot-summary strong,
 .sync-summary strong,
 .audit-summary strong,
+.lifecycle-trail > div strong,
 .context-summary strong,
 .release-summary strong,
 .source-lock-summary strong,
@@ -666,6 +671,7 @@ button.active {
 .snapshot-summary span,
 .sync-summary span,
 .audit-summary span,
+.lifecycle-trail > div span,
 .context-summary span,
 .release-summary span,
 .source-lock-summary span,
@@ -1178,9 +1184,65 @@ button.active {
   gap: 10px;
 }
 
-.research-lineage p {
+.research-lineage p,
+.lifecycle-trail p {
   margin: 0;
   color: var(--muted);
+}
+
+.lifecycle-trail {
+  margin-top: 0;
+}
+
+.lifecycle-card {
+  grid-column: 1 / -1;
+  border: 1px solid rgba(139, 209, 124, 0.38);
+  border-radius: 8px;
+  padding: 11px;
+  background: #10151a;
+}
+
+.lifecycle-card h4,
+.lifecycle-card p {
+  margin: 0;
+}
+
+.lifecycle-card h4 {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.lifecycle-card p {
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.lifecycle-card ol {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lifecycle-card li {
+  display: grid;
+  gap: 3px;
+  border-left: 2px solid var(--green);
+  padding-left: 8px;
+}
+
+.lifecycle-card strong {
+  color: var(--green);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lifecycle-card span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
 }
 
 .lineage-card {

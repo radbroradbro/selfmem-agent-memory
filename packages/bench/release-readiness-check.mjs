@@ -22,6 +22,7 @@ const requiredFiles = [
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   "packages/brain-ui/fixtures/model-matrix.json",
+  "packages/brain-ui/static-evidence.mjs",
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
@@ -77,6 +78,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-release-readiness-review.md`,
   `${reviewDir}/brain-ui-current-head-live-evidence.md`,
   `${reviewDir}/gemini-brain-ui-current-head-live-review.md`,
+  `${reviewDir}/brain-ui-static-evidence.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-evidence.md`,
   `${reviewDir}/gemini-brain-ui-lifecycle-policy-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-apply-evidence.md`,
@@ -209,6 +211,7 @@ const requiredScripts = [
   "smoke:hermes",
   "brain:smoke",
   "brain:smoke:built",
+  "brain:evidence:static",
   "brain:interaction",
   "brain:interaction:built",
   "container:audit:smoke",
@@ -896,6 +899,16 @@ check("model matrix and autoresearch gate stay conservative", () => {
 
 check("fresh local session compaction audit passes", () => {
   run("node", ["packages/bench/session-compaction-local-audit.mjs", "--strict"]);
+});
+
+check("fresh static brain UI evidence passes", () => {
+  const report = JSON.parse(run("node", ["packages/brain-ui/static-evidence.mjs"]).stdout);
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "fixture-brain-ui-static-evidence");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.hostedWriteBackEnabled, false);
+  assert.equal(report.privacyLeakCount, 0);
+  assert.equal(report.productionReady, false);
 });
 
 check("fresh brain UI smoke passes", () => {

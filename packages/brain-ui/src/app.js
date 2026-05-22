@@ -3,6 +3,7 @@ import {
   buildEditExport,
   buildGraphNavigation,
   buildGraphLayout,
+  buildLifecycleTrail,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildModelMatrix,
@@ -69,6 +70,7 @@ const detailKind = document.querySelector("#detailKind");
 const detailTitle = document.querySelector("#detailTitle");
 const detailFacts = document.querySelector("#detailFacts");
 const provenance = document.querySelector("#provenance");
+const lifecycleTrail = document.querySelector("#lifecycleTrail");
 const snapshotSummary = document.querySelector("#snapshotSummary");
 const snapshotExport = document.querySelector("#snapshotExport");
 const researchLineage = document.querySelector("#researchLineage");
@@ -543,6 +545,7 @@ function render() {
   renderGraph(nodes);
   renderTimeline(nodes);
   renderDetails(selected);
+  renderLifecycleTrail(selected);
   renderNucleusSnapshot();
   renderResearchLineage();
   renderResearchSourceLock();
@@ -764,6 +767,58 @@ function renderResearchLineage() {
     }
     card.append(title, meta, list);
     researchLineage.append(card);
+  }
+}
+
+function renderLifecycleTrail(node) {
+  lifecycleTrail.replaceChildren();
+  const trail = buildLifecycleTrail(state.snapshot, node?.id);
+  lifecycleTrail.dataset.mode = trail.mode;
+  lifecycleTrail.append(
+    stat("Events", trail.summary.connectedLifecycleEvents),
+    stat("Traces", trail.summary.connectedRetrievalTraces),
+    stat("Links", trail.summary.maxDistance),
+    stat("Selected", trail.selected?.kind?.replaceAll("_", " ") ?? "none"),
+  );
+  if (trail.trail.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = "No lifecycle trail is linked to this fixture node.";
+    lifecycleTrail.append(empty);
+    return;
+  }
+
+  for (const item of trail.trail) {
+    const card = document.createElement("article");
+    const title = document.createElement("h4");
+    const meta = document.createElement("p");
+    const path = document.createElement("ol");
+    card.className = "lifecycle-card";
+    card.dataset.kind = item.kind;
+    title.textContent = item.title;
+    meta.textContent = [
+      item.kind.replaceAll("_", " "),
+      item.runtime || item.query || "fixture",
+      item.phase || `${item.distance} graph link${item.distance === 1 ? "" : "s"}`,
+    ]
+      .filter(Boolean)
+      .join(" | ");
+    for (const edge of item.path) {
+      const step = document.createElement("li");
+      const strong = document.createElement("strong");
+      const span = document.createElement("span");
+      strong.textContent = edge.kind.replaceAll("_", " ");
+      span.textContent = edge.from === item.id ? edge.to : edge.from;
+      step.append(strong, span);
+      path.append(step);
+    }
+    if (item.result) {
+      const result = document.createElement("p");
+      result.textContent = item.result;
+      card.append(title, meta, result, path);
+    } else {
+      card.append(title, meta, path);
+    }
+    lifecycleTrail.append(card);
   }
 }
 
@@ -1834,6 +1889,7 @@ export {
   buildContainerHealth,
   buildEditExport,
   buildLifecyclePolicyDraft,
+  buildLifecycleTrail,
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildResearchLineage,

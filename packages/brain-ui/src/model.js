@@ -148,6 +148,84 @@ function buildResearchLineage(snapshot) {
   };
 }
 
+function buildLifecycleTrail(snapshot, selectedId) {
+  const nodes = Array.isArray(snapshot.nodes) ? snapshot.nodes : [];
+  const edges = Array.isArray(snapshot.edges) ? snapshot.edges : [];
+  const nodesById = new Map(nodes.map((node) => [node.id, node]));
+  const selected = nodesById.get(safeExportText(selectedId)) ?? nodes[0] ?? null;
+  if (!selected) {
+    return {
+      schemaVersion: snapshot.schemaVersion ?? 1,
+      mode: "fixture-lifecycle-trail",
+      writesRealFiles: false,
+      selected: null,
+      summary: { connectedLifecycleEvents: 0, connectedRetrievalTraces: 0, maxDistance: 0 },
+      trail: [],
+    };
+  }
+
+  const lifecycleKinds = new Set(["lifecycle_event", "retrieval_trace"]);
+  const visited = new Set([selected.id]);
+  const pathById = new Map([[selected.id, []]]);
+  let frontier = [selected.id];
+  for (let depth = 0; depth < 3; depth += 1) {
+    const nextFrontier = [];
+    for (const current of frontier) {
+      for (const edge of edges.filter((candidate) => candidate.from === current || candidate.to === current)) {
+        const nextId = edge.from === current ? edge.to : edge.from;
+        if (visited.has(nextId)) continue;
+        visited.add(nextId);
+        pathById.set(nextId, [
+          ...(pathById.get(current) ?? []),
+          {
+            id: safeExportText(edge.id),
+            kind: safeExportText(edge.kind),
+            from: safeExportText(edge.from),
+            to: safeExportText(edge.to),
+          },
+        ]);
+        nextFrontier.push(nextId);
+      }
+    }
+    frontier = nextFrontier;
+    if (frontier.length === 0) break;
+  }
+
+  const trail = [...visited]
+    .map((id) => nodesById.get(id))
+    .filter((node) => node && lifecycleKinds.has(node.kind))
+    .map((node) => {
+      const path = pathById.get(node.id) ?? [];
+      return {
+        id: safeExportText(node.id),
+        kind: safeExportText(node.kind),
+        title: safeExportText(node.title),
+        createdAt: safeExportText(node.createdAt ?? ""),
+        runtime: safeExportText(node.metadata?.runtime ?? ""),
+        phase: safeExportText(node.metadata?.phase ?? ""),
+        result: safeExportText(node.metadata?.result ?? ""),
+        query: safeExportText(node.metadata?.query ?? ""),
+        privacyLeakCount: numeric(node.metadata?.privacyLeakCount),
+        distance: path.length,
+        path,
+      };
+    })
+    .sort((a, b) => a.distance - b.distance || String(a.createdAt).localeCompare(String(b.createdAt)) || a.title.localeCompare(b.title));
+
+  return {
+    schemaVersion: snapshot.schemaVersion,
+    mode: "fixture-lifecycle-trail",
+    writesRealFiles: false,
+    selected: nodeSummary(selected),
+    summary: {
+      connectedLifecycleEvents: trail.filter((node) => node.kind === "lifecycle_event").length,
+      connectedRetrievalTraces: trail.filter((node) => node.kind === "retrieval_trace").length,
+      maxDistance: trail.reduce((max, node) => Math.max(max, node.distance), 0),
+    },
+    trail,
+  };
+}
+
 function buildResearchSourceLock(packet = {}) {
   const rawSerialized = JSON.stringify(packet ?? {});
   const sources = Array.isArray(packet?.sources)
@@ -1038,6 +1116,7 @@ export {
   buildContainerHealth,
   buildGraphNavigation,
   buildGraphLayout,
+  buildLifecycleTrail,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,

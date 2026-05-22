@@ -26,6 +26,7 @@
     "brain:serve": "pnpm build && node packages/brain-ui/server.mjs",
     "brain:smoke": "pnpm build && node packages/brain-ui/smoke.mjs",
     "brain:smoke:built": "node packages/brain-ui/smoke.mjs",
+    "brain:evidence:static": "node packages/brain-ui/static-evidence.mjs",
     "brain:interaction": "pnpm build && node packages/brain-ui/interaction-smoke.mjs",
     "brain:interaction:built": "node packages/brain-ui/interaction-smoke.mjs",
     "container:audit:smoke": "pnpm build && node packages/bench/local-container-audit-smoke.mjs",

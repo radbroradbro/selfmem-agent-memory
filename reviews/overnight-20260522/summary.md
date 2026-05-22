@@ -99,6 +99,8 @@ evidence are still required before any public live update.
 | Brain UI canary rollout | `reviews/overnight-20260522/brain-ui-canary-rollout-evidence.md` |
 | Brain UI context preview | `reviews/overnight-20260522/brain-ui-context-preview-evidence.md` |
 | Brain UI release readiness | `reviews/overnight-20260522/brain-ui-release-readiness-evidence.md` |
+| Brain UI lifecycle trail | `packages/brain-ui/src/model.js`, `packages/brain-ui/src/app.js`, `reviews/overnight-20260522/brain-ui-static-rerun-evidence.md` |
+| Brain UI static evidence fallback | `packages/brain-ui/static-evidence.mjs`, `reviews/overnight-20260522/brain-ui-static-evidence.md`, `reviews/overnight-20260522/brain-ui-static-rerun-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
 | Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Browser evidence gate review | `reviews/overnight-20260522/gemini-browser-evidence-gate-review.md` |
@@ -128,6 +130,9 @@ evidence are still required before any public live update.
 Latest local verification before this summary:
 
 - `npm run test`: passed, 22 tests.
+- `node packages/brain-ui/static-evidence.mjs`: passed with 9 fixture Nucleus
+  nodes, 9 graph edges, 19 required UI sections, 13 required controls, zero
+  privacy leaks, hosted write-back disabled, and `productionReady: false`.
 - `pnpm smoke`: passed.
 - `pnpm brain:interaction`: passed for the Brain UI model refactor slice.
 - `pnpm wiki:sync:smoke`: passed with 12 pre-write audit entries.
@@ -517,6 +522,13 @@ local memory contents.
 ## Residual Risks
 
 - Claude review is blocked until Claude CLI is logged in.
+- This 2026-05-22 automation rerun created branch
+  `automation/recallweave-overnight-20260522-2315` and added only the static
+  Brain UI evidence fallback. In this sandbox, server-backed Brain UI smoke,
+  interaction smoke, clean consumer smoke, GitHub live sync, and release check
+  are still blocked by `listen EPERM` on `127.0.0.1` or DNS failure for
+  GitHub. The static evidence check is a fallback signal, not a production or
+  launch gate replacement.
 - The Brain UI has read-only selected local-container audit and browse previews,
   browser-local audit history, plus write-confirmed selected vault sync apply,
   write-confirmed selected lifecycle policy apply, and write-confirmed selected
