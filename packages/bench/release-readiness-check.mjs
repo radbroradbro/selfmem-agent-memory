@@ -24,6 +24,8 @@ const requiredFiles = [
   `${reviewDir}/claude-pr5-review-blocked.md`,
   `${reviewDir}/session-compaction-evidence.md`,
   `${reviewDir}/session-compaction-benchmark-evidence.md`,
+  `${reviewDir}/session-compaction-local-audit-evidence.md`,
+  `${reviewDir}/gemini-session-compaction-local-audit-review.md`,
   `${reviewDir}/wiki-vault-evidence.md`,
   `${reviewDir}/wiki-vault-sync-evidence.md`,
   `${reviewDir}/gemini-wiki-sync-audit-log-review.md`,
@@ -143,6 +145,8 @@ const requiredScripts = [
   "compaction:smoke:built",
   "compaction:benchmark",
   "compaction:benchmark:built",
+  "compaction:local-audit",
+  "compaction:local-audit:built",
   "wiki:smoke",
   "wiki:smoke:built",
   "wiki:sync:smoke",
@@ -163,6 +167,7 @@ const textExtensions = new Set([
   ".html",
   ".js",
   ".json",
+  ".jsonl",
   ".md",
   ".mjs",
   ".py",
@@ -467,6 +472,7 @@ check("release state is conservative", () => {
     "brain-ui-dynamic-graph-layout",
     "brain-ui-graph-navigation-controls",
     "session-compaction-benchmark",
+    "session-compaction-local-audit",
     "selfmem-update",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
@@ -517,6 +523,10 @@ check("release handoff documents blocked launch path", () => {
   assert.match(text, /selfmem_update/);
   assert.match(text, /one-agent canary/i);
   assert.match(text, /Do not paste private diagnostics/);
+});
+
+check("fresh local session compaction audit passes", () => {
+  run("node", ["packages/bench/session-compaction-local-audit.mjs", "--strict"]);
 });
 
 check("fresh brain UI smoke passes", () => {

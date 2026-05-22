@@ -111,6 +111,7 @@ What `release:check` verifies:
 - required docs and review evidence files exist and are non-empty,
 - the release readiness evidence file itself exists,
 - package scripts for build, tests, smokes, and release check exist,
+- local-session compaction audit scripts and evidence exist,
 - Brain UI vault preview DOM evidence is sane,
 - Brain UI Container Health DOM evidence is sane,
 - Brain UI Local Audit Preflight DOM evidence is sane,
@@ -172,6 +173,7 @@ Verification:
 - Fresh Brain UI interaction smoke: covered by `release:check`.
 - Fresh dynamic graph layout smoke: covered by `release:check`.
 - Fresh graph navigation controls smoke: covered by `release:check`.
+- Fresh local-session compaction audit: covered by `release:check`.
 - Core package dry-run: covered by `release:check`.
 - Broadened secret-pattern scan: covered by `release:check`.
 - Broadened forbidden runtime file scan: covered by `release:check`.
@@ -245,6 +247,9 @@ Known limits:
   blocked launch path language.
 - GitHub Actions CI run `26298339106` passed on release handoff gate commit
   `aebd205`.
+- Local-session compaction audit follow-up: `release:check` now requires the
+  local audit evidence file, release-state surface, and a fresh metrics-only
+  audit run; the public secret scan includes `.jsonl` files.
 - Dynamic graph layout CI is pending until this slice is pushed. Local
   `node packages/brain-ui/smoke.mjs`,
   `node packages/brain-ui/interaction-smoke.mjs`, and

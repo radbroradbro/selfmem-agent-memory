@@ -44,6 +44,8 @@ Before a public live update or release note:
   decisions without leaking private evidence,
 - session compaction benchmark passes on fixture data with chronological output
   and zero privacy leaks,
+- local-session compaction audit passes in metrics-only mode without candidate
+  memory text,
 - multi-scenario compaction benchmark passes exact-identifier, stale/privacy,
   dedupe, and kind-coverage checks,
 - reviewer packet records which council routes actually ran.

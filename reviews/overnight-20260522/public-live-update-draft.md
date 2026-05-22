@@ -24,6 +24,8 @@ The current PR adds:
 - a dry-run-first `selfmem_update` command for agent update workflows;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
+- a metrics-only local-session compaction audit path for private Codex, Claude,
+  Hermes, and OpenClaw exports.
 
 ## Safety Boundary
 

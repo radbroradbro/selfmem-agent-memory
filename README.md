@@ -63,6 +63,8 @@ must run before making quality claims.
 - Fixture-safe session compaction benchmark for chronological durable memory
   extraction, exact identifier preservation, stale/private suppression, and
   duplicate merge behavior.
+- Metrics-only local-session compaction audit for private Codex, Claude,
+  Hermes, or OpenClaw exports without printing candidate memory text.
 - Lifecycle logs for recall, writes, compression checkpoints, provider errors,
   and privacy counts.
 - Dry-run update command for deployed agents.

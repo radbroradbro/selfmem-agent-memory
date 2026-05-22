@@ -46,6 +46,7 @@ Retry note:
 - Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, graph navigation controls, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, vault preview, and sync-report inspection.
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
+- Adds a metrics-only local-session compaction audit path for private Codex, Claude, Hermes, and OpenClaw exports without printing candidate memory text.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
 - Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and run a one-agent canary with `selfmem_update`.
 
@@ -62,6 +63,7 @@ Latest local verification includes the release handoff gate slice.
 - Local `npm run test`: 6 files, 22 tests passed.
 - Local `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
 - Local `node packages/bench/release-readiness-check.mjs`: passed.
+- Local `node packages/bench/session-compaction-local-audit.mjs --strict`: passed.
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
 - Local private-name scan: no hits.
@@ -81,7 +83,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26297064340` passed on `be47cff`, the dynamic Brain UI graph layout commit.
 - GitHub Actions CI: run `26297876735` passed on `62367a1`, the graph navigation controls commit.
 - GitHub Actions CI: run `26298339106` passed on `aebd205`, the release handoff gate commit.
-- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
+- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
 
@@ -107,5 +109,6 @@ Latest local verification includes the release handoff gate slice.
 - `reviews/overnight-20260522/gemini-brain-ui-dynamic-layout-review.md`
 - `reviews/overnight-20260522/brain-ui-graph-navigation-evidence.md`
 - `reviews/overnight-20260522/gemini-brain-ui-graph-navigation-review.md`
+- `reviews/overnight-20260522/session-compaction-local-audit-evidence.md`
 - `packages/bench/release-readiness-check.mjs`
 ```

@@ -20,6 +20,46 @@ multiple synthetic session shapes and fails if local compaction loses required
 kinds, exact identifiers, stale/privacy suppression, dedupe behavior, or minimum
 noise reduction.
 
+## Local Session Audit
+
+Use the local audit when you want to test real Codex, Claude, Hermes, or
+OpenClaw session exports without printing candidate memory text:
+
+```bash
+node packages/bench/session-compaction-local-audit.mjs \
+  --input /private/path/to/session-events.jsonl \
+  --source codex \
+  --session-id private-run-001
+```
+
+The audit is metrics-only by default. It emits:
+
+- event count,
+- redaction count,
+- output candidate count,
+- chronological status,
+- noise reduction ratio,
+- kind counts,
+- stale candidate count,
+- exact-identifier candidate count,
+- average salience,
+- candidate fingerprints.
+
+It does not emit candidate memory text, raw source text, local paths, or session
+IDs. The input path is reduced to a redacted `.../filename` label, and the
+session id is hashed.
+
+The public smoke fixture runs:
+
+```bash
+pnpm compaction:local-audit
+```
+
+That smoke uses
+`packages/bench/fixtures/session-compaction-local-audit.fixture.jsonl` and
+requires chronological output, at least two redactions, exact-identifier
+coverage, and zero privacy leaks.
+
 ## What It Measures
 
 - input event count,
@@ -74,6 +114,7 @@ Future private runs may point this same harness at local Codex or Claude session
 exports, but those outputs must stay out of git unless reduced to:
 
 - aggregate metrics,
+- candidate fingerprints without text,
 - synthetic examples,
 - redacted fixture text,
 - methodology notes.

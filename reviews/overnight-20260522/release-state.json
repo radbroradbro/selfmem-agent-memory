@@ -50,6 +50,7 @@
     "brain-ui-dynamic-graph-layout",
     "brain-ui-graph-navigation-controls",
     "session-compaction-benchmark",
+    "session-compaction-local-audit",
     "selfmem-update"
   ],
   "remainingBlockers": [

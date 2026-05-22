@@ -74,6 +74,7 @@ is still required before any public live update.
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `reviews/overnight-20260522/local-container-audit-evidence.md` |
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
+| Local-session compaction audit | `packages/bench/session-compaction-local-audit.mjs`, `reviews/overnight-20260522/session-compaction-local-audit-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
 | Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md` |
 | Conservative release-state manifest | `reviews/overnight-20260522/release-state.json` |
@@ -103,6 +104,9 @@ Latest local verification before this summary:
 - Private-name scan: no hits.
 - Release handoff follow-up: `docs/RELEASE_HANDOFF.md` added and required by
   `release:check`.
+- Local-session compaction audit: `pnpm compaction:local-audit:built` passed
+  in metrics-only mode with 6 input events, 2 redactions, 4 candidate
+  fingerprints, chronological output, and zero privacy leaks.
 - GitHub Actions CI: success on the latest inspected baseline, `aebd205`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
@@ -129,6 +133,9 @@ Latest local verification before this summary:
 - Release handoff verification: local release gate, full smoke, tests,
   private-name scan, Gemini review, and GitHub Actions CI run `26298339106`
   passed on `aebd205`.
+- Local-session compaction audit verification: release gate now requires
+  `session-compaction-local-audit-evidence.md`, the local audit script, and
+  the `session-compaction-local-audit` release-state surface.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -233,6 +240,7 @@ local memory contents.
 - Gemini public live-update copy review: `CLEAN`.
 - Gemini completion-audit review: first `BLOCK` because the audit was untracked
   and absent from the diff, then final `CLEAN` after staging.
+- Gemini session compaction local audit review: `CLEAN`.
 - Gemini blocker-permission refresh review: `CLEAN`.
 - Gemini release-state guard review: `CLEAN`.
 - Gemini release-handoff review: `CLEAN`.
@@ -320,7 +328,8 @@ local memory contents.
   materialize path.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
-  reusable tooling.
+  reusable tooling. The local-session compaction audit now provides that
+  metrics-only path without candidate text.
 - Benchmark comparison against hosted Supermemory is not a release claim. The
   current public docs correctly require a fresh valid baseline before quality
   marketing.
