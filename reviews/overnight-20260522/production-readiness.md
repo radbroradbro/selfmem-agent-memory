@@ -156,6 +156,8 @@ Controller follow-up after that sandbox run:
   text.
 - GitHub Actions CI run `26300784883` on Brain UI Context Preview commit
   `0ec4396` passed Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26301888111` on Brain UI Release Readiness commit
+  `8c26de7` passed Test, Full smoke, and Release readiness check.
 - Brain UI Context Preview local verification passed fresh Brain UI smoke and
   interaction smoke. Browser evidence reports 642 of 900 fixture context tokens
   used, 258 tokens remaining, 3 selected memories, 3 context sections, 2
@@ -165,7 +167,8 @@ Controller follow-up after that sandbox run:
   and interaction smoke. Browser evidence reports public launch verdict `FAIL`,
   `productionReady: false`, 15 proven surfaces, 5 remaining blockers, 5 manual
   actions, fixture-only evidence, hosted write-back disabled, zero privacy
-  leaks, zero console errors, and no private/key-shaped visible text.
+  leaks, zero console errors, and no private/key-shaped visible text. GitHub
+  Actions CI run `26301888111` passed on `8c26de7`.
 
 ## UI Evidence
 

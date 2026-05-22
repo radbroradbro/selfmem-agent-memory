@@ -276,7 +276,5 @@ Known limits:
   commit `fb466db`.
 - GitHub Actions CI run `26300784883` passed on Brain UI Context Preview
   commit `0ec4396`.
-- Brain UI Release Readiness CI is pending until this slice is pushed. Local
-  `node packages/brain-ui/smoke.mjs`,
-  `node packages/brain-ui/interaction-smoke.mjs`, and
-  `node packages/bench/release-readiness-check.mjs` are the current evidence.
+- GitHub Actions CI run `26301888111` passed on Brain UI Release Readiness
+  commit `8c26de7`, including Test, Full smoke, and Release readiness check.
