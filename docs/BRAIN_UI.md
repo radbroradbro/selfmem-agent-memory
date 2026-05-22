@@ -17,6 +17,7 @@ The UI should expose:
 - lifecycle policy draft export,
 - selected lifecycle policy apply with explicit confirmation,
 - memory review queue draft export,
+- selected memory review queue apply with explicit confirmation,
 - sanitized Nucleus snapshot export,
 - derived docs and wiki pages,
 - compiled wiki/vault files,
@@ -67,11 +68,12 @@ Required visual review path:
 12. lifecycle policy preview,
 13. selected lifecycle policy apply confirmation,
 14. memory review queue preview,
-15. compiled wiki/vault preview,
-16. fixture vault sync report with conflict handling,
-17. selected local vault sync dry-run,
-18. selected local vault sync apply confirmation,
-19. fixture local-container audit preflight.
+15. selected memory review queue apply confirmation,
+16. compiled wiki/vault preview,
+17. fixture vault sync report with conflict handling,
+18. selected local vault sync dry-run,
+19. selected local vault sync apply confirmation,
+20. fixture local-container audit preflight.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -108,6 +110,17 @@ The Review Queue panel stages candidate memory decisions as a fixture draft
 export. It exposes approve, suppress, merge, and needs-more-evidence choices
 for low-confidence or noisy candidate memories and marks `writesRealFiles:
 false`.
+
+Selected memory review queue apply is disabled unless
+`RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY=1` is set. When enabled, it requires
+a write checkbox and the exact confirmation phrase `APPLY LOCAL REVIEW QUEUE`.
+It writes only content-free decision records to
+`.recallweave/review-decisions.jsonl` plus a content-free
+`.recallweave/review-queue-audit.jsonl` audit line under the selected local
+container root. It rejects review payloads containing `<private>` spans or
+key-shaped text, does not write candidate memory text, clears typed paths after
+submit, and returns only a redacted `.../container` label, relative file paths,
+summary counts, and an audit hash.
 
 The Local Audit Preflight panel uses a temporary fixture container and the
 read-only audit utility. It displays file counts, redaction counts, and health
@@ -155,7 +168,6 @@ Before connecting real local containers, the UI needs:
 - selected local-container browse preview,
 - write confirmation for derived docs,
 - wiki lint before save,
-- memory review queue apply path with explicit confirmation,
 - Nucleus snapshot export against a selected redacted local container,
 - screenshot/recording safety guardrails,
 - accessibility review.

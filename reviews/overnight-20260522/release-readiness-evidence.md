@@ -55,6 +55,12 @@ Scope:
 - Added Brain UI memory review queue evidence to the release gate so noisy,
   duplicate, and high-value candidate decisions are staged as fixture-only
   `writesRealFiles: false` draft exports.
+- Added Brain UI memory review queue apply coverage so selected local review
+  applies remain disabled by default, require
+  `RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY`, require the exact
+  `APPLY LOCAL REVIEW QUEUE` phrase, reject private/key-shaped review payloads,
+  write only selected local decision metadata plus a content-free audit log,
+  and return only redacted root labels plus relative paths and counts.
 - Added `release-state.json` to the release gate so the current packet must
   explicitly remain conservative: active goal, `FAIL` launch verdict, green
   verified code baseline, fixture-only safety boundary, unresolved blockers,
@@ -91,6 +97,8 @@ What `release:check` verifies:
 - Brain UI selected lifecycle policy apply evidence exists and is covered by a
   fresh interaction smoke,
 - Brain UI memory review queue DOM evidence is sane,
+- Brain UI selected memory review queue apply evidence exists and is covered by
+  a fresh interaction smoke,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,
@@ -159,7 +167,9 @@ Cold review response:
   vault path selection, selected local-container browse, selected vault sync
   dry-run, write-confirmed selected vault sync apply, write-confirmed selected
   lifecycle policy apply, private/key-shaped policy rejection, dry-run sync
-  reporting, audit-log write intent coverage, and public-safe serialization.
+  reporting, write-confirmed selected review queue apply, private/key-shaped
+  review rejection, audit-log write intent coverage, and public-safe
+  serialization.
 
 Known limits:
 

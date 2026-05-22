@@ -22,11 +22,13 @@ const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.j
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
 const selectedPolicyRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-policy-"));
+const selectedReviewRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-review-"));
 const server = createBrainUiServer({
   enableLocalAudit: true,
   enableLocalBrowse: true,
   enableLocalApply: true,
   enablePolicyApply: true,
+  enableReviewApply: true,
 });
 
 await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
@@ -215,6 +217,62 @@ try {
   assert.equal(changedReviewQueue.summary.changed, 2);
   assert.ok(changedReviewQueue.items.some((item) => item.id === "candidate:maintenance-noise" && item.action === "approve"));
   assert.equal(changedReviewQueue.items.find((item) => item.id === "candidate:duplicate-recallweave-decision")?.action, "approve");
+  const missingReviewApplyConfirmation = await postJson(`${base}/review-queue/apply`, {
+    rootDir: selectedReviewRoot,
+    reviewQueue,
+    confirmWrite: false,
+    confirmationPhrase: "APPLY LOCAL REVIEW QUEUE",
+  });
+  assert.equal(missingReviewApplyConfirmation.ok, false);
+  assert.equal(missingReviewApplyConfirmation.code, "write_confirmation_required");
+  const unsafeReviewApply = await postJson(`${base}/review-queue/apply`, {
+    rootDir: selectedReviewRoot,
+    reviewQueue: {
+      ...reviewQueue,
+      items: [
+        ...reviewQueue.items,
+        {
+          id: "candidate:unsafe",
+          action: "suppress",
+          text: `public ${"sm_" + "G".repeat(42)}`,
+        },
+      ],
+    },
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL REVIEW QUEUE",
+  });
+  assert.equal(unsafeReviewApply.ok, false);
+  assert.equal(unsafeReviewApply.code, "review_queue_contains_private_or_key_shaped_text");
+  const selectedReviewApply = await postJson(`${base}/review-queue/apply`, {
+    rootDir: selectedReviewRoot,
+    reviewQueue,
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL REVIEW QUEUE",
+  });
+  assert.equal(selectedReviewApply.ok, true);
+  assert.equal(selectedReviewApply.mode, "selected-review-queue-apply");
+  assert.equal(selectedReviewApply.writesRealFiles, true);
+  assert.equal(selectedReviewApply.selection.rootPathRedacted, true);
+  assert.match(selectedReviewApply.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedReviewApply.selection.rootDisplay.includes(selectedReviewRoot), false);
+  assert.equal(selectedReviewApply.report.rootDir.includes(selectedReviewRoot), false);
+  assert.equal(selectedReviewApply.report.decisionsPath, ".recallweave/review-decisions.jsonl");
+  assert.equal(selectedReviewApply.report.auditLog.entriesWritten, 1);
+  assert.equal(selectedReviewApply.report.summary.decisions, 3);
+  assert.equal(selectedReviewApply.report.summary.approve, 1);
+  assert.equal(selectedReviewApply.report.summary.suppress, 1);
+  assert.equal(selectedReviewApply.report.summary.merge, 1);
+  assert.equal(selectedReviewApply.auditTrail.event, "review_queue_apply");
+  assert.equal(selectedReviewApply.auditTrail.writesRealFiles, true);
+  const reviewDecisionLog = await readFile(join(selectedReviewRoot, ".recallweave/review-decisions.jsonl"), "utf8");
+  const reviewAuditLog = await readFile(join(selectedReviewRoot, ".recallweave/review-queue-audit.jsonl"), "utf8");
+  assert.match(reviewDecisionLog, /memory_review_decision/);
+  assert.match(reviewAuditLog, /review_queue_apply/);
+  assert.equal(reviewDecisionLog.includes(selectedReviewRoot), false);
+  assert.equal(reviewAuditLog.includes(selectedReviewRoot), false);
+  assert.equal(reviewDecisionLog.includes("The nightly watchdog ping completed"), false, "review apply should not write candidate text");
+  assert.equal(reviewDecisionLog.includes("RecallWeave should keep local writes"), false, "review apply should not write candidate text");
+  assert.equal(reviewDecisionLog.includes("Run privacy tests"), false, "review apply should not write candidate text");
 
   assert.equal(vault.ok, true);
   assert.equal(vault.lint.length, 0);
@@ -375,6 +433,11 @@ try {
     lifecycleAuditLog,
     reviewQueue,
     changedReviewQueue,
+    missingReviewApplyConfirmation,
+    unsafeReviewApply,
+    selectedReviewApply,
+    reviewDecisionLog,
+    reviewAuditLog,
     vault,
     syncReport,
     missingSyncConfirmation,
@@ -393,6 +456,7 @@ try {
   assert.equal(serialized.includes(selectedRoot), false, "selected local root path must stay redacted");
   assert.equal(serialized.includes(selectedSyncRoot), false, "selected sync root path must stay redacted");
   assert.equal(serialized.includes(selectedSyncRoot), false, "selected wiki sync root path must stay redacted");
+  assert.equal(serialized.includes(selectedReviewRoot), false, "selected review root path must stay redacted");
   assert.equal(serialized.includes("/Users/private/profile"), false, "dirty prior history paths must be collapsed");
 
   console.log(
@@ -411,6 +475,7 @@ try {
           "lifecycle-policy-draft",
           "selected-lifecycle-policy-apply",
           "review-queue-draft",
+          "selected-review-queue-apply",
           "vault-path",
           "sync-report",
           "selected-wiki-sync-dry-run",
@@ -431,6 +496,7 @@ try {
   await rm(selectedRoot, { recursive: true, force: true });
   await rm(selectedSyncRoot, { recursive: true, force: true });
   await rm(selectedPolicyRoot, { recursive: true, force: true });
+  await rm(selectedReviewRoot, { recursive: true, force: true });
 }
 
 async function json(url) {

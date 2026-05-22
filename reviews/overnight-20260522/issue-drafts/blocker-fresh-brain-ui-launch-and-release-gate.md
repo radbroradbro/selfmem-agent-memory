@@ -55,7 +55,7 @@ local-container mode, and a public release note that does not overclaim.
   Nucleus snapshot preview, research lineage, wiki/vault preview, sync conflict
   view, selected local-container browse, selected vault sync dry-run, selected
   vault sync apply, lifecycle policy preview, selected lifecycle policy apply,
-  and memory review queue preview.
+  memory review queue preview, and selected review queue apply.
 - `npm run release:check` passes without special private machine state or CI
   passes the same release-readiness gate.
 - Reviewer packet records Claude and Gemini as either completed with verdicts or

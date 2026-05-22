@@ -43,6 +43,7 @@
     "brain-ui-lifecycle-policy-preview",
     "brain-ui-lifecycle-policy-apply",
     "brain-ui-memory-review-queue",
+    "brain-ui-memory-review-queue-apply",
     "session-compaction-benchmark",
     "selfmem-update"
   ],

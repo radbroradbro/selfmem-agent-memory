@@ -144,6 +144,24 @@
             <p id="reviewQueueStatus" role="status"></p>
           </form>
           <pre id="reviewQueueDraft" class="policy-draft" aria-label="Fixture memory review queue draft export"></pre>
+          <form id="reviewQueueApplyForm" class="review-queue review-apply-form" aria-label="Selected local review queue apply">
+            <label>
+              <span>Review container path</span>
+              <input id="reviewQueueApplyPath" name="reviewQueueApplyPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local review queue path" />
+            </label>
+            <label class="check-row">
+              <input id="reviewQueueApplyConfirm" name="reviewQueueApplyConfirm" type="checkbox" />
+              <span>Write review decisions</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="reviewQueueApplyPhrase" name="reviewQueueApplyPhrase" type="text" autocomplete="off" aria-label="Selected local review queue confirmation phrase" />
+            </label>
+            <button id="applyReviewQueue" type="submit">Apply review</button>
+            <p id="reviewQueueApplyStatus" role="status"></p>
+            <div id="reviewQueueApplySummary" class="review-summary" aria-label="Selected local review queue apply summary"></div>
+            <ol id="reviewQueueApplyActions" class="audit-reasons" aria-label="Selected local review queue apply audit trail"></ol>
+          </form>
         </section>
         <section>
           <h3>Wiki Vault Preview</h3>

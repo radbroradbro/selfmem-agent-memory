@@ -30,6 +30,7 @@ try {
   assert.match(index, /Lifecycle Policy/);
   assert.match(index, /Selected local lifecycle policy apply/);
   assert.match(index, /Review Queue/);
+  assert.match(index, /Selected local review queue apply/);
   assert.match(index, /Wiki Vault Preview/);
   assert.match(index, /Vault Sync Report/);
   assert.match(index, /Selected local vault sync dry run/);
@@ -47,6 +48,7 @@ try {
   assert.match(app, /renderLifecyclePolicy/);
   assert.match(app, /renderLifecyclePolicyApply/);
   assert.match(app, /renderReviewQueue/);
+  assert.match(app, /renderReviewQueueApply/);
   assert.match(app, /renderVaultPreview/);
   assert.match(app, /renderSyncReport/);
   assert.match(app, /renderSelectedSync/);
@@ -147,6 +149,14 @@ try {
   assert.equal(disabledPolicyApply.status, 403);
   assert.equal(disabledPolicyApply.body.ok, false);
   assert.equal(disabledPolicyApply.body.code, "lifecycle_policy_apply_disabled");
+  const disabledReviewApply = await postJson(`${base}/review-queue/apply`, {
+    rootDir: "/tmp/recallweave-disabled-review-apply-fixture",
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL REVIEW QUEUE",
+  });
+  assert.equal(disabledReviewApply.status, 403);
+  assert.equal(disabledReviewApply.body.ok, false);
+  assert.equal(disabledReviewApply.body.code, "review_queue_apply_disabled");
 
   const serialized = JSON.stringify({
     fixture,
@@ -159,6 +169,7 @@ try {
     disabledSelectedSync,
     disabledSelectedSyncApply,
     disabledPolicyApply,
+    disabledReviewApply,
   });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
@@ -178,6 +189,7 @@ try {
           "selected-wiki-sync-disabled",
           "selected-wiki-sync-apply-disabled",
           "lifecycle-policy-apply-disabled",
+          "review-queue-apply-disabled",
           "local-container-audit",
           "local-container-browse",
           "selected-local-browse-disabled",

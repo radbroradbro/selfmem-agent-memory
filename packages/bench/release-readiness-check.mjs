@@ -40,6 +40,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-lifecycle-policy-apply-review.md`,
   `${reviewDir}/brain-ui-review-queue-evidence.md`,
   `${reviewDir}/gemini-brain-ui-review-queue-review.md`,
+  `${reviewDir}/brain-ui-review-queue-apply-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-review-queue-apply-review.md`,
   `${reviewDir}/brain-ui-edit-export-evidence.md`,
   `${reviewDir}/gemini-brain-ui-edit-export-review.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
@@ -335,7 +337,6 @@ check("dom evidence is sane", () => {
   assert.equal(reviewQueueEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(reviewQueueEvidence.evidence.draftTextHasPrivate, false);
   assert.equal(reviewQueueEvidence.evidence.draftTextHasWritesRealFilesFalse, true);
-  assert.equal(reviewQueueEvidence.evidence.noRealApplyLanguage, true);
   assert.equal(reviewQueueEvidence.consoleMessages.length, 0);
 
   const editEvidence = JSON.parse(
@@ -403,6 +404,7 @@ check("release state is conservative", () => {
     "brain-ui-lifecycle-policy-preview",
     "brain-ui-lifecycle-policy-apply",
     "brain-ui-memory-review-queue",
+    "brain-ui-memory-review-queue-apply",
     "session-compaction-benchmark",
     "selfmem-update",
   ]) {
@@ -434,6 +436,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /lifecycle policy/i, `${file} missing lifecycle policy`);
     assert.match(text, /lifecycle policy apply|selected lifecycle policy apply/i, `${file} missing lifecycle policy apply`);
     assert.match(text, /memory review queue/i, `${file} missing memory review queue`);
+    assert.match(text, /review queue apply|selected memory review queue apply|selected review queue apply/i, `${file} missing review queue apply`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });

@@ -32,6 +32,7 @@ const state = {
   lifecyclePolicyDraft: null,
   lifecyclePolicyApply: null,
   reviewQueueDraft: null,
+  reviewQueueApply: null,
 };
 
 const positions = {
@@ -80,6 +81,13 @@ const reviewQueueForm = document.querySelector("#reviewQueueForm");
 const reviewQueueItems = document.querySelector("#reviewQueueItems");
 const reviewQueueStatus = document.querySelector("#reviewQueueStatus");
 const reviewQueueDraft = document.querySelector("#reviewQueueDraft");
+const reviewQueueApplyForm = document.querySelector("#reviewQueueApplyForm");
+const reviewQueueApplyPath = document.querySelector("#reviewQueueApplyPath");
+const reviewQueueApplyConfirm = document.querySelector("#reviewQueueApplyConfirm");
+const reviewQueueApplyPhrase = document.querySelector("#reviewQueueApplyPhrase");
+const reviewQueueApplyStatus = document.querySelector("#reviewQueueApplyStatus");
+const reviewQueueApplySummary = document.querySelector("#reviewQueueApplySummary");
+const reviewQueueApplyActions = document.querySelector("#reviewQueueApplyActions");
 const vaultFileSelect = document.querySelector("#vaultFileSelect");
 const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
@@ -231,6 +239,31 @@ reviewQueueForm.addEventListener("submit", (event) => {
   renderReviewQueue();
 });
 
+reviewQueueApplyForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.reviewQueueApply = { ok: false, code: "loading", message: "Applying selected local review decisions." };
+  renderReviewQueueApply();
+  try {
+    const response = await fetch("/review-queue/apply", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: reviewQueueApplyPath.value,
+        reviewQueue: state.reviewQueueDraft,
+        confirmWrite: reviewQueueApplyConfirm.checked,
+        confirmationPhrase: reviewQueueApplyPhrase.value,
+      }),
+    });
+    state.reviewQueueApply = await response.json();
+  } catch (error) {
+    state.reviewQueueApply = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    reviewQueueApplyPath.value = "";
+    reviewQueueApplyPhrase.value = "";
+    renderReviewQueueApply();
+  }
+});
+
 selectedSyncForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   state.selectedSync = { ok: false, code: "loading", message: "Previewing selected local vault sync." };
@@ -340,6 +373,7 @@ function render() {
   renderLifecyclePolicy();
   renderLifecyclePolicyApply();
   renderReviewQueue();
+  renderReviewQueueApply();
   renderVaultControls(selected);
   renderSyncReport();
   renderSelectedSync();
@@ -604,6 +638,42 @@ function renderReviewQueue() {
     reviewQueueItems.append(article);
   }
   reviewQueueDraft.textContent = JSON.stringify(draft, null, 2);
+}
+
+function renderReviewQueueApply() {
+  reviewQueueApplySummary.replaceChildren();
+  reviewQueueApplyActions.replaceChildren();
+  const payload = state.reviewQueueApply;
+  if (!payload) {
+    reviewQueueApplyStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    reviewQueueApplyStatus.textContent = payload.message ?? payload.code ?? "Review queue apply unavailable.";
+    return;
+  }
+
+  reviewQueueApplyStatus.textContent = `${payload.selection.rootDisplay} review decisions applied.`;
+  reviewQueueApplySummary.replaceChildren(
+    stat("Writes", payload.writesRealFiles ? "enabled" : "disabled"),
+    stat("Decisions", payload.report?.summary?.decisions ?? 0),
+    stat("Suppress", payload.report?.summary?.suppress ?? 0),
+    stat("Audit", payload.report?.auditLog?.entriesWritten ?? 0),
+  );
+  for (const [label, value] of [
+    ["Decisions", payload.report?.decisionsPath],
+    ["Audit", payload.report?.auditLog?.path],
+    ["Trail", payload.auditTrail?.event],
+  ]) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = label;
+    span.textContent = value ?? "";
+    item.append(strong, span);
+    reviewQueueApplyActions.append(item);
+  }
 }
 
 function appendLineageStep(list, label, node) {

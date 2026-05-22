@@ -44,6 +44,7 @@ Interaction smoke output:
     "lifecycle-policy-draft",
     "selected-lifecycle-policy-apply",
     "review-queue-draft",
+    "selected-review-queue-apply",
     "vault-path",
     "sync-report",
     "selected-wiki-sync-dry-run",
@@ -81,9 +82,14 @@ Release impact:
   rejects private or key-shaped policy payloads, writes only the selected local
   `.recallweave/lifecycle-policy.json` plus a content-free audit log, and keeps
   selected root paths redacted.
+- The interaction smoke now starts the server with review queue apply enabled
+  and proves selected review apply rejects missing write confirmation, rejects
+  private or key-shaped review payloads, writes only selected local decision
+  metadata plus a content-free audit log, excludes candidate text from the
+  decision log, and keeps selected root paths redacted.
 
 Known limits:
 
 - This is still fixture mode for memory browsing and editing. Live local
-  container editing, derived-doc apply, and review queue apply still need
-  separate security-reviewed write paths.
+  container editing and derived-doc apply still need separate
+  security-reviewed write paths.

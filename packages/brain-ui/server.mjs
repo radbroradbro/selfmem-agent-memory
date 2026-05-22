@@ -28,6 +28,7 @@ export function createBrainUiServer(options = {}) {
   const enableLocalBrowse = options.enableLocalBrowse ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE === "1";
   const enableLocalApply = options.enableLocalApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY === "1";
   const enablePolicyApply = options.enablePolicyApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY === "1";
+  const enableReviewApply = options.enableReviewApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY === "1";
 
   return createHttpServer(async (request, response) => {
     try {
@@ -186,6 +187,29 @@ export function createBrainUiServer(options = {}) {
         return;
       }
 
+      if (path === "__review_queue_apply") {
+        if (!enableReviewApply) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "review_queue_apply_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY=1 to apply selected local review decisions.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await applySelectedReviewQueue(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -212,6 +236,7 @@ function routePath(pathname) {
   if (pathname === "/wiki/sync/dry-run") return "__wiki_sync_dry_run";
   if (pathname === "/wiki/sync/apply") return "__wiki_sync_apply";
   if (pathname === "/lifecycle-policy/apply") return "__lifecycle_policy_apply";
+  if (pathname === "/review-queue/apply") return "__review_queue_apply";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -568,6 +593,96 @@ async function applySelectedLifecyclePolicy(request) {
   };
 }
 
+async function applySelectedReviewQueue(request) {
+  const body = await readJsonBody(request, 80_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+  const confirmationPhrase = typeof body.confirmationPhrase === "string" ? body.confirmationPhrase.trim() : "";
+
+  if (body.confirmWrite !== true || confirmationPhrase !== "APPLY LOCAL REVIEW QUEUE") {
+    return {
+      ok: false,
+      code: "write_confirmation_required",
+      message: "Confirm review write and type APPLY LOCAL REVIEW QUEUE before writing selected local review decisions.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local container directory first." };
+  }
+
+  const rawQueueText = JSON.stringify(body.reviewQueue ?? {});
+  const redaction = redactPrivate(rawQueueText);
+  if (redaction.redacted) {
+    return {
+      ok: false,
+      code: "review_queue_contains_private_or_key_shaped_text",
+      message: "Review apply refused private or key-shaped review text.",
+      redactionCount: redaction.redactionCount,
+    };
+  }
+
+  const appliedAt = new Date().toISOString();
+  const decisions = normalizeReviewDecisions(body.reviewQueue, appliedAt);
+  if (decisions.length === 0) {
+    return {
+      ok: false,
+      code: "review_decisions_required",
+      message: "Review apply requires at least one review decision.",
+    };
+  }
+
+  const decisionPayload = decisions.map((decision) => JSON.stringify(decision)).join("\n") + "\n";
+  const contentHash = createHash("sha256").update(decisionPayload).digest("hex");
+  const decisionsPath = resolveUnderSelectedRoot(rootDir, ".recallweave/review-decisions.jsonl");
+  const auditPath = resolveUnderSelectedRoot(rootDir, ".recallweave/review-queue-audit.jsonl");
+  const summary = summarizeReviewDecisions(decisions);
+  await mkdir(dirname(decisionsPath), { recursive: true });
+  await appendFile(decisionsPath, decisionPayload, "utf8");
+  await appendFile(
+    auditPath,
+    `${JSON.stringify({
+      schemaVersion: 1,
+      event: "review_queue_apply",
+      createdAt: appliedAt,
+      writesRealFiles: true,
+      decisionsPath: ".recallweave/review-decisions.jsonl",
+      contentHash,
+      summary,
+    })}\n`,
+    "utf8",
+  );
+
+  return {
+    ok: true,
+    mode: "selected-review-queue-apply",
+    writesRealFiles: true,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+    },
+    auditTrail: {
+      event: "review_queue_apply",
+      writesRealFiles: true,
+      auditLog: {
+        path: ".recallweave/review-queue-audit.jsonl",
+        entriesWritten: 1,
+      },
+      contentHash,
+    },
+    report: {
+      ok: true,
+      dryRun: false,
+      rootDir: redactPathForDisplay(rootDir),
+      decisionsPath: ".recallweave/review-decisions.jsonl",
+      auditLog: {
+        path: ".recallweave/review-queue-audit.jsonl",
+        entriesWritten: 1,
+      },
+      summary,
+    },
+  };
+}
+
 async function readJsonBody(request, maxBytes) {
   let body = "";
   for await (const chunk of request) {
@@ -640,6 +755,47 @@ function normalizeLifecyclePolicy(input, appliedAt) {
   };
 }
 
+function normalizeReviewDecisions(input, appliedAt) {
+  const items = Array.isArray(input?.items) ? input.items : [];
+  return items
+    .map((item) => {
+      const id = safePolicyToken(item?.id ?? "");
+      const action = safeChoice(item?.action, ["approve", "suppress", "merge", "needs_more_evidence"]);
+      if (!id) return null;
+      return {
+        schemaVersion: 1,
+        event: "memory_review_decision",
+        createdAt: appliedAt,
+        candidateId: id,
+        action,
+        kind: safePolicyToken(item?.kind ?? "memory"),
+        reason: safePolicyToken(item?.reason ?? "review_required"),
+        sourceNodeId: safePolicyToken(item?.sourceNodeId ?? ""),
+        confidence: clampNumber(item?.confidence, 0, 1, 0),
+        contentIncluded: false,
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 200);
+}
+
+function summarizeReviewDecisions(decisions) {
+  const summary = {
+    decisions: decisions.length,
+    approve: 0,
+    suppress: 0,
+    merge: 0,
+    needsMoreEvidence: 0,
+  };
+  for (const decision of decisions) {
+    if (decision.action === "approve") summary.approve += 1;
+    if (decision.action === "suppress") summary.suppress += 1;
+    if (decision.action === "merge") summary.merge += 1;
+    if (decision.action === "needs_more_evidence") summary.needsMoreEvidence += 1;
+  }
+  return summary;
+}
+
 function safeChangedFields(value) {
   const allowed = new Set([
     "recall.forceEveryTurn",
@@ -694,6 +850,12 @@ function booleanSetting(value, fallback) {
 
 function clampInteger(value, min, max, fallback) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function clampNumber(value, min, max, fallback) {
+  const parsed = Number.parseFloat(String(value ?? ""));
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, parsed));
 }

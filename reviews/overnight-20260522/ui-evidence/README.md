@@ -61,6 +61,9 @@
   `brain-ui-review-queue-dom-evidence.json`.
 - Chrome DevTools captured the memory review queue panel in
   `brain-ui-review-queue.png`.
+- The selected review queue apply slice was verified by fresh Brain UI smoke
+  and interaction smoke. It has no committed screenshot yet; the evidence is
+  the gated route, docs, smoke output, and Gemini review.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.

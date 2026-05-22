@@ -49,6 +49,8 @@ is still required before any public live update.
 | Brain UI lifecycle policy apply | `reviews/overnight-20260522/brain-ui-lifecycle-policy-apply-evidence.md` |
 | Brain UI lifecycle policy apply review | `reviews/overnight-20260522/gemini-brain-ui-lifecycle-policy-apply-review.md` |
 | Brain UI memory review queue | `reviews/overnight-20260522/brain-ui-review-queue-evidence.md` |
+| Brain UI memory review queue apply | `reviews/overnight-20260522/brain-ui-review-queue-apply-evidence.md` |
+| Brain UI memory review queue apply review | `reviews/overnight-20260522/gemini-brain-ui-review-queue-apply-review.md` |
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
@@ -126,6 +128,10 @@ Sanitized fixture evidence exists under
   source and interaction smoke proves writes require
   `RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY` plus the exact
   `APPLY LOCAL LIFECYCLE POLICY` phrase
+- selected review queue apply controls are present in the current Brain UI
+  source and interaction smoke proves writes require
+  `RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY` plus the exact
+  `APPLY LOCAL REVIEW QUEUE` phrase
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -154,6 +160,7 @@ local memory contents.
   gate docs, then final `CLEAN` after `docs/BRAIN_UI.md` documented the apply
   path.
 - Gemini Brain UI review queue review: `CLEAN`.
+- Gemini Brain UI review queue apply review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
@@ -211,6 +218,11 @@ local memory contents.
 - Brain UI memory review queue is fixture-only. It stages approve, suppress,
   merge, and needs-more-evidence decisions as `writesRealFiles: false` draft
   output and does not write real memories.
+- Brain UI selected memory review queue apply is disabled by default, requires
+  the review apply environment flag, requires write confirmation plus an exact
+  phrase, rejects private/key-shaped review payloads, writes only selected
+  local decision metadata plus a content-free audit line, excludes candidate
+  text, and returns only redacted root labels and relative paths.
 - Wiki vault sync is explicit and protects reviewed pages by writing conflict
   notes instead of overwriting.
 - Wiki vault sync can append a content-free pre-write audit log when
@@ -223,8 +235,9 @@ local memory contents.
 - Claude review is blocked until Claude CLI is logged in.
 - The Brain UI has read-only selected local-container audit and browse previews,
   browser-local audit history, plus write-confirmed selected vault sync apply,
-  plus write-confirmed selected lifecycle policy apply, but real local-container
-  edit and review-queue apply still need write confirmation and UI wiring.
+  write-confirmed selected lifecycle policy apply, and write-confirmed selected
+  review queue apply, but real local-container edit still needs write
+  confirmation and UI wiring.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

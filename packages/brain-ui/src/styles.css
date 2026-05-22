@@ -713,6 +713,7 @@ button.active {
 .policy-form input[type="text"],
 .policy-form input[type="number"],
 .policy-form select,
+.review-queue input[type="text"],
 .review-candidate select {
   width: 100%;
   min-height: 38px;
@@ -735,6 +736,7 @@ button.active {
 #selectedSyncStatus,
 #policyApplyStatus,
 #policyStatus,
+#reviewQueueApplyStatus,
 #reviewQueueStatus {
   min-height: 18px;
   margin: 0;

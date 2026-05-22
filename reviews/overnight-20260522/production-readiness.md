@@ -31,7 +31,7 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   selected local-container audit preview, browser-local selected audit history,
   selected local-container browse preview, selected vault sync dry-run,
   selected vault sync apply, lifecycle policy preview, selected lifecycle
-  policy apply, and memory review queue preview.
+  policy apply, memory review queue preview, and selected review queue apply.
 - Session compaction fixture benchmark.
 - Dry-run-first updater wrapper and updater smoke.
 - Release-readiness gate.
@@ -124,6 +124,7 @@ evidence for:
 - lifecycle policy preview.
 - selected lifecycle policy apply.
 - memory review queue preview.
+- selected review queue apply.
 - Codex Browser DOM evidence for the main Brain UI surfaces.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
@@ -139,7 +140,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, with browser-local content-free history. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, selected local-container audit and browse previews, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, selected local-container audit and browse previews, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |
@@ -178,11 +179,15 @@ Use only bundled fixture data:
    policy apply, and show that it requires explicit write confirmation before
    it can write the local policy file.
 12. Open the memory review queue and stage a no-write candidate decision.
-13. Optional, in a throwaway fixture only: start with
+13. In a throwaway fixture only, start with
+   `RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY=1`, open selected review queue
+   apply, and show that it requires explicit write confirmation before it can
+   write the local decision log.
+14. Optional, in a throwaway fixture only: start with
    `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` and
    `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE=1`, run selected local-container
    audit and browse, and confirm the visible path is redacted.
-14. End with the release-readiness gate output and residual alpha caveats.
+15. End with the release-readiness gate output and residual alpha caveats.
 
 Do not record real local memories, raw session history, private diagnostics,
 credentials, private paths, or real agent logs.
