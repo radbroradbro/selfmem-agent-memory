@@ -39,6 +39,8 @@ approval to publish, merge, or roll out broadly.
 - `git diff --check`: passed.
 - Private-name sweep over the public tree: no hits.
 - Gemini release handoff review: `CLEAN`.
+- GitHub Actions CI run `26298339106` on commit `aebd205`: passed Test, Full
+  smoke, and Release readiness check.
 
 The new evidence is docs and release-gate logic only. It does not include raw
 memories, raw transcripts, credentials, private diagnostics, private agent

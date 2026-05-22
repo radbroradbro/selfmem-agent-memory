@@ -243,6 +243,8 @@ Known limits:
   body update, blocker issue, blocked Claude route, public visibility, and
   one-agent canary steps. `release:check` requires the handoff and verifies the
   blocked launch path language.
+- GitHub Actions CI run `26298339106` passed on release handoff gate commit
+  `aebd205`.
 - Dynamic graph layout CI is pending until this slice is pushed. Local
   `node packages/brain-ui/smoke.mjs`,
   `node packages/brain-ui/interaction-smoke.mjs`, and

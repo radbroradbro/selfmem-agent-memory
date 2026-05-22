@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `62367a1`, run `26297876735`, success.
+  `aebd205`, run `26298339106`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -31,6 +31,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26295772356` on `21fd4d6`: success.
 - GitHub Actions CI run `26297064340` on `be47cff`: success.
 - GitHub Actions CI run `26297876735` on `62367a1`: success.
+- GitHub Actions CI run `26298339106` on `aebd205`: success.
 
 ## Shipped Overnight Slices
 
@@ -102,7 +103,7 @@ Latest local verification before this summary:
 - Private-name scan: no hits.
 - Release handoff follow-up: `docs/RELEASE_HANDOFF.md` added and required by
   `release:check`.
-- GitHub Actions CI: success on the latest inspected baseline, `be47cff`.
+- GitHub Actions CI: success on the latest inspected baseline, `aebd205`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
@@ -125,6 +126,9 @@ Latest local verification before this summary:
 - Graph navigation verification: local smoke and interaction smoke passed with
   `graph-navigation-controls` evidence, and GitHub Actions CI run
   `26297876735` passed on `62367a1`.
+- Release handoff verification: local release gate, full smoke, tests,
+  private-name scan, Gemini review, and GitHub Actions CI run `26298339106`
+  passed on `aebd205`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
