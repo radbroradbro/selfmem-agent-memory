@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "description": "Public-safe deterministic suite for local-only RecallWeave session compaction quality checks.",
+  "scenarios": [
+    {
+      "id": "release-readiness-overnight",
+      "description": "Keeps durable RecallWeave release decisions while dropping status chatter.",
+      "input": {
+        "sessionId": "fixture-release-readiness",
+        "source": "codex",
+        "startedAt": "2026-05-22T08:00:00.000Z",
+        "events": [
+          {
+            "id": "rr-001",
+            "role": "user",
+            "timestamp": "2026-05-22T08:01:00.000Z",
+            "content": "Please keep RecallWeave local-first and do not write back to hosted Supermemory automatically."
+          },
+          {
+            "id": "rr-002",
+            "role": "assistant",
+            "timestamp": "2026-05-22T08:02:00.000Z",
+            "content": "Decision: RecallWeave will use local writes by default, with hosted Supermemory read-through only when configured."
+          },
+          {
+            "id": "rr-003",
+            "role": "user",
+            "timestamp": "2026-05-22T08:03:00.000Z",
+            "content": "ok lol"
+          },
+          {
+            "id": "rr-004",
+            "role": "assistant",
+            "timestamp": "2026-05-22T08:04:00.000Z",
+            "content": "Procedure: run doctor, smoke tests, secret scans, and browser fixture evidence before calling a release production ready."
+          },
+          {
+            "id": "rr-005",
+            "role": "assistant",
+            "timestamp": "2026-05-22T08:05:00.000Z",
+            "content": "Fix: release readiness now requires a public-safe gate before any public update."
+          }
+        ]
+      },
+      "expect": {
+        "requiredKinds": ["decision", "procedure", "fix"],
+        "requiredTerms": ["local writes", "smoke tests", "release readiness"],
+        "forbiddenTerms": ["ok lol"],
+        "minOutputCandidates": 3,
+        "minNoiseReductionRatio": 0.2
+      }
+    },
+    {
+      "id": "exact-identifier-preservation",
+      "description": "Preserves exact bug and ticket identifiers needed for future search.",
+      "input": {
+        "sessionId": "fixture-exact-identifiers",
+        "source": "hermes",
+        "startedAt": "2026-05-22T09:00:00.000Z",
+        "events": [
+          {
+            "id": "ei-001",
+            "role": "assistant",
+            "timestamp": "2026-05-22T09:01:00.000Z",
+            "content": "Bug: retrieval trace BUG-1192 failed to include exact ticket RW-4827 when local cache missed."
+          },
+          {
+            "id": "ei-002",
+            "role": "assistant",
+            "timestamp": "2026-05-22T09:02:00.000Z",
+            "content": "Fix: preserve exact identifiers RW-4827 and BUG-1192 in compacted memory so agents can search by ticket."
+          },
+          {
+            "id": "ei-003",
+            "role": "user",
+            "timestamp": "2026-05-22T09:03:00.000Z",
+            "content": "done thanks"
+          }
+        ]
+      },
+      "expect": {
+        "requiredKinds": ["bug", "fix"],
+        "requiredTerms": ["BUG-1192", "RW-4827"],
+        "forbiddenTerms": ["done thanks"],
+        "exactIdentifierTerms": ["BUG-1192", "RW-4827"],
+        "minOutputCandidates": 2,
+        "minExactIdentifierAccuracy": 1
+      }
+    },
+    {
+      "id": "stale-and-private-suppression",
+      "description": "Downshifts stale academic context and blocks private-only storage.",
+      "input": {
+        "sessionId": "fixture-stale-privacy",
+        "source": "claude",
+        "startedAt": "2026-05-22T10:00:00.000Z",
+        "events": [
+          {
+            "id": "sp-001",
+            "role": "user",
+            "timestamp": "2026-05-22T10:01:00.000Z",
+            "content": "Spring 2026 course notes and exam outlines are done; remember only high-level class background."
+          },
+          {
+            "id": "sp-002",
+            "role": "system",
+            "timestamp": "2026-05-22T10:02:00.000Z",
+            "content": "<private>fixture secret only</private>"
+          },
+          {
+            "id": "sp-003",
+            "role": "assistant",
+            "timestamp": "2026-05-22T10:03:00.000Z",
+            "content": "Preference: do not bulk-retain old class outlines in prompt-time memory."
+          }
+        ]
+      },
+      "expect": {
+        "requiredKinds": ["profile", "preference"],
+        "requiredTerms": ["stale background", "do not bulk-retain"],
+        "forbiddenTerms": ["fixture secret", "<private>", "exam outlines"],
+        "minRedactionCount": 1,
+        "minSkippedFullyPrivate": 1,
+        "minStaleCandidates": 1,
+        "minOutputCandidates": 2
+      }
+    },
+    {
+      "id": "dedupe-repeated-decisions",
+      "description": "Merges repeated durable statements into one candidate with multiple source events.",
+      "input": {
+        "sessionId": "fixture-dedupe",
+        "source": "openclaw",
+        "startedAt": "2026-05-22T11:00:00.000Z",
+        "events": [
+          {
+            "id": "dd-001",
+            "role": "assistant",
+            "timestamp": "2026-05-22T11:01:00.000Z",
+            "content": "Decision: use one local RecallWeave container per agent identity."
+          },
+          {
+            "id": "dd-002",
+            "role": "assistant",
+            "timestamp": "2026-05-22T11:02:00.000Z",
+            "content": "Decision: use one local RecallWeave container per agent identity."
+          },
+          {
+            "id": "dd-003",
+            "role": "user",
+            "timestamp": "2026-05-22T11:03:00.000Z",
+            "content": "typing"
+          }
+        ]
+      },
+      "expect": {
+        "requiredKinds": ["decision"],
+        "requiredTerms": ["one local RecallWeave container"],
+        "forbiddenTerms": ["typing"],
+        "minOutputCandidates": 1,
+        "maxOutputCandidates": 1,
+        "minMergedSourceEvents": 2
+      }
+    },
+    {
+      "id": "standalone-ticket-fact",
+      "description": "Keeps ticket-style identifiers even when a short sentence lacks bug or fix wording.",
+      "input": {
+        "sessionId": "fixture-standalone-ticket",
+        "source": "codex",
+        "startedAt": "2026-05-22T12:00:00.000Z",
+        "events": [
+          {
+            "id": "tf-001",
+            "role": "user",
+            "timestamp": "2026-05-22T12:01:00.000Z",
+            "content": "Track ticket RW-4827 for the next recall validation pass."
+          }
+        ]
+      },
+      "expect": {
+        "requiredKinds": ["fact"],
+        "requiredTerms": ["RW-4827"],
+        "exactIdentifierTerms": ["RW-4827"],
+        "minOutputCandidates": 1,
+        "minExactIdentifierAccuracy": 1
+      }
+    }
+  ]
+}

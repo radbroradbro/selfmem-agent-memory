@@ -8,10 +8,17 @@ The first harness is deterministic and fixture-safe:
 
 ```bash
 pnpm compaction:smoke
+pnpm compaction:benchmark
 ```
 
 It uses `packages/bench/fixtures/session-compaction.fixture.json`, not real
 local session history.
+
+The benchmark suite uses
+`packages/bench/fixtures/session-compaction-benchmark.fixture.json`. It runs
+multiple synthetic session shapes and fails if local compaction loses required
+kinds, exact identifiers, stale/privacy suppression, dedupe behavior, or minimum
+noise reduction.
 
 ## What It Measures
 
@@ -23,6 +30,15 @@ local session history.
 - chronological order,
 - noise reduction ratio,
 - stale background handling.
+
+The multi-scenario benchmark also measures:
+
+- required kind coverage,
+- required term coverage,
+- exact identifier accuracy,
+- merged source-event coverage for duplicates,
+- privacy leak count,
+- aggregate pass/fail counts.
 
 ## Candidate Rules
 
@@ -73,4 +89,7 @@ Production readiness should require this benchmark to show:
 - zero privacy leaks,
 - meaningful noise reduction,
 - durable candidates that cover decisions, fixes, methodology, and procedures,
+- exact identifiers preserved when the source session uses them,
+- repeated durable statements merged into one memory with multiple source
+  events,
 - no bulk stale school-note retention.

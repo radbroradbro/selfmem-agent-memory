@@ -7,9 +7,10 @@ const durablePatterns = [
     { kind: "profile", pattern: /\b(remember|background|profile|identity|high-level|class context|school material)\b/i, reason: "profile", baseSalience: 0.7 },
     { kind: "procedure", pattern: /\b(procedure|run|install|setup|set up|wire|configure|update|doctor|smoke|test)\b/i, reason: "procedure", baseSalience: 0.82 },
     { kind: "bug", pattern: /\b(bug|error|failed|failure|issue|regression|broken|blocked)\b/i, reason: "bug", baseSalience: 0.75 },
-    { kind: "fix", pattern: /\b(fixed|patched|resolved|clean|passed|working|verified)\b/i, reason: "fix", baseSalience: 0.76 },
+    { kind: "fix", pattern: /\b(fix|fixed|patched|resolved|clean|passed|working|verified)\b/i, reason: "fix", baseSalience: 0.76 },
     { kind: "methodology", pattern: /\b(benchmark|hypothesis|research|lineage|source-lock|review|evidence|gate)\b/i, reason: "methodology", baseSalience: 0.8 },
     { kind: "source", pattern: /\b(source|paper|docs|github|plugin|gbrain|wiki|obsidian)\b/i, reason: "source", baseSalience: 0.69 },
+    { kind: "fact", pattern: /\b[A-Z][A-Z0-9]+-\d{2,}\b/, reason: "exact-identifier", baseSalience: 0.74 },
 ];
 const defaultStaleRules = [
     {

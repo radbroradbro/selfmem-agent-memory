@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { redactPrivate } from "../../packages/core/src/redaction/private.js";
+import { containsRedactionBoundaryText, redactPrivate } from "../../packages/core/src/redaction/private.js";
 
 describe("private redaction", () => {
   it("stores public text and strips private spans", () => {
@@ -56,6 +56,8 @@ describe("private redaction", () => {
     expect(result.text).not.toMatch(/\d{8,12}:[A-Z]/);
     expect(result.text).not.toMatch(/xoxb-[A-Z]/);
     expect(result.redactionCount).toBe(12);
+    expect(containsRedactionBoundaryText(keyLike("sm_", "F", 42))).toBe(true);
+    expect(containsRedactionBoundaryText("ordinary public memory text")).toBe(false);
   });
 });
 

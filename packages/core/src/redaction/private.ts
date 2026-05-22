@@ -20,6 +20,15 @@ const keyPatterns: Array<[RegExp, string]> = [
   [/xox[baprs]-[A-Za-z0-9-]{10,}/g, "[REDACTED_SLACK_TOKEN]"],
 ];
 
+export const redactionBoundaryPatterns: RegExp[] = [
+  /<\s*\/?\s*private\s*>/i,
+  ...keyPatterns.map(([pattern]) => new RegExp(pattern.source, pattern.flags.replace(/g/g, ""))),
+];
+
+export function containsRedactionBoundaryText(input: string): boolean {
+  return redactionBoundaryPatterns.some((pattern) => pattern.test(input));
+}
+
 export function redactPrivate(input: string): RedactionResult {
   let text = redactPrivateTags(input);
   let redactionCount = text.count;

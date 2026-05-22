@@ -12,6 +12,13 @@ const keyPatterns = [
     [/\b\d{8,12}:[A-Za-z0-9_-]{30,}\b/g, "[REDACTED_TELEGRAM_BOT_TOKEN]"],
     [/xox[baprs]-[A-Za-z0-9-]{10,}/g, "[REDACTED_SLACK_TOKEN]"],
 ];
+export const redactionBoundaryPatterns = [
+    /<\s*\/?\s*private\s*>/i,
+    ...keyPatterns.map(([pattern]) => new RegExp(pattern.source, pattern.flags.replace(/g/g, ""))),
+];
+export function containsRedactionBoundaryText(input) {
+    return redactionBoundaryPatterns.some((pattern) => pattern.test(input));
+}
 export function redactPrivate(input) {
     let text = redactPrivateTags(input);
     let redactionCount = text.count;

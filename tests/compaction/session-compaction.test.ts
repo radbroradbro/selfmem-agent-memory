@@ -90,4 +90,44 @@ describe("session compaction", () => {
     expect(result.candidates[0]?.text).toBe("Archived Project Atlas is stale background. Keep only strategic context.");
     expect(result.candidates[0]?.reasons).toContain("stale:archived-project");
   });
+
+  it("treats explicit Fix labels as fixes even when other durable patterns appear", () => {
+    const result = compactSession({
+      sessionId: "explicit-fix-label",
+      source: "hermes",
+      startedAt: "2026-05-22T08:00:00.000Z",
+      events: [
+        {
+          id: "e1",
+          role: "assistant",
+          timestamp: "2026-05-22T08:01:00.000Z",
+          content: "Fix: preserve exact identifier RW-4827 during memory update checks.",
+        },
+      ],
+    });
+
+    expect(result.candidates).toHaveLength(1);
+    expect(result.candidates[0]?.kind).toBe("fix");
+    expect(result.candidates[0]?.text).toContain("RW-4827");
+  });
+
+  it("keeps ticket-style identifiers as durable facts even without bug or fix wording", () => {
+    const result = compactSession({
+      sessionId: "identifier-fact",
+      source: "codex",
+      startedAt: "2026-05-22T08:00:00.000Z",
+      events: [
+        {
+          id: "e1",
+          role: "user",
+          timestamp: "2026-05-22T08:01:00.000Z",
+          content: "Track ticket RW-4827 for the next recall validation pass.",
+        },
+      ],
+    });
+
+    expect(result.candidates).toHaveLength(1);
+    expect(result.candidates[0]?.kind).toBe("fact");
+    expect(result.candidates[0]?.text).toContain("RW-4827");
+  });
 });

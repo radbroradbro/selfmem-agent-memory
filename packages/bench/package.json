@@ -6,6 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "compaction:smoke": "node session-compaction-smoke.mjs"
+    "compaction:smoke": "node session-compaction-smoke.mjs",
+    "compaction:benchmark": "node session-compaction-benchmark.mjs"
   }
 }

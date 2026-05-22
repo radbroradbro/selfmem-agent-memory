@@ -54,7 +54,8 @@ must run before making quality claims.
 - LLM-wiki compiler and explicit disk-sync rules for Obsidian-compatible vaults
   and the self-hosted brain UI.
 - Fixture-safe session compaction benchmark for chronological durable memory
-  extraction.
+  extraction, exact identifier preservation, stale/private suppression, and
+  duplicate merge behavior.
 - Lifecycle logs for recall, writes, compression checkpoints, provider errors,
   and privacy counts.
 - Dry-run update command for deployed agents.
