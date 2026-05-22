@@ -24,6 +24,8 @@ try {
 
   assert.equal(health.ok, true);
   assert.match(index, /RecallWeave Brain/);
+  assert.match(index, /Jump to Nucleus node/);
+  assert.match(index, /data-graph-scope="neighborhood"/);
   assert.match(index, /Container/);
   assert.match(index, /Nucleus Snapshot/);
   assert.match(index, /Research Lineage/);
@@ -42,7 +44,9 @@ try {
   assert.match(index, /Selected local container audit/);
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
+  assert.match(app, /renderGraphNavigation/);
   assert.match(app, /buildContainerHealth/);
+  assert.match(app, /buildGraphNavigation/);
   assert.match(app, /buildGraphLayout/);
   assert.match(app, /buildNucleusExport/);
   assert.match(app, /buildResearchLineage/);
@@ -65,13 +69,16 @@ try {
   assert.match(app, /buildEditExport/);
   assert.match(model, /const kind = safeExportText\(node\.kind\)/);
   assert.match(model, /function buildContainerHealth/);
+  assert.match(model, /function buildGraphNavigation/);
   assert.match(model, /function buildGraphLayout/);
+  assert.match(model, /function graphScopedNodes/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
   assert.match(model, /function buildMemoryReviewQueue/);
   assert.match(model, /function mergeSelectedAuditTrail/);
   assert.match(model, /function filteredNodes/);
   assert.match(model, /function preferredVaultPath/);
   assert.match(styles, /nucleus-shell/);
+  assert.match(styles, /graph-toolbar/);
   assert.match(styles, /container-health/);
   assert.match(styles, /snapshot-export/);
   assert.match(styles, /research-lineage/);
@@ -209,6 +216,7 @@ try {
           "styles",
           "fixture",
           "dynamic-graph-layout",
+          "graph-navigation-controls",
           "lifecycle-policy",
           "review-queue",
           "wiki-vault",

@@ -53,6 +53,7 @@ complete or publish a public live update.
 | Self-hosted Brain UI | `packages/brain-ui/`, UI screenshots and DOM evidence under `reviews/overnight-20260522/ui-evidence/` | Proven for fixture mode |
 | Brain UI graph/editor evidence | `brain-ui-fixture-edit.png`, `brain-ui-dom-evidence.json`, `brain-ui-edit-export-*` | Proven with sanitized fixtures |
 | Brain UI dynamic graph layout | `brain-ui-dynamic-layout-evidence.md`, `gemini-brain-ui-dynamic-layout-review.md`, `ui-evidence/brain-ui-dynamic-layout-evidence.json`, `ui-evidence/brain-ui-dynamic-layout.png` | Proven locally with data-driven layout, zero fixture overlaps, and no private/key-shaped text |
+| Brain UI graph navigation controls | `brain-ui-graph-navigation-evidence.md`, `gemini-brain-ui-graph-navigation-review.md`, `ui-evidence/brain-ui-graph-navigation-evidence.json`, `ui-evidence/brain-ui-graph-navigation.png` | Proven locally with all-vs-neighborhood scope, jump-to-node, selected-node centering, and no private/key-shaped text |
 | Brain UI vault/sync evidence | `brain-ui-vault-preview-*`, `brain-ui-sync-report-*` | Proven with sanitized fixtures |
 | Brain UI container-health evidence | `brain-ui-container-health-*`, `brain-ui-container-health-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI local-audit preview evidence | `brain-ui-local-audit-*`, `brain-ui-local-audit-preview-evidence.md`, Gemini review | Proven with sanitized fixtures |
@@ -84,6 +85,7 @@ complete or publish a public live update.
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
 | Dynamic graph layout release gate | `packages/bench/release-readiness-check.mjs` now requires dynamic layout evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297064340` |
+| Graph navigation release gate | `packages/bench/release-readiness-check.mjs` now requires graph navigation evidence, screenshot, Gemini review, and release-doc references | Proven locally; CI pending until this slice is pushed |
 | GitHub Actions | CI run `26297064340` on `be47cff` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
@@ -108,8 +110,9 @@ complete or publish a public live update.
    write-confirmed selected lifecycle policy apply, memory review queue draft
    export, write-confirmed selected review queue apply, write-confirmed
    selected local memory edit overlays, and write-confirmed selected local
-   memory materialize with backup. The graph now uses a dynamic layout, but the
-   richer large-container navigation controls remain future work.
+   memory materialize with backup. The graph now uses a dynamic layout and
+   fixture-safe navigation controls; real-container clustering and pagination
+   remain future work.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

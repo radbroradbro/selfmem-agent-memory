@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import {
   buildContainerHealth,
   buildEditExport,
+  buildGraphNavigation,
   buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
@@ -13,6 +14,7 @@ import {
   buildResearchLineage,
   containsPrivateLikeText,
   filteredNodes,
+  graphScopedNodes,
   mergeSelectedAuditTrail,
   preferredVaultPath,
 } from "./src/model.js";
@@ -125,6 +127,24 @@ try {
       assert.ok(sorted[index].y - sorted[index - 1].y >= 110, "same-column graph nodes should be vertically separated");
     }
   }
+  const selectedLayoutNode = expandedFixture.nodes[0];
+  const neighborhoodNodes = graphScopedNodes(expandedFixture, expandedFixture.nodes, selectedLayoutNode.id, "neighborhood");
+  const graphNavigation = buildGraphNavigation(
+    expandedFixture,
+    expandedFixture.nodes,
+    neighborhoodNodes,
+    selectedLayoutNode.id,
+    "neighborhood",
+  );
+  assert.equal(graphNavigation.mode, "fixture-graph-navigation");
+  assert.equal(graphNavigation.writesRealFiles, false);
+  assert.equal(graphNavigation.scope, "neighborhood");
+  assert.equal(graphNavigation.filteredNodeCount, expandedFixture.nodes.length);
+  assert.ok(graphNavigation.visibleNodeCount < graphNavigation.filteredNodeCount, "neighborhood mode should reduce visible nodes");
+  assert.equal(graphNavigation.selectedVisible, true);
+  assert.ok(graphNavigation.jumpOptions.length >= expandedFixture.nodes.length);
+  assert.ok(graphNavigation.selectedNeighborCount >= 1);
+  assert.doesNotMatch(JSON.stringify(graphNavigation), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const containerHealth = buildContainerHealth(fixture);
   assert.equal(containerHealth.mode, "fixture-container-health");
@@ -644,6 +664,7 @@ try {
           "search-filter",
           "retrieval-trace",
           "dynamic-graph-layout",
+          "graph-navigation-controls",
           "editable-node",
           "container-health",
           "private-edit-guard",

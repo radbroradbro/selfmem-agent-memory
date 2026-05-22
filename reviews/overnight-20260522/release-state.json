@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T15:36:29Z",
+  "generatedAt": "2026-05-22T15:50:01Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -21,7 +21,7 @@
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the dynamic Brain UI graph layout slice. GitHub Actions run 26297064340 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after the dynamic Brain UI graph layout slice. The graph navigation controls slice is local-only until pushed and CI-verified."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -48,6 +48,7 @@
     "brain-ui-local-edit-overlay-browse",
     "brain-ui-selected-local-memory-materialize",
     "brain-ui-dynamic-graph-layout",
+    "brain-ui-graph-navigation-controls",
     "session-compaction-benchmark",
     "selfmem-update"
   ],

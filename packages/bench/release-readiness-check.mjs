@@ -62,6 +62,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-local-memory-materialize-review.md`,
   `${reviewDir}/brain-ui-dynamic-layout-evidence.md`,
   `${reviewDir}/gemini-brain-ui-dynamic-layout-review.md`,
+  `${reviewDir}/brain-ui-graph-navigation-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-graph-navigation-review.md`,
   `${reviewDir}/brain-ui-selected-audit-history-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-audit-history-review.md`,
   `${reviewDir}/brain-ui-selected-sync-dry-run-evidence.md`,
@@ -102,6 +104,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-local-memory-materialize.png`,
   `${reviewDir}/ui-evidence/brain-ui-dynamic-layout-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-dynamic-layout.png`,
+  `${reviewDir}/ui-evidence/brain-ui-graph-navigation-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-graph-navigation.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -407,6 +411,23 @@ check("dom evidence is sane", () => {
   assert.equal(layoutEvidence.overlapCount, 0);
   assert.equal(layoutEvidence.hasPrivateOrKeyText, false);
   assert.equal(layoutEvidence.consoleErrorCount, 0);
+
+  const graphNavigationEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-graph-navigation-evidence.json"), "utf8"),
+  );
+  assert.equal(graphNavigationEvidence.ok, true);
+  assert.equal(graphNavigationEvidence.mode, "fixture-graph-navigation-controls");
+  assert.equal(graphNavigationEvidence.writesRealFiles, false);
+  assert.equal(graphNavigationEvidence.scope, "neighborhood");
+  assert.ok(graphNavigationEvidence.visibleNodeCount >= 1);
+  assert.ok(graphNavigationEvidence.jumpOptions >= graphNavigationEvidence.visibleNodeCount);
+  assert.equal(graphNavigationEvidence.selectedVisible, true);
+  assert.equal(graphNavigationEvidence.activeNeighborhood, true);
+  assert.equal(graphNavigationEvidence.hasGraphToolbar, true);
+  assert.equal(graphNavigationEvidence.hasJumpSelect, true);
+  assert.equal(graphNavigationEvidence.hasCenterButton, true);
+  assert.equal(graphNavigationEvidence.hasPrivateOrKeyText, false);
+  assert.equal(graphNavigationEvidence.consoleErrorCount, 0);
 });
 
 check("release state is conservative", () => {
@@ -441,6 +462,7 @@ check("release state is conservative", () => {
     "brain-ui-local-edit-overlay-browse",
     "brain-ui-selected-local-memory-materialize",
     "brain-ui-dynamic-graph-layout",
+    "brain-ui-graph-navigation-controls",
     "session-compaction-benchmark",
     "selfmem-update",
   ]) {
@@ -477,6 +499,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /overlay browse|edit overlay.*browse|browse.*edit overlay/i, `${file} missing edit overlay browse`);
     assert.match(text, /materialize|materialization/i, `${file} missing local memory materialize`);
     assert.match(text, /dynamic graph layout|dynamic layout|graph layout/i, `${file} missing dynamic graph layout`);
+    assert.match(text, /graph navigation|jump-to-node|neighborhood scope|all-vs-neighborhood/i, `${file} missing graph navigation`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });

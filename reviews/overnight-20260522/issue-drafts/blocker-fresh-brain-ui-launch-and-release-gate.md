@@ -47,6 +47,10 @@ or explicitly accepted.
   Brain UI graph layout slice became required. Fixture browser evidence reports
   `dynamic-graph-layout`, 9 nodes, 9 edges, 2 columns, 5 rows, zero overlaps,
   zero console errors, and no private/key-shaped visible text.
+- Local graph navigation controls evidence passed with neighborhood scope, 3
+  visible fixture nodes, 9 jump options, selected-node visibility, zero console
+  errors, and no private/key-shaped visible text. CI for that slice is pending
+  until pushed.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was
@@ -63,7 +67,7 @@ local-container mode, and a public release note that does not overclaim.
 
 - Fresh `brain:serve` or `brain:smoke` passes on localhost with fixture data.
 - Browser or Playwright evidence covers search, graph/index navigation,
-  dynamic graph layout, provenance, lifecycle/retrieval trace, derived doc edit, save/cancel behavior,
+  dynamic graph layout, graph navigation controls, provenance, lifecycle/retrieval trace, derived doc edit, save/cancel behavior,
   Nucleus snapshot preview, research lineage, wiki/vault preview, sync conflict
   view, selected local-container browse, selected local memory edit overlay,
   local edit overlay browse visibility, selected local memory materialize,

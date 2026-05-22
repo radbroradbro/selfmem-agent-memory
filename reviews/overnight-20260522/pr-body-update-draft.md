@@ -29,6 +29,9 @@ Retry note:
   `26295772356` passed on `21fd4d6`.
 - It was refreshed again after the dynamic Brain UI layout slice passed
   GitHub Actions CI run `26297064340` on `be47cff`.
+- It was refreshed again after local graph navigation controls were verified
+  with fixture browser evidence. CI verification for that slice is pending
+  until pushed.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -37,7 +40,7 @@ Retry note:
 
 - Adds the Nucleus Index contract for memory nodes, lifecycle events, retrieval traces, wiki pages, research questions, hypotheses, decisions, and evidence.
 - Adds LLM-wiki compile/sync flow with Obsidian-style frontmatter, wikilinks, index/log pages, provenance, linting, reviewed-page conflict handling, and optional content-free pre-write audit logging.
-- Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, vault preview, and sync-report inspection.
+- Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, graph navigation controls, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, vault preview, and sync-report inspection.
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
@@ -61,6 +64,9 @@ Latest local verification includes the guarded local memory materialize slice.
 - Local dynamic graph layout evidence: `dynamic-graph-layout`, 9 fixture nodes,
   9 fixture edges, 2 columns, 5 rows, zero overlaps, zero console errors, and
   no private/key-shaped visible text.
+- Local graph navigation evidence: neighborhood scope, 3 visible fixture nodes,
+  9 jump options, selected-node visibility, zero console errors, and no
+  private/key-shaped visible text.
 - GitHub Actions CI: run `26288370812` passed on `2888f91`, the latest baseline inspected before this draft.
 - GitHub Actions CI: run `26289073223` passed on `dd17f44`, the release-state guard follow-up commit.
 - GitHub Actions CI: run `26292137539` passed on `3b5e140`, the guarded lifecycle policy apply commit.
@@ -91,5 +97,7 @@ Latest local verification includes the guarded local memory materialize slice.
 - `reviews/overnight-20260522/ui-evidence/README.md`
 - `reviews/overnight-20260522/brain-ui-dynamic-layout-evidence.md`
 - `reviews/overnight-20260522/gemini-brain-ui-dynamic-layout-review.md`
+- `reviews/overnight-20260522/brain-ui-graph-navigation-evidence.md`
+- `reviews/overnight-20260522/gemini-brain-ui-graph-navigation-review.md`
 - `packages/bench/release-readiness-check.mjs`
 ```

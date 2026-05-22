@@ -14,7 +14,7 @@ The current PR adds:
 - an LLM-wiki compiler with Obsidian-style frontmatter, wikilinks, index/log
   pages, provenance, conflict handling for reviewed pages, and optional
   content-free pre-write audit logging;
-- a fixture-only Brain UI for graph browsing with dynamic graph layout, search, provenance, timeline
+- a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
   lineage, vault preview, sync-report inspection, selected vault sync dry-run,
   selected vault sync apply, selected local-container browse, lifecycle policy
@@ -73,6 +73,9 @@ Latest verified head before this draft refresh:
 - Dynamic graph layout evidence: 9 fixture nodes, 9 fixture edges, 2 columns,
   5 rows, zero overlaps, zero console errors, and no private/key-shaped visible
   text
+- Graph navigation evidence: neighborhood scope, 3 visible fixture nodes, 9
+  jump options, selected-node visibility, zero console errors, and no
+  private/key-shaped visible text
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
 - Completion audit: not complete, with public launch still blocked on human

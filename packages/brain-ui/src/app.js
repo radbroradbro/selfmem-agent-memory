@@ -1,6 +1,7 @@
 import {
   buildContainerHealth,
   buildEditExport,
+  buildGraphNavigation,
   buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
@@ -8,6 +9,7 @@ import {
   buildResearchLineage,
   containsPrivateLikeText,
   filteredNodes as selectFilteredNodes,
+  graphScopedNodes,
   mergeSelectedAuditTrail,
   preferredVaultPath,
 } from "./model.js";
@@ -18,6 +20,7 @@ const state = {
   snapshot: null,
   filter: "all",
   query: "",
+  graphScope: "all",
   selectedId: null,
   edits: readEdits(),
   vault: null,
@@ -40,6 +43,9 @@ const state = {
 
 const searchInput = document.querySelector("#searchInput");
 const graph = document.querySelector("#graph");
+const graphNavigationStatus = document.querySelector("#graphNavigationStatus");
+const graphNodeJump = document.querySelector("#graphNodeJump");
+const centerSelected = document.querySelector("#centerSelected");
 const nodeCount = document.querySelector("#nodeCount");
 const edgeCount = document.querySelector("#edgeCount");
 const editableCount = document.querySelector("#editableCount");
@@ -176,6 +182,27 @@ document.querySelectorAll("[data-filter]").forEach((button) => {
     button.classList.add("active");
     render();
   });
+});
+
+document.querySelectorAll("[data-graph-scope]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.graphScope = button.dataset.graphScope === "neighborhood" ? "neighborhood" : "all";
+    document.querySelectorAll("[data-graph-scope]").forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    render();
+    centerSelectedNode();
+  });
+});
+
+graphNodeJump.addEventListener("change", (event) => {
+  state.selectedId = event.target.value;
+  editStatus.textContent = "";
+  render();
+  centerSelectedNode();
+});
+
+centerSelected.addEventListener("click", () => {
+  centerSelectedNode();
 });
 
 saveEdit.addEventListener("click", () => {
@@ -429,10 +456,12 @@ selectedAuditForm.addEventListener("submit", async (event) => {
 });
 
 function render() {
-  const nodes = filteredNodes();
-  const selected = currentSelected(nodes);
+  const filtered = filteredNodes();
+  const selected = currentSelected(filtered);
+  const nodes = graphScopedNodes(state.snapshot, filtered, state.selectedId, state.graphScope);
   renderMetrics();
   renderContainerHealth();
+  renderGraphNavigation(filtered, nodes);
   renderGraph(nodes);
   renderTimeline(nodes);
   renderDetails(selected);
@@ -487,6 +516,8 @@ function renderGraph(nodes) {
   graph.dataset.layoutMode = layout.mode;
   graph.dataset.layoutColumns = String(layout.columns);
   graph.dataset.layoutRows = String(layout.rows);
+  graph.dataset.graphScope = state.graphScope;
+  graph.dataset.visibleNodeCount = String(nodes.length);
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("viewBox", `0 0 100 ${layout.height}`);
@@ -531,9 +562,42 @@ function renderGraph(nodes) {
       state.selectedId = node.id;
       editStatus.textContent = "";
       render();
+      centerSelectedNode();
     });
     graph.append(button);
   }
+}
+
+function renderGraphNavigation(filtered, nodes) {
+  const navigation = buildGraphNavigation(state.snapshot, filtered, nodes, state.selectedId, state.graphScope);
+  graphNavigationStatus.textContent = `${navigation.visibleNodeCount}/${navigation.filteredNodeCount} nodes | ${navigation.selectedNeighborCount} links`;
+  graphNavigationStatus.dataset.mode = navigation.mode;
+  graphNavigationStatus.dataset.scope = navigation.scope;
+  graphNavigationStatus.dataset.visibleNodeCount = String(navigation.visibleNodeCount);
+  graphNavigationStatus.dataset.filteredNodeCount = String(navigation.filteredNodeCount);
+  graphNavigationStatus.dataset.neighborCount = String(navigation.selectedNeighborCount);
+  graphNodeJump.replaceChildren(
+    ...navigation.jumpOptions.map((option) => {
+      const item = document.createElement("option");
+      item.value = option.id;
+      item.textContent = `${option.kind.replaceAll("_", " ")} | ${option.title}`;
+      item.selected = option.id === state.selectedId;
+      return item;
+    }),
+  );
+  graphNodeJump.disabled = navigation.jumpOptions.length === 0;
+  centerSelected.disabled = !navigation.selectedVisible;
+  document.querySelectorAll("[data-graph-scope]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.graphScope === navigation.scope);
+  });
+}
+
+function centerSelectedNode() {
+  requestAnimationFrame(() => {
+    const selected = graph.querySelector(".node.selected");
+    if (!selected) return;
+    selected.scrollIntoView({ block: "center", inline: "center" });
+  });
 }
 
 function renderTimeline(nodes) {

@@ -58,6 +58,18 @@
             <p>Hybrid recall, lifecycle, wiki sync, and research lineage in one inspectable map.</p>
           </div>
           <div class="review-pill">fixture-safe evidence</div>
+          <div class="graph-toolbar" aria-label="Graph navigation controls">
+            <div class="scope-toggle" role="group" aria-label="Graph scope">
+              <button type="button" data-graph-scope="all" class="active">All</button>
+              <button type="button" data-graph-scope="neighborhood">Neighborhood</button>
+            </div>
+            <label>
+              <span>Jump</span>
+              <select id="graphNodeJump" name="graphNodeJump" aria-label="Jump to Nucleus node"></select>
+            </label>
+            <button id="centerSelected" type="button">Center</button>
+            <p id="graphNavigationStatus" role="status"></p>
+          </div>
         </header>
         <div id="graph" class="graph" aria-label="Interactive Nucleus graph"></div>
         <section class="timeline" aria-label="Low-noise memory timeline">

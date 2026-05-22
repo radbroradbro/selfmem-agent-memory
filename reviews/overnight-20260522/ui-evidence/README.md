@@ -79,6 +79,12 @@
   fresh Brain UI smoke, and interaction smoke. A fixture-only screenshot was
   captured at `brain-ui-dynamic-layout.png`, and
   `brain-ui-dynamic-layout-evidence.json` reports `overlapCount: 0`.
+- The graph navigation controls slice was verified by Codex Browser DOM
+  evidence, fresh Brain UI smoke, and interaction smoke. A fixture-only
+  screenshot was captured at `brain-ui-graph-navigation.png`, and
+  `brain-ui-graph-navigation-evidence.json` reports neighborhood scope,
+  jump-to-node options, selected-node visibility, zero console errors, and no
+  private/key-shaped visible text.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.
@@ -122,7 +128,10 @@ Applied in this PR:
 - graph-node confidence text,
 - deterministic dynamic graph layout with vertical growth and no-overlap
   browser evidence.
+- graph navigation controls for all-vs-neighborhood scope, jump-to-node, and
+  selected-node centering.
 
 Deferred:
 
-- richer graph layout controls for very large real local containers.
+- large-container clustering and pagination after real local-container UX is
+  approved.

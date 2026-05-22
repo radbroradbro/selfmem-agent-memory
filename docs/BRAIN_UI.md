@@ -11,6 +11,8 @@ The UI should expose:
 
 - Nucleus graph nodes and edges,
 - deterministic dynamic graph layout with vertical growth,
+- graph navigation controls for all-vs-neighborhood scope, jump-to-node, and
+  selected-node centering,
 - container health and provider mode,
 - hybrid retrieval traces,
 - lifecycle and sleep-cycle events,
@@ -59,27 +61,29 @@ Required visual review path:
 
 1. search,
 2. graph navigation,
-3. dynamic layout spacing and scroll behavior,
-4. retrieval trace inspection,
-5. lifecycle event inspection,
-6. derived doc edit,
-7. save or reset,
-8. draft export preview,
-9. timeline scan,
-10. provenance scan,
-11. Nucleus snapshot preview,
-12. research lineage preview,
-13. lifecycle policy preview,
-14. selected lifecycle policy apply confirmation,
-15. memory review queue preview,
-16. selected memory review queue apply confirmation,
-17. compiled wiki/vault preview,
-18. fixture vault sync report with conflict handling,
-19. selected local vault sync dry-run,
-20. selected local vault sync apply confirmation,
-21. fixture local-container audit preflight,
-22. selected local memory edit overlay confirmation,
-23. selected local memory materialize confirmation.
+3. graph navigation controls: all scope, neighborhood scope, jump-to-node,
+   selected-node center,
+4. dynamic layout spacing and scroll behavior,
+5. retrieval trace inspection,
+6. lifecycle event inspection,
+7. derived doc edit,
+8. save or reset,
+9. draft export preview,
+10. timeline scan,
+11. provenance scan,
+12. Nucleus snapshot preview,
+13. research lineage preview,
+14. lifecycle policy preview,
+15. selected lifecycle policy apply confirmation,
+16. memory review queue preview,
+17. selected memory review queue apply confirmation,
+18. compiled wiki/vault preview,
+19. fixture vault sync report with conflict handling,
+20. selected local vault sync dry-run,
+21. selected local vault sync apply confirmation,
+22. fixture local-container audit preflight,
+23. selected local memory edit overlay confirmation,
+24. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -102,6 +106,13 @@ edges and kind fallback order, limits columns so cards do not overlap in the
 center panel, and grows vertically with scroll when the visible graph expands.
 The browser evidence records layout mode, node count, edge count, column count,
 row count, overlap count, console errors, and private/key-shaped text checks.
+
+Graph navigation is also fixture-safe. The controls can show the full filtered
+graph, narrow the current graph to the selected node's direct neighborhood,
+jump to any node in the filtered result set, and center the selected graph
+card. The browser evidence records navigation mode, active scope, visible node
+count, jump option count, selected-node visibility, console errors, and
+private/key-shaped text checks.
 
 The Lifecycle Policy panel stages recall and write-policy choices as a fixture
 draft export. It clamps numeric settings, limits low-confidence write behavior
@@ -206,6 +217,7 @@ Before connecting real local containers, the UI needs:
 - selected local-container browse preview,
 - selected local memory edit overlay,
 - selected local memory materialize with backup,
+- graph navigation controls for large filtered result sets,
 - write confirmation for derived docs,
 - wiki lint before save,
 - Nucleus snapshot export against a selected redacted local container,

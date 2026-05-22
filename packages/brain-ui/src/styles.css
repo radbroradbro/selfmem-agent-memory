@@ -244,8 +244,8 @@ button.active {
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 20px;
   align-items: center;
   padding: 18px 22px;
@@ -274,12 +274,53 @@ button.active {
 }
 
 .review-pill {
+  justify-self: end;
+  align-self: start;
   border: 1px solid rgba(99, 214, 197, 0.55);
   border-radius: 999px;
   color: var(--cyan);
   padding: 7px 12px;
   white-space: nowrap;
   background: rgba(99, 214, 197, 0.08);
+}
+
+.graph-toolbar {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) auto minmax(84px, auto);
+  gap: 8px;
+  align-items: end;
+}
+
+.graph-toolbar label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.graph-toolbar select {
+  min-height: 36px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: #10151a;
+  color: var(--text);
+}
+
+.scope-toggle {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) minmax(118px, auto);
+  gap: 6px;
+}
+
+.graph-toolbar p {
+  align-self: center;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
 .graph {

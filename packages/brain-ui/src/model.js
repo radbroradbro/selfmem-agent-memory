@@ -69,6 +69,39 @@ function buildGraphLayout(snapshot, visibleNodes) {
   };
 }
 
+function graphScopedNodes(snapshot, visibleNodes, selectedId, scope) {
+  const nodes = Array.isArray(visibleNodes) ? visibleNodes : [];
+  if (scope !== "neighborhood" || !selectedId) return nodes;
+  const neighborIds = selectedNeighborhoodIds(snapshot, selectedId);
+  return nodes.filter((node) => neighborIds.has(node.id));
+}
+
+function buildGraphNavigation(snapshot, filteredNodes, visibleNodes, selectedId, scope) {
+  const filtered = Array.isArray(filteredNodes) ? filteredNodes : [];
+  const visible = Array.isArray(visibleNodes) ? visibleNodes : [];
+  const selected = safeExportText(selectedId ?? "");
+  const visibleIds = new Set(visible.map((node) => node.id));
+  const neighborIds = selectedNeighborhoodIds(snapshot, selected);
+  return {
+    schemaVersion: 1,
+    mode: "fixture-graph-navigation",
+    writesRealFiles: false,
+    scope: scope === "neighborhood" ? "neighborhood" : "all",
+    selectedId: selected,
+    selectedVisible: visibleIds.has(selected),
+    filteredNodeCount: filtered.length,
+    visibleNodeCount: visible.length,
+    visibleEdgeCount: (snapshot.edges ?? []).filter((edge) => visibleIds.has(edge.from) && visibleIds.has(edge.to)).length,
+    selectedNeighborCount: selected ? Math.max(0, neighborIds.size - 1) : 0,
+    jumpOptions: filtered.map((node) => ({
+      id: safeExportText(node.id),
+      title: safeExportText(node.title),
+      kind: safeExportText(node.kind),
+      edgeCount: (snapshot.edges ?? []).filter((edge) => edge.from === node.id || edge.to === node.id).length,
+    })),
+  };
+}
+
 function buildNucleusExport(snapshot) {
   const kindCounts = snapshot.nodes.reduce((counts, node) => {
     const kind = safeExportText(node.kind);
@@ -364,6 +397,17 @@ function preferredVaultPath(vault, node) {
   return files.find((file) => file.path === "wiki/index.md")?.path ?? files[0]?.path ?? "";
 }
 
+function selectedNeighborhoodIds(snapshot, selectedId) {
+  const selected = safeExportText(selectedId ?? "");
+  if (!selected) return new Set();
+  const ids = new Set([selected]);
+  for (const edge of snapshot.edges ?? []) {
+    if (edge.from === selected) ids.add(edge.to);
+    if (edge.to === selected) ids.add(edge.from);
+  }
+  return ids;
+}
+
 function rankVisibleNodes(snapshot, nodes, edges) {
   const incoming = new Map(nodes.map((node) => [node.id, 0]));
   const outgoing = new Map(nodes.map((node) => [node.id, []]));
@@ -499,6 +543,7 @@ function nodeSummary(node) {
 export {
   buildEditExport,
   buildContainerHealth,
+  buildGraphNavigation,
   buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
@@ -507,6 +552,7 @@ export {
   buildSelectedAuditTrailEntry,
   containsPrivateLikeText,
   filteredNodes,
+  graphScopedNodes,
   mergeSelectedAuditTrail,
   preferredVaultPath,
   redactPrivateLikeText,
