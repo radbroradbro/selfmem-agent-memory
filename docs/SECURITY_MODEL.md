@@ -70,3 +70,8 @@ requires an explicit directory, inspects only known runtime filenames, redacts
 the root path, returns counts and health reasons, and never returns raw memory
 or event text. It is a preflight for future Brain UI local mode, not permission
 to display live memories.
+
+The Brain UI selected audit route is disabled unless
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` is set. When enabled, it requires
+read-only confirmation, clears the typed path after submit, and displays only a
+redacted `.../container` label.

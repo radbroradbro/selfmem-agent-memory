@@ -25,9 +25,10 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   wiki pages, and research lineage.
 - LLM-wiki compiler and disk-sync flow with lint and reviewed-page conflict
   handling.
-- Fixture-only Brain UI for search, graph/index inspection, provenance,
+- Fixture-first Brain UI for search, graph/index inspection, provenance,
   lifecycle/retrieval trace inspection, derived doc editing, draft export,
-  vault preview, sync report, and Nucleus snapshot preview.
+  vault preview, sync report, Nucleus snapshot preview, local audit preflight,
+  and selected local-container audit preview.
 - Session compaction fixture benchmark.
 - Dry-run-first updater wrapper and updater smoke.
 - Release-readiness gate.
@@ -39,7 +40,7 @@ These are proposed on PR #5. They are not yet merged to `main`.
 Passed in this run:
 
 - `npm run build`
-- `npm run test`: 5 files, 18 tests
+- `npm run test`: 6 files, 20 tests
 - `npm run typecheck`
 - `npm run privacy:test`
 - `npm run smoke:openclaw`: `privacyLeakCount: 0`
@@ -50,6 +51,7 @@ Passed in this run:
 - `npm run wiki:smoke:built`
 - `npm run wiki:sync:smoke:built`
 - `npm run update:smoke`
+- `npm run release:check`
 - `git diff --check`
 - Core package `npm pack --dry-run` when npm used a writable temporary cache
 
@@ -69,10 +71,12 @@ Controller follow-up after that sandbox run:
 
 - `pnpm brain:smoke`: passed with the fresh Brain UI.
 - `pnpm release:check`: passed.
-- GitHub Actions `Verify` on `ec37f86` passed, including Test, Full smoke, and
+- GitHub Actions `Verify` on `f867792` passed, including Test, Full smoke, and
   Release readiness check.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.
+- Focused Gemini reviews for Brain UI local-audit preview and selected
+  local-audit preview returned `CLEAN` verdicts.
 
 ## UI Evidence
 
@@ -85,7 +89,9 @@ evidence for:
 - sync report,
 - edit draft export,
 - Nucleus snapshot preview.
-- research-lineage preview.
+- research-lineage preview,
+- local audit preflight,
+- selected local-container audit preview.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
@@ -98,9 +104,9 @@ still wait for the remaining reviewer and human-approval gates.
 | --- | --- | --- |
 | Security/privacy | PASS WITH CONCERNS | Redaction, secret-pattern, forbidden-file, and privacy smokes are strong, but current reviewer routes are blocked. |
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
-| Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; real local-container UI mode remains deferred. |
+| Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit preview is read-only and gated. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists and fresh controller/CI checks pass; real-container mode is not present. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, selected local-container audit preview is gated and read-only, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |
@@ -130,7 +136,11 @@ Use only bundled fixture data:
 6. Open the Nucleus snapshot preview and confirm `writesRealFiles: false`.
 7. Open the wiki/vault preview and sync report, including the reviewed-page
    conflict note.
-8. End with the release-readiness gate output and residual alpha caveats.
+8. Open the local audit preflight panel.
+9. Optional, in a throwaway fixture only: start with
+   `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1`, run selected local-container
+   audit, and confirm the visible path is redacted.
+10. End with the release-readiness gate output and residual alpha caveats.
 
 Do not record real local memories, raw session history, private diagnostics,
 credentials, private paths, or real agent logs.

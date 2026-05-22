@@ -17,6 +17,8 @@ This roadmap tracks useful user-facing features without mixing them into the cur
   snapshot, research lineage, compiled vault preview, and dry-run sync report.
 - Read-only local-container audit preflight that returns counts and health
   reasons without exposing raw memory content or private paths.
+- Disabled-by-default selected local-container audit preview with read-only
+  confirmation and redacted `.../container` path display.
 
 ## Brain UI
 
