@@ -233,6 +233,11 @@ Latest local verification before this summary:
   launch verdict blocked while GitHub write routes are unavailable. GitHub
   Actions CI run `26308475033` passed on `6a33e62`; dynamic follow-up CI run
   `26308588261` passed on `8efe4d0`.
+- Goal completion audit verification: local `goal:audit` now maps the full
+  active objective to current evidence. It reports `goalComplete: false`,
+  `mayCallUpdateGoalComplete: false`, 10 proven requirements, 5 blocked
+  requirements, and 1 incomplete requirement, preserving the reviewer, GitHub,
+  human approval, hosted-baseline, and real-rollout blockers.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,
@@ -486,7 +491,8 @@ local memory contents.
   app cannot update the PR body, add a PR status comment, or create the blocker
   issue, and a human release decision has not been made. Use the generated
   GitHub handoff packet as the manual GitHub source of truth while that remains
-  true.
+  true. Use the goal completion audit before any future attempt to mark the
+  native goal complete.
 
 ## Next Recommended Slice
 

@@ -308,6 +308,10 @@ evidence for:
   packet writes no files, uses fixture/public release metadata only, reports
   zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI
   runs `26308475033` on `6a33e62` and `26308588261` on `8efe4d0` passed.
+- goal completion audit evidence with `goalComplete: false`,
+  `mayCallUpdateGoalComplete: false`, 10 proven requirements, 5 blocked
+  requirements, and 1 incomplete requirement. This keeps production readiness
+  separate from the native thread goal completion claim.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
@@ -333,6 +337,7 @@ Use
 `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`
 as a conservative issue draft if the current PR is not immediately updated.
 Run `release:handoff` first for the generated manual GitHub packet.
+Run `goal:audit` before any claim that the native goal itself is complete.
 
 ## Public Live Update Status
 

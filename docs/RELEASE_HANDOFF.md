@@ -62,6 +62,19 @@ The doctor is intentionally conservative. It should report
 approval, and hosted-baseline blockers are resolved or explicitly accepted.
 Use its `manualCommands` list as the next-action checklist for agents.
 
+## Goal Completion Audit
+
+Run this before anyone claims the active goal is complete:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- goal:audit
+```
+
+The audit must report `goalComplete: false` while Claude review, GitHub write
+routes, human approval, hosted-baseline, or real rollout evidence remain
+blocked. Do not call the native goal complete unless a later audit proves every
+requirement with current evidence.
+
 ## Reviewer Route Choices
 
 Before merge, choose one path:

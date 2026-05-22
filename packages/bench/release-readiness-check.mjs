@@ -24,6 +24,7 @@ const requiredFiles = [
   "packages/brain-ui/fixtures/model-matrix.json",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
+  "packages/bench/goal-completion-audit.mjs",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
   `${reviewDir}/claude-pr5-review-blocked.md`,
@@ -106,6 +107,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-release-blocker-doctor-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
   `${reviewDir}/gemini-github-handoff-packet-review.md`,
+  `${reviewDir}/goal-completion-audit-evidence.md`,
+  `${reviewDir}/gemini-goal-completion-audit-review.md`,
   `${reviewDir}/release-state.json`,
   `${reviewDir}/gemini-release-state-guard-review.md`,
   `${reviewDir}/production-readiness.md`,
@@ -196,6 +199,7 @@ const requiredScripts = [
   "wiki:sync:smoke:built",
   "update:smoke",
   "consumer:smoke",
+  "goal:audit",
   "release:doctor",
   "release:handoff",
   "smoke",
@@ -743,6 +747,7 @@ check("release state is conservative", () => {
     "clean-consumer-smoke",
     "release-blocker-doctor",
     "github-handoff-packet",
+    "goal-completion-audit",
     "selfmem-update",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
@@ -791,6 +796,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /clean consumer|consumer smoke|clean checkout/i, `${file} missing clean consumer smoke`);
     assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
     assert.match(text, /github handoff|handoff packet|manual GitHub/i, `${file} missing GitHub handoff packet`);
+    assert.match(text, /goal completion audit|goal:audit|completion audit/i, `${file} missing goal completion audit`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });
@@ -883,6 +889,29 @@ check("fresh GitHub handoff packet passes", () => {
   assert.match(packet.statusComment, /public launch verdict: FAIL/i);
   assert.match(packet.issueBody, /Acceptance Criteria/);
   assert.ok(packet.labels.includes("not-production-ready"));
+  assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.doesNotMatch(geminiReview, /pending external review/i);
+});
+
+check("fresh goal completion audit passes", () => {
+  const result = run("node", ["packages/bench/goal-completion-audit.mjs"]);
+  const report = JSON.parse(result.stdout);
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-goal-completion-audit-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "goal-completion-audit");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.goalComplete, false);
+  assert.equal(report.mayCallUpdateGoalComplete, false);
+  assert.ok(report.counts?.proven >= 8);
+  assert.ok(report.counts?.blocked >= 4);
+  assert.ok(report.counts?.incomplete >= 1);
+  assert.equal(report.safety?.privateLeakCount, 0);
+  assert.equal(report.safety?.hasSecretPattern, false);
+  assert.ok(report.requirements.some((item) => item.id === "claude-council-review" && item.status === "blocked"));
+  assert.ok(report.requirements.some((item) => item.id === "github-pr-body-current" && item.status === "blocked"));
+  assert.ok(
+    report.requirements.some((item) => item.id === "real-container-production-rollout" && item.status === "incomplete"),
+  );
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
 });

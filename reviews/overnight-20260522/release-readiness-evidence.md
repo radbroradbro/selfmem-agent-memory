@@ -119,6 +119,10 @@ Scope:
   private research notes or local memory.
 - Added Gemini review for the browser evidence gate and made that review packet
   a required release-readiness artifact.
+- Added a machine-readable goal completion audit to the release gate. The audit
+  maps the full active objective to current evidence and must keep
+  `goalComplete: false` while reviewer, GitHub write-route, human approval,
+  hosted-baseline, or real-rollout blockers remain unresolved.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.

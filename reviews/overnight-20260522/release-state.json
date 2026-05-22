@@ -63,6 +63,7 @@
     "clean-consumer-smoke",
     "release-blocker-doctor",
     "github-handoff-packet",
+    "goal-completion-audit",
     "selfmem-update"
   ],
   "remainingBlockers": [

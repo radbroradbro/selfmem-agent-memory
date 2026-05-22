@@ -84,6 +84,9 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 10 proven
+  requirements, 5 blocked requirements, and 1 incomplete requirement, so this
+  remains a public-readiness candidate rather than a completed production goal
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

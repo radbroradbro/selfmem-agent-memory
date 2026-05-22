@@ -86,6 +86,10 @@ Retry note:
   so the PR body, status comment, blocker issue, labels, and manual GitHub
   steps can be copied from one audited JSON output while GitHub write routes
   are blocked.
+- A machine-readable goal completion audit is now available through
+  `goal:audit`; it reports `goalComplete: false` and blocks any native goal
+  completion claim until reviewer, GitHub, human approval, hosted-baseline, and
+  real-rollout requirements are resolved.
 - GitHub Actions CI run `26308475033` passed on `6a33e62`, the GitHub handoff
   packet gate commit.
 - GitHub Actions CI run `26308588261` passed on `8efe4d0`, the dynamic handoff
@@ -122,6 +126,7 @@ Latest local verification includes the release handoff gate slice.
 - Local `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
 - Local `node packages/bench/release-readiness-check.mjs`: passed.
 - Local `node packages/bench/github-handoff-packet.mjs`: passed.
+- Local `node packages/bench/goal-completion-audit.mjs`: passed.
 - Local `node packages/bench/session-compaction-local-audit.mjs --strict`: passed.
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
@@ -170,6 +175,9 @@ Latest local verification includes the release handoff gate slice.
   comment, blocker issue title/body, labels, and manual GitHub steps, with
   `writesRealFiles: false`, `privateLeakCount: 0`, and `hasSecretPattern:
   false`.
+- Local goal completion audit evidence: machine-readable requirement matrix
+  with `goalComplete: false`, 10 proven requirements, 5 blocked requirements,
+  and 1 incomplete requirement.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6`, captured a 1280 by 1223 screenshot, showed Nucleus, wiki/vault
   sync, Model Matrix, Context Preview, Release Readiness, Compaction Audit,
