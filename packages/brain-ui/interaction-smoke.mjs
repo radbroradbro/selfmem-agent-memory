@@ -10,6 +10,7 @@ import {
   buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
+  buildModelMatrix,
   buildNucleusExport,
   buildBenchmarkDashboard,
   buildCanaryRollout,
@@ -32,6 +33,7 @@ const sessionCompactionFixture = JSON.parse(await readFile(join(here, "fixtures/
 const benchmarkSummaryFixture = JSON.parse(await readFile(join(here, "fixtures/benchmark-summary.json"), "utf8"));
 const canaryRolloutFixture = JSON.parse(await readFile(join(here, "fixtures/canary-rollout.json"), "utf8"));
 const researchSourceLockFixture = JSON.parse(await readFile(join(here, "fixtures/research-source-lock.json"), "utf8"));
+const modelMatrixFixture = JSON.parse(await readFile(join(here, "fixtures/model-matrix.json"), "utf8"));
 const promptContextFixture = JSON.parse(await readFile(join(here, "fixtures/prompt-context-preview.json"), "utf8"));
 const releaseReadinessFixture = JSON.parse(await readFile(join(here, "fixtures/release-readiness.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
@@ -275,6 +277,27 @@ try {
   assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:dashboard-to-cluster-zoom"));
   assert.ok(researchSourceLock.benchmarkTargets.some((target) => target.id === "bench:agentic-canary"));
   assert.doesNotMatch(JSON.stringify(researchSourceLock), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+
+  const modelMatrix = buildModelMatrix(modelMatrixFixture);
+  assert.equal(modelMatrix.mode, "fixture-model-autoresearch-matrix");
+  assert.equal(modelMatrix.writesRealFiles, false);
+  assert.equal(modelMatrix.metricsOnly, true);
+  assert.equal(modelMatrix.defaults.cloudArm, "cloud-voyage4-voyage");
+  assert.equal(modelMatrix.defaults.localArm, "local-apple-qwen3-0_6b");
+  assert.equal(modelMatrix.defaults.queryExpansion, "off");
+  assert.equal(modelMatrix.defaults.credentialMode, "env-only");
+  assert.equal(modelMatrix.safety.credentialsEnvOnly, true);
+  assert.equal(modelMatrix.safety.queryExpansionOffByDefault, true);
+  assert.equal(modelMatrix.safety.privacyLeakCount, 0);
+  assert.ok(modelMatrix.localLane.targetHardware.includes("24GB"));
+  assert.ok(modelMatrix.localLane.embedder.includes("Qwen3-Embedding-0.6B"));
+  assert.ok(modelMatrix.localLane.runtime.includes("llama.cpp"));
+  assert.ok(modelMatrix.arms.some((arm) => arm.id === "cloud-nvidia-nemotron-1b" && arm.lane === "cloud"));
+  assert.ok(modelMatrix.arms.some((arm) => arm.id === "local-apple-qwen3-0_6b" && arm.lane === "local"));
+  assert.ok(modelMatrix.gates.some((gate) => gate.includes("same dataset slice")));
+  assert.ok(modelMatrix.gates.some((gate) => gate.includes("Provider credentials")));
+  assert.ok(modelMatrix.blockers.includes("hosted-supermemory-baseline-not-current"));
+  assert.doesNotMatch(JSON.stringify(modelMatrix), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const promptContext = buildPromptContextPreview(fixture, promptContextFixture);
   assert.equal(promptContext.mode, "fixture-prompt-context-preview");
@@ -801,6 +824,7 @@ try {
           "benchmark-dashboard",
           "canary-rollout",
           "research-source-lock",
+          "model-autoresearch-matrix",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy-draft",

@@ -62,6 +62,10 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - May 2026 model/autoresearch matrix gate that keeps Apple Silicon local model
   support, Voyage/Gemini/NVIDIA cloud challengers, and query expansion behind
   matched canary evidence instead of public benchmark claims.
+- Brain UI Model Matrix panel that renders the guarded cloud/local model
+  matrix, Apple Silicon local lane, query-expansion status, credential mode,
+  reviewer gates, and hosted-baseline blockers without touching private memory
+  or credentials.
 - Session compaction fixture benchmark.
 - Dry-run-first updater wrapper and updater smoke.
 - Release-readiness gate.
@@ -213,6 +217,12 @@ Controller follow-up after that sandbox run:
   `26305635737` on `22e17b1`. The release readiness check now requires the
   model matrix and autoresearch plan, verifies conservative local/cloud/query
   expansion defaults, and scans those docs/configs for key-shaped secrets.
+- Brain UI Model Matrix local verification passed fresh Brain UI smoke,
+  interaction smoke, browser evidence, release readiness check, and Gemini
+  focused review. Browser evidence reports 6 provider arms, 4 cloud arms, 2
+  local arms, Apple Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA
+  cloud arms, query expansion off, env-only credentials, 5 gates, 3 blockers,
+  zero console errors, and no private/key-shaped visible text.
 
 ## UI Evidence
 
@@ -258,6 +268,10 @@ evidence for:
   lifecycle-frequency decisions, dashboard-to-cluster zoom direction,
   collapsed technical export, zero privacy leaks, zero console errors, and no
   private/key-shaped visible text.
+- model matrix evidence with 6 fixture provider arms, Apple Silicon local
+  defaults, Voyage/Gemini/NVIDIA cloud arms, query expansion off, env-only
+  credential mode, reviewer gates, hosted-baseline blockers, zero console
+  errors, and no private/key-shaped visible text.
 - context preview evidence with the fixture prompt recall packet, selected and
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
@@ -279,7 +293,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Benchmark Dashboard shows fixture local-only compaction quality metrics and caveats, Canary Rollout shows the one-agent dry-run/apply/observe/rollback path, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Benchmark Dashboard shows fixture local-only compaction quality metrics and caveats, Canary Rollout shows the one-agent dry-run/apply/observe/rollback path, Research Source Lock shows methodology sources, Model Matrix shows guarded provider choices and local Apple Silicon defaults, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |

@@ -5,6 +5,7 @@ import {
   buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
+  buildModelMatrix,
   buildNucleusExport,
   buildBenchmarkDashboard,
   buildCanaryRollout,
@@ -35,6 +36,7 @@ const state = {
   benchmarkSummary: null,
   canaryRollout: null,
   researchSourceLock: null,
+  modelMatrix: null,
   promptContextPreview: null,
   releaseReadiness: null,
   selectedVaultPath: "",
@@ -75,6 +77,12 @@ const researchSourceLockSummary = document.querySelector("#researchSourceLockSum
 const researchSourceLockSources = document.querySelector("#researchSourceLockSources");
 const researchSourceLockRules = document.querySelector("#researchSourceLockRules");
 const researchSourceLockExport = document.querySelector("#researchSourceLockExport");
+const modelMatrixStatus = document.querySelector("#modelMatrixStatus");
+const modelMatrixSummary = document.querySelector("#modelMatrixSummary");
+const modelMatrixLocal = document.querySelector("#modelMatrixLocal");
+const modelMatrixArms = document.querySelector("#modelMatrixArms");
+const modelMatrixGates = document.querySelector("#modelMatrixGates");
+const modelMatrixExport = document.querySelector("#modelMatrixExport");
 const compactionAuditSummary = document.querySelector("#compactionAuditSummary");
 const compactionAuditFingerprints = document.querySelector("#compactionAuditFingerprints");
 const compactionAuditExport = document.querySelector("#compactionAuditExport");
@@ -201,6 +209,7 @@ const [
   benchmarkResponse,
   canaryResponse,
   researchSourceLockResponse,
+  modelMatrixResponse,
   promptContextResponse,
   releaseReadinessResponse,
   localAuditResponse,
@@ -213,6 +222,7 @@ const [
   fetch("/fixtures/benchmark-summary.json"),
   fetch("/fixtures/canary-rollout.json"),
   fetch("/fixtures/research-source-lock.json"),
+  fetch("/fixtures/model-matrix.json"),
   fetch("/fixtures/prompt-context-preview.json"),
   fetch("/fixtures/release-readiness.json"),
   fetch("/fixtures/local-container-audit.json"),
@@ -225,6 +235,7 @@ state.sessionCompactionAudit = await sessionCompactionResponse.json();
 state.benchmarkSummary = await benchmarkResponse.json();
 state.canaryRollout = await canaryResponse.json();
 state.researchSourceLock = await researchSourceLockResponse.json();
+state.modelMatrix = await modelMatrixResponse.json();
 state.promptContextPreview = await promptContextResponse.json();
 state.releaseReadiness = await releaseReadinessResponse.json();
 state.localAudit = await localAuditResponse.json();
@@ -535,6 +546,7 @@ function render() {
   renderNucleusSnapshot();
   renderResearchLineage();
   renderResearchSourceLock();
+  renderModelMatrix();
   renderSessionCompactionAudit();
   renderBenchmarkDashboard();
   renderCanaryRollout();
@@ -806,6 +818,62 @@ function renderResearchSourceLock() {
   }
 
   researchSourceLockExport.textContent = JSON.stringify(packet, null, 2);
+}
+
+function renderModelMatrix() {
+  const packet = buildModelMatrix(state.modelMatrix);
+  const statusText = packet.safety.queryExpansionOffByDefault && packet.safety.credentialsEnvOnly ? "guarded" : "needs review";
+  modelMatrixStatus.textContent = statusText;
+  modelMatrixStatus.dataset.status = statusText;
+  modelMatrixSummary.replaceChildren(
+    stat("Cloud default", packet.defaults.cloudArm),
+    stat("Local default", packet.defaults.localArm),
+    stat("Query expansion", packet.defaults.queryExpansion),
+    stat("Keys", packet.defaults.credentialMode),
+    stat("Cloud arms", packet.summary.cloudArms),
+    stat("Local arms", packet.summary.localArms),
+    stat("Gates", packet.summary.gates),
+    stat("Leaks", packet.safety.privacyLeakCount),
+  );
+
+  modelMatrixLocal.replaceChildren(
+    stat("Hardware", packet.localLane.targetHardware),
+    stat("Embedder", packet.localLane.embedder),
+    stat("Reranker", packet.localLane.reranker),
+    stat("Runtime", packet.localLane.runtime),
+    stat("Sources", packet.localLane.sourcePolicy),
+    stat("Processes", packet.localLane.staleProcessPolicy),
+  );
+
+  modelMatrixArms.replaceChildren();
+  for (const arm of packet.arms) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    item.dataset.lane = arm.lane;
+    item.dataset.status = arm.status;
+    strong.textContent = humanLabel(arm.status);
+    span.textContent = `${arm.id}: ${arm.embedder} + ${arm.reranker}`;
+    small.textContent = `${humanLabel(arm.lane)} | ${arm.purpose}`;
+    item.append(strong, span, small);
+    modelMatrixArms.append(item);
+  }
+
+  modelMatrixGates.replaceChildren();
+  for (const gate of [...packet.gates, ...packet.blockers]) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const isBlocker = packet.blockers.includes(gate);
+    strong.textContent = isBlocker ? "blocker" : "gate";
+    span.textContent = gate;
+    item.dataset.kind = isBlocker ? "blocker" : "gate";
+    item.append(strong, span);
+    modelMatrixGates.append(item);
+  }
+
+  modelMatrixExport.textContent = JSON.stringify(packet, null, 2);
 }
 
 function renderSessionCompactionAudit() {

@@ -54,6 +54,7 @@ is still required before any public live update.
 | Brain UI dynamic graph layout | `packages/brain-ui/src/model.js`, `reviews/overnight-20260522/brain-ui-dynamic-layout-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-dynamic-layout-review.md` |
 | Brain UI graph navigation controls | `packages/brain-ui/src/model.js`, `packages/brain-ui/src/app.js`, `reviews/overnight-20260522/brain-ui-graph-navigation-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-graph-navigation-review.md` |
 | Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml` |
+| Brain UI model matrix | `packages/brain-ui/fixtures/model-matrix.json`, `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
 | Brain UI draft export | `reviews/overnight-20260522/brain-ui-edit-export-evidence.md` |
@@ -202,6 +203,12 @@ Latest local verification before this summary:
   `26305635737` passed on `22e17b1`. The release check now requires the model
   matrix and autoresearch plan and validates conservative provider, query
   expansion, local runtime, and no-secret guardrails.
+- Brain UI Model Matrix verification: local smoke, interaction smoke, browser
+  evidence, release readiness check, and Gemini focused review passed locally.
+  Browser evidence reports 6 provider arms, 4 cloud arms, 2 local arms, Apple
+  Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA cloud arms, query
+  expansion off, env-only credentials, 5 gates, 3 blockers, zero console
+  errors, and no private/key-shaped visible text.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -330,6 +337,7 @@ local memory contents.
   CLI produced transient capacity warnings before returning the verdict.
 - Gemini Brain UI canary rollout review: `CLEAN`.
 - Gemini Brain UI research source lock review: `CLEAN`.
+- Gemini Brain UI model matrix review: `CLEAN`.
 - Gemini Brain UI release readiness review: `CLEAN`, with a note that Gemini
   CLI produced transient capacity warnings before returning the verdict.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after

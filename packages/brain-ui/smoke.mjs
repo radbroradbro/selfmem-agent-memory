@@ -21,6 +21,7 @@ try {
     benchmarkSummary,
     canaryRollout,
     researchSourceLock,
+    modelMatrix,
     promptContextPreview,
     releaseReadiness,
     localAudit,
@@ -38,6 +39,7 @@ try {
     json(`${base}/fixtures/benchmark-summary.json`),
     json(`${base}/fixtures/canary-rollout.json`),
     json(`${base}/fixtures/research-source-lock.json`),
+    json(`${base}/fixtures/model-matrix.json`),
     json(`${base}/fixtures/prompt-context-preview.json`),
     json(`${base}/fixtures/release-readiness.json`),
     json(`${base}/fixtures/local-container-audit.json`),
@@ -56,6 +58,7 @@ try {
   assert.match(index, /Benchmark Dashboard/);
   assert.match(index, /Canary Rollout/);
   assert.match(index, /Research Source Lock/);
+  assert.match(index, /Model Matrix/);
   assert.match(index, /Context Preview/);
   assert.match(index, /Release Readiness/);
   assert.match(index, /Lifecycle Policy/);
@@ -83,6 +86,8 @@ try {
   assert.match(app, /buildBenchmarkDashboard/);
   assert.match(app, /buildCanaryRollout/);
   assert.match(app, /buildResearchSourceLock/);
+  assert.match(app, /renderModelMatrix/);
+  assert.match(app, /buildModelMatrix/);
   assert.match(app, /buildPromptContextPreview/);
   assert.match(app, /buildReleaseReadinessConsole/);
   assert.match(app, /buildLifecyclePolicyDraft/);
@@ -112,6 +117,7 @@ try {
   assert.match(model, /function buildBenchmarkDashboard/);
   assert.match(model, /function buildCanaryRollout/);
   assert.match(model, /function buildResearchSourceLock/);
+  assert.match(model, /function buildModelMatrix/);
   assert.match(model, /function buildPromptContextPreview/);
   assert.match(model, /function buildReleaseReadinessConsole/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
@@ -135,6 +141,7 @@ try {
   assert.match(styles, /benchmark-verdict/);
   assert.match(styles, /canary-verdict/);
   assert.match(styles, /source-lock-status/);
+  assert.match(styles, /model-matrix-status/);
   assert.match(styles, /context-section-list/);
   assert.match(styles, /release-verdict/);
   assert.match(styles, /edit-export/);
@@ -204,6 +211,16 @@ try {
   assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:stale-memory-supersession"));
   assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:budgeted-lifecycle-frequency"));
   assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:dashboard-to-cluster-zoom"));
+  assert.equal(modelMatrix.mode, "model-autoresearch-matrix");
+  assert.equal(modelMatrix.writesRealFiles, false);
+  assert.equal(modelMatrix.metricsOnly, true);
+  assert.equal(modelMatrix.defaults.localArm, "local-apple-qwen3-0_6b");
+  assert.equal(modelMatrix.defaults.queryExpansion, "off");
+  assert.equal(modelMatrix.defaults.credentialMode, "env-only");
+  assert.ok(modelMatrix.localLane.embedder.includes("Qwen3-Embedding-0.6B"));
+  assert.ok(modelMatrix.localLane.runtime.includes("llama.cpp"));
+  assert.ok(modelMatrix.arms.some((arm) => arm.id === "cloud-nvidia-nemotron-1b"));
+  assert.ok(modelMatrix.gates.some((gate) => gate.includes("matched source-locked canary")));
   assert.equal(promptContextPreview.ok, true);
   assert.equal(promptContextPreview.mode, "prompt-context-preview");
   assert.equal(promptContextPreview.tokenBudget, 900);
@@ -340,6 +357,7 @@ try {
           "benchmark-dashboard",
           "canary-rollout",
           "research-source-lock",
+          "model-autoresearch-matrix",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy",

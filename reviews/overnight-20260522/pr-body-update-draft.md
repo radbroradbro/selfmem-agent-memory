@@ -64,6 +64,9 @@ Retry note:
   Apple Silicon defaults, NVIDIA NIM wording, query expansion off by default,
   env-only credential handling, and matched-canary-only public score claims.
 - GitHub Actions CI run `26305635737` passed on `22e17b1`.
+- It was refreshed again after the Brain UI Model Matrix slice passed local
+  smoke, interaction smoke, browser evidence, release readiness check, and
+  Gemini focused review.
 - A top-level PR comment retry after docs/evidence refresh commit `1074bfd` and
   CI run `26300868065` still returned the same 403.
 - A top-level PR review comment retry after docs/blocker refresh commit
@@ -76,7 +79,7 @@ Retry note:
 
 - Adds the Nucleus Index contract for memory nodes, lifecycle events, retrieval traces, wiki pages, research questions, hypotheses, decisions, and evidence.
 - Adds LLM-wiki compile/sync flow with Obsidian-style frontmatter, wikilinks, index/log pages, provenance, linting, reviewed-page conflict handling, and optional content-free pre-write audit logging.
-- Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, graph navigation controls, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, Research Source Lock, Compaction Audit, Benchmark Dashboard, Canary Rollout, Context Preview, Release Readiness, vault preview, and sync-report inspection.
+- Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, graph navigation controls, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, Research Source Lock, Model Matrix, Compaction Audit, Benchmark Dashboard, Canary Rollout, Context Preview, Release Readiness, vault preview, and sync-report inspection.
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
 - Adds a metrics-only local-session compaction audit path for private Codex, Claude, Hermes, and OpenClaw exports without printing candidate memory text.
@@ -128,6 +131,10 @@ Latest local verification includes the release handoff gate slice.
   stale-memory supersession, budgeted lifecycle-frequency, and
   dashboard-to-cluster zoom rules, collapsed technical export, human-readable
   labels, zero console errors, and no private/key-shaped visible text.
+- Local Model Matrix evidence: 6 fixture provider arms, 4 cloud arms, 2 local
+  arms, Apple Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA cloud
+  arms, query expansion off, env-only credentials, 5 gates, 3 blockers, zero
+  console errors, and no private/key-shaped visible text.
 - Local Context Preview evidence: 642 of 900 fixture context tokens used, 258
   remaining, 3 selected memories, 3 context sections, 2 omitted candidates,
   hosted read-through as read-only, local-only writes, zero privacy leaks, zero
@@ -155,7 +162,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26304465466` passed on `e043d6b`, the Brain UI Research Source Lock commit.
 - GitHub Actions CI: run `26305284384` passed on `13cbe8d`, the May 2026 model/autoresearch matrix gate commit.
 - GitHub Actions CI: run `26305635737` passed on `22e17b1`, the release gate hardening commit for the model/autoresearch matrix.
-- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
+- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
 
@@ -193,6 +200,8 @@ Latest local verification includes the release handoff gate slice.
 - `reviews/overnight-20260522/gemini-brain-ui-canary-rollout-review.md`
 - `reviews/overnight-20260522/brain-ui-research-source-lock-evidence.md`
 - `reviews/overnight-20260522/gemini-brain-ui-research-source-lock-review.md`
+- `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`
+- `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md`
 - `reviews/overnight-20260522/brain-ui-release-readiness-evidence.md`
 - `reviews/overnight-20260522/gemini-brain-ui-release-readiness-review.md`
 - `reviews/overnight-20260522/session-compaction-local-audit-evidence.md`

@@ -87,6 +87,10 @@ Latest verified head before this draft refresh:
   through Hugging Face/llama.cpp/Metal, Voyage/Gemini/NVIDIA are benchmark
   challengers, query expansion is off by default, and public benchmark claims
   require a matched source-locked canary win with reviewer sign-off
+- Brain UI Model Matrix evidence: 6 fixture provider arms, 4 cloud arms, 2
+  local arms, Apple Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA
+  cloud arms, query expansion off, env-only credentials, 5 gates, 3 blockers,
+  zero console errors, and no private/key-shaped visible text
 - Dynamic graph layout evidence: 9 fixture nodes, 9 fixture edges, 2 columns,
   5 rows, zero overlaps, zero console errors, and no private/key-shaped visible
   text

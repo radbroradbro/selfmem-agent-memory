@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "mode": "model-autoresearch-matrix",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "generatedAt": "2026-05-22T18:41:56.000Z",
+  "defaults": {
+    "cloudArm": "cloud-voyage4-voyage",
+    "localArm": "local-apple-qwen3-0_6b",
+    "queryExpansion": "off",
+    "credentialMode": "env-only"
+  },
+  "localLane": {
+    "label": "Apple Silicon local",
+    "targetHardware": "Apple Silicon 24GB unified memory",
+    "embedder": "Qwen3-Embedding-0.6B-GGUF",
+    "reranker": "Qwen3-Reranker-0.6B",
+    "runtime": "llama.cpp with Metal",
+    "sourcePolicy": "Hugging Face or official model-card artifacts only",
+    "staleProcessPolicy": "Stop only RecallWeave-owned model processes; block when ownership is unclear.",
+    "quantizationPolicy": "No experimental quantization in the default lane."
+  },
+  "arms": [
+    {
+      "id": "cloud-voyage4-voyage",
+      "lane": "cloud",
+      "embedder": "voyage-4-large",
+      "reranker": "rerank-2.5",
+      "status": "default-cloud-canary",
+      "purpose": "First cloud quality proof for text and code memory."
+    },
+    {
+      "id": "cloud-gemini2-cohere4pro",
+      "lane": "cloud",
+      "embedder": "Gemini Embedding 2",
+      "reranker": "Cohere Rerank 4 Pro",
+      "status": "challenger",
+      "purpose": "Multimodal and document-heavy memory challenger."
+    },
+    {
+      "id": "cloud-nvidia-nemotron-1b",
+      "lane": "cloud",
+      "embedder": "nvidia/llama-nemotron-embed-1b-v2",
+      "reranker": "nvidia/llama-nemotron-rerank-1b-v2",
+      "status": "challenger",
+      "purpose": "NVIDIA NIM text retrieval latency and quality comparison."
+    },
+    {
+      "id": "cloud-nvidia-nemotron-vl-1b",
+      "lane": "cloud",
+      "embedder": "nvidia/llama-nemotron-embed-vl-1b-v2",
+      "reranker": "nvidia/llama-nemotron-rerank-vl-1b-v2",
+      "status": "challenger",
+      "purpose": "NVIDIA NIM multimodal retrieval comparison."
+    },
+    {
+      "id": "local-apple-qwen3-0_6b",
+      "lane": "local",
+      "embedder": "Qwen3-Embedding-0.6B-GGUF",
+      "reranker": "Qwen3-Reranker-0.6B",
+      "status": "default-local-canary",
+      "purpose": "Fast Apple Silicon local proof for 24GB-class Macs."
+    },
+    {
+      "id": "local-apple-qwen3-4b",
+      "lane": "local",
+      "embedder": "Qwen3-Embedding-4B",
+      "reranker": "Qwen3-Reranker-4B",
+      "status": "optional-quality-arm",
+      "purpose": "Larger local quality challenger when memory pressure allows."
+    }
+  ],
+  "gates": [
+    "Query expansion stays off until a matched source-locked canary proves better quality.",
+    "Public scores require same dataset slice, query set, judge, answer model, scoring code, privacy scan, and reviewer sign-off.",
+    "Claude Opus 4.7 and a separate Codex GPT-5.5 review must approve autoresearch setup before implementation changes.",
+    "Local latency runs must start from a clean RecallWeave-owned model runtime.",
+    "Provider credentials stay in local environment variables only."
+  ],
+  "blockers": [
+    "claude-reviewer-route-blocked",
+    "hosted-supermemory-baseline-not-current",
+    "human-public-launch-approval-required"
+  ]
+}

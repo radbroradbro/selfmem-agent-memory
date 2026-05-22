@@ -234,6 +234,67 @@ function buildResearchSourceLock(packet = {}) {
   };
 }
 
+function buildModelMatrix(packet = {}) {
+  const rawSerialized = JSON.stringify(packet ?? {});
+  const defaults = packet?.defaults ?? {};
+  const localLane = packet?.localLane ?? {};
+  const arms = Array.isArray(packet?.arms)
+    ? packet.arms.map((arm, index) => ({
+        id: safeExportText(arm?.id ?? `arm:${index}`),
+        lane: safeChoice(arm?.lane ?? "cloud", ["cloud", "local"], "cloud"),
+        embedder: safeExportText(arm?.embedder ?? ""),
+        reranker: safeExportText(arm?.reranker ?? ""),
+        status: safeExportText(arm?.status ?? "challenger"),
+        purpose: safeExportText(arm?.purpose ?? ""),
+      }))
+    : [];
+  const cloudArms = arms.filter((arm) => arm.lane === "cloud").length;
+  const localArms = arms.filter((arm) => arm.lane === "local").length;
+  const queryExpansion = safeChoice(defaults.queryExpansion ?? "off", ["off", "canary-only", "enabled"], "off");
+  const credentialMode = safeChoice(defaults.credentialMode ?? "env-only", ["env-only", "not-configured"], "env-only");
+  const gates = safeStringList(packet?.gates);
+  const blockers = safeStringList(packet?.blockers);
+  return {
+    schemaVersion: 1,
+    mode: "fixture-model-autoresearch-matrix",
+    writesRealFiles: false,
+    metricsOnly: true,
+    generatedAt: safeTimestamp(packet?.generatedAt, "1970-01-01T00:00:00.000Z"),
+    defaults: {
+      cloudArm: safeExportText(defaults.cloudArm ?? ""),
+      localArm: safeExportText(defaults.localArm ?? ""),
+      queryExpansion,
+      credentialMode,
+    },
+    localLane: {
+      label: safeExportText(localLane.label ?? "Apple Silicon local"),
+      targetHardware: safeExportText(localLane.targetHardware ?? ""),
+      embedder: safeExportText(localLane.embedder ?? ""),
+      reranker: safeExportText(localLane.reranker ?? ""),
+      runtime: safeExportText(localLane.runtime ?? ""),
+      sourcePolicy: safeExportText(localLane.sourcePolicy ?? ""),
+      staleProcessPolicy: safeExportText(localLane.staleProcessPolicy ?? ""),
+      quantizationPolicy: safeExportText(localLane.quantizationPolicy ?? ""),
+    },
+    arms,
+    gates,
+    blockers,
+    safety: {
+      privacyLeakCount: containsPrivateLikeText(rawSerialized) ? 1 : 0,
+      credentialsEnvOnly: credentialMode === "env-only",
+      queryExpansionOffByDefault: queryExpansion === "off",
+      writesRealFiles: false,
+    },
+    summary: {
+      cloudArms,
+      localArms,
+      totalArms: arms.length,
+      gates: gates.length,
+      blockers: blockers.length,
+    },
+  };
+}
+
 function buildSessionCompactionAudit(report) {
   const candidateFingerprints = Array.isArray(report?.candidateFingerprints)
     ? report.candidateFingerprints.map((candidate) => ({
@@ -980,6 +1041,7 @@ export {
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
+  buildModelMatrix,
   buildBenchmarkDashboard,
   buildCanaryRollout,
   buildPromptContextPreview,

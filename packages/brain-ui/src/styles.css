@@ -590,6 +590,8 @@ button.active {
 .context-summary,
 .release-summary,
 .source-lock-summary,
+.model-matrix-summary,
+.model-matrix-local,
 .benchmark-summary,
 .canary-summary,
 .policy-summary,
@@ -605,6 +607,8 @@ button.active {
 .context-summary div,
 .release-summary div,
 .source-lock-summary div,
+.model-matrix-summary div,
+.model-matrix-local div,
 .benchmark-summary div,
 .canary-summary div,
 .policy-summary div,
@@ -628,6 +632,10 @@ button.active {
 .release-summary span,
 .source-lock-summary strong,
 .source-lock-summary span,
+.model-matrix-summary strong,
+.model-matrix-summary span,
+.model-matrix-local strong,
+.model-matrix-local span,
 .benchmark-summary strong,
 .benchmark-summary span,
 .canary-summary strong,
@@ -645,6 +653,8 @@ button.active {
 .context-summary strong,
 .release-summary strong,
 .source-lock-summary strong,
+.model-matrix-summary strong,
+.model-matrix-local strong,
 .benchmark-summary strong,
 .canary-summary strong,
 .policy-summary strong,
@@ -659,6 +669,8 @@ button.active {
 .context-summary span,
 .release-summary span,
 .source-lock-summary span,
+.model-matrix-summary span,
+.model-matrix-local span,
 .benchmark-summary span,
 .canary-summary span,
 .policy-summary span,
@@ -676,6 +688,7 @@ button.active {
 .context-omitted-list,
 .release-list,
 .source-lock-list,
+.model-matrix-list,
 .benchmark-scenarios,
 .benchmark-caveats,
 .canary-list {
@@ -694,6 +707,7 @@ button.active {
 .context-omitted-list li,
 .release-list li,
 .source-lock-list li,
+.model-matrix-list li,
 .benchmark-scenarios li,
 .benchmark-caveats li,
 .canary-list li {
@@ -711,6 +725,7 @@ button.active {
 .context-omitted-list strong,
 .release-list strong,
 .source-lock-list strong,
+.model-matrix-list strong,
 .benchmark-scenarios strong,
 .benchmark-caveats strong,
 .canary-list strong {
@@ -730,6 +745,8 @@ button.active {
 .source-lock-list span,
 .source-lock-list a,
 .source-lock-list small,
+.model-matrix-list span,
+.model-matrix-list small,
 .benchmark-scenarios span,
 .benchmark-scenarios small,
 .benchmark-caveats span,
@@ -745,6 +762,7 @@ button.active {
 .context-omitted-list span,
 .release-list span,
 .source-lock-list span,
+.model-matrix-list span,
 .benchmark-scenarios span,
 .benchmark-caveats span,
 .canary-list span {
@@ -765,6 +783,7 @@ button.active {
 .sync-actions small,
 .context-memory-list small,
 .source-lock-list small,
+.model-matrix-list small,
 .benchmark-scenarios small,
 .canary-list small {
   color: var(--amber);
@@ -817,6 +836,7 @@ button.active {
   font-weight: 760;
 }
 
+.model-matrix-status,
 .source-lock-status {
   display: inline-grid;
   min-height: 30px;
@@ -829,6 +849,12 @@ button.active {
   background: rgba(244, 185, 90, 0.08);
   font-size: 12px;
   font-weight: 760;
+}
+
+.model-matrix-status[data-status="guarded"] {
+  border-color: rgba(139, 209, 124, 0.58);
+  color: var(--green);
+  background: rgba(139, 209, 124, 0.08);
 }
 
 .source-lock-status[data-status="source-locked"] {
@@ -882,6 +908,20 @@ button.active {
 
 .source-lock-rules li {
   border-color: rgba(99, 214, 197, 0.46);
+}
+
+.model-matrix-list li[data-lane="local"],
+.model-matrix-list li[data-status="default-local-canary"] {
+  border-color: rgba(99, 214, 197, 0.5);
+}
+
+.model-matrix-list li[data-lane="cloud"],
+.model-matrix-list li[data-kind="gate"] {
+  border-color: rgba(118, 168, 255, 0.46);
+}
+
+.model-matrix-list li[data-kind="blocker"] {
+  border-color: rgba(228, 111, 105, 0.58);
 }
 
 .technical-export {

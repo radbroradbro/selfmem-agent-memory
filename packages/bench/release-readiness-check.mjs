@@ -21,6 +21,7 @@ const requiredFiles = [
   "docs/RELEASE_HANDOFF.md",
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
+  "packages/brain-ui/fixtures/model-matrix.json",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
   `${reviewDir}/claude-pr5-review-blocked.md`,
@@ -41,6 +42,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
   `${reviewDir}/brain-ui-research-source-lock-evidence.md`,
   `${reviewDir}/gemini-brain-ui-research-source-lock-review.md`,
+  `${reviewDir}/brain-ui-model-matrix-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-model-matrix-review.md`,
   `${reviewDir}/brain-ui-compaction-audit-evidence.md`,
   `${reviewDir}/gemini-brain-ui-compaction-audit-review.md`,
   `${reviewDir}/brain-ui-benchmark-dashboard-evidence.md`,
@@ -116,6 +119,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-research-lineage.png`,
   `${reviewDir}/ui-evidence/brain-ui-research-source-lock-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-research-source-lock.png`,
+  `${reviewDir}/ui-evidence/brain-ui-model-matrix-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-model-matrix.png`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit.png`,
   `${reviewDir}/ui-evidence/brain-ui-benchmark-dashboard-evidence.json`,
@@ -378,6 +383,38 @@ check("dom evidence is sane", () => {
   assert.equal(sourceLockEvidence.containerShowsHumanLabels, true);
   assert.equal(sourceLockEvidence.technicalExportCollapsed, true);
   assert.equal(sourceLockEvidence.consoleErrorCount, 0);
+
+  const modelMatrixEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-model-matrix-evidence.json"), "utf8"),
+  );
+  assert.equal(modelMatrixEvidence.ok, true);
+  assert.equal(modelMatrixEvidence.mode, "fixture-brain-ui-model-matrix");
+  assert.equal(modelMatrixEvidence.writesRealFiles, false);
+  assert.equal(modelMatrixEvidence.metricsOnly, true);
+  assert.equal(modelMatrixEvidence.heading, "Model Matrix");
+  assert.equal(modelMatrixEvidence.statusText, "guarded");
+  assert.ok(modelMatrixEvidence.summaryCount >= 4);
+  assert.ok(modelMatrixEvidence.localCount >= 6);
+  assert.equal(modelMatrixEvidence.armCount, 6);
+  assert.ok(modelMatrixEvidence.cloudArmCount >= 4);
+  assert.ok(modelMatrixEvidence.localArmCount >= 2);
+  assert.equal(modelMatrixEvidence.gateCount, 5);
+  assert.equal(modelMatrixEvidence.blockerCount, 3);
+  assert.equal(modelMatrixEvidence.hasAppleSilicon, true);
+  assert.equal(modelMatrixEvidence.hasQwenLocal, true);
+  assert.equal(modelMatrixEvidence.hasLlamaCpp, true);
+  assert.equal(modelMatrixEvidence.hasVoyage, true);
+  assert.equal(modelMatrixEvidence.hasGemini, true);
+  assert.equal(modelMatrixEvidence.hasNvidiaNim, true);
+  assert.equal(modelMatrixEvidence.queryExpansionOff, true);
+  assert.equal(modelMatrixEvidence.envOnlyCredentials, true);
+  assert.equal(modelMatrixEvidence.matchedCanaryGateVisible, true);
+  assert.equal(modelMatrixEvidence.reviewerGateVisible, true);
+  assert.equal(modelMatrixEvidence.hostedBaselineBlockerVisible, true);
+  assert.equal(modelMatrixEvidence.technicalExportCollapsed, true);
+  assert.equal(modelMatrixEvidence.hasPrivateOrKeyText, false);
+  assert.equal(modelMatrixEvidence.visibleTextHasPrivate, false);
+  assert.equal(modelMatrixEvidence.consoleErrorCount, 0);
 
   const compactionAuditEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-compaction-audit-evidence.json"), "utf8"),
@@ -660,6 +697,7 @@ check("release state is conservative", () => {
     "brain-ui-benchmark-dashboard",
     "brain-ui-canary-rollout",
     "brain-ui-research-source-lock",
+    "brain-ui-model-matrix",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
     "model-autoresearch-matrix",
@@ -705,6 +743,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /benchmark dashboard|benchmark summary|compaction benchmark/i, `${file} missing benchmark dashboard`);
     assert.match(text, /canary rollout|one-agent canary|selfmem_update/i, `${file} missing canary rollout`);
     assert.match(text, /research source lock|source-lock|source lock/i, `${file} missing research source lock`);
+    assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
