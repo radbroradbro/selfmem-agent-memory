@@ -35,6 +35,9 @@ Scope:
   write no wiki files.
 - Added Brain UI lifecycle policy evidence to the release gate so policy
   changes are staged as fixture-only `writesRealFiles: false` draft exports.
+- Added Brain UI memory review queue evidence to the release gate so noisy,
+  duplicate, and high-value candidate decisions are staged as fixture-only
+  `writesRealFiles: false` draft exports.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -51,6 +54,7 @@ What `release:check` verifies:
 - Brain UI selected audit history DOM evidence is sane,
 - Brain UI selected vault sync dry-run DOM evidence is sane,
 - Brain UI lifecycle policy DOM evidence is sane,
+- Brain UI memory review queue DOM evidence is sane,
 - a fresh local-container audit smoke passes against current source,
 - a fresh Brain UI smoke passes against the current source,
 - a fresh Brain UI interaction smoke passes against the current source,
@@ -112,12 +116,13 @@ Cold review response:
   to catch obvious runtime drift.
 - Interaction smoke now covers search filtering, retrieval trace visibility,
   private/key-shaped edit rejection, draft export, Nucleus export, research
-  lineage, lifecycle policy draft export, vault path selection, selected vault
-  sync dry-run, dry-run sync reporting, and public-safe serialization.
+  lineage, lifecycle policy draft export, memory review queue draft export,
+  vault path selection, selected vault sync dry-run, dry-run sync reporting,
+  and public-safe serialization.
 
 Known limits:
 
 - Private-name scans remain an operator-side release step because putting
   private names in public source would itself leak them.
-- GitHub Actions CI run `26287666832` passed on `6ae816d` after the latest
+- GitHub Actions CI run `26288125249` passed on `cc9cee9` after the latest
   code-changing push. Reinspect Actions after any later branch push.

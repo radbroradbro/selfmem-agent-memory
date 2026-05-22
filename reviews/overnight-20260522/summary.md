@@ -16,10 +16,10 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest CI-inspected code-changing head after the lifecycle policy slice:
-  `6ae816d`
+- Latest CI-inspected code-changing head after the memory review queue slice:
+  `cc9cee9`
 - PR API state when checked: open, not draft, mergeable, clean.
-- GitHub Actions CI run `26287666832` on `6ae816d`: success.
+- GitHub Actions CI run `26288125249` on `cc9cee9`: success.
 
 ## Shipped Overnight Slices
 
@@ -37,6 +37,7 @@ is still required before any public live update.
 | Brain UI local audit preview | `reviews/overnight-20260522/brain-ui-local-audit-preview-evidence.md` |
 | Brain UI selected vault sync dry-run | `reviews/overnight-20260522/brain-ui-selected-sync-dry-run-evidence.md` |
 | Brain UI lifecycle policy preview | `reviews/overnight-20260522/brain-ui-lifecycle-policy-evidence.md` |
+| Brain UI memory review queue | `reviews/overnight-20260522/brain-ui-review-queue-evidence.md` |
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
@@ -67,7 +68,7 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions CI: success on the latest code head, `6ae816d`.
+- GitHub Actions CI: success on the latest code head, `cc9cee9`.
 
 ## UI Evidence
 
@@ -83,13 +84,14 @@ Sanitized fixture evidence exists under
 - `brain-ui-selected-audit-history.png`
 - `brain-ui-selected-sync-dry-run.png`
 - `brain-ui-lifecycle-policy.png`
+- `brain-ui-review-queue.png`
 - `brain-ui-edit-export.png`
 - `brain-ui-nucleus-snapshot.png`
 - `brain-ui-research-lineage.png`
 - matching DOM evidence JSON for the UI, vault preview, sync report, and edit
   draft export, plus Container Health, Local Audit Preflight, Nucleus snapshot,
   selected local-container audit, selected audit history, selected vault sync
-  dry-run, lifecycle policy, and research-lineage previews
+  dry-run, lifecycle policy, memory review queue, and research-lineage previews
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -111,6 +113,7 @@ local memory contents.
 - Gemini Brain UI selected audit-history review: `CLEAN`.
 - Gemini Brain UI selected vault sync dry-run review: `CLEAN`.
 - Gemini Brain UI lifecycle policy review: `CLEAN`.
+- Gemini Brain UI review queue review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
@@ -152,6 +155,9 @@ local memory contents.
 - Brain UI lifecycle policy preview is fixture-only. It stages recall/write
   settings as `writesRealFiles: false` draft output and does not edit host
   config files.
+- Brain UI memory review queue is fixture-only. It stages approve, suppress,
+  merge, and needs-more-evidence decisions as `writesRealFiles: false` draft
+  output and does not write real memories.
 - Wiki vault sync is explicit and protects reviewed pages by writing conflict
   notes instead of overwriting.
 - Wiki vault sync can append a content-free pre-write audit log when
