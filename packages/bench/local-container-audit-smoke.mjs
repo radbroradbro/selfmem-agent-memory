@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { auditLocalContainer, browseLocalContainer } from "../core/dist/index.js";
@@ -16,6 +16,19 @@ await writeFile(
 await writeFile(
   join(rootDir, "trace.jsonl"),
   "{\"event\":\"search\",\"count\":1}\n{\"event\":\"store\",\"text\":\"public <private>hidden</private>\"}\n",
+  "utf8",
+);
+await mkdir(join(rootDir, ".recallweave"), { recursive: true });
+await writeFile(
+  join(rootDir, ".recallweave/local-memory-edits.jsonl"),
+  `${JSON.stringify({
+    event: "local_memory_edit_overlay",
+    sourceFile: "memories.jsonl",
+    line: 1,
+    action: "replace",
+    reason: "manual_correction",
+    replacementText: "Use local writes with overlay visibility.",
+  })}\n`,
   "utf8",
 );
 
@@ -46,7 +59,10 @@ assert.equal(browse.mode, "local-container-browse-preview");
 assert.equal(browse.writesRealFiles, false);
 assert.equal(browse.rootPathRedacted, true);
 assert.ok(browse.items.some((item) => item.summary.includes("Use local writes")));
+assert.ok(browse.items.some((item) => item.overlays?.some((overlay) => overlay.replacementPreview?.includes("overlay visibility"))));
 assert.ok(browse.items.some((item) => item.event === "search"));
+assert.equal(browse.editOverlay.applied, 1);
+assert.equal(browse.totals.editOverlayCount, 1);
 assert.ok(browse.totals.redactionCount >= 1);
 assert.doesNotMatch(browseSerialized, /hidden|pa-[A-Z]{10,}/);
 assert.doesNotMatch(browseSerialized, new RegExp(rootDir.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
@@ -66,6 +82,7 @@ console.log(
       browseMode: browse.mode,
       browseItems: browse.totals.itemsReturned,
       browseRedactionCount: browse.totals.redactionCount,
+      browseOverlayCount: browse.totals.editOverlayCount,
     },
     null,
     2,

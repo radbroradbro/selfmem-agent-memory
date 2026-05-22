@@ -73,6 +73,12 @@ skipped. The selected-container browse route is disabled unless
 confirmation, clears the typed path after submit, reports
 `writesRealFiles: false`, and never returns the selected root path.
 
+Browse also reads `.recallweave/local-memory-edits.jsonl` when it exists. It
+attaches matching overlay actions, reasons, and redacted replacement previews to
+the relevant browsed memory item by source file, line, or source id. This makes
+operator edits visible in the review surface while leaving `memories.jsonl`
+unchanged.
+
 The Brain UI now also has a disabled-by-default selected local memory edit
 overlay. It is enabled only with `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT=1`,
 requires the exact confirmation phrase `APPLY LOCAL MEMORY EDIT`, rejects

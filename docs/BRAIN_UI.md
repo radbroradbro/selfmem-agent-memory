@@ -142,7 +142,8 @@ Selected local-container browse is disabled unless the server starts with
 read-only confirmation, clears the typed path after submit, reads only the
 allow-listed local memory files, and returns a bounded list of redacted memory
 or trace snippets. It skips fully private entries, reports redaction counts,
-returns only a redacted `.../container` label, and writes no agent files.
+surfaces matching append-only local memory edit overlays, returns only a
+redacted `.../container` label, and writes no agent files.
 
 Selected local memory edit is disabled unless the server starts with
 `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT=1`. When enabled, it requires a write
@@ -154,7 +155,9 @@ local container root. The overlay may include the replacement memory text, but
 the audit log and server response do not. It rejects payloads containing
 `<private>` spans or key-shaped text, clears typed paths and edit text after
 submit, and returns only a redacted `.../container` label, relative file paths,
-summary counts, and an audit hash.
+summary counts, and an audit hash. The selected local-container browse preview
+can then show the overlay action, reason, and redacted replacement preview next
+to the matching memory line without mutating the source JSONL.
 
 Selected local vault sync dry-run is also disabled unless
 `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` is set. When enabled, it requires

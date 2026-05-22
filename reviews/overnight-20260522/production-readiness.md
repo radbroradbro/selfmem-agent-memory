@@ -30,6 +30,7 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   vault preview, sync report, Nucleus snapshot preview, local audit preflight,
   selected local-container audit preview, browser-local selected audit history,
   selected local-container browse preview, selected local memory edit overlay,
+  local edit overlay browse visibility,
   selected vault sync dry-run,
   selected vault sync apply, lifecycle policy preview, selected lifecycle
   policy apply, memory review queue preview, and selected review queue apply.
@@ -96,6 +97,7 @@ Controller follow-up after that sandbox run:
   local-audit preview returned `CLEAN` verdicts.
 - Focused Gemini review for selected local-container browse returned `CLEAN`.
 - Focused Gemini review for selected local memory edit returned `CLEAN`.
+- Focused Gemini review for local edit overlay browse returned `CLEAN`.
 - Focused Gemini review for selected audit-history returned `CLEAN`.
 - Focused Gemini reviews for selected vault sync dry-run and lifecycle policy
   preview returned `CLEAN`.
@@ -131,6 +133,7 @@ evidence for:
 - selected local-container audit preview,
 - selected local-container browse preview,
 - selected local memory edit overlay,
+- local edit overlay browse visibility,
 - selected audit history.
 - selected vault sync dry-run,
 - selected vault sync apply,
@@ -151,9 +154,9 @@ still wait for the remaining reviewer and human-approval gates.
 | --- | --- | --- |
 | Security/privacy | PASS WITH CONCERNS | Redaction, secret-pattern, forbidden-file, and privacy smokes are strong, but current reviewer routes are blocked. |
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
-| Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, and browser-local history is content-free. |
+| Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible without mutating source memory files, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, selected local-container audit and browse previews, selected local memory edit overlay, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |
@@ -199,7 +202,8 @@ Use only bundled fixture data:
 14. Optional, in a throwaway fixture only: start with
    `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` and
    `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE=1`, run selected local-container
-   audit and browse, and confirm the visible path is redacted.
+   audit and browse, confirm the visible path is redacted, and confirm local
+   edit overlay browse shows only redacted overlay previews.
 15. End with the release-readiness gate output and residual alpha caveats.
 
 Do not record real local memories, raw session history, private diagnostics,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { auditLocalContainer, browseLocalContainer } from "../../packages/core/src/index.js";
@@ -67,6 +67,31 @@ describe("local container audit", () => {
       "utf8",
     );
     await writeFile(join(rootDir, "trace.jsonl"), "{\"event\":\"search\",\"query\":\"local recall\",\"count\":2}\n", "utf8");
+    await mkdir(join(rootDir, ".recallweave"), { recursive: true });
+    await writeFile(
+      join(rootDir, ".recallweave/local-memory-edits.jsonl"),
+      [
+        JSON.stringify({
+          event: "local_memory_edit_overlay",
+          sourceFile: "memories.jsonl",
+          line: 1,
+          sourceId: "mem_1",
+          action: "replace",
+          reason: "manual_correction",
+          replacementText: "Use overlay-corrected local-only write mode.",
+        }),
+        JSON.stringify({
+          event: "local_memory_edit_overlay",
+          sourceFile: "memories.jsonl",
+          line: 2,
+          sourceId: "mem_2",
+          action: "replace",
+          reason: "privacy",
+          replacementText: `safe ${keyLike}`,
+        }),
+      ].join("\n"),
+      "utf8",
+    );
 
     const report = await browseLocalContainer({
       rootDir,
@@ -82,7 +107,12 @@ describe("local container audit", () => {
     expect(report.totals.itemsReturned).toBe(3);
     expect(report.totals.skippedPrivate).toBe(1);
     expect(report.totals.redactionCount).toBeGreaterThanOrEqual(2);
+    expect(report.editOverlay.exists).toBe(true);
+    expect(report.editOverlay.applied).toBe(2);
+    expect(report.totals.editOverlayCount).toBe(2);
+    expect(report.totals.editOverlayRedactionCount).toBeGreaterThanOrEqual(1);
     expect(report.items.some((item) => item.summary.includes("Use local-only write mode"))).toBe(true);
+    expect(report.items.some((item) => item.overlays?.some((overlay) => overlay.replacementPreview?.includes("overlay-corrected")))).toBe(true);
     expect(report.items.some((item) => item.event === "search")).toBe(true);
     expect(serialized).not.toContain(rootDir);
     expect(serialized).not.toContain("hidden");

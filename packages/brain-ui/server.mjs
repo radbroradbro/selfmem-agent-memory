@@ -325,6 +325,20 @@ async function createFixtureLocalContainerBrowse() {
       "utf8",
     );
     await writeFile(join(tempRoot, "trace.jsonl"), "{\"event\":\"search\",\"query\":\"memory health\",\"count\":2}\n", "utf8");
+    await mkdir(join(tempRoot, ".recallweave"), { recursive: true });
+    await writeFile(
+      join(tempRoot, ".recallweave/local-memory-edits.jsonl"),
+      `${JSON.stringify({
+        event: "local_memory_edit_overlay",
+        sourceFile: "memories.jsonl",
+        line: 1,
+        sourceId: "mem_fixture_1",
+        action: "replace",
+        reason: "manual_correction",
+        replacementText: "Use local-only writes with visible edit overlays.",
+      })}\n`,
+      "utf8",
+    );
     return await browseLocalContainer({
       rootDir: tempRoot,
       containerLabel: "fixture-local-container",

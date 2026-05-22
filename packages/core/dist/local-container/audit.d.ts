@@ -2,6 +2,7 @@ export declare const DEFAULT_LOCAL_CONTAINER_AUDIT_FILES: readonly ["memories.js
 export type LocalContainerAuditFileName = (typeof DEFAULT_LOCAL_CONTAINER_AUDIT_FILES)[number];
 export declare const DEFAULT_LOCAL_CONTAINER_BROWSE_FILES: readonly ["memories.jsonl", "trace.jsonl", "lossless_context.jsonl"];
 export type LocalContainerBrowseFileName = (typeof DEFAULT_LOCAL_CONTAINER_BROWSE_FILES)[number];
+declare const LOCAL_MEMORY_EDIT_OVERLAY_FILE = ".recallweave/local-memory-edits.jsonl";
 export interface LocalContainerAuditInput {
     rootDir: string;
     containerLabel?: string;
@@ -52,6 +53,18 @@ export interface LocalContainerBrowseItem {
     sourceId?: string;
     summary: string;
     redactionCount: number;
+    overlays?: LocalMemoryEditOverlay[];
+}
+export interface LocalMemoryEditOverlay {
+    action: string;
+    reason: string;
+    sourceFile: LocalContainerBrowseFileName;
+    line: number;
+    sourceId?: string;
+    createdAt?: string;
+    replacementPreview?: string;
+    redactionCount: number;
+    contentIncluded: boolean;
 }
 export interface LocalContainerBrowseReport {
     schemaVersion: 1;
@@ -68,6 +81,16 @@ export interface LocalContainerBrowseReport {
         inspectedLines?: number;
         skippedReason?: "missing" | "unsafe_name" | "oversize" | "read_error";
     }>;
+    editOverlay: {
+        path: typeof LOCAL_MEMORY_EDIT_OVERLAY_FILE;
+        exists: boolean;
+        bytes?: number;
+        inspectedLines?: number;
+        applied: number;
+        skippedPrivate: number;
+        redactionCount: number;
+        skippedReason?: "missing" | "oversize" | "read_error";
+    };
     items: LocalContainerBrowseItem[];
     totals: {
         filesInspected: number;
@@ -75,8 +98,11 @@ export interface LocalContainerBrowseReport {
         itemsReturned: number;
         skippedPrivate: number;
         redactionCount: number;
+        editOverlayCount: number;
+        editOverlayRedactionCount: number;
     };
 }
 export declare function auditLocalContainer(input: LocalContainerAuditInput): Promise<LocalContainerAuditReport>;
 export declare function browseLocalContainer(input: LocalContainerBrowseInput): Promise<LocalContainerBrowseReport>;
+export {};
 //# sourceMappingURL=audit.d.ts.map

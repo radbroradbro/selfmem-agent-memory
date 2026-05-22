@@ -114,6 +114,8 @@ try {
   assert.equal(localBrowse.report.rootPathRedacted, true);
   assert.ok(localBrowse.report.totals.itemsReturned >= 2);
   assert.ok(localBrowse.report.items.some((item) => item.summary.includes("local-only writes")));
+  assert.equal(localBrowse.report.editOverlay.applied, 1);
+  assert.ok(localBrowse.report.items.some((item) => item.overlays?.some((overlay) => overlay.replacementPreview?.includes("visible edit overlays"))));
   const disabledLocalAudit = await postJson(`${base}/local-container/audit`, {
     rootDir: "/tmp/recallweave-disabled-fixture",
     confirmReadOnly: true,

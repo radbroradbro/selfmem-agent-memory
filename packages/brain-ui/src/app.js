@@ -1032,6 +1032,14 @@ function renderBrowseItems(target, items) {
     value.textContent = entry.summary;
     meta.textContent = `${entry.sourceFile}:${entry.line}${entry.event ? ` | ${entry.event}` : ""}`;
     item.append(label, value, meta);
+    for (const overlay of entry.overlays ?? []) {
+      const note = document.createElement("small");
+      note.dataset.overlay = overlay.action;
+      note.textContent = `overlay: ${overlay.action.replaceAll("_", " ")} | ${overlay.reason.replaceAll("_", " ")}${
+        overlay.replacementPreview ? ` | ${overlay.replacementPreview}` : ""
+      }`;
+      item.append(note);
+    }
     target.append(item);
   }
 }

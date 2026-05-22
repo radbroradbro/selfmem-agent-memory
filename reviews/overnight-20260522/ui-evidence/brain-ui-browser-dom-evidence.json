@@ -46,7 +46,10 @@
       "hasSelectedLocalEdit": true,
       "hasLocalEditPath": true,
       "hasLocalEditText": true,
-      "hasLocalEditPhrase": true
+      "hasLocalEditPhrase": true,
+      "hasLocalEditOverlayBrowse": true,
+      "hasLocalEditOverlayPreview": true,
+      "hasSelectedBrowsePanel": true
     },
     "h1": "Nucleus",
     "inputs": [
@@ -247,12 +250,15 @@
     "title": "RecallWeave Brain",
     "url": "http://127.0.0.1:4177/",
     "inputCount": 32,
-    "localEditText": "Edit container path\nSource file\nmemories.jsonl\nLine\nSource id\nAction\nAppend correction\nReplace derived memory\nSuppress\nNeeds review\nReason\nManual correction\nDuplicate\nStale\nNoise\nPrivacy\nOther\nReplacement text\nWrite edit overlay\nConfirmation phrase\nApply edit"
+    "localEditText": "Edit container path\nSource file\nmemories.jsonl\nLine\nSource id\nAction\nAppend correction\nReplace derived memory\nSuppress\nNeeds review\nReason\nManual correction\nDuplicate\nStale\nNoise\nPrivacy\nOther\nReplacement text\nWrite edit overlay\nConfirmation phrase\nApply edit",
+    "localBrowseText": "DECISION\nUse local-only writes with hosted read-through disabled by default.\nmemories.jsonl:1\noverlay: replace | manual correction | Use local-only writes with visible edit overlays.\nPREFERENCE\nPrefer concise lifecycle recall for maintenance turns.\nmemories.jsonl:2\nTRACE\nmemory health\ntrace.jsonl:1 | search",
+    "selectedBrowseText": ""
   },
   "screenshot": {
     "ok": false,
     "reason": "in-app browser Page.captureScreenshot timed out in the prior browser DOM pass; existing fixture screenshots remain in ui-evidence"
   },
   "localEditCapturedAt": "2026-05-22T14:22:13.884Z",
-  "note": "Updated by Codex Browser against localhost fixture UI with selected local memory edit overlay controls visible. Screenshot path is fixture-only."
+  "note": "Updated by Codex Browser against localhost fixture UI with selected local memory edit overlay controls visible. Screenshot path is fixture-only.",
+  "localEditOverlayBrowseCapturedAt": "2026-05-22T14:33:57.222Z"
 }

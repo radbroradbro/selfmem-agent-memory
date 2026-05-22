@@ -446,6 +446,22 @@ try {
   assert.equal(localEditAuditLog.includes("new fixture memory text"), false, "local edit audit must be content-free");
   assert.equal(localEditLog.includes(selectedEditRoot), false);
   assert.equal(localEditAuditLog.includes(selectedEditRoot), false);
+  const selectedEditBrowse = await postJson(`${base}/local-container/browse`, {
+    rootDir: selectedEditRoot,
+    confirmReadOnly: true,
+    maxItems: 5,
+  });
+  assert.equal(selectedEditBrowse.ok, true);
+  assert.equal(selectedEditBrowse.mode, "selected-local-container-browse");
+  assert.equal(selectedEditBrowse.report.editOverlay.applied, 1);
+  assert.equal(selectedEditBrowse.report.totals.editOverlayCount, 1);
+  assert.ok(
+    selectedEditBrowse.report.items.some((item) =>
+      item.overlays?.some((overlay) => overlay.replacementPreview?.includes("new fixture memory text")),
+    ),
+    "selected browse should surface the local edit overlay",
+  );
+  assert.equal(selectedEditBrowse.report.rootDir?.includes?.(selectedEditRoot) ?? false, false);
   const missingConfirmation = await postJson(`${base}/local-container/audit`, {
     rootDir: selectedRoot,
     confirmReadOnly: false,
@@ -524,6 +540,7 @@ try {
     unsafeLocalEdit,
     selectedLocalEdit,
     localEditAuditLog,
+    selectedEditBrowse,
     missingConfirmation,
     selectedAudit,
     selectedAuditHistory,
@@ -560,6 +577,7 @@ try {
           "local-container-audit",
           "selected-local-browse",
           "selected-local-memory-edit",
+          "selected-local-edit-overlay-browse",
           "selected-local-audit",
           "selected-audit-history",
           "public-safe-serialization",

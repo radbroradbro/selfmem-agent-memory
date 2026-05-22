@@ -41,6 +41,11 @@ Scope:
   relative paths and counts.
 - Added Gemini review for selected local memory edit and made that review
   packet a required release-readiness artifact.
+- Added Brain UI local edit overlay browse coverage so selected local-container
+  browse can show matching append-only edit overlays with redacted previews
+  while keeping browse read-only and source memory files unchanged.
+- Added Gemini review for local edit overlay browse and made that review packet
+  a required release-readiness artifact.
 - Added Brain UI selected audit history evidence to the release gate so
   browser-local history is content-free, bounded, and does not expose raw local
   paths or private/key-shaped text.
@@ -99,6 +104,8 @@ What `release:check` verifies:
 - Brain UI selected local-container browse evidence exists and is covered by
   fresh interaction smoke,
 - Brain UI selected local memory edit evidence exists and is covered by fresh
+  interaction smoke and Browser DOM evidence,
+- Brain UI local edit overlay browse evidence exists and is covered by fresh
   interaction smoke and Browser DOM evidence,
 - Brain UI selected audit history DOM evidence is sane,
 - Brain UI selected vault sync dry-run DOM evidence is sane,

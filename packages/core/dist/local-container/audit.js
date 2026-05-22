@@ -12,6 +12,7 @@ export const DEFAULT_LOCAL_CONTAINER_BROWSE_FILES = [
     "trace.jsonl",
     "lossless_context.jsonl",
 ];
+const LOCAL_MEMORY_EDIT_OVERLAY_FILE = ".recallweave/local-memory-edits.jsonl";
 export async function auditLocalContainer(input) {
     const maxFileBytes = input.maxFileBytes ?? 1_000_000;
     const inspectFiles = input.inspectFiles ?? DEFAULT_LOCAL_CONTAINER_AUDIT_FILES;
@@ -63,6 +64,8 @@ export async function browseLocalContainer(input) {
     let linesInspected = 0;
     let skippedPrivate = 0;
     let redactionCount = 0;
+    const editOverlay = await readLocalMemoryEditOverlay(input.rootDir, maxFileBytes);
+    redactionCount += editOverlay.report.redactionCount;
     for (const fileName of inspectFiles) {
         const name = basename(fileName);
         if (name !== fileName || !DEFAULT_LOCAL_CONTAINER_BROWSE_FILES.includes(name)) {
@@ -79,6 +82,9 @@ export async function browseLocalContainer(input) {
             if (items.length >= maxItems)
                 break;
             const item = browseItemFromLine(name, index + 1, line);
+            const overlays = overlaysForItem(item, editOverlay);
+            if (overlays.length > 0)
+                item.overlays = overlays;
             redactionCount += item.redactionCount;
             if (!item.summary) {
                 skippedPrivate += 1;
@@ -98,6 +104,7 @@ export async function browseLocalContainer(input) {
         maxFileBytes,
         maxItems,
         files,
+        editOverlay: editOverlay.report,
         items,
         totals: {
             filesInspected: files.filter((file) => file.exists && !file.skippedReason).length,
@@ -105,6 +112,8 @@ export async function browseLocalContainer(input) {
             itemsReturned: items.length,
             skippedPrivate,
             redactionCount,
+            editOverlayCount: editOverlay.report.applied,
+            editOverlayRedactionCount: editOverlay.report.redactionCount,
         },
     };
 }
@@ -192,6 +201,134 @@ function browseItemFromLine(sourceFile, line, rawLine) {
     if (sourceId)
         item.sourceId = sourceId;
     return item;
+}
+async function readLocalMemoryEditOverlay(rootDir, maxFileBytes) {
+    const path = join(rootDir, ".recallweave", "local-memory-edits.jsonl");
+    const empty = (skippedReason, bytes) => {
+        const report = {
+            path: LOCAL_MEMORY_EDIT_OVERLAY_FILE,
+            exists: skippedReason !== "missing",
+            applied: 0,
+            skippedPrivate: 0,
+            redactionCount: 0,
+        };
+        if (bytes !== undefined)
+            report.bytes = bytes;
+        if (skippedReason !== undefined)
+            report.skippedReason = skippedReason;
+        return {
+            report,
+            byLine: new Map(),
+            bySourceId: new Map(),
+        };
+    };
+    let size = 0;
+    try {
+        const info = await stat(path);
+        if (!info.isFile())
+            return empty("missing");
+        size = info.size;
+    }
+    catch {
+        return empty("missing");
+    }
+    if (size > maxFileBytes)
+        return empty("oversize", size);
+    try {
+        const text = await readFile(path, "utf8");
+        const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
+        const byLine = new Map();
+        const bySourceId = new Map();
+        let skippedPrivate = 0;
+        let redactionCount = 0;
+        let applied = 0;
+        for (const line of lines) {
+            const overlay = overlayFromLine(line);
+            if (!overlay)
+                continue;
+            redactionCount += overlay.redactionCount;
+            if (overlay.redactionCount > 0 && !overlay.contentIncluded && overlay.action !== "suppress")
+                skippedPrivate += 1;
+            addOverlay(byLine, `${overlay.sourceFile}:${overlay.line}`, overlay);
+            if (overlay.sourceId)
+                addOverlay(bySourceId, `${overlay.sourceFile}:${overlay.sourceId}`, overlay);
+            applied += 1;
+        }
+        return {
+            report: {
+                path: LOCAL_MEMORY_EDIT_OVERLAY_FILE,
+                exists: true,
+                bytes: size,
+                inspectedLines: lines.length,
+                applied,
+                skippedPrivate,
+                redactionCount,
+            },
+            byLine,
+            bySourceId,
+        };
+    }
+    catch {
+        return empty("read_error", size);
+    }
+}
+function overlayFromLine(line) {
+    const parsed = parseJsonLine(line);
+    if (!parsed)
+        return undefined;
+    const sourceFile = safeBrowseFileName(parsed.sourceFile);
+    if (!sourceFile)
+        return undefined;
+    const lineNumber = clampInteger(Number.parseInt(stringifyScalar(parsed.line), 10), 1, 1_000_000);
+    const action = sanitizeScalar(entryValue(parsed, ["action"]) ?? "needs_review") || "needs_review";
+    const reason = sanitizeScalar(entryValue(parsed, ["reason"]) ?? "manual_correction") || "manual_correction";
+    const sourceId = sanitizeOptionalScalar(entryValue(parsed, ["sourceId"]));
+    const createdAt = sanitizeOptionalScalar(entryValue(parsed, ["createdAt"]));
+    const replacementValue = entryValue(parsed, ["replacementText"]);
+    const replacement = redactPrivate(stringifyScalar(replacementValue));
+    const hasReplacement = replacementValue !== undefined && stringifyScalar(replacementValue).trim().length > 0;
+    const overlay = {
+        action,
+        reason,
+        sourceFile,
+        line: lineNumber,
+        redactionCount: replacement.redactionCount,
+        contentIncluded: hasReplacement && !replacement.fullyPrivate && replacement.text.trim().length > 0 && action !== "suppress",
+    };
+    if (sourceId)
+        overlay.sourceId = sourceId;
+    if (createdAt)
+        overlay.createdAt = createdAt;
+    if (overlay.contentIncluded)
+        overlay.replacementPreview = truncate(replacement.text, 180);
+    return overlay;
+}
+function overlaysForItem(item, overlays) {
+    const matches = [
+        ...(overlays.byLine.get(`${item.sourceFile}:${item.line}`) ?? []),
+        ...(item.sourceId ? overlays.bySourceId.get(`${item.sourceFile}:${item.sourceId}`) ?? [] : []),
+    ];
+    const seen = new Set();
+    return matches
+        .filter((overlay) => {
+        const key = `${overlay.sourceFile}:${overlay.line}:${overlay.sourceId ?? ""}:${overlay.action}:${overlay.createdAt ?? ""}`;
+        if (seen.has(key))
+            return false;
+        seen.add(key);
+        return true;
+    })
+        .slice(0, 5);
+}
+function addOverlay(map, key, overlay) {
+    const existing = map.get(key) ?? [];
+    existing.push(overlay);
+    map.set(key, existing);
+}
+function safeBrowseFileName(value) {
+    const name = sanitizeScalar(value);
+    return DEFAULT_LOCAL_CONTAINER_BROWSE_FILES.includes(name)
+        ? name
+        : undefined;
 }
 function parseJsonLine(line) {
     try {

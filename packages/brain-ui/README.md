@@ -41,7 +41,9 @@ Use this flow for browser or computer-use evidence:
 11. Optional: start with `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT=1`, apply a
     selected local memory edit overlay in a throwaway fixture, and confirm the
     response and audit trail are content-free.
-12. Capture only sanitized screenshots or recordings.
+12. Browse the same selected fixture container and confirm the edit overlay is
+    visible next to the matching memory line.
+13. Capture only sanitized screenshots or recordings.
 
 ## Current Scope
 
@@ -49,4 +51,5 @@ This is a scaffold, not the final app. It proves the product surface and visual
 review loop before direct in-place memory editing. Selected local audits are
 read-only and return counts, reasons, and redacted path labels only. Selected
 local memory edits write append-only overlays under `.recallweave/` and never
-rewrite `memories.jsonl` directly.
+rewrite `memories.jsonl` directly. The browse preview surfaces those overlays
+so an operator can see which memory line has a correction or suppression.

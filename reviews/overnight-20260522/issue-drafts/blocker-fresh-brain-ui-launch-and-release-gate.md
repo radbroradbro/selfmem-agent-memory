@@ -58,6 +58,7 @@ local-container mode, and a public release note that does not overclaim.
   provenance, lifecycle/retrieval trace, derived doc edit, save/cancel behavior,
   Nucleus snapshot preview, research lineage, wiki/vault preview, sync conflict
   view, selected local-container browse, selected local memory edit overlay,
+  local edit overlay browse visibility,
   selected vault sync dry-run, selected vault sync apply, lifecycle policy
   preview, selected lifecycle policy apply, memory review queue preview, and
   selected review queue apply.

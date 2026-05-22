@@ -19,6 +19,8 @@ export const DEFAULT_LOCAL_CONTAINER_BROWSE_FILES = [
 
 export type LocalContainerBrowseFileName = (typeof DEFAULT_LOCAL_CONTAINER_BROWSE_FILES)[number];
 
+const LOCAL_MEMORY_EDIT_OVERLAY_FILE = ".recallweave/local-memory-edits.jsonl";
+
 export interface LocalContainerAuditInput {
   rootDir: string;
   containerLabel?: string;
@@ -73,6 +75,19 @@ export interface LocalContainerBrowseItem {
   sourceId?: string;
   summary: string;
   redactionCount: number;
+  overlays?: LocalMemoryEditOverlay[];
+}
+
+export interface LocalMemoryEditOverlay {
+  action: string;
+  reason: string;
+  sourceFile: LocalContainerBrowseFileName;
+  line: number;
+  sourceId?: string;
+  createdAt?: string;
+  replacementPreview?: string;
+  redactionCount: number;
+  contentIncluded: boolean;
 }
 
 export interface LocalContainerBrowseReport {
@@ -90,6 +105,16 @@ export interface LocalContainerBrowseReport {
     inspectedLines?: number;
     skippedReason?: "missing" | "unsafe_name" | "oversize" | "read_error";
   }>;
+  editOverlay: {
+    path: typeof LOCAL_MEMORY_EDIT_OVERLAY_FILE;
+    exists: boolean;
+    bytes?: number;
+    inspectedLines?: number;
+    applied: number;
+    skippedPrivate: number;
+    redactionCount: number;
+    skippedReason?: "missing" | "oversize" | "read_error";
+  };
   items: LocalContainerBrowseItem[];
   totals: {
     filesInspected: number;
@@ -97,6 +122,8 @@ export interface LocalContainerBrowseReport {
     itemsReturned: number;
     skippedPrivate: number;
     redactionCount: number;
+    editOverlayCount: number;
+    editOverlayRedactionCount: number;
   };
 }
 
@@ -155,6 +182,8 @@ export async function browseLocalContainer(input: LocalContainerBrowseInput): Pr
   let linesInspected = 0;
   let skippedPrivate = 0;
   let redactionCount = 0;
+  const editOverlay = await readLocalMemoryEditOverlay(input.rootDir, maxFileBytes);
+  redactionCount += editOverlay.report.redactionCount;
 
   for (const fileName of inspectFiles) {
     const name = basename(fileName);
@@ -172,6 +201,8 @@ export async function browseLocalContainer(input: LocalContainerBrowseInput): Pr
     for (const [index, line] of lines.entries()) {
       if (items.length >= maxItems) break;
       const item = browseItemFromLine(name as LocalContainerBrowseFileName, index + 1, line);
+      const overlays = overlaysForItem(item, editOverlay);
+      if (overlays.length > 0) item.overlays = overlays;
       redactionCount += item.redactionCount;
       if (!item.summary) {
         skippedPrivate += 1;
@@ -191,6 +222,7 @@ export async function browseLocalContainer(input: LocalContainerBrowseInput): Pr
     maxFileBytes,
     maxItems,
     files,
+    editOverlay: editOverlay.report,
     items,
     totals: {
       filesInspected: files.filter((file) => file.exists && !file.skippedReason).length,
@@ -198,6 +230,8 @@ export async function browseLocalContainer(input: LocalContainerBrowseInput): Pr
       itemsReturned: items.length,
       skippedPrivate,
       redactionCount,
+      editOverlayCount: editOverlay.report.applied,
+      editOverlayRedactionCount: editOverlay.report.redactionCount,
     },
   };
 }
@@ -294,6 +328,143 @@ function browseItemFromLine(sourceFile: LocalContainerBrowseFileName, line: numb
   const sourceId = sanitizeOptionalScalar(entryValue(parsed, ["id", "memoryId", "sourceId", "sessionId"]));
   if (sourceId) item.sourceId = sourceId;
   return item;
+}
+
+async function readLocalMemoryEditOverlay(
+  rootDir: string,
+  maxFileBytes: number,
+): Promise<{
+  report: LocalContainerBrowseReport["editOverlay"];
+  byLine: Map<string, LocalMemoryEditOverlay[]>;
+  bySourceId: Map<string, LocalMemoryEditOverlay[]>;
+}> {
+  const path = join(rootDir, ".recallweave", "local-memory-edits.jsonl");
+  const empty = (skippedReason: LocalContainerBrowseReport["editOverlay"]["skippedReason"], bytes?: number): {
+    report: LocalContainerBrowseReport["editOverlay"];
+    byLine: Map<string, LocalMemoryEditOverlay[]>;
+    bySourceId: Map<string, LocalMemoryEditOverlay[]>;
+  } => {
+    const report: LocalContainerBrowseReport["editOverlay"] = {
+      path: LOCAL_MEMORY_EDIT_OVERLAY_FILE,
+      exists: skippedReason !== "missing",
+      applied: 0,
+      skippedPrivate: 0,
+      redactionCount: 0,
+    };
+    if (bytes !== undefined) report.bytes = bytes;
+    if (skippedReason !== undefined) report.skippedReason = skippedReason;
+    return {
+      report,
+      byLine: new Map(),
+      bySourceId: new Map(),
+    };
+  };
+
+  let size = 0;
+  try {
+    const info = await stat(path);
+    if (!info.isFile()) return empty("missing");
+    size = info.size;
+  } catch {
+    return empty("missing");
+  }
+
+  if (size > maxFileBytes) return empty("oversize", size);
+
+  try {
+    const text = await readFile(path, "utf8");
+    const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
+    const byLine = new Map<string, LocalMemoryEditOverlay[]>();
+    const bySourceId = new Map<string, LocalMemoryEditOverlay[]>();
+    let skippedPrivate = 0;
+    let redactionCount = 0;
+    let applied = 0;
+
+    for (const line of lines) {
+      const overlay = overlayFromLine(line);
+      if (!overlay) continue;
+      redactionCount += overlay.redactionCount;
+      if (overlay.redactionCount > 0 && !overlay.contentIncluded && overlay.action !== "suppress") skippedPrivate += 1;
+      addOverlay(byLine, `${overlay.sourceFile}:${overlay.line}`, overlay);
+      if (overlay.sourceId) addOverlay(bySourceId, `${overlay.sourceFile}:${overlay.sourceId}`, overlay);
+      applied += 1;
+    }
+
+    return {
+      report: {
+        path: LOCAL_MEMORY_EDIT_OVERLAY_FILE,
+        exists: true,
+        bytes: size,
+        inspectedLines: lines.length,
+        applied,
+        skippedPrivate,
+        redactionCount,
+      },
+      byLine,
+      bySourceId,
+    };
+  } catch {
+    return empty("read_error", size);
+  }
+}
+
+function overlayFromLine(line: string): LocalMemoryEditOverlay | undefined {
+  const parsed = parseJsonLine(line);
+  if (!parsed) return undefined;
+  const sourceFile = safeBrowseFileName(parsed.sourceFile);
+  if (!sourceFile) return undefined;
+  const lineNumber = clampInteger(Number.parseInt(stringifyScalar(parsed.line), 10), 1, 1_000_000);
+  const action = sanitizeScalar(entryValue(parsed, ["action"]) ?? "needs_review") || "needs_review";
+  const reason = sanitizeScalar(entryValue(parsed, ["reason"]) ?? "manual_correction") || "manual_correction";
+  const sourceId = sanitizeOptionalScalar(entryValue(parsed, ["sourceId"]));
+  const createdAt = sanitizeOptionalScalar(entryValue(parsed, ["createdAt"]));
+  const replacementValue = entryValue(parsed, ["replacementText"]);
+  const replacement = redactPrivate(stringifyScalar(replacementValue));
+  const hasReplacement = replacementValue !== undefined && stringifyScalar(replacementValue).trim().length > 0;
+  const overlay: LocalMemoryEditOverlay = {
+    action,
+    reason,
+    sourceFile,
+    line: lineNumber,
+    redactionCount: replacement.redactionCount,
+    contentIncluded: hasReplacement && !replacement.fullyPrivate && replacement.text.trim().length > 0 && action !== "suppress",
+  };
+  if (sourceId) overlay.sourceId = sourceId;
+  if (createdAt) overlay.createdAt = createdAt;
+  if (overlay.contentIncluded) overlay.replacementPreview = truncate(replacement.text, 180);
+  return overlay;
+}
+
+function overlaysForItem(
+  item: LocalContainerBrowseItem,
+  overlays: Awaited<ReturnType<typeof readLocalMemoryEditOverlay>>,
+): LocalMemoryEditOverlay[] {
+  const matches = [
+    ...(overlays.byLine.get(`${item.sourceFile}:${item.line}`) ?? []),
+    ...(item.sourceId ? overlays.bySourceId.get(`${item.sourceFile}:${item.sourceId}`) ?? [] : []),
+  ];
+  const seen = new Set<string>();
+  return matches
+    .filter((overlay) => {
+      const key = `${overlay.sourceFile}:${overlay.line}:${overlay.sourceId ?? ""}:${overlay.action}:${overlay.createdAt ?? ""}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 5);
+}
+
+function addOverlay(map: Map<string, LocalMemoryEditOverlay[]>, key: string, overlay: LocalMemoryEditOverlay): void {
+  const existing = map.get(key) ?? [];
+  existing.push(overlay);
+  map.set(key, existing);
+}
+
+function safeBrowseFileName(value: unknown): LocalContainerBrowseFileName | undefined {
+  const name = sanitizeScalar(value);
+  return DEFAULT_LOCAL_CONTAINER_BROWSE_FILES.includes(name as LocalContainerBrowseFileName)
+    ? (name as LocalContainerBrowseFileName)
+    : undefined;
 }
 
 function parseJsonLine(line: string): Record<string, unknown> | undefined {

@@ -67,6 +67,10 @@
 - The selected local memory edit overlay slice was verified by fresh Brain UI
   smoke, interaction smoke, and updated Browser DOM evidence. A fixture-only
   screenshot was captured at `brain-ui-local-memory-edit.png`.
+- The local edit overlay browse slice was verified by fresh Brain UI smoke,
+  interaction smoke, local-container audit smoke, and updated Browser DOM
+  evidence. A fixture-only screenshot was captured at
+  `brain-ui-local-edit-overlay-browse.png`.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.
