@@ -26,6 +26,7 @@ const requiredFiles = [
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
+  "packages/bench/canary-operator-packet.mjs",
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
   "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
   "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
@@ -129,6 +130,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   `${reviewDir}/canary-remediation-evidence.md`,
   `${reviewDir}/gemini-canary-remediation-review.md`,
+  `${reviewDir}/canary-operator-packet-evidence.md`,
+  `${reviewDir}/gemini-canary-operator-packet-review.md`,
   `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
@@ -231,6 +234,7 @@ const requiredScripts = [
   "canary:report",
   "canary:intake",
   "canary:diagnose",
+  "canary:operator-packet",
   "baseline:preflight",
   "goal:audit",
   "release:doctor",
@@ -788,6 +792,7 @@ check("release state is conservative", () => {
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
     "canary-remediation-plan",
+    "canary-operator-packet",
     "hosted-baseline-preflight",
     "claude-opus-pr5-review",
     "github-handoff-packet",
@@ -838,6 +843,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /canary report generator|canary:report|trace-derived canary/i, `${file} missing canary report generator`);
     assert.match(text, /canary evidence intake|canary:intake|runtime canary evidence/i, `${file} missing canary evidence intake`);
     assert.match(text, /canary diagnose|canary:diagnose|remediation/i, `${file} missing canary remediation`);
+    assert.match(text, /operator packet|canary operator|strict-real.*packet/i, `${file} missing canary operator packet`);
     assert.match(text, /research source lock|source-lock|source lock/i, `${file} missing research source lock`);
     assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
@@ -1149,6 +1155,38 @@ check("fresh canary remediation passes", () => {
   assert.doesNotMatch(failingResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
+});
+
+check("fresh canary operator packet passes", () => {
+  const hermesResult = run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "hermes"]);
+  const openclawMarkdown = run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "openclaw", "--format", "markdown"]);
+  const report = JSON.parse(hermesResult.stdout);
+  const evidence = readFileSync(join(root, reviewDir, "canary-operator-packet-evidence.md"), "utf8");
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-operator-packet-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "strict-real-canary-operator-packet");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.publicSafe, true);
+  assert.equal(report.host, "hermes");
+  assert.match(report.requiredSource, /live mapped container/i);
+  assert.ok(report.commands.some((item) => item.id === "apply-and-collect-live-container" && /--strict-real/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-dir" && /--canary-diagnostic-dir/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-zip" && /--canary-diagnostic-zip/.test(item.command)));
+  assert.ok(report.acceptanceCriteria.includes("countsAsRealRolloutEvidence is true"));
+  assert.ok(report.acceptanceCriteria.includes("fixtureOnly is false"));
+  assert.ok(report.acceptanceCriteria.includes("instrumentation.missingStoreLatencyCount is 0"));
+  assert.ok(report.forbidden.includes("raw memories"));
+  assert.ok(report.forbidden.includes("provider keys"));
+  assert.match(openclawMarkdown.stdout, /RecallWeave Strict-Real Canary Packet \(OpenClaw\)/);
+  assert.match(openclawMarkdown.stdout, /--host openclaw/);
+  assert.match(openclawMarkdown.stdout, /Attach Only/);
+  assert.doesNotMatch(hermesResult.stdout, secretPattern);
+  assert.doesNotMatch(openclawMarkdown.stdout, secretPattern);
+  assert.doesNotMatch(hermesResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(openclawMarkdown.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.match(evidence, /strict-real canary operator packet/i);
+  assert.match(evidence, /canary:operator-packet/i);
+  assert.match(geminiReview, /Verdict:\s*CLEAN/i);
 });
 
 check("fresh release blocker doctor passes", () => {

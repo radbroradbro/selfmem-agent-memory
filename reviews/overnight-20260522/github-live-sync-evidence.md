@@ -42,11 +42,11 @@ Observed public-safe output:
   "prBodyMatches": true,
   "issueTitleMatches": true,
   "issueBodyMatches": true,
-  "prBodyHash": "139e4a8f04cd409529d8e6015f6b0de1cf45f3ef3137f9248676c19bdfb8e46e",
+  "prBodyHash": "50771054fd1fae5f6ebb8dc64f472aa623676559bd800bec4c32934b326f5822",
   "issueTitleHash": "e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c",
   "issueBodyHash": "a13c47f671440705479041173778d9a4c1e00e4d2c49cc130034a1ef999023d2",
   "liveUpdatedAt": {
-    "pullRequest": "2026-05-22T23:34:50Z",
+    "pullRequest": "2026-05-22T23:44:29Z",
     "issue": "2026-05-22T23:21:27Z"
   },
   "safety": {

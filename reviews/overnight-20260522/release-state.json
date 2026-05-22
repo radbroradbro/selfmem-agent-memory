@@ -67,6 +67,7 @@
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
     "canary-remediation-plan",
+    "canary-operator-packet",
     "adapter-bounded-read-through",
     "hosted-baseline-preflight",
     "claude-opus-pr5-review",

@@ -46,13 +46,14 @@
     "canary:report": "node packages/bench/canary-report-from-trace.mjs",
     "canary:intake": "node packages/bench/canary-evidence-intake.mjs",
     "canary:diagnose": "node packages/bench/canary-remediation.mjs",
+    "canary:operator-packet": "node packages/bench/canary-operator-packet.mjs",
     "baseline:preflight": "node packages/bench/hosted-baseline-preflight.mjs",
     "goal:audit": "node packages/bench/goal-completion-audit.mjs",
     "release:doctor": "node packages/bench/release-blocker-doctor.mjs",
     "release:handoff": "node packages/bench/github-handoff-packet.mjs",
     "release:github-sync": "node packages/bench/github-live-sync-check.mjs",
     "release:check": "node packages/bench/release-readiness-check.mjs",
-    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm brain:interaction:built && pnpm container:audit:smoke:built && pnpm compaction:smoke:built && pnpm compaction:benchmark:built && pnpm compaction:local-audit:built && pnpm wiki:smoke:built && pnpm wiki:sync:smoke:built && pnpm update:smoke && pnpm canary:report -- --fixture && pnpm canary:report -- --diagnostic-dir packages/bench/fixtures/canary-diagnostic-export.fixture && pnpm canary:intake && pnpm canary:diagnose && pnpm baseline:preflight && pnpm baseline:preflight -- --fixture && pnpm consumer:smoke"
+    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm brain:interaction:built && pnpm container:audit:smoke:built && pnpm compaction:smoke:built && pnpm compaction:benchmark:built && pnpm compaction:local-audit:built && pnpm wiki:smoke:built && pnpm wiki:sync:smoke:built && pnpm update:smoke && pnpm canary:report -- --fixture && pnpm canary:report -- --diagnostic-dir packages/bench/fixtures/canary-diagnostic-export.fixture && pnpm canary:intake && pnpm canary:diagnose && pnpm canary:operator-packet && pnpm baseline:preflight && pnpm baseline:preflight -- --fixture && pnpm consumer:smoke"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

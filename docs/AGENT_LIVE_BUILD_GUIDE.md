@@ -155,6 +155,16 @@ applies into fake runtime directories, verifies adapter backups, preserves the
 container mapping, confirms copied local key files use `0600`, and exercises the
 canary report/intake path against a fixture diagnostic export.
 
+To generate one paste-ready handoff for an agent operator, run:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:operator-packet
+npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw --format markdown
+```
+
+The operator packet is public-safe. It uses placeholders for runtime paths and
+lists only the metrics-only files the agent should attach after the run.
+
 ## Failed Canary Reports
 
 If a live canary report fails strict intake, do not summarize the private logs

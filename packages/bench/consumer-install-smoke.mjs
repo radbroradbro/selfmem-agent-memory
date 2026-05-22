@@ -19,6 +19,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
+  "packages/bench/canary-operator-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
   "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
   "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
@@ -38,6 +39,7 @@ try {
   assert.equal(packageJson.bin?.selfmem_update, "./bin/selfmem_update");
   assert.equal(typeof packageJson.scripts?.["consumer:smoke"], "string");
   assert.equal(typeof packageJson.scripts?.["update:smoke"], "string");
+  assert.equal(typeof packageJson.scripts?.["canary:operator-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["release:github-sync"], "string");
   assert.ok(existsSync(join(checkout, "README.md")), "README.md missing from consumer checkout");
   assert.ok(existsSync(join(checkout, "docs/USER_MANUAL.md")), "user manual missing from consumer checkout");
@@ -57,6 +59,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-report-from-trace.mjs", "--diagnostic-dir", "packages/bench/fixtures/canary-diagnostic-export.fixture"], "canary diagnostic report generator"));
   checks.push(run("node", ["packages/bench/canary-evidence-intake.mjs"], "canary evidence intake"));
   checks.push(run("node", ["packages/bench/canary-remediation.mjs"], "canary remediation plan"));
+  checks.push(run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "hermes"], "canary operator packet"));
 
   const pack = run("npm", ["pack", "--dry-run", "--json", "--cache", npmCache], "npm package dry run");
   const packJson = JSON.parse(pack.stdout);
@@ -74,6 +77,7 @@ try {
     "packages/bench/canary-report-from-trace.mjs",
     "packages/bench/canary-evidence-intake.mjs",
     "packages/bench/canary-remediation.mjs",
+    "packages/bench/canary-operator-packet.mjs",
     "packages/bench/github-live-sync-check.mjs",
     "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
     "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",

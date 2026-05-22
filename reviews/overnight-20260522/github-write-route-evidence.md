@@ -17,13 +17,13 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-22T23:34:50Z
-  - Body length: 5901
+  - Updated at: 2026-05-22T23:44:29Z
+  - Body length: 5939
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
     evidence refresh, 200 on real-canary diagnostic evidence refresh, 200 on
-    strict-real source-guard refresh
+    strict-real source-guard refresh, canary operator packet refresh
   - Updated at: 2026-05-22T23:21:27Z
   - Body length: 3033
 

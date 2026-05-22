@@ -70,6 +70,7 @@ evidence are still required before any public live update.
 | Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |
+| Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `reviews/overnight-20260522/canary-operator-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-operator-packet-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
 | Brain UI model matrix | `packages/brain-ui/fixtures/model-matrix.json`, `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md` |
@@ -292,6 +293,10 @@ Latest local verification before this summary:
   fixture reports `recall-p95` and `store-p95`, keeps fleet/public rollout
   blocked, and requires a fresh collection window after fixes. GitHub Actions
   CI run `26312283137` passed on `4f5a079`.
+- Canary operator packet verification: local `canary:operator-packet` emits a
+  public-safe Hermes/OpenClaw handoff with strict-real commands, attach-only
+  metrics files, pass criteria, and forbidden raw artifacts. It is an operator
+  aid, not rollout success.
 - Real canary diagnostic evaluation: two redacted external Hermes diagnostic
   bundles were converted into temporary metrics-only reports. Both were real
   external inputs and privacy-clean. Both failed strict rollout intake on

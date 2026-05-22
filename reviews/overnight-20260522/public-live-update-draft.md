@@ -39,6 +39,9 @@ The current PR adds:
   sanitized report format without raw memory text or local paths;
 - a canary diagnosis command that turns failed canary reports into metrics-only
   remediation actions without exposing diagnostic contents;
+- a canary operator packet that prints public-safe Hermes/OpenClaw strict-real
+  collection commands, attach-only metrics files, pass criteria, and forbidden
+  raw artifacts;
 - real diagnostic canary evaluation evidence from two redacted external Hermes
   bundles, both privacy-clean and both rejected by strict rollout intake;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and

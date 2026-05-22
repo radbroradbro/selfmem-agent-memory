@@ -347,6 +347,9 @@ evidence for:
   or local-path output.
 - canary remediation evidence with failed-check diagnosis, metrics-only action
   plans, and fleet/public rollout still blocked.
+- canary operator packet evidence with public-safe Hermes/OpenClaw strict-real
+  collection commands, attach-only metrics files, pass criteria, and forbidden
+  raw artifacts. This helps collect the next live canary but does not satisfy it.
 - real canary diagnostic evidence from two redacted external Hermes bundles,
   both privacy-clean and both rejected by strict rollout intake because store
   latency was missing and recall p95 exceeded the strict threshold.
