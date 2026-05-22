@@ -86,6 +86,8 @@ Retry note:
   so the PR body, status comment, blocker issue, labels, and manual GitHub
   steps can be copied from one audited JSON output while GitHub write routes
   are blocked.
+- GitHub Actions CI run `26308475033` passed on `6a33e62`, the GitHub handoff
+  packet gate commit.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -202,6 +204,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26306827655` passed on `4cee083`, the clean consumer smoke gate commit.
 - GitHub Actions CI: run `26307335652` passed on `d93d781`, the release blocker doctor gate commit.
 - GitHub Actions CI: run `26307824017` passed on `733c1e6`, the current-head live browser evidence gate commit.
+- GitHub Actions CI: run `26308475033` passed on `6a33e62`, the GitHub handoff packet gate commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, clean consumer smoke, release blocker doctor, current-head live browser evidence, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

@@ -47,6 +47,9 @@ const issueTitle = extractIssueTitle(issueBody);
 const currentHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
 const branch = run("git", ["branch", "--show-current"]).stdout.trim();
 const remoteUrl = run("git", ["remote", "get-url", "origin"]).stdout.trim();
+const latestBaseline = releaseState.latestVerifiedCodeBaseline;
+const latestCiRunId = latestBaseline?.ciRunId;
+const latestHeadShort = String(latestBaseline?.headSha ?? "").slice(0, 7);
 
 assert.equal(releaseState.goalStatus, "active");
 assert.equal(releaseState.repository, repository);
@@ -58,15 +61,16 @@ assert.equal(releaseState.safetyBoundary?.commitsRawMemories, false);
 assert.equal(releaseState.safetyBoundary?.commitsRawTranscripts, false);
 assert.equal(releaseState.safetyBoundary?.commitsCredentials, false);
 assert.equal(releaseState.safetyBoundary?.enablesHostedWriteBack, false);
-assert.equal(releaseState.latestVerifiedCodeBaseline?.ciRunId, 26307824017);
-assert.equal(releaseState.latestVerifiedCodeBaseline?.ciConclusion, "success");
+assert.equal(typeof latestCiRunId, "number");
+assert.match(String(latestBaseline?.headSha ?? ""), /^[a-f0-9]{40}$/);
+assert.equal(latestBaseline?.ciConclusion, "success");
 for (const blocker of requiredBlockers) {
   assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
 }
 
 assert.match(prBody, /Current-head live browser evidence/i);
 assert.match(prBody, /release blocker doctor/i);
-assert.match(prBody, /26307824017/);
+assert.match(prBody, new RegExp(String(latestCiRunId)));
 assert.match(prBody, /public launch.*blocked|Public launch should still wait/i);
 assert.match(prBody, /Not production ready for public launch yet/i);
 assert.match(prBody, /fixture/i);
@@ -85,7 +89,7 @@ const statusComment = [
   "",
   "- Current public launch verdict: FAIL.",
   "- Current production readiness: false.",
-  "- Latest verified code baseline: 733c1e6, GitHub Actions run 26307824017 passed.",
+  `- Latest verified code baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
   "- Current head has a generated GitHub handoff packet so a maintainer can paste the PR body, create the blocker issue, and keep the blocker list visible while app permissions are read-only.",
   "- Remaining blockers: Claude reviewer route blocked by login, GitHub write routes blocked by integration permissions, human public-launch approval required, and hosted Supermemory baseline not current.",
   "",

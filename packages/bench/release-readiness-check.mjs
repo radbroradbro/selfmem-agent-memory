@@ -864,6 +864,7 @@ check("fresh GitHub handoff packet passes", () => {
   const result = run("node", ["packages/bench/github-handoff-packet.mjs"]);
   const packet = JSON.parse(result.stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-github-handoff-packet-review.md"), "utf8");
+  const releaseState = JSON.parse(readFileSync(join(root, reviewDir, "release-state.json"), "utf8"));
   assert.equal(packet.ok, true);
   assert.equal(packet.mode, "github-handoff-packet");
   assert.equal(packet.writesRealFiles, false);
@@ -871,13 +872,14 @@ check("fresh GitHub handoff packet passes", () => {
   assert.equal(packet.pullRequest, 5);
   assert.equal(packet.publicLaunchAllowed, false);
   assert.equal(packet.productionReady, false);
-  assert.equal(packet.latestVerifiedCodeBaseline?.ciRunId, 26307824017);
+  assert.equal(packet.latestVerifiedCodeBaseline?.ciRunId, releaseState.latestVerifiedCodeBaseline?.ciRunId);
+  assert.equal(packet.latestVerifiedCodeBaseline?.ciConclusion, "success");
   assert.equal(packet.safety?.privateLeakCount, 0);
   assert.equal(packet.safety?.hasSecretPattern, false);
   assert.equal(packet.safety?.fixtureOnly, true);
   assert.match(packet.prBody, /Current-head live browser evidence/i);
   assert.match(packet.prBody, /release blocker doctor/i);
-  assert.match(packet.prBody, /26307824017/);
+  assert.match(packet.prBody, new RegExp(String(releaseState.latestVerifiedCodeBaseline?.ciRunId)));
   assert.match(packet.statusComment, /public launch verdict: FAIL/i);
   assert.match(packet.issueBody, /Acceptance Criteria/);
   assert.ok(packet.labels.includes("not-production-ready"));

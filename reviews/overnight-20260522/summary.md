@@ -230,7 +230,8 @@ Latest local verification before this summary:
   public-safe manual GitHub packet with PR body, status comment, blocker issue,
   labels, and manual GitHub steps. It writes no files, reports
   `privateLeakCount: 0`, keeps `productionReady: false`, and keeps the public
-  launch verdict blocked while GitHub write routes are unavailable.
+  launch verdict blocked while GitHub write routes are unavailable. GitHub
+  Actions CI run `26308475033` passed on `6a33e62`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,

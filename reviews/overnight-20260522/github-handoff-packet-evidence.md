@@ -68,3 +68,5 @@ auditable and repeatable while keeping `publicLaunchVerdict: "FAIL"` and
 - `npm exec --yes pnpm@10.23.0 -- test`: passed, 6 files and 22 tests.
 - `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
 - `git diff --check`: passed.
+- GitHub Actions CI run `26308475033` passed on `6a33e62`, including Test,
+  Full smoke, and Release readiness check.

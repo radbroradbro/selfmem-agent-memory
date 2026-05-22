@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "733c1e6e38a546e8e37b5ecffcfc262e9fae59da",
-    "ciRunId": 26307824017,
+    "headSha": "6a33e62f4190a15cc805255b820d75bf3b1d237a",
+    "ciRunId": 26308475033,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the current-head live browser evidence gate was added. GitHub Actions run 26307824017 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after the GitHub handoff packet gate was added. GitHub Actions run 26308475033 passed Test, Full smoke, and Release readiness check."
   },
   "releaseStateGuard": {
     "enabled": true,
