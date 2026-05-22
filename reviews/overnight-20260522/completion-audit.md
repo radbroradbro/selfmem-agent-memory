@@ -19,7 +19,7 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `ff6f343`
+- Latest public-draft baseline inspected before this audit refresh: `4cee083`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -58,6 +58,7 @@ complete or publish a public live update.
 - Model/autoresearch release-gate hardening follow-up: `22e17b1`, CI run
   `26305635737` passed
 - Brain UI Model Matrix follow-up: `ff6f343`, CI run `26306469240` passed
+- Clean consumer smoke follow-up: `4cee083`, CI run `26306827655` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 

@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `ff6f343`, run `26306469240`, success.
+  `4cee083`, run `26306827655`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -42,6 +42,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26305284384` on `13cbe8d`: success.
 - GitHub Actions CI run `26305635737` on `22e17b1`: success.
 - GitHub Actions CI run `26306469240` on `ff6f343`: success.
+- GitHub Actions CI run `26306827655` on `4cee083`: success.
 
 ## Shipped Overnight Slices
 
@@ -217,7 +218,8 @@ Latest local verification before this summary:
   smoke, local-container audit smoke, local-session compaction audit, and
   `npm pack --dry-run --json`. It verified required user-facing docs, updater
   files, built core runtime, Brain UI model-matrix fixture, zero forbidden
-  runtime files, and zero key-shaped hits.
+  runtime files, and zero key-shaped hits. GitHub Actions CI run
+  `26306827655` passed on `4cee083`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture

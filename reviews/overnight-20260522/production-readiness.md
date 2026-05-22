@@ -231,7 +231,8 @@ Controller follow-up after that sandbox run:
   checkout ran updater help, update smoke, Brain UI smoke, Brain UI
   interaction smoke, local-container audit smoke, local-session compaction
   audit, and npm package dry-run, then verified required docs/package files,
-  zero forbidden runtime files, and zero key-shaped hits.
+  zero forbidden runtime files, and zero key-shaped hits. GitHub Actions CI
+  run `26306827655` passed on `4cee083`.
 
 ## UI Evidence
 
