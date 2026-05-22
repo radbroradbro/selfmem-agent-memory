@@ -12,8 +12,6 @@ const releaseStatePath = join(root, reviewDir, "release-state.json");
 const releaseState = JSON.parse(readFileSync(releaseStatePath, "utf8"));
 const requiredBlockers = [
   "claude-reviewer-route-blocked",
-  "github-pr-body-update-blocked",
-  "github-issue-create-blocked",
   "human-public-launch-approval-required",
   "hosted-supermemory-baseline-not-current",
 ];
@@ -24,6 +22,7 @@ const requiredFiles = {
   prBodyDraft: "pr-body-update-draft.md",
   issueDraft: "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md",
   githubBlocked: "github-issue-create-blocked.md",
+  githubWriteEvidence: "github-write-route-evidence.md",
   claudeBlocked: "claude-pr5-review-blocked.md",
   hostedBaselinePreflight: "hosted-baseline-preflight-evidence.md",
   hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
@@ -52,12 +51,13 @@ for (const item of Object.values(evidence)) {
   assert.ok(item.bytes > 0, `${item.path} empty`);
 }
 
-const githubBlockedText = readFileSync(join(root, reviewDir, "github-issue-create-blocked.md"), "utf8");
+const githubWriteText = readFileSync(join(root, reviewDir, "github-write-route-evidence.md"), "utf8");
 const claudeBlockedText = readFileSync(join(root, reviewDir, "claude-pr5-review-blocked.md"), "utf8");
 const prBodyDraftText = readFileSync(join(root, reviewDir, "pr-body-update-draft.md"), "utf8");
 const issueDraftText = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
 
-assert.match(githubBlockedText, /FORBIDDEN: Resource not accessible by integration|Resource not accessible by integration/);
+assert.match(githubWriteText, /PR #5 body updated/);
+assert.match(githubWriteText, /issues\/6/);
 assert.match(claudeBlockedText, /Not logged in/);
 assert.match(prBodyDraftText, /clean consumer smoke/i);
 assert.match(issueDraftText, /Acceptance Criteria/);
@@ -81,18 +81,6 @@ const blockerReport = [
     status: "blocked",
     evidence: "claude-pr5-review-blocked.md",
     nextAction: "Run `claude /login`, then rerun the cold PR review, or explicitly accept the blocked route.",
-  },
-  {
-    id: "github-pr-body-update-blocked",
-    status: "blocked",
-    evidence: "pr-body-update-draft.md and github-issue-create-blocked.md",
-    nextAction: "Paste `pr-body-update-draft.md` into PR #5 or grant a GitHub integration route that can update PR bodies.",
-  },
-  {
-    id: "github-issue-create-blocked",
-    status: "blocked",
-    evidence: "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md",
-    nextAction: "Create the blocker issue manually or explicitly accept the missing issue as part of the release decision.",
   },
   {
     id: "human-public-launch-approval-required",
@@ -159,8 +147,7 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- release:check",
         "npm exec --yes pnpm@10.23.0 -- smoke",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight",
-        "Copy reviews/overnight-20260522/pr-body-update-draft.md into PR #5",
-        "Create an issue from reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md",
+        "Verify PR #5 and issue #6 still match reviews/overnight-20260522/github-write-route-evidence.md",
       ],
     },
     null,

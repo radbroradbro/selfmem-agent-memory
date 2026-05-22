@@ -93,8 +93,8 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 15 proven
-  requirements, 5 blocked requirements, and 1 incomplete requirement, so this
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 17 proven
+  requirements, 3 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with
   `callsHostedProvider: false`, `metricsOnly: true`, and

@@ -15,8 +15,6 @@ const secretPattern =
 
 const requiredBlockers = [
   "claude-reviewer-route-blocked",
-  "github-pr-body-update-blocked",
-  "github-issue-create-blocked",
   "human-public-launch-approval-required",
   "hosted-supermemory-baseline-not-current",
 ];
@@ -26,6 +24,7 @@ const paths = {
   prBodyDraft: join(root, reviewDir, "pr-body-update-draft.md"),
   issueDraft: join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"),
   githubBlocked: join(root, reviewDir, "github-issue-create-blocked.md"),
+  githubWriteEvidence: join(root, reviewDir, "github-write-route-evidence.md"),
   claudeBlocked: join(root, reviewDir, "claude-pr5-review-blocked.md"),
   hostedBaselinePreflight: join(root, reviewDir, "hosted-baseline-preflight-evidence.md"),
   releaseHandoff: join(root, "docs/RELEASE_HANDOFF.md"),
@@ -39,7 +38,7 @@ for (const [name, path] of Object.entries(paths)) {
 const releaseState = JSON.parse(readFileSync(paths.releaseState, "utf8"));
 const prBodyDraftText = readFileSync(paths.prBodyDraft, "utf8");
 const issueBody = readFileSync(paths.issueDraft, "utf8");
-const githubBlockedText = readFileSync(paths.githubBlocked, "utf8");
+const githubWriteText = readFileSync(paths.githubWriteEvidence, "utf8");
 const claudeBlockedText = readFileSync(paths.claudeBlocked, "utf8");
 const releaseHandoffText = readFileSync(paths.releaseHandoff, "utf8");
 
@@ -79,7 +78,8 @@ assert.match(prBody, /fixture/i);
 assert.match(issueBody, /Acceptance Criteria/);
 assert.match(issueBody, /reviewer/i);
 assert.match(issueBody, /human approval/i);
-assert.match(githubBlockedText, /Resource not accessible by integration/);
+assert.match(githubWriteText, /PR #5 body updated/);
+assert.match(githubWriteText, /issues\/6/);
 assert.match(claudeBlockedText, /Not logged in/);
 assert.match(releaseHandoffText, /Manual GitHub Steps/);
 assert.match(releaseHandoffText, /release:doctor/);
@@ -92,8 +92,8 @@ const statusComment = [
   "- Current public launch verdict: FAIL.",
   "- Current production readiness: false.",
   `- Latest verified code baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
-  "- Current head has a generated GitHub handoff packet so a maintainer can paste the PR body, create the blocker issue, and keep the blocker list visible while app permissions are read-only.",
-  "- Remaining blockers: Claude reviewer route blocked by login, GitHub write routes blocked by integration permissions, human public-launch approval required, and hosted Supermemory baseline not current. Use baseline:preflight before any comparison claim.",
+  "- PR #5 has been updated and release blocker issue #6 has been created. The generated handoff packet remains useful for auditing or refreshing those public-safe fields later.",
+  "- Remaining blockers: Claude reviewer route blocked by login, human public-launch approval required, hosted Supermemory baseline not current, and one real-container canary still incomplete. Use baseline:preflight before any comparison claim.",
   "",
   "Do not treat green CI as public launch approval. The repo evidence is fixture-only and contains no raw memories, transcripts, credentials, or private diagnostics.",
 ].join("\n");
@@ -123,10 +123,9 @@ const packet = {
   issueTitle,
   issueBody,
   manualSteps: [
-    "Open PR #5.",
-    "Replace the PR body with packet.prBody.",
-    "Add packet.statusComment as a top-level PR comment if useful.",
-    "Create a blocker issue with packet.issueTitle and packet.issueBody, or record that the owner accepts the missing issue.",
+    "Open PR #5 and verify the body still matches packet.prBody.",
+    "Open issue #6 and verify the blocker text still matches packet.issueBody.",
+    "Add packet.statusComment as a top-level PR comment only if a fresh status refresh is useful.",
     "Keep publicLaunchVerdict as FAIL until the owner approves a different verdict.",
   ],
   safety: {

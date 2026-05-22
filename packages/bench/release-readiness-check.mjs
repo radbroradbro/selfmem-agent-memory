@@ -141,6 +141,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-public-live-update-copy-review.md`,
   `${reviewDir}/pr-body-update-draft.md`,
   `${reviewDir}/github-issue-create-blocked.md`,
+  `${reviewDir}/github-write-route-evidence.md`,
   `${reviewDir}/gemini-blocker-permission-refresh-review.md`,
   `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
   `${reviewDir}/ui-evidence/brain-ui-dom-evidence.json`,
@@ -777,6 +778,8 @@ check("release state is conservative", () => {
     "canary-remediation-plan",
     "hosted-baseline-preflight",
     "github-handoff-packet",
+    "github-pr-body-live",
+    "github-blocker-issue-live",
     "goal-completion-audit",
     "selfmem-update",
   ]) {
@@ -784,8 +787,6 @@ check("release state is conservative", () => {
   }
   for (const blocker of [
     "claude-reviewer-route-blocked",
-    "github-pr-body-update-blocked",
-    "github-issue-create-blocked",
     "human-public-launch-approval-required",
     "hosted-supermemory-baseline-not-current",
   ]) {
@@ -839,6 +840,7 @@ check("release handoff documents blocked launch path", () => {
   const text = readFileSync(join(root, "docs/RELEASE_HANDOFF.md"), "utf8");
   assert.match(text, /PR #5/);
   assert.match(text, /pr-body-update-draft\.md/);
+  assert.match(text, /issue #6|GitHub issue #6/i);
   assert.match(text, /blocker-fresh-brain-ui-launch-and-release-gate\.md/);
   assert.match(text, /blocked Claude route|Claude CLI/i);
   assert.match(text, /public launch verdict as `FAIL`|publicLaunchVerdict: "FAIL"/);
@@ -1140,12 +1142,13 @@ check("fresh goal completion audit passes", () => {
   assert.equal(report.goalComplete, false);
   assert.equal(report.mayCallUpdateGoalComplete, false);
   assert.ok(report.counts?.proven >= 8);
-  assert.ok(report.counts?.blocked >= 4);
+  assert.ok(report.counts?.blocked >= 3);
   assert.ok(report.counts?.incomplete >= 1);
   assert.equal(report.safety?.privateLeakCount, 0);
   assert.equal(report.safety?.hasSecretPattern, false);
   assert.ok(report.requirements.some((item) => item.id === "claude-council-review" && item.status === "blocked"));
-  assert.ok(report.requirements.some((item) => item.id === "github-pr-body-current" && item.status === "blocked"));
+  assert.ok(report.requirements.some((item) => item.id === "github-pr-body-current" && item.status === "proven"));
+  assert.ok(report.requirements.some((item) => item.id === "github-blocker-issue-created" && item.status === "proven"));
   assert.ok(
     report.requirements.some((item) => item.id === "real-container-production-rollout" && item.status === "incomplete"),
   );

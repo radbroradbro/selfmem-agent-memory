@@ -20,6 +20,7 @@ const files = {
   releaseHandoff: "docs/RELEASE_HANDOFF.md",
   prBodyDraft: `${reviewDir}/pr-body-update-draft.md`,
   githubBlocked: `${reviewDir}/github-issue-create-blocked.md`,
+  githubWriteEvidence: `${reviewDir}/github-write-route-evidence.md`,
   claudeBlocked: `${reviewDir}/claude-pr5-review-blocked.md`,
   handoffPacketEvidence: `${reviewDir}/github-handoff-packet-evidence.md`,
   handoffPacketReview: `${reviewDir}/gemini-github-handoff-packet-review.md`,
@@ -67,7 +68,8 @@ assert.equal(currentHeadLiveEvidence.privateLeakCount, 0);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeBlocked, /Not logged in/);
-assert.match(texts.githubBlocked, /Resource not accessible by integration/);
+assert.match(texts.githubWriteEvidence, /PR #5 body updated/);
+assert.match(texts.githubWriteEvidence, /issues\/6/);
 assert.match(texts.handoffPacketReview, /Verdict: `CLEAN`|^CLEAN/m);
 
 const currentHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
@@ -149,16 +151,16 @@ const requirements = [
     files.canaryRemediationEvidence,
     files.canaryRemediationReview,
   ]),
+  proven("github-pr-body-current", "PR body is current on GitHub", [
+    files.prBodyDraft,
+    files.githubWriteEvidence,
+  ]),
+  proven("github-blocker-issue-created", "External blocker issue exists on GitHub", [
+    files.issueDraft,
+    files.githubWriteEvidence,
+  ]),
   blocked("claude-council-review", "Claude/Opus reviewer route remains blocked by missing login", [
     files.claudeBlocked,
-  ]),
-  blocked("github-pr-body-current", "PR body is stale because GitHub write route remains forbidden", [
-    files.prBodyDraft,
-    files.githubBlocked,
-  ]),
-  blocked("github-blocker-issue-created", "External blocker issue is drafted but not created through the connector", [
-    files.issueDraft,
-    files.githubBlocked,
   ]),
   blocked("human-public-launch-approval", "Human approval is required before merge, visibility change, or public live update", [
     files.releaseState,
@@ -183,7 +185,7 @@ for (const requirement of requirements) {
 
 const blockedRequirements = requirements.filter((item) => item.status === "blocked");
 const incompleteRequirements = requirements.filter((item) => item.status === "incomplete");
-assert.ok(blockedRequirements.length >= 4, "goal completion audit must preserve remaining blockers");
+assert.ok(blockedRequirements.length >= 3, "goal completion audit must preserve remaining blockers");
 assert.ok(incompleteRequirements.length >= 1, "goal completion audit must preserve incomplete rollout scope");
 
 const report = {
@@ -196,7 +198,7 @@ const report = {
   latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
   goalComplete: false,
   mayCallUpdateGoalComplete: false,
-  reason: "The core preview work is strongly evidenced, but reviewer, GitHub write-route, human approval, hosted-baseline, and real rollout requirements remain unresolved.",
+  reason: "The core preview work is strongly evidenced, but reviewer, human approval, hosted-baseline, and real rollout requirements remain unresolved.",
   counts: {
     total: requirements.length,
     proven: requirements.filter((item) => item.status === "proven").length,

@@ -112,7 +112,8 @@ is still required before any public live update.
 | Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
 | Public live-update copy review | `reviews/overnight-20260522/gemini-public-live-update-copy-review.md` |
 | PR body/comment update draft | `reviews/overnight-20260522/pr-body-update-draft.md` |
-| GitHub issue creation blocker | `reviews/overnight-20260522/github-issue-create-blocked.md` |
+| Historical GitHub issue creation blocker | `reviews/overnight-20260522/github-issue-create-blocked.md` |
+| Live GitHub write evidence | `reviews/overnight-20260522/github-write-route-evidence.md` |
 | Blocker permission refresh review | `reviews/overnight-20260522/gemini-blocker-permission-refresh-review.md` |
 | Completion audit | `reviews/overnight-20260522/completion-audit.md` |
 | Completion audit review | `reviews/overnight-20260522/gemini-completion-audit-review.md` |
@@ -238,13 +239,14 @@ Latest local verification before this summary:
   public-safe manual GitHub packet with PR body, status comment, blocker issue,
   labels, and manual GitHub steps. It writes no files, reports
   `privateLeakCount: 0`, keeps `productionReady: false`, and keeps the public
-  launch verdict blocked while GitHub write routes are unavailable. GitHub
+  launch verdict blocked while PR #5 and issue #6 remain visible as the live
+  GitHub release-tracking surfaces. GitHub
   Actions CI run `26308475033` passed on `6a33e62`; dynamic follow-up CI run
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 15 proven requirements, 5 blocked
-  requirements, and 1 incomplete requirement, preserving the reviewer, GitHub,
+  `mayCallUpdateGoalComplete: false`, 17 proven requirements, 3 blocked
+  requirements, and 1 incomplete requirement, preserving the reviewer,
   human approval, hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.
 - Hosted baseline preflight verification: local `baseline:preflight` now checks

@@ -1,91 +1,47 @@
-# Blocking Issue Draft: Final Release Gate And Reviewer Approval
+# Release Gate: Final Reviewer, Hosted Baseline, And Real Canary
 
 ## Summary
 
-The post-12-hour readiness gate should remain blocked until final reviewer
-routes and human approval are complete. A later controller run and GitHub CI
-proved the fresh Brain UI and `release:check` path can pass, but the release
-should still remain conservative until the blocked reviewer routes are resolved
-or explicitly accepted.
+Track the final blockers before PR #5 can be treated as public-launch ready.
+The code, fixture UI, and release gates are green, but public launch should
+remain conservative until reviewer, owner, hosted-baseline, and real canary
+requirements are resolved.
 
-## Evidence
+## Current Evidence
 
-- `npm run build`: passed.
-- `npm run test`: passed, 6 files and 22 tests.
-- `npm run typecheck`: passed.
-- `npm run privacy:test`: passed.
-- `npm run smoke:openclaw`: passed with `privacyLeakCount: 0`.
-- `npm run smoke:hermes`: passed with `privacyLeakCount: 0`.
-- `npm run compaction:smoke:built`: passed.
-- `npm run compaction:benchmark:built`: passed, 5 of 5 scenarios and
-  `privacyLeakCount: 0`.
-- `npm run wiki:smoke:built`: passed.
-- `npm run wiki:sync:smoke:built`: passed with conflict handling and dry-run
-  coverage.
-- `npm run update:smoke`: passed for Hermes and OpenClaw fixture runtimes.
-- `git diff --check`: passed.
-- Core package `npm pack --dry-run`: passed when npm used a writable temporary
-  cache.
-- Initial cron `npm run release:check`: failed because the fresh Brain UI smoke
-  could not bind to localhost in that sandbox.
-- Controller follow-up: `pnpm brain:smoke` and `pnpm release:check` passed.
-- GitHub Actions CI run `26288370812` on `2888f91`: passed, including Test,
-  Full smoke, and Release readiness check.
-- GitHub Actions CI run `26289073223` on `dd17f44`: passed after the
-  conservative release-state guard review became required.
-- GitHub Actions CI run `26292137539` on `3b5e140`: passed after the guarded
-  selected lifecycle policy apply slice became required.
-- GitHub Actions CI run `26292772262` on `19f2577`: passed after the guarded
-  selected review queue apply slice became required.
-- GitHub Actions CI run `26293533847` on `72ab902`: passed after the guarded
-  selected local memory edit overlay slice became required.
-- GitHub Actions CI run `26294323086` on `b5352a0`: passed after the guarded
-  local edit overlay browse slice became required.
-- GitHub Actions CI run `26295772356` on `21fd4d6`: passed after the guarded
-  local memory materialize slice became required.
-- GitHub Actions CI run `26297064340` on `be47cff`: passed after the dynamic
-  Brain UI graph layout slice became required. Fixture browser evidence reports
-  `dynamic-graph-layout`, 9 nodes, 9 edges, 2 columns, 5 rows, zero overlaps,
-  zero console errors, and no private/key-shaped visible text.
-- GitHub Actions CI run `26297876735` on `62367a1`: passed after the graph
-  navigation controls slice became required. Fixture browser evidence reports
-  neighborhood scope, 3 visible fixture nodes, 9 jump options, selected-node
-  visibility, zero console errors, and no private/key-shaped visible text.
-- GitHub Actions CI run `26305284384` on `13cbe8d`: passed after the May 2026
-  model/autoresearch matrix gate was added. The gate keeps Apple Silicon local
-  setup, cloud provider challengers, and query expansion behind controlled
-  canary evidence and env-only credentials.
-- GitHub Actions CI run `26305635737` on `22e17b1`: passed after the release
-  readiness check began enforcing the model/autoresearch matrix and scanning
-  those docs/configs for key-shaped secrets.
-- GitHub issue creation from this draft was attempted and blocked by GitHub app
-  permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
-- GitHub issue creation from this draft was retried after `13cbe8d` and was
-  still blocked by the same 403.
-- A top-level PR status comment was also attempted after CI run #44 and was
-  blocked by the same GitHub integration permissions.
+- Latest code/product baseline: `4f5a0790f1c403c8c8405910935f7a3eea1072a1`.
+- GitHub Actions run `26312283137` passed Test, Full smoke, and Release
+  readiness check.
+- Previous docs/evidence head before the GitHub write-route extension:
+  `3ad7b5ddcc4c3213ba22ca666e71d01433c05d30`.
+- GitHub Actions run `26312385019` passed Verify.
+- Local release readiness, smoke, goal audit, hosted-baseline preflight, canary
+  evidence intake, canary report generation, and canary diagnosis all passed in
+  their safe fixture or metrics-only modes.
+- Secret and private-name scans found no actual credential or private memory
+  exposure in the changed evidence files.
 
-## Blocker
+## Remaining Blockers
 
-The initial cron run could not produce fresh localhost UI launch evidence.
-Later controller and CI evidence closed that specific gap. Remaining blockers
-are final reviewer availability, human approval, alpha limitations around real
-local-container mode, and a public release note that does not overclaim.
+- Claude/Opus council review route is blocked by login or must be explicitly
+  accepted as blocked evidence.
+- Human approval is required before merge, visibility changes, or public live
+  update copy.
+- Hosted Supermemory comparison claims require a fresh metrics-only baseline.
+  The current hosted-baseline preflight deliberately calls no hosted provider
+  and blocks public benchmark claims.
+- One real-container production canary remains incomplete. Fixture UI and
+  report tooling are not a production rollout.
 
 ## Acceptance Criteria
 
-- Fresh `brain:serve` or `brain:smoke` passes on localhost with fixture data.
-- Browser or Playwright evidence covers search, graph/index navigation,
-  dynamic graph layout, graph navigation controls, provenance, lifecycle/retrieval trace, derived doc edit, save/cancel behavior,
-  Nucleus snapshot preview, research lineage, wiki/vault preview, sync conflict
-  view, selected local-container browse, selected local memory edit overlay,
-  local edit overlay browse visibility, selected local memory materialize,
-  selected vault sync dry-run, selected vault sync apply, lifecycle policy
-  preview, selected lifecycle policy apply, memory review queue preview, and
-  selected review queue apply.
-- `npm run release:check` passes without special private machine state or CI
-  passes the same release-readiness gate.
-- Reviewer packet records Claude and Gemini as either completed with verdicts or
-  explicitly blocked with reasons.
-- Public evidence contains only fixture data and no raw memories, transcripts,
-  diagnostics, credentials, agent logs, or private paths.
+- Final reviewer route is completed or the owner accepts the blocked reviewer
+  packet.
+- A real one-agent canary report is collected through the sanitized canary
+  report/intake path and passes privacy, lifecycle, hybrid search, latency,
+  rollback, and write/read checks.
+- Any hosted comparison claim is backed by a fresh metrics-only baseline using
+  the same dataset, judge, settings, and scoring code.
+- The owner approves merge and public release wording.
+- Public evidence contains no raw memories, transcripts, diagnostics,
+  credentials, agent logs, private paths, or private container names.

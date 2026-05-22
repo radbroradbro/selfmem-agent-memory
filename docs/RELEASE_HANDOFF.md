@@ -18,17 +18,16 @@ Do not shorten this to "ready" unless the public release checklist is complete.
 
 ## Manual GitHub Steps
 
-The GitHub app may be able to read PRs while still lacking permission to update
-PR bodies, add top-level comments, or create issues. If that happens, use the
-repo files below as the source of truth.
+PR #5 and GitHub issue #6 have been updated from the audited packet. If they
+drift later, use the repo files below as the source of truth.
 
 1. Open PR #5.
-2. Replace the PR body with
+2. Verify the PR body matches
    `reviews/overnight-20260522/pr-body-update-draft.md`.
-3. Create a blocker issue from
+3. Verify GitHub issue #6 matches
    `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
    or record that the owner accepts the missing issue.
-4. Link the blocker issue in PR #5.
+4. Link issue #6 in PR #5 if the relationship is not already visible.
 5. Keep the public launch verdict as `FAIL` until the owner approves a different
    verdict.
 
@@ -38,7 +37,8 @@ paths, provider keys, or private container names into GitHub.
 ## Generated Handoff Packet
 
 Run this when GitHub write permissions are blocked and a maintainer needs a
-single paste-ready packet:
+single paste-ready packet, or when a later change needs the public PR/issue
+text refreshed:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- release:handoff
@@ -58,8 +58,8 @@ npm exec --yes pnpm@10.23.0 -- release:doctor
 ```
 
 The doctor is intentionally conservative. It should report
-`publicLaunchAllowed: false` until Claude review, GitHub handoff, human
-approval, and hosted-baseline blockers are resolved or explicitly accepted.
+`publicLaunchAllowed: false` until Claude review, human approval, and
+hosted-baseline blockers are resolved or explicitly accepted.
 Use its `manualCommands` list as the next-action checklist for agents.
 
 ## Hosted Baseline Preflight
@@ -84,10 +84,10 @@ Run this before anyone claims the active goal is complete:
 npm exec --yes pnpm@10.23.0 -- goal:audit
 ```
 
-The audit must report `goalComplete: false` while Claude review, GitHub write
-routes, human approval, hosted-baseline, or real rollout evidence remain
-blocked. Do not call the native goal complete unless a later audit proves every
-requirement with current evidence.
+The audit must report `goalComplete: false` while Claude review, human
+approval, hosted-baseline, or real rollout evidence remain blocked. Do not call
+the native goal complete unless a later audit proves every requirement with
+current evidence.
 
 ## Canary Evidence Intake
 

@@ -11,7 +11,7 @@ compaction benchmarking.
 
 This slice adds a machine-readable completion audit so the goal cannot be
 quietly marked complete while the evidence still shows blocked reviewer,
-GitHub, human approval, hosted-baseline, and real-rollout requirements.
+human approval, hosted-baseline, and real-rollout requirements.
 
 ## Implementation
 
@@ -40,8 +40,8 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 15 proven requirements
-- 5 blocked requirements
+- 17 proven requirements
+- 3 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
 - `hasSecretPattern: false`
@@ -49,8 +49,8 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 ## Blockers Preserved
 
 - Claude/Opus council review is blocked by missing login.
-- PR body and PR status comments remain blocked by GitHub integration 403.
-- External blocker issue creation remains blocked by GitHub integration 403.
+- PR body and external blocker issue creation are now proven live through
+  `github-write-route-evidence.md`.
 - Human approval is still required for merge, public visibility, and live
   update.
 - Hosted Supermemory benchmark claims need a fresh metrics-only baseline that

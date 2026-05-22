@@ -17,7 +17,7 @@ complete or publish a public live update.
 
 Machine-readable follow-up: `goal:audit` now runs
 `packages/bench/goal-completion-audit.mjs` and returns `goalComplete: false`,
-`mayCallUpdateGoalComplete: false`, 15 proven requirements, 5 blocked
+`mayCallUpdateGoalComplete: false`, 17 proven requirements, 3 blocked
 requirements, and 1 incomplete requirement. The release gate requires this
 audit so future agents cannot treat green CI as native-goal completion.
 
@@ -131,9 +131,9 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `canary:report`, `canary-report-generator-evidence.md`, Gemini review | Proven locally and in CI run `26310773948` as the producer side for runtime canary evidence. It converts Hermes/OpenClaw traces into a metrics-only report with hashes, counts, latency, quality rates, privacy counters, and rollback readiness, while fixture-derived reports still fail `--strict-real` |
 | Canary diagnostic bundle report | `packages/bench/canary-report-from-trace.mjs`, `packages/bench/fixtures/canary-diagnostic-export.fixture/`, `canary-report-generator-evidence.md`, Gemini diagnostic-bundle re-review | Proven locally and in CI run `26311728246` as a redacted diagnostic directory and ZIP intake path. Metadata-only diagnostic exports produce sanitized metrics-only canary reports, relocated fixtures remain `fixtureOnly: true`, and strict-real intake rejects those fixtures so copied bundles cannot satisfy real rollout evidence |
 | Canary remediation plan | `packages/bench/canary-remediation.mjs`, `packages/bench/fixtures/canary-runtime-report-failing.fixture.json`, `canary-remediation-evidence.md`, Gemini review | Proven locally as a metrics-only diagnosis path for failed one-agent canary reports. It maps failed checks such as `recall-p95` and `store-p95` to safe remediation actions, keeps public and fleet rollout disabled, and emits no raw memory, transcript, prompt, answer, credential, or local-path content |
-| Goal completion audit gate | `packages/bench/goal-completion-audit.mjs`, `goal:audit`, `goal-completion-audit-evidence.md`, Gemini review | Proven locally and in CI run `26308994908` as a machine-readable requirement audit that keeps `goalComplete: false` while reviewer, GitHub, human approval, hosted baseline, and real rollout requirements remain unresolved |
-| PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment; retry after `13cbe8d` also returned 403 |
-| External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue; retry after `13cbe8d` also returned 403 |
+| Goal completion audit gate | `packages/bench/goal-completion-audit.mjs`, `goal:audit`, `goal-completion-audit-evidence.md`, Gemini review | Proven locally and in CI run `26308994908` as a machine-readable requirement audit that keeps `goalComplete: false` while reviewer, human approval, hosted baseline, and real rollout requirements remain unresolved |
+| PR body reflects current state | PR #5, `reviews/overnight-20260522/pr-body-update-draft.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: PR #5 body update returned GitHub status 200 at 2026-05-22T21:21:15Z |
+| External blocker issue exists | Issue #6, `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: release blocker issue creation returned GitHub status 201 at 2026-05-22T21:21:16Z |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
 | Dynamic graph layout release gate | `packages/bench/release-readiness-check.mjs` now requires dynamic layout evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297064340` |
 | Graph navigation release gate | `packages/bench/release-readiness-check.mjs` now requires graph navigation evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297876735` |
@@ -167,13 +167,10 @@ audit so future agents cannot treat green CI as native-goal completion.
    `8927df0` and CI run `26301206074` also returned 403. A direct PR body
    update retry after `13cbe8d` also returned 403. A generated manual GitHub
    handoff packet now exists through `release:handoff`.
-3. A GitHub blocker issue draft exists, but the GitHub app cannot create the
-   issue with its current permissions. The issue-creation retry after
-   `1074bfd` and CI run `26300868065` still returned 403. An issue creation
-   retry after `13cbe8d` also returned 403.
-4. The public launch verdict remains `FAIL`. Human approval is required before
+3. PR #5 and issue #6 are now live, but public launch remains blocked. Human
+   approval is required before
    making a live update or changing repository visibility.
-5. The Brain UI has read-only selected local-container audit and browse
+4. The Brain UI has read-only selected local-container audit and browse
    previews, read-only overlay browse visibility for matching local edit
    overlays, browser-local audit history, selected vault sync dry-run,
    write-confirmed selected vault sync apply, lifecycle policy draft export,

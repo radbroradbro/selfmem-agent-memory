@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T21:15:52Z",
+  "generatedAt": "2026-05-22T21:21:16Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -68,13 +68,13 @@
     "canary-remediation-plan",
     "hosted-baseline-preflight",
     "github-handoff-packet",
+    "github-pr-body-live",
+    "github-blocker-issue-live",
     "goal-completion-audit",
     "selfmem-update"
   ],
   "remainingBlockers": [
     "claude-reviewer-route-blocked",
-    "github-pr-body-update-blocked",
-    "github-issue-create-blocked",
     "human-public-launch-approval-required",
     "hosted-supermemory-baseline-not-current"
   ],

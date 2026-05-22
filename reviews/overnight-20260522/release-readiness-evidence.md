@@ -121,7 +121,7 @@ Scope:
   a required release-readiness artifact.
 - Added a machine-readable goal completion audit to the release gate. The audit
   maps the full active objective to current evidence and must keep
-  `goalComplete: false` while reviewer, GitHub write-route, human approval,
+  `goalComplete: false` while reviewer, human approval,
   hosted-baseline, or real-rollout blockers remain unresolved.
 - Added hosted baseline preflight evidence to the release gate. The preflight
   checks the future hosted Supermemory comparison contract, calls no hosted
