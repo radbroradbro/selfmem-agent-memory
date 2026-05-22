@@ -19,6 +19,9 @@ Scope:
 - Added local-container audit smoke coverage to the release gate so future live
   container work has a read-only preflight that returns counts and health
   reasons without exposing raw contents or root paths.
+- Added Brain UI Local Audit Preflight evidence to the release gate so the UI
+  must prove it can render audit counts and reasons without exposing raw memory
+  content or temporary root paths.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -30,6 +33,7 @@ What `release:check` verifies:
 - package scripts for build, tests, smokes, and release check exist,
 - Brain UI vault preview DOM evidence is sane,
 - Brain UI Container Health DOM evidence is sane,
+- Brain UI Local Audit Preflight DOM evidence is sane,
 - a fresh local-container audit smoke passes against current source,
 - a fresh Brain UI smoke passes against the current source,
 - a fresh Brain UI interaction smoke passes against the current source,

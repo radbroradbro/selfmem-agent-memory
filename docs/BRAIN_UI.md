@@ -62,7 +62,8 @@ Required visual review path:
 10. Nucleus snapshot preview,
 11. research lineage preview,
 12. compiled wiki/vault preview,
-13. fixture vault sync report with conflict handling.
+13. fixture vault sync report with conflict handling,
+14. fixture local-container audit preflight.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -79,6 +80,11 @@ edits as a preview object with `writesRealFiles: false`.
 
 The Nucleus snapshot preview is also fixture-only and marks
 `writesRealFiles: false`.
+
+The Local Audit Preflight panel uses a temporary fixture container and the
+read-only audit utility. It displays file counts, redaction counts, and health
+reasons only. It never displays raw memory, raw event text, provider keys, or
+the temporary root path.
 
 ## Production Path
 

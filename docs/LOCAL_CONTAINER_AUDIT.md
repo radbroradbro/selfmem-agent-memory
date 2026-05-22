@@ -44,7 +44,9 @@ detected in the inspected files.
 
 ## Current Use
 
-The first implementation is a core utility plus a smoke test. It is not yet a
-real local-container browser. The Brain UI can use this utility as the first
-gate before a future explicit container picker, redacted path display, read-only
-preview, write confirmation, and local audit trail.
+The first implementation is a core utility, a smoke test, and a Brain UI
+fixture preview. It is not yet a real local-container browser. The Brain UI
+fixture preview uses a temporary synthetic container and shows file counts,
+redaction counts, and health reasons only. The same utility can serve as the
+first gate before a future explicit container picker, redacted path display,
+read-only preview, write confirmation, and local audit trail.

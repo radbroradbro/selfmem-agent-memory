@@ -9,7 +9,7 @@ try {
   const address = server.address();
   assert(address && typeof address === "object");
   const base = `http://127.0.0.1:${address.port}`;
-  const [index, app, model, styles, fixture, vault, syncReport, health] = await Promise.all([
+  const [index, app, model, styles, fixture, vault, syncReport, localAudit, health] = await Promise.all([
     text(`${base}/`),
     text(`${base}/app.js`),
     text(`${base}/model.js`),
@@ -17,6 +17,7 @@ try {
     json(`${base}/fixtures/nucleus.fixture.json`),
     json(`${base}/fixtures/wiki-vault.json`),
     json(`${base}/fixtures/wiki-sync-report.json`),
+    json(`${base}/fixtures/local-container-audit.json`),
     json(`${base}/healthz`),
   ]);
 
@@ -27,6 +28,7 @@ try {
   assert.match(index, /Research Lineage/);
   assert.match(index, /Wiki Vault Preview/);
   assert.match(index, /Vault Sync Report/);
+  assert.match(index, /Local Audit Preflight/);
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
   assert.match(app, /buildContainerHealth/);
@@ -34,6 +36,7 @@ try {
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /renderVaultPreview/);
   assert.match(app, /renderSyncReport/);
+  assert.match(app, /renderLocalAudit/);
   assert.match(app, /buildEditExport/);
   assert.match(model, /const kind = safeExportText\(node\.kind\)/);
   assert.match(model, /function buildContainerHealth/);
@@ -45,6 +48,7 @@ try {
   assert.match(styles, /research-lineage/);
   assert.match(styles, /vault-preview/);
   assert.match(styles, /sync-summary/);
+  assert.match(styles, /audit-summary/);
   assert.match(styles, /edit-export/);
   assert.equal(fixture.schemaVersion, 1);
   assert.equal(fixture.roots.container.writeMode, "local-only");
@@ -64,12 +68,32 @@ try {
   assert.ok(syncReport.report.summary.write > 0);
   assert.ok(syncReport.report.summary.write_conflict_note >= 1);
   assert.ok(syncReport.report.actions.some((action) => action.action === "write_conflict_note" && action.conflictPath));
+  assert.equal(localAudit.ok, true);
+  assert.equal(localAudit.report.mode, "local-container-audit");
+  assert.equal(localAudit.report.writesRealFiles, false);
+  assert.equal(localAudit.report.rootPathRedacted, true);
+  assert.equal(localAudit.report.totals.existingFiles, 3);
+  assert.ok(localAudit.report.totals.redactionCount >= 2);
+  assert.equal(localAudit.report.health.status, "needs-review");
 
-  const serialized = JSON.stringify({ fixture, vault, syncReport });
+  const serialized = JSON.stringify({ fixture, vault, syncReport, localAudit });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
     JSON.stringify(
-      { ok: true, checked: ["index", "app", "model", "styles", "fixture", "wiki-vault", "wiki-sync-report", "healthz"] },
+      {
+        ok: true,
+        checked: [
+          "index",
+          "app",
+          "model",
+          "styles",
+          "fixture",
+          "wiki-vault",
+          "wiki-sync-report",
+          "local-container-audit",
+          "healthz",
+        ],
+      },
       null,
       2,
     ),

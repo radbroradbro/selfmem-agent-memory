@@ -520,14 +520,16 @@ button.active {
 }
 
 .snapshot-summary,
-.sync-summary {
+.sync-summary,
+.audit-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
 .snapshot-summary div,
-.sync-summary div {
+.sync-summary div,
+.audit-summary div {
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -538,24 +540,30 @@ button.active {
 .snapshot-summary strong,
 .snapshot-summary span,
 .sync-summary strong,
-.sync-summary span {
+.sync-summary span,
+.audit-summary strong,
+.audit-summary span {
   display: block;
 }
 
 .snapshot-summary strong,
-.sync-summary strong {
+.sync-summary strong,
+.audit-summary strong {
   color: var(--cyan);
   font-size: 18px;
 }
 
 .snapshot-summary span,
-.sync-summary span {
+.sync-summary span,
+.audit-summary span {
   color: var(--muted);
   font-size: 11px;
   margin-top: 2px;
 }
 
-.sync-actions {
+.sync-actions,
+.audit-files,
+.audit-reasons {
   display: grid;
   gap: 8px;
   list-style: none;
@@ -563,7 +571,9 @@ button.active {
   padding: 0;
 }
 
-.sync-actions li {
+.sync-actions li,
+.audit-files li,
+.audit-reasons li {
   display: grid;
   gap: 4px;
   border: 1px solid var(--line);
@@ -572,7 +582,8 @@ button.active {
   background: #10151a;
 }
 
-.sync-actions strong {
+.sync-actions strong,
+.audit-files strong {
   color: var(--green);
   font-size: 12px;
   text-transform: uppercase;
@@ -580,12 +591,14 @@ button.active {
 }
 
 .sync-actions span,
-.sync-actions small {
+.sync-actions small,
+.audit-files span {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.sync-actions span {
+.sync-actions span,
+.audit-files span {
   color: var(--text);
   font-size: 12px;
 }
@@ -597,6 +610,20 @@ button.active {
 
 .sync-actions li[data-action="write_conflict_note"] {
   border-color: rgba(244, 185, 90, 0.62);
+}
+
+.audit-files li[data-reason="missing"] {
+  border-color: rgba(158, 171, 180, 0.4);
+}
+
+.audit-files li[data-reason="inspected"] {
+  border-color: rgba(139, 209, 124, 0.52);
+}
+
+.audit-reasons li {
+  border-color: rgba(244, 185, 90, 0.62);
+  color: var(--amber);
+  font-size: 12px;
 }
 
 .snapshot-export {

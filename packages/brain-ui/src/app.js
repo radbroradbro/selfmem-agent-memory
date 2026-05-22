@@ -17,6 +17,7 @@ const state = {
   vault: null,
   syncReport: null,
   selectedVaultPath: "",
+  localAudit: null,
 };
 
 const positions = {
@@ -50,6 +51,9 @@ const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
 const syncSummary = document.querySelector("#syncSummary");
 const syncActions = document.querySelector("#syncActions");
+const localAuditSummary = document.querySelector("#localAuditSummary");
+const localAuditFiles = document.querySelector("#localAuditFiles");
+const localAuditReasons = document.querySelector("#localAuditReasons");
 const docEditor = document.querySelector("#docEditor");
 const saveEdit = document.querySelector("#saveEdit");
 const resetEdit = document.querySelector("#resetEdit");
@@ -58,14 +62,16 @@ const exportStatus = document.querySelector("#exportStatus");
 const editExport = document.querySelector("#editExport");
 const timelineList = document.querySelector("#timelineList");
 
-const [response, vaultResponse, syncResponse] = await Promise.all([
+const [response, vaultResponse, syncResponse, localAuditResponse] = await Promise.all([
   fetch("/fixtures/nucleus.fixture.json"),
   fetch("/fixtures/wiki-vault.json"),
   fetch("/fixtures/wiki-sync-report.json"),
+  fetch("/fixtures/local-container-audit.json"),
 ]);
 state.snapshot = await response.json();
 state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
+state.localAudit = await localAuditResponse.json();
 state.query = searchInput.value;
 state.selectedId = state.snapshot.nodes[0]?.id ?? null;
 state.selectedVaultPath = preferredVaultPath(state.vault?.vault);
@@ -123,6 +129,7 @@ function render() {
   renderResearchLineage();
   renderVaultControls(selected);
   renderSyncReport();
+  renderLocalAudit();
   renderEditExport();
 }
 
@@ -357,6 +364,43 @@ function renderSyncReport() {
       item.append(conflict);
     }
     syncActions.append(item);
+  }
+}
+
+function renderLocalAudit() {
+  localAuditSummary.replaceChildren();
+  localAuditFiles.replaceChildren();
+  localAuditReasons.replaceChildren();
+  const report = state.localAudit?.report;
+  if (!report) {
+    localAuditSummary.textContent = "Fixture audit unavailable.";
+    return;
+  }
+
+  localAuditSummary.replaceChildren(
+    stat("Status", report.health.status),
+    stat("Files", report.totals.existingFiles),
+    stat("Lines", report.totals.lines),
+    stat("Redactions", report.totals.redactionCount),
+  );
+
+  for (const file of report.files) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    item.dataset.reason = file.skippedReason ?? "inspected";
+    label.textContent = file.name;
+    value.textContent = file.skippedReason
+      ? file.skippedReason.replaceAll("_", " ")
+      : `${file.lineCount ?? 0} lines, ${file.redactionCount ?? 0} redactions`;
+    item.append(label, value);
+    localAuditFiles.append(item);
+  }
+
+  for (const reason of report.health.reasons) {
+    const item = document.createElement("li");
+    item.textContent = reason.replaceAll("_", " ");
+    localAuditReasons.append(item);
   }
 }
 

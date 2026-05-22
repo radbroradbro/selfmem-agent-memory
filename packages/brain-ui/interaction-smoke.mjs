@@ -27,6 +27,7 @@ try {
     json(`${base}/fixtures/wiki-vault.json`),
     json(`${base}/fixtures/wiki-sync-report.json`),
   ]);
+  const localAudit = await json(`${base}/fixtures/local-container-audit.json`);
 
   const nativeMemoryMatches = filteredNodes(fixture, "all", "native memory");
   assert.ok(nativeMemoryMatches.some((node) => node.kind === "derived_doc"), "native memory search should find derived docs");
@@ -99,8 +100,16 @@ try {
   assert.equal(syncReport.report.dryRun, true);
   assert.ok(syncReport.report.summary.write_conflict_note >= 1);
   assert.ok(syncReport.report.actions.some((action) => action.action === "write_conflict_note" && action.conflictPath));
+  assert.equal(localAudit.ok, true);
+  assert.equal(localAudit.report.mode, "local-container-audit");
+  assert.equal(localAudit.report.writesRealFiles, false);
+  assert.equal(localAudit.report.rootPathRedacted, true);
+  assert.equal(localAudit.report.totals.existingFiles, 3);
+  assert.ok(localAudit.report.totals.redactionCount >= 2);
+  assert.equal(localAudit.report.health.status, "needs-review");
+  assert.ok(localAudit.report.health.reasons.includes("private_or_key_shaped_text_detected"));
 
-  const serialized = JSON.stringify({ containerHealth, editExport, unsafeExport, nucleusExport, lineage, vault, syncReport });
+  const serialized = JSON.stringify({ containerHealth, editExport, unsafeExport, nucleusExport, lineage, vault, syncReport, localAudit });
   assert.equal(containsPrivateLikeText(serialized), false, "serialized interaction outputs must stay public-safe");
 
   console.log(
@@ -118,6 +127,7 @@ try {
           "research-lineage",
           "vault-path",
           "sync-report",
+          "local-container-audit",
           "public-safe-serialization",
         ],
       },

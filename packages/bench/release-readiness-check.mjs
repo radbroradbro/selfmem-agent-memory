@@ -39,6 +39,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-sync-report-review.md`,
   `${reviewDir}/brain-ui-container-health-evidence.md`,
   `${reviewDir}/gemini-brain-ui-container-health-review.md`,
+  `${reviewDir}/brain-ui-local-audit-preview-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-local-audit-preview-review.md`,
   `${reviewDir}/brain-ui-interaction-smoke-evidence.md`,
   `${reviewDir}/gemini-brain-ui-interaction-smoke-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
@@ -68,6 +70,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-sync-report.png`,
   `${reviewDir}/ui-evidence/brain-ui-container-health-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-container-health.png`,
+  `${reviewDir}/ui-evidence/brain-ui-local-audit-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-local-audit.png`,
 ];
 
 const requiredScripts = [
@@ -181,6 +185,19 @@ check("dom evidence is sane", () => {
   assert.equal(containerEvidence.evidence.retrievalTraceVisible, true);
   assert.equal(containerEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(containerEvidence.consoleMessages.length, 0);
+
+  const auditEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-local-audit-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(auditEvidence.ok, true);
+  assert.equal(auditEvidence.evidence.hasLocalAuditHeading, true);
+  assert.equal(auditEvidence.evidence.statusNeedsReviewVisible, true);
+  assert.equal(auditEvidence.evidence.existingFilesVisible, true);
+  assert.equal(auditEvidence.evidence.redactionCountVisible, true);
+  assert.equal(auditEvidence.evidence.missingFileVisible, true);
+  assert.equal(auditEvidence.evidence.privateReasonVisible, true);
+  assert.equal(auditEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(auditEvidence.consoleMessages.length, 0);
 
   const nucleusEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-nucleus-snapshot-dom-evidence.json"), "utf8"),

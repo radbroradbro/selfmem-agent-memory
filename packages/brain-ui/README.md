@@ -34,7 +34,8 @@ Use this flow for browser or computer-use evidence:
 6. Edit the derived doc text.
 7. Save the fixture edit.
 8. Inspect provenance and the timeline.
-9. Capture only sanitized screenshots or recordings.
+9. Inspect the Local Audit Preflight panel.
+10. Capture only sanitized screenshots or recordings.
 
 ## Current Scope
 

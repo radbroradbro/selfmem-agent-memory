@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, extname, join, normalize, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { compileNucleusWikiVault, lintCompiledWikiVault, syncCompiledWikiVault } from "../core/dist/index.js";
+import { auditLocalContainer, compileNucleusWikiVault, lintCompiledWikiVault, syncCompiledWikiVault } from "../core/dist/index.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 
@@ -46,6 +46,12 @@ export function createBrainUiServer() {
         return;
       }
 
+      if (path === "__local_container_audit_fixture") {
+        const report = await createFixtureLocalContainerAudit();
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify({ ok: true, report }));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -65,6 +71,7 @@ function routePath(pathname) {
   if (pathname === "/fixtures/nucleus.fixture.json") return "fixtures/nucleus.fixture.json";
   if (pathname === "/fixtures/wiki-vault.json") return "__wiki_vault_fixture";
   if (pathname === "/fixtures/wiki-sync-report.json") return "__wiki_sync_report_fixture";
+  if (pathname === "/fixtures/local-container-audit.json") return "__local_container_audit_fixture";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -89,6 +96,27 @@ async function createFixtureSyncReport(vault) {
       rootDir: "fixture-temp-vault",
       summary: summarizeSyncActions(report.actions),
     };
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function createFixtureLocalContainerAudit() {
+  const tempRoot = await mkdtemp(join(tmpdir(), "recallweave-brain-local-audit-fixture-"));
+  try {
+    const keyLike = `pa-${"A".repeat(44)}`;
+    await writeFile(join(tempRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"Use local writes.\"}\n", "utf8");
+    await writeFile(
+      join(tempRoot, "raw_events.jsonl"),
+      `{"event":"store","text":"public <private>hidden</private> ${keyLike}"}\n`,
+      "utf8",
+    );
+    await writeFile(join(tempRoot, "trace.jsonl"), "{\"event\":\"search\",\"count\":1}\n", "utf8");
+    return await auditLocalContainer({
+      rootDir: tempRoot,
+      containerLabel: "fixture-local-container",
+      maxFileBytes: 256_000,
+    });
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
