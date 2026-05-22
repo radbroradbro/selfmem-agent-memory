@@ -14,6 +14,10 @@ Scope:
   cleanup passed CI; the permission failure remained the same.
 - Retried a top-level PR status comment after the Brain UI Compaction Audit
   evidence refresh passed CI. The permission failure remained the same.
+- Retried a top-level PR status comment after the Brain UI Context Preview
+  code and docs refresh passed CI. The permission failure remained the same.
+- Retried blocker issue creation after the Brain UI Context Preview code and
+  docs refresh passed CI. The permission failure remained the same.
 
 Result:
 
@@ -28,6 +32,8 @@ No private evidence was sent. The attempted issue body used only public-safe
 fixture and review metadata, including the dynamic layout fixture evidence.
 The 2026-05-22T16:36Z PR comment retry used only the public head, CI run, and
 release-state pointers.
+The 2026-05-22T17:01Z PR comment and issue-creation retries used only public
+commit IDs, CI run IDs, release-state pointers, and public blocker summaries.
 
 Follow-up:
 

@@ -14,6 +14,9 @@ Reason:
 - The route was retried after the Brain UI Compaction Audit CI pass on
   2026-05-22T16:36Z. Claude CLI still returned `Not logged in · Please run
   /login`.
+- The route was retried after the Brain UI Context Preview code and docs CI
+  passed on 2026-05-22T17:01Z. Claude CLI still returned
+  `Not logged in · Please run /login`.
 
 Command class attempted:
 
@@ -27,6 +30,8 @@ Safety note:
   transcript context was sent to Claude.
 - The planned review packet referenced public repo files, sanitized evidence,
   and current PR state only.
+- The 2026-05-22T17:01Z retry referenced only current public-safe repo files,
+  CI run IDs, and review-packet paths.
 
 Follow-up:
 

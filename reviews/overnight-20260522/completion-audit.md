@@ -113,9 +113,11 @@ complete or publish a public live update.
    the owner explicitly accepts the blocked route.
 2. PR #5 body is stale. A paste-ready replacement exists, but the GitHub app
    cannot update the PR body or add a top-level PR status comment with its
-   current permissions.
+   current permissions. The PR comment retry after `1074bfd` and CI run
+   `26300868065` still returned 403.
 3. A GitHub blocker issue draft exists, but the GitHub app cannot create the
-   issue with its current permissions.
+   issue with its current permissions. The issue-creation retry after
+   `1074bfd` and CI run `26300868065` still returned 403.
 4. The public launch verdict remains `FAIL`. Human approval is required before
    making a live update or changing repository visibility.
 5. The Brain UI has read-only selected local-container audit and browse
