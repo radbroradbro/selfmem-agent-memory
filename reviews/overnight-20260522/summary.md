@@ -14,10 +14,10 @@ Verdict: in progress. Do not mark the goal complete yet.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest verified implementation commit before this summary:
-  `ba1d1bb012b91c3f3d876581641b325b70986ff8`
+- Latest verified implementation commit before the Nucleus snapshot slice:
+  `768f92d`
 - PR API state when checked: open, not draft, mergeable, clean.
-- GitHub Actions `Verify` on `ba1d1bb`: success.
+- GitHub Actions `Verify` on `768f92d`: success.
 
 ## Shipped Overnight Slices
 
@@ -30,6 +30,7 @@ Verdict: in progress. Do not mark the goal complete yet.
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
 | Brain UI draft export | `reviews/overnight-20260522/brain-ui-edit-export-evidence.md` |
+| Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
@@ -55,8 +56,9 @@ Sanitized fixture evidence exists under
 - `brain-ui-vault-preview.png`
 - `brain-ui-sync-report.png`
 - `brain-ui-edit-export.png`
+- `brain-ui-nucleus-snapshot.png`
 - matching DOM evidence JSON for the UI, vault preview, sync report, and edit
-  draft export
+  draft export, plus Nucleus snapshot preview
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -70,6 +72,8 @@ local memory contents.
 - Gemini update-command review: first `BLOCK`, then final `CLEAN` after symlink
   resolution was fixed and tested.
 - Gemini edit-export review: `CLEAN`.
+- Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
+  object-key redaction was fixed and smoke-guarded.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 

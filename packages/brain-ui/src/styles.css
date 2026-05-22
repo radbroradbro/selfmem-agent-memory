@@ -469,12 +469,14 @@ button.active {
   font-size: 12px;
 }
 
+.snapshot-summary,
 .sync-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
+.snapshot-summary div,
 .sync-summary div {
   min-width: 0;
   border: 1px solid var(--line);
@@ -483,16 +485,20 @@ button.active {
   background: #10151a;
 }
 
+.snapshot-summary strong,
+.snapshot-summary span,
 .sync-summary strong,
 .sync-summary span {
   display: block;
 }
 
+.snapshot-summary strong,
 .sync-summary strong {
   color: var(--cyan);
   font-size: 18px;
 }
 
+.snapshot-summary span,
 .sync-summary span {
   color: var(--muted);
   font-size: 11px;
@@ -541,6 +547,22 @@ button.active {
 
 .sync-actions li[data-action="write_conflict_note"] {
   border-color: rgba(244, 185, 90, 0.62);
+}
+
+.snapshot-export {
+  min-height: 120px;
+  max-height: 230px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #10151a;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 10px;
 }
 
 textarea {

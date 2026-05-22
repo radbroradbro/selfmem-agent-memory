@@ -30,6 +30,8 @@ const detailKind = document.querySelector("#detailKind");
 const detailTitle = document.querySelector("#detailTitle");
 const detailFacts = document.querySelector("#detailFacts");
 const provenance = document.querySelector("#provenance");
+const snapshotSummary = document.querySelector("#snapshotSummary");
+const snapshotExport = document.querySelector("#snapshotExport");
 const vaultFileSelect = document.querySelector("#vaultFileSelect");
 const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
@@ -106,6 +108,7 @@ function render() {
   renderGraph(nodes);
   renderTimeline(nodes);
   renderDetails(selected);
+  renderNucleusSnapshot();
   renderVaultControls(selected);
   renderSyncReport();
   renderEditExport();
@@ -192,6 +195,49 @@ function renderDetails(node) {
   saveEdit.disabled = !node.editable;
   resetEdit.disabled = !node.editable;
   if (!node.editable) editStatus.textContent = "This fixture node is inspect-only.";
+}
+
+function renderNucleusSnapshot() {
+  const snapshot = buildNucleusExport();
+  snapshotSummary.replaceChildren(
+    stat("Mode", "fixture"),
+    stat("Nodes", snapshot.counts.nodes),
+    stat("Edges", snapshot.counts.edges),
+    stat("Editable", snapshot.counts.editable),
+  );
+  snapshotExport.textContent = JSON.stringify(snapshot, null, 2);
+}
+
+function buildNucleusExport() {
+  const kindCounts = state.snapshot.nodes.reduce((counts, node) => {
+    const kind = safeExportText(node.kind);
+    counts[kind] = (counts[kind] ?? 0) + 1;
+    return counts;
+  }, {});
+  return {
+    schemaVersion: state.snapshot.schemaVersion,
+    mode: "fixture-nucleus-snapshot",
+    writesRealFiles: false,
+    counts: {
+      nodes: state.snapshot.nodes.length,
+      edges: state.snapshot.edges.length,
+      editable: state.snapshot.nodes.filter((node) => node.editable).length,
+      kinds: kindCounts,
+    },
+    nodes: state.snapshot.nodes.map((node) => ({
+      id: safeExportText(node.id),
+      kind: safeExportText(node.kind),
+      title: safeExportText(node.title),
+      editable: Boolean(node.editable),
+      tags: (node.tags ?? []).map(safeExportText),
+    })),
+    edges: state.snapshot.edges.map((edge) => ({
+      id: safeExportText(edge.id),
+      kind: safeExportText(edge.kind),
+      from: safeExportText(edge.from),
+      to: safeExportText(edge.to),
+    })),
+  };
 }
 
 function renderEditExport() {
@@ -428,4 +474,8 @@ function redactPrivateLikeText(value) {
   return String(value).replace(privateLikePattern, "[REDACTED_PRIVATE]");
 }
 
-export { buildEditExport, renderGraph };
+function safeExportText(value) {
+  return redactPrivateLikeText(value ?? "");
+}
+
+export { buildEditExport, buildNucleusExport, renderGraph };

@@ -13,6 +13,7 @@ The UI should expose:
 - hybrid retrieval traces,
 - lifecycle and sleep-cycle events,
 - research lineage,
+- sanitized Nucleus snapshot export,
 - derived docs and wiki pages,
 - compiled wiki/vault files,
 - vault disk-sync status and conflicts,
@@ -57,8 +58,9 @@ Required visual review path:
 7. draft export preview,
 8. timeline scan,
 9. provenance scan,
-10. compiled wiki/vault preview,
-11. fixture vault sync report with conflict handling.
+10. Nucleus snapshot preview,
+11. compiled wiki/vault preview,
+12. fixture vault sync report with conflict handling.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -67,6 +69,9 @@ memory directory.
 
 The fixture editor refuses private or key-shaped text and exports saved fixture
 edits as a preview object with `writesRealFiles: false`.
+
+The Nucleus snapshot preview is also fixture-only and marks
+`writesRealFiles: false`.
 
 ## Production Path
 
@@ -77,7 +82,7 @@ Before connecting real local containers, the UI needs:
 - explicit file picker or config path,
 - write confirmation for derived docs,
 - wiki lint before save,
-- Nucleus snapshot export,
+- Nucleus snapshot export against a selected redacted local container,
 - explicit vault sync confirmation,
 - screenshot/recording safety guardrails,
 - accessibility review.

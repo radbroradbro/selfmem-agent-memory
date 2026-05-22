@@ -30,6 +30,8 @@ Before a public live update or release note:
 - forbidden runtime file scan passes,
 - UI launches on localhost if a UI exists,
 - UI evidence uses sanitized fixture data only,
+- UI Nucleus snapshot evidence proves the exported snapshot is fixture-only and
+  `writesRealFiles: false`,
 - UI sync-report evidence proves dry-run vault writes and reviewed-page
   conflicts without reading real agent memory paths,
 - UI edit evidence proves private/key-shaped text is refused before fixture

@@ -21,14 +21,18 @@ try {
 
   assert.equal(health.ok, true);
   assert.match(index, /RecallWeave Brain/);
+  assert.match(index, /Nucleus Snapshot/);
   assert.match(index, /Wiki Vault Preview/);
   assert.match(index, /Vault Sync Report/);
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
+  assert.match(app, /buildNucleusExport/);
+  assert.match(app, /const kind = safeExportText\(node\.kind\)/);
   assert.match(app, /renderVaultPreview/);
   assert.match(app, /renderSyncReport/);
   assert.match(app, /buildEditExport/);
   assert.match(styles, /nucleus-shell/);
+  assert.match(styles, /snapshot-export/);
   assert.match(styles, /vault-preview/);
   assert.match(styles, /sync-summary/);
   assert.match(styles, /edit-export/);

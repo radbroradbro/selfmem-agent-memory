@@ -22,6 +22,10 @@
   `brain-ui-edit-export-dom-evidence.json`.
 - Headless Chrome captured the edit-export panel in
   `brain-ui-edit-export.png`.
+- Codex Browser captured Nucleus snapshot DOM evidence in
+  `brain-ui-nucleus-snapshot-dom-evidence.json`.
+- Headless Chrome captured the fixture-only Nucleus snapshot panel in
+  `brain-ui-nucleus-snapshot.png`.
 
 Chrome DevTools MCP was unavailable because no debug Chrome was listening on
 port `9222`. The run fell back to Computer Use plus headless Chrome.

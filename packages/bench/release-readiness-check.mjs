@@ -26,6 +26,8 @@ const requiredFiles = [
   `${reviewDir}/wiki-vault-sync-evidence.md`,
   `${reviewDir}/update-flow-evidence.md`,
   `${reviewDir}/brain-ui-vault-preview-evidence.md`,
+  `${reviewDir}/brain-ui-nucleus-snapshot-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-nucleus-snapshot-review.md`,
   `${reviewDir}/brain-ui-edit-export-evidence.md`,
   `${reviewDir}/gemini-brain-ui-edit-export-review.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
@@ -36,6 +38,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-fixture-edit.png`,
   `${reviewDir}/ui-evidence/brain-ui-vault-preview-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-vault-preview.png`,
+  `${reviewDir}/ui-evidence/brain-ui-nucleus-snapshot-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-nucleus-snapshot.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -133,6 +137,18 @@ check("dom evidence is sane", () => {
   assert.equal(vaultEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(vaultEvidence.consoleMessages.length, 0);
   assert.ok(vaultEvidence.evidence.vaultOptionCount >= 10);
+
+  const nucleusEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-nucleus-snapshot-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(nucleusEvidence.ok, true);
+  assert.equal(nucleusEvidence.evidence.hasNucleusSnapshotHeading, true);
+  assert.equal(nucleusEvidence.evidence.mode, "fixture-nucleus-snapshot");
+  assert.equal(nucleusEvidence.evidence.writesRealFiles, false);
+  assert.ok(nucleusEvidence.evidence.nodeCount >= 8);
+  assert.ok(nucleusEvidence.evidence.edgeCount >= 8);
+  assert.equal(nucleusEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(nucleusEvidence.consoleMessages.length, 0);
 
   const editEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-edit-export-dom-evidence.json"), "utf8"),
