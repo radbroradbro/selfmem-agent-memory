@@ -64,8 +64,8 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Head: `19f2577`
-- GitHub Actions: CI run `26292772262` passed
+- Head: `72ab902`
+- GitHub Actions: CI run `26293533847` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
 - Local release gate: `node packages/bench/release-readiness-check.mjs` passed
   in the controller run

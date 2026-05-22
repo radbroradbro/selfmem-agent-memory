@@ -37,6 +37,8 @@ or explicitly accepted.
   selected lifecycle policy apply slice became required.
 - GitHub Actions CI run `26292772262` on `19f2577`: passed after the guarded
   selected review queue apply slice became required.
+- GitHub Actions CI run `26293533847` on `72ab902`: passed after the guarded
+  selected local memory edit overlay slice became required.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was

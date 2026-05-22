@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `19f2577`, run `26292772262`, success.
+  `72ab902`, run `26293533847`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -26,6 +26,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26291352800` on `04f1096`: success.
 - GitHub Actions CI run `26292137539` on `3b5e140`: success.
 - GitHub Actions CI run `26292772262` on `19f2577`: success.
+- GitHub Actions CI run `26293533847` on `72ab902`: success.
 
 ## Shipped Overnight Slices
 
@@ -99,6 +100,8 @@ Latest local verification before this summary:
   `3b5e140`, run `26292137539`.
 - GitHub Actions CI: success on guarded selected review queue apply commit
   `19f2577`, run `26292772262`.
+- GitHub Actions CI: success on guarded selected local memory edit overlay
+  commit `72ab902`, run `26293533847`.
 
 ## UI Evidence
 

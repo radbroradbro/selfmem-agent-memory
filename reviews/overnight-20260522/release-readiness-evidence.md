@@ -199,3 +199,5 @@ Known limits:
   policy apply commit `3b5e140`.
 - GitHub Actions CI run `26292772262` passed on guarded selected review queue
   apply commit `19f2577`.
+- GitHub Actions CI run `26293533847` passed on guarded selected local memory
+  edit overlay commit `72ab902`.
