@@ -238,6 +238,9 @@ Verification:
 - `pnpm release:check`: passed.
 - GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
   Full smoke, and Release readiness check.
+- GitHub Actions CI run `26310773948` passed on `6ae4ce7`, including Test,
+  Full smoke, and Release readiness check after the canary report generator
+  gate was added.
 - `pnpm smoke`: passed.
 - `pnpm test`: 22 tests passed.
 - `pnpm container:audit:smoke`: passed.

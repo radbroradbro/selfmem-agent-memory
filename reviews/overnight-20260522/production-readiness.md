@@ -337,6 +337,8 @@ evidence for:
 - canary report generator evidence with trace-derived lifecycle counts,
   hybrid-search coverage, recall/store latency, privacy counters, event
   fingerprints, and fixture rejection under `--strict-real`.
+- GitHub Actions CI run `26310773948` passed on `6ae4ce7`, including Test,
+  Full smoke, and Release readiness check for the canary report generator gate.
 - GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
   Full smoke, and Release readiness check for the hosted baseline preflight
   gate.

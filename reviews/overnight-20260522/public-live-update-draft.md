@@ -85,8 +85,8 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `d26eb78`
-- GitHub Actions: CI run `26310168571` passed for the canary evidence intake
+- Latest verified code baseline: `6ae4ce7`
+- GitHub Actions: CI run `26310773948` passed for the canary report generator
   gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
@@ -104,6 +104,8 @@ Latest verified head before this draft refresh:
 - Canary report generator: `canary:report -- --fixture` creates the sanitized
   report shape from trace fixtures and proves fixture-derived reports fail
   `--strict-real`
+- GitHub Actions CI run `26310773948` passed on `6ae4ce7`, the canary report
+  generator gate commit.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

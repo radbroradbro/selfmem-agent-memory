@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `d26eb78`, run `26310168571`, success.
+  `6ae4ce7`, run `26310773948`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -45,6 +45,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26306827655` on `4cee083`: success.
 - GitHub Actions CI run `26309563159` on `02b3a13`: success.
 - GitHub Actions CI run `26310168571` on `d26eb78`: success.
+- GitHub Actions CI run `26310773948` on `6ae4ce7`: success.
 
 ## Shipped Overnight Slices
 
@@ -262,6 +263,7 @@ Latest local verification before this summary:
   hashed agent/container labels, lifecycle counts, hybrid-search coverage,
   p50/p95 recall and store latency, privacy counters, and rollback readiness.
   The fixture report remains `fixtureOnly: true` and fails `--strict-real`.
+  GitHub Actions CI run `26310773948` passed on `6ae4ce7`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,
