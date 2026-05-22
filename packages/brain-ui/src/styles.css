@@ -469,6 +469,80 @@ button.active {
   font-size: 12px;
 }
 
+.sync-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sync-summary div {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px;
+  background: #10151a;
+}
+
+.sync-summary strong,
+.sync-summary span {
+  display: block;
+}
+
+.sync-summary strong {
+  color: var(--cyan);
+  font-size: 18px;
+}
+
+.sync-summary span {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.sync-actions {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.sync-actions li {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px;
+  background: #10151a;
+}
+
+.sync-actions strong {
+  color: var(--green);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sync-actions span,
+.sync-actions small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sync-actions span {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.sync-actions small {
+  color: var(--amber);
+  font-size: 11px;
+}
+
+.sync-actions li[data-action="write_conflict_note"] {
+  border-color: rgba(244, 185, 90, 0.62);
+}
+
 textarea {
   width: 100%;
   min-height: 230px;

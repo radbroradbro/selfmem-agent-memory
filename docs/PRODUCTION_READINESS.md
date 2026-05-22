@@ -30,6 +30,8 @@ Before a public live update or release note:
 - forbidden runtime file scan passes,
 - UI launches on localhost if a UI exists,
 - UI evidence uses sanitized fixture data only,
+- UI sync-report evidence proves dry-run vault writes and reviewed-page
+  conflicts without reading real agent memory paths,
 - wiki lint passes if wiki sync changed,
 - wiki vault compiler smoke passes if wiki sync changed,
 - wiki vault disk-sync smoke passes if wiki sync changed,

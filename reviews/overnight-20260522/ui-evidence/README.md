@@ -14,6 +14,10 @@
 - Headless Chrome via Playwright Core captured
   `brain-ui-fixture-edit.png`.
 - DOM evidence captured in `brain-ui-dom-evidence.json`.
+- Codex Browser captured sync-report DOM evidence in
+  `brain-ui-sync-report-dom-evidence.json`.
+- Headless Chrome captured the sync-report panel in
+  `brain-ui-sync-report.png`.
 
 Chrome DevTools MCP was unavailable because no debug Chrome was listening on
 port `9222`. The run fell back to Computer Use plus headless Chrome.

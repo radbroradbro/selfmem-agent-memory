@@ -5,6 +5,7 @@ const state = {
   selectedId: null,
   edits: readEdits(),
   vault: null,
+  syncReport: null,
   selectedVaultPath: "",
 };
 
@@ -32,18 +33,22 @@ const provenance = document.querySelector("#provenance");
 const vaultFileSelect = document.querySelector("#vaultFileSelect");
 const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
+const syncSummary = document.querySelector("#syncSummary");
+const syncActions = document.querySelector("#syncActions");
 const docEditor = document.querySelector("#docEditor");
 const saveEdit = document.querySelector("#saveEdit");
 const resetEdit = document.querySelector("#resetEdit");
 const editStatus = document.querySelector("#editStatus");
 const timelineList = document.querySelector("#timelineList");
 
-const [response, vaultResponse] = await Promise.all([
+const [response, vaultResponse, syncResponse] = await Promise.all([
   fetch("/fixtures/nucleus.fixture.json"),
   fetch("/fixtures/wiki-vault.json"),
+  fetch("/fixtures/wiki-sync-report.json"),
 ]);
 state.snapshot = await response.json();
 state.vault = await vaultResponse.json();
+state.syncReport = await syncResponse.json();
 state.query = searchInput.value;
 state.selectedId = state.snapshot.nodes[0]?.id ?? null;
 state.selectedVaultPath = preferredVaultPath();
@@ -93,6 +98,7 @@ function render() {
   renderTimeline(nodes);
   renderDetails(selected);
   renderVaultControls(selected);
+  renderSyncReport();
 }
 
 function renderMetrics() {
@@ -215,6 +221,61 @@ function renderVaultPreview() {
   const lintCount = state.vault?.lint?.length ?? 0;
   vaultStatus.textContent = `${files.length} files compiled. ${lintCount === 0 ? "Lint clean." : `${lintCount} lint issues.`}`;
   vaultPreview.textContent = selected.contents;
+}
+
+function renderSyncReport() {
+  syncSummary.replaceChildren();
+  syncActions.replaceChildren();
+  const report = state.syncReport?.report;
+  if (!report) {
+    syncSummary.textContent = "Fixture sync report unavailable.";
+    return;
+  }
+
+  const summary = report.summary ?? {};
+  syncSummary.replaceChildren(
+    stat("Dry run", report.dryRun ? "yes" : "no"),
+    stat("Writes", summary.write ?? 0),
+    stat("Conflicts", summary.write_conflict_note ?? 0),
+    stat("Unchanged", summary.skip_unchanged ?? 0),
+  );
+
+  const prioritized = [...(report.actions ?? [])].sort((a, b) => actionRank(a.action) - actionRank(b.action)).slice(0, 8);
+  for (const action of prioritized) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const path = document.createElement("span");
+    item.dataset.action = action.action;
+    label.textContent = action.action.replaceAll("_", " ");
+    path.textContent = action.path;
+    item.append(label, path);
+    if (action.conflictPath) {
+      const conflict = document.createElement("small");
+      conflict.textContent = action.conflictPath;
+      item.append(conflict);
+    }
+    syncActions.append(item);
+  }
+}
+
+function stat(label, value) {
+  const item = document.createElement("div");
+  const strong = document.createElement("strong");
+  const span = document.createElement("span");
+  strong.textContent = String(value);
+  span.textContent = label;
+  item.append(strong, span);
+  return item;
+}
+
+function actionRank(action) {
+  const ranks = {
+    write_conflict_note: 0,
+    skip_reviewed: 1,
+    write: 2,
+    skip_unchanged: 3,
+  };
+  return ranks[action] ?? 9;
 }
 
 function renderProvenance(node) {

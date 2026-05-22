@@ -22,11 +22,15 @@ const requiredFiles = [
   `${reviewDir}/wiki-vault-sync-evidence.md`,
   `${reviewDir}/update-flow-evidence.md`,
   `${reviewDir}/brain-ui-vault-preview-evidence.md`,
+  `${reviewDir}/brain-ui-sync-report-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-sync-report-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
   `${reviewDir}/ui-evidence/brain-ui-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-fixture-edit.png`,
   `${reviewDir}/ui-evidence/brain-ui-vault-preview-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-vault-preview.png`,
+  `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-sync-report.png`,
 ];
 
 const requiredScripts = [
@@ -103,6 +107,16 @@ check("dom evidence is sane", () => {
   assert.equal(vaultEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(vaultEvidence.consoleMessages.length, 0);
   assert.ok(vaultEvidence.evidence.vaultOptionCount >= 10);
+
+  const syncEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-sync-report-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(syncEvidence.ok, true);
+  assert.equal(syncEvidence.evidence.hasSyncReportHeading, true);
+  assert.match(syncEvidence.evidence.syncStatus, /Dry run/i);
+  assert.ok(syncEvidence.evidence.conflictActionCount >= 1);
+  assert.equal(syncEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(syncEvidence.consoleMessages.length, 0);
 });
 
 check("fresh brain UI smoke passes", () => {

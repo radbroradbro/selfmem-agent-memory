@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "evidence": {
+    "actionCount": 8,
+    "bodyTextSample": "RW\nRecallWeave\nfixture brain\nSearch\nAll\nMemory\nDocs\nTrace\nResearch\nLifecycle\n9\nnodes\n9\nedges\n2\neditable\nUpdate Flow\nPull update\nRun doctor\nSmoke test\nOpen PR\nNucleus\n\nHybrid recall, lifecycle, wiki sync, and research lineage in one inspectable map.\n\nfixture-safe evidence\nRETRIEVAL TRACE\nRetrieval trace for native memory optimization\nDERIVED DOC\nNative Memory Optimization Plan\n88% confidence\nTimeline\nchronological derived events\n08:05\nretrieval trace\n\nRetrieval trace for native memory optimization\n\n08:10\nderived doc\n\nNative Memory Optimization Plan\n\nRETRIEVAL TRACE\nRetrieval trace for native memory optimization\nCreated\n08:05\nUpdated\n08:05\nConfidence\nnot scored\nTags\ntrace, hybrid-search\nEdges\ninjected_into: memory:hybrid-recall | captured_by: event:hermes-pre-compress\nProvenance\n\nNo source q",
+    "conflictActionCount": 1,
+    "hasConflictPath": true,
+    "hasSyncReportHeading": true,
+    "syncStatus": "yes\nDry run\n11\nWrites\n1\nConflicts\n0\nUnchanged",
+    "title": "RecallWeave Brain",
+    "visibleTextHasPrivate": false
+  },
+  "consoleMessages": []
+}
