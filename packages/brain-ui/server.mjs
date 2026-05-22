@@ -1,7 +1,8 @@
 import { createServer as createHttpServer } from "node:http";
 import { readFile } from "node:fs/promises";
-import { extname, join, normalize } from "node:path";
+import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { compileNucleusWikiVault, lintCompiledWikiVault } from "../core/dist/index.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 
@@ -24,7 +25,20 @@ export function createBrainUiServer() {
         return;
       }
 
-      const filePath = join(root, path);
+      if (path === "__favicon") {
+        send(response, 204, "image/x-icon", "");
+        return;
+      }
+
+      if (path === "__wiki_vault_fixture") {
+        const fixture = JSON.parse(await readFile(join(root, "fixtures/nucleus.fixture.json"), "utf8"));
+        const vault = compileNucleusWikiVault(fixture);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify({ ok: true, vault, lint: lintCompiledWikiVault(vault) }));
+        return;
+      }
+
+      const filePath = resolve(root, path);
+      if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
       send(response, 200, contentTypes.get(extname(filePath)) ?? "application/octet-stream", body);
     } catch (error) {
@@ -39,6 +53,8 @@ function routePath(pathname) {
   if (pathname === "/app.js") return "src/app.js";
   if (pathname === "/styles.css") return "src/styles.css";
   if (pathname === "/fixtures/nucleus.fixture.json") return "fixtures/nucleus.fixture.json";
+  if (pathname === "/fixtures/wiki-vault.json") return "__wiki_vault_fixture";
+  if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
   const cleaned = normalize(pathname.replace(/^\/+/, ""));

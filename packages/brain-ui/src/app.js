@@ -4,6 +4,8 @@ const state = {
   query: "",
   selectedId: null,
   edits: readEdits(),
+  vault: null,
+  selectedVaultPath: "",
 };
 
 const positions = {
@@ -27,16 +29,24 @@ const detailKind = document.querySelector("#detailKind");
 const detailTitle = document.querySelector("#detailTitle");
 const detailFacts = document.querySelector("#detailFacts");
 const provenance = document.querySelector("#provenance");
+const vaultFileSelect = document.querySelector("#vaultFileSelect");
+const vaultStatus = document.querySelector("#vaultStatus");
+const vaultPreview = document.querySelector("#vaultPreview");
 const docEditor = document.querySelector("#docEditor");
 const saveEdit = document.querySelector("#saveEdit");
 const resetEdit = document.querySelector("#resetEdit");
 const editStatus = document.querySelector("#editStatus");
 const timelineList = document.querySelector("#timelineList");
 
-const response = await fetch("/fixtures/nucleus.fixture.json");
+const [response, vaultResponse] = await Promise.all([
+  fetch("/fixtures/nucleus.fixture.json"),
+  fetch("/fixtures/wiki-vault.json"),
+]);
 state.snapshot = await response.json();
+state.vault = await vaultResponse.json();
 state.query = searchInput.value;
 state.selectedId = state.snapshot.nodes[0]?.id ?? null;
+state.selectedVaultPath = preferredVaultPath();
 
 render();
 
@@ -70,6 +80,11 @@ resetEdit.addEventListener("click", () => {
   render();
 });
 
+vaultFileSelect.addEventListener("change", (event) => {
+  state.selectedVaultPath = event.target.value;
+  renderVaultPreview();
+});
+
 function render() {
   const nodes = filteredNodes();
   const selected = currentSelected(nodes);
@@ -77,6 +92,7 @@ function render() {
   renderGraph(nodes);
   renderTimeline(nodes);
   renderDetails(selected);
+  renderVaultControls(selected);
 }
 
 function renderMetrics() {
@@ -162,6 +178,45 @@ function renderDetails(node) {
   if (!node.editable) editStatus.textContent = "This fixture node is inspect-only.";
 }
 
+function renderVaultControls(node) {
+  if (!state.vault?.ok) {
+    vaultStatus.textContent = "Vault fixture unavailable.";
+    vaultPreview.textContent = "";
+    vaultFileSelect.replaceChildren();
+    vaultFileSelect.disabled = true;
+    return;
+  }
+
+  const files = state.vault.vault.files;
+  const preferred = preferredVaultPath(node);
+  const nextPath = files.some((file) => file.path === state.selectedVaultPath) ? state.selectedVaultPath : preferred;
+  state.selectedVaultPath = nextPath;
+  vaultFileSelect.replaceChildren(
+    ...files.map((file) => {
+      const option = document.createElement("option");
+      option.value = file.path;
+      option.textContent = `${file.kind}: ${file.path}`;
+      option.selected = file.path === nextPath;
+      return option;
+    }),
+  );
+  vaultFileSelect.disabled = files.length === 0;
+  renderVaultPreview();
+}
+
+function renderVaultPreview() {
+  const files = state.vault?.vault?.files ?? [];
+  const selected = files.find((file) => file.path === state.selectedVaultPath) ?? files[0];
+  if (!selected) {
+    vaultStatus.textContent = "No compiled vault files.";
+    vaultPreview.textContent = "";
+    return;
+  }
+  const lintCount = state.vault?.lint?.length ?? 0;
+  vaultStatus.textContent = `${files.length} files compiled. ${lintCount === 0 ? "Lint clean." : `${lintCount} lint issues.`}`;
+  vaultPreview.textContent = selected.contents;
+}
+
 function renderProvenance(node) {
   provenance.replaceChildren();
   const refs = node.provenance ?? [];
@@ -195,6 +250,15 @@ function filteredNodes() {
     const matchesQuery = query.length === 0 || query.split(/\s+/).every((token) => haystack.includes(token));
     return matchesKind && matchesQuery;
   });
+}
+
+function preferredVaultPath(node) {
+  const files = state.vault?.vault?.files ?? [];
+  if (node) {
+    const direct = files.find((file) => file.nodeId === node.id);
+    if (direct) return direct.path;
+  }
+  return files.find((file) => file.path === "wiki/index.md")?.path ?? files[0]?.path ?? "";
 }
 
 function fact(label, value) {

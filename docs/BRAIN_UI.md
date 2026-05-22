@@ -14,6 +14,7 @@ The UI should expose:
 - lifecycle and sleep-cycle events,
 - research lineage,
 - derived docs and wiki pages,
+- compiled wiki/vault files,
 - provenance,
 - low-noise chronological timelines.
 
@@ -53,7 +54,8 @@ Required visual review path:
 5. derived doc edit,
 6. save or reset,
 7. timeline scan,
-8. provenance scan.
+8. provenance scan,
+9. compiled wiki/vault preview.
 
 ## Production Path
 

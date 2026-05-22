@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "evidence": {
+    "title": "RecallWeave Brain",
+    "hasVaultPreviewHeading": true,
+    "vaultStatus": "12 files compiled. Lint clean.",
+    "selectedVaultPath": "wiki/pages/recallweave-index-90439aeb.md",
+    "previewStart": "---\ntitle: \"RecallWeave Index\"\ntype: \"wiki_page\"\ncategory: \"wiki-page\"\ntags: [\"wiki\", \"index\"]\naliases: []\nsources: []\ncreated: \"2026-05-22T08:00:00.000Z\"\nupdated: \"2026-05-22T08:30:00.000Z\"\nconfidence: 0.96\nversion: 1\nprovenance:\n  extracted: []\n  inferred: []\n  ambiguous: []\nreviewed: false\n---\n\n# RecallWeave Index\n\n# RecallWeave Index\n\nThis fixture brain links native host lifecycle, hybrid retrieval, LLM-wiki pages, and research lineage. It contains no private user data.\n\n## Links\n\n- syncs_to: [[Native Memory Optimization Plan]]\n",
+    "nodeCount": "9",
+    "edgeCount": "9",
+    "editableCount": "2",
+    "visibleTextHasPrivate": false,
+    "vaultOptionCount": 12
+  },
+  "consoleMessages": [],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:4177/",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4177/styles.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4177/app.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4177/fixtures/wiki-vault.json",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4177/fixtures/nucleus.fixture.json",
+      "status": 200
+    }
+  ]
+}
