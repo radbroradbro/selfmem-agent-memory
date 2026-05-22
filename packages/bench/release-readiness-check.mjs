@@ -37,6 +37,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
   `${reviewDir}/production-readiness.md`,
+  `${reviewDir}/completion-audit.md`,
+  `${reviewDir}/gemini-completion-audit-review.md`,
   `${reviewDir}/gemini-production-readiness-review-blocked.md`,
   `${reviewDir}/public-live-update-draft.md`,
   `${reviewDir}/dummy-brain-demo-storyboard.md`,

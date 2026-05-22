@@ -16,10 +16,10 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest verified implementation commit before the Nucleus snapshot slice:
-  `768f92d`
+- Latest pushed head inspected by the completion audit:
+  `e3970b9`
 - PR API state when checked: open, not draft, mergeable, clean.
-- GitHub Actions `Verify` on `768f92d`: success.
+- GitHub Actions `Verify` on `e3970b9`: success.
 
 ## Shipped Overnight Slices
 
@@ -42,6 +42,8 @@ is still required before any public live update.
 | Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
 | Public live-update copy review | `reviews/overnight-20260522/gemini-public-live-update-copy-review.md` |
 | PR body update draft | `reviews/overnight-20260522/pr-body-update-draft.md` |
+| Completion audit | `reviews/overnight-20260522/completion-audit.md` |
+| Completion audit review | `reviews/overnight-20260522/gemini-completion-audit-review.md` |
 
 ## Verification Run
 
@@ -85,6 +87,8 @@ local memory contents.
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
 - Gemini public live-update copy review: `CLEAN`.
+- Gemini completion-audit review: first `BLOCK` because the audit was untracked
+  and absent from the diff, then final `CLEAN` after staging.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
