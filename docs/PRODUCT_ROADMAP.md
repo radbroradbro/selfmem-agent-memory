@@ -15,6 +15,8 @@ This roadmap tracks useful user-facing features without mixing them into the cur
   reviewed-page conflict protection.
 - Fixture-safe Brain UI panels for graph/editor, container health, Nucleus
   snapshot, research lineage, compiled vault preview, and dry-run sync report.
+- Read-only local-container audit preflight that returns counts and health
+  reasons without exposing raw memory content or private paths.
 
 ## Brain UI
 

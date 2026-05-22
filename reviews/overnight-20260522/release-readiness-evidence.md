@@ -16,6 +16,9 @@ Scope:
   prove fixture-safe local container, hosted read-through, provider mode,
   local-only write mode, leak count, redaction count, and retrieval trace
   visibility.
+- Added local-container audit smoke coverage to the release gate so future live
+  container work has a read-only preflight that returns counts and health
+  reasons without exposing raw contents or root paths.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -27,6 +30,7 @@ What `release:check` verifies:
 - package scripts for build, tests, smokes, and release check exist,
 - Brain UI vault preview DOM evidence is sane,
 - Brain UI Container Health DOM evidence is sane,
+- a fresh local-container audit smoke passes against current source,
 - a fresh Brain UI smoke passes against the current source,
 - a fresh Brain UI interaction smoke passes against the current source,
 - `git diff --check` passes,
@@ -50,7 +54,8 @@ Verification:
 
 - `pnpm release:check`: passed.
 - `pnpm smoke`: passed.
-- `pnpm test`: 18 tests passed.
+- `pnpm test`: 20 tests passed.
+- `pnpm container:audit:smoke`: passed.
 - `git diff --check`: covered by `release:check`.
 - Fresh Brain UI smoke: covered by `release:check`.
 - Fresh Brain UI interaction smoke: covered by `release:check`.

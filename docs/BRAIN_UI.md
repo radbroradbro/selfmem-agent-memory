@@ -85,6 +85,7 @@ The Nucleus snapshot preview is also fixture-only and marks
 Before connecting real local containers, the UI needs:
 
 - read-only local fixture mode,
+- local container audit preflight,
 - redacted local container mode,
 - explicit file picker or config path,
 - write confirmation for derived docs,
@@ -93,3 +94,5 @@ Before connecting real local containers, the UI needs:
 - explicit vault sync confirmation,
 - screenshot/recording safety guardrails,
 - accessibility review.
+
+See `docs/LOCAL_CONTAINER_AUDIT.md` for the first safe preflight utility.

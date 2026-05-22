@@ -36,6 +36,7 @@ is still required before any public live update.
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
+| Local container audit preflight | `packages/core/src/local-container/audit.ts`, `reviews/overnight-20260522/local-container-audit-evidence.md` |
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
@@ -53,9 +54,10 @@ is still required before any public live update.
 
 Latest local verification before this summary:
 
-- `pnpm test`: passed, 18 tests.
+- `pnpm test`: passed, 20 tests.
 - `pnpm smoke`: passed.
 - `pnpm brain:interaction`: passed for the Brain UI model refactor slice.
+- `pnpm container:audit:smoke`: passed.
 - `pnpm release:check`: passed.
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
@@ -96,6 +98,7 @@ local memory contents.
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
 - Gemini Brain UI interaction-smoke review: `CLEAN`.
+- Gemini local-container audit review: `CLEAN`.
 - Gemini public live-update copy review: `CLEAN`.
 - Gemini completion-audit review: first `BLOCK` because the audit was untracked
   and absent from the diff, then final `CLEAN` after staging.
@@ -116,6 +119,9 @@ local memory contents.
 - Brain UI model helpers are covered by a repeatable interaction smoke for
   search, retrieval traces, draft export, Nucleus export, research lineage,
   vault path selection, sync reporting, and private/key-shaped edit rejection.
+- Local-container audit preflight is read-only, redacts the selected root path,
+  returns counts and health reasons only, and never returns raw memory/event
+  text.
 - Wiki vault sync is explicit and protects reviewed pages by writing conflict
   notes instead of overwriting.
 - `selfmem_update` is dry-run by default and requires `--apply` before copying

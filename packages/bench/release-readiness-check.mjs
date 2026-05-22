@@ -15,6 +15,7 @@ const requiredFiles = [
   "LICENSE",
   "SECURITY.md",
   "bin/selfmem_update",
+  "docs/LOCAL_CONTAINER_AUDIT.md",
   "docs/PRODUCTION_READINESS.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
   `${reviewDir}/kickoff.md`,
@@ -25,6 +26,8 @@ const requiredFiles = [
   `${reviewDir}/wiki-vault-evidence.md`,
   `${reviewDir}/wiki-vault-sync-evidence.md`,
   `${reviewDir}/update-flow-evidence.md`,
+  `${reviewDir}/local-container-audit-evidence.md`,
+  `${reviewDir}/gemini-local-container-audit-review.md`,
   `${reviewDir}/brain-ui-vault-preview-evidence.md`,
   `${reviewDir}/brain-ui-nucleus-snapshot-evidence.md`,
   `${reviewDir}/gemini-brain-ui-nucleus-snapshot-review.md`,
@@ -78,6 +81,8 @@ const requiredScripts = [
   "brain:smoke:built",
   "brain:interaction",
   "brain:interaction:built",
+  "container:audit:smoke",
+  "container:audit:smoke:built",
   "compaction:smoke",
   "compaction:smoke:built",
   "compaction:benchmark",
@@ -231,6 +236,10 @@ check("fresh brain UI smoke passes", () => {
 
 check("fresh brain UI interaction smoke passes", () => {
   run("node", ["packages/brain-ui/interaction-smoke.mjs"]);
+});
+
+check("fresh local container audit smoke passes", () => {
+  run("node", ["packages/bench/local-container-audit-smoke.mjs"]);
 });
 
 check("git diff check passes", () => {

@@ -41,6 +41,7 @@ complete or publish a public live update.
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Update flow | `bin/selfmem_update`, `packages/bench/update-flow-smoke.py`, `reviews/overnight-20260522/update-flow-evidence.md` | Proven by smoke and review |
+| Local container audit preflight | `packages/core/src/local-container/audit.ts`, `tests/local-container/audit.test.ts`, `local-container-audit-evidence.md`, Gemini review | Proven as read-only preflight |
 | Local-only compaction benchmarking | `packages/core/src/compaction/session.ts`, `packages/bench/session-compaction-smoke.mjs`, `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` | Proven with public fixtures |
 | Council review | Gemini reviews exist for UI, wiki/vault, update flow, Nucleus snapshot, research lineage, and public copy | Partial: Gemini proven, Claude blocked |
 | Claude reviewer route | `reviews/overnight-20260522/claude-pr5-review-blocked.md` | Blocked by missing login |
