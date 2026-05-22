@@ -178,6 +178,7 @@ Controller follow-up after that sandbox run:
   passed, 0 failed scenarios, 0 privacy leaks, exact-identifier accuracy 1,
   average noise reduction 0.307, hosted-baseline caveat visible, no-raw-text
   caveat visible, zero console errors, and no private/key-shaped visible text.
+  GitHub Actions CI run `26302442423` passed on `d0113c0`.
 
 ## UI Evidence
 

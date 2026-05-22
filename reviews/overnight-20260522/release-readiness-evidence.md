@@ -284,9 +284,8 @@ Known limits:
   compaction audit commit `be08302`.
 - GitHub Actions CI run `26299756374` passed on Brain UI Compaction Audit
   commit `fb466db`.
-- Brain UI Benchmark Dashboard has passed local release-gate verification and
-  focused Gemini review. Reinspect Actions after this slice is committed and
-  pushed.
+- GitHub Actions CI run `26302442423` passed on Brain UI Benchmark Dashboard
+  commit `d0113c0`, including Test, Full smoke, and Release readiness check.
 - GitHub Actions CI run `26300784883` passed on Brain UI Context Preview
   commit `0ec4396`.
 - GitHub Actions CI run `26301888111` passed on Brain UI Release Readiness
