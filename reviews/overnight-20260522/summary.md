@@ -43,6 +43,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26305635737` on `22e17b1`: success.
 - GitHub Actions CI run `26306469240` on `ff6f343`: success.
 - GitHub Actions CI run `26306827655` on `4cee083`: success.
+- GitHub Actions CI run `26309563159` on `02b3a13`: success.
 
 ## Shipped Overnight Slices
 
@@ -245,6 +246,7 @@ Latest local verification before this summary:
   default. It reports `callsHostedProvider: false`, `metricsOnly: true`,
   `hostedBaselineFresh: false`, and `benchmarkClaimsAllowed: false`, so future
   comparison claims need a sanitized live result plus reviewer approval.
+  GitHub Actions CI run `26309563159` passed on `02b3a13`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,

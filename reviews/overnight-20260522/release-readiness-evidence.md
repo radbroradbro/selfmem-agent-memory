@@ -220,6 +220,8 @@ Boundary:
 Verification:
 
 - `pnpm release:check`: passed.
+- GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
+  Full smoke, and Release readiness check.
 - `pnpm smoke`: passed.
 - `pnpm test`: 22 tests passed.
 - `pnpm container:audit:smoke`: passed.

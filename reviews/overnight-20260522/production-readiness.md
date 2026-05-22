@@ -321,6 +321,9 @@ evidence for:
   `benchmarkClaimsAllowed: false`. The preflight accepts only aggregate
   metrics and hashes for later live results, never raw memory text or
   credentials.
+- GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
+  Full smoke, and Release readiness check for the hosted baseline preflight
+  gate.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI

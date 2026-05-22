@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "13efb18b4bc1a739c290bade0b7fc4eb3d6bc132",
-    "ciRunId": 26308994908,
+    "headSha": "02b3a13a68eed5edc5dabedf5c2bb0d95c17a974",
+    "ciRunId": 26309563159,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the goal completion audit gate was added. GitHub Actions run 26308994908 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after the hosted baseline preflight gate was added. GitHub Actions run 26309563159 passed Test, Full smoke, and Release readiness check."
   },
   "releaseStateGuard": {
     "enabled": true,

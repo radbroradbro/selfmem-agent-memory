@@ -38,6 +38,9 @@ Live retry results:
   `Not logged in`.
 - GitHub Actions CI run `26307335652` passed on `d93d781` with Test, Full
   smoke, and Release readiness check.
+- GitHub Actions CI run `26309563159` passed on `02b3a13` with Test, Full
+  smoke, and Release readiness check after the hosted baseline preflight was
+  added to the doctor.
 
 Manual next actions:
 

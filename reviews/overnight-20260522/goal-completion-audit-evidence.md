@@ -61,6 +61,9 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `git diff --check`: passed.
 - GitHub Actions CI run `26308994908` passed on `13efb18`, including Test,
   Full smoke, and Release readiness check.
+- GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
+  Full smoke, and Release readiness check after the hosted baseline preflight
+  gate was added.
 
 The audit is intentionally conservative. It is a proof that the current branch
 is a public-readiness candidate, not proof that the active goal is complete.

@@ -80,3 +80,8 @@ Required live-run inputs are recorded as names only:
 This is a preflight and release gate, not a live hosted benchmark. The blocker
 `hosted-supermemory-baseline-not-current` remains valid until a sanitized live
 result is reviewed.
+
+## CI
+
+GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test, Full
+smoke, and Release readiness check.

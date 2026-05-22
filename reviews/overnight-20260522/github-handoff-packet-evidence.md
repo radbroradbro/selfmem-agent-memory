@@ -40,8 +40,8 @@ steps without reconstructing the release state from scattered notes.
 - PR number `5`
 - public launch blocked
 - production readiness false
-- latest verified code baseline `13efb18`
-- CI run `26308994908`
+- latest verified code baseline `02b3a13`
+- CI run `26309563159`
 - PR body from `pr-body-update-draft.md`
 - status comment text
 - blocker issue title and body
@@ -76,3 +76,6 @@ auditable and repeatable while keeping `publicLaunchVerdict: "FAIL"` and
 - GitHub Actions CI run `26308588261` passed on `8efe4d0`, including Test,
   Full smoke, and Release readiness check after the handoff packet gate was
   made dynamic.
+- GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
+  Full smoke, and Release readiness check after the hosted baseline preflight
+  reminder was added to the handoff packet.
