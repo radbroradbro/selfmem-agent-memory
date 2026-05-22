@@ -16,6 +16,7 @@ Live status:
 - Adds LLM-wiki compile and vault sync flows with Obsidian-style frontmatter, wikilinks, provenance, linting, reviewed-page conflict handling, and content-free pre-write audit logging.
 - Adds the self-hosted Brain UI preview for graph browsing, research lineage, research source lock, model matrix, compaction audit, benchmark dashboard, canary rollout, context preview, release readiness, current-head live browser evidence, local audit, selected local-container browse, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, selected local memory edit, local edit overlay browse, selected local memory materialize, dynamic graph layout, graph navigation, and provenance/timeline inspection.
 - Adds `selfmem_update`, clean consumer smoke coverage, release blocker doctor, GitHub handoff packet, goal completion audit, hosted baseline preflight, canary evidence intake, canary report generator from trace/diagnostic exports, and `canary:diagnose` remediation guidance for failed reports.
+- Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Keeps public launch conservative: fixture evidence is allowed, real private memory text is not committed, and benchmark claims stay blocked until a matched source-locked canary or hosted baseline passes with reviewer sign-off.
 
 ## Current Verdict
@@ -26,11 +27,11 @@ The code, fixture UI, release gate, and CI are healthy, but launch remains block
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `4f5a0790f1c403c8c8405910935f7a3eea1072a1`.
-- GitHub Actions run `26312283137`: passed Test, Full smoke, and Release readiness check.
-- Previous docs/evidence head before the GitHub write-route extension:
-  `3ad7b5ddcc4c3213ba22ca666e71d01433c05d30`.
-- GitHub Actions run `26312385019`: passed Verify.
+- Latest code/product baseline: `e765e8ff331475c6f91565f4e68577b011e4781a`.
+- GitHub Actions run `26313358962`: passed CI after the bounded read-through latency patch.
+- Previous verified baseline before the adapter latency extension:
+  `581be61d8304ae0576554121aef28d9afefd73c1`.
+- GitHub Actions run `26312945295`: passed CI.
 - PR #5 body is live and current.
 - GitHub issue #6 exists for final release blockers.
 
@@ -45,6 +46,8 @@ The code, fixture UI, release gate, and CI are healthy, but launch remains block
 - `node packages/bench/canary-evidence-intake.mjs`: passed in fixture mode and rejects raw memories/transcripts/prompts.
 - `node packages/bench/canary-report-from-trace.mjs`: passed for trace fixtures and redacted diagnostic export fixtures.
 - `npm exec --yes pnpm@10.23.0 -- canary:diagnose`: passed, producing metrics-only remediation guidance for a failing canary report.
+- `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.
+- `npm exec --yes pnpm@10.23.0 -- smoke:hermes`: passed with bounded read-through policy and local/remote/total recall timing assertions.
 - `git diff --check`: clean.
 - Changed-file secret and private-name scans: no actual key or private memory hits.
 

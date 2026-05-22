@@ -16,8 +16,8 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest CI-inspected public-draft baseline:
-  `4f5a079`, run `26312283137`, success.
+- Latest CI-inspected code/product baseline:
+  `e765e8f`, run `26313358962`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -48,6 +48,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26310773948` on `6ae4ce7`: success.
 - GitHub Actions CI run `26311728246` on `77b3cee`: success.
 - GitHub Actions CI run `26312283137` on `4f5a079`: success.
+- GitHub Actions CI run `26313358962` on `e765e8f`: success.
 
 ## Shipped Overnight Slices
 

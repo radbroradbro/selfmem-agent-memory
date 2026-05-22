@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T21:39:00Z",
+  "generatedAt": "2026-05-22T21:43:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "4f5a0790f1c403c8c8405910935f7a3eea1072a1",
-    "ciRunId": 26312283137,
+    "headSha": "e765e8ff331475c6f91565f4e68577b011e4781a",
+    "ciRunId": 26313358962,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after canary remediation diagnosis was added. GitHub Actions run 26312283137 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after Hermes and OpenClaw bounded read-through latency hardening. GitHub Actions run 26313358962 passed CI on e765e8f."
   },
   "releaseStateGuard": {
     "enabled": true,
