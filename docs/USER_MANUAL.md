@@ -5,8 +5,9 @@ read-only Supermemory search. New writes go to local storage. Hosted
 Supermemory stays available as old history when credentials and quota allow it.
 
 The runtime id is currently `selfmem_canary` for compatibility with installed
-Hermes and OpenClaw setup scripts. Once that id is assigned to the runtime
-memory slot, RecallWeave is the default memory provider for that agent.
+Hermes and OpenClaw setup scripts. That is a compatibility id, not the product
+name. Once that id is assigned to the runtime memory slot, RecallWeave is the
+default memory provider for that agent.
 
 ## What To Install
 

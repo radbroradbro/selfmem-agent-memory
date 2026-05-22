@@ -30,6 +30,8 @@ The UI should expose:
 - selected local memory materialize with explicit confirmation and backup,
 - sanitized Nucleus snapshot export,
 - derived docs and wiki pages,
+- research source lock cards for current public sources, implementation rules,
+  caveats, and benchmark targets,
 - compiled wiki/vault files,
 - vault disk-sync status and conflicts,
 - provenance,
@@ -78,22 +80,23 @@ Required visual review path:
 11. provenance scan,
 12. Nucleus snapshot preview,
 13. research lineage preview,
-14. local session compaction audit preview,
-15. local compaction benchmark dashboard,
-16. one-agent canary rollout dashboard,
-17. prompt context preview,
-18. release readiness console,
-19. lifecycle policy preview,
-20. selected lifecycle policy apply confirmation,
-21. memory review queue preview,
-22. selected memory review queue apply confirmation,
-23. compiled wiki/vault preview,
-24. fixture vault sync report with conflict handling,
-25. selected local vault sync dry-run,
-26. selected local vault sync apply confirmation,
-27. fixture local-container audit preflight,
-28. selected local memory edit overlay confirmation,
-29. selected local memory materialize confirmation.
+14. research source lock preview,
+15. local session compaction audit preview,
+16. local compaction benchmark dashboard,
+17. one-agent canary rollout dashboard,
+18. prompt context preview,
+19. release readiness console,
+20. lifecycle policy preview,
+21. selected lifecycle policy apply confirmation,
+22. memory review queue preview,
+23. selected memory review queue apply confirmation,
+24. compiled wiki/vault preview,
+25. fixture vault sync report with conflict handling,
+26. selected local vault sync dry-run,
+27. selected local vault sync apply confirmation,
+28. fixture local-container audit preflight,
+29. selected local memory edit overlay confirmation,
+30. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -110,6 +113,20 @@ edits as a preview object with `writesRealFiles: false`.
 
 The Nucleus snapshot preview is also fixture-only and marks
 `writesRealFiles: false`.
+
+The Research Source Lock panel is fixture-only and metrics-only. It shows the
+public sources that currently constrain RecallWeave's design, including the
+LLM-wiki pattern, GBrain, Obsidian-compatible wiki work, MemoryBench, Hermes
+provider hooks, Supermemory, and recent memory-system papers. It renders source
+cards and implementation rules in human language, keeps the technical JSON
+export collapsed by default, and keeps backend labels copyable without making
+raw ids the primary interface. Current browser evidence records 11 sources, 10
+  source-locked sources, 9 recent sources, 8 implementation rules, 3 benchmark
+targets, zero console errors, and no private/key-shaped visible text. The rules
+include topic/subtopic paths, stale-memory supersession for resolved bugs or
+tasks, user-adjustable lifecycle frequency so recall and write cadence can
+balance continuity, latency, token use, and provider limits, and a
+dashboard-to-cluster zoom path for larger memory graphs.
 
 The graph layout is data-driven. It ranks visible Nucleus nodes from graph
 edges and kind fallback order, limits columns so cards do not overlap in the
@@ -175,7 +192,7 @@ fixture-only status, hosted write-back status, and leak counter. It is meant to
 make the release gate easy to inspect before a human approves publication. It
 does not update GitHub, change repository visibility, or write local agent
 files. Current browser evidence records `fixture-release-readiness-console`,
-public launch verdict `FAIL`, `productionReady: false`, 15 proven surfaces, 5
+public launch verdict `FAIL`, `productionReady: false`, 16 proven surfaces, 5
 remaining blockers, 5 manual actions, hosted write-back disabled, zero console
 errors, and no private/key-shaped visible text.
 

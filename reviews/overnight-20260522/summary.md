@@ -74,6 +74,7 @@ is still required before any public live update.
 | Brain UI memory review queue apply review | `reviews/overnight-20260522/gemini-brain-ui-review-queue-apply-review.md` |
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
+| Brain UI research source lock | `reviews/overnight-20260522/brain-ui-research-source-lock-evidence.md` |
 | Brain UI compaction audit | `reviews/overnight-20260522/brain-ui-compaction-audit-evidence.md` |
 | Brain UI benchmark dashboard | `reviews/overnight-20260522/brain-ui-benchmark-dashboard-evidence.md` |
 | Brain UI canary rollout | `reviews/overnight-20260522/brain-ui-canary-rollout-evidence.md` |
@@ -161,7 +162,7 @@ Latest local verification before this summary:
   Actions CI run `26300784883` passed on `0ec4396`.
 - Brain UI Release Readiness verification: local smoke and interaction smoke
   pass with `release-readiness-console` evidence. Browser DOM evidence reports
-  public launch verdict `FAIL`, `productionReady: false`, 15 proven preview
+  public launch verdict `FAIL`, `productionReady: false`, 16 proven preview
   surfaces, 5 remaining blockers, 5 manual actions, fixture-only evidence,
   hosted write-back disabled, zero privacy leaks, zero console errors, and no
   private/key-shaped visible text. GitHub Actions CI run `26301888111` passed
@@ -180,6 +181,13 @@ Latest local verification before this summary:
   required, 5 rollout steps, 11 metrics to collect, rollback and dry-run steps
   visible, zero console errors, and no private/key-shaped visible text. GitHub
   Actions CI run `26302990767` passed on `f51346f`.
+- Brain UI Research Source Lock verification: local smoke and interaction
+  smoke pass with `research-source-lock` evidence. Browser evidence reports 11
+  public sources, 10 source-locked sources, 9 recent sources, 8 implementation
+  rules, 3 benchmark targets, topic-path and stale-supersession rules,
+  dashboard-to-cluster zoom, collapsed technical export, human-readable
+  container labels, zero console errors, and no private/key-shaped visible
+  text.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -256,13 +264,18 @@ Sanitized fixture evidence exists under
   `FAIL`, owner approval required, rollback and dry-run steps visible, 11
   metrics to collect, zero console errors, and no private/key-shaped visible
   text
+- research source lock evidence records 11 public sources, 10 source-locked
+  sources, 9 recent sources, 8 implementation rules, topic/subtopic path,
+  stale-memory supersession, budgeted lifecycle-frequency, and
+  dashboard-to-cluster zoom rules, collapsed technical export, human-readable
+  container labels, zero console errors, and no private/key-shaped visible text
 - context preview evidence records the fixture prompt recall packet, 642 of 900
   context tokens used, 258 tokens remaining, 3 selected memories, 3 context
   sections, 2 omitted candidates, hosted read-through as read-only, local-only
   writes, zero privacy leaks, zero console errors, and no private/key-shaped
   visible text
 - release readiness evidence records public launch verdict `FAIL`,
-  `productionReady: false`, verified CI status, 15 proven preview surfaces, 5
+  `productionReady: false`, verified CI status, 16 proven preview surfaces, 5
   blockers, 5 manual actions, hosted write-back disabled, zero privacy leaks,
   zero console errors, and no private/key-shaped visible text
 
@@ -302,6 +315,7 @@ local memory contents.
 - Gemini Brain UI benchmark dashboard review: `CLEAN`, with a note that Gemini
   CLI produced transient capacity warnings before returning the verdict.
 - Gemini Brain UI canary rollout review: `CLEAN`.
+- Gemini Brain UI research source lock review: `CLEAN`.
 - Gemini Brain UI release readiness review: `CLEAN`, with a note that Gemini
   CLI produced transient capacity warnings before returning the verdict.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after

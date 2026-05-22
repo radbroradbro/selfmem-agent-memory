@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "mode": "research-source-lock",
+  "asOfDate": "2026-05-22",
+  "retrievedAt": "2026-05-22T18:25:00.000Z",
+  "themes": [
+    "Preserve raw sources, then compile durable knowledge",
+    "Use hybrid retrieval plus a human-readable knowledge graph",
+    "Treat benchmark quality, latency, and context tokens as separate metrics",
+    "Keep host-native lifecycle hooks instead of forcing one memory rhythm",
+    "Route memories through topic and subtopic paths so recall can boost the right branch",
+    "Supersede stale bug and task memories instead of letting old failures keep ranking",
+    "Expose dashboard-level health before zooming into clusters, paths, and documents"
+  ],
+  "sources": [
+    {
+      "id": "source:karpathy-llm-wiki",
+      "title": "Karpathy LLM Wiki pattern",
+      "url": "https://gist.githubusercontent.com/karpathy/442a6bf555914893e9891c11519de94f/raw/ac46de1ad27f92b28ac95459c782c07f6b8c964a/llm-wiki.md",
+      "sourceType": "project",
+      "status": "source-locked",
+      "publishedAt": "2026-04-02",
+      "retrievedAt": "2026-05-22T18:03:00.000Z",
+      "claimKind": "method",
+      "memoryImplication": "Use immutable sources, an agent-maintained wiki, a schema file, index, log, and periodic lint so memory compounds instead of becoming only query-time RAG.",
+      "supports": ["llm-wiki", "obsidian", "research-lineage", "wiki-lint"],
+      "challenges": ["Needs guardrails to avoid stale compiled pages"],
+      "confidence": 0.95,
+      "evidenceStrength": "high"
+    },
+    {
+      "id": "source:gbrain",
+      "title": "GBrain public repository",
+      "url": "https://github.com/garrytan/gbrain",
+      "sourceType": "project",
+      "status": "source-locked",
+      "publishedAt": "2026-04-05",
+      "retrievedAt": "2026-05-22T18:05:00.000Z",
+      "claimKind": "product",
+      "memoryImplication": "Add typed links, brain-first lookup, auto-linking on writes, background consolidation, and a doctor/remediation loop as inspiration, without copying private data or unverified claims.",
+      "supports": ["typed-links", "doctor-loop", "pglite-or-postgres", "host-skillpack"],
+      "challenges": ["Do not claim GBrain parity until compatible evals are run"],
+      "confidence": 0.9,
+      "evidenceStrength": "high"
+    },
+    {
+      "id": "source:obsidian-karpathy-plugin",
+      "title": "Karpathy LLM Wiki Obsidian plugin",
+      "url": "https://community.obsidian.md/plugins/karpathywiki",
+      "sourceType": "project",
+      "status": "source-locked",
+      "publishedAt": "2026-04-24",
+      "retrievedAt": "2026-05-22T18:07:00.000Z",
+      "claimKind": "integration",
+      "memoryImplication": "Keep RecallWeave vault output Obsidian-compatible with wiki links, generated indexes, lint, duplicate detection, contradiction handling, and reviewed-page protection.",
+      "supports": ["obsidian", "wikilinks", "duplicate-merge", "reviewed-pages"],
+      "challenges": ["Native Brain UI should be cleaner for nontechnical users than raw Obsidian files"],
+      "confidence": 0.89,
+      "evidenceStrength": "high"
+    },
+    {
+      "id": "source:memorybench",
+      "title": "MemoryBench public harness",
+      "url": "https://github.com/supermemoryai/memorybench",
+      "sourceType": "benchmark",
+      "status": "source-locked",
+      "retrievedAt": "2026-05-22T18:09:00.000Z",
+      "claimKind": "benchmark",
+      "memoryImplication": "Use checkpointed ingest, index, search, answer, evaluate, and report runs. Report accuracy, latency, and context tokens separately instead of one vague score.",
+      "supports": ["locomo", "longmemeval", "convomem", "memscore"],
+      "challenges": ["Hosted Supermemory baseline is blocked until a non-quota-limited key is available"],
+      "confidence": 0.94,
+      "evidenceStrength": "high"
+    },
+    {
+      "id": "source:supermemory",
+      "title": "Supermemory public repository",
+      "url": "https://github.com/supermemoryai/supermemory",
+      "sourceType": "official",
+      "status": "source-locked",
+      "retrievedAt": "2026-05-22T18:10:00.000Z",
+      "claimKind": "product",
+      "memoryImplication": "Mirror the useful public-facing behavior: profiles, hybrid search, contradiction handling, connectors, and easy host plugins, while keeping RecallWeave local writes separate.",
+      "supports": ["host-parity", "hybrid-search", "profiles", "contradictions"],
+      "challenges": ["Public claims about beating Supermemory require fresh matched baselines"],
+      "confidence": 0.88,
+      "evidenceStrength": "medium"
+    },
+    {
+      "id": "source:hermes-memory-provider",
+      "title": "Hermes memory provider plugin docs",
+      "url": "https://hermes-agent.nousresearch.com/docs/developer-guide/memory-provider-plugin/",
+      "sourceType": "official",
+      "status": "source-locked",
+      "retrievedAt": "2026-05-22T18:12:00.000Z",
+      "claimKind": "integration",
+      "memoryImplication": "Use Hermes provider hooks for system prompt blocks, prefetch, queued prefetch, sync turn, session end, pre-compress preservation, and mirrored memory writes.",
+      "supports": ["hermes", "prefetch", "sync-turn", "pre-compress"],
+      "challenges": ["Only one external Hermes memory provider is active at a time"],
+      "confidence": 0.94,
+      "evidenceStrength": "high"
+    },
+    {
+      "id": "source:storage-not-memory",
+      "title": "Storage Is Not Memory",
+      "url": "https://arxiv.org/abs/2605.04897",
+      "sourceType": "paper",
+      "status": "watch",
+      "publishedAt": "2026-05-06",
+      "retrievedAt": "2026-05-22T18:14:00.000Z",
+      "claimKind": "method",
+      "memoryImplication": "Preserve verbatim event substrate and defer some extraction until retrieval because facts discarded at ingest cannot be recovered later.",
+      "supports": ["raw-substrate", "retrieval-centered", "sqlite-option"],
+      "challenges": ["Benchmark claims are technical-report claims and need reproduction before product copy"],
+      "confidence": 0.78,
+      "evidenceStrength": "medium"
+    },
+    {
+      "id": "source:plugmem",
+      "title": "PlugMem task-agnostic memory module",
+      "url": "https://arxiv.org/abs/2603.03296",
+      "sourceType": "paper",
+      "status": "source-locked",
+      "publishedAt": "2026-02-06",
+      "retrievedAt": "2026-05-22T18:16:00.000Z",
+      "claimKind": "method",
+      "memoryImplication": "Favor compact knowledge-centric graph memories for decision-relevant information instead of flooding prompts with raw trajectories.",
+      "supports": ["knowledge-graph", "information-density", "procedure-memory"],
+      "challenges": ["Still keep raw evidence available for audit and retrieval fallback"],
+      "confidence": 0.86,
+      "evidenceStrength": "medium"
+    },
+    {
+      "id": "source:longmemeval-v2",
+      "title": "LongMemEval V2",
+      "url": "https://arxiv.org/abs/2605.12493",
+      "sourceType": "paper",
+      "status": "source-locked",
+      "publishedAt": "2026-05-12",
+      "retrievedAt": "2026-05-22T18:17:00.000Z",
+      "claimKind": "benchmark",
+      "memoryImplication": "Add tests for environment gotchas, workflow knowledge, dynamic state tracking, and premise awareness, not only preference recall.",
+      "supports": ["workflow-memory", "gotcha-memory", "environment-experience"],
+      "challenges": ["Coding-agent evidence gathering can improve accuracy but may add latency"],
+      "confidence": 0.84,
+      "evidenceStrength": "medium"
+    },
+    {
+      "id": "source:evomembench",
+      "title": "EvoMemBench",
+      "url": "https://arxiv.org/abs/2605.18421",
+      "sourceType": "paper",
+      "status": "source-locked",
+      "publishedAt": "2026-05-18",
+      "retrievedAt": "2026-05-22T18:18:00.000Z",
+      "claimKind": "benchmark",
+      "memoryImplication": "Evaluate knowledge memory and execution memory separately because no single memory form wins across all settings.",
+      "supports": ["scope-aware-evals", "execution-memory", "knowledge-memory"],
+      "challenges": ["Do not optimize one benchmark and claim general memory superiority"],
+      "confidence": 0.83,
+      "evidenceStrength": "medium"
+    },
+    {
+      "id": "source:memoryarena",
+      "title": "MemoryArena",
+      "url": "https://arxiv.org/abs/2602.16313",
+      "sourceType": "paper",
+      "status": "source-locked",
+      "publishedAt": "2026-02-18",
+      "retrievedAt": "2026-05-22T18:19:00.000Z",
+      "claimKind": "benchmark",
+      "memoryImplication": "Add multi-session agent loops where memories are learned during action and reused later, because static recall benchmarks miss operational failures.",
+      "supports": ["agentic-loop-eval", "multi-session", "action-memory"],
+      "challenges": ["Requires controlled tasks beyond current fixture dashboard"],
+      "confidence": 0.84,
+      "evidenceStrength": "medium"
+    }
+  ],
+  "implementationRules": [
+    {
+      "id": "rule:human-readable-brain",
+      "label": "Human-readable brain",
+      "decision": "Translate memory internals into ideas, workflows, decisions, evidence, contradictions, and review state in the UI.",
+      "sourceIds": ["source:karpathy-llm-wiki", "source:gbrain", "source:obsidian-karpathy-plugin"]
+    },
+    {
+      "id": "rule:raw-plus-compiled",
+      "label": "Raw plus compiled",
+      "decision": "Preserve source substrate for audit while compiling concise wiki and graph knowledge for prompt-time recall.",
+      "sourceIds": ["source:karpathy-llm-wiki", "source:storage-not-memory", "source:plugmem"]
+    },
+    {
+      "id": "rule:host-native",
+      "label": "Host-native lifecycle",
+      "decision": "Use Hermes, OpenClaw, Codex, and Claude lifecycle hooks natively, then map them into one RecallWeave container contract.",
+      "sourceIds": ["source:hermes-memory-provider", "source:gbrain"]
+    },
+    {
+      "id": "rule:benchmark-separated",
+      "label": "Separated benchmarks",
+      "decision": "Track quality, latency, context tokens, privacy failures, and production-use failures as separate gates.",
+      "sourceIds": ["source:memorybench", "source:longmemeval-v2", "source:evomembench", "source:memoryarena"]
+    },
+    {
+      "id": "rule:topic-paths",
+      "label": "Topic paths",
+      "decision": "Store major topic and subtopic paths on memories and wiki pages, then use those paths as graph links and retrieval boosts.",
+      "sourceIds": ["source:karpathy-llm-wiki", "source:gbrain", "source:plugmem"]
+    },
+    {
+      "id": "rule:stale-memory-supersession",
+      "label": "Stale memory supersession",
+      "decision": "When a bug, task, or contradiction is resolved, add a superseding state and demote the stale open item while preserving the fix history.",
+      "sourceIds": ["source:karpathy-llm-wiki", "source:supermemory", "source:longmemeval-v2"]
+    },
+    {
+      "id": "rule:budgeted-lifecycle-frequency",
+      "label": "Budgeted lifecycle frequency",
+      "decision": "Expose user-adjustable recall and write cadence so agents can trade latency, token cost, and continuity instead of hardcoding one frequency.",
+      "sourceIds": ["source:hermes-memory-provider", "source:memorybench", "source:memoryarena"]
+    },
+    {
+      "id": "rule:dashboard-to-cluster-zoom",
+      "label": "Dashboard to cluster zoom",
+      "decision": "Start with dashboard health and activity metrics, then let users zoom into topic clusters, linked paths, and editable documents as memory scale grows.",
+      "sourceIds": ["source:gbrain", "source:karpathy-llm-wiki", "source:memoryarena"]
+    }
+  ],
+  "benchmarkTargets": [
+    {
+      "id": "bench:memorybench-limited",
+      "label": "Limited MemoryBench rerun",
+      "status": "planned",
+      "reason": "Needed before claiming Supermemory parity or superiority."
+    },
+    {
+      "id": "bench:agentic-canary",
+      "label": "One-agent live canary",
+      "status": "planned",
+      "reason": "Needed to prove prompt-time recall actually appears during work."
+    },
+    {
+      "id": "bench:brain-ui-human-review",
+      "label": "Human Brain UI review",
+      "status": "planned",
+      "reason": "Needed to confirm the UI is readable without inspecting JSON."
+    }
+  ],
+  "caveats": [
+    "This fixture source lock is public-safe and contains no private agent memory.",
+    "It does not prove current SOTA performance. It only constrains what RecallWeave should test and implement next.",
+    "GBrain and recent arXiv benchmark claims need reproduction before being used as marketing claims."
+  ]
+}

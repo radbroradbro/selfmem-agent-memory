@@ -32,6 +32,10 @@ RecallWeave is public alpha software.
 - Current fallback path: local lexical recall and metadata scoring.
 - Current hosted bridge: read-only Supermemory search and export-cache search.
 
+`selfmem_canary` is a legacy compatibility id, not the product name. New docs,
+UI surfaces, and operator instructions should call the system RecallWeave and
+reserve "canary" for a limited one-agent rollout test.
+
 Do not treat this release as a proven Supermemory replacement. The included
 benchmark notes are metrics-only engineering evidence. A fresh public benchmark
 must run before making quality claims.

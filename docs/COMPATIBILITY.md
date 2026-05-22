@@ -1,7 +1,8 @@
 # Compatibility Notes
 
-RecallWeave is the public project name. The current Hermes and OpenClaw adapter
-id remains `selfmem_canary` so existing installs and setup scripts keep working.
+RecallWeave is the public project name. "Canary" means a limited rollout test,
+not the system name. The current Hermes and OpenClaw adapter id remains
+`selfmem_canary` only so existing installs and setup scripts keep working.
 
 ## Runtime Ids
 
@@ -18,6 +19,10 @@ id remains `selfmem_canary` so existing installs and setup scripts keep working.
 A later release may add `recallweave` as a first-class runtime id. That release
 should keep `selfmem_canary` as a compatibility alias and provide a migration
 command that updates configs without changing container mappings.
+
+New docs, UI labels, and examples should say RecallWeave unless they are
+showing an exact compatibility id that must be pasted into an existing runtime
+config.
 
 ## Supermemory Bridge
 

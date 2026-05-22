@@ -112,6 +112,14 @@
   read-through-only mode, public launch verdict `FAIL`, owner approval
   required, dry-run and rollback steps visible, 11 metrics to collect, zero
   console errors, and no private/key-shaped visible text.
+- The Research Source Lock slice was verified by Playwright browser evidence,
+  fresh Brain UI smoke, interaction smoke, and Gemini focused review. A
+  fixture-only screenshot was captured at `brain-ui-research-source-lock.png`,
+  and `brain-ui-research-source-lock-evidence.json` reports 11 public sources,
+  10 source-locked sources, 9 recent sources, 8 implementation rules, 3
+  benchmark targets, topic-path and stale-supersession rules, collapsed
+  technical export, dashboard-to-cluster zoom, human-readable container labels,
+  zero console errors, and no private/key-shaped visible text.
 - The Context Preview slice was verified by Codex Browser DOM evidence, fresh
   Brain UI smoke, and interaction smoke. A fixture-only screenshot was captured
   at `brain-ui-context-preview.png`, and
@@ -124,7 +132,7 @@
   fresh Brain UI smoke, and interaction smoke. A fixture-only screenshot was
   captured at `brain-ui-release-readiness.png`, and
   `brain-ui-release-readiness-evidence.json` reports public launch verdict
-  `FAIL`, `productionReady: false`, 15 proven preview surfaces, 5 blockers, 5
+  `FAIL`, `productionReady: false`, 16 proven preview surfaces, 5 blockers, 5
   manual actions, hosted write-back disabled, zero privacy leaks, zero console
   errors, and no private/key-shaped visible text.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh

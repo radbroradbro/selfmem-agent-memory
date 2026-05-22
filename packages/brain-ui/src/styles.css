@@ -207,6 +207,29 @@ button.active {
   overflow-wrap: anywhere;
 }
 
+.copyable-fact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.copyable-fact span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyable-fact button {
+  min-height: 24px;
+  padding: 0 7px;
+  border-color: rgba(99, 214, 197, 0.34);
+  border-radius: 5px;
+  color: var(--cyan);
+  font-size: 11px;
+}
+
 .ops-flow {
   margin-top: 18px;
   border: 1px solid var(--line);
@@ -566,6 +589,7 @@ button.active {
 .audit-summary,
 .context-summary,
 .release-summary,
+.source-lock-summary,
 .benchmark-summary,
 .canary-summary,
 .policy-summary,
@@ -580,6 +604,7 @@ button.active {
 .audit-summary div,
 .context-summary div,
 .release-summary div,
+.source-lock-summary div,
 .benchmark-summary div,
 .canary-summary div,
 .policy-summary div,
@@ -601,6 +626,8 @@ button.active {
 .context-summary span,
 .release-summary strong,
 .release-summary span,
+.source-lock-summary strong,
+.source-lock-summary span,
 .benchmark-summary strong,
 .benchmark-summary span,
 .canary-summary strong,
@@ -617,6 +644,7 @@ button.active {
 .audit-summary strong,
 .context-summary strong,
 .release-summary strong,
+.source-lock-summary strong,
 .benchmark-summary strong,
 .canary-summary strong,
 .policy-summary strong,
@@ -630,6 +658,7 @@ button.active {
 .audit-summary span,
 .context-summary span,
 .release-summary span,
+.source-lock-summary span,
 .benchmark-summary span,
 .canary-summary span,
 .policy-summary span,
@@ -646,6 +675,7 @@ button.active {
 .context-memory-list,
 .context-omitted-list,
 .release-list,
+.source-lock-list,
 .benchmark-scenarios,
 .benchmark-caveats,
 .canary-list {
@@ -663,6 +693,7 @@ button.active {
 .context-memory-list li,
 .context-omitted-list li,
 .release-list li,
+.source-lock-list li,
 .benchmark-scenarios li,
 .benchmark-caveats li,
 .canary-list li {
@@ -679,6 +710,7 @@ button.active {
 .context-memory-list strong,
 .context-omitted-list strong,
 .release-list strong,
+.source-lock-list strong,
 .benchmark-scenarios strong,
 .benchmark-caveats strong,
 .canary-list strong {
@@ -695,6 +727,9 @@ button.active {
 .context-memory-list small,
 .context-omitted-list span,
 .release-list span,
+.source-lock-list span,
+.source-lock-list a,
+.source-lock-list small,
 .benchmark-scenarios span,
 .benchmark-scenarios small,
 .benchmark-caveats span,
@@ -709,6 +744,7 @@ button.active {
 .context-memory-list span,
 .context-omitted-list span,
 .release-list span,
+.source-lock-list span,
 .benchmark-scenarios span,
 .benchmark-caveats span,
 .canary-list span {
@@ -716,8 +752,19 @@ button.active {
   font-size: 12px;
 }
 
+.source-lock-list a {
+  color: var(--text);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.source-lock-list a:hover {
+  color: var(--cyan);
+}
+
 .sync-actions small,
 .context-memory-list small,
+.source-lock-list small,
 .benchmark-scenarios small,
 .canary-list small {
   color: var(--amber);
@@ -770,6 +817,26 @@ button.active {
   font-weight: 760;
 }
 
+.source-lock-status {
+  display: inline-grid;
+  min-height: 30px;
+  place-items: center;
+  margin: 0 0 10px;
+  border: 1px solid rgba(244, 185, 90, 0.58);
+  border-radius: 999px;
+  padding: 5px 11px;
+  color: var(--amber);
+  background: rgba(244, 185, 90, 0.08);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.source-lock-status[data-status="source-locked"] {
+  border-color: rgba(139, 209, 124, 0.58);
+  color: var(--green);
+  background: rgba(139, 209, 124, 0.08);
+}
+
 .benchmark-verdict[data-verdict="FAIL"],
 .benchmark-scenarios li[data-status="fail"],
 .canary-verdict[data-verdict="NEEDS_REVIEW"],
@@ -801,6 +868,36 @@ button.active {
 
 .release-list.manual-actions li {
   border-color: rgba(244, 185, 90, 0.58);
+}
+
+.source-lock-list li[data-status="source-locked"] {
+  border-color: rgba(139, 209, 124, 0.52);
+}
+
+.source-lock-list li[data-status="needs-review"],
+.source-lock-list li[data-status="unresolved"],
+.source-lock-list li[data-status="watch"] {
+  border-color: rgba(244, 185, 90, 0.58);
+}
+
+.source-lock-rules li {
+  border-color: rgba(99, 214, 197, 0.46);
+}
+
+.technical-export {
+  margin-top: 10px;
+}
+
+.technical-export summary {
+  min-height: 34px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.technical-export[open] summary {
+  color: var(--cyan);
 }
 
 .context-section-list {

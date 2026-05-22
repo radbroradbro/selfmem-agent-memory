@@ -148,6 +148,92 @@ function buildResearchLineage(snapshot) {
   };
 }
 
+function buildResearchSourceLock(packet = {}) {
+  const rawSerialized = JSON.stringify(packet ?? {});
+  const sources = Array.isArray(packet?.sources)
+    ? packet.sources.map((source, index) => {
+        const status = safeChoice(source?.status ?? "needs-review", [
+          "source-locked",
+          "needs-review",
+          "unresolved",
+          "watch",
+        ]);
+        return {
+          id: safeExportText(source?.id ?? `source:${index}`),
+          title: safeExportText(source?.title ?? "Untitled source"),
+          url: safeExportText(source?.url ?? ""),
+          sourceType: safeChoice(source?.sourceType ?? "project", [
+            "official",
+            "paper",
+            "project",
+            "benchmark",
+            "community",
+          ]),
+          status,
+          publishedAt: safeExportText(source?.publishedAt ?? ""),
+          retrievedAt: safeTimestamp(source?.retrievedAt, packet?.retrievedAt ?? "1970-01-01T00:00:00.000Z"),
+          claimKind: safeChoice(source?.claimKind ?? "method", [
+            "method",
+            "benchmark",
+            "product",
+            "integration",
+            "open-question",
+          ]),
+          memoryImplication: safeExportText(source?.memoryImplication ?? ""),
+          supports: safeStringList(source?.supports),
+          challenges: safeStringList(source?.challenges),
+          confidence: score(source?.confidence),
+          evidenceStrength: safeChoice(source?.evidenceStrength ?? "medium", ["high", "medium", "low"]),
+        };
+      })
+    : [];
+  const implementationRules = Array.isArray(packet?.implementationRules)
+    ? packet.implementationRules.map((rule, index) => ({
+        id: safeExportText(rule?.id ?? `rule:${index}`),
+        label: safeExportText(rule?.label ?? "Implementation rule"),
+        decision: safeExportText(rule?.decision ?? ""),
+        sourceIds: safeStringList(rule?.sourceIds),
+      }))
+    : [];
+  const benchmarkTargets = Array.isArray(packet?.benchmarkTargets)
+    ? packet.benchmarkTargets.map((target, index) => ({
+        id: safeExportText(target?.id ?? `benchmark:${index}`),
+        label: safeExportText(target?.label ?? "Benchmark target"),
+        status: safeChoice(target?.status ?? "planned", ["planned", "blocked", "running", "complete"], "planned"),
+        reason: safeExportText(target?.reason ?? ""),
+      }))
+    : [];
+  const statusCounts = sources.reduce((counts, source) => {
+    counts[source.status] = (counts[source.status] ?? 0) + 1;
+    return counts;
+  }, {});
+  const recentThreshold = Date.parse("2026-03-23T00:00:00.000Z");
+  const recentSourceCount = sources.filter((source) => {
+    const date = Date.parse(source.publishedAt || source.retrievedAt);
+    return Number.isFinite(date) && date >= recentThreshold;
+  }).length;
+  const unresolvedCount = numeric(statusCounts.unresolved) + numeric(statusCounts["needs-review"]);
+  return {
+    schemaVersion: 1,
+    mode: "fixture-research-source-lock",
+    writesRealFiles: false,
+    metricsOnly: true,
+    asOfDate: safeExportText(packet?.asOfDate ?? "2026-05-22"),
+    retrievedAt: safeTimestamp(packet?.retrievedAt, "2026-05-22T00:00:00.000Z"),
+    sourceCount: sources.length,
+    sourceLockedCount: numeric(statusCounts["source-locked"]),
+    unresolvedCount,
+    recentSourceCount,
+    privacyLeakCount: containsPrivateLikeText(rawSerialized) ? 1 : 0,
+    themes: safeStringList(packet?.themes),
+    statusCounts,
+    sources,
+    implementationRules,
+    benchmarkTargets,
+    caveats: safeStringList(packet?.caveats),
+  };
+}
+
 function buildSessionCompactionAudit(report) {
   const candidateFingerprints = Array.isArray(report?.candidateFingerprints)
     ? report.candidateFingerprints.map((candidate) => ({
@@ -899,6 +985,7 @@ export {
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,
+  buildResearchSourceLock,
   buildSessionCompactionAudit,
   buildSelectedAuditTrailEntry,
   containsPrivateLikeText,

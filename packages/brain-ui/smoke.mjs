@@ -20,6 +20,7 @@ try {
     sessionCompactionAudit,
     benchmarkSummary,
     canaryRollout,
+    researchSourceLock,
     promptContextPreview,
     releaseReadiness,
     localAudit,
@@ -36,6 +37,7 @@ try {
     json(`${base}/fixtures/session-compaction-local-audit.json`),
     json(`${base}/fixtures/benchmark-summary.json`),
     json(`${base}/fixtures/canary-rollout.json`),
+    json(`${base}/fixtures/research-source-lock.json`),
     json(`${base}/fixtures/prompt-context-preview.json`),
     json(`${base}/fixtures/release-readiness.json`),
     json(`${base}/fixtures/local-container-audit.json`),
@@ -53,6 +55,7 @@ try {
   assert.match(index, /Compaction Audit/);
   assert.match(index, /Benchmark Dashboard/);
   assert.match(index, /Canary Rollout/);
+  assert.match(index, /Research Source Lock/);
   assert.match(index, /Context Preview/);
   assert.match(index, /Release Readiness/);
   assert.match(index, /Lifecycle Policy/);
@@ -79,6 +82,7 @@ try {
   assert.match(app, /buildSessionCompactionAudit/);
   assert.match(app, /buildBenchmarkDashboard/);
   assert.match(app, /buildCanaryRollout/);
+  assert.match(app, /buildResearchSourceLock/);
   assert.match(app, /buildPromptContextPreview/);
   assert.match(app, /buildReleaseReadinessConsole/);
   assert.match(app, /buildLifecyclePolicyDraft/);
@@ -107,6 +111,7 @@ try {
   assert.match(model, /function buildSessionCompactionAudit/);
   assert.match(model, /function buildBenchmarkDashboard/);
   assert.match(model, /function buildCanaryRollout/);
+  assert.match(model, /function buildResearchSourceLock/);
   assert.match(model, /function buildPromptContextPreview/);
   assert.match(model, /function buildReleaseReadinessConsole/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
@@ -129,6 +134,7 @@ try {
   assert.match(styles, /audit-history/);
   assert.match(styles, /benchmark-verdict/);
   assert.match(styles, /canary-verdict/);
+  assert.match(styles, /source-lock-status/);
   assert.match(styles, /context-section-list/);
   assert.match(styles, /release-verdict/);
   assert.match(styles, /edit-export/);
@@ -185,6 +191,19 @@ try {
   assert.ok(canaryRollout.steps.some((step) => step.id === "rollback"));
   assert.ok(canaryRollout.metricsToCollect.includes("privacy_leak_count"));
   assert.ok(canaryRollout.blockers.includes("human-public-launch-approval-required"));
+  assert.equal(researchSourceLock.mode, "research-source-lock");
+  assert.equal(researchSourceLock.sources.length, 11);
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:gbrain"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:karpathy-llm-wiki"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:obsidian-karpathy-plugin"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:memorybench"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:hermes-memory-provider"));
+  assert.ok(researchSourceLock.sources.some((source) => source.status === "watch"));
+  assert.equal(researchSourceLock.implementationRules.length, 8);
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:topic-paths"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:stale-memory-supersession"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:budgeted-lifecycle-frequency"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:dashboard-to-cluster-zoom"));
   assert.equal(promptContextPreview.ok, true);
   assert.equal(promptContextPreview.mode, "prompt-context-preview");
   assert.equal(promptContextPreview.tokenBudget, 900);
@@ -290,6 +309,7 @@ try {
     sessionCompactionAudit,
     benchmarkSummary,
     canaryRollout,
+    researchSourceLock,
     promptContextPreview,
     releaseReadiness,
     localAudit,
@@ -319,6 +339,7 @@ try {
           "session-compaction-audit",
           "benchmark-dashboard",
           "canary-rollout",
+          "research-source-lock",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy",

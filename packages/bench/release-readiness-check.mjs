@@ -37,6 +37,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-nucleus-snapshot-review.md`,
   `${reviewDir}/brain-ui-research-lineage-evidence.md`,
   `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
+  `${reviewDir}/brain-ui-research-source-lock-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-research-source-lock-review.md`,
   `${reviewDir}/brain-ui-compaction-audit-evidence.md`,
   `${reviewDir}/gemini-brain-ui-compaction-audit-review.md`,
   `${reviewDir}/brain-ui-benchmark-dashboard-evidence.md`,
@@ -110,6 +112,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-nucleus-snapshot.png`,
   `${reviewDir}/ui-evidence/brain-ui-research-lineage-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-research-lineage.png`,
+  `${reviewDir}/ui-evidence/brain-ui-research-source-lock-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-research-source-lock.png`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit.png`,
   `${reviewDir}/ui-evidence/brain-ui-benchmark-dashboard-evidence.json`,
@@ -343,6 +347,35 @@ check("dom evidence is sane", () => {
   assert.equal(lineageEvidence.evidence.hasDecision, true);
   assert.equal(lineageEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(lineageEvidence.consoleMessages.length, 0);
+
+  const sourceLockEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-research-source-lock-evidence.json"), "utf8"),
+  );
+  assert.equal(sourceLockEvidence.ok, true);
+  assert.equal(sourceLockEvidence.mode, "fixture-brain-ui-research-source-lock");
+  assert.equal(sourceLockEvidence.writesRealFiles, false);
+  assert.equal(sourceLockEvidence.metricsOnly, true);
+  assert.equal(sourceLockEvidence.heading, "Research Source Lock");
+  assert.equal(sourceLockEvidence.statusText, "source locked");
+  assert.equal(sourceLockEvidence.sourceCount, 11);
+  assert.ok(sourceLockEvidence.sourceLockedCount >= 9);
+  assert.ok(sourceLockEvidence.recentSourceCount >= 6);
+  assert.equal(sourceLockEvidence.privacyLeakCount, 0);
+  assert.equal(sourceLockEvidence.hasGBrain, true);
+  assert.equal(sourceLockEvidence.hasLlmWiki, true);
+  assert.equal(sourceLockEvidence.hasObsidian, true);
+  assert.equal(sourceLockEvidence.hasMemoryBench, true);
+  assert.equal(sourceLockEvidence.hasHermes, true);
+  assert.equal(sourceLockEvidence.hasStorageWatch, true);
+  assert.equal(sourceLockEvidence.implementationRuleCount, 8);
+  assert.equal(sourceLockEvidence.benchmarkTargetCount, 3);
+  assert.ok(sourceLockEvidence.copyButtons >= 3);
+  assert.ok(sourceLockEvidence.sourceLinks >= 10);
+  assert.equal(sourceLockEvidence.visibleSourceLock, true);
+  assert.equal(sourceLockEvidence.visibleTextHasPrivate, false);
+  assert.equal(sourceLockEvidence.containerShowsHumanLabels, true);
+  assert.equal(sourceLockEvidence.technicalExportCollapsed, true);
+  assert.equal(sourceLockEvidence.consoleErrorCount, 0);
 
   const compactionAuditEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-compaction-audit-evidence.json"), "utf8"),
@@ -624,6 +657,7 @@ check("release state is conservative", () => {
     "brain-ui-session-compaction-audit",
     "brain-ui-benchmark-dashboard",
     "brain-ui-canary-rollout",
+    "brain-ui-research-source-lock",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
     "session-compaction-benchmark",
@@ -667,6 +701,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /compaction audit|local-session compaction/i, `${file} missing compaction audit`);
     assert.match(text, /benchmark dashboard|benchmark summary|compaction benchmark/i, `${file} missing benchmark dashboard`);
     assert.match(text, /canary rollout|one-agent canary|selfmem_update/i, `${file} missing canary rollout`);
+    assert.match(text, /research source lock|source-lock|source lock/i, `${file} missing research source lock`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);

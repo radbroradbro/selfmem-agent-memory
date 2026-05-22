@@ -16,6 +16,7 @@ import {
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,
+  buildResearchSourceLock,
   buildSessionCompactionAudit,
   containsPrivateLikeText,
   filteredNodes,
@@ -30,6 +31,7 @@ const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.j
 const sessionCompactionFixture = JSON.parse(await readFile(join(here, "fixtures/session-compaction-local-audit.json"), "utf8"));
 const benchmarkSummaryFixture = JSON.parse(await readFile(join(here, "fixtures/benchmark-summary.json"), "utf8"));
 const canaryRolloutFixture = JSON.parse(await readFile(join(here, "fixtures/canary-rollout.json"), "utf8"));
+const researchSourceLockFixture = JSON.parse(await readFile(join(here, "fixtures/research-source-lock.json"), "utf8"));
 const promptContextFixture = JSON.parse(await readFile(join(here, "fixtures/prompt-context-preview.json"), "utf8"));
 const releaseReadinessFixture = JSON.parse(await readFile(join(here, "fixtures/release-readiness.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
@@ -250,6 +252,29 @@ try {
   assert.ok(canaryRollout.blockers.includes("human-public-launch-approval-required"));
   assert.ok(canaryRollout.passCriteria.some((criterion) => criterion.includes("privacy_leak_count")));
   assert.doesNotMatch(JSON.stringify(canaryRollout), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+
+  const researchSourceLock = buildResearchSourceLock(researchSourceLockFixture);
+  assert.equal(researchSourceLock.mode, "fixture-research-source-lock");
+  assert.equal(researchSourceLock.writesRealFiles, false);
+  assert.equal(researchSourceLock.metricsOnly, true);
+  assert.equal(researchSourceLock.sourceCount, 11);
+  assert.ok(researchSourceLock.sourceLockedCount >= 9);
+  assert.ok(researchSourceLock.unresolvedCount >= 0);
+  assert.ok(researchSourceLock.recentSourceCount >= 6);
+  assert.equal(researchSourceLock.privacyLeakCount, 0);
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:gbrain"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:karpathy-llm-wiki"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:obsidian-karpathy-plugin"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:memorybench"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:hermes-memory-provider"));
+  assert.ok(researchSourceLock.sources.some((source) => source.id === "source:storage-not-memory" && source.status === "watch"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:human-readable-brain"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:topic-paths"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:stale-memory-supersession"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:budgeted-lifecycle-frequency"));
+  assert.ok(researchSourceLock.implementationRules.some((rule) => rule.id === "rule:dashboard-to-cluster-zoom"));
+  assert.ok(researchSourceLock.benchmarkTargets.some((target) => target.id === "bench:agentic-canary"));
+  assert.doesNotMatch(JSON.stringify(researchSourceLock), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const promptContext = buildPromptContextPreview(fixture, promptContextFixture);
   assert.equal(promptContext.mode, "fixture-prompt-context-preview");
@@ -710,6 +735,7 @@ try {
     sessionCompactionAudit,
     benchmarkDashboard,
     canaryRollout,
+    researchSourceLock,
     promptContext,
     releaseReadiness,
     policyDraft,
@@ -774,6 +800,7 @@ try {
           "session-compaction-audit",
           "benchmark-dashboard",
           "canary-rollout",
+          "research-source-lock",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy-draft",

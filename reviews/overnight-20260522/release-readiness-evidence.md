@@ -112,6 +112,11 @@ Scope:
   exposes the one-agent canary path, dry-run/apply/observe/rollback steps,
   metrics to collect, blockers, and caveats without touching real agent state
   or local paths.
+- Added Brain UI Research Source Lock evidence to the release gate. The UI now
+  exposes public source cards, implementation rules, topic/subtopic path
+  direction, stale-memory supersession, budgeted lifecycle frequency,
+  dashboard-to-cluster zoom, benchmark targets, and caveats without touching
+  private research notes or local memory.
 - Added Gemini review for the browser evidence gate and made that review packet
   a required release-readiness artifact.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
@@ -165,6 +170,11 @@ What `release:check` verifies:
   leaks, dry-run and rollback steps, p95 latency and privacy metrics, human
   approval blocker, zero console errors, and no private/key-shaped visible
   text,
+- Brain UI Research Source Lock evidence exists and reports fixture source-lock
+  mode, 11 public sources, 10 source-locked sources, 8 implementation rules,
+  topic/subtopic path, stale-memory supersession, budgeted lifecycle frequency,
+  dashboard-to-cluster zoom, collapsed technical export, zero console errors,
+  and no private/key-shaped visible text,
 - Brain UI Context Preview evidence exists and reports selected memories,
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
@@ -254,8 +264,8 @@ Cold review response:
   write-confirmed selected lifecycle policy apply, private/key-shaped policy
   rejection, dry-run sync reporting, write-confirmed selected review queue
   apply, private/key-shaped review rejection, dynamic graph layout spacing, graph navigation controls, Compaction Audit metrics-only rendering, Context Preview rendering, Release Readiness rendering, audit-log write intent coverage,
-  Benchmark Dashboard rendering, Canary Rollout rendering, and public-safe
-  serialization.
+  Benchmark Dashboard rendering, Canary Rollout rendering, Research Source
+  Lock rendering, and public-safe serialization.
 
 Known limits:
 

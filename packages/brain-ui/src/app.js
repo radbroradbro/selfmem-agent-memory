@@ -11,6 +11,7 @@ import {
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,
+  buildResearchSourceLock,
   buildSessionCompactionAudit,
   containsPrivateLikeText,
   filteredNodes as selectFilteredNodes,
@@ -33,6 +34,7 @@ const state = {
   sessionCompactionAudit: null,
   benchmarkSummary: null,
   canaryRollout: null,
+  researchSourceLock: null,
   promptContextPreview: null,
   releaseReadiness: null,
   selectedVaultPath: "",
@@ -68,6 +70,11 @@ const provenance = document.querySelector("#provenance");
 const snapshotSummary = document.querySelector("#snapshotSummary");
 const snapshotExport = document.querySelector("#snapshotExport");
 const researchLineage = document.querySelector("#researchLineage");
+const researchSourceLockStatus = document.querySelector("#researchSourceLockStatus");
+const researchSourceLockSummary = document.querySelector("#researchSourceLockSummary");
+const researchSourceLockSources = document.querySelector("#researchSourceLockSources");
+const researchSourceLockRules = document.querySelector("#researchSourceLockRules");
+const researchSourceLockExport = document.querySelector("#researchSourceLockExport");
 const compactionAuditSummary = document.querySelector("#compactionAuditSummary");
 const compactionAuditFingerprints = document.querySelector("#compactionAuditFingerprints");
 const compactionAuditExport = document.querySelector("#compactionAuditExport");
@@ -193,6 +200,7 @@ const [
   sessionCompactionResponse,
   benchmarkResponse,
   canaryResponse,
+  researchSourceLockResponse,
   promptContextResponse,
   releaseReadinessResponse,
   localAuditResponse,
@@ -204,6 +212,7 @@ const [
   fetch("/fixtures/session-compaction-local-audit.json"),
   fetch("/fixtures/benchmark-summary.json"),
   fetch("/fixtures/canary-rollout.json"),
+  fetch("/fixtures/research-source-lock.json"),
   fetch("/fixtures/prompt-context-preview.json"),
   fetch("/fixtures/release-readiness.json"),
   fetch("/fixtures/local-container-audit.json"),
@@ -215,6 +224,7 @@ state.syncReport = await syncResponse.json();
 state.sessionCompactionAudit = await sessionCompactionResponse.json();
 state.benchmarkSummary = await benchmarkResponse.json();
 state.canaryRollout = await canaryResponse.json();
+state.researchSourceLock = await researchSourceLockResponse.json();
 state.promptContextPreview = await promptContextResponse.json();
 state.releaseReadiness = await releaseReadinessResponse.json();
 state.localAudit = await localAuditResponse.json();
@@ -524,6 +534,7 @@ function render() {
   renderDetails(selected);
   renderNucleusSnapshot();
   renderResearchLineage();
+  renderResearchSourceLock();
   renderSessionCompactionAudit();
   renderBenchmarkDashboard();
   renderCanaryRollout();
@@ -559,11 +570,11 @@ function renderContainerHealth() {
   healthStatus.textContent = health.health.status;
   healthStatus.dataset.status = health.health.status;
   containerFacts.replaceChildren(
-    fact("Agent", health.agentLabel),
-    fact("Local", health.localContainer),
-    fact("Hosted read", health.sourceSupermemoryContainer),
-    fact("Provider", health.providerMode),
-    fact("Writes", health.writeMode),
+    copyFact("Agent", health.agentLabel),
+    copyFact("Local Brain", health.localContainer),
+    copyFact("Hosted History", health.sourceSupermemoryContainer),
+    copyFact("Provider", health.providerMode),
+    fact("Writes", humanLabel(health.writeMode)),
     fact("Lifecycle", health.health.lifecycleEvents),
     fact("Traces", health.health.retrievalTraces),
     fact("Leaks", health.health.privacyLeakCount),
@@ -734,7 +745,7 @@ function renderResearchLineage() {
     const list = document.createElement("ol");
     card.className = "lineage-card";
     title.textContent = trail.query.title;
-    meta.textContent = `${packet.mode} | writesRealFiles: ${packet.writesRealFiles}`;
+    meta.textContent = "Fixture-safe trail. No real files changed.";
     appendLineageStep(list, "query", trail.query);
     for (const step of trail.steps) {
       appendLineageStep(list, step.edgeKind, step.node);
@@ -742,6 +753,59 @@ function renderResearchLineage() {
     card.append(title, meta, list);
     researchLineage.append(card);
   }
+}
+
+function renderResearchSourceLock() {
+  const packet = buildResearchSourceLock(state.researchSourceLock);
+  const statusText =
+    packet.unresolvedCount === 0
+      ? "source locked"
+      : `${packet.sourceLockedCount}/${packet.sourceCount} locked`;
+  researchSourceLockStatus.textContent = statusText;
+  researchSourceLockStatus.dataset.status = packet.unresolvedCount === 0 ? "source-locked" : "needs-review";
+  researchSourceLockSummary.replaceChildren(
+    stat("Sources", packet.sourceCount),
+    stat("Locked", packet.sourceLockedCount),
+    stat("Needs review", packet.unresolvedCount),
+    stat("Recent", packet.recentSourceCount),
+    stat("Benchmarks", packet.benchmarkTargets.length),
+    stat("Leaks", packet.privacyLeakCount),
+  );
+
+  researchSourceLockSources.replaceChildren();
+  for (const source of packet.sources) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const sourceLink = document.createElement(source.url ? "a" : "span");
+    const small = document.createElement("small");
+    item.dataset.status = source.status;
+    item.dataset.sourceType = source.sourceType;
+    strong.textContent = humanLabel(source.status);
+    sourceLink.textContent = source.title;
+    if (source.url) {
+      sourceLink.href = source.url;
+      sourceLink.target = "_blank";
+      sourceLink.rel = "noreferrer";
+    }
+    small.textContent = `${humanLabel(source.sourceType)} | ${humanLabel(source.claimKind)} | ${Math.round(source.confidence * 100)}% confidence`;
+    item.append(strong, sourceLink, small);
+    researchSourceLockSources.append(item);
+  }
+
+  researchSourceLockRules.replaceChildren();
+  for (const rule of packet.implementationRules) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    strong.textContent = rule.label;
+    span.textContent = rule.decision;
+    small.textContent = `${rule.sourceIds.length} supporting source${rule.sourceIds.length === 1 ? "" : "s"}`;
+    item.append(strong, span, small);
+    researchSourceLockRules.append(item);
+  }
+
+  researchSourceLockExport.textContent = JSON.stringify(packet, null, 2);
 }
 
 function renderSessionCompactionAudit() {
@@ -1131,6 +1195,21 @@ function appendLineageStep(list, label, node) {
   span.textContent = node.title;
   item.append(strong, span);
   list.append(item);
+}
+
+function humanLabel(value) {
+  return String(value ?? "")
+    .replaceAll(/[_-]/g, " ")
+    .replaceAll(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => {
+      if (/^[A-Z0-9]+$/.test(word)) return word;
+      if (/^\d/.test(word)) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
 }
 
 function renderEditExport() {
@@ -1590,6 +1669,33 @@ function fact(label, value) {
   dt.textContent = label;
   const dd = document.createElement("dd");
   dd.textContent = value;
+  const fragment = document.createDocumentFragment();
+  fragment.append(dt, dd);
+  return fragment;
+}
+
+function copyFact(label, value) {
+  const exact = String(value ?? "");
+  const dt = document.createElement("dt");
+  const dd = document.createElement("dd");
+  const labelText = document.createElement("span");
+  const button = document.createElement("button");
+  dt.textContent = label;
+  dd.className = "copyable-fact";
+  labelText.textContent = humanLabel(exact);
+  labelText.title = exact;
+  button.type = "button";
+  button.textContent = "Copy";
+  button.setAttribute("aria-label", `Copy exact ${label}`);
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(exact);
+      button.textContent = "Copied";
+    } catch {
+      button.textContent = "Copy unavailable";
+    }
+  });
+  dd.append(labelText, button);
   const fragment = document.createDocumentFragment();
   fragment.append(dt, dd);
   return fragment;

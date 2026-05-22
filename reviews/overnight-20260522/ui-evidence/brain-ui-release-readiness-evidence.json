@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "head": "8c26de7ded0b533b127f3c4b80b2f379d24aa975",
+  "head": "pending-local-source-lock-slice",
   "mode": "fixture-brain-ui-release-readiness",
   "writesRealFiles": false,
   "evidence": {
@@ -14,7 +14,7 @@
     "codeCiConclusion": "success",
     "codeShortSha": "0ec4396",
     "blockerCount": 5,
-    "surfaceCount": 15,
+    "surfaceCount": 16,
     "manualActionCount": 5,
     "privacyLeakCount": 0,
     "fixtureOnly": true,
@@ -22,6 +22,7 @@
     "hasHumanApprovalBlocker": true,
     "hasClaudeBlocker": true,
     "hasManualCanaryAction": true,
+    "hasResearchSourceLockSurface": true,
     "hasPrivateOrKeyText": false
   },
   "consoleErrorCount": 0,

@@ -16,7 +16,7 @@ The current PR adds:
   content-free pre-write audit logging;
 - a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
-  lineage, Compaction Audit, Benchmark Dashboard, Canary Rollout, Context Preview, Release Readiness, vault preview, sync-report
+  lineage, Research Source Lock, Compaction Audit, Benchmark Dashboard, Canary Rollout, Context Preview, Release Readiness, vault preview, sync-report
   inspection,
   selected vault sync dry-run, selected vault sync apply, selected
   local-container browse, lifecycle policy preview, selected lifecycle policy apply, memory
@@ -32,8 +32,9 @@ The current PR adds:
 Preview surfaces include selected local-container browse, selected vault sync
 dry-run, selected vault sync apply, lifecycle policy, lifecycle policy apply,
 memory review queue, review queue apply, local memory edit, overlay browse,
-materialize, dynamic graph layout, graph navigation, Compaction Audit,
-Benchmark Dashboard, Canary Rollout, Context Preview, and Release Readiness.
+materialize, dynamic graph layout, graph navigation, Research Source Lock,
+Compaction Audit, Benchmark Dashboard, Canary Rollout, Context Preview, and
+Release Readiness.
 
 ## Safety Boundary
 
@@ -98,6 +99,10 @@ Latest verified head before this draft refresh:
   apply, observe, and rollback steps, 11 metrics to collect, public launch
   still `FAIL`, owner approval required, zero console errors, and no
   private/key-shaped visible text
+- Research Source Lock evidence: 11 public sources, 8 implementation rules,
+  topic/subtopic paths, stale-memory supersession, budgeted lifecycle
+  frequency, dashboard-to-cluster zoom, collapsed technical export, zero
+  console errors, and no private/key-shaped visible text
 - Context Preview evidence: fixture recall packet with selected memories,
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible

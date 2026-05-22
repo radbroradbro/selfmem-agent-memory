@@ -48,6 +48,11 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Brain UI Canary Rollout panel that renders one-agent canary prerequisites,
   dry-run/apply/observe/rollback steps, metrics to collect, blockers, and
   caveats without touching a real agent or local path.
+- Brain UI Research Source Lock panel that renders current public sources,
+  implementation rules, topic-path and stale-memory supersession decisions,
+  dashboard-to-cluster zoom direction, benchmark targets, collapsed technical
+  export, and source caveats without touching private research notes or local
+  memory.
 - Brain UI Context Preview panel that renders the fixture prompt recall packet,
   selected memories, omitted candidates, token budget, read-only hosted mode,
   local-only write mode, and safety counters.
@@ -172,7 +177,7 @@ Controller follow-up after that sandbox run:
   privacy leaks, zero console errors, and no private/key-shaped visible text.
 - Brain UI Release Readiness local verification passed fresh Brain UI smoke
   and interaction smoke. Browser evidence reports public launch verdict `FAIL`,
-  `productionReady: false`, 15 proven surfaces, 5 remaining blockers, 5 manual
+  `productionReady: false`, 16 proven surfaces, 5 remaining blockers, 5 manual
   actions, fixture-only evidence, hosted write-back disabled, zero privacy
   leaks, zero console errors, and no private/key-shaped visible text. GitHub
   Actions CI run `26301888111` passed on `8c26de7`.
@@ -229,6 +234,11 @@ evidence for:
 - canary rollout evidence with fixture one-agent rollout status, dry-run and
   rollback path, metrics to collect, public launch still blocked, zero privacy
   leaks, zero console errors, and no private/key-shaped visible text.
+- research source lock evidence with 11 public sources, 8 implementation
+  rules, topic/subtopic path, stale-memory supersession, budgeted
+  lifecycle-frequency decisions, dashboard-to-cluster zoom direction,
+  collapsed technical export, zero privacy leaks, zero console errors, and no
+  private/key-shaped visible text.
 - context preview evidence with the fixture prompt recall packet, selected and
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible

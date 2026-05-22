@@ -84,6 +84,35 @@ recall/write surfaces.
 The Nucleus Index makes those different host events comparable without forcing
 the runtimes to behave identically.
 
+## Topic Tree And Staleness
+
+The Nucleus should expose a topic tree, not only loose graph edges. Each memory
+or derived page may carry:
+
+- a major topic,
+- a subtopic path,
+- a current state such as open, resolved, superseded, or archived,
+- a salience score,
+- a recency score,
+- source and lifecycle provenance.
+
+Retrieval can then boost candidates that sit on the same topic path as the
+current work, while still using dense, sparse, graph, temporal, and rerank
+channels. This helps code projects, legal matters, agent operations, and
+research threads stay navigable as they grow.
+
+The Brain UI should show this as a scale ladder:
+
+1. dashboard health and recent activity,
+2. topic clusters,
+3. linked paths inside a topic,
+4. source-backed documents and memories.
+
+Resolved bugs and finished tasks should not vanish, but they should be
+superseded. A fixed bug can still teach the system how the issue arose and how
+to avoid it, while the open-bug memory gets demoted so it does not confuse
+future prompt context.
+
 ## Sleep Cycle
 
 Hermes already has sleep/compression-style lifecycle behavior. RecallWeave's
