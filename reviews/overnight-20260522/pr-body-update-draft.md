@@ -67,6 +67,8 @@ Retry note:
 - It was refreshed again after the Brain UI Model Matrix slice passed local
   smoke, interaction smoke, browser evidence, release readiness check, and
   Gemini focused review.
+- It was refreshed again after the Brain UI Model Matrix slice passed GitHub
+  Actions CI run `26306469240` on `ff6f343`.
 - A top-level PR comment retry after docs/evidence refresh commit `1074bfd` and
   CI run `26300868065` still returned the same 403.
 - A top-level PR review comment retry after docs/blocker refresh commit
@@ -162,6 +164,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26304465466` passed on `e043d6b`, the Brain UI Research Source Lock commit.
 - GitHub Actions CI: run `26305284384` passed on `13cbe8d`, the May 2026 model/autoresearch matrix gate commit.
 - GitHub Actions CI: run `26305635737` passed on `22e17b1`, the release gate hardening commit for the model/autoresearch matrix.
+- GitHub Actions CI: run `26306469240` passed on `ff6f343`, the Brain UI Model Matrix commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

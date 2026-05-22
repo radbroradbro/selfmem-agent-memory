@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `22e17b1`, run `26305635737`, success.
+  `ff6f343`, run `26306469240`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -41,6 +41,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26304465466` on `e043d6b`: success.
 - GitHub Actions CI run `26305284384` on `13cbe8d`: success.
 - GitHub Actions CI run `26305635737` on `22e17b1`: success.
+- GitHub Actions CI run `26306469240` on `ff6f343`: success.
 
 ## Shipped Overnight Slices
 
@@ -208,7 +209,8 @@ Latest local verification before this summary:
   Browser evidence reports 6 provider arms, 4 cloud arms, 2 local arms, Apple
   Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA cloud arms, query
   expansion off, env-only credentials, 5 gates, 3 blockers, zero console
-  errors, and no private/key-shaped visible text.
+  errors, and no private/key-shaped visible text. GitHub Actions CI run
+  `26306469240` passed on `ff6f343`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture

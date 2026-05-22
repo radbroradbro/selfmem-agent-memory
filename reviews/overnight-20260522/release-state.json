@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "22e17b1c3735e37916d9578a74c61c03a541f464",
-    "ciRunId": 26305635737,
+    "headSha": "ff6f34364f4361aaaa1b70ccb334618a415cfecc",
+    "ciRunId": 26306469240,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the release gate began enforcing the May 2026 model matrix and autoresearch benchmark plan. GitHub Actions run 26305635737 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after the Brain UI Model Matrix was added and the release gate began requiring model-matrix browser evidence. GitHub Actions run 26306469240 passed Test, Full smoke, and Release readiness check."
   },
   "releaseStateGuard": {
     "enabled": true,

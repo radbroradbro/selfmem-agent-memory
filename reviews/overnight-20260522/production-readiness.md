@@ -222,7 +222,8 @@ Controller follow-up after that sandbox run:
   focused review. Browser evidence reports 6 provider arms, 4 cloud arms, 2
   local arms, Apple Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA
   cloud arms, query expansion off, env-only credentials, 5 gates, 3 blockers,
-  zero console errors, and no private/key-shaped visible text.
+  zero console errors, and no private/key-shaped visible text. GitHub Actions
+  CI run `26306469240` passed on `ff6f343`.
 
 ## UI Evidence
 
