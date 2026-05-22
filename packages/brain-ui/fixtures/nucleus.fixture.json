@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-05-22T08:30:00.000Z",
+  "roots": {
+    "indexPageId": "wiki:index",
+    "methodologyPageId": "wiki:methodology",
+    "activeSessionId": "session:fixture-overnight"
+  },
+  "nodes": [
+    {
+      "id": "wiki:index",
+      "kind": "wiki_page",
+      "title": "RecallWeave Index",
+      "createdAt": "2026-05-22T08:00:00.000Z",
+      "updatedAt": "2026-05-22T08:30:00.000Z",
+      "tags": ["wiki", "index"],
+      "editable": true,
+      "confidence": 0.96,
+      "metadata": {
+        "path": "vault/wiki/index.md",
+        "body": "# RecallWeave Index\n\nThis fixture brain links native host lifecycle, hybrid retrieval, LLM-wiki pages, and research lineage. It contains no private user data."
+      }
+    },
+    {
+      "id": "memory:hybrid-recall",
+      "kind": "memory",
+      "title": "Hybrid recall should expose dense, sparse, graph, and temporal channels",
+      "createdAt": "2026-05-22T08:02:00.000Z",
+      "updatedAt": "2026-05-22T08:02:00.000Z",
+      "scope": "project",
+      "containerTag": "fixture_recallweave_public",
+      "tags": ["hybrid-search", "retrieval"],
+      "confidence": 0.91,
+      "provenance": [
+        {
+          "sourceId": "source:fixture-design-note",
+          "quote": "Hybrid retrieval must be visible in traces so production recall failures can be diagnosed.",
+          "createdAt": "2026-05-22T08:02:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "trace:context-001",
+      "kind": "retrieval_trace",
+      "title": "Retrieval trace for native memory optimization",
+      "createdAt": "2026-05-22T08:05:00.000Z",
+      "updatedAt": "2026-05-22T08:05:00.000Z",
+      "tags": ["trace", "hybrid-search"],
+      "metadata": {
+        "query": "native memory optimization",
+        "channels": "dense, sparse, graph, temporal",
+        "candidateCount": 12,
+        "rerankCount": 6,
+        "finalContextTokens": 710,
+        "injected": true
+      }
+    },
+    {
+      "id": "event:hermes-pre-compress",
+      "kind": "lifecycle_event",
+      "title": "Hermes pre-compression checkpoint preserved compact evidence",
+      "createdAt": "2026-05-22T08:07:00.000Z",
+      "updatedAt": "2026-05-22T08:07:00.000Z",
+      "tags": ["hermes", "sleep-cycle", "pre-compress"],
+      "metadata": {
+        "runtime": "hermes",
+        "phase": "pre_compress",
+        "result": "fixture preserved before compression",
+        "privacyLeakCount": 0
+      }
+    },
+    {
+      "id": "doc:native-memory-plan",
+      "kind": "derived_doc",
+      "title": "Native Memory Optimization Plan",
+      "createdAt": "2026-05-22T08:10:00.000Z",
+      "updatedAt": "2026-05-22T08:18:00.000Z",
+      "tags": ["native-memory", "editable-doc"],
+      "editable": true,
+      "confidence": 0.88,
+      "metadata": {
+        "path": "vault/wiki/decisions/native-memory-optimization.md",
+        "body": "## Decision\n\nUse each host's native memory lifecycle. Hermes supplies provider hooks and sleep/compression rhythm. RecallWeave supplies local storage, hybrid retrieval, Nucleus tracing, and LLM-wiki sync.\n\n## Test\n\nRun fixture UI evidence first, then host smoke tests, then local-only redacted session compaction."
+      }
+    },
+    {
+      "id": "research:gbrain-query",
+      "kind": "research_query",
+      "title": "Which GBrain patterns should RecallWeave source-lock before UI finalization?",
+      "createdAt": "2026-05-22T08:12:00.000Z",
+      "updatedAt": "2026-05-22T08:22:00.000Z",
+      "tags": ["research", "source-lock"],
+      "metadata": {
+        "status": "open",
+        "pros": ["typed graph links", "eval replay", "doctor/remediation cycle"],
+        "cons": ["avoid copying code before license and attribution review", "different product goal"]
+      }
+    },
+    {
+      "id": "hypothesis:research-lineage",
+      "kind": "hypothesis",
+      "title": "Research lineage makes architecture decisions easier to audit",
+      "createdAt": "2026-05-22T08:14:00.000Z",
+      "updatedAt": "2026-05-22T08:14:00.000Z",
+      "tags": ["research", "hypothesis"],
+      "confidence": 0.84,
+      "metadata": {
+        "testPlan": "Render query, source claim, hypothesis, pros, cons, and decision as connected Nucleus nodes."
+      }
+    },
+    {
+      "id": "decision:ui-fixture-first",
+      "kind": "decision",
+      "title": "Brain UI evidence must start with sanitized fixture data",
+      "createdAt": "2026-05-22T08:16:00.000Z",
+      "updatedAt": "2026-05-22T08:16:00.000Z",
+      "tags": ["ui", "safety", "decision"],
+      "confidence": 0.98,
+      "metadata": {
+        "reason": "Public screenshots and recordings cannot expose private memories, private paths, agent logs, or credentials."
+      }
+    },
+    {
+      "id": "source:fixture-design-note",
+      "kind": "source",
+      "title": "Fixture design note",
+      "createdAt": "2026-05-22T08:00:00.000Z",
+      "updatedAt": "2026-05-22T08:00:00.000Z",
+      "tags": ["fixture", "source"],
+      "metadata": {
+        "publicSafe": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:index-cites-memory",
+      "from": "wiki:index",
+      "to": "memory:hybrid-recall",
+      "kind": "cites",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    },
+    {
+      "id": "edge:trace-injected-memory",
+      "from": "trace:context-001",
+      "to": "memory:hybrid-recall",
+      "kind": "injected_into",
+      "createdAt": "2026-05-22T08:30:00.000Z",
+      "weight": 0.91
+    },
+    {
+      "id": "edge:event-captured-trace",
+      "from": "event:hermes-pre-compress",
+      "to": "trace:context-001",
+      "kind": "captured_by",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    },
+    {
+      "id": "edge:doc-derived-memory",
+      "from": "doc:native-memory-plan",
+      "to": "memory:hybrid-recall",
+      "kind": "derived_from",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    },
+    {
+      "id": "edge:research-answers-hypothesis",
+      "from": "research:gbrain-query",
+      "to": "hypothesis:research-lineage",
+      "kind": "answers",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    },
+    {
+      "id": "edge:hypothesis-informs-decision",
+      "from": "hypothesis:research-lineage",
+      "to": "decision:ui-fixture-first",
+      "kind": "informs",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    },
+    {
+      "id": "edge:decision-edits-doc",
+      "from": "decision:ui-fixture-first",
+      "to": "doc:native-memory-plan",
+      "kind": "decides",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    },
+    {
+      "id": "edge:source-supports-memory",
+      "from": "source:fixture-design-note",
+      "to": "memory:hybrid-recall",
+      "kind": "supports",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    },
+    {
+      "id": "edge:wiki-syncs-doc",
+      "from": "wiki:index",
+      "to": "doc:native-memory-plan",
+      "kind": "syncs_to",
+      "createdAt": "2026-05-22T08:30:00.000Z"
+    }
+  ]
+}

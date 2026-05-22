@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RecallWeave Brain</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="nucleus-shell" data-app-shell>
+      <aside class="rail" aria-label="Brain navigation">
+        <div class="brand">
+          <span class="brand-mark">RW</span>
+          <div>
+            <strong>RecallWeave</strong>
+            <span>fixture brain</span>
+          </div>
+        </div>
+        <label class="search">
+          <span>Search</span>
+          <input id="searchInput" type="search" value="native memory" aria-label="Search Nucleus graph" />
+        </label>
+        <nav class="kind-filter" aria-label="Filter by node kind">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="memory">Memory</button>
+          <button data-filter="derived_doc">Docs</button>
+          <button data-filter="retrieval_trace">Trace</button>
+          <button data-filter="research_query">Research</button>
+          <button data-filter="lifecycle_event">Lifecycle</button>
+        </nav>
+        <div class="metrics" aria-label="Brain metrics">
+          <div><span id="nodeCount">0</span><small>nodes</small></div>
+          <div><span id="edgeCount">0</span><small>edges</small></div>
+          <div><span id="editableCount">0</span><small>editable</small></div>
+        </div>
+        <section class="ops-flow" aria-label="Agent update flow">
+          <h2>Update Flow</h2>
+          <ol>
+            <li>Pull update</li>
+            <li>Run doctor</li>
+            <li>Smoke test</li>
+            <li>Open PR</li>
+          </ol>
+        </section>
+      </aside>
+
+      <section class="graph-panel" aria-label="Nucleus graph">
+        <header class="topbar">
+          <div>
+            <h1>Nucleus</h1>
+            <p>Hybrid recall, lifecycle, wiki sync, and research lineage in one inspectable map.</p>
+          </div>
+          <div class="review-pill">fixture-safe evidence</div>
+        </header>
+        <div id="graph" class="graph" aria-label="Interactive Nucleus graph"></div>
+        <section class="timeline" aria-label="Low-noise memory timeline">
+          <header>
+            <h2>Timeline</h2>
+            <span>chronological derived events</span>
+          </header>
+          <ol id="timelineList"></ol>
+        </section>
+      </section>
+
+      <aside class="detail-panel" aria-label="Node details">
+        <header>
+          <span id="detailKind">node</span>
+          <h2 id="detailTitle">Loading</h2>
+        </header>
+        <dl class="facts" id="detailFacts"></dl>
+        <section>
+          <h3>Provenance</h3>
+          <div id="provenance" class="provenance"></div>
+        </section>
+        <section>
+          <h3>Derived Doc Editor</h3>
+          <textarea id="docEditor" aria-label="Derived document editor"></textarea>
+          <div class="editor-actions">
+            <button id="saveEdit">Save fixture edit</button>
+            <button id="resetEdit">Reset</button>
+          </div>
+          <p id="editStatus" role="status"></p>
+        </section>
+      </aside>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

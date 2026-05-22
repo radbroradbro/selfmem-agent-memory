@@ -25,6 +25,7 @@ Seeded from public `main` at `f498173`.
 - `docs/LLM_WIKI_SYNC.md`
 - `docs/RESEARCH_LINEAGE.md`
 - `docs/PRODUCTION_READINESS.md`
+- `packages/brain-ui/`
 
 ## Design Commitments
 

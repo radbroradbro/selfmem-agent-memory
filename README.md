@@ -161,6 +161,7 @@ auth state, browser state, or provider keys.
 
 - [User manual](docs/USER_MANUAL.md)
 - [Visual guide](docs/VISUAL_GUIDE.md)
+- [Brain UI](docs/BRAIN_UI.md)
 - [Compatibility notes](docs/COMPATIBILITY.md)
 - [Nucleus Index](docs/NUCLEUS_INDEX.md)
 - [Research lineage](docs/RESEARCH_LINEAGE.md)

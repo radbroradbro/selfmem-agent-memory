@@ -1,0 +1,35 @@
+{
+  "title": "Native Memory Optimization Plan",
+  "kind": "derived doc",
+  "status": "Saved locally for this fixture review.",
+  "metrics": [
+    "9",
+    "9",
+    "2"
+  ],
+  "updateFlow": [
+    "Pull update",
+    "Run doctor",
+    "Smoke test",
+    "Open PR"
+  ],
+  "nodeLabels": [
+    "wiki page: RecallWeave Index",
+    "memory: Hybrid recall should expose dense, sparse, graph, and temporal channels",
+    "retrieval trace: Retrieval trace for native memory optimization",
+    "lifecycle event: Hermes pre-compression checkpoint preserved compact evidence",
+    "derived doc: Native Memory Optimization Plan",
+    "research query: Which GBrain patterns should RecallWeave source-lock before UI finalization?",
+    "hypothesis: Research lineage makes architecture decisions easier to audit",
+    "decision: Brain UI evidence must start with sanitized fixture data",
+    "source: Fixture design note"
+  ],
+  "confidenceLabels": [
+    "96% confidence",
+    "91% confidence",
+    "88% confidence",
+    "84% confidence",
+    "98% confidence"
+  ],
+  "editorChars": 238
+}
