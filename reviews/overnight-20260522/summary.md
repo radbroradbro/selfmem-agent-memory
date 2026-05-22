@@ -241,7 +241,7 @@ Latest local verification before this summary:
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 13 proven requirements, 5 blocked
+  `mayCallUpdateGoalComplete: false`, 14 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement, preserving the reviewer, GitHub,
   human approval, hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.
@@ -264,6 +264,10 @@ Latest local verification before this summary:
   p50/p95 recall and store latency, privacy counters, and rollback readiness.
   The fixture report remains `fixtureOnly: true` and fails `--strict-real`.
   GitHub Actions CI run `26310773948` passed on `6ae4ce7`.
+- Canary diagnostic bundle verification: local `canary:report` now accepts
+  redacted diagnostic directories and ZIP bundles, including metadata-only
+  exports. The release gate zips a relocated fixture, confirms it still reports
+  `fixtureOnly: true`, and confirms strict-real intake rejects it.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,

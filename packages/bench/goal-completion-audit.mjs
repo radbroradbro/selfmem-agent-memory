@@ -135,6 +135,12 @@ const requirements = [
     files.canaryReportGeneratorEvidence,
     files.canaryReportGeneratorReview,
   ]),
+  proven("canary-diagnostic-bundle-report", "Redacted diagnostic directories and zip bundles can be converted into sanitized metrics-only canary reports while relocated fixtures remain fixture-only", [
+    "packages/bench/canary-report-from-trace.mjs",
+    "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary_metadata/trace_metadata_only.jsonl",
+    files.canaryReportGeneratorEvidence,
+    files.canaryReportGeneratorReview,
+  ]),
   blocked("claude-council-review", "Claude/Opus reviewer route remains blocked by missing login", [
     files.claudeBlocked,
   ]),

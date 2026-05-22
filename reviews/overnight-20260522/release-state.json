@@ -63,6 +63,7 @@
     "clean-consumer-smoke",
     "release-blocker-doctor",
     "canary-report-generator",
+    "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
     "hosted-baseline-preflight",
     "github-handoff-packet",

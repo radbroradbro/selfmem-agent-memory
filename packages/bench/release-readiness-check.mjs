@@ -29,6 +29,9 @@ const requiredFiles = [
   "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-memories.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-report.fixture.json",
+  "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary_metadata/trace_metadata_only.jsonl",
+  "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/containers/selfmem_fixture_agent/container-map.json",
+  "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/reliability_reports/latest.json",
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
@@ -920,6 +923,79 @@ check("fresh canary report generator passes", () => {
     assert.equal(intakeReport.fixtureOnly, true);
     assert.equal(intakeReport.countsAsRealRolloutEvidence, false);
     assert.equal(intakeReport.canaryPass, true);
+    const diagnosticReportPath = join(tempRoot, "diagnostic-report.json");
+    const diagnostic = run("node", [
+      "packages/bench/canary-report-from-trace.mjs",
+      "--diagnostic-dir",
+      "packages/bench/fixtures/canary-diagnostic-export.fixture",
+      "--output",
+      diagnosticReportPath,
+    ]);
+    const diagnosticReport = JSON.parse(diagnostic.stdout);
+    assert.deepEqual(JSON.parse(readFileSync(diagnosticReportPath, "utf8")), diagnosticReport);
+    assert.equal(diagnosticReport.fixtureOnly, true);
+    assert.equal(diagnosticReport.evidenceSource.inputKind, "diagnostic-dir");
+    assert.equal(diagnosticReport.evidenceSource.traceKind, "trace_metadata_only.jsonl");
+    assert.equal(diagnosticReport.evidenceSource.metadataOnly, true);
+    assert.equal(diagnosticReport.provider.hostedSupermemoryMode, "read-through-only");
+    assert.equal(diagnosticReport.counts.sessionStart, 1);
+    assert.equal(diagnosticReport.counts.beforePromptBuild, 1);
+    assert.equal(diagnosticReport.counts.preCompress, 1);
+    assert.equal(diagnosticReport.counts.agentEnd, 1);
+    assert.equal(diagnosticReport.counts.search, 1);
+    assert.equal(diagnosticReport.counts.store, 1);
+    assert.equal(diagnosticReport.latencyMs.recallP95, 220);
+    assert.equal(diagnosticReport.latencyMs.storeP95, 145);
+    assert.equal(diagnosticReport.quality.hybridSearchCovered, true);
+    assert.equal(diagnosticReport.quality.hostedReadThroughObserved, true);
+    assert.equal(diagnosticReport.privacy.privacyLeakCount, 0);
+    assert.doesNotMatch(diagnostic.stdout, secretPattern);
+    assert.doesNotMatch(diagnostic.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+    const diagnosticIntake = run("node", ["packages/bench/canary-evidence-intake.mjs", "--report", diagnosticReportPath]);
+    const diagnosticIntakeReport = JSON.parse(diagnosticIntake.stdout);
+    assert.equal(diagnosticIntakeReport.fixtureOnly, true);
+    assert.equal(diagnosticIntakeReport.countsAsRealRolloutEvidence, false);
+    assert.equal(diagnosticIntakeReport.canaryPass, true);
+    const diagnosticZip = join(tempRoot, "diagnostic-fixture.zip");
+    const zipCreate = spawnSync("python3", [
+      "-m",
+      "zipfile",
+      "-c",
+      diagnosticZip,
+      "packages/bench/fixtures/canary-diagnostic-export.fixture",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.equal(zipCreate.status, 0, "failed to build diagnostic zip fixture");
+    const diagnosticZipReportPath = join(tempRoot, "diagnostic-zip-report.json");
+    const diagnosticZipRun = run("node", [
+      "packages/bench/canary-report-from-trace.mjs",
+      "--zip",
+      diagnosticZip,
+      "--output",
+      diagnosticZipReportPath,
+    ]);
+    const diagnosticZipReport = JSON.parse(diagnosticZipRun.stdout);
+    assert.equal(diagnosticZipReport.fixtureOnly, true);
+    assert.equal(diagnosticZipReport.evidenceSource.inputKind, "diagnostic-zip");
+    assert.equal(diagnosticZipReport.evidenceSource.traceKind, "trace_metadata_only.jsonl");
+    assert.equal(diagnosticZipReport.latencyMs.storeP95, 145);
+    assert.doesNotMatch(diagnosticZipRun.stdout, secretPattern);
+    assert.doesNotMatch(diagnosticZipRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+    const diagnosticZipStrict = spawnSync("node", [
+      "packages/bench/canary-evidence-intake.mjs",
+      "--report",
+      diagnosticZipReportPath,
+      "--strict-real",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(diagnosticZipStrict.status, 0, "relocated fixture zip must fail --strict-real");
+    assert.match(diagnosticZipStrict.stderr, /strict-real cannot use.*fixture/i);
     const strict = spawnSync("node", ["packages/bench/canary-evidence-intake.mjs", "--report", reportPath, "--strict-real"], {
       cwd: root,
       encoding: "utf8",

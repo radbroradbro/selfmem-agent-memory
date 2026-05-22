@@ -203,7 +203,7 @@ Latest local verification includes the release handoff gate slice.
   `writesRealFiles: false`, `privateLeakCount: 0`, and `hasSecretPattern:
   false`.
 - Local goal completion audit evidence: machine-readable requirement matrix
-  with `goalComplete: false`, 13 proven requirements, 5 blocked requirements,
+  with `goalComplete: false`, 14 proven requirements, 5 blocked requirements,
   and 1 incomplete requirement.
 - Local hosted baseline preflight evidence: offline metrics-only contract,
   no hosted provider call by default, hosted write-back disabled, raw memory
@@ -215,6 +215,9 @@ Latest local verification includes the release handoff gate slice.
 - Local canary report generator: fixture traces produce a metrics-only report,
   normal intake accepts it as fixture evidence, and strict-real intake rejects
   it so fixture evidence cannot satisfy real rollout.
+- Local canary diagnostic bundle generator: redacted diagnostic dirs and ZIPs
+  produce metrics-only reports, copied fixtures remain fixture-only, and
+  strict-real intake rejects them.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6`, captured a 1280 by 1223 screenshot, showed Nucleus, wiki/vault
   sync, Model Matrix, Context Preview, Release Readiness, Compaction Audit,

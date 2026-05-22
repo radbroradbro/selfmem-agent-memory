@@ -24,6 +24,9 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
   production rollout as incomplete until a live sanitized report is reviewed.
 - Added `canary-report-generator` as a proven surface so deployed agents can
   produce the sanitized report consumed by strict canary intake.
+- Added `canary-diagnostic-bundle-report` as a proven surface so redacted
+  diagnostic directories and ZIP bundles can produce the same sanitized report
+  shape while copied fixtures still fail strict real-rollout intake.
 - Updated `packages/bench/release-readiness-check.mjs` so release readiness now
   requires the audit script, evidence file, Gemini review, package script, and
   a fresh audit run.
@@ -37,7 +40,7 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 13 proven requirements
+- 14 proven requirements
 - 5 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
@@ -57,6 +60,9 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
   bundled fixture reports `countsAsRealRolloutEvidence: false`.
 - Canary report generation can produce that report from Hermes/OpenClaw traces,
   but fixture-derived reports still fail `--strict-real`.
+- Canary diagnostic bundle generation can produce that report from metadata-only
+  redacted diagnostic exports, but relocated fixture ZIPs still fail
+  `--strict-real`.
 - Real-container production rollout is still a canary step, not complete.
 
 ## Verification

@@ -320,7 +320,7 @@ evidence for:
   zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI
   runs `26308475033` on `6a33e62` and `26308588261` on `8efe4d0` passed.
 - goal completion audit evidence with `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 13 proven requirements, 5 blocked
+  `mayCallUpdateGoalComplete: false`, 14 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement. This keeps production readiness
   separate from the native thread goal completion claim. GitHub Actions CI run
   `26308994908` passed on `13efb18`.
@@ -337,6 +337,9 @@ evidence for:
 - canary report generator evidence with trace-derived lifecycle counts,
   hybrid-search coverage, recall/store latency, privacy counters, event
   fingerprints, and fixture rejection under `--strict-real`.
+- canary diagnostic bundle evidence with metadata-only directory and ZIP intake,
+  relocated fixture detection, strict-real fixture rejection, and no raw memory
+  or local-path output.
 - GitHub Actions CI run `26310773948` passed on `6ae4ce7`, including Test,
   Full smoke, and Release readiness check for the canary report generator gate.
 - GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,

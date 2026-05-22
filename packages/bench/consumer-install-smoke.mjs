@@ -23,6 +23,9 @@ const extraCurrentFiles = [
   "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-memories.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-report.fixture.json",
+  "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary_metadata/trace_metadata_only.jsonl",
+  "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/containers/selfmem_fixture_agent/container-map.json",
+  "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/reliability_reports/latest.json",
 ];
 const checks = [];
 
@@ -47,6 +50,7 @@ try {
   checks.push(run("node", ["packages/bench/local-container-audit-smoke.mjs"], "local-container audit smoke"));
   checks.push(run("node", ["packages/bench/session-compaction-local-audit.mjs", "--strict"], "local-session compaction audit"));
   checks.push(run("node", ["packages/bench/canary-report-from-trace.mjs", "--fixture"], "canary report generator"));
+  checks.push(run("node", ["packages/bench/canary-report-from-trace.mjs", "--diagnostic-dir", "packages/bench/fixtures/canary-diagnostic-export.fixture"], "canary diagnostic report generator"));
   checks.push(run("node", ["packages/bench/canary-evidence-intake.mjs"], "canary evidence intake"));
 
   const pack = run("npm", ["pack", "--dry-run", "--json", "--cache", npmCache], "npm package dry run");
@@ -69,6 +73,9 @@ try {
     "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
     "packages/bench/fixtures/canary-runtime-memories.fixture.jsonl",
     "packages/bench/fixtures/canary-runtime-report.fixture.json",
+    "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary_metadata/trace_metadata_only.jsonl",
+    "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/containers/selfmem_fixture_agent/container-map.json",
+    "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/reliability_reports/latest.json",
     "plugins/selfmem-fallback/scripts/selfmem_update.py",
   ]) {
     assert.ok(files.has(file), `npm dry-run package missing ${file}`);

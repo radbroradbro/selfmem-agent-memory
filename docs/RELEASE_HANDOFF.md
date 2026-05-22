@@ -101,6 +101,21 @@ npm exec --yes pnpm@10.23.0 -- canary:report -- \
   --output sanitized-report.json
 ```
 
+If the agent sent a redacted diagnostic export instead of a live container path,
+use the bundle directly:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:report -- \
+  --diagnostic-dir <unzipped-agent-diagnostics-dir> \
+  --rollback-tested \
+  --output sanitized-report.json
+
+npm exec --yes pnpm@10.23.0 -- canary:report -- \
+  --zip <agent-diagnostics.zip> \
+  --rollback-tested \
+  --output sanitized-report.json
+```
+
 Then run the intake gate:
 
 ```bash
@@ -110,10 +125,10 @@ npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json -
 The report must contain aggregate metrics only: hashed agent/container labels,
 lifecycle event counts, hybrid-search coverage, local-write observation,
 hosted read-through mode, p50 and p95 latency, privacy counters, and rollback
-readiness. The canary report generator reads local trace files but does not
-print raw memories, transcripts, prompts, answers, local paths, credentials,
-cookies, or bearer tokens. A fixture pass is useful for the tooling path, but
-it is not real rollout evidence.
+readiness. The canary report generator reads local trace files or metadata-only
+diagnostic summaries but does not print raw memories, transcripts, prompts,
+answers, local paths, credentials, cookies, or bearer tokens. A fixture pass is
+useful for the tooling path, but it is not real rollout evidence.
 
 ## Reviewer Route Choices
 

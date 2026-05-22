@@ -1,0 +1,10 @@
+{
+  "agent_identity": "fixture-agent",
+  "fixture_only": true,
+  "host": "hermes",
+  "local_container": "selfmem_fixture_agent",
+  "mode": "local-write-supermemory-read-through",
+  "query_expansion": "off_by_default_for_live_hooks",
+  "source_supermemory_container": "fixture_source",
+  "supermemory_read_through": true
+}

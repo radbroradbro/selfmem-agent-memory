@@ -135,6 +135,10 @@ Scope:
   converts Hermes/OpenClaw traces into sanitized runtime canary reports, emits
   no raw local paths or memory text, writes output only when requested, and
   proves fixture-derived reports fail strict-real intake.
+- Extended canary report generator coverage to redacted diagnostic directories
+  and ZIP bundles. The gate now checks metadata-only diagnostic exports,
+  relocated fixture ZIPs, strict-real fixture rejection, zip path safety, and
+  no raw private logs, local paths, secrets, prompts, answers, or memory text.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.

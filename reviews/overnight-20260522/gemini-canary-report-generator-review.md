@@ -29,3 +29,30 @@ Findings:
   fixture strict-real rejection, intake behavior, evidence files, and reviewer
   packet coverage. `goal-completion-audit.mjs` lists the canary report
   generator as a proven surface while the real rollout remains incomplete.
+
+## Diagnostic Bundle Follow-up
+
+Command:
+
+```sh
+gemini --skip-trust --approval-mode plan -p 'Cold re-review the RecallWeave canary diagnostic-bundle intake slice after the fixture relocation fix. Inspect only repository files, not private diagnostics. Scope: packages/bench/canary-report-from-trace.mjs, packages/bench/fixtures/canary-diagnostic-export.fixture/**, packages/bench/fixtures/canary-runtime-container-map.fixture.json, packages/bench/release-readiness-check.mjs, packages/bench/consumer-install-smoke.mjs, package.json, docs/RELEASE_HANDOFF.md, and reviews/overnight-20260522/canary-report-generator-evidence.md. Confirm whether the previous blocker is fixed: copied/zipped fixtures must still emit fixtureOnly true and fail strict-real intake. Also check zip path validation, diagnostic-dir support, no raw memories/transcripts/prompts/answers/local paths/secrets in generated reports, and no fabricated latency for older bundles. Return exactly: Verdict: CLEAN or Verdict: BLOCKED, then concise findings.'
+```
+
+Verdict: `CLEAN`
+
+Findings:
+
+- Fixture relocation and zip handling are fixed. The release gate packages the
+  diagnostic fixture into a temporary zip outside `packages/bench/fixtures`,
+  then confirms the report still emits `fixtureOnly: true` and fails
+  `--strict-real`.
+- Zip path validation blocks absolute paths, Windows drive paths, and `..`
+  traversal entries before extraction.
+- Diagnostic directory support covers `--diagnostic-dir`, `--bundle-dir`, and
+  `--audit-dir`, including metadata-only `trace_metadata_only.jsonl` exports.
+- Generated reports stay metrics-only, with hashes, counters, rates, latency,
+  quality booleans, privacy counters, and no raw memories, transcripts,
+  prompts, answers, credentials, or local paths.
+- Missing latency is not fabricated. Older bundles without store `elapsed_ms`
+  emit `0` latency and fail the strict intake instead of becoming green
+  rollout evidence.

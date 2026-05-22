@@ -91,7 +91,7 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 13 proven
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 14 proven
   requirements, 5 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with
@@ -104,6 +104,9 @@ Latest verified head before this draft refresh:
 - Canary report generator: `canary:report -- --fixture` creates the sanitized
   report shape from trace fixtures and proves fixture-derived reports fail
   `--strict-real`
+- Canary diagnostic bundle generator: redacted diagnostic directories and ZIP
+  bundles can produce the same sanitized report shape, while relocated fixtures
+  still fail `--strict-real`
 - GitHub Actions CI run `26310773948` passed on `6ae4ce7`, the canary report
   generator gate commit.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
