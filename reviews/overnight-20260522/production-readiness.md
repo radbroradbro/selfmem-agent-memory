@@ -311,7 +311,8 @@ evidence for:
 - goal completion audit evidence with `goalComplete: false`,
   `mayCallUpdateGoalComplete: false`, 10 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement. This keeps production readiness
-  separate from the native thread goal completion claim.
+  separate from the native thread goal completion claim. GitHub Actions CI run
+  `26308994908` passed on `13efb18`.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI

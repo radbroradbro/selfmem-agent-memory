@@ -237,7 +237,8 @@ Latest local verification before this summary:
   active objective to current evidence. It reports `goalComplete: false`,
   `mayCallUpdateGoalComplete: false`, 10 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement, preserving the reviewer, GitHub,
-  human approval, hosted-baseline, and real-rollout blockers.
+  human approval, hosted-baseline, and real-rollout blockers. GitHub Actions CI
+  run `26308994908` passed on `13efb18`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,

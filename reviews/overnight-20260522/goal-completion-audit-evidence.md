@@ -52,6 +52,11 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `node packages/bench/goal-completion-audit.mjs`: passed.
 - `node packages/bench/release-readiness-check.mjs`: passed with the audit
   required.
+- `npm exec --yes pnpm@10.23.0 -- test`: passed, 6 files and 22 tests.
+- `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
+- `git diff --check`: passed.
+- GitHub Actions CI run `26308994908` passed on `13efb18`, including Test,
+  Full smoke, and Release readiness check.
 
 The audit is intentionally conservative. It is a proof that the current branch
 is a public-readiness candidate, not proof that the active goal is complete.
