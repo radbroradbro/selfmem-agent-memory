@@ -111,6 +111,7 @@ def main() -> None:
             {},
         )
         search_trace_data = search_trace.get("data", {})
+        store_traces = [event for event in trace_events if event.get("event") == "store"]
         leaks = count_leaks("\n".join([memories, trace, lossless, raw, prefetch]))
         output = {
             "ok": True,
@@ -131,6 +132,11 @@ def main() -> None:
             "searchLatencyInstrumentationCovered": float(search_trace_data.get("elapsed_ms") or 0) > 0
             and float(search_trace_data.get("local_elapsed_ms") or 0) > 0
             and float(search_trace_data.get("remote_elapsed_ms") or 0) > 0,
+            "storeLatencyInstrumentationCovered": bool(store_traces)
+            and all(float(event.get("data", {}).get("elapsed_ms") or 0) > 0 for event in store_traces),
+            "storeLatencySampleCount": sum(
+                1 for event in store_traces if float(event.get("data", {}).get("elapsed_ms") or 0) > 0
+            ),
             "prefetchHasContext": bool(prefetch.strip()),
             "maintenanceRecallGateCovered": skipped_prefetch == "" and "prefetch_skipped" in trace,
             "statusLikeRecallCovered": bool(status_like_prefetch.strip()),
@@ -158,6 +164,7 @@ def main() -> None:
             output["hybridSearchCovered"],
             output["boundedReadThroughPolicyCovered"],
             output["searchLatencyInstrumentationCovered"],
+            output["storeLatencyInstrumentationCovered"],
             output["sourceSupermemoryContainer"] == "hermes_standalone_source",
             output["localContainer"] == "selfmem_hermes_standalone_source",
             output["prefetchHasContext"],

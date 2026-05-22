@@ -132,6 +132,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-remediation-review.md`,
   `${reviewDir}/canary-operator-packet-evidence.md`,
   `${reviewDir}/gemini-canary-operator-packet-review.md`,
+  `${reviewDir}/gemini-adapter-store-latency-review.md`,
   `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
@@ -931,6 +932,21 @@ check("fresh local container audit smoke passes", () => {
 
 check("fresh clean consumer smoke passes", () => {
   run("node", ["packages/bench/consumer-install-smoke.mjs"]);
+});
+
+check("fresh adapter store latency instrumentation passes", () => {
+  const openclaw = JSON.parse(run("node", ["packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs"]).stdout);
+  const hermes = JSON.parse(run("python3", ["packages/adapters/hermes/selfmem_canary_standalone_smoke.py"]).stdout);
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-adapter-store-latency-review.md"), "utf8");
+  for (const report of [openclaw, hermes]) {
+    assert.equal(report.ok, true);
+    assert.equal(report.searchLatencyInstrumentationCovered, true);
+    assert.equal(report.storeLatencyInstrumentationCovered, true);
+    assert.equal(Number(report.storeLatencySampleCount) > 0, true);
+    assert.equal(report.privacyLeakCount, 0);
+  }
+  assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+  assert.match(geminiReview, /positive `elapsed_ms`|positive elapsed_ms/i);
 });
 
 check("fresh canary report generator passes", () => {

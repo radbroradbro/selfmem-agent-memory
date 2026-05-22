@@ -26,6 +26,8 @@ still required.
   plus the skip reason.
 - Store traces use positive sub-millisecond timing so strict canary intake does
   not treat a fast local write as missing instrumentation.
+- Hermes and OpenClaw standalone smokes now assert positive store latency
+  samples, not only search latency samples.
 - OpenClaw fetch timeouts now clear in a `finally` block.
 
 ## Configuration
@@ -61,6 +63,7 @@ Adapter smokes now assert:
 - hosted read-through can still return remote results on explicit or thin-local
   queries;
 - search traces contain positive total, local, and remote timing;
+- store traces contain positive `elapsed_ms` samples;
 - lifecycle coverage still includes prompt recall, end-of-turn capture, and LCM
   compression signals;
 - privacy leak count remains zero.

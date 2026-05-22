@@ -13,6 +13,14 @@ This evidence does not complete the real-container rollout requirement. It
 proves the current gate can process real diagnostics and reject a rollout when
 latency or instrumentation evidence is not good enough.
 
+After the strict-real operator packet landed, the controller also ran the
+metrics-only path against eight available redacted local diagnostic packages.
+The expanded check did not write any report into the repository and did not
+print memory text. It confirmed the same blocker pattern: all privacy-clean
+real inputs still failed strict rollout intake, and the closest OpenClaw
+diagnostic was under the recall latency threshold but lacked store latency
+samples.
+
 ## Commands
 
 The controller generated temporary metrics-only reports outside the repository:
@@ -98,6 +106,8 @@ node packages/bench/canary-evidence-intake.mjs \
 The failure is actionable and matches the adapter hardening work:
 
 - Fresh adapters must record positive `elapsed_ms` on every store event.
+- Adapter standalone smokes must assert store latency instrumentation so this
+  blocker cannot regress silently before the next one-agent canary.
 - Fresh adapters must keep recall p95 under the strict canary threshold.
 - The next canary must collect a fresh runtime window after the bounded
   read-through and store-latency patches are installed.

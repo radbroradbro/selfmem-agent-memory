@@ -110,6 +110,7 @@ const traceText = readFileSync(join(home, "selfmem", "containers", "selfmem_open
 const rawText = readFileSync(join(home, "selfmem", "containers", "selfmem_openclaw_standalone_source", "raw_events.jsonl"), "utf8");
 const traceEvents = traceText.split(/\n+/).filter(Boolean).map((line) => JSON.parse(line));
 const searchTrace = traceEvents.find((item) => item.event === "search" && item.data?.supermemory_attempted === true);
+const storeTraces = traceEvents.filter((item) => item.event === "store");
 const audit = JSON.parse(execFileSync("python3", [
   new URL("./selfmem_audit.py", import.meta.url).pathname,
   "--home",
@@ -127,6 +128,9 @@ const output = {
   searchLatencyInstrumentationCovered: Number(searchTrace?.data?.elapsed_ms || 0) > 0
     && Number(searchTrace?.data?.local_elapsed_ms || 0) > 0
     && Number(searchTrace?.data?.remote_elapsed_ms || 0) > 0,
+  storeLatencyInstrumentationCovered: storeTraces.length > 0
+    && storeTraces.every((item) => Number(item.data?.elapsed_ms || 0) > 0),
+  storeLatencySampleCount: storeTraces.filter((item) => Number(item.data?.elapsed_ms || 0) > 0).length,
   aliasStoreSuccess: Boolean(store.success),
   aliasSearchResultCount: search.results.length,
   hybridSearchCovered: search.results.some((item) => item.memory_source === "supermemory_read_through"),
@@ -149,7 +153,7 @@ const output = {
 
 console.log(JSON.stringify(output, null, 2));
 
-if (!output.boundedReadThroughPolicyCovered || !output.searchLatencyInstrumentationCovered || !output.aliasStoreSuccess || output.aliasSearchResultCount < 1 || !output.hybridSearchCovered || !output.voyageEnabled || !output.voyageCallsCovered || !output.embeddingCacheCovered || !output.maintenanceRecallGateCovered || !output.statusLikeRecallCovered || !output.openclawStateDirCovered || !output.identityPinCovered || !output.readOnlyCovered || !output.pluginEntryCovered || !output.compressionCheckpointCovered || !output.auditCovered || !output.beforePromptHasContext || !output.lifecycleCovered || !output.rawAuditCovered || output.privacyLeakCount !== 0) {
+if (!output.boundedReadThroughPolicyCovered || !output.searchLatencyInstrumentationCovered || !output.storeLatencyInstrumentationCovered || !output.aliasStoreSuccess || output.aliasSearchResultCount < 1 || !output.hybridSearchCovered || !output.voyageEnabled || !output.voyageCallsCovered || !output.embeddingCacheCovered || !output.maintenanceRecallGateCovered || !output.statusLikeRecallCovered || !output.openclawStateDirCovered || !output.identityPinCovered || !output.readOnlyCovered || !output.pluginEntryCovered || !output.compressionCheckpointCovered || !output.auditCovered || !output.beforePromptHasContext || !output.lifecycleCovered || !output.rawAuditCovered || output.privacyLeakCount !== 0) {
   process.exit(1);
 }
 
