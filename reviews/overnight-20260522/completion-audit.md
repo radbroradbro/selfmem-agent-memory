@@ -19,7 +19,7 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `d0113c0`
+- Latest public-draft baseline inspected before this audit refresh: `f51346f`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -50,6 +50,7 @@ complete or publish a public live update.
   passed
 - Brain UI Benchmark Dashboard follow-up: `d0113c0`, CI run `26302442423`
   passed
+- Brain UI Canary Rollout follow-up: `f51346f`, CI run `26302990767` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -108,10 +109,10 @@ complete or publish a public live update.
 | Metrics-only local session compaction audit gate | `packages/bench/release-readiness-check.mjs` now requires local-session compaction audit evidence, Gemini review evidence, and a fresh metrics-only audit run | Proven locally and in CI run `26298965544` |
 | Brain UI compaction audit release gate | `packages/bench/release-readiness-check.mjs` now requires Compaction Audit DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26299756374` |
 | Brain UI benchmark dashboard release gate | `packages/bench/release-readiness-check.mjs` now requires Benchmark Dashboard DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26302442423` |
-| Brain UI canary rollout release gate | `packages/bench/release-readiness-check.mjs` now requires Canary Rollout DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally; CI pending for this uncommitted slice |
+| Brain UI canary rollout release gate | `packages/bench/release-readiness-check.mjs` now requires Canary Rollout DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26302990767` |
 | Brain UI context preview release gate | `packages/bench/release-readiness-check.mjs` now requires Context Preview DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26300784883` |
 | Brain UI release readiness gate | `packages/bench/release-readiness-check.mjs` now requires Release Readiness DOM evidence, screenshot, Gemini review, release-doc references, conservative `FAIL` verdict, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26301888111` |
-| GitHub Actions | CI run `26302442423` on `d0113c0` passed Test, Full smoke, and Release readiness check | Proven |
+| GitHub Actions | CI run `26302990767` on `f51346f` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |

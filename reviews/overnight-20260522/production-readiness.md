@@ -187,7 +187,8 @@ Controller follow-up after that sandbox run:
   one-agent scope, hosted Supermemory read-through-only mode, public launch
   verdict `FAIL`, owner approval required, 5 steps, 11 metrics to collect,
   rollback and dry-run steps visible, zero console errors, and no
-  private/key-shaped visible text.
+  private/key-shaped visible text. GitHub Actions CI run `26302990767` passed
+  on `f51346f`.
 
 ## UI Evidence
 
