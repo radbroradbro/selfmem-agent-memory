@@ -19,12 +19,14 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `103e7c6`
+- Latest public-draft baseline inspected before this audit refresh: `04f1096`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
 - Guarded selected vault sync apply follow-up: `103e7c6`, CI run
   `26290534116` passed
+- Guarded selected local-container browse follow-up: `04f1096`, CI run
+  `26291352800` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -63,7 +65,7 @@ complete or publish a public live update.
 | PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment |
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
-| GitHub Actions | CI run `26290534116` on `103e7c6` passed Test, Full smoke, and Release readiness check | Proven |
+| GitHub Actions | CI run `26291352800` on `04f1096` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |

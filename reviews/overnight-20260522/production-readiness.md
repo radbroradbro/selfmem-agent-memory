@@ -80,6 +80,8 @@ Controller follow-up after that sandbox run:
   passed after the Gemini guard review became required.
 - GitHub Actions CI run `26290534116` on guarded selected vault sync apply
   commit `103e7c6` passed Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26291352800` on guarded selected local-container
+  browse commit `04f1096` passed Test, Full smoke, and Release readiness check.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.
 - Focused Gemini reviews for Brain UI local-audit preview and selected
@@ -94,6 +96,8 @@ Controller follow-up after that sandbox run:
   passed.
 - GitHub Actions CI run `26290534116` on guarded selected vault sync apply
   commit `103e7c6` passed.
+- GitHub Actions CI run `26291352800` on guarded selected local-container
+  browse commit `04f1096` passed.
 
 ## UI Evidence
 

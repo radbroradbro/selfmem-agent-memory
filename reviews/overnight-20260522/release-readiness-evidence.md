@@ -162,3 +162,5 @@ Known limits:
   `dd17f44` after the Gemini guard review became required.
 - GitHub Actions CI run `26290534116` passed on guarded selected vault sync
   apply commit `103e7c6`.
+- GitHub Actions CI run `26291352800` passed on guarded selected
+  local-container browse commit `04f1096`.
