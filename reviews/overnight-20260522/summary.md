@@ -16,7 +16,7 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest CI-inspected code head after the Brain UI selected audit-history slice:
+- Latest CI-inspected code-changing head after the Brain UI selected audit-history slice:
   `8617bd3`
 - PR API state when checked: open, not draft, mergeable, clean.
 - GitHub Actions `Verify` run #40 on `8617bd3`: success.
@@ -63,7 +63,8 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions `Verify`: success on `8617bd3`.
+- GitHub Actions `Verify`: success on the selected audit-history code head,
+  `8617bd3`. Later docs-only pushes still need Actions inspection before merge.
 
 ## UI Evidence
 

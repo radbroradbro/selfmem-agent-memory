@@ -57,7 +57,7 @@ issues.
 
 ## Verification Snapshot
 
-Latest verified head before this draft refresh:
+Latest verified code-changing head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Head: `8617bd3`

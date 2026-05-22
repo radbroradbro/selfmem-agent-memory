@@ -19,7 +19,7 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest code head inspected before this audit refresh: `8617bd3`
+- Latest code-changing head inspected before this audit refresh: `8617bd3`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `8617bd3`: `CI / Verify` run #40 passed
 - Worktree at audit start: clean
@@ -30,7 +30,7 @@ complete or publish a public live update.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all pushed slices through `8617bd3` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all code-changing slices through `8617bd3` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Self-hosted Brain UI | `packages/brain-ui/`, UI screenshots and DOM evidence under `reviews/overnight-20260522/ui-evidence/` | Proven for fixture mode |
