@@ -66,6 +66,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 - Brain UI Model Matrix follow-up: `ff6f343`, CI run `26306469240` passed
 - Clean consumer smoke follow-up: `4cee083`, CI run `26306827655` passed
 - Hosted baseline preflight follow-up: `02b3a13`, CI run `26309563159` passed
+- Canary evidence intake follow-up: `d26eb78`, CI run `26310168571` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
