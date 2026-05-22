@@ -1,6 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { dirname, relative, resolve, sep } from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { lintCompiledWikiVault } from "./compiler.js";
 export async function syncCompiledWikiVault(vault, options) {
     const rootDir = resolve(options.rootDir);
@@ -10,6 +10,7 @@ export async function syncCompiledWikiVault(vault, options) {
     }
     const dryRun = options.dryRun ?? false;
     const conflictPolicy = options.conflictPolicy ?? "write_conflict_note";
+    const auditLog = createAuditLogger(rootDir, options.auditLogPath, dryRun);
     const actions = [];
     for (const file of vault.files) {
         const targetPath = safeTargetPath(rootDir, file.path);
@@ -24,6 +25,7 @@ export async function syncCompiledWikiVault(vault, options) {
                 const conflictTargetPath = safeTargetPath(rootDir, conflictPath);
                 actions.push({ path: file.path, action: "write_conflict_note", kind: "conflict_note", conflictPath });
                 if (!dryRun) {
+                    await auditLog.writeIntent({ path: conflictPath, action: "write_conflict_note", kind: "conflict_note" });
                     await mkdir(dirname(conflictTargetPath), { recursive: true });
                     await writeFile(conflictTargetPath, renderConflictNote(file), "utf8");
                 }
@@ -35,11 +37,51 @@ export async function syncCompiledWikiVault(vault, options) {
         }
         actions.push({ path: file.path, action: "write", kind: file.kind });
         if (!dryRun) {
+            await auditLog.writeIntent({ path: file.path, action: "write", kind: file.kind });
             await mkdir(dirname(targetPath), { recursive: true });
             await writeFile(targetPath, file.contents, "utf8");
         }
     }
-    return { ok: true, dryRun, rootDir, actions };
+    const auditReport = auditLog.report();
+    return {
+        ok: true,
+        dryRun,
+        rootDir,
+        actions,
+        ...(auditReport ? { auditLog: auditReport } : {}),
+    };
+}
+function createAuditLogger(rootDir, auditLogPath, dryRun) {
+    let entriesWritten = 0;
+    if (!auditLogPath || dryRun) {
+        return {
+            async writeIntent(_entry) { },
+            report() {
+                return undefined;
+            },
+        };
+    }
+    const targetPath = safeAuditLogPath(rootDir, auditLogPath);
+    const publicPath = normalizeAuditLogPath(rootDir, targetPath);
+    return {
+        async writeIntent(entry) {
+            const payload = {
+                schemaVersion: 1,
+                event: "wiki_vault_sync_write_intent",
+                createdAt: new Date().toISOString(),
+                path: entry.path,
+                action: entry.action,
+                kind: entry.kind,
+                contentHash: createHash("sha256").update(`${entry.kind}:${entry.action}:${entry.path}`).digest("hex"),
+            };
+            await mkdir(dirname(targetPath), { recursive: true });
+            await appendFile(targetPath, `${JSON.stringify(payload)}\n`, "utf8");
+            entriesWritten += 1;
+        },
+        report() {
+            return { path: publicPath, entriesWritten };
+        },
+    };
 }
 function safeTargetPath(rootDir, vaultPath) {
     const targetPath = resolve(rootDir, vaultPath);
@@ -48,6 +90,20 @@ function safeTargetPath(rootDir, vaultPath) {
         throw new Error(`Unsafe wiki vault output path: ${vaultPath}`);
     }
     return targetPath;
+}
+function safeAuditLogPath(rootDir, auditLogPath) {
+    const path = auditLogPath.trim();
+    if (!path)
+        throw new Error("Audit log path cannot be empty");
+    const targetPath = isAbsolute(path) ? resolve(path) : resolve(rootDir, path);
+    const rel = relative(rootDir, targetPath);
+    if (!rel || rel.startsWith("..") || rel.includes(`..${sep}`) || resolve(rootDir, rel) !== targetPath) {
+        throw new Error(`Unsafe wiki vault audit log path: ${auditLogPath}`);
+    }
+    return targetPath;
+}
+function normalizeAuditLogPath(rootDir, targetPath) {
+    return relative(rootDir, targetPath).split(sep).join("/");
 }
 async function readExisting(path) {
     try {

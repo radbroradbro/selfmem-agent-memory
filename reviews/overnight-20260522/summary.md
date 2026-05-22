@@ -28,6 +28,7 @@ is still required before any public live update.
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` |
 | LLM-wiki compiler | `packages/core/src/wiki/compiler.ts`, `packages/bench/wiki-vault-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-evidence.md` |
 | Wiki vault disk sync | `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` |
+| Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` |
 | Brain UI graph and editor | `packages/brain-ui/`, `reviews/overnight-20260522/ui-evidence/README.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
@@ -94,6 +95,7 @@ local memory contents.
 
 - Gemini UI review: concerns found and applied in earlier UI slice.
 - Gemini wiki/vault reviews: final `CLEAN`.
+- Gemini wiki sync audit-log review: `CLEAN`.
 - Gemini sync-report review: `CLEAN`.
 - Gemini update-command review: first `BLOCK`, then final `CLEAN` after symlink
   resolution was fixed and tested.

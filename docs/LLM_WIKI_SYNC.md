@@ -89,6 +89,12 @@ only compiled, lint-clean files under the provided directory. If a markdown page
 already has `reviewed: true`, sync leaves the reviewed page in place and writes a
 sanitized conflict note under `wiki/_conflicts/`.
 
+For live agent containers, pass `auditLogPath: ".recallweave/wiki-sync-audit.jsonl"`
+during apply. Sync writes a content-free
+`wiki_vault_sync_write_intent` entry before each vault file write. The audit log
+records relative paths, action, kind, timestamp, and a hash. It does not record
+raw page contents or the local root path.
+
 The compiler emits:
 
 - `wiki/index.md`,

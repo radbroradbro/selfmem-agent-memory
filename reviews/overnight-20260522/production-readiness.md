@@ -24,7 +24,7 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Nucleus Index contracts for memory nodes, lifecycle events, retrieval traces,
   wiki pages, and research lineage.
 - LLM-wiki compiler and disk-sync flow with lint and reviewed-page conflict
-  handling.
+  handling, plus optional content-free pre-write audit logging.
 - Fixture-first Brain UI for search, graph/index inspection, provenance,
   lifecycle/retrieval trace inspection, derived doc editing, draft export,
   vault preview, sync report, Nucleus snapshot preview, local audit preflight,

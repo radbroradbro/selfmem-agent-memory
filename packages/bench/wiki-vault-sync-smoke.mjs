@@ -24,7 +24,7 @@ const dryRun = await syncCompiledWikiVault(vault, { rootDir, dryRun: true });
 assert.equal(dryRun.dryRun, true);
 assert.ok(dryRun.actions.some((action) => action.action === "write_conflict_note"));
 
-const report = await syncCompiledWikiVault(vault, { rootDir });
+const report = await syncCompiledWikiVault(vault, { rootDir, auditLogPath: ".recallweave/wiki-sync-audit.jsonl" });
 const unchangedReviewed = await readFile(reviewedPath, "utf8");
 assert.match(unchangedReviewed, /Human-reviewed fixture page remains unchanged/);
 assert.ok(report.actions.some((action) => action.action === "write"));
@@ -32,7 +32,12 @@ const conflict = report.actions.find((action) => action.action === "write_confli
 assert.ok(conflict?.conflictPath);
 const conflictNote = await readFile(join(rootDir, conflict.conflictPath), "utf8");
 assert.match(conflictNote, /Proposed Sanitized Update/);
-assert.doesNotMatch(JSON.stringify({ report, conflictNote }), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+const auditLog = await readFile(join(rootDir, ".recallweave/wiki-sync-audit.jsonl"), "utf8");
+assert.equal(report.auditLog?.path, ".recallweave/wiki-sync-audit.jsonl");
+assert.equal(report.auditLog?.entriesWritten, report.actions.filter((action) => action.action === "write" || action.action === "write_conflict_note").length);
+assert.match(auditLog, /wiki_vault_sync_write_intent/);
+assert.doesNotMatch(auditLog, new RegExp(rootDir.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+assert.doesNotMatch(JSON.stringify({ report, conflictNote, auditLog }), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
 console.log(JSON.stringify({
   ok: true,
@@ -40,5 +45,6 @@ console.log(JSON.stringify({
   fileCount: vault.files.length,
   writeCount: report.actions.filter((action) => action.action === "write").length,
   conflictCount: report.actions.filter((action) => action.action === "write_conflict_note").length,
+  auditEntries: report.auditLog.entriesWritten,
   dryRunCovered: dryRun.dryRun,
 }, null, 2));

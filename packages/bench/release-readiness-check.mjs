@@ -25,6 +25,7 @@ const requiredFiles = [
   `${reviewDir}/session-compaction-benchmark-evidence.md`,
   `${reviewDir}/wiki-vault-evidence.md`,
   `${reviewDir}/wiki-vault-sync-evidence.md`,
+  `${reviewDir}/gemini-wiki-sync-audit-log-review.md`,
   `${reviewDir}/update-flow-evidence.md`,
   `${reviewDir}/local-container-audit-evidence.md`,
   `${reviewDir}/gemini-local-container-audit-review.md`,

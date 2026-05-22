@@ -6,6 +6,9 @@ Scope:
 
 - Added `syncCompiledWikiVault()` as an explicit apply step for compiled
   Nucleus wiki vaults.
+- Added optional content-free sync audit logging. When `auditLogPath` is
+  supplied, sync appends a `wiki_vault_sync_write_intent` entry before each
+  vault file write, without raw page contents or the local root path.
 - Added a fixture-safe `pnpm wiki:sync:smoke` gate.
 - Kept disk writes opt-in and pointed at a caller-provided vault directory.
 
@@ -18,12 +21,15 @@ Public-safety boundary:
 - If an existing markdown page has `reviewed: true`, sync leaves it unchanged
   and writes a sanitized proposed update under `wiki/_conflicts/`.
 - Conflict notes do not copy the existing reviewed page contents.
+- Optional sync audit logs record only relative path, action, kind, timestamp,
+  and a hash.
 
 Verification:
 
 - `pnpm wiki:sync:smoke`: passed with 12 compiled files, 11 writes, 1
-  reviewed-page conflict note, and dry-run coverage.
-- `pnpm test`: 16 tests passed.
+  reviewed-page conflict note, 12 pre-write audit entries, and dry-run
+  coverage.
+- `pnpm test`: 20 tests passed.
 - `pnpm typecheck`: passed.
 - `pnpm smoke`: passed with wiki sync smoke included.
 - `pnpm release:check`: passed.

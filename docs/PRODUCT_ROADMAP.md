@@ -55,6 +55,8 @@ For RecallWeave, this should become an optional view layer:
 - Current sync writes compiled, lint-clean files only after an explicit apply
   call. If a page is marked `reviewed: true`, sync writes a conflict note rather
   than overwriting it.
+- Current sync can write a local content-free audit log before each vault file
+  write when `auditLogPath` is supplied.
 
 References for the design direction:
 

@@ -3,6 +3,7 @@ export interface WikiVaultSyncOptions {
     rootDir: string;
     dryRun?: boolean;
     conflictPolicy?: "skip" | "write_conflict_note";
+    auditLogPath?: string;
 }
 export interface WikiVaultSyncAction {
     path: string;
@@ -15,6 +16,10 @@ export interface WikiVaultSyncReport {
     dryRun: boolean;
     rootDir: string;
     actions: WikiVaultSyncAction[];
+    auditLog?: {
+        path: string;
+        entriesWritten: number;
+    };
 }
 export declare function syncCompiledWikiVault(vault: CompiledWikiVault, options: WikiVaultSyncOptions): Promise<WikiVaultSyncReport>;
 //# sourceMappingURL=sync.d.ts.map

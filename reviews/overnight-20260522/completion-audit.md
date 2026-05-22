@@ -33,6 +33,7 @@ complete or publish a public live update.
 | Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all code-changing slices through `8617bd3` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
+| Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
 | Self-hosted Brain UI | `packages/brain-ui/`, UI screenshots and DOM evidence under `reviews/overnight-20260522/ui-evidence/` | Proven for fixture mode |
 | Brain UI graph/editor evidence | `brain-ui-fixture-edit.png`, `brain-ui-dom-evidence.json`, `brain-ui-edit-export-*` | Proven with sanitized fixtures |
 | Brain UI vault/sync evidence | `brain-ui-vault-preview-*`, `brain-ui-sync-report-*` | Proven with sanitized fixtures |

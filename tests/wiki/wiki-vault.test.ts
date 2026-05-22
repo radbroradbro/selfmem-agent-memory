@@ -139,10 +139,11 @@ describe("wiki vault compiler", () => {
       "utf8",
     );
 
-    const report = await syncCompiledWikiVault(vault, { rootDir });
+    const report = await syncCompiledWikiVault(vault, { rootDir, auditLogPath: ".recallweave/wiki-sync-audit.jsonl" });
     const actions = new Map(report.actions.map((action) => [action.path, action]));
 
     expect(report.ok).toBe(true);
+    expect(report.auditLog?.path).toBe(".recallweave/wiki-sync-audit.jsonl");
     expect(actions.get("wiki/index.md")?.action).toBe("write");
     expect(actions.get("wiki/decisions/reviewed-manual-page.md")?.action).toBe("write_conflict_note");
     await expect(readFile(reviewedPath, "utf8")).resolves.toContain("Human-reviewed text stays put.");
@@ -154,6 +155,13 @@ describe("wiki vault compiler", () => {
     expect(conflictNote).toContain("````markdown");
     expect(conflictNote).toContain("````");
     expect(conflictNote).not.toContain("Human-reviewed text stays put.");
+    const auditLog = await readFile(join(rootDir, ".recallweave/wiki-sync-audit.jsonl"), "utf8");
+    const auditEntries = auditLog.trim().split(/\r?\n/).map((line) => JSON.parse(line));
+    expect(report.auditLog?.entriesWritten).toBe(auditEntries.length);
+    expect(auditEntries.length).toBe(report.actions.filter((action) => action.action === "write" || action.action === "write_conflict_note").length);
+    expect(auditEntries.every((entry) => entry.event === "wiki_vault_sync_write_intent")).toBe(true);
+    expect(auditLog).not.toContain(rootDir);
+    expect(auditLog).not.toContain("Generated sanitized update.");
   });
 
   it("keeps dry-runs dry, supports skip policy, and rejects unsafe sync input", async () => {
