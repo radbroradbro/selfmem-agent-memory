@@ -347,6 +347,9 @@ evidence for:
 - GitHub Actions CI run `26311728246` passed on `77b3cee`, including Test,
   Full smoke, and Release readiness check for the diagnostic bundle canary
   report gate.
+- GitHub Actions CI run `26312283137` passed on `4f5a079`, including Test,
+  Full smoke, and Release readiness check for the canary remediation diagnosis
+  gate.
 - GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
   Full smoke, and Release readiness check for the hosted baseline preflight
   gate.

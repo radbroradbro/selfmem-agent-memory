@@ -90,6 +90,9 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - GitHub Actions CI run `26311728246` passed on `77b3cee`, including Test,
   Full smoke, and Release readiness check after the diagnostic bundle canary
   report gate was added.
+- GitHub Actions CI run `26312283137` passed on `4f5a079`, including Test,
+  Full smoke, and Release readiness check after the canary remediation
+  diagnosis gate was added.
 
 The audit is intentionally conservative. It is a proof that the current branch
 is a public-readiness candidate, not proof that the active goal is complete.

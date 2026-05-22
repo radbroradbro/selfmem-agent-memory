@@ -70,6 +70,8 @@ audit so future agents cannot treat green CI as native-goal completion.
 - Canary report generator follow-up: `6ae4ce7`, CI run `26310773948` passed
 - Diagnostic bundle canary report follow-up: `77b3cee`, CI run `26311728246`
   passed
+- Canary remediation diagnosis follow-up: `4f5a079`, CI run `26312283137`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 

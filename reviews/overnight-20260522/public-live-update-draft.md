@@ -87,9 +87,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `77b3cee`
-- GitHub Actions: CI run `26311728246` passed for the diagnostic bundle
-  canary report gate
+- Latest verified code baseline: `4f5a079`
+- GitHub Actions: CI run `26312283137` passed for the canary remediation
+  diagnosis gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -111,8 +111,8 @@ Latest verified head before this draft refresh:
   still fail `--strict-real`
 - Canary diagnosis: `canary:diagnose` turns failed canary reports into
   metrics-only remediation actions and keeps fleet/public rollout blocked
-- GitHub Actions CI run `26311728246` passed on `77b3cee`, the diagnostic
-  bundle canary report gate commit.
+- GitHub Actions CI run `26312283137` passed on `4f5a079`, the canary
+  remediation diagnosis gate commit.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
