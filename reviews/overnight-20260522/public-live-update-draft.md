@@ -29,6 +29,8 @@ The current PR adds:
 - a hosted baseline preflight for future Supermemory comparisons, offline by
   default and blocked from public score claims until a metrics-only live result
   is reviewed;
+- a canary evidence intake for sanitized one-agent runtime reports, blocked
+  from fleet rollout and public launch when the report is only a fixture;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
@@ -87,12 +89,16 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 11 proven
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 12 proven
   requirements, 5 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with
   `callsHostedProvider: false`, `metricsOnly: true`, and
   `benchmarkClaimsAllowed: false`
+- Canary evidence intake: `canary:intake` passes on the public fixture with
+  lifecycle coverage, hybrid search coverage, local writes, read-through mode,
+  p50/p95 latency, rollback readiness, zero privacy leaks, and
+  `countsAsRealRolloutEvidence: false`
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

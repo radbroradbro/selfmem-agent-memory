@@ -22,6 +22,8 @@ const requiredFiles = [
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   "packages/brain-ui/fixtures/model-matrix.json",
+  "packages/bench/canary-evidence-intake.mjs",
+  "packages/bench/fixtures/canary-runtime-report.fixture.json",
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
@@ -106,6 +108,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-release-handoff-review.md`,
   `${reviewDir}/release-blocker-doctor-evidence.md`,
   `${reviewDir}/gemini-release-blocker-doctor-review.md`,
+  `${reviewDir}/canary-evidence-intake-evidence.md`,
+  `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
@@ -202,6 +206,7 @@ const requiredScripts = [
   "wiki:sync:smoke:built",
   "update:smoke",
   "consumer:smoke",
+  "canary:intake",
   "baseline:preflight",
   "goal:audit",
   "release:doctor",
@@ -750,6 +755,7 @@ check("release state is conservative", () => {
     "session-compaction-local-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
+    "canary-evidence-intake",
     "hosted-baseline-preflight",
     "github-handoff-packet",
     "goal-completion-audit",
@@ -793,6 +799,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /compaction audit|local-session compaction/i, `${file} missing compaction audit`);
     assert.match(text, /benchmark dashboard|benchmark summary|compaction benchmark/i, `${file} missing benchmark dashboard`);
     assert.match(text, /canary rollout|one-agent canary|selfmem_update/i, `${file} missing canary rollout`);
+    assert.match(text, /canary evidence intake|canary:intake|runtime canary evidence/i, `${file} missing canary evidence intake`);
     assert.match(text, /research source lock|source-lock|source lock/i, `${file} missing research source lock`);
     assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
@@ -866,6 +873,31 @@ check("fresh local container audit smoke passes", () => {
 
 check("fresh clean consumer smoke passes", () => {
   run("node", ["packages/bench/consumer-install-smoke.mjs"]);
+});
+
+check("fresh canary evidence intake passes", () => {
+  const result = run("node", ["packages/bench/canary-evidence-intake.mjs"]);
+  const report = JSON.parse(result.stdout);
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-evidence-intake-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "canary-evidence-intake");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.fixtureOnly, true);
+  assert.equal(report.countsAsRealRolloutEvidence, false);
+  assert.equal(report.canaryPass, true);
+  assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(report.publicLaunchAllowed, false);
+  assert.equal(report.privacy?.privacyLeakCount, 0);
+  assert.equal(report.privacy?.secretPatternHits, 0);
+  assert.equal(report.privacy?.rawMemoryIncluded, false);
+  assert.equal(report.lifecycle?.beforePromptBuild > 0, true);
+  assert.equal(report.lifecycle?.store > 0, true);
+  assert.equal(report.quality?.lifecycleCovered, true);
+  assert.equal(report.quality?.hybridSearchCovered, true);
+  assert.deepEqual(report.failedChecks, []);
+  assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.doesNotMatch(geminiReview, /pending external review/i);
 });
 
 check("fresh release blocker doctor passes", () => {

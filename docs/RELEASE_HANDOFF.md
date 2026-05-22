@@ -89,6 +89,21 @@ routes, human approval, hosted-baseline, or real rollout evidence remain
 blocked. Do not call the native goal complete unless a later audit proves every
 requirement with current evidence.
 
+## Canary Evidence Intake
+
+Run this after a one-agent canary produces a sanitized runtime report:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
+```
+
+The report must contain aggregate metrics only: hashed agent/container labels,
+lifecycle event counts, hybrid-search coverage, local-write observation,
+hosted read-through mode, p50 and p95 latency, privacy counters, and rollback
+readiness. Do not attach raw memories, transcripts, prompts, answers, local
+paths, credentials, cookies, or bearer tokens. A fixture pass is useful for the
+tooling path, but it is not real rollout evidence.
+
 ## Reviewer Route Choices
 
 Before merge, choose one path:
@@ -137,7 +152,8 @@ For each deployed agent:
 3. Apply to one agent with `--apply --run-canary`.
 4. Collect event counts, redaction count, provider mode, p50 and p95 recall
    latency, and errors.
-5. Open a PR or issue if any runtime behavior diverges.
+5. Run `canary:intake -- --report sanitized-report.json --strict-real`.
+6. Open a PR or issue if any runtime behavior diverges.
 
 Do not roll the same change to every agent until one-agent canary evidence is
 clean.

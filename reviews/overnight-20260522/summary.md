@@ -58,6 +58,7 @@ is still required before any public live update.
 | Brain UI graph navigation controls | `packages/brain-ui/src/model.js`, `packages/brain-ui/src/app.js`, `reviews/overnight-20260522/brain-ui-graph-navigation-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-graph-navigation-review.md` |
 | Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml` |
 | Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md` |
+| Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Brain UI model matrix | `packages/brain-ui/fixtures/model-matrix.json`, `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
@@ -237,7 +238,7 @@ Latest local verification before this summary:
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 11 proven requirements, 5 blocked
+  `mayCallUpdateGoalComplete: false`, 12 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement, preserving the reviewer, GitHub,
   human approval, hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.
@@ -247,6 +248,12 @@ Latest local verification before this summary:
   `hostedBaselineFresh: false`, and `benchmarkClaimsAllowed: false`, so future
   comparison claims need a sanitized live result plus reviewer approval.
   GitHub Actions CI run `26309563159` passed on `02b3a13`.
+- Canary evidence intake verification: local `canary:intake` accepts only
+  metrics-only one-agent runtime canary reports. The bundled fixture reports
+  lifecycle coverage, hybrid search coverage, local writes, read-through mode,
+  p50/p95 latency, rollback readiness, and zero privacy leaks, but it also
+  reports `fixtureOnly: true`, `countsAsRealRolloutEvidence: false`,
+  `fleetRolloutAllowed: false`, and `publicLaunchAllowed: false`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,

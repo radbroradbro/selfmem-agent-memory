@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "mode": "one-agent-canary-runtime-report",
+  "generatedAt": "2026-05-22T20:00:00.000Z",
+  "commit": "fixture-canary-commit",
+  "agent": {
+    "host": "hermes",
+    "agentIdentityHash": "agent_8f2b1d4c",
+    "localContainerHash": "container_1ab439d0",
+    "sourceContainerHash": "source_6c7a3019"
+  },
+  "window": {
+    "startedAt": "2026-05-22T19:00:00.000Z",
+    "endedAt": "2026-05-22T20:00:00.000Z",
+    "durationMinutes": 60
+  },
+  "provider": {
+    "mode": "local-write-hosted-read-through",
+    "localWriteMode": "enabled",
+    "hostedSupermemoryMode": "read-through-only",
+    "embedder": "voyage-4-large",
+    "reranker": "rerank-2.5"
+  },
+  "counts": {
+    "sessionStart": 3,
+    "beforePromptBuild": 42,
+    "preCompress": 4,
+    "agentEnd": 39,
+    "search": 42,
+    "store": 18,
+    "forget": 0,
+    "errors": 0,
+    "skippedUnknownIdentity": 0,
+    "unknownContainerWrites": 0
+  },
+  "latencyMs": {
+    "recallP50": 212,
+    "recallP95": 847,
+    "storeP50": 118,
+    "storeP95": 390
+  },
+  "quality": {
+    "beforePromptHasContextRate": 0.88,
+    "zeroResultRate": 0.07,
+    "writeSuccessRate": 1,
+    "lcmHookObserved": true,
+    "lifecycleCovered": true,
+    "hybridSearchCovered": true,
+    "localWritesObserved": true,
+    "hostedReadThroughObserved": true
+  },
+  "privacy": {
+    "privacyLeakCount": 0,
+    "redactionCount": 12,
+    "secretPatternHits": 0,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPromptIncluded": false,
+    "rawAnswerIncluded": false
+  },
+  "eventFingerprints": [
+    {
+      "eventHash": "evt_0c4a9f1e",
+      "kind": "search",
+      "observedAt": "2026-05-22T19:10:00.000Z"
+    },
+    {
+      "eventHash": "evt_b916de41",
+      "kind": "store",
+      "observedAt": "2026-05-22T19:12:00.000Z"
+    }
+  ],
+  "rollback": {
+    "available": true,
+    "tested": true,
+    "command": "selfmem_update --rollback"
+  },
+  "failures": []
+}

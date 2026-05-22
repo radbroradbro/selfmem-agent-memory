@@ -20,6 +20,8 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - Added `goal-completion-audit` to `release-state.json` proven surfaces.
 - Added `hosted-baseline-preflight` as a proven surface while preserving the
   hosted Supermemory baseline as a blocker.
+- Added `canary-evidence-intake` as a proven surface while preserving the real
+  production rollout as incomplete until a live sanitized report is reviewed.
 - Updated `packages/bench/release-readiness-check.mjs` so release readiness now
   requires the audit script, evidence file, Gemini review, package script, and
   a fresh audit run.
@@ -33,7 +35,7 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 11 proven requirements
+- 12 proven requirements
 - 5 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
@@ -49,6 +51,8 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - Hosted Supermemory benchmark claims need a fresh metrics-only baseline that
   passes `baseline:preflight` and is reviewed against a matched RecallWeave
   run.
+- Canary evidence intake can verify a metrics-only one-agent report, but the
+  bundled fixture reports `countsAsRealRolloutEvidence: false`.
 - Real-container production rollout is still a canary step, not complete.
 
 ## Verification

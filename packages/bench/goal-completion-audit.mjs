@@ -23,6 +23,8 @@ const files = {
   claudeBlocked: `${reviewDir}/claude-pr5-review-blocked.md`,
   handoffPacketEvidence: `${reviewDir}/github-handoff-packet-evidence.md`,
   handoffPacketReview: `${reviewDir}/gemini-github-handoff-packet-review.md`,
+  canaryEvidenceIntakeEvidence: `${reviewDir}/canary-evidence-intake-evidence.md`,
+  canaryEvidenceIntakeReview: `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
@@ -120,6 +122,11 @@ const requirements = [
     "packages/bench/hosted-baseline-preflight.mjs",
     files.hostedBaselinePreflightEvidence,
     files.hostedBaselinePreflightReview,
+  ]),
+  proven("canary-evidence-intake", "One-agent runtime canary reports have a metrics-only, sanitized intake gate that does not count fixtures as real rollout evidence", [
+    "packages/bench/canary-evidence-intake.mjs",
+    files.canaryEvidenceIntakeEvidence,
+    files.canaryEvidenceIntakeReview,
   ]),
   blocked("claude-council-review", "Claude/Opus reviewer route remains blocked by missing login", [
     files.claudeBlocked,

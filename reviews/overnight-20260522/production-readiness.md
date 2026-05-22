@@ -65,6 +65,10 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Hosted baseline preflight that makes the Supermemory comparison path
   explicit while calling no hosted provider by default and keeping public
   benchmark claims blocked.
+- Canary evidence intake that accepts sanitized one-agent runtime reports with
+  lifecycle, hybrid-search, local-write, read-through, latency, privacy, and
+  rollback metrics, while refusing raw memories, transcripts, prompts,
+  answers, secrets, and local paths.
 - Brain UI Model Matrix panel that renders the guarded cloud/local model
   matrix, Apple Silicon local lane, query-expansion status, credential mode,
   reviewer gates, and hosted-baseline blockers without touching private memory
@@ -312,7 +316,7 @@ evidence for:
   zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI
   runs `26308475033` on `6a33e62` and `26308588261` on `8efe4d0` passed.
 - goal completion audit evidence with `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 11 proven requirements, 5 blocked
+  `mayCallUpdateGoalComplete: false`, 12 proven requirements, 5 blocked
   requirements, and 1 incomplete requirement. This keeps production readiness
   separate from the native thread goal completion claim. GitHub Actions CI run
   `26308994908` passed on `13efb18`.
@@ -321,6 +325,11 @@ evidence for:
   `benchmarkClaimsAllowed: false`. The preflight accepts only aggregate
   metrics and hashes for later live results, never raw memory text or
   credentials.
+- canary evidence intake evidence with `fixtureOnly: true`,
+  `countsAsRealRolloutEvidence: false`, lifecycle coverage, hybrid search
+  coverage, local write observation, read-through mode, p50/p95 latency,
+  rollback readiness, zero secret hits, and zero privacy leaks. This proves the
+  intake gate, not a real rollout.
 - GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
   Full smoke, and Release readiness check for the hosted baseline preflight
   gate.

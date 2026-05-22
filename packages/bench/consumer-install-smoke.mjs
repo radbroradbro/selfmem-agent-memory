@@ -14,7 +14,11 @@ const forbiddenRuntimeFilePattern =
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 
-const extraCurrentFiles = ["packages/bench/consumer-install-smoke.mjs"];
+const extraCurrentFiles = [
+  "packages/bench/consumer-install-smoke.mjs",
+  "packages/bench/canary-evidence-intake.mjs",
+  "packages/bench/fixtures/canary-runtime-report.fixture.json",
+];
 const checks = [];
 
 try {
@@ -37,6 +41,7 @@ try {
   checks.push(run("node", ["packages/brain-ui/interaction-smoke.mjs"], "Brain UI interaction smoke"));
   checks.push(run("node", ["packages/bench/local-container-audit-smoke.mjs"], "local-container audit smoke"));
   checks.push(run("node", ["packages/bench/session-compaction-local-audit.mjs", "--strict"], "local-session compaction audit"));
+  checks.push(run("node", ["packages/bench/canary-evidence-intake.mjs"], "canary evidence intake"));
 
   const pack = run("npm", ["pack", "--dry-run", "--json", "--cache", npmCache], "npm package dry run");
   const packJson = JSON.parse(pack.stdout);
@@ -51,6 +56,8 @@ try {
     "packages/core/dist/index.js",
     "packages/brain-ui/src/index.html",
     "packages/brain-ui/fixtures/model-matrix.json",
+    "packages/bench/canary-evidence-intake.mjs",
+    "packages/bench/fixtures/canary-runtime-report.fixture.json",
     "plugins/selfmem-fallback/scripts/selfmem_update.py",
   ]) {
     assert.ok(files.has(file), `npm dry-run package missing ${file}`);

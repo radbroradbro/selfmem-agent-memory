@@ -127,6 +127,10 @@ Scope:
   checks the future hosted Supermemory comparison contract, calls no hosted
   provider by default, keeps `benchmarkClaimsAllowed: false`, and requires
   metrics-only no-raw-text output before any comparison result can be reviewed.
+- Added canary evidence intake to the release gate. The intake accepts
+  sanitized one-agent runtime canary reports, rejects raw memories,
+  transcripts, prompts, answers, secrets, and local paths, and keeps fixture
+  reports from counting as real rollout evidence.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -194,6 +198,10 @@ What `release:check` verifies:
 - Hosted baseline preflight evidence exists and a fresh preflight reports
   `callsHostedProvider: false`, `metricsOnly: true`,
   `hostedBaselineFresh: false`, and `publicBenchmarkClaimsAllowed: false`,
+- Canary evidence intake exists and a fresh intake pass reports metrics-only
+  lifecycle coverage, hybrid search coverage, local writes, read-through mode,
+  p50/p95 latency, rollback readiness, zero privacy leaks, and
+  `countsAsRealRolloutEvidence: false`,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,
