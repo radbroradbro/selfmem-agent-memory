@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T23:35:30Z",
+  "generatedAt": "2026-05-22T23:48:27Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "4b2ec839cddbce73540d3aea02b4b81f2a474e6a",
-    "ciRunId": 26316961518,
+    "headSha": "6b772936f57fbe31e33aaeb18bb4696da90b8185",
+    "ciRunId": 26317344140,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the strict-real update guard. GitHub Actions run 26316961518 passed CI on 4b2ec83."
+    "note": "This is the latest inspected code/product baseline after the strict-real canary operator packet. GitHub Actions run 26317344140 passed CI on 6b77293."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -91,7 +91,8 @@
   },
   "remainingBlockers": [
     "human-public-launch-approval-required",
-    "hosted-supermemory-baseline-not-current"
+    "hosted-supermemory-baseline-not-current",
+    "fresh-real-container-canary-not-current"
   ],
   "safetyBoundary": {
     "usesFixtureUiEvidence": true,

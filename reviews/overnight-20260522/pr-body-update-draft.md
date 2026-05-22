@@ -29,7 +29,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `4b2ec839cddbce73540d3aea02b4b81f2a474e6a`.
+- Latest code/product baseline: `6b772936f57fbe31e33aaeb18bb4696da90b8185`.
+- GitHub Actions run `26317344140`: passed CI after the strict-real canary operator packet.
+- Previous verified baseline before the strict-real canary operator packet:
+  `4b2ec839cddbce73540d3aea02b4b81f2a474e6a`.
 - GitHub Actions run `26316961518`: passed CI after the strict-real update guard.
 - Previous verified baseline before the strict-real update guard:
   `6a8bbf09ef6e24ed12c30e0fcff1fe185100e907`.

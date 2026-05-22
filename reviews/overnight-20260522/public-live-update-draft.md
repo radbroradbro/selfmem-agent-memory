@@ -97,8 +97,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `4b2ec83`
-- GitHub Actions: CI run `26316961518` passed for the strict-real update guard
+- Latest verified code baseline: `6b77293`
+- GitHub Actions: CI run `26317344140` passed for the strict-real canary
+  operator packet
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -136,6 +137,8 @@ Latest verified head before this draft refresh:
   trail evidence refresh.
 - GitHub Actions CI run `26316961518` passed on `4b2ec83`, the strict-real
   update guard.
+- GitHub Actions CI run `26317344140` passed on `6b77293`, the strict-real
+  canary operator packet.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
