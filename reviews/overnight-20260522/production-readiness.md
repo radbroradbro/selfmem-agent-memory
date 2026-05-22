@@ -43,7 +43,7 @@ These are proposed on PR #5. They are not yet merged to `main`.
 Passed in this run:
 
 - `npm run build`
-- `npm run test`: 6 files, 20 tests
+- `npm run test`: 6 files, 21 tests
 - `npm run typecheck`
 - `npm run privacy:test`
 - `npm run smoke:openclaw`: `privacyLeakCount: 0`
@@ -84,6 +84,8 @@ Controller follow-up after that sandbox run:
   browse commit `04f1096` passed Test, Full smoke, and Release readiness check.
 - GitHub Actions CI run `26292137539` on guarded selected lifecycle policy
   apply commit `3b5e140` passed Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26292772262` on guarded selected review queue apply
+  commit `19f2577` passed Test, Full smoke, and Release readiness check.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.
 - Focused Gemini reviews for Brain UI local-audit preview and selected
@@ -93,6 +95,7 @@ Controller follow-up after that sandbox run:
 - Focused Gemini reviews for selected vault sync dry-run and lifecycle policy
   preview returned `CLEAN`.
 - Focused Gemini review for memory review queue returned `CLEAN`.
+- Focused Gemini review for selected review queue apply returned `CLEAN`.
 - GitHub Actions CI run `26288370812` on inspected baseline `2888f91` passed.
 - GitHub Actions CI run `26289073223` on release-state guard commit `dd17f44`
   passed.
@@ -102,6 +105,8 @@ Controller follow-up after that sandbox run:
   browse commit `04f1096` passed.
 - GitHub Actions CI run `26292137539` on guarded selected lifecycle policy
   apply commit `3b5e140` passed.
+- GitHub Actions CI run `26292772262` on guarded selected review queue apply
+  commit `19f2577` passed.
 
 ## UI Evidence
 

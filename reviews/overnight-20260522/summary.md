@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `3b5e140`, run `26292137539`, success.
+  `19f2577`, run `26292772262`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -25,6 +25,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26290534116` on `103e7c6`: success.
 - GitHub Actions CI run `26291352800` on `04f1096`: success.
 - GitHub Actions CI run `26292137539` on `3b5e140`: success.
+- GitHub Actions CI run `26292772262` on `19f2577`: success.
 
 ## Shipped Overnight Slices
 
@@ -76,7 +77,7 @@ is still required before any public live update.
 
 Latest local verification before this summary:
 
-- `pnpm test`: passed, 20 tests.
+- `npm run test`: passed, 21 tests.
 - `pnpm smoke`: passed.
 - `pnpm brain:interaction`: passed for the Brain UI model refactor slice.
 - `pnpm wiki:sync:smoke`: passed with 12 pre-write audit entries.
@@ -85,7 +86,7 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions CI: success on the latest inspected baseline, `3b5e140`.
+- GitHub Actions CI: success on the latest inspected baseline, `19f2577`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
@@ -94,6 +95,8 @@ Latest local verification before this summary:
   `04f1096`, run `26291352800`.
 - GitHub Actions CI: success on guarded selected lifecycle policy apply commit
   `3b5e140`, run `26292137539`.
+- GitHub Actions CI: success on guarded selected review queue apply commit
+  `19f2577`, run `26292772262`.
 
 ## UI Evidence
 

@@ -19,6 +19,8 @@ Retry note:
   on `dd17f44`.
 - It was refreshed again after guarded lifecycle policy apply CI run
   `26292137539` passed on `3b5e140`.
+- It was refreshed again after guarded review queue apply CI run
+  `26292772262` passed on `19f2577`.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -40,7 +42,7 @@ The code, fixture UI, release gate, and GitHub Actions pass. Public launch shoul
 
 ## Verification
 
-Latest local verification includes the guarded lifecycle policy apply slice.
+Latest local verification includes the guarded review queue apply slice.
 
 - Local `npm run test`: 6 files, 21 tests passed.
 - Local `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
@@ -51,6 +53,7 @@ Latest local verification includes the guarded lifecycle policy apply slice.
 - GitHub Actions CI: run `26288370812` passed on `2888f91`, the latest baseline inspected before this draft.
 - GitHub Actions CI: run `26289073223` passed on `dd17f44`, the release-state guard follow-up commit.
 - GitHub Actions CI: run `26292137539` passed on `3b5e140`, the guarded lifecycle policy apply commit.
+- GitHub Actions CI: run `26292772262` passed on `19f2577`, the guarded review queue apply commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, and public live-update copy are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

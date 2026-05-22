@@ -126,7 +126,7 @@ Verification:
 
 - `pnpm release:check`: passed.
 - `pnpm smoke`: passed.
-- `pnpm test`: 20 tests passed.
+- `pnpm test`: 21 tests passed.
 - `pnpm container:audit:smoke`: passed.
 - `git diff --check`: covered by `release:check`.
 - Fresh Brain UI smoke: covered by `release:check`.
@@ -185,3 +185,5 @@ Known limits:
   local-container browse commit `04f1096`.
 - GitHub Actions CI run `26292137539` passed on guarded selected lifecycle
   policy apply commit `3b5e140`.
+- GitHub Actions CI run `26292772262` passed on guarded selected review queue
+  apply commit `19f2577`.

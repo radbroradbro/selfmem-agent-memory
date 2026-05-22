@@ -11,7 +11,7 @@ or explicitly accepted.
 ## Evidence
 
 - `npm run build`: passed.
-- `npm run test`: passed, 6 files and 20 tests.
+- `npm run test`: passed, 6 files and 21 tests.
 - `npm run typecheck`: passed.
 - `npm run privacy:test`: passed.
 - `npm run smoke:openclaw`: passed with `privacyLeakCount: 0`.
@@ -35,6 +35,8 @@ or explicitly accepted.
   conservative release-state guard review became required.
 - GitHub Actions CI run `26292137539` on `3b5e140`: passed after the guarded
   selected lifecycle policy apply slice became required.
+- GitHub Actions CI run `26292772262` on `19f2577`: passed after the guarded
+  selected review queue apply slice became required.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was
