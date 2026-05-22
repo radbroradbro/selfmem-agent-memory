@@ -46,6 +46,7 @@ is still required before any public live update.
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
 | Conservative release-state manifest | `reviews/overnight-20260522/release-state.json` |
+| Release-state guard review | `reviews/overnight-20260522/gemini-release-state-guard-review.md` |
 | Post-12-hour readiness verdict | `reviews/overnight-20260522/production-readiness.md` |
 | Public live-update draft | `reviews/overnight-20260522/public-live-update-draft.md` |
 | Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
@@ -124,6 +125,7 @@ local memory contents.
 - Gemini completion-audit review: first `BLOCK` because the audit was untracked
   and absent from the diff, then final `CLEAN` after staging.
 - Gemini blocker-permission refresh review: `CLEAN`.
+- Gemini release-state guard review: `CLEAN`.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.

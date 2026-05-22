@@ -57,6 +57,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
   `${reviewDir}/release-state.json`,
+  `${reviewDir}/gemini-release-state-guard-review.md`,
   `${reviewDir}/production-readiness.md`,
   `${reviewDir}/completion-audit.md`,
   `${reviewDir}/gemini-completion-audit-review.md`,
@@ -360,10 +361,13 @@ check("release state is conservative", () => {
   assert.equal(releaseState.productionReady, false);
   assert.equal(releaseState.pullRequest?.number, 5);
   assert.equal(releaseState.pullRequest?.branch, "feat/nucleus-wiki-native-contract");
-  assert.equal(releaseState.latestVerifiedBaseline?.ciConclusion, "success");
-  assert.match(releaseState.latestVerifiedBaseline?.headSha ?? "", /^[a-f0-9]{40}$/);
-  assert.equal(releaseState.latestVerifiedBaseline?.localReleaseCheck, "passed");
-  assert.equal(releaseState.latestVerifiedBaseline?.secretScan, "zero_hits");
+  assert.equal(releaseState.latestVerifiedCodeBaseline?.ciConclusion, "success");
+  assert.match(releaseState.latestVerifiedCodeBaseline?.headSha ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(releaseState.latestVerifiedCodeBaseline?.localReleaseCheck, "passed");
+  assert.equal(releaseState.latestVerifiedCodeBaseline?.secretScan, "zero_hits");
+  assert.equal(releaseState.releaseStateGuard?.enabled, true);
+  assert.equal(releaseState.releaseStateGuard?.checkedBy, "pnpm release:check");
+  assert.equal(releaseState.releaseStateGuard?.requiresConservativeVerdict, true);
   assert.equal(releaseState.safetyBoundary?.usesFixtureUiEvidence, true);
   assert.equal(releaseState.safetyBoundary?.commitsRawMemories, false);
   assert.equal(releaseState.safetyBoundary?.commitsRawTranscripts, false);

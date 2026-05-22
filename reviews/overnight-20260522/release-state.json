@@ -13,14 +13,21 @@
     "state": "open",
     "draft": false
   },
-  "latestVerifiedBaseline": {
+  "latestVerifiedCodeBaseline": {
     "headSha": "2888f9123643e0acfd3a66c9855a54214f99ed3f",
     "ciRunId": 26288370812,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
-    "privateNameScan": "zero_hits"
+    "privateNameScan": "zero_hits",
+    "note": "This is the latest inspected code/product baseline before release-state guard commits. Later guard/docs commits must pass CI but do not change runtime evidence."
+  },
+  "releaseStateGuard": {
+    "enabled": true,
+    "checkedBy": "pnpm release:check",
+    "requiresConservativeVerdict": true,
+    "allowsDocsOnlyCommitsAfterCodeBaseline": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",

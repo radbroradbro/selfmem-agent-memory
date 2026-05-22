@@ -40,7 +40,11 @@ Scope:
   `writesRealFiles: false` draft exports.
 - Added `release-state.json` to the release gate so the current packet must
   explicitly remain conservative: active goal, `FAIL` launch verdict, green
-  verified baseline, fixture-only safety boundary, and unresolved blockers.
+  verified code baseline, fixture-only safety boundary, unresolved blockers,
+  and a guard note that later docs/gate commits still need CI but do not create
+  a new runtime evidence claim.
+- Added Gemini review for the release-state guard and made that review packet a
+  required release-readiness artifact.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
