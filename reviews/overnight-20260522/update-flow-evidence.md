@@ -8,6 +8,8 @@ Scope:
 - Added `bin/selfmem_update` as the user-facing command wrapper and package
   binary mapping.
 - Exercised Hermes and OpenClaw updater paths in temporary runtime directories.
+- Exercised updater-triggered canary report and intake generation against a
+  fixture diagnostic export.
 - Verified dry-run and apply behavior without touching real agent homes.
 
 Public-safety boundary:
@@ -26,6 +28,9 @@ Verification expectations:
 - Apply preserves local container mapping reports.
 - Apply copies local key files with `0600`.
 - OpenClaw apply installs the audit helper by default.
+- `--run-canary --canary-output <path>` runs adapter smoke, writes a sanitized
+  canary report, runs intake, and keeps fixture output from counting as real
+  rollout evidence.
 
 Command:
 
@@ -38,6 +43,8 @@ Verification:
 - `pnpm update:smoke`: passed for Hermes and OpenClaw fixture runtimes.
 - `python3 -m py_compile packages/bench/update-flow-smoke.py plugins/selfmem-fallback/scripts/selfmem_update.py`: passed.
 - `bin/selfmem_update --help`: covered by the release-readiness gate.
+- `bin/selfmem_update --help`: now exposes `--run-canary`, `--canary-output`,
+  `--strict-real`, and `--rollback-tested`.
 - `pnpm smoke`: passed with update smoke included.
 - `pnpm test`: 14 tests passed.
 - `git diff --check`: passed.
@@ -58,6 +65,7 @@ Cold review:
 
 Known limits:
 
-- This smoke proves updater mechanics, not live runtime health.
+- This smoke proves updater mechanics and report generation, not live runtime
+  health.
 - Live agent rollout still requires one-agent canary evidence before broad
   installation.

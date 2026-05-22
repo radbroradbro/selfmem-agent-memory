@@ -285,7 +285,11 @@ check("selfmem_update command is mapped", () => {
   const command = join(root, "bin/selfmem_update");
   assert.ok(statSync(command).mode & 0o111, "bin/selfmem_update must be executable");
   assert.match(readFileSync(command, "utf8"), /^#!\/usr\/bin\/env sh/);
-  run(command, ["--help"]);
+  const help = run(command, ["--help"]).stdout;
+  assert.match(help, /--run-canary/);
+  assert.match(help, /--canary-output/);
+  assert.match(help, /--strict-real/);
+  assert.match(help, /--rollback-tested/);
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-bin-check-"));
   try {
     const symlinkPath = join(tempRoot, "selfmem_update");

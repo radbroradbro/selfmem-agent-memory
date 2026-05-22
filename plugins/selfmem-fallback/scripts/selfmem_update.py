@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Any
@@ -41,7 +42,7 @@ def main() -> None:
         result["steps"].append(install_openclaw_audit(home, apply=args.apply))
 
     if args.run_canary:
-        result["canary"] = run_canary(args.host)
+        result["canary"] = run_canary(args.host, home, args)
         if not result["canary"]["ok"]:
             result["ok"] = False
 
@@ -58,6 +59,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--keys-file", default="", help="Optional local credentials file to copy into this agent's selfmem home. Never commit this file.")
     parser.add_argument("--install-audit", action="store_true", default=True)
     parser.add_argument("--run-canary", action="store_true")
+    parser.add_argument("--canary-output", default="", help="Optional path for a sanitized canary report JSON.")
+    parser.add_argument("--canary-diagnostic-dir", default="", help="Optional redacted diagnostic directory to convert into canary evidence.")
+    parser.add_argument("--canary-diagnostic-zip", default="", help="Optional redacted diagnostic zip to convert into canary evidence.")
+    parser.add_argument("--strict-real", action="store_true", help="Require strict real canary intake to pass.")
+    parser.add_argument("--rollback-tested", action="store_true", help="Mark the canary report rollback drill as tested.")
     parser.add_argument("--apply", action="store_true", help="Actually copy files. Without this, the updater is a dry run.")
     return parser.parse_args()
 
@@ -148,20 +154,185 @@ def install_openclaw_audit(home: Path, *, apply: bool) -> dict[str, Any]:
     return {"step": "install_openclaw_audit", "ok": True, "target": str(target)}
 
 
-def run_canary(host: str) -> dict[str, Any]:
+def run_canary(host: str, home: Path, args: argparse.Namespace) -> dict[str, Any]:
     command = (
         [sys.executable, str(REPO_ROOT / "packages" / "adapters" / "hermes" / "selfmem_canary_standalone_smoke.py")]
         if host == "hermes"
         else ["node", str(REPO_ROOT / "packages" / "adapters" / "openclaw" / "selfmem_canary_standalone_smoke.mjs")]
     )
     result = subprocess.run(command, capture_output=True, text=True, check=False, timeout=30)
-    return {
+    output: dict[str, Any] = {
         "ok": result.returncode == 0,
-        "evidenceType": "adapter-smoke-with-mocked-provider-calls",
-        "command": " ".join(command),
-        "stdout": parse_json(result.stdout),
-        "stderr": result.stderr[-1000:],
+        "evidenceType": "adapter-smoke-plus-optional-runtime-canary",
+        "adapterSmoke": {
+            "ok": result.returncode == 0,
+            "evidenceType": "adapter-smoke-with-mocked-provider-calls",
+            "command": "adapter standalone smoke",
+            "stdout": parse_json(result.stdout),
+            "stderr": result.stderr[-1000:],
+        },
     }
+    runtime = run_runtime_canary(host, home, args)
+    if runtime:
+        output["runtimeReport"] = runtime
+        if args.strict_real and not runtime["ok"]:
+            output["ok"] = False
+    return output
+
+
+def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[str, Any] | None:
+    source_args = runtime_canary_source_args(host, home, args)
+    if not source_args:
+        return None
+    output_path = Path(args.canary_output).expanduser().resolve() if args.canary_output else None
+    temp_file = None
+    if output_path is None:
+        temp_file = tempfile.NamedTemporaryFile(prefix="recallweave-canary-", suffix=".json", delete=False)
+        temp_file.close()
+        output_path = Path(temp_file.name)
+    else:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    report_command = [
+        "node",
+        str(REPO_ROOT / "packages" / "bench" / "canary-report-from-trace.mjs"),
+        *source_args,
+        "--output",
+        str(output_path),
+    ]
+    if args.rollback_tested:
+        report_command.append("--rollback-tested")
+    report = subprocess.run(report_command, cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=45)
+    runtime: dict[str, Any] = {
+        "ok": report.returncode == 0,
+        "reportGenerated": report.returncode == 0,
+        "reportPath": str(output_path) if args.canary_output else "",
+        "source": runtime_canary_source_label(source_args),
+        "strictReal": bool(args.strict_real),
+        "rollbackTested": bool(args.rollback_tested),
+        "stderr": report.stderr[-1000:],
+    }
+    if report.returncode != 0:
+        cleanup_temp(temp_file)
+        return runtime
+
+    runtime["report"] = summarize_canary_report(parse_json(report.stdout))
+    intake_command = [
+        "node",
+        str(REPO_ROOT / "packages" / "bench" / "canary-evidence-intake.mjs"),
+        "--report",
+        str(output_path),
+    ]
+    if args.strict_real:
+        intake_command.append("--strict-real")
+    intake = subprocess.run(intake_command, cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=30)
+    runtime["intake"] = summarize_canary_intake(parse_json(intake.stdout))
+    runtime["intakeOk"] = intake.returncode == 0
+    runtime["intakeStderr"] = intake.stderr[-1000:]
+    if intake.returncode != 0:
+        diagnosis = subprocess.run([
+            "node",
+            str(REPO_ROOT / "packages" / "bench" / "canary-remediation.mjs"),
+            "--report",
+            str(output_path),
+        ], cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=30)
+        runtime["diagnosis"] = summarize_canary_diagnosis(parse_json(diagnosis.stdout))
+        runtime["ok"] = False
+    cleanup_temp(temp_file)
+    return runtime
+
+
+def runtime_canary_source_args(host: str, home: Path, args: argparse.Namespace) -> list[str]:
+    if args.canary_diagnostic_dir:
+        return ["--diagnostic-dir", str(Path(args.canary_diagnostic_dir).expanduser().resolve())]
+    if args.canary_diagnostic_zip:
+        return ["--diagnostic-zip", str(Path(args.canary_diagnostic_zip).expanduser().resolve())]
+    container = newest_container_dir(host, home)
+    if not container:
+        return []
+    return ["--host", host, "--container", str(container)]
+
+
+def runtime_canary_source_label(source_args: list[str]) -> str:
+    if "--diagnostic-dir" in source_args:
+        return "diagnostic-dir"
+    if "--diagnostic-zip" in source_args:
+        return "diagnostic-zip"
+    if "--container" in source_args:
+        return "container"
+    return "unknown"
+
+
+def newest_container_dir(host: str, home: Path) -> Path | None:
+    root = home / ("selfmem_canary" if host == "hermes" else "selfmem") / "containers"
+    if not root.exists():
+        return None
+    containers = [path for path in root.iterdir() if path.is_dir()]
+    if not containers:
+        return None
+
+    def sort_key(path: Path) -> float:
+        candidates = [path / "trace.jsonl", path / "container-map.json", path]
+        return max((candidate.stat().st_mtime for candidate in candidates if candidate.exists()), default=0.0)
+
+    return sorted(containers, key=sort_key, reverse=True)[0]
+
+
+def summarize_canary_report(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    return {
+        "mode": value.get("mode"),
+        "fixtureOnly": value.get("fixtureOnly"),
+        "evidenceType": value.get("evidenceType"),
+        "host": ((value.get("agent") or {}).get("host")),
+        "window": value.get("window"),
+        "counts": value.get("counts"),
+        "latencyMs": value.get("latencyMs"),
+        "instrumentation": value.get("instrumentation"),
+        "quality": value.get("quality"),
+        "privacy": value.get("privacy"),
+    }
+
+
+def summarize_canary_intake(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    return {
+        "ok": value.get("ok"),
+        "fixtureOnly": value.get("fixtureOnly"),
+        "countsAsRealRolloutEvidence": value.get("countsAsRealRolloutEvidence"),
+        "canaryPass": value.get("canaryPass"),
+        "failedChecks": value.get("failedChecks"),
+        "lifecycle": value.get("lifecycle"),
+        "latencyMs": value.get("latencyMs"),
+        "instrumentation": value.get("instrumentation"),
+        "quality": value.get("quality"),
+        "privacy": value.get("privacy"),
+    }
+
+
+def summarize_canary_diagnosis(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    return {
+        "ok": value.get("ok"),
+        "canaryPass": value.get("canaryPass"),
+        "severity": value.get("severity"),
+        "failedChecks": value.get("failedChecks"),
+        "measurements": value.get("measurements"),
+        "actions": value.get("actions"),
+        "operatorSummary": value.get("operatorSummary"),
+    }
+
+
+def cleanup_temp(temp_file: Any) -> None:
+    if not temp_file:
+        return
+    try:
+        Path(temp_file.name).unlink(missing_ok=True)
+    except Exception:
+        pass
 
 
 def parse_json(text: str) -> Any:

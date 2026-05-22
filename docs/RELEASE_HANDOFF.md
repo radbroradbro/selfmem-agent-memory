@@ -212,14 +212,18 @@ For each deployed agent:
 1. Update from the merged commit.
 2. Run `selfmem_update` in dry-run mode.
 3. Apply to one agent with `--apply --run-canary`.
-4. Collect event counts, redaction count, provider mode, p50 and p95 recall
-   latency, and errors.
-5. Run `canary:report` for the selected agent container.
-6. Run `canary:intake -- --report sanitized-report.json --strict-real`.
-7. If strict intake fails, run
+4. Prefer `--canary-output /tmp/recallweave-canary-report.json` so the update
+   command writes a metrics-only report while it runs adapter smoke.
+5. Verify the agent can still answer normal traffic and then collect a fresh
+   live window with event counts, redaction count, provider mode, search/store
+   latency samples, and errors.
+6. Run `canary:report` for the selected agent container if the update command
+   did not already write a report.
+7. Run `canary:intake -- --report sanitized-report.json --strict-real`.
+8. If strict intake fails, run
    `canary:diagnose -- --report sanitized-report.json` and attach only the
    metrics-only remediation output to the PR or issue.
-8. Open a PR or issue if any runtime behavior diverges.
+9. Open a PR or issue if any runtime behavior diverges.
 
 Do not roll the same change to every agent until one-agent canary evidence is
 clean.

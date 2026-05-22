@@ -117,6 +117,25 @@ Apply only after review:
 bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary
 ```
 
+To produce a shareable metrics-only canary artifact during the same update,
+write a sanitized report and run intake:
+
+```bash
+bin/selfmem_update \
+  --host hermes \
+  --repo /path/to/hermes \
+  --apply \
+  --run-canary \
+  --canary-output /tmp/recallweave-canary-report.json
+```
+
+After a rollback drill, add `--rollback-tested --strict-real`. Strict-real
+passes only when the selected live container has a fresh runtime window with
+search/store latency samples, lifecycle coverage, hybrid search coverage, local
+writes, read-through mode, and zero privacy leaks. If an agent sends a redacted
+diagnostic export instead of a live container path, use
+`--canary-diagnostic-dir` or `--canary-diagnostic-zip`.
+
 Use `--keys-file` only with a local private file on that runtime machine. Never
 put keys in the repository.
 
@@ -128,7 +147,8 @@ npm exec --yes pnpm@10.23.0 -- update:smoke
 
 The smoke creates temporary Hermes and OpenClaw homes, checks dry-run behavior,
 applies into fake runtime directories, verifies adapter backups, preserves the
-container mapping, and confirms copied local key files use `0600`.
+container mapping, confirms copied local key files use `0600`, and exercises the
+canary report/intake path against a fixture diagnostic export.
 
 ## Failed Canary Reports
 

@@ -79,6 +79,29 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
     second_apply = run_update(host, home, runtime, keys_file, apply=True)
     assert second_apply["ok"] is True
     assert len(list(adapter_target(host, runtime).parent.glob(f"{adapter_target(host, runtime).name}.bak-selfmem-update-*"))) >= 2
+    canary_output = root / f"{host}-canary-report.json"
+    canary = run_update(
+        host,
+        home,
+        runtime,
+        keys_file,
+        apply=False,
+        extra=[
+            "--run-canary",
+            "--canary-diagnostic-dir",
+            str(REPO_ROOT / "packages" / "bench" / "fixtures" / "canary-diagnostic-export.fixture"),
+            "--canary-output",
+            str(canary_output),
+            "--rollback-tested",
+        ],
+    )
+    assert canary["ok"] is True
+    assert canary["canary"]["adapterSmoke"]["ok"] is True
+    assert canary["canary"]["runtimeReport"]["reportGenerated"] is True
+    assert canary["canary"]["runtimeReport"]["intakeOk"] is True
+    assert canary["canary"]["runtimeReport"]["intake"]["canaryPass"] is True
+    assert canary["canary"]["runtimeReport"]["intake"]["countsAsRealRolloutEvidence"] is False
+    assert canary_output.exists(), "canary output should be written when requested"
 
     return {
         "ok": True,
@@ -86,6 +109,8 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
         "dryRunSteps": [step["step"] for step in dry["steps"]],
         "applySteps": [step["step"] for step in applied["steps"]],
         "secondApplySteps": [step["step"] for step in second_apply["steps"]],
+        "canarySource": canary["canary"]["runtimeReport"]["source"],
+        "canaryIntakePass": canary["canary"]["runtimeReport"]["intake"]["canaryPass"],
         "mappingFound": applied["preservedMapping"]["found"],
         "keyMode": oct(stat.S_IMODE(installed_key_path(host, home).stat().st_mode)),
     }
@@ -115,7 +140,7 @@ def setup_fixture(host: str, home: Path, runtime: Path, keys_file: Path) -> None
     (target / "OLD_ADAPTER.txt").write_text("old adapter fixture\n", encoding="utf-8")
 
 
-def run_update(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: bool) -> dict[str, Any]:
+def run_update(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: bool, extra: list[str] | None = None) -> dict[str, Any]:
     command = [
         str(UPDATER),
         "--host",
@@ -129,6 +154,8 @@ def run_update(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: 
     ]
     if apply:
         command.append("--apply")
+    if extra:
+        command.extend(extra)
 
     result = subprocess.run(
         command,

@@ -108,6 +108,7 @@ For local update scripts:
 ```bash
 bin/selfmem_update --host hermes --repo /path/to/hermes
 bin/selfmem_update --host hermes --repo /path/to/hermes --apply
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary --canary-output /tmp/recallweave-canary-report.json
 ```
 
 After linking or installing the package, use `selfmem_update` directly.
@@ -131,6 +132,7 @@ npm exec --yes pnpm@10.23.0 -- update:smoke
 For a real one-agent canary, use metrics-only reports:
 
 ```bash
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary --canary-output /tmp/recallweave-canary-report.json
 npm exec --yes pnpm@10.23.0 -- canary:report -- --diagnostic-dir <redacted-diagnostic-dir> --rollback-tested --output sanitized-report.json
 npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
 npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
@@ -140,6 +142,8 @@ Attach diagnosis output only. Do not attach the source diagnostic bundle or raw
 runtime logs. Strict canary intake requires search and store latency
 instrumentation. Summary-only exports and older traces that omit `elapsed_ms`
 can produce a useful diagnosis, but they cannot count as real rollout evidence.
+Use `selfmem_update --strict-real --rollback-tested` only after the agent has
+actually run a rollback drill and collected a fresh live window.
 
 ## Runtime Checks
 
