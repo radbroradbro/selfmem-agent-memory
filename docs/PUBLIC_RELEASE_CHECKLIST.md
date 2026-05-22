@@ -37,6 +37,9 @@ Use this checklist before making the repository public.
 - [ ] Docs clarity review completed.
 - [ ] Release claim review completed.
 - [ ] Any `CONCERNS` decision has an explicit acceptance note.
+- [ ] Public live-update draft says whether the release is production ready or
+  alpha only.
+- [ ] Dummy-data demo storyboard exists and forbids private memory footage.
 
 ## Publish
 

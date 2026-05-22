@@ -38,6 +38,9 @@ is still required before any public live update.
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
 | Post-12-hour readiness verdict | `reviews/overnight-20260522/production-readiness.md` |
+| Public live-update draft | `reviews/overnight-20260522/public-live-update-draft.md` |
+| Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
+| Public live-update copy review | `reviews/overnight-20260522/gemini-public-live-update-copy-review.md` |
 
 ## Verification Run
 
@@ -49,7 +52,7 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions `Verify`: success on `ba1d1bb`.
+- GitHub Actions `Verify`: success on `d9d264c`.
 
 ## UI Evidence
 
@@ -80,6 +83,7 @@ local memory contents.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
+- Gemini public live-update copy review: `CLEAN`.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
