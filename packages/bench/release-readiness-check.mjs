@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { extname, join, relative } from "node:path";
@@ -13,6 +14,7 @@ const requiredFiles = [
   "README.md",
   "LICENSE",
   "SECURITY.md",
+  "bin/selfmem_update",
   "docs/PRODUCTION_READINESS.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
   `${reviewDir}/kickoff.md`,
@@ -24,6 +26,7 @@ const requiredFiles = [
   `${reviewDir}/brain-ui-vault-preview-evidence.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
   `${reviewDir}/gemini-brain-ui-sync-report-review.md`,
+  `${reviewDir}/gemini-selfmem-update-command-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
   `${reviewDir}/ui-evidence/brain-ui-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-fixture-edit.png`,
@@ -94,6 +97,23 @@ check("required scripts exist", () => {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   for (const script of requiredScripts) {
     assert.equal(typeof pkg.scripts?.[script], "string", `missing script ${script}`);
+  }
+});
+
+check("selfmem_update command is mapped", () => {
+  const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+  assert.equal(pkg.bin?.selfmem_update, "./bin/selfmem_update");
+  const command = join(root, "bin/selfmem_update");
+  assert.ok(statSync(command).mode & 0o111, "bin/selfmem_update must be executable");
+  assert.match(readFileSync(command, "utf8"), /^#!\/usr\/bin\/env sh/);
+  run(command, ["--help"]);
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-bin-check-"));
+  try {
+    const symlinkPath = join(tempRoot, "selfmem_update");
+    symlinkSync(command, symlinkPath);
+    run(symlinkPath, ["--help"]);
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
   }
 });
 

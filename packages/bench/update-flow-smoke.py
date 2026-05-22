@@ -14,17 +14,40 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-UPDATER = REPO_ROOT / "plugins" / "selfmem-fallback" / "scripts" / "selfmem_update.py"
+UPDATER = REPO_ROOT / "bin" / "selfmem_update"
+UPDATER_IMPL = REPO_ROOT / "plugins" / "selfmem-fallback" / "scripts" / "selfmem_update.py"
 
 
 def main() -> None:
     results = []
     with tempfile.TemporaryDirectory(prefix="recallweave-update-smoke-") as tmp:
         root = Path(tmp)
+        assert UPDATER.exists(), "selfmem_update command wrapper missing"
+        assert os.access(UPDATER, os.X_OK), "selfmem_update command wrapper must be executable"
+        compile_result = subprocess.run(
+            [sys.executable, "-m", "py_compile", str(UPDATER_IMPL)],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
+        )
+        assert compile_result.returncode == 0, compile_result.stderr
         results.append(run_host_case(root, "hermes"))
         results.append(run_host_case(root, "openclaw"))
 
-    print(json.dumps({"ok": all(item["ok"] for item in results), "results": results}, indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "ok": all(item["ok"] for item in results),
+                "command": "selfmem_update",
+                "wrapper": str(UPDATER.relative_to(REPO_ROOT)),
+                "results": results,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
 
 
 def run_host_case(root: Path, host: str) -> dict[str, Any]:
@@ -94,7 +117,6 @@ def setup_fixture(host: str, home: Path, runtime: Path, keys_file: Path) -> None
 
 def run_update(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: bool) -> dict[str, Any]:
     command = [
-        sys.executable,
         str(UPDATER),
         "--host",
         host,

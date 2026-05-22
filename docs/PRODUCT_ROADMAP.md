@@ -10,7 +10,7 @@ This roadmap tracks useful user-facing features without mixing them into the cur
 - Voyage embedding and rerank when local credentials are present.
 - Maintenance/status recall skip gate.
 - Lifecycle traces for recall, writes, compression checkpoints, provider errors, and privacy counts.
-- `selfmem_update.py` for dry-run updates and safer agent patching.
+- `selfmem_update` for dry-run updates and safer agent patching.
 - Fixture-safe Nucleus-to-wiki compiler and explicit disk-sync helper with
   reviewed-page conflict protection.
 

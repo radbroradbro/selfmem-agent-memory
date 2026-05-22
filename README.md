@@ -142,9 +142,12 @@ runtime's private config directory or process environment.
 Runtime updates should use the bundled updater. It is dry-run by default:
 
 ```bash
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes --apply
+bin/selfmem_update --host hermes --repo /path/to/hermes
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply
 ```
+
+If the package is linked or installed, the same command is available as
+`selfmem_update`.
 
 Agents should branch from `main`, make a focused change, run the relevant smoke
 tests, and open a pull request. If a runtime issue cannot be fixed safely, open

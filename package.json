@@ -13,6 +13,9 @@
   "homepage": "https://github.com/radbroradbro/selfmem-agent-memory#readme",
   "type": "module",
   "packageManager": "pnpm@10.23.0",
+  "bin": {
+    "selfmem_update": "./bin/selfmem_update"
+  },
   "scripts": {
     "build": "tsc -b",
     "test": "vitest run tests",

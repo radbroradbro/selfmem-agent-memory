@@ -44,7 +44,7 @@ should improve a clear failure mode without changing unrelated memory behavior.
 After merge, ask the agent to run:
 
 ```bash
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes --apply --run-canary
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary
 ```
 
 Use the matching `--host openclaw` command for OpenClaw. Then collect sanitized

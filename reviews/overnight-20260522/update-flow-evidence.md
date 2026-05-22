@@ -5,6 +5,8 @@ Date: 2026-05-22
 Scope:
 
 - Added a fixture-safe smoke test for `selfmem_update.py`.
+- Added `bin/selfmem_update` as the user-facing command wrapper and package
+  binary mapping.
 - Exercised Hermes and OpenClaw updater paths in temporary runtime directories.
 - Verified dry-run and apply behavior without touching real agent homes.
 
@@ -35,6 +37,7 @@ Verification:
 
 - `pnpm update:smoke`: passed for Hermes and OpenClaw fixture runtimes.
 - `python3 -m py_compile packages/bench/update-flow-smoke.py plugins/selfmem-fallback/scripts/selfmem_update.py`: passed.
+- `bin/selfmem_update --help`: covered by the release-readiness gate.
 - `pnpm smoke`: passed with update smoke included.
 - `pnpm test`: 14 tests passed.
 - `git diff --check`: passed.
@@ -43,10 +46,15 @@ Verification:
 
 Cold review:
 
-- Gemini CLI returned `CLEAN`.
-- A minor backup-collision observation was hardened before commit. The updater
-  now allocates unique backup paths if multiple applies happen in the same
-  second, and the smoke test verifies repeated apply behavior.
+- Earlier Gemini review returned `CLEAN` after a backup-collision observation
+  was hardened. The updater allocates unique backup paths if multiple applies
+  happen in the same second, and the smoke test verifies repeated apply
+  behavior.
+- Gemini later blocked the first `selfmem_update` wrapper because package-manager
+  symlinks would break path resolution. The wrapper now resolves symlinks before
+  locating the Python updater, and the release-readiness gate executes it through
+  a temporary symlink.
+- Final Gemini CLI review returned `CLEAN` for the command wrapper.
 
 Known limits:
 

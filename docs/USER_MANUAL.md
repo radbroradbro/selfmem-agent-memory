@@ -83,16 +83,18 @@ Agents should pull the repo, branch, patch, run smokes, and open a pull request.
 For local update scripts:
 
 ```bash
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes --apply
+bin/selfmem_update --host hermes --repo /path/to/hermes
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply
 ```
+
+After linking or installing the package, use `selfmem_update` directly.
 
 The updater is dry-run by default and should back up the adapter directory
 before copying files. If an agent needs credentials installed, pass a local path
 that already exists on that machine:
 
 ```bash
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --keys-file ~/private/recallweave/keys.env --apply
+selfmem_update --host hermes --keys-file ~/private/recallweave/keys.env --apply
 ```
 
 The repository never ships a bundled key file.

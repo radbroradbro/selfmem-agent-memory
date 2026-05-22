@@ -107,13 +107,13 @@ A live-runtime PR should answer five questions:
 The updater is dry-run by default:
 
 ```bash
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes
+bin/selfmem_update --host hermes --repo /path/to/hermes
 ```
 
 Apply only after review:
 
 ```bash
-python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes --apply --run-canary
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary
 ```
 
 Use `--keys-file` only with a local private file on that runtime machine. Never
