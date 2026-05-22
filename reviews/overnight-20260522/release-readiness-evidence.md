@@ -135,3 +135,5 @@ Known limits:
   private names in public source would itself leak them.
 - GitHub Actions CI run `26288370812` passed on inspected baseline `2888f91`.
   Reinspect Actions after any later branch push.
+- GitHub Actions CI run `26289073223` passed on release-state guard commit
+  `dd17f44` after the Gemini guard review became required.

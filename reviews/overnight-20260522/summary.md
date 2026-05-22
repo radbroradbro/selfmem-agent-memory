@@ -18,6 +18,8 @@ is still required before any public live update.
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
   `2888f91`
+- Latest release-state guard CI:
+  `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
 - GitHub Actions CI run `26288370812` on `2888f91`: success.
 
@@ -71,6 +73,8 @@ Latest local verification before this summary:
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
 - GitHub Actions CI: success on the latest inspected baseline, `2888f91`.
+- GitHub Actions CI: success on release-state guard commit `dd17f44`, run
+  `26289073223`.
 
 ## UI Evidence
 

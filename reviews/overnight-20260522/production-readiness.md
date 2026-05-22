@@ -75,6 +75,8 @@ Controller follow-up after that sandbox run:
 - `pnpm release:check`: passed.
 - GitHub Actions CI run `26288370812` on inspected baseline `2888f91` passed,
   including Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26289073223` on release-state guard commit `dd17f44`
+  passed after the Gemini guard review became required.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.
 - Focused Gemini reviews for Brain UI local-audit preview and selected
@@ -84,6 +86,8 @@ Controller follow-up after that sandbox run:
   preview returned `CLEAN`.
 - Focused Gemini review for memory review queue returned `CLEAN`.
 - GitHub Actions CI run `26288370812` on inspected baseline `2888f91` passed.
+- GitHub Actions CI run `26289073223` on release-state guard commit `dd17f44`
+  passed.
 
 ## UI Evidence
 

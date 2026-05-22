@@ -22,6 +22,7 @@ complete or publish a public live update.
 - Latest public-draft baseline inspected before this audit refresh: `2888f91`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
+- Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -58,6 +59,7 @@ complete or publish a public live update.
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
 | GitHub Actions | CI run `26288370812` on `2888f91` passed Test, Full smoke, and Release readiness check | Proven |
+| Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |
 | Hosted Supermemory write-back disabled | Docs and safety notes state read-through only; no committed evidence enables write-back | Proven in repo scope |

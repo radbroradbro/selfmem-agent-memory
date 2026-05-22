@@ -31,6 +31,8 @@ or explicitly accepted.
 - Controller follow-up: `pnpm brain:smoke` and `pnpm release:check` passed.
 - GitHub Actions CI run `26288370812` on `2888f91`: passed, including Test,
   Full smoke, and Release readiness check.
+- GitHub Actions CI run `26289073223` on `dd17f44`: passed after the
+  conservative release-state guard review became required.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was
