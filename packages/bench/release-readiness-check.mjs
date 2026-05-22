@@ -41,6 +41,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-compaction-audit-review.md`,
   `${reviewDir}/brain-ui-benchmark-dashboard-evidence.md`,
   `${reviewDir}/gemini-brain-ui-benchmark-dashboard-review.md`,
+  `${reviewDir}/brain-ui-canary-rollout-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-canary-rollout-review.md`,
   `${reviewDir}/brain-ui-context-preview-evidence.md`,
   `${reviewDir}/gemini-brain-ui-context-preview-review.md`,
   `${reviewDir}/brain-ui-release-readiness-evidence.md`,
@@ -112,6 +114,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit.png`,
   `${reviewDir}/ui-evidence/brain-ui-benchmark-dashboard-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-benchmark-dashboard.png`,
+  `${reviewDir}/ui-evidence/brain-ui-canary-rollout-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-canary-rollout.png`,
   `${reviewDir}/ui-evidence/brain-ui-context-preview-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-context-preview.png`,
   `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
@@ -388,6 +392,38 @@ check("dom evidence is sane", () => {
   assert.equal(benchmarkDashboardEvidence.evidence.hasPrivateOrKeyText, false);
   assert.equal(benchmarkDashboardEvidence.consoleErrorCount, 0);
 
+  const canaryRolloutEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-canary-rollout-evidence.json"), "utf8"),
+  );
+  assert.equal(canaryRolloutEvidence.ok, true);
+  assert.equal(canaryRolloutEvidence.mode, "fixture-brain-ui-canary-rollout");
+  assert.equal(canaryRolloutEvidence.writesRealFiles, false);
+  assert.equal(canaryRolloutEvidence.evidence.hasCanaryHeading, true);
+  assert.equal(canaryRolloutEvidence.evidence.verdict, "READY_FOR_ONE_AGENT_CANARY");
+  assert.equal(canaryRolloutEvidence.evidence.statusDataVerdict, "READY_FOR_ONE_AGENT_CANARY");
+  assert.equal(canaryRolloutEvidence.evidence.mode, "fixture-one-agent-canary-rollout");
+  assert.equal(canaryRolloutEvidence.evidence.writesRealFiles, false);
+  assert.equal(canaryRolloutEvidence.evidence.metricsOnly, true);
+  assert.equal(canaryRolloutEvidence.evidence.targetScope, "one-agent");
+  assert.equal(canaryRolloutEvidence.evidence.hostedSupermemoryMode, "read-through-only");
+  assert.equal(canaryRolloutEvidence.evidence.publicLaunchVerdict, "FAIL");
+  assert.equal(canaryRolloutEvidence.evidence.publicLaunchStillBlocked, true);
+  assert.equal(canaryRolloutEvidence.evidence.ownerApprovalRequired, true);
+  assert.equal(canaryRolloutEvidence.evidence.privacyLeakCount, 0);
+  assert.equal(canaryRolloutEvidence.evidence.prerequisiteCount, 4);
+  assert.equal(canaryRolloutEvidence.evidence.failedPrerequisites, 0);
+  assert.equal(canaryRolloutEvidence.evidence.stepCount, 5);
+  assert.ok(canaryRolloutEvidence.evidence.metricCount >= 10);
+  assert.ok(canaryRolloutEvidence.evidence.blockerCount >= 3);
+  assert.equal(canaryRolloutEvidence.evidence.hasRollbackStep, true);
+  assert.equal(canaryRolloutEvidence.evidence.hasDryRunStep, true);
+  assert.equal(canaryRolloutEvidence.evidence.hasPrivacyMetric, true);
+  assert.equal(canaryRolloutEvidence.evidence.hasLatencyMetric, true);
+  assert.equal(canaryRolloutEvidence.evidence.hasHumanBlocker, true);
+  assert.equal(canaryRolloutEvidence.evidence.hasCanaryNotLaunchCaveat, true);
+  assert.equal(canaryRolloutEvidence.evidence.hasPrivateOrKeyText, false);
+  assert.equal(canaryRolloutEvidence.consoleErrorCount, 0);
+
   const contextPreviewEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-context-preview-evidence.json"), "utf8"),
   );
@@ -587,6 +623,7 @@ check("release state is conservative", () => {
     "brain-ui-graph-navigation-controls",
     "brain-ui-session-compaction-audit",
     "brain-ui-benchmark-dashboard",
+    "brain-ui-canary-rollout",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
     "session-compaction-benchmark",
@@ -629,6 +666,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /graph navigation|jump-to-node|neighborhood scope|all-vs-neighborhood/i, `${file} missing graph navigation`);
     assert.match(text, /compaction audit|local-session compaction/i, `${file} missing compaction audit`);
     assert.match(text, /benchmark dashboard|benchmark summary|compaction benchmark/i, `${file} missing benchmark dashboard`);
+    assert.match(text, /canary rollout|one-agent canary|selfmem_update/i, `${file} missing canary rollout`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);

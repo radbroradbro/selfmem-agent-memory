@@ -567,6 +567,7 @@ button.active {
 .context-summary,
 .release-summary,
 .benchmark-summary,
+.canary-summary,
 .policy-summary,
 .review-summary {
   display: grid;
@@ -580,6 +581,7 @@ button.active {
 .context-summary div,
 .release-summary div,
 .benchmark-summary div,
+.canary-summary div,
 .policy-summary div,
 .review-summary div {
   min-width: 0;
@@ -601,6 +603,8 @@ button.active {
 .release-summary span,
 .benchmark-summary strong,
 .benchmark-summary span,
+.canary-summary strong,
+.canary-summary span,
 .policy-summary strong,
 .policy-summary span,
 .review-summary strong,
@@ -614,6 +618,7 @@ button.active {
 .context-summary strong,
 .release-summary strong,
 .benchmark-summary strong,
+.canary-summary strong,
 .policy-summary strong,
 .review-summary strong {
   color: var(--cyan);
@@ -626,6 +631,7 @@ button.active {
 .context-summary span,
 .release-summary span,
 .benchmark-summary span,
+.canary-summary span,
 .policy-summary span,
 .review-summary span {
   color: var(--muted);
@@ -641,7 +647,8 @@ button.active {
 .context-omitted-list,
 .release-list,
 .benchmark-scenarios,
-.benchmark-caveats {
+.benchmark-caveats,
+.canary-list {
   display: grid;
   gap: 8px;
   list-style: none;
@@ -657,7 +664,8 @@ button.active {
 .context-omitted-list li,
 .release-list li,
 .benchmark-scenarios li,
-.benchmark-caveats li {
+.benchmark-caveats li,
+.canary-list li {
   display: grid;
   gap: 4px;
   border: 1px solid var(--line);
@@ -672,7 +680,8 @@ button.active {
 .context-omitted-list strong,
 .release-list strong,
 .benchmark-scenarios strong,
-.benchmark-caveats strong {
+.benchmark-caveats strong,
+.canary-list strong {
   color: var(--green);
   font-size: 12px;
   text-transform: uppercase;
@@ -688,7 +697,9 @@ button.active {
 .release-list span,
 .benchmark-scenarios span,
 .benchmark-scenarios small,
-.benchmark-caveats span {
+.benchmark-caveats span,
+.canary-list span,
+.canary-list small {
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -699,14 +710,16 @@ button.active {
 .context-omitted-list span,
 .release-list span,
 .benchmark-scenarios span,
-.benchmark-caveats span {
+.benchmark-caveats span,
+.canary-list span {
   color: var(--text);
   font-size: 12px;
 }
 
 .sync-actions small,
 .context-memory-list small,
-.benchmark-scenarios small {
+.benchmark-scenarios small,
+.canary-list small {
   color: var(--amber);
   font-size: 11px;
 }
@@ -743,14 +756,35 @@ button.active {
   font-weight: 760;
 }
 
+.canary-verdict {
+  display: inline-grid;
+  min-height: 30px;
+  place-items: center;
+  margin: 0 0 10px;
+  border: 1px solid rgba(118, 168, 255, 0.58);
+  border-radius: 999px;
+  padding: 5px 11px;
+  color: var(--blue);
+  background: rgba(118, 168, 255, 0.08);
+  font-size: 12px;
+  font-weight: 760;
+}
+
 .benchmark-verdict[data-verdict="FAIL"],
-.benchmark-scenarios li[data-status="fail"] {
+.benchmark-scenarios li[data-status="fail"],
+.canary-verdict[data-verdict="NEEDS_REVIEW"],
+.canary-list li[data-status="blocked"],
+.canary-list li[data-status="failed"] {
   border-color: rgba(228, 111, 105, 0.58);
   color: var(--red);
   background: rgba(228, 111, 105, 0.08);
 }
 
 .benchmark-caveats li {
+  border-color: rgba(244, 185, 90, 0.58);
+}
+
+.canary-list li[data-status="required"] {
   border-color: rgba(244, 185, 90, 0.58);
 }
 

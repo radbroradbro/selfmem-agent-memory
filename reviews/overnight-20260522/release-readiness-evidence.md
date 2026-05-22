@@ -108,6 +108,10 @@ Scope:
   exposes fixture local-only compaction benchmark status, scenario pass/fail
   counts, exact-identifier accuracy, noise reduction, and caveats without raw
   session text or candidate memory text.
+- Added Brain UI Canary Rollout evidence to the release gate. The UI now
+  exposes the one-agent canary path, dry-run/apply/observe/rollback steps,
+  metrics to collect, blockers, and caveats without touching real agent state
+  or local paths.
 - Added Gemini review for the browser evidence gate and made that review packet
   a required release-readiness artifact.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
@@ -155,6 +159,12 @@ What `release:check` verifies:
   privacy leaks, exact-identifier accuracy 1, average noise reduction at least
   0.2, hosted-baseline caveat, no-raw-text caveat, zero console errors, and no
   private/key-shaped visible text,
+- Brain UI Canary Rollout evidence exists and reports fixture one-agent canary
+  mode, `READY_FOR_ONE_AGENT_CANARY`, hosted Supermemory read-through-only
+  mode, public launch verdict `FAIL`, owner approval required, zero privacy
+  leaks, dry-run and rollback steps, p95 latency and privacy metrics, human
+  approval blocker, zero console errors, and no private/key-shaped visible
+  text,
 - Brain UI Context Preview evidence exists and reports selected memories,
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
@@ -199,6 +209,7 @@ Verification:
 - Fresh graph navigation controls smoke: covered by `release:check`.
 - Fresh Brain UI Compaction Audit smoke: covered by `release:check`.
 - Fresh Brain UI Benchmark Dashboard smoke: covered by `release:check`.
+- Fresh Brain UI Canary Rollout smoke: covered by `release:check`.
 - Fresh Brain UI Context Preview smoke: covered by `release:check`.
 - Fresh Brain UI Release Readiness smoke: covered by `release:check`.
 - Fresh local-session compaction audit: covered by `release:check`.
@@ -243,7 +254,8 @@ Cold review response:
   write-confirmed selected lifecycle policy apply, private/key-shaped policy
   rejection, dry-run sync reporting, write-confirmed selected review queue
   apply, private/key-shaped review rejection, dynamic graph layout spacing, graph navigation controls, Compaction Audit metrics-only rendering, Context Preview rendering, Release Readiness rendering, audit-log write intent coverage,
-  Benchmark Dashboard rendering, and public-safe serialization.
+  Benchmark Dashboard rendering, Canary Rollout rendering, and public-safe
+  serialization.
 
 Known limits:
 
@@ -286,6 +298,9 @@ Known limits:
   commit `fb466db`.
 - GitHub Actions CI run `26302442423` passed on Brain UI Benchmark Dashboard
   commit `d0113c0`, including Test, Full smoke, and Release readiness check.
+- Brain UI Canary Rollout has passed local release-gate verification and
+  focused Gemini review. Reinspect Actions after this slice is committed and
+  pushed.
 - GitHub Actions CI run `26300784883` passed on Brain UI Context Preview
   commit `0ec4396`.
 - GitHub Actions CI run `26301888111` passed on Brain UI Release Readiness

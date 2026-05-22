@@ -45,6 +45,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   compaction benchmark pass/fail metrics, exact-identifier accuracy, noise
   reduction, scenario status, and benchmark caveats without raw session or
   candidate text.
+- Brain UI Canary Rollout panel that renders one-agent canary prerequisites,
+  dry-run/apply/observe/rollback steps, metrics to collect, blockers, and
+  caveats without touching a real agent or local path.
 - Brain UI Context Preview panel that renders the fixture prompt recall packet,
   selected memories, omitted candidates, token budget, read-only hosted mode,
   local-only write mode, and safety counters.
@@ -179,6 +182,12 @@ Controller follow-up after that sandbox run:
   average noise reduction 0.307, hosted-baseline caveat visible, no-raw-text
   caveat visible, zero console errors, and no private/key-shaped visible text.
   GitHub Actions CI run `26302442423` passed on `d0113c0`.
+- Brain UI Canary Rollout local verification passed fresh Brain UI smoke and
+  interaction smoke. Browser evidence reports `READY_FOR_ONE_AGENT_CANARY`,
+  one-agent scope, hosted Supermemory read-through-only mode, public launch
+  verdict `FAIL`, owner approval required, 5 steps, 11 metrics to collect,
+  rollback and dry-run steps visible, zero console errors, and no
+  private/key-shaped visible text.
 
 ## UI Evidence
 
@@ -216,6 +225,9 @@ evidence for:
   metrics, 5 of 5 scenarios passed, hosted-baseline caveat, no-raw-text caveat,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
   text.
+- canary rollout evidence with fixture one-agent rollout status, dry-run and
+  rollback path, metrics to collect, public launch still blocked, zero privacy
+  leaks, zero console errors, and no private/key-shaped visible text.
 - context preview evidence with the fixture prompt recall packet, selected and
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
@@ -237,7 +249,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Benchmark Dashboard shows fixture local-only compaction quality metrics and caveats, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Benchmark Dashboard shows fixture local-only compaction quality metrics and caveats, Canary Rollout shows the one-agent dry-run/apply/observe/rollback path, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |

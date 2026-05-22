@@ -19,6 +19,7 @@ The UI should expose:
 - research lineage,
 - metrics-only local session compaction audit,
 - local-only compaction benchmark dashboard,
+- one-agent canary rollout dashboard,
 - prompt context preview for injected recall packets,
 - release readiness console for current public-launch blockers,
 - lifecycle policy draft export,
@@ -79,19 +80,20 @@ Required visual review path:
 13. research lineage preview,
 14. local session compaction audit preview,
 15. local compaction benchmark dashboard,
-16. prompt context preview,
-17. release readiness console,
-18. lifecycle policy preview,
-19. selected lifecycle policy apply confirmation,
-20. memory review queue preview,
-21. selected memory review queue apply confirmation,
-22. compiled wiki/vault preview,
-23. fixture vault sync report with conflict handling,
-24. selected local vault sync dry-run,
-25. selected local vault sync apply confirmation,
-26. fixture local-container audit preflight,
-27. selected local memory edit overlay confirmation,
-28. selected local memory materialize confirmation.
+16. one-agent canary rollout dashboard,
+17. prompt context preview,
+18. release readiness console,
+19. lifecycle policy preview,
+20. selected lifecycle policy apply confirmation,
+21. memory review queue preview,
+22. selected memory review queue apply confirmation,
+23. compiled wiki/vault preview,
+24. fixture vault sync report with conflict handling,
+25. selected local vault sync dry-run,
+26. selected local vault sync apply confirmation,
+27. fixture local-container audit preflight,
+28. selected local memory edit overlay confirmation,
+29. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -142,6 +144,19 @@ reduction 0.307, hosted-baseline caveat visible, no-raw-text caveat visible,
 zero console errors, and no private/key-shaped visible text. This panel does
 not claim hosted Supermemory superiority; it points to the need for a fresh
 metrics-only hosted baseline.
+
+The Canary Rollout panel is fixture-only and metrics-only. It summarizes the
+safe path from a green PR to one controlled agent canary without touching a
+real agent. It shows one-agent scope, host type, local checks, GitHub Actions
+status, public launch verdict, prerequisites, dry-run/apply/observe/rollback
+steps, metrics to collect, blockers, and caveats. Current browser evidence
+records `fixture-one-agent-canary-rollout`, verdict
+`READY_FOR_ONE_AGENT_CANARY`, target scope `one-agent`, hosted Supermemory mode
+`read-through-only`, public launch verdict `FAIL`, owner approval required,
+privacy leak count 0, 5 steps, 11 metrics, rollback and dry-run steps visible,
+zero console errors, and no private/key-shaped visible text. This panel does
+not approve public launch or fleet rollout; it only makes the one-agent canary
+path inspectable.
 
 The Context Preview panel is fixture-only. It shows the recall packet that
 would enter a prompt after hybrid retrieval and reranking: selected memory

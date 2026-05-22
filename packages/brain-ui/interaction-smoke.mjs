@@ -12,6 +12,7 @@ import {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildBenchmarkDashboard,
+  buildCanaryRollout,
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,
@@ -28,6 +29,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const sessionCompactionFixture = JSON.parse(await readFile(join(here, "fixtures/session-compaction-local-audit.json"), "utf8"));
 const benchmarkSummaryFixture = JSON.parse(await readFile(join(here, "fixtures/benchmark-summary.json"), "utf8"));
+const canaryRolloutFixture = JSON.parse(await readFile(join(here, "fixtures/canary-rollout.json"), "utf8"));
 const promptContextFixture = JSON.parse(await readFile(join(here, "fixtures/prompt-context-preview.json"), "utf8"));
 const releaseReadinessFixture = JSON.parse(await readFile(join(here, "fixtures/release-readiness.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
@@ -230,6 +232,24 @@ try {
   assert.ok(benchmarkDashboard.scenarios.every((scenario) => scenario.passed));
   assert.ok(benchmarkDashboard.caveats.some((caveat) => caveat.includes("Fixture benchmark")));
   assert.doesNotMatch(JSON.stringify(benchmarkDashboard), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+
+  const canaryRollout = buildCanaryRollout(canaryRolloutFixture);
+  assert.equal(canaryRollout.mode, "fixture-one-agent-canary-rollout");
+  assert.equal(canaryRollout.writesRealFiles, false);
+  assert.equal(canaryRollout.metricsOnly, true);
+  assert.equal(canaryRollout.verdict, "READY_FOR_ONE_AGENT_CANARY");
+  assert.equal(canaryRollout.target.scope, "one-agent");
+  assert.equal(canaryRollout.target.hostedSupermemoryMode, "read-through-only");
+  assert.equal(canaryRollout.readiness.publicLaunchVerdict, "FAIL");
+  assert.equal(canaryRollout.safety.publicLaunchStillBlocked, true);
+  assert.equal(canaryRollout.safety.ownerApprovalRequired, true);
+  assert.equal(canaryRollout.safety.privacyLeakCount, 0);
+  assert.ok(canaryRollout.prerequisites.some((item) => item.id === "dry-run-first" && item.status === "required"));
+  assert.ok(canaryRollout.steps.some((step) => step.id === "rollback"));
+  assert.ok(canaryRollout.metricsToCollect.includes("p95_recall_latency_ms"));
+  assert.ok(canaryRollout.blockers.includes("human-public-launch-approval-required"));
+  assert.ok(canaryRollout.passCriteria.some((criterion) => criterion.includes("privacy_leak_count")));
+  assert.doesNotMatch(JSON.stringify(canaryRollout), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const promptContext = buildPromptContextPreview(fixture, promptContextFixture);
   assert.equal(promptContext.mode, "fixture-prompt-context-preview");
@@ -689,6 +709,7 @@ try {
     lineage,
     sessionCompactionAudit,
     benchmarkDashboard,
+    canaryRollout,
     promptContext,
     releaseReadiness,
     policyDraft,
@@ -752,6 +773,7 @@ try {
           "research-lineage",
           "session-compaction-audit",
           "benchmark-dashboard",
+          "canary-rollout",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy-draft",

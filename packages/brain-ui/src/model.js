@@ -259,6 +259,90 @@ function buildBenchmarkDashboard(report = {}) {
   };
 }
 
+function buildCanaryRollout(packet = {}) {
+  const rawSerialized = JSON.stringify(packet ?? {});
+  const target = packet?.target ?? {};
+  const readiness = packet?.readiness ?? {};
+  const prerequisites = Array.isArray(packet?.prerequisites)
+    ? packet.prerequisites.map((item, index) => ({
+        id: safeExportText(item?.id ?? `prerequisite:${index}`),
+        label: safeExportText(item?.label ?? "Canary prerequisite"),
+        status: safeChoice(item?.status ?? "required", ["passed", "required", "blocked", "failed"], "required"),
+        evidence: safeExportText(item?.evidence ?? ""),
+      }))
+    : [];
+  const steps = Array.isArray(packet?.steps)
+    ? packet.steps.map((step, index) => ({
+        id: safeExportText(step?.id ?? `step:${index}`),
+        label: safeExportText(step?.label ?? "Canary step"),
+        command: safeExportText(step?.command ?? ""),
+        required: step?.required !== false,
+      }))
+    : [];
+  const blockers = safeStringList(packet?.blockers);
+  const privacyLeakCount = containsPrivateLikeText(rawSerialized) ? 1 : 0;
+  const failedPrerequisites = prerequisites.filter((item) => item.status === "failed" || item.status === "blocked").length;
+  const requiredPrerequisites = prerequisites.filter((item) => item.status === "required").length;
+  const ownerApprovalRequired = safeChoice(readiness.ownerApproval ?? "required", ["required", "approved"], "required") === "required";
+  const publicLaunchVerdict = safeChoice(readiness.publicLaunchVerdict ?? "FAIL", ["FAIL", "PASS", "PASS_WITH_CONCERNS"], "FAIL");
+  const localChecks = safeChoice(readiness.localChecks ?? "unknown", ["passed", "failed", "unknown"], "unknown");
+  const githubActions = safeChoice(readiness.githubActions ?? "unknown", ["passed", "failed", "unknown"], "unknown");
+  const releaseGate = safeChoice(readiness.releaseGate ?? "unknown", ["passed", "failed", "unknown"], "unknown");
+  const readyForCanary =
+    privacyLeakCount === 0 &&
+    failedPrerequisites === 0 &&
+    localChecks === "passed" &&
+    githubActions === "passed" &&
+    releaseGate === "passed" &&
+    publicLaunchVerdict === "FAIL" &&
+    ownerApprovalRequired;
+  return {
+    schemaVersion: 1,
+    mode: "fixture-one-agent-canary-rollout",
+    writesRealFiles: false,
+    metricsOnly: true,
+    generatedAt: safeTimestamp(packet?.generatedAt, "1970-01-01T00:00:00.000Z"),
+    target: {
+      scope: safeChoice(target.scope ?? "one-agent", ["one-agent", "fleet"], "one-agent"),
+      host: safeExportText(target.host ?? "hermes-or-openclaw"),
+      containerPolicy: safeExportText(target.containerPolicy ?? "agent-specific-local-container"),
+      hostedSupermemoryMode: safeChoice(target.hostedSupermemoryMode ?? "read-through-only", [
+        "read-through-only",
+        "disabled",
+      ]),
+      widerRollout: safeExportText(target.widerRollout ?? "blocked-until-canary-clean"),
+    },
+    readiness: {
+      localChecks,
+      githubActions,
+      releaseGate,
+      publicLaunchVerdict,
+      ownerApproval: safeChoice(readiness.ownerApproval ?? "required", ["required", "approved"], "required"),
+    },
+    verdict: readyForCanary ? "READY_FOR_ONE_AGENT_CANARY" : "NEEDS_REVIEW",
+    safety: {
+      privacyLeakCount,
+      publicLaunchStillBlocked: publicLaunchVerdict === "FAIL",
+      ownerApprovalRequired,
+      hostedWriteBackDisabled: target.hostedSupermemoryMode !== "write-back",
+    },
+    summary: {
+      prerequisites: prerequisites.length,
+      requiredPrerequisites,
+      failedPrerequisites,
+      steps: steps.length,
+      metricsToCollect: safeStringList(packet?.metricsToCollect).length,
+      blockers: blockers.length,
+    },
+    prerequisites,
+    steps,
+    metricsToCollect: safeStringList(packet?.metricsToCollect),
+    blockers,
+    passCriteria: safeStringList(packet?.passCriteria),
+    caveats: safeStringList(packet?.caveats),
+  };
+}
+
 function buildPromptContextPreview(snapshot, packet = {}) {
   const nodesById = new Map((snapshot.nodes ?? []).map((node) => [node.id, node]));
   const rawSerialized = JSON.stringify(packet ?? {});
@@ -811,6 +895,7 @@ export {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildBenchmarkDashboard,
+  buildCanaryRollout,
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,

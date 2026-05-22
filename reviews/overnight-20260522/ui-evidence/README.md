@@ -104,6 +104,14 @@
   accuracy 1, average noise reduction 0.307, hosted-baseline caveat,
   no-raw-text caveat, zero console errors, and no private/key-shaped visible
   text.
+- The Canary Rollout slice was verified by Playwright browser evidence, fresh
+  Brain UI smoke, interaction smoke, and Gemini focused review. A fixture-only
+  screenshot was captured at `brain-ui-canary-rollout.png`, and
+  `brain-ui-canary-rollout-evidence.json` reports
+  `READY_FOR_ONE_AGENT_CANARY`, one-agent scope, hosted Supermemory
+  read-through-only mode, public launch verdict `FAIL`, owner approval
+  required, dry-run and rollback steps visible, 11 metrics to collect, zero
+  console errors, and no private/key-shaped visible text.
 - The Context Preview slice was verified by Codex Browser DOM evidence, fresh
   Brain UI smoke, and interaction smoke. A fixture-only screenshot was captured
   at `brain-ui-context-preview.png`, and

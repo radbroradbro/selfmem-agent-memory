@@ -7,6 +7,7 @@ import {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildBenchmarkDashboard,
+  buildCanaryRollout,
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,
@@ -31,6 +32,7 @@ const state = {
   syncReport: null,
   sessionCompactionAudit: null,
   benchmarkSummary: null,
+  canaryRollout: null,
   promptContextPreview: null,
   releaseReadiness: null,
   selectedVaultPath: "",
@@ -74,6 +76,13 @@ const benchmarkSummary = document.querySelector("#benchmarkSummary");
 const benchmarkScenarios = document.querySelector("#benchmarkScenarios");
 const benchmarkCaveats = document.querySelector("#benchmarkCaveats");
 const benchmarkExport = document.querySelector("#benchmarkExport");
+const canaryStatus = document.querySelector("#canaryStatus");
+const canarySummary = document.querySelector("#canarySummary");
+const canaryPrerequisites = document.querySelector("#canaryPrerequisites");
+const canarySteps = document.querySelector("#canarySteps");
+const canaryMetrics = document.querySelector("#canaryMetrics");
+const canaryBlockers = document.querySelector("#canaryBlockers");
+const canaryExport = document.querySelector("#canaryExport");
 const contextPreviewSummary = document.querySelector("#contextPreviewSummary");
 const contextPreviewMemories = document.querySelector("#contextPreviewMemories");
 const contextPreviewSections = document.querySelector("#contextPreviewSections");
@@ -183,6 +192,7 @@ const [
   syncResponse,
   sessionCompactionResponse,
   benchmarkResponse,
+  canaryResponse,
   promptContextResponse,
   releaseReadinessResponse,
   localAuditResponse,
@@ -193,6 +203,7 @@ const [
   fetch("/fixtures/wiki-sync-report.json"),
   fetch("/fixtures/session-compaction-local-audit.json"),
   fetch("/fixtures/benchmark-summary.json"),
+  fetch("/fixtures/canary-rollout.json"),
   fetch("/fixtures/prompt-context-preview.json"),
   fetch("/fixtures/release-readiness.json"),
   fetch("/fixtures/local-container-audit.json"),
@@ -203,6 +214,7 @@ state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
 state.sessionCompactionAudit = await sessionCompactionResponse.json();
 state.benchmarkSummary = await benchmarkResponse.json();
+state.canaryRollout = await canaryResponse.json();
 state.promptContextPreview = await promptContextResponse.json();
 state.releaseReadiness = await releaseReadinessResponse.json();
 state.localAudit = await localAuditResponse.json();
@@ -514,6 +526,7 @@ function render() {
   renderResearchLineage();
   renderSessionCompactionAudit();
   renderBenchmarkDashboard();
+  renderCanaryRollout();
   renderPromptContextPreview();
   renderReleaseReadiness();
   renderLifecyclePolicy();
@@ -802,6 +815,73 @@ function renderBenchmarkDashboard() {
   }
 
   benchmarkExport.textContent = JSON.stringify(packet, null, 2);
+}
+
+function renderCanaryRollout() {
+  const packet = buildCanaryRollout(state.canaryRollout);
+  canaryStatus.textContent = packet.verdict;
+  canaryStatus.dataset.verdict = packet.verdict;
+  canarySummary.replaceChildren(
+    stat("Target", packet.target.scope),
+    stat("Host", packet.target.host),
+    stat("Checks", packet.readiness.localChecks),
+    stat("CI", packet.readiness.githubActions),
+    stat("Public", packet.readiness.publicLaunchVerdict),
+    stat("Prereqs", packet.summary.prerequisites),
+    stat("Metrics", packet.summary.metricsToCollect),
+    stat("Leaks", packet.safety.privacyLeakCount),
+  );
+
+  canaryPrerequisites.replaceChildren();
+  for (const prerequisite of packet.prerequisites) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    item.dataset.status = prerequisite.status;
+    strong.textContent = prerequisite.status;
+    span.textContent = prerequisite.label;
+    small.textContent = prerequisite.evidence;
+    item.append(strong, span, small);
+    canaryPrerequisites.append(item);
+  }
+
+  canarySteps.replaceChildren();
+  for (const [index, step] of packet.steps.entries()) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    strong.textContent = `${index + 1}`;
+    span.textContent = step.label;
+    small.textContent = step.command;
+    item.append(strong, span, small);
+    canarySteps.append(item);
+  }
+
+  canaryMetrics.replaceChildren();
+  for (const metric of packet.metricsToCollect) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = "metric";
+    span.textContent = metric;
+    item.append(strong, span);
+    canaryMetrics.append(item);
+  }
+
+  canaryBlockers.replaceChildren();
+  for (const blocker of [...packet.blockers, ...packet.caveats]) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = packet.blockers.includes(blocker) ? "blocker" : "caveat";
+    span.textContent = blocker;
+    item.append(strong, span);
+    canaryBlockers.append(item);
+  }
+
+  canaryExport.textContent = JSON.stringify(packet, null, 2);
 }
 
 function renderPromptContextPreview() {

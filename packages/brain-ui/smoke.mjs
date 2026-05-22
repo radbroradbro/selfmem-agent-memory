@@ -19,6 +19,7 @@ try {
     syncReport,
     sessionCompactionAudit,
     benchmarkSummary,
+    canaryRollout,
     promptContextPreview,
     releaseReadiness,
     localAudit,
@@ -34,6 +35,7 @@ try {
     json(`${base}/fixtures/wiki-sync-report.json`),
     json(`${base}/fixtures/session-compaction-local-audit.json`),
     json(`${base}/fixtures/benchmark-summary.json`),
+    json(`${base}/fixtures/canary-rollout.json`),
     json(`${base}/fixtures/prompt-context-preview.json`),
     json(`${base}/fixtures/release-readiness.json`),
     json(`${base}/fixtures/local-container-audit.json`),
@@ -50,6 +52,7 @@ try {
   assert.match(index, /Research Lineage/);
   assert.match(index, /Compaction Audit/);
   assert.match(index, /Benchmark Dashboard/);
+  assert.match(index, /Canary Rollout/);
   assert.match(index, /Context Preview/);
   assert.match(index, /Release Readiness/);
   assert.match(index, /Lifecycle Policy/);
@@ -75,6 +78,7 @@ try {
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /buildSessionCompactionAudit/);
   assert.match(app, /buildBenchmarkDashboard/);
+  assert.match(app, /buildCanaryRollout/);
   assert.match(app, /buildPromptContextPreview/);
   assert.match(app, /buildReleaseReadinessConsole/);
   assert.match(app, /buildLifecyclePolicyDraft/);
@@ -102,6 +106,7 @@ try {
   assert.match(model, /function graphScopedNodes/);
   assert.match(model, /function buildSessionCompactionAudit/);
   assert.match(model, /function buildBenchmarkDashboard/);
+  assert.match(model, /function buildCanaryRollout/);
   assert.match(model, /function buildPromptContextPreview/);
   assert.match(model, /function buildReleaseReadinessConsole/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
@@ -123,6 +128,7 @@ try {
   assert.match(styles, /selected-audit/);
   assert.match(styles, /audit-history/);
   assert.match(styles, /benchmark-verdict/);
+  assert.match(styles, /canary-verdict/);
   assert.match(styles, /context-section-list/);
   assert.match(styles, /release-verdict/);
   assert.match(styles, /edit-export/);
@@ -169,6 +175,16 @@ try {
   assert.equal(benchmarkSummary.aggregate.exactIdentifierAccuracy, 1);
   assert.ok(benchmarkSummary.aggregate.averageNoiseReductionRatio >= 0.2);
   assert.ok(benchmarkSummary.scenarios.every((scenario) => scenario.passed));
+  assert.equal(canaryRollout.mode, "one-agent-canary-rollout");
+  assert.equal(canaryRollout.writesRealFiles, false);
+  assert.equal(canaryRollout.metricsOnly, true);
+  assert.equal(canaryRollout.target.scope, "one-agent");
+  assert.equal(canaryRollout.target.hostedSupermemoryMode, "read-through-only");
+  assert.equal(canaryRollout.readiness.publicLaunchVerdict, "FAIL");
+  assert.ok(canaryRollout.prerequisites.some((item) => item.id === "dry-run-first"));
+  assert.ok(canaryRollout.steps.some((step) => step.id === "rollback"));
+  assert.ok(canaryRollout.metricsToCollect.includes("privacy_leak_count"));
+  assert.ok(canaryRollout.blockers.includes("human-public-launch-approval-required"));
   assert.equal(promptContextPreview.ok, true);
   assert.equal(promptContextPreview.mode, "prompt-context-preview");
   assert.equal(promptContextPreview.tokenBudget, 900);
@@ -273,6 +289,7 @@ try {
     syncReport,
     sessionCompactionAudit,
     benchmarkSummary,
+    canaryRollout,
     promptContextPreview,
     releaseReadiness,
     localAudit,
@@ -301,6 +318,7 @@ try {
           "graph-navigation-controls",
           "session-compaction-audit",
           "benchmark-dashboard",
+          "canary-rollout",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy",
