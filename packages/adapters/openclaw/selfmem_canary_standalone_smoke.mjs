@@ -60,7 +60,7 @@ const search = await plugin.tools.supermemory_search({
 const pre = await plugin.before_prompt_build({ query: "What should OpenClaw selfmem canary do?" });
 const skippedPre = await plugin.before_prompt_build({ query: "heartbeat diagnostic status check ping" });
 const statusLikeRealPre = await plugin.before_prompt_build({ query: "What is the status decision for OpenClaw memory retrieval?" });
-plugin.agent_end({ summary: "Decision: OpenClaw agent_end writes distilled local selfmem memory for this agent only." });
+plugin.agent_end({ summary: "Decision: OpenClaw agent_end writes distilled local RecallWeave memory for this agent only." });
 plugin.compression_checkpoint({
   event: "lcm_pre_compress",
   summary: "LCM compression checkpoint should preserve durable local memory before compaction.",

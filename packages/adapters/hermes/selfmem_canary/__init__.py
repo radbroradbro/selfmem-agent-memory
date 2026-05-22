@@ -222,11 +222,11 @@ class SelfmemCanaryProvider(MemoryProvider):
         if not self._active:
             return ""
         return "\n".join([
-            "# selfmem_canary",
-            f"Active canary provider. Mode: {self._provider_mode}. Use selfmem_search, selfmem_store, selfmem_forget, and selfmem_profile for explicit memory operations.",
+            "# RecallWeave memory",
+            f"Active RecallWeave provider. Mode: {self._provider_mode}. Use selfmem_search, selfmem_store, selfmem_forget, and selfmem_profile for explicit memory operations.",
             f"Local memory container: {self._local_container}. Source Supermemory container: {self._source_supermemory_container or 'not detected'}.",
-            "New memory writes are local. Search includes local selfmem plus mapped Supermemory read-through when the key and source container are available.",
-            "For durable growing memory, use selfmem_store. Keep built-in MEMORY.md/USER.md small and stable; if the built-in memory tool hits a character limit, store the durable fact in selfmem instead.",
+            "New memory writes are local. Search includes local RecallWeave plus mapped Supermemory read-through when the key and source container are available.",
+            "For durable growing memory, use selfmem_store. Keep built-in MEMORY.md/USER.md small and stable; if the built-in memory tool hits a character limit, store the durable fact in RecallWeave instead.",
         ])
 
     def prefetch(self, query: str, *, session_id: str = "") -> str:
@@ -416,11 +416,11 @@ class SelfmemCanaryProvider(MemoryProvider):
             FORGET_SCHEMA,
             PROFILE_SCHEMA,
             STATUS_SCHEMA,
-            _alias_schema(STORE_SCHEMA, "supermemory_store", "Compatibility alias: store a local selfmem canary memory."),
-            _alias_schema(SEARCH_SCHEMA, "supermemory_search", "Compatibility alias: search local selfmem plus mapped Supermemory read-through."),
-            _alias_schema(FORGET_SCHEMA, "supermemory_forget", "Compatibility alias: forget a local selfmem canary memory."),
-            _alias_schema(PROFILE_SCHEMA, "supermemory_profile", "Compatibility alias: return a local selfmem canary profile summary."),
-            _alias_schema(STATUS_SCHEMA, "supermemory_status", "Compatibility alias: return selfmem canary status."),
+            _alias_schema(STORE_SCHEMA, "supermemory_store", "Compatibility alias: store a local RecallWeave memory."),
+            _alias_schema(SEARCH_SCHEMA, "supermemory_search", "Compatibility alias: search local RecallWeave plus mapped Supermemory read-through."),
+            _alias_schema(FORGET_SCHEMA, "supermemory_forget", "Compatibility alias: forget a local RecallWeave memory."),
+            _alias_schema(PROFILE_SCHEMA, "supermemory_profile", "Compatibility alias: return a local RecallWeave profile summary."),
+            _alias_schema(STATUS_SCHEMA, "supermemory_status", "Compatibility alias: return RecallWeave status."),
         ]
 
     def handle_tool_call(self, tool_name: str, args: Dict[str, Any], **kwargs) -> str:

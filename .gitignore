@@ -1,5 +1,7 @@
 node_modules/
 dist/
+!packages/core/dist/
+!packages/core/dist/**
 coverage/
 .env
 .env.*
@@ -10,6 +12,14 @@ docs/benchmark-results/
 supermemory-export*/
 .selfmem-export*/
 .source-cache/
+memories.jsonl
+raw_events.jsonl
+lossless_context.jsonl
+trace.jsonl
+*.db
+*.sqlite
+*.sqlite3
+*.zip
 .goal-loop-review/
 *.tsbuildinfo
 __pycache__/

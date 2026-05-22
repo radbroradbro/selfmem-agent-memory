@@ -209,7 +209,7 @@ function renderTypedContext(input: {
     }).join("\n\n")
     : "No retrieved evidence.";
 
-  return `Selfmem shadow context
+  return `RecallWeave shadow context
 Intent: ${input.intent}
 Query: ${input.query}
 

@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a selfmem runtime issue with sanitized evidence
+about: Report a RecallWeave runtime issue with sanitized evidence
 title: ""
 labels: bug
 assignees: ""

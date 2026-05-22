@@ -3,7 +3,7 @@
   "name": "selfmem_canary",
   "version": "0.1.0",
   "kind": "memory",
-  "description": "Local selfmem canary memory plugin with per-agent Supermemory container mapping.",
+  "description": "RecallWeave local memory plugin with per-agent Supermemory container mapping.",
   "main": "./index.mjs",
   "tools": [
     "selfmem_store",

@@ -9,7 +9,7 @@ flowchart TD
   C --> D["Deduplicate against local container"]
   D --> E["Embed when provider keys are available"]
   D --> F["Write lexical and metadata index"]
-  E --> G["Write local selfmem memory"]
+  E --> G["Write local RecallWeave memory"]
   F --> G
   G --> H["Append trace event"]
 ```
@@ -30,7 +30,7 @@ flowchart TD
   G --> H
   H --> I["Rerank or score"]
   I --> J["Bound context by token budget"]
-  J --> K["Inject selfmem context"]
+  J --> K["Inject RecallWeave context"]
 ```
 
 ## Update Flow
@@ -50,7 +50,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  A["Local selfmem"] --> B["Search local memories"]
+  A["Local RecallWeave"] --> B["Search local memories"]
   C["Hosted Supermemory"] --> D["Read-only search"]
   E["Export cache"] --> F["Read-only local fallback"]
   B --> G["Unified candidates"]

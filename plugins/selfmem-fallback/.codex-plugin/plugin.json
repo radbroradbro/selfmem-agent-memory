@@ -1,15 +1,15 @@
 {
-  "name": "selfmem-fallback",
+  "name": "recallweave-fallback",
   "version": "0.1.0",
-  "description": "Selfmem shadow-memory and Supermemory export fallback kit.",
+  "description": "RecallWeave shadow-memory and Supermemory export fallback kit.",
   "author": {
-    "name": "selfmem",
+    "name": "RecallWeave",
     "email": "local-only@example.invalid",
-    "url": "https://local.invalid/selfmem"
+    "url": "https://github.com/bradleysuarezcpa/selfmem-agent-memory"
   },
-  "homepage": "https://local.invalid/selfmem",
-  "repository": "https://local.invalid/selfmem",
-  "license": "UNLICENSED",
+  "homepage": "https://github.com/bradleysuarezcpa/selfmem-agent-memory",
+  "repository": "https://github.com/bradleysuarezcpa/selfmem-agent-memory",
+  "license": "Apache-2.0",
   "keywords": [
     "memory",
     "supermemory",
@@ -20,23 +20,23 @@
   "hooks": "./hooks.json",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Selfmem Fallback",
+    "displayName": "RecallWeave Fallback",
     "shortDescription": "Shadow memory, export, and benchmark fallback tools.",
-    "longDescription": "Selfmem Fallback packages the current selfmem shadow-memory workflow, redaction rules, Supermemory export script, Hermes canary provider, and benchmark instructions. It is designed as an alternative or fallback lane while hosted Supermemory write credits are constrained.",
-    "developerName": "selfmem",
+    "longDescription": "RecallWeave Fallback packages the current shadow-memory workflow, redaction rules, Supermemory export script, Hermes canary provider, and benchmark instructions. It is designed as an alternative or fallback lane while hosted Supermemory write credits are constrained.",
+    "developerName": "RecallWeave",
     "category": "Productivity",
     "capabilities": [
       "Interactive",
       "Read",
       "Write"
     ],
-    "websiteURL": "https://local.invalid/selfmem",
-    "privacyPolicyURL": "https://local.invalid/selfmem/privacy",
-    "termsOfServiceURL": "https://local.invalid/selfmem/terms",
+    "websiteURL": "https://github.com/bradleysuarezcpa/selfmem-agent-memory",
+    "privacyPolicyURL": "https://github.com/bradleysuarezcpa/selfmem-agent-memory/blob/main/SECURITY.md",
+    "termsOfServiceURL": "https://github.com/bradleysuarezcpa/selfmem-agent-memory/blob/main/LICENSE",
     "defaultPrompt": [
       "Check whether memory writes are healthy.",
       "Export existing Supermemory documents safely.",
-      "Run the selfmem fallback benchmark."
+      "Run the RecallWeave fallback benchmark."
     ],
     "brandColor": "#2563EB"
   }

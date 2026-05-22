@@ -1,0 +1,1 @@
+{"version":3,"file":"export-cache.d.ts","sourceRoot":"","sources":["../../src/hybrid/export-cache.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,eAAe,EAAE,MAAM,gBAAgB,CAAC;AAGtD,MAAM,WAAW,qBAAqB;IACpC,UAAU,EAAE,eAAe,EAAE,CAAC;IAC9B,aAAa,EAAE,MAAM,CAAC;IACtB,OAAO,EAAE,MAAM,CAAC;CACjB;AAED,wBAAgB,0BAA0B,CAAC,MAAM,EAAE,MAAM,GAAG,qBAAqB,CAuDhF"}

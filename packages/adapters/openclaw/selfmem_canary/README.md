@@ -1,8 +1,8 @@
 # selfmem_canary OpenClaw Plugin
 
-Local selfmem memory provider for OpenClaw. The package id remains `selfmem_canary` so existing setup scripts and OpenClaw slot mappings keep working.
+Local RecallWeave memory provider for OpenClaw. The package id remains `selfmem_canary` so existing setup scripts and OpenClaw slot mappings keep working.
 
-It maps the current agent's Supermemory container to a local selfmem container, exposes `selfmem_*` tools plus `supermemory_*` aliases, and covers the OpenClaw memory lifecycle.
+It maps the current agent's Supermemory container to a local RecallWeave container, exposes `selfmem_*` tools plus `supermemory_*` aliases, and covers the OpenClaw memory lifecycle.
 
 The adapter preserves OpenClaw profile safety:
 
@@ -11,7 +11,7 @@ The adapter preserves OpenClaw profile safety:
 - suppresses writes in read-only mode when identity is unresolved,
 - exports the real plugin loader entry point through `default.register`.
 
-Search merges local selfmem with mapped Supermemory read-through. Voyage semantic search/rerank activates when a Voyage key is present.
+Search merges local RecallWeave with mapped Supermemory read-through. Voyage semantic search/rerank activates when a Voyage key is present.
 
 Reliability logging:
 

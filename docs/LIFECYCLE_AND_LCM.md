@@ -1,6 +1,6 @@
 # Lifecycle And LCM
 
-selfmem should behave like a native memory provider. It should recall before useful turns, write durable memories after useful turns, and avoid turning status checks into memory noise.
+RecallWeave should behave like a native memory provider. It should recall before useful turns, write durable memories after useful turns, and avoid turning status checks into memory noise.
 
 ## Hermes
 
@@ -26,10 +26,10 @@ Expected behavior:
 - `prefetch` and `queue_prefetch` prepare recall context.
 - `sync_turn` records completed turns after redaction and distillation.
 - `on_pre_compress` preserves compact evidence before context compression when Hermes exposes that event.
-- `on_memory_write` mirrors explicit memory-tool writes into local selfmem.
+- `on_memory_write` mirrors explicit memory-tool writes into local RecallWeave.
 - `on_session_end` closes the turn and records a summary when appropriate.
 
-If Hermes LCM is unavailable, Hermes may fall back to its built-in compressor. selfmem should continue to write local distilled memory, but it does not install or repair the LCM engine.
+If Hermes LCM is unavailable, Hermes may fall back to its built-in compressor. RecallWeave should continue to write local distilled memory, but it does not install or repair the LCM engine.
 
 ## OpenClaw
 
@@ -44,7 +44,7 @@ The OpenClaw adapter covers:
 Expected behavior:
 
 - `session_start` activates the agent's local container mapping.
-- `before_prompt_build` searches local selfmem plus optional hosted Supermemory history, then injects bounded context.
+- `before_prompt_build` searches local RecallWeave plus optional hosted Supermemory history, then injects bounded context.
 - `agent_end` redacts, distills, deduplicates, and stores useful memory locally.
 - compression checkpoint events record compact evidence when available.
 

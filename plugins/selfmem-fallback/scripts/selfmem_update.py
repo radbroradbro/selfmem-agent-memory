@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply a selfmem package update without remapping an agent's memory identity."""
+"""Apply a RecallWeave package update without remapping an agent's memory identity."""
 
 from __future__ import annotations
 

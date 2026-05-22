@@ -1,23 +1,23 @@
 ---
 name: selfmem-fallback
-description: Operate the selfmem fallback kit when hosted Supermemory is degraded, when exporting existing Supermemory data, or when running selfmem shadow-memory benchmarks.
+description: Operate the RecallWeave fallback kit when hosted Supermemory is degraded, when exporting existing Supermemory data, or when running RecallWeave shadow-memory benchmarks.
 ---
 
-# Selfmem Fallback
+# RecallWeave Fallback
 
-Use this skill when memory writes are blocked, hosted Supermemory is credit-limited, or the user wants a selfmem alternative/fallback lane.
+Use this skill when memory writes are blocked, hosted Supermemory is credit-limited, or the user wants a RecallWeave alternative/fallback lane.
 
 ## Operating Rules
 
-- Do not write provider keys to files.
+- Do not write provider keys to repository files.
 - Do not print provider keys.
 - Do not save exported raw memories into another service until the export has been reviewed.
-- Keep Supermemory and selfmem benchmark lanes separate.
+- Keep Supermemory and RecallWeave benchmark lanes separate.
 - Redact `<private>...</private>` and common key shapes before creating reports, traces, wiki pages, or screenshots.
 - Preserve full sessions as raw evidence, but inject/search distilled memories first. Raw full-session recall is an audit fallback, not the default.
 - Set up per-agent containers only for the target runtime named by the user or operator. Do not touch unrelated agents or machines.
-- After a target agent passes canary, make selfmem the native/default memory lane for that agent.
-- Search should merge local selfmem plus mapped Supermemory read-through. Dedupe only true copies and keep relevant unique memories from both systems.
+- After a target agent passes canary, make RecallWeave the native/default memory lane for that agent.
+- Search should merge local RecallWeave plus mapped Supermemory read-through. Dedupe only true copies and keep relevant unique memories from both systems.
 - Write new memories locally. Treat hosted Supermemory as read-only history unless the user separately approves a sync-back job.
 - Read keys only from environment variables. `VOYAGE_API_KEY` or `SELFMEM_VOYAGE_API_KEY` enables local semantic search/rerank. `SUPERMEMORY_API_KEY` or `SELFMEM_SUPERMEMORY_READ_KEY` enables old hosted Supermemory read-through.
 
@@ -69,10 +69,10 @@ python3 plugins/selfmem-fallback/scripts/setup-agent-memory.py --host openclaw -
 
 - Hosted memory writes may fail while read/list/search paths still work. Treat this as a reason to use local writes plus read-through history.
 - Export and benchmark reports must contain metrics only unless an operator explicitly approves local redacted content export.
-- Public benchmark claims remain bounded until the same dataset, judge, answer model, and scoring code run cleanly for both selfmem and the baseline system.
+- Public benchmark claims remain bounded until the same dataset, judge, answer model, and scoring code run cleanly for both RecallWeave and the baseline system.
 - The live Codex bridge has a distilled-memory cache path and should avoid injecting raw export blobs by default.
 - The Hermes canary should expose both `selfmem_*` tools and `supermemory_*` compatibility aliases.
 
 ## Default Recommendation
 
-Use selfmem as the default/native memory lane for any target agent that passes canary. Use hosted Supermemory as read/export history when configured. Do not switch unrelated agents.
+Use RecallWeave as the default/native memory lane for any target agent that passes canary. Use hosted Supermemory as read/export history when configured. Do not switch unrelated agents.

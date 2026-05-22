@@ -67,10 +67,10 @@ def main() -> None:
         provider._search_supermemory = fake_supermemory_search
         tool_names = [schema["name"] for schema in provider.get_tool_schemas()]
         alias_store = json.loads(provider.handle_tool_call("supermemory_store", {
-            "content": "LCM lifecycle memory should be distilled into local selfmem before any future Supermemory sync.",
+            "content": "LCM lifecycle memory should be distilled into local RecallWeave before any future Supermemory sync.",
         }))
         alias_search = json.loads(provider.handle_tool_call("supermemory_search", {
-            "query": "LCM lifecycle local selfmem sync remote Supermemory history",
+            "query": "LCM lifecycle local RecallWeave sync remote Supermemory history",
             "limit": 5,
         }))
         provider.sync_turn(
@@ -89,7 +89,7 @@ def main() -> None:
         pre_compress = provider.on_pre_compress([
             {"role": "user", "content": [{"type": "text", "text": "LCM pre-compress should be tracked by selfmem."}]},
         ])
-        provider.on_memory_write("remember", "MEMORY.md", "Built-in Hermes memory writes should mirror into local selfmem.")
+        provider.on_memory_write("remember", "MEMORY.md", "Built-in Hermes memory writes should mirror into local RecallWeave.")
         provider.on_session_end([
             {"role": "user", "content": "session ending after LCM lifecycle smoke"},
             {"role": "assistant", "content": "done"},

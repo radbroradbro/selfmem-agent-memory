@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Detect a Hermes agent's current Supermemory container and local selfmem target."""
+"""Detect a Hermes agent's current Supermemory container and local RecallWeave target."""
 
 from __future__ import annotations
 
@@ -138,4 +138,3 @@ def scrub(text: str) -> str:
 
 if __name__ == "__main__":
     main()
-

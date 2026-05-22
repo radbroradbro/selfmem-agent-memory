@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Propose a selfmem memory, UI, lifecycle, or benchmark improvement
+about: Propose a RecallWeave memory, UI, lifecycle, or benchmark improvement
 title: ""
 labels: enhancement
 assignees: ""

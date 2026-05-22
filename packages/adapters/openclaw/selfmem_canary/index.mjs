@@ -435,7 +435,7 @@ function forget(state, id, query) {
   const items = readAll(state);
   let target = id.trim();
   if (!target && query.trim()) target = searchLocalLexical(state, query, 1)[0]?.id || "";
-  if (target.startsWith("supermemory:")) return { success: false, message: "Read-through Supermemory memories are read-only. Forget only removes local selfmem memories." };
+  if (target.startsWith("supermemory:")) return { success: false, message: "Read-through Supermemory memories are read-only. Forget only removes local RecallWeave memories." };
   if (!target) return { success: false, message: "No memory id or matching query." };
   const kept = items.filter((item) => item.id !== target);
   if (kept.length === items.length) return { success: false, message: "Memory not found." };
@@ -787,11 +787,11 @@ export function selfmemCanarySetup(api = {}) {
 function registerOpenClawTools(api, plugin) {
   if (typeof api.registerTool !== "function") return;
   const definitions = [
-    ["selfmem_search", "Memory Search", "Search local selfmem plus mapped Supermemory history.", async (params) => plugin.tools.selfmem_search(params)],
-    ["selfmem_store", "Memory Store", "Store a new local selfmem memory.", async (params) => plugin.tools.selfmem_store(params)],
-    ["selfmem_forget", "Memory Forget", "Forget a local selfmem memory by id or query.", async (params) => plugin.tools.selfmem_forget(params)],
-    ["selfmem_profile", "Memory Profile", "Return a profile summary from selfmem recall.", async (params) => plugin.tools.selfmem_profile(params)],
-    ["selfmem_status", "Memory Status", "Return selfmem status.", async (params) => plugin.tools.selfmem_status(params)],
+    ["selfmem_search", "Memory Search", "Search local RecallWeave plus mapped Supermemory history.", async (params) => plugin.tools.selfmem_search(params)],
+    ["selfmem_store", "Memory Store", "Store a new local RecallWeave memory.", async (params) => plugin.tools.selfmem_store(params)],
+    ["selfmem_forget", "Memory Forget", "Forget a local RecallWeave memory by id or query.", async (params) => plugin.tools.selfmem_forget(params)],
+    ["selfmem_profile", "Memory Profile", "Return a profile summary from RecallWeave recall.", async (params) => plugin.tools.selfmem_profile(params)],
+    ["selfmem_status", "Memory Status", "Return RecallWeave status.", async (params) => plugin.tools.selfmem_status(params)],
     ["supermemory_search", "Memory Search", "Compatibility alias for selfmem_search.", async (params) => plugin.tools.supermemory_search(params)],
     ["supermemory_store", "Memory Store", "Compatibility alias for selfmem_store.", async (params) => plugin.tools.supermemory_store(params)],
     ["supermemory_forget", "Memory Forget", "Compatibility alias for selfmem_forget.", async (params) => plugin.tools.supermemory_forget(params)],
@@ -861,9 +861,9 @@ function registerOpenClawMemoryCapability(api, plugin) {
     const hasSearch = !availableTools || availableTools.has?.("selfmem_search") || availableTools.has?.("supermemory_search");
     if (!hasSearch) return [];
     return [
-      "## Memory (selfmem)",
+      "## Memory (RecallWeave)",
       "",
-      "selfmem is the active native memory lane. New memories write locally. Old mapped Supermemory history is read-only and may be searched together with local memories.",
+      "RecallWeave is the active native memory lane. New memories write locally. Old mapped Supermemory history is read-only and may be searched together with local memories.",
       "Use selfmem_search or supermemory_search to recall prior context. Use selfmem_store or supermemory_store only for durable memories.",
     ];
   };

@@ -155,7 +155,7 @@ export interface MemoryEngine {
 }
 
 /**
- * Internal selfmem provider boundary. This intentionally extends MemoryEngine
+ * Internal RecallWeave provider boundary. This intentionally extends MemoryEngine
  * with per-record/query forget support even though MemoryBench only exposes
  * bulk clear for benchmark isolation; see docs/memorybench-provider-contract.md.
  */

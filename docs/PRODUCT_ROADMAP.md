@@ -28,13 +28,13 @@ The first UI should show:
 - provider mode,
 - search preview with no raw private text unless explicitly opened locally.
 
-The UI should read local selfmem stores directly and should not upload memories to a hosted service.
+The UI should read local RecallWeave stores directly and should not upload memories to a hosted service.
 
 ## LLM Wiki And Obsidian View
 
 Karpathy-style LLM wiki tools use a simple pattern: immutable raw sources, generated markdown wiki pages, a schema/rules file, `index.md`, and `log.md`. Current public implementations also emphasize wikilinks, provenance, linting, contradiction checks, manual edit protection, and provider flexibility.
 
-For selfmem, this should become an optional view layer:
+For RecallWeave, this should become an optional view layer:
 
 - `sources/` stores immutable redacted source copies or source references.
 - `wiki/` stores generated pages for people, projects, workflows, bugs, decisions, and concepts.
@@ -62,7 +62,7 @@ Candidate modes:
 - central read-through with local write buffer,
 - central primary only for agents with stable network and small disk.
 
-The central store should expose the same container mapping model as local selfmem. It should never pool unrelated agents into one global namespace unless a user deliberately creates a shared team container.
+The central store should expose the same container mapping model as local RecallWeave. It should never pool unrelated agents into one global namespace unless a user deliberately creates a shared team container.
 
 Open design questions:
 

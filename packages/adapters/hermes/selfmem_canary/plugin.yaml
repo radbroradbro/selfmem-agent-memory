@@ -1,4 +1,4 @@
 name: selfmem_canary
 version: 0.1.0
-description: "Project-local selfmem canary provider for Hermes memory-provider smoke tests."
+description: "RecallWeave local memory provider for Hermes memory-provider smoke tests."
 pip_dependencies: []
