@@ -38,10 +38,15 @@ Use this flow for browser or computer-use evidence:
 9. Inspect the Local Audit Preflight panel.
 10. Optional: start with `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1`, run a
     selected-container audit, and confirm the visible path is redacted.
-11. Capture only sanitized screenshots or recordings.
+11. Optional: start with `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT=1`, apply a
+    selected local memory edit overlay in a throwaway fixture, and confirm the
+    response and audit trail are content-free.
+12. Capture only sanitized screenshots or recordings.
 
 ## Current Scope
 
 This is a scaffold, not the final app. It proves the product surface and visual
-review loop before editable real local containers. Selected local audits are
-read-only and return counts, reasons, and redacted path labels only.
+review loop before direct in-place memory editing. Selected local audits are
+read-only and return counts, reasons, and redacted path labels only. Selected
+local memory edits write append-only overlays under `.recallweave/` and never
+rewrite `memories.jsonl` directly.

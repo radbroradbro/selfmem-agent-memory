@@ -236,6 +236,62 @@
             <div id="selectedBrowseSummary" class="audit-summary" aria-label="Selected local container browse summary"></div>
             <ol id="selectedBrowseItems" class="audit-files" aria-label="Selected local container browse items"></ol>
           </form>
+          <form id="localEditForm" class="selected-audit local-edit" aria-label="Selected local memory edit">
+            <label>
+              <span>Edit container path</span>
+              <input id="localEditPath" name="localEditPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local memory edit path" />
+            </label>
+            <label>
+              <span>Source file</span>
+              <select id="localEditSourceFile" name="localEditSourceFile" aria-label="Selected local memory edit source file">
+                <option value="memories.jsonl">memories.jsonl</option>
+              </select>
+            </label>
+            <label>
+              <span>Line</span>
+              <input id="localEditLine" name="localEditLine" type="number" min="1" step="1" value="1" aria-label="Selected local memory edit line" />
+            </label>
+            <label>
+              <span>Source id</span>
+              <input id="localEditSourceId" name="localEditSourceId" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local memory edit source id" />
+            </label>
+            <label>
+              <span>Action</span>
+              <select id="localEditAction" name="localEditAction" aria-label="Selected local memory edit action">
+                <option value="append_correction">Append correction</option>
+                <option value="replace">Replace derived memory</option>
+                <option value="suppress">Suppress</option>
+                <option value="needs_review">Needs review</option>
+              </select>
+            </label>
+            <label>
+              <span>Reason</span>
+              <select id="localEditReason" name="localEditReason" aria-label="Selected local memory edit reason">
+                <option value="manual_correction">Manual correction</option>
+                <option value="duplicate">Duplicate</option>
+                <option value="stale">Stale</option>
+                <option value="noise">Noise</option>
+                <option value="privacy">Privacy</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label>
+              <span>Replacement text</span>
+              <textarea id="localEditText" name="localEditText" aria-label="Selected local memory edit replacement text"></textarea>
+            </label>
+            <label class="check-row">
+              <input id="localEditConfirm" name="localEditConfirm" type="checkbox" />
+              <span>Write edit overlay</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="localEditPhrase" name="localEditPhrase" type="text" autocomplete="off" aria-label="Selected local memory edit confirmation phrase" />
+            </label>
+            <button id="applyLocalEdit" type="submit">Apply edit</button>
+            <p id="localEditStatus" role="status"></p>
+            <div id="localEditSummary" class="audit-summary" aria-label="Selected local memory edit summary"></div>
+            <ol id="localEditActions" class="audit-reasons" aria-label="Selected local memory edit audit trail"></ol>
+          </form>
           <form id="selectedAuditForm" class="selected-audit" aria-label="Selected local container audit">
             <label>
               <span>Local container path</span>

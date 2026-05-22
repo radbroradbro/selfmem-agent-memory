@@ -29,6 +29,7 @@ export function createBrainUiServer(options = {}) {
   const enableLocalApply = options.enableLocalApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY === "1";
   const enablePolicyApply = options.enablePolicyApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY === "1";
   const enableReviewApply = options.enableReviewApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY === "1";
+  const enableLocalEdit = options.enableLocalEdit ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT === "1";
 
   return createHttpServer(async (request, response) => {
     try {
@@ -210,6 +211,29 @@ export function createBrainUiServer(options = {}) {
         return;
       }
 
+      if (path === "__local_container_edit") {
+        if (!enableLocalEdit) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "local_edit_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT=1 to apply a selected local memory edit overlay.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await applySelectedLocalMemoryEdit(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -237,6 +261,7 @@ function routePath(pathname) {
   if (pathname === "/wiki/sync/apply") return "__wiki_sync_apply";
   if (pathname === "/lifecycle-policy/apply") return "__lifecycle_policy_apply";
   if (pathname === "/review-queue/apply") return "__review_queue_apply";
+  if (pathname === "/local-container/edit") return "__local_container_edit";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -683,6 +708,111 @@ async function applySelectedReviewQueue(request) {
   };
 }
 
+async function applySelectedLocalMemoryEdit(request) {
+  const body = await readJsonBody(request, 80_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+  const confirmationPhrase = typeof body.confirmationPhrase === "string" ? body.confirmationPhrase.trim() : "";
+
+  if (body.confirmWrite !== true || confirmationPhrase !== "APPLY LOCAL MEMORY EDIT") {
+    return {
+      ok: false,
+      code: "write_confirmation_required",
+      message: "Confirm local edit write and type APPLY LOCAL MEMORY EDIT before writing a selected local memory edit overlay.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local container directory first." };
+  }
+
+  const rawEditText = JSON.stringify(body.edit ?? {});
+  const redaction = redactPrivate(rawEditText);
+  if (redaction.redacted) {
+    return {
+      ok: false,
+      code: "local_edit_contains_private_or_key_shaped_text",
+      message: "Local edit refused private or key-shaped edit text.",
+      redactionCount: redaction.redactionCount,
+    };
+  }
+
+  const appliedAt = new Date().toISOString();
+  const edit = normalizeLocalMemoryEdit(body.edit, appliedAt);
+  if (!edit) {
+    return {
+      ok: false,
+      code: "local_edit_required",
+      message: "Local edit requires a supported action, source reference, and replacement text unless the action is suppress.",
+    };
+  }
+
+  const editPayload = `${JSON.stringify(edit)}\n`;
+  const contentHash = createHash("sha256").update(editPayload).digest("hex");
+  const editsPath = resolveUnderSelectedRoot(rootDir, ".recallweave/local-memory-edits.jsonl");
+  const auditPath = resolveUnderSelectedRoot(rootDir, ".recallweave/local-memory-edit-audit.jsonl");
+  await mkdir(dirname(editsPath), { recursive: true });
+  await appendFile(editsPath, editPayload, "utf8");
+  await appendFile(
+    auditPath,
+    `${JSON.stringify({
+      schemaVersion: 1,
+      event: "local_memory_edit_overlay",
+      createdAt: appliedAt,
+      writesRealFiles: true,
+      editsPath: ".recallweave/local-memory-edits.jsonl",
+      contentHash,
+      sourceFile: edit.sourceFile,
+      line: edit.line,
+      sourceId: edit.sourceId,
+      action: edit.action,
+      reason: edit.reason,
+      replacementBytes: edit.replacementText ? Buffer.byteLength(edit.replacementText, "utf8") : 0,
+      originalContentIncluded: false,
+      replacementContentIncludedInAudit: false,
+    })}\n`,
+    "utf8",
+  );
+
+  return {
+    ok: true,
+    mode: "selected-local-memory-edit",
+    writesRealFiles: true,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+    },
+    auditTrail: {
+      event: "local_memory_edit_overlay",
+      writesRealFiles: true,
+      auditLog: {
+        path: ".recallweave/local-memory-edit-audit.jsonl",
+        entriesWritten: 1,
+      },
+      contentHash,
+    },
+    report: {
+      ok: true,
+      dryRun: false,
+      rootDir: redactPathForDisplay(rootDir),
+      editsPath: ".recallweave/local-memory-edits.jsonl",
+      auditLog: {
+        path: ".recallweave/local-memory-edit-audit.jsonl",
+        entriesWritten: 1,
+      },
+      summary: {
+        sourceFile: edit.sourceFile,
+        line: edit.line,
+        sourceId: edit.sourceId,
+        action: edit.action,
+        reason: edit.reason,
+        replacementBytes: edit.replacementText ? Buffer.byteLength(edit.replacementText, "utf8") : 0,
+        replacementContentIncludedInEditLog: Boolean(edit.replacementText),
+        originalContentIncluded: false,
+      },
+    },
+  };
+}
+
 async function readJsonBody(request, maxBytes) {
   let body = "";
   for await (const chunk of request) {
@@ -779,6 +909,34 @@ function normalizeReviewDecisions(input, appliedAt) {
     .slice(0, 200);
 }
 
+function normalizeLocalMemoryEdit(input, appliedAt) {
+  const edit = input && typeof input === "object" ? input : {};
+  const sourceFile = safeChoice(edit.sourceFile, ["memories.jsonl"]);
+  const line = clampInteger(edit.line, 1, 1_000_000, 1);
+  const sourceId = safePolicyToken(edit.sourceId ?? "");
+  const action = safeChoice(edit.action, ["append_correction", "replace", "suppress", "needs_review"]);
+  const reason = safeChoice(edit.reason, ["manual_correction", "duplicate", "stale", "noise", "privacy", "other"], "manual_correction");
+  const replacementText = safeMemoryEditText(edit.replacementText ?? "");
+
+  if ((action === "append_correction" || action === "replace" || action === "needs_review") && !replacementText) {
+    return null;
+  }
+
+  return {
+    schemaVersion: 1,
+    event: "local_memory_edit_overlay",
+    createdAt: appliedAt,
+    writesRealFiles: true,
+    sourceFile,
+    line,
+    sourceId,
+    action,
+    reason,
+    replacementText: action === "suppress" ? "" : replacementText,
+    originalContentIncluded: false,
+  };
+}
+
 function summarizeReviewDecisions(decisions) {
   const summary = {
     decisions: decisions.length,
@@ -841,6 +999,13 @@ function safePolicyToken(value) {
 
 function safePolicyString(value) {
   return redactPrivate(String(value ?? "")).text.trim().slice(0, 240);
+}
+
+function safeMemoryEditText(value) {
+  return redactPrivate(String(value ?? ""))
+    .text.replace(/\r\n/g, "\n")
+    .trim()
+    .slice(0, 4000);
 }
 
 function booleanSetting(value, fallback) {

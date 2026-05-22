@@ -73,6 +73,14 @@ skipped. The selected-container browse route is disabled unless
 confirmation, clears the typed path after submit, reports
 `writesRealFiles: false`, and never returns the selected root path.
 
-This is still browse/audit preview. Editable real memory state needs write
-confirmation and UI wiring. The wiki sync helper already lints before write and
-can append a content-free pre-write audit log when `auditLogPath` is supplied.
+The Brain UI now also has a disabled-by-default selected local memory edit
+overlay. It is enabled only with `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT=1`,
+requires the exact confirmation phrase `APPLY LOCAL MEMORY EDIT`, rejects
+private/key-shaped payloads, and writes append-only overlay records under
+`.recallweave/local-memory-edits.jsonl` plus a content-free audit trail under
+`.recallweave/local-memory-edit-audit.jsonl`. It does not mutate
+`memories.jsonl` in place.
+
+Direct in-place editable memory state remains intentionally disabled. The wiki
+sync helper already lints before write and can append a content-free pre-write
+audit log when `auditLogPath` is supplied.

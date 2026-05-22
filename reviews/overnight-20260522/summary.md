@@ -43,6 +43,8 @@ is still required before any public live update.
 | Brain UI local audit preview | `reviews/overnight-20260522/brain-ui-local-audit-preview-evidence.md` |
 | Brain UI selected local-container browse | `reviews/overnight-20260522/brain-ui-selected-local-browse-evidence.md` |
 | Brain UI selected local-container browse review | `reviews/overnight-20260522/gemini-brain-ui-selected-local-browse-review.md` |
+| Brain UI selected local memory edit overlay | `reviews/overnight-20260522/brain-ui-local-memory-edit-evidence.md` |
+| Brain UI selected local memory edit review | `reviews/overnight-20260522/gemini-brain-ui-local-memory-edit-review.md` |
 | Brain UI selected vault sync dry-run | `reviews/overnight-20260522/brain-ui-selected-sync-dry-run-evidence.md` |
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Selected vault sync apply review | `reviews/overnight-20260522/gemini-selected-sync-apply-review.md` |
@@ -113,6 +115,7 @@ Sanitized fixture evidence exists under
 - `brain-ui-selected-sync-dry-run.png`
 - `brain-ui-lifecycle-policy.png`
 - `brain-ui-review-queue.png`
+- `brain-ui-local-memory-edit.png`
 - `brain-ui-edit-export.png`
 - `brain-ui-nucleus-snapshot.png`
 - `brain-ui-research-lineage.png`
@@ -135,6 +138,10 @@ Sanitized fixture evidence exists under
   source and interaction smoke proves writes require
   `RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY` plus the exact
   `APPLY LOCAL REVIEW QUEUE` phrase
+- selected local memory edit controls are present in Browser DOM evidence and
+  interaction smoke proves writes require
+  `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT` plus the exact
+  `APPLY LOCAL MEMORY EDIT` phrase
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -164,6 +171,7 @@ local memory contents.
   path.
 - Gemini Brain UI review queue review: `CLEAN`.
 - Gemini Brain UI review queue apply review: `CLEAN`.
+- Gemini Brain UI local memory edit review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
@@ -226,6 +234,12 @@ local memory contents.
   phrase, rejects private/key-shaped review payloads, writes only selected
   local decision metadata plus a content-free audit line, excludes candidate
   text, and returns only redacted root labels and relative paths.
+- Brain UI selected local memory edit is disabled by default, requires the
+  local edit environment flag, requires write confirmation plus an exact
+  phrase, rejects private/key-shaped edit payloads, writes only an append-only
+  local edit overlay plus a content-free audit line, does not mutate
+  `memories.jsonl` in place, and returns only redacted root labels and relative
+  paths.
 - Wiki vault sync is explicit and protects reviewed pages by writing conflict
   notes instead of overwriting.
 - Wiki vault sync can append a content-free pre-write audit log when
@@ -239,8 +253,8 @@ local memory contents.
 - The Brain UI has read-only selected local-container audit and browse previews,
   browser-local audit history, plus write-confirmed selected vault sync apply,
   write-confirmed selected lifecycle policy apply, and write-confirmed selected
-  review queue apply, but real local-container edit still needs write
-  confirmation and UI wiring.
+  review queue apply, plus write-confirmed selected local memory edit overlays.
+  Direct in-place local memory mutation remains disabled.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

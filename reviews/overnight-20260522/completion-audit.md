@@ -50,6 +50,7 @@ complete or publish a public live update.
 | Brain UI local-audit preview evidence | `brain-ui-local-audit-*`, `brain-ui-local-audit-preview-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI selected local-audit evidence | `brain-ui-selected-local-audit-*`, `brain-ui-selected-local-audit-evidence.md`, Gemini review | Proven as read-only selected preview |
 | Brain UI selected local-container browse | `brain-ui-selected-local-browse-evidence.md`, `packages/brain-ui/interaction-smoke.mjs`, `tests/local-container/audit.test.ts` | Proven as disabled-by-default read-only redacted browse preview |
+| Brain UI selected local memory edit overlay | `brain-ui-local-memory-edit-evidence.md`, `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, Gemini review | Proven as disabled-by-default write-confirmed append-only overlay |
 | Brain UI selected audit-history evidence | `brain-ui-selected-audit-history-*`, `brain-ui-selected-audit-history-evidence.md`, Gemini review | Proven as browser-local content-free history |
 | Brain UI selected vault sync dry-run evidence | `brain-ui-selected-sync-dry-run-*`, `brain-ui-selected-sync-dry-run-evidence.md`, Gemini review | Proven as disabled-by-default read-only dry-run |
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-browser-dom-evidence.json` | Proven as disabled-by-default write-confirmed apply with content-free audit log |
@@ -92,8 +93,9 @@ complete or publish a public live update.
    previews, browser-local audit history, selected vault sync dry-run,
    write-confirmed selected vault sync apply, lifecycle policy draft export,
    write-confirmed selected lifecycle policy apply, memory review queue draft
-   export, and write-confirmed selected review queue apply. Real
-   local-container edit still needs explicit write confirmation and UI wiring.
+   export, write-confirmed selected review queue apply, and write-confirmed
+   selected local memory edit overlays. Direct in-place local memory mutation
+   remains disabled.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

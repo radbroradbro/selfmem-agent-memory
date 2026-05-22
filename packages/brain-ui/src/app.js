@@ -26,6 +26,7 @@ const state = {
   localBrowse: null,
   selectedBrowse: null,
   selectedAudit: null,
+  localEdit: null,
   selectedAuditHistory: readSelectedAuditHistory(),
   selectedSync: null,
   selectedSyncApply: null,
@@ -118,6 +119,19 @@ const selectedBrowseMaxItems = document.querySelector("#selectedBrowseMaxItems")
 const selectedBrowseStatus = document.querySelector("#selectedBrowseStatus");
 const selectedBrowseSummary = document.querySelector("#selectedBrowseSummary");
 const selectedBrowseItems = document.querySelector("#selectedBrowseItems");
+const localEditForm = document.querySelector("#localEditForm");
+const localEditPath = document.querySelector("#localEditPath");
+const localEditSourceFile = document.querySelector("#localEditSourceFile");
+const localEditLine = document.querySelector("#localEditLine");
+const localEditSourceId = document.querySelector("#localEditSourceId");
+const localEditAction = document.querySelector("#localEditAction");
+const localEditReason = document.querySelector("#localEditReason");
+const localEditText = document.querySelector("#localEditText");
+const localEditConfirm = document.querySelector("#localEditConfirm");
+const localEditPhrase = document.querySelector("#localEditPhrase");
+const localEditStatus = document.querySelector("#localEditStatus");
+const localEditSummary = document.querySelector("#localEditSummary");
+const localEditActions = document.querySelector("#localEditActions");
 const selectedAuditForm = document.querySelector("#selectedAuditForm");
 const selectedAuditPath = document.querySelector("#selectedAuditPath");
 const selectedAuditConfirm = document.querySelector("#selectedAuditConfirm");
@@ -333,6 +347,39 @@ selectedBrowseForm.addEventListener("submit", async (event) => {
   }
 });
 
+localEditForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.localEdit = { ok: false, code: "loading", message: "Applying selected local memory edit." };
+  renderLocalEdit();
+  try {
+    const response = await fetch("/local-container/edit", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: localEditPath.value,
+        edit: {
+          sourceFile: localEditSourceFile.value,
+          line: Number(localEditLine.value),
+          sourceId: localEditSourceId.value,
+          action: localEditAction.value,
+          reason: localEditReason.value,
+          replacementText: localEditText.value,
+        },
+        confirmWrite: localEditConfirm.checked,
+        confirmationPhrase: localEditPhrase.value,
+      }),
+    });
+    state.localEdit = await response.json();
+  } catch (error) {
+    state.localEdit = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    localEditPath.value = "";
+    localEditPhrase.value = "";
+    localEditText.value = "";
+    renderLocalEdit();
+  }
+});
+
 selectedAuditForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   state.selectedAudit = { ok: false, code: "loading", message: "Checking selected local container." };
@@ -381,6 +428,7 @@ function render() {
   renderLocalAudit();
   renderLocalBrowse();
   renderSelectedBrowse();
+  renderLocalEdit();
   renderSelectedAudit();
   renderSelectedAuditHistory();
   renderEditExport();
@@ -931,6 +979,46 @@ function renderSelectedBrowse() {
     stat("Writes", payload.writesRealFiles ? "enabled" : "disabled"),
   );
   renderBrowseItems(selectedBrowseItems, payload.report.items);
+}
+
+function renderLocalEdit() {
+  localEditSummary.replaceChildren();
+  localEditActions.replaceChildren();
+  const payload = state.localEdit;
+  if (!payload) {
+    localEditStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    localEditStatus.textContent = payload.message ?? payload.code ?? "Local memory edit unavailable.";
+    return;
+  }
+
+  const summary = payload.report?.summary ?? {};
+  localEditStatus.textContent = `${payload.selection.rootDisplay} edit overlay applied.`;
+  localEditSummary.replaceChildren(
+    stat("Action", summary.action ?? "unknown"),
+    stat("Source", `${summary.sourceFile ?? "memories.jsonl"}:${summary.line ?? 1}`),
+    stat("Bytes", summary.replacementBytes ?? 0),
+    stat("Audit entries", payload.report?.auditLog?.entriesWritten ?? 0),
+  );
+
+  const entries = [
+    ["Trail", payload.auditTrail?.event ?? "local_memory_edit_overlay"],
+    ["Edit log", payload.report?.editsPath ?? ".recallweave/local-memory-edits.jsonl"],
+    ["Audit log", payload.report?.auditLog?.path ?? ".recallweave/local-memory-edit-audit.jsonl"],
+    ["Hash", payload.auditTrail?.contentHash ?? "unknown"],
+  ];
+  for (const [label, value] of entries) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = label;
+    span.textContent = String(value);
+    item.append(strong, span);
+    localEditActions.append(item);
+  }
 }
 
 function renderBrowseItems(target, items) {

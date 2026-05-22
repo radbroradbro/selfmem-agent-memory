@@ -54,6 +54,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-selected-local-audit-review.md`,
   `${reviewDir}/brain-ui-selected-local-browse-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-local-browse-review.md`,
+  `${reviewDir}/brain-ui-local-memory-edit-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-local-memory-edit-review.md`,
   `${reviewDir}/brain-ui-selected-audit-history-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-audit-history-review.md`,
   `${reviewDir}/brain-ui-selected-sync-dry-run-evidence.md`,
@@ -89,6 +91,7 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
   `${reviewDir}/ui-evidence/brain-ui-review-queue-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-review-queue.png`,
+  `${reviewDir}/ui-evidence/brain-ui-local-memory-edit.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -375,6 +378,7 @@ check("dom evidence is sane", () => {
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedSyncPath"));
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedSyncApplyPath"));
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedAuditPath"));
+  assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "localEditPath"));
 });
 
 check("release state is conservative", () => {
@@ -405,6 +409,7 @@ check("release state is conservative", () => {
     "brain-ui-lifecycle-policy-apply",
     "brain-ui-memory-review-queue",
     "brain-ui-memory-review-queue-apply",
+    "brain-ui-selected-local-memory-edit",
     "session-compaction-benchmark",
     "selfmem-update",
   ]) {
@@ -414,7 +419,7 @@ check("release state is conservative", () => {
     "claude-reviewer-route-blocked",
     "github-pr-body-update-blocked",
     "human-public-launch-approval-required",
-    "brain-ui-real-local-container-edit-not-enabled",
+    "brain-ui-direct-local-memory-mutation-not-enabled",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
   }
@@ -437,6 +442,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /lifecycle policy apply|selected lifecycle policy apply/i, `${file} missing lifecycle policy apply`);
     assert.match(text, /memory review queue/i, `${file} missing memory review queue`);
     assert.match(text, /review queue apply|selected memory review queue apply|selected review queue apply/i, `${file} missing review queue apply`);
+    assert.match(text, /local memory edit|selected local memory edit/i, `${file} missing local memory edit`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });

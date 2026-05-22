@@ -39,5 +39,5 @@ Verification:
 Known limits:
 
 - This is still a read-only browse preview.
-- Real local-container edit/save remains blocked until explicit write
-  confirmation, conflict handling, and reviewer-approved UI wiring exist.
+- Selected local memory edits now use a separate disabled-by-default append-only
+  overlay path. Direct in-place local memory mutation remains blocked.

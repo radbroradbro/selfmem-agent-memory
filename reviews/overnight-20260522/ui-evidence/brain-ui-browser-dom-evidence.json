@@ -37,153 +37,222 @@
       "hasSyncReport": true,
       "hasVaultPreview": true,
       "hasWriteDisabledLanguage": true,
-      "pathInputsAreVisibleText": true
+      "pathInputsAreVisibleText": true,
+      "hasSearch": true,
+      "hasVaultSyncApply": true,
+      "hasLifecyclePolicyApply": true,
+      "hasReviewQueueApply": true,
+      "hasSelectedLocalBrowse": true,
+      "hasSelectedLocalEdit": true,
+      "hasLocalEditPath": true,
+      "hasLocalEditText": true,
+      "hasLocalEditPhrase": true
     },
     "h1": "Nucleus",
     "inputs": [
       {
-        "ariaLabel": "Search Nucleus graph",
         "id": "searchInput",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "input",
-        "type": "search"
+        "type": "search",
+        "ariaLabel": "Search Nucleus graph"
       },
       {
-        "ariaLabel": null,
         "id": "policyForceRecall",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "input",
-        "type": "checkbox"
+        "type": "checkbox",
+        "ariaLabel": ""
       },
       {
-        "ariaLabel": null,
         "id": "policyPreCompress",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "input",
-        "type": "checkbox"
+        "type": "checkbox",
+        "ariaLabel": ""
       },
       {
-        "ariaLabel": null,
         "id": "policyMaxWrites",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "input",
-        "type": "number"
+        "type": "number",
+        "ariaLabel": ""
       },
       {
-        "ariaLabel": "Low-confidence write action",
         "id": "policyLowConfidence",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "select",
-        "type": null
+        "type": "select",
+        "ariaLabel": "Low-confidence write action"
       },
       {
-        "ariaLabel": null,
-        "id": "review-candidate-maintenance-noise",
-        "placeholder": null,
-        "spellcheck": null,
-        "tag": "select",
-        "type": null
+        "id": "policyApplyPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local lifecycle policy path"
       },
       {
-        "ariaLabel": null,
-        "id": "review-candidate-duplicate-recallweave-decision",
-        "placeholder": null,
-        "spellcheck": null,
-        "tag": "select",
-        "type": null
+        "id": "policyApplyConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
       },
       {
-        "ariaLabel": null,
-        "id": "review-candidate-high-value-policy",
-        "placeholder": null,
-        "spellcheck": null,
-        "tag": "select",
-        "type": null
+        "id": "policyApplyPhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local lifecycle policy confirmation phrase"
       },
       {
-        "ariaLabel": "Compiled wiki vault file",
+        "id": "reviewQueueApplyPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local review queue path"
+      },
+      {
+        "id": "reviewQueueApplyConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "reviewQueueApplyPhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local review queue confirmation phrase"
+      },
+      {
         "id": "vaultFileSelect",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "select",
-        "type": null
+        "type": "select",
+        "ariaLabel": "Compiled wiki vault file"
       },
       {
-        "ariaLabel": "Selected local vault path",
         "id": "selectedSyncPath",
-        "placeholder": null,
-        "spellcheck": "false",
         "tag": "input",
-        "type": "text"
+        "type": "text",
+        "ariaLabel": "Selected local vault path"
       },
       {
-        "ariaLabel": null,
         "id": "selectedSyncConfirm",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "input",
-        "type": "checkbox"
+        "type": "checkbox",
+        "ariaLabel": ""
       },
       {
-        "ariaLabel": "Selected local vault apply path",
         "id": "selectedSyncApplyPath",
-        "placeholder": null,
-        "spellcheck": "false",
         "tag": "input",
-        "type": "text"
+        "type": "text",
+        "ariaLabel": "Selected local vault apply path"
       },
       {
-        "ariaLabel": null,
         "id": "selectedSyncApplyConfirm",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "input",
-        "type": "checkbox"
+        "type": "checkbox",
+        "ariaLabel": ""
       },
       {
-        "ariaLabel": "Selected local vault apply confirmation phrase",
         "id": "selectedSyncApplyPhrase",
-        "placeholder": null,
-        "spellcheck": null,
         "tag": "input",
-        "type": "text"
+        "type": "text",
+        "ariaLabel": "Selected local vault apply confirmation phrase"
       },
       {
-        "ariaLabel": "Selected local container path",
-        "id": "selectedAuditPath",
-        "placeholder": null,
-        "spellcheck": "false",
+        "id": "selectedBrowsePath",
         "tag": "input",
-        "type": "text"
+        "type": "text",
+        "ariaLabel": "Selected local container browse path"
       },
       {
-        "ariaLabel": null,
-        "id": "selectedAuditConfirm",
-        "placeholder": null,
-        "spellcheck": null,
+        "id": "selectedBrowseConfirm",
         "tag": "input",
-        "type": "checkbox"
+        "type": "checkbox",
+        "ariaLabel": ""
       },
       {
-        "ariaLabel": "Derived document editor",
-        "id": "docEditor",
-        "placeholder": null,
-        "spellcheck": null,
+        "id": "selectedBrowseMaxItems",
+        "tag": "input",
+        "type": "number",
+        "ariaLabel": "Selected local browse max items"
+      },
+      {
+        "id": "localEditPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory edit path"
+      },
+      {
+        "id": "localEditSourceFile",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Selected local memory edit source file"
+      },
+      {
+        "id": "localEditLine",
+        "tag": "input",
+        "type": "number",
+        "ariaLabel": "Selected local memory edit line"
+      },
+      {
+        "id": "localEditSourceId",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory edit source id"
+      },
+      {
+        "id": "localEditAction",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Selected local memory edit action"
+      },
+      {
+        "id": "localEditReason",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": "Selected local memory edit reason"
+      },
+      {
+        "id": "localEditText",
         "tag": "textarea",
-        "type": null
+        "type": "textarea",
+        "ariaLabel": "Selected local memory edit replacement text"
+      },
+      {
+        "id": "localEditConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "localEditPhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory edit confirmation phrase"
+      },
+      {
+        "id": "selectedAuditPath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local container path"
+      },
+      {
+        "id": "selectedAuditConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "docEditor",
+        "tag": "textarea",
+        "type": "textarea",
+        "ariaLabel": "Derived document editor"
       }
     ],
-    "sectionCount": 17,
+    "sectionCount": 13,
     "title": "RecallWeave Brain",
-    "url": "http://127.0.0.1:4177/"
+    "url": "http://127.0.0.1:4177/",
+    "inputCount": 32,
+    "localEditText": "Edit container path\nSource file\nmemories.jsonl\nLine\nSource id\nAction\nAppend correction\nReplace derived memory\nSuppress\nNeeds review\nReason\nManual correction\nDuplicate\nStale\nNoise\nPrivacy\nOther\nReplacement text\nWrite edit overlay\nConfirmation phrase\nApply edit"
   },
   "screenshot": {
     "ok": false,
     "reason": "in-app browser Page.captureScreenshot timed out in the prior browser DOM pass; existing fixture screenshots remain in ui-evidence"
-  }
+  },
+  "localEditCapturedAt": "2026-05-22T14:22:13.884Z",
+  "note": "Updated by Codex Browser against localhost fixture UI with selected local memory edit overlay controls visible. Screenshot path is fixture-only."
 }

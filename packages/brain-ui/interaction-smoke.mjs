@@ -23,15 +23,22 @@ const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-au
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
 const selectedPolicyRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-policy-"));
 const selectedReviewRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-review-"));
+const selectedEditRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-edit-"));
 const server = createBrainUiServer({
   enableLocalAudit: true,
   enableLocalBrowse: true,
   enableLocalApply: true,
   enablePolicyApply: true,
   enableReviewApply: true,
+  enableLocalEdit: true,
 });
 
 await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
+await writeFile(
+  join(selectedEditRoot, "memories.jsonl"),
+  "{\"id\":\"mem_fixture_edit\",\"kind\":\"decision\",\"text\":\"old fixture memory text\"}\n",
+  "utf8",
+);
 await writeFile(
   join(selectedRoot, "trace.jsonl"),
   [
@@ -374,6 +381,71 @@ try {
   assert.equal(selectedBrowse.auditTrail.writesRealFiles, false);
   assert.ok(selectedBrowse.report.items.some((item) => item.summary.includes("selected local writes only")));
   assert.ok(selectedBrowse.report.items.some((item) => item.event === "search"));
+  const missingLocalEditConfirmation = await postJson(`${base}/local-container/edit`, {
+    rootDir: selectedEditRoot,
+    edit: {
+      sourceFile: "memories.jsonl",
+      line: 1,
+      sourceId: "mem_fixture_edit",
+      action: "replace",
+      reason: "manual_correction",
+      replacementText: "new fixture memory text",
+    },
+    confirmWrite: false,
+    confirmationPhrase: "APPLY LOCAL MEMORY EDIT",
+  });
+  assert.equal(missingLocalEditConfirmation.ok, false);
+  assert.equal(missingLocalEditConfirmation.code, "write_confirmation_required");
+  const unsafeLocalEdit = await postJson(`${base}/local-container/edit`, {
+    rootDir: selectedEditRoot,
+    edit: {
+      sourceFile: "memories.jsonl",
+      line: 1,
+      sourceId: "mem_fixture_edit",
+      action: "replace",
+      reason: "manual_correction",
+      replacementText: `public ${"sm_" + "H".repeat(42)}`,
+    },
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL MEMORY EDIT",
+  });
+  assert.equal(unsafeLocalEdit.ok, false);
+  assert.equal(unsafeLocalEdit.code, "local_edit_contains_private_or_key_shaped_text");
+  const selectedLocalEdit = await postJson(`${base}/local-container/edit`, {
+    rootDir: selectedEditRoot,
+    edit: {
+      sourceFile: "memories.jsonl",
+      line: 1,
+      sourceId: "mem_fixture_edit",
+      action: "replace",
+      reason: "manual_correction",
+      replacementText: "new fixture memory text",
+    },
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL MEMORY EDIT",
+  });
+  assert.equal(selectedLocalEdit.ok, true);
+  assert.equal(selectedLocalEdit.mode, "selected-local-memory-edit");
+  assert.equal(selectedLocalEdit.writesRealFiles, true);
+  assert.equal(selectedLocalEdit.selection.rootPathRedacted, true);
+  assert.match(selectedLocalEdit.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedLocalEdit.selection.rootDisplay.includes(selectedEditRoot), false);
+  assert.equal(selectedLocalEdit.report.rootDir.includes(selectedEditRoot), false);
+  assert.equal(selectedLocalEdit.report.editsPath, ".recallweave/local-memory-edits.jsonl");
+  assert.equal(selectedLocalEdit.report.auditLog.entriesWritten, 1);
+  assert.equal(selectedLocalEdit.report.summary.action, "replace");
+  assert.equal(selectedLocalEdit.report.summary.originalContentIncluded, false);
+  assert.equal(selectedLocalEdit.report.summary.replacementContentIncludedInEditLog, true);
+  assert.equal(selectedLocalEdit.auditTrail.event, "local_memory_edit_overlay");
+  assert.equal(selectedLocalEdit.auditTrail.writesRealFiles, true);
+  const localEditLog = await readFile(join(selectedEditRoot, ".recallweave/local-memory-edits.jsonl"), "utf8");
+  const localEditAuditLog = await readFile(join(selectedEditRoot, ".recallweave/local-memory-edit-audit.jsonl"), "utf8");
+  assert.match(localEditLog, /local_memory_edit_overlay/);
+  assert.match(localEditLog, /new fixture memory text/);
+  assert.match(localEditAuditLog, /local_memory_edit_overlay/);
+  assert.equal(localEditAuditLog.includes("new fixture memory text"), false, "local edit audit must be content-free");
+  assert.equal(localEditLog.includes(selectedEditRoot), false);
+  assert.equal(localEditAuditLog.includes(selectedEditRoot), false);
   const missingConfirmation = await postJson(`${base}/local-container/audit`, {
     rootDir: selectedRoot,
     confirmReadOnly: false,
@@ -448,6 +520,10 @@ try {
     localAudit,
     missingBrowseConfirmation,
     selectedBrowse,
+    missingLocalEditConfirmation,
+    unsafeLocalEdit,
+    selectedLocalEdit,
+    localEditAuditLog,
     missingConfirmation,
     selectedAudit,
     selectedAuditHistory,
@@ -457,6 +533,7 @@ try {
   assert.equal(serialized.includes(selectedSyncRoot), false, "selected sync root path must stay redacted");
   assert.equal(serialized.includes(selectedSyncRoot), false, "selected wiki sync root path must stay redacted");
   assert.equal(serialized.includes(selectedReviewRoot), false, "selected review root path must stay redacted");
+  assert.equal(serialized.includes(selectedEditRoot), false, "selected edit root path must stay redacted");
   assert.equal(serialized.includes("/Users/private/profile"), false, "dirty prior history paths must be collapsed");
 
   console.log(
@@ -482,6 +559,7 @@ try {
           "selected-wiki-sync-apply",
           "local-container-audit",
           "selected-local-browse",
+          "selected-local-memory-edit",
           "selected-local-audit",
           "selected-audit-history",
           "public-safe-serialization",
@@ -497,6 +575,7 @@ try {
   await rm(selectedSyncRoot, { recursive: true, force: true });
   await rm(selectedPolicyRoot, { recursive: true, force: true });
   await rm(selectedReviewRoot, { recursive: true, force: true });
+  await rm(selectedEditRoot, { recursive: true, force: true });
 }
 
 async function json(url) {

@@ -37,6 +37,7 @@ try {
   assert.match(index, /Selected local vault sync apply/);
   assert.match(index, /Local Audit Preflight/);
   assert.match(index, /Selected local container browse/);
+  assert.match(index, /Selected local memory edit/);
   assert.match(index, /Selected local container audit/);
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
@@ -55,6 +56,7 @@ try {
   assert.match(app, /renderLocalAudit/);
   assert.match(app, /renderLocalBrowse/);
   assert.match(app, /renderSelectedBrowse/);
+  assert.match(app, /renderLocalEdit/);
   assert.match(app, /renderSelectedAudit/);
   assert.match(app, /renderSelectedAuditHistory/);
   assert.match(app, /buildEditExport/);
@@ -157,6 +159,14 @@ try {
   assert.equal(disabledReviewApply.status, 403);
   assert.equal(disabledReviewApply.body.ok, false);
   assert.equal(disabledReviewApply.body.code, "review_queue_apply_disabled");
+  const disabledLocalEdit = await postJson(`${base}/local-container/edit`, {
+    rootDir: "/tmp/recallweave-disabled-local-edit-fixture",
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL MEMORY EDIT",
+  });
+  assert.equal(disabledLocalEdit.status, 403);
+  assert.equal(disabledLocalEdit.body.ok, false);
+  assert.equal(disabledLocalEdit.body.code, "local_edit_disabled");
 
   const serialized = JSON.stringify({
     fixture,
@@ -170,6 +180,7 @@ try {
     disabledSelectedSyncApply,
     disabledPolicyApply,
     disabledReviewApply,
+    disabledLocalEdit,
   });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
@@ -190,6 +201,7 @@ try {
           "selected-wiki-sync-apply-disabled",
           "lifecycle-policy-apply-disabled",
           "review-queue-apply-disabled",
+          "selected-local-edit-disabled",
           "local-container-audit",
           "local-container-browse",
           "selected-local-browse-disabled",

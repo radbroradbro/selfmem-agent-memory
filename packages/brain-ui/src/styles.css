@@ -708,6 +708,9 @@ button.active {
 
 .selected-audit input[type="password"],
 .selected-audit input[type="text"],
+.selected-audit input[type="number"],
+.selected-audit select,
+.selected-audit textarea,
 .selected-sync input[type="password"],
 .selected-sync input[type="text"],
 .policy-form input[type="text"],
@@ -724,6 +727,11 @@ button.active {
   color: var(--text);
 }
 
+.selected-audit textarea {
+  min-height: 96px;
+  padding: 10px;
+}
+
 .check-row {
   display: flex;
   align-items: center;
@@ -733,6 +741,7 @@ button.active {
 }
 
 #selectedAuditStatus,
+#localEditStatus,
 #selectedSyncStatus,
 #policyApplyStatus,
 #policyStatus,

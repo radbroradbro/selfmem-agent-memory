@@ -64,6 +64,9 @@
 - The selected review queue apply slice was verified by fresh Brain UI smoke
   and interaction smoke. It has no committed screenshot yet; the evidence is
   the gated route, docs, smoke output, and Gemini review.
+- The selected local memory edit overlay slice was verified by fresh Brain UI
+  smoke, interaction smoke, and updated Browser DOM evidence. A fixture-only
+  screenshot was captured at `brain-ui-local-memory-edit.png`.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.

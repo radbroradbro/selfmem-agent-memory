@@ -18,6 +18,7 @@ The UI should expose:
 - selected lifecycle policy apply with explicit confirmation,
 - memory review queue draft export,
 - selected memory review queue apply with explicit confirmation,
+- selected local memory edit overlay with explicit confirmation,
 - sanitized Nucleus snapshot export,
 - derived docs and wiki pages,
 - compiled wiki/vault files,
@@ -73,7 +74,8 @@ Required visual review path:
 17. fixture vault sync report with conflict handling,
 18. selected local vault sync dry-run,
 19. selected local vault sync apply confirmation,
-20. fixture local-container audit preflight.
+20. fixture local-container audit preflight,
+21. selected local memory edit overlay confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -142,6 +144,18 @@ allow-listed local memory files, and returns a bounded list of redacted memory
 or trace snippets. It skips fully private entries, reports redaction counts,
 returns only a redacted `.../container` label, and writes no agent files.
 
+Selected local memory edit is disabled unless the server starts with
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT=1`. When enabled, it requires a write
+checkbox and the exact confirmation phrase `APPLY LOCAL MEMORY EDIT`. It does
+not mutate `memories.jsonl` in place. It writes an append-only
+`.recallweave/local-memory-edits.jsonl` overlay record plus a content-free
+`.recallweave/local-memory-edit-audit.jsonl` audit line under the selected
+local container root. The overlay may include the replacement memory text, but
+the audit log and server response do not. It rejects payloads containing
+`<private>` spans or key-shaped text, clears typed paths and edit text after
+submit, and returns only a redacted `.../container` label, relative file paths,
+summary counts, and an audit hash.
+
 Selected local vault sync dry-run is also disabled unless
 `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` is set. When enabled, it requires
 read-only confirmation, clears the typed path after submit, runs
@@ -166,6 +180,8 @@ Before connecting real local containers, the UI needs:
 - redacted local container mode,
 - explicit file picker or config path with read-only confirmation,
 - selected local-container browse preview,
+- selected local memory edit overlay,
+- direct in-place local memory mutation remains disabled,
 - write confirmation for derived docs,
 - wiki lint before save,
 - Nucleus snapshot export against a selected redacted local container,

@@ -32,6 +32,15 @@ Scope:
   fully private entries, and writes no files.
 - Added Gemini review for selected local-container browse and made that review
   packet a required release-readiness artifact.
+- Added Brain UI selected local memory edit overlay coverage so selected memory
+  edits remain disabled by default, require
+  `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT`, require the exact
+  `APPLY LOCAL MEMORY EDIT` phrase, reject private/key-shaped edit payloads,
+  write append-only local edit overlays plus content-free audit logs, do not
+  mutate `memories.jsonl` in place, and return only redacted root labels plus
+  relative paths and counts.
+- Added Gemini review for selected local memory edit and made that review
+  packet a required release-readiness artifact.
 - Added Brain UI selected audit history evidence to the release gate so
   browser-local history is content-free, bounded, and does not expose raw local
   paths or private/key-shaped text.
@@ -89,6 +98,8 @@ What `release:check` verifies:
 - Brain UI selected local-container audit DOM evidence is sane,
 - Brain UI selected local-container browse evidence exists and is covered by
   fresh interaction smoke,
+- Brain UI selected local memory edit evidence exists and is covered by fresh
+  interaction smoke and Browser DOM evidence,
 - Brain UI selected audit history DOM evidence is sane,
 - Brain UI selected vault sync dry-run DOM evidence is sane,
 - Brain UI selected vault sync apply controls are present in Browser DOM
@@ -164,12 +175,13 @@ Cold review response:
 - Interaction smoke now covers search filtering, retrieval trace visibility,
   private/key-shaped edit rejection, draft export, Nucleus export, research
   lineage, lifecycle policy draft export, memory review queue draft export,
-  vault path selection, selected local-container browse, selected vault sync
-  dry-run, write-confirmed selected vault sync apply, write-confirmed selected
-  lifecycle policy apply, private/key-shaped policy rejection, dry-run sync
-  reporting, write-confirmed selected review queue apply, private/key-shaped
-  review rejection, audit-log write intent coverage, and public-safe
-  serialization.
+  vault path selection, selected local-container browse, write-confirmed
+  selected local memory edit, private/key-shaped local edit rejection, selected
+  vault sync dry-run, write-confirmed selected vault sync apply,
+  write-confirmed selected lifecycle policy apply, private/key-shaped policy
+  rejection, dry-run sync reporting, write-confirmed selected review queue
+  apply, private/key-shaped review rejection, audit-log write intent coverage,
+  and public-safe serialization.
 
 Known limits:
 
