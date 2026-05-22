@@ -57,14 +57,16 @@ issues.
 
 ## Verification Snapshot
 
-Latest verified head when this draft was written:
+Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Head: `d9d264c`
+- Head: `79dbd76`
 - GitHub Actions: `Verify` passed
 - Local release gate: `pnpm release:check` passed in the controller run
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
+- Completion audit: not complete, with public launch still blocked on human
+  approval and reviewer-route acceptance
 
 ## Known Gaps
 
@@ -74,4 +76,3 @@ Latest verified head when this draft was written:
 - The benchmark evidence is fixture-focused. Hosted Supermemory comparison
   claims require a fresh, valid, metrics-only baseline.
 - The public release should stay conservative until the owner approves it.
-

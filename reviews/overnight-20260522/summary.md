@@ -16,10 +16,10 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest pushed head inspected by the completion audit:
-  `e3970b9`
+- Latest CI-inspected head before the blocker-permission refresh:
+  `79dbd76`
 - PR API state when checked: open, not draft, mergeable, clean.
-- GitHub Actions `Verify` on `e3970b9`: success.
+- GitHub Actions `Verify` on `79dbd76`: success.
 
 ## Shipped Overnight Slices
 
@@ -42,6 +42,8 @@ is still required before any public live update.
 | Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
 | Public live-update copy review | `reviews/overnight-20260522/gemini-public-live-update-copy-review.md` |
 | PR body update draft | `reviews/overnight-20260522/pr-body-update-draft.md` |
+| GitHub issue creation blocker | `reviews/overnight-20260522/github-issue-create-blocked.md` |
+| Blocker permission refresh review | `reviews/overnight-20260522/gemini-blocker-permission-refresh-review.md` |
 | Completion audit | `reviews/overnight-20260522/completion-audit.md` |
 | Completion audit review | `reviews/overnight-20260522/gemini-completion-audit-review.md` |
 
@@ -89,6 +91,7 @@ local memory contents.
 - Gemini public live-update copy review: `CLEAN`.
 - Gemini completion-audit review: first `BLOCK` because the audit was untracked
   and absent from the diff, then final `CLEAN` after staging.
+- Gemini blocker-permission refresh review: `CLEAN`.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
@@ -120,8 +123,9 @@ local memory contents.
   current public docs correctly require a fresh valid baseline before quality
   marketing.
 - The post-12-hour production-ready verdict remains `FAIL` for public launch.
-  Fresh controller and CI checks pass, but Claude remains blocked and a human
-  release decision has not been made.
+  Fresh controller and CI checks pass, but Claude remains blocked, the GitHub
+  app cannot update the PR body or create the blocker issue, and a human release
+  decision has not been made.
 
 ## Next Recommended Slice
 

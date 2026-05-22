@@ -25,16 +25,17 @@ The code, fixture UI, release gate, and GitHub Actions pass. Public launch shoul
 
 ## Verification
 
-Latest verified head: `f8737b4`.
+Latest verified head before this draft refresh: `79dbd76`.
 
 - Local `pnpm test`: 5 files, 18 tests passed.
 - Local `pnpm release:check`: passed.
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
 - Local private-name scan: no hits.
-- GitHub Actions `CI / Verify` on `f8737b4`: passed.
+- GitHub Actions `CI / Verify` on `79dbd76`: passed.
 - Gemini focused reviews: sync report, update command, edit export, Nucleus snapshot, Research Lineage, and public live-update copy are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
+- Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
 
 ## Safety
 
@@ -49,7 +50,7 @@ Latest verified head: `f8737b4`.
 - `reviews/overnight-20260522/production-readiness.md`
 - `reviews/overnight-20260522/public-live-update-draft.md`
 - `reviews/overnight-20260522/dummy-brain-demo-storyboard.md`
+- `reviews/overnight-20260522/completion-audit.md`
 - `reviews/overnight-20260522/ui-evidence/README.md`
 - `packages/bench/release-readiness-check.mjs`
 ```
-
