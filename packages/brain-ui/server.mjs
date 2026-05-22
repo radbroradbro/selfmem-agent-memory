@@ -5,6 +5,7 @@ import { dirname, extname, join, normalize, relative, resolve } from "node:path"
 import { fileURLToPath } from "node:url";
 import {
   auditLocalContainer,
+  browseLocalContainer,
   compileNucleusWikiVault,
   lintCompiledWikiVault,
   syncCompiledWikiVault,
@@ -22,6 +23,7 @@ const contentTypes = new Map([
 
 export function createBrainUiServer(options = {}) {
   const enableLocalAudit = options.enableLocalAudit ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT === "1";
+  const enableLocalBrowse = options.enableLocalBrowse ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE === "1";
   const enableLocalApply = options.enableLocalApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY === "1";
 
   return createHttpServer(async (request, response) => {
@@ -60,6 +62,12 @@ export function createBrainUiServer(options = {}) {
         return;
       }
 
+      if (path === "__local_container_browse_fixture") {
+        const report = await createFixtureLocalContainerBrowse();
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify({ ok: true, report }));
+        return;
+      }
+
       if (path === "__local_container_audit") {
         if (!enableLocalAudit) {
           send(
@@ -79,6 +87,29 @@ export function createBrainUiServer(options = {}) {
           return;
         }
         const result = await auditSelectedLocalContainer(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
+      if (path === "__local_container_browse") {
+        if (!enableLocalBrowse) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "local_browse_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE=1 to browse a selected local container.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await browseSelectedLocalContainer(request);
         send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
         return;
       }
@@ -149,7 +180,9 @@ function routePath(pathname) {
   if (pathname === "/fixtures/wiki-vault.json") return "__wiki_vault_fixture";
   if (pathname === "/fixtures/wiki-sync-report.json") return "__wiki_sync_report_fixture";
   if (pathname === "/fixtures/local-container-audit.json") return "__local_container_audit_fixture";
+  if (pathname === "/fixtures/local-container-browse.json") return "__local_container_browse_fixture";
   if (pathname === "/local-container/audit") return "__local_container_audit";
+  if (pathname === "/local-container/browse") return "__local_container_browse";
   if (pathname === "/wiki/sync/dry-run") return "__wiki_sync_dry_run";
   if (pathname === "/wiki/sync/apply") return "__wiki_sync_apply";
   if (pathname === "/favicon.ico") return "__favicon";
@@ -202,6 +235,30 @@ async function createFixtureLocalContainerAudit() {
   }
 }
 
+async function createFixtureLocalContainerBrowse() {
+  const tempRoot = await mkdtemp(join(tmpdir(), "recallweave-brain-local-browse-fixture-"));
+  try {
+    await writeFile(
+      join(tempRoot, "memories.jsonl"),
+      [
+        JSON.stringify({ id: "mem_fixture_1", kind: "decision", text: "Use local-only writes with hosted read-through disabled by default." }),
+        JSON.stringify({ id: "mem_fixture_2", kind: "preference", text: "Prefer concise lifecycle recall for maintenance turns." }),
+        JSON.stringify({ id: "mem_fixture_3", kind: "secret", text: "<private>hidden fixture</private>" }),
+      ].join("\n"),
+      "utf8",
+    );
+    await writeFile(join(tempRoot, "trace.jsonl"), "{\"event\":\"search\",\"query\":\"memory health\",\"count\":2}\n", "utf8");
+    return await browseLocalContainer({
+      rootDir: tempRoot,
+      containerLabel: "fixture-local-container",
+      maxFileBytes: 256_000,
+      maxItems: 8,
+    });
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
 async function auditSelectedLocalContainer(request) {
   const body = await readJsonBody(request, 20_000);
   const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
@@ -239,6 +296,51 @@ async function auditSelectedLocalContainer(request) {
       event: "local_container_audit_preview",
       status: report.health.status,
       existingFiles: report.totals.existingFiles,
+      redactionCount: report.totals.redactionCount,
+      writesRealFiles: false,
+    },
+    report,
+  };
+}
+
+async function browseSelectedLocalContainer(request) {
+  const body = await readJsonBody(request, 20_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+  const containerLabel = typeof body.containerLabel === "string" ? body.containerLabel.trim() : undefined;
+  const maxFileBytes = Number.isFinite(body.maxFileBytes) ? Number(body.maxFileBytes) : 256_000;
+  const maxItems = Number.isFinite(body.maxItems) ? Number(body.maxItems) : 12;
+
+  if (body.confirmReadOnly !== true) {
+    return {
+      ok: false,
+      code: "read_only_confirmation_required",
+      message: "Confirm read-only browse before inspecting selected local memory entries.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local container directory first." };
+  }
+
+  const report = await browseLocalContainer({
+    rootDir,
+    containerLabel,
+    maxFileBytes: Math.min(Math.max(maxFileBytes, 1_024), 1_000_000),
+    maxItems: Math.min(Math.max(maxItems, 1), 25),
+  });
+
+  return {
+    ok: true,
+    mode: "selected-local-container-browse",
+    writesRealFiles: false,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+      containerLabel: report.containerLabel,
+    },
+    auditTrail: {
+      event: "local_container_browse_preview",
+      itemsReturned: report.totals.itemsReturned,
       redactionCount: report.totals.redactionCount,
       writesRealFiles: false,
     },

@@ -9,7 +9,7 @@ try {
   const address = server.address();
   assert(address && typeof address === "object");
   const base = `http://127.0.0.1:${address.port}`;
-  const [index, app, model, styles, fixture, vault, syncReport, localAudit, health] = await Promise.all([
+  const [index, app, model, styles, fixture, vault, syncReport, localAudit, localBrowse, health] = await Promise.all([
     text(`${base}/`),
     text(`${base}/app.js`),
     text(`${base}/model.js`),
@@ -18,6 +18,7 @@ try {
     json(`${base}/fixtures/wiki-vault.json`),
     json(`${base}/fixtures/wiki-sync-report.json`),
     json(`${base}/fixtures/local-container-audit.json`),
+    json(`${base}/fixtures/local-container-browse.json`),
     json(`${base}/healthz`),
   ]);
 
@@ -33,6 +34,7 @@ try {
   assert.match(index, /Selected local vault sync dry run/);
   assert.match(index, /Selected local vault sync apply/);
   assert.match(index, /Local Audit Preflight/);
+  assert.match(index, /Selected local container browse/);
   assert.match(index, /Selected local container audit/);
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
@@ -47,6 +49,8 @@ try {
   assert.match(app, /renderSyncReport/);
   assert.match(app, /renderSelectedSync/);
   assert.match(app, /renderLocalAudit/);
+  assert.match(app, /renderLocalBrowse/);
+  assert.match(app, /renderSelectedBrowse/);
   assert.match(app, /renderSelectedAudit/);
   assert.match(app, /renderSelectedAuditHistory/);
   assert.match(app, /buildEditExport/);
@@ -98,6 +102,12 @@ try {
   assert.equal(localAudit.report.totals.existingFiles, 3);
   assert.ok(localAudit.report.totals.redactionCount >= 2);
   assert.equal(localAudit.report.health.status, "needs-review");
+  assert.equal(localBrowse.ok, true);
+  assert.equal(localBrowse.report.mode, "local-container-browse-preview");
+  assert.equal(localBrowse.report.writesRealFiles, false);
+  assert.equal(localBrowse.report.rootPathRedacted, true);
+  assert.ok(localBrowse.report.totals.itemsReturned >= 2);
+  assert.ok(localBrowse.report.items.some((item) => item.summary.includes("local-only writes")));
   const disabledLocalAudit = await postJson(`${base}/local-container/audit`, {
     rootDir: "/tmp/recallweave-disabled-fixture",
     confirmReadOnly: true,
@@ -105,6 +115,13 @@ try {
   assert.equal(disabledLocalAudit.status, 403);
   assert.equal(disabledLocalAudit.body.ok, false);
   assert.equal(disabledLocalAudit.body.code, "local_audit_disabled");
+  const disabledLocalBrowse = await postJson(`${base}/local-container/browse`, {
+    rootDir: "/tmp/recallweave-disabled-browse-fixture",
+    confirmReadOnly: true,
+  });
+  assert.equal(disabledLocalBrowse.status, 403);
+  assert.equal(disabledLocalBrowse.body.ok, false);
+  assert.equal(disabledLocalBrowse.body.code, "local_browse_disabled");
   const disabledSelectedSync = await postJson(`${base}/wiki/sync/dry-run`, {
     rootDir: "/tmp/recallweave-disabled-sync-fixture",
     confirmReadOnly: true,
@@ -126,7 +143,9 @@ try {
     vault,
     syncReport,
     localAudit,
+    localBrowse,
     disabledLocalAudit,
+    disabledLocalBrowse,
     disabledSelectedSync,
     disabledSelectedSyncApply,
   });
@@ -148,6 +167,8 @@ try {
           "selected-wiki-sync-disabled",
           "selected-wiki-sync-apply-disabled",
           "local-container-audit",
+          "local-container-browse",
+          "selected-local-browse-disabled",
           "selected-local-audit-disabled",
           "healthz",
         ],

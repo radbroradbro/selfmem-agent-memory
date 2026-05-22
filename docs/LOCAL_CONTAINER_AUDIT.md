@@ -60,6 +60,19 @@ The Brain UI keeps a bounded browser-local selected-audit history in
 `localStorage`. Each entry contains only the redacted container label, status,
 counts, event name, and timestamp.
 
-This is still an audit preview. Editable real memory state needs write
+`browseLocalContainer()` is the next read-only step. It inspects only:
+
+- `memories.jsonl`
+- `trace.jsonl`
+- `lossless_context.jsonl`
+
+It returns a bounded list of redacted snippets plus source file, line number,
+kind, event, and optional source id. Fully private entries are counted and
+skipped. The selected-container browse route is disabled unless
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE=1` is set, requires read-only
+confirmation, clears the typed path after submit, reports
+`writesRealFiles: false`, and never returns the selected root path.
+
+This is still browse/audit preview. Editable real memory state needs write
 confirmation and UI wiring. The wiki sync helper already lints before write and
 can append a content-free pre-write audit log when `auditLogPath` is supplied.

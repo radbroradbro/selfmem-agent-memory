@@ -21,10 +21,17 @@ const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
-const server = createBrainUiServer({ enableLocalAudit: true, enableLocalApply: true });
+const server = createBrainUiServer({ enableLocalAudit: true, enableLocalBrowse: true, enableLocalApply: true });
 
 await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
-await writeFile(join(selectedRoot, "trace.jsonl"), "{\"event\":\"search\",\"count\":3}\n", "utf8");
+await writeFile(
+  join(selectedRoot, "trace.jsonl"),
+  [
+    "{\"event\":\"search\",\"query\":\"selected local recall\",\"count\":3}",
+    "{\"event\":\"store\",\"text\":\"public <private>hidden</private>\"}",
+  ].join("\n"),
+  "utf8",
+);
 await mkdir(join(selectedSyncRoot, "wiki/pages"), { recursive: true });
 await writeFile(
   join(selectedSyncRoot, "wiki/pages/recallweave-index-90439aeb.md"),
@@ -226,6 +233,30 @@ try {
   assert.ok(localAudit.report.totals.redactionCount >= 2);
   assert.equal(localAudit.report.health.status, "needs-review");
   assert.ok(localAudit.report.health.reasons.includes("private_or_key_shaped_text_detected"));
+  const missingBrowseConfirmation = await postJson(`${base}/local-container/browse`, {
+    rootDir: selectedRoot,
+    confirmReadOnly: false,
+  });
+  assert.equal(missingBrowseConfirmation.ok, false);
+  assert.equal(missingBrowseConfirmation.code, "read_only_confirmation_required");
+  const selectedBrowse = await postJson(`${base}/local-container/browse`, {
+    rootDir: selectedRoot,
+    containerLabel: `browse ${"sm_" + "E".repeat(42)}`,
+    confirmReadOnly: true,
+    maxItems: 8,
+  });
+  assert.equal(selectedBrowse.ok, true);
+  assert.equal(selectedBrowse.mode, "selected-local-container-browse");
+  assert.equal(selectedBrowse.writesRealFiles, false);
+  assert.equal(selectedBrowse.selection.rootPathRedacted, true);
+  assert.match(selectedBrowse.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedBrowse.selection.rootDisplay.includes(selectedRoot), false);
+  assert.ok(selectedBrowse.report.totals.itemsReturned >= 2);
+  assert.ok(selectedBrowse.report.totals.redactionCount >= 1);
+  assert.equal(selectedBrowse.auditTrail.event, "local_container_browse_preview");
+  assert.equal(selectedBrowse.auditTrail.writesRealFiles, false);
+  assert.ok(selectedBrowse.report.items.some((item) => item.summary.includes("selected local writes only")));
+  assert.ok(selectedBrowse.report.items.some((item) => item.event === "search"));
   const missingConfirmation = await postJson(`${base}/local-container/audit`, {
     rootDir: selectedRoot,
     confirmReadOnly: false,
@@ -245,7 +276,8 @@ try {
   assert.match(selectedAudit.selection.rootDisplay, /^\.\.\.\//);
   assert.equal(selectedAudit.selection.rootDisplay.includes(selectedRoot), false);
   assert.equal(selectedAudit.report.totals.existingFiles, 2);
-  assert.equal(selectedAudit.report.health.status, "healthy");
+  assert.equal(selectedAudit.report.health.status, "needs-review");
+  assert.ok(selectedAudit.report.health.reasons.includes("private_or_key_shaped_text_detected"));
   assert.equal(selectedAudit.auditTrail.writesRealFiles, false);
   assert.equal(selectedAudit.auditTrail.event, "local_container_audit_preview");
   const selectedAuditHistory = mergeSelectedAuditTrail(
@@ -287,6 +319,8 @@ try {
     selectedSyncApply,
     applyAuditLog,
     localAudit,
+    missingBrowseConfirmation,
+    selectedBrowse,
     missingConfirmation,
     selectedAudit,
     selectedAuditHistory,
@@ -317,6 +351,7 @@ try {
           "selected-wiki-sync-dry-run",
           "selected-wiki-sync-apply",
           "local-container-audit",
+          "selected-local-browse",
           "selected-local-audit",
           "selected-audit-history",
           "public-safe-serialization",

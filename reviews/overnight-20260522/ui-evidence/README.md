@@ -61,9 +61,12 @@
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.
-- That browser DOM evidence now includes selected local vault sync apply
-  controls, including the password path field, write checkbox, and confirmation
-  phrase field.
+- That browser DOM evidence includes selected local vault sync apply controls,
+  including the visible path field, write checkbox, and confirmation phrase
+  field.
+- The selected local-container browse slice was verified by fresh Brain UI smoke
+  and interaction smoke. A later Chrome DevTools capture attempt could not
+  connect because no debug Chrome was listening on port `9222`.
 - Codex Browser screenshot capture timed out twice for that browser pass,
   so the browser artifact records DOM evidence only. Existing screenshot
   artifacts remain fixture-only visual evidence.

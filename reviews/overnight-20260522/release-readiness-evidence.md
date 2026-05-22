@@ -26,6 +26,12 @@ Scope:
   a real-path preview remains disabled by default, requires read-only
   confirmation, clears the typed path, and displays only a redacted
   `.../container` label.
+- Added Brain UI selected local-container browse evidence to the release gate
+  so a real-path browse preview remains disabled by default, requires read-only
+  confirmation, clears the typed path, returns bounded redacted snippets, skips
+  fully private entries, and writes no files.
+- Added Gemini review for selected local-container browse and made that review
+  packet a required release-readiness artifact.
 - Added Brain UI selected audit history evidence to the release gate so
   browser-local history is content-free, bounded, and does not expose raw local
   paths or private/key-shaped text.
@@ -69,6 +75,8 @@ What `release:check` verifies:
 - Brain UI Container Health DOM evidence is sane,
 - Brain UI Local Audit Preflight DOM evidence is sane,
 - Brain UI selected local-container audit DOM evidence is sane,
+- Brain UI selected local-container browse evidence exists and is covered by
+  fresh interaction smoke,
 - Brain UI selected audit history DOM evidence is sane,
 - Brain UI selected vault sync dry-run DOM evidence is sane,
 - Brain UI selected vault sync apply controls are present in Browser DOM
@@ -140,9 +148,9 @@ Cold review response:
 - Interaction smoke now covers search filtering, retrieval trace visibility,
   private/key-shaped edit rejection, draft export, Nucleus export, research
   lineage, lifecycle policy draft export, memory review queue draft export,
-  vault path selection, selected vault sync dry-run, write-confirmed selected
-  vault sync apply, dry-run sync reporting, audit-log write intent coverage, and
-  public-safe serialization.
+  vault path selection, selected local-container browse, selected vault sync
+  dry-run, write-confirmed selected vault sync apply, dry-run sync reporting,
+  audit-log write intent coverage, and public-safe serialization.
 
 Known limits:
 

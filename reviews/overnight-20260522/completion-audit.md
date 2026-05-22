@@ -43,6 +43,7 @@ complete or publish a public live update.
 | Brain UI container-health evidence | `brain-ui-container-health-*`, `brain-ui-container-health-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI local-audit preview evidence | `brain-ui-local-audit-*`, `brain-ui-local-audit-preview-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI selected local-audit evidence | `brain-ui-selected-local-audit-*`, `brain-ui-selected-local-audit-evidence.md`, Gemini review | Proven as read-only selected preview |
+| Brain UI selected local-container browse | `brain-ui-selected-local-browse-evidence.md`, `packages/brain-ui/interaction-smoke.mjs`, `tests/local-container/audit.test.ts` | Proven as disabled-by-default read-only redacted browse preview |
 | Brain UI selected audit-history evidence | `brain-ui-selected-audit-history-*`, `brain-ui-selected-audit-history-evidence.md`, Gemini review | Proven as browser-local content-free history |
 | Brain UI selected vault sync dry-run evidence | `brain-ui-selected-sync-dry-run-*`, `brain-ui-selected-sync-dry-run-evidence.md`, Gemini review | Proven as disabled-by-default read-only dry-run |
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-browser-dom-evidence.json` | Proven as disabled-by-default write-confirmed apply with content-free audit log |
@@ -79,11 +80,12 @@ complete or publish a public live update.
    issue with its current permissions.
 4. The public launch verdict remains `FAIL`. Human approval is required before
    making a live update or changing repository visibility.
-5. The Brain UI has read-only selected local-container audit preview,
-   browser-local audit history, selected vault sync dry-run, write-confirmed
-   selected vault sync apply, lifecycle policy draft export, and memory review
-   queue draft export. Real local-container browse/edit, real policy apply, and
-   real review-queue apply still need explicit write confirmation and UI wiring.
+5. The Brain UI has read-only selected local-container audit and browse
+   previews, browser-local audit history, selected vault sync dry-run,
+   write-confirmed selected vault sync apply, lifecycle policy draft export,
+   and memory review queue draft export. Real local-container edit, real policy
+   apply, and real review-queue apply still need explicit write confirmation
+   and UI wiring.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

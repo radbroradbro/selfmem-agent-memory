@@ -38,6 +38,8 @@ is still required before any public live update.
 | Brain UI draft export | `reviews/overnight-20260522/brain-ui-edit-export-evidence.md` |
 | Brain UI container health | `reviews/overnight-20260522/brain-ui-container-health-evidence.md` |
 | Brain UI local audit preview | `reviews/overnight-20260522/brain-ui-local-audit-preview-evidence.md` |
+| Brain UI selected local-container browse | `reviews/overnight-20260522/brain-ui-selected-local-browse-evidence.md` |
+| Brain UI selected local-container browse review | `reviews/overnight-20260522/gemini-brain-ui-selected-local-browse-review.md` |
 | Brain UI selected vault sync dry-run | `reviews/overnight-20260522/brain-ui-selected-sync-dry-run-evidence.md` |
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Selected vault sync apply review | `reviews/overnight-20260522/gemini-selected-sync-apply-review.md` |
@@ -103,8 +105,9 @@ Sanitized fixture evidence exists under
 - `brain-ui-research-lineage.png`
 - matching DOM evidence JSON for the UI, vault preview, sync report, and edit
   draft export, plus Container Health, Local Audit Preflight, Nucleus snapshot,
-  selected local-container audit, selected audit history, selected vault sync
-  dry-run, lifecycle policy, memory review queue, and research-lineage previews
+  selected local-container audit, selected local-container browse, selected
+  audit history, selected vault sync dry-run, lifecycle policy, memory review
+  queue, and research-lineage previews
 - `brain-ui-browser-dom-evidence.json`, captured by Codex Browser
   against browser evidence baseline `96ae9cc`; screenshot capture timed out and is recorded in
   the artifact
@@ -129,6 +132,7 @@ local memory contents.
   transient routing warnings before returning the verdict.
 - Gemini Brain UI local-audit preview review: `CLEAN`.
 - Gemini Brain UI selected local-audit review: `CLEAN`.
+- Gemini Brain UI selected local-container browse review: `CLEAN`.
 - Gemini Brain UI selected audit-history review: `CLEAN`.
 - Gemini Brain UI selected vault sync dry-run review: `CLEAN`.
 - Gemini selected vault sync apply review: first `BLOCK`, then final `CLEAN`
@@ -170,6 +174,9 @@ local memory contents.
 - Brain UI selected local-audit mode is disabled by default, requires read-only
   confirmation, clears the typed path, and displays only a redacted
   `.../container` label.
+- Brain UI selected local-container browse is disabled by default, requires
+  read-only confirmation, clears the typed path, returns bounded redacted
+  memory/trace snippets, skips fully private entries, and writes no files.
 - Brain UI selected audit history is browser-local and stores only redacted
   labels, counts, status, event name, and timestamp.
 - Brain UI selected vault sync dry-run is disabled by default, requires
@@ -194,10 +201,10 @@ local memory contents.
 ## Residual Risks
 
 - Claude review is blocked until Claude CLI is logged in.
-- The Brain UI has read-only selected local-container audit preview and
-  browser-local audit history plus write-confirmed selected vault sync apply,
-  but real local-container browse/edit, lifecycle policy apply, and review-queue
-  apply still need write confirmation and UI wiring.
+- The Brain UI has read-only selected local-container audit and browse previews,
+  browser-local audit history, plus write-confirmed selected vault sync apply,
+  but real local-container edit, lifecycle policy apply, and review-queue apply
+  still need write confirmation and UI wiring.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

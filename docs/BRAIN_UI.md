@@ -110,6 +110,13 @@ summary. The browser also keeps a bounded content-free selected-audit history
 in `localStorage`. It still writes no agent files and never returns raw memory
 text.
 
+Selected local-container browse is disabled unless the server starts with
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE=1`. When enabled, it requires
+read-only confirmation, clears the typed path after submit, reads only the
+allow-listed local memory files, and returns a bounded list of redacted memory
+or trace snippets. It skips fully private entries, reports redaction counts,
+returns only a redacted `.../container` label, and writes no agent files.
+
 Selected local vault sync dry-run is also disabled unless
 `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` is set. When enabled, it requires
 read-only confirmation, clears the typed path after submit, runs
@@ -133,6 +140,7 @@ Before connecting real local containers, the UI needs:
 - local container audit preflight,
 - redacted local container mode,
 - explicit file picker or config path with read-only confirmation,
+- selected local-container browse preview,
 - write confirmation for derived docs,
 - wiki lint before save,
 - lifecycle policy apply path with explicit config confirmation,

@@ -36,6 +36,7 @@
     "brain-ui-container-health",
     "brain-ui-local-audit-preflight",
     "brain-ui-selected-local-audit",
+    "brain-ui-selected-local-container-browse",
     "brain-ui-selected-audit-history",
     "brain-ui-selected-vault-sync-dry-run",
     "brain-ui-selected-vault-sync-apply",
@@ -49,7 +50,7 @@
     "github-pr-body-update-blocked",
     "github-issue-create-blocked",
     "human-public-launch-approval-required",
-    "brain-ui-real-local-container-mode-not-enabled",
+    "brain-ui-real-local-container-edit-not-enabled",
     "hosted-supermemory-baseline-not-current"
   ],
   "safetyBoundary": {

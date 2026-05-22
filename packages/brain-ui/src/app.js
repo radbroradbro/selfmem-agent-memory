@@ -23,6 +23,8 @@ const state = {
   syncReport: null,
   selectedVaultPath: "",
   localAudit: null,
+  localBrowse: null,
+  selectedBrowse: null,
   selectedAudit: null,
   selectedAuditHistory: readSelectedAuditHistory(),
   selectedSync: null,
@@ -91,6 +93,15 @@ const selectedSyncApplyActions = document.querySelector("#selectedSyncApplyActio
 const localAuditSummary = document.querySelector("#localAuditSummary");
 const localAuditFiles = document.querySelector("#localAuditFiles");
 const localAuditReasons = document.querySelector("#localAuditReasons");
+const localBrowseSummary = document.querySelector("#localBrowseSummary");
+const localBrowseItems = document.querySelector("#localBrowseItems");
+const selectedBrowseForm = document.querySelector("#selectedBrowseForm");
+const selectedBrowsePath = document.querySelector("#selectedBrowsePath");
+const selectedBrowseConfirm = document.querySelector("#selectedBrowseConfirm");
+const selectedBrowseMaxItems = document.querySelector("#selectedBrowseMaxItems");
+const selectedBrowseStatus = document.querySelector("#selectedBrowseStatus");
+const selectedBrowseSummary = document.querySelector("#selectedBrowseSummary");
+const selectedBrowseItems = document.querySelector("#selectedBrowseItems");
 const selectedAuditForm = document.querySelector("#selectedAuditForm");
 const selectedAuditPath = document.querySelector("#selectedAuditPath");
 const selectedAuditConfirm = document.querySelector("#selectedAuditConfirm");
@@ -106,16 +117,18 @@ const exportStatus = document.querySelector("#exportStatus");
 const editExport = document.querySelector("#editExport");
 const timelineList = document.querySelector("#timelineList");
 
-const [response, vaultResponse, syncResponse, localAuditResponse] = await Promise.all([
+const [response, vaultResponse, syncResponse, localAuditResponse, localBrowseResponse] = await Promise.all([
   fetch("/fixtures/nucleus.fixture.json"),
   fetch("/fixtures/wiki-vault.json"),
   fetch("/fixtures/wiki-sync-report.json"),
   fetch("/fixtures/local-container-audit.json"),
+  fetch("/fixtures/local-container-browse.json"),
 ]);
 state.snapshot = await response.json();
 state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
 state.localAudit = await localAuditResponse.json();
+state.localBrowse = await localBrowseResponse.json();
 state.query = searchInput.value;
 state.selectedId = state.snapshot.nodes[0]?.id ?? null;
 state.selectedVaultPath = preferredVaultPath(state.vault?.vault);
@@ -231,6 +244,29 @@ selectedSyncApplyForm.addEventListener("submit", async (event) => {
   }
 });
 
+selectedBrowseForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.selectedBrowse = { ok: false, code: "loading", message: "Browsing selected local container." };
+  renderSelectedBrowse();
+  try {
+    const response = await fetch("/local-container/browse", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: selectedBrowsePath.value,
+        confirmReadOnly: selectedBrowseConfirm.checked,
+        maxItems: Number(selectedBrowseMaxItems.value),
+      }),
+    });
+    state.selectedBrowse = await response.json();
+  } catch (error) {
+    state.selectedBrowse = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    selectedBrowsePath.value = "";
+    renderSelectedBrowse();
+  }
+});
+
 selectedAuditForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   state.selectedAudit = { ok: false, code: "loading", message: "Checking selected local container." };
@@ -275,6 +311,8 @@ function render() {
   renderSelectedSync();
   renderSelectedSyncApply();
   renderLocalAudit();
+  renderLocalBrowse();
+  renderSelectedBrowse();
   renderSelectedAudit();
   renderSelectedAuditHistory();
   renderEditExport();
@@ -709,6 +747,64 @@ function renderLocalAudit() {
     const item = document.createElement("li");
     item.textContent = reason.replaceAll("_", " ");
     localAuditReasons.append(item);
+  }
+}
+
+function renderLocalBrowse() {
+  localBrowseSummary.replaceChildren();
+  localBrowseItems.replaceChildren();
+  const report = state.localBrowse?.report;
+  if (!report) {
+    localBrowseSummary.textContent = "Fixture browse unavailable.";
+    return;
+  }
+
+  localBrowseSummary.replaceChildren(
+    stat("Browse mode", "fixture"),
+    stat("Items", report.totals.itemsReturned),
+    stat("Lines", report.totals.linesInspected),
+    stat("Redactions", report.totals.redactionCount),
+  );
+  renderBrowseItems(localBrowseItems, report.items);
+}
+
+function renderSelectedBrowse() {
+  selectedBrowseSummary.replaceChildren();
+  selectedBrowseItems.replaceChildren();
+  const payload = state.selectedBrowse;
+  if (!payload) {
+    selectedBrowseStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    selectedBrowseStatus.textContent = payload.message ?? payload.code ?? "Local browse unavailable.";
+    return;
+  }
+
+  selectedBrowseStatus.textContent = `${payload.selection.rootDisplay} browsed read-only.`;
+  selectedBrowseSummary.replaceChildren(
+    stat("Items", payload.report.totals.itemsReturned),
+    stat("Files", payload.report.totals.filesInspected),
+    stat("Skipped private", payload.report.totals.skippedPrivate),
+    stat("Redactions", payload.report.totals.redactionCount),
+    stat("Writes", payload.writesRealFiles ? "enabled" : "disabled"),
+  );
+  renderBrowseItems(selectedBrowseItems, payload.report.items);
+}
+
+function renderBrowseItems(target, items) {
+  for (const entry of items ?? []) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    const meta = document.createElement("small");
+    item.dataset.kind = entry.kind;
+    label.textContent = entry.kind;
+    value.textContent = entry.summary;
+    meta.textContent = `${entry.sourceFile}:${entry.line}${entry.event ? ` | ${entry.event}` : ""}`;
+    item.append(label, value, meta);
+    target.append(item);
   }
 }
 

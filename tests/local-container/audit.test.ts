@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { auditLocalContainer } from "../../packages/core/src/index.js";
+import { auditLocalContainer, browseLocalContainer } from "../../packages/core/src/index.js";
 
 describe("local container audit", () => {
   it("summarizes known local memory files without returning raw content or paths", async () => {
@@ -52,5 +52,40 @@ describe("local container audit", () => {
     expect(report.health.status).toBe("needs-review");
     expect(report.health.reasons).toContain("file_exceeds_safe_audit_size");
     expect(report.health.reasons).toContain("unsafe_audit_file_name_rejected");
+  });
+
+  it("browses selected local memory files with redacted snippets and no raw root path", async () => {
+    const rootDir = await mkdtemp(join(tmpdir(), "recallweave-local-browse-"));
+    const keyLike = `pa-${"B".repeat(44)}`;
+    await writeFile(
+      join(rootDir, "memories.jsonl"),
+      [
+        JSON.stringify({ id: "mem_1", kind: "decision", text: "Use local-only write mode." }),
+        JSON.stringify({ id: "mem_2", kind: "preference", text: `public <private>hidden</private> ${keyLike}` }),
+        JSON.stringify({ id: "mem_3", kind: "secret", text: `<private>fully hidden</private>` }),
+      ].join("\n"),
+      "utf8",
+    );
+    await writeFile(join(rootDir, "trace.jsonl"), "{\"event\":\"search\",\"query\":\"local recall\",\"count\":2}\n", "utf8");
+
+    const report = await browseLocalContainer({
+      rootDir,
+      containerLabel: `agent ${keyLike}`,
+      maxItems: 10,
+    });
+    const serialized = JSON.stringify(report);
+
+    expect(report.mode).toBe("local-container-browse-preview");
+    expect(report.writesRealFiles).toBe(false);
+    expect(report.rootPathRedacted).toBe(true);
+    expect(report.containerLabel).not.toContain(keyLike);
+    expect(report.totals.itemsReturned).toBe(3);
+    expect(report.totals.skippedPrivate).toBe(1);
+    expect(report.totals.redactionCount).toBeGreaterThanOrEqual(2);
+    expect(report.items.some((item) => item.summary.includes("Use local-only write mode"))).toBe(true);
+    expect(report.items.some((item) => item.event === "search")).toBe(true);
+    expect(serialized).not.toContain(rootDir);
+    expect(serialized).not.toContain("hidden");
+    expect(serialized).not.toContain(keyLike);
   });
 });

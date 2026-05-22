@@ -180,6 +180,26 @@
           <div id="localAuditSummary" class="audit-summary" aria-label="Fixture local container audit summary"></div>
           <ol id="localAuditFiles" class="audit-files" aria-label="Fixture local container audit files"></ol>
           <ol id="localAuditReasons" class="audit-reasons" aria-label="Fixture local container audit reasons"></ol>
+          <div id="localBrowseSummary" class="audit-summary" aria-label="Fixture local container browse summary"></div>
+          <ol id="localBrowseItems" class="audit-files" aria-label="Fixture local container browse items"></ol>
+          <form id="selectedBrowseForm" class="selected-audit" aria-label="Selected local container browse">
+            <label>
+              <span>Browse container path</span>
+              <input id="selectedBrowsePath" name="selectedBrowsePath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local container browse path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedBrowseConfirm" name="selectedBrowseConfirm" type="checkbox" />
+              <span>Read-only browse</span>
+            </label>
+            <label>
+              <span>Max items</span>
+              <input id="selectedBrowseMaxItems" name="selectedBrowseMaxItems" type="number" min="1" max="25" value="12" aria-label="Selected local browse max items" />
+            </label>
+            <button id="runSelectedBrowse" type="submit">Browse entries</button>
+            <p id="selectedBrowseStatus" role="status"></p>
+            <div id="selectedBrowseSummary" class="audit-summary" aria-label="Selected local container browse summary"></div>
+            <ol id="selectedBrowseItems" class="audit-files" aria-label="Selected local container browse items"></ol>
+          </form>
           <form id="selectedAuditForm" class="selected-audit" aria-label="Selected local container audit">
             <label>
               <span>Local container path</span>

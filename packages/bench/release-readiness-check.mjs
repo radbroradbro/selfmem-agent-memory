@@ -48,6 +48,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-local-audit-preview-review.md`,
   `${reviewDir}/brain-ui-selected-local-audit-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-local-audit-review.md`,
+  `${reviewDir}/brain-ui-selected-local-browse-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-selected-local-browse-review.md`,
   `${reviewDir}/brain-ui-selected-audit-history-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-audit-history-review.md`,
   `${reviewDir}/brain-ui-selected-sync-dry-run-evidence.md`,
@@ -396,6 +398,7 @@ check("release state is conservative", () => {
   for (const surface of [
     "brain-ui-selected-vault-sync-dry-run",
     "brain-ui-selected-vault-sync-apply",
+    "brain-ui-selected-local-container-browse",
     "brain-ui-lifecycle-policy-preview",
     "brain-ui-memory-review-queue",
     "session-compaction-benchmark",
@@ -407,7 +410,7 @@ check("release state is conservative", () => {
     "claude-reviewer-route-blocked",
     "github-pr-body-update-blocked",
     "human-public-launch-approval-required",
-    "brain-ui-real-local-container-mode-not-enabled",
+    "brain-ui-real-local-container-edit-not-enabled",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
   }
@@ -425,6 +428,7 @@ check("release docs mention current preview surfaces", () => {
     const text = readFileSync(join(root, reviewDir, file), "utf8");
     assert.match(text, /selected vault sync dry-run|selected local vault sync dry-run/i, `${file} missing selected sync`);
     assert.match(text, /selected vault sync apply|selected local vault sync apply/i, `${file} missing selected sync apply`);
+    assert.match(text, /selected local-container browse|selected local container browse/i, `${file} missing selected browse`);
     assert.match(text, /lifecycle policy/i, `${file} missing lifecycle policy`);
     assert.match(text, /memory review queue/i, `${file} missing memory review queue`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);

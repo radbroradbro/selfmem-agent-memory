@@ -8,8 +8,8 @@ Scope:
 - The route is disabled unless the server starts with
   `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1`.
 - The route requires `confirmReadOnly: true`.
-- The UI path field is password-style, wrapped in a form, and cleared after
-  submit.
+- The UI path field is visible text for operator clarity, wrapped in a form,
+  and cleared after submit.
 - The response returns only a redacted `.../container` label, counts, health
   reasons, and an audit-trail summary.
 
