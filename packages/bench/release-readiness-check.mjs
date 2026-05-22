@@ -28,6 +28,8 @@ const requiredFiles = [
   `${reviewDir}/brain-ui-vault-preview-evidence.md`,
   `${reviewDir}/brain-ui-nucleus-snapshot-evidence.md`,
   `${reviewDir}/gemini-brain-ui-nucleus-snapshot-review.md`,
+  `${reviewDir}/brain-ui-research-lineage-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
   `${reviewDir}/brain-ui-edit-export-evidence.md`,
   `${reviewDir}/gemini-brain-ui-edit-export-review.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
@@ -40,6 +42,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-vault-preview.png`,
   `${reviewDir}/ui-evidence/brain-ui-nucleus-snapshot-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-nucleus-snapshot.png`,
+  `${reviewDir}/ui-evidence/brain-ui-research-lineage-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-research-lineage.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -149,6 +153,21 @@ check("dom evidence is sane", () => {
   assert.ok(nucleusEvidence.evidence.edgeCount >= 8);
   assert.equal(nucleusEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(nucleusEvidence.consoleMessages.length, 0);
+
+  const lineageEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-research-lineage-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(lineageEvidence.ok, true);
+  assert.equal(lineageEvidence.evidence.hasResearchLineageHeading, true);
+  assert.equal(lineageEvidence.evidence.fixtureModeVisible, true);
+  assert.equal(lineageEvidence.evidence.writesRealFilesFalseVisible, true);
+  assert.ok(lineageEvidence.evidence.cardCount >= 1);
+  assert.ok(lineageEvidence.evidence.stepCount >= 3);
+  assert.equal(lineageEvidence.evidence.hasQuery, true);
+  assert.equal(lineageEvidence.evidence.hasHypothesis, true);
+  assert.equal(lineageEvidence.evidence.hasDecision, true);
+  assert.equal(lineageEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(lineageEvidence.consoleMessages.length, 0);
 
   const editEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-edit-export-dom-evidence.json"), "utf8"),

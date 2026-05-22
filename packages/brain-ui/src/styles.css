@@ -565,6 +565,67 @@ button.active {
   margin-top: 10px;
 }
 
+.research-lineage {
+  display: grid;
+  gap: 10px;
+}
+
+.research-lineage p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.lineage-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px;
+  background: #10151a;
+}
+
+.lineage-card h4,
+.lineage-card p {
+  margin: 0;
+}
+
+.lineage-card h4 {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.lineage-card p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.lineage-card ol {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lineage-card li {
+  display: grid;
+  gap: 3px;
+  border-left: 2px solid var(--amber);
+  padding-left: 8px;
+}
+
+.lineage-card strong {
+  color: var(--amber);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lineage-card span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
 textarea {
   width: 100%;
   min-height: 230px;

@@ -32,6 +32,7 @@ const detailFacts = document.querySelector("#detailFacts");
 const provenance = document.querySelector("#provenance");
 const snapshotSummary = document.querySelector("#snapshotSummary");
 const snapshotExport = document.querySelector("#snapshotExport");
+const researchLineage = document.querySelector("#researchLineage");
 const vaultFileSelect = document.querySelector("#vaultFileSelect");
 const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
@@ -109,6 +110,7 @@ function render() {
   renderTimeline(nodes);
   renderDetails(selected);
   renderNucleusSnapshot();
+  renderResearchLineage();
   renderVaultControls(selected);
   renderSyncReport();
   renderEditExport();
@@ -238,6 +240,82 @@ function buildNucleusExport() {
       to: safeExportText(edge.to),
     })),
   };
+}
+
+function renderResearchLineage() {
+  const packet = buildResearchLineage();
+  researchLineage.replaceChildren();
+  if (packet.trails.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = "No fixture research lineage nodes.";
+    researchLineage.append(empty);
+    return;
+  }
+
+  for (const trail of packet.trails) {
+    const card = document.createElement("article");
+    const title = document.createElement("h4");
+    const meta = document.createElement("p");
+    const list = document.createElement("ol");
+    card.className = "lineage-card";
+    title.textContent = trail.query.title;
+    meta.textContent = `${packet.mode} | writesRealFiles: ${packet.writesRealFiles}`;
+    appendLineageStep(list, "query", trail.query);
+    for (const step of trail.steps) {
+      appendLineageStep(list, step.edgeKind, step.node);
+    }
+    card.append(title, meta, list);
+    researchLineage.append(card);
+  }
+}
+
+function buildResearchLineage() {
+  const nodesById = new Map(state.snapshot.nodes.map((node) => [node.id, node]));
+  const queryNodes = state.snapshot.nodes.filter((node) => node.kind === "research_query");
+  return {
+    schemaVersion: state.snapshot.schemaVersion,
+    mode: "fixture-research-lineage",
+    writesRealFiles: false,
+    trails: queryNodes.map((query) => ({
+      query: nodeSummary(query),
+      steps: collectLineageSteps(query.id, nodesById),
+    })),
+  };
+}
+
+function collectLineageSteps(startId, nodesById) {
+  const lineageKinds = new Set(["research_query", "hypothesis", "decision", "source"]);
+  const steps = [];
+  const visited = new Set([startId]);
+  let frontier = [startId];
+  for (let depth = 0; depth < 4; depth += 1) {
+    const nextFrontier = [];
+    for (const from of frontier) {
+      for (const edge of state.snapshot.edges.filter((candidate) => candidate.from === from)) {
+        if (visited.has(edge.to)) continue;
+        const node = nodesById.get(edge.to);
+        if (!node) continue;
+        visited.add(edge.to);
+        if (lineageKinds.has(node.kind) || (node.tags ?? []).includes("research")) {
+          steps.push({ edgeKind: safeExportText(edge.kind), node: nodeSummary(node) });
+        }
+        nextFrontier.push(edge.to);
+      }
+    }
+    frontier = nextFrontier;
+    if (frontier.length === 0) break;
+  }
+  return steps;
+}
+
+function appendLineageStep(list, label, node) {
+  const item = document.createElement("li");
+  const strong = document.createElement("strong");
+  const span = document.createElement("span");
+  strong.textContent = `${label}: ${node.kind}`;
+  span.textContent = node.title;
+  item.append(strong, span);
+  list.append(item);
 }
 
 function renderEditExport() {
@@ -420,6 +498,16 @@ function fact(label, value) {
   return fragment;
 }
 
+function nodeSummary(node) {
+  return {
+    id: safeExportText(node.id),
+    kind: safeExportText(node.kind),
+    title: safeExportText(node.title),
+    confidence: typeof node.confidence === "number" ? node.confidence : null,
+    tags: (node.tags ?? []).map(safeExportText),
+  };
+}
+
 function edgeSummary(id) {
   return state.snapshot.edges
     .filter((edge) => edge.from === id || edge.to === id)
@@ -478,4 +566,4 @@ function safeExportText(value) {
   return redactPrivateLikeText(value ?? "");
 }
 
-export { buildEditExport, buildNucleusExport, renderGraph };
+export { buildEditExport, buildNucleusExport, buildResearchLineage, renderGraph };

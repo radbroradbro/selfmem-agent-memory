@@ -59,8 +59,9 @@ Required visual review path:
 8. timeline scan,
 9. provenance scan,
 10. Nucleus snapshot preview,
-11. compiled wiki/vault preview,
-12. fixture vault sync report with conflict handling.
+11. research lineage preview,
+12. compiled wiki/vault preview,
+13. fixture vault sync report with conflict handling.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture

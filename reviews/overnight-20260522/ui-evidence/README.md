@@ -26,6 +26,10 @@
   `brain-ui-nucleus-snapshot-dom-evidence.json`.
 - Headless Chrome captured the fixture-only Nucleus snapshot panel in
   `brain-ui-nucleus-snapshot.png`.
+- Headless Chrome captured Research Lineage DOM evidence in
+  `brain-ui-research-lineage-dom-evidence.json`.
+- Headless Chrome captured the fixture-only Research Lineage panel in
+  `brain-ui-research-lineage.png`.
 
 Chrome DevTools MCP was unavailable because no debug Chrome was listening on
 port `9222`. The run fell back to Computer Use plus headless Chrome.
