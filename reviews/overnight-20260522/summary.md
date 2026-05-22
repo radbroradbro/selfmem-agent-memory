@@ -32,6 +32,7 @@ is still required before any public live update.
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
 | Brain UI draft export | `reviews/overnight-20260522/brain-ui-edit-export-evidence.md` |
+| Brain UI container health | `reviews/overnight-20260522/brain-ui-container-health-evidence.md` |
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
@@ -69,11 +70,13 @@ Sanitized fixture evidence exists under
 - `brain-ui-fixture-edit.png`
 - `brain-ui-vault-preview.png`
 - `brain-ui-sync-report.png`
+- `brain-ui-container-health.png`
 - `brain-ui-edit-export.png`
 - `brain-ui-nucleus-snapshot.png`
 - `brain-ui-research-lineage.png`
 - matching DOM evidence JSON for the UI, vault preview, sync report, and edit
-  draft export, plus Nucleus snapshot and research-lineage previews
+  draft export, plus Container Health, Nucleus snapshot, and research-lineage
+  previews
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -87,6 +90,8 @@ local memory contents.
 - Gemini update-command review: first `BLOCK`, then final `CLEAN` after symlink
   resolution was fixed and tested.
 - Gemini edit-export review: `CLEAN`.
+- Gemini Container Health review: `CLEAN`, with a note that Gemini CLI produced
+  transient routing warnings before returning the verdict.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.

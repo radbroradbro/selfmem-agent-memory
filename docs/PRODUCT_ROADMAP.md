@@ -13,6 +13,8 @@ This roadmap tracks useful user-facing features without mixing them into the cur
 - `selfmem_update` for dry-run updates and safer agent patching.
 - Fixture-safe Nucleus-to-wiki compiler and explicit disk-sync helper with
   reviewed-page conflict protection.
+- Fixture-safe Brain UI panels for graph/editor, container health, Nucleus
+  snapshot, research lineage, compiled vault preview, and dry-run sync report.
 
 ## Brain UI
 

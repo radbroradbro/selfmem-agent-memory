@@ -157,6 +157,56 @@ button.active {
   font-size: 12px;
 }
 
+.container-health {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #10151a;
+}
+
+.container-health header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.container-health h2 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+#healthStatus {
+  border: 1px solid rgba(139, 209, 124, 0.48);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--green);
+  font-size: 11px;
+  white-space: nowrap;
+  background: rgba(139, 209, 124, 0.08);
+}
+
+.container-health dl {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) minmax(0, 1fr);
+  gap: 6px 10px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.container-health dt {
+  color: var(--muted);
+}
+
+.container-health dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .ops-flow {
   margin-top: 18px;
   border: 1px solid var(--line);

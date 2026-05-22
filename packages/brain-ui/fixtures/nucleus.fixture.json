@@ -4,7 +4,17 @@
   "roots": {
     "indexPageId": "wiki:index",
     "methodologyPageId": "wiki:methodology",
-    "activeSessionId": "session:fixture-overnight"
+    "activeSessionId": "session:fixture-overnight",
+    "container": {
+      "agentLabel": "fixture-agent",
+      "localContainer": "recallweave_fixture_local",
+      "sourceSupermemoryContainer": "fixture_supermemory_readonly",
+      "providerMode": "voyage-4-large plus rerank-2.5 plus hosted read-through",
+      "writeMode": "local-only",
+      "lastAuditAt": "2026-05-22T08:30:00.000Z",
+      "privacyLeakCount": 0,
+      "redactionCount": 1
+    }
   },
   "nodes": [
     {

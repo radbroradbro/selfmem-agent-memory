@@ -36,6 +36,7 @@ complete or publish a public live update.
 | Self-hosted Brain UI | `packages/brain-ui/`, UI screenshots and DOM evidence under `reviews/overnight-20260522/ui-evidence/` | Proven for fixture mode |
 | Brain UI graph/editor evidence | `brain-ui-fixture-edit.png`, `brain-ui-dom-evidence.json`, `brain-ui-edit-export-*` | Proven with sanitized fixtures |
 | Brain UI vault/sync evidence | `brain-ui-vault-preview-*`, `brain-ui-sync-report-*` | Proven with sanitized fixtures |
+| Brain UI container-health evidence | `brain-ui-container-health-*`, `brain-ui-container-health-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |

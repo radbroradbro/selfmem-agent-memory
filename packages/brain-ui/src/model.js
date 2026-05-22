@@ -57,6 +57,42 @@ function buildResearchLineage(snapshot) {
   };
 }
 
+function buildContainerHealth(snapshot) {
+  const fixtureContainer = snapshot.roots?.container ?? {};
+  const memoryKinds = ["memory", "derived_doc", "retrieval_trace", "lifecycle_event", "research_query", "decision", "hypothesis"];
+  const countsByKind = Object.fromEntries(memoryKinds.map((kind) => [kind, snapshot.nodes.filter((node) => node.kind === kind).length]));
+  const newestWrites = [...snapshot.nodes]
+    .sort((a, b) => String(b.updatedAt ?? b.createdAt).localeCompare(String(a.updatedAt ?? a.createdAt)))
+    .slice(0, 4)
+    .map(nodeSummary);
+  const duplicateClusters = duplicateTitleClusters(snapshot.nodes);
+  const lifecycleEvents = snapshot.nodes.filter((node) => node.kind === "lifecycle_event");
+  const retrievalTraces = snapshot.nodes.filter((node) => node.kind === "retrieval_trace");
+  const privacyLeakCount = numeric(fixtureContainer.privacyLeakCount) + sumMetadataNumber(snapshot.nodes, "privacyLeakCount");
+  const redactionCount = numeric(fixtureContainer.redactionCount) + sumMetadataNumber(snapshot.nodes, "redactionCount");
+  return {
+    schemaVersion: snapshot.schemaVersion,
+    mode: "fixture-container-health",
+    writesRealFiles: false,
+    agentLabel: safeExportText(fixtureContainer.agentLabel ?? "fixture-agent"),
+    localContainer: safeExportText(fixtureContainer.localContainer ?? "recallweave_fixture_local"),
+    sourceSupermemoryContainer: safeExportText(fixtureContainer.sourceSupermemoryContainer ?? "fixture_supermemory_readonly"),
+    providerMode: safeExportText(fixtureContainer.providerMode ?? "fixture-voyage-rerank-read-through"),
+    writeMode: safeExportText(fixtureContainer.writeMode ?? "local-only"),
+    lastAuditAt: safeExportText(fixtureContainer.lastAuditAt ?? snapshot.generatedAt ?? ""),
+    countsByKind,
+    newestWrites,
+    duplicateClusters,
+    health: {
+      lifecycleEvents: lifecycleEvents.length,
+      retrievalTraces: retrievalTraces.length,
+      privacyLeakCount,
+      redactionCount,
+      status: privacyLeakCount === 0 && retrievalTraces.length > 0 ? "healthy-fixture" : "needs-review",
+    },
+  };
+}
+
 function buildEditExport(snapshot, edits) {
   const editableNodes = new Map(snapshot.nodes.filter((node) => node.editable).map((node) => [node.id, node]));
   const exportEdits = Object.entries(edits)
@@ -101,6 +137,29 @@ function safeExportText(value) {
   return redactPrivateLikeText(value ?? "");
 }
 
+function duplicateTitleClusters(nodes) {
+  const clusters = new Map();
+  for (const node of nodes) {
+    const key = String(node.title ?? "")
+      .trim()
+      .toLowerCase()
+      .replaceAll(/\s+/g, " ");
+    if (!key) continue;
+    const group = clusters.get(key) ?? [];
+    group.push(nodeSummary(node));
+    clusters.set(key, group);
+  }
+  return [...clusters.values()].filter((group) => group.length > 1);
+}
+
+function sumMetadataNumber(nodes, key) {
+  return nodes.reduce((total, node) => total + numeric(node.metadata?.[key]), 0);
+}
+
+function numeric(value) {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
 function collectLineageSteps(snapshot, startId, nodesById) {
   const lineageKinds = new Set(["research_query", "hypothesis", "decision", "source"]);
   const steps = [];
@@ -138,6 +197,7 @@ function nodeSummary(node) {
 
 export {
   buildEditExport,
+  buildContainerHealth,
   buildNucleusExport,
   buildResearchLineage,
   containsPrivateLikeText,

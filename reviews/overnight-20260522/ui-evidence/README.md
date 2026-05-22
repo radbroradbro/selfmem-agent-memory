@@ -30,9 +30,14 @@
   `brain-ui-research-lineage-dom-evidence.json`.
 - Headless Chrome captured the fixture-only Research Lineage panel in
   `brain-ui-research-lineage.png`.
+- Chrome DevTools captured Container Health DOM evidence in
+  `brain-ui-container-health-dom-evidence.json`.
+- Chrome DevTools captured the fixture-only Container Health panel in
+  `brain-ui-container-health.png`.
 
-Chrome DevTools MCP was unavailable because no debug Chrome was listening on
-port `9222`. The run fell back to Computer Use plus headless Chrome.
+Early Chrome DevTools MCP capture was unavailable because no debug Chrome was
+listening on port `9222`. The Container Health capture used a temporary
+isolated debug Chrome profile with fixture-only data.
 
 ## Reviewer Evidence
 

@@ -1,4 +1,5 @@
 import {
+  buildContainerHealth,
   buildEditExport,
   buildNucleusExport,
   buildResearchLineage,
@@ -35,6 +36,8 @@ const graph = document.querySelector("#graph");
 const nodeCount = document.querySelector("#nodeCount");
 const edgeCount = document.querySelector("#edgeCount");
 const editableCount = document.querySelector("#editableCount");
+const healthStatus = document.querySelector("#healthStatus");
+const containerFacts = document.querySelector("#containerFacts");
 const detailKind = document.querySelector("#detailKind");
 const detailTitle = document.querySelector("#detailTitle");
 const detailFacts = document.querySelector("#detailFacts");
@@ -112,6 +115,7 @@ function render() {
   const nodes = filteredNodes();
   const selected = currentSelected(nodes);
   renderMetrics();
+  renderContainerHealth();
   renderGraph(nodes);
   renderTimeline(nodes);
   renderDetails(selected);
@@ -126,6 +130,24 @@ function renderMetrics() {
   nodeCount.textContent = String(state.snapshot.nodes.length);
   edgeCount.textContent = String(state.snapshot.edges.length);
   editableCount.textContent = String(state.snapshot.nodes.filter((node) => node.editable).length);
+}
+
+function renderContainerHealth() {
+  const health = buildContainerHealth(state.snapshot);
+  healthStatus.textContent = health.health.status;
+  healthStatus.dataset.status = health.health.status;
+  containerFacts.replaceChildren(
+    fact("Agent", health.agentLabel),
+    fact("Local", health.localContainer),
+    fact("Hosted read", health.sourceSupermemoryContainer),
+    fact("Provider", health.providerMode),
+    fact("Writes", health.writeMode),
+    fact("Lifecycle", health.health.lifecycleEvents),
+    fact("Traces", health.health.retrievalTraces),
+    fact("Leaks", health.health.privacyLeakCount),
+    fact("Redactions", health.health.redactionCount),
+    fact("Duplicates", health.duplicateClusters.length),
+  );
 }
 
 function renderGraph(nodes) {
@@ -441,4 +463,4 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
-export { buildEditExport, buildNucleusExport, buildResearchLineage, renderGraph };
+export { buildContainerHealth, buildEditExport, buildNucleusExport, buildResearchLineage, renderGraph };

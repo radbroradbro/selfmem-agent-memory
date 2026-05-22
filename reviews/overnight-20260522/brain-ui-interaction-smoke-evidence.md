@@ -9,9 +9,9 @@ Scope:
 - Moved export and selection helpers into `packages/brain-ui/src/model.js` so
   browser UI behavior and smoke tests share the same logic.
 - The smoke covers search filtering, retrieval trace visibility, editable node
-  handling, private/key-shaped edit rejection, draft export, Nucleus export,
-  research lineage, vault path selection, dry-run sync reporting, and
-  public-safe serialization.
+  handling, Container Health, private/key-shaped edit rejection, draft export,
+  Nucleus export, research lineage, vault path selection, dry-run sync
+  reporting, and public-safe serialization.
 
 Public-safety boundary:
 
@@ -36,6 +36,7 @@ Interaction smoke output:
     "search-filter",
     "retrieval-trace",
     "editable-node",
+    "container-health",
     "private-edit-guard",
     "draft-export",
     "nucleus-export",

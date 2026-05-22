@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
+  buildContainerHealth,
   buildEditExport,
   buildNucleusExport,
   buildResearchLineage,
@@ -39,6 +40,15 @@ try {
   const editableNode = editableNodes.at(-1);
   assert.ok(retrievalTrace, "fixture must include a retrieval trace");
   assert.ok(editableNode, "fixture must include an editable node");
+
+  const containerHealth = buildContainerHealth(fixture);
+  assert.equal(containerHealth.mode, "fixture-container-health");
+  assert.equal(containerHealth.writesRealFiles, false);
+  assert.equal(containerHealth.writeMode, "local-only");
+  assert.equal(containerHealth.health.status, "healthy-fixture");
+  assert.equal(containerHealth.health.privacyLeakCount, 0);
+  assert.ok(containerHealth.health.retrievalTraces >= 1);
+  assert.ok(containerHealth.countsByKind.memory >= 1);
 
   const privateCandidate = `<private>fixture secret</private> ${"pa-" + "x".repeat(24)}`;
   assert.equal(containsPrivateLikeText(privateCandidate), true, "private/key-shaped edit should be rejected by UI guard");
@@ -90,7 +100,7 @@ try {
   assert.ok(syncReport.report.summary.write_conflict_note >= 1);
   assert.ok(syncReport.report.actions.some((action) => action.action === "write_conflict_note" && action.conflictPath));
 
-  const serialized = JSON.stringify({ editExport, unsafeExport, nucleusExport, lineage, vault, syncReport });
+  const serialized = JSON.stringify({ containerHealth, editExport, unsafeExport, nucleusExport, lineage, vault, syncReport });
   assert.equal(containsPrivateLikeText(serialized), false, "serialized interaction outputs must stay public-safe");
 
   console.log(
@@ -101,6 +111,7 @@ try {
           "search-filter",
           "retrieval-trace",
           "editable-node",
+          "container-health",
           "private-edit-guard",
           "draft-export",
           "nucleus-export",

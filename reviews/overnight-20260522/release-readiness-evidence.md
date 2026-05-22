@@ -12,6 +12,10 @@ Scope:
   available for pinned review packets.
 - Added Brain UI interaction smoke coverage to the release gate so derived
   model behavior is tested directly, not only through static DOM evidence.
+- Added Brain UI Container Health evidence to the release gate so the UI must
+  prove fixture-safe local container, hosted read-through, provider mode,
+  local-only write mode, leak count, redaction count, and retrieval trace
+  visibility.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -22,6 +26,7 @@ What `release:check` verifies:
 - the release readiness evidence file itself exists,
 - package scripts for build, tests, smokes, and release check exist,
 - Brain UI vault preview DOM evidence is sane,
+- Brain UI Container Health DOM evidence is sane,
 - a fresh Brain UI smoke passes against the current source,
 - a fresh Brain UI interaction smoke passes against the current source,
 - `git diff --check` passes,

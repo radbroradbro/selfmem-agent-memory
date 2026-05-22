@@ -10,6 +10,7 @@ The first scaffold lives in `packages/brain-ui/` and uses fixture data only.
 The UI should expose:
 
 - Nucleus graph nodes and edges,
+- container health and provider mode,
 - hybrid retrieval traces,
 - lifecycle and sleep-cycle events,
 - research lineage,
@@ -67,6 +68,11 @@ Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
 vault, redacts its root as `fixture-temp-vault`, and never reads an agent's real
 memory directory.
+
+The fixture Container panel shows fake local/read-through container labels,
+provider mode, local-only write mode, lifecycle/retrieval counts, leak count,
+redaction count, and duplicate-cluster count. It proves the health affordance
+without touching real agent state.
 
 The fixture editor refuses private or key-shaped text and exports saved fixture
 edits as a preview object with `writesRealFiles: false`.
