@@ -67,6 +67,9 @@ Cold review response:
 - Post-push CI check passed. The workflow then moved to
   `actions/checkout@v5` and `actions/setup-node@v5` after confirming those tags
   exist, clearing the upcoming Node 20 action deprecation warning at the source.
+- The first v5 run showed `pnpm` missing from PATH, so CI now invokes pinned
+  pnpm through `npm exec --yes pnpm@10.23.0` for install, test, smoke, and
+  release readiness.
 - Accepted residual note: `release:check` records every check result before
   exiting, so the core package dry-run is still reported even if another check
   fails.

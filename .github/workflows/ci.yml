@@ -22,19 +22,14 @@ jobs:
         with:
           node-version: 22
 
-      - name: Enable pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.23.0 --activate
-
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: npm exec --yes pnpm@10.23.0 -- install --frozen-lockfile
 
       - name: Test
-        run: pnpm test
+        run: npm exec --yes pnpm@10.23.0 -- test
 
       - name: Full smoke
-        run: pnpm smoke
+        run: npm exec --yes pnpm@10.23.0 -- smoke
 
       - name: Release readiness check
-        run: pnpm release:check
+        run: npm exec --yes pnpm@10.23.0 -- release:check
