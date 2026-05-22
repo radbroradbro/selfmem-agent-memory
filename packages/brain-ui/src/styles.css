@@ -707,7 +707,10 @@ button.active {
 }
 
 .selected-audit input[type="password"],
+.selected-audit input[type="text"],
 .selected-sync input[type="password"],
+.selected-sync input[type="text"],
+.policy-form input[type="text"],
 .policy-form input[type="number"],
 .policy-form select,
 .review-candidate select {
@@ -730,6 +733,7 @@ button.active {
 
 #selectedAuditStatus,
 #selectedSyncStatus,
+#policyApplyStatus,
 #policyStatus,
 #reviewQueueStatus {
   min-height: 18px;

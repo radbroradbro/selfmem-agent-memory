@@ -21,7 +21,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
-const server = createBrainUiServer({ enableLocalAudit: true, enableLocalBrowse: true, enableLocalApply: true });
+const selectedPolicyRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-policy-"));
+const server = createBrainUiServer({
+  enableLocalAudit: true,
+  enableLocalBrowse: true,
+  enableLocalApply: true,
+  enablePolicyApply: true,
+});
 
 await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
 await writeFile(
@@ -134,6 +140,59 @@ try {
   assert.equal(clampedPolicyDraft.recall.rerankCandidateLimit, 200);
   assert.equal(clampedPolicyDraft.recall.rerankTokenBudget, 6400);
   assert.equal(clampedPolicyDraft.writes.lowConfidenceAction, "review_queue");
+  const missingPolicyApplyConfirmation = await postJson(`${base}/lifecycle-policy/apply`, {
+    rootDir: selectedPolicyRoot,
+    policy: policyDraft,
+    confirmWrite: false,
+    confirmationPhrase: "APPLY LOCAL LIFECYCLE POLICY",
+  });
+  assert.equal(missingPolicyApplyConfirmation.ok, false);
+  assert.equal(missingPolicyApplyConfirmation.code, "write_confirmation_required");
+  const unsafePolicyApply = await postJson(`${base}/lifecycle-policy/apply`, {
+    rootDir: selectedPolicyRoot,
+    policy: {
+      ...policyDraft,
+      recall: {
+        ...policyDraft.recall,
+        forceWhenPromptMatches: [`public ${"pa-" + "F".repeat(44)}`],
+      },
+    },
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL LIFECYCLE POLICY",
+  });
+  assert.equal(unsafePolicyApply.ok, false);
+  assert.equal(unsafePolicyApply.code, "policy_contains_private_or_key_shaped_text");
+  const selectedPolicyApply = await postJson(`${base}/lifecycle-policy/apply`, {
+    rootDir: selectedPolicyRoot,
+    policy: policyDraft,
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL LIFECYCLE POLICY",
+  });
+  assert.equal(selectedPolicyApply.ok, true);
+  assert.equal(selectedPolicyApply.mode, "selected-lifecycle-policy-apply");
+  assert.equal(selectedPolicyApply.writesRealFiles, true);
+  assert.equal(selectedPolicyApply.selection.rootPathRedacted, true);
+  assert.match(selectedPolicyApply.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedPolicyApply.selection.rootDisplay.includes(selectedPolicyRoot), false);
+  assert.equal(selectedPolicyApply.report.rootDir.includes(selectedPolicyRoot), false);
+  assert.equal(selectedPolicyApply.report.policyPath, ".recallweave/lifecycle-policy.json");
+  assert.equal(selectedPolicyApply.report.auditLog.entriesWritten, 1);
+  assert.equal(selectedPolicyApply.report.summary.forceEveryTurn, true);
+  assert.equal(selectedPolicyApply.report.summary.storePreCompressCheckpoints, true);
+  assert.equal(selectedPolicyApply.report.summary.maxAutoWritesPerSession, 12);
+  assert.equal(selectedPolicyApply.report.summary.lowConfidenceAction, "suppress");
+  assert.equal(selectedPolicyApply.auditTrail.event, "lifecycle_policy_apply");
+  assert.equal(selectedPolicyApply.auditTrail.writesRealFiles, true);
+  const lifecyclePolicyFile = await readFile(join(selectedPolicyRoot, ".recallweave/lifecycle-policy.json"), "utf8");
+  const lifecycleAuditLog = await readFile(join(selectedPolicyRoot, ".recallweave/lifecycle-policy-audit.jsonl"), "utf8");
+  const writtenPolicy = JSON.parse(lifecyclePolicyFile);
+  assert.equal(writtenPolicy.mode, "local-lifecycle-policy");
+  assert.equal(writtenPolicy.writesRealFiles, true);
+  assert.equal(writtenPolicy.recall.forceEveryTurn, true);
+  assert.equal(writtenPolicy.writes.storePreCompressCheckpoints, true);
+  assert.equal(writtenPolicy.writes.maxAutoWritesPerSession, 12);
+  assert.match(lifecycleAuditLog, /lifecycle_policy_apply/);
+  assert.equal(lifecycleAuditLog.includes(selectedPolicyRoot), false);
 
   const reviewQueue = buildMemoryReviewQueue(fixture, {
     "candidate:maintenance-noise": "suppress",
@@ -309,6 +368,11 @@ try {
     lineage,
     policyDraft,
     clampedPolicyDraft,
+    missingPolicyApplyConfirmation,
+    unsafePolicyApply,
+    selectedPolicyApply,
+    lifecyclePolicyFile,
+    lifecycleAuditLog,
     reviewQueue,
     changedReviewQueue,
     vault,
@@ -345,6 +409,7 @@ try {
           "nucleus-export",
           "research-lineage",
           "lifecycle-policy-draft",
+          "selected-lifecycle-policy-apply",
           "review-queue-draft",
           "vault-path",
           "sync-report",
@@ -365,6 +430,7 @@ try {
   await new Promise((resolve) => server.close(resolve));
   await rm(selectedRoot, { recursive: true, force: true });
   await rm(selectedSyncRoot, { recursive: true, force: true });
+  await rm(selectedPolicyRoot, { recursive: true, force: true });
 }
 
 async function json(url) {

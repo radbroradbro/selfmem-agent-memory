@@ -54,6 +54,9 @@
   `brain-ui-lifecycle-policy-dom-evidence.json`.
 - Chrome DevTools captured the lifecycle policy draft panel in
   `brain-ui-lifecycle-policy.png`.
+- The selected lifecycle policy apply slice was verified by fresh Brain UI
+  smoke and interaction smoke. It has no committed screenshot yet; the evidence
+  is the gated route, docs, smoke output, and Gemini review.
 - Chrome DevTools captured memory review queue DOM evidence in
   `brain-ui-review-queue-dom-evidence.json`.
 - Chrome DevTools captured the memory review queue panel in

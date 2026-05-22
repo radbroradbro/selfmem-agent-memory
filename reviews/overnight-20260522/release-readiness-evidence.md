@@ -46,6 +46,12 @@ Scope:
   counts.
 - Added Brain UI lifecycle policy evidence to the release gate so policy
   changes are staged as fixture-only `writesRealFiles: false` draft exports.
+- Added Brain UI lifecycle policy apply coverage so selected local policy
+  applies remain disabled by default, require
+  `RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY`, require the exact
+  `APPLY LOCAL LIFECYCLE POLICY` phrase, reject private/key-shaped policy
+  payloads, write only a selected local policy file plus content-free audit log,
+  and return only redacted root labels plus relative paths and counts.
 - Added Brain UI memory review queue evidence to the release gate so noisy,
   duplicate, and high-value candidate decisions are staged as fixture-only
   `writesRealFiles: false` draft exports.
@@ -82,6 +88,8 @@ What `release:check` verifies:
 - Brain UI selected vault sync apply controls are present in Browser DOM
   evidence,
 - Brain UI lifecycle policy DOM evidence is sane,
+- Brain UI selected lifecycle policy apply evidence exists and is covered by a
+  fresh interaction smoke,
 - Brain UI memory review queue DOM evidence is sane,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
@@ -149,8 +157,9 @@ Cold review response:
   private/key-shaped edit rejection, draft export, Nucleus export, research
   lineage, lifecycle policy draft export, memory review queue draft export,
   vault path selection, selected local-container browse, selected vault sync
-  dry-run, write-confirmed selected vault sync apply, dry-run sync reporting,
-  audit-log write intent coverage, and public-safe serialization.
+  dry-run, write-confirmed selected vault sync apply, write-confirmed selected
+  lifecycle policy apply, private/key-shaped policy rejection, dry-run sync
+  reporting, audit-log write intent coverage, and public-safe serialization.
 
 Known limits:
 

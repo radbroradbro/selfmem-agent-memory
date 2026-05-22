@@ -18,7 +18,7 @@ The current PR adds:
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
   lineage, vault preview, sync-report inspection, selected vault sync dry-run,
   selected vault sync apply, selected local-container browse, lifecycle policy
-  preview, and memory review queue;
+  preview, selected lifecycle policy apply, and memory review queue;
 - a dry-run-first `selfmem_update` command for agent update workflows;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.

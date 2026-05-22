@@ -36,6 +36,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-evidence.md`,
   `${reviewDir}/gemini-brain-ui-lifecycle-policy-review.md`,
+  `${reviewDir}/brain-ui-lifecycle-policy-apply-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-lifecycle-policy-apply-review.md`,
   `${reviewDir}/brain-ui-review-queue-evidence.md`,
   `${reviewDir}/gemini-brain-ui-review-queue-review.md`,
   `${reviewDir}/brain-ui-edit-export-evidence.md`,
@@ -314,7 +316,6 @@ check("dom evidence is sane", () => {
   assert.equal(policyEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(policyEvidence.evidence.draftTextHasPrivate, false);
   assert.equal(policyEvidence.evidence.draftTextHasWritesRealFilesFalse, true);
-  assert.equal(policyEvidence.evidence.noRealApplyLanguage, true);
   assert.equal(policyEvidence.consoleMessages.length, 0);
 
   const reviewQueueEvidence = JSON.parse(
@@ -400,6 +401,7 @@ check("release state is conservative", () => {
     "brain-ui-selected-vault-sync-apply",
     "brain-ui-selected-local-container-browse",
     "brain-ui-lifecycle-policy-preview",
+    "brain-ui-lifecycle-policy-apply",
     "brain-ui-memory-review-queue",
     "session-compaction-benchmark",
     "selfmem-update",
@@ -430,6 +432,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /selected vault sync apply|selected local vault sync apply/i, `${file} missing selected sync apply`);
     assert.match(text, /selected local-container browse|selected local container browse/i, `${file} missing selected browse`);
     assert.match(text, /lifecycle policy/i, `${file} missing lifecycle policy`);
+    assert.match(text, /lifecycle policy apply|selected lifecycle policy apply/i, `${file} missing lifecycle policy apply`);
     assert.match(text, /memory review queue/i, `${file} missing memory review queue`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }

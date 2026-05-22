@@ -50,6 +50,7 @@ complete or publish a public live update.
 | Brain UI selected vault sync dry-run evidence | `brain-ui-selected-sync-dry-run-*`, `brain-ui-selected-sync-dry-run-evidence.md`, Gemini review | Proven as disabled-by-default read-only dry-run |
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-browser-dom-evidence.json` | Proven as disabled-by-default write-confirmed apply with content-free audit log |
 | Brain UI lifecycle policy evidence | `brain-ui-lifecycle-policy-*`, `brain-ui-lifecycle-policy-evidence.md`, Gemini review | Proven as fixture-only no-write draft export |
+| Brain UI lifecycle policy apply | `brain-ui-lifecycle-policy-apply-evidence.md`, `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, Gemini review | Proven as disabled-by-default write-confirmed selected local policy apply |
 | Brain UI memory review queue evidence | `brain-ui-review-queue-*`, `brain-ui-review-queue-evidence.md`, Gemini review | Proven as fixture-only no-write memory-quality draft export |
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
@@ -85,9 +86,9 @@ complete or publish a public live update.
 5. The Brain UI has read-only selected local-container audit and browse
    previews, browser-local audit history, selected vault sync dry-run,
    write-confirmed selected vault sync apply, lifecycle policy draft export,
-   and memory review queue draft export. Real local-container edit, real policy
-   apply, and real review-queue apply still need explicit write confirmation
-   and UI wiring.
+   write-confirmed selected lifecycle policy apply, and memory review queue
+   draft export. Real local-container edit and real review-queue apply still
+   need explicit write confirmation and UI wiring.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

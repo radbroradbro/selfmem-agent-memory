@@ -30,6 +30,7 @@ const state = {
   selectedSync: null,
   selectedSyncApply: null,
   lifecyclePolicyDraft: null,
+  lifecyclePolicyApply: null,
   reviewQueueDraft: null,
 };
 
@@ -67,6 +68,13 @@ const policyMaxWrites = document.querySelector("#policyMaxWrites");
 const policyLowConfidence = document.querySelector("#policyLowConfidence");
 const policyStatus = document.querySelector("#policyStatus");
 const policyDraft = document.querySelector("#policyDraft");
+const policyApplyForm = document.querySelector("#policyApplyForm");
+const policyApplyPath = document.querySelector("#policyApplyPath");
+const policyApplyConfirm = document.querySelector("#policyApplyConfirm");
+const policyApplyPhrase = document.querySelector("#policyApplyPhrase");
+const policyApplyStatus = document.querySelector("#policyApplyStatus");
+const policyApplySummary = document.querySelector("#policyApplySummary");
+const policyApplyActions = document.querySelector("#policyApplyActions");
 const reviewQueueSummary = document.querySelector("#reviewQueueSummary");
 const reviewQueueForm = document.querySelector("#reviewQueueForm");
 const reviewQueueItems = document.querySelector("#reviewQueueItems");
@@ -188,6 +196,31 @@ policyForm.addEventListener("submit", (event) => {
   renderLifecyclePolicy();
 });
 
+policyApplyForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.lifecyclePolicyApply = { ok: false, code: "loading", message: "Applying selected local lifecycle policy." };
+  renderLifecyclePolicyApply();
+  try {
+    const response = await fetch("/lifecycle-policy/apply", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: policyApplyPath.value,
+        policy: state.lifecyclePolicyDraft,
+        confirmWrite: policyApplyConfirm.checked,
+        confirmationPhrase: policyApplyPhrase.value,
+      }),
+    });
+    state.lifecyclePolicyApply = await response.json();
+  } catch (error) {
+    state.lifecyclePolicyApply = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    policyApplyPath.value = "";
+    policyApplyPhrase.value = "";
+    renderLifecyclePolicyApply();
+  }
+});
+
 reviewQueueForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const decisions = Object.fromEntries(
@@ -305,6 +338,7 @@ function render() {
   renderNucleusSnapshot();
   renderResearchLineage();
   renderLifecyclePolicy();
+  renderLifecyclePolicyApply();
   renderReviewQueue();
   renderVaultControls(selected);
   renderSyncReport();
@@ -492,6 +526,42 @@ function renderLifecyclePolicy() {
     null,
     2,
   );
+}
+
+function renderLifecyclePolicyApply() {
+  policyApplySummary.replaceChildren();
+  policyApplyActions.replaceChildren();
+  const payload = state.lifecyclePolicyApply;
+  if (!payload) {
+    policyApplyStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    policyApplyStatus.textContent = payload.message ?? payload.code ?? "Lifecycle policy apply unavailable.";
+    return;
+  }
+
+  policyApplyStatus.textContent = `${payload.selection.rootDisplay} lifecycle policy applied.`;
+  policyApplySummary.replaceChildren(
+    stat("Writes", payload.writesRealFiles ? "enabled" : "disabled"),
+    stat("Changed", payload.report?.summary?.changedFields ?? 0),
+    stat("Pre-compress", payload.report?.summary?.storePreCompressCheckpoints ? "on" : "off"),
+    stat("Audit", payload.report?.auditLog?.entriesWritten ?? 0),
+  );
+  for (const [label, value] of [
+    ["Policy", payload.report?.policyPath],
+    ["Audit", payload.report?.auditLog?.path],
+    ["Trail", payload.auditTrail?.event],
+  ]) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = label;
+    span.textContent = value ?? "";
+    item.append(strong, span);
+    policyApplyActions.append(item);
+  }
 }
 
 function renderReviewQueue() {

@@ -1,5 +1,6 @@
 import { createServer as createHttpServer } from "node:http";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, extname, join, normalize, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,6 +9,7 @@ import {
   browseLocalContainer,
   compileNucleusWikiVault,
   lintCompiledWikiVault,
+  redactPrivate,
   syncCompiledWikiVault,
 } from "../core/dist/index.js";
 
@@ -25,6 +27,7 @@ export function createBrainUiServer(options = {}) {
   const enableLocalAudit = options.enableLocalAudit ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT === "1";
   const enableLocalBrowse = options.enableLocalBrowse ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE === "1";
   const enableLocalApply = options.enableLocalApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY === "1";
+  const enablePolicyApply = options.enablePolicyApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY === "1";
 
   return createHttpServer(async (request, response) => {
     try {
@@ -160,6 +163,29 @@ export function createBrainUiServer(options = {}) {
         return;
       }
 
+      if (path === "__lifecycle_policy_apply") {
+        if (!enablePolicyApply) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "lifecycle_policy_apply_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY=1 to apply selected local lifecycle policy.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await applySelectedLifecyclePolicy(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -185,6 +211,7 @@ function routePath(pathname) {
   if (pathname === "/local-container/browse") return "__local_container_browse";
   if (pathname === "/wiki/sync/dry-run") return "__wiki_sync_dry_run";
   if (pathname === "/wiki/sync/apply") return "__wiki_sync_apply";
+  if (pathname === "/lifecycle-policy/apply") return "__lifecycle_policy_apply";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -454,6 +481,93 @@ async function applySelectedWikiSync(request) {
   };
 }
 
+async function applySelectedLifecyclePolicy(request) {
+  const body = await readJsonBody(request, 80_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+  const confirmationPhrase = typeof body.confirmationPhrase === "string" ? body.confirmationPhrase.trim() : "";
+
+  if (body.confirmWrite !== true || confirmationPhrase !== "APPLY LOCAL LIFECYCLE POLICY") {
+    return {
+      ok: false,
+      code: "write_confirmation_required",
+      message: "Confirm policy write and type APPLY LOCAL LIFECYCLE POLICY before writing selected local lifecycle policy.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local container directory first." };
+  }
+
+  const rawPolicyText = JSON.stringify(body.policy ?? {});
+  const redaction = redactPrivate(rawPolicyText);
+  if (redaction.redacted) {
+    return {
+      ok: false,
+      code: "policy_contains_private_or_key_shaped_text",
+      message: "Policy apply refused private or key-shaped policy text.",
+      redactionCount: redaction.redactionCount,
+    };
+  }
+
+  const appliedAt = new Date().toISOString();
+  const policy = normalizeLifecyclePolicy(body.policy, appliedAt);
+  const policyJson = `${JSON.stringify(policy, null, 2)}\n`;
+  const contentHash = createHash("sha256").update(policyJson).digest("hex");
+  const policyPath = resolveUnderSelectedRoot(rootDir, ".recallweave/lifecycle-policy.json");
+  const auditPath = resolveUnderSelectedRoot(rootDir, ".recallweave/lifecycle-policy-audit.jsonl");
+  await mkdir(dirname(policyPath), { recursive: true });
+  await writeFile(policyPath, policyJson, "utf8");
+  await appendFile(
+    auditPath,
+    `${JSON.stringify({
+      schemaVersion: 1,
+      event: "lifecycle_policy_apply",
+      createdAt: appliedAt,
+      writesRealFiles: true,
+      policyPath: ".recallweave/lifecycle-policy.json",
+      contentHash,
+      changedFields: policy.changedFields.map((change) => change.field),
+    })}\n`,
+    "utf8",
+  );
+
+  return {
+    ok: true,
+    mode: "selected-lifecycle-policy-apply",
+    writesRealFiles: true,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+    },
+    auditTrail: {
+      event: "lifecycle_policy_apply",
+      writesRealFiles: true,
+      auditLog: {
+        path: ".recallweave/lifecycle-policy-audit.jsonl",
+        entriesWritten: 1,
+      },
+      contentHash,
+    },
+    report: {
+      ok: true,
+      dryRun: false,
+      rootDir: redactPathForDisplay(rootDir),
+      policyPath: ".recallweave/lifecycle-policy.json",
+      auditLog: {
+        path: ".recallweave/lifecycle-policy-audit.jsonl",
+        entriesWritten: 1,
+      },
+      summary: {
+        changedFields: policy.changedFields.length,
+        forceEveryTurn: policy.recall.forceEveryTurn,
+        storePreCompressCheckpoints: policy.writes.storePreCompressCheckpoints,
+        maxAutoWritesPerSession: policy.writes.maxAutoWritesPerSession,
+        lowConfidenceAction: policy.writes.lowConfidenceAction,
+      },
+    },
+  };
+}
+
 async function readJsonBody(request, maxBytes) {
   let body = "";
   for await (const chunk of request) {
@@ -475,6 +589,113 @@ function resolveUnderRoot(rootDir, relativePath) {
     throw new Error("fixture path escaped temp root");
   }
   return target;
+}
+
+function resolveUnderSelectedRoot(rootDir, relativePath) {
+  const target = resolve(rootDir, relativePath);
+  const rel = relative(rootDir, target);
+  if (rel === "" || rel.startsWith("..") || rel.startsWith("/")) {
+    throw new Error("selected path escaped root");
+  }
+  return target;
+}
+
+function normalizeLifecyclePolicy(input, appliedAt) {
+  const policy = input && typeof input === "object" ? input : {};
+  const recall = policy.recall && typeof policy.recall === "object" ? policy.recall : {};
+  const writes = policy.writes && typeof policy.writes === "object" ? policy.writes : {};
+  const lifecycle = policy.lifecycle && typeof policy.lifecycle === "object" ? policy.lifecycle : {};
+  return {
+    schemaVersion: 1,
+    mode: "local-lifecycle-policy",
+    writesRealFiles: true,
+    appliedAt,
+    recall: {
+      forceEveryTurn: booleanSetting(recall.forceEveryTurn, false),
+      defaultMode: safeChoice(recall.defaultMode, ["skip_obvious_maintenance", "balanced", "force_every_turn"]),
+      rerankCandidateLimit: clampInteger(recall.rerankCandidateLimit, 1, 200, 36),
+      rerankTokenBudget: clampInteger(recall.rerankTokenBudget, 256, 64_000, 6400),
+      skipWhenPromptMatches: safeStringList(recall.skipWhenPromptMatches),
+      forceWhenPromptMatches: safeStringList(recall.forceWhenPromptMatches),
+    },
+    writes: {
+      storeExplicitToolWrites: booleanSetting(writes.storeExplicitToolWrites, true),
+      storeAgentEndSummaries: booleanSetting(writes.storeAgentEndSummaries, true),
+      storePreCompressCheckpoints: booleanSetting(writes.storePreCompressCheckpoints, false),
+      rejectFullyPrivate: booleanSetting(writes.rejectFullyPrivate, true),
+      rejectKeyShapedContent: booleanSetting(writes.rejectKeyShapedContent, true),
+      suppressDuplicates: booleanSetting(writes.suppressDuplicates, true),
+      maxAutoWritesPerSession: clampInteger(writes.maxAutoWritesPerSession, 0, 200, 20),
+      lowConfidenceAction: safeChoice(writes.lowConfidenceAction, [
+        "review_queue",
+        "suppress",
+        "write_with_low_confidence_flag",
+      ]),
+    },
+    lifecycle: {
+      hermes: safeStatusMap(lifecycle.hermes),
+      openclaw: safeStatusMap(lifecycle.openclaw),
+    },
+    changedFields: safeChangedFields(policy.changedFields),
+  };
+}
+
+function safeChangedFields(value) {
+  const allowed = new Set([
+    "recall.forceEveryTurn",
+    "recall.rerankCandidateLimit",
+    "recall.rerankTokenBudget",
+    "writes.storePreCompressCheckpoints",
+    "writes.maxAutoWritesPerSession",
+    "writes.lowConfidenceAction",
+  ]);
+  return Array.isArray(value)
+    ? value
+        .map((item) => {
+          const field = safePolicyToken(item?.field ?? "");
+          return allowed.has(field) ? { field } : null;
+        })
+        .filter(Boolean)
+        .slice(0, 20)
+    : [];
+}
+
+function safeStatusMap(value) {
+  if (!value || typeof value !== "object") return {};
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([key, status]) => [safePolicyToken(key), safeChoice(status, ["enabled", "disabled"], "disabled")])
+      .filter(([key]) => key)
+      .slice(0, 40),
+  );
+}
+
+function safeStringList(value) {
+  return Array.isArray(value) ? value.map((item) => safePolicyString(item)).filter(Boolean).slice(0, 20) : [];
+}
+
+function safeChoice(value, allowed, fallback = allowed[0]) {
+  const safe = safePolicyToken(value);
+  return allowed.includes(safe) ? safe : fallback;
+}
+
+function safePolicyToken(value) {
+  return safePolicyString(value).replaceAll(/[^a-z0-9_.:-]/gi, "_").slice(0, 80);
+}
+
+function safePolicyString(value) {
+  return redactPrivate(String(value ?? "")).text.trim().slice(0, 240);
+}
+
+function booleanSetting(value, fallback) {
+  if (typeof value === "boolean") return value;
+  return Boolean(fallback);
+}
+
+function clampInteger(value, min, max, fallback) {
+  const parsed = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, parsed));
 }
 
 function summarizeSyncActions(actions) {

@@ -45,6 +45,8 @@ is still required before any public live update.
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Selected vault sync apply review | `reviews/overnight-20260522/gemini-selected-sync-apply-review.md` |
 | Brain UI lifecycle policy preview | `reviews/overnight-20260522/brain-ui-lifecycle-policy-evidence.md` |
+| Brain UI lifecycle policy apply | `reviews/overnight-20260522/brain-ui-lifecycle-policy-apply-evidence.md` |
+| Brain UI lifecycle policy apply review | `reviews/overnight-20260522/gemini-brain-ui-lifecycle-policy-apply-review.md` |
 | Brain UI memory review queue | `reviews/overnight-20260522/brain-ui-review-queue-evidence.md` |
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
@@ -117,6 +119,10 @@ Sanitized fixture evidence exists under
 - selected vault sync apply controls are present in browser DOM evidence and
   interaction smoke proves writes require `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_APPLY`
   plus the exact `APPLY LOCAL WIKI SYNC` phrase
+- selected lifecycle policy apply controls are present in the current Brain UI
+  source and interaction smoke proves writes require
+  `RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY` plus the exact
+  `APPLY LOCAL LIFECYCLE POLICY` phrase
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -141,6 +147,9 @@ local memory contents.
 - Gemini selected vault sync apply review: first `BLOCK`, then final `CLEAN`
   after explicit lint checking and visible path fields were added.
 - Gemini Brain UI lifecycle policy review: `CLEAN`.
+- Gemini Brain UI lifecycle policy apply review: first `BLOCK` for missing env
+  gate docs, then final `CLEAN` after `docs/BRAIN_UI.md` documented the apply
+  path.
 - Gemini Brain UI review queue review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
@@ -191,6 +200,11 @@ local memory contents.
 - Brain UI lifecycle policy preview is fixture-only. It stages recall/write
   settings as `writesRealFiles: false` draft output and does not edit host
   config files.
+- Brain UI selected lifecycle policy apply is disabled by default, requires the
+  policy apply environment flag, requires write confirmation plus an exact
+  phrase, rejects private/key-shaped policy payloads, writes only a sanitized
+  selected local `.recallweave/lifecycle-policy.json` plus a content-free audit
+  line, and returns only redacted root labels and relative paths.
 - Brain UI memory review queue is fixture-only. It stages approve, suppress,
   merge, and needs-more-evidence decisions as `writesRealFiles: false` draft
   output and does not write real memories.
@@ -206,8 +220,8 @@ local memory contents.
 - Claude review is blocked until Claude CLI is logged in.
 - The Brain UI has read-only selected local-container audit and browse previews,
   browser-local audit history, plus write-confirmed selected vault sync apply,
-  but real local-container edit, lifecycle policy apply, and review-queue apply
-  still need write confirmation and UI wiring.
+  plus write-confirmed selected lifecycle policy apply, but real local-container
+  edit and review-queue apply still need write confirmation and UI wiring.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

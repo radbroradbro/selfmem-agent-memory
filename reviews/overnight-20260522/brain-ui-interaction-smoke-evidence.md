@@ -41,8 +41,17 @@ Interaction smoke output:
     "draft-export",
     "nucleus-export",
     "research-lineage",
+    "lifecycle-policy-draft",
+    "selected-lifecycle-policy-apply",
+    "review-queue-draft",
     "vault-path",
     "sync-report",
+    "selected-wiki-sync-dry-run",
+    "selected-wiki-sync-apply",
+    "local-container-audit",
+    "selected-local-browse",
+    "selected-local-audit",
+    "selected-audit-history",
     "public-safe-serialization"
   ]
 }
@@ -67,9 +76,14 @@ Release impact:
   proves selected vault sync apply rejects missing write confirmation, writes
   compiled wiki files only after the exact confirmation phrase, creates a
   content-free audit log, and keeps selected root paths redacted.
+- The interaction smoke now starts the server with lifecycle policy apply
+  enabled and proves selected policy apply rejects missing write confirmation,
+  rejects private or key-shaped policy payloads, writes only the selected local
+  `.recallweave/lifecycle-policy.json` plus a content-free audit log, and keeps
+  selected root paths redacted.
 
 Known limits:
 
 - This is still fixture mode for memory browsing and editing. Live local
-  container browsing, derived-doc apply, lifecycle policy apply, and review
-  queue apply still need separate security-reviewed write paths.
+  container editing, derived-doc apply, and review queue apply still need
+  separate security-reviewed write paths.

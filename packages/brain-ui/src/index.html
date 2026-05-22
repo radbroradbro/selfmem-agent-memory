@@ -116,6 +116,24 @@
             <p id="policyStatus" role="status"></p>
           </form>
           <pre id="policyDraft" class="policy-draft" aria-label="Fixture lifecycle policy draft export"></pre>
+          <form id="policyApplyForm" class="policy-form policy-apply-form" aria-label="Selected local lifecycle policy apply">
+            <label>
+              <span>Policy container path</span>
+              <input id="policyApplyPath" name="policyApplyPath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local lifecycle policy path" />
+            </label>
+            <label class="check-row">
+              <input id="policyApplyConfirm" name="policyApplyConfirm" type="checkbox" />
+              <span>Write lifecycle policy</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="policyApplyPhrase" name="policyApplyPhrase" type="text" autocomplete="off" aria-label="Selected local lifecycle policy confirmation phrase" />
+            </label>
+            <button id="applyPolicy" type="submit">Apply policy</button>
+            <p id="policyApplyStatus" role="status"></p>
+            <div id="policyApplySummary" class="policy-summary" aria-label="Selected local lifecycle policy apply summary"></div>
+            <ol id="policyApplyActions" class="audit-reasons" aria-label="Selected local lifecycle policy apply audit trail"></ol>
+          </form>
         </section>
         <section>
           <h3>Review Queue</h3>
