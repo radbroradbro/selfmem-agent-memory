@@ -79,6 +79,8 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
     second_apply = run_update(host, home, runtime, keys_file, apply=True)
     assert second_apply["ok"] is True
     assert len(list(adapter_target(host, runtime).parent.glob(f"{adapter_target(host, runtime).name}.bak-selfmem-update-*"))) >= 2
+    assert_strict_real_requires_runtime_source(root, host, runtime, keys_file)
+
     canary_output = root / f"{host}-canary-report.json"
     canary = run_update(
         host,
@@ -111,9 +113,30 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
         "secondApplySteps": [step["step"] for step in second_apply["steps"]],
         "canarySource": canary["canary"]["runtimeReport"]["source"],
         "canaryIntakePass": canary["canary"]["runtimeReport"]["intake"]["canaryPass"],
+        "strictRealSourceRequired": True,
         "mappingFound": applied["preservedMapping"]["found"],
         "keyMode": oct(stat.S_IMODE(installed_key_path(host, home).stat().st_mode)),
     }
+
+
+def assert_strict_real_requires_runtime_source(root: Path, host: str, runtime: Path, keys_file: Path) -> None:
+    empty_home = root / f"{host}-empty-home"
+    empty_home.mkdir(parents=True, exist_ok=True)
+    result = run_update_raw(
+        host,
+        empty_home,
+        runtime,
+        keys_file,
+        apply=False,
+        extra=["--run-canary", "--strict-real"],
+    )
+    assert result.returncode != 0, "strict-real must fail when no live runtime source exists"
+    payload = json.loads(result.stdout)
+    assert payload["ok"] is False
+    assert payload["canary"]["adapterSmoke"]["ok"] is True
+    assert payload["canary"]["runtimeReport"]["ok"] is False
+    assert payload["canary"]["runtimeReport"]["source"] == "missing"
+    assert "requires a live container" in payload["canary"]["runtimeReport"]["reason"]
 
 
 def setup_fixture(host: str, home: Path, runtime: Path, keys_file: Path) -> None:
@@ -141,6 +164,13 @@ def setup_fixture(host: str, home: Path, runtime: Path, keys_file: Path) -> None
 
 
 def run_update(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: bool, extra: list[str] | None = None) -> dict[str, Any]:
+    result = run_update_raw(host, home, runtime, keys_file, apply=apply, extra=extra)
+    if result.returncode != 0:
+        raise AssertionError(f"updater failed for {host}: {result.stderr}\n{result.stdout}")
+    return json.loads(result.stdout)
+
+
+def run_update_raw(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: bool, extra: list[str] | None = None) -> subprocess.CompletedProcess[str]:
     command = [
         str(UPDATER),
         "--host",
@@ -157,7 +187,7 @@ def run_update(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: 
     if extra:
         command.extend(extra)
 
-    result = subprocess.run(
+    return subprocess.run(
         command,
         cwd=REPO_ROOT,
         env={**os.environ, "PYTHONWARNINGS": "error"},
@@ -166,9 +196,6 @@ def run_update(host: str, home: Path, runtime: Path, keys_file: Path, *, apply: 
         check=False,
         timeout=30,
     )
-    if result.returncode != 0:
-        raise AssertionError(f"updater failed for {host}: {result.stderr}\n{result.stdout}")
-    return json.loads(result.stdout)
 
 
 def adapter_target(host: str, runtime: Path) -> Path:

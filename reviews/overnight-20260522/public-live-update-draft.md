@@ -23,7 +23,9 @@ The current PR adds:
   review queue preview, and selected review queue apply, selected local memory
   edit overlay, local edit overlay browse visibility, and selected local memory
   materialize;
-- a dry-run-first `selfmem_update` command for agent update workflows;
+- a dry-run-first `selfmem_update` command for agent update workflows, with
+  strict-real canary checks blocked unless a live mapped container or explicit
+  diagnostic source produces a runtime report;
 - a generated GitHub handoff packet for manual GitHub updates while connector
   write routes are blocked;
 - a live GitHub sync check that verifies PR #5 and issue #6 still match the

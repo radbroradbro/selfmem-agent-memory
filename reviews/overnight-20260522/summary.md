@@ -529,6 +529,9 @@ local memory contents.
   `auditLogPath` is supplied.
 - `selfmem_update` is dry-run by default and requires `--apply` before copying
   files.
+- `selfmem_update --run-canary --strict-real` now requires a live mapped
+  container or an explicit diagnostic source. Adapter standalone smoke alone
+  cannot satisfy strict-real rollout evidence.
 
 ## Residual Risks
 

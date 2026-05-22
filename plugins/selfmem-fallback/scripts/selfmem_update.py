@@ -177,6 +177,21 @@ def run_canary(host: str, home: Path, args: argparse.Namespace) -> dict[str, Any
         output["runtimeReport"] = runtime
         if args.strict_real and not runtime["ok"]:
             output["ok"] = False
+    elif args.strict_real or args.canary_output:
+        output["ok"] = False
+        output["runtimeReport"] = {
+            "ok": False,
+            "reportGenerated": False,
+            "source": "missing",
+            "strictReal": bool(args.strict_real),
+            "rollbackTested": bool(args.rollback_tested),
+            "reason": "strict real canary requires a live container, diagnostic directory, or diagnostic zip",
+            "nextActions": [
+                "Run the agent long enough to create a mapped RecallWeave container, or pass --canary-diagnostic-dir/--canary-diagnostic-zip.",
+                "Collect a fresh runtime window after installing the patched adapter.",
+                "Do not treat adapter standalone smoke as real rollout evidence.",
+            ],
+        }
     return output
 
 

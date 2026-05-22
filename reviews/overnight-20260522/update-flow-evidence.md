@@ -31,6 +31,9 @@ Verification expectations:
 - `--run-canary --canary-output <path>` runs adapter smoke, writes a sanitized
   canary report, runs intake, and keeps fixture output from counting as real
   rollout evidence.
+- `--run-canary --strict-real` fails if no live container, diagnostic directory,
+  or diagnostic zip is available. Adapter standalone smoke alone cannot satisfy
+  strict-real rollout evidence.
 
 Command:
 
@@ -45,6 +48,8 @@ Verification:
 - `bin/selfmem_update --help`: covered by the release-readiness gate.
 - `bin/selfmem_update --help`: now exposes `--run-canary`, `--canary-output`,
   `--strict-real`, and `--rollback-tested`.
+- Strict-real missing-source guard: passed for Hermes and OpenClaw fixture
+  runtimes.
 - `pnpm smoke`: passed with update smoke included.
 - `pnpm test`: 14 tests passed.
 - `git diff --check`: passed.
@@ -62,6 +67,9 @@ Cold review:
   locating the Python updater, and the release-readiness gate executes it through
   a temporary symlink.
 - Final Gemini CLI review returned `CLEAN` for the command wrapper.
+- Gemini strict-real source-guard review returned `CLEAN` after inspecting
+  `selfmem_update.py`, `update-flow-smoke.py`, this guide surface, and canary
+  intake behavior.
 
 Known limits:
 

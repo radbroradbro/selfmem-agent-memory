@@ -136,6 +136,11 @@ writes, read-through mode, and zero privacy leaks. If an agent sends a redacted
 diagnostic export instead of a live container path, use
 `--canary-diagnostic-dir` or `--canary-diagnostic-zip`.
 
+Strict-real must produce a runtime report. Adapter standalone smoke is useful
+for install sanity, but it is not rollout evidence. If the updater cannot find
+a mapped live container and no diagnostic source is provided, `--strict-real`
+fails instead of treating the adapter smoke as a pass.
+
 Use `--keys-file` only with a local private file on that runtime machine. Never
 put keys in the repository.
 
