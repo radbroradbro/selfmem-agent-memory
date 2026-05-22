@@ -58,6 +58,8 @@ must run before making quality claims.
   selected local-container audit preview.
 - Read-only selected local-container audit route, disabled by default, with
   read-only confirmation and redacted `.../container` path display.
+- Browser-local selected-audit history that stores only redacted labels, counts,
+  status, event name, and timestamp.
 - Fixture-safe session compaction benchmark for chronological durable memory
   extraction, exact identifier preservation, stale/private suppression, and
   duplicate merge behavior.

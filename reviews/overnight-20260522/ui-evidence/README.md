@@ -42,6 +42,10 @@
   `brain-ui-selected-local-audit-dom-evidence.json`.
 - Chrome DevTools captured the selected local-container audit panel in
   `brain-ui-selected-local-audit.png`.
+- Chrome DevTools captured browser-local selected audit history DOM evidence in
+  `brain-ui-selected-audit-history-dom-evidence.json`.
+- Chrome DevTools captured the selected audit history panel in
+  `brain-ui-selected-audit-history.png`.
 
 Early Chrome DevTools MCP capture was unavailable because no debug Chrome was
 listening on port `9222`. The Container Health capture used a temporary

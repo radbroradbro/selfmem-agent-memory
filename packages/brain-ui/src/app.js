@@ -5,8 +5,11 @@ import {
   buildResearchLineage,
   containsPrivateLikeText,
   filteredNodes as selectFilteredNodes,
+  mergeSelectedAuditTrail,
   preferredVaultPath,
 } from "./model.js";
+
+const selectedAuditHistoryKey = "recallweave.selectedAudit.history";
 
 const state = {
   snapshot: null,
@@ -19,6 +22,7 @@ const state = {
   selectedVaultPath: "",
   localAudit: null,
   selectedAudit: null,
+  selectedAuditHistory: readSelectedAuditHistory(),
 };
 
 const positions = {
@@ -61,6 +65,7 @@ const selectedAuditConfirm = document.querySelector("#selectedAuditConfirm");
 const selectedAuditStatus = document.querySelector("#selectedAuditStatus");
 const selectedAuditSummary = document.querySelector("#selectedAuditSummary");
 const selectedAuditMeta = document.querySelector("#selectedAuditMeta");
+const selectedAuditHistory = document.querySelector("#selectedAuditHistory");
 const docEditor = document.querySelector("#docEditor");
 const saveEdit = document.querySelector("#saveEdit");
 const resetEdit = document.querySelector("#resetEdit");
@@ -138,11 +143,16 @@ selectedAuditForm.addEventListener("submit", async (event) => {
       }),
     });
     state.selectedAudit = await response.json();
+    if (state.selectedAudit.ok) {
+      state.selectedAuditHistory = mergeSelectedAuditTrail(state.selectedAuditHistory, state.selectedAudit);
+      localStorage.setItem(selectedAuditHistoryKey, JSON.stringify(state.selectedAuditHistory));
+    }
   } catch (error) {
     state.selectedAudit = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
   } finally {
     selectedAuditPath.value = "";
     renderSelectedAudit();
+    renderSelectedAuditHistory();
   }
 });
 
@@ -160,6 +170,7 @@ function render() {
   renderSyncReport();
   renderLocalAudit();
   renderSelectedAudit();
+  renderSelectedAuditHistory();
   renderEditExport();
 }
 
@@ -472,6 +483,21 @@ function renderSelectedAudit() {
   }
 }
 
+function renderSelectedAuditHistory() {
+  selectedAuditHistory.replaceChildren();
+  for (const entry of state.selectedAuditHistory) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    strong.textContent = `${entry.status} | ${entry.rootDisplay}`;
+    span.textContent = `${entry.existingFiles} files, ${entry.lines} lines, ${entry.redactionCount} redactions`;
+    small.textContent = `${entry.event} | ${formatTime(entry.capturedAt)}`;
+    item.append(strong, span, small);
+    selectedAuditHistory.append(item);
+  }
+}
+
 function stat(label, value) {
   const item = document.createElement("div");
   const strong = document.createElement("strong");
@@ -563,8 +589,18 @@ function readEdits() {
   }
 }
 
+function readSelectedAuditHistory() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(selectedAuditHistoryKey) ?? "[]");
+    return Array.isArray(parsed) ? mergeSelectedAuditTrail(parsed, null) : [];
+  } catch {
+    return [];
+  }
+}
+
 function formatTime(value) {
-  return new Date(value).toISOString().slice(11, 16);
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "unknown" : date.toISOString().slice(11, 16);
 }
 
 function escapeHtml(value) {

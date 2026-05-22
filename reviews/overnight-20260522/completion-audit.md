@@ -39,6 +39,7 @@ complete or publish a public live update.
 | Brain UI container-health evidence | `brain-ui-container-health-*`, `brain-ui-container-health-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI local-audit preview evidence | `brain-ui-local-audit-*`, `brain-ui-local-audit-preview-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI selected local-audit evidence | `brain-ui-selected-local-audit-*`, `brain-ui-selected-local-audit-evidence.md`, Gemini review | Proven as read-only selected preview |
+| Brain UI selected audit-history evidence | `brain-ui-selected-audit-history-*`, `brain-ui-selected-audit-history-evidence.md`, Gemini review | Proven as browser-local content-free history |
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
@@ -67,9 +68,10 @@ complete or publish a public live update.
    issue with its current permissions.
 4. The public launch verdict remains `FAIL`. Human approval is required before
    making a live update or changing repository visibility.
-5. The Brain UI has read-only selected local-container audit preview. Real
-   local-container browse/edit/sync still needs write confirmation, wiki lint
-   before save, and a persistent local audit log.
+5. The Brain UI has read-only selected local-container audit preview and
+   browser-local audit history. Real local-container browse/edit/sync still
+   needs write confirmation, wiki lint before save, and an agent-side audit log
+   before any file write.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

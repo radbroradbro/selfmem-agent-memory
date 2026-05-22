@@ -90,7 +90,9 @@ Selected local-container audit is disabled unless the server starts with
 `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1`. When enabled, the form requires
 read-only confirmation, clears the typed path after submit, and returns only a
 redacted `.../container` label, counts, health reasons, and an audit-trail
-summary. It still writes no files and never returns raw memory text.
+summary. The browser also keeps a bounded content-free selected-audit history
+in `localStorage`. It still writes no agent files and never returns raw memory
+text.
 
 ## Production Path
 

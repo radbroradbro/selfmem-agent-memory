@@ -39,9 +39,11 @@ try {
   assert.match(app, /renderSyncReport/);
   assert.match(app, /renderLocalAudit/);
   assert.match(app, /renderSelectedAudit/);
+  assert.match(app, /renderSelectedAuditHistory/);
   assert.match(app, /buildEditExport/);
   assert.match(model, /const kind = safeExportText\(node\.kind\)/);
   assert.match(model, /function buildContainerHealth/);
+  assert.match(model, /function mergeSelectedAuditTrail/);
   assert.match(model, /function filteredNodes/);
   assert.match(model, /function preferredVaultPath/);
   assert.match(styles, /nucleus-shell/);
@@ -52,6 +54,7 @@ try {
   assert.match(styles, /sync-summary/);
   assert.match(styles, /audit-summary/);
   assert.match(styles, /selected-audit/);
+  assert.match(styles, /audit-history/);
   assert.match(styles, /edit-export/);
   assert.equal(fixture.schemaVersion, 1);
   assert.equal(fixture.roots.container.writeMode, "local-only");

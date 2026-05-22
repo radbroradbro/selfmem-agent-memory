@@ -563,7 +563,8 @@ button.active {
 
 .sync-actions,
 .audit-files,
-.audit-reasons {
+.audit-reasons,
+.audit-history {
   display: grid;
   gap: 8px;
   list-style: none;
@@ -573,7 +574,8 @@ button.active {
 
 .sync-actions li,
 .audit-files li,
-.audit-reasons li {
+.audit-reasons li,
+.audit-history li {
   display: grid;
   gap: 4px;
   border: 1px solid var(--line);
@@ -642,6 +644,33 @@ button.active {
 
 .audit-reasons span {
   color: var(--text);
+}
+
+.audit-history li {
+  border-color: rgba(99, 214, 197, 0.42);
+}
+
+.audit-history strong,
+.audit-history span,
+.audit-history small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.audit-history strong {
+  color: var(--cyan);
+  font-size: 12px;
+}
+
+.audit-history span {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.audit-history small {
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .selected-audit {

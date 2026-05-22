@@ -19,6 +19,7 @@ This roadmap tracks useful user-facing features without mixing them into the cur
   reasons without exposing raw memory content or private paths.
 - Disabled-by-default selected local-container audit preview with read-only
   confirmation and redacted `.../container` path display.
+- Browser-local selected-audit history with content-free metadata only.
 
 ## Brain UI
 

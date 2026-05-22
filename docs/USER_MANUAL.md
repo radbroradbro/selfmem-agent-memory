@@ -149,7 +149,8 @@ RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1 npm exec --yes pnpm@10.23.0 -- brain:s
 
 The selected audit is read-only. It requires confirmation, clears the typed
 path after submit, and shows only a redacted `.../container` path, counts, and
-health reasons.
+health reasons. The UI keeps a browser-local audit history with redacted labels
+and counts only.
 
 On a live agent, inspect the runtime trace for:
 

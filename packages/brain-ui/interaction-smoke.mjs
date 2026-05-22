@@ -10,6 +10,7 @@ import {
   buildResearchLineage,
   containsPrivateLikeText,
   filteredNodes,
+  mergeSelectedAuditTrail,
   preferredVaultPath,
 } from "./src/model.js";
 import { createBrainUiServer } from "./server.mjs";
@@ -135,6 +136,26 @@ try {
   assert.equal(selectedAudit.report.health.status, "healthy");
   assert.equal(selectedAudit.auditTrail.writesRealFiles, false);
   assert.equal(selectedAudit.auditTrail.event, "local_container_audit_preview");
+  const selectedAuditHistory = mergeSelectedAuditTrail(
+    [
+      {
+        capturedAt: "not-a-date",
+        rootDisplay: `/Users/private/profile/${"pa-" + "x".repeat(24)}`,
+        containerLabel: `agent ${"sm_" + "B".repeat(42)}`,
+        status: "<private>hidden</private>",
+        existingFiles: 99,
+        lines: 99,
+        redactionCount: 99,
+        event: "old_event",
+      },
+    ],
+    selectedAudit,
+  );
+  assert.equal(selectedAuditHistory.length, 2);
+  assert.equal(selectedAuditHistory[0].rootDisplay.includes(selectedRoot), false);
+  assert.equal(selectedAuditHistory[0].writesRealFiles, false);
+  assert.equal(selectedAuditHistory[0].event, "local_container_audit_preview");
+  assert.equal(selectedAuditHistory[1].capturedAt, "unknown");
 
   const serialized = JSON.stringify({
     containerHealth,
@@ -147,9 +168,11 @@ try {
     localAudit,
     missingConfirmation,
     selectedAudit,
+    selectedAuditHistory,
   });
   assert.equal(containsPrivateLikeText(serialized), false, "serialized interaction outputs must stay public-safe");
   assert.equal(serialized.includes(selectedRoot), false, "selected local root path must stay redacted");
+  assert.equal(serialized.includes("/Users/private/profile"), false, "dirty prior history paths must be collapsed");
 
   console.log(
     JSON.stringify(
@@ -168,6 +191,7 @@ try {
           "sync-report",
           "local-container-audit",
           "selected-local-audit",
+          "selected-audit-history",
           "public-safe-serialization",
         ],
       },

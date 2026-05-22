@@ -56,6 +56,10 @@ clears the typed path after submit, and returns only a redacted `.../container`
 label, counts, health reasons, and an audit-trail summary. It still writes no
 files and does not return raw memory/event text.
 
-This is still an audit preview. Editable real memory state needs a full file
-picker, write confirmation, wiki lint before save, and a persistent local audit
-trail.
+The Brain UI keeps a bounded browser-local selected-audit history in
+`localStorage`. Each entry contains only the redacted container label, status,
+counts, event name, and timestamp.
+
+This is still an audit preview. Editable real memory state needs write
+confirmation, wiki lint before save, and an agent-side audit log before any file
+write.

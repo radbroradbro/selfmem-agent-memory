@@ -114,6 +114,57 @@ function buildEditExport(snapshot, edits) {
   };
 }
 
+function buildSelectedAuditTrailEntry(payload, capturedAt = new Date().toISOString()) {
+  if (!payload?.ok) return null;
+  return {
+    schemaVersion: 1,
+    mode: "selected-local-audit-trail-entry",
+    writesRealFiles: false,
+    capturedAt: safeTimestamp(capturedAt),
+    rootDisplay: normalizeRootDisplay(payload.selection?.rootDisplay),
+    containerLabel: safeExportText(payload.selection?.containerLabel ?? "selected-local-container"),
+    status: safeExportText(payload.report?.health?.status ?? "unknown"),
+    existingFiles: numeric(payload.report?.totals?.existingFiles),
+    lines: numeric(payload.report?.totals?.lines),
+    redactionCount: numeric(payload.report?.totals?.redactionCount),
+    event: safeExportText(payload.auditTrail?.event ?? "local_container_audit_preview"),
+  };
+}
+
+function mergeSelectedAuditTrail(existing, payload, limit = 8) {
+  const entry = buildSelectedAuditTrailEntry(payload);
+  const prior = Array.isArray(existing) ? existing : [];
+  const safePrior = prior
+    .map((item) => ({
+      schemaVersion: 1,
+      mode: "selected-local-audit-trail-entry",
+      writesRealFiles: false,
+      capturedAt: safeTimestamp(item?.capturedAt, "unknown"),
+      rootDisplay: normalizeRootDisplay(item?.rootDisplay),
+      containerLabel: safeExportText(item?.containerLabel ?? ""),
+      status: safeExportText(item?.status ?? ""),
+      existingFiles: numeric(item?.existingFiles),
+      lines: numeric(item?.lines),
+      redactionCount: numeric(item?.redactionCount),
+      event: safeExportText(item?.event ?? ""),
+    }))
+    .filter((item) => item.rootDisplay && item.status);
+  return [...(entry ? [entry] : []), ...safePrior].slice(0, Math.max(1, limit));
+}
+
+function normalizeRootDisplay(value) {
+  const safe = safeExportText(value ?? "selected-local-container").trim();
+  const compact = safe.replace(/^(\.\.\.[/\\])+/, "");
+  const segments = compact.split(/[/\\]+/).filter(Boolean);
+  return `.../${segments.at(-1) ?? "selected-local-container"}`;
+}
+
+function safeTimestamp(value, fallback = new Date().toISOString()) {
+  const safe = safeExportText(value ?? fallback);
+  const date = new Date(safe);
+  return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
+}
+
 function preferredVaultPath(vault, node) {
   const files = vault?.files ?? [];
   if (node) {
@@ -200,8 +251,10 @@ export {
   buildContainerHealth,
   buildNucleusExport,
   buildResearchLineage,
+  buildSelectedAuditTrailEntry,
   containsPrivateLikeText,
   filteredNodes,
+  mergeSelectedAuditTrail,
   preferredVaultPath,
   redactPrivateLikeText,
   safeExportText,

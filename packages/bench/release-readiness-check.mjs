@@ -43,6 +43,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-local-audit-preview-review.md`,
   `${reviewDir}/brain-ui-selected-local-audit-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-local-audit-review.md`,
+  `${reviewDir}/brain-ui-selected-audit-history-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-selected-audit-history-review.md`,
   `${reviewDir}/brain-ui-interaction-smoke-evidence.md`,
   `${reviewDir}/gemini-brain-ui-interaction-smoke-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
@@ -76,6 +78,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-local-audit.png`,
   `${reviewDir}/ui-evidence/brain-ui-selected-local-audit-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-selected-local-audit.png`,
+  `${reviewDir}/ui-evidence/brain-ui-selected-audit-history-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-selected-audit-history.png`,
 ];
 
 const requiredScripts = [
@@ -214,6 +218,21 @@ check("dom evidence is sane", () => {
   assert.equal(selectedAuditEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(selectedAuditEvidence.evidence.redactedRootVisible, true);
   assert.equal(selectedAuditEvidence.consoleMessages.length, 0);
+
+  const auditHistoryEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-selected-audit-history-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(auditHistoryEvidence.ok, true);
+  assert.equal(auditHistoryEvidence.evidence.historyCount, 1);
+  assert.match(auditHistoryEvidence.evidence.historyText, /local_container_audit_preview/);
+  assert.equal(auditHistoryEvidence.evidence.storedEntry.writesRealFiles, false);
+  assert.equal(auditHistoryEvidence.evidence.inputCleared, true);
+  assert.equal(auditHistoryEvidence.evidence.visibleTextHasRawRoot, false);
+  assert.equal(auditHistoryEvidence.evidence.storedHasRawRoot, false);
+  assert.equal(auditHistoryEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(auditHistoryEvidence.evidence.storedHasPrivate, false);
+  assert.equal(auditHistoryEvidence.evidence.redactedRootVisible, true);
+  assert.equal(auditHistoryEvidence.consoleMessages.length, 0);
 
   const nucleusEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-nucleus-snapshot-dom-evidence.json"), "utf8"),

@@ -26,6 +26,9 @@ Scope:
   a real-path preview remains disabled by default, requires read-only
   confirmation, clears the typed path, and displays only a redacted
   `.../container` label.
+- Added Brain UI selected audit history evidence to the release gate so
+  browser-local history is content-free, bounded, and does not expose raw local
+  paths or private/key-shaped text.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -39,6 +42,7 @@ What `release:check` verifies:
 - Brain UI Container Health DOM evidence is sane,
 - Brain UI Local Audit Preflight DOM evidence is sane,
 - Brain UI selected local-container audit DOM evidence is sane,
+- Brain UI selected audit history DOM evidence is sane,
 - a fresh local-container audit smoke passes against current source,
 - a fresh Brain UI smoke passes against the current source,
 - a fresh Brain UI interaction smoke passes against the current source,

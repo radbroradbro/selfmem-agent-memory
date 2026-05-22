@@ -76,12 +76,14 @@ Sanitized fixture evidence exists under
 - `brain-ui-container-health.png`
 - `brain-ui-local-audit.png`
 - `brain-ui-selected-local-audit.png`
+- `brain-ui-selected-audit-history.png`
 - `brain-ui-edit-export.png`
 - `brain-ui-nucleus-snapshot.png`
 - `brain-ui-research-lineage.png`
 - matching DOM evidence JSON for the UI, vault preview, sync report, and edit
   draft export, plus Container Health, Local Audit Preflight, Nucleus snapshot,
-  selected local-container audit, and research-lineage previews
+  selected local-container audit, selected audit history, and research-lineage
+  previews
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -99,6 +101,7 @@ local memory contents.
   transient routing warnings before returning the verdict.
 - Gemini Brain UI local-audit preview review: `CLEAN`.
 - Gemini Brain UI selected local-audit review: `CLEAN`.
+- Gemini Brain UI selected audit-history review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
@@ -132,6 +135,8 @@ local memory contents.
 - Brain UI selected local-audit mode is disabled by default, requires read-only
   confirmation, clears the typed path, and displays only a redacted
   `.../container` label.
+- Brain UI selected audit history is browser-local and stores only redacted
+  labels, counts, status, event name, and timestamp.
 - Wiki vault sync is explicit and protects reviewed pages by writing conflict
   notes instead of overwriting.
 - `selfmem_update` is dry-run by default and requires `--apply` before copying
@@ -140,9 +145,10 @@ local memory contents.
 ## Residual Risks
 
 - Claude review is blocked until Claude CLI is logged in.
-- The Brain UI has read-only selected local-container audit preview, but real
-  local-container browse, edit, and sync still need write confirmation, wiki
-  lint before save, and a persistent local audit log.
+- The Brain UI has read-only selected local-container audit preview and
+  browser-local audit history, but real local-container browse, edit, and sync
+  still need write confirmation, wiki lint before save, and an agent-side audit
+  log before any file write.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.
