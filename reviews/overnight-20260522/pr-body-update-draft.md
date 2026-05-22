@@ -45,7 +45,7 @@ Retry note:
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
-- Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and canary rollout with `selfmem_update`.
+- Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and run a one-agent canary with `selfmem_update`.
 
 ## Current Verdict
 
@@ -55,7 +55,7 @@ The code, fixture UI, release gate, and GitHub Actions pass. Public launch shoul
 
 ## Verification
 
-Latest local verification includes the guarded local memory materialize slice.
+Latest local verification includes the release handoff gate slice.
 
 - Local `npm run test`: 6 files, 22 tests passed.
 - Local `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
