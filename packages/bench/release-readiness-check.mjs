@@ -34,6 +34,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-nucleus-snapshot-review.md`,
   `${reviewDir}/brain-ui-research-lineage-evidence.md`,
   `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
+  `${reviewDir}/brain-ui-lifecycle-policy-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-lifecycle-policy-review.md`,
   `${reviewDir}/brain-ui-edit-export-evidence.md`,
   `${reviewDir}/gemini-brain-ui-edit-export-review.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
@@ -71,6 +73,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-nucleus-snapshot.png`,
   `${reviewDir}/ui-evidence/brain-ui-research-lineage-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-research-lineage.png`,
+  `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -279,6 +283,28 @@ check("dom evidence is sane", () => {
   assert.equal(lineageEvidence.evidence.hasDecision, true);
   assert.equal(lineageEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(lineageEvidence.consoleMessages.length, 0);
+
+  const policyEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(policyEvidence.ok, true);
+  assert.equal(policyEvidence.evidence.hasPolicyHeading, true);
+  assert.equal(policyEvidence.evidence.hasPolicyControls, true);
+  assert.equal(policyEvidence.evidence.draftMode, "fixture-lifecycle-policy-draft");
+  assert.equal(policyEvidence.evidence.writesRealFiles, false);
+  assert.equal(policyEvidence.evidence.forceEveryTurn, true);
+  assert.equal(policyEvidence.evidence.maxAutoWritesPerSession, 8);
+  assert.equal(policyEvidence.evidence.lowConfidenceAction, "suppress");
+  assert.deepEqual(policyEvidence.evidence.changedFields, [
+    "recall.forceEveryTurn",
+    "writes.maxAutoWritesPerSession",
+    "writes.lowConfidenceAction",
+  ]);
+  assert.equal(policyEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(policyEvidence.evidence.draftTextHasPrivate, false);
+  assert.equal(policyEvidence.evidence.draftTextHasWritesRealFilesFalse, true);
+  assert.equal(policyEvidence.evidence.noRealApplyLanguage, true);
+  assert.equal(policyEvidence.consoleMessages.length, 0);
 
   const editEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-edit-export-dom-evidence.json"), "utf8"),

@@ -93,6 +93,54 @@ function buildContainerHealth(snapshot) {
   };
 }
 
+function buildLifecyclePolicyDraft(snapshot, overrides = {}) {
+  const policy = snapshot.roots?.lifecyclePolicy ?? {};
+  const recall = policy.recall ?? {};
+  const writes = policy.writes ?? {};
+  const lifecycle = policy.lifecycle ?? {};
+  const draft = {
+    schemaVersion: 1,
+    mode: "fixture-lifecycle-policy-draft",
+    writesRealFiles: false,
+    recall: {
+      forceEveryTurn: booleanSetting(overrides.forceEveryTurn, recall.forceEveryTurn),
+      defaultMode: safeExportText(recall.defaultMode ?? "skip_obvious_maintenance"),
+      rerankCandidateLimit: clampInteger(
+        overrides.rerankCandidateLimit ?? recall.rerankCandidateLimit,
+        1,
+        200,
+        36,
+      ),
+      rerankTokenBudget: clampInteger(overrides.rerankTokenBudget ?? recall.rerankTokenBudget, 256, 64_000, 6400),
+      skipWhenPromptMatches: safeStringList(recall.skipWhenPromptMatches),
+      forceWhenPromptMatches: safeStringList(recall.forceWhenPromptMatches),
+    },
+    writes: {
+      storeExplicitToolWrites: booleanSetting(writes.storeExplicitToolWrites, true),
+      storeAgentEndSummaries: booleanSetting(writes.storeAgentEndSummaries, true),
+      storePreCompressCheckpoints: booleanSetting(
+        overrides.storePreCompressCheckpoints,
+        writes.storePreCompressCheckpoints,
+      ),
+      rejectFullyPrivate: booleanSetting(writes.rejectFullyPrivate, true),
+      rejectKeyShapedContent: booleanSetting(writes.rejectKeyShapedContent, true),
+      suppressDuplicates: booleanSetting(writes.suppressDuplicates, true),
+      maxAutoWritesPerSession: clampInteger(overrides.maxAutoWritesPerSession ?? writes.maxAutoWritesPerSession, 0, 200, 20),
+      lowConfidenceAction: safeChoice(overrides.lowConfidenceAction ?? writes.lowConfidenceAction, [
+        "review_queue",
+        "suppress",
+        "write_with_low_confidence_flag",
+      ]),
+    },
+    lifecycle: {
+      hermes: safeStatusMap(lifecycle.hermes),
+      openclaw: safeStatusMap(lifecycle.openclaw),
+    },
+  };
+  draft.changedFields = summarizePolicyChanges(policy, draft);
+  return draft;
+}
+
 function buildEditExport(snapshot, edits) {
   const editableNodes = new Map(snapshot.nodes.filter((node) => node.editable).map((node) => [node.id, node]));
   const exportEdits = Object.entries(edits)
@@ -163,6 +211,52 @@ function safeTimestamp(value, fallback = new Date().toISOString()) {
   const safe = safeExportText(value ?? fallback);
   const date = new Date(safe);
   return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
+}
+
+function booleanSetting(value, fallback) {
+  if (typeof value === "boolean") return value;
+  return Boolean(fallback);
+}
+
+function clampInteger(value, min, max, fallback) {
+  const parsed = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function safeChoice(value, allowed, fallback = allowed[0]) {
+  const safe = safeExportText(value);
+  return allowed.includes(safe) ? safe : fallback;
+}
+
+function safeStringList(value) {
+  return Array.isArray(value) ? value.map(safeExportText).filter(Boolean).slice(0, 20) : [];
+}
+
+function safeStatusMap(value) {
+  const entries = Object.entries(value ?? {}).map(([key, status]) => [
+    safeExportText(key),
+    safeChoice(status, ["enabled", "disabled"], "disabled"),
+  ]);
+  return Object.fromEntries(entries);
+}
+
+function summarizePolicyChanges(original, draft) {
+  const changes = [];
+  const pairs = [
+    ["recall.forceEveryTurn", original.recall?.forceEveryTurn, draft.recall.forceEveryTurn],
+    ["recall.rerankCandidateLimit", original.recall?.rerankCandidateLimit, draft.recall.rerankCandidateLimit],
+    ["recall.rerankTokenBudget", original.recall?.rerankTokenBudget, draft.recall.rerankTokenBudget],
+    ["writes.storePreCompressCheckpoints", original.writes?.storePreCompressCheckpoints, draft.writes.storePreCompressCheckpoints],
+    ["writes.maxAutoWritesPerSession", original.writes?.maxAutoWritesPerSession, draft.writes.maxAutoWritesPerSession],
+    ["writes.lowConfidenceAction", original.writes?.lowConfidenceAction, draft.writes.lowConfidenceAction],
+  ];
+  for (const [field, before, after] of pairs) {
+    if (before !== after) {
+      changes.push({ field, before: safeExportText(before), after: safeExportText(after) });
+    }
+  }
+  return changes;
 }
 
 function preferredVaultPath(vault, node) {
@@ -249,6 +343,7 @@ function nodeSummary(node) {
 export {
   buildEditExport,
   buildContainerHealth,
+  buildLifecyclePolicyDraft,
   buildNucleusExport,
   buildResearchLineage,
   buildSelectedAuditTrailEntry,

@@ -14,6 +14,7 @@ The UI should expose:
 - hybrid retrieval traces,
 - lifecycle and sleep-cycle events,
 - research lineage,
+- lifecycle policy draft export,
 - sanitized Nucleus snapshot export,
 - derived docs and wiki pages,
 - compiled wiki/vault files,
@@ -61,10 +62,11 @@ Required visual review path:
 9. provenance scan,
 10. Nucleus snapshot preview,
 11. research lineage preview,
-12. compiled wiki/vault preview,
-13. fixture vault sync report with conflict handling,
-14. selected local vault sync dry-run,
-15. fixture local-container audit preflight.
+12. lifecycle policy preview,
+13. compiled wiki/vault preview,
+14. fixture vault sync report with conflict handling,
+15. selected local vault sync dry-run,
+16. fixture local-container audit preflight.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -81,6 +83,11 @@ edits as a preview object with `writesRealFiles: false`.
 
 The Nucleus snapshot preview is also fixture-only and marks
 `writesRealFiles: false`.
+
+The Lifecycle Policy panel stages recall and write-policy choices as a fixture
+draft export. It clamps numeric settings, limits low-confidence write behavior
+to known choices, shows changed fields, and marks `writesRealFiles: false`.
+It does not edit real host config files.
 
 The Local Audit Preflight panel uses a temporary fixture container and the
 read-only audit utility. It displays file counts, redaction counts, and health
@@ -112,6 +119,7 @@ Before connecting real local containers, the UI needs:
 - explicit file picker or config path with read-only confirmation,
 - write confirmation for derived docs,
 - wiki lint before save,
+- lifecycle policy apply path with explicit config confirmation,
 - Nucleus snapshot export against a selected redacted local container,
 - explicit vault sync apply confirmation,
 - screenshot/recording safety guardrails,

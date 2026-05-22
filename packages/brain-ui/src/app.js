@@ -1,6 +1,7 @@
 import {
   buildContainerHealth,
   buildEditExport,
+  buildLifecyclePolicyDraft,
   buildNucleusExport,
   buildResearchLineage,
   containsPrivateLikeText,
@@ -24,6 +25,7 @@ const state = {
   selectedAudit: null,
   selectedAuditHistory: readSelectedAuditHistory(),
   selectedSync: null,
+  lifecyclePolicyDraft: null,
 };
 
 const positions = {
@@ -52,6 +54,14 @@ const provenance = document.querySelector("#provenance");
 const snapshotSummary = document.querySelector("#snapshotSummary");
 const snapshotExport = document.querySelector("#snapshotExport");
 const researchLineage = document.querySelector("#researchLineage");
+const policySummary = document.querySelector("#policySummary");
+const policyForm = document.querySelector("#policyForm");
+const policyForceRecall = document.querySelector("#policyForceRecall");
+const policyPreCompress = document.querySelector("#policyPreCompress");
+const policyMaxWrites = document.querySelector("#policyMaxWrites");
+const policyLowConfidence = document.querySelector("#policyLowConfidence");
+const policyStatus = document.querySelector("#policyStatus");
+const policyDraft = document.querySelector("#policyDraft");
 const vaultFileSelect = document.querySelector("#vaultFileSelect");
 const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
@@ -94,6 +104,7 @@ state.localAudit = await localAuditResponse.json();
 state.query = searchInput.value;
 state.selectedId = state.snapshot.nodes[0]?.id ?? null;
 state.selectedVaultPath = preferredVaultPath(state.vault?.vault);
+hydratePolicyControls();
 
 render();
 
@@ -134,6 +145,18 @@ resetEdit.addEventListener("click", () => {
 vaultFileSelect.addEventListener("change", (event) => {
   state.selectedVaultPath = event.target.value;
   renderVaultPreview();
+});
+
+policyForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  state.lifecyclePolicyDraft = buildLifecyclePolicyDraft(state.snapshot, {
+    forceEveryTurn: policyForceRecall.checked,
+    storePreCompressCheckpoints: policyPreCompress.checked,
+    maxAutoWritesPerSession: policyMaxWrites.value,
+    lowConfidenceAction: policyLowConfidence.value,
+  });
+  policyStatus.textContent = `${state.lifecyclePolicyDraft.changedFields.length} staged change${state.lifecyclePolicyDraft.changedFields.length === 1 ? "" : "s"}.`;
+  renderLifecyclePolicy();
 });
 
 selectedSyncForm.addEventListener("submit", async (event) => {
@@ -195,6 +218,7 @@ function render() {
   renderDetails(selected);
   renderNucleusSnapshot();
   renderResearchLineage();
+  renderLifecyclePolicy();
   renderVaultControls(selected);
   renderSyncReport();
   renderSelectedSync();
@@ -316,6 +340,15 @@ function renderNucleusSnapshot() {
   snapshotExport.textContent = JSON.stringify(snapshot, null, 2);
 }
 
+function hydratePolicyControls() {
+  state.lifecyclePolicyDraft = buildLifecyclePolicyDraft(state.snapshot);
+  policyForceRecall.checked = state.lifecyclePolicyDraft.recall.forceEveryTurn;
+  policyPreCompress.checked = state.lifecyclePolicyDraft.writes.storePreCompressCheckpoints;
+  policyMaxWrites.value = String(state.lifecyclePolicyDraft.writes.maxAutoWritesPerSession);
+  policyLowConfidence.value = state.lifecyclePolicyDraft.writes.lowConfidenceAction;
+  policyStatus.textContent = "Fixture policy loaded.";
+}
+
 function renderResearchLineage() {
   const packet = buildResearchLineage(state.snapshot);
   researchLineage.replaceChildren();
@@ -341,6 +374,29 @@ function renderResearchLineage() {
     card.append(title, meta, list);
     researchLineage.append(card);
   }
+}
+
+function renderLifecyclePolicy() {
+  const draft = state.lifecyclePolicyDraft ?? buildLifecyclePolicyDraft(state.snapshot);
+  const hermesEnabled = Object.values(draft.lifecycle.hermes ?? {}).filter((value) => value === "enabled").length;
+  const openclawEnabled = Object.values(draft.lifecycle.openclaw ?? {}).filter((value) => value === "enabled").length;
+  policySummary.replaceChildren(
+    stat("Recall", draft.recall.forceEveryTurn ? "every turn" : draft.recall.defaultMode),
+    stat("Rerank K", draft.recall.rerankCandidateLimit),
+    stat("Writes", draft.writes.maxAutoWritesPerSession),
+    stat("Changes", draft.changedFields.length),
+  );
+  policyDraft.textContent = JSON.stringify(
+    {
+      ...draft,
+      lifecycleSummary: {
+        hermesEnabled,
+        openclawEnabled,
+      },
+    },
+    null,
+    2,
+  );
 }
 
 function appendLineageStep(list, label, node) {
@@ -682,4 +738,4 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
-export { buildContainerHealth, buildEditExport, buildNucleusExport, buildResearchLineage, renderGraph };
+export { buildContainerHealth, buildEditExport, buildLifecyclePolicyDraft, buildNucleusExport, buildResearchLineage, renderGraph };

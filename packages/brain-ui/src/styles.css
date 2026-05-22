@@ -521,7 +521,8 @@ button.active {
 
 .snapshot-summary,
 .sync-summary,
-.audit-summary {
+.audit-summary,
+.policy-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
@@ -529,7 +530,8 @@ button.active {
 
 .snapshot-summary div,
 .sync-summary div,
-.audit-summary div {
+.audit-summary div,
+.policy-summary div {
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -542,20 +544,24 @@ button.active {
 .sync-summary strong,
 .sync-summary span,
 .audit-summary strong,
-.audit-summary span {
+.audit-summary span,
+.policy-summary strong,
+.policy-summary span {
   display: block;
 }
 
 .snapshot-summary strong,
 .sync-summary strong,
-.audit-summary strong {
+.audit-summary strong,
+.policy-summary strong {
   color: var(--cyan);
   font-size: 18px;
 }
 
 .snapshot-summary span,
 .sync-summary span,
-.audit-summary span {
+.audit-summary span,
+.policy-summary span {
   color: var(--muted);
   font-size: 11px;
   margin-top: 2px;
@@ -674,7 +680,8 @@ button.active {
 }
 
 .selected-audit,
-.selected-sync {
+.selected-sync,
+.policy-form {
   display: grid;
   gap: 9px;
   margin-top: 14px;
@@ -683,7 +690,8 @@ button.active {
 }
 
 .selected-audit label:not(.check-row),
-.selected-sync label:not(.check-row) {
+.selected-sync label:not(.check-row),
+.policy-form label:not(.check-row) {
   display: grid;
   gap: 6px;
   color: var(--muted);
@@ -691,7 +699,9 @@ button.active {
 }
 
 .selected-audit input[type="password"],
-.selected-sync input[type="password"] {
+.selected-sync input[type="password"],
+.policy-form input[type="number"],
+.policy-form select {
   width: 100%;
   min-height: 38px;
   border: 1px solid var(--line);
@@ -710,14 +720,16 @@ button.active {
 }
 
 #selectedAuditStatus,
-#selectedSyncStatus {
+#selectedSyncStatus,
+#policyStatus {
   min-height: 18px;
   margin: 0;
   color: var(--green);
   font-size: 12px;
 }
 
-.snapshot-export {
+.snapshot-export,
+.policy-draft {
   min-height: 120px;
   max-height: 230px;
   overflow: auto;

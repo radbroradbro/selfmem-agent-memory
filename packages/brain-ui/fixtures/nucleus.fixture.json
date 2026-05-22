@@ -14,6 +14,42 @@
       "lastAuditAt": "2026-05-22T08:30:00.000Z",
       "privacyLeakCount": 0,
       "redactionCount": 1
+    },
+    "lifecyclePolicy": {
+      "recall": {
+        "forceEveryTurn": false,
+        "defaultMode": "skip_obvious_maintenance",
+        "rerankCandidateLimit": 36,
+        "rerankTokenBudget": 6400,
+        "skipWhenPromptMatches": ["heartbeat", "watchdog", "diagnostic", "healthcheck", "update check", "ping"],
+        "forceWhenPromptMatches": ["remember", "recall", "decision", "preference", "workflow", "bug", "fix", "lcm", "compress"]
+      },
+      "writes": {
+        "storeExplicitToolWrites": true,
+        "storeAgentEndSummaries": true,
+        "storePreCompressCheckpoints": true,
+        "rejectFullyPrivate": true,
+        "rejectKeyShapedContent": true,
+        "suppressDuplicates": true,
+        "maxAutoWritesPerSession": 20,
+        "lowConfidenceAction": "review_queue"
+      },
+      "lifecycle": {
+        "hermes": {
+          "prefetch": "enabled",
+          "queue_prefetch": "enabled",
+          "sync_turn": "enabled",
+          "on_pre_compress": "enabled",
+          "on_memory_write": "enabled",
+          "on_session_end": "enabled"
+        },
+        "openclaw": {
+          "session_start": "enabled",
+          "before_prompt_build": "enabled",
+          "agent_end": "enabled",
+          "compression_checkpoint": "enabled"
+        }
+      }
     }
   },
   "nodes": [

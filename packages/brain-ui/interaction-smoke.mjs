@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import {
   buildContainerHealth,
   buildEditExport,
+  buildLifecyclePolicyDraft,
   buildNucleusExport,
   buildResearchLineage,
   containsPrivateLikeText,
@@ -102,6 +103,30 @@ try {
   assert.ok(lineageKinds.has("hypothesis"));
   assert.ok(lineageKinds.has("decision"));
 
+  const policyDraft = buildLifecyclePolicyDraft(fixture, {
+    forceEveryTurn: true,
+    storePreCompressCheckpoints: true,
+    maxAutoWritesPerSession: 12,
+    lowConfidenceAction: "suppress",
+  });
+  assert.equal(policyDraft.mode, "fixture-lifecycle-policy-draft");
+  assert.equal(policyDraft.writesRealFiles, false);
+  assert.equal(policyDraft.recall.forceEveryTurn, true);
+  assert.equal(policyDraft.writes.maxAutoWritesPerSession, 12);
+  assert.equal(policyDraft.writes.lowConfidenceAction, "suppress");
+  assert.ok(policyDraft.changedFields.some((change) => change.field === "recall.forceEveryTurn"));
+  assert.ok(policyDraft.changedFields.some((change) => change.field === "writes.lowConfidenceAction"));
+  const clampedPolicyDraft = buildLifecyclePolicyDraft(fixture, {
+    maxAutoWritesPerSession: 9000,
+    rerankCandidateLimit: 9000,
+    rerankTokenBudget: "not-a-number",
+    lowConfidenceAction: `unsafe ${"sm_" + "C".repeat(42)}`,
+  });
+  assert.equal(clampedPolicyDraft.writes.maxAutoWritesPerSession, 200);
+  assert.equal(clampedPolicyDraft.recall.rerankCandidateLimit, 200);
+  assert.equal(clampedPolicyDraft.recall.rerankTokenBudget, 6400);
+  assert.equal(clampedPolicyDraft.writes.lowConfidenceAction, "review_queue");
+
   assert.equal(vault.ok, true);
   assert.equal(vault.lint.length, 0);
   assert.ok(vault.vault.files.some((file) => file.path === "wiki/index.md"));
@@ -195,6 +220,8 @@ try {
     unsafeExport,
     nucleusExport,
     lineage,
+    policyDraft,
+    clampedPolicyDraft,
     vault,
     syncReport,
     missingSyncConfirmation,
@@ -222,6 +249,7 @@ try {
           "draft-export",
           "nucleus-export",
           "research-lineage",
+          "lifecycle-policy-draft",
           "vault-path",
           "sync-report",
           "selected-wiki-sync-dry-run",

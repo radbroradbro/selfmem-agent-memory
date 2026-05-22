@@ -22,6 +22,8 @@ This roadmap tracks useful user-facing features without mixing them into the cur
 - Browser-local selected-audit history with content-free metadata only.
 - Disabled-by-default selected local vault sync dry-run with read-only
   confirmation and redacted `.../container` path display.
+- Fixture-safe lifecycle policy preview that stages recall/write settings as a
+  no-write draft export.
 
 ## Brain UI
 
@@ -120,5 +122,7 @@ Planned controls:
 - minimum importance threshold,
 - review queue for low-confidence writes,
 - UI toggles for recall frequency and write aggressiveness.
+- Current Brain UI can preview these settings as fixture draft exports; a real
+  apply path still needs explicit config-file confirmation.
 
 See `configs/lifecycle-policy.example.yaml` for the target shape.
