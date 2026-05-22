@@ -82,6 +82,7 @@ complete or publish a public live update.
 | Claude reviewer route | `reviews/overnight-20260522/claude-pr5-review-blocked.md` | Blocked by missing login |
 | Production-readiness review | `reviews/overnight-20260522/production-readiness.md` | Completed with verdict `FAIL` |
 | Public launch messaging | `reviews/overnight-20260522/public-live-update-draft.md`, `dummy-brain-demo-storyboard.md`, Gemini copy review | Proven as draft only |
+| Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md`, `reviews/overnight-20260522/gemini-release-handoff-review.md` | Proven locally as a public-safe manual path for PR body update, blocker issue creation, blocked reviewer route, visibility approval, and one-agent canary rollout; Gemini focused review returned `CLEAN` |
 | PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment |
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |

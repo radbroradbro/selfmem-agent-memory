@@ -185,6 +185,7 @@ auth state, browser state, or provider keys.
 - [Operations guide](docs/OPERATIONS.md)
 - [Agent live-build guide](docs/AGENT_LIVE_BUILD_GUIDE.md)
 - [Maintainer review guide](docs/MAINTAINER_REVIEW_GUIDE.md)
+- [Release handoff](docs/RELEASE_HANDOFF.md)
 - [GitHub rules](docs/GITHUB_RULES.md)
 - [Security model](docs/SECURITY_MODEL.md)
 - [Production readiness](docs/PRODUCTION_READINESS.md)

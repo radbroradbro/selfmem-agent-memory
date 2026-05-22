@@ -239,6 +239,10 @@ Known limits:
   `be47cff`.
 - GitHub Actions CI run `26297876735` passed on graph navigation controls
   commit `62367a1`.
+- Release handoff follow-up: `docs/RELEASE_HANDOFF.md` now gives the manual PR
+  body update, blocker issue, blocked Claude route, public visibility, and
+  one-agent canary steps. `release:check` requires the handoff and verifies the
+  blocked launch path language.
 - Dynamic graph layout CI is pending until this slice is pushed. Local
   `node packages/brain-ui/smoke.mjs`,
   `node packages/brain-ui/interaction-smoke.mjs`, and

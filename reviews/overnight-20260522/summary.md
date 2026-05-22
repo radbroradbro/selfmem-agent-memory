@@ -74,6 +74,7 @@ is still required before any public live update.
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
+| Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md` |
 | Conservative release-state manifest | `reviews/overnight-20260522/release-state.json` |
 | Release-state guard review | `reviews/overnight-20260522/gemini-release-state-guard-review.md` |
 | Post-12-hour readiness verdict | `reviews/overnight-20260522/production-readiness.md` |
@@ -99,6 +100,8 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
+- Release handoff follow-up: `docs/RELEASE_HANDOFF.md` added and required by
+  `release:check`.
 - GitHub Actions CI: success on the latest inspected baseline, `be47cff`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
@@ -228,6 +231,7 @@ local memory contents.
   and absent from the diff, then final `CLEAN` after staging.
 - Gemini blocker-permission refresh review: `CLEAN`.
 - Gemini release-state guard review: `CLEAN`.
+- Gemini release-handoff review: `CLEAN`.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.

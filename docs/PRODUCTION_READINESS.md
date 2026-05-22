@@ -47,6 +47,8 @@ Before a public live update or release note:
 - multi-scenario compaction benchmark passes exact-identifier, stale/privacy,
   dedupe, and kind-coverage checks,
 - reviewer packet records which council routes actually ran.
+- release handoff states the manual PR update path, blocked reviewer choices,
+  public visibility criteria, and one-agent canary rollout path.
 
 Run the repeatable gate:
 

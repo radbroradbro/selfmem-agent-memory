@@ -40,6 +40,11 @@ Use this checklist before making the repository public.
 - [ ] Public live-update draft says whether the release is production ready or
   alpha only.
 - [ ] Dummy-data demo storyboard exists and forbids private memory footage.
+- [ ] `docs/RELEASE_HANDOFF.md` has the current manual PR, blocked reviewer,
+  public visibility, and one-agent canary steps.
+- [ ] If GitHub automation cannot update the PR body or create blocker issues,
+  the owner has either completed the manual steps or accepted the missing
+  GitHub updates in writing.
 
 ## Publish
 

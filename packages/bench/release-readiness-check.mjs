@@ -18,6 +18,7 @@ const requiredFiles = [
   "docs/LOCAL_CONTAINER_AUDIT.md",
   "docs/PRODUCTION_READINESS.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
+  "docs/RELEASE_HANDOFF.md",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
   `${reviewDir}/claude-pr5-review-blocked.md`,
@@ -74,6 +75,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-browser-evidence-gate-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
+  `${reviewDir}/release-handoff-evidence.md`,
+  `${reviewDir}/gemini-release-handoff-review.md`,
   `${reviewDir}/release-state.json`,
   `${reviewDir}/gemini-release-state-guard-review.md`,
   `${reviewDir}/production-readiness.md`,
@@ -502,6 +505,18 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /graph navigation|jump-to-node|neighborhood scope|all-vs-neighborhood/i, `${file} missing graph navigation`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
+});
+
+check("release handoff documents blocked launch path", () => {
+  const text = readFileSync(join(root, "docs/RELEASE_HANDOFF.md"), "utf8");
+  assert.match(text, /PR #5/);
+  assert.match(text, /pr-body-update-draft\.md/);
+  assert.match(text, /blocker-fresh-brain-ui-launch-and-release-gate\.md/);
+  assert.match(text, /blocked Claude route|Claude CLI/i);
+  assert.match(text, /public launch verdict as `FAIL`|publicLaunchVerdict: "FAIL"/);
+  assert.match(text, /selfmem_update/);
+  assert.match(text, /one-agent canary/i);
+  assert.match(text, /Do not paste private diagnostics/);
 });
 
 check("fresh brain UI smoke passes", () => {

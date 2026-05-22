@@ -43,6 +43,7 @@ Retry note:
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
+- Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and canary rollout with `selfmem_update`.
 
 ## Current Verdict
 
@@ -75,7 +76,7 @@ Latest local verification includes the guarded local memory materialize slice.
 - GitHub Actions CI: run `26295772356` passed on `21fd4d6`, the guarded local memory materialize commit.
 - GitHub Actions CI: run `26297064340` passed on `be47cff`, the dynamic Brain UI graph layout commit.
 - GitHub Actions CI: run `26297876735` passed on `62367a1`, the graph navigation controls commit.
-- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, and public live-update copy are `CLEAN` after fixes.
+- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
 
@@ -93,6 +94,8 @@ Latest local verification includes the guarded local memory materialize slice.
 - `reviews/overnight-20260522/release-state.json`
 - `reviews/overnight-20260522/public-live-update-draft.md`
 - `reviews/overnight-20260522/dummy-brain-demo-storyboard.md`
+- `docs/RELEASE_HANDOFF.md`
+- `reviews/overnight-20260522/release-handoff-evidence.md`
 - `reviews/overnight-20260522/completion-audit.md`
 - `reviews/overnight-20260522/ui-evidence/README.md`
 - `reviews/overnight-20260522/brain-ui-dynamic-layout-evidence.md`
