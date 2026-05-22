@@ -97,6 +97,12 @@ python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --keys-
 
 The repository never ships a bundled key file.
 
+To test the updater on temporary fixture runtimes before touching an agent:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- update:smoke
+```
+
 ## Runtime Checks
 
 Run these from a checkout:

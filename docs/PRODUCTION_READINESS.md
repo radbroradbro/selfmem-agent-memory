@@ -23,6 +23,7 @@ Before a public live update or release note:
 - unit and privacy tests pass,
 - Hermes smoke passes,
 - OpenClaw smoke passes,
+- updater smoke passes,
 - package dry-run passes,
 - secret scan passes,
 - private-name scan passes,

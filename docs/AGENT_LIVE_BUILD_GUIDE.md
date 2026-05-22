@@ -119,6 +119,16 @@ python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo 
 Use `--keys-file` only with a local private file on that runtime machine. Never
 put keys in the repository.
 
+Maintainers can test the updater without touching a real agent:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- update:smoke
+```
+
+The smoke creates temporary Hermes and OpenClaw homes, checks dry-run behavior,
+applies into fake runtime directories, verifies adapter backups, preserves the
+container mapping, and confirms copied local key files use `0600`.
+
 ## Benchmark Or Model Changes
 
 Provider, reranker, query expansion, and benchmark changes are experiments.

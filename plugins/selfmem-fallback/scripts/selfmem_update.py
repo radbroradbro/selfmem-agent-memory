@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -112,7 +113,7 @@ def install_adapter(host: str, repo: Path, *, apply: bool) -> dict[str, Any]:
         return {"step": "install_adapter", "ok": False, "reason": "adapter source missing", "source": str(source)}
     backup = None
     if target.exists():
-        backup = target.with_name(f"{target.name}.bak-selfmem-update-{int(__import__('time').time())}")
+        backup = unique_backup_path(target)
     if not apply:
         return {"step": "install_adapter", "ok": True, "dryRun": True, "source": str(source), "target": str(target), "backup": str(backup) if backup else None}
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -121,6 +122,17 @@ def install_adapter(host: str, repo: Path, *, apply: bool) -> dict[str, Any]:
         shutil.move(str(target), str(backup))
     shutil.copytree(source, target)
     return {"step": "install_adapter", "ok": True, "source": str(source), "target": str(target), "backup": str(backup) if backup else None}
+
+
+def unique_backup_path(target: Path) -> Path:
+    base = target.with_name(f"{target.name}.bak-selfmem-update-{int(time.time())}")
+    if not base.exists():
+        return base
+    for index in range(2, 1000):
+        candidate = target.with_name(f"{base.name}-{index}")
+        if not candidate.exists():
+            return candidate
+    raise RuntimeError(f"could not allocate backup path for {target}")
 
 
 def install_openclaw_audit(home: Path, *, apply: bool) -> dict[str, Any]:
