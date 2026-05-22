@@ -101,6 +101,16 @@ def main() -> None:
         trace = Path(status["trace_path"]).read_text(encoding="utf-8", errors="ignore")
         lossless = Path(status["lossless_path"]).read_text(encoding="utf-8", errors="ignore")
         raw = Path(status["raw_path"]).read_text(encoding="utf-8", errors="ignore")
+        trace_events = [json.loads(line) for line in trace.splitlines() if line.strip()]
+        search_trace = next(
+            (
+                event
+                for event in trace_events
+                if event.get("event") == "search" and event.get("data", {}).get("supermemory_attempted") is True
+            ),
+            {},
+        )
+        search_trace_data = search_trace.get("data", {})
         leaks = count_leaks("\n".join([memories, trace, lossless, raw, prefetch]))
         output = {
             "ok": True,
@@ -116,6 +126,11 @@ def main() -> None:
             "hybridSearchCovered": any(item.get("memory_source") == "supermemory_read_through" for item in alias_search.get("results", [])),
             "sourceSupermemoryContainer": status.get("source_supermemory_container"),
             "localContainer": status.get("local_container"),
+            "boundedReadThroughPolicyCovered": status.get("search_policy") == "local_first_then_bounded_supermemory_read_through"
+            and status.get("recall_policy", {}).get("remote_read_through") == "explicit_history_intent_or_thin_local_results",
+            "searchLatencyInstrumentationCovered": float(search_trace_data.get("elapsed_ms") or 0) > 0
+            and float(search_trace_data.get("local_elapsed_ms") or 0) > 0
+            and float(search_trace_data.get("remote_elapsed_ms") or 0) > 0,
             "prefetchHasContext": bool(prefetch.strip()),
             "maintenanceRecallGateCovered": skipped_prefetch == "" and "prefetch_skipped" in trace,
             "statusLikeRecallCovered": bool(status_like_prefetch.strip()),
@@ -141,6 +156,8 @@ def main() -> None:
             output["aliasStoreSuccess"],
             output["aliasSearchResultCount"] > 0,
             output["hybridSearchCovered"],
+            output["boundedReadThroughPolicyCovered"],
+            output["searchLatencyInstrumentationCovered"],
             output["sourceSupermemoryContainer"] == "hermes_standalone_source",
             output["localContainer"] == "selfmem_hermes_standalone_source",
             output["prefetchHasContext"],

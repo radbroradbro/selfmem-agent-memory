@@ -30,6 +30,7 @@ const files = {
   canaryEvidenceIntakeReview: `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   canaryRemediationEvidence: `${reviewDir}/canary-remediation-evidence.md`,
   canaryRemediationReview: `${reviewDir}/gemini-canary-remediation-review.md`,
+  adapterBoundedReadThroughEvidence: `${reviewDir}/adapter-bounded-read-through-evidence.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
@@ -150,6 +151,11 @@ const requirements = [
     "packages/bench/fixtures/canary-runtime-report-failing.fixture.json",
     files.canaryRemediationEvidence,
     files.canaryRemediationReview,
+  ]),
+  proven("adapter-bounded-read-through", "Hermes and OpenClaw adapters bound hosted read-through and trace local, remote, and total recall latency for fresh canaries", [
+    "packages/adapters/hermes/selfmem_canary/__init__.py",
+    "packages/adapters/openclaw/selfmem_canary/index.mjs",
+    files.adapterBoundedReadThroughEvidence,
   ]),
   proven("github-pr-body-current", "PR body is current on GitHub", [
     files.prBodyDraft,

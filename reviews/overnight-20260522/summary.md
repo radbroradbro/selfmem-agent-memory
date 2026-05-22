@@ -64,6 +64,7 @@ is still required before any public live update.
 | Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |
+| Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
 | Brain UI model matrix | `packages/brain-ui/fixtures/model-matrix.json`, `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |

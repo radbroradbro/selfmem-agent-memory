@@ -141,6 +141,14 @@ diagnostic summaries but does not print raw memories, transcripts, prompts,
 answers, local paths, credentials, cookies, or bearer tokens. A fixture pass is
 useful for the tooling path, but it is not real rollout evidence.
 
+Current Hermes and OpenClaw adapters use local-first bounded hosted
+read-through. They search hosted Supermemory when local results are thin or the
+query explicitly asks for old, legacy, hosted, or Supermemory history. To prove
+hybrid search in a canary, include at least one explicit history query and verify
+the sanitized report shows both local and hosted results. The adapters trace
+total, local, and remote recall latency, plus whether hosted read-through was
+attempted or skipped.
+
 ## Reviewer Route Choices
 
 Before merge, choose one path:

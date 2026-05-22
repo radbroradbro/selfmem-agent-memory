@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T21:21:16Z",
+  "generatedAt": "2026-05-22T21:39:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -66,6 +66,7 @@
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
     "canary-remediation-plan",
+    "adapter-bounded-read-through",
     "hosted-baseline-preflight",
     "github-handoff-packet",
     "github-pr-body-live",
