@@ -5,10 +5,10 @@
   "author": {
     "name": "RecallWeave",
     "email": "local-only@example.invalid",
-    "url": "https://github.com/bradleysuarezcpa/selfmem-agent-memory"
+    "url": "https://github.com/radbroradbro/selfmem-agent-memory"
   },
-  "homepage": "https://github.com/bradleysuarezcpa/selfmem-agent-memory",
-  "repository": "https://github.com/bradleysuarezcpa/selfmem-agent-memory",
+  "homepage": "https://github.com/radbroradbro/selfmem-agent-memory",
+  "repository": "https://github.com/radbroradbro/selfmem-agent-memory",
   "license": "Apache-2.0",
   "keywords": [
     "memory",
@@ -30,9 +30,9 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/bradleysuarezcpa/selfmem-agent-memory",
-    "privacyPolicyURL": "https://github.com/bradleysuarezcpa/selfmem-agent-memory/blob/main/SECURITY.md",
-    "termsOfServiceURL": "https://github.com/bradleysuarezcpa/selfmem-agent-memory/blob/main/LICENSE",
+    "websiteURL": "https://github.com/radbroradbro/selfmem-agent-memory",
+    "privacyPolicyURL": "https://github.com/radbroradbro/selfmem-agent-memory/blob/main/SECURITY.md",
+    "termsOfServiceURL": "https://github.com/radbroradbro/selfmem-agent-memory/blob/main/LICENSE",
     "defaultPrompt": [
       "Check whether memory writes are healthy.",
       "Export existing Supermemory documents safely.",

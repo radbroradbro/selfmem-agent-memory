@@ -5,12 +5,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bradleysuarezcpa/selfmem-agent-memory.git"
+    "url": "https://github.com/radbroradbro/selfmem-agent-memory.git"
   },
   "bugs": {
-    "url": "https://github.com/bradleysuarezcpa/selfmem-agent-memory/issues"
+    "url": "https://github.com/radbroradbro/selfmem-agent-memory/issues"
   },
-  "homepage": "https://github.com/bradleysuarezcpa/selfmem-agent-memory#readme",
+  "homepage": "https://github.com/radbroradbro/selfmem-agent-memory#readme",
   "type": "module",
   "packageManager": "pnpm@10.23.0",
   "scripts": {
