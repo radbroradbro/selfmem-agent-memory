@@ -62,6 +62,7 @@
     "session-compaction-local-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
+    "canary-report-generator",
     "canary-evidence-intake",
     "hosted-baseline-preflight",
     "github-handoff-packet",

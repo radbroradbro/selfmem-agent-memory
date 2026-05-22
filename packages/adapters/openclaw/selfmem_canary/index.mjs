@@ -153,6 +153,7 @@ function toolStore(state, args) {
 }
 
 function store(state, content, metadata = {}) {
+  const startedAt = Date.now();
   if (state.readOnly) throw new Error("Read-only mode: identity is unresolved, so writes are suppressed.");
   const redacted = redact(content);
   if (redacted.fullyPrivate) throw new Error("Cannot store fully private memory.");
@@ -160,7 +161,7 @@ function store(state, content, metadata = {}) {
   const existing = findDuplicate(state, distilled);
   if (existing) {
     state.usage.dedupe_suppressed += 1;
-    trace(state, "store_deduped", { id: existing.id, local_container: state.localContainer });
+    trace(state, "store_deduped", { id: existing.id, local_container: state.localContainer, elapsed_ms: Date.now() - startedAt });
     return existing;
   }
   const item = {
@@ -178,7 +179,7 @@ function store(state, content, metadata = {}) {
     },
   };
   appendFileSync(state.paths.memories, `${JSON.stringify(item)}\n`);
-  trace(state, "store", { id: item.id, local_container: state.localContainer });
+  trace(state, "store", { id: item.id, local_container: state.localContainer, elapsed_ms: Date.now() - startedAt });
   return item;
 }
 

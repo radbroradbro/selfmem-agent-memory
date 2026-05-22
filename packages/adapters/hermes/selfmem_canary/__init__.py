@@ -462,6 +462,7 @@ class SelfmemCanaryProvider(MemoryProvider):
         return None
 
     def _store(self, content: str, metadata: Dict[str, Any]) -> Dict[str, Any]:
+        start = time.perf_counter()
         assert self._memories_path is not None
         content = _coerce_text(content)
         distilled = _distill_content(content, metadata)
@@ -473,6 +474,7 @@ class SelfmemCanaryProvider(MemoryProvider):
             self._trace("store_deduped", {
                 "id": duplicate.get("id"),
                 "local_container": self._local_container,
+                "elapsed_ms": round((time.perf_counter() - start) * 1000, 3),
             })
             return duplicate
         embedding = None
@@ -512,6 +514,7 @@ class SelfmemCanaryProvider(MemoryProvider):
             "local_container": self._local_container,
             "source_supermemory_container": self._source_supermemory_container or None,
             "usage": self._usage,
+            "elapsed_ms": round((time.perf_counter() - start) * 1000, 3),
         })
         return item
 

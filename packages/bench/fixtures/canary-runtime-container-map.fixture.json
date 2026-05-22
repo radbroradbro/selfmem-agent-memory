@@ -1,0 +1,8 @@
+{
+  "host": "hermes",
+  "agent_identity": "fixture-agent",
+  "source_supermemory_container": "fixture_source_container",
+  "local_container": "selfmem_fixture_agent",
+  "mode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+  "read_only": false
+}

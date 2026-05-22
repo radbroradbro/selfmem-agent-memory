@@ -22,7 +22,12 @@ const requiredFiles = [
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   "packages/brain-ui/fixtures/model-matrix.json",
+  "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
+  "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
+  "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
+  "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
+  "packages/bench/fixtures/canary-runtime-memories.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-report.fixture.json",
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/release-blocker-doctor.mjs",
@@ -108,6 +113,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-release-handoff-review.md`,
   `${reviewDir}/release-blocker-doctor-evidence.md`,
   `${reviewDir}/gemini-release-blocker-doctor-review.md`,
+  `${reviewDir}/canary-report-generator-evidence.md`,
+  `${reviewDir}/gemini-canary-report-generator-review.md`,
   `${reviewDir}/canary-evidence-intake-evidence.md`,
   `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   `${reviewDir}/hosted-baseline-preflight-evidence.md`,
@@ -206,6 +213,7 @@ const requiredScripts = [
   "wiki:sync:smoke:built",
   "update:smoke",
   "consumer:smoke",
+  "canary:report",
   "canary:intake",
   "baseline:preflight",
   "goal:audit",
@@ -755,6 +763,7 @@ check("release state is conservative", () => {
     "session-compaction-local-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
+    "canary-report-generator",
     "canary-evidence-intake",
     "hosted-baseline-preflight",
     "github-handoff-packet",
@@ -799,6 +808,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /compaction audit|local-session compaction/i, `${file} missing compaction audit`);
     assert.match(text, /benchmark dashboard|benchmark summary|compaction benchmark/i, `${file} missing benchmark dashboard`);
     assert.match(text, /canary rollout|one-agent canary|selfmem_update/i, `${file} missing canary rollout`);
+    assert.match(text, /canary report generator|canary:report|trace-derived canary/i, `${file} missing canary report generator`);
     assert.match(text, /canary evidence intake|canary:intake|runtime canary evidence/i, `${file} missing canary evidence intake`);
     assert.match(text, /research source lock|source-lock|source lock/i, `${file} missing research source lock`);
     assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
@@ -873,6 +883,55 @@ check("fresh local container audit smoke passes", () => {
 
 check("fresh clean consumer smoke passes", () => {
   run("node", ["packages/bench/consumer-install-smoke.mjs"]);
+});
+
+check("fresh canary report generator passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-report-"));
+  try {
+    const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-report-generator-review.md"), "utf8");
+    const reportPath = join(tempRoot, "report.json");
+    const generator = run("node", ["packages/bench/canary-report-from-trace.mjs", "--fixture", "--output", reportPath]);
+    const generatedReport = JSON.parse(generator.stdout);
+    const fileReport = JSON.parse(readFileSync(reportPath, "utf8"));
+    assert.deepEqual(fileReport, generatedReport);
+    assert.equal(generatedReport.mode, "one-agent-canary-runtime-report");
+    assert.equal(generatedReport.fixtureOnly, true);
+    assert.equal(generatedReport.evidenceType, "fixture-trace-derived-canary-report");
+    assert.match(generatedReport.agent.agentIdentityHash, /^agent_[a-f0-9]{8,}$/);
+    assert.equal(generatedReport.provider.hostedSupermemoryMode, "read-through-only");
+    assert.equal(generatedReport.counts.sessionStart > 0, true);
+    assert.equal(generatedReport.counts.beforePromptBuild > 0, true);
+    assert.equal(generatedReport.counts.preCompress > 0, true);
+    assert.equal(generatedReport.counts.agentEnd > 0, true);
+    assert.equal(generatedReport.counts.search > 0, true);
+    assert.equal(generatedReport.counts.store > 0, true);
+    assert.equal(generatedReport.counts.errors, 0);
+    assert.equal(generatedReport.latencyMs.recallP95 > 0, true);
+    assert.equal(generatedReport.latencyMs.storeP95 > 0, true);
+    assert.equal(generatedReport.quality.lifecycleCovered, true);
+    assert.equal(generatedReport.quality.hybridSearchCovered, true);
+    assert.equal(generatedReport.privacy.privacyLeakCount, 0);
+    assert.equal(generatedReport.privacy.secretPatternHits, 0);
+    assert.equal(generatedReport.privacy.rawMemoryIncluded, false);
+    assert.doesNotMatch(generator.stdout, secretPattern);
+    assert.doesNotMatch(generator.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+    const intake = run("node", ["packages/bench/canary-evidence-intake.mjs", "--report", reportPath]);
+    const intakeReport = JSON.parse(intake.stdout);
+    assert.equal(intakeReport.fixtureOnly, true);
+    assert.equal(intakeReport.countsAsRealRolloutEvidence, false);
+    assert.equal(intakeReport.canaryPass, true);
+    const strict = spawnSync("node", ["packages/bench/canary-evidence-intake.mjs", "--report", reportPath, "--strict-real"], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(strict.status, 0, "fixture-derived report must fail --strict-real");
+    assert.match(strict.stderr, /strict-real cannot use.*fixture/i);
+    assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+    assert.doesNotMatch(geminiReview, /pending external review/i);
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
 });
 
 check("fresh canary evidence intake passes", () => {

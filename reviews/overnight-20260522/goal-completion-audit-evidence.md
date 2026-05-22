@@ -22,6 +22,8 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
   hosted Supermemory baseline as a blocker.
 - Added `canary-evidence-intake` as a proven surface while preserving the real
   production rollout as incomplete until a live sanitized report is reviewed.
+- Added `canary-report-generator` as a proven surface so deployed agents can
+  produce the sanitized report consumed by strict canary intake.
 - Updated `packages/bench/release-readiness-check.mjs` so release readiness now
   requires the audit script, evidence file, Gemini review, package script, and
   a fresh audit run.
@@ -35,7 +37,7 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 12 proven requirements
+- 13 proven requirements
 - 5 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
@@ -53,6 +55,8 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
   run.
 - Canary evidence intake can verify a metrics-only one-agent report, but the
   bundled fixture reports `countsAsRealRolloutEvidence: false`.
+- Canary report generation can produce that report from Hermes/OpenClaw traces,
+  but fixture-derived reports still fail `--strict-real`.
 - Real-container production rollout is still a canary step, not complete.
 
 ## Verification

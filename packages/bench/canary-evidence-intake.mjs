@@ -24,7 +24,7 @@ assert.doesNotMatch(raw, secretPattern, "canary report contains a key-shaped sec
 assert.doesNotMatch(raw, privatePathPattern, "canary report contains a raw local path");
 
 const report = JSON.parse(raw);
-const fixtureOnly = inputPath === fixturePath;
+const fixtureOnly = inputPath === fixturePath || report.fixtureOnly === true || report.evidenceType === "fixture-trace-derived-canary-report";
 const forbiddenKeys = findForbiddenKeys(report);
 assert.deepEqual(forbiddenKeys, [], `canary report contains forbidden raw-content keys: ${forbiddenKeys.join(", ")}`);
 
@@ -89,7 +89,7 @@ const output = {
   fleetRolloutAllowed: false,
   publicLaunchAllowed: false,
   report: {
-    path: fixtureOnly ? "packages/bench/fixtures/canary-runtime-report.fixture.json" : relative(root, inputPath).replaceAll("\\", "/"),
+    path: fixtureOnly ? "fixture-canary-report" : "external-canary-report",
     sha256: createHash("sha256").update(raw).digest("hex"),
     generatedAt: report.generatedAt ?? null,
     commit: report.commit ?? null,

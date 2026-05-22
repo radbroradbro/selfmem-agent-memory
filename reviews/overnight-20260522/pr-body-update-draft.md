@@ -96,6 +96,9 @@ Retry note:
 - A canary evidence intake is now available through `canary:intake`; it accepts
   sanitized one-agent runtime reports, rejects raw memories/transcripts/prompts,
   and keeps fixture evidence from counting as real rollout proof.
+- A canary report generator is now available through `canary:report`; it
+  converts Hermes/OpenClaw traces into the sanitized report format needed for
+  strict one-agent canary review.
 - GitHub Actions CI run `26308475033` passed on `6a33e62`, the GitHub handoff
   packet gate commit.
 - GitHub Actions CI run `26308588261` passed on `8efe4d0`, the dynamic handoff
@@ -126,6 +129,8 @@ Retry note:
 - Adds a canary evidence intake so one-agent runtime reports can be checked for
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   latency, rollback readiness, and privacy without attaching raw memory logs.
+- Adds a canary report generator so deployed agents can produce those reports
+  from local trace files without exposing raw memory text or local paths.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
 - Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and run a one-agent canary with `selfmem_update`.
 - Adds a generated GitHub handoff packet so blocked GitHub write routes have one audited source for PR body, status comment, blocker issue, labels, and manual GitHub steps.
@@ -196,7 +201,7 @@ Latest local verification includes the release handoff gate slice.
   `writesRealFiles: false`, `privateLeakCount: 0`, and `hasSecretPattern:
   false`.
 - Local goal completion audit evidence: machine-readable requirement matrix
-  with `goalComplete: false`, 12 proven requirements, 5 blocked requirements,
+  with `goalComplete: false`, 13 proven requirements, 5 blocked requirements,
   and 1 incomplete requirement.
 - Local hosted baseline preflight evidence: offline metrics-only contract,
   no hosted provider call by default, hosted write-back disabled, raw memory
@@ -205,6 +210,9 @@ Latest local verification includes the release handoff gate slice.
   coverage, hybrid search coverage, local writes, read-through mode, p50/p95
   latency, rollback readiness, zero privacy leaks, and
   `countsAsRealRolloutEvidence: false`.
+- Local canary report generator: fixture traces produce a metrics-only report,
+  normal intake accepts it as fixture evidence, and strict-real intake rejects
+  it so fixture evidence cannot satisfy real rollout.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6`, captured a 1280 by 1223 screenshot, showed Nucleus, wiki/vault
   sync, Model Matrix, Context Preview, Release Readiness, Compaction Audit,

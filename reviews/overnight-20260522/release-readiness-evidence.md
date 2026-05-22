@@ -131,6 +131,10 @@ Scope:
   sanitized one-agent runtime canary reports, rejects raw memories,
   transcripts, prompts, answers, secrets, and local paths, and keeps fixture
   reports from counting as real rollout evidence.
+- Added canary report generator coverage to the release gate. The generator
+  converts Hermes/OpenClaw traces into sanitized runtime canary reports, emits
+  no raw local paths or memory text, writes output only when requested, and
+  proves fixture-derived reports fail strict-real intake.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -202,6 +206,10 @@ What `release:check` verifies:
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   p50/p95 latency, rollback readiness, zero privacy leaks, and
   `countsAsRealRolloutEvidence: false`,
+- Canary report generator exists and a fresh fixture pass reports hashed
+  labels, lifecycle counts, hybrid-search coverage, p50/p95 recall and store
+  latency, privacy counters, rollback readiness, and strict-real fixture
+  rejection,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,

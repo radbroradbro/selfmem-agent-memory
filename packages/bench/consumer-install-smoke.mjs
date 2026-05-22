@@ -16,7 +16,12 @@ const secretPattern =
 
 const extraCurrentFiles = [
   "packages/bench/consumer-install-smoke.mjs",
+  "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
+  "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
+  "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
+  "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
+  "packages/bench/fixtures/canary-runtime-memories.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-report.fixture.json",
 ];
 const checks = [];
@@ -41,6 +46,7 @@ try {
   checks.push(run("node", ["packages/brain-ui/interaction-smoke.mjs"], "Brain UI interaction smoke"));
   checks.push(run("node", ["packages/bench/local-container-audit-smoke.mjs"], "local-container audit smoke"));
   checks.push(run("node", ["packages/bench/session-compaction-local-audit.mjs", "--strict"], "local-session compaction audit"));
+  checks.push(run("node", ["packages/bench/canary-report-from-trace.mjs", "--fixture"], "canary report generator"));
   checks.push(run("node", ["packages/bench/canary-evidence-intake.mjs"], "canary evidence intake"));
 
   const pack = run("npm", ["pack", "--dry-run", "--json", "--cache", npmCache], "npm package dry run");
@@ -56,7 +62,12 @@ try {
     "packages/core/dist/index.js",
     "packages/brain-ui/src/index.html",
     "packages/brain-ui/fixtures/model-matrix.json",
+    "packages/bench/canary-report-from-trace.mjs",
     "packages/bench/canary-evidence-intake.mjs",
+    "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
+    "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
+    "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
+    "packages/bench/fixtures/canary-runtime-memories.fixture.jsonl",
     "packages/bench/fixtures/canary-runtime-report.fixture.json",
     "plugins/selfmem-fallback/scripts/selfmem_update.py",
   ]) {

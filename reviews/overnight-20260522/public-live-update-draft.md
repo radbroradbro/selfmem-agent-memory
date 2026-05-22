@@ -31,6 +31,8 @@ The current PR adds:
   is reviewed;
 - a canary evidence intake for sanitized one-agent runtime reports, blocked
   from fleet rollout and public launch when the report is only a fixture;
+- a canary report generator that converts Hermes/OpenClaw traces into the
+  sanitized report format without raw memory text or local paths;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
@@ -89,7 +91,7 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 12 proven
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 13 proven
   requirements, 5 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with
@@ -99,6 +101,9 @@ Latest verified head before this draft refresh:
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   p50/p95 latency, rollback readiness, zero privacy leaks, and
   `countsAsRealRolloutEvidence: false`
+- Canary report generator: `canary:report -- --fixture` creates the sanitized
+  report shape from trace fixtures and proves fixture-derived reports fail
+  `--strict-real`
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

@@ -23,6 +23,8 @@ const files = {
   claudeBlocked: `${reviewDir}/claude-pr5-review-blocked.md`,
   handoffPacketEvidence: `${reviewDir}/github-handoff-packet-evidence.md`,
   handoffPacketReview: `${reviewDir}/gemini-github-handoff-packet-review.md`,
+  canaryReportGeneratorEvidence: `${reviewDir}/canary-report-generator-evidence.md`,
+  canaryReportGeneratorReview: `${reviewDir}/gemini-canary-report-generator-review.md`,
   canaryEvidenceIntakeEvidence: `${reviewDir}/canary-evidence-intake-evidence.md`,
   canaryEvidenceIntakeReview: `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
@@ -127,6 +129,11 @@ const requirements = [
     "packages/bench/canary-evidence-intake.mjs",
     files.canaryEvidenceIntakeEvidence,
     files.canaryEvidenceIntakeReview,
+  ]),
+  proven("canary-report-generator", "Hermes and OpenClaw trace logs can be converted into sanitized metrics-only canary reports without raw content", [
+    "packages/bench/canary-report-from-trace.mjs",
+    files.canaryReportGeneratorEvidence,
+    files.canaryReportGeneratorReview,
   ]),
   blocked("claude-council-review", "Claude/Opus reviewer route remains blocked by missing login", [
     files.claudeBlocked,
