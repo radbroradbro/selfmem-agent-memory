@@ -11,6 +11,8 @@ This roadmap tracks useful user-facing features without mixing them into the cur
 - Maintenance/status recall skip gate.
 - Lifecycle traces for recall, writes, compression checkpoints, provider errors, and privacy counts.
 - `selfmem_update.py` for dry-run updates and safer agent patching.
+- Fixture-safe Nucleus-to-wiki compiler and explicit disk-sync helper with
+  reviewed-page conflict protection.
 
 ## Brain UI
 
@@ -43,6 +45,9 @@ For RecallWeave, this should become an optional view layer:
 - `schema.md` or `AGENTS.md` defines citation, tagging, and lint rules.
 - Obsidian can open the folder, but Obsidian is optional.
 - The Brain UI should read the same wiki graph for users who do not want Obsidian.
+- Current sync writes compiled, lint-clean files only after an explicit apply
+  call. If a page is marked `reviewed: true`, sync writes a conflict note rather
+  than overwriting it.
 
 References for the design direction:
 

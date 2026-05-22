@@ -71,15 +71,23 @@ the page without creating a conflict note.
 
 ## Compiler
 
-The current public-safe compiler lives in `@recallweave/core`:
+The public-safe compiler and explicit sync helper live in `@recallweave/core`:
 
 ```ts
-import { compileNucleusWikiVault, lintCompiledWikiVault } from "@recallweave/core";
+import {
+  compileNucleusWikiVault,
+  lintCompiledWikiVault,
+  syncCompiledWikiVault,
+} from "@recallweave/core";
 ```
 
-`compileNucleusWikiVault(snapshot)` returns files in memory. It does not write
-to a real vault by itself. This keeps tests, screenshots, and agent handoffs
-safe until a maintainer explicitly applies an update.
+`compileNucleusWikiVault(snapshot)` returns files in memory. It still does not
+write to a real vault by itself.
+
+`syncCompiledWikiVault(vault, { rootDir })` is the explicit apply step. It writes
+only compiled, lint-clean files under the provided directory. If a markdown page
+already has `reviewed: true`, sync leaves the reviewed page in place and writes a
+sanitized conflict note under `wiki/_conflicts/`.
 
 The compiler emits:
 
@@ -94,6 +102,7 @@ Run the fixture gate with:
 
 ```bash
 pnpm wiki:smoke
+pnpm wiki:sync:smoke
 ```
 
 ## Editing Flow

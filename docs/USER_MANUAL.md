@@ -115,6 +115,19 @@ npm exec --yes pnpm@10.23.0 -- smoke:openclaw
 npm exec --yes pnpm@10.23.0 -- smoke:hermes
 ```
 
+## Wiki Vault Sync
+
+RecallWeave can compile a sanitized Nucleus snapshot into an Obsidian-style
+wiki vault and apply it to a selected folder. Disk sync is explicit. Reviewed
+markdown pages are not overwritten; a proposed update is written under
+`wiki/_conflicts/` instead.
+
+Run the fixture check before enabling any live vault flow:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- wiki:sync:smoke
+```
+
 On a live agent, inspect the runtime trace for:
 
 - `session_start`,

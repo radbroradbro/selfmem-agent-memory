@@ -15,6 +15,7 @@ The UI should expose:
 - research lineage,
 - derived docs and wiki pages,
 - compiled wiki/vault files,
+- vault disk-sync status and conflicts,
 - provenance,
 - low-noise chronological timelines.
 
@@ -67,5 +68,6 @@ Before connecting real local containers, the UI needs:
 - write confirmation for derived docs,
 - wiki lint before save,
 - Nucleus snapshot export,
+- explicit vault sync confirmation,
 - screenshot/recording safety guardrails,
 - accessibility review.

@@ -27,9 +27,11 @@
     "compaction:smoke:built": "node packages/bench/session-compaction-smoke.mjs",
     "wiki:smoke": "pnpm build && node packages/bench/wiki-vault-smoke.mjs",
     "wiki:smoke:built": "node packages/bench/wiki-vault-smoke.mjs",
+    "wiki:sync:smoke": "pnpm build && node packages/bench/wiki-vault-sync-smoke.mjs",
+    "wiki:sync:smoke:built": "node packages/bench/wiki-vault-sync-smoke.mjs",
     "update:smoke": "python3 packages/bench/update-flow-smoke.py",
     "release:check": "node packages/bench/release-readiness-check.mjs",
-    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm compaction:smoke:built && pnpm wiki:smoke:built && pnpm update:smoke"
+    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm compaction:smoke:built && pnpm wiki:smoke:built && pnpm wiki:sync:smoke:built && pnpm update:smoke"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

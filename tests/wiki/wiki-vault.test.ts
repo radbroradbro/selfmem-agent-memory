@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   compileNucleusWikiVault,
   lintCompiledWikiVault,
+  syncCompiledWikiVault,
   type NucleusIndexSnapshot,
 } from "../../packages/core/src/index.js";
 
@@ -102,5 +106,99 @@ describe("wiki vault compiler", () => {
     expect(lintCompiledWikiVault(vault).map((issue) => issue.code)).toEqual(
       expect.arrayContaining(["unsafe_path", "broken_wikilink"]),
     );
+  });
+
+  it("syncs compiled files to a vault directory without overwriting reviewed pages", async () => {
+    const snapshot: NucleusIndexSnapshot = {
+      schemaVersion: 1,
+      generatedAt: "2026-05-22T10:00:00.000Z",
+      roots: {},
+      nodes: [
+        {
+          id: "decision:reviewed-page",
+          kind: "decision",
+          title: "Reviewed Manual Page",
+          createdAt: "2026-05-22T09:00:00.000Z",
+          updatedAt: "2026-05-22T09:10:00.000Z",
+          metadata: {
+            path: "wiki/decisions/reviewed-manual-page.md",
+            body: "Generated sanitized update.\n\n```ts\nconst safe = true;\n```",
+          },
+        },
+      ],
+      edges: [],
+    };
+
+    const vault = compileNucleusWikiVault(snapshot, { includeNucleusJson: false });
+    const rootDir = await mkdtemp(join(tmpdir(), "recallweave-wiki-sync-"));
+    const reviewedPath = join(rootDir, "wiki/decisions/reviewed-manual-page.md");
+    await mkdir(join(rootDir, "wiki/decisions"), { recursive: true });
+    await writeFile(
+      reviewedPath,
+      "---\ntitle: \"Reviewed Manual Page\"\nreviewed: true\n---\n\nHuman-reviewed text stays put.\n",
+      "utf8",
+    );
+
+    const report = await syncCompiledWikiVault(vault, { rootDir });
+    const actions = new Map(report.actions.map((action) => [action.path, action]));
+
+    expect(report.ok).toBe(true);
+    expect(actions.get("wiki/index.md")?.action).toBe("write");
+    expect(actions.get("wiki/decisions/reviewed-manual-page.md")?.action).toBe("write_conflict_note");
+    await expect(readFile(reviewedPath, "utf8")).resolves.toContain("Human-reviewed text stays put.");
+
+    const conflictPath = actions.get("wiki/decisions/reviewed-manual-page.md")?.conflictPath;
+    expect(conflictPath).toMatch(/^wiki\/_conflicts\/reviewed-manual-page-/);
+    const conflictNote = await readFile(join(rootDir, conflictPath!), "utf8");
+    expect(conflictNote).toContain("Generated sanitized update.");
+    expect(conflictNote).toContain("````markdown");
+    expect(conflictNote).toContain("````");
+    expect(conflictNote).not.toContain("Human-reviewed text stays put.");
+  });
+
+  it("keeps dry-runs dry, supports skip policy, and rejects unsafe sync input", async () => {
+    const snapshot: NucleusIndexSnapshot = {
+      schemaVersion: 1,
+      generatedAt: "2026-05-22T10:00:00.000Z",
+      roots: {},
+      nodes: [
+        {
+          id: "decision:skip-page",
+          kind: "decision",
+          title: "Skip Policy Page",
+          createdAt: "2026-05-22T09:00:00.000Z",
+          updatedAt: "2026-05-22T09:10:00.000Z",
+          metadata: {
+            path: "wiki/decisions/skip-policy-page.md",
+            body: "Generated replacement.",
+          },
+        },
+      ],
+      edges: [],
+    };
+    const vault = compileNucleusWikiVault(snapshot, { includeNucleusJson: false });
+    const rootDir = await mkdtemp(join(tmpdir(), "recallweave-wiki-sync-edge-"));
+
+    const dryRun = await syncCompiledWikiVault(vault, { rootDir, dryRun: true });
+    expect(dryRun.actions.some((action) => action.action === "write")).toBe(true);
+    await expect(readFile(join(rootDir, "wiki/index.md"), "utf8")).rejects.toThrow();
+
+    await mkdir(join(rootDir, "wiki/decisions"), { recursive: true });
+    await writeFile(
+      join(rootDir, "wiki/decisions/skip-policy-page.md"),
+      "---\ntitle: \"Skip Policy Page\"\nreviewed: true\n---\n\nKeep this page.\n",
+      "utf8",
+    );
+    const skipReport = await syncCompiledWikiVault(vault, { rootDir, conflictPolicy: "skip" });
+    expect(skipReport.actions.find((action) => action.path === "wiki/decisions/skip-policy-page.md")?.action).toBe("skip_reviewed");
+    expect(skipReport.actions.some((action) => action.action === "write_conflict_note")).toBe(false);
+
+    const unsafeVault = compileNucleusWikiVault(snapshot, { includeNucleusJson: false });
+    unsafeVault.files.push({
+      path: "../escape.md",
+      kind: "wiki_page",
+      contents: "---\ntitle: \"Escape\"\n---\n\nNope.\n",
+    });
+    await expect(syncCompiledWikiVault(unsafeVault, { rootDir })).rejects.toThrow(/lint issues/);
   });
 });

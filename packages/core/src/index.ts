@@ -11,3 +11,4 @@ export * from "./hybrid/distill.js";
 export * from "./nucleus/index.js";
 export * from "./compaction/session.js";
 export * from "./wiki/compiler.js";
+export * from "./wiki/sync.js";

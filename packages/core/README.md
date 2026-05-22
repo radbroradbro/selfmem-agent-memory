@@ -9,7 +9,7 @@ Core TypeScript utilities for RecallWeave:
 - context compilation,
 - Nucleus Index contracts for the brain UI, LLM-wiki sync, lifecycle events,
   and retrieval traces,
-- fixture-safe Nucleus-to-wiki vault compilation.
+- fixture-safe Nucleus-to-wiki vault compilation and explicit disk sync.
 
 Build before publishing:
 

@@ -28,6 +28,7 @@ Use this checklist before making the repository public.
 - [ ] `pnpm smoke:openclaw`
 - [ ] `pnpm smoke:hermes`
 - [ ] `pnpm smoke`
+- [ ] `pnpm wiki:sync:smoke` if vault sync changed.
 
 ## Review
 
