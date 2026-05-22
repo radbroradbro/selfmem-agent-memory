@@ -41,6 +41,7 @@ is still required before any public live update.
 | Public live-update draft | `reviews/overnight-20260522/public-live-update-draft.md` |
 | Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
 | Public live-update copy review | `reviews/overnight-20260522/gemini-public-live-update-copy-review.md` |
+| PR body update draft | `reviews/overnight-20260522/pr-body-update-draft.md` |
 
 ## Verification Run
 

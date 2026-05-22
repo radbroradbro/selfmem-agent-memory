@@ -41,6 +41,7 @@ const requiredFiles = [
   `${reviewDir}/public-live-update-draft.md`,
   `${reviewDir}/dummy-brain-demo-storyboard.md`,
   `${reviewDir}/gemini-public-live-update-copy-review.md`,
+  `${reviewDir}/pr-body-update-draft.md`,
   `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
   `${reviewDir}/ui-evidence/brain-ui-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-fixture-edit.png`,
