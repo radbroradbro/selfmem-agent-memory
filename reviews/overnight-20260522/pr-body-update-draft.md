@@ -35,7 +35,7 @@ Latest local verification includes the Brain UI selected audit-history slice.
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
 - Local private-name scan: no hits.
-- GitHub Actions `CI / Verify`: passed on the latest pushed head inspected before this draft.
+- GitHub Actions `CI / Verify`: run #40 passed on `8617bd3`, the latest pushed head inspected before this draft.
 - Gemini focused reviews: sync report, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected audit-history, local-container audit, Nucleus snapshot, Research Lineage, and public live-update copy are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

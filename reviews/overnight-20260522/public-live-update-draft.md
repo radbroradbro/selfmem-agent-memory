@@ -60,8 +60,8 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Head: `79dbd76`
-- GitHub Actions: `Verify` passed
+- Head: `8617bd3`
+- GitHub Actions: `Verify` run #40 passed
 - Local release gate: `pnpm release:check` passed in the controller run
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
