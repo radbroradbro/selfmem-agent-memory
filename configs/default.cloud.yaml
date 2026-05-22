@@ -44,10 +44,11 @@ queryExpansion:
   enabled: false
   exposeRewriteQueryOption: true
   searchParameter: rewriteQuery
-  provider: nvidia
+  provider: none
   apiKeyEnv: NVIDIA_API_KEY
   apiKeysEnv: NVIDIA_API_KEYS
-  model: nvidia/nemotron-mini-4b-instruct
+  model: none
+  preferredSweepProvider: nvidia
   sweepConfig: configs/nvidia-nim-query-expansion.yaml
   challengerModels:
     - qwen/qwen3-next-80b-a3b-instruct
@@ -57,6 +58,16 @@ queryExpansion:
     apiKeyEnv: OPENROUTER_API_KEY
     apiKeysEnv: OPENROUTER_API_KEYS
     model: qwen/qwen3-next-80b-a3b-instruct:free
+  gemini:
+    apiKeyEnv: GEMINI_API_KEY
+    apiKeysEnv: GEMINI_API_KEYS
+    model: gemini-2.5-flash
+    role: benchmark-challenger
+  local:
+    baseUrlEnv: SELFMEM_QUERY_EXPANSION_BASE_URL
+    apiKeyEnv: SELFMEM_QUERY_EXPANSION_API_KEY
+    modelEnv: SELFMEM_QUERY_EXPANSION_MODEL
+    role: apple-silicon-smoke
   maxRewrites: 3
   latencyBudgetMs: 500
   onlySend: user_query

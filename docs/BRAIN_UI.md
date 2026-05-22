@@ -159,8 +159,9 @@ caveats. Current browser evidence records
 failed scenarios, 0 privacy leaks, exact-identifier accuracy 1, average noise
 reduction 0.307, hosted-baseline caveat visible, no-raw-text caveat visible,
 zero console errors, and no private/key-shaped visible text. This panel does
-not claim hosted Supermemory superiority; it points to the need for a fresh
-metrics-only hosted baseline.
+not claim hosted Supermemory superiority, and it is not a public GitHub
+benchmark score. A public score needs a matched, source-locked canary win with
+the same judge, settings, scoring code, privacy scan, and reviewer sign-off.
 
 The Canary Rollout panel is fixture-only and metrics-only. It summarizes the
 safe path from a green PR to one controlled agent canary without touching a

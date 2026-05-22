@@ -34,6 +34,13 @@ showing raw ids as the product language.
 Source lock is not marketing proof. It records what the product should test
 next and which claims need live reproduction before publication.
 
+Provider and benchmark decisions use the same rule. RecallWeave may document
+Voyage, Gemini, NVIDIA, Qwen3, llama.cpp, GBrain, LLM-wiki, and memory
+benchmark sources as inputs, but public score claims require a matched canary
+win. The canary must share dataset slice, queries, judge, answer model, scoring
+code, privacy rules, and reviewer sign-off with the baseline. Otherwise the
+result stays an internal gap report.
+
 ## Nucleus Nodes
 
 Research lineage uses these node kinds:

@@ -103,7 +103,10 @@ Latest local verification includes the release handoff gate slice.
   summary with 5 of 5 scenarios passed, 0 failed scenarios, 0 privacy leaks,
   exact-identifier accuracy 1, average noise reduction 0.307,
   hosted-baseline caveat, no-raw-text caveat, zero console errors, and no
-  private/key-shaped visible text.
+  private/key-shaped visible text. These fixture metrics are not a public
+  benchmark score; public score claims require a matched source-locked canary
+  win with the same judge, settings, scoring code, privacy scan, and reviewer
+  sign-off.
 - Local Canary Rollout evidence: fixture one-agent rollout path with dry-run,
   apply, observe, rollback, 11 metrics to collect, public launch still `FAIL`,
   owner approval required, zero console errors, and no private/key-shaped

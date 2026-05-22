@@ -94,7 +94,9 @@ Latest verified head before this draft refresh:
   summary with 5 of 5 scenarios passed, 0 failed scenarios, 0 privacy leaks,
   exact-identifier accuracy 1, average noise reduction 0.307,
   hosted-baseline caveat, no-raw-text caveat, zero console errors, and no
-  private/key-shaped visible text
+  private/key-shaped visible text. This is not a public benchmark score; public
+  score claims require a matched source-locked canary win with the same judge,
+  settings, scoring code, privacy scan, and reviewer sign-off
 - Canary Rollout evidence: fixture one-agent rollout dashboard with dry-run,
   apply, observe, and rollback steps, 11 metrics to collect, public launch
   still `FAIL`, owner approval required, zero console errors, and no

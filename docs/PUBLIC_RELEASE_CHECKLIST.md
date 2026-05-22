@@ -9,7 +9,9 @@ Use this checklist before making the repository public.
 - [ ] README names RecallWeave and explains the legacy `selfmem_canary` id.
 - [ ] Docs do not expose private agent names, raw memories, raw diagnostics, or
   credentials.
-- [ ] Benchmark notes are metrics-only and include claim boundaries.
+- [ ] Benchmark notes are metrics-only and say public scores require a matched
+  source-locked canary win, same judge/settings, zero privacy failures, and
+  reviewer sign-off.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.
 
 ## Scans

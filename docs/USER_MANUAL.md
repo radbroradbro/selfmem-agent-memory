@@ -65,6 +65,28 @@ local writes only
 Multiple Voyage keys may be configured locally for rate-limit rotation. Rotation
 is a runtime credential setting, not repository data.
 
+The intended local mode for 24GB-class Apple Silicon machines is:
+
+```text
+Qwen3 Embedding 0.6B through llama.cpp/Metal
+Qwen3 Reranker 0.6B through a local rerank sidecar
+local writes only
+lexical recall as no-credential fallback
+```
+
+Gemini Embedding 2 and NVIDIA hosted retrieval models are benchmark arms, not
+silent fallbacks. Enable them only through local environment variables and only
+compare them with separate indexes or a fresh rebuild.
+
+Query expansion is disabled by default. It should be enabled only after a
+controlled canary proves that the rewrite improves answer quality without
+leaking private text, damaging exact identifiers, or adding unacceptable
+latency.
+
+For local model tests, close or stop old RecallWeave-owned model servers before
+measuring latency. Do not kill unrelated user model servers. If process
+ownership is unclear, treat the benchmark as blocked and clean it up manually.
+
 ## Supermemory Read-Through
 
 When configured, search merges:
@@ -95,7 +117,7 @@ before copying files. If an agent needs credentials installed, pass a local path
 that already exists on that machine:
 
 ```bash
-selfmem_update --host hermes --keys-file ~/private/recallweave/keys.env --apply
+selfmem_update --host hermes --keys-file <local-keys-file> --apply
 ```
 
 The repository never ships a bundled key file.

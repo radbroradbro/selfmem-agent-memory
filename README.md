@@ -29,7 +29,9 @@ RecallWeave is public alpha software.
   setup scripts and installed agents.
 - Current cloud-quality path: Voyage embeddings plus Voyage rerank when local
   credentials are configured.
-- Current fallback path: local lexical recall and metadata scoring.
+- Current local path: Apple Silicon-friendly Qwen3 0.6B embedding and rerank
+  arms through llama.cpp or a local OpenAI-compatible sidecar, with lexical
+  recall as the no-credential fallback.
 - Current hosted bridge: read-only Supermemory search and export-cache search.
 
 `selfmem_canary` is a legacy compatibility id, not the product name. New docs,
@@ -37,8 +39,9 @@ UI surfaces, and operator instructions should call the system RecallWeave and
 reserve "canary" for a limited one-agent rollout test.
 
 Do not treat this release as a proven Supermemory replacement. The included
-benchmark notes are metrics-only engineering evidence. A fresh public benchmark
-must run before making quality claims.
+benchmark notes are metrics-only engineering evidence. A public score requires
+a matched, source-locked canary win with the same judge, answer model, queries,
+scoring code, privacy rules, and reviewer sign-off.
 
 ## Features
 
@@ -142,8 +145,12 @@ Runtime keys can enable:
 
 - Voyage `voyage-4-large` embeddings.
 - Voyage `rerank-2.5` reranking.
+- Gemini embedding benchmark arms.
+- NVIDIA hosted embedding, rerank, or query-expansion benchmark arms.
+- Local Apple Silicon embedding and rerank services.
 - Supermemory read-only history search.
-- Optional query expansion through a configured provider.
+- Optional query expansion through a configured provider, disabled by default
+  until a controlled canary proves it helps.
 
 The repository never ships bundled keys.
 
@@ -196,6 +203,8 @@ auth state, browser state, or provider keys.
 - [Security model](docs/SECURITY_MODEL.md)
 - [Production readiness](docs/PRODUCTION_READINESS.md)
 - [Benchmark summary](docs/BENCHMARK_SUMMARY.md)
+- [Autoresearch benchmark plan](docs/AUTORESEARCH_BENCHMARK_PLAN.md)
+- [Model matrix](docs/MODEL_MATRIX.md)
 - [Product roadmap](docs/PRODUCT_ROADMAP.md)
 - [Public release checklist](docs/PUBLIC_RELEASE_CHECKLIST.md)
 

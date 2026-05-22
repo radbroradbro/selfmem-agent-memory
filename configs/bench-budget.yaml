@@ -3,6 +3,8 @@ defaultPolicy:
   requireSameJudgeAndDatasetForComparisons: true
   requireFreshIsolatedContainers: true
   requireExplicitUserConfirmationForFullExternalBench: true
+  requireCleanLocalModelRuntimeForLatency: true
+  stopOnProviderRateLimitInsteadOfSwitchingArms: true
 
 phases:
   controlledPluginP2P:
@@ -49,6 +51,17 @@ providerCallPolicy:
       maxPaidCostUsd: 0
       doNotBypassProviderRateLimitsOrTerms: true
       stopOnRateLimitInsteadOfCircumventing: true
+  selfmemLocal:
+    defaultArm: "local-apple-qwen3-0_6b"
+    targetHardware: "Apple Silicon 24GB unified memory"
+    requireSourceLockedModelArtifacts: true
+    preferHuggingFaceOrOfficialModelCards: true
+    staleProcessPolicy: "Stop only RecallWeave-owned model processes; block when ownership is unclear."
+    quantizationPolicy: "No experimental quantization in the default lane; test quantization as a labeled canary arm only."
   queryExpansion:
-    defaultModel: "nvidia/nemotron-mini-4b-instruct"
+    defaultModel: "none"
     disabledUnlessRewriteQueryParityIsUnderTest: true
+    enableOnlyAfterMatchedCanaryWin: true
+    requireReviewerSignoff: true
+    sendOnlyCurrentQuery: true
+    preferFreeTierOrApprovedBudget: true

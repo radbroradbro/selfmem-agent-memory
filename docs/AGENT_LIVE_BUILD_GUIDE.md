@@ -140,3 +140,16 @@ They need:
 - latency and cost notes,
 - redaction failure count,
 - no raw memory in reports.
+
+The preferred local experiment for Apple Silicon users is the small
+llama.cpp/Metal lane first: Qwen3 Embedding 0.6B plus Qwen3 Reranker 0.6B.
+Qwen3 4B and 8B arms are quality challengers, not defaults for 24GB machines.
+
+Gemini, NVIDIA hosted retrieval models, and query expansion providers must be
+configured by local environment variables only. Do not paste provider keys into
+PRs, docs, traces, screenshots, or diagnostics.
+
+Do not publish benchmark scores from a patch unless RecallWeave beats the
+matched baseline on a source-locked canary with the same dataset slice, memory
+set, queries, judge, answer model, scoring code, settings, privacy scan, and
+reviewer sign-off.

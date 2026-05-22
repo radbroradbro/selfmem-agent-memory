@@ -4,7 +4,7 @@ This repository includes metrics-only benchmark notes. It does not include agent
 
 ## Current Claim Boundary
 
-RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts and must rerun formal benchmarks before making quality claims.
+RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. Quality claims require a matched, source-locked canary win before any public score, then a fuller benchmark before broad superiority language.
 
 ## Historical Controlled Local Baseline
 
@@ -47,13 +47,36 @@ Interpretation: retrieval can be strong while answer synthesis remains weak. The
 
 A stronger claim requires:
 
+- a source-locked canary from a real benchmark or documented benchmark slice,
+- a RecallWeave win against the matched baseline,
 - the same memory set,
 - the same queries,
 - the same judge and answer model,
 - the same scoring code,
+- the same settings,
+- two independent reviewer approvals,
 - no memory text in shared reports,
 - zero redaction failures,
 - cost and latency accounting,
 - a valid Supermemory baseline that is not quota-blocked.
 
 Until then, RecallWeave should be described as a local-first fallback and experimental native memory lane, not as a proven replacement.
+
+## Next Canary Matrix
+
+The next public-safe benchmark gate will test separated provider arms:
+
+- `cloud-voyage4-voyage` for the first cloud quality proof.
+- `cloud-gemini2-cohere4pro` for multimodal and dimension tests.
+- `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
+  `cloud-nvidia-nemotron-vl-1b`, and `cloud-nvidia-e5-mistral` for hosted
+  NVIDIA retrieval comparisons.
+- `local-apple-qwen3-0_6b` for the default Apple Silicon lane.
+
+Query expansion stays off unless it enters as one isolated methodology change
+and beats the no-expansion run without exact-identifier, privacy, or latency
+regressions.
+
+Public GitHub benchmark scores are allowed only after a real matched canary win
+with two independent reviewer approvals. A canary win may justify a full
+benchmark; it does not prove general SOTA superiority.

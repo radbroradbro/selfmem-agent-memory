@@ -103,6 +103,12 @@ Cloud Voyage remains the current default cloud-quality arm. Future self-hosted m
 
 Self-hosted models should be benchmark arms, not silent fallbacks. Changing embedding models changes the vector space, so the index must be rebuilt or kept separate.
 
+For Apple Silicon, the first recommended local arm is small and practical:
+Qwen3 Embedding 0.6B through llama.cpp/Metal plus Qwen3 Reranker 0.6B through a
+local rerank sidecar. Qwen3 4B and 8B arms should remain optional quality
+challengers until latency, memory pressure, and recall gains are measured on
+24GB-class Macs.
+
 ## Lifecycle Policy Controls
 
 Goal: make memory behavior editable by users instead of buried in code.

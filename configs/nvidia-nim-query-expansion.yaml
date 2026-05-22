@@ -1,8 +1,19 @@
 source:
-  hostedApiReference: https://docs.api.nvidia.com/nim/reference/qwen-qwen3-next-80b-a3b-instruct
-  supportedModelsTable: https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html
+  hostedLlmsReference: https://docs.api.nvidia.com/nim/reference/llm-apis
+  hostedRetrievalReference: https://docs.api.nvidia.com/nim/reference/retrieval-apis
+  hostedEmbeddingsReference: https://docs.api.nvidia.com/nim/reference/nvidia-nv-embedqa-e5-v5-infer
+  hostedRerankerReference: https://docs.api.nvidia.com/nim/reference/nvidia-llama-3_2-nemoretriever-500m-rerank-v2
+  buildCatalogObserved:
+    - llama-nemotron-embed-1b-v2
+    - llama-nemotron-rerank-1b-v2
+    - llama-nemotron-embed-vl-1b-v2
+    - llama-nemotron-rerank-vl-1b-v2
+    - nv-embedcode-7b-v1
+    - nv-embed-v1
+    - nv-embedqa-e5-v5
+    - rerank-qa-mistral-4b
 
-purpose: "Find the best NVIDIA NIM model for Supermemory-style rewriteQuery expansion before choosing a default."
+purpose: "Find the best NVIDIA NIM model for Supermemory-style rewriteQuery expansion before any canary-approved default exists."
 
 liveSweep:
   enabledEnv: SELFMEM_NVIDIA_SWEEP_LIVE
@@ -24,11 +35,12 @@ queryExpansion:
   temperature: 0.1
   maxTokens: 120
   preserveExactIdentifiers: true
-  defaultAfterFirstLiveSweep: nvidia/nemotron-mini-4b-instruct
+  noDefaultUntilCanaryWin: true
   challengers:
     - meta/llama-3.2-3b-instruct
     - mistralai/mistral-nemotron
     - nvidia/llama-3.1-nemotron-nano-8b-v1
+    - nvidia/nemotron-mini-4b-instruct
     - qwen/qwen3-next-80b-a3b-instruct
   chooseWinnerBy:
     - successful_response_rate
@@ -36,6 +48,39 @@ queryExpansion:
     - valid_rewrite_rate
     - latency_p50
     - latency_p95
+
+retrievalChallengers:
+  embedRerankPairs:
+    - id: nvidia-retriever-500m
+      embedModel: nvidia/llama-nemotron-embed-1b-v2
+      rerankModel: nvidia/llama-3.2-nemoretriever-500m-rerank-v2
+      reason: "Latency-oriented hosted NVIDIA retrieval path."
+    - id: nvidia-nemotron-1b
+      embedModel: nvidia/llama-nemotron-embed-1b-v2
+      rerankModel: nvidia/llama-nemotron-rerank-1b-v2
+      reason: "Current NVIDIA text retrieval pair observed in the Build catalog."
+    - id: nvidia-nemotron-vl-1b
+      embedModel: nvidia/llama-nemotron-embed-vl-1b-v2
+      rerankModel: nvidia/llama-nemotron-rerank-vl-1b-v2
+      reason: "NVIDIA multimodal retrieval challenger for document/image-heavy memory."
+    - id: nvidia-e5-mistral
+      embedModel: nvidia/nv-embedqa-e5-v5
+      rerankModel: nvidia/nv-rerankqa-mistral-4b-v3
+      reason: "QA-oriented hosted NVIDIA quality path."
+    - id: nvidia-code
+      embedModel: nvidia/nv-embedcode-7b-v1
+      rerankModel: nvidia/llama-nemotron-rerank-1b-v2
+      reason: "Code-memory challenger. Use only on code-heavy benchmark slices."
+  compareAgainst:
+    - cloud-voyage4-voyage
+    - cloud-gemini2-cohere4pro
+    - local-apple-qwen3-0_6b
+  publishOnlyIf:
+    - matched_dataset
+    - matched_queries
+    - matched_judge_and_answer_model
+    - zero_redaction_failures
+    - recallweave_beats_matched_baseline
 
 excludeByDefault:
   - safety
@@ -50,4 +95,5 @@ notes:
   - "Run with SELFMEM_NVIDIA_SWEEP_ALL=1 to include specialized models too."
   - "The sweep uses synthetic benchmark queries only."
   - "Do not switch the default by model release date alone."
+  - "Do not enable query expansion by default until a matched canary beats no-expansion with reviewer sign-off."
   - "Use SELFMEM_NVIDIA_SWEEP_LIMIT for a quick smoke before the full live sweep."
