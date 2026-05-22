@@ -23,6 +23,7 @@ const state = {
   localAudit: null,
   selectedAudit: null,
   selectedAuditHistory: readSelectedAuditHistory(),
+  selectedSync: null,
 };
 
 const positions = {
@@ -56,6 +57,12 @@ const vaultStatus = document.querySelector("#vaultStatus");
 const vaultPreview = document.querySelector("#vaultPreview");
 const syncSummary = document.querySelector("#syncSummary");
 const syncActions = document.querySelector("#syncActions");
+const selectedSyncForm = document.querySelector("#selectedSyncForm");
+const selectedSyncPath = document.querySelector("#selectedSyncPath");
+const selectedSyncConfirm = document.querySelector("#selectedSyncConfirm");
+const selectedSyncStatus = document.querySelector("#selectedSyncStatus");
+const selectedSyncSummary = document.querySelector("#selectedSyncSummary");
+const selectedSyncActions = document.querySelector("#selectedSyncActions");
 const localAuditSummary = document.querySelector("#localAuditSummary");
 const localAuditFiles = document.querySelector("#localAuditFiles");
 const localAuditReasons = document.querySelector("#localAuditReasons");
@@ -129,6 +136,28 @@ vaultFileSelect.addEventListener("change", (event) => {
   renderVaultPreview();
 });
 
+selectedSyncForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.selectedSync = { ok: false, code: "loading", message: "Previewing selected local vault sync." };
+  renderSelectedSync();
+  try {
+    const response = await fetch("/wiki/sync/dry-run", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: selectedSyncPath.value,
+        confirmReadOnly: selectedSyncConfirm.checked,
+      }),
+    });
+    state.selectedSync = await response.json();
+  } catch (error) {
+    state.selectedSync = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    selectedSyncPath.value = "";
+    renderSelectedSync();
+  }
+});
+
 selectedAuditForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   state.selectedAudit = { ok: false, code: "loading", message: "Checking selected local container." };
@@ -168,6 +197,7 @@ function render() {
   renderResearchLineage();
   renderVaultControls(selected);
   renderSyncReport();
+  renderSelectedSync();
   renderLocalAudit();
   renderSelectedAudit();
   renderSelectedAuditHistory();
@@ -405,6 +435,47 @@ function renderSyncReport() {
       item.append(conflict);
     }
     syncActions.append(item);
+  }
+}
+
+function renderSelectedSync() {
+  selectedSyncSummary.replaceChildren();
+  selectedSyncActions.replaceChildren();
+  const payload = state.selectedSync;
+  if (!payload) {
+    selectedSyncStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    selectedSyncStatus.textContent = payload.message ?? payload.code ?? "Selected vault sync unavailable.";
+    return;
+  }
+
+  const summary = payload.report?.summary ?? {};
+  selectedSyncStatus.textContent = `${payload.selection.rootDisplay} previewed read-only.`;
+  selectedSyncSummary.replaceChildren(
+    stat("Dry run", payload.report?.dryRun ? "yes" : "no"),
+    stat("Writes", summary.write ?? 0),
+    stat("Conflicts", summary.write_conflict_note ?? 0),
+    stat("Unchanged", summary.skip_unchanged ?? 0),
+  );
+
+  const actions = [...(payload.report?.actions ?? [])].sort((a, b) => actionRank(a.action) - actionRank(b.action)).slice(0, 8);
+  for (const action of actions) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const path = document.createElement("span");
+    item.dataset.action = action.action;
+    label.textContent = action.action.replaceAll("_", " ");
+    path.textContent = action.path;
+    item.append(label, path);
+    if (action.conflictPath) {
+      const conflict = document.createElement("small");
+      conflict.textContent = action.conflictPath;
+      item.append(conflict);
+    }
+    selectedSyncActions.append(item);
   }
 }
 

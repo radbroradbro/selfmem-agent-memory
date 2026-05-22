@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -18,10 +18,17 @@ import { createBrainUiServer } from "./server.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
+const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
 const server = createBrainUiServer({ enableLocalAudit: true });
 
 await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
 await writeFile(join(selectedRoot, "trace.jsonl"), "{\"event\":\"search\",\"count\":3}\n", "utf8");
+await mkdir(join(selectedSyncRoot, "wiki/pages"), { recursive: true });
+await writeFile(
+  join(selectedSyncRoot, "wiki/pages/recallweave-index-90439aeb.md"),
+  "---\ntitle: \"RecallWeave Index\"\nreviewed: true\n---\n\nHuman-reviewed local vault page remains untouched.\n",
+  "utf8",
+);
 
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 
@@ -106,6 +113,31 @@ try {
   assert.equal(syncReport.report.dryRun, true);
   assert.ok(syncReport.report.summary.write_conflict_note >= 1);
   assert.ok(syncReport.report.actions.some((action) => action.action === "write_conflict_note" && action.conflictPath));
+  const missingSyncConfirmation = await postJson(`${base}/wiki/sync/dry-run`, {
+    rootDir: selectedSyncRoot,
+    confirmReadOnly: false,
+  });
+  assert.equal(missingSyncConfirmation.ok, false);
+  assert.equal(missingSyncConfirmation.code, "read_only_confirmation_required");
+  const selectedSync = await postJson(`${base}/wiki/sync/dry-run`, {
+    rootDir: selectedSyncRoot,
+    confirmReadOnly: true,
+  });
+  assert.equal(selectedSync.ok, true);
+  assert.equal(selectedSync.mode, "selected-wiki-sync-dry-run");
+  assert.equal(selectedSync.writesRealFiles, false);
+  assert.equal(selectedSync.report.dryRun, true);
+  assert.equal(selectedSync.selection.rootPathRedacted, true);
+  assert.match(selectedSync.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedSync.selection.rootDisplay.includes(selectedSyncRoot), false);
+  assert.equal(selectedSync.report.rootDir.includes(selectedSyncRoot), false);
+  assert.ok(selectedSync.report.summary.write > 0);
+  assert.ok(selectedSync.report.summary.write_conflict_note >= 1);
+  const selectedSyncConflict = selectedSync.report.actions.find((action) => action.action === "write_conflict_note" && action.conflictPath);
+  assert.ok(selectedSyncConflict);
+  assert.equal(selectedSync.auditTrail.event, "wiki_vault_sync_dry_run");
+  assert.equal(selectedSync.auditTrail.writesRealFiles, false);
+  await assert.rejects(readFile(join(selectedSyncRoot, selectedSyncConflict.conflictPath), "utf8"));
   assert.equal(localAudit.ok, true);
   assert.equal(localAudit.report.mode, "local-container-audit");
   assert.equal(localAudit.report.writesRealFiles, false);
@@ -165,6 +197,8 @@ try {
     lineage,
     vault,
     syncReport,
+    missingSyncConfirmation,
+    selectedSync,
     localAudit,
     missingConfirmation,
     selectedAudit,
@@ -172,6 +206,7 @@ try {
   });
   assert.equal(containsPrivateLikeText(serialized), false, "serialized interaction outputs must stay public-safe");
   assert.equal(serialized.includes(selectedRoot), false, "selected local root path must stay redacted");
+  assert.equal(serialized.includes(selectedSyncRoot), false, "selected wiki sync root path must stay redacted");
   assert.equal(serialized.includes("/Users/private/profile"), false, "dirty prior history paths must be collapsed");
 
   console.log(
@@ -189,6 +224,7 @@ try {
           "research-lineage",
           "vault-path",
           "sync-report",
+          "selected-wiki-sync-dry-run",
           "local-container-audit",
           "selected-local-audit",
           "selected-audit-history",
@@ -202,6 +238,7 @@ try {
 } finally {
   await new Promise((resolve) => server.close(resolve));
   await rm(selectedRoot, { recursive: true, force: true });
+  await rm(selectedSyncRoot, { recursive: true, force: true });
 }
 
 async function json(url) {

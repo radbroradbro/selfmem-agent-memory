@@ -28,6 +28,7 @@ try {
   assert.match(index, /Research Lineage/);
   assert.match(index, /Wiki Vault Preview/);
   assert.match(index, /Vault Sync Report/);
+  assert.match(index, /Selected local vault sync dry run/);
   assert.match(index, /Local Audit Preflight/);
   assert.match(index, /Selected local container audit/);
   assert.match(index, /Draft Export/);
@@ -37,6 +38,7 @@ try {
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /renderVaultPreview/);
   assert.match(app, /renderSyncReport/);
+  assert.match(app, /renderSelectedSync/);
   assert.match(app, /renderLocalAudit/);
   assert.match(app, /renderSelectedAudit/);
   assert.match(app, /renderSelectedAuditHistory/);
@@ -52,6 +54,7 @@ try {
   assert.match(styles, /research-lineage/);
   assert.match(styles, /vault-preview/);
   assert.match(styles, /sync-summary/);
+  assert.match(styles, /selected-sync/);
   assert.match(styles, /audit-summary/);
   assert.match(styles, /selected-audit/);
   assert.match(styles, /audit-history/);
@@ -88,8 +91,15 @@ try {
   assert.equal(disabledLocalAudit.status, 403);
   assert.equal(disabledLocalAudit.body.ok, false);
   assert.equal(disabledLocalAudit.body.code, "local_audit_disabled");
+  const disabledSelectedSync = await postJson(`${base}/wiki/sync/dry-run`, {
+    rootDir: "/tmp/recallweave-disabled-sync-fixture",
+    confirmReadOnly: true,
+  });
+  assert.equal(disabledSelectedSync.status, 403);
+  assert.equal(disabledSelectedSync.body.ok, false);
+  assert.equal(disabledSelectedSync.body.code, "local_sync_disabled");
 
-  const serialized = JSON.stringify({ fixture, vault, syncReport, localAudit, disabledLocalAudit });
+  const serialized = JSON.stringify({ fixture, vault, syncReport, localAudit, disabledLocalAudit, disabledSelectedSync });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
     JSON.stringify(
@@ -103,6 +113,7 @@ try {
           "fixture",
           "wiki-vault",
           "wiki-sync-report",
+          "selected-wiki-sync-disabled",
           "local-container-audit",
           "selected-local-audit-disabled",
           "healthz",

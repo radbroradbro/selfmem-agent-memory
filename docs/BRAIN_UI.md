@@ -63,7 +63,8 @@ Required visual review path:
 11. research lineage preview,
 12. compiled wiki/vault preview,
 13. fixture vault sync report with conflict handling,
-14. fixture local-container audit preflight.
+14. selected local vault sync dry-run,
+15. fixture local-container audit preflight.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -94,6 +95,13 @@ summary. The browser also keeps a bounded content-free selected-audit history
 in `localStorage`. It still writes no agent files and never returns raw memory
 text.
 
+Selected local vault sync dry-run is also disabled unless
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` is set. When enabled, it requires
+read-only confirmation, clears the typed path after submit, runs
+`syncCompiledWikiVault()` in dry-run mode, and returns only a redacted
+`.../container` label plus relative action counts and conflicts. It writes no
+wiki files.
+
 ## Production Path
 
 Before connecting real local containers, the UI needs:
@@ -105,7 +113,7 @@ Before connecting real local containers, the UI needs:
 - write confirmation for derived docs,
 - wiki lint before save,
 - Nucleus snapshot export against a selected redacted local container,
-- explicit vault sync confirmation,
+- explicit vault sync apply confirmation,
 - screenshot/recording safety guardrails,
 - accessibility review.
 

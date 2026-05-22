@@ -46,6 +46,10 @@
   `brain-ui-selected-audit-history-dom-evidence.json`.
 - Chrome DevTools captured the selected audit history panel in
   `brain-ui-selected-audit-history.png`.
+- Chrome DevTools captured selected local vault sync dry-run DOM evidence in
+  `brain-ui-selected-sync-dry-run-dom-evidence.json`.
+- Chrome DevTools captured the selected local vault sync dry-run panel in
+  `brain-ui-selected-sync-dry-run.png`.
 
 Early Chrome DevTools MCP capture was unavailable because no debug Chrome was
 listening on port `9222`. The Container Health capture used a temporary

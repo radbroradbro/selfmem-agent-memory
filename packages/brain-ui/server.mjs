@@ -83,6 +83,29 @@ export function createBrainUiServer(options = {}) {
         return;
       }
 
+      if (path === "__wiki_sync_dry_run") {
+        if (!enableLocalAudit) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "local_sync_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1 to preview selected local vault sync.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await dryRunSelectedWikiSync(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -104,6 +127,7 @@ function routePath(pathname) {
   if (pathname === "/fixtures/wiki-sync-report.json") return "__wiki_sync_report_fixture";
   if (pathname === "/fixtures/local-container-audit.json") return "__local_container_audit_fixture";
   if (pathname === "/local-container/audit") return "__local_container_audit";
+  if (pathname === "/wiki/sync/dry-run") return "__wiki_sync_dry_run";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -195,6 +219,51 @@ async function auditSelectedLocalContainer(request) {
       writesRealFiles: false,
     },
     report,
+  };
+}
+
+async function dryRunSelectedWikiSync(request) {
+  const body = await readJsonBody(request, 20_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+
+  if (body.confirmReadOnly !== true) {
+    return {
+      ok: false,
+      code: "read_only_confirmation_required",
+      message: "Confirm read-only dry run before inspecting a selected local vault.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local vault directory first." };
+  }
+
+  const fixture = JSON.parse(await readFile(join(root, "fixtures/nucleus.fixture.json"), "utf8"));
+  const vault = compileNucleusWikiVault(fixture);
+  const report = await syncCompiledWikiVault(vault, { rootDir, dryRun: true });
+  const summary = summarizeSyncActions(report.actions);
+
+  return {
+    ok: true,
+    mode: "selected-wiki-sync-dry-run",
+    writesRealFiles: false,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+    },
+    auditTrail: {
+      event: "wiki_vault_sync_dry_run",
+      writesRealFiles: false,
+      actionCount: report.actions.length,
+      summary,
+    },
+    report: {
+      ok: report.ok,
+      dryRun: true,
+      rootDir: redactPathForDisplay(rootDir),
+      summary,
+      actions: report.actions,
+    },
   };
 }
 

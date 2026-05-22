@@ -673,7 +673,8 @@ button.active {
   font-size: 11px;
 }
 
-.selected-audit {
+.selected-audit,
+.selected-sync {
   display: grid;
   gap: 9px;
   margin-top: 14px;
@@ -681,14 +682,16 @@ button.active {
   border-top: 1px solid var(--line);
 }
 
-.selected-audit label:not(.check-row) {
+.selected-audit label:not(.check-row),
+.selected-sync label:not(.check-row) {
   display: grid;
   gap: 6px;
   color: var(--muted);
   font-size: 12px;
 }
 
-.selected-audit input[type="password"] {
+.selected-audit input[type="password"],
+.selected-sync input[type="password"] {
   width: 100%;
   min-height: 38px;
   border: 1px solid var(--line);
@@ -706,7 +709,8 @@ button.active {
   font-size: 12px;
 }
 
-#selectedAuditStatus {
+#selectedAuditStatus,
+#selectedSyncStatus {
   min-height: 18px;
   margin: 0;
   color: var(--green);

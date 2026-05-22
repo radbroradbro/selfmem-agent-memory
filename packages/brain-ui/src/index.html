@@ -103,6 +103,20 @@
           <h3>Vault Sync Report</h3>
           <div id="syncSummary" class="sync-summary" aria-label="Fixture vault sync summary"></div>
           <ol id="syncActions" class="sync-actions" aria-label="Fixture vault sync actions"></ol>
+          <form id="selectedSyncForm" class="selected-sync" aria-label="Selected local vault sync dry run">
+            <label>
+              <span>Local vault path</span>
+              <input id="selectedSyncPath" type="password" autocomplete="off" aria-label="Selected local vault path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedSyncConfirm" type="checkbox" />
+              <span>Read-only dry run</span>
+            </label>
+            <button id="runSelectedSync" type="submit">Preview sync</button>
+            <p id="selectedSyncStatus" role="status"></p>
+            <div id="selectedSyncSummary" class="sync-summary" aria-label="Selected local vault sync dry-run summary"></div>
+            <ol id="selectedSyncActions" class="sync-actions" aria-label="Selected local vault sync dry-run actions"></ol>
+          </form>
         </section>
         <section>
           <h3>Local Audit Preflight</h3>
