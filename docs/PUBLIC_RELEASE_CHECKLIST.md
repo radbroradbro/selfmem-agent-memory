@@ -19,6 +19,7 @@ Use this checklist before making the repository public.
   diagnostics files.
 - [ ] `git diff --check` is clean.
 - [ ] Remote URL does not contain a token.
+- [ ] `pnpm release:check` passes.
 
 ## Tests
 
@@ -26,6 +27,7 @@ Use this checklist before making the repository public.
 - [ ] `pnpm typecheck`
 - [ ] `pnpm smoke:openclaw`
 - [ ] `pnpm smoke:hermes`
+- [ ] `pnpm smoke`
 
 ## Review
 

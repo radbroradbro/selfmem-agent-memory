@@ -39,6 +39,18 @@ Before a public live update or release note:
   and zero privacy leaks,
 - reviewer packet records which council routes actually ran.
 
+Run the repeatable gate:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- release:check
+```
+
+This gate verifies required evidence artifacts, a fresh Brain UI smoke, public
+scans, forbidden runtime file absence, remote URL safety, package dry-run, and
+DOM evidence sanity. It does not replace `pnpm smoke`; run both for release
+review. By default it checks the newest directory under `reviews/`; set
+`RECALLWEAVE_REVIEW_DIR=reviews/<dir>` to pin a specific review packet.
+
 ## UI Evidence
 
 The brain UI is not ready unless a reviewer can inspect a sanitized flow:

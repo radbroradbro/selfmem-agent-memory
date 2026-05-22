@@ -1,0 +1,78 @@
+# Release Readiness Evidence
+
+Date: 2026-05-22
+
+Scope:
+
+- Added a repeatable `pnpm release:check` gate.
+- Added CI coverage for full smoke and release readiness.
+- Updated the PR template so future live-build changes include full smoke,
+  release readiness, and UI evidence when relevant.
+- Made the review evidence directory dynamic, with `RECALLWEAVE_REVIEW_DIR`
+  available for pinned review packets.
+- Reduced aggregate smoke churn by using one build before built-artifact smoke
+  commands.
+- Kept the gate public-safe and evidence-based.
+
+What `release:check` verifies:
+
+- required docs and review evidence files exist and are non-empty,
+- the release readiness evidence file itself exists,
+- package scripts for build, tests, smokes, and release check exist,
+- Brain UI vault preview DOM evidence is sane,
+- a fresh Brain UI smoke passes against the current source,
+- `git diff --check` passes,
+- remote URL has no embedded token,
+- `npm pack --dry-run` passes for `packages/core`,
+- forbidden runtime files are absent, including common local auth/config/log
+  artifacts,
+- secret-pattern scan has zero hits across the public tree.
+
+Boundary:
+
+- The gate does not read real agent homes, raw memory logs, databases, or
+  private diagnostics.
+- It uses URL-to-path conversion so the checker can run from repos whose parent
+  path contains spaces.
+- It checks the latest review directory by default and can be pinned with
+  `RECALLWEAVE_REVIEW_DIR`.
+- It does not replace `pnpm smoke`; release review should run both.
+
+Verification:
+
+- `pnpm release:check`: passed.
+- `pnpm smoke`: passed.
+- `pnpm test`: 14 tests passed.
+- `git diff --check`: covered by `release:check`.
+- Fresh Brain UI smoke: covered by `release:check`.
+- Core package dry-run: covered by `release:check`.
+- Broadened secret-pattern scan: covered by `release:check`.
+- Broadened forbidden runtime file scan: covered by `release:check`.
+- Remote URL token check: covered by `release:check`.
+
+Cold review response:
+
+- First Gemini pass returned concerns about stale evidence, narrow secret
+  scanning, runtime artifact gaps, and indirect UI privacy evidence.
+- Second Gemini pass returned concerns about hardcoded review paths, redundant
+  CI build/smoke cycles, and package dry-run visibility.
+- Changes after review: dynamic review directory resolution, broader secret and
+  forbidden-artifact patterns, fresh Brain UI smoke inside `release:check`, and
+  aggregate smoke scripts that build once.
+- Changes after final review: CI now runs `pnpm test`, `pnpm smoke`, and
+  `pnpm release:check` instead of repeating build/typecheck/adapter smoke as
+  separate steps; the public scanner includes shell, example, SQL, and TOML
+  files; the PR checklist no longer asks for core package dry-run separately
+  because release readiness already covers it.
+- Accepted residual note: `release:check` records every check result before
+  exiting, so the core package dry-run is still reported even if another check
+  fails.
+- Accepted residual note: recorded DOM screenshots remain evidence artifacts,
+  while `release:check` performs a fresh Brain UI smoke against current source
+  to catch obvious runtime drift.
+
+Known limits:
+
+- Private-name scans remain an operator-side release step because putting
+  private names in public source would itself leak them.
+- GitHub Actions status still needs to be inspected after the branch pushes.
