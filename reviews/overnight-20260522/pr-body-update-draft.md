@@ -77,6 +77,15 @@ Retry note:
   CI run `26300868065` still returned the same 403.
 - A top-level PR review comment retry after docs/blocker refresh commit
   `8927df0` and CI run `26301206074` still returned the same 403.
+- It was refreshed again after current-head live browser evidence passed
+  GitHub Actions CI run `26307824017` on `733c1e6`.
+- A direct PR body update, top-level PR status comment, and blocker issue
+  creation retry after docs refresh commit `2d3328a` still returned the same
+  403.
+- A generated GitHub handoff packet is now available through `release:handoff`
+  so the PR body, status comment, blocker issue, labels, and manual GitHub
+  steps can be copied from one audited JSON output while GitHub write routes
+  are blocked.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -93,6 +102,7 @@ Retry note:
 - Adds the May 2026 model/autoresearch matrix with Voyage, Gemini, NVIDIA NIM challenger arms, an Apple Silicon local default using Qwen3 0.6B through Hugging Face/llama.cpp/Metal, and query expansion disabled until a matched canary proves it helps.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
 - Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and run a one-agent canary with `selfmem_update`.
+- Adds a generated GitHub handoff packet so blocked GitHub write routes have one audited source for PR body, status comment, blocker issue, labels, and manual GitHub steps.
 
 ## Current Verdict
 
@@ -107,6 +117,7 @@ Latest local verification includes the release handoff gate slice.
 - Local `npm run test`: 6 files, 22 tests passed.
 - Local `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
 - Local `node packages/bench/release-readiness-check.mjs`: passed.
+- Local `node packages/bench/github-handoff-packet.mjs`: passed.
 - Local `node packages/bench/session-compaction-local-audit.mjs --strict`: passed.
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
@@ -151,6 +162,10 @@ Latest local verification includes the release handoff gate slice.
   required blocker packets, token-free remote verification, blocked Claude and
   GitHub route evidence, and manual next-action commands. It reports public
   launch as still blocked.
+- Local GitHub handoff packet evidence: generated paste-ready PR body, status
+  comment, blocker issue title/body, labels, and manual GitHub steps, with
+  `writesRealFiles: false`, `privateLeakCount: 0`, and `hasSecretPattern:
+  false`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6`, captured a 1280 by 1223 screenshot, showed Nucleus, wiki/vault
   sync, Model Matrix, Context Preview, Release Readiness, Compaction Audit,
@@ -231,6 +246,8 @@ Latest local verification includes the release handoff gate slice.
 - `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md`
 - `reviews/overnight-20260522/brain-ui-release-readiness-evidence.md`
 - `reviews/overnight-20260522/gemini-brain-ui-release-readiness-review.md`
+- `reviews/overnight-20260522/github-handoff-packet-evidence.md`
+- `reviews/overnight-20260522/gemini-github-handoff-packet-review.md`
 - `reviews/overnight-20260522/session-compaction-local-audit-evidence.md`
 - `packages/bench/release-readiness-check.mjs`
 ```

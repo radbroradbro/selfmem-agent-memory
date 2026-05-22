@@ -23,6 +23,7 @@ const requiredFiles = [
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   "packages/brain-ui/fixtures/model-matrix.json",
   "packages/bench/release-blocker-doctor.mjs",
+  "packages/bench/github-handoff-packet.mjs",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
   `${reviewDir}/claude-pr5-review-blocked.md`,
@@ -103,6 +104,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-release-handoff-review.md`,
   `${reviewDir}/release-blocker-doctor-evidence.md`,
   `${reviewDir}/gemini-release-blocker-doctor-review.md`,
+  `${reviewDir}/github-handoff-packet-evidence.md`,
+  `${reviewDir}/gemini-github-handoff-packet-review.md`,
   `${reviewDir}/release-state.json`,
   `${reviewDir}/gemini-release-state-guard-review.md`,
   `${reviewDir}/production-readiness.md`,
@@ -194,6 +197,7 @@ const requiredScripts = [
   "update:smoke",
   "consumer:smoke",
   "release:doctor",
+  "release:handoff",
   "smoke",
   "release:check",
 ];
@@ -738,6 +742,7 @@ check("release state is conservative", () => {
     "session-compaction-local-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
+    "github-handoff-packet",
     "selfmem-update",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
@@ -745,6 +750,7 @@ check("release state is conservative", () => {
   for (const blocker of [
     "claude-reviewer-route-blocked",
     "github-pr-body-update-blocked",
+    "github-issue-create-blocked",
     "human-public-launch-approval-required",
     "hosted-supermemory-baseline-not-current",
   ]) {
@@ -784,6 +790,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /current-head live|fresh.*browser|live browser/i, `${file} missing current-head live browser evidence`);
     assert.match(text, /clean consumer|consumer smoke|clean checkout/i, `${file} missing clean consumer smoke`);
     assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
+    assert.match(text, /github handoff|handoff packet|manual GitHub/i, `${file} missing GitHub handoff packet`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });
@@ -796,6 +803,8 @@ check("release handoff documents blocked launch path", () => {
   assert.match(text, /blocked Claude route|Claude CLI/i);
   assert.match(text, /public launch verdict as `FAIL`|publicLaunchVerdict: "FAIL"/);
   assert.match(text, /selfmem_update/);
+  assert.match(text, /release:handoff/);
+  assert.match(text, /handoff packet/i);
   assert.match(text, /one-agent canary/i);
   assert.match(text, /Do not paste private diagnostics/);
 });
@@ -849,6 +858,31 @@ check("fresh clean consumer smoke passes", () => {
 
 check("fresh release blocker doctor passes", () => {
   run("node", ["packages/bench/release-blocker-doctor.mjs"]);
+});
+
+check("fresh GitHub handoff packet passes", () => {
+  const result = run("node", ["packages/bench/github-handoff-packet.mjs"]);
+  const packet = JSON.parse(result.stdout);
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-github-handoff-packet-review.md"), "utf8");
+  assert.equal(packet.ok, true);
+  assert.equal(packet.mode, "github-handoff-packet");
+  assert.equal(packet.writesRealFiles, false);
+  assert.equal(packet.repository, "radbroradbro/selfmem-agent-memory");
+  assert.equal(packet.pullRequest, 5);
+  assert.equal(packet.publicLaunchAllowed, false);
+  assert.equal(packet.productionReady, false);
+  assert.equal(packet.latestVerifiedCodeBaseline?.ciRunId, 26307824017);
+  assert.equal(packet.safety?.privateLeakCount, 0);
+  assert.equal(packet.safety?.hasSecretPattern, false);
+  assert.equal(packet.safety?.fixtureOnly, true);
+  assert.match(packet.prBody, /Current-head live browser evidence/i);
+  assert.match(packet.prBody, /release blocker doctor/i);
+  assert.match(packet.prBody, /26307824017/);
+  assert.match(packet.statusComment, /public launch verdict: FAIL/i);
+  assert.match(packet.issueBody, /Acceptance Criteria/);
+  assert.ok(packet.labels.includes("not-production-ready"));
+  assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.doesNotMatch(geminiReview, /pending external review/i);
 });
 
 check("git diff check passes", () => {

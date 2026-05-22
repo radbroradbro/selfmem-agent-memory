@@ -226,6 +226,11 @@ Latest local verification before this summary:
   It reports `publicLaunchAllowed: false` and `productionReady: false` by
   design, so green CI cannot be mistaken for public-launch approval. GitHub
   Actions CI run `26307335652` passed on `d93d781`.
+- GitHub handoff packet verification: local `release:handoff` now generates a
+  public-safe manual GitHub packet with PR body, status comment, blocker issue,
+  labels, and manual GitHub steps. It writes no files, reports
+  `privateLeakCount: 0`, keeps `productionReady: false`, and keeps the public
+  launch verdict blocked while GitHub write routes are unavailable.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
   graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,
@@ -477,10 +482,13 @@ local memory contents.
 - The post-12-hour production-ready verdict remains `FAIL` for public launch.
   Fresh controller and CI checks pass, but Claude remains blocked, the GitHub
   app cannot update the PR body, add a PR status comment, or create the blocker
-  issue, and a human release decision has not been made.
+  issue, and a human release decision has not been made. Use the generated
+  GitHub handoff packet as the manual GitHub source of truth while that remains
+  true.
 
 ## Next Recommended Slice
 
 Use `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`
-as the conservative issue text unless PR #5 is updated directly. Do not publish
-a live update until reviewer blockers and human approval are resolved.
+as the conservative issue text unless PR #5 is updated directly. Run
+`release:handoff` first for the current manual GitHub packet. Do not publish a
+live update until reviewer blockers and human approval are resolved.

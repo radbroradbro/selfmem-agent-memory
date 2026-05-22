@@ -26,6 +26,9 @@ Scope:
 - Retried the PR body update and blocker issue creation after the clean
   consumer smoke gate commit `4cee083` passed CI run `26306827655`. The
   permission failure remained the same.
+- Retried the PR body update, a top-level PR status comment, and blocker issue
+  creation after current-head live browser evidence and docs refresh commit
+  `2d3328a`. The permission failure remained the same.
 
 Result:
 
@@ -50,6 +53,9 @@ diagnostics, or private paths were sent.
 The post-`4cee083` retry used only public commit IDs, CI run IDs,
 release-state pointers, and public blocker summaries. No provider keys, raw
 memories, raw diagnostics, or private paths were sent.
+The post-`2d3328a` retry used only public commit IDs, CI run IDs, release-state
+pointers, and public blocker summaries. No provider keys, raw memories, raw
+diagnostics, or private paths were sent.
 
 Follow-up:
 
@@ -57,3 +63,5 @@ Follow-up:
   `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`
   when repository permissions allow it.
 - Or explicitly accept the missing issue as part of the human release decision.
+- Use `npm exec --yes pnpm@10.23.0 -- release:handoff` for the generated GitHub
+  handoff packet before pasting PR or issue text.

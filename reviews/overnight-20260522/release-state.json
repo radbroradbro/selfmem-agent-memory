@@ -62,6 +62,7 @@
     "session-compaction-local-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
+    "github-handoff-packet",
     "selfmem-update"
   ],
   "remainingBlockers": [

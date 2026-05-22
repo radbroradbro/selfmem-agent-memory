@@ -303,6 +303,10 @@ evidence for:
   matrix visibility, context preview visibility, release readiness visibility,
   zero console errors or warnings, zero private/key-shaped visible text hits,
   and public launch still `FAIL`.
+- generated GitHub handoff packet evidence with paste-ready PR body, status
+  comment, blocker issue title/body, labels, and manual GitHub steps. The
+  packet writes no files, uses fixture/public release metadata only, reports
+  zero privacy leaks, and keeps `productionReady: false`.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
@@ -327,6 +331,7 @@ still wait for the remaining reviewer and human-approval gates.
 Use
 `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`
 as a conservative issue draft if the current PR is not immediately updated.
+Run `release:handoff` first for the generated manual GitHub packet.
 
 ## Public Live Update Status
 

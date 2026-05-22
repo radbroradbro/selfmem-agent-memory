@@ -35,6 +35,20 @@ repo files below as the source of truth.
 Do not paste private diagnostics, raw memories, session transcripts, local agent
 paths, provider keys, or private container names into GitHub.
 
+## Generated Handoff Packet
+
+Run this when GitHub write permissions are blocked and a maintainer needs a
+single paste-ready packet:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- release:handoff
+```
+
+The GitHub handoff packet prints the current PR body, status comment, blocker
+issue title, blocker issue body, labels, and manual steps. It does not call
+GitHub or write files. Treat it as the public-safe source of truth only while
+the packet reports `publicLaunchAllowed: false` and `productionReady: false`.
+
 ## Blocker Doctor
 
 Run this before merge or visibility changes:

@@ -24,6 +24,8 @@ The current PR adds:
   edit overlay, local edit overlay browse visibility, and selected local memory
   materialize;
 - a dry-run-first `selfmem_update` command for agent update workflows;
+- a generated GitHub handoff packet for manual GitHub updates while connector
+  write routes are blocked;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
@@ -76,8 +78,13 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Head: `4cee083`
-- GitHub Actions: CI run `26306827655` passed
+- Latest verified code baseline: `733c1e6`
+- GitHub Actions: CI run `26307824017` passed for current-head live browser
+  evidence
+- Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
+  body, status comment, blocker issue, labels, and manual GitHub steps with
+  no file writes and no secret-pattern hits
+- Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed

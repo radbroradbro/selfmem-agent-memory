@@ -20,6 +20,9 @@ Reason:
 - The release blocker doctor confirmed the Claude command is installed and the
   blocked-review packet remains the authoritative launch blocker. No fresh
   approval was produced.
+- The route was retried after current-head live browser evidence and docs
+  refresh commit `2d3328a`. Claude CLI still returned `Not logged in · Please
+  run /login`.
 
 Command class attempted:
 
@@ -42,3 +45,5 @@ Follow-up:
   production-ready verdict.
 - Until then, Gemini reviews and local verification are evidence, but Claude is
   a blocked reviewer route rather than an approval.
+- Use the generated GitHub handoff packet only for manual GitHub text. It does
+  not replace the blocked Claude review.
