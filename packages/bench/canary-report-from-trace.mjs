@@ -48,6 +48,8 @@ const monitorContainer = activeMonitorContainer(monitor);
 const monitorSummary = objectValue(monitor.stdout_json?.summary) || objectValue(monitor.summary) || {};
 const eventCounts = mergeCounts(
   countEvents(trace),
+  objectValue(traceSummary.event_counts),
+  objectValue(traceSummary.recent_event_counts),
   objectValue(reliability.event_counts),
   objectValue(monitorContainer.eventCounts),
 );
@@ -63,7 +65,11 @@ const privacyLeakCount = Math.max(
   Number(monitorSummary.privacyLeakCount ?? 0),
   Number(monitorContainer.privacyLeakCount ?? 0),
 );
-const timestamps = trace.map((item) => timestampMs(item.ts ?? item.timestamp ?? item.created_at)).filter(Number.isFinite);
+const timestamps = [
+  ...trace.map((item) => timestampMs(item.ts ?? item.timestamp ?? item.created_at)),
+  timestampMs(traceSummary.first_ts),
+  timestampMs(traceSummary.last_ts),
+].filter(Number.isFinite);
 const startedAt = timestamps.length ? new Date(Math.min(...timestamps)).toISOString() : new Date(0).toISOString();
 const endedAt = timestamps.length ? new Date(Math.max(...timestamps)).toISOString() : startedAt;
 const durationMinutes = Math.max(0, Math.ceil((Date.parse(endedAt) - Date.parse(startedAt)) / 60000));
@@ -115,6 +121,8 @@ const preCompressCount = countNamed(eventCounts, ["pre_compress", "compression_c
 const agentEndCount = countNamed(eventCounts, ["agent_end", "session_end"]);
 const searchCount = Math.max(searchEvents.length, countNamed(eventCounts, ["search"]), beforePromptCount);
 const storeCount = Math.max(storeEvents.length, countNamed(eventCounts, ["store"]));
+const searchLatencySamples = searchEvents.map((item) => nestedNumber(item, "data", "elapsed_ms")).filter((value) => value > 0);
+const storeLatencySamples = storeEvents.map((item) => nestedNumber(item, "data", "elapsed_ms")).filter((value) => value > 0);
 const zeroResultSearches = searchEvents.filter((item) => nestedNumber(item, "data", "result_count") === 0).length;
 const rejectedWrites = countNamed(eventCounts, ["agent_end_write_suppressed", "memory_write_rejected"]);
 const writeDenominator = Math.max(1, storeCount + rejectedWrites);
@@ -163,15 +171,29 @@ const report = {
     search: searchCount,
     store: storeCount,
     forget: countNamed(eventCounts, ["forget"]),
-    errors: Math.max(errorEvents.length, Number(monitorContainer.errorCount ?? 0), Number(reliability.issues?.length ?? 0)),
+    errors: Math.max(
+      errorEvents.length,
+      countErrorLikeEvents(eventCounts),
+      Number(monitorContainer.errorCount ?? 0),
+      Number(reliability.issues?.length ?? 0),
+      Number(traceSummary.error_like_events?.length ?? 0),
+    ),
     skippedUnknownIdentity: agentIdentity === "unknown-agent" ? 1 : 0,
     unknownContainerWrites: localContainer.includes("unknown") && storeCount > 0 ? storeCount : 0,
   },
   latencyMs: {
-    recallP50: percentile(searchEvents.map((item) => nestedNumber(item, "data", "elapsed_ms")).filter((value) => value > 0), 0.5),
-    recallP95: percentile(searchEvents.map((item) => nestedNumber(item, "data", "elapsed_ms")).filter((value) => value > 0), 0.95),
-    storeP50: percentile(storeEvents.map((item) => nestedNumber(item, "data", "elapsed_ms")).filter((value) => value > 0), 0.5),
-    storeP95: percentile(storeEvents.map((item) => nestedNumber(item, "data", "elapsed_ms")).filter((value) => value > 0), 0.95),
+    recallP50: percentile(searchLatencySamples, 0.5),
+    recallP95: percentile(searchLatencySamples, 0.95),
+    storeP50: percentile(storeLatencySamples, 0.5),
+    storeP95: percentile(storeLatencySamples, 0.95),
+  },
+  instrumentation: {
+    searchLatencySampleCount: searchLatencySamples.length,
+    storeLatencySampleCount: storeLatencySamples.length,
+    missingSearchLatencyCount: Math.max(0, searchCount - searchLatencySamples.length),
+    missingStoreLatencyCount: Math.max(0, storeCount - storeLatencySamples.length),
+    metadataOnlyTrace: /metadata_only|summary/i.test(tracePath),
+    summaryOnlyTrace: Boolean(traceSummary.event_counts && trace.length === 0),
   },
   quality: {
     beforePromptHasContextRate: beforePromptEvents.length
@@ -283,6 +305,7 @@ function discoverDiagnosticInputs(rootDir) {
       /(^|\/)trace\.jsonl$/i,
       /(^|\/)trace_metadata_only\.jsonl$/i,
       /(^|\/)recent-trace-summary\.json$/i,
+      /(^|\/)trace_summary_sanitized\.json$/i,
     ]),
     raw: pickFile(files, [
       /(^|\/)raw_events_metadata_only\.jsonl$/i,
@@ -421,6 +444,13 @@ function countEvents(items) {
 
 function countNamed(counts, names) {
   return names.reduce((sum, name) => sum + Number(counts[name] || 0), 0);
+}
+
+function countErrorLikeEvents(counts) {
+  if (!counts || typeof counts !== "object") return 0;
+  return Object.entries(counts).reduce((sum, [name, value]) => {
+    return isErrorEvent(name) ? sum + Number(value || 0) : sum;
+  }, 0);
 }
 
 function mergeCounts(...groups) {

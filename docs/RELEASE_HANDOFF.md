@@ -143,9 +143,12 @@ If the intake gate fails, generate a metrics-only remediation plan:
 npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
 ```
 
-The diagnosis should name failed checks, p95 latency values, missing lifecycle
-coverage, identity issues, privacy failures, and the next safe collection
-steps. It must not print memory text, prompt text, answer text, local paths,
+The diagnosis should name failed checks, p95 latency values, missing latency
+instrumentation, missing lifecycle coverage, identity issues, privacy failures,
+and the next safe collection steps. Summary-only diagnostic exports are allowed
+for diagnosis, but they cannot satisfy strict real canary evidence because they
+do not prove prompt-time/store latency. It must not print memory text, prompt
+text, answer text, local paths,
 credentials, cookies, or bearer tokens.
 
 The report must contain aggregate metrics only: hashed agent/container labels,

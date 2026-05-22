@@ -137,7 +137,9 @@ npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
 ```
 
 Attach diagnosis output only. Do not attach the source diagnostic bundle or raw
-runtime logs.
+runtime logs. Strict canary intake requires search and store latency
+instrumentation. Summary-only exports and older traces that omit `elapsed_ms`
+can produce a useful diagnosis, but they cannot count as real rollout evidence.
 
 ## Runtime Checks
 

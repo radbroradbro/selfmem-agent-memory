@@ -1,0 +1,22 @@
+{
+  "exists": true,
+  "source": "fixture-summary-only",
+  "line_count": 17,
+  "first_ts": "2026-05-22T19:00:00.000Z",
+  "last_ts": "2026-05-22T19:20:00.000Z",
+  "event_counts": {
+    "initialize": 1,
+    "prefetch": 4,
+    "pre_compress": 1,
+    "session_end": 1,
+    "search": 5,
+    "store": 3,
+    "search_error": 1
+  },
+  "error_like_events": [
+    {
+      "event": "search_error",
+      "count": 1
+    }
+  ]
+}

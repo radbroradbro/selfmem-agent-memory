@@ -30,6 +30,7 @@ assert.deepEqual(forbiddenKeys, [], `canary report contains forbidden raw-conten
 
 const counts = report.counts ?? {};
 const latency = report.latencyMs ?? {};
+const instrumentation = report.instrumentation ?? {};
 const quality = report.quality ?? {};
 const privacy = report.privacy ?? {};
 const agent = report.agent ?? {};
@@ -53,6 +54,8 @@ const checks = [
   check("store-events", Number(counts.store) > 0),
   check("zero-errors", Number(counts.errors) === 0),
   check("known-identity", Number(counts.skippedUnknownIdentity) === 0 && Number(counts.unknownContainerWrites) === 0),
+  check("search-latency-instrumented", Number(instrumentation.searchLatencySampleCount ?? 0) > 0),
+  check("store-latency-instrumented", Number(instrumentation.storeLatencySampleCount ?? 0) > 0),
   check("recall-p95", Number(latency.recallP95) > 0 && Number(latency.recallP95) <= 2500),
   check("store-p95", Number(latency.storeP95) > 0 && Number(latency.storeP95) <= 2500),
   check("context-rate", Number(quality.beforePromptHasContextRate) >= 0.5),
@@ -121,6 +124,14 @@ const output = {
     recallP95: Number(latency.recallP95 ?? 0),
     storeP50: Number(latency.storeP50 ?? 0),
     storeP95: Number(latency.storeP95 ?? 0),
+  },
+  instrumentation: {
+    searchLatencySampleCount: Number(instrumentation.searchLatencySampleCount ?? 0),
+    storeLatencySampleCount: Number(instrumentation.storeLatencySampleCount ?? 0),
+    missingSearchLatencyCount: Number(instrumentation.missingSearchLatencyCount ?? 0),
+    missingStoreLatencyCount: Number(instrumentation.missingStoreLatencyCount ?? 0),
+    metadataOnlyTrace: Boolean(instrumentation.metadataOnlyTrace),
+    summaryOnlyTrace: Boolean(instrumentation.summaryOnlyTrace),
   },
   quality: {
     beforePromptHasContextRate: Number(quality.beforePromptHasContextRate ?? 0),

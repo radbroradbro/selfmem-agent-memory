@@ -39,6 +39,14 @@
     "storeP50": 118,
     "storeP95": 390
   },
+  "instrumentation": {
+    "searchLatencySampleCount": 42,
+    "storeLatencySampleCount": 18,
+    "missingSearchLatencyCount": 0,
+    "missingStoreLatencyCount": 0,
+    "metadataOnlyTrace": false,
+    "summaryOnlyTrace": false
+  },
   "quality": {
     "beforePromptHasContextRate": 0.88,
     "zeroResultRate": 0.07,

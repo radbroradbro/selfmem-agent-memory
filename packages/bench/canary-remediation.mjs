@@ -71,6 +71,10 @@ const output = {
     windowMinutes: numberValue(report.window?.durationMinutes),
     recallP95Ms: numberValue(report.latencyMs?.recallP95),
     storeP95Ms: numberValue(report.latencyMs?.storeP95),
+    searchLatencySampleCount: numberValue(report.instrumentation?.searchLatencySampleCount),
+    storeLatencySampleCount: numberValue(report.instrumentation?.storeLatencySampleCount),
+    missingSearchLatencyCount: numberValue(report.instrumentation?.missingSearchLatencyCount),
+    missingStoreLatencyCount: numberValue(report.instrumentation?.missingStoreLatencyCount),
     zeroResultRate: numberValue(report.quality?.zeroResultRate),
     beforePromptHasContextRate: numberValue(report.quality?.beforePromptHasContextRate),
     writeSuccessRate: numberValue(report.quality?.writeSuccessRate),
@@ -136,6 +140,7 @@ function normalizeReport(value) {
         unknownContainerWrites: 0,
       },
       latencyMs: value.latencyMs,
+      instrumentation: value.instrumentation,
       quality: value.quality,
       privacy: value.privacy,
       rollback: { available: true, tested: true },
@@ -147,6 +152,7 @@ function normalizeReport(value) {
 function evaluateChecks(report) {
   const counts = report.counts ?? {};
   const latency = report.latencyMs ?? {};
+  const instrumentation = report.instrumentation ?? {};
   const quality = report.quality ?? {};
   const privacy = report.privacy ?? {};
   const agent = report.agent ?? {};
@@ -169,6 +175,8 @@ function evaluateChecks(report) {
     check("store-events", numberValue(counts.store) > 0),
     check("zero-errors", numberValue(counts.errors) === 0),
     check("known-identity", numberValue(counts.skippedUnknownIdentity) === 0 && numberValue(counts.unknownContainerWrites) === 0),
+    check("search-latency-instrumented", numberValue(instrumentation.searchLatencySampleCount) > 0),
+    check("store-latency-instrumented", numberValue(instrumentation.storeLatencySampleCount) > 0),
     check("recall-p95", numberValue(latency.recallP95) > 0 && numberValue(latency.recallP95) <= 2500),
     check("store-p95", numberValue(latency.storeP95) > 0 && numberValue(latency.storeP95) <= 2500),
     check("context-rate", numberValue(quality.beforePromptHasContextRate) >= 0.5),
@@ -213,6 +221,24 @@ function actionFor(name, report) {
     "store-events": [{ ...base, category: "write-lane", recommendation: "Run an active prompt that should create a durable memory; no store events were observed." }],
     "zero-errors": [{ ...base, category: "runtime-errors", recommendation: "Inspect sanitized error classes, patch the failing lifecycle path, then collect a fresh report." }],
     "known-identity": [{ ...base, category: "identity", recommendation: "Pin the agent identity and container mapping so writes cannot land in an unknown bucket." }],
+    "search-latency-instrumented": [{
+      ...base,
+      category: "instrumentation",
+      measured: {
+        searchLatencySampleCount: numberValue(report.instrumentation?.searchLatencySampleCount),
+        missingSearchLatencyCount: numberValue(report.instrumentation?.missingSearchLatencyCount),
+      },
+      recommendation: "Collect a fresh report from a patched adapter that records elapsed_ms on search/prefetch events. Summary-only exports cannot pass strict canary latency gates.",
+    }],
+    "store-latency-instrumented": [{
+      ...base,
+      category: "instrumentation",
+      measured: {
+        storeLatencySampleCount: numberValue(report.instrumentation?.storeLatencySampleCount),
+        missingStoreLatencyCount: numberValue(report.instrumentation?.missingStoreLatencyCount),
+      },
+      recommendation: "Collect a fresh report from a patched adapter that records elapsed_ms on every store event. Older bundles without store latency cannot pass strict canary.",
+    }],
     "recall-p95": [{
       ...base,
       category: "latency",

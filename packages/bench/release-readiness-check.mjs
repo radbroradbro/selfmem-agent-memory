@@ -932,6 +932,9 @@ check("fresh canary report generator passes", () => {
     assert.equal(generatedReport.counts.errors, 0);
     assert.equal(generatedReport.latencyMs.recallP95 > 0, true);
     assert.equal(generatedReport.latencyMs.storeP95 > 0, true);
+    assert.equal(generatedReport.instrumentation.searchLatencySampleCount > 0, true);
+    assert.equal(generatedReport.instrumentation.storeLatencySampleCount > 0, true);
+    assert.equal(generatedReport.instrumentation.missingStoreLatencyCount, 0);
     assert.equal(generatedReport.quality.lifecycleCovered, true);
     assert.equal(generatedReport.quality.hybridSearchCovered, true);
     assert.equal(generatedReport.privacy.privacyLeakCount, 0);
@@ -967,6 +970,9 @@ check("fresh canary report generator passes", () => {
     assert.equal(diagnosticReport.counts.store, 1);
     assert.equal(diagnosticReport.latencyMs.recallP95, 220);
     assert.equal(diagnosticReport.latencyMs.storeP95, 145);
+    assert.equal(diagnosticReport.instrumentation.searchLatencySampleCount, 1);
+    assert.equal(diagnosticReport.instrumentation.storeLatencySampleCount, 1);
+    assert.equal(diagnosticReport.instrumentation.missingStoreLatencyCount, 0);
     assert.equal(diagnosticReport.quality.hybridSearchCovered, true);
     assert.equal(diagnosticReport.quality.hostedReadThroughObserved, true);
     assert.equal(diagnosticReport.privacy.privacyLeakCount, 0);
@@ -1003,6 +1009,7 @@ check("fresh canary report generator passes", () => {
     assert.equal(diagnosticZipReport.evidenceSource.inputKind, "diagnostic-zip");
     assert.equal(diagnosticZipReport.evidenceSource.traceKind, "trace_metadata_only.jsonl");
     assert.equal(diagnosticZipReport.latencyMs.storeP95, 145);
+    assert.equal(diagnosticZipReport.instrumentation.storeLatencySampleCount, 1);
     assert.doesNotMatch(diagnosticZipRun.stdout, secretPattern);
     assert.doesNotMatch(diagnosticZipRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
     const diagnosticZipStrict = spawnSync("node", [
@@ -1017,6 +1024,36 @@ check("fresh canary report generator passes", () => {
     });
     assert.notEqual(diagnosticZipStrict.status, 0, "relocated fixture zip must fail --strict-real");
     assert.match(diagnosticZipStrict.stderr, /strict-real cannot use.*fixture/i);
+    const summaryDiagnosticReportPath = join(tempRoot, "summary-diagnostic-report.json");
+    const summaryDiagnostic = run("node", [
+      "packages/bench/canary-report-from-trace.mjs",
+      "--diagnostic-dir",
+      "packages/bench/fixtures/canary-summary-diagnostic.fixture",
+      "--output",
+      summaryDiagnosticReportPath,
+    ]);
+    const summaryReport = JSON.parse(summaryDiagnostic.stdout);
+    assert.equal(summaryReport.fixtureOnly, true);
+    assert.equal(summaryReport.evidenceSource.traceKind, "trace_summary_sanitized.json");
+    assert.equal(summaryReport.instrumentation.summaryOnlyTrace, true);
+    assert.equal(summaryReport.instrumentation.searchLatencySampleCount, 0);
+    assert.equal(summaryReport.instrumentation.missingSearchLatencyCount, 5);
+    assert.equal(summaryReport.instrumentation.missingStoreLatencyCount, 3);
+    assert.equal(summaryReport.counts.errors, 1);
+    assert.equal(summaryReport.privacy.privacyLeakCount, 0);
+    assert.doesNotMatch(summaryDiagnostic.stdout, secretPattern);
+    assert.doesNotMatch(summaryDiagnostic.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+    const summaryDiagnosis = run("node", [
+      "packages/bench/canary-remediation.mjs",
+      "--report",
+      summaryDiagnosticReportPath,
+    ]);
+    const summaryDiagnosisReport = JSON.parse(summaryDiagnosis.stdout);
+    assert.equal(summaryDiagnosisReport.canaryPass, false);
+    assert.ok(summaryDiagnosisReport.failedChecks.includes("search-latency-instrumented"));
+    assert.ok(summaryDiagnosisReport.failedChecks.includes("store-latency-instrumented"));
+    assert.ok(summaryDiagnosisReport.actions.some((item) => item.check === "search-latency-instrumented"));
+    assert.ok(summaryDiagnosisReport.actions.some((item) => item.check === "store-latency-instrumented"));
     const strict = spawnSync("node", ["packages/bench/canary-evidence-intake.mjs", "--report", reportPath, "--strict-real"], {
       cwd: root,
       encoding: "utf8",
@@ -1049,6 +1086,9 @@ check("fresh canary evidence intake passes", () => {
   assert.equal(report.privacy?.rawMemoryIncluded, false);
   assert.equal(report.lifecycle?.beforePromptBuild > 0, true);
   assert.equal(report.lifecycle?.store > 0, true);
+  assert.equal(report.instrumentation?.searchLatencySampleCount > 0, true);
+  assert.equal(report.instrumentation?.storeLatencySampleCount > 0, true);
+  assert.equal(report.instrumentation?.missingStoreLatencyCount, 0);
   assert.equal(report.quality?.lifecycleCovered, true);
   assert.equal(report.quality?.hybridSearchCovered, true);
   assert.deepEqual(report.failedChecks, []);
@@ -1075,9 +1115,12 @@ check("fresh canary remediation passes", () => {
   assert.equal(failingReport.severity, "blocked");
   assert.equal(failingReport.publicLaunchAllowed, false);
   assert.equal(failingReport.fleetRolloutAllowed, false);
-  assert.deepEqual(failingReport.failedChecks, ["recall-p95", "store-p95"]);
+  assert.deepEqual(failingReport.failedChecks, ["store-latency-instrumented", "recall-p95", "store-p95"]);
   assert.equal(failingReport.measurements.recallP95Ms, 3894);
   assert.equal(failingReport.measurements.storeP95Ms, 0);
+  assert.equal(failingReport.measurements.storeLatencySampleCount, 0);
+  assert.equal(failingReport.measurements.missingStoreLatencyCount, 12);
+  assert.ok(failingReport.actions.some((item) => item.check === "store-latency-instrumented" && item.category === "instrumentation"));
   assert.ok(failingReport.actions.some((item) => item.check === "recall-p95" && item.category === "latency"));
   assert.ok(failingReport.actions.some((item) => item.check === "store-p95" && item.category === "instrumentation"));
   assert.equal(failingReport.recollectWindow.needsFreshWindow, true);

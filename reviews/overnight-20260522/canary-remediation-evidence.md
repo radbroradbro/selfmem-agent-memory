@@ -32,14 +32,19 @@ npm exec --yes pnpm@10.23.0 -- canary:diagnose
 - A failing fixture report produces `mode: canary-remediation-plan`.
 - The output is metrics-only and reports `writesRealFiles: false`.
 - The failing fixture reports `canaryPass: false`, `severity: blocked`, and
-  failed checks `recall-p95` and `store-p95`.
+  failed checks `store-latency-instrumented`, `recall-p95`, and `store-p95`.
+- The output reports search/store latency sample counts and missing latency
+  counts, so an older export without store `elapsed_ms` is classified as an
+  instrumentation gap rather than a real performance measurement.
 - The recall action is categorized as latency remediation.
-- The missing store p95 action is categorized as instrumentation remediation.
+- The missing store latency and missing store p95 actions are categorized as
+  instrumentation remediation.
 - The output keeps `publicLaunchAllowed: false` and `fleetRolloutAllowed:
   false`.
 - A passing fixture report produces `canaryPass: true` but still keeps fleet
   rollout blocked until maintainer review.
-- The release gate now runs both failing and passing diagnosis fixtures.
+- The release gate now runs passing, failing, and summary-only diagnosis
+  fixtures.
 
 ## Review And Verification
 
@@ -59,8 +64,8 @@ secrets and local paths before producing output.
 
 ## Why This Moves The Goal
 
-The previous diagnostic bundle slice could safely produce failure reports from
-real agent exports, but failed reports were not yet actionable. This slice turns
-those failures into a public-safe remediation plan so a live Hermes or OpenClaw
-agent can patch the right thing, recollect a fresh window, and rerun strict
-canary intake without sending private memory contents.
+The diagnostic bundle path can safely produce failure reports from real agent
+exports, but failed reports must be precise. This slice turns those failures
+into a public-safe remediation plan so a live Hermes or OpenClaw agent can patch
+the right thing, recollect a fresh window, and rerun strict canary intake
+without sending private memory contents.

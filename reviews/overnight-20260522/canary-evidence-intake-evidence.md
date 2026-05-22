@@ -64,6 +64,8 @@ latency, aggregate quality rates, redaction counts, and rollback readiness.
 - agent-end events,
 - search and store counts,
 - LCM/pre-compression evidence,
+- search and store latency sample counts,
+- missing search and store latency counts,
 - p50 and p95 recall/store latency,
 - context-hit rate,
 - zero-result rate,

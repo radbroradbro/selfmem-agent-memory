@@ -108,6 +108,11 @@ read-through, and zero privacy leaks. It does not fabricate missing store
 latency, so older bundles can generate a useful failure report without becoming
 rollout evidence.
 
+The generator now also accepts summary-only sanitized trace exports such as
+`trace_summary_sanitized.json`. Those exports can prove event counts and error
+classes, but they produce zero latency samples and therefore fail strict canary
+intake until the agent recollects a fresh patched runtime window.
+
 ## Adapter Change
 
 Hermes and OpenClaw store events now include `elapsed_ms`. The generator does
