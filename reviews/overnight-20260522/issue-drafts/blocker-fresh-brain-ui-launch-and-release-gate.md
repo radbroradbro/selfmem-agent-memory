@@ -11,7 +11,7 @@ or explicitly accepted.
 ## Evidence
 
 - `npm run build`: passed.
-- `npm run test`: passed, 6 files and 21 tests.
+- `npm run test`: passed, 6 files and 22 tests.
 - `npm run typecheck`: passed.
 - `npm run privacy:test`: passed.
 - `npm run smoke:openclaw`: passed with `privacyLeakCount: 0`.
@@ -41,8 +41,8 @@ or explicitly accepted.
   selected local memory edit overlay slice became required.
 - GitHub Actions CI run `26294323086` on `b5352a0`: passed after the guarded
   local edit overlay browse slice became required.
-- Local checks passed for the guarded local memory materialize slice. CI is
-  pending until this slice is pushed.
+- GitHub Actions CI run `26295772356` on `21fd4d6`: passed after the guarded
+  local memory materialize slice became required.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was

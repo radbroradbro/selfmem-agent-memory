@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `b5352a0`, run `26294323086`, success.
+  `21fd4d6`, run `26295772356`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -28,6 +28,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26292772262` on `19f2577`: success.
 - GitHub Actions CI run `26293533847` on `72ab902`: success.
 - GitHub Actions CI run `26294323086` on `b5352a0`: success.
+- GitHub Actions CI run `26295772356` on `21fd4d6`: success.
 
 ## Shipped Overnight Slices
 
@@ -85,7 +86,7 @@ is still required before any public live update.
 
 Latest local verification before this summary:
 
-- `npm run test`: passed, 21 tests.
+- `npm run test`: passed, 22 tests.
 - `pnpm smoke`: passed.
 - `pnpm brain:interaction`: passed for the Brain UI model refactor slice.
 - `pnpm wiki:sync:smoke`: passed with 12 pre-write audit entries.
@@ -94,7 +95,7 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions CI: success on the latest inspected baseline, `b5352a0`.
+- GitHub Actions CI: success on the latest inspected baseline, `21fd4d6`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
@@ -109,6 +110,8 @@ Latest local verification before this summary:
   commit `72ab902`, run `26293533847`.
 - GitHub Actions CI: success on guarded local edit overlay browse commit
   `b5352a0`, run `26294323086`.
+- GitHub Actions CI: success on guarded local memory materialize commit
+  `21fd4d6`, run `26295772356`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -289,7 +292,8 @@ local memory contents.
   write-confirmed selected lifecycle policy apply, and write-confirmed selected
   review queue apply, plus write-confirmed selected local memory edit overlays
   with read-only overlay browse visibility and guarded materialization.
-  Direct in-place local memory mutation remains disabled.
+  Freeform in-place local memory mutation remains disabled outside the guarded
+  materialize path.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

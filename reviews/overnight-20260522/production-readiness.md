@@ -45,7 +45,7 @@ These are proposed on PR #5. They are not yet merged to `main`.
 Passed in this run:
 
 - `npm run build`
-- `npm run test`: 6 files, 21 tests
+- `npm run test`: 6 files, 22 tests
 - `npm run typecheck`
 - `npm run privacy:test`
 - `npm run smoke:openclaw`: `privacyLeakCount: 0`
@@ -93,6 +93,8 @@ Controller follow-up after that sandbox run:
   check.
 - GitHub Actions CI run `26294323086` on guarded local edit overlay browse
   commit `b5352a0` passed Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26295772356` on guarded local memory materialize
+  commit `21fd4d6` passed Test, Full smoke, and Release readiness check.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.
 - Focused Gemini reviews for Brain UI local-audit preview and selected
@@ -121,6 +123,8 @@ Controller follow-up after that sandbox run:
   overlay commit `72ab902` passed.
 - GitHub Actions CI run `26294323086` on guarded local edit overlay browse
   commit `b5352a0` passed.
+- GitHub Actions CI run `26295772356` on guarded local memory materialize
+  commit `21fd4d6` passed.
 
 ## UI Evidence
 
@@ -160,7 +164,7 @@ still wait for the remaining reviewer and human-approval gates.
 | --- | --- | --- |
 | Security/privacy | PASS WITH CONCERNS | Redaction, secret-pattern, forbidden-file, and privacy smokes are strong, but current reviewer routes are blocked. |
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
-| Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with backup and content-free audit, and browser-local history is content-free. |
+| Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
 | UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |

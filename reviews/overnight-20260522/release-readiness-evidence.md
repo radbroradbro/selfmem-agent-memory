@@ -152,7 +152,7 @@ Verification:
 
 - `pnpm release:check`: passed.
 - `pnpm smoke`: passed.
-- `pnpm test`: 21 tests passed.
+- `pnpm test`: 22 tests passed.
 - `pnpm container:audit:smoke`: passed.
 - `git diff --check`: covered by `release:check`.
 - Fresh Brain UI smoke: covered by `release:check`.
@@ -218,3 +218,5 @@ Known limits:
   edit overlay commit `72ab902`.
 - GitHub Actions CI run `26294323086` passed on guarded local edit overlay
   browse commit `b5352a0`.
+- GitHub Actions CI run `26295772356` passed on guarded local memory
+  materialize commit `21fd4d6`.
