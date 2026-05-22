@@ -39,6 +39,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
   `${reviewDir}/brain-ui-compaction-audit-evidence.md`,
   `${reviewDir}/gemini-brain-ui-compaction-audit-review.md`,
+  `${reviewDir}/brain-ui-context-preview-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-context-preview-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-evidence.md`,
   `${reviewDir}/gemini-brain-ui-lifecycle-policy-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-apply-evidence.md`,
@@ -104,6 +106,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-research-lineage.png`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit.png`,
+  `${reviewDir}/ui-evidence/brain-ui-context-preview-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-context-preview.png`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
   `${reviewDir}/ui-evidence/brain-ui-review-queue-dom-evidence.json`,
@@ -352,6 +356,30 @@ check("dom evidence is sane", () => {
   assert.equal(compactionAuditEvidence.evidence.exportHasPrivateOrKeyText, false);
   assert.equal(compactionAuditEvidence.consoleErrorCount, 0);
 
+  const contextPreviewEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-context-preview-evidence.json"), "utf8"),
+  );
+  assert.equal(contextPreviewEvidence.ok, true);
+  assert.equal(contextPreviewEvidence.mode, "fixture-brain-ui-context-preview");
+  assert.equal(contextPreviewEvidence.writesRealFiles, false);
+  assert.equal(contextPreviewEvidence.evidence.hasContextPreviewHeading, true);
+  assert.equal(contextPreviewEvidence.evidence.mode, "fixture-prompt-context-preview");
+  assert.equal(contextPreviewEvidence.evidence.writesRealFiles, false);
+  assert.equal(contextPreviewEvidence.evidence.tokenBudget, 900);
+  assert.equal(contextPreviewEvidence.evidence.totalTokens, 642);
+  assert.equal(contextPreviewEvidence.evidence.budgetRemaining, 258);
+  assert.equal(contextPreviewEvidence.evidence.selectedMemoryCount, 3);
+  assert.equal(contextPreviewEvidence.evidence.sectionCount, 3);
+  assert.equal(contextPreviewEvidence.evidence.omittedCount, 2);
+  assert.equal(contextPreviewEvidence.evidence.privacyLeakCount, 0);
+  assert.equal(contextPreviewEvidence.evidence.hostedReadThrough, "read-only");
+  assert.equal(contextPreviewEvidence.evidence.writeMode, "local-only");
+  assert.equal(contextPreviewEvidence.evidence.hasCompiledContext, true);
+  assert.equal(contextPreviewEvidence.evidence.hasGuardrailsSection, true);
+  assert.equal(contextPreviewEvidence.evidence.hasOmittedNoiseCandidate, true);
+  assert.equal(contextPreviewEvidence.evidence.hasPrivateOrKeyText, false);
+  assert.equal(contextPreviewEvidence.consoleErrorCount, 0);
+
   const policyEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json"), "utf8"),
   );
@@ -500,6 +528,7 @@ check("release state is conservative", () => {
     "brain-ui-dynamic-graph-layout",
     "brain-ui-graph-navigation-controls",
     "brain-ui-session-compaction-audit",
+    "brain-ui-prompt-context-preview",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
     "selfmem-update",
@@ -539,6 +568,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /dynamic graph layout|dynamic layout|graph layout/i, `${file} missing dynamic graph layout`);
     assert.match(text, /graph navigation|jump-to-node|neighborhood scope|all-vs-neighborhood/i, `${file} missing graph navigation`);
     assert.match(text, /compaction audit|local-session compaction/i, `${file} missing compaction audit`);
+    assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });

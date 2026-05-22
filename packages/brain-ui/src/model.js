@@ -197,6 +197,74 @@ function buildSessionCompactionAudit(report) {
   };
 }
 
+function buildPromptContextPreview(snapshot, packet = {}) {
+  const nodesById = new Map((snapshot.nodes ?? []).map((node) => [node.id, node]));
+  const rawSerialized = JSON.stringify(packet ?? {});
+  const selectedMemories = Array.isArray(packet?.selectedMemories)
+    ? packet.selectedMemories.map((memory, index) => {
+        const id = safeExportText(memory?.id ?? `memory:${index}`);
+        const node = nodesById.get(id);
+        return {
+          id,
+          kind: safeExportText(memory?.kind ?? node?.kind ?? "memory"),
+          title: safeExportText(memory?.title ?? node?.title ?? id),
+          source: safeChoice(memory?.source ?? "local", ["local", "hosted-readonly", "wiki", "session", "fixture"], "local"),
+          tokens: numeric(memory?.tokens),
+          injected: memory?.injected !== false,
+          rerankScore: score(memory?.rerankScore),
+          channelRanks: safeNumberMap(memory?.channelRanks),
+          reason: safeExportText(memory?.reason ?? "selected_by_rerank"),
+          citationIds: safeStringList(memory?.citationIds),
+        };
+      })
+    : [];
+  const omittedCandidates = Array.isArray(packet?.omittedCandidates)
+    ? packet.omittedCandidates.map((candidate, index) => ({
+        id: safeExportText(candidate?.id ?? `omitted:${index}`),
+        kind: safeExportText(candidate?.kind ?? "memory"),
+        reason: safeExportText(candidate?.reason ?? "outside_token_budget"),
+        tokens: numeric(candidate?.tokens),
+        rerankScore: score(candidate?.rerankScore),
+      }))
+    : [];
+  const sections = Array.isArray(packet?.sections)
+    ? packet.sections.map((section, index) => ({
+        id: safeExportText(section?.id ?? `section:${index}`),
+        title: safeExportText(section?.title ?? "Recall section"),
+        source: safeChoice(section?.source ?? "local", ["local", "hosted-readonly", "wiki", "session", "fixture"], "local"),
+        tokens: numeric(section?.tokens),
+        injected: section?.injected !== false,
+        citationIds: safeStringList(section?.citationIds),
+        text: safeExportText(section?.text ?? ""),
+      }))
+    : [];
+  const tokenBudget = numeric(packet?.tokenBudget);
+  const totalTokens = numeric(packet?.totalTokens) || sections.reduce((total, section) => total + section.tokens, 0);
+  return {
+    schemaVersion: 1,
+    mode: "fixture-prompt-context-preview",
+    writesRealFiles: false,
+    query: safeExportText(packet?.query ?? ""),
+    generatedAt: safeTimestamp(packet?.generatedAt, snapshot.generatedAt ?? "1970-01-01T00:00:00.000Z"),
+    traceId: safeExportText(packet?.traceId ?? ""),
+    tokenBudget,
+    totalTokens,
+    budgetRemaining: Math.max(0, tokenBudget - totalTokens),
+    selectedMemories,
+    omittedCandidates,
+    sections,
+    citations: safeStringList(packet?.citations),
+    safety: {
+      metricsOnly: false,
+      privacyLeakCount: numeric(packet?.safety?.privacyLeakCount) + (containsPrivateLikeText(rawSerialized) ? 1 : 0),
+      redactionCount: numeric(packet?.safety?.redactionCount),
+      hostedReadThrough: safeChoice(packet?.safety?.hostedReadThrough ?? "read-only", ["read-only", "disabled"], "read-only"),
+      writeMode: safeChoice(packet?.safety?.writeMode ?? "local-only", ["local-only", "disabled"], "local-only"),
+    },
+    compiledContext: safeExportText(packet?.compiledContext ?? ""),
+  };
+}
+
 function buildContainerHealth(snapshot) {
   const fixtureContainer = snapshot.roots?.container ?? {};
   const memoryKinds = ["memory", "derived_doc", "retrieval_trace", "lifecycle_event", "research_query", "decision", "hypothesis"];
@@ -610,6 +678,7 @@ export {
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
+  buildPromptContextPreview,
   buildResearchLineage,
   buildSessionCompactionAudit,
   buildSelectedAuditTrailEntry,

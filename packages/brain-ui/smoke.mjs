@@ -18,6 +18,7 @@ try {
     vault,
     syncReport,
     sessionCompactionAudit,
+    promptContextPreview,
     localAudit,
     localBrowse,
     health,
@@ -30,6 +31,7 @@ try {
     json(`${base}/fixtures/wiki-vault.json`),
     json(`${base}/fixtures/wiki-sync-report.json`),
     json(`${base}/fixtures/session-compaction-local-audit.json`),
+    json(`${base}/fixtures/prompt-context-preview.json`),
     json(`${base}/fixtures/local-container-audit.json`),
     json(`${base}/fixtures/local-container-browse.json`),
     json(`${base}/healthz`),
@@ -43,6 +45,7 @@ try {
   assert.match(index, /Nucleus Snapshot/);
   assert.match(index, /Research Lineage/);
   assert.match(index, /Compaction Audit/);
+  assert.match(index, /Context Preview/);
   assert.match(index, /Lifecycle Policy/);
   assert.match(index, /Selected local lifecycle policy apply/);
   assert.match(index, /Review Queue/);
@@ -65,6 +68,7 @@ try {
   assert.match(app, /buildNucleusExport/);
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /buildSessionCompactionAudit/);
+  assert.match(app, /buildPromptContextPreview/);
   assert.match(app, /buildLifecyclePolicyDraft/);
   assert.match(app, /buildMemoryReviewQueue/);
   assert.match(app, /renderLifecyclePolicy/);
@@ -81,6 +85,7 @@ try {
   assert.match(app, /renderLocalMaterialize/);
   assert.match(app, /renderSelectedAudit/);
   assert.match(app, /renderSelectedAuditHistory/);
+  assert.match(app, /scrollHashTargetIntoPanel/);
   assert.match(app, /buildEditExport/);
   assert.match(model, /const kind = safeExportText\(node\.kind\)/);
   assert.match(model, /function buildContainerHealth/);
@@ -88,6 +93,7 @@ try {
   assert.match(model, /function buildGraphLayout/);
   assert.match(model, /function graphScopedNodes/);
   assert.match(model, /function buildSessionCompactionAudit/);
+  assert.match(model, /function buildPromptContextPreview/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
   assert.match(model, /function buildMemoryReviewQueue/);
   assert.match(model, /function mergeSelectedAuditTrail/);
@@ -106,6 +112,7 @@ try {
   assert.match(styles, /audit-summary/);
   assert.match(styles, /selected-audit/);
   assert.match(styles, /audit-history/);
+  assert.match(styles, /context-section-list/);
   assert.match(styles, /edit-export/);
   assert.equal(fixture.schemaVersion, 1);
   assert.equal(fixture.roots.container.writeMode, "local-only");
@@ -140,6 +147,15 @@ try {
   assert.equal(sessionCompactionAudit.quality.exactIdentifierCandidateCount, 1);
   assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
   assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
+  assert.equal(promptContextPreview.ok, true);
+  assert.equal(promptContextPreview.mode, "prompt-context-preview");
+  assert.equal(promptContextPreview.tokenBudget, 900);
+  assert.equal(promptContextPreview.totalTokens, 642);
+  assert.equal(promptContextPreview.safety.privacyLeakCount, 0);
+  assert.equal(promptContextPreview.safety.writeMode, "local-only");
+  assert.ok(promptContextPreview.selectedMemories.length >= 3);
+  assert.ok(promptContextPreview.sections.some((section) => section.title === "Active Recall"));
+  assert.ok(promptContextPreview.omittedCandidates.some((candidate) => candidate.reason.includes("noise")));
   assert.equal(localAudit.ok, true);
   assert.equal(localAudit.report.mode, "local-container-audit");
   assert.equal(localAudit.report.writesRealFiles, false);
@@ -222,6 +238,7 @@ try {
     vault,
     syncReport,
     sessionCompactionAudit,
+    promptContextPreview,
     localAudit,
     localBrowse,
     disabledLocalAudit,
@@ -247,6 +264,7 @@ try {
           "dynamic-graph-layout",
           "graph-navigation-controls",
           "session-compaction-audit",
+          "prompt-context-preview",
           "lifecycle-policy",
           "review-queue",
           "wiki-vault",

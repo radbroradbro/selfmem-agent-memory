@@ -6,6 +6,7 @@ import {
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
+  buildPromptContextPreview,
   buildResearchLineage,
   buildSessionCompactionAudit,
   containsPrivateLikeText,
@@ -27,6 +28,7 @@ const state = {
   vault: null,
   syncReport: null,
   sessionCompactionAudit: null,
+  promptContextPreview: null,
   selectedVaultPath: "",
   localAudit: null,
   localBrowse: null,
@@ -63,6 +65,11 @@ const researchLineage = document.querySelector("#researchLineage");
 const compactionAuditSummary = document.querySelector("#compactionAuditSummary");
 const compactionAuditFingerprints = document.querySelector("#compactionAuditFingerprints");
 const compactionAuditExport = document.querySelector("#compactionAuditExport");
+const contextPreviewSummary = document.querySelector("#contextPreviewSummary");
+const contextPreviewMemories = document.querySelector("#contextPreviewMemories");
+const contextPreviewSections = document.querySelector("#contextPreviewSections");
+const contextPreviewOmitted = document.querySelector("#contextPreviewOmitted");
+const contextPreviewExport = document.querySelector("#contextPreviewExport");
 const policySummary = document.querySelector("#policySummary");
 const policyForm = document.querySelector("#policyForm");
 const policyForceRecall = document.querySelector("#policyForceRecall");
@@ -155,11 +162,20 @@ const exportStatus = document.querySelector("#exportStatus");
 const editExport = document.querySelector("#editExport");
 const timelineList = document.querySelector("#timelineList");
 
-const [response, vaultResponse, syncResponse, sessionCompactionResponse, localAuditResponse, localBrowseResponse] = await Promise.all([
+const [
+  response,
+  vaultResponse,
+  syncResponse,
+  sessionCompactionResponse,
+  promptContextResponse,
+  localAuditResponse,
+  localBrowseResponse,
+] = await Promise.all([
   fetch("/fixtures/nucleus.fixture.json"),
   fetch("/fixtures/wiki-vault.json"),
   fetch("/fixtures/wiki-sync-report.json"),
   fetch("/fixtures/session-compaction-local-audit.json"),
+  fetch("/fixtures/prompt-context-preview.json"),
   fetch("/fixtures/local-container-audit.json"),
   fetch("/fixtures/local-container-browse.json"),
 ]);
@@ -167,6 +183,7 @@ state.snapshot = await response.json();
 state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
 state.sessionCompactionAudit = await sessionCompactionResponse.json();
+state.promptContextPreview = await promptContextResponse.json();
 state.localAudit = await localAuditResponse.json();
 state.localBrowse = await localBrowseResponse.json();
 state.query = searchInput.value;
@@ -475,6 +492,7 @@ function render() {
   renderNucleusSnapshot();
   renderResearchLineage();
   renderSessionCompactionAudit();
+  renderPromptContextPreview();
   renderLifecyclePolicy();
   renderLifecyclePolicyApply();
   renderReviewQueue();
@@ -491,6 +509,7 @@ function render() {
   renderSelectedAudit();
   renderSelectedAuditHistory();
   renderEditExport();
+  scrollHashTargetIntoPanel();
 }
 
 function renderMetrics() {
@@ -717,6 +736,57 @@ function renderSessionCompactionAudit() {
   }
 
   compactionAuditExport.textContent = JSON.stringify(packet, null, 2);
+}
+
+function renderPromptContextPreview() {
+  const packet = buildPromptContextPreview(state.snapshot, state.promptContextPreview);
+  contextPreviewSummary.replaceChildren(
+    stat("Tokens", `${packet.totalTokens}/${packet.tokenBudget}`),
+    stat("Remaining", packet.budgetRemaining),
+    stat("Selected", packet.selectedMemories.length),
+    stat("Leaks", packet.safety.privacyLeakCount),
+  );
+
+  contextPreviewMemories.replaceChildren();
+  for (const memory of packet.selectedMemories) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    const meta = document.createElement("small");
+    item.dataset.source = memory.source;
+    label.textContent = memory.kind;
+    value.textContent = memory.title;
+    meta.textContent = `${memory.source} | ${Math.round(memory.rerankScore * 100)}% rerank | ${memory.tokens} tokens`;
+    item.append(label, value, meta);
+    contextPreviewMemories.append(item);
+  }
+
+  contextPreviewSections.replaceChildren();
+  for (const section of packet.sections) {
+    const article = document.createElement("article");
+    const title = document.createElement("h4");
+    const text = document.createElement("p");
+    const meta = document.createElement("small");
+    article.dataset.source = section.source;
+    title.textContent = section.title;
+    text.textContent = section.text;
+    meta.textContent = `${section.source} | ${section.tokens} tokens | ${section.citationIds.length} citation${section.citationIds.length === 1 ? "" : "s"}`;
+    article.append(title, text, meta);
+    contextPreviewSections.append(article);
+  }
+
+  contextPreviewOmitted.replaceChildren();
+  for (const candidate of packet.omittedCandidates) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    label.textContent = candidate.kind;
+    value.textContent = `${candidate.reason} | ${candidate.tokens} tokens`;
+    item.append(label, value);
+    contextPreviewOmitted.append(item);
+  }
+
+  contextPreviewExport.textContent = JSON.stringify(packet, null, 2);
 }
 
 function renderLifecyclePolicy() {
@@ -1363,6 +1433,17 @@ function readSelectedAuditHistory() {
   } catch {
     return [];
   }
+}
+
+function scrollHashTargetIntoPanel() {
+  const hash = window.location.hash.replace(/^#/, "");
+  if (!hash) return;
+  const panel = document.querySelector(".detail-panel");
+  const target = document.getElementById(hash);
+  if (!panel || !target || !panel.contains(target)) return;
+  requestAnimationFrame(() => {
+    panel.scrollTop = Math.max(0, target.offsetTop - 28);
+  });
 }
 
 function formatTime(value) {

@@ -71,6 +71,7 @@ is still required before any public live update.
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI compaction audit | `reviews/overnight-20260522/brain-ui-compaction-audit-evidence.md` |
+| Brain UI context preview | `reviews/overnight-20260522/brain-ui-context-preview-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
 | Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Browser evidence gate review | `reviews/overnight-20260522/gemini-browser-evidence-gate-review.md` |
@@ -145,6 +146,11 @@ Latest local verification before this summary:
   evidence, Gemini review evidence, the `brain-ui-session-compaction-audit`
   release-state surface, and fresh Brain UI smoke and interaction smoke
   coverage. GitHub Actions CI run `26299756374` passed on `fb466db`.
+- Brain UI Context Preview verification: local smoke and interaction smoke pass
+  with `prompt-context-preview` evidence. Browser DOM evidence reports 642 of
+  900 fixture context tokens used, 3 selected memories, 3 context sections, 2
+  omitted candidates, read-only hosted mode, local-only writes, zero privacy
+  leaks, zero console errors, and no private/key-shaped visible text.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -212,6 +218,11 @@ Sanitized fixture evidence exists under
   4 candidate fingerprints, 2 redactions, chronological output, 1
   exact-identifier candidate, zero privacy leaks, zero console errors, and no
   raw candidate text
+- context preview evidence records the fixture prompt recall packet, 642 of 900
+  context tokens used, 258 tokens remaining, 3 selected memories, 3 context
+  sections, 2 omitted candidates, hosted read-through as read-only, local-only
+  writes, zero privacy leaks, zero console errors, and no private/key-shaped
+  visible text
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -244,6 +255,8 @@ local memory contents.
 - Gemini Brain UI local memory edit review: `CLEAN`.
 - Gemini Brain UI local edit overlay browse review: `CLEAN`.
 - Gemini Brain UI local memory materialize review: `CLEAN`.
+- Gemini Brain UI context preview review: `CLEAN`, with a note that Gemini CLI
+  produced transient capacity warnings before returning the verdict.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.

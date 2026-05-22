@@ -11,6 +11,7 @@ import {
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
+  buildPromptContextPreview,
   buildResearchLineage,
   buildSessionCompactionAudit,
   containsPrivateLikeText,
@@ -24,6 +25,7 @@ import { createBrainUiServer } from "./server.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const sessionCompactionFixture = JSON.parse(await readFile(join(here, "fixtures/session-compaction-local-audit.json"), "utf8"));
+const promptContextFixture = JSON.parse(await readFile(join(here, "fixtures/prompt-context-preview.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
 const selectedPolicyRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-policy-"));
@@ -208,6 +210,22 @@ try {
   assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
   assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
   assert.doesNotMatch(JSON.stringify(sessionCompactionAudit), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+
+  const promptContext = buildPromptContextPreview(fixture, promptContextFixture);
+  assert.equal(promptContext.mode, "fixture-prompt-context-preview");
+  assert.equal(promptContext.writesRealFiles, false);
+  assert.equal(promptContext.query, "native memory optimization");
+  assert.equal(promptContext.tokenBudget, 900);
+  assert.equal(promptContext.totalTokens, 642);
+  assert.equal(promptContext.budgetRemaining, 258);
+  assert.equal(promptContext.safety.privacyLeakCount, 0);
+  assert.equal(promptContext.safety.hostedReadThrough, "read-only");
+  assert.equal(promptContext.safety.writeMode, "local-only");
+  assert.ok(promptContext.selectedMemories.some((memory) => memory.id === "memory:hybrid-recall" && memory.injected));
+  assert.ok(promptContext.sections.some((section) => section.title === "Guardrails" && section.injected));
+  assert.ok(promptContext.omittedCandidates.some((candidate) => candidate.reason.includes("noise")));
+  assert.match(promptContext.compiledContext, /<recallweave-context>/);
+  assert.doesNotMatch(JSON.stringify(promptContext), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const policyDraft = buildLifecyclePolicyDraft(fixture, {
     forceEveryTurn: true,
@@ -689,6 +707,7 @@ try {
           "nucleus-export",
           "research-lineage",
           "session-compaction-audit",
+          "prompt-context-preview",
           "lifecycle-policy-draft",
           "selected-lifecycle-policy-apply",
           "review-queue-draft",

@@ -18,6 +18,7 @@ The UI should expose:
 - lifecycle and sleep-cycle events,
 - research lineage,
 - metrics-only local session compaction audit,
+- prompt context preview for injected recall packets,
 - lifecycle policy draft export,
 - selected lifecycle policy apply with explicit confirmation,
 - memory review queue draft export,
@@ -75,17 +76,18 @@ Required visual review path:
 12. Nucleus snapshot preview,
 13. research lineage preview,
 14. local session compaction audit preview,
-15. lifecycle policy preview,
-16. selected lifecycle policy apply confirmation,
-17. memory review queue preview,
-18. selected memory review queue apply confirmation,
-19. compiled wiki/vault preview,
-20. fixture vault sync report with conflict handling,
-21. selected local vault sync dry-run,
-22. selected local vault sync apply confirmation,
-23. fixture local-container audit preflight,
-24. selected local memory edit overlay confirmation,
-25. selected local memory materialize confirmation.
+15. prompt context preview,
+16. lifecycle policy preview,
+17. selected lifecycle policy apply confirmation,
+18. memory review queue preview,
+19. selected memory review queue apply confirmation,
+20. compiled wiki/vault preview,
+21. fixture vault sync report with conflict handling,
+22. selected local vault sync dry-run,
+23. selected local vault sync apply confirmation,
+24. fixture local-container audit preflight,
+25. selected local memory edit overlay confirmation,
+26. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -123,6 +125,16 @@ fingerprints. It does not show raw session text or candidate memory text. The
 browser evidence records `fixture-local-session-compaction-audit`,
 `metricsOnly: true`, `writesRealFiles: false`, zero privacy leaks, zero console
 errors, and no private/key-shaped visible text.
+
+The Context Preview panel is fixture-only. It shows the recall packet that
+would enter a prompt after hybrid retrieval and reranking: selected memory
+metadata, context sections, omitted candidates, token budget, citations,
+read-only hosted status, local-only write mode, and leak counters. It uses
+public fixture text only and marks `writesRealFiles: false`. The browser
+evidence records `fixture-prompt-context-preview`, 642 of 900 context tokens
+used, 3 selected memories, 3 context sections, 2 omitted candidates, hosted
+read-through as read-only, local-only writes, zero console errors, and no
+private/key-shaped visible text.
 
 The Lifecycle Policy panel stages recall and write-policy choices as a fixture
 draft export. It clamps numeric settings, limits low-confidence write behavior

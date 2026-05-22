@@ -16,7 +16,8 @@ The current PR adds:
   content-free pre-write audit logging;
 - a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
-  lineage, Compaction Audit, vault preview, sync-report inspection,
+  lineage, Compaction Audit, Context Preview, vault preview, sync-report
+  inspection,
   selected vault sync dry-run, selected vault sync apply, selected
   local-container browse, lifecycle policy preview, selected lifecycle policy apply, memory
   review queue preview, and selected review queue apply, selected local memory
@@ -31,7 +32,8 @@ The current PR adds:
 Preview surfaces include selected local-container browse, selected vault sync
 dry-run, selected vault sync apply, lifecycle policy, lifecycle policy apply,
 memory review queue, review queue apply, local memory edit, overlay browse,
-materialize, dynamic graph layout, graph navigation, and Compaction Audit.
+materialize, dynamic graph layout, graph navigation, Compaction Audit, and
+Context Preview.
 
 ## Safety Boundary
 

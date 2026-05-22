@@ -96,6 +96,14 @@
   events, 4 candidate fingerprints, 2 redactions, chronological output, 1
   exact-identifier candidate, zero privacy leaks, zero console errors, and no
   raw candidate text.
+- The Context Preview slice was verified by Codex Browser DOM evidence, fresh
+  Brain UI smoke, and interaction smoke. A fixture-only screenshot was captured
+  at `brain-ui-context-preview.png`, and
+  `brain-ui-context-preview-evidence.json` reports 642 of 900 context tokens
+  used, 258 tokens remaining, 3 selected memories, 3 context sections, 2
+  omitted candidates, hosted read-through as read-only, local-only write mode,
+  zero privacy leaks, zero console errors, and no private/key-shaped visible
+  text.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.
