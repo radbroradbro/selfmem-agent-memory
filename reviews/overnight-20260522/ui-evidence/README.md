@@ -18,6 +18,10 @@
   `brain-ui-sync-report-dom-evidence.json`.
 - Headless Chrome captured the sync-report panel in
   `brain-ui-sync-report.png`.
+- Codex Browser captured edit-export DOM evidence in
+  `brain-ui-edit-export-dom-evidence.json`.
+- Headless Chrome captured the edit-export panel in
+  `brain-ui-edit-export.png`.
 
 Chrome DevTools MCP was unavailable because no debug Chrome was listening on
 port `9222`. The run fell back to Computer Use plus headless Chrome.

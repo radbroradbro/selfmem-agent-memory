@@ -567,6 +567,40 @@ textarea {
   margin: 10px 0 0;
 }
 
+.edit-export-panel {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.edit-export-panel h4 {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+#exportStatus {
+  min-height: 18px;
+  color: var(--green);
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.edit-export {
+  min-height: 78px;
+  max-height: 190px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #10151a;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 @media (max-width: 1080px) {
   body {
     overflow: auto;

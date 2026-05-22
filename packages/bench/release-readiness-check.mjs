@@ -24,6 +24,8 @@ const requiredFiles = [
   `${reviewDir}/wiki-vault-sync-evidence.md`,
   `${reviewDir}/update-flow-evidence.md`,
   `${reviewDir}/brain-ui-vault-preview-evidence.md`,
+  `${reviewDir}/brain-ui-edit-export-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-edit-export-review.md`,
   `${reviewDir}/brain-ui-sync-report-evidence.md`,
   `${reviewDir}/gemini-brain-ui-sync-report-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
@@ -32,6 +34,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-fixture-edit.png`,
   `${reviewDir}/ui-evidence/brain-ui-vault-preview-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-vault-preview.png`,
+  `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report.png`,
 ];
@@ -127,6 +131,16 @@ check("dom evidence is sane", () => {
   assert.equal(vaultEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(vaultEvidence.consoleMessages.length, 0);
   assert.ok(vaultEvidence.evidence.vaultOptionCount >= 10);
+
+  const editEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-edit-export-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(editEvidence.ok, true);
+  assert.equal(editEvidence.evidence.hasDraftExportHeading, true);
+  assert.equal(editEvidence.evidence.writesRealFiles, false);
+  assert.ok(editEvidence.evidence.editCount >= 1);
+  assert.equal(editEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(editEvidence.consoleMessages.length, 0);
 
   const syncEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-sync-report-dom-evidence.json"), "utf8"),

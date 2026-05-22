@@ -39,7 +39,12 @@ const docEditor = document.querySelector("#docEditor");
 const saveEdit = document.querySelector("#saveEdit");
 const resetEdit = document.querySelector("#resetEdit");
 const editStatus = document.querySelector("#editStatus");
+const exportStatus = document.querySelector("#exportStatus");
+const editExport = document.querySelector("#editExport");
 const timelineList = document.querySelector("#timelineList");
+
+const privateLikePattern =
+  /<private>[\s\S]*?(?:<\/private>|$)|pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|Bearer [A-Za-z0-9._-]{20,}/gi;
 
 const [response, vaultResponse, syncResponse] = await Promise.all([
   fetch("/fixtures/nucleus.fixture.json"),
@@ -71,6 +76,10 @@ document.querySelectorAll("[data-filter]").forEach((button) => {
 
 saveEdit.addEventListener("click", () => {
   if (!state.selectedId) return;
+  if (containsPrivateLikeText(docEditor.value)) {
+    editStatus.textContent = "Private or key-shaped text was not saved.";
+    return;
+  }
   state.edits[state.selectedId] = docEditor.value;
   localStorage.setItem("recallweave.fixture.edits", JSON.stringify(state.edits));
   editStatus.textContent = "Saved locally for this fixture review.";
@@ -99,6 +108,7 @@ function render() {
   renderDetails(selected);
   renderVaultControls(selected);
   renderSyncReport();
+  renderEditExport();
 }
 
 function renderMetrics() {
@@ -182,6 +192,38 @@ function renderDetails(node) {
   saveEdit.disabled = !node.editable;
   resetEdit.disabled = !node.editable;
   if (!node.editable) editStatus.textContent = "This fixture node is inspect-only.";
+}
+
+function renderEditExport() {
+  const draft = buildEditExport();
+  if (draft.edits.length === 0) {
+    exportStatus.textContent = "No saved fixture edits.";
+    editExport.textContent = "";
+    return;
+  }
+  exportStatus.textContent = `${draft.edits.length} saved fixture edit${draft.edits.length === 1 ? "" : "s"}.`;
+  editExport.textContent = JSON.stringify(draft, null, 2);
+}
+
+function buildEditExport() {
+  const editableNodes = new Map(state.snapshot.nodes.filter((node) => node.editable).map((node) => [node.id, node]));
+  const edits = Object.entries(state.edits)
+    .filter(([nodeId, contents]) => editableNodes.has(nodeId) && typeof contents === "string" && contents.trim().length > 0)
+    .map(([nodeId, contents]) => {
+      const node = editableNodes.get(nodeId);
+      return {
+        nodeId,
+        title: node.title,
+        kind: node.kind,
+        contents: redactPrivateLikeText(contents),
+      };
+    });
+  return {
+    schemaVersion: 1,
+    mode: "fixture-draft",
+    writesRealFiles: false,
+    edits,
+  };
 }
 
 function renderVaultControls(node) {
@@ -355,7 +397,10 @@ function position(id) {
 
 function readEdits() {
   try {
-    return JSON.parse(localStorage.getItem("recallweave.fixture.edits") ?? "{}");
+    const parsed = JSON.parse(localStorage.getItem("recallweave.fixture.edits") ?? "{}");
+    return Object.fromEntries(
+      Object.entries(parsed).filter(([, value]) => typeof value === "string" && !containsPrivateLikeText(value)),
+    );
   } catch {
     return {};
   }
@@ -373,4 +418,14 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
-export { renderGraph };
+function containsPrivateLikeText(value) {
+  privateLikePattern.lastIndex = 0;
+  return privateLikePattern.test(String(value));
+}
+
+function redactPrivateLikeText(value) {
+  privateLikePattern.lastIndex = 0;
+  return String(value).replace(privateLikePattern, "[REDACTED_PRIVATE]");
+}
+
+export { buildEditExport, renderGraph };

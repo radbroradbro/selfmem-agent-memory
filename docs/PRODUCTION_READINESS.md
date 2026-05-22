@@ -32,6 +32,8 @@ Before a public live update or release note:
 - UI evidence uses sanitized fixture data only,
 - UI sync-report evidence proves dry-run vault writes and reviewed-page
   conflicts without reading real agent memory paths,
+- UI edit evidence proves private/key-shaped text is refused before fixture
+  draft export,
 - wiki lint passes if wiki sync changed,
 - wiki vault compiler smoke passes if wiki sync changed,
 - wiki vault disk-sync smoke passes if wiki sync changed,

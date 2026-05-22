@@ -54,15 +54,19 @@ Required visual review path:
 4. lifecycle event inspection,
 5. derived doc edit,
 6. save or reset,
-7. timeline scan,
-8. provenance scan,
-9. compiled wiki/vault preview,
-10. fixture vault sync report with conflict handling.
+7. draft export preview,
+8. timeline scan,
+9. provenance scan,
+10. compiled wiki/vault preview,
+11. fixture vault sync report with conflict handling.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
 vault, redacts its root as `fixture-temp-vault`, and never reads an agent's real
 memory directory.
+
+The fixture editor refuses private or key-shaped text and exports saved fixture
+edits as a preview object with `writesRealFiles: false`.
 
 ## Production Path
 
