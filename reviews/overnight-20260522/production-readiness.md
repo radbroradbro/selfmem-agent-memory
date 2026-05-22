@@ -347,6 +347,9 @@ evidence for:
   or local-path output.
 - canary remediation evidence with failed-check diagnosis, metrics-only action
   plans, and fleet/public rollout still blocked.
+- real canary diagnostic evidence from two redacted external Hermes bundles,
+  both privacy-clean and both rejected by strict rollout intake because store
+  latency was missing and recall p95 exceeded the strict threshold.
 - GitHub Actions CI run `26310773948` passed on `6ae4ce7`, including Test,
   Full smoke, and Release readiness check for the canary report generator gate.
 - GitHub Actions CI run `26311728246` passed on `77b3cee`, including Test,

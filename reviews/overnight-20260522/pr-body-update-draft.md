@@ -17,6 +17,7 @@ Live status:
 - Adds the self-hosted Brain UI preview for graph browsing, research lineage, research source lock, model matrix, compaction audit, benchmark dashboard, canary rollout, context preview, release readiness, lifecycle trail, current-head live browser evidence, local audit, selected local-container browse, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, selected local memory edit, local edit overlay browse, selected local memory materialize, dynamic graph layout, graph navigation, and provenance/timeline inspection.
 - Adds `selfmem_update`, clean consumer smoke coverage, release blocker doctor, GitHub handoff packet, goal completion audit, hosted baseline preflight, canary evidence intake, canary report generator from trace/diagnostic exports, and `canary:diagnose` remediation guidance for failed reports.
 - Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
+- Adds real diagnostic canary evaluation evidence from two redacted external Hermes bundles. Both were metrics-only and privacy-clean, and both failed strict rollout intake, so they do not count as production rollout evidence.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Keeps public launch conservative: fixture evidence is allowed, real private memory text is not committed, and benchmark claims stay blocked until a matched source-locked canary or hosted baseline passes with reviewer sign-off.
 
@@ -28,9 +29,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `8777290169f598ff9172e889e927858b3956f764`.
+- Latest code/product baseline: `6a8bbf09ef6e24ed12c30e0fcff1fe185100e907`.
+- GitHub Actions run `26316450928`: passed CI after the Brain UI lifecycle trail evidence refresh.
+- Previous verified baseline before the latest lifecycle trail evidence refresh:
+  `8777290169f598ff9172e889e927858b3956f764`.
 - GitHub Actions run `26316074705`: passed CI after the Brain UI lifecycle trail and current-head browser evidence refresh.
-- Previous verified baseline before the lifecycle trail browser evidence refresh:
+- Earlier verified baseline before the lifecycle trail browser evidence refresh:
   `b5c1e025db072fca750dc6730741c23e1b981eca`.
 - GitHub Actions run `26313942262`: passed CI after the GitHub live sync release gate.
 - Earlier verified baseline before the live sync release gate:
@@ -62,6 +66,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Human approval is required before merge, visibility changes, or public release messaging.
 - Hosted Supermemory comparison claims require a fresh metrics-only baseline.
 - One real-container production rollout remains incomplete; fixture UI and canary tooling are not enough for public launch.
+- Two redacted real diagnostic bundles have been evaluated and rejected by the strict rollout gate. A fresh patched one-agent canary must pass before this blocker can close.
 
 ## Evidence Packet
 

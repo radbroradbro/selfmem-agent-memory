@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `8777290`, run `26316074705`, success.
+  `6a8bbf0`, run `26316450928`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -52,6 +52,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26313358962` on `e765e8f`: success.
 - GitHub Actions CI run `26313942262` on `b5c1e02`: success.
 - GitHub Actions CI run `26316074705` on `8777290`: success.
+- GitHub Actions CI run `26316450928` on `6a8bbf0`: success.
 
 ## Shipped Overnight Slices
 
@@ -68,6 +69,7 @@ evidence are still required before any public live update.
 | Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |
+| Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
 | Brain UI model matrix | `packages/brain-ui/fixtures/model-matrix.json`, `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
@@ -289,6 +291,12 @@ Latest local verification before this summary:
   fixture reports `recall-p95` and `store-p95`, keeps fleet/public rollout
   blocked, and requires a fresh collection window after fixes. GitHub Actions
   CI run `26312283137` passed on `4f5a079`.
+- Real canary diagnostic evaluation: two redacted external Hermes diagnostic
+  bundles were converted into temporary metrics-only reports. Both were real
+  external inputs and privacy-clean. Both failed strict rollout intake on
+  missing store latency and recall p95, so neither counts as real rollout
+  evidence. This confirms the canary gate rejects weak real evidence rather
+  than treating any diagnostic bundle as success.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `8777290` at `http://127.0.0.1:4189/`. The screenshot shows the Nucleus
   graph, lifecycle trail, lifecycle event card, retrieval trace card, and

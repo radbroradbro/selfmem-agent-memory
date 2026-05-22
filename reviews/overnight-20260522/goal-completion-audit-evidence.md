@@ -71,6 +71,11 @@ hosted-baseline, and real-rollout requirements.
 - Canary remediation can turn failed canary reports into metrics-only next
   actions, but it does not make failed evidence pass or authorize broader
   rollout.
+- Two real redacted Hermes diagnostic bundles were evaluated through
+  `canary:report`, `canary:intake`, and `canary:diagnose`. They were
+  metrics-only and privacy-clean, but both failed strict-real intake on missing
+  store latency and recall p95. This confirms the gate is rejecting weak real
+  rollout evidence instead of marking the rollout complete.
 - Real-container production rollout is still a canary step, not complete.
 
 ## Verification

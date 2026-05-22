@@ -33,6 +33,7 @@ const files = {
   canaryRemediationEvidence: `${reviewDir}/canary-remediation-evidence.md`,
   canaryRemediationReview: `${reviewDir}/gemini-canary-remediation-review.md`,
   adapterBoundedReadThroughEvidence: `${reviewDir}/adapter-bounded-read-through-evidence.md`,
+  realCanaryDiagnosticEvidence: `${reviewDir}/real-canary-diagnostic-evidence.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
@@ -188,6 +189,7 @@ const requirements = [
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [
     `${reviewDir}/brain-ui-canary-rollout-evidence.md`,
+    files.realCanaryDiagnosticEvidence,
     "docs/RELEASE_HANDOFF.md",
   ]),
 ];

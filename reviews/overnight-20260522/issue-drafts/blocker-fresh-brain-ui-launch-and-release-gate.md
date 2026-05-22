@@ -9,10 +9,14 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `8777290169f598ff9172e889e927858b3956f764`.
+- Latest code/product baseline: `6a8bbf09ef6e24ed12c30e0fcff1fe185100e907`.
+- GitHub Actions run `26316450928` passed CI after the Brain UI lifecycle
+  trail evidence refresh.
+- Previous code/product baseline before the latest lifecycle trail evidence
+  refresh: `8777290169f598ff9172e889e927858b3956f764`.
 - GitHub Actions run `26316074705` passed CI after the Brain UI lifecycle
   trail and current-head browser evidence refresh.
-- Previous code/product baseline before the lifecycle trail browser evidence
+- Earlier code/product baseline before the lifecycle trail browser evidence
   refresh: `b5c1e025db072fca750dc6730741c23e1b981eca`.
 - GitHub Actions run `26313942262` passed CI after the GitHub live sync
   release gate.
@@ -39,6 +43,9 @@ requirements are resolved.
   and blocks public benchmark claims.
 - One real-container production canary remains incomplete. Fixture UI and
   report tooling are not a production rollout.
+- Two redacted real diagnostic bundles were evaluated and rejected by strict
+  rollout intake on missing store latency and recall p95. The next canary must
+  use a fresh patched runtime window and pass strict intake.
 
 ## Acceptance Criteria
 

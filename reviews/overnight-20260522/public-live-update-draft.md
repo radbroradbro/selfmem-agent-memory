@@ -37,6 +37,8 @@ The current PR adds:
   sanitized report format without raw memory text or local paths;
 - a canary diagnosis command that turns failed canary reports into metrics-only
   remediation actions without exposing diagnostic contents;
+- real diagnostic canary evaluation evidence from two redacted external Hermes
+  bundles, both privacy-clean and both rejected by strict rollout intake;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
@@ -90,9 +92,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `8777290`
-- GitHub Actions: CI run `26316074705` passed for the Brain UI lifecycle trail
-  and current-head browser evidence refresh
+- Latest verified code baseline: `6a8bbf0`
+- GitHub Actions: CI run `26316450928` passed for the Brain UI lifecycle trail
+  evidence refresh
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -116,12 +118,18 @@ Latest verified head before this draft refresh:
   still fail `--strict-real`
 - Canary diagnosis: `canary:diagnose` turns failed canary reports into
   metrics-only remediation actions and keeps fleet/public rollout blocked
+- Real diagnostic canary evaluation: two redacted external Hermes bundles were
+  converted into temporary metrics-only reports. Both were real inputs,
+  privacy-clean, and rejected by strict rollout intake on missing store latency
+  and recall p95. They do not count as real rollout evidence
 - GitHub Actions CI run `26312283137` passed on `4f5a079`, the canary
   remediation diagnosis gate commit.
 - GitHub Actions CI run `26313942262` passed on `b5c1e02`, the GitHub live
   sync release gate commit.
 - GitHub Actions CI run `26316074705` passed on `8777290`, the Brain UI
   lifecycle trail and current-head browser evidence refresh.
+- GitHub Actions CI run `26316450928` passed on `6a8bbf0`, the lifecycle
+  trail evidence refresh.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
