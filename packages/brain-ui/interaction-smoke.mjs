@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import {
   buildContainerHealth,
   buildEditExport,
+  buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
@@ -79,6 +80,51 @@ try {
   const editableNode = editableNodes.at(-1);
   assert.ok(retrievalTrace, "fixture must include a retrieval trace");
   assert.ok(editableNode, "fixture must include an editable node");
+
+  const expandedFixture = {
+    ...fixture,
+    nodes: [
+      ...fixture.nodes,
+      ...Array.from({ length: 18 }, (_, index) => ({
+        id: `memory:layout-extra-${index}`,
+        kind: index % 3 === 0 ? "memory" : index % 3 === 1 ? "decision" : "derived_doc",
+        title: `Layout extra node ${index}`,
+        createdAt: `2026-05-22T10:${String(index).padStart(2, "0")}:00.000Z`,
+        updatedAt: `2026-05-22T10:${String(index).padStart(2, "0")}:30.000Z`,
+        tags: ["layout"],
+      })),
+    ],
+    edges: [
+      ...fixture.edges,
+      ...Array.from({ length: 18 }, (_, index) => ({
+        id: `edge:layout-extra-${index}`,
+        from: index % 2 === 0 ? fixture.nodes[0].id : `memory:layout-extra-${Math.max(0, index - 1)}`,
+        to: `memory:layout-extra-${index}`,
+        kind: "relates_to",
+        createdAt: `2026-05-22T10:${String(index).padStart(2, "0")}:45.000Z`,
+      })),
+    ],
+  };
+  const layout = buildGraphLayout(expandedFixture, expandedFixture.nodes);
+  assert.equal(layout.mode, "dynamic-graph-layout");
+  assert.equal(layout.writesRealFiles, false);
+  assert.equal(layout.nodes.length, expandedFixture.nodes.length);
+  assert.ok(layout.columns >= 2, "expanded layout should use multiple dynamic columns");
+  assert.ok(layout.height > 380, "expanded layout should grow vertically instead of piling nodes");
+  const layoutSerialized = JSON.stringify(layout);
+  assert.doesNotMatch(layoutSerialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+  const pointsByColumn = new Map();
+  for (const point of layout.nodes) {
+    const points = pointsByColumn.get(point.x) ?? [];
+    points.push(point);
+    pointsByColumn.set(point.x, points);
+  }
+  for (const points of pointsByColumn.values()) {
+    const sorted = [...points].sort((a, b) => a.y - b.y);
+    for (let index = 1; index < sorted.length; index += 1) {
+      assert.ok(sorted[index].y - sorted[index - 1].y >= 110, "same-column graph nodes should be vertically separated");
+    }
+  }
 
   const containerHealth = buildContainerHealth(fixture);
   assert.equal(containerHealth.mode, "fixture-container-health");
@@ -597,6 +643,7 @@ try {
         checked: [
           "search-filter",
           "retrieval-trace",
+          "dynamic-graph-layout",
           "editable-node",
           "container-health",
           "private-edit-guard",

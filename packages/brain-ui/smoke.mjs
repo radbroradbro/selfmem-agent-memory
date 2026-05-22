@@ -43,6 +43,7 @@ try {
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
   assert.match(app, /buildContainerHealth/);
+  assert.match(app, /buildGraphLayout/);
   assert.match(app, /buildNucleusExport/);
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /buildLifecyclePolicyDraft/);
@@ -64,6 +65,7 @@ try {
   assert.match(app, /buildEditExport/);
   assert.match(model, /const kind = safeExportText\(node\.kind\)/);
   assert.match(model, /function buildContainerHealth/);
+  assert.match(model, /function buildGraphLayout/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
   assert.match(model, /function buildMemoryReviewQueue/);
   assert.match(model, /function mergeSelectedAuditTrail/);
@@ -206,6 +208,7 @@ try {
           "model",
           "styles",
           "fixture",
+          "dynamic-graph-layout",
           "lifecycle-policy",
           "review-queue",
           "wiki-vault",

@@ -39,6 +39,7 @@ is still required before any public live update.
 | Wiki vault disk sync | `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` |
 | Brain UI graph and editor | `packages/brain-ui/`, `reviews/overnight-20260522/ui-evidence/README.md` |
+| Brain UI dynamic graph layout | `packages/brain-ui/src/model.js`, `reviews/overnight-20260522/brain-ui-dynamic-layout-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-dynamic-layout-review.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |
 | Brain UI draft export | `reviews/overnight-20260522/brain-ui-edit-export-evidence.md` |
@@ -112,6 +113,10 @@ Latest local verification before this summary:
   `b5352a0`, run `26294323086`.
 - GitHub Actions CI: success on guarded local memory materialize commit
   `21fd4d6`, run `26295772356`.
+- Local dynamic Brain UI layout verification: `node packages/brain-ui/smoke.mjs`
+  and `node packages/brain-ui/interaction-smoke.mjs` passed with
+  `dynamic-graph-layout` evidence. CI verification is pending until this slice
+  is pushed.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -169,6 +174,9 @@ Sanitized fixture evidence exists under
 - selected local memory materialize controls are present in Browser DOM
   evidence and interaction smoke proves safe overlays can be written into
   `memories.jsonl` with a backup and content-free audit log
+- dynamic graph layout evidence records `dynamic-graph-layout`, 9 fixture
+  nodes, 9 fixture edges, 2 columns, 5 rows, zero node overlaps, no console
+  errors, and no private/key-shaped visible text
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real

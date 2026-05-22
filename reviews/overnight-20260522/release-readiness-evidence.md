@@ -91,6 +91,10 @@ Scope:
   loaded browser evidence baseline `96ae9cc` in the in-app browser and verifies the main Brain UI
   surfaces without private or key-shaped visible text. Screenshot capture timed
   out and is recorded as such.
+- Added dynamic Brain UI graph layout evidence to the release gate. The graph
+  now derives positions from visible Nucleus nodes and edges, grows vertically,
+  scrolls when needed, and the fixture evidence must report zero node overlaps,
+  zero console errors, and no private/key-shaped visible text.
 - Added Gemini review for the browser evidence gate and made that review packet
   a required release-readiness artifact.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
@@ -125,6 +129,8 @@ What `release:check` verifies:
 - Brain UI memory review queue DOM evidence is sane,
 - Brain UI selected memory review queue apply evidence exists and is covered by
   a fresh interaction smoke,
+- Brain UI dynamic graph layout evidence exists and reports the
+  `dynamic-graph-layout` mode with zero overlaps,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,
@@ -157,6 +163,7 @@ Verification:
 - `git diff --check`: covered by `release:check`.
 - Fresh Brain UI smoke: covered by `release:check`.
 - Fresh Brain UI interaction smoke: covered by `release:check`.
+- Fresh dynamic graph layout smoke: covered by `release:check`.
 - Core package dry-run: covered by `release:check`.
 - Broadened secret-pattern scan: covered by `release:check`.
 - Broadened forbidden runtime file scan: covered by `release:check`.
@@ -195,7 +202,7 @@ Cold review response:
   local memory materialize, selected vault sync dry-run, write-confirmed selected vault sync apply,
   write-confirmed selected lifecycle policy apply, private/key-shaped policy
   rejection, dry-run sync reporting, write-confirmed selected review queue
-  apply, private/key-shaped review rejection, audit-log write intent coverage,
+  apply, private/key-shaped review rejection, dynamic graph layout spacing, audit-log write intent coverage,
   and public-safe serialization.
 
 Known limits:
@@ -220,3 +227,7 @@ Known limits:
   browse commit `b5352a0`.
 - GitHub Actions CI run `26295772356` passed on guarded local memory
   materialize commit `21fd4d6`.
+- Dynamic graph layout CI is pending until this slice is pushed. Local
+  `node packages/brain-ui/smoke.mjs`,
+  `node packages/brain-ui/interaction-smoke.mjs`, and
+  `node packages/bench/release-readiness-check.mjs` are the current evidence.

@@ -34,6 +34,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   selected vault sync dry-run,
   selected vault sync apply, lifecycle policy preview, selected lifecycle
   policy apply, memory review queue preview, and selected review queue apply.
+- Deterministic Brain UI dynamic graph layout that derives visible node
+  positions from the current Nucleus graph, grows vertically, scrolls when
+  needed, and replaces the older fixed fixture coordinates.
 - Session compaction fixture benchmark.
 - Dry-run-first updater wrapper and updater smoke.
 - Release-readiness gate.
@@ -125,6 +128,11 @@ Controller follow-up after that sandbox run:
   commit `b5352a0` passed.
 - GitHub Actions CI run `26295772356` on guarded local memory materialize
   commit `21fd4d6` passed.
+- Local dynamic graph layout checks passed after the latest CI baseline:
+  `node packages/brain-ui/smoke.mjs` and
+  `node packages/brain-ui/interaction-smoke.mjs`. Browser evidence reports
+  `dynamic-graph-layout`, 9 fixture nodes, 9 fixture edges, 2 columns, 5 rows,
+  zero overlaps, zero console errors, and no private/key-shaped visible text.
 
 ## UI Evidence
 
@@ -152,6 +160,7 @@ evidence for:
 - memory review queue preview.
 - selected review queue apply.
 - Codex Browser DOM evidence for the main Brain UI surfaces.
+- dynamic graph layout evidence with zero overlaps and fixture-only text.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
@@ -166,7 +175,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout rather than fixed coordinates, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |
@@ -191,34 +200,36 @@ Use only bundled fixture data:
 1. Start the Brain UI from a clean checkout.
 2. Search for the native-memory fixture.
 3. Open the Nucleus graph/index view and inspect node kinds.
-4. Open provenance and retrieval trace panels.
-5. Edit the derived native-memory doc, then show save/cancel and draft export.
-6. Open the Nucleus snapshot preview and confirm `writesRealFiles: false`.
-7. Open the wiki/vault preview and sync report, including the reviewed-page
+4. Confirm the dynamic graph layout shows the fixture graph without node
+   overlaps.
+5. Open provenance and retrieval trace panels.
+6. Edit the derived native-memory doc, then show save/cancel and draft export.
+7. Open the Nucleus snapshot preview and confirm `writesRealFiles: false`.
+8. Open the wiki/vault preview and sync report, including the reviewed-page
    conflict note.
-8. Open the local audit preflight panel.
-9. Open selected vault sync apply and show that it requires explicit write
+9. Open the local audit preflight panel.
+10. Open selected vault sync apply and show that it requires explicit write
    confirmation before it can write files.
-10. Open the lifecycle policy preview and stage a no-write draft export.
-11. In a throwaway fixture only, start with
+11. Open the lifecycle policy preview and stage a no-write draft export.
+12. In a throwaway fixture only, start with
    `RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY=1`, open selected lifecycle
    policy apply, and show that it requires explicit write confirmation before
    it can write the local policy file.
-12. Open the memory review queue and stage a no-write candidate decision.
-13. In a throwaway fixture only, start with
+13. Open the memory review queue and stage a no-write candidate decision.
+14. In a throwaway fixture only, start with
    `RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY=1`, open selected review queue
    apply, and show that it requires explicit write confirmation before it can
    write the local decision log.
-14. Optional, in a throwaway fixture only: start with
+15. Optional, in a throwaway fixture only: start with
    `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` and
    `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_BROWSE=1`, run selected local-container
    audit and browse, confirm the visible path is redacted, and confirm local
    edit overlay browse shows only redacted overlay previews.
-15. Optional, in a throwaway fixture only: start with
+16. Optional, in a throwaway fixture only: start with
    `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_MATERIALIZE=1`, run selected local memory
    materialize, and confirm backup plus audit paths are relative and
    content-free.
-16. End with the release-readiness gate output and residual alpha caveats.
+17. End with the release-readiness gate output and residual alpha caveats.
 
 Do not record real local memories, raw session history, private diagnostics,
 credentials, private paths, or real agent logs.

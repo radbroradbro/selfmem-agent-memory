@@ -285,7 +285,8 @@ button.active {
 .graph {
   position: relative;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
+  scrollbar-gutter: stable;
 }
 
 .graph svg {
@@ -314,7 +315,7 @@ button.active {
 
 .node {
   position: absolute;
-  width: 188px;
+  width: 168px;
   min-height: 70px;
   transform: translate(-50%, -50%);
   border: 1px solid var(--line);

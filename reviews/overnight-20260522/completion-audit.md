@@ -51,6 +51,7 @@ complete or publish a public live update.
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
 | Self-hosted Brain UI | `packages/brain-ui/`, UI screenshots and DOM evidence under `reviews/overnight-20260522/ui-evidence/` | Proven for fixture mode |
 | Brain UI graph/editor evidence | `brain-ui-fixture-edit.png`, `brain-ui-dom-evidence.json`, `brain-ui-edit-export-*` | Proven with sanitized fixtures |
+| Brain UI dynamic graph layout | `brain-ui-dynamic-layout-evidence.md`, `gemini-brain-ui-dynamic-layout-review.md`, `ui-evidence/brain-ui-dynamic-layout-evidence.json`, `ui-evidence/brain-ui-dynamic-layout.png` | Proven locally with data-driven layout, zero fixture overlaps, and no private/key-shaped text |
 | Brain UI vault/sync evidence | `brain-ui-vault-preview-*`, `brain-ui-sync-report-*` | Proven with sanitized fixtures |
 | Brain UI container-health evidence | `brain-ui-container-health-*`, `brain-ui-container-health-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI local-audit preview evidence | `brain-ui-local-audit-*`, `brain-ui-local-audit-preview-evidence.md`, Gemini review | Proven with sanitized fixtures |
@@ -70,6 +71,7 @@ complete or publish a public live update.
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` loaded browser evidence baseline `96ae9cc` in Codex Browser and checked main surfaces plus no private/key-shaped visible text | Proven for DOM; screenshot timed out |
+| Dynamic layout browser evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-dynamic-layout-evidence.json` and `brain-ui-dynamic-layout.png` show 9 nodes, 9 edges, 2 columns, 5 rows, zero overlaps, zero console errors, and no private/key-shaped visible text | Proven with sanitized fixtures |
 | Update flow | `bin/selfmem_update`, `packages/bench/update-flow-smoke.py`, `reviews/overnight-20260522/update-flow-evidence.md` | Proven by smoke and review |
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `tests/local-container/audit.test.ts`, `local-container-audit-evidence.md`, Gemini review | Proven as read-only preflight |
 | Local-only compaction benchmarking | `packages/core/src/compaction/session.ts`, `packages/bench/session-compaction-smoke.mjs`, `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` | Proven with public fixtures |
@@ -80,6 +82,7 @@ complete or publish a public live update.
 | PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment |
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
+| Dynamic graph layout release gate | `packages/bench/release-readiness-check.mjs` now requires dynamic layout evidence, screenshot, Gemini review, and release-doc references | Proven locally; CI pending until this slice is pushed |
 | GitHub Actions | CI run `26295772356` on `21fd4d6` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
@@ -104,7 +107,8 @@ complete or publish a public live update.
    write-confirmed selected lifecycle policy apply, memory review queue draft
    export, write-confirmed selected review queue apply, write-confirmed
    selected local memory edit overlays, and write-confirmed selected local
-   memory materialize with backup.
+   memory materialize with backup. The graph now uses a dynamic layout, but the
+   richer large-container navigation controls remain future work.
 6. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

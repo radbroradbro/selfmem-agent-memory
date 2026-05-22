@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T15:09:00Z",
+  "generatedAt": "2026-05-22T15:32:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -21,7 +21,7 @@
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the guarded local memory materialize slice. Later evidence-only guard/docs commits must pass CI but do not change runtime behavior."
+    "note": "This is the latest inspected code/product baseline after the guarded local memory materialize slice. The dynamic graph layout slice is local-only until pushed and CI-verified."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -47,6 +47,7 @@
     "brain-ui-selected-local-memory-edit",
     "brain-ui-local-edit-overlay-browse",
     "brain-ui-selected-local-memory-materialize",
+    "brain-ui-dynamic-graph-layout",
     "session-compaction-benchmark",
     "selfmem-update"
   ],

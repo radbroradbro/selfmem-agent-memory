@@ -11,6 +11,64 @@ function filteredNodes(snapshot, filter, query) {
   });
 }
 
+function buildGraphLayout(snapshot, visibleNodes) {
+  const nodes = Array.isArray(visibleNodes) ? visibleNodes : [];
+  const visibleIds = new Set(nodes.map((node) => node.id));
+  const visibleEdges = (snapshot.edges ?? []).filter((edge) => visibleIds.has(edge.from) && visibleIds.has(edge.to));
+  const rankById = rankVisibleNodes(snapshot, nodes, visibleEdges);
+  const ranks = [...new Set([...rankById.values()])].sort((a, b) => a - b);
+  const columnCount = Math.min(2, Math.max(1, ranks.length));
+  const columnByRank = new Map(
+    ranks.map((rank, index) => [rank, Math.min(columnCount - 1, Math.floor((index * columnCount) / Math.max(1, ranks.length)))]),
+  );
+  const groups = new Map(Array.from({ length: columnCount }, (_, index) => [index, []]));
+
+  for (const node of [...nodes].sort(compareGraphNodes)) {
+    const rank = rankById.get(node.id) ?? kindRank(node.kind);
+    groups.get(columnByRank.get(rank) ?? 0)?.push(node);
+  }
+
+  const maxRows = Math.max(1, ...[...groups.values()].map((group) => group.length));
+  const rowGap = 148;
+  const topPadding = 64;
+  const bottomPadding = 72;
+  const height = Math.max(380, topPadding + bottomPadding + maxRows * rowGap);
+  const nodePositions = new Map();
+
+  for (const [column, group] of groups.entries()) {
+    const x = ((column + 1) / (columnCount + 1)) * 100;
+    const columnOffset = column % 2 === 0 ? 0 : rowGap / 2;
+    for (const [row, node] of group.entries()) {
+      const rank = rankById.get(node.id) ?? kindRank(node.kind);
+      const y = topPadding + columnOffset + row * rowGap;
+      nodePositions.set(node.id, {
+        id: node.id,
+        x: Number(x.toFixed(2)),
+        y: Math.round(Math.min(height - bottomPadding, y)),
+        rank,
+        row,
+      });
+    }
+  }
+
+  return {
+    schemaVersion: 1,
+    mode: "dynamic-graph-layout",
+    writesRealFiles: false,
+    height,
+    columns: columnCount,
+    rows: maxRows,
+    nodes: [...nodePositions.values()],
+    edges: visibleEdges.map((edge) => ({
+      id: safeExportText(edge.id),
+      kind: safeExportText(edge.kind),
+      from: safeExportText(edge.from),
+      to: safeExportText(edge.to),
+    })),
+    positionById: nodePositions,
+  };
+}
+
 function buildNucleusExport(snapshot) {
   const kindCounts = snapshot.nodes.reduce((counts, node) => {
     const kind = safeExportText(node.kind);
@@ -306,6 +364,62 @@ function preferredVaultPath(vault, node) {
   return files.find((file) => file.path === "wiki/index.md")?.path ?? files[0]?.path ?? "";
 }
 
+function rankVisibleNodes(snapshot, nodes, edges) {
+  const incoming = new Map(nodes.map((node) => [node.id, 0]));
+  const outgoing = new Map(nodes.map((node) => [node.id, []]));
+  for (const edge of edges) {
+    incoming.set(edge.to, (incoming.get(edge.to) ?? 0) + 1);
+    outgoing.get(edge.from)?.push(edge.to);
+  }
+
+  const ranks = new Map();
+  const explicitRoot = safeExportText(snapshot.roots?.indexPageId);
+  const roots = nodes
+    .filter((node) => node.id === explicitRoot || (incoming.get(node.id) ?? 0) === 0)
+    .sort(compareGraphNodes);
+  const queue = roots.map((node) => ({ id: node.id, rank: node.id === explicitRoot ? 0 : kindRank(node.kind) }));
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const previous = ranks.get(current.id);
+    if (previous !== undefined && previous <= current.rank) continue;
+    ranks.set(current.id, current.rank);
+    for (const next of outgoing.get(current.id) ?? []) {
+      queue.push({ id: next, rank: current.rank + 1 });
+    }
+  }
+
+  for (const node of nodes) {
+    if (!ranks.has(node.id)) ranks.set(node.id, kindRank(node.kind));
+  }
+
+  return ranks;
+}
+
+function compareGraphNodes(a, b) {
+  return (
+    kindRank(a.kind) - kindRank(b.kind) ||
+    String(a.createdAt ?? "").localeCompare(String(b.createdAt ?? "")) ||
+    String(a.title ?? "").localeCompare(String(b.title ?? "")) ||
+    String(a.id ?? "").localeCompare(String(b.id ?? ""))
+  );
+}
+
+function kindRank(kind) {
+  const ranks = {
+    source: 0,
+    memory: 1,
+    research_query: 1,
+    retrieval_trace: 2,
+    lifecycle_event: 2,
+    hypothesis: 2,
+    decision: 3,
+    derived_doc: 4,
+    wiki_page: 4,
+  };
+  return ranks[safeExportText(kind)] ?? 2;
+}
+
 function containsPrivateLikeText(value) {
   privateLikePattern.lastIndex = 0;
   return privateLikePattern.test(String(value));
@@ -385,6 +499,7 @@ function nodeSummary(node) {
 export {
   buildEditExport,
   buildContainerHealth,
+  buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,

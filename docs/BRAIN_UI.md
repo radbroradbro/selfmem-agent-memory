@@ -10,6 +10,7 @@ The first scaffold lives in `packages/brain-ui/` and uses fixture data only.
 The UI should expose:
 
 - Nucleus graph nodes and edges,
+- deterministic dynamic graph layout with vertical growth,
 - container health and provider mode,
 - hybrid retrieval traces,
 - lifecycle and sleep-cycle events,
@@ -58,26 +59,27 @@ Required visual review path:
 
 1. search,
 2. graph navigation,
-3. retrieval trace inspection,
-4. lifecycle event inspection,
-5. derived doc edit,
-6. save or reset,
-7. draft export preview,
-8. timeline scan,
-9. provenance scan,
-10. Nucleus snapshot preview,
-11. research lineage preview,
-12. lifecycle policy preview,
-13. selected lifecycle policy apply confirmation,
-14. memory review queue preview,
-15. selected memory review queue apply confirmation,
-16. compiled wiki/vault preview,
-17. fixture vault sync report with conflict handling,
-18. selected local vault sync dry-run,
-19. selected local vault sync apply confirmation,
-20. fixture local-container audit preflight,
-21. selected local memory edit overlay confirmation,
-22. selected local memory materialize confirmation.
+3. dynamic layout spacing and scroll behavior,
+4. retrieval trace inspection,
+5. lifecycle event inspection,
+6. derived doc edit,
+7. save or reset,
+8. draft export preview,
+9. timeline scan,
+10. provenance scan,
+11. Nucleus snapshot preview,
+12. research lineage preview,
+13. lifecycle policy preview,
+14. selected lifecycle policy apply confirmation,
+15. memory review queue preview,
+16. selected memory review queue apply confirmation,
+17. compiled wiki/vault preview,
+18. fixture vault sync report with conflict handling,
+19. selected local vault sync dry-run,
+20. selected local vault sync apply confirmation,
+21. fixture local-container audit preflight,
+22. selected local memory edit overlay confirmation,
+23. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -94,6 +96,12 @@ edits as a preview object with `writesRealFiles: false`.
 
 The Nucleus snapshot preview is also fixture-only and marks
 `writesRealFiles: false`.
+
+The graph layout is data-driven. It ranks visible Nucleus nodes from graph
+edges and kind fallback order, limits columns so cards do not overlap in the
+center panel, and grows vertically with scroll when the visible graph expands.
+The browser evidence records layout mode, node count, edge count, column count,
+row count, overlap count, console errors, and private/key-shaped text checks.
 
 The Lifecycle Policy panel stages recall and write-policy choices as a fixture
 draft export. It clamps numeric settings, limits low-confidence write behavior

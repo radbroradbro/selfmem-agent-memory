@@ -1,6 +1,7 @@
 import {
   buildContainerHealth,
   buildEditExport,
+  buildGraphLayout,
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
@@ -35,18 +36,6 @@ const state = {
   lifecyclePolicyApply: null,
   reviewQueueDraft: null,
   reviewQueueApply: null,
-};
-
-const positions = {
-  "wiki:index": [50, 15],
-  "memory:hybrid-recall": [27, 34],
-  "trace:context-001": [52, 39],
-  "event:hermes-pre-compress": [76, 32],
-  "doc:native-memory-plan": [53, 64],
-  "research:gbrain-query": [22, 70],
-  "hypothesis:research-lineage": [36, 84],
-  "decision:ui-fixture-first": [68, 84],
-  "source:fixture-design-note": [78, 62],
 };
 
 const searchInput = document.querySelector("#searchInput");
@@ -493,19 +482,25 @@ function renderContainerHealth() {
 
 function renderGraph(nodes) {
   graph.replaceChildren();
-  const visible = new Set(nodes.map((node) => node.id));
-  const edges = state.snapshot.edges.filter((edge) => visible.has(edge.from) && visible.has(edge.to));
+  const layout = buildGraphLayout(state.snapshot, nodes);
+  graph.style.minHeight = `${layout.height}px`;
+  graph.dataset.layoutMode = layout.mode;
+  graph.dataset.layoutColumns = String(layout.columns);
+  graph.dataset.layoutRows = String(layout.rows);
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("aria-hidden", "true");
-  for (const edge of edges) {
-    const from = position(edge.from);
-    const to = position(edge.to);
+  svg.setAttribute("viewBox", `0 0 100 ${layout.height}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+  for (const edge of layout.edges) {
+    const from = layout.positionById.get(edge.from);
+    const to = layout.positionById.get(edge.to);
+    if (!from || !to) continue;
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("class", "edge");
-    line.setAttribute("x1", `${from[0]}%`);
-    line.setAttribute("y1", `${from[1]}%`);
-    line.setAttribute("x2", `${to[0]}%`);
-    line.setAttribute("y2", `${to[1]}%`);
+    line.setAttribute("x1", String(from.x));
+    line.setAttribute("y1", String(from.y));
+    line.setAttribute("x2", String(to.x));
+    line.setAttribute("y2", String(to.y));
     svg.append(line);
   }
   graph.append(svg);
@@ -519,12 +514,14 @@ function renderGraph(nodes) {
   }
 
   for (const node of nodes) {
+    const point = layout.positionById.get(node.id);
+    if (!point) continue;
     const button = document.createElement("button");
     button.className = `node${node.id === state.selectedId ? " selected" : ""}`;
     button.dataset.kind = node.kind;
     button.setAttribute("aria-label", `${node.kind.replaceAll("_", " ")}: ${node.title}`);
-    button.style.left = `${position(node.id)[0]}%`;
-    button.style.top = `${position(node.id)[1]}%`;
+    button.style.left = `${point.x}%`;
+    button.style.top = `${point.y}px`;
     button.innerHTML = [
       `<small>${escapeHtml(node.kind.replaceAll("_", " "))}</small>`,
       `<strong>${escapeHtml(node.title)}</strong>`,
@@ -1244,10 +1241,6 @@ function renderMetadata(metadata) {
 function confidenceMarkup(confidence) {
   if (typeof confidence !== "number") return "";
   return `<span class="confidence">${Math.round(confidence * 100)}% confidence</span>`;
-}
-
-function position(id) {
-  return positions[id] ?? [50, 50];
 }
 
 function readEdits() {

@@ -75,6 +75,10 @@
   smoke, interaction smoke, local-container audit smoke, and updated Browser
   DOM evidence. A fixture-only screenshot was captured at
   `brain-ui-local-memory-materialize.png`.
+- The dynamic graph layout slice was verified by Codex Browser DOM evidence,
+  fresh Brain UI smoke, and interaction smoke. A fixture-only screenshot was
+  captured at `brain-ui-dynamic-layout.png`, and
+  `brain-ui-dynamic-layout-evidence.json` reports `overlapCount: 0`.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.
@@ -115,8 +119,10 @@ Applied in this PR:
 - node `aria-label` with readable kind/title,
 - update-flow panel,
 - empty-state message,
-- graph-node confidence text.
+- graph-node confidence text,
+- deterministic dynamic graph layout with vertical growth and no-overlap
+  browser evidence.
 
 Deferred:
 
-- dynamic graph layout engine for non-fixture data.
+- richer graph layout controls for very large real local containers.

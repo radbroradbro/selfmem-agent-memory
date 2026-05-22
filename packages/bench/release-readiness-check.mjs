@@ -60,6 +60,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-local-edit-overlay-browse-review.md`,
   `${reviewDir}/brain-ui-local-memory-materialize-evidence.md`,
   `${reviewDir}/gemini-brain-ui-local-memory-materialize-review.md`,
+  `${reviewDir}/brain-ui-dynamic-layout-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-dynamic-layout-review.md`,
   `${reviewDir}/brain-ui-selected-audit-history-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-audit-history-review.md`,
   `${reviewDir}/brain-ui-selected-sync-dry-run-evidence.md`,
@@ -98,6 +100,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-local-memory-edit.png`,
   `${reviewDir}/ui-evidence/brain-ui-local-edit-overlay-browse.png`,
   `${reviewDir}/ui-evidence/brain-ui-local-memory-materialize.png`,
+  `${reviewDir}/ui-evidence/brain-ui-dynamic-layout-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-dynamic-layout.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -390,6 +394,19 @@ check("dom evidence is sane", () => {
   assert.equal(browserEvidence.evidence.checks.hasLocalEditOverlayPreview, true);
   assert.equal(browserEvidence.evidence.checks.hasLocalMemoryMaterialize, true);
   assert.equal(browserEvidence.evidence.checks.hasLocalMaterializeBackup, true);
+
+  const layoutEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-dynamic-layout-evidence.json"), "utf8"),
+  );
+  assert.equal(layoutEvidence.ok, true);
+  assert.equal(layoutEvidence.layoutMode, "dynamic-graph-layout");
+  assert.equal(layoutEvidence.nodeCount, 9);
+  assert.equal(layoutEvidence.edgeCount, 9);
+  assert.ok(layoutEvidence.layoutColumns >= 2);
+  assert.ok(layoutEvidence.layoutRows >= 4);
+  assert.equal(layoutEvidence.overlapCount, 0);
+  assert.equal(layoutEvidence.hasPrivateOrKeyText, false);
+  assert.equal(layoutEvidence.consoleErrorCount, 0);
 });
 
 check("release state is conservative", () => {
@@ -423,6 +440,7 @@ check("release state is conservative", () => {
     "brain-ui-selected-local-memory-edit",
     "brain-ui-local-edit-overlay-browse",
     "brain-ui-selected-local-memory-materialize",
+    "brain-ui-dynamic-graph-layout",
     "session-compaction-benchmark",
     "selfmem-update",
   ]) {
@@ -458,6 +476,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /local memory edit|selected local memory edit/i, `${file} missing local memory edit`);
     assert.match(text, /overlay browse|edit overlay.*browse|browse.*edit overlay/i, `${file} missing edit overlay browse`);
     assert.match(text, /materialize|materialization/i, `${file} missing local memory materialize`);
+    assert.match(text, /dynamic graph layout|dynamic layout|graph layout/i, `${file} missing dynamic graph layout`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });
