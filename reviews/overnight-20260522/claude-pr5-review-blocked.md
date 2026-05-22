@@ -11,6 +11,9 @@ Reason:
 - Claude CLI is installed.
 - The attempted cold PR review failed with `Not logged in`.
 - No Claude review verdict was produced.
+- The route was retried after the Brain UI Compaction Audit CI pass on
+  2026-05-22T16:36Z. Claude CLI still returned `Not logged in · Please run
+  /login`.
 
 Command class attempted:
 

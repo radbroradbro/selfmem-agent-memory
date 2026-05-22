@@ -12,6 +12,8 @@ Scope:
   layout evidence was added; the permission failure remained the same.
 - Retried the PR body update after the release handoff gate and PR-draft wording
   cleanup passed CI; the permission failure remained the same.
+- Retried a top-level PR status comment after the Brain UI Compaction Audit
+  evidence refresh passed CI. The permission failure remained the same.
 
 Result:
 
@@ -24,6 +26,8 @@ FORBIDDEN: Resource not accessible by integration
 
 No private evidence was sent. The attempted issue body used only public-safe
 fixture and review metadata, including the dynamic layout fixture evidence.
+The 2026-05-22T16:36Z PR comment retry used only the public head, CI run, and
+release-state pointers.
 
 Follow-up:
 
