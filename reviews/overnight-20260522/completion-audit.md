@@ -17,7 +17,7 @@ complete or publish a public live update.
 
 Machine-readable follow-up: `goal:audit` now runs
 `packages/bench/goal-completion-audit.mjs` and returns `goalComplete: false`,
-`mayCallUpdateGoalComplete: false`, 19 proven requirements, 3 blocked
+`mayCallUpdateGoalComplete: false`, 20 proven requirements, 2 blocked
 requirements, and 1 incomplete requirement. The release gate requires this
 audit so future agents cannot treat green CI as native-goal completion.
 
@@ -122,18 +122,18 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `tests/local-container/audit.test.ts`, `local-container-audit-evidence.md`, Gemini review | Proven as read-only preflight |
 | Local-only compaction benchmarking | `packages/core/src/compaction/session.ts`, `packages/bench/session-compaction-smoke.mjs`, `packages/bench/session-compaction-benchmark.mjs`, `packages/bench/session-compaction-local-audit.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md`, `reviews/overnight-20260522/session-compaction-local-audit-evidence.md`, `reviews/overnight-20260522/gemini-session-compaction-local-audit-review.md` | Proven with public fixtures and a metrics-only local-session audit path for private Codex/Claude/Hermes/OpenClaw exports; Gemini focused review returned `CLEAN` |
 | Clean consumer smoke | `packages/bench/consumer-install-smoke.mjs`, `consumer-install-smoke-evidence.md`, Gemini review | Proven locally from a clean public-style checkout: updater help, update smoke, Brain UI smoke, Brain UI interaction smoke, local audit, compaction audit, npm package dry-run, required package files, zero forbidden runtime files, and zero key-shaped hits |
-| Council review | Gemini reviews exist for UI, wiki/vault, update flow, Nucleus snapshot, research lineage, and public copy | Partial: Gemini proven, Claude blocked |
-| Claude reviewer route | `reviews/overnight-20260522/claude-pr5-review-blocked.md` | Blocked by missing login |
+| Council review | Gemini reviews exist for UI, wiki/vault, update flow, Nucleus snapshot, research lineage, and public copy; Claude Opus review exists for PR #5 | Proven with concerns |
+| Claude reviewer route | `reviews/overnight-20260522/claude-pr5-review.md` | Proven with Claude Opus `CONCERNS`; alpha PR can proceed, public launch and goal completion remain blocked |
 | Production-readiness review | `reviews/overnight-20260522/production-readiness.md` | Completed with verdict `FAIL` |
 | Public launch messaging | `reviews/overnight-20260522/public-live-update-draft.md`, `dummy-brain-demo-storyboard.md`, Gemini copy review | Proven as draft only |
-| Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md`, `reviews/overnight-20260522/gemini-release-handoff-review.md` | Proven locally as a public-safe manual path for PR body update, blocker issue creation, blocked reviewer route, visibility approval, and one-agent canary rollout; Gemini focused review returned `CLEAN` |
+| Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md`, `reviews/overnight-20260522/gemini-release-handoff-review.md` | Proven locally as a public-safe manual path for PR body update, blocker issue creation, Claude concerns, visibility approval, and one-agent canary rollout; Gemini focused review returned `CLEAN` |
 | GitHub handoff packet | `packages/bench/github-handoff-packet.mjs`, `release:handoff`, `github-handoff-packet-evidence.md`, Gemini review | Proven locally and in CI runs `26308475033` and `26308588261` as a generated manual GitHub packet for PR body, status comment, blocker issue, labels, and manual steps; writes no files and keeps production readiness false |
 | Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `baseline:preflight`, `hosted-baseline-preflight-evidence.md`, Gemini review | Proven locally and in CI run `26309563159` as an offline metrics-only contract that calls no hosted provider by default, prints no credential values, forbids raw memory/transcript output, and keeps benchmark claims blocked until a fresh hosted baseline, matched RecallWeave run, RecallWeave win, and two reviewer approvals exist |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `canary:intake`, `canary-evidence-intake-evidence.md`, Gemini review | Proven locally as a metrics-only intake gate for one-agent runtime canary reports. The fixture pass reports lifecycle coverage, hybrid search coverage, local writes, read-through mode, latency, rollback readiness, and zero privacy leaks, but `countsAsRealRolloutEvidence: false` keeps the real rollout requirement incomplete until a live sanitized report is reviewed |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `canary:report`, `canary-report-generator-evidence.md`, Gemini review | Proven locally and in CI run `26310773948` as the producer side for runtime canary evidence. It converts Hermes/OpenClaw traces into a metrics-only report with hashes, counts, latency, quality rates, privacy counters, and rollback readiness, while fixture-derived reports still fail `--strict-real` |
 | Canary diagnostic bundle report | `packages/bench/canary-report-from-trace.mjs`, `packages/bench/fixtures/canary-diagnostic-export.fixture/`, `canary-report-generator-evidence.md`, Gemini diagnostic-bundle re-review | Proven locally and in CI run `26311728246` as a redacted diagnostic directory and ZIP intake path. Metadata-only diagnostic exports produce sanitized metrics-only canary reports, relocated fixtures remain `fixtureOnly: true`, and strict-real intake rejects those fixtures so copied bundles cannot satisfy real rollout evidence |
 | Canary remediation plan | `packages/bench/canary-remediation.mjs`, `packages/bench/fixtures/canary-runtime-report-failing.fixture.json`, `canary-remediation-evidence.md`, Gemini review | Proven locally as a metrics-only diagnosis path for failed one-agent canary reports. It maps failed checks such as `recall-p95` and `store-p95` to safe remediation actions, keeps public and fleet rollout disabled, and emits no raw memory, transcript, prompt, answer, credential, or local-path content |
-| Goal completion audit gate | `packages/bench/goal-completion-audit.mjs`, `goal:audit`, `goal-completion-audit-evidence.md`, Gemini review | Proven locally and in CI run `26308994908` as a machine-readable requirement audit that keeps `goalComplete: false` while reviewer, human approval, hosted baseline, and real rollout requirements remain unresolved |
+| Goal completion audit gate | `packages/bench/goal-completion-audit.mjs`, `goal:audit`, `goal-completion-audit-evidence.md`, Gemini review | Proven locally and in CI run `26308994908` as a machine-readable requirement audit that keeps `goalComplete: false` while human approval, hosted baseline, and real rollout requirements remain unresolved |
 | PR body reflects current state | PR #5, `reviews/overnight-20260522/pr-body-update-draft.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: PR #5 body update returned GitHub status 200 at 2026-05-22T21:21:15Z |
 | External blocker issue exists | Issue #6, `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: release blocker issue creation returned GitHub status 201 at 2026-05-22T21:21:16Z |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
@@ -161,8 +161,8 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 ## Remaining Blockers
 
-1. Claude/Opus cold review remains blocked until the Claude CLI is logged in or
-   the owner explicitly accepts the blocked route.
+1. Claude/Opus cold review completed with `CONCERNS`; it supports alpha PR
+   review only and does not approve public launch or goal completion.
 2. PR #5 body is stale. A paste-ready replacement exists, but the GitHub app
    cannot update the PR body or add a top-level PR status comment with its
    current permissions. The PR comment retry after `1074bfd` and CI run
@@ -191,7 +191,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 The owner can choose one of three paths:
 
-1. Accept the blocked Claude route, update the PR body manually from
+1. Keep the Claude `CONCERNS` review visible, update the PR body manually from
    `pr-body-update-draft.md`, and merge PR #5 as an alpha/public-readiness
    candidate.
 2. Log in Claude CLI and rerun the final cold review before merge.

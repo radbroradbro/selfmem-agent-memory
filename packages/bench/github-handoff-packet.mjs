@@ -14,7 +14,6 @@ const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 
 const requiredBlockers = [
-  "claude-reviewer-route-blocked",
   "human-public-launch-approval-required",
   "hosted-supermemory-baseline-not-current",
 ];
@@ -26,6 +25,7 @@ const paths = {
   githubBlocked: join(root, reviewDir, "github-issue-create-blocked.md"),
   githubWriteEvidence: join(root, reviewDir, "github-write-route-evidence.md"),
   claudeBlocked: join(root, reviewDir, "claude-pr5-review-blocked.md"),
+  claudeReview: join(root, reviewDir, "claude-pr5-review.md"),
   hostedBaselinePreflight: join(root, reviewDir, "hosted-baseline-preflight-evidence.md"),
   releaseHandoff: join(root, "docs/RELEASE_HANDOFF.md"),
 };
@@ -40,6 +40,7 @@ const prBodyDraftText = readFileSync(paths.prBodyDraft, "utf8");
 const issueBody = readFileSync(paths.issueDraft, "utf8");
 const githubWriteText = readFileSync(paths.githubWriteEvidence, "utf8");
 const claudeBlockedText = readFileSync(paths.claudeBlocked, "utf8");
+const claudeReviewText = readFileSync(paths.claudeReview, "utf8");
 const releaseHandoffText = readFileSync(paths.releaseHandoff, "utf8");
 
 const prBody = extractFencedMarkdown(prBodyDraftText);
@@ -81,6 +82,7 @@ assert.match(issueBody, /human approval/i);
 assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
 assert.match(claudeBlockedText, /Not logged in/);
+assert.match(claudeReviewText, /Verdict:\s*CONCERNS/i);
 assert.match(releaseHandoffText, /Manual GitHub Steps/);
 assert.match(releaseHandoffText, /release:doctor/);
 assert.doesNotMatch(remoteUrl, /:\/\/[^/\s]+@/);
@@ -93,7 +95,7 @@ const statusComment = [
   "- Current production readiness: false.",
   `- Latest verified code baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
   "- PR #5 has been updated and release blocker issue #6 has been created. The generated handoff packet remains useful for auditing or refreshing those public-safe fields later.",
-  "- Remaining blockers: Claude reviewer route blocked by login, human public-launch approval required, hosted Supermemory baseline not current, and one real-container canary still incomplete. Use baseline:preflight before any comparison claim.",
+  "- Claude Opus review completed with CONCERNS. Remaining blockers: human public-launch approval required, hosted Supermemory baseline not current, and one real-container canary still incomplete. Use baseline:preflight before any comparison claim.",
   "",
   "Do not treat green CI as public launch approval. The repo evidence is fixture-only and contains no raw memories, transcripts, credentials, or private diagnostics.",
 ].join("\n");
@@ -115,7 +117,7 @@ const packet = {
     "code-checks-pass",
     "fixture-ui-proven",
     "not-production-ready",
-    "reviewer-route-blocked",
+    "reviewer-concerns-recorded",
     "human-approval-required",
   ],
   prBody,

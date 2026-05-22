@@ -24,7 +24,6 @@ Result:
 
 Current blockers:
 
-- `claude-reviewer-route-blocked`
 - `human-public-launch-approval-required`
 - `hosted-supermemory-baseline-not-current`
 
@@ -34,12 +33,13 @@ Resolved in this extension:
 - GitHub issue #6 was created live.
 - `release:github-sync` now verifies the live PR and issue against checked-in
   drafts with hashes and booleans only.
+- Claude Opus review completed with `CONCERNS` and is recorded in
+  `claude-pr5-review.md`.
 - The old GitHub 403 packet remains historical evidence only.
 
 Manual next actions:
 
-- Run `claude /login`.
-- Rerun the cold Claude PR review or explicitly accept the blocked route.
+- Treat the Claude `CONCERNS` review as alpha-PR evidence only.
 - Run `release:github-sync` and verify PR #5 and issue #6 still match the
   checked-in drafts.
 - Run `baseline:preflight` with a sanitized live result after a fresh

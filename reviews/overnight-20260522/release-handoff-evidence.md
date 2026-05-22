@@ -14,7 +14,7 @@ in the release gate.
 - Added operations guidance for GitHub permission blockers.
 - Updated `packages/bench/release-readiness-check.mjs` so the gate requires the
   handoff page and checks for the manual PR update path, blocker issue draft,
-  blocked Claude route, conservative public verdict, `selfmem_update`, and
+  Claude concerns, conservative public verdict, `selfmem_update`, and
   one-agent canary language.
 
 ## Why This Matters

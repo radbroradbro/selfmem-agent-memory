@@ -6,8 +6,8 @@ Verdict: FAIL
 
 RecallWeave should not receive a public live update yet. PR #5 is substantial
 and directionally aligned with the LLM-wiki/Nucleus/Brain UI target, but the
-gate still lacks enough final reviewer and human-approval evidence to mark it
-production ready.
+gate still lacks enough human-approval, hosted-baseline, and real-canary
+evidence to mark it production ready.
 
 ## Current PR Trail
 
@@ -117,7 +117,8 @@ Initial cron-environment blockers:
   this sandbox.
 - `npm run release:check`: failed on the fresh Brain UI smoke for the same
   localhost binding reason. With a writable npm cache, package dry-run passed.
-- Claude CLI reviewer: blocked because the CLI is not logged in.
+- Claude CLI reviewer: initially blocked because bare mode ignored OAuth, then
+  completed with `CONCERNS` using `--setting-sources local`.
 - Gemini CLI production-readiness reviewer: blocked because the CLI requested
   browser authentication and did not return a review.
 
@@ -323,7 +324,7 @@ evidence for:
   zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI
   runs `26308475033` on `6a33e62` and `26308588261` on `8efe4d0` passed.
 - goal completion audit evidence with `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 19 proven requirements, 3 blocked
+  `mayCallUpdateGoalComplete: false`, 20 proven requirements, 2 blocked
   requirements, and 1 incomplete requirement. This keeps production readiness
   separate from the native thread goal completion claim. GitHub Actions CI run
   `26308994908` passed on `13efb18`.
@@ -363,7 +364,8 @@ evidence for:
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
 now prove the fixture UI and release gate can pass, but public release should
-still wait for the remaining reviewer and human-approval gates.
+still wait for the remaining human-approval, hosted-baseline, and real-canary
+gates.
 
 ## Sandbox Automation Recheck
 
@@ -433,14 +435,14 @@ passed on `3578802`. The sandbox failures above remain useful because they show
 where constrained shells can still produce false negatives.
 
 These blockers do not justify a public PASS. They reinforce the existing FAIL
-verdict until the Claude reviewer route, hosted-baseline run, human approval,
-and real one-agent canary are all complete.
+verdict until the hosted-baseline run, human approval, and real one-agent
+canary are all complete.
 
 ## Readiness Grades
 
 | Area | Grade | Reason |
 | --- | --- | --- |
-| Security/privacy | PASS WITH CONCERNS | Redaction, secret-pattern, forbidden-file, and privacy smokes are strong, but current reviewer routes are blocked. |
+| Security/privacy | PASS WITH CONCERNS | Redaction, secret-pattern, forbidden-file, and privacy smokes are strong, and Claude Opus returned `CONCERNS`; public launch still needs owner approval and real-runtime evidence. |
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes, wrapper is dry-run-first, clean consumer smoke proves updater help, Brain UI checks, local audit, compaction audit, and package dry-run from a temporary public-style checkout, and the release blocker doctor prints the remaining manual actions. A true GitHub install still depends on public visibility and user approval. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |

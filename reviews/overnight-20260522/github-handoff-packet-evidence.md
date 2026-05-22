@@ -23,7 +23,8 @@ steps without reconstructing the release state from scattered notes.
 
 ## Fresh Blocked Routes
 
-- Claude CLI health check after current head still returned `Not logged in`.
+- Claude Opus review later completed with `CONCERNS`; this handoff now treats
+  that review as alpha-PR evidence only.
 - PR body update after current head returned GitHub 403:
   `Resource not accessible by integration`.
 - Top-level PR status comment after current head returned the same GitHub 403.

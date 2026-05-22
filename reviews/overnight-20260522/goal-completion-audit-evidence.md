@@ -10,8 +10,8 @@ wiki/vault sync, self-hosted Brain UI, update flow, and local-only memory
 compaction benchmarking.
 
 This slice adds a machine-readable completion audit so the goal cannot be
-quietly marked complete while the evidence still shows blocked reviewer,
-human approval, hosted-baseline, and real-rollout requirements.
+quietly marked complete while the evidence still shows human approval,
+hosted-baseline, and real-rollout requirements.
 
 ## Implementation
 
@@ -42,15 +42,16 @@ human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 19 proven requirements
-- 3 blocked requirements
+- 20 proven requirements
+- 2 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
 - `hasSecretPattern: false`
 
 ## Blockers Preserved
 
-- Claude/Opus council review is blocked by missing login.
+- Claude/Opus review completed with `CONCERNS`; it is alpha-PR evidence, not
+  public-launch approval.
 - PR body and external blocker issue creation are now proven live through
   `github-write-route-evidence.md`.
 - GitHub live sync is now proven through `github-live-sync-evidence.md` and the

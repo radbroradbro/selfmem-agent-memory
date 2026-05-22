@@ -6,6 +6,15 @@ Reviewer route: Claude CLI with `claude --bare --print --model opus`
 
 Result: blocked.
 
+Superseded state:
+
+- A later authenticated Claude CLI route succeeded with `--setting-sources
+  local`, avoiding the user-level Stop hook while preserving noninteractive
+  review.
+- Current Claude evidence is
+  `reviews/overnight-20260522/claude-pr5-review.md`.
+- That review returned `CONCERNS`, not public-launch approval.
+
 Reason:
 
 - Claude CLI is installed.

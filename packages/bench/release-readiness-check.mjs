@@ -42,6 +42,7 @@ const requiredFiles = [
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
   `${reviewDir}/claude-pr5-review-blocked.md`,
+  `${reviewDir}/claude-pr5-review.md`,
   `${reviewDir}/session-compaction-evidence.md`,
   `${reviewDir}/session-compaction-benchmark-evidence.md`,
   `${reviewDir}/session-compaction-local-audit-evidence.md`,
@@ -780,6 +781,7 @@ check("release state is conservative", () => {
     "canary-evidence-intake",
     "canary-remediation-plan",
     "hosted-baseline-preflight",
+    "claude-opus-pr5-review",
     "github-handoff-packet",
     "github-live-sync-check",
     "github-pr-body-live",
@@ -789,8 +791,10 @@ check("release state is conservative", () => {
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
   }
+  assert.equal(releaseState.reviewerEvidence?.claudeOpus?.status, "completed_with_concerns");
+  assert.equal(releaseState.reviewerEvidence?.claudeOpus?.verdict, "CONCERNS");
+  assert.equal(releaseState.reviewerEvidence?.claudeOpus?.countsAsPublicLaunchApproval, false);
   for (const blocker of [
-    "claude-reviewer-route-blocked",
     "human-public-launch-approval-required",
     "hosted-supermemory-baseline-not-current",
   ]) {
@@ -847,7 +851,7 @@ check("release handoff documents blocked launch path", () => {
   assert.match(text, /pr-body-update-draft\.md/);
   assert.match(text, /issue #6|GitHub issue #6/i);
   assert.match(text, /blocker-fresh-brain-ui-launch-and-release-gate\.md/);
-  assert.match(text, /blocked Claude route|Claude CLI/i);
+  assert.match(text, /Claude Opus review|Claude CLI|Claude concerns/i);
   assert.match(text, /public launch verdict as `FAIL`|publicLaunchVerdict: "FAIL"/);
   assert.match(text, /selfmem_update/);
   assert.match(text, /release:handoff/);
@@ -1174,11 +1178,11 @@ check("fresh goal completion audit passes", () => {
   assert.equal(report.goalComplete, false);
   assert.equal(report.mayCallUpdateGoalComplete, false);
   assert.ok(report.counts?.proven >= 8);
-  assert.ok(report.counts?.blocked >= 3);
+  assert.ok(report.counts?.blocked >= 2);
   assert.ok(report.counts?.incomplete >= 1);
   assert.equal(report.safety?.privateLeakCount, 0);
   assert.equal(report.safety?.hasSecretPattern, false);
-  assert.ok(report.requirements.some((item) => item.id === "claude-council-review" && item.status === "blocked"));
+  assert.ok(report.requirements.some((item) => item.id === "claude-council-review" && item.status === "proven"));
   assert.ok(report.requirements.some((item) => item.id === "github-pr-body-current" && item.status === "proven"));
   assert.ok(report.requirements.some((item) => item.id === "github-blocker-issue-created" && item.status === "proven"));
   assert.ok(report.requirements.some((item) => item.id === "github-live-sync-current" && item.status === "proven"));

@@ -11,7 +11,6 @@ const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir()
 const releaseStatePath = join(root, reviewDir, "release-state.json");
 const releaseState = JSON.parse(readFileSync(releaseStatePath, "utf8"));
 const requiredBlockers = [
-  "claude-reviewer-route-blocked",
   "human-public-launch-approval-required",
   "hosted-supermemory-baseline-not-current",
 ];
@@ -25,6 +24,7 @@ const requiredFiles = {
   githubWriteEvidence: "github-write-route-evidence.md",
   githubLiveSyncEvidence: "github-live-sync-evidence.md",
   claudeBlocked: "claude-pr5-review-blocked.md",
+  claudeReview: "claude-pr5-review.md",
   hostedBaselinePreflight: "hosted-baseline-preflight-evidence.md",
   hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
   releaseHandoff: "../../docs/RELEASE_HANDOFF.md",
@@ -55,6 +55,7 @@ for (const item of Object.values(evidence)) {
 const githubWriteText = readFileSync(join(root, reviewDir, "github-write-route-evidence.md"), "utf8");
 const githubLiveSyncText = readFileSync(join(root, reviewDir, "github-live-sync-evidence.md"), "utf8");
 const claudeBlockedText = readFileSync(join(root, reviewDir, "claude-pr5-review-blocked.md"), "utf8");
+const claudeReviewText = readFileSync(join(root, reviewDir, "claude-pr5-review.md"), "utf8");
 const prBodyDraftText = readFileSync(join(root, reviewDir, "pr-body-update-draft.md"), "utf8");
 const issueDraftText = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
 
@@ -62,6 +63,8 @@ assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
 assert.match(githubLiveSyncText, /PR\s*#5[\s\S]*issue #6[\s\S]*match/i);
 assert.match(claudeBlockedText, /Not logged in/);
+assert.match(claudeReviewText, /Verdict:\s*CONCERNS/i);
+assert.match(claudeReviewText, /Can mark native goal complete:\s*no/i);
 assert.match(prBodyDraftText, /clean consumer smoke/i);
 assert.match(issueDraftText, /Acceptance Criteria/);
 
@@ -74,6 +77,7 @@ assert.doesNotMatch(remote, /(ghp_|github_pat_|[?&]token=)/);
 const live = process.argv.includes("--live");
 const claude = inspectCommand("claude", ["--version"]);
 const gh = inspectCommand("gh", ["auth", "status"]);
+let claudeLiveHealth = null;
 const hostedBaselinePreflight = JSON.parse(run("node", ["packages/bench/hosted-baseline-preflight.mjs"]).stdout);
 assert.equal(hostedBaselinePreflight.callsHostedProvider, false);
 assert.equal(hostedBaselinePreflight.publicBenchmarkClaimsAllowed, false);
@@ -83,13 +87,16 @@ assert.equal(githubLiveSync.prBodyMatches, true);
 assert.equal(githubLiveSync.issueTitleMatches, true);
 assert.equal(githubLiveSync.issueBodyMatches, true);
 
-const blockerReport = [
+const reviewerReport = [
   {
-    id: "claude-reviewer-route-blocked",
-    status: "blocked",
-    evidence: "claude-pr5-review-blocked.md",
-    nextAction: "Run `claude /login`, then rerun the cold PR review, or explicitly accept the blocked route.",
+    id: "claude-opus-pr5-review",
+    status: "completed_with_concerns",
+    evidence: "claude-pr5-review.md",
+    nextAction: "Treat the Claude review as alpha-PR support only. It does not authorize public launch or goal completion.",
   },
+];
+
+const blockerReport = [
   {
     id: "human-public-launch-approval-required",
     status: "blocked",
@@ -105,24 +112,20 @@ const blockerReport = [
 ];
 
 if (live) {
-  const claudeReview = inspectCommand("claude", [
-    "--bare",
+  claudeLiveHealth = inspectCommand("claude", [
     "--print",
     "--model",
     "opus",
     "--permission-mode",
     "plan",
     "--max-budget-usd",
-    "1",
+    "0.5",
+    "--no-session-persistence",
+    "--disable-slash-commands",
+    "--setting-sources",
+    "local",
     "Health check only: reply OK.",
   ]);
-  if (claudeReview.ok) {
-    blockerReport[0] = {
-      ...blockerReport[0],
-      status: "needs-review-rerun",
-      nextAction: "Claude CLI health check succeeded. Rerun the full cold PR review before changing release verdict.",
-    };
-  }
 }
 
 console.log(
@@ -137,6 +140,7 @@ console.log(
       branch,
       head: gitHead,
       latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
+      reviewers: reviewerReport,
       blockers: blockerReport,
       checks: {
         releaseStateConservative: true,
@@ -154,10 +158,10 @@ console.log(
           issueBodyMatches: githubLiveSync.issueBodyMatches,
         },
         claudeCommand: claude,
+        claudeLiveHealth,
         githubCli: gh,
       },
       manualCommands: [
-        "claude /login",
         "npm exec --yes pnpm@10.23.0 -- release:check",
         "npm exec --yes pnpm@10.23.0 -- release:github-sync",
         "npm exec --yes pnpm@10.23.0 -- smoke",

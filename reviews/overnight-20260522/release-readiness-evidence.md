@@ -344,7 +344,7 @@ Known limits:
 - GitHub Actions CI run `26297876735` passed on graph navigation controls
   commit `62367a1`.
 - Release handoff follow-up: `docs/RELEASE_HANDOFF.md` now gives the manual PR
-  body update, blocker issue, blocked Claude route, public visibility, and
+  body update, blocker issue, Claude concerns, public visibility, and
   one-agent canary steps. `release:check` requires the handoff and verifies the
   blocked launch path language.
 - GitHub Actions CI run `26298339106` passed on release handoff gate commit

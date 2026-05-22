@@ -10,7 +10,8 @@ Use these labels in PRs, issues, and release notes:
 - `code-checks-pass`: local checks and GitHub Actions pass.
 - `fixture-ui-proven`: Brain UI evidence uses public fixture data only.
 - `not-production-ready`: public launch remains blocked.
-- `reviewer-route-blocked`: one requested reviewer could not run.
+- `reviewer-concerns-recorded`: Claude Opus review ran and returned
+  `CONCERNS`.
 - `human-approval-required`: the owner must approve visibility, merge, and live
   rollout.
 
@@ -165,14 +166,13 @@ attempted or skipped.
 
 ## Reviewer Route Choices
 
-Before merge, choose one path:
+Claude Opus review now exists at
+`reviews/overnight-20260522/claude-pr5-review.md` with verdict `CONCERNS`.
+Treat it as support for an alpha PR only. It does not approve public launch,
+benchmark claims, or native-goal completion.
 
-- Log in Claude CLI and rerun the cold Claude review.
-- Accept the blocked Claude route in writing and rely on the recorded Gemini
-  reviews, local checks, GitHub Actions, and release gate.
-- Keep the PR open until the blocked reviewer route is healthy.
-
-If a route is blocked, say so directly. A blocked route is not an approval.
+Before merge, make sure the owner has accepted the current concern list and
+the remaining blockers are visible.
 
 ## Alpha Merge Criteria
 

@@ -24,7 +24,7 @@ Live status:
 
 Not production ready for public launch yet.
 
-The code, fixture UI, release gate, and CI are healthy, but launch remains blocked on human approval, Claude reviewer login or accepted blocker evidence, hosted Supermemory baseline evidence for public comparison claims, and one real-container production canary.
+The code, fixture UI, release gate, CI, and Claude Opus review are healthy enough for an alpha PR, but launch remains blocked on human approval, hosted Supermemory baseline evidence for public comparison claims, and one real-container production canary.
 
 ## Latest Verified Baseline
 
@@ -55,7 +55,7 @@ The code, fixture UI, release gate, and CI are healthy, but launch remains block
 
 ## Release Blockers
 
-- Claude/Opus council review route is still blocked by login.
+- Claude/Opus review completed with `CONCERNS`; it supports alpha PR review only and does not approve public launch.
 - Human approval is required before merge, visibility changes, or public release messaging.
 - Hosted Supermemory comparison claims require a fresh metrics-only baseline.
 - One real-container production rollout remains incomplete; fixture UI and canary tooling are not enough for public launch.

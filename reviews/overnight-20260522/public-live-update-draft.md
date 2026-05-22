@@ -63,8 +63,9 @@ writes locally by default and does not enable hosted write-back.
 Not production ready yet.
 
 The code and fixture checks pass, and GitHub Actions has passed the release
-readiness gate on PR #5. Public launch should still wait for final human
-approval and the blocked reviewer routes to be resolved or explicitly accepted.
+readiness gate on PR #5. Claude Opus returned `CONCERNS`, which supports alpha
+PR review only. Public launch should still wait for human approval,
+hosted-baseline evidence, and real canary evidence.
 
 ## Try The Fixture Brain
 
@@ -97,8 +98,8 @@ Latest verified head before this draft refresh:
   no file writes and no secret-pattern hits
 - GitHub live sync: `release:github-sync` confirms PR #5 and issue #6 match
   the checked-in public-safe drafts, with hashes and booleans only
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 19 proven
-  requirements, 3 blocked requirements, and 1 incomplete requirement, so this
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 20 proven
+  requirements, 2 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with
   `callsHostedProvider: false`, `metricsOnly: true`, and
@@ -178,10 +179,10 @@ Latest verified head before this draft refresh:
   Release Readiness, Compaction Audit, Benchmark Dashboard, Canary Rollout, and
   Research Source Lock visible; zero console errors or warnings; zero
   private/key-shaped visible text hits.
-- Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
-  login
+- Reviewer state: Gemini focused slice reviews passed; Claude Opus returned
+  `CONCERNS`
 - Completion audit: not complete, with public launch still blocked on human
-  approval and reviewer-route acceptance
+  approval, hosted baseline, and real canary evidence
 
 ## Known Gaps
 

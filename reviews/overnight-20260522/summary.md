@@ -7,8 +7,9 @@ Nucleus Index, wiki/vault sync, self-hosted Brain UI, update flow, and
 local-only memory compaction benchmarking.
 
 Verdict: post-12-hour production readiness remains FAIL for public launch. The
-fresh controller run and GitHub CI now pass, but final reviewer/human approval
-is still required before any public live update.
+fresh controller run, Claude Opus review, and GitHub CI now pass for alpha PR
+evidence, but human approval, hosted-baseline evidence, and real canary
+evidence are still required before any public live update.
 
 ## Current PR State
 
@@ -235,7 +236,7 @@ Latest local verification before this summary:
   `26306827655` passed on `4cee083`.
 - Release blocker doctor verification: local `release:doctor` now checks the
   conservative release state, required blocker evidence, token-free remote URL,
-  blocked Claude route packet, GitHub 403 packet, and manual next-action list.
+  Claude concerns packet, GitHub 403 packet, and manual next-action list.
   It reports `publicLaunchAllowed: false` and `productionReady: false` by
   design, so green CI cannot be mistaken for public-launch approval. GitHub
   Actions CI run `26307335652` passed on `d93d781`.
@@ -249,9 +250,9 @@ Latest local verification before this summary:
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 19 proven requirements, 3 blocked
-  requirements, and 1 incomplete requirement, preserving the reviewer,
-  human approval, hosted-baseline, and real-rollout blockers. GitHub Actions CI
+  `mayCallUpdateGoalComplete: false`, 20 proven requirements, 2 blocked
+  requirements, and 1 incomplete requirement, preserving the human approval,
+  hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.
 - Hosted baseline preflight verification: local `baseline:preflight` now checks
   the live Supermemory comparison contract without calling a hosted provider by
@@ -531,16 +532,16 @@ local memory contents.
   current public docs correctly require a fresh valid metrics-only baseline
   accepted by the hosted baseline preflight before quality marketing.
 - The post-12-hour production-ready verdict remains `FAIL` for public launch.
-  Fresh controller and CI checks pass, but Claude remains blocked, the GitHub
-  app cannot update the PR body, add a PR status comment, or create the blocker
-  issue, and a human release decision has not been made. Use the generated
-  GitHub handoff packet as the manual GitHub source of truth while that remains
-  true. Use the goal completion audit before any future attempt to mark the
-  native goal complete.
+  Fresh controller and CI checks pass, Claude Opus returned `CONCERNS`, PR #5
+  and issue #6 are live, and a human release decision has not been made. Use
+  the generated GitHub handoff packet as the manual GitHub source of truth
+  while that remains true. Use the goal completion audit before any future
+  attempt to mark the native goal complete.
 
 ## Next Recommended Slice
 
 Use `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`
 as the conservative issue text unless PR #5 is updated directly. Run
 `release:handoff` first for the current manual GitHub packet. Do not publish a
-live update until reviewer blockers and human approval are resolved.
+live update until human approval, hosted-baseline evidence, and real canary
+evidence are resolved.

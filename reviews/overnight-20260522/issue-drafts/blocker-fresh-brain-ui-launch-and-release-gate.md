@@ -4,7 +4,7 @@
 
 Track the final blockers before PR #5 can be treated as public-launch ready.
 The code, fixture UI, and release gates are green, but public launch should
-remain conservative until reviewer, owner, hosted-baseline, and real canary
+remain conservative until owner, hosted-baseline, and real canary
 requirements are resolved.
 
 ## Current Evidence
@@ -26,8 +26,8 @@ requirements are resolved.
 
 ## Remaining Blockers
 
-- Claude/Opus council review route is blocked by login or must be explicitly
-  accepted as blocked evidence.
+- Claude/Opus review completed with `CONCERNS`; it supports alpha PR review
+  but does not approve public launch.
 - Human approval is required before merge, visibility changes, or public live
   update copy.
 - Hosted Supermemory comparison claims require a fresh metrics-only baseline.
@@ -38,8 +38,7 @@ requirements are resolved.
 
 ## Acceptance Criteria
 
-- Final reviewer route is completed or the owner accepts the blocked reviewer
-  packet.
+- The owner accepts the Claude `CONCERNS` review as alpha-PR evidence.
 - A real one-agent canary report is collected through the sanitized canary
   report/intake path and passes privacy, lifecycle, hybrid search, latency,
   rollback, and write/read checks.

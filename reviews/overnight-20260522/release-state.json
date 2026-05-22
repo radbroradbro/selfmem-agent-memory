@@ -68,6 +68,7 @@
     "canary-remediation-plan",
     "adapter-bounded-read-through",
     "hosted-baseline-preflight",
+    "claude-opus-pr5-review",
     "github-handoff-packet",
     "github-live-sync-check",
     "github-pr-body-live",
@@ -75,8 +76,18 @@
     "goal-completion-audit",
     "selfmem-update"
   ],
+  "reviewerEvidence": {
+    "claudeOpus": {
+      "status": "completed_with_concerns",
+      "verdict": "CONCERNS",
+      "route": "claude --print --model opus --setting-sources local",
+      "evidence": "reviews/overnight-20260522/claude-pr5-review.md",
+      "costUsd": 2.0719125,
+      "completedAt": "2026-05-22T22:12:00Z",
+      "countsAsPublicLaunchApproval": false
+    }
+  },
   "remainingBlockers": [
-    "claude-reviewer-route-blocked",
     "human-public-launch-approval-required",
     "hosted-supermemory-baseline-not-current"
   ],
