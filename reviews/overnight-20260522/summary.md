@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `b5c1e02`, run `26313942262`, success.
+  `8777290`, run `26316074705`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -51,6 +51,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26312283137` on `4f5a079`: success.
 - GitHub Actions CI run `26313358962` on `e765e8f`: success.
 - GitHub Actions CI run `26313942262` on `b5c1e02`: success.
+- GitHub Actions CI run `26316074705` on `8777290`: success.
 
 ## Shipped Overnight Slices
 
@@ -99,7 +100,7 @@ evidence are still required before any public live update.
 | Brain UI canary rollout | `reviews/overnight-20260522/brain-ui-canary-rollout-evidence.md` |
 | Brain UI context preview | `reviews/overnight-20260522/brain-ui-context-preview-evidence.md` |
 | Brain UI release readiness | `reviews/overnight-20260522/brain-ui-release-readiness-evidence.md` |
-| Brain UI lifecycle trail | `packages/brain-ui/src/model.js`, `packages/brain-ui/src/app.js`, `reviews/overnight-20260522/brain-ui-static-rerun-evidence.md` |
+| Brain UI lifecycle trail | `packages/brain-ui/src/model.js`, `packages/brain-ui/src/app.js`, `reviews/overnight-20260522/brain-ui-static-rerun-evidence.md`, `reviews/overnight-20260522/brain-ui-lifecycle-trail-evidence.md` |
 | Brain UI static evidence fallback | `packages/brain-ui/static-evidence.mjs`, `reviews/overnight-20260522/brain-ui-static-evidence.md`, `reviews/overnight-20260522/brain-ui-static-rerun-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
 | Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
@@ -289,10 +290,11 @@ Latest local verification before this summary:
   blocked, and requires a fresh collection window after fixes. GitHub Actions
   CI run `26312283137` passed on `4f5a079`.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
-  on `733c1e6` at `http://127.0.0.1:4187/`. The screenshot shows the Nucleus
-  graph and surrounding Brain surfaces, the page title is `RecallWeave Brain`,
-  browser console error/warning count is 0, private/key-shaped visible text
-  hits are 0, and the public launch verdict remains `FAIL`.
+  on `8777290` at `http://127.0.0.1:4189/`. The screenshot shows the Nucleus
+  graph, lifecycle trail, lifecycle event card, retrieval trace card, and
+  surrounding Brain surfaces. The page title is `RecallWeave Brain`, browser
+  console error/warning count is 0, private/key-shaped visible text hits are 0,
+  and the public launch verdict remains `FAIL`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -389,7 +391,8 @@ Sanitized fixture evidence exists under
 - current-head live browser evidence records a fresh rendered Brain UI
   screenshot and DOM-derived checks for Nucleus, wiki/vault sync, model matrix,
   context preview, release readiness, compaction audit, benchmark dashboard,
-  canary rollout, and research source lock
+  canary rollout, research source lock, lifecycle trail, lifecycle event card,
+  retrieval trace card, and `on_pre_compress` fixture text
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real

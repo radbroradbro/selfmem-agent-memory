@@ -101,6 +101,9 @@ hosted-baseline, and real-rollout requirements.
 - GitHub Actions CI run `26313942262` passed on `b5c1e02`, including Test,
   Full smoke, and Release readiness check after the GitHub live sync gate was
   added.
+- GitHub Actions CI run `26316074705` passed on `8777290`, including Test,
+  Full smoke, and Release readiness check after the Brain UI lifecycle trail
+  and current-head browser evidence refresh.
 
 The audit is intentionally conservative. It is a proof that the current branch
 is a public-readiness candidate, not proof that the active goal is complete.

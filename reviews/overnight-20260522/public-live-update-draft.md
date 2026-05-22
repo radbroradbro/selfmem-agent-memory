@@ -14,7 +14,7 @@ The current PR adds:
 - an LLM-wiki compiler with Obsidian-style frontmatter, wikilinks, index/log
   pages, provenance, conflict handling for reviewed pages, and optional
   content-free pre-write audit logging;
-- a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, search, provenance, timeline
+- a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, lifecycle trail, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
   lineage, Research Source Lock, Compaction Audit, Benchmark Dashboard, Canary Rollout, Context Preview, Release Readiness, vault preview, sync-report
   inspection,
@@ -90,9 +90,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `b5c1e02`
-- GitHub Actions: CI run `26313942262` passed for the GitHub live sync release
-  gate
+- Latest verified code baseline: `8777290`
+- GitHub Actions: CI run `26316074705` passed for the Brain UI lifecycle trail
+  and current-head browser evidence refresh
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -120,6 +120,8 @@ Latest verified head before this draft refresh:
   remediation diagnosis gate commit.
 - GitHub Actions CI run `26313942262` passed on `b5c1e02`, the GitHub live
   sync release gate commit.
+- GitHub Actions CI run `26316074705` passed on `8777290`, the Brain UI
+  lifecycle trail and current-head browser evidence refresh.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
@@ -175,10 +177,11 @@ Latest verified head before this draft refresh:
   token-free remote verification, and manual next actions. It keeps public
   launch blocked. GitHub Actions CI run `26307335652` passed on `d93d781`.
 - Current-head live browser evidence: fresh rendered Brain UI screenshot on
-  `733c1e6` with Nucleus, wiki/vault sync, Model Matrix, Context Preview,
-  Release Readiness, Compaction Audit, Benchmark Dashboard, Canary Rollout, and
-  Research Source Lock visible; zero console errors or warnings; zero
-  private/key-shaped visible text hits.
+  `8777290` with Nucleus, wiki/vault sync, Model Matrix, Context Preview,
+  Release Readiness, Compaction Audit, Benchmark Dashboard, Canary Rollout,
+  Research Source Lock, Lifecycle Trail, lifecycle event cards, retrieval trace
+  cards, and `on_pre_compress` fixture text visible; zero console errors or
+  warnings; zero private/key-shaped visible text hits.
 - Reviewer state: Gemini focused slice reviews passed; Claude Opus returned
   `CONCERNS`
 - Completion audit: not complete, with public launch still blocked on human

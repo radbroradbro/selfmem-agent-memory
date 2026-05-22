@@ -5,9 +5,9 @@ Date: 2026-05-22
 Scope:
 
 - Fresh in-app browser render of the Brain UI on the current PR head.
-- Local URL: `http://127.0.0.1:4187/`
-- Head checked: `733c1e6e38a546e8e37b5ecffcfc262e9fae59da`
-- GitHub Actions CI run already passing for that head: `26307824017`
+- Local URL: `http://127.0.0.1:4189/`
+- Head checked: `8777290169f598ff9172e889e927858b3956f764`
+- GitHub Actions CI run already passing for that head: `26316074705`
 
 Evidence:
 
@@ -29,6 +29,10 @@ Checks:
 - Benchmark Dashboard visible: true
 - Canary Rollout visible: true
 - Research Source Lock visible: true
+- Lifecycle Trail visible: true
+- Lifecycle Event card visible: true
+- Retrieval Trace card visible: true
+- `on_pre_compress` fixture event visible: true
 - Public launch verdict remains `FAIL`: true
 - Production-ready state remains false: true
 - Browser console error or warning count: 0

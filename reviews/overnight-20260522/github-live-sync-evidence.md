@@ -42,6 +42,13 @@ Observed public-safe output:
   "prBodyMatches": true,
   "issueTitleMatches": true,
   "issueBodyMatches": true,
+  "prBodyHash": "1240088927ca8353d9d35ec6c41e9f8b7a384066d6b0deadf4012036de57bc68",
+  "issueTitleHash": "e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c",
+  "issueBodyHash": "5ae8b2ba93faeb3b7312cfab5c70d98e8656a305787fd74da1685c3a564567cb",
+  "liveUpdatedAt": {
+    "pullRequest": "2026-05-22T23:12:42Z",
+    "issue": "2026-05-22T23:12:42Z"
+  },
   "safety": {
     "printsBodyText": false,
     "printsCredentials": false,

@@ -14,7 +14,7 @@ Live status:
 
 - Adds the Nucleus Index contract for memory nodes, lifecycle events, retrieval traces, wiki pages, research questions, hypotheses, decisions, and evidence.
 - Adds LLM-wiki compile and vault sync flows with Obsidian-style frontmatter, wikilinks, provenance, linting, reviewed-page conflict handling, and content-free pre-write audit logging.
-- Adds the self-hosted Brain UI preview for graph browsing, research lineage, research source lock, model matrix, compaction audit, benchmark dashboard, canary rollout, context preview, release readiness, current-head live browser evidence, local audit, selected local-container browse, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, selected local memory edit, local edit overlay browse, selected local memory materialize, dynamic graph layout, graph navigation, and provenance/timeline inspection.
+- Adds the self-hosted Brain UI preview for graph browsing, research lineage, research source lock, model matrix, compaction audit, benchmark dashboard, canary rollout, context preview, release readiness, lifecycle trail, current-head live browser evidence, local audit, selected local-container browse, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, selected local memory edit, local edit overlay browse, selected local memory materialize, dynamic graph layout, graph navigation, and provenance/timeline inspection.
 - Adds `selfmem_update`, clean consumer smoke coverage, release blocker doctor, GitHub handoff packet, goal completion audit, hosted baseline preflight, canary evidence intake, canary report generator from trace/diagnostic exports, and `canary:diagnose` remediation guidance for failed reports.
 - Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
@@ -28,9 +28,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `b5c1e025db072fca750dc6730741c23e1b981eca`.
+- Latest code/product baseline: `8777290169f598ff9172e889e927858b3956f764`.
+- GitHub Actions run `26316074705`: passed CI after the Brain UI lifecycle trail and current-head browser evidence refresh.
+- Previous verified baseline before the lifecycle trail browser evidence refresh:
+  `b5c1e025db072fca750dc6730741c23e1b981eca`.
 - GitHub Actions run `26313942262`: passed CI after the GitHub live sync release gate.
-- Previous verified baseline before the live sync release gate:
+- Earlier verified baseline before the live sync release gate:
   `e765e8ff331475c6f91565f4e68577b011e4781a`.
 - GitHub Actions run `26313358962`: passed CI after the bounded read-through latency patch.
 - PR #5 body is live and current.

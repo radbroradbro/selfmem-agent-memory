@@ -9,7 +9,11 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `b5c1e025db072fca750dc6730741c23e1b981eca`.
+- Latest code/product baseline: `8777290169f598ff9172e889e927858b3956f764`.
+- GitHub Actions run `26316074705` passed CI after the Brain UI lifecycle
+  trail and current-head browser evidence refresh.
+- Previous code/product baseline before the lifecycle trail browser evidence
+  refresh: `b5c1e025db072fca750dc6730741c23e1b981eca`.
 - GitHub Actions run `26313942262` passed CI after the GitHub live sync
   release gate.
 - Previous code/product baseline before the live sync release gate:

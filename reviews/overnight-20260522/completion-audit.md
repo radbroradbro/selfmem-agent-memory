@@ -74,6 +74,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   passed
 - GitHub live sync release gate follow-up: `b5c1e02`, CI run `26313942262`
   passed
+- Brain UI lifecycle trail and current-head browser evidence follow-up:
+  `8777290`, CI run `26316074705` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -150,7 +152,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Brain UI model matrix release gate | `packages/bench/release-readiness-check.mjs` now requires Model Matrix browser evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally |
 | Brain UI context preview release gate | `packages/bench/release-readiness-check.mjs` now requires Context Preview DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26300784883` |
 | Brain UI release readiness gate | `packages/bench/release-readiness-check.mjs` now requires Release Readiness DOM evidence, screenshot, Gemini review, release-doc references, conservative `FAIL` verdict, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26301888111` |
-| Brain UI current-head live browser evidence | `reviews/overnight-20260522/brain-ui-current-head-live-evidence.md`, `reviews/overnight-20260522/ui-evidence/brain-ui-current-head-live-evidence.json`, and screenshot evidence from `733c1e6` | Proven locally and in CI run `26307824017` |
+| Brain UI current-head live browser evidence | `reviews/overnight-20260522/brain-ui-current-head-live-evidence.md`, `reviews/overnight-20260522/ui-evidence/brain-ui-current-head-live-evidence.json`, and screenshot evidence from `8777290` | Proven locally and in CI run `26316074705`; the refreshed slice includes lifecycle trail, lifecycle event card, retrieval trace card, and `on_pre_compress` fixture checks |
 | Brain UI static evidence fallback gate | `packages/bench/release-readiness-check.mjs` now requires the static evidence script, package script, and review evidence, and runs the static check before live server-backed Brain UI smoke | Proven locally; live server-backed checks can still fail independently |
 | Clean consumer smoke release gate | `packages/bench/release-readiness-check.mjs` now requires the clean consumer smoke script, evidence, Gemini review, release-doc references, and a fresh consumer-style checkout run | Proven locally |
 | Release blocker doctor gate | `packages/bench/release-readiness-check.mjs` now requires `packages/bench/release-blocker-doctor.mjs`, release blocker evidence, Gemini review evidence, release-doc references, and a fresh conservative blocker-doctor run | Proven locally and in CI run `26307335652` |

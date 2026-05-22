@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T21:43:00Z",
+  "generatedAt": "2026-05-22T23:18:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "b5c1e025db072fca750dc6730741c23e1b981eca",
-    "ciRunId": 26313942262,
+    "headSha": "8777290169f598ff9172e889e927858b3956f764",
+    "ciRunId": 26316074705,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the GitHub live sync release gate. GitHub Actions run 26313942262 passed CI on b5c1e02."
+    "note": "This is the latest inspected code/product baseline after the Brain UI lifecycle trail and current-head browser evidence refresh. GitHub Actions run 26316074705 passed CI on 8777290."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -56,6 +56,7 @@
     "brain-ui-model-matrix",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
+    "brain-ui-lifecycle-trail",
     "brain-ui-current-head-live-browser",
     "model-autoresearch-matrix",
     "session-compaction-benchmark",

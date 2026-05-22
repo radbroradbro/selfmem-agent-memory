@@ -314,10 +314,11 @@ evidence for:
   false` and `productionReady: false`. GitHub Actions CI run `26307335652`
   passed on `d93d781`.
 - current-head live browser evidence with a fresh rendered Brain UI screenshot
-  on `733c1e6`, Nucleus graph visibility, wiki/vault sync visibility, model
+  on `8777290`, Nucleus graph visibility, wiki/vault sync visibility, model
   matrix visibility, context preview visibility, release readiness visibility,
-  zero console errors or warnings, zero private/key-shaped visible text hits,
-  and public launch still `FAIL`.
+  lifecycle trail visibility, lifecycle event card visibility, retrieval trace
+  card visibility, zero console errors or warnings, zero private/key-shaped
+  visible text hits, and public launch still `FAIL`.
 - generated GitHub handoff packet evidence with paste-ready PR body, status
   comment, blocker issue title/body, labels, and manual GitHub steps. The
   packet writes no files, uses fixture/public release metadata only, reports
@@ -373,7 +374,7 @@ Run time: 2026-05-22 18:02:04 EDT.
 
 This follow-up ran from the PR branch worktree
 `feat/nucleus-wiki-native-contract` at
-`b5c1e025db072fca750dc6730741c23e1b981eca`. GitHub connector inspection found
+`8777290169f598ff9172e889e927858b3956f764`. GitHub connector inspection found
 PR #5 open, not draft, mergeable, and with no unresolved inline review threads.
 The live PR body still records the conservative public launch verdict and issue
 #6 as the blocker trail.

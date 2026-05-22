@@ -136,13 +136,18 @@
   manual actions, hosted write-back disabled, zero privacy leaks, zero console
   errors, and no private/key-shaped visible text.
 - The Current-Head Live Browser slice was verified in the in-app browser on
-  head `733c1e6`. A fixture-only screenshot was captured at
+  head `8777290`. A fixture-only screenshot was captured at
   `brain-ui-current-head-live.png`, and
   `brain-ui-current-head-live-evidence.json` reports Nucleus, wiki/vault sync,
   Model Matrix, Context Preview, Release Readiness, Compaction Audit, Benchmark
-  Dashboard, Canary Rollout, and Research Source Lock visible, with public
-  launch still `FAIL`, zero console errors or warnings, and no
-  private/key-shaped visible text.
+  Dashboard, Canary Rollout, Research Source Lock, Lifecycle Trail, lifecycle
+  event cards, retrieval trace cards, and `on_pre_compress` fixture text
+  visible, with public launch still `FAIL`, zero console errors or warnings,
+  and no private/key-shaped visible text.
+- The Lifecycle Trail Browser slice was captured separately at
+  `brain-ui-lifecycle-trail.png`; `brain-ui-lifecycle-trail-evidence.json`
+  records the selected wiki page, event card, retrieval trace card, fixture-only
+  mode, zero console errors or warnings, and no private/key-shaped visible text.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.

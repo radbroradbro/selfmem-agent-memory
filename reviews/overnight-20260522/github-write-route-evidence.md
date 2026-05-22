@@ -6,8 +6,8 @@ Verdict: resolved for PR body and blocker issue writes.
 
 ## What Changed
 
-- The GitHub app connector still returned `401 token_expired` when asked to update
-  PR #5.
+- The GitHub app connector still returned `401 token_expired` when asked to
+  update PR #5 during the lifecycle-trail evidence refresh.
 - The local git credential helper had a valid GitHub credential.
 - A token-free command body used that helper internally, did not print the
   credential, and completed both GitHub write actions.
@@ -17,13 +17,14 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-22T22:19:15Z
-  - Body length: 4677
+  - Updated at: 2026-05-22T23:12:42Z
+  - Body length: 4945
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
-  - GitHub status: 201 on create, 200 on refresh
-  - Updated at: 2026-05-22T22:19:15Z
-  - Body length: 2329
+  - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
+    evidence refresh
+  - Updated at: 2026-05-22T23:12:42Z
+  - Body length: 2586
 
 ## Safety
 
