@@ -69,6 +69,8 @@ Retry note:
   Gemini focused review.
 - It was refreshed again after the Brain UI Model Matrix slice passed GitHub
   Actions CI run `26306469240` on `ff6f343`.
+- It was refreshed again after the clean consumer smoke passed locally and
+  Gemini returned `CLEAN`.
 - A top-level PR comment retry after docs/evidence refresh commit `1074bfd` and
   CI run `26300868065` still returned the same 403.
 - A top-level PR review comment retry after docs/blocker refresh commit
@@ -84,6 +86,7 @@ Retry note:
 - Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, graph navigation controls, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, Research Source Lock, Model Matrix, Compaction Audit, Benchmark Dashboard, Canary Rollout, Context Preview, Release Readiness, vault preview, and sync-report inspection.
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
+- Adds a clean consumer smoke that copies a public-style checkout and proves updater help, update smoke, Brain UI smoke, Brain UI interaction smoke, local audit, compaction audit, and package dry-run from that copy.
 - Adds a metrics-only local-session compaction audit path for private Codex, Claude, Hermes, and OpenClaw exports without printing candidate memory text.
 - Adds the May 2026 model/autoresearch matrix with Voyage, Gemini, NVIDIA NIM challenger arms, an Apple Silicon local default using Qwen3 0.6B through Hugging Face/llama.cpp/Metal, and query expansion disabled until a matched canary proves it helps.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
@@ -137,6 +140,11 @@ Latest local verification includes the release handoff gate slice.
   arms, Apple Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA cloud
   arms, query expansion off, env-only credentials, 5 gates, 3 blockers, zero
   console errors, and no private/key-shaped visible text.
+- Local clean consumer smoke evidence: a temporary public-style checkout ran
+  updater help, update smoke, Brain UI smoke, Brain UI interaction smoke,
+  local-container audit smoke, local-session compaction audit, and npm package
+  dry-run, then verified required docs/package files, zero forbidden runtime
+  files, and zero key-shaped hits.
 - Local Context Preview evidence: 642 of 900 fixture context tokens used, 258
   remaining, 3 selected memories, 3 context sections, 2 omitted candidates,
   hosted read-through as read-only, local-only writes, zero privacy leaks, zero
@@ -165,7 +173,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26305284384` passed on `13cbe8d`, the May 2026 model/autoresearch matrix gate commit.
 - GitHub Actions CI: run `26305635737` passed on `22e17b1`, the release gate hardening commit for the model/autoresearch matrix.
 - GitHub Actions CI: run `26306469240` passed on `ff6f343`, the Brain UI Model Matrix commit.
-- Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
+- Gemini focused reviews: sync report, wiki sync audit log, update command, clean consumer smoke, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
 
@@ -189,6 +197,8 @@ Latest local verification includes the release handoff gate slice.
 - `docs/MODEL_MATRIX.md`
 - `docs/AUTORESEARCH_BENCHMARK_PLAN.md`
 - `reviews/overnight-20260522/release-handoff-evidence.md`
+- `reviews/overnight-20260522/consumer-install-smoke-evidence.md`
+- `reviews/overnight-20260522/gemini-consumer-install-smoke-review.md`
 - `reviews/overnight-20260522/completion-audit.md`
 - `reviews/overnight-20260522/ui-evidence/README.md`
 - `reviews/overnight-20260522/brain-ui-dynamic-layout-evidence.md`

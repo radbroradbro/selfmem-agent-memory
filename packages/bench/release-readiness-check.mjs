@@ -33,6 +33,8 @@ const requiredFiles = [
   `${reviewDir}/wiki-vault-sync-evidence.md`,
   `${reviewDir}/gemini-wiki-sync-audit-log-review.md`,
   `${reviewDir}/update-flow-evidence.md`,
+  `${reviewDir}/consumer-install-smoke-evidence.md`,
+  `${reviewDir}/gemini-consumer-install-smoke-review.md`,
   `${reviewDir}/local-container-audit-evidence.md`,
   `${reviewDir}/gemini-local-container-audit-review.md`,
   `${reviewDir}/brain-ui-vault-preview-evidence.md`,
@@ -183,6 +185,7 @@ const requiredScripts = [
   "wiki:sync:smoke",
   "wiki:sync:smoke:built",
   "update:smoke",
+  "consumer:smoke",
   "smoke",
   "release:check",
 ];
@@ -703,6 +706,7 @@ check("release state is conservative", () => {
     "model-autoresearch-matrix",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
+    "clean-consumer-smoke",
     "selfmem-update",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
@@ -746,6 +750,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
+    assert.match(text, /clean consumer|consumer smoke|clean checkout/i, `${file} missing clean consumer smoke`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });
@@ -803,6 +808,10 @@ check("fresh brain UI interaction smoke passes", () => {
 
 check("fresh local container audit smoke passes", () => {
   run("node", ["packages/bench/local-container-audit-smoke.mjs"]);
+});
+
+check("fresh clean consumer smoke passes", () => {
+  run("node", ["packages/bench/consumer-install-smoke.mjs"]);
 });
 
 check("git diff check passes", () => {

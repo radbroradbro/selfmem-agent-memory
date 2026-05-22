@@ -59,6 +59,7 @@
     "model-autoresearch-matrix",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
+    "clean-consumer-smoke",
     "selfmem-update"
   ],
   "remainingBlockers": [

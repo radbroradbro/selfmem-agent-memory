@@ -41,8 +41,9 @@
     "wiki:sync:smoke": "pnpm build && node packages/bench/wiki-vault-sync-smoke.mjs",
     "wiki:sync:smoke:built": "node packages/bench/wiki-vault-sync-smoke.mjs",
     "update:smoke": "python3 packages/bench/update-flow-smoke.py",
+    "consumer:smoke": "node packages/bench/consumer-install-smoke.mjs",
     "release:check": "node packages/bench/release-readiness-check.mjs",
-    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm brain:interaction:built && pnpm container:audit:smoke:built && pnpm compaction:smoke:built && pnpm compaction:benchmark:built && pnpm compaction:local-audit:built && pnpm wiki:smoke:built && pnpm wiki:sync:smoke:built && pnpm update:smoke"
+    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm brain:interaction:built && pnpm container:audit:smoke:built && pnpm compaction:smoke:built && pnpm compaction:benchmark:built && pnpm compaction:local-audit:built && pnpm wiki:smoke:built && pnpm wiki:sync:smoke:built && pnpm update:smoke && pnpm consumer:smoke"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

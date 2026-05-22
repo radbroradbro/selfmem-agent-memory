@@ -91,6 +91,7 @@ is still required before any public live update.
 | Browser evidence gate review | `reviews/overnight-20260522/gemini-browser-evidence-gate-review.md` |
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `reviews/overnight-20260522/local-container-audit-evidence.md` |
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
+| Clean consumer smoke | `packages/bench/consumer-install-smoke.mjs`, `reviews/overnight-20260522/consumer-install-smoke-evidence.md`, `reviews/overnight-20260522/gemini-consumer-install-smoke-review.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Local-session compaction audit | `packages/bench/session-compaction-local-audit.mjs`, `reviews/overnight-20260522/session-compaction-local-audit-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
@@ -211,6 +212,12 @@ Latest local verification before this summary:
   expansion off, env-only credentials, 5 gates, 3 blockers, zero console
   errors, and no private/key-shaped visible text. GitHub Actions CI run
   `26306469240` passed on `ff6f343`.
+- Clean consumer smoke verification: a temporary public-style checkout ran
+  `selfmem_update --help`, update smoke, Brain UI smoke, Brain UI interaction
+  smoke, local-container audit smoke, local-session compaction audit, and
+  `npm pack --dry-run --json`. It verified required user-facing docs, updater
+  files, built core runtime, Brain UI model-matrix fixture, zero forbidden
+  runtime files, and zero key-shaped hits.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -355,6 +362,7 @@ local memory contents.
 - Gemini blocker-permission refresh review: `CLEAN`.
 - Gemini release-state guard review: `CLEAN`.
 - Gemini release-handoff review: `CLEAN`.
+- Gemini clean consumer smoke review: `CLEAN`.
 - Gemini production-readiness review: blocked by CLI browser authentication.
 - Claude CLI route: blocked because Claude CLI is not logged in. See
   `reviews/overnight-20260522/claude-pr5-review-blocked.md`.

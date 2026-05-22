@@ -91,6 +91,10 @@ Latest verified head before this draft refresh:
   local arms, Apple Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA
   cloud arms, query expansion off, env-only credentials, 5 gates, 3 blockers,
   zero console errors, and no private/key-shaped visible text
+- Clean consumer smoke evidence: a temporary public-style checkout ran updater
+  help, update smoke, Brain UI smoke, Brain UI interaction smoke, local audit,
+  compaction audit, and npm package dry-run, then verified required
+  docs/package files, zero forbidden runtime files, and zero key-shaped hits
 - Dynamic graph layout evidence: 9 fixture nodes, 9 fixture edges, 2 columns,
   5 rows, zero overlaps, zero console errors, and no private/key-shaped visible
   text

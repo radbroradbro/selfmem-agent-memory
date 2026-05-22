@@ -1,0 +1,50 @@
+# Clean Consumer Smoke Evidence
+
+Date: 2026-05-22
+
+Scope:
+
+- Fresh temporary checkout built from the public tracked file set.
+- Consumer-visible updater, Brain UI, local-container audit, local-session
+  compaction audit, and package dry-run behavior.
+- No private memories, credentials, local paths, or diagnostics.
+
+Result:
+
+- Mode: `clean-consumer-smoke`
+- Writes real files: false
+- Temporary checkout files: 337
+- Required npm package files present: true
+- Forbidden runtime files: 0
+- Secret/key-shaped hits: 0
+
+Commands proven inside the clean checkout:
+
+- `selfmem_update --help`
+- `python3 packages/bench/update-flow-smoke.py`
+- `node packages/brain-ui/smoke.mjs`
+- `node packages/brain-ui/interaction-smoke.mjs`
+- `node packages/bench/local-container-audit-smoke.mjs`
+- `node packages/bench/session-compaction-local-audit.mjs --strict`
+- `npm pack --dry-run --json`
+
+Required package entries verified:
+
+- `package.json`
+- `bin/selfmem_update`
+- `README.md`
+- `docs/USER_MANUAL.md`
+- `docs/BRAIN_UI.md`
+- `docs/MODEL_MATRIX.md`
+- `packages/core/dist/index.js`
+- `packages/brain-ui/src/index.html`
+- `packages/brain-ui/fixtures/model-matrix.json`
+- `plugins/selfmem-fallback/scripts/selfmem_update.py`
+
+Notes:
+
+- This does not claim production launch readiness. It proves that a clean
+  consumer-style copy has the updater, built core runtime, Brain UI fixtures,
+  model-matrix visibility, and local audit tooling needed for a public alpha
+  user or agent to start without relying on the developer worktree.
+- The release gate now reruns this smoke directly.

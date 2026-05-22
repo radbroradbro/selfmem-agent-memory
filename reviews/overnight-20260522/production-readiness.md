@@ -68,6 +68,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   or credentials.
 - Session compaction fixture benchmark.
 - Dry-run-first updater wrapper and updater smoke.
+- Clean consumer smoke that builds a temporary public-style checkout and runs
+  updater, Brain UI, local audit, compaction audit, and package dry-run checks
+  from that copy.
 - Release-readiness gate.
 
 These are proposed on PR #5. They are not yet merged to `main`.
@@ -224,6 +227,11 @@ Controller follow-up after that sandbox run:
   cloud arms, query expansion off, env-only credentials, 5 gates, 3 blockers,
   zero console errors, and no private/key-shaped visible text. GitHub Actions
   CI run `26306469240` passed on `ff6f343`.
+- Clean consumer smoke verification passed locally. A temporary public-style
+  checkout ran updater help, update smoke, Brain UI smoke, Brain UI
+  interaction smoke, local-container audit smoke, local-session compaction
+  audit, and npm package dry-run, then verified required docs/package files,
+  zero forbidden runtime files, and zero key-shaped hits.
 
 ## UI Evidence
 
@@ -280,6 +288,10 @@ evidence for:
 - release readiness evidence with the fixture public launch verdict, blocker
   list, manual action list, CI status, hosted write-back disabled, zero privacy
   leaks, zero console errors, and no private/key-shaped visible text.
+- clean consumer smoke evidence with a fresh public-style checkout, updater
+  help, Brain UI checks, local audit, compaction audit, npm package dry-run,
+  required docs/package files, zero forbidden runtime files, and zero
+  key-shaped hits.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
@@ -291,7 +303,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Area | Grade | Reason |
 | --- | --- | --- |
 | Security/privacy | PASS WITH CONCERNS | Redaction, secret-pattern, forbidden-file, and privacy smokes are strong, but current reviewer routes are blocked. |
-| Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
+| Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes, wrapper is dry-run-first, and clean consumer smoke now proves updater help, Brain UI checks, local audit, compaction audit, and package dry-run from a temporary public-style checkout. A true GitHub install still depends on public visibility and user approval. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
 | UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Benchmark Dashboard shows fixture local-only compaction quality metrics and caveats, Canary Rollout shows the one-agent dry-run/apply/observe/rollback path, Research Source Lock shows methodology sources, Model Matrix shows guarded provider choices and local Apple Silicon defaults, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
