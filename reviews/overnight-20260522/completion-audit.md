@@ -44,6 +44,8 @@ complete or publish a public live update.
   `26298965544` passed
 - Brain UI Compaction Audit follow-up: `fb466db`, CI run `26299756374`
   passed
+- Brain UI Context Preview follow-up: `0ec4396`, CI run `26300784883`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -98,8 +100,8 @@ complete or publish a public live update.
 | Release handoff gate | `packages/bench/release-readiness-check.mjs` now requires `docs/RELEASE_HANDOFF.md`, release-handoff evidence, and Gemini review evidence | Proven locally and in CI run `26298339106` |
 | Metrics-only local session compaction audit gate | `packages/bench/release-readiness-check.mjs` now requires local-session compaction audit evidence, Gemini review evidence, and a fresh metrics-only audit run | Proven locally and in CI run `26298965544` |
 | Brain UI compaction audit release gate | `packages/bench/release-readiness-check.mjs` now requires Compaction Audit DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26299756374` |
-| Brain UI context preview release gate | `packages/bench/release-readiness-check.mjs` now requires Context Preview DOM evidence, screenshot, review blocker note, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally; CI pending for the next pushed commit |
-| GitHub Actions | CI run `26299756374` on `fb466db` passed Test, Full smoke, and Release readiness check | Proven |
+| Brain UI context preview release gate | `packages/bench/release-readiness-check.mjs` now requires Context Preview DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26300784883` |
+| GitHub Actions | CI run `26300784883` on `0ec4396` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |

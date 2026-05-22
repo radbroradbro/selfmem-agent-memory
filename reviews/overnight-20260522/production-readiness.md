@@ -151,6 +151,8 @@ Controller follow-up after that sandbox run:
   fingerprints, 2 redactions, chronological output, 1 exact-identifier
   candidate, zero privacy leaks, zero console errors, and no raw candidate
   text.
+- GitHub Actions CI run `26300784883` on Brain UI Context Preview commit
+  `0ec4396` passed Test, Full smoke, and Release readiness check.
 - Brain UI Context Preview local verification passed fresh Brain UI smoke and
   interaction smoke. Browser evidence reports 642 of 900 fixture context tokens
   used, 258 tokens remaining, 3 selected memories, 3 context sections, 2
