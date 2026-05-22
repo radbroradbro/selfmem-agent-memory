@@ -122,6 +122,17 @@ Then run the intake gate:
 npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
 ```
 
+If the intake gate fails, generate a metrics-only remediation plan:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
+```
+
+The diagnosis should name failed checks, p95 latency values, missing lifecycle
+coverage, identity issues, privacy failures, and the next safe collection
+steps. It must not print memory text, prompt text, answer text, local paths,
+credentials, cookies, or bearer tokens.
+
 The report must contain aggregate metrics only: hashed agent/container labels,
 lifecycle event counts, hybrid-search coverage, local-write observation,
 hosted read-through mode, p50 and p95 latency, privacy counters, and rollback
@@ -180,7 +191,10 @@ For each deployed agent:
    latency, and errors.
 5. Run `canary:report` for the selected agent container.
 6. Run `canary:intake -- --report sanitized-report.json --strict-real`.
-7. Open a PR or issue if any runtime behavior diverges.
+7. If strict intake fails, run
+   `canary:diagnose -- --report sanitized-report.json` and attach only the
+   metrics-only remediation output to the PR or issue.
+8. Open a PR or issue if any runtime behavior diverges.
 
 Do not roll the same change to every agent until one-agent canary evidence is
 clean.

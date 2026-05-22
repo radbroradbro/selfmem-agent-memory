@@ -44,6 +44,7 @@ Share:
 - p50/p95 recall latency,
 - smoke command output,
 - sanitized stack trace.
+- metrics-only `canary:diagnose` output when strict canary intake fails.
 
 Do not share:
 
@@ -128,6 +129,20 @@ npm exec --yes pnpm@10.23.0 -- update:smoke
 The smoke creates temporary Hermes and OpenClaw homes, checks dry-run behavior,
 applies into fake runtime directories, verifies adapter backups, preserves the
 container mapping, and confirms copied local key files use `0600`.
+
+## Failed Canary Reports
+
+If a live canary report fails strict intake, do not summarize the private logs
+by hand. Run:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
+```
+
+Attach the diagnosis output, not the source diagnostic bundle. A good diagnosis
+names the failed checks, p95 latency numbers, missing hook coverage, identity
+mapping problems, privacy counters, and whether a fresh window is needed after
+the fix.
 
 ## Benchmark Or Model Changes
 

@@ -40,7 +40,7 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 14 proven requirements
+- 15 proven requirements
 - 5 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
@@ -63,6 +63,9 @@ GitHub, human approval, hosted-baseline, and real-rollout requirements.
 - Canary diagnostic bundle generation can produce that report from metadata-only
   redacted diagnostic exports, but relocated fixture ZIPs still fail
   `--strict-real`.
+- Canary remediation can turn failed canary reports into metrics-only next
+  actions, but it does not make failed evidence pass or authorize broader
+  rollout.
 - Real-container production rollout is still a canary step, not complete.
 
 ## Verification

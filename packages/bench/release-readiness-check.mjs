@@ -24,11 +24,13 @@ const requiredFiles = [
   "packages/brain-ui/fixtures/model-matrix.json",
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
+  "packages/bench/canary-remediation.mjs",
   "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
   "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-memories.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-report.fixture.json",
+  "packages/bench/fixtures/canary-runtime-report-failing.fixture.json",
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary_metadata/trace_metadata_only.jsonl",
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/containers/selfmem_fixture_agent/container-map.json",
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/reliability_reports/latest.json",
@@ -120,6 +122,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-report-generator-review.md`,
   `${reviewDir}/canary-evidence-intake-evidence.md`,
   `${reviewDir}/gemini-canary-evidence-intake-review.md`,
+  `${reviewDir}/canary-remediation-evidence.md`,
+  `${reviewDir}/gemini-canary-remediation-review.md`,
   `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
@@ -218,6 +222,7 @@ const requiredScripts = [
   "consumer:smoke",
   "canary:report",
   "canary:intake",
+  "canary:diagnose",
   "baseline:preflight",
   "goal:audit",
   "release:doctor",
@@ -767,7 +772,9 @@ check("release state is conservative", () => {
     "clean-consumer-smoke",
     "release-blocker-doctor",
     "canary-report-generator",
+    "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
+    "canary-remediation-plan",
     "hosted-baseline-preflight",
     "github-handoff-packet",
     "goal-completion-audit",
@@ -813,6 +820,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /canary rollout|one-agent canary|selfmem_update/i, `${file} missing canary rollout`);
     assert.match(text, /canary report generator|canary:report|trace-derived canary/i, `${file} missing canary report generator`);
     assert.match(text, /canary evidence intake|canary:intake|runtime canary evidence/i, `${file} missing canary evidence intake`);
+    assert.match(text, /canary diagnose|canary:diagnose|remediation/i, `${file} missing canary remediation`);
     assert.match(text, /research source lock|source-lock|source lock/i, `${file} missing research source lock`);
     assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
@@ -1031,6 +1039,40 @@ check("fresh canary evidence intake passes", () => {
   assert.equal(report.quality?.lifecycleCovered, true);
   assert.equal(report.quality?.hybridSearchCovered, true);
   assert.deepEqual(report.failedChecks, []);
+  assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.doesNotMatch(geminiReview, /pending external review/i);
+});
+
+check("fresh canary remediation passes", () => {
+  const failingResult = run("node", ["packages/bench/canary-remediation.mjs"]);
+  const failingReport = JSON.parse(failingResult.stdout);
+  const passingResult = run("node", [
+    "packages/bench/canary-remediation.mjs",
+    "--report",
+    "packages/bench/fixtures/canary-runtime-report.fixture.json",
+  ]);
+  const passingReport = JSON.parse(passingResult.stdout);
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-remediation-review.md"), "utf8");
+  assert.equal(failingReport.ok, true);
+  assert.equal(failingReport.mode, "canary-remediation-plan");
+  assert.equal(failingReport.writesRealFiles, false);
+  assert.equal(failingReport.metricsOnly, true);
+  assert.equal(failingReport.fixtureOnly, true);
+  assert.equal(failingReport.canaryPass, false);
+  assert.equal(failingReport.severity, "blocked");
+  assert.equal(failingReport.publicLaunchAllowed, false);
+  assert.equal(failingReport.fleetRolloutAllowed, false);
+  assert.deepEqual(failingReport.failedChecks, ["recall-p95", "store-p95"]);
+  assert.equal(failingReport.measurements.recallP95Ms, 3894);
+  assert.equal(failingReport.measurements.storeP95Ms, 0);
+  assert.ok(failingReport.actions.some((item) => item.check === "recall-p95" && item.category === "latency"));
+  assert.ok(failingReport.actions.some((item) => item.check === "store-p95" && item.category === "instrumentation"));
+  assert.equal(failingReport.recollectWindow.needsFreshWindow, true);
+  assert.equal(passingReport.canaryPass, true);
+  assert.equal(passingReport.fixtureOnly, true);
+  assert.deepEqual(passingReport.failedChecks, []);
+  assert.doesNotMatch(failingResult.stdout, secretPattern);
+  assert.doesNotMatch(failingResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
 });

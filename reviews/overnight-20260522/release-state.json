@@ -65,6 +65,7 @@
     "canary-report-generator",
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
+    "canary-remediation-plan",
     "hosted-baseline-preflight",
     "github-handoff-packet",
     "goal-completion-audit",

@@ -128,6 +128,17 @@ To test the updater on temporary fixture runtimes before touching an agent:
 npm exec --yes pnpm@10.23.0 -- update:smoke
 ```
 
+For a real one-agent canary, use metrics-only reports:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:report -- --diagnostic-dir <redacted-diagnostic-dir> --rollback-tested --output sanitized-report.json
+npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
+npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
+```
+
+Attach diagnosis output only. Do not attach the source diagnostic bundle or raw
+runtime logs.
+
 ## Runtime Checks
 
 Run these from a checkout:

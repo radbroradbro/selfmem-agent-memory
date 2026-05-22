@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "mode": "one-agent-canary-runtime-report",
+  "generatedAt": "2026-05-22T20:30:00.000Z",
+  "commit": "fixture-failing-canary-commit",
+  "fixtureOnly": true,
+  "evidenceType": "fixture-trace-derived-canary-report",
+  "agent": {
+    "host": "hermes",
+    "agentIdentityHash": "agent_0123456789ab",
+    "localContainerHash": "container_0123456789ab",
+    "sourceContainerHash": "source_0123456789ab"
+  },
+  "window": {
+    "startedAt": "2026-05-22T20:00:00.000Z",
+    "endedAt": "2026-05-22T20:30:00.000Z",
+    "durationMinutes": 30
+  },
+  "provider": {
+    "mode": "local-write-hosted-read-through",
+    "localWriteMode": "enabled",
+    "hostedSupermemoryMode": "read-through-only",
+    "embedder": "voyage-4-large",
+    "reranker": "rerank-2.5"
+  },
+  "counts": {
+    "sessionStart": 2,
+    "beforePromptBuild": 18,
+    "preCompress": 2,
+    "agentEnd": 14,
+    "search": 24,
+    "store": 12,
+    "forget": 0,
+    "errors": 0,
+    "skippedUnknownIdentity": 0,
+    "unknownContainerWrites": 0
+  },
+  "latencyMs": {
+    "recallP50": 817,
+    "recallP95": 3894,
+    "storeP50": 0,
+    "storeP95": 0
+  },
+  "quality": {
+    "beforePromptHasContextRate": 0.83,
+    "zeroResultRate": 0.04,
+    "writeSuccessRate": 1,
+    "lcmHookObserved": true,
+    "lifecycleCovered": true,
+    "hybridSearchCovered": true,
+    "localWritesObserved": true,
+    "hostedReadThroughObserved": true
+  },
+  "privacy": {
+    "privacyLeakCount": 0,
+    "redactionCount": 4,
+    "secretPatternHits": 0,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPromptIncluded": false,
+    "rawAnswerIncluded": false
+  },
+  "rollback": {
+    "available": true,
+    "tested": true,
+    "command": "selfmem_update --rollback"
+  },
+  "failures": []
+}

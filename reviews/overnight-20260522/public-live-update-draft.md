@@ -33,6 +33,8 @@ The current PR adds:
   from fleet rollout and public launch when the report is only a fixture;
 - a canary report generator that converts Hermes/OpenClaw traces into the
   sanitized report format without raw memory text or local paths;
+- a canary diagnosis command that turns failed canary reports into metrics-only
+  remediation actions without exposing diagnostic contents;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
@@ -91,7 +93,7 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 14 proven
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 15 proven
   requirements, 5 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with
@@ -107,6 +109,8 @@ Latest verified head before this draft refresh:
 - Canary diagnostic bundle generator: redacted diagnostic directories and ZIP
   bundles can produce the same sanitized report shape, while relocated fixtures
   still fail `--strict-real`
+- Canary diagnosis: `canary:diagnose` turns failed canary reports into
+  metrics-only remediation actions and keeps fleet/public rollout blocked
 - GitHub Actions CI run `26311728246` passed on `77b3cee`, the diagnostic
   bundle canary report gate commit.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed

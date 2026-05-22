@@ -139,6 +139,10 @@ Scope:
   and ZIP bundles. The gate now checks metadata-only diagnostic exports,
   relocated fixture ZIPs, strict-real fixture rejection, zip path safety, and
   no raw private logs, local paths, secrets, prompts, answers, or memory text.
+- Added canary remediation coverage to the release gate. The diagnosis command
+  turns failed canary reports into metrics-only action plans, verifies a failing
+  fixture with `recall-p95` and `store-p95`, verifies a passing fixture, and
+  keeps fleet and public rollout disabled.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.

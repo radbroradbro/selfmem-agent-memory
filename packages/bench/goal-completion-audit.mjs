@@ -27,6 +27,8 @@ const files = {
   canaryReportGeneratorReview: `${reviewDir}/gemini-canary-report-generator-review.md`,
   canaryEvidenceIntakeEvidence: `${reviewDir}/canary-evidence-intake-evidence.md`,
   canaryEvidenceIntakeReview: `${reviewDir}/gemini-canary-evidence-intake-review.md`,
+  canaryRemediationEvidence: `${reviewDir}/canary-remediation-evidence.md`,
+  canaryRemediationReview: `${reviewDir}/gemini-canary-remediation-review.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
@@ -140,6 +142,12 @@ const requirements = [
     "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary_metadata/trace_metadata_only.jsonl",
     files.canaryReportGeneratorEvidence,
     files.canaryReportGeneratorReview,
+  ]),
+  proven("canary-remediation-plan", "Failed canary reports can be converted into sanitized metrics-only remediation guidance without raw content", [
+    "packages/bench/canary-remediation.mjs",
+    "packages/bench/fixtures/canary-runtime-report-failing.fixture.json",
+    files.canaryRemediationEvidence,
+    files.canaryRemediationReview,
   ]),
   blocked("claude-council-review", "Claude/Opus reviewer route remains blocked by missing login", [
     files.claudeBlocked,

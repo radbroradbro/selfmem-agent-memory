@@ -101,6 +101,9 @@ Retry note:
   strict one-agent canary review.
 - The canary report generator now also accepts redacted diagnostic directories
   and ZIP bundles, while relocated fixtures still fail strict-real intake.
+- A canary diagnosis command is now available through `canary:diagnose`; it
+  turns failed canary reports into metrics-only remediation actions without
+  exposing diagnostic contents.
 - GitHub Actions CI run `26308475033` passed on `6a33e62`, the GitHub handoff
   packet gate commit.
 - GitHub Actions CI run `26308588261` passed on `8efe4d0`, the dynamic handoff
@@ -136,7 +139,10 @@ Retry note:
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   latency, rollback readiness, and privacy without attaching raw memory logs.
 - Adds a canary report generator so deployed agents can produce those reports
-  from local trace files without exposing raw memory text or local paths.
+  from local trace files, redacted diagnostic dirs, or redacted diagnostic ZIPs
+  without exposing raw memory text or local paths.
+- Adds a canary diagnosis command so failed reports produce safe next actions
+  instead of vague rollout failure.
 - Adds post-12-hour readiness evidence, a conservative public live-update draft, and a dummy-data demo storyboard.
 - Adds `docs/RELEASE_HANDOFF.md` so the owner can manually update the stale PR body, create the blocker issue, accept or rerun the blocked Claude route, and run a one-agent canary with `selfmem_update`.
 - Adds a generated GitHub handoff packet so blocked GitHub write routes have one audited source for PR body, status comment, blocker issue, labels, and manual GitHub steps.
@@ -207,7 +213,7 @@ Latest local verification includes the release handoff gate slice.
   `writesRealFiles: false`, `privateLeakCount: 0`, and `hasSecretPattern:
   false`.
 - Local goal completion audit evidence: machine-readable requirement matrix
-  with `goalComplete: false`, 14 proven requirements, 5 blocked requirements,
+  with `goalComplete: false`, 15 proven requirements, 5 blocked requirements,
   and 1 incomplete requirement.
 - Local hosted baseline preflight evidence: offline metrics-only contract,
   no hosted provider call by default, hosted write-back disabled, raw memory
@@ -222,6 +228,9 @@ Latest local verification includes the release handoff gate slice.
 - Local canary diagnostic bundle generator: redacted diagnostic dirs and ZIPs
   produce metrics-only reports, copied fixtures remain fixture-only, and
   strict-real intake rejects them.
+- Local canary diagnosis: failed metrics-only reports produce remediation
+  actions for latency, instrumentation, lifecycle, identity, retrieval, privacy,
+  and rollback failures while fleet/public rollout remains blocked.
 - Current-head live browser evidence: the in-app browser rendered the Brain UI
   on `733c1e6`, captured a 1280 by 1223 screenshot, showed Nucleus, wiki/vault
   sync, Model Matrix, Context Preview, Release Readiness, Compaction Audit,

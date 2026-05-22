@@ -173,6 +173,15 @@ Agents should branch from `main`, make a focused change, run the relevant smoke
 tests, and open a pull request. If a runtime issue cannot be fixed safely, open
 an issue with sanitized logs and no raw memory content.
 
+For one-agent canaries, generate a sanitized report, run strict intake, and
+diagnose failures before touching another agent:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:report -- --diagnostic-dir <redacted-diagnostic-dir> --rollback-tested --output sanitized-report.json
+npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
+npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
+```
+
 ## Safety Rules
 
 Do not commit keys, raw memories, raw transcripts, `.env`, auth files, browser
