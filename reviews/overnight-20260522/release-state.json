@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T15:32:00Z",
+  "generatedAt": "2026-05-22T15:36:29Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "21fd4d6c82bf2c07f8e5dba70f8508b0b9884649",
-    "ciRunId": 26295772356,
+    "headSha": "be47cffe1a79b38262bb29a76da340b087a1cf87",
+    "ciRunId": 26297064340,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the guarded local memory materialize slice. The dynamic graph layout slice is local-only until pushed and CI-verified."
+    "note": "This is the latest inspected code/product baseline after the dynamic Brain UI graph layout slice. GitHub Actions run 26297064340 passed Test, Full smoke, and Release readiness check."
   },
   "releaseStateGuard": {
     "enabled": true,

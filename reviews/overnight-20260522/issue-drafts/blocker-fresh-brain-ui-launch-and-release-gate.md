@@ -43,10 +43,10 @@ or explicitly accepted.
   local edit overlay browse slice became required.
 - GitHub Actions CI run `26295772356` on `21fd4d6`: passed after the guarded
   local memory materialize slice became required.
-- Dynamic Brain UI graph layout checks passed locally with fixture browser
-  evidence: `dynamic-graph-layout`, 9 nodes, 9 edges, 2 columns, 5 rows, zero
-  overlaps, zero console errors, and no private/key-shaped visible text. CI for
-  that slice is pending until pushed.
+- GitHub Actions CI run `26297064340` on `be47cff`: passed after the dynamic
+  Brain UI graph layout slice became required. Fixture browser evidence reports
+  `dynamic-graph-layout`, 9 nodes, 9 edges, 2 columns, 5 rows, zero overlaps,
+  zero console errors, and no private/key-shaped visible text.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was

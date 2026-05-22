@@ -128,11 +128,11 @@ Controller follow-up after that sandbox run:
   commit `b5352a0` passed.
 - GitHub Actions CI run `26295772356` on guarded local memory materialize
   commit `21fd4d6` passed.
-- Local dynamic graph layout checks passed after the latest CI baseline:
-  `node packages/brain-ui/smoke.mjs` and
-  `node packages/brain-ui/interaction-smoke.mjs`. Browser evidence reports
-  `dynamic-graph-layout`, 9 fixture nodes, 9 fixture edges, 2 columns, 5 rows,
-  zero overlaps, zero console errors, and no private/key-shaped visible text.
+- GitHub Actions CI run `26297064340` on dynamic graph layout commit
+  `be47cff` passed Test, Full smoke, and Release readiness check. Browser
+  evidence reports `dynamic-graph-layout`, 9 fixture nodes, 9 fixture edges, 2
+  columns, 5 rows, zero overlaps, zero console errors, and no
+  private/key-shaped visible text.
 
 ## UI Evidence
 

@@ -227,6 +227,8 @@ Known limits:
   browse commit `b5352a0`.
 - GitHub Actions CI run `26295772356` passed on guarded local memory
   materialize commit `21fd4d6`.
+- GitHub Actions CI run `26297064340` passed on dynamic graph layout commit
+  `be47cff`.
 - Dynamic graph layout CI is pending until this slice is pushed. Local
   `node packages/brain-ui/smoke.mjs`,
   `node packages/brain-ui/interaction-smoke.mjs`, and
