@@ -48,6 +48,8 @@ complete or publish a public live update.
   passed
 - Brain UI Release Readiness follow-up: `8c26de7`, CI run `26301888111`
   passed
+- Brain UI Benchmark Dashboard follow-up: local verification passed; GitHub
+  Actions CI pending until this slice is committed and pushed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -82,6 +84,7 @@ complete or publish a public live update.
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI compaction audit evidence | `brain-ui-compaction-audit-*`, `brain-ui-compaction-audit-evidence.md`, Gemini review | Proven with sanitized metrics-only fixtures |
+| Brain UI benchmark dashboard evidence | `brain-ui-benchmark-dashboard-*`, `brain-ui-benchmark-dashboard-evidence.md`, Gemini review | Proven locally with fixture local-only compaction benchmark metrics, 5 of 5 scenarios passed, zero privacy leaks, exact-identifier accuracy 1, average noise reduction 0.307, and hosted-baseline caveat |
 | Brain UI context preview evidence | `brain-ui-context-preview-*`, `brain-ui-context-preview-evidence.md`, Gemini review | Proven locally with sanitized fixture recall packet, selected/omitted candidates, token budget, read-only hosted mode, local-only write mode, zero privacy leaks, and no private/key-shaped text |
 | Brain UI release readiness evidence | `brain-ui-release-readiness-*`, `brain-ui-release-readiness-evidence.md`, Gemini review | Proven locally with sanitized fixture public launch verdict, blocker list, manual actions, CI status, hosted write-back disabled, zero privacy leaks, and no private/key-shaped text |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
@@ -103,6 +106,7 @@ complete or publish a public live update.
 | Release handoff gate | `packages/bench/release-readiness-check.mjs` now requires `docs/RELEASE_HANDOFF.md`, release-handoff evidence, and Gemini review evidence | Proven locally and in CI run `26298339106` |
 | Metrics-only local session compaction audit gate | `packages/bench/release-readiness-check.mjs` now requires local-session compaction audit evidence, Gemini review evidence, and a fresh metrics-only audit run | Proven locally and in CI run `26298965544` |
 | Brain UI compaction audit release gate | `packages/bench/release-readiness-check.mjs` now requires Compaction Audit DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26299756374` |
+| Brain UI benchmark dashboard release gate | `packages/bench/release-readiness-check.mjs` now requires Benchmark Dashboard DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally; CI pending for this uncommitted slice |
 | Brain UI context preview release gate | `packages/bench/release-readiness-check.mjs` now requires Context Preview DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26300784883` |
 | Brain UI release readiness gate | `packages/bench/release-readiness-check.mjs` now requires Release Readiness DOM evidence, screenshot, Gemini review, release-doc references, conservative `FAIL` verdict, and fresh Brain UI smoke and interaction smoke coverage | Proven locally and in CI run `26301888111` |
 | GitHub Actions | CI run `26301888111` on `8c26de7` passed Test, Full smoke, and Release readiness check | Proven |

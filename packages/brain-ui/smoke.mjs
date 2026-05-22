@@ -18,6 +18,7 @@ try {
     vault,
     syncReport,
     sessionCompactionAudit,
+    benchmarkSummary,
     promptContextPreview,
     releaseReadiness,
     localAudit,
@@ -32,6 +33,7 @@ try {
     json(`${base}/fixtures/wiki-vault.json`),
     json(`${base}/fixtures/wiki-sync-report.json`),
     json(`${base}/fixtures/session-compaction-local-audit.json`),
+    json(`${base}/fixtures/benchmark-summary.json`),
     json(`${base}/fixtures/prompt-context-preview.json`),
     json(`${base}/fixtures/release-readiness.json`),
     json(`${base}/fixtures/local-container-audit.json`),
@@ -47,6 +49,7 @@ try {
   assert.match(index, /Nucleus Snapshot/);
   assert.match(index, /Research Lineage/);
   assert.match(index, /Compaction Audit/);
+  assert.match(index, /Benchmark Dashboard/);
   assert.match(index, /Context Preview/);
   assert.match(index, /Release Readiness/);
   assert.match(index, /Lifecycle Policy/);
@@ -71,6 +74,7 @@ try {
   assert.match(app, /buildNucleusExport/);
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /buildSessionCompactionAudit/);
+  assert.match(app, /buildBenchmarkDashboard/);
   assert.match(app, /buildPromptContextPreview/);
   assert.match(app, /buildReleaseReadinessConsole/);
   assert.match(app, /buildLifecyclePolicyDraft/);
@@ -97,6 +101,7 @@ try {
   assert.match(model, /function buildGraphLayout/);
   assert.match(model, /function graphScopedNodes/);
   assert.match(model, /function buildSessionCompactionAudit/);
+  assert.match(model, /function buildBenchmarkDashboard/);
   assert.match(model, /function buildPromptContextPreview/);
   assert.match(model, /function buildReleaseReadinessConsole/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
@@ -117,6 +122,7 @@ try {
   assert.match(styles, /audit-summary/);
   assert.match(styles, /selected-audit/);
   assert.match(styles, /audit-history/);
+  assert.match(styles, /benchmark-verdict/);
   assert.match(styles, /context-section-list/);
   assert.match(styles, /release-verdict/);
   assert.match(styles, /edit-export/);
@@ -153,6 +159,16 @@ try {
   assert.equal(sessionCompactionAudit.quality.exactIdentifierCandidateCount, 1);
   assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
   assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
+  assert.equal(benchmarkSummary.mode, "local-compaction-benchmark-summary");
+  assert.equal(benchmarkSummary.writesRealFiles, false);
+  assert.equal(benchmarkSummary.metricsOnly, true);
+  assert.equal(benchmarkSummary.suite.scenarioCount, 5);
+  assert.equal(benchmarkSummary.aggregate.passedScenarios, 5);
+  assert.equal(benchmarkSummary.aggregate.failedScenarios, 0);
+  assert.equal(benchmarkSummary.aggregate.privacyLeakCount, 0);
+  assert.equal(benchmarkSummary.aggregate.exactIdentifierAccuracy, 1);
+  assert.ok(benchmarkSummary.aggregate.averageNoiseReductionRatio >= 0.2);
+  assert.ok(benchmarkSummary.scenarios.every((scenario) => scenario.passed));
   assert.equal(promptContextPreview.ok, true);
   assert.equal(promptContextPreview.mode, "prompt-context-preview");
   assert.equal(promptContextPreview.tokenBudget, 900);
@@ -256,6 +272,7 @@ try {
     vault,
     syncReport,
     sessionCompactionAudit,
+    benchmarkSummary,
     promptContextPreview,
     releaseReadiness,
     localAudit,
@@ -283,6 +300,7 @@ try {
           "dynamic-graph-layout",
           "graph-navigation-controls",
           "session-compaction-audit",
+          "benchmark-dashboard",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy",

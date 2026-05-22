@@ -6,6 +6,7 @@ import {
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
+  buildBenchmarkDashboard,
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,
@@ -29,6 +30,7 @@ const state = {
   vault: null,
   syncReport: null,
   sessionCompactionAudit: null,
+  benchmarkSummary: null,
   promptContextPreview: null,
   releaseReadiness: null,
   selectedVaultPath: "",
@@ -67,6 +69,11 @@ const researchLineage = document.querySelector("#researchLineage");
 const compactionAuditSummary = document.querySelector("#compactionAuditSummary");
 const compactionAuditFingerprints = document.querySelector("#compactionAuditFingerprints");
 const compactionAuditExport = document.querySelector("#compactionAuditExport");
+const benchmarkStatus = document.querySelector("#benchmarkStatus");
+const benchmarkSummary = document.querySelector("#benchmarkSummary");
+const benchmarkScenarios = document.querySelector("#benchmarkScenarios");
+const benchmarkCaveats = document.querySelector("#benchmarkCaveats");
+const benchmarkExport = document.querySelector("#benchmarkExport");
 const contextPreviewSummary = document.querySelector("#contextPreviewSummary");
 const contextPreviewMemories = document.querySelector("#contextPreviewMemories");
 const contextPreviewSections = document.querySelector("#contextPreviewSections");
@@ -175,6 +182,7 @@ const [
   vaultResponse,
   syncResponse,
   sessionCompactionResponse,
+  benchmarkResponse,
   promptContextResponse,
   releaseReadinessResponse,
   localAuditResponse,
@@ -184,6 +192,7 @@ const [
   fetch("/fixtures/wiki-vault.json"),
   fetch("/fixtures/wiki-sync-report.json"),
   fetch("/fixtures/session-compaction-local-audit.json"),
+  fetch("/fixtures/benchmark-summary.json"),
   fetch("/fixtures/prompt-context-preview.json"),
   fetch("/fixtures/release-readiness.json"),
   fetch("/fixtures/local-container-audit.json"),
@@ -193,6 +202,7 @@ state.snapshot = await response.json();
 state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
 state.sessionCompactionAudit = await sessionCompactionResponse.json();
+state.benchmarkSummary = await benchmarkResponse.json();
 state.promptContextPreview = await promptContextResponse.json();
 state.releaseReadiness = await releaseReadinessResponse.json();
 state.localAudit = await localAuditResponse.json();
@@ -503,6 +513,7 @@ function render() {
   renderNucleusSnapshot();
   renderResearchLineage();
   renderSessionCompactionAudit();
+  renderBenchmarkDashboard();
   renderPromptContextPreview();
   renderReleaseReadiness();
   renderLifecyclePolicy();
@@ -748,6 +759,49 @@ function renderSessionCompactionAudit() {
   }
 
   compactionAuditExport.textContent = JSON.stringify(packet, null, 2);
+}
+
+function renderBenchmarkDashboard() {
+  const packet = buildBenchmarkDashboard(state.benchmarkSummary);
+  benchmarkStatus.textContent = packet.verdict;
+  benchmarkStatus.dataset.verdict = packet.verdict;
+  benchmarkSummary.replaceChildren(
+    stat("Scenarios", `${packet.aggregate.passedScenarios}/${packet.suite.scenarioCount}`),
+    stat("Failures", packet.aggregate.failedScenarios),
+    stat("Leaks", packet.aggregate.privacyLeakCount),
+    stat("Exact IDs", `${Math.round(packet.aggregate.exactIdentifierAccuracy * 100)}%`),
+    stat("Kind cov", `${Math.round(packet.aggregate.averageKindCoverage * 100)}%`),
+    stat("Term cov", `${Math.round(packet.aggregate.averageRequiredTermCoverage * 100)}%`),
+    stat("Noise", `${Math.round(packet.aggregate.averageNoiseReductionRatio * 100)}%`),
+    stat("Candidates", packet.aggregate.totalOutputCandidates),
+  );
+
+  benchmarkScenarios.replaceChildren();
+  for (const scenario of packet.scenarios) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    item.dataset.status = scenario.passed ? "pass" : "fail";
+    strong.textContent = scenario.passed ? "pass" : "fail";
+    span.textContent = scenario.label;
+    small.textContent = `${Math.round(scenario.exactIdentifierAccuracy * 100)}% exact IDs | ${Math.round(scenario.noiseReductionRatio * 100)}% noise reduction | ${scenario.outputCandidates} candidates`;
+    item.append(strong, span, small);
+    benchmarkScenarios.append(item);
+  }
+
+  benchmarkCaveats.replaceChildren();
+  for (const caveat of packet.caveats) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = "caveat";
+    span.textContent = caveat;
+    item.append(strong, span);
+    benchmarkCaveats.append(item);
+  }
+
+  benchmarkExport.textContent = JSON.stringify(packet, null, 2);
 }
 
 function renderPromptContextPreview() {

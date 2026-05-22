@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "head": "7c6d14c35ace65d92b0709229be94e0550755b3d",
+  "mode": "fixture-brain-ui-benchmark-dashboard",
+  "writesRealFiles": false,
+  "evidence": {
+    "hasBenchmarkHeading": true,
+    "verdict": "PASS",
+    "statusDataVerdict": "PASS",
+    "mode": "fixture-local-compaction-benchmark-dashboard",
+    "writesRealFiles": false,
+    "metricsOnly": true,
+    "passedScenarios": 5,
+    "failedScenarios": 0,
+    "privacyLeakCount": 0,
+    "exactIdentifierAccuracy": 1,
+    "averageNoiseReductionRatio": 0.307,
+    "scenarioCount": 5,
+    "caveatCount": 3,
+    "hasHostedBaselineCaveat": true,
+    "hasNoRawTextCaveat": true,
+    "hasPrivateOrKeyText": false
+  },
+  "consoleErrorCount": 0,
+  "consoleMessages": []
+}

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "mode": "local-compaction-benchmark-summary",
+  "generatedAt": "2026-05-22T17:30:00.000Z",
+  "source": "packages/bench/session-compaction-benchmark.mjs",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "suite": {
+    "scenarioCount": 5,
+    "description": "Public-safe deterministic suite for local-only RecallWeave session compaction quality checks."
+  },
+  "aggregate": {
+    "passedScenarios": 5,
+    "failedScenarios": 0,
+    "privacyLeakCount": 0,
+    "exactIdentifierAccuracy": 1,
+    "averageKindCoverage": 1,
+    "averageRequiredTermCoverage": 1,
+    "averageNoiseReductionRatio": 0.307,
+    "totalOutputCandidates": 10
+  },
+  "thresholds": {
+    "failedScenarios": 0,
+    "privacyLeakCount": 0,
+    "exactIdentifierAccuracy": 1,
+    "minimumAverageNoiseReductionRatio": 0.2
+  },
+  "scenarios": [
+    {
+      "id": "release-readiness-overnight",
+      "label": "Release readiness",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.2,
+      "outputCandidates": 4,
+      "failures": []
+    },
+    {
+      "id": "exact-identifier-preservation",
+      "label": "Exact identifiers",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.333,
+      "outputCandidates": 2,
+      "failures": []
+    },
+    {
+      "id": "stale-and-private-suppression",
+      "label": "Stale/private suppression",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.333,
+      "outputCandidates": 2,
+      "failures": []
+    },
+    {
+      "id": "dedupe-repeated-decisions",
+      "label": "Dedupe decisions",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0.667,
+      "outputCandidates": 1,
+      "failures": []
+    },
+    {
+      "id": "standalone-ticket-fact",
+      "label": "Standalone ticket fact",
+      "passed": true,
+      "kindCoverage": 1,
+      "requiredTermCoverage": 1,
+      "exactIdentifierAccuracy": 1,
+      "noiseReductionRatio": 0,
+      "outputCandidates": 1,
+      "failures": []
+    }
+  ],
+  "caveats": [
+    "Fixture benchmark only.",
+    "Hosted Supermemory comparison requires a fresh metrics-only baseline.",
+    "No raw session text or candidate memory text is included."
+  ]
+}

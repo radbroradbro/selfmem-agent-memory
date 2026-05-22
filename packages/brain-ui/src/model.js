@@ -197,6 +197,68 @@ function buildSessionCompactionAudit(report) {
   };
 }
 
+function buildBenchmarkDashboard(report = {}) {
+  const rawSerialized = JSON.stringify(report ?? {});
+  const aggregate = report?.aggregate ?? {};
+  const thresholds = report?.thresholds ?? {};
+  const scenarios = Array.isArray(report?.scenarios)
+    ? report.scenarios.map((scenario, index) => ({
+        id: safeExportText(scenario?.id ?? `scenario:${index}`),
+        label: safeExportText(scenario?.label ?? scenario?.id ?? `Scenario ${index + 1}`),
+        passed: scenario?.passed === true,
+        kindCoverage: score(scenario?.kindCoverage),
+        requiredTermCoverage: score(scenario?.requiredTermCoverage),
+        exactIdentifierAccuracy: score(scenario?.exactIdentifierAccuracy),
+        noiseReductionRatio: numeric(scenario?.noiseReductionRatio),
+        outputCandidates: numeric(scenario?.outputCandidates),
+        failures: safeStringList(scenario?.failures),
+      }))
+    : [];
+  const privacyLeakCount = numeric(aggregate.privacyLeakCount) + (containsPrivateLikeText(rawSerialized) ? 1 : 0);
+  const failedScenarios = numeric(aggregate.failedScenarios) || scenarios.filter((scenario) => !scenario.passed).length;
+  const exactIdentifierAccuracy = score(aggregate.exactIdentifierAccuracy);
+  const averageNoiseReductionRatio = numeric(aggregate.averageNoiseReductionRatio);
+  const thresholdFailures = [];
+  if (failedScenarios > numeric(thresholds.failedScenarios)) thresholdFailures.push("failed-scenarios");
+  if (privacyLeakCount > numeric(thresholds.privacyLeakCount)) thresholdFailures.push("privacy-leaks");
+  if (exactIdentifierAccuracy < score(thresholds.exactIdentifierAccuracy ?? 1)) thresholdFailures.push("exact-identifier-accuracy");
+  if (averageNoiseReductionRatio + 1e-9 < numeric(thresholds.minimumAverageNoiseReductionRatio)) {
+    thresholdFailures.push("noise-reduction");
+  }
+  return {
+    schemaVersion: 1,
+    mode: "fixture-local-compaction-benchmark-dashboard",
+    writesRealFiles: false,
+    metricsOnly: true,
+    generatedAt: safeTimestamp(report?.generatedAt, "1970-01-01T00:00:00.000Z"),
+    source: safeExportText(report?.source ?? "packages/bench/session-compaction-benchmark.mjs"),
+    suite: {
+      scenarioCount: numeric(report?.suite?.scenarioCount) || scenarios.length,
+      description: safeExportText(report?.suite?.description ?? ""),
+    },
+    aggregate: {
+      passedScenarios: numeric(aggregate.passedScenarios),
+      failedScenarios,
+      privacyLeakCount,
+      exactIdentifierAccuracy,
+      averageKindCoverage: score(aggregate.averageKindCoverage),
+      averageRequiredTermCoverage: score(aggregate.averageRequiredTermCoverage),
+      averageNoiseReductionRatio,
+      totalOutputCandidates: numeric(aggregate.totalOutputCandidates),
+    },
+    thresholds: {
+      failedScenarios: numeric(thresholds.failedScenarios),
+      privacyLeakCount: numeric(thresholds.privacyLeakCount),
+      exactIdentifierAccuracy: score(thresholds.exactIdentifierAccuracy ?? 1),
+      minimumAverageNoiseReductionRatio: numeric(thresholds.minimumAverageNoiseReductionRatio),
+    },
+    verdict: thresholdFailures.length === 0 ? "PASS" : "FAIL",
+    thresholdFailures,
+    scenarios,
+    caveats: safeStringList(report?.caveats),
+  };
+}
+
 function buildPromptContextPreview(snapshot, packet = {}) {
   const nodesById = new Map((snapshot.nodes ?? []).map((node) => [node.id, node]));
   const rawSerialized = JSON.stringify(packet ?? {});
@@ -748,6 +810,7 @@ export {
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
+  buildBenchmarkDashboard,
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,

@@ -104,6 +104,10 @@ Scope:
   exposes metrics-only local-session audit output, candidate fingerprints,
   chronology, exact-identifier preservation, and privacy status without raw
   session text or candidate memory text.
+- Added Brain UI Benchmark Dashboard evidence to the release gate. The UI now
+  exposes fixture local-only compaction benchmark status, scenario pass/fail
+  counts, exact-identifier accuracy, noise reduction, and caveats without raw
+  session text or candidate memory text.
 - Added Gemini review for the browser evidence gate and made that review packet
   a required release-readiness artifact.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
@@ -146,6 +150,11 @@ What `release:check` verifies:
 - Brain UI Compaction Audit evidence exists and reports metrics-only mode,
   chronological output, candidate fingerprints, exact-identifier coverage, zero
   privacy leaks, zero console errors, and no raw candidate text,
+- Brain UI Benchmark Dashboard evidence exists and reports fixture local-only
+  compaction benchmark mode, 5 passed scenarios, 0 failed scenarios, zero
+  privacy leaks, exact-identifier accuracy 1, average noise reduction at least
+  0.2, hosted-baseline caveat, no-raw-text caveat, zero console errors, and no
+  private/key-shaped visible text,
 - Brain UI Context Preview evidence exists and reports selected memories,
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
@@ -189,6 +198,7 @@ Verification:
 - Fresh dynamic graph layout smoke: covered by `release:check`.
 - Fresh graph navigation controls smoke: covered by `release:check`.
 - Fresh Brain UI Compaction Audit smoke: covered by `release:check`.
+- Fresh Brain UI Benchmark Dashboard smoke: covered by `release:check`.
 - Fresh Brain UI Context Preview smoke: covered by `release:check`.
 - Fresh Brain UI Release Readiness smoke: covered by `release:check`.
 - Fresh local-session compaction audit: covered by `release:check`.
@@ -233,7 +243,7 @@ Cold review response:
   write-confirmed selected lifecycle policy apply, private/key-shaped policy
   rejection, dry-run sync reporting, write-confirmed selected review queue
   apply, private/key-shaped review rejection, dynamic graph layout spacing, graph navigation controls, Compaction Audit metrics-only rendering, Context Preview rendering, Release Readiness rendering, audit-log write intent coverage,
-  and public-safe serialization.
+  Benchmark Dashboard rendering, and public-safe serialization.
 
 Known limits:
 
@@ -274,6 +284,9 @@ Known limits:
   compaction audit commit `be08302`.
 - GitHub Actions CI run `26299756374` passed on Brain UI Compaction Audit
   commit `fb466db`.
+- Brain UI Benchmark Dashboard has passed local release-gate verification and
+  focused Gemini review. Reinspect Actions after this slice is committed and
+  pushed.
 - GitHub Actions CI run `26300784883` passed on Brain UI Context Preview
   commit `0ec4396`.
 - GitHub Actions CI run `26301888111` passed on Brain UI Release Readiness

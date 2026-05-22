@@ -96,6 +96,14 @@
   events, 4 candidate fingerprints, 2 redactions, chronological output, 1
   exact-identifier candidate, zero privacy leaks, zero console errors, and no
   raw candidate text.
+- The Benchmark Dashboard slice was verified by Codex Browser DOM evidence,
+  fresh Brain UI smoke, interaction smoke, and Gemini focused review. A
+  fixture-only screenshot was captured at `brain-ui-benchmark-dashboard.png`,
+  and `brain-ui-benchmark-dashboard-evidence.json` reports 5 of 5 fixture
+  scenarios passed, 0 failed scenarios, 0 privacy leaks, exact-identifier
+  accuracy 1, average noise reduction 0.307, hosted-baseline caveat,
+  no-raw-text caveat, zero console errors, and no private/key-shaped visible
+  text.
 - The Context Preview slice was verified by Codex Browser DOM evidence, fresh
   Brain UI smoke, and interaction smoke. A fixture-only screenshot was captured
   at `brain-ui-context-preview.png`, and

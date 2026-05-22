@@ -11,6 +11,7 @@ import {
   buildLifecyclePolicyDraft,
   buildMemoryReviewQueue,
   buildNucleusExport,
+  buildBenchmarkDashboard,
   buildPromptContextPreview,
   buildReleaseReadinessConsole,
   buildResearchLineage,
@@ -26,6 +27,7 @@ import { createBrainUiServer } from "./server.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const sessionCompactionFixture = JSON.parse(await readFile(join(here, "fixtures/session-compaction-local-audit.json"), "utf8"));
+const benchmarkSummaryFixture = JSON.parse(await readFile(join(here, "fixtures/benchmark-summary.json"), "utf8"));
 const promptContextFixture = JSON.parse(await readFile(join(here, "fixtures/prompt-context-preview.json"), "utf8"));
 const releaseReadinessFixture = JSON.parse(await readFile(join(here, "fixtures/release-readiness.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
@@ -212,6 +214,22 @@ try {
   assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
   assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
   assert.doesNotMatch(JSON.stringify(sessionCompactionAudit), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+
+  const benchmarkDashboard = buildBenchmarkDashboard(benchmarkSummaryFixture);
+  assert.equal(benchmarkDashboard.mode, "fixture-local-compaction-benchmark-dashboard");
+  assert.equal(benchmarkDashboard.writesRealFiles, false);
+  assert.equal(benchmarkDashboard.metricsOnly, true);
+  assert.equal(benchmarkDashboard.verdict, "PASS");
+  assert.equal(benchmarkDashboard.suite.scenarioCount, 5);
+  assert.equal(benchmarkDashboard.aggregate.passedScenarios, 5);
+  assert.equal(benchmarkDashboard.aggregate.failedScenarios, 0);
+  assert.equal(benchmarkDashboard.aggregate.privacyLeakCount, 0);
+  assert.equal(benchmarkDashboard.aggregate.exactIdentifierAccuracy, 1);
+  assert.ok(benchmarkDashboard.aggregate.averageNoiseReductionRatio >= 0.2);
+  assert.equal(benchmarkDashboard.thresholdFailures.length, 0);
+  assert.ok(benchmarkDashboard.scenarios.every((scenario) => scenario.passed));
+  assert.ok(benchmarkDashboard.caveats.some((caveat) => caveat.includes("Fixture benchmark")));
+  assert.doesNotMatch(JSON.stringify(benchmarkDashboard), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const promptContext = buildPromptContextPreview(fixture, promptContextFixture);
   assert.equal(promptContext.mode, "fixture-prompt-context-preview");
@@ -670,6 +688,7 @@ try {
     nucleusExport,
     lineage,
     sessionCompactionAudit,
+    benchmarkDashboard,
     promptContext,
     releaseReadiness,
     policyDraft,
@@ -732,6 +751,7 @@ try {
           "nucleus-export",
           "research-lineage",
           "session-compaction-audit",
+          "benchmark-dashboard",
           "prompt-context-preview",
           "release-readiness-console",
           "lifecycle-policy-draft",

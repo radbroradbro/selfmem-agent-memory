@@ -566,6 +566,7 @@ button.active {
 .audit-summary,
 .context-summary,
 .release-summary,
+.benchmark-summary,
 .policy-summary,
 .review-summary {
   display: grid;
@@ -578,6 +579,7 @@ button.active {
 .audit-summary div,
 .context-summary div,
 .release-summary div,
+.benchmark-summary div,
 .policy-summary div,
 .review-summary div {
   min-width: 0;
@@ -597,6 +599,8 @@ button.active {
 .context-summary span,
 .release-summary strong,
 .release-summary span,
+.benchmark-summary strong,
+.benchmark-summary span,
 .policy-summary strong,
 .policy-summary span,
 .review-summary strong,
@@ -609,6 +613,7 @@ button.active {
 .audit-summary strong,
 .context-summary strong,
 .release-summary strong,
+.benchmark-summary strong,
 .policy-summary strong,
 .review-summary strong {
   color: var(--cyan);
@@ -620,6 +625,7 @@ button.active {
 .audit-summary span,
 .context-summary span,
 .release-summary span,
+.benchmark-summary span,
 .policy-summary span,
 .review-summary span {
   color: var(--muted);
@@ -633,7 +639,9 @@ button.active {
 .audit-history,
 .context-memory-list,
 .context-omitted-list,
-.release-list {
+.release-list,
+.benchmark-scenarios,
+.benchmark-caveats {
   display: grid;
   gap: 8px;
   list-style: none;
@@ -647,7 +655,9 @@ button.active {
 .audit-history li,
 .context-memory-list li,
 .context-omitted-list li,
-.release-list li {
+.release-list li,
+.benchmark-scenarios li,
+.benchmark-caveats li {
   display: grid;
   gap: 4px;
   border: 1px solid var(--line);
@@ -660,7 +670,9 @@ button.active {
 .audit-files strong,
 .context-memory-list strong,
 .context-omitted-list strong,
-.release-list strong {
+.release-list strong,
+.benchmark-scenarios strong,
+.benchmark-caveats strong {
   color: var(--green);
   font-size: 12px;
   text-transform: uppercase;
@@ -673,7 +685,10 @@ button.active {
 .context-memory-list span,
 .context-memory-list small,
 .context-omitted-list span,
-.release-list span {
+.release-list span,
+.benchmark-scenarios span,
+.benchmark-scenarios small,
+.benchmark-caveats span {
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -682,13 +697,16 @@ button.active {
 .audit-files span,
 .context-memory-list span,
 .context-omitted-list span,
-.release-list span {
+.release-list span,
+.benchmark-scenarios span,
+.benchmark-caveats span {
   color: var(--text);
   font-size: 12px;
 }
 
 .sync-actions small,
-.context-memory-list small {
+.context-memory-list small,
+.benchmark-scenarios small {
   color: var(--amber);
   font-size: 11px;
 }
@@ -709,6 +727,31 @@ button.active {
   background: rgba(228, 111, 105, 0.08);
   font-size: 12px;
   font-weight: 760;
+}
+
+.benchmark-verdict {
+  display: inline-grid;
+  min-height: 30px;
+  place-items: center;
+  margin: 0 0 10px;
+  border: 1px solid rgba(139, 209, 124, 0.58);
+  border-radius: 999px;
+  padding: 5px 11px;
+  color: var(--green);
+  background: rgba(139, 209, 124, 0.08);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.benchmark-verdict[data-verdict="FAIL"],
+.benchmark-scenarios li[data-status="fail"] {
+  border-color: rgba(228, 111, 105, 0.58);
+  color: var(--red);
+  background: rgba(228, 111, 105, 0.08);
+}
+
+.benchmark-caveats li {
+  border-color: rgba(244, 185, 90, 0.58);
 }
 
 .release-verdict[data-verdict="PASS"],

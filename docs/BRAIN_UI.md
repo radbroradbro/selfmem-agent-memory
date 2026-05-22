@@ -18,6 +18,7 @@ The UI should expose:
 - lifecycle and sleep-cycle events,
 - research lineage,
 - metrics-only local session compaction audit,
+- local-only compaction benchmark dashboard,
 - prompt context preview for injected recall packets,
 - release readiness console for current public-launch blockers,
 - lifecycle policy draft export,
@@ -77,19 +78,20 @@ Required visual review path:
 12. Nucleus snapshot preview,
 13. research lineage preview,
 14. local session compaction audit preview,
-15. prompt context preview,
-16. release readiness console,
-17. lifecycle policy preview,
-18. selected lifecycle policy apply confirmation,
-19. memory review queue preview,
-20. selected memory review queue apply confirmation,
-21. compiled wiki/vault preview,
-22. fixture vault sync report with conflict handling,
-23. selected local vault sync dry-run,
-24. selected local vault sync apply confirmation,
-25. fixture local-container audit preflight,
-26. selected local memory edit overlay confirmation,
-27. selected local memory materialize confirmation.
+15. local compaction benchmark dashboard,
+16. prompt context preview,
+17. release readiness console,
+18. lifecycle policy preview,
+19. selected lifecycle policy apply confirmation,
+20. memory review queue preview,
+21. selected memory review queue apply confirmation,
+22. compiled wiki/vault preview,
+23. fixture vault sync report with conflict handling,
+24. selected local vault sync dry-run,
+25. selected local vault sync apply confirmation,
+26. fixture local-container audit preflight,
+27. selected local memory edit overlay confirmation,
+28. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -127,6 +129,19 @@ fingerprints. It does not show raw session text or candidate memory text. The
 browser evidence records `fixture-local-session-compaction-audit`,
 `metricsOnly: true`, `writesRealFiles: false`, zero privacy leaks, zero console
 errors, and no private/key-shaped visible text.
+
+The Benchmark Dashboard panel is fixture-only and metrics-only. It summarizes
+the local-only compaction benchmark suite without raw session text or candidate
+memory text. It shows pass/fail verdict, scenarios passed, failed scenarios,
+privacy leaks, exact-identifier accuracy, kind coverage, required-term
+coverage, noise reduction, output-candidate count, per-scenario statuses, and
+caveats. Current browser evidence records
+`fixture-local-compaction-benchmark-dashboard`, 5 of 5 scenarios passed, 0
+failed scenarios, 0 privacy leaks, exact-identifier accuracy 1, average noise
+reduction 0.307, hosted-baseline caveat visible, no-raw-text caveat visible,
+zero console errors, and no private/key-shaped visible text. This panel does
+not claim hosted Supermemory superiority; it points to the need for a fresh
+metrics-only hosted baseline.
 
 The Context Preview panel is fixture-only. It shows the recall packet that
 would enter a prompt after hybrid retrieval and reranking: selected memory

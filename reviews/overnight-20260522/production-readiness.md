@@ -41,6 +41,10 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   jump-to-node selection, and selected-node centering.
 - Brain UI Compaction Audit panel that renders local-session audit metrics and
   candidate fingerprints without raw session or candidate text.
+- Brain UI Benchmark Dashboard panel that renders fixture local-only
+  compaction benchmark pass/fail metrics, exact-identifier accuracy, noise
+  reduction, scenario status, and benchmark caveats without raw session or
+  candidate text.
 - Brain UI Context Preview panel that renders the fixture prompt recall packet,
   selected memories, omitted candidates, token budget, read-only hosted mode,
   local-only write mode, and safety counters.
@@ -169,6 +173,11 @@ Controller follow-up after that sandbox run:
   actions, fixture-only evidence, hosted write-back disabled, zero privacy
   leaks, zero console errors, and no private/key-shaped visible text. GitHub
   Actions CI run `26301888111` passed on `8c26de7`.
+- Brain UI Benchmark Dashboard local verification passed fresh Brain UI smoke
+  and interaction smoke. Browser evidence reports 5 of 5 fixture scenarios
+  passed, 0 failed scenarios, 0 privacy leaks, exact-identifier accuracy 1,
+  average noise reduction 0.307, hosted-baseline caveat visible, no-raw-text
+  caveat visible, zero console errors, and no private/key-shaped visible text.
 
 ## UI Evidence
 
@@ -202,6 +211,10 @@ evidence for:
 - compaction audit evidence with metrics-only fixture output, 6 input events,
   4 candidate fingerprints, chronological output, zero privacy leaks, zero
   console errors, and no raw candidate text.
+- benchmark dashboard evidence with fixture local-only compaction benchmark
+  metrics, 5 of 5 scenarios passed, hosted-baseline caveat, no-raw-text caveat,
+  zero privacy leaks, zero console errors, and no private/key-shaped visible
+  text.
 - context preview evidence with the fixture prompt recall packet, selected and
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
@@ -223,7 +236,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Benchmark Dashboard shows fixture local-only compaction quality metrics and caveats, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |

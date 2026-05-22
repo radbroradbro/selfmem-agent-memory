@@ -16,7 +16,7 @@ The current PR adds:
   content-free pre-write audit logging;
 - a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
-  lineage, Compaction Audit, Context Preview, Release Readiness, vault preview, sync-report
+  lineage, Compaction Audit, Benchmark Dashboard, Context Preview, Release Readiness, vault preview, sync-report
   inspection,
   selected vault sync dry-run, selected vault sync apply, selected
   local-container browse, lifecycle policy preview, selected lifecycle policy apply, memory
@@ -32,8 +32,8 @@ The current PR adds:
 Preview surfaces include selected local-container browse, selected vault sync
 dry-run, selected vault sync apply, lifecycle policy, lifecycle policy apply,
 memory review queue, review queue apply, local memory edit, overlay browse,
-materialize, dynamic graph layout, graph navigation, Compaction Audit, Context
-Preview, and Release Readiness.
+materialize, dynamic graph layout, graph navigation, Compaction Audit,
+Benchmark Dashboard, Context Preview, and Release Readiness.
 
 ## Safety Boundary
 
@@ -89,6 +89,11 @@ Latest verified head before this draft refresh:
 - Compaction Audit evidence: metrics-only fixture output, 6 input events, 4
   candidate fingerprints, chronological output, zero privacy leaks, zero
   console errors, and no raw candidate text
+- Benchmark Dashboard evidence: fixture local-only compaction benchmark
+  summary with 5 of 5 scenarios passed, 0 failed scenarios, 0 privacy leaks,
+  exact-identifier accuracy 1, average noise reduction 0.307,
+  hosted-baseline caveat, no-raw-text caveat, zero console errors, and no
+  private/key-shaped visible text
 - Context Preview evidence: fixture recall packet with selected memories,
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible

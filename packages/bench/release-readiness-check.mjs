@@ -39,6 +39,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-research-lineage-review.md`,
   `${reviewDir}/brain-ui-compaction-audit-evidence.md`,
   `${reviewDir}/gemini-brain-ui-compaction-audit-review.md`,
+  `${reviewDir}/brain-ui-benchmark-dashboard-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-benchmark-dashboard-review.md`,
   `${reviewDir}/brain-ui-context-preview-evidence.md`,
   `${reviewDir}/gemini-brain-ui-context-preview-review.md`,
   `${reviewDir}/brain-ui-release-readiness-evidence.md`,
@@ -108,6 +110,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-research-lineage.png`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit.png`,
+  `${reviewDir}/ui-evidence/brain-ui-benchmark-dashboard-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-benchmark-dashboard.png`,
   `${reviewDir}/ui-evidence/brain-ui-context-preview-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-context-preview.png`,
   `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
@@ -360,6 +364,30 @@ check("dom evidence is sane", () => {
   assert.equal(compactionAuditEvidence.evidence.exportHasPrivateOrKeyText, false);
   assert.equal(compactionAuditEvidence.consoleErrorCount, 0);
 
+  const benchmarkDashboardEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-benchmark-dashboard-evidence.json"), "utf8"),
+  );
+  assert.equal(benchmarkDashboardEvidence.ok, true);
+  assert.equal(benchmarkDashboardEvidence.mode, "fixture-brain-ui-benchmark-dashboard");
+  assert.equal(benchmarkDashboardEvidence.writesRealFiles, false);
+  assert.equal(benchmarkDashboardEvidence.evidence.hasBenchmarkHeading, true);
+  assert.equal(benchmarkDashboardEvidence.evidence.mode, "fixture-local-compaction-benchmark-dashboard");
+  assert.equal(benchmarkDashboardEvidence.evidence.writesRealFiles, false);
+  assert.equal(benchmarkDashboardEvidence.evidence.metricsOnly, true);
+  assert.equal(benchmarkDashboardEvidence.evidence.verdict, "PASS");
+  assert.equal(benchmarkDashboardEvidence.evidence.statusDataVerdict, "PASS");
+  assert.equal(benchmarkDashboardEvidence.evidence.passedScenarios, 5);
+  assert.equal(benchmarkDashboardEvidence.evidence.failedScenarios, 0);
+  assert.equal(benchmarkDashboardEvidence.evidence.privacyLeakCount, 0);
+  assert.equal(benchmarkDashboardEvidence.evidence.exactIdentifierAccuracy, 1);
+  assert.ok(benchmarkDashboardEvidence.evidence.averageNoiseReductionRatio >= 0.2);
+  assert.equal(benchmarkDashboardEvidence.evidence.scenarioCount, 5);
+  assert.ok(benchmarkDashboardEvidence.evidence.caveatCount >= 3);
+  assert.equal(benchmarkDashboardEvidence.evidence.hasHostedBaselineCaveat, true);
+  assert.equal(benchmarkDashboardEvidence.evidence.hasNoRawTextCaveat, true);
+  assert.equal(benchmarkDashboardEvidence.evidence.hasPrivateOrKeyText, false);
+  assert.equal(benchmarkDashboardEvidence.consoleErrorCount, 0);
+
   const contextPreviewEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-context-preview-evidence.json"), "utf8"),
   );
@@ -558,6 +586,7 @@ check("release state is conservative", () => {
     "brain-ui-dynamic-graph-layout",
     "brain-ui-graph-navigation-controls",
     "brain-ui-session-compaction-audit",
+    "brain-ui-benchmark-dashboard",
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
     "session-compaction-benchmark",
@@ -599,6 +628,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /dynamic graph layout|dynamic layout|graph layout/i, `${file} missing dynamic graph layout`);
     assert.match(text, /graph navigation|jump-to-node|neighborhood scope|all-vs-neighborhood/i, `${file} missing graph navigation`);
     assert.match(text, /compaction audit|local-session compaction/i, `${file} missing compaction audit`);
+    assert.match(text, /benchmark dashboard|benchmark summary|compaction benchmark/i, `${file} missing benchmark dashboard`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
     assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);

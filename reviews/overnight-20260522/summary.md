@@ -73,6 +73,7 @@ is still required before any public live update.
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI compaction audit | `reviews/overnight-20260522/brain-ui-compaction-audit-evidence.md` |
+| Brain UI benchmark dashboard | `reviews/overnight-20260522/brain-ui-benchmark-dashboard-evidence.md` |
 | Brain UI context preview | `reviews/overnight-20260522/brain-ui-context-preview-evidence.md` |
 | Brain UI release readiness | `reviews/overnight-20260522/brain-ui-release-readiness-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
@@ -162,6 +163,12 @@ Latest local verification before this summary:
   hosted write-back disabled, zero privacy leaks, zero console errors, and no
   private/key-shaped visible text. GitHub Actions CI run `26301888111` passed
   on `8c26de7`.
+- Brain UI Benchmark Dashboard verification: local smoke and interaction smoke
+  pass with `benchmark-dashboard` evidence. Browser DOM evidence reports 5 of
+  5 fixture scenarios passed, 0 failed scenarios, 0 privacy leaks,
+  exact-identifier accuracy 1, average noise reduction 0.307, 3 caveats,
+  hosted-baseline caveat visible, zero console errors, and no
+  private/key-shaped visible text.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -229,6 +236,10 @@ Sanitized fixture evidence exists under
   4 candidate fingerprints, 2 redactions, chronological output, 1
   exact-identifier candidate, zero privacy leaks, zero console errors, and no
   raw candidate text
+- benchmark dashboard evidence records 5 of 5 fixture scenarios passed, 0
+  failed scenarios, 0 privacy leaks, exact-identifier accuracy 1, average noise
+  reduction 0.307, hosted-baseline caveat visible, zero console errors, and no
+  private/key-shaped visible text
 - context preview evidence records the fixture prompt recall packet, 642 of 900
   context tokens used, 258 tokens remaining, 3 selected memories, 3 context
   sections, 2 omitted candidates, hosted read-through as read-only, local-only
@@ -272,6 +283,8 @@ local memory contents.
 - Gemini Brain UI local memory materialize review: `CLEAN`.
 - Gemini Brain UI context preview review: `CLEAN`, with a note that Gemini CLI
   produced transient capacity warnings before returning the verdict.
+- Gemini Brain UI benchmark dashboard review: `CLEAN`, with a note that Gemini
+  CLI produced transient capacity warnings before returning the verdict.
 - Gemini Brain UI release readiness review: `CLEAN`, with a note that Gemini
   CLI produced transient capacity warnings before returning the verdict.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
