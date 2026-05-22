@@ -9,15 +9,17 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `4f5a0790f1c403c8c8405910935f7a3eea1072a1`.
-- GitHub Actions run `26312283137` passed Test, Full smoke, and Release
-  readiness check.
-- Previous docs/evidence head before the GitHub write-route extension:
-  `3ad7b5ddcc4c3213ba22ca666e71d01433c05d30`.
-- GitHub Actions run `26312385019` passed Verify.
+- Latest code/product baseline: `e765e8ff331475c6f91565f4e68577b011e4781a`.
+- GitHub Actions run `26313358962` passed CI after the Hermes and OpenClaw
+  bounded read-through latency patch.
+- Latest docs/evidence refresh before this issue text update:
+  `a93a9f3cfc0293381f97798ecd87c6e192869b8c`.
+- GitHub Actions run `26313463135` passed CI.
 - Local release readiness, smoke, goal audit, hosted-baseline preflight, canary
   evidence intake, canary report generation, and canary diagnosis all passed in
   their safe fixture or metrics-only modes.
+- Adapter smokes now assert bounded read-through policy plus positive total,
+  local, and remote recall timings.
 - Secret and private-name scans found no actual credential or private memory
   exposure in the changed evidence files.
 
