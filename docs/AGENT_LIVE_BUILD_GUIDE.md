@@ -1,0 +1,132 @@
+# Agent Live-Build Guide
+
+This guide explains how deployed agents should propose fixes without risking
+private memory, credentials, or unstable rollout.
+
+## Rule Zero
+
+Agents can propose. Maintainers approve.
+
+Do not push directly to `main`. Do not tell other agents to install a patch until
+a maintainer merges it or explicitly approves the exact commit.
+
+## Good Reasons To Propose A Patch
+
+- A lifecycle event fails or never fires.
+- Recall works in tests but not in a live prompt.
+- Writes go to the wrong local container.
+- Hosted Supermemory read-through returns errors or noisy results.
+- A redaction, dedupe, or write gate behaves incorrectly.
+- The updater would copy to the wrong runtime path.
+- A doc step misleads an operator.
+- A smoke test misses a failure seen in production.
+
+## Bad Reasons To Patch Directly
+
+- A provider key is missing.
+- A memory seems wrong but the evidence contains private text.
+- A benchmark result is interesting but not reproducible.
+- The fix requires changing every agent at once.
+- The change enables hosted write-back without a dry-run sync report.
+- The change broadens recall frequency or provider spend without a budget note.
+
+## Evidence To Share
+
+Share:
+
+- runtime name,
+- commit or package version,
+- event counts,
+- search/store counts,
+- error class,
+- redaction leak count,
+- provider mode,
+- p50/p95 recall latency,
+- smoke command output,
+- sanitized stack trace.
+
+Do not share:
+
+- provider keys,
+- raw memories,
+- raw transcripts,
+- raw JSONL logs,
+- `memories.jsonl`,
+- `raw_events.jsonl`,
+- `lossless_context.jsonl`,
+- `.env`,
+- auth files,
+- browser state,
+- private container mappings.
+
+## Branch And PR Flow
+
+1. Update from `main`.
+2. Create a branch:
+
+```bash
+git checkout -b agent/hermes/short-topic
+```
+
+3. Make the smallest useful patch.
+4. Run the relevant checks:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- privacy:test
+npm exec --yes pnpm@10.23.0 -- typecheck
+npm exec --yes pnpm@10.23.0 -- smoke:openclaw
+npm exec --yes pnpm@10.23.0 -- smoke:hermes
+```
+
+5. Open a pull request.
+6. Fill out the PR template.
+7. Wait for maintainer review.
+
+## Live Runtime Patch Standard
+
+A live-runtime PR should answer five questions:
+
+1. What failed?
+2. Why is this the smallest safe fix?
+3. How was it tested without exposing memory content?
+4. How can one agent try it first?
+5. How can the operator roll it back?
+
+## Rollout Levels
+
+| Level | Meaning | Approval |
+|---|---|---|
+| L0 docs | Docs, comments, examples, diagrams. | Maintainer review. |
+| L1 local smoke | Tests or adapter code that passes mocked smokes. | Maintainer review plus CI. |
+| L2 one-agent canary | One live agent applies the patch. | Maintainer approval and rollback. |
+| L3 multi-agent rollout | Several agents update. | Maintainer approval after L2 evidence. |
+| L4 public release | Public-facing claim or visibility change. | Owner approval only. |
+
+## Update Command
+
+The updater is dry-run by default:
+
+```bash
+python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes
+```
+
+Apply only after review:
+
+```bash
+python3 plugins/selfmem-fallback/scripts/selfmem_update.py --host hermes --repo /path/to/hermes --apply --run-canary
+```
+
+Use `--keys-file` only with a local private file on that runtime machine. Never
+put keys in the repository.
+
+## Benchmark Or Model Changes
+
+Provider, reranker, query expansion, and benchmark changes are experiments.
+They need:
+
+- same dataset or fixture set,
+- same scoring code,
+- same judge and answer model,
+- latency and cost notes,
+- redaction failure count,
+- no raw memory in reports.

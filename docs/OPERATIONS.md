@@ -10,7 +10,15 @@ Recommended branch names:
 agent/<runtime>/<short-topic>
 fix/<short-topic>
 experiment/<short-topic>
+docs/<short-topic>
 ```
+
+Agents should submit pull requests instead of pushing to `main`. Maintainers own
+release decisions, native-default rollout, public visibility, and sync-back
+behavior.
+
+See `docs/GITHUB_RULES.md` for the intended branch protection and agent
+permission model.
 
 ## Issue Template Guidance
 
@@ -48,6 +56,14 @@ Every pull request should state:
 - whether live provider calls were mocked,
 - whether any behavior changes recall, writes, privacy, or spend.
 
+Every live-runtime pull request should also state:
+
+- how the failure was observed,
+- where sanitized evidence came from,
+- how to test the fix on one agent,
+- how to roll it back,
+- whether the update script can apply it safely.
+
 ## Reliability Audit
 
 A good runtime audit should report:
@@ -63,3 +79,17 @@ A good runtime audit should report:
 - whether hosted Supermemory returned results or failed.
 
 Do not include the recalled text. Metrics are enough for repo issues.
+
+## Live Build Improvement Loop
+
+Use this loop when an agent finds a production issue:
+
+1. Capture sanitized counts and error classes.
+2. Decide whether the issue is docs-only, runtime-fix, quality, safety, ops, or
+   experiment.
+3. Open an issue if the evidence cannot be shared safely.
+4. Branch from `main` and keep the patch small.
+5. Run the smallest relevant checks.
+6. Open a pull request with the reason, evidence, checks, and rollback.
+7. Wait for maintainer approval before merging or telling other agents to
+   install it.

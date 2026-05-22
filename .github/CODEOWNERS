@@ -1,0 +1,8 @@
+# Human owners review release and runtime-risk changes.
+* @radbroradbro
+
+# Runtime adapters and memory core need owner review before merge.
+/packages/adapters/ @radbroradbro
+/packages/core/ @radbroradbro
+/plugins/selfmem-fallback/ @radbroradbro
+/configs/ @radbroradbro

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security or private evidence
+    url: https://github.com/radbroradbro/selfmem-agent-memory/security
+    about: Do not paste raw memories, logs, or credentials into public issues.
