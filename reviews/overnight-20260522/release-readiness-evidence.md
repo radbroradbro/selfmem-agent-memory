@@ -237,10 +237,8 @@ Known limits:
   materialize commit `21fd4d6`.
 - GitHub Actions CI run `26297064340` passed on dynamic graph layout commit
   `be47cff`.
-- Graph navigation CI is pending until this slice is pushed. Local
-  `node packages/brain-ui/smoke.mjs`,
-  `node packages/brain-ui/interaction-smoke.mjs`, and
-  `node packages/bench/release-readiness-check.mjs` are the current evidence.
+- GitHub Actions CI run `26297876735` passed on graph navigation controls
+  commit `62367a1`.
 - Dynamic graph layout CI is pending until this slice is pushed. Local
   `node packages/brain-ui/smoke.mjs`,
   `node packages/brain-ui/interaction-smoke.mjs`, and

@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `be47cff`, run `26297064340`, success.
+  `62367a1`, run `26297876735`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -30,6 +30,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26294323086` on `b5352a0`: success.
 - GitHub Actions CI run `26295772356` on `21fd4d6`: success.
 - GitHub Actions CI run `26297064340` on `be47cff`: success.
+- GitHub Actions CI run `26297876735` on `62367a1`: success.
 
 ## Shipped Overnight Slices
 
@@ -118,10 +119,9 @@ Latest local verification before this summary:
 - Dynamic Brain UI layout verification: local smoke and interaction smoke
   passed with `dynamic-graph-layout` evidence, and GitHub Actions CI run
   `26297064340` passed on `be47cff`.
-- Local graph navigation verification: `node packages/brain-ui/smoke.mjs` and
-  `node packages/brain-ui/interaction-smoke.mjs` passed with
-  `graph-navigation-controls` evidence. CI verification is pending until this
-  slice is pushed.
+- Graph navigation verification: local smoke and interaction smoke passed with
+  `graph-navigation-controls` evidence, and GitHub Actions CI run
+  `26297876735` passed on `62367a1`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture

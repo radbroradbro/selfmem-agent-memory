@@ -29,9 +29,8 @@ Retry note:
   `26295772356` passed on `21fd4d6`.
 - It was refreshed again after the dynamic Brain UI layout slice passed
   GitHub Actions CI run `26297064340` on `be47cff`.
-- It was refreshed again after local graph navigation controls were verified
-  with fixture browser evidence. CI verification for that slice is pending
-  until pushed.
+- It was refreshed again after graph navigation controls passed GitHub Actions
+  CI run `26297876735` on `62367a1`.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -75,6 +74,7 @@ Latest local verification includes the guarded local memory materialize slice.
 - GitHub Actions CI: run `26294323086` passed on `b5352a0`, the guarded local edit overlay browse commit.
 - GitHub Actions CI: run `26295772356` passed on `21fd4d6`, the guarded local memory materialize commit.
 - GitHub Actions CI: run `26297064340` passed on `be47cff`, the dynamic Brain UI graph layout commit.
+- GitHub Actions CI: run `26297876735` passed on `62367a1`, the graph navigation controls commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, and public live-update copy are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

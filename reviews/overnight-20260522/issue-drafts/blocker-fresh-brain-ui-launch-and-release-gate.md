@@ -47,10 +47,10 @@ or explicitly accepted.
   Brain UI graph layout slice became required. Fixture browser evidence reports
   `dynamic-graph-layout`, 9 nodes, 9 edges, 2 columns, 5 rows, zero overlaps,
   zero console errors, and no private/key-shaped visible text.
-- Local graph navigation controls evidence passed with neighborhood scope, 3
-  visible fixture nodes, 9 jump options, selected-node visibility, zero console
-  errors, and no private/key-shaped visible text. CI for that slice is pending
-  until pushed.
+- GitHub Actions CI run `26297876735` on `62367a1`: passed after the graph
+  navigation controls slice became required. Fixture browser evidence reports
+  neighborhood scope, 3 visible fixture nodes, 9 jump options, selected-node
+  visibility, zero console errors, and no private/key-shaped visible text.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was

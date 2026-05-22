@@ -135,11 +135,11 @@ Controller follow-up after that sandbox run:
   evidence reports `dynamic-graph-layout`, 9 fixture nodes, 9 fixture edges, 2
   columns, 5 rows, zero overlaps, zero console errors, and no
   private/key-shaped visible text.
-- Local graph navigation controls checks passed after the latest CI baseline:
-  `node packages/brain-ui/smoke.mjs` and
-  `node packages/brain-ui/interaction-smoke.mjs`. Browser evidence reports
-  neighborhood scope, 3 visible fixture nodes, 9 jump options, selected-node
-  visibility, zero console errors, and no private/key-shaped visible text.
+- GitHub Actions CI run `26297876735` on graph navigation controls commit
+  `62367a1` passed Test, Full smoke, and Release readiness check. Browser
+  evidence reports neighborhood scope, 3 visible fixture nodes, 9 jump options,
+  selected-node visibility, zero console errors, and no private/key-shaped
+  visible text.
 
 ## UI Evidence
 
