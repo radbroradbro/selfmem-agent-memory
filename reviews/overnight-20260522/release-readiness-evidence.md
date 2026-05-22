@@ -64,6 +64,8 @@ Cold review response:
   separate steps; the public scanner includes shell, example, SQL, and TOML
   files; the PR checklist no longer asks for core package dry-run separately
   because release readiness already covers it.
+- Post-push CI check passed, then the workflow opted into GitHub's Node 24
+  action runtime to clear the upcoming Node 20 action deprecation warning.
 - Accepted residual note: `release:check` records every check result before
   exiting, so the core package dry-run is still reported even if another check
   fails.
