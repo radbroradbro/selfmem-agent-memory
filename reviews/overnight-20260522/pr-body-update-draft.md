@@ -16,6 +16,7 @@ Live status:
 - Adds LLM-wiki compile and vault sync flows with Obsidian-style frontmatter, wikilinks, provenance, linting, reviewed-page conflict handling, and content-free pre-write audit logging.
 - Adds the self-hosted Brain UI preview for graph browsing, research lineage, research source lock, model matrix, compaction audit, benchmark dashboard, canary rollout, context preview, release readiness, current-head live browser evidence, local audit, selected local-container browse, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, selected local memory edit, local edit overlay browse, selected local memory materialize, dynamic graph layout, graph navigation, and provenance/timeline inspection.
 - Adds `selfmem_update`, clean consumer smoke coverage, release blocker doctor, GitHub handoff packet, goal completion audit, hosted baseline preflight, canary evidence intake, canary report generator from trace/diagnostic exports, and `canary:diagnose` remediation guidance for failed reports.
+- Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Keeps public launch conservative: fixture evidence is allowed, real private memory text is not committed, and benchmark claims stay blocked until a matched source-locked canary or hosted baseline passes with reviewer sign-off.
 
@@ -41,6 +42,7 @@ The code, fixture UI, release gate, and CI are healthy, but launch remains block
 - `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
 - `node packages/bench/release-readiness-check.mjs`: passed.
 - `node packages/bench/github-handoff-packet.mjs`: passed.
+- `node packages/bench/github-live-sync-check.mjs`: passed with PR #5 and issue #6 matching checked-in drafts.
 - `node packages/bench/goal-completion-audit.mjs`: passed with `goalComplete: false`.
 - `node packages/bench/hosted-baseline-preflight.mjs`: passed with `callsHostedProvider: false` and benchmark claims blocked.
 - `node packages/bench/canary-evidence-intake.mjs`: passed in fixture mode and rejects raw memories/transcripts/prompts.

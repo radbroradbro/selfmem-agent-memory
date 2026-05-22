@@ -17,7 +17,7 @@ complete or publish a public live update.
 
 Machine-readable follow-up: `goal:audit` now runs
 `packages/bench/goal-completion-audit.mjs` and returns `goalComplete: false`,
-`mayCallUpdateGoalComplete: false`, 17 proven requirements, 3 blocked
+`mayCallUpdateGoalComplete: false`, 19 proven requirements, 3 blocked
 requirements, and 1 incomplete requirement. The release gate requires this
 audit so future agents cannot treat green CI as native-goal completion.
 
@@ -150,6 +150,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Clean consumer smoke release gate | `packages/bench/release-readiness-check.mjs` now requires the clean consumer smoke script, evidence, Gemini review, release-doc references, and a fresh consumer-style checkout run | Proven locally |
 | Release blocker doctor gate | `packages/bench/release-readiness-check.mjs` now requires `packages/bench/release-blocker-doctor.mjs`, release blocker evidence, Gemini review evidence, release-doc references, and a fresh conservative blocker-doctor run | Proven locally and in CI run `26307335652` |
 | GitHub handoff packet gate | `packages/bench/release-readiness-check.mjs` now requires `packages/bench/github-handoff-packet.mjs`, release handoff evidence, Gemini review evidence, release-doc references, and a fresh generated packet run | Proven locally and in CI runs `26308475033` and `26308588261` |
+| GitHub live sync gate | `packages/bench/github-live-sync-check.mjs`, `reviews/overnight-20260522/github-live-sync-evidence.md`, and `release:github-sync` | Proven locally: PR #5 and issue #6 match the checked-in public-safe drafts, and output is hashes/booleans only |
 | GitHub Actions | CI run `26304465466` on `e043d6b` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |

@@ -26,6 +26,8 @@ The current PR adds:
 - a dry-run-first `selfmem_update` command for agent update workflows;
 - a generated GitHub handoff packet for manual GitHub updates while connector
   write routes are blocked;
+- a live GitHub sync check that verifies PR #5 and issue #6 still match the
+  checked-in release drafts without printing body text or credentials;
 - a hosted baseline preflight for future Supermemory comparisons, offline by
   default and blocked from public score claims until a metrics-only live result
   is reviewed;
@@ -93,7 +95,9 @@ Latest verified head before this draft refresh:
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 17 proven
+- GitHub live sync: `release:github-sync` confirms PR #5 and issue #6 match
+  the checked-in public-safe drafts, with hashes and booleans only
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 19 proven
   requirements, 3 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with

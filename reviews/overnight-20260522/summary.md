@@ -116,6 +116,7 @@ is still required before any public live update.
 | PR body/comment update draft | `reviews/overnight-20260522/pr-body-update-draft.md` |
 | Historical GitHub issue creation blocker | `reviews/overnight-20260522/github-issue-create-blocked.md` |
 | Live GitHub write evidence | `reviews/overnight-20260522/github-write-route-evidence.md` |
+| GitHub live sync check | `packages/bench/github-live-sync-check.mjs`, `reviews/overnight-20260522/github-live-sync-evidence.md` |
 | Blocker permission refresh review | `reviews/overnight-20260522/gemini-blocker-permission-refresh-review.md` |
 | Completion audit | `reviews/overnight-20260522/completion-audit.md` |
 | Completion audit review | `reviews/overnight-20260522/gemini-completion-audit-review.md` |

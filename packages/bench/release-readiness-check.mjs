@@ -37,6 +37,7 @@ const requiredFiles = [
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
+  "packages/bench/github-live-sync-check.mjs",
   "packages/bench/goal-completion-audit.mjs",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
@@ -128,6 +129,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
   `${reviewDir}/gemini-github-handoff-packet-review.md`,
+  `${reviewDir}/github-live-sync-evidence.md`,
   `${reviewDir}/goal-completion-audit-evidence.md`,
   `${reviewDir}/gemini-goal-completion-audit-review.md`,
   `${reviewDir}/release-state.json`,
@@ -228,6 +230,7 @@ const requiredScripts = [
   "goal:audit",
   "release:doctor",
   "release:handoff",
+  "release:github-sync",
   "smoke",
   "release:check",
 ];
@@ -778,6 +781,7 @@ check("release state is conservative", () => {
     "canary-remediation-plan",
     "hosted-baseline-preflight",
     "github-handoff-packet",
+    "github-live-sync-check",
     "github-pr-body-live",
     "github-blocker-issue-live",
     "goal-completion-audit",
@@ -831,6 +835,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
     assert.match(text, /hosted baseline preflight|baseline preflight/i, `${file} missing hosted baseline preflight`);
     assert.match(text, /github handoff|handoff packet|manual GitHub/i, `${file} missing GitHub handoff packet`);
+    assert.match(text, /github live sync|release:github-sync|live GitHub sync/i, `${file} missing GitHub live sync`);
     assert.match(text, /goal completion audit|goal:audit|completion audit/i, `${file} missing goal completion audit`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
@@ -847,6 +852,8 @@ check("release handoff documents blocked launch path", () => {
   assert.match(text, /selfmem_update/);
   assert.match(text, /release:handoff/);
   assert.match(text, /handoff packet/i);
+  assert.match(text, /release:github-sync/);
+  assert.match(text, /live GitHub sync|GitHub live sync/i);
   assert.match(text, /one-agent canary/i);
   assert.match(text, /Do not paste private diagnostics/);
 });
@@ -1132,6 +1139,31 @@ check("fresh GitHub handoff packet passes", () => {
   assert.doesNotMatch(geminiReview, /pending external review/i);
 });
 
+check("fresh GitHub live sync passes", () => {
+  const result = run("node", ["packages/bench/github-live-sync-check.mjs"]);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "github-live-sync-check");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.callsGitHubApi, true);
+  assert.equal(report.repository, "radbroradbro/selfmem-agent-memory");
+  assert.equal(report.pullRequest, 5);
+  assert.equal(report.issueNumber, 6);
+  assert.equal(report.livePrOpen, true);
+  assert.equal(report.liveIssueOpen, true);
+  assert.equal(report.livePrHeadMatches, true);
+  assert.equal(report.prBodyMatches, true);
+  assert.equal(report.issueTitleMatches, true);
+  assert.equal(report.issueBodyMatches, true);
+  assert.match(report.prBodyHash, /^[a-f0-9]{64}$/);
+  assert.match(report.issueBodyHash, /^[a-f0-9]{64}$/);
+  assert.equal(report.safety?.printsBodyText, false);
+  assert.equal(report.safety?.printsCredentials, false);
+  assert.equal(report.safety?.privateLeakCount, 0);
+  assert.equal(report.safety?.hasSecretPattern, false);
+  assert.equal(report.safety?.hasPrivatePathPattern, false);
+});
+
 check("fresh goal completion audit passes", () => {
   const result = run("node", ["packages/bench/goal-completion-audit.mjs"]);
   const report = JSON.parse(result.stdout);
@@ -1149,6 +1181,7 @@ check("fresh goal completion audit passes", () => {
   assert.ok(report.requirements.some((item) => item.id === "claude-council-review" && item.status === "blocked"));
   assert.ok(report.requirements.some((item) => item.id === "github-pr-body-current" && item.status === "proven"));
   assert.ok(report.requirements.some((item) => item.id === "github-blocker-issue-created" && item.status === "proven"));
+  assert.ok(report.requirements.some((item) => item.id === "github-live-sync-current" && item.status === "proven"));
   assert.ok(
     report.requirements.some((item) => item.id === "real-container-production-rollout" && item.status === "incomplete"),
   );

@@ -7,6 +7,7 @@ Scope:
 - Machine-readable release blocker status for PR #5.
 - Conservative launch boundary after GitHub write-route recovery.
 - Hosted baseline preflight status folded into the blocker report.
+- GitHub live sync status folded into the blocker report.
 
 Result:
 
@@ -18,6 +19,8 @@ Result:
 - Remote has no token: true
 - Hosted baseline preflight: ok true, calls hosted provider false, benchmark
   claims allowed false
+- GitHub live sync: ok true, PR body matches true, issue title matches true,
+  issue body matches true
 
 Current blockers:
 
@@ -29,14 +32,16 @@ Resolved in this extension:
 
 - PR #5 body was updated live.
 - GitHub issue #6 was created live.
+- `release:github-sync` now verifies the live PR and issue against checked-in
+  drafts with hashes and booleans only.
 - The old GitHub 403 packet remains historical evidence only.
 
 Manual next actions:
 
 - Run `claude /login`.
 - Rerun the cold Claude PR review or explicitly accept the blocked route.
-- Verify PR #5 and issue #6 still match
-  `reviews/overnight-20260522/github-write-route-evidence.md`.
+- Run `release:github-sync` and verify PR #5 and issue #6 still match the
+  checked-in drafts.
 - Run `baseline:preflight` with a sanitized live result after a fresh
   metrics-only hosted Supermemory baseline and before any public head-to-head
   benchmark claim.

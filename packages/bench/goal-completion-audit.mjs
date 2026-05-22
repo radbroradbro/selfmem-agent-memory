@@ -24,6 +24,7 @@ const files = {
   claudeBlocked: `${reviewDir}/claude-pr5-review-blocked.md`,
   handoffPacketEvidence: `${reviewDir}/github-handoff-packet-evidence.md`,
   handoffPacketReview: `${reviewDir}/gemini-github-handoff-packet-review.md`,
+  githubLiveSyncEvidence: `${reviewDir}/github-live-sync-evidence.md`,
   canaryReportGeneratorEvidence: `${reviewDir}/canary-report-generator-evidence.md`,
   canaryReportGeneratorReview: `${reviewDir}/gemini-canary-report-generator-review.md`,
   canaryEvidenceIntakeEvidence: `${reviewDir}/canary-evidence-intake-evidence.md`,
@@ -124,6 +125,12 @@ const requirements = [
     "packages/bench/github-handoff-packet.mjs",
     files.handoffPacketEvidence,
     files.handoffPacketReview,
+  ]),
+  proven("github-live-sync-current", "Live PR and blocker issue content match the checked-in public-safe drafts", [
+    "packages/bench/github-live-sync-check.mjs",
+    files.githubLiveSyncEvidence,
+    files.prBodyDraft,
+    files.issueDraft,
   ]),
   proven("hosted-baseline-preflight", "Hosted baseline comparison has a metrics-only preflight that keeps public claims blocked by default", [
     "packages/bench/hosted-baseline-preflight.mjs",

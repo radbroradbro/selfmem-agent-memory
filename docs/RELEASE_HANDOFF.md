@@ -49,6 +49,20 @@ issue title, blocker issue body, labels, and manual steps. It does not call
 GitHub or write files. Treat it as the public-safe source of truth only while
 the packet reports `publicLaunchAllowed: false` and `productionReady: false`.
 
+## Live GitHub Sync
+
+Run this after refreshing PR #5 or issue #6, or before merge, to confirm the
+live GitHub text still matches the checked-in release drafts:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- release:github-sync
+```
+
+The live GitHub sync check calls the GitHub API in read-only mode and prints
+only hashes, booleans, and public state. It does not print PR body text, issue
+body text, credentials, private local paths, raw memories, transcripts, or
+diagnostic contents.
+
 ## Blocker Doctor
 
 Run this before merge or visibility changes:

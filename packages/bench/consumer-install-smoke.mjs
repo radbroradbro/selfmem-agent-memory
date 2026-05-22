@@ -19,6 +19,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
+  "packages/bench/github-live-sync-check.mjs",
   "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
   "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
@@ -37,6 +38,7 @@ try {
   assert.equal(packageJson.bin?.selfmem_update, "./bin/selfmem_update");
   assert.equal(typeof packageJson.scripts?.["consumer:smoke"], "string");
   assert.equal(typeof packageJson.scripts?.["update:smoke"], "string");
+  assert.equal(typeof packageJson.scripts?.["release:github-sync"], "string");
   assert.ok(existsSync(join(checkout, "README.md")), "README.md missing from consumer checkout");
   assert.ok(existsSync(join(checkout, "docs/USER_MANUAL.md")), "user manual missing from consumer checkout");
   assert.ok(existsSync(join(checkout, "docs/BRAIN_UI.md")), "Brain UI docs missing from consumer checkout");
@@ -72,6 +74,7 @@ try {
     "packages/bench/canary-report-from-trace.mjs",
     "packages/bench/canary-evidence-intake.mjs",
     "packages/bench/canary-remediation.mjs",
+    "packages/bench/github-live-sync-check.mjs",
     "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
     "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
     "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",

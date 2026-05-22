@@ -27,6 +27,8 @@ human approval, hosted-baseline, and real-rollout requirements.
 - Added `canary-diagnostic-bundle-report` as a proven surface so redacted
   diagnostic directories and ZIP bundles can produce the same sanitized report
   shape while copied fixtures still fail strict real-rollout intake.
+- Added `github-live-sync-current` as a proven requirement so the audit now
+  checks that PR #5 and issue #6 match the checked-in public-safe drafts.
 - Updated `packages/bench/release-readiness-check.mjs` so release readiness now
   requires the audit script, evidence file, Gemini review, package script, and
   a fresh audit run.
@@ -40,7 +42,7 @@ human approval, hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 17 proven requirements
+- 19 proven requirements
 - 3 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
@@ -51,6 +53,8 @@ human approval, hosted-baseline, and real-rollout requirements.
 - Claude/Opus council review is blocked by missing login.
 - PR body and external blocker issue creation are now proven live through
   `github-write-route-evidence.md`.
+- GitHub live sync is now proven through `github-live-sync-evidence.md` and the
+  `release:github-sync` command.
 - Human approval is still required for merge, public visibility, and live
   update.
 - Hosted Supermemory benchmark claims need a fresh metrics-only baseline that

@@ -69,6 +69,7 @@
     "adapter-bounded-read-through",
     "hosted-baseline-preflight",
     "github-handoff-packet",
+    "github-live-sync-check",
     "github-pr-body-live",
     "github-blocker-issue-live",
     "goal-completion-audit",

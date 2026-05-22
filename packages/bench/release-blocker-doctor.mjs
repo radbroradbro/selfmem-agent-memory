@@ -23,6 +23,7 @@ const requiredFiles = {
   issueDraft: "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md",
   githubBlocked: "github-issue-create-blocked.md",
   githubWriteEvidence: "github-write-route-evidence.md",
+  githubLiveSyncEvidence: "github-live-sync-evidence.md",
   claudeBlocked: "claude-pr5-review-blocked.md",
   hostedBaselinePreflight: "hosted-baseline-preflight-evidence.md",
   hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
@@ -52,12 +53,14 @@ for (const item of Object.values(evidence)) {
 }
 
 const githubWriteText = readFileSync(join(root, reviewDir, "github-write-route-evidence.md"), "utf8");
+const githubLiveSyncText = readFileSync(join(root, reviewDir, "github-live-sync-evidence.md"), "utf8");
 const claudeBlockedText = readFileSync(join(root, reviewDir, "claude-pr5-review-blocked.md"), "utf8");
 const prBodyDraftText = readFileSync(join(root, reviewDir, "pr-body-update-draft.md"), "utf8");
 const issueDraftText = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
 
 assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
+assert.match(githubLiveSyncText, /PR\s*#5[\s\S]*issue #6[\s\S]*match/i);
 assert.match(claudeBlockedText, /Not logged in/);
 assert.match(prBodyDraftText, /clean consumer smoke/i);
 assert.match(issueDraftText, /Acceptance Criteria/);
@@ -74,6 +77,11 @@ const gh = inspectCommand("gh", ["auth", "status"]);
 const hostedBaselinePreflight = JSON.parse(run("node", ["packages/bench/hosted-baseline-preflight.mjs"]).stdout);
 assert.equal(hostedBaselinePreflight.callsHostedProvider, false);
 assert.equal(hostedBaselinePreflight.publicBenchmarkClaimsAllowed, false);
+const githubLiveSync = JSON.parse(run("node", ["packages/bench/github-live-sync-check.mjs"]).stdout);
+assert.equal(githubLiveSync.ok, true);
+assert.equal(githubLiveSync.prBodyMatches, true);
+assert.equal(githubLiveSync.issueTitleMatches, true);
+assert.equal(githubLiveSync.issueBodyMatches, true);
 
 const blockerReport = [
   {
@@ -139,15 +147,22 @@ console.log(
           callsHostedProvider: hostedBaselinePreflight.callsHostedProvider,
           benchmarkClaimsAllowed: hostedBaselinePreflight.benchmarkClaimsAllowed,
         },
+        githubLiveSync: {
+          ok: githubLiveSync.ok,
+          prBodyMatches: githubLiveSync.prBodyMatches,
+          issueTitleMatches: githubLiveSync.issueTitleMatches,
+          issueBodyMatches: githubLiveSync.issueBodyMatches,
+        },
         claudeCommand: claude,
         githubCli: gh,
       },
       manualCommands: [
         "claude /login",
         "npm exec --yes pnpm@10.23.0 -- release:check",
+        "npm exec --yes pnpm@10.23.0 -- release:github-sync",
         "npm exec --yes pnpm@10.23.0 -- smoke",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight",
-        "Verify PR #5 and issue #6 still match reviews/overnight-20260522/github-write-route-evidence.md",
+        "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },
     null,

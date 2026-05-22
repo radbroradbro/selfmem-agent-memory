@@ -65,6 +65,8 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Hosted baseline preflight that makes the Supermemory comparison path
   explicit while calling no hosted provider by default and keeping public
   benchmark claims blocked.
+- GitHub live sync check that compares live PR #5 and blocker issue #6 against
+  checked-in release drafts without printing body text or credentials.
 - Canary evidence intake that accepts sanitized one-agent runtime reports with
   lifecycle, hybrid-search, local-write, read-through, latency, privacy, and
   rollback metrics, while refusing raw memories, transcripts, prompts,
@@ -103,6 +105,7 @@ Passed in this run:
 - `npm run wiki:sync:smoke:built`
 - `npm run update:smoke`
 - `npm run release:check`
+- `npm run release:github-sync`
 - `git diff --check`
 - Core package `npm pack --dry-run` when npm used a writable temporary cache
 
