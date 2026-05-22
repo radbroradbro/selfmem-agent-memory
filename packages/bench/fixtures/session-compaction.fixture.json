@@ -1,0 +1,55 @@
+{
+  "sessionId": "fixture-codex-claude-overnight",
+  "source": "codex",
+  "startedAt": "2026-05-22T08:00:00.000Z",
+  "events": [
+    {
+      "id": "turn-001",
+      "role": "user",
+      "timestamp": "2026-05-22T08:01:00.000Z",
+      "content": "Please keep RecallWeave local-first and do not write back to hosted Supermemory automatically."
+    },
+    {
+      "id": "turn-002",
+      "role": "assistant",
+      "timestamp": "2026-05-22T08:02:00.000Z",
+      "content": "Decision: RecallWeave will use local writes by default, with hosted Supermemory read-through only when configured."
+    },
+    {
+      "id": "turn-003",
+      "role": "user",
+      "timestamp": "2026-05-22T08:03:00.000Z",
+      "content": "ok lol"
+    },
+    {
+      "id": "turn-004",
+      "role": "assistant",
+      "timestamp": "2026-05-22T08:04:00.000Z",
+      "content": "Fix: brain UI fixture smoke passed and the editable derived doc path saved a local fixture edit."
+    },
+    {
+      "id": "turn-005",
+      "role": "user",
+      "timestamp": "2026-05-22T08:05:00.000Z",
+      "content": "Research hypothesis: use an LLM-wiki research graph to track source claims, pros, cons, tests, and decisions."
+    },
+    {
+      "id": "turn-006",
+      "role": "user",
+      "timestamp": "2026-05-22T08:06:00.000Z",
+      "content": "Spring 2026 law school notes and course outlines are done; remember only high-level class background."
+    },
+    {
+      "id": "turn-007",
+      "role": "assistant",
+      "timestamp": "2026-05-22T08:07:00.000Z",
+      "content": "Procedure: run doctor, smoke tests, secret scans, and browser fixture evidence before calling a release production ready."
+    },
+    {
+      "id": "turn-008",
+      "role": "user",
+      "timestamp": "2026-05-22T08:08:00.000Z",
+      "content": "Never store <private>fixture secret</private> or key-shaped data in public benchmark traces."
+    }
+  ]
+}

@@ -33,6 +33,8 @@ Before a public live update or release note:
 - Nucleus snapshot redaction tests pass,
 - research-lineage examples link queries, hypotheses, pros, cons, sources, and
   decisions without leaking private evidence,
+- session compaction benchmark passes on fixture data with chronological output
+  and zero privacy leaks,
 - reviewer packet records which council routes actually ran.
 
 ## UI Evidence
@@ -127,6 +129,19 @@ research path:
 
 This lineage should be visible in the wiki and the Nucleus graph. It may use
 public sources and sanitized fixture evidence only.
+
+## Session Compaction
+
+Production review must verify that local session compaction can extract durable
+memory candidates without bloating recall.
+
+Required checks:
+
+- redaction before extraction,
+- chronological candidate output,
+- noise reduction,
+- stale school-note downshift to background,
+- no raw private sessions in public artifacts.
 
 ## Failure Loop
 

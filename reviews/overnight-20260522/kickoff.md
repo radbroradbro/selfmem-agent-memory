@@ -13,6 +13,8 @@ review, browser/computer-use UI evidence, and safe PR-based implementation for:
 - native memory optimization per host runtime.
 - research lineage for source-backed hypotheses, pros, cons, decisions, and
   follow-up questions.
+- local-only session compaction benchmarking with public fixtures and private
+  real-session outputs kept out of git.
 
 ## Current Commit
 
@@ -26,6 +28,7 @@ Seeded from public `main` at `f498173`.
 - `docs/RESEARCH_LINEAGE.md`
 - `docs/PRODUCTION_READINESS.md`
 - `packages/brain-ui/`
+- `packages/bench/fixtures/session-compaction.fixture.json`
 
 ## Design Commitments
 

@@ -9,4 +9,5 @@ export * from "./hybrid/sync.js";
 export * from "./hybrid/export-cache.js";
 export * from "./hybrid/distill.js";
 export * from "./nucleus/index.js";
+export * from "./compaction/session.js";
 //# sourceMappingURL=index.d.ts.map

@@ -1,0 +1,11 @@
+{
+  "name": "@recallweave/bench",
+  "version": "0.1.0-alpha.0",
+  "description": "Fixture-safe RecallWeave benchmark and compaction harnesses.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compaction:smoke": "node session-compaction-smoke.mjs"
+  }
+}

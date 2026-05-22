@@ -22,7 +22,8 @@
     "smoke:hermes": "python3 packages/adapters/hermes/selfmem_canary_standalone_smoke.py",
     "brain:serve": "node packages/brain-ui/server.mjs",
     "brain:smoke": "node packages/brain-ui/smoke.mjs",
-    "smoke": "pnpm privacy:test && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke"
+    "compaction:smoke": "pnpm build && node packages/bench/session-compaction-smoke.mjs",
+    "smoke": "pnpm privacy:test && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke && node packages/bench/session-compaction-smoke.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

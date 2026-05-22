@@ -53,6 +53,8 @@ must run before making quality claims.
   decisions, and follow-up questions.
 - LLM-wiki sync rules for Obsidian-compatible vaults and the self-hosted brain
   UI.
+- Fixture-safe session compaction benchmark for chronological durable memory
+  extraction.
 - Lifecycle logs for recall, writes, compression checkpoints, provider errors,
   and privacy counts.
 - Dry-run update command for deployed agents.
@@ -166,6 +168,7 @@ auth state, browser state, or provider keys.
 - [Nucleus Index](docs/NUCLEUS_INDEX.md)
 - [Research lineage](docs/RESEARCH_LINEAGE.md)
 - [LLM-wiki sync](docs/LLM_WIKI_SYNC.md)
+- [Session compaction benchmark](docs/SESSION_COMPACTION_BENCHMARK.md)
 - [Lifecycle and LCM notes](docs/LIFECYCLE_AND_LCM.md)
 - [System flows](docs/FLOWS.md)
 - [Operations guide](docs/OPERATIONS.md)

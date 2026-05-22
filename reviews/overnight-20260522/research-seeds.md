@@ -44,6 +44,6 @@ Initial use:
   them, or only borrow design patterns?
 - Which lifecycle events should emit Nucleus edges by default?
 - Which research-lineage nodes should be visible in the first self-hosted UI?
-- Which local embedding path is useful on Bradley's Mac while remaining
+- Which local embedding path is useful on a single-user Mac while remaining
   optional and not the default?
 - How should UI evidence become a traceable hypothesis/test/decision record?
