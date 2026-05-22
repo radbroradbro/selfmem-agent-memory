@@ -166,6 +166,8 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- release:github-sync",
         "npm exec --yes pnpm@10.23.0 -- smoke",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight",
+        "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
+        "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },

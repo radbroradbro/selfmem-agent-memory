@@ -10,12 +10,19 @@ The current branch includes a hosted baseline preflight:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
+npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 ```
 
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are
 present. Reports may contain aggregate metrics and hashes only.
+
+The fixture command validates the expected result shape without counting as
+baseline evidence. The template command prints the live-result schema agents
+should fill after a hosted run. A fixture can pass every shape check and still
+fail the real-evidence check because `fixtureOnly: true`.
 
 ## Historical Controlled Local Baseline
 
@@ -70,6 +77,8 @@ A stronger claim requires:
 - zero redaction failures,
 - cost and latency accounting,
 - a valid Supermemory baseline that is not quota-blocked.
+- a baseline result that is not a fixture and passes the hosted preflight
+  result checks.
 
 Until then, RecallWeave should be described as a local-first fallback and experimental native memory lane, not as a proven replacement.
 

@@ -30,6 +30,8 @@ Run the hosted baseline preflight before any live comparison:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
+npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 ```
 
 The preflight is offline by default. It must report `callsHostedProvider:
@@ -40,6 +42,11 @@ metrics-only output file. The output may include run ids, source commits, model
 ids, aggregate scores, cost, latency, and hashes. It must not include raw
 memories, raw transcripts, private prompts, private answers, credentials,
 cookies, or bearer tokens.
+
+The fixture path proves that the result shape is parseable. It must never count
+as hosted baseline evidence, even if all metrics fields are present. Use
+`--print-template` before live collection so the agent writes only aggregate
+fields and source-lock hashes.
 
 Allowed public wording after a win:
 

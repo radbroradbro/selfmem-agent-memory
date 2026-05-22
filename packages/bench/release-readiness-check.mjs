@@ -25,6 +25,7 @@ const requiredFiles = [
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
+  "packages/bench/fixtures/hosted-baseline-result.fixture.json",
   "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
   "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
@@ -1143,7 +1144,11 @@ check("fresh release blocker doctor passes", () => {
 
 check("fresh hosted baseline preflight passes", () => {
   const result = run("node", ["packages/bench/hosted-baseline-preflight.mjs"]);
+  const fixtureResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--fixture"]);
+  const templateResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--print-template"]);
   const report = JSON.parse(result.stdout);
+  const fixtureReport = JSON.parse(fixtureResult.stdout);
+  const templateReport = JSON.parse(templateResult.stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
   assert.equal(report.ok, true);
   assert.equal(report.mode, "hosted-baseline-preflight");
@@ -1154,10 +1159,19 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(report.hostedBaselineFresh, false);
   assert.equal(report.benchmarkClaimsAllowed, false);
   assert.equal(report.publicBenchmarkClaimsAllowed, false);
+  assert.equal(report.countsAsHostedBaselineEvidence, false);
   assert.equal(report.safety?.permitsHostedWriteBack, false);
   assert.equal(report.safety?.permitsRawMemoryOutput, false);
   assert.ok(report.liveRunContract?.requiredMetrics?.includes("P@1"));
   assert.ok(report.liveRunContract?.requiredComparability?.includes("same dataset slice"));
+  assert.equal(fixtureReport.resultInspection?.fixtureOnly, true);
+  assert.deepEqual(fixtureReport.resultInspection?.failedResultChecks, ["not-fixture"]);
+  assert.equal(fixtureReport.countsAsHostedBaselineEvidence, false);
+  assert.equal(fixtureReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(templateReport.resultTemplateIncluded, true);
+  assert.equal(templateReport.baselineResultTemplate?.provider, "hosted-supermemory");
+  assert.equal(templateReport.baselineResultTemplate?.metricsOnly, true);
+  assert.equal(templateReport.baselineResultTemplate?.rawMemoryIncluded, false);
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
 });

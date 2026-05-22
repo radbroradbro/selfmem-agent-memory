@@ -7,7 +7,13 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir());
-const resultPath = readArgValue("--result") ?? process.env.RECALLWEAVE_BASELINE_RESULT_JSON;
+const fixturePath = join(root, "packages/bench/fixtures/hosted-baseline-result.fixture.json");
+const fixtureRequested = process.argv.includes("--fixture");
+const printTemplate = process.argv.includes("--print-template") || process.argv.includes("--template");
+const resultPath =
+  readArgValue("--result") ??
+  process.env.RECALLWEAVE_BASELINE_RESULT_JSON ??
+  (fixtureRequested ? fixturePath : null);
 const liveRequested = process.argv.includes("--live") || process.env.RECALLWEAVE_BASELINE_LIVE === "1";
 
 const secretPattern =
@@ -112,11 +118,12 @@ if (resultPath) {
 }
 
 const hostedBaselineFresh = Boolean(baselineResult?.fresh);
+const countsAsHostedBaselineEvidence = Boolean(baselineResult?.countsAsHostedBaselineEvidence);
 const matchedRecallWeaveRunPresent = Boolean(baselineResult?.matchedRecallWeaveRunPresent);
 const reviewerApprovalCount = Number(baselineResult?.reviewerApprovalCount ?? 0);
 const recallWeaveWin = Boolean(baselineResult?.recallWeaveWin);
 const benchmarkClaimsAllowed =
-  hostedBaselineFresh && matchedRecallWeaveRunPresent && reviewerApprovalCount >= 2 && recallWeaveWin;
+  countsAsHostedBaselineEvidence && matchedRecallWeaveRunPresent && reviewerApprovalCount >= 2 && recallWeaveWin;
 
 const report = {
   ok: true,
@@ -132,12 +139,15 @@ const report = {
   liveInputReady,
   missingLiveEnv,
   hostedBaselineFresh,
+  countsAsHostedBaselineEvidence,
   matchedRecallWeaveRunPresent,
   reviewerApprovalCount,
   recallWeaveWin,
   benchmarkClaimsAllowed,
   publicBenchmarkClaimsAllowed: benchmarkClaimsAllowed,
   resultInspection: baselineResult,
+  resultTemplateIncluded: printTemplate,
+  baselineResultTemplate: printTemplate ? buildBaselineResultTemplate({ branch, head }) : undefined,
   envContract: envStatus,
   safety: {
     printsCredentialValues: false,
@@ -178,6 +188,8 @@ const report = {
     forbiddenOutput: "raw memories, raw transcripts, raw prompts, raw answers from private containers, credentials, cookies, and bearer tokens",
   },
   nextActions: [
+    "Run `baseline:preflight -- --fixture` to validate the metrics-only result shape without making any benchmark claim.",
+    "Run `baseline:preflight -- --print-template` to print the live result schema before collecting a hosted baseline.",
     "Choose an isolated source-locked query set or explicit read-only hosted container.",
     "Run the hosted Supermemory baseline with RECALLWEAVE_BASELINE_LIVE=1 and RECALLWEAVE_BASELINE_NO_RAW_TEXT=1.",
     "Store only aggregate metrics and hashes in RECALLWEAVE_BASELINE_OUTPUT_JSON.",
@@ -203,57 +215,140 @@ function inspectBaselineResult(inputPath) {
   const redactionFailureCount = Number(result.redactionFailureCount ?? result.redactionFailures ?? NaN);
   const rawMemoryIncluded = Boolean(result.rawMemoryIncluded ?? result.includesRawMemoryText ?? false);
   const rawTranscriptIncluded = Boolean(result.rawTranscriptIncluded ?? result.includesRawTranscriptText ?? false);
+  const rawPromptIncluded = Boolean(result.rawPromptIncluded ?? result.includesRawPromptText ?? false);
+  const rawAnswerIncluded = Boolean(result.rawAnswerIncluded ?? result.includesRawAnswerText ?? false);
   const metricsOnly = result.metricsOnly === true;
   const provider = String(result.provider ?? result.baselineProvider ?? "");
   const runAt = String(result.runAt ?? result.generatedAt ?? "");
+  const fixtureOnly =
+    result.fixtureOnly === true ||
+    String(result.evidenceType ?? "").toLowerCase().includes("fixture") ||
+    relative(root, path).replaceAll("\\", "/").includes("/fixtures/");
   const ageHours = runAt ? (Date.now() - Date.parse(runAt)) / 36e5 : Number.POSITIVE_INFINITY;
   const sameHarness = result.sameHarness === true || result.comparability?.sameHarness === true;
   const sameDataset = result.sameDataset === true || result.comparability?.sameDataset === true;
   const sameJudge = result.sameJudge === true || result.comparability?.sameJudge === true;
   const sameAnswerModel = result.sameAnswerModel === true || result.comparability?.sameAnswerModel === true;
+  const hasRunId = nonEmpty(result.runId);
+  const hasSourceCommit = nonEmpty(result.sourceCommit ?? result.commit);
+  const hasDatasetSlice = nonEmpty(result.datasetSlice ?? result.benchmarkSlice ?? result.datasetVersion);
+  const hasQuerySetHash = hashLike(result.querySetHash ?? result.queryHash ?? result.questionSetHash);
+  const hasScoringCodeHash = hashLike(result.scoringCodeHash ?? result.harnessHash ?? result.scoringHash);
+  const ingestCost = result.ingestCostUsd ?? result.cost?.ingestUsd;
+  const queryCost = result.queryCostUsd ?? result.cost?.queryUsd;
   const hasCostLatency =
     isFiniteNumber(result.latencyP50Ms ?? result.metrics?.latencyP50Ms) &&
     isFiniteNumber(result.latencyP95Ms ?? result.metrics?.latencyP95Ms) &&
-    isFiniteNumber(result.queryCostUsd ?? result.cost?.queryUsd ?? 0);
+    isFiniteNumber(ingestCost) &&
+    isFiniteNumber(queryCost);
   const hasRetrievalMetric =
+    isFiniteNumber(result.accuracy ?? result.quality ?? result.metrics?.accuracy ?? result.metrics?.quality) ||
     isFiniteNumber(result.pAt1 ?? result.metrics?.pAt1) ||
     isFiniteNumber(result.recallAt5 ?? result.metrics?.recallAt5) ||
     isFiniteNumber(result.ndcgAt10 ?? result.metrics?.ndcgAt10);
+  const freshWindow = fixtureOnly || (ageHours >= 0 && ageHours <= 168);
+  const checks = [
+    resultCheck("not-fixture", !fixtureOnly),
+    resultCheck("provider-hosted-supermemory", provider === "hosted-supermemory"),
+    resultCheck("metrics-only", metricsOnly),
+    resultCheck("privacy-leaks-zero", privacyLeakCount === 0),
+    resultCheck("redaction-failures-zero", redactionFailureCount === 0),
+    resultCheck("no-raw-memory", rawMemoryIncluded === false),
+    resultCheck("no-raw-transcript", rawTranscriptIncluded === false),
+    resultCheck("no-raw-prompt", rawPromptIncluded === false),
+    resultCheck("no-raw-answer", rawAnswerIncluded === false),
+    resultCheck("same-harness", sameHarness),
+    resultCheck("same-dataset", sameDataset),
+    resultCheck("same-judge", sameJudge),
+    resultCheck("same-answer-model", sameAnswerModel),
+    resultCheck("run-id", hasRunId),
+    resultCheck("source-commit", hasSourceCommit),
+    resultCheck("dataset-slice", hasDatasetSlice),
+    resultCheck("query-set-hash", hasQuerySetHash),
+    resultCheck("scoring-code-hash", hasScoringCodeHash),
+    resultCheck("cost-latency", hasCostLatency),
+    resultCheck("retrieval-or-quality-metric", hasRetrievalMetric),
+    resultCheck("fresh-window", freshWindow),
+  ];
+  const failedResultChecks = checks.filter((item) => !item.ok).map((item) => item.name);
   const fresh =
-    provider === "hosted-supermemory" &&
-    metricsOnly &&
-    privacyLeakCount === 0 &&
-    redactionFailureCount === 0 &&
-    rawMemoryIncluded === false &&
-    rawTranscriptIncluded === false &&
-    sameHarness &&
-    sameDataset &&
-    sameJudge &&
-    sameAnswerModel &&
-    hasCostLatency &&
-    hasRetrievalMetric &&
-    ageHours >= 0 &&
-    ageHours <= 168;
+    failedResultChecks.length === 0;
 
   return {
     path: relative(root, path).replaceAll("\\", "/"),
     provider,
+    fixtureOnly,
     metricsOnly,
     privacyLeakCount,
     redactionFailureCount,
     rawMemoryIncluded,
     rawTranscriptIncluded,
+    rawPromptIncluded,
+    rawAnswerIncluded,
     sameHarness,
     sameDataset,
     sameJudge,
     sameAnswerModel,
+    hasRunId,
+    hasSourceCommit,
+    hasDatasetSlice,
+    hasQuerySetHash,
+    hasScoringCodeHash,
     hasCostLatency,
     hasRetrievalMetric,
     ageHours: Number.isFinite(ageHours) ? Number(ageHours.toFixed(2)) : null,
     fresh,
+    countsAsHostedBaselineEvidence: fresh,
+    checks,
+    failedResultChecks,
     matchedRecallWeaveRunPresent: Boolean(result.matchedRecallWeaveRunPresent ?? result.matchedRecallWeaveRun?.present),
     reviewerApprovalCount: Number(result.reviewerApprovalCount ?? result.reviewers?.approvedCount ?? 0),
     recallWeaveWin: Boolean(result.recallWeaveWin ?? result.comparison?.recallWeaveWin),
+  };
+}
+
+function buildBaselineResultTemplate({ branch, head }) {
+  return {
+    schemaVersion: 1,
+    provider: "hosted-supermemory",
+    fixtureOnly: false,
+    metricsOnly: true,
+    runId: "supermemory-baseline-YYYYMMDD-HHMM",
+    runAt: new Date().toISOString(),
+    branch,
+    sourceCommit: head,
+    datasetSlice: "source-locked-canary-slice-id",
+    querySetHash: "sha256:<hash-of-query-set>",
+    scoringCodeHash: "sha256:<hash-of-scoring-code>",
+    judgeModel: "same-judge-as-recallweave-run",
+    answerModel: "same-answer-model-as-recallweave-run",
+    sameHarness: true,
+    sameDataset: true,
+    sameJudge: true,
+    sameAnswerModel: true,
+    privacyLeakCount: 0,
+    redactionFailureCount: 0,
+    rawMemoryIncluded: false,
+    rawTranscriptIncluded: false,
+    rawPromptIncluded: false,
+    rawAnswerIncluded: false,
+    metrics: {
+      quality: 0,
+      pAt1: 0,
+      recallAt5: 0,
+      recallAt10: 0,
+      ndcgAt10: 0,
+      latencyP50Ms: 0,
+      latencyP95Ms: 0,
+      contextTokensAvg: 0,
+    },
+    cost: {
+      ingestUsd: 0,
+      queryUsd: 0,
+    },
+    matchedRecallWeaveRunPresent: false,
+    reviewerApprovalCount: 0,
+    recallWeaveWin: false,
   };
 }
 
@@ -265,6 +360,18 @@ function readArgValue(name) {
 
 function isFiniteNumber(value) {
   return typeof Number(value) === "number" && Number.isFinite(Number(value));
+}
+
+function nonEmpty(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function hashLike(value) {
+  return typeof value === "string" && /^(sha256:)?[A-Za-z0-9_-]{8,}$/.test(value.trim());
+}
+
+function resultCheck(name, ok) {
+  return { name, ok: Boolean(ok) };
 }
 
 function run(command, args) {

@@ -9,11 +9,20 @@ safe contract. It does not call hosted Supermemory by default. It verifies that
 benchmark claims stay blocked until a fresh metrics-only hosted baseline, a
 matched RecallWeave run, and two independent reviewer approvals exist.
 
+This extension adds a fixture/template route so agents can test the exact
+result shape before using a hosted key. The fixture proves parser coverage but
+is rejected as real baseline evidence.
+
 ## Files Added Or Updated
 
 - `packages/bench/hosted-baseline-preflight.mjs`
+- `packages/bench/fixtures/hosted-baseline-result.fixture.json`
 - `package.json`
 - `packages/bench/release-readiness-check.mjs`
+- `packages/bench/release-blocker-doctor.mjs`
+- `docs/BENCHMARK_SUMMARY.md`
+- `docs/AUTORESEARCH_BENCHMARK_PLAN.md`
+- `docs/RELEASE_HANDOFF.md`
 - `reviews/overnight-20260522/release-state.json`
 - `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`
 - `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md`
@@ -22,6 +31,8 @@ matched RecallWeave run, and two independent reviewer approvals exist.
 
 ```sh
 node packages/bench/hosted-baseline-preflight.mjs
+node packages/bench/hosted-baseline-preflight.mjs --fixture
+node packages/bench/hosted-baseline-preflight.mjs --print-template
 ```
 
 Result:
@@ -33,8 +44,23 @@ Result:
 - `metricsOnly: true`
 - `releaseBlockerPresent: true`
 - `hostedBaselineFresh: false`
+- `countsAsHostedBaselineEvidence: false`
 - `benchmarkClaimsAllowed: false`
 - `publicBenchmarkClaimsAllowed: false`
+
+Fixture result:
+
+- `resultInspection.fixtureOnly: true`
+- `resultInspection.failedResultChecks: ["not-fixture"]`
+- `resultInspection.countsAsHostedBaselineEvidence: false`
+- `benchmarkClaimsAllowed: false`
+
+Template result:
+
+- `resultTemplateIncluded: true`
+- template includes provider, run id, source commit, dataset slice,
+  query-set hash, scoring-code hash, model ids, privacy counters, aggregate
+  metrics, and cost fields.
 
 ## Safety Contract
 
@@ -46,6 +72,8 @@ Result:
 - Public benchmark claims remain blocked unless a metrics-only hosted baseline,
   matched RecallWeave run, RecallWeave win, and two reviewer approvals are all
   present.
+- Fixtures and templates can validate shape only. They cannot satisfy the
+  hosted-baseline blocker.
 
 ## Live Baseline Inputs
 
@@ -75,13 +103,41 @@ Required live-run inputs are recorded as names only:
 - query cost
 - redaction failure count
 
+## Required Result Checks
+
+- not a fixture
+- hosted Supermemory provider label
+- metrics-only output
+- zero privacy leaks and redaction failures
+- no raw memory, transcript, prompt, or answer text
+- same harness, dataset, judge, and answer model
+- run id, source commit, dataset slice, query-set hash, and scoring-code hash
+- cost and latency fields
+- at least one quality or retrieval metric
+- fresh collection window
+
 ## Boundary
 
 This is a preflight and release gate, not a live hosted benchmark. The blocker
 `hosted-supermemory-baseline-not-current` remains valid until a sanitized live
 result is reviewed.
 
-## CI
+The `baseline:preflight -- --fixture` path is now part of full smoke so this
+guard cannot silently regress.
+
+## Current Local Verification
+
+- `npm exec --yes pnpm@10.23.0 -- test`: 6 files, 22 tests passed.
+- `npm exec --yes pnpm@10.23.0 -- smoke`: passed, including the new
+  `baseline:preflight` and `baseline:preflight -- --fixture` smoke steps.
+- `node packages/bench/release-readiness-check.mjs`: passed.
+- `node packages/bench/goal-completion-audit.mjs`: passed with
+  `goalComplete: false` and the hosted-baseline blocker preserved.
+- `git diff --check`: clean.
+- Added-line secret scan: zero hits.
+
+## Prior CI
 
 GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test, Full
-smoke, and Release readiness check.
+smoke, and Release readiness check for the earlier hosted-baseline preflight
+slice. A fresh CI run is required after this extension is pushed.
