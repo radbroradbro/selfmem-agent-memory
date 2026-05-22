@@ -44,6 +44,8 @@ Before a public live update or release note:
   decisions without leaking private evidence,
 - session compaction benchmark passes on fixture data with chronological output
   and zero privacy leaks,
+- Brain UI Compaction Audit evidence proves local-session audit metrics render
+  without raw session text or candidate memory text,
 - local-session compaction audit passes in metrics-only mode without candidate
   memory text,
 - multi-scenario compaction benchmark passes exact-identifier, stale/privacy,

@@ -75,6 +75,7 @@ complete or publish a public live update.
 | Brain UI memory review queue apply | `brain-ui-review-queue-apply-evidence.md`, `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, Gemini review | Proven as disabled-by-default write-confirmed selected local decision apply |
 | Brain UI Nucleus snapshot evidence | `brain-ui-nucleus-snapshot-*`, `brain-ui-nucleus-snapshot-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Brain UI research-lineage evidence | `brain-ui-research-lineage-*`, `brain-ui-research-lineage-evidence.md`, Gemini review | Proven with sanitized fixtures |
+| Brain UI compaction audit evidence | `brain-ui-compaction-audit-*`, `brain-ui-compaction-audit-evidence.md`, Gemini review | Proven with sanitized metrics-only fixtures |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-interaction-smoke-evidence.md`, Gemini review | Proven with sanitized fixtures |
 | Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` loaded browser evidence baseline `96ae9cc` in Codex Browser and checked main surfaces plus no private/key-shaped visible text | Proven for DOM; screenshot timed out |
 | Dynamic layout browser evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-dynamic-layout-evidence.json` and `brain-ui-dynamic-layout.png` show 9 nodes, 9 edges, 2 columns, 5 rows, zero overlaps, zero console errors, and no private/key-shaped visible text | Proven with sanitized fixtures |
@@ -93,6 +94,7 @@ complete or publish a public live update.
 | Graph navigation release gate | `packages/bench/release-readiness-check.mjs` now requires graph navigation evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297876735` |
 | Release handoff gate | `packages/bench/release-readiness-check.mjs` now requires `docs/RELEASE_HANDOFF.md`, release-handoff evidence, and Gemini review evidence | Proven locally and in CI run `26298339106` |
 | Metrics-only local session compaction audit gate | `packages/bench/release-readiness-check.mjs` now requires local-session compaction audit evidence, Gemini review evidence, and a fresh metrics-only audit run | Proven locally and in CI run `26298965544` |
+| Brain UI compaction audit release gate | `packages/bench/release-readiness-check.mjs` now requires Compaction Audit DOM evidence, screenshot, Gemini review, release-doc references, and fresh Brain UI smoke and interaction smoke coverage | Proven locally with sanitized fixture metrics |
 | GitHub Actions | CI run `26298965544` on `be08302` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |

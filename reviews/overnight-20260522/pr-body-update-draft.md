@@ -45,7 +45,7 @@ Retry note:
 
 - Adds the Nucleus Index contract for memory nodes, lifecycle events, retrieval traces, wiki pages, research questions, hypotheses, decisions, and evidence.
 - Adds LLM-wiki compile/sync flow with Obsidian-style frontmatter, wikilinks, index/log pages, provenance, linting, reviewed-page conflict handling, and optional content-free pre-write audit logging.
-- Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, graph navigation controls, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, vault preview, and sync-report inspection.
+- Adds a fixture-first Brain UI for graph browsing with a deterministic dynamic graph layout, graph navigation controls, search, container health, Local Audit Preflight, selected local-container audit preview, selected local-container browse preview, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, browser-local selected audit history, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, provenance, timeline review, lifecycle/retrieval trace inspection, derived-doc editing, draft export, Nucleus snapshot preview, Research Lineage, Compaction Audit, vault preview, and sync-report inspection.
 - Adds a read-only local-container audit preflight, disabled-by-default selected audit and browse routes, disabled-by-default selected memory edit overlay, local edit overlay browse previews, selected local memory materialize with backup, and content-free selected audit history that return or store counts, health reasons, bounded redacted snippets, or append-only local edit metadata without returning raw root paths.
 - Adds `selfmem_update` dry-run-first update flow and fixture smokes for Hermes/OpenClaw adapters, wiki sync, compaction, update flow, and release readiness.
 - Adds a metrics-only local-session compaction audit path for private Codex, Claude, Hermes, and OpenClaw exports without printing candidate memory text.
@@ -75,6 +75,10 @@ Latest local verification includes the release handoff gate slice.
 - Local graph navigation evidence: neighborhood scope, 3 visible fixture nodes,
   9 jump options, selected-node visibility, zero console errors, and no
   private/key-shaped visible text.
+- Local Compaction Audit evidence: metrics-only fixture output, 6 input events,
+  4 candidate fingerprints, 2 redactions, chronological output, 1 exact
+  identifier candidate, zero privacy leaks, zero console errors, and no raw
+  candidate text.
 - GitHub Actions CI: run `26288370812` passed on `2888f91`, the latest baseline inspected before this draft.
 - GitHub Actions CI: run `26289073223` passed on `dd17f44`, the release-state guard follow-up commit.
 - GitHub Actions CI: run `26292137539` passed on `3b5e140`, the guarded lifecycle policy apply commit.
@@ -112,6 +116,8 @@ Latest local verification includes the release handoff gate slice.
 - `reviews/overnight-20260522/gemini-brain-ui-dynamic-layout-review.md`
 - `reviews/overnight-20260522/brain-ui-graph-navigation-evidence.md`
 - `reviews/overnight-20260522/gemini-brain-ui-graph-navigation-review.md`
+- `reviews/overnight-20260522/brain-ui-compaction-audit-evidence.md`
+- `reviews/overnight-20260522/gemini-brain-ui-compaction-audit-review.md`
 - `reviews/overnight-20260522/session-compaction-local-audit-evidence.md`
 - `packages/bench/release-readiness-check.mjs`
 ```

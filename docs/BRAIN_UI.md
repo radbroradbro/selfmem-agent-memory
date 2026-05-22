@@ -17,6 +17,7 @@ The UI should expose:
 - hybrid retrieval traces,
 - lifecycle and sleep-cycle events,
 - research lineage,
+- metrics-only local session compaction audit,
 - lifecycle policy draft export,
 - selected lifecycle policy apply with explicit confirmation,
 - memory review queue draft export,
@@ -73,17 +74,18 @@ Required visual review path:
 11. provenance scan,
 12. Nucleus snapshot preview,
 13. research lineage preview,
-14. lifecycle policy preview,
-15. selected lifecycle policy apply confirmation,
-16. memory review queue preview,
-17. selected memory review queue apply confirmation,
-18. compiled wiki/vault preview,
-19. fixture vault sync report with conflict handling,
-20. selected local vault sync dry-run,
-21. selected local vault sync apply confirmation,
-22. fixture local-container audit preflight,
-23. selected local memory edit overlay confirmation,
-24. selected local memory materialize confirmation.
+14. local session compaction audit preview,
+15. lifecycle policy preview,
+16. selected lifecycle policy apply confirmation,
+17. memory review queue preview,
+18. selected memory review queue apply confirmation,
+19. compiled wiki/vault preview,
+20. fixture vault sync report with conflict handling,
+21. selected local vault sync dry-run,
+22. selected local vault sync apply confirmation,
+23. fixture local-container audit preflight,
+24. selected local memory edit overlay confirmation,
+25. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -113,6 +115,14 @@ jump to any node in the filtered result set, and center the selected graph
 card. The browser evidence records navigation mode, active scope, visible node
 count, jump option count, selected-node visibility, console errors, and
 private/key-shaped text checks.
+
+The Compaction Audit panel is fixture-only and metrics-only. It shows input
+event count, output candidate count, redaction count, skipped noise count,
+chronology, exact-identifier preservation, privacy leak count, and candidate
+fingerprints. It does not show raw session text or candidate memory text. The
+browser evidence records `fixture-local-session-compaction-audit`,
+`metricsOnly: true`, `writesRealFiles: false`, zero privacy leaks, zero console
+errors, and no private/key-shaped visible text.
 
 The Lifecycle Policy panel stages recall and write-policy choices as a fixture
 draft export. It clamps numeric settings, limits low-confidence write behavior

@@ -7,6 +7,7 @@ import {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildResearchLineage,
+  buildSessionCompactionAudit,
   containsPrivateLikeText,
   filteredNodes as selectFilteredNodes,
   graphScopedNodes,
@@ -25,6 +26,7 @@ const state = {
   edits: readEdits(),
   vault: null,
   syncReport: null,
+  sessionCompactionAudit: null,
   selectedVaultPath: "",
   localAudit: null,
   localBrowse: null,
@@ -58,6 +60,9 @@ const provenance = document.querySelector("#provenance");
 const snapshotSummary = document.querySelector("#snapshotSummary");
 const snapshotExport = document.querySelector("#snapshotExport");
 const researchLineage = document.querySelector("#researchLineage");
+const compactionAuditSummary = document.querySelector("#compactionAuditSummary");
+const compactionAuditFingerprints = document.querySelector("#compactionAuditFingerprints");
+const compactionAuditExport = document.querySelector("#compactionAuditExport");
 const policySummary = document.querySelector("#policySummary");
 const policyForm = document.querySelector("#policyForm");
 const policyForceRecall = document.querySelector("#policyForceRecall");
@@ -150,16 +155,18 @@ const exportStatus = document.querySelector("#exportStatus");
 const editExport = document.querySelector("#editExport");
 const timelineList = document.querySelector("#timelineList");
 
-const [response, vaultResponse, syncResponse, localAuditResponse, localBrowseResponse] = await Promise.all([
+const [response, vaultResponse, syncResponse, sessionCompactionResponse, localAuditResponse, localBrowseResponse] = await Promise.all([
   fetch("/fixtures/nucleus.fixture.json"),
   fetch("/fixtures/wiki-vault.json"),
   fetch("/fixtures/wiki-sync-report.json"),
+  fetch("/fixtures/session-compaction-local-audit.json"),
   fetch("/fixtures/local-container-audit.json"),
   fetch("/fixtures/local-container-browse.json"),
 ]);
 state.snapshot = await response.json();
 state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
+state.sessionCompactionAudit = await sessionCompactionResponse.json();
 state.localAudit = await localAuditResponse.json();
 state.localBrowse = await localBrowseResponse.json();
 state.query = searchInput.value;
@@ -467,6 +474,7 @@ function render() {
   renderDetails(selected);
   renderNucleusSnapshot();
   renderResearchLineage();
+  renderSessionCompactionAudit();
   renderLifecyclePolicy();
   renderLifecyclePolicyApply();
   renderReviewQueue();
@@ -679,6 +687,36 @@ function renderResearchLineage() {
     card.append(title, meta, list);
     researchLineage.append(card);
   }
+}
+
+function renderSessionCompactionAudit() {
+  const packet = buildSessionCompactionAudit(state.sessionCompactionAudit);
+  compactionAuditSummary.replaceChildren(
+    stat("Mode", packet.metricsOnly ? "metrics-only" : "needs review"),
+    stat("Events", packet.input.eventCount),
+    stat("Candidates", packet.metrics.outputCandidates),
+    stat("Leaks", packet.quality.privacyLeakCount),
+    stat("Redactions", packet.metrics.redactionCount),
+    stat("Noise skipped", packet.metrics.skippedNoise),
+    stat("Chronological", packet.metrics.chronological ? "yes" : "no"),
+    stat("Exact IDs", packet.quality.exactIdentifierCandidateCount),
+  );
+
+  compactionAuditFingerprints.replaceChildren();
+  for (const candidate of packet.candidateFingerprints) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    const meta = document.createElement("small");
+    item.dataset.kind = candidate.kind;
+    label.textContent = candidate.kind;
+    value.textContent = `${Math.round(candidate.salience * 100)}% salience, ${candidate.reasonCount} reasons`;
+    meta.textContent = `${candidate.idHash} | ${formatTime(candidate.observedAt)} | ${candidate.sourceEventCount} source event${candidate.sourceEventCount === 1 ? "" : "s"}`;
+    item.append(label, value, meta);
+    compactionAuditFingerprints.append(item);
+  }
+
+  compactionAuditExport.textContent = JSON.stringify(packet, null, 2);
 }
 
 function renderLifecyclePolicy() {

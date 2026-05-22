@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "mode": "fixture-brain-ui-compaction-audit",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "head": "8869886098bb56ed29fc223ffba06956852144ad",
+  "url": "http://127.0.0.1:4177/",
+  "evidence": {
+    "candidateTextVisible": false,
+    "chronological": true,
+    "eventCount": 6,
+    "exactIdentifierCandidateCount": 1,
+    "exportHasCandidateText": false,
+    "exportHasPrivateOrKeyText": false,
+    "fingerprintCount": 4,
+    "hasCompactionHeading": true,
+    "hasPrivateOrKeyText": false,
+    "metricsOnly": true,
+    "mode": "fixture-local-session-compaction-audit",
+    "outputCandidates": 4,
+    "privacyLeakCount": 0,
+    "redactionCount": 2,
+    "summaryText": "metrics-onlyMode6Events4Candidates0Leaks2Redactions2Noise skippedyesChronological1Exact IDs",
+    "writesRealFiles": false
+  },
+  "consoleErrorCount": 0,
+  "consoleMessages": []
+}

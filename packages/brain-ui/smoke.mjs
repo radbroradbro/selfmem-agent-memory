@@ -9,7 +9,19 @@ try {
   const address = server.address();
   assert(address && typeof address === "object");
   const base = `http://127.0.0.1:${address.port}`;
-  const [index, app, model, styles, fixture, vault, syncReport, localAudit, localBrowse, health] = await Promise.all([
+  const [
+    index,
+    app,
+    model,
+    styles,
+    fixture,
+    vault,
+    syncReport,
+    sessionCompactionAudit,
+    localAudit,
+    localBrowse,
+    health,
+  ] = await Promise.all([
     text(`${base}/`),
     text(`${base}/app.js`),
     text(`${base}/model.js`),
@@ -17,6 +29,7 @@ try {
     json(`${base}/fixtures/nucleus.fixture.json`),
     json(`${base}/fixtures/wiki-vault.json`),
     json(`${base}/fixtures/wiki-sync-report.json`),
+    json(`${base}/fixtures/session-compaction-local-audit.json`),
     json(`${base}/fixtures/local-container-audit.json`),
     json(`${base}/fixtures/local-container-browse.json`),
     json(`${base}/healthz`),
@@ -29,6 +42,7 @@ try {
   assert.match(index, /Container/);
   assert.match(index, /Nucleus Snapshot/);
   assert.match(index, /Research Lineage/);
+  assert.match(index, /Compaction Audit/);
   assert.match(index, /Lifecycle Policy/);
   assert.match(index, /Selected local lifecycle policy apply/);
   assert.match(index, /Review Queue/);
@@ -50,6 +64,7 @@ try {
   assert.match(app, /buildGraphLayout/);
   assert.match(app, /buildNucleusExport/);
   assert.match(app, /buildResearchLineage/);
+  assert.match(app, /buildSessionCompactionAudit/);
   assert.match(app, /buildLifecyclePolicyDraft/);
   assert.match(app, /buildMemoryReviewQueue/);
   assert.match(app, /renderLifecyclePolicy/);
@@ -72,6 +87,7 @@ try {
   assert.match(model, /function buildGraphNavigation/);
   assert.match(model, /function buildGraphLayout/);
   assert.match(model, /function graphScopedNodes/);
+  assert.match(model, /function buildSessionCompactionAudit/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
   assert.match(model, /function buildMemoryReviewQueue/);
   assert.match(model, /function mergeSelectedAuditTrail/);
@@ -112,6 +128,18 @@ try {
   assert.ok(syncReport.report.summary.write > 0);
   assert.ok(syncReport.report.summary.write_conflict_note >= 1);
   assert.ok(syncReport.report.actions.some((action) => action.action === "write_conflict_note" && action.conflictPath));
+  assert.equal(sessionCompactionAudit.ok, true);
+  assert.equal(sessionCompactionAudit.mode, "local-session-compaction-audit");
+  assert.equal(sessionCompactionAudit.writesRealFiles, false);
+  assert.equal(sessionCompactionAudit.metricsOnly, true);
+  assert.equal(sessionCompactionAudit.input.eventCount, 6);
+  assert.equal(sessionCompactionAudit.metrics.redactionCount, 2);
+  assert.equal(sessionCompactionAudit.metrics.outputCandidates, 4);
+  assert.equal(sessionCompactionAudit.metrics.chronological, true);
+  assert.equal(sessionCompactionAudit.quality.privacyLeakCount, 0);
+  assert.equal(sessionCompactionAudit.quality.exactIdentifierCandidateCount, 1);
+  assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
+  assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
   assert.equal(localAudit.ok, true);
   assert.equal(localAudit.report.mode, "local-container-audit");
   assert.equal(localAudit.report.writesRealFiles, false);
@@ -193,6 +221,7 @@ try {
     fixture,
     vault,
     syncReport,
+    sessionCompactionAudit,
     localAudit,
     localBrowse,
     disabledLocalAudit,
@@ -217,6 +246,7 @@ try {
           "fixture",
           "dynamic-graph-layout",
           "graph-navigation-controls",
+          "session-compaction-audit",
           "lifecycle-policy",
           "review-queue",
           "wiki-vault",

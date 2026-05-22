@@ -100,6 +100,10 @@ Scope:
   and the fixture evidence must report selected-node visibility, active
   neighborhood scope, zero console errors, and no private/key-shaped visible
   text.
+- Added Brain UI Compaction Audit evidence to the release gate. The UI now
+  exposes metrics-only local-session audit output, candidate fingerprints,
+  chronology, exact-identifier preservation, and privacy status without raw
+  session text or candidate memory text.
 - Added Gemini review for the browser evidence gate and made that review packet
   a required release-readiness artifact.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
@@ -139,6 +143,9 @@ What `release:check` verifies:
   `dynamic-graph-layout` mode with zero overlaps,
 - Brain UI graph navigation controls evidence exists and reports neighborhood
   scope, jump options, selected-node visibility, and public-safe text,
+- Brain UI Compaction Audit evidence exists and reports metrics-only mode,
+  chronological output, candidate fingerprints, exact-identifier coverage, zero
+  privacy leaks, zero console errors, and no raw candidate text,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,
@@ -173,6 +180,7 @@ Verification:
 - Fresh Brain UI interaction smoke: covered by `release:check`.
 - Fresh dynamic graph layout smoke: covered by `release:check`.
 - Fresh graph navigation controls smoke: covered by `release:check`.
+- Fresh Brain UI Compaction Audit smoke: covered by `release:check`.
 - Fresh local-session compaction audit: covered by `release:check`.
 - Core package dry-run: covered by `release:check`.
 - Broadened secret-pattern scan: covered by `release:check`.
@@ -212,7 +220,7 @@ Cold review response:
   local memory materialize, selected vault sync dry-run, write-confirmed selected vault sync apply,
   write-confirmed selected lifecycle policy apply, private/key-shaped policy
   rejection, dry-run sync reporting, write-confirmed selected review queue
-  apply, private/key-shaped review rejection, dynamic graph layout spacing, graph navigation controls, audit-log write intent coverage,
+  apply, private/key-shaped review rejection, dynamic graph layout spacing, graph navigation controls, Compaction Audit metrics-only rendering, audit-log write intent coverage,
   and public-safe serialization.
 
 Known limits:

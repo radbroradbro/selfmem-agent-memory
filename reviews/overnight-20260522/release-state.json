@@ -49,6 +49,7 @@
     "brain-ui-selected-local-memory-materialize",
     "brain-ui-dynamic-graph-layout",
     "brain-ui-graph-navigation-controls",
+    "brain-ui-session-compaction-audit",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
     "selfmem-update"

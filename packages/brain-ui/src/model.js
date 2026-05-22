@@ -148,6 +148,55 @@ function buildResearchLineage(snapshot) {
   };
 }
 
+function buildSessionCompactionAudit(report) {
+  const candidateFingerprints = Array.isArray(report?.candidateFingerprints)
+    ? report.candidateFingerprints.map((candidate) => ({
+        idHash: safeExportText(candidate?.idHash ?? ""),
+        kind: safeExportText(candidate?.kind ?? "memory"),
+        stale: Boolean(candidate?.stale),
+        salience: score(candidate?.salience),
+        reasonCount: numeric(candidate?.reasonCount),
+        sourceEventCount: numeric(candidate?.sourceEventCount),
+        observedAt: safeTimestamp(candidate?.observedAt, "1970-01-01T00:00:00.000Z"),
+      }))
+    : [];
+  return {
+    schemaVersion: 1,
+    mode: "fixture-local-session-compaction-audit",
+    writesRealFiles: false,
+    metricsOnly: true,
+    ok: Boolean(report?.ok),
+    input: {
+      source: safeExportText(report?.input?.source ?? "codex"),
+      sessionIdHash: safeExportText(report?.input?.sessionIdHash ?? ""),
+      inputPathDisplay: normalizeRootDisplay(report?.input?.inputPathDisplay ?? "session-compaction-local-audit.fixture.jsonl"),
+      eventCount: numeric(report?.input?.eventCount),
+    },
+    metrics: {
+      inputEvents: numeric(report?.metrics?.inputEvents),
+      redactionCount: numeric(report?.metrics?.redactionCount),
+      skippedFullyPrivate: numeric(report?.metrics?.skippedFullyPrivate),
+      skippedNoise: numeric(report?.metrics?.skippedNoise),
+      outputCandidates: numeric(report?.metrics?.outputCandidates),
+      chronological: report?.metrics?.chronological === true,
+      noiseReductionRatio: numeric(report?.metrics?.noiseReductionRatio),
+    },
+    quality: {
+      candidateCount: numeric(report?.quality?.candidateCount),
+      kindCounts: safeNumberMap(report?.quality?.kindCounts),
+      staleCandidateCount: numeric(report?.quality?.staleCandidateCount),
+      exactIdentifierCandidateCount: numeric(report?.quality?.exactIdentifierCandidateCount),
+      averageSalience: numeric(report?.quality?.averageSalience),
+      salienceBands: safeNumberMap(report?.quality?.salienceBands),
+      firstObservedAt: safeOptionalTimestamp(report?.quality?.firstObservedAt),
+      lastObservedAt: safeOptionalTimestamp(report?.quality?.lastObservedAt),
+      privacyLeakCount: numeric(report?.quality?.privacyLeakCount),
+    },
+    candidateFingerprints,
+    strict: Boolean(report?.strict),
+  };
+}
+
 function buildContainerHealth(snapshot) {
   const fixtureContainer = snapshot.roots?.container ?? {};
   const memoryKinds = ["memory", "derived_doc", "retrieval_trace", "lifecycle_event", "research_query", "decision", "hypothesis"];
@@ -342,6 +391,11 @@ function safeTimestamp(value, fallback = new Date().toISOString()) {
   return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
 }
 
+function safeOptionalTimestamp(value) {
+  if (!value) return null;
+  return safeTimestamp(value, "1970-01-01T00:00:00.000Z");
+}
+
 function booleanSetting(value, fallback) {
   if (typeof value === "boolean") return value;
   return Boolean(fallback);
@@ -368,6 +422,14 @@ function safeStatusMap(value) {
     safeChoice(status, ["enabled", "disabled"], "disabled"),
   ]);
   return Object.fromEntries(entries);
+}
+
+function safeNumberMap(value) {
+  return Object.fromEntries(
+    Object.entries(value ?? {})
+      .map(([key, count]) => [safeExportText(key), numeric(count)])
+      .filter(([key]) => key),
+  );
 }
 
 function summarizePolicyChanges(original, draft) {
@@ -549,6 +611,7 @@ export {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildResearchLineage,
+  buildSessionCompactionAudit,
   buildSelectedAuditTrailEntry,
   containsPrivateLikeText,
   filteredNodes,

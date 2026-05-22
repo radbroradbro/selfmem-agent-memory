@@ -16,16 +16,22 @@ The current PR adds:
   content-free pre-write audit logging;
 - a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
-  lineage, vault preview, sync-report inspection, selected vault sync dry-run,
-  selected vault sync apply, selected local-container browse, lifecycle policy
-  preview, selected lifecycle policy apply, memory review queue preview, and
-  selected review queue apply, selected local memory edit overlay, local edit
-  overlay browse visibility, and selected local memory materialize;
+  lineage, Compaction Audit, vault preview, sync-report inspection,
+  selected vault sync dry-run, selected vault sync apply, selected
+  local-container browse, lifecycle policy preview, selected lifecycle policy apply, memory
+  review queue preview, and selected review queue apply, selected local memory
+  edit overlay, local edit overlay browse visibility, and selected local memory
+  materialize;
 - a dry-run-first `selfmem_update` command for agent update workflows;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
   Hermes, and OpenClaw exports.
+
+Preview surfaces include selected local-container browse, selected vault sync
+dry-run, selected vault sync apply, lifecycle policy, lifecycle policy apply,
+memory review queue, review queue apply, local memory edit, overlay browse,
+materialize, dynamic graph layout, graph navigation, and Compaction Audit.
 
 ## Safety Boundary
 
@@ -78,6 +84,9 @@ Latest verified head before this draft refresh:
 - Graph navigation evidence: neighborhood scope, 3 visible fixture nodes, 9
   jump options, selected-node visibility, zero console errors, and no
   private/key-shaped visible text
+- Compaction Audit evidence: metrics-only fixture output, 6 input events, 4
+  candidate fingerprints, chronological output, zero privacy leaks, zero
+  console errors, and no raw candidate text
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
 - Completion audit: not complete, with public launch still blocked on human

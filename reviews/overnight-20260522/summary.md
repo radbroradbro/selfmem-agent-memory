@@ -69,6 +69,7 @@ is still required before any public live update.
 | Brain UI memory review queue apply review | `reviews/overnight-20260522/gemini-brain-ui-review-queue-apply-review.md` |
 | Brain UI Nucleus snapshot | `reviews/overnight-20260522/brain-ui-nucleus-snapshot-evidence.md` |
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
+| Brain UI compaction audit | `reviews/overnight-20260522/brain-ui-compaction-audit-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
 | Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Browser evidence gate review | `reviews/overnight-20260522/gemini-browser-evidence-gate-review.md` |
@@ -201,6 +202,10 @@ Sanitized fixture evidence exists under
 - graph navigation evidence records all-vs-neighborhood scope, 3 visible
   neighborhood nodes, 9 jump options, selected-node visibility, zero console
   errors, and no private/key-shaped visible text
+- compaction audit evidence records metrics-only mode, 6 fixture input events,
+  4 candidate fingerprints, 2 redactions, chronological output, 1
+  exact-identifier candidate, zero privacy leaks, zero console errors, and no
+  raw candidate text
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real

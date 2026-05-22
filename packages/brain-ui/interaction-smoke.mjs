@@ -12,6 +12,7 @@ import {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildResearchLineage,
+  buildSessionCompactionAudit,
   containsPrivateLikeText,
   filteredNodes,
   graphScopedNodes,
@@ -22,6 +23,7 @@ import { createBrainUiServer } from "./server.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
+const sessionCompactionFixture = JSON.parse(await readFile(join(here, "fixtures/session-compaction-local-audit.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
 const selectedPolicyRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-policy-"));
@@ -192,6 +194,20 @@ try {
   assert.ok(lineageKinds.has("research_query"));
   assert.ok(lineageKinds.has("hypothesis"));
   assert.ok(lineageKinds.has("decision"));
+
+  const sessionCompactionAudit = buildSessionCompactionAudit(sessionCompactionFixture);
+  assert.equal(sessionCompactionAudit.mode, "fixture-local-session-compaction-audit");
+  assert.equal(sessionCompactionAudit.writesRealFiles, false);
+  assert.equal(sessionCompactionAudit.metricsOnly, true);
+  assert.equal(sessionCompactionAudit.input.eventCount, 6);
+  assert.equal(sessionCompactionAudit.metrics.redactionCount, 2);
+  assert.equal(sessionCompactionAudit.metrics.outputCandidates, 4);
+  assert.equal(sessionCompactionAudit.metrics.chronological, true);
+  assert.equal(sessionCompactionAudit.quality.privacyLeakCount, 0);
+  assert.equal(sessionCompactionAudit.quality.exactIdentifierCandidateCount, 1);
+  assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
+  assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
+  assert.doesNotMatch(JSON.stringify(sessionCompactionAudit), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const policyDraft = buildLifecyclePolicyDraft(fixture, {
     forceEveryTurn: true,
@@ -612,6 +628,7 @@ try {
     unsafeExport,
     nucleusExport,
     lineage,
+    sessionCompactionAudit,
     policyDraft,
     clampedPolicyDraft,
     missingPolicyApplyConfirmation,
@@ -671,6 +688,7 @@ try {
           "draft-export",
           "nucleus-export",
           "research-lineage",
+          "session-compaction-audit",
           "lifecycle-policy-draft",
           "selected-lifecycle-policy-apply",
           "review-queue-draft",
