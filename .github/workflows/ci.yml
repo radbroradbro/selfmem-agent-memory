@@ -23,13 +23,13 @@ jobs:
           node-version: 22
 
       - name: Install
-        run: npm exec --yes pnpm@10.23.0 -- install --frozen-lockfile
+        run: npm exec --yes --package=pnpm@10.23.0 -- pnpm install --frozen-lockfile
 
       - name: Test
-        run: npm exec --yes pnpm@10.23.0 -- test
+        run: npm exec --yes --package=pnpm@10.23.0 -- pnpm test
 
       - name: Full smoke
-        run: npm exec --yes pnpm@10.23.0 -- smoke
+        run: npm exec --yes --package=pnpm@10.23.0 -- pnpm smoke
 
       - name: Release readiness check
-        run: npm exec --yes pnpm@10.23.0 -- release:check
+        run: npm exec --yes --package=pnpm@10.23.0 -- pnpm release:check
