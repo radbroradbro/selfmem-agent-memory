@@ -29,9 +29,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `6a8bbf09ef6e24ed12c30e0fcff1fe185100e907`.
+- Latest code/product baseline: `4b2ec839cddbce73540d3aea02b4b81f2a474e6a`.
+- GitHub Actions run `26316961518`: passed CI after the strict-real update guard.
+- Previous verified baseline before the strict-real update guard:
+  `6a8bbf09ef6e24ed12c30e0fcff1fe185100e907`.
 - GitHub Actions run `26316450928`: passed CI after the Brain UI lifecycle trail evidence refresh.
-- Previous verified baseline before the latest lifecycle trail evidence refresh:
+- Previous verified baseline before the lifecycle trail evidence refresh:
   `8777290169f598ff9172e889e927858b3956f764`.
 - GitHub Actions run `26316074705`: passed CI after the Brain UI lifecycle trail and current-head browser evidence refresh.
 - Earlier verified baseline before the lifecycle trail browser evidence refresh:

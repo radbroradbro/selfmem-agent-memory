@@ -94,9 +94,8 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `6a8bbf0`
-- GitHub Actions: CI run `26316450928` passed for the Brain UI lifecycle trail
-  evidence refresh
+- Latest verified code baseline: `4b2ec83`
+- GitHub Actions: CI run `26316961518` passed for the strict-real update guard
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -132,6 +131,8 @@ Latest verified head before this draft refresh:
   lifecycle trail and current-head browser evidence refresh.
 - GitHub Actions CI run `26316450928` passed on `6a8bbf0`, the lifecycle
   trail evidence refresh.
+- GitHub Actions CI run `26316961518` passed on `4b2ec83`, the strict-real
+  update guard.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
