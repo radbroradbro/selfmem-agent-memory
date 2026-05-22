@@ -8,6 +8,15 @@ FORBIDDEN: Resource not accessible by integration
 
 Paste this body into PR #5 when repository permissions allow it.
 
+Retry note:
+
+- A direct PR body update was retried after CI run #44 and still returned the
+  same 403.
+- A top-level PR comment with a concise status refresh was also attempted and
+  returned the same 403.
+- The PR body below is therefore the public-safe source of truth until a human
+  can paste it or GitHub integration permissions change.
+
 ```markdown
 ## Summary
 

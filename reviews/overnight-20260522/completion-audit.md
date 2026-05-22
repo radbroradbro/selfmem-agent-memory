@@ -51,7 +51,7 @@ complete or publish a public live update.
 | Claude reviewer route | `reviews/overnight-20260522/claude-pr5-review-blocked.md` | Blocked by missing login |
 | Production-readiness review | `reviews/overnight-20260522/production-readiness.md` | Completed with verdict `FAIL` |
 | Public launch messaging | `reviews/overnight-20260522/public-live-update-draft.md`, `dummy-brain-demo-storyboard.md`, Gemini copy review | Proven as draft only |
-| PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body |
+| PR body reflects current state | `reviews/overnight-20260522/pr-body-update-draft.md` | Blocked: GitHub connector returned 403 when updating PR body and when adding a PR status comment |
 | External blocker issue exists | `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md` | Blocked: GitHub connector returned 403 when creating the issue |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
 | GitHub Actions | `CI / Verify` run #43 on `9e6554c` passed Test, Full smoke, and Release readiness check | Proven |
@@ -64,7 +64,8 @@ complete or publish a public live update.
 1. Claude/Opus cold review remains blocked until the Claude CLI is logged in or
    the owner explicitly accepts the blocked route.
 2. PR #5 body is stale. A paste-ready replacement exists, but the GitHub app
-   cannot update the PR body with its current permissions.
+   cannot update the PR body or add a top-level PR status comment with its
+   current permissions.
 3. A GitHub blocker issue draft exists, but the GitHub app cannot create the
    issue with its current permissions.
 4. The public launch verdict remains `FAIL`. Human approval is required before

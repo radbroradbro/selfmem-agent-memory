@@ -46,7 +46,7 @@ is still required before any public live update.
 | Public live-update draft | `reviews/overnight-20260522/public-live-update-draft.md` |
 | Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
 | Public live-update copy review | `reviews/overnight-20260522/gemini-public-live-update-copy-review.md` |
-| PR body update draft | `reviews/overnight-20260522/pr-body-update-draft.md` |
+| PR body/comment update draft | `reviews/overnight-20260522/pr-body-update-draft.md` |
 | GitHub issue creation blocker | `reviews/overnight-20260522/github-issue-create-blocked.md` |
 | Blocker permission refresh review | `reviews/overnight-20260522/gemini-blocker-permission-refresh-review.md` |
 | Completion audit | `reviews/overnight-20260522/completion-audit.md` |
@@ -163,8 +163,8 @@ local memory contents.
   marketing.
 - The post-12-hour production-ready verdict remains `FAIL` for public launch.
   Fresh controller and CI checks pass, but Claude remains blocked, the GitHub
-  app cannot update the PR body or create the blocker issue, and a human release
-  decision has not been made.
+  app cannot update the PR body, add a PR status comment, or create the blocker
+  issue, and a human release decision has not been made.
 
 ## Next Recommended Slice
 

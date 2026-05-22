@@ -6,10 +6,13 @@ Scope:
 
 - Tried to create a public-safe blocker issue from
   `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`.
+- Tried to add a public-safe top-level PR status comment after the latest
+  controller refresh.
 
 Result:
 
-- Blocked. The GitHub connector returned:
+- Blocked. The GitHub connector returned this 403 for both issue creation and
+  PR commenting:
 
 ```text
 FORBIDDEN: Resource not accessible by integration
@@ -24,4 +27,3 @@ Follow-up:
   `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`
   when repository permissions allow it.
 - Or explicitly accept the missing issue as part of the human release decision.
-
