@@ -152,3 +152,5 @@ Known limits:
   Reinspect Actions after any later branch push.
 - GitHub Actions CI run `26289073223` passed on release-state guard commit
   `dd17f44` after the Gemini guard review became required.
+- GitHub Actions CI run `26290534116` passed on guarded selected vault sync
+  apply commit `103e7c6`.

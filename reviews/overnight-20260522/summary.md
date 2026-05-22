@@ -17,11 +17,12 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `2888f91`
+  `103e7c6`, run `26290534116`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
 - GitHub Actions CI run `26288370812` on `2888f91`: success.
+- GitHub Actions CI run `26290534116` on `103e7c6`: success.
 
 ## Shipped Overnight Slices
 
@@ -76,9 +77,11 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions CI: success on the latest inspected baseline, `2888f91`.
+- GitHub Actions CI: success on the latest inspected baseline, `103e7c6`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
+- GitHub Actions CI: success on guarded selected vault sync apply commit
+  `103e7c6`, run `26290534116`.
 
 ## UI Evidence
 

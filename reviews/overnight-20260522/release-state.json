@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T12:41:53Z",
+  "generatedAt": "2026-05-22T13:28:58Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "2888f9123643e0acfd3a66c9855a54214f99ed3f",
-    "ciRunId": 26288370812,
+    "headSha": "103e7c606b93988f27f22ffc19bd4386b41b23b0",
+    "ciRunId": 26290534116,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline before release-state guard commits. Later guard/docs commits must pass CI but do not change runtime evidence."
+    "note": "This is the latest inspected code/product baseline after the guarded selected vault sync apply slice. Later evidence-only guard/docs commits must pass CI but do not change runtime behavior."
   },
   "releaseStateGuard": {
     "enabled": true,
