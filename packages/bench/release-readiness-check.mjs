@@ -41,6 +41,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-compaction-audit-review.md`,
   `${reviewDir}/brain-ui-context-preview-evidence.md`,
   `${reviewDir}/gemini-brain-ui-context-preview-review.md`,
+  `${reviewDir}/brain-ui-release-readiness-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-release-readiness-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-evidence.md`,
   `${reviewDir}/gemini-brain-ui-lifecycle-policy-review.md`,
   `${reviewDir}/brain-ui-lifecycle-policy-apply-evidence.md`,
@@ -108,6 +110,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-compaction-audit.png`,
   `${reviewDir}/ui-evidence/brain-ui-context-preview-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-context-preview.png`,
+  `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-release-readiness.png`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
   `${reviewDir}/ui-evidence/brain-ui-review-queue-dom-evidence.json`,
@@ -380,6 +384,32 @@ check("dom evidence is sane", () => {
   assert.equal(contextPreviewEvidence.evidence.hasPrivateOrKeyText, false);
   assert.equal(contextPreviewEvidence.consoleErrorCount, 0);
 
+  const releaseReadinessEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-release-readiness-evidence.json"), "utf8"),
+  );
+  assert.equal(releaseReadinessEvidence.ok, true);
+  assert.equal(releaseReadinessEvidence.mode, "fixture-brain-ui-release-readiness");
+  assert.equal(releaseReadinessEvidence.writesRealFiles, false);
+  assert.equal(releaseReadinessEvidence.evidence.hasReleaseReadinessHeading, true);
+  assert.equal(releaseReadinessEvidence.evidence.mode, "fixture-release-readiness-console");
+  assert.equal(releaseReadinessEvidence.evidence.writesRealFiles, false);
+  assert.equal(releaseReadinessEvidence.evidence.metricsOnly, true);
+  assert.equal(releaseReadinessEvidence.evidence.verdict, "FAIL");
+  assert.equal(releaseReadinessEvidence.evidence.statusDataVerdict, "FAIL");
+  assert.equal(releaseReadinessEvidence.evidence.productionReady, false);
+  assert.equal(releaseReadinessEvidence.evidence.codeCiConclusion, "success");
+  assert.ok(releaseReadinessEvidence.evidence.blockerCount >= 4);
+  assert.ok(releaseReadinessEvidence.evidence.surfaceCount >= 10);
+  assert.ok(releaseReadinessEvidence.evidence.manualActionCount >= 4);
+  assert.equal(releaseReadinessEvidence.evidence.privacyLeakCount, 0);
+  assert.equal(releaseReadinessEvidence.evidence.fixtureOnly, true);
+  assert.equal(releaseReadinessEvidence.evidence.hostedWriteBackDisabled, true);
+  assert.equal(releaseReadinessEvidence.evidence.hasHumanApprovalBlocker, true);
+  assert.equal(releaseReadinessEvidence.evidence.hasClaudeBlocker, true);
+  assert.equal(releaseReadinessEvidence.evidence.hasManualCanaryAction, true);
+  assert.equal(releaseReadinessEvidence.evidence.hasPrivateOrKeyText, false);
+  assert.equal(releaseReadinessEvidence.consoleErrorCount, 0);
+
   const policyEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json"), "utf8"),
   );
@@ -529,6 +559,7 @@ check("release state is conservative", () => {
     "brain-ui-graph-navigation-controls",
     "brain-ui-session-compaction-audit",
     "brain-ui-prompt-context-preview",
+    "brain-ui-release-readiness-console",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
     "selfmem-update",
@@ -569,6 +600,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /graph navigation|jump-to-node|neighborhood scope|all-vs-neighborhood/i, `${file} missing graph navigation`);
     assert.match(text, /compaction audit|local-session compaction/i, `${file} missing compaction audit`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
+    assert.match(text, /release readiness|public launch verdict|production ready/i, `${file} missing release readiness`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });

@@ -19,6 +19,7 @@ try {
     syncReport,
     sessionCompactionAudit,
     promptContextPreview,
+    releaseReadiness,
     localAudit,
     localBrowse,
     health,
@@ -32,6 +33,7 @@ try {
     json(`${base}/fixtures/wiki-sync-report.json`),
     json(`${base}/fixtures/session-compaction-local-audit.json`),
     json(`${base}/fixtures/prompt-context-preview.json`),
+    json(`${base}/fixtures/release-readiness.json`),
     json(`${base}/fixtures/local-container-audit.json`),
     json(`${base}/fixtures/local-container-browse.json`),
     json(`${base}/healthz`),
@@ -46,6 +48,7 @@ try {
   assert.match(index, /Research Lineage/);
   assert.match(index, /Compaction Audit/);
   assert.match(index, /Context Preview/);
+  assert.match(index, /Release Readiness/);
   assert.match(index, /Lifecycle Policy/);
   assert.match(index, /Selected local lifecycle policy apply/);
   assert.match(index, /Review Queue/);
@@ -69,6 +72,7 @@ try {
   assert.match(app, /buildResearchLineage/);
   assert.match(app, /buildSessionCompactionAudit/);
   assert.match(app, /buildPromptContextPreview/);
+  assert.match(app, /buildReleaseReadinessConsole/);
   assert.match(app, /buildLifecyclePolicyDraft/);
   assert.match(app, /buildMemoryReviewQueue/);
   assert.match(app, /renderLifecyclePolicy/);
@@ -94,6 +98,7 @@ try {
   assert.match(model, /function graphScopedNodes/);
   assert.match(model, /function buildSessionCompactionAudit/);
   assert.match(model, /function buildPromptContextPreview/);
+  assert.match(model, /function buildReleaseReadinessConsole/);
   assert.match(model, /function buildLifecyclePolicyDraft/);
   assert.match(model, /function buildMemoryReviewQueue/);
   assert.match(model, /function mergeSelectedAuditTrail/);
@@ -113,6 +118,7 @@ try {
   assert.match(styles, /selected-audit/);
   assert.match(styles, /audit-history/);
   assert.match(styles, /context-section-list/);
+  assert.match(styles, /release-verdict/);
   assert.match(styles, /edit-export/);
   assert.equal(fixture.schemaVersion, 1);
   assert.equal(fixture.roots.container.writeMode, "local-only");
@@ -156,6 +162,18 @@ try {
   assert.ok(promptContextPreview.selectedMemories.length >= 3);
   assert.ok(promptContextPreview.sections.some((section) => section.title === "Active Recall"));
   assert.ok(promptContextPreview.omittedCandidates.some((candidate) => candidate.reason.includes("noise")));
+  assert.equal(releaseReadiness.mode, "release-readiness-console");
+  assert.equal(releaseReadiness.publicLaunchVerdict, "FAIL");
+  assert.equal(releaseReadiness.productionReady, false);
+  assert.equal(releaseReadiness.safetyBoundary.usesFixtureUiEvidence, true);
+  assert.equal(releaseReadiness.safetyBoundary.commitsRawMemories, false);
+  assert.equal(releaseReadiness.safetyBoundary.commitsRawTranscripts, false);
+  assert.equal(releaseReadiness.safetyBoundary.commitsCredentials, false);
+  assert.equal(releaseReadiness.safetyBoundary.enablesHostedWriteBack, false);
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion, "success");
+  assert.ok(releaseReadiness.provenPreviewSurfaces.includes("brain-ui-prompt-context-preview"));
+  assert.ok(releaseReadiness.remainingBlockers.includes("human-public-launch-approval-required"));
+  assert.ok(releaseReadiness.manualActions.length >= 4);
   assert.equal(localAudit.ok, true);
   assert.equal(localAudit.report.mode, "local-container-audit");
   assert.equal(localAudit.report.writesRealFiles, false);
@@ -239,6 +257,7 @@ try {
     syncReport,
     sessionCompactionAudit,
     promptContextPreview,
+    releaseReadiness,
     localAudit,
     localBrowse,
     disabledLocalAudit,
@@ -265,6 +284,7 @@ try {
           "graph-navigation-controls",
           "session-compaction-audit",
           "prompt-context-preview",
+          "release-readiness-console",
           "lifecycle-policy",
           "review-queue",
           "wiki-vault",

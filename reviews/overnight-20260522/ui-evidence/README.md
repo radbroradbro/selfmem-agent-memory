@@ -104,6 +104,13 @@
   omitted candidates, hosted read-through as read-only, local-only write mode,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
   text.
+- The Release Readiness slice was verified by Codex Browser DOM evidence,
+  fresh Brain UI smoke, and interaction smoke. A fixture-only screenshot was
+  captured at `brain-ui-release-readiness.png`, and
+  `brain-ui-release-readiness-evidence.json` reports public launch verdict
+  `FAIL`, `productionReady: false`, 15 proven preview surfaces, 5 blockers, 5
+  manual actions, hosted write-back disabled, zero privacy leaks, zero console
+  errors, and no private/key-shaped visible text.
 - Codex Browser loaded browser evidence baseline `96ae9cc` and captured fresh
   Browser DOM evidence in
   `brain-ui-browser-dom-evidence.json`.

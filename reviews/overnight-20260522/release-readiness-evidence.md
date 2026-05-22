@@ -146,6 +146,14 @@ What `release:check` verifies:
 - Brain UI Compaction Audit evidence exists and reports metrics-only mode,
   chronological output, candidate fingerprints, exact-identifier coverage, zero
   privacy leaks, zero console errors, and no raw candidate text,
+- Brain UI Context Preview evidence exists and reports selected memories,
+  omitted candidates, token budget, read-only hosted mode, local-only writes,
+  zero privacy leaks, zero console errors, and no private/key-shaped visible
+  text,
+- Brain UI Release Readiness evidence exists and reports public launch verdict
+  `FAIL`, `productionReady: false`, blocker count, manual actions, fixture-only
+  evidence, hosted write-back disabled, zero privacy leaks, zero console
+  errors, and no private/key-shaped visible text,
 - Codex Browser DOM evidence is sane,
 - release-state manifest is conservative and lists required blockers,
 - release docs mention current preview surfaces,
@@ -181,6 +189,8 @@ Verification:
 - Fresh dynamic graph layout smoke: covered by `release:check`.
 - Fresh graph navigation controls smoke: covered by `release:check`.
 - Fresh Brain UI Compaction Audit smoke: covered by `release:check`.
+- Fresh Brain UI Context Preview smoke: covered by `release:check`.
+- Fresh Brain UI Release Readiness smoke: covered by `release:check`.
 - Fresh local-session compaction audit: covered by `release:check`.
 - Core package dry-run: covered by `release:check`.
 - Broadened secret-pattern scan: covered by `release:check`.
@@ -222,7 +232,7 @@ Cold review response:
   local memory materialize, selected vault sync dry-run, write-confirmed selected vault sync apply,
   write-confirmed selected lifecycle policy apply, private/key-shaped policy
   rejection, dry-run sync reporting, write-confirmed selected review queue
-  apply, private/key-shaped review rejection, dynamic graph layout spacing, graph navigation controls, Compaction Audit metrics-only rendering, audit-log write intent coverage,
+  apply, private/key-shaped review rejection, dynamic graph layout spacing, graph navigation controls, Compaction Audit metrics-only rendering, Context Preview rendering, Release Readiness rendering, audit-log write intent coverage,
   and public-safe serialization.
 
 Known limits:
@@ -262,7 +272,11 @@ Known limits:
   audit run; the public secret scan includes `.jsonl` files.
 - GitHub Actions CI run `26298965544` passed on metrics-only local session
   compaction audit commit `be08302`.
-- Dynamic graph layout CI is pending until this slice is pushed. Local
+- GitHub Actions CI run `26299756374` passed on Brain UI Compaction Audit
+  commit `fb466db`.
+- GitHub Actions CI run `26300784883` passed on Brain UI Context Preview
+  commit `0ec4396`.
+- Brain UI Release Readiness CI is pending until this slice is pushed. Local
   `node packages/brain-ui/smoke.mjs`,
   `node packages/brain-ui/interaction-smoke.mjs`, and
   `node packages/bench/release-readiness-check.mjs` are the current evidence.

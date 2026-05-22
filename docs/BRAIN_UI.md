@@ -19,6 +19,7 @@ The UI should expose:
 - research lineage,
 - metrics-only local session compaction audit,
 - prompt context preview for injected recall packets,
+- release readiness console for current public-launch blockers,
 - lifecycle policy draft export,
 - selected lifecycle policy apply with explicit confirmation,
 - memory review queue draft export,
@@ -77,17 +78,18 @@ Required visual review path:
 13. research lineage preview,
 14. local session compaction audit preview,
 15. prompt context preview,
-16. lifecycle policy preview,
-17. selected lifecycle policy apply confirmation,
-18. memory review queue preview,
-19. selected memory review queue apply confirmation,
-20. compiled wiki/vault preview,
-21. fixture vault sync report with conflict handling,
-22. selected local vault sync dry-run,
-23. selected local vault sync apply confirmation,
-24. fixture local-container audit preflight,
-25. selected local memory edit overlay confirmation,
-26. selected local memory materialize confirmation.
+16. release readiness console,
+17. lifecycle policy preview,
+18. selected lifecycle policy apply confirmation,
+19. memory review queue preview,
+20. selected memory review queue apply confirmation,
+21. compiled wiki/vault preview,
+22. fixture vault sync report with conflict handling,
+23. selected local vault sync dry-run,
+24. selected local vault sync apply confirmation,
+25. fixture local-container audit preflight,
+26. selected local memory edit overlay confirmation,
+27. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -135,6 +137,17 @@ evidence records `fixture-prompt-context-preview`, 642 of 900 context tokens
 used, 3 selected memories, 3 context sections, 2 omitted candidates, hosted
 read-through as read-only, local-only writes, zero console errors, and no
 private/key-shaped visible text.
+
+The Release Readiness panel is fixture-only and metrics-only. It shows the
+current public launch verdict, production-ready flag, latest verified code CI
+status, blocker count, proven preview-surface count, manual action count,
+fixture-only status, hosted write-back status, and leak counter. It is meant to
+make the release gate easy to inspect before a human approves publication. It
+does not update GitHub, change repository visibility, or write local agent
+files. Current browser evidence records `fixture-release-readiness-console`,
+public launch verdict `FAIL`, `productionReady: false`, 15 proven surfaces, 5
+remaining blockers, 5 manual actions, hosted write-back disabled, zero console
+errors, and no private/key-shaped visible text.
 
 The Lifecycle Policy panel stages recall and write-policy choices as a fixture
 draft export. It clamps numeric settings, limits low-confidence write behavior

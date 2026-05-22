@@ -7,6 +7,7 @@ import {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildPromptContextPreview,
+  buildReleaseReadinessConsole,
   buildResearchLineage,
   buildSessionCompactionAudit,
   containsPrivateLikeText,
@@ -29,6 +30,7 @@ const state = {
   syncReport: null,
   sessionCompactionAudit: null,
   promptContextPreview: null,
+  releaseReadiness: null,
   selectedVaultPath: "",
   localAudit: null,
   localBrowse: null,
@@ -70,6 +72,12 @@ const contextPreviewMemories = document.querySelector("#contextPreviewMemories")
 const contextPreviewSections = document.querySelector("#contextPreviewSections");
 const contextPreviewOmitted = document.querySelector("#contextPreviewOmitted");
 const contextPreviewExport = document.querySelector("#contextPreviewExport");
+const releaseReadinessStatus = document.querySelector("#releaseReadinessStatus");
+const releaseReadinessSummary = document.querySelector("#releaseReadinessSummary");
+const releaseReadinessSurfaces = document.querySelector("#releaseReadinessSurfaces");
+const releaseReadinessBlockers = document.querySelector("#releaseReadinessBlockers");
+const releaseReadinessActions = document.querySelector("#releaseReadinessActions");
+const releaseReadinessExport = document.querySelector("#releaseReadinessExport");
 const policySummary = document.querySelector("#policySummary");
 const policyForm = document.querySelector("#policyForm");
 const policyForceRecall = document.querySelector("#policyForceRecall");
@@ -168,6 +176,7 @@ const [
   syncResponse,
   sessionCompactionResponse,
   promptContextResponse,
+  releaseReadinessResponse,
   localAuditResponse,
   localBrowseResponse,
 ] = await Promise.all([
@@ -176,6 +185,7 @@ const [
   fetch("/fixtures/wiki-sync-report.json"),
   fetch("/fixtures/session-compaction-local-audit.json"),
   fetch("/fixtures/prompt-context-preview.json"),
+  fetch("/fixtures/release-readiness.json"),
   fetch("/fixtures/local-container-audit.json"),
   fetch("/fixtures/local-container-browse.json"),
 ]);
@@ -184,6 +194,7 @@ state.vault = await vaultResponse.json();
 state.syncReport = await syncResponse.json();
 state.sessionCompactionAudit = await sessionCompactionResponse.json();
 state.promptContextPreview = await promptContextResponse.json();
+state.releaseReadiness = await releaseReadinessResponse.json();
 state.localAudit = await localAuditResponse.json();
 state.localBrowse = await localBrowseResponse.json();
 state.query = searchInput.value;
@@ -493,6 +504,7 @@ function render() {
   renderResearchLineage();
   renderSessionCompactionAudit();
   renderPromptContextPreview();
+  renderReleaseReadiness();
   renderLifecyclePolicy();
   renderLifecyclePolicyApply();
   renderReviewQueue();
@@ -787,6 +799,57 @@ function renderPromptContextPreview() {
   }
 
   contextPreviewExport.textContent = JSON.stringify(packet, null, 2);
+}
+
+function renderReleaseReadiness() {
+  const packet = buildReleaseReadinessConsole(state.releaseReadiness);
+  releaseReadinessStatus.textContent = packet.publicLaunchVerdict;
+  releaseReadinessStatus.dataset.verdict = packet.publicLaunchVerdict;
+  releaseReadinessSummary.replaceChildren(
+    stat("Verdict", packet.publicLaunchVerdict),
+    stat("Prod ready", packet.productionReady ? "yes" : "no"),
+    stat("Code CI", packet.latestVerifiedCodeBaseline.ciConclusion),
+    stat("Blockers", packet.blockers.length),
+    stat("Surfaces", packet.surfaces.length),
+    stat("Leaks", packet.safetySummary.privacyLeakCount),
+    stat("Fixture", packet.safetySummary.fixtureOnly ? "yes" : "no"),
+    stat("Hosted writes", packet.safetySummary.hostedWriteBackDisabled ? "off" : "review"),
+  );
+
+  releaseReadinessSurfaces.replaceChildren();
+  for (const surface of packet.surfaces) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = "surface";
+    span.textContent = surface;
+    item.append(strong, span);
+    releaseReadinessSurfaces.append(item);
+  }
+
+  releaseReadinessBlockers.replaceChildren();
+  for (const blocker of packet.blockers) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = "blocker";
+    span.textContent = blocker;
+    item.append(strong, span);
+    releaseReadinessBlockers.append(item);
+  }
+
+  releaseReadinessActions.replaceChildren();
+  for (const action of packet.manualActions) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = "manual";
+    span.textContent = action;
+    item.append(strong, span);
+    releaseReadinessActions.append(item);
+  }
+
+  releaseReadinessExport.textContent = JSON.stringify(packet, null, 2);
 }
 
 function renderLifecyclePolicy() {

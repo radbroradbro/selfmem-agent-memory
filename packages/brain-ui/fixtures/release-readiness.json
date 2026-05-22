@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "mode": "release-readiness-console",
+  "generatedAt": "2026-05-22T17:18:00.000Z",
+  "publicLaunchVerdict": "FAIL",
+  "productionReady": false,
+  "repository": "example/recallweave",
+  "pullRequest": {
+    "number": 5,
+    "branch": "feat/nucleus-wiki-native-contract",
+    "base": "main",
+    "state": "open",
+    "mergeable": true
+  },
+  "latestVerifiedCodeBaseline": {
+    "headSha": "0ec4396f3445775c9f315294860fbdf4e302325d",
+    "ciRunId": 26300784883,
+    "ciConclusion": "success",
+    "localReleaseCheck": "passed",
+    "secretScan": "zero_hits"
+  },
+  "latestDocumentationBaseline": {
+    "headSha": "27c902cb0c4a5e1b72a7f5e9d1e5b1f6a57d8f43",
+    "ciRunId": 26301295098,
+    "ciConclusion": "success"
+  },
+  "safetyBoundary": {
+    "usesFixtureUiEvidence": true,
+    "commitsRawMemories": false,
+    "commitsRawTranscripts": false,
+    "commitsCredentials": false,
+    "enablesHostedWriteBack": false
+  },
+  "provenPreviewSurfaces": [
+    "nucleus-index",
+    "wiki-vault-compile",
+    "wiki-vault-sync-dry-run",
+    "brain-ui-container-health",
+    "brain-ui-selected-local-container-browse",
+    "brain-ui-selected-vault-sync-apply",
+    "brain-ui-lifecycle-policy-apply",
+    "brain-ui-memory-review-queue-apply",
+    "brain-ui-selected-local-memory-edit",
+    "brain-ui-selected-local-memory-materialize",
+    "brain-ui-dynamic-graph-layout",
+    "brain-ui-graph-navigation-controls",
+    "brain-ui-session-compaction-audit",
+    "brain-ui-prompt-context-preview",
+    "selfmem-update"
+  ],
+  "remainingBlockers": [
+    "claude-reviewer-route-blocked",
+    "github-pr-body-update-blocked",
+    "github-issue-create-blocked",
+    "human-public-launch-approval-required",
+    "hosted-supermemory-baseline-not-current"
+  ],
+  "manualActions": [
+    "Log in Claude CLI or accept the blocked reviewer route.",
+    "Paste the prepared PR body update manually.",
+    "Create the blocker issue from the checked draft.",
+    "Approve public visibility only after the final release gate stays green.",
+    "Run a one-agent canary before wider rollout."
+  ]
+}

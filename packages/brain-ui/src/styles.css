@@ -565,6 +565,7 @@ button.active {
 .sync-summary,
 .audit-summary,
 .context-summary,
+.release-summary,
 .policy-summary,
 .review-summary {
   display: grid;
@@ -576,6 +577,7 @@ button.active {
 .sync-summary div,
 .audit-summary div,
 .context-summary div,
+.release-summary div,
 .policy-summary div,
 .review-summary div {
   min-width: 0;
@@ -593,6 +595,8 @@ button.active {
 .audit-summary span,
 .context-summary strong,
 .context-summary span,
+.release-summary strong,
+.release-summary span,
 .policy-summary strong,
 .policy-summary span,
 .review-summary strong,
@@ -604,6 +608,7 @@ button.active {
 .sync-summary strong,
 .audit-summary strong,
 .context-summary strong,
+.release-summary strong,
 .policy-summary strong,
 .review-summary strong {
   color: var(--cyan);
@@ -614,6 +619,7 @@ button.active {
 .sync-summary span,
 .audit-summary span,
 .context-summary span,
+.release-summary span,
 .policy-summary span,
 .review-summary span {
   color: var(--muted);
@@ -626,7 +632,8 @@ button.active {
 .audit-reasons,
 .audit-history,
 .context-memory-list,
-.context-omitted-list {
+.context-omitted-list,
+.release-list {
   display: grid;
   gap: 8px;
   list-style: none;
@@ -639,7 +646,8 @@ button.active {
 .audit-reasons li,
 .audit-history li,
 .context-memory-list li,
-.context-omitted-list li {
+.context-omitted-list li,
+.release-list li {
   display: grid;
   gap: 4px;
   border: 1px solid var(--line);
@@ -651,7 +659,8 @@ button.active {
 .sync-actions strong,
 .audit-files strong,
 .context-memory-list strong,
-.context-omitted-list strong {
+.context-omitted-list strong,
+.release-list strong {
   color: var(--green);
   font-size: 12px;
   text-transform: uppercase;
@@ -663,7 +672,8 @@ button.active {
 .audit-files span,
 .context-memory-list span,
 .context-memory-list small,
-.context-omitted-list span {
+.context-omitted-list span,
+.release-list span {
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -671,7 +681,8 @@ button.active {
 .sync-actions span,
 .audit-files span,
 .context-memory-list span,
-.context-omitted-list span {
+.context-omitted-list span,
+.release-list span {
   color: var(--text);
   font-size: 12px;
 }
@@ -684,6 +695,35 @@ button.active {
 
 .context-memory-list li[data-source="hosted-readonly"] {
   border-color: rgba(115, 168, 255, 0.55);
+}
+
+.release-verdict {
+  display: inline-grid;
+  min-height: 30px;
+  place-items: center;
+  margin: 0 0 10px;
+  border: 1px solid rgba(228, 111, 105, 0.58);
+  border-radius: 999px;
+  padding: 5px 11px;
+  color: var(--red);
+  background: rgba(228, 111, 105, 0.08);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.release-verdict[data-verdict="PASS"],
+.release-verdict[data-verdict="PASS_WITH_CONCERNS"] {
+  border-color: rgba(139, 209, 124, 0.58);
+  color: var(--green);
+  background: rgba(139, 209, 124, 0.08);
+}
+
+.release-list.blocker-list li {
+  border-color: rgba(228, 111, 105, 0.58);
+}
+
+.release-list.manual-actions li {
+  border-color: rgba(244, 185, 90, 0.58);
 }
 
 .context-section-list {

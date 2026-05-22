@@ -16,7 +16,7 @@ The current PR adds:
   content-free pre-write audit logging;
 - a fixture-only Brain UI for graph browsing with dynamic graph layout, graph navigation controls, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
-  lineage, Compaction Audit, Context Preview, vault preview, sync-report
+  lineage, Compaction Audit, Context Preview, Release Readiness, vault preview, sync-report
   inspection,
   selected vault sync dry-run, selected vault sync apply, selected
   local-container browse, lifecycle policy preview, selected lifecycle policy apply, memory
@@ -32,8 +32,8 @@ The current PR adds:
 Preview surfaces include selected local-container browse, selected vault sync
 dry-run, selected vault sync apply, lifecycle policy, lifecycle policy apply,
 memory review queue, review queue apply, local memory edit, overlay browse,
-materialize, dynamic graph layout, graph navigation, Compaction Audit, and
-Context Preview.
+materialize, dynamic graph layout, graph navigation, Compaction Audit, Context
+Preview, and Release Readiness.
 
 ## Safety Boundary
 
@@ -89,6 +89,14 @@ Latest verified head before this draft refresh:
 - Compaction Audit evidence: metrics-only fixture output, 6 input events, 4
   candidate fingerprints, chronological output, zero privacy leaks, zero
   console errors, and no raw candidate text
+- Context Preview evidence: fixture recall packet with selected memories,
+  omitted candidates, token budget, read-only hosted mode, local-only writes,
+  zero privacy leaks, zero console errors, and no private/key-shaped visible
+  text
+- Release Readiness evidence: public launch verdict `FAIL`,
+  `productionReady: false`, blocker list, manual actions, hosted write-back
+  disabled, zero privacy leaks, zero console errors, and no private/key-shaped
+  visible text
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
 - Completion audit: not complete, with public launch still blocked on human

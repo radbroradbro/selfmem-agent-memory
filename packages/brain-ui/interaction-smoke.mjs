@@ -12,6 +12,7 @@ import {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildPromptContextPreview,
+  buildReleaseReadinessConsole,
   buildResearchLineage,
   buildSessionCompactionAudit,
   containsPrivateLikeText,
@@ -26,6 +27,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
 const sessionCompactionFixture = JSON.parse(await readFile(join(here, "fixtures/session-compaction-local-audit.json"), "utf8"));
 const promptContextFixture = JSON.parse(await readFile(join(here, "fixtures/prompt-context-preview.json"), "utf8"));
+const releaseReadinessFixture = JSON.parse(await readFile(join(here, "fixtures/release-readiness.json"), "utf8"));
 const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
 const selectedSyncRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-wiki-sync-"));
 const selectedPolicyRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-policy-"));
@@ -226,6 +228,27 @@ try {
   assert.ok(promptContext.omittedCandidates.some((candidate) => candidate.reason.includes("noise")));
   assert.match(promptContext.compiledContext, /<recallweave-context>/);
   assert.doesNotMatch(JSON.stringify(promptContext), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
+
+  const releaseReadiness = buildReleaseReadinessConsole(releaseReadinessFixture);
+  assert.equal(releaseReadiness.mode, "fixture-release-readiness-console");
+  assert.equal(releaseReadiness.writesRealFiles, false);
+  assert.equal(releaseReadiness.metricsOnly, true);
+  assert.equal(releaseReadiness.publicLaunchVerdict, "FAIL");
+  assert.equal(releaseReadiness.productionReady, false);
+  assert.equal(releaseReadiness.pullRequest.number, 5);
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.shortSha, "0ec4396");
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion, "success");
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.secretScan, "zero_hits");
+  assert.equal(releaseReadiness.latestDocumentationBaseline.ciConclusion, "success");
+  assert.equal(releaseReadiness.safetySummary.fixtureOnly, true);
+  assert.equal(releaseReadiness.safetySummary.rawMemorySafe, true);
+  assert.equal(releaseReadiness.safetySummary.credentialSafe, true);
+  assert.equal(releaseReadiness.safetySummary.hostedWriteBackDisabled, true);
+  assert.equal(releaseReadiness.safetySummary.privacyLeakCount, 0);
+  assert.ok(releaseReadiness.surfaces.includes("brain-ui-prompt-context-preview"));
+  assert.ok(releaseReadiness.blockers.includes("human-public-launch-approval-required"));
+  assert.ok(releaseReadiness.manualActions.some((action) => action.includes("one-agent canary")));
+  assert.doesNotMatch(JSON.stringify(releaseReadiness), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const policyDraft = buildLifecyclePolicyDraft(fixture, {
     forceEveryTurn: true,
@@ -647,6 +670,8 @@ try {
     nucleusExport,
     lineage,
     sessionCompactionAudit,
+    promptContext,
+    releaseReadiness,
     policyDraft,
     clampedPolicyDraft,
     missingPolicyApplyConfirmation,
@@ -708,6 +733,7 @@ try {
           "research-lineage",
           "session-compaction-audit",
           "prompt-context-preview",
+          "release-readiness-console",
           "lifecycle-policy-draft",
           "selected-lifecycle-policy-apply",
           "review-queue-draft",

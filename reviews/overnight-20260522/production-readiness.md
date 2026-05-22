@@ -44,6 +44,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Brain UI Context Preview panel that renders the fixture prompt recall packet,
   selected memories, omitted candidates, token budget, read-only hosted mode,
   local-only write mode, and safety counters.
+- Brain UI Release Readiness panel that renders the current fixture public
+  launch verdict, production-ready flag, verified CI status, proven surfaces,
+  blockers, manual actions, hosted write-back status, and safety counters.
 - Session compaction fixture benchmark.
 - Dry-run-first updater wrapper and updater smoke.
 - Release-readiness gate.
@@ -158,6 +161,11 @@ Controller follow-up after that sandbox run:
   used, 258 tokens remaining, 3 selected memories, 3 context sections, 2
   omitted candidates, hosted read-through as read-only, local-only writes, zero
   privacy leaks, zero console errors, and no private/key-shaped visible text.
+- Brain UI Release Readiness local verification passed fresh Brain UI smoke
+  and interaction smoke. Browser evidence reports public launch verdict `FAIL`,
+  `productionReady: false`, 15 proven surfaces, 5 remaining blockers, 5 manual
+  actions, fixture-only evidence, hosted write-back disabled, zero privacy
+  leaks, zero console errors, and no private/key-shaped visible text.
 
 ## UI Evidence
 
@@ -195,6 +203,9 @@ evidence for:
   omitted candidates, token budget, read-only hosted mode, local-only writes,
   zero privacy leaks, zero console errors, and no private/key-shaped visible
   text.
+- release readiness evidence with the fixture public launch verdict, blocker
+  list, manual action list, CI status, hosted write-back disabled, zero privacy
+  leaks, zero console errors, and no private/key-shaped visible text.
 
 Initial cron limitation: that run could not launch the UI on localhost, so it
 could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
@@ -209,7 +220,7 @@ still wait for the remaining reviewer and human-approval gates.
 | Install/update ergonomics | PASS WITH CONCERNS | Updater smoke passes and wrapper is dry-run-first; clean install could not be rerun because package registry DNS is unavailable. |
 | Local-first memory correctness | PASS WITH CONCERNS | Hermes/OpenClaw smokes and compaction fixtures pass; selected local-container audit and browse previews are read-only and gated, selected local memory edits use append-only overlays, overlay browse makes those edits visible, selected local memory materialize applies safe overlays with duplicate-rerun skipping, backup, and content-free audit, and browser-local history is content-free. |
 | LLM-wiki integrity | PASS WITH CONCERNS | Compiler, lint, and sync conflict smoke pass on fixtures; live user vault confirmation flow is still future work. |
-| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Context Preview shows the prompt recall packet and omitted candidates, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
+| UI usefulness | PASS WITH CONCERNS | Fixture UI evidence exists, the graph now uses a dynamic layout and navigation controls rather than fixed coordinates alone, Compaction Audit shows metrics-only local-session evidence, Context Preview shows the prompt recall packet and omitted candidates, Release Readiness shows the current public launch verdict and blockers, selected local-container audit and browse previews, selected local memory edit overlay, local edit overlay browse visibility, selected local memory materialize, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview/apply, and history are gated/read-only/content-free, and fresh controller/CI checks pass. |
 | Docs clarity | PASS WITH CONCERNS | Docs and evidence are extensive, but the public launch story needs a clean verdict and blocked-route notes. |
 | Test coverage | PASS WITH CONCERNS | Core fixture coverage is good; browser/Playwright rerun is blocked in this environment. |
 | Rollback safety | PASS WITH CONCERNS | Updater is dry-run-first and uses fixture smoke, but public live update should wait for release-gate pass. |

@@ -51,6 +51,7 @@
     "brain-ui-graph-navigation-controls",
     "brain-ui-session-compaction-audit",
     "brain-ui-prompt-context-preview",
+    "brain-ui-release-readiness-console",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
     "selfmem-update"

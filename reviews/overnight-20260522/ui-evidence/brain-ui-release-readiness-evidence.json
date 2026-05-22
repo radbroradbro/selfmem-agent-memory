@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "head": "27c902cfea3eb6cd09ea6d4e71ddacabb53e0d2a",
+  "mode": "fixture-brain-ui-release-readiness",
+  "writesRealFiles": false,
+  "evidence": {
+    "hasReleaseReadinessHeading": true,
+    "verdict": "FAIL",
+    "statusDataVerdict": "FAIL",
+    "mode": "fixture-release-readiness-console",
+    "writesRealFiles": false,
+    "metricsOnly": true,
+    "productionReady": false,
+    "codeCiConclusion": "success",
+    "codeShortSha": "0ec4396",
+    "blockerCount": 5,
+    "surfaceCount": 15,
+    "manualActionCount": 5,
+    "privacyLeakCount": 0,
+    "fixtureOnly": true,
+    "hostedWriteBackDisabled": true,
+    "hasHumanApprovalBlocker": true,
+    "hasClaudeBlocker": true,
+    "hasManualCanaryAction": true,
+    "hasPrivateOrKeyText": false
+  },
+  "consoleErrorCount": 0,
+  "consoleMessages": []
+}

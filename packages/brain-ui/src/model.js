@@ -265,6 +265,67 @@ function buildPromptContextPreview(snapshot, packet = {}) {
   };
 }
 
+function buildReleaseReadinessConsole(packet = {}) {
+  const rawSerialized = JSON.stringify(packet ?? {});
+  const codeBaseline = packet?.latestVerifiedCodeBaseline ?? {};
+  const documentationBaseline = packet?.latestDocumentationBaseline ?? {};
+  const safetyBoundary = packet?.safetyBoundary ?? {};
+  const blockers = safeStringList(packet?.remainingBlockers);
+  const manualActions = safeStringList(packet?.manualActions);
+  const surfaces = safeStringList(packet?.provenPreviewSurfaces);
+  const launchVerdict = safeChoice(packet?.publicLaunchVerdict ?? "FAIL", ["FAIL", "PASS", "PASS_WITH_CONCERNS"], "FAIL");
+  const productionReady = packet?.productionReady === true;
+  const safetyFlags = {
+    usesFixtureUiEvidence: booleanSetting(safetyBoundary.usesFixtureUiEvidence, true),
+    commitsRawMemories: booleanSetting(safetyBoundary.commitsRawMemories, false),
+    commitsRawTranscripts: booleanSetting(safetyBoundary.commitsRawTranscripts, false),
+    commitsCredentials: booleanSetting(safetyBoundary.commitsCredentials, false),
+    enablesHostedWriteBack: booleanSetting(safetyBoundary.enablesHostedWriteBack, false),
+  };
+  return {
+    schemaVersion: 1,
+    mode: "fixture-release-readiness-console",
+    writesRealFiles: false,
+    metricsOnly: true,
+    generatedAt: safeTimestamp(packet?.generatedAt, "1970-01-01T00:00:00.000Z"),
+    publicLaunchVerdict: launchVerdict,
+    productionReady,
+    repository: safeExportText(packet?.repository ?? "example/recallweave"),
+    pullRequest: {
+      number: numeric(packet?.pullRequest?.number),
+      branch: safeExportText(packet?.pullRequest?.branch ?? ""),
+      base: safeExportText(packet?.pullRequest?.base ?? ""),
+      state: safeChoice(packet?.pullRequest?.state ?? "open", ["open", "closed", "merged", "draft"], "open"),
+      mergeable: packet?.pullRequest?.mergeable === true,
+    },
+    latestVerifiedCodeBaseline: {
+      headSha: safeCommitSha(codeBaseline.headSha),
+      shortSha: shortSha(codeBaseline.headSha),
+      ciRunId: numeric(codeBaseline.ciRunId),
+      ciConclusion: safeChoice(codeBaseline.ciConclusion ?? "unknown", ["success", "failure", "cancelled", "skipped", "unknown"], "unknown"),
+      localReleaseCheck: safeChoice(codeBaseline.localReleaseCheck ?? "unknown", ["passed", "failed", "unknown"], "unknown"),
+      secretScan: safeChoice(codeBaseline.secretScan ?? "unknown", ["zero_hits", "hits", "unknown"], "unknown"),
+    },
+    latestDocumentationBaseline: {
+      headSha: safeCommitSha(documentationBaseline.headSha),
+      shortSha: shortSha(documentationBaseline.headSha),
+      ciRunId: numeric(documentationBaseline.ciRunId),
+      ciConclusion: safeChoice(documentationBaseline.ciConclusion ?? "unknown", ["success", "failure", "cancelled", "skipped", "unknown"], "unknown"),
+    },
+    safetyBoundary: safetyFlags,
+    safetySummary: {
+      fixtureOnly: safetyFlags.usesFixtureUiEvidence === true,
+      rawMemorySafe: safetyFlags.commitsRawMemories === false && safetyFlags.commitsRawTranscripts === false,
+      credentialSafe: safetyFlags.commitsCredentials === false,
+      hostedWriteBackDisabled: safetyFlags.enablesHostedWriteBack === false,
+      privacyLeakCount: containsPrivateLikeText(rawSerialized) ? 1 : 0,
+    },
+    surfaces,
+    blockers,
+    manualActions,
+  };
+}
+
 function buildContainerHealth(snapshot) {
   const fixtureContainer = snapshot.roots?.container ?? {};
   const memoryKinds = ["memory", "derived_doc", "retrieval_trace", "lifecycle_event", "research_query", "decision", "hypothesis"];
@@ -500,6 +561,15 @@ function safeNumberMap(value) {
   );
 }
 
+function safeCommitSha(value) {
+  const safe = safeExportText(value ?? "");
+  return /^[a-f0-9]{40}$/i.test(safe) ? safe.toLowerCase() : "";
+}
+
+function shortSha(value) {
+  return safeCommitSha(value).slice(0, 7);
+}
+
 function summarizePolicyChanges(original, draft) {
   const changes = [];
   const pairs = [
@@ -679,6 +749,7 @@ export {
   buildMemoryReviewQueue,
   buildNucleusExport,
   buildPromptContextPreview,
+  buildReleaseReadinessConsole,
   buildResearchLineage,
   buildSessionCompactionAudit,
   buildSelectedAuditTrailEntry,

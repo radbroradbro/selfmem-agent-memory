@@ -73,6 +73,7 @@ is still required before any public live update.
 | Brain UI research lineage | `reviews/overnight-20260522/brain-ui-research-lineage-evidence.md` |
 | Brain UI compaction audit | `reviews/overnight-20260522/brain-ui-compaction-audit-evidence.md` |
 | Brain UI context preview | `reviews/overnight-20260522/brain-ui-context-preview-evidence.md` |
+| Brain UI release readiness | `reviews/overnight-20260522/brain-ui-release-readiness-evidence.md` |
 | Brain UI interaction smoke | `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/brain-ui-interaction-smoke-evidence.md` |
 | Browser DOM evidence | `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Browser evidence gate review | `reviews/overnight-20260522/gemini-browser-evidence-gate-review.md` |
@@ -153,6 +154,12 @@ Latest local verification before this summary:
   omitted candidates, read-only hosted mode, local-only writes, zero privacy
   leaks, zero console errors, and no private/key-shaped visible text. GitHub
   Actions CI run `26300784883` passed on `0ec4396`.
+- Brain UI Release Readiness verification: local smoke and interaction smoke
+  pass with `release-readiness-console` evidence. Browser DOM evidence reports
+  public launch verdict `FAIL`, `productionReady: false`, 15 proven preview
+  surfaces, 5 remaining blockers, 5 manual actions, fixture-only evidence,
+  hosted write-back disabled, zero privacy leaks, zero console errors, and no
+  private/key-shaped visible text.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture
@@ -225,6 +232,10 @@ Sanitized fixture evidence exists under
   sections, 2 omitted candidates, hosted read-through as read-only, local-only
   writes, zero privacy leaks, zero console errors, and no private/key-shaped
   visible text
+- release readiness evidence records public launch verdict `FAIL`,
+  `productionReady: false`, verified CI status, 15 proven preview surfaces, 5
+  blockers, 5 manual actions, hosted write-back disabled, zero privacy leaks,
+  zero console errors, and no private/key-shaped visible text
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -259,6 +270,8 @@ local memory contents.
 - Gemini Brain UI local memory materialize review: `CLEAN`.
 - Gemini Brain UI context preview review: `CLEAN`, with a note that Gemini CLI
   produced transient capacity warnings before returning the verdict.
+- Gemini Brain UI release readiness review: `CLEAN`, with a note that Gemini
+  CLI produced transient capacity warnings before returning the verdict.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
