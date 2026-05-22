@@ -1,0 +1,35 @@
+providerArm: local-qwen3-gte
+storage:
+  rawStore: sqlite
+  vectorStore: sqlite-vec
+  sparseStore: sqlite-fts5
+  graphStore: sqlite
+retrieval:
+  rrfK: 60
+  channelWeights:
+    dense: 1.0
+    sparse: 0.9
+    graph: 0.8
+    temporal: 0.5
+  firstStageTopK: 50
+  rerankTopK: 20
+  searchMode: hybrid
+  rerank: true
+  rewriteQuery: false
+fallbacks:
+  enabled: false
+  failClosed: true
+  fallbackArms: []
+queryExpansion:
+  enabled: false
+  exposeRewriteQueryOption: true
+  provider: local-openai-compatible
+  baseUrlEnv: SELFMEM_QUERY_EXPANSION_BASE_URL
+  apiKeyEnv: SELFMEM_QUERY_EXPANSION_API_KEY
+  modelEnv: SELFMEM_QUERY_EXPANSION_MODEL
+  maxRewrites: 3
+  onlySend: user_query
+  fallbackEnabled: false
+privacy:
+  redactPrivateTags: true
+  redactKeyShapes: true

@@ -1,0 +1,43 @@
+# Example target policy. Current adapters support the environment variables
+# listed below. The full policy-file loader is a roadmap item.
+
+recall:
+  current:
+    forceEveryTurnEnv: SELFMEM_RECALL_EVERY_TURN
+    rerankCandidateLimitEnv: SELFMEM_RERANK_CANDIDATE_LIMIT
+    rerankTokenBudgetEnv: SELFMEM_RERANK_TOKEN_BUDGET
+  defaultMode: skip_obvious_maintenance
+  forceEveryTurn: false
+  skipWhenPromptMatches:
+    - "\\b(heartbeat|watchdog|diagnostic|healthcheck|update check|ping)\\b"
+  forceWhenPromptMatches:
+    - "\\b(remember|recall|decision|preference|workflow|bug|fix|lcm|compress)\\b"
+
+writes:
+  storeExplicitToolWrites: true
+  storeAgentEndSummaries: true
+  storePreCompressCheckpoints: true
+  rejectFullyPrivate: true
+  rejectKeyShapedContent: true
+  suppressDuplicates: true
+  maxAutoWritesPerSession: 20
+  lowConfidenceAction: review_queue
+
+lifecycle:
+  hermes:
+    prefetch: enabled
+    queue_prefetch: enabled
+    sync_turn: enabled
+    on_pre_compress: enabled
+    on_memory_write: enabled
+    on_session_end: enabled
+  openclaw:
+    session_start: enabled
+    before_prompt_build: enabled
+    agent_end: enabled
+    compression_checkpoint: enabled
+
+ui:
+  exposeBrainView: planned
+  exposeLifecycleToggles: planned
+  exposeMemoryReviewQueue: planned

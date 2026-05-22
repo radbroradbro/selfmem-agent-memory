@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+configs/private/
+data/
+docs/benchmark-results/
+supermemory-export*/
+.selfmem-export*/
+.source-cache/
+.goal-loop-review/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,43 @@
+{
+  "name": "selfmem-fallback",
+  "version": "0.1.0",
+  "description": "Selfmem shadow-memory and Supermemory export fallback kit.",
+  "author": {
+    "name": "selfmem",
+    "email": "local-only@example.invalid",
+    "url": "https://local.invalid/selfmem"
+  },
+  "homepage": "https://local.invalid/selfmem",
+  "repository": "https://local.invalid/selfmem",
+  "license": "UNLICENSED",
+  "keywords": [
+    "memory",
+    "supermemory",
+    "fallback",
+    "benchmark"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks.json",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Selfmem Fallback",
+    "shortDescription": "Shadow memory, export, and benchmark fallback tools.",
+    "longDescription": "Selfmem Fallback packages the current selfmem shadow-memory workflow, redaction rules, Supermemory export script, Hermes canary provider, and benchmark instructions. It is designed as an alternative or fallback lane while hosted Supermemory write credits are constrained.",
+    "developerName": "selfmem",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://local.invalid/selfmem",
+    "privacyPolicyURL": "https://local.invalid/selfmem/privacy",
+    "termsOfServiceURL": "https://local.invalid/selfmem/terms",
+    "defaultPrompt": [
+      "Check whether memory writes are healthy.",
+      "Export existing Supermemory documents safely.",
+      "Run the selfmem fallback benchmark."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

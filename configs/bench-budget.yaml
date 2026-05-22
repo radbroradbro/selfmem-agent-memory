@@ -1,0 +1,54 @@
+defaultPolicy:
+  stopOnPrivacyFailure: true
+  requireSameJudgeAndDatasetForComparisons: true
+  requireFreshIsolatedContainers: true
+  requireExplicitUserConfirmationForFullExternalBench: true
+
+phases:
+  controlledPluginP2P:
+    maxCostUsd: 10
+    maxProviderCalls: 500
+    allowedHosts:
+      - codex
+      - claude-code
+    stopRule: "Stop after Codex and Claude Code P2P reports exist, or immediately on any private-content leak."
+  formalMemoryBenchSmoke:
+    maxCostUsd: 15
+    maxQuestionsPerBenchmark: 25
+    benchmarks:
+      - longmemeval
+    stopRule: "Run only the smallest source-locked real benchmark slice first."
+  formalMemoryBenchFull:
+    enabledByDefault: false
+    maxCostUsd: 0
+    mayRunWithFreeCreditRotationOnly: true
+    maxPaidCostUsd: 0
+    benchmarks:
+      - longmemeval
+      - locomo
+      - convomem
+    requiresUserConfirmation: true
+    requiresFreshCostEstimate: true
+    stopRule: "Do not run in the default goal. Re-open only after the smoke test passes and either the user approves a new exact paid budget or confirms a free-credit/key-rotation run with max paid cost $0."
+  hermesGoogleVmP2P:
+    maxCostUsd: 10
+    requiresUserConfirmation: true
+    requiresPreflightSnapshot: true
+    stopRule: "Run only after local/plugin P2P is competitive; do not change the live default provider without explicit approval."
+
+providerCallPolicy:
+  supermemory:
+    useFreshContainerPrefix: "selfmem-bench-"
+    mayUseEnvCredentialsOnly: true
+  selfmemCloud:
+    defaultArm: "cloud-voyage4-voyage"
+    mayUseEnvCredentialsOnly: true
+    keyRotation:
+      enabledWhenMultipleEnvKeysPresent: true
+      purpose: "cost isolation, reliability, and free-credit usage"
+      maxPaidCostUsd: 0
+      doNotBypassProviderRateLimitsOrTerms: true
+      stopOnRateLimitInsteadOfCircumventing: true
+  queryExpansion:
+    defaultModel: "nvidia/nemotron-mini-4b-instruct"
+    disabledUnlessRewriteQueryParityIsUnderTest: true

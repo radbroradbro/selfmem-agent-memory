@@ -1,0 +1,53 @@
+source:
+  hostedApiReference: https://docs.api.nvidia.com/nim/reference/qwen-qwen3-next-80b-a3b-instruct
+  supportedModelsTable: https://docs.nvidia.com/nim/large-language-models/1.15.0/supported-models.html
+
+purpose: "Find the best NVIDIA NIM model for Supermemory-style rewriteQuery expansion before choosing a default."
+
+liveSweep:
+  enabledEnv: SELFMEM_NVIDIA_SWEEP_LIVE
+  allModelsEnv: SELFMEM_NVIDIA_SWEEP_ALL
+  limitEnv: SELFMEM_NVIDIA_SWEEP_LIMIT
+  timeoutEnv: SELFMEM_NVIDIA_SWEEP_TIMEOUT_MS
+  concurrencyEnv: SELFMEM_NVIDIA_SWEEP_CONCURRENCY
+  temperatureEnv: SELFMEM_NVIDIA_SWEEP_TEMPERATURE
+  apiKeyEnv: NVIDIA_API_KEY
+  apiKeysEnv: NVIDIA_API_KEYS
+  endpoint: https://integrate.api.nvidia.com/v1/chat/completions
+  defaultAllHostedLlms: true
+  storeSecrets: false
+  sendStoredMemories: false
+  sendRawTranscripts: false
+
+queryExpansion:
+  maxRewrites: 3
+  temperature: 0.1
+  maxTokens: 120
+  preserveExactIdentifiers: true
+  defaultAfterFirstLiveSweep: nvidia/nemotron-mini-4b-instruct
+  challengers:
+    - meta/llama-3.2-3b-instruct
+    - mistralai/mistral-nemotron
+    - nvidia/llama-3.1-nemotron-nano-8b-v1
+    - qwen/qwen3-next-80b-a3b-instruct
+  chooseWinnerBy:
+    - successful_response_rate
+    - exact_identifier_preservation_rate
+    - valid_rewrite_rate
+    - latency_p50
+    - latency_p95
+
+excludeByDefault:
+  - safety
+  - guard
+  - jailbreak
+  - pii
+  - translate
+  - gliner
+  - usdcode
+
+notes:
+  - "Run with SELFMEM_NVIDIA_SWEEP_ALL=1 to include specialized models too."
+  - "The sweep uses synthetic benchmark queries only."
+  - "Do not switch the default by model release date alone."
+  - "Use SELFMEM_NVIDIA_SWEEP_LIMIT for a quick smoke before the full live sweep."

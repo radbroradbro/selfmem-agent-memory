@@ -1,0 +1,93 @@
+defaultCloudArm: cloud-voyage4-voyage
+defaultLocalArm: local-qwen3-gte
+
+fallbackPolicy:
+  enabled: false
+  reason: "Do not mix embedding spaces. Rate-limit resilience uses same-provider key rotation or separate benchmark arms."
+
+queryExpansion:
+  defaultEnabled: false
+  exposeRewriteQueryOption: true
+  searchParameter: rewriteQuery
+  defaultProvider: nvidia
+  defaultModel: nvidia/nemotron-mini-4b-instruct
+  selectionPolicy: "Sweep NVIDIA hosted LLM models for latency and rewrite quality before changing the default."
+  sweepConfig: configs/nvidia-nim-query-expansion.yaml
+  challengerModels:
+    - qwen/qwen3-next-80b-a3b-instruct
+    - meta/llama-3.2-3b-instruct
+    - nvidia/llama-3.1-nemotron-nano-8b-v1
+    - mistralai/mistral-nemotron
+  maxRewrites: 3
+  onlySend: user_query
+  neverSend:
+    - stored_memories
+    - raw_transcripts
+    - provider_keys
+    - private_tagged_content
+  fallbackEnabled: false
+
+arms:
+  cloud-gemini2-cohere4pro:
+    embedder: gemini
+    embedModel: gemini-embedding-2
+    dimensions: 1536
+    reranker: cohere
+    rerankModel: cohere.rerank-v4.0-pro
+    purpose: multimodal and document-heavy challenger arm
+
+  cloud-gemini2-cohere4pro-3072:
+    embedder: gemini
+    embedModel: gemini-embedding-2
+    dimensions: 3072
+    reranker: cohere
+    rerankModel: cohere.rerank-v4.0-pro
+    purpose: max-dimension Gemini ablation
+
+  cloud-voyage4-cohere4pro:
+    embedder: voyage
+    embedModel: voyage-4-large
+    dimensions: 1024
+    reranker: cohere
+    rerankModel: cohere.rerank-v4.0-pro
+    purpose: code and text-heavy cloud peer
+
+  cloud-voyage4-voyage:
+    embedder: voyage
+    embedModel: voyage-4-large
+    dimensions: 1024
+    reranker: voyage
+    rerankModel: rerank-2.5
+    keyRotationEnv: VOYAGE_API_KEYS
+    singleKeyEnv: VOYAGE_API_KEY
+    purpose: default text/code memory arm with same-provider embedding and rerank
+
+  cloud-gemini2-pinecone:
+    embedder: gemini
+    embedModel: gemini-embedding-2
+    dimensions: 1536
+    reranker: pinecone
+    rerankModel: pinecone-rerank-v0
+    purpose: BEIR-style rerank check
+
+  local-qwen3-gte:
+    embedder: qwen3
+    embedModel: qwen3-embedding-8b
+    reranker: gte
+    rerankModel: gte-reranker-modernbert-base
+    purpose: practical zero-spend local default
+
+  local-qwen3-qwen3rerank:
+    embedder: qwen3
+    embedModel: qwen3-embedding-8b
+    reranker: qwen3
+    rerankModel: qwen3-reranker-4b-or-8b-based-on-local-fit
+    purpose: quality-first local arm
+
+  local-jina5-gte:
+    embedder: jina
+    embedModel: jina-embeddings-v5-text-small
+    reranker: gte
+    rerankModel: gte-reranker-modernbert-base
+    licenseNote: CC BY-NC 4.0, not default for commercial distribution
+    purpose: smaller local multilingual arm

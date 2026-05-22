@@ -1,0 +1,66 @@
+providerArm: cloud-voyage4-voyage
+storage:
+  rawStore: sqlite
+  vectorStore: sqlite-vec
+  sparseStore: sqlite-fts5
+  graphStore: sqlite
+retrieval:
+  rrfK: 60
+  channelWeights:
+    dense: 1.0
+    sparse: 0.9
+    graph: 0.8
+    temporal: 0.5
+  firstStageTopK: 50
+  rerankTopK: 20
+  searchMode: hybrid
+  rerank: true
+  rewriteQuery: false
+fallbacks:
+  enabled: false
+  failClosed: true
+  fallbackArms: []
+providers:
+  voyage:
+    apiKeyEnv: VOYAGE_API_KEY
+    apiKeysEnv: VOYAGE_API_KEYS
+    embeddingModel: voyage-4-large
+    embeddingDimensions: 1024
+    embeddingInputTypes:
+      query: query
+      document: document
+    rerankModel: rerank-2.5
+    keyRotation:
+      enabled: true
+      strategy: round_robin
+      sameProviderOnly: true
+      neverSwitchModels: true
+      maxAttemptsPerRequest: 3
+      retryOn:
+        - rate_limit
+        - transient_5xx
+        - network_error
+queryExpansion:
+  enabled: false
+  exposeRewriteQueryOption: true
+  searchParameter: rewriteQuery
+  provider: nvidia
+  apiKeyEnv: NVIDIA_API_KEY
+  apiKeysEnv: NVIDIA_API_KEYS
+  model: nvidia/nemotron-mini-4b-instruct
+  sweepConfig: configs/nvidia-nim-query-expansion.yaml
+  challengerModels:
+    - qwen/qwen3-next-80b-a3b-instruct
+    - meta/llama-3.2-3b-instruct
+    - nvidia/llama-3.1-nemotron-nano-8b-v1
+  openRouter:
+    apiKeyEnv: OPENROUTER_API_KEY
+    apiKeysEnv: OPENROUTER_API_KEYS
+    model: qwen/qwen3-next-80b-a3b-instruct:free
+  maxRewrites: 3
+  latencyBudgetMs: 500
+  onlySend: user_query
+  fallbackEnabled: false
+privacy:
+  redactPrivateTags: true
+  redactKeyShapes: true

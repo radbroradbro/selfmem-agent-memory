@@ -1,0 +1,31 @@
+{
+  "id": "selfmem_canary",
+  "name": "selfmem_canary",
+  "version": "0.1.0",
+  "kind": "memory",
+  "description": "Local selfmem canary memory plugin with per-agent Supermemory container mapping.",
+  "main": "./index.mjs",
+  "tools": [
+    "selfmem_store",
+    "selfmem_search",
+    "selfmem_forget",
+    "selfmem_profile",
+    "selfmem_status",
+    "supermemory_store",
+    "supermemory_search",
+    "supermemory_forget",
+    "supermemory_profile",
+    "supermemory_status"
+  ],
+  "lifecycle": [
+    "session_start",
+    "before_prompt_build",
+    "agent_end",
+    "pre_compress",
+    "before_compress",
+    "before_context_compress",
+    "lcm_pre_compress",
+    "context_pre_compress",
+    "memory_pre_compress"
+  ]
+}

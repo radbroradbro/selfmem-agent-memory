@@ -1,0 +1,22 @@
+{
+  "name": "selfmem-agent-memory",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.23.0",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run tests",
+    "typecheck": "tsc -b --pretty false",
+    "privacy:test": "vitest run tests/privacy/private-redaction.test.ts",
+    "smoke:openclaw": "node packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs",
+    "smoke:hermes": "python3 packages/adapters/hermes/selfmem_canary_standalone_smoke.py",
+    "smoke": "pnpm privacy:test && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  }
+}
