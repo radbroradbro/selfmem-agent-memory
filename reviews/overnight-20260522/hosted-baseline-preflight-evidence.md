@@ -140,4 +140,5 @@ guard cannot silently regress.
 
 GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test, Full
 smoke, and Release readiness check for the earlier hosted-baseline preflight
-slice. A fresh CI run is required after this extension is pushed.
+slice. For the current branch head, use the live PR checks as the authoritative
+CI state because every evidence-only commit creates a new workflow run.
