@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected public-draft baseline:
-  `aebd205`, run `26298339106`, success.
+  `be08302`, run `26298965544`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -32,6 +32,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26297064340` on `be47cff`: success.
 - GitHub Actions CI run `26297876735` on `62367a1`: success.
 - GitHub Actions CI run `26298339106` on `aebd205`: success.
+- GitHub Actions CI run `26298965544` on `be08302`: success.
 
 ## Shipped Overnight Slices
 
@@ -107,7 +108,7 @@ Latest local verification before this summary:
 - Local-session compaction audit: `pnpm compaction:local-audit:built` passed
   in metrics-only mode with 6 input events, 2 redactions, 4 candidate
   fingerprints, chronological output, and zero privacy leaks.
-- GitHub Actions CI: success on the latest inspected baseline, `aebd205`.
+- GitHub Actions CI: success on the latest inspected baseline, `be08302`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
@@ -136,6 +137,7 @@ Latest local verification before this summary:
 - Local-session compaction audit verification: release gate now requires
   `session-compaction-local-audit-evidence.md`, the local audit script, and
   the `session-compaction-local-audit` release-state surface.
+  GitHub Actions CI run `26298965544` passed on `be08302`.
 
 Automation rerun evidence from 2026-05-22T14:42Z is recorded in
 `automation-rerun-20260522T1442Z.md`. That rerun passed the non-server fixture

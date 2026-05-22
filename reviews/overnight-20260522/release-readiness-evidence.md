@@ -250,6 +250,8 @@ Known limits:
 - Local-session compaction audit follow-up: `release:check` now requires the
   local audit evidence file, release-state surface, and a fresh metrics-only
   audit run; the public secret scan includes `.jsonl` files.
+- GitHub Actions CI run `26298965544` passed on metrics-only local session
+  compaction audit commit `be08302`.
 - Dynamic graph layout CI is pending until this slice is pushed. Local
   `node packages/brain-ui/smoke.mjs`,
   `node packages/brain-ui/interaction-smoke.mjs`, and

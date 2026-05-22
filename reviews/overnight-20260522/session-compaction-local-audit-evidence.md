@@ -52,3 +52,5 @@ No raw candidate memory text appears in this evidence file.
 - `pnpm release:check`: passed with fresh local-session compaction audit.
 - Release secret scan now includes `.jsonl` files.
 - Gemini session compaction local audit review: `CLEAN`.
+- GitHub Actions CI run `26298965544` on commit `be08302`: passed Test, Full
+  smoke, and Release readiness check.

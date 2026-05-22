@@ -19,7 +19,7 @@ complete or publish a public live update.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `aebd205`
+- Latest public-draft baseline inspected before this audit refresh: `be08302`
 - PR state from GitHub connector: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -40,6 +40,8 @@ complete or publish a public live update.
 - Dynamic graph layout follow-up: `be47cff`, CI run `26297064340` passed
 - Graph navigation controls follow-up: `62367a1`, CI run `26297876735` passed
 - Release handoff gate follow-up: `aebd205`, CI run `26298339106` passed
+- Metrics-only local session compaction audit follow-up: `be08302`, CI run
+  `26298965544` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -48,7 +50,7 @@ complete or publish a public live update.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `aebd205` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `be08302` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
@@ -90,7 +92,8 @@ complete or publish a public live update.
 | Dynamic graph layout release gate | `packages/bench/release-readiness-check.mjs` now requires dynamic layout evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297064340` |
 | Graph navigation release gate | `packages/bench/release-readiness-check.mjs` now requires graph navigation evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297876735` |
 | Release handoff gate | `packages/bench/release-readiness-check.mjs` now requires `docs/RELEASE_HANDOFF.md`, release-handoff evidence, and Gemini review evidence | Proven locally and in CI run `26298339106` |
-| GitHub Actions | CI run `26298339106` on `aebd205` passed Test, Full smoke, and Release readiness check | Proven |
+| Metrics-only local session compaction audit gate | `packages/bench/release-readiness-check.mjs` now requires local-session compaction audit evidence, Gemini review evidence, and a fresh metrics-only audit run | Proven locally and in CI run `26298965544` |
+| GitHub Actions | CI run `26298965544` on `be08302` passed Test, Full smoke, and Release readiness check | Proven |
 | Release-state guard follow-up | CI run `26289073223` on `dd17f44` passed after the conservative release-state guard review was required | Proven |
 | Secret/private safety | Local secret-pattern and private-name scans returned no hits; release gate secret scan passed | Proven for current worktree |
 | No raw memory or diagnostic artifacts | Release gate forbidden-file scan passed | Proven for current worktree |
