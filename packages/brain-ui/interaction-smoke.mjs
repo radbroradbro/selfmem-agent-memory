@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
@@ -15,7 +16,11 @@ import { createBrainUiServer } from "./server.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(await readFile(join(here, "fixtures/nucleus.fixture.json"), "utf8"));
-const server = createBrainUiServer();
+const selectedRoot = await mkdtemp(join(tmpdir(), "recallweave-selected-local-audit-"));
+const server = createBrainUiServer({ enableLocalAudit: true });
+
+await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
+await writeFile(join(selectedRoot, "trace.jsonl"), "{\"event\":\"search\",\"count\":3}\n", "utf8");
 
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 
@@ -108,9 +113,43 @@ try {
   assert.ok(localAudit.report.totals.redactionCount >= 2);
   assert.equal(localAudit.report.health.status, "needs-review");
   assert.ok(localAudit.report.health.reasons.includes("private_or_key_shaped_text_detected"));
+  const missingConfirmation = await postJson(`${base}/local-container/audit`, {
+    rootDir: selectedRoot,
+    confirmReadOnly: false,
+  });
+  assert.equal(missingConfirmation.ok, false);
+  assert.equal(missingConfirmation.code, "read_only_confirmation_required");
 
-  const serialized = JSON.stringify({ containerHealth, editExport, unsafeExport, nucleusExport, lineage, vault, syncReport, localAudit });
+  const selectedAudit = await postJson(`${base}/local-container/audit`, {
+    rootDir: selectedRoot,
+    containerLabel: `selected ${"sm_" + "A".repeat(42)}`,
+    confirmReadOnly: true,
+  });
+  assert.equal(selectedAudit.ok, true);
+  assert.equal(selectedAudit.mode, "selected-local-container-audit");
+  assert.equal(selectedAudit.writesRealFiles, false);
+  assert.equal(selectedAudit.selection.rootPathRedacted, true);
+  assert.match(selectedAudit.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedAudit.selection.rootDisplay.includes(selectedRoot), false);
+  assert.equal(selectedAudit.report.totals.existingFiles, 2);
+  assert.equal(selectedAudit.report.health.status, "healthy");
+  assert.equal(selectedAudit.auditTrail.writesRealFiles, false);
+  assert.equal(selectedAudit.auditTrail.event, "local_container_audit_preview");
+
+  const serialized = JSON.stringify({
+    containerHealth,
+    editExport,
+    unsafeExport,
+    nucleusExport,
+    lineage,
+    vault,
+    syncReport,
+    localAudit,
+    missingConfirmation,
+    selectedAudit,
+  });
   assert.equal(containsPrivateLikeText(serialized), false, "serialized interaction outputs must stay public-safe");
+  assert.equal(serialized.includes(selectedRoot), false, "selected local root path must stay redacted");
 
   console.log(
     JSON.stringify(
@@ -128,6 +167,7 @@ try {
           "vault-path",
           "sync-report",
           "local-container-audit",
+          "selected-local-audit",
           "public-safe-serialization",
         ],
       },
@@ -137,10 +177,21 @@ try {
   );
 } finally {
   await new Promise((resolve) => server.close(resolve));
+  await rm(selectedRoot, { recursive: true, force: true });
 }
 
 async function json(url) {
   const response = await fetch(url);
+  assert.equal(response.status, 200, url);
+  return response.json();
+}
+
+async function postJson(url, body) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
   assert.equal(response.status, 200, url);
   return response.json();
 }

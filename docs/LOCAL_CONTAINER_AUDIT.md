@@ -44,9 +44,18 @@ detected in the inspected files.
 
 ## Current Use
 
-The first implementation is a core utility, a smoke test, and a Brain UI
-fixture preview. It is not yet a real local-container browser. The Brain UI
-fixture preview uses a temporary synthetic container and shows file counts,
-redaction counts, and health reasons only. The same utility can serve as the
-first gate before a future explicit container picker, redacted path display,
-read-only preview, write confirmation, and local audit trail.
+The implementation now includes a core utility, smoke tests, a Brain UI fixture
+preview, and a disabled by default selected-container audit route.
+
+The fixture preview uses a temporary synthetic container and shows file counts,
+redaction counts, and health reasons only.
+
+The selected-container route is enabled only with
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1`. It requires read-only confirmation,
+clears the typed path after submit, and returns only a redacted `.../container`
+label, counts, health reasons, and an audit-trail summary. It still writes no
+files and does not return raw memory/event text.
+
+This is still an audit preview. Editable real memory state needs a full file
+picker, write confirmation, wiki lint before save, and a persistent local audit
+trail.

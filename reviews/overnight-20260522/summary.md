@@ -75,12 +75,13 @@ Sanitized fixture evidence exists under
 - `brain-ui-sync-report.png`
 - `brain-ui-container-health.png`
 - `brain-ui-local-audit.png`
+- `brain-ui-selected-local-audit.png`
 - `brain-ui-edit-export.png`
 - `brain-ui-nucleus-snapshot.png`
 - `brain-ui-research-lineage.png`
 - matching DOM evidence JSON for the UI, vault preview, sync report, and edit
   draft export, plus Container Health, Local Audit Preflight, Nucleus snapshot,
-  and research-lineage previews
+  selected local-container audit, and research-lineage previews
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -97,6 +98,7 @@ local memory contents.
 - Gemini Container Health review: `CLEAN`, with a note that Gemini CLI produced
   transient routing warnings before returning the verdict.
 - Gemini Brain UI local-audit preview review: `CLEAN`.
+- Gemini Brain UI selected local-audit review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
@@ -127,6 +129,9 @@ local memory contents.
   text.
 - Brain UI local-audit preview uses a temporary fixture container and displays
   counts/reasons only.
+- Brain UI selected local-audit mode is disabled by default, requires read-only
+  confirmation, clears the typed path, and displays only a redacted
+  `.../container` label.
 - Wiki vault sync is explicit and protects reviewed pages by writing conflict
   notes instead of overwriting.
 - `selfmem_update` is dry-run by default and requires `--apply` before copying
@@ -135,9 +140,9 @@ local memory contents.
 ## Residual Risks
 
 - Claude review is blocked until Claude CLI is logged in.
-- The Brain UI is still fixture mode. Real local-container browse, edit, and
-  sync need an explicit path picker, confirmation flow, and redacted container
-  audit.
+- The Brain UI has read-only selected local-container audit preview, but real
+  local-container browse, edit, and sync still need write confirmation, wiki
+  lint before save, and a persistent local audit log.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

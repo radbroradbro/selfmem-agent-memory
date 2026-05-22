@@ -29,6 +29,7 @@ try {
   assert.match(index, /Wiki Vault Preview/);
   assert.match(index, /Vault Sync Report/);
   assert.match(index, /Local Audit Preflight/);
+  assert.match(index, /Selected local container audit/);
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
   assert.match(app, /buildContainerHealth/);
@@ -37,6 +38,7 @@ try {
   assert.match(app, /renderVaultPreview/);
   assert.match(app, /renderSyncReport/);
   assert.match(app, /renderLocalAudit/);
+  assert.match(app, /renderSelectedAudit/);
   assert.match(app, /buildEditExport/);
   assert.match(model, /const kind = safeExportText\(node\.kind\)/);
   assert.match(model, /function buildContainerHealth/);
@@ -49,6 +51,7 @@ try {
   assert.match(styles, /vault-preview/);
   assert.match(styles, /sync-summary/);
   assert.match(styles, /audit-summary/);
+  assert.match(styles, /selected-audit/);
   assert.match(styles, /edit-export/);
   assert.equal(fixture.schemaVersion, 1);
   assert.equal(fixture.roots.container.writeMode, "local-only");
@@ -75,8 +78,15 @@ try {
   assert.equal(localAudit.report.totals.existingFiles, 3);
   assert.ok(localAudit.report.totals.redactionCount >= 2);
   assert.equal(localAudit.report.health.status, "needs-review");
+  const disabledLocalAudit = await postJson(`${base}/local-container/audit`, {
+    rootDir: "/tmp/recallweave-disabled-fixture",
+    confirmReadOnly: true,
+  });
+  assert.equal(disabledLocalAudit.status, 403);
+  assert.equal(disabledLocalAudit.body.ok, false);
+  assert.equal(disabledLocalAudit.body.code, "local_audit_disabled");
 
-  const serialized = JSON.stringify({ fixture, vault, syncReport, localAudit });
+  const serialized = JSON.stringify({ fixture, vault, syncReport, localAudit, disabledLocalAudit });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
     JSON.stringify(
@@ -91,6 +101,7 @@ try {
           "wiki-vault",
           "wiki-sync-report",
           "local-container-audit",
+          "selected-local-audit-disabled",
           "healthz",
         ],
       },
@@ -112,4 +123,16 @@ async function json(url) {
   const response = await fetch(url);
   assert.equal(response.status, 200, url);
   return response.json();
+}
+
+async function postJson(url, body) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return {
+    status: response.status,
+    body: await response.json(),
+  };
 }

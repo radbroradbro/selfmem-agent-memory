@@ -1,9 +1,15 @@
 import { createServer as createHttpServer } from "node:http";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, extname, join, normalize, relative, resolve } from "node:path";
+import { basename, dirname, extname, join, normalize, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { auditLocalContainer, compileNucleusWikiVault, lintCompiledWikiVault, syncCompiledWikiVault } from "../core/dist/index.js";
+import {
+  auditLocalContainer,
+  compileNucleusWikiVault,
+  lintCompiledWikiVault,
+  redactPrivate,
+  syncCompiledWikiVault,
+} from "../core/dist/index.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 
@@ -15,7 +21,9 @@ const contentTypes = new Map([
   [".svg", "image/svg+xml; charset=utf-8"],
 ]);
 
-export function createBrainUiServer() {
+export function createBrainUiServer(options = {}) {
+  const enableLocalAudit = options.enableLocalAudit ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT === "1";
+
   return createHttpServer(async (request, response) => {
     try {
       const url = new URL(request.url ?? "/", "http://127.0.0.1");
@@ -52,6 +60,29 @@ export function createBrainUiServer() {
         return;
       }
 
+      if (path === "__local_container_audit") {
+        if (!enableLocalAudit) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "local_audit_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1 to inspect a selected local container.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await auditSelectedLocalContainer(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -72,6 +103,7 @@ function routePath(pathname) {
   if (pathname === "/fixtures/wiki-vault.json") return "__wiki_vault_fixture";
   if (pathname === "/fixtures/wiki-sync-report.json") return "__wiki_sync_report_fixture";
   if (pathname === "/fixtures/local-container-audit.json") return "__local_container_audit_fixture";
+  if (pathname === "/local-container/audit") return "__local_container_audit";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -120,6 +152,65 @@ async function createFixtureLocalContainerAudit() {
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
+}
+
+async function auditSelectedLocalContainer(request) {
+  const body = await readJsonBody(request, 20_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+  const containerLabel = typeof body.containerLabel === "string" ? body.containerLabel.trim() : undefined;
+  const maxFileBytes = Number.isFinite(body.maxFileBytes) ? Number(body.maxFileBytes) : 256_000;
+
+  if (body.confirmReadOnly !== true) {
+    return {
+      ok: false,
+      code: "read_only_confirmation_required",
+      message: "Confirm read-only audit before inspecting a selected local container.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local container directory first." };
+  }
+
+  const report = await auditLocalContainer({
+    rootDir,
+    containerLabel,
+    maxFileBytes: Math.min(Math.max(maxFileBytes, 1_024), 1_000_000),
+  });
+
+  return {
+    ok: true,
+    mode: "selected-local-container-audit",
+    writesRealFiles: false,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+      containerLabel: report.containerLabel,
+    },
+    auditTrail: {
+      event: "local_container_audit_preview",
+      status: report.health.status,
+      existingFiles: report.totals.existingFiles,
+      redactionCount: report.totals.redactionCount,
+      writesRealFiles: false,
+    },
+    report,
+  };
+}
+
+async function readJsonBody(request, maxBytes) {
+  let body = "";
+  for await (const chunk of request) {
+    body += chunk;
+    if (Buffer.byteLength(body, "utf8") > maxBytes) throw new Error("request body too large");
+  }
+  if (!body.trim()) return {};
+  return JSON.parse(body);
+}
+
+function redactPathForDisplay(rootDir) {
+  const redacted = redactPrivate(basename(rootDir)).text.trim();
+  return `.../${redacted || "selected-local-container"}`;
 }
 
 function resolveUnderRoot(rootDir, relativePath) {

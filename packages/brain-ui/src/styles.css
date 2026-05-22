@@ -626,6 +626,64 @@ button.active {
   font-size: 12px;
 }
 
+.audit-reasons strong,
+.audit-reasons span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.audit-reasons strong {
+  color: var(--green);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.audit-reasons span {
+  color: var(--text);
+}
+
+.selected-audit {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.selected-audit label:not(.check-row) {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.selected-audit input[type="password"] {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 10px;
+  background: #10151a;
+  color: var(--text);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#selectedAuditStatus {
+  min-height: 18px;
+  margin: 0;
+  color: var(--green);
+  font-size: 12px;
+}
+
 .snapshot-export {
   min-height: 120px;
   max-height: 230px;

@@ -86,6 +86,12 @@ read-only audit utility. It displays file counts, redaction counts, and health
 reasons only. It never displays raw memory, raw event text, provider keys, or
 the temporary root path.
 
+Selected local-container audit is disabled unless the server starts with
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1`. When enabled, the form requires
+read-only confirmation, clears the typed path after submit, and returns only a
+redacted `.../container` label, counts, health reasons, and an audit-trail
+summary. It still writes no files and never returns raw memory text.
+
 ## Production Path
 
 Before connecting real local containers, the UI needs:
@@ -93,7 +99,7 @@ Before connecting real local containers, the UI needs:
 - read-only local fixture mode,
 - local container audit preflight,
 - redacted local container mode,
-- explicit file picker or config path,
+- explicit file picker or config path with read-only confirmation,
 - write confirmation for derived docs,
 - wiki lint before save,
 - Nucleus snapshot export against a selected redacted local container,

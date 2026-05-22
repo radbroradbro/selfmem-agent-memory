@@ -109,6 +109,20 @@
           <div id="localAuditSummary" class="audit-summary" aria-label="Fixture local container audit summary"></div>
           <ol id="localAuditFiles" class="audit-files" aria-label="Fixture local container audit files"></ol>
           <ol id="localAuditReasons" class="audit-reasons" aria-label="Fixture local container audit reasons"></ol>
+          <form id="selectedAuditForm" class="selected-audit" aria-label="Selected local container audit">
+            <label>
+              <span>Local container path</span>
+              <input id="selectedAuditPath" type="password" autocomplete="off" aria-label="Selected local container path" />
+            </label>
+            <label class="check-row">
+              <input id="selectedAuditConfirm" type="checkbox" />
+              <span>Read-only</span>
+            </label>
+            <button id="runSelectedAudit" type="submit">Audit</button>
+            <p id="selectedAuditStatus" role="status"></p>
+            <div id="selectedAuditSummary" class="audit-summary" aria-label="Selected local container audit summary"></div>
+            <ol id="selectedAuditMeta" class="audit-reasons" aria-label="Selected local container audit trail"></ol>
+          </form>
         </section>
         <section>
           <h3>Derived Doc Editor</h3>

@@ -18,6 +18,7 @@ const state = {
   syncReport: null,
   selectedVaultPath: "",
   localAudit: null,
+  selectedAudit: null,
 };
 
 const positions = {
@@ -54,6 +55,12 @@ const syncActions = document.querySelector("#syncActions");
 const localAuditSummary = document.querySelector("#localAuditSummary");
 const localAuditFiles = document.querySelector("#localAuditFiles");
 const localAuditReasons = document.querySelector("#localAuditReasons");
+const selectedAuditForm = document.querySelector("#selectedAuditForm");
+const selectedAuditPath = document.querySelector("#selectedAuditPath");
+const selectedAuditConfirm = document.querySelector("#selectedAuditConfirm");
+const selectedAuditStatus = document.querySelector("#selectedAuditStatus");
+const selectedAuditSummary = document.querySelector("#selectedAuditSummary");
+const selectedAuditMeta = document.querySelector("#selectedAuditMeta");
 const docEditor = document.querySelector("#docEditor");
 const saveEdit = document.querySelector("#saveEdit");
 const resetEdit = document.querySelector("#resetEdit");
@@ -117,6 +124,28 @@ vaultFileSelect.addEventListener("change", (event) => {
   renderVaultPreview();
 });
 
+selectedAuditForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.selectedAudit = { ok: false, code: "loading", message: "Checking selected local container." };
+  renderSelectedAudit();
+  try {
+    const response = await fetch("/local-container/audit", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: selectedAuditPath.value,
+        confirmReadOnly: selectedAuditConfirm.checked,
+      }),
+    });
+    state.selectedAudit = await response.json();
+  } catch (error) {
+    state.selectedAudit = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    selectedAuditPath.value = "";
+    renderSelectedAudit();
+  }
+});
+
 function render() {
   const nodes = filteredNodes();
   const selected = currentSelected(nodes);
@@ -130,6 +159,7 @@ function render() {
   renderVaultControls(selected);
   renderSyncReport();
   renderLocalAudit();
+  renderSelectedAudit();
   renderEditExport();
 }
 
@@ -401,6 +431,44 @@ function renderLocalAudit() {
     const item = document.createElement("li");
     item.textContent = reason.replaceAll("_", " ");
     localAuditReasons.append(item);
+  }
+}
+
+function renderSelectedAudit() {
+  selectedAuditSummary.replaceChildren();
+  selectedAuditMeta.replaceChildren();
+  const payload = state.selectedAudit;
+  if (!payload) {
+    selectedAuditStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    selectedAuditStatus.textContent = payload.message ?? payload.code ?? "Local audit unavailable.";
+    return;
+  }
+
+  selectedAuditStatus.textContent = `${payload.selection.rootDisplay} audited read-only.`;
+  selectedAuditSummary.replaceChildren(
+    stat("Status", payload.report.health.status),
+    stat("Files", payload.report.totals.existingFiles),
+    stat("Lines", payload.report.totals.lines),
+    stat("Redactions", payload.report.totals.redactionCount),
+  );
+
+  const entries = [
+    ["Root", payload.selection.rootDisplay],
+    ["Writes", payload.writesRealFiles ? "enabled" : "disabled"],
+    ["Trail", payload.auditTrail.event],
+  ];
+  for (const [label, value] of entries) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = label;
+    span.textContent = String(value);
+    item.append(strong, span);
+    selectedAuditMeta.append(item);
   }
 }
 

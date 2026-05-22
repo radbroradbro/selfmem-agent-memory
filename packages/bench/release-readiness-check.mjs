@@ -41,6 +41,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-container-health-review.md`,
   `${reviewDir}/brain-ui-local-audit-preview-evidence.md`,
   `${reviewDir}/gemini-brain-ui-local-audit-preview-review.md`,
+  `${reviewDir}/brain-ui-selected-local-audit-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-selected-local-audit-review.md`,
   `${reviewDir}/brain-ui-interaction-smoke-evidence.md`,
   `${reviewDir}/gemini-brain-ui-interaction-smoke-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
@@ -72,6 +74,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-container-health.png`,
   `${reviewDir}/ui-evidence/brain-ui-local-audit-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-local-audit.png`,
+  `${reviewDir}/ui-evidence/brain-ui-selected-local-audit-dom-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-selected-local-audit.png`,
 ];
 
 const requiredScripts = [
@@ -198,6 +202,18 @@ check("dom evidence is sane", () => {
   assert.equal(auditEvidence.evidence.privateReasonVisible, true);
   assert.equal(auditEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(auditEvidence.consoleMessages.length, 0);
+
+  const selectedAuditEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-selected-local-audit-dom-evidence.json"), "utf8"),
+  );
+  assert.equal(selectedAuditEvidence.ok, true);
+  assert.equal(selectedAuditEvidence.evidence.hasSelectedAuditControls, true);
+  assert.match(selectedAuditEvidence.evidence.status, /^\.\.\.\//);
+  assert.equal(selectedAuditEvidence.evidence.inputCleared, true);
+  assert.equal(selectedAuditEvidence.evidence.visibleTextHasRawRoot, false);
+  assert.equal(selectedAuditEvidence.evidence.visibleTextHasPrivate, false);
+  assert.equal(selectedAuditEvidence.evidence.redactedRootVisible, true);
+  assert.equal(selectedAuditEvidence.consoleMessages.length, 0);
 
   const nucleusEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-nucleus-snapshot-dom-evidence.json"), "utf8"),
