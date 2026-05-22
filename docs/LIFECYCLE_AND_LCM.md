@@ -65,6 +65,30 @@ The write gate should prefer durable facts, preferences, decisions, procedures, 
 
 Full raw evidence may remain in a local redacted raw-events file for audit, but prompt recall should use distilled memory by default.
 
+## Sleep Cycle
+
+Hermes already has sleep/compression-style lifecycle behavior. RecallWeave
+should use that rhythm when Hermes exposes it, not install a competing agent
+runtime.
+
+Target cycle phases:
+
+- signal detection,
+- pre-compression preservation,
+- distillation,
+- dedupe,
+- relinking,
+- contradiction repair,
+- salience scoring,
+- wiki sync,
+- eval replay,
+- compacting,
+- archiving.
+
+The cycle should be visible in the Nucleus Index as lifecycle nodes and edges.
+Protected phases that can burn paid model calls must require explicit policy and
+cost caps.
+
 ## Logging
 
 The runtime should keep local logs such as:

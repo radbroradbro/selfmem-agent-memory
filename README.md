@@ -47,6 +47,12 @@ must run before making quality claims.
   traces.
 - Hybrid local search with semantic, lexical, dedupe, rerank, and context
   compilation helpers.
+- Nucleus Index contracts for memory nodes, wiki pages, lifecycle events,
+  retrieval traces, and editable derived docs.
+- Research lineage contracts for source-backed hypotheses, pros, cons, tests,
+  decisions, and follow-up questions.
+- LLM-wiki sync rules for Obsidian-compatible vaults and the self-hosted brain
+  UI.
 - Lifecycle logs for recall, writes, compression checkpoints, provider errors,
   and privacy counts.
 - Dry-run update command for deployed agents.
@@ -156,6 +162,9 @@ auth state, browser state, or provider keys.
 - [User manual](docs/USER_MANUAL.md)
 - [Visual guide](docs/VISUAL_GUIDE.md)
 - [Compatibility notes](docs/COMPATIBILITY.md)
+- [Nucleus Index](docs/NUCLEUS_INDEX.md)
+- [Research lineage](docs/RESEARCH_LINEAGE.md)
+- [LLM-wiki sync](docs/LLM_WIKI_SYNC.md)
 - [Lifecycle and LCM notes](docs/LIFECYCLE_AND_LCM.md)
 - [System flows](docs/FLOWS.md)
 - [Operations guide](docs/OPERATIONS.md)
@@ -163,6 +172,7 @@ auth state, browser state, or provider keys.
 - [Maintainer review guide](docs/MAINTAINER_REVIEW_GUIDE.md)
 - [GitHub rules](docs/GITHUB_RULES.md)
 - [Security model](docs/SECURITY_MODEL.md)
+- [Production readiness](docs/PRODUCTION_READINESS.md)
 - [Benchmark summary](docs/BENCHMARK_SUMMARY.md)
 - [Product roadmap](docs/PRODUCT_ROADMAP.md)
 - [Public release checklist](docs/PUBLIC_RELEASE_CHECKLIST.md)
