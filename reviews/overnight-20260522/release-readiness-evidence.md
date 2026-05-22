@@ -64,12 +64,11 @@ Cold review response:
   separate steps; the public scanner includes shell, example, SQL, and TOML
   files; the PR checklist no longer asks for core package dry-run separately
   because release readiness already covers it.
-- Post-push CI check passed. The workflow then moved to
-  `actions/checkout@v5` and `actions/setup-node@v5` after confirming those tags
-  exist, clearing the upcoming Node 20 action deprecation warning at the source.
-- The first v5 run showed `pnpm` missing from PATH, so CI now invokes pinned
-  pnpm through `npm exec --yes --package=pnpm@10.23.0 -- pnpm ...` for install,
-  test, smoke, and release readiness.
+- Post-push CI check passed. An attempted move to `actions/checkout@v5` and
+  `actions/setup-node@v5` failed because the runner could not locate `pnpm`.
+  The workflow returned to the known-good v4 actions plus Corepack path and
+  keeps `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` as the interim warning
+  mitigation.
 - Accepted residual note: `release:check` records every check result before
   exiting, so the core package dry-run is still reported even if another check
   fails.
