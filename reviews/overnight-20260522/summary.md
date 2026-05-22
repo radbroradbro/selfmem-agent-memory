@@ -16,10 +16,10 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest CI-inspected code-changing head after the Brain UI selected audit-history slice:
-  `8617bd3`
+- Latest CI-inspected code-changing head after the wiki sync audit-log slice:
+  `9e6554c`
 - PR API state when checked: open, not draft, mergeable, clean.
-- GitHub Actions `Verify` run #40 on `8617bd3`: success.
+- GitHub Actions `Verify` run #43 on `9e6554c`: success.
 
 ## Shipped Overnight Slices
 
@@ -59,13 +59,14 @@ Latest local verification before this summary:
 - `pnpm test`: passed, 20 tests.
 - `pnpm smoke`: passed.
 - `pnpm brain:interaction`: passed for the Brain UI model refactor slice.
+- `pnpm wiki:sync:smoke`: passed with 12 pre-write audit entries.
 - `pnpm container:audit:smoke`: passed.
 - `pnpm release:check`: passed.
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions `Verify`: success on the selected audit-history code head,
-  `8617bd3`. Later docs-only pushes still need Actions inspection before merge.
+- GitHub Actions `Verify`: success on the wiki sync audit-log code head,
+  `9e6554c`. Later pushes still need Actions inspection before merge.
 
 ## UI Evidence
 
@@ -142,6 +143,8 @@ local memory contents.
   labels, counts, status, event name, and timestamp.
 - Wiki vault sync is explicit and protects reviewed pages by writing conflict
   notes instead of overwriting.
+- Wiki vault sync can append a content-free pre-write audit log when
+  `auditLogPath` is supplied.
 - `selfmem_update` is dry-run by default and requires `--apply` before copying
   files.
 
@@ -150,8 +153,8 @@ local memory contents.
 - Claude review is blocked until Claude CLI is logged in.
 - The Brain UI has read-only selected local-container audit preview and
   browser-local audit history, but real local-container browse, edit, and sync
-  still need write confirmation, wiki lint before save, and an agent-side audit
-  log before any file write.
+  still need write confirmation and UI wiring. The sync helper now has wiki lint
+  and optional content-free pre-write audit logging.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or
   reusable tooling.

@@ -12,7 +12,8 @@ The current PR adds:
 - a Nucleus Index contract for memories, lifecycle events, retrieval traces,
   wiki pages, research questions, hypotheses, decisions, and evidence;
 - an LLM-wiki compiler with Obsidian-style frontmatter, wikilinks, index/log
-  pages, provenance, and conflict handling for reviewed pages;
+  pages, provenance, conflict handling for reviewed pages, and optional
+  content-free pre-write audit logging;
 - a fixture-only Brain UI for graph browsing, search, provenance, timeline
   review, derived-doc editing, draft export, Nucleus snapshot preview, research
   lineage, vault preview, and sync-report inspection;
@@ -60,8 +61,8 @@ issues.
 Latest verified code-changing head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Head: `8617bd3`
-- GitHub Actions: `Verify` run #40 passed
+- Head: `9e6554c`
+- GitHub Actions: `Verify` run #43 passed
 - Local release gate: `pnpm release:check` passed in the controller run
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login

@@ -111,5 +111,5 @@ Known limits:
 
 - Private-name scans remain an operator-side release step because putting
   private names in public source would itself leak them.
-- GitHub Actions `CI / Verify` run #40 passed on `8617bd3` after the latest
+- GitHub Actions `CI / Verify` run #43 passed on `9e6554c` after the latest
   code-changing push. Reinspect Actions after any later branch push.

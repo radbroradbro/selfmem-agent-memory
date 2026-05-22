@@ -72,7 +72,7 @@ Controller follow-up after that sandbox run:
 
 - `pnpm brain:smoke`: passed with the fresh Brain UI.
 - `pnpm release:check`: passed.
-- GitHub Actions `Verify` run #40 on `8617bd3` passed, including Test, Full smoke, and
+- GitHub Actions `Verify` run #43 on `9e6554c` passed, including Test, Full smoke, and
   Release readiness check.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.

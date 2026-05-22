@@ -29,7 +29,7 @@ or explicitly accepted.
 - Initial cron `npm run release:check`: failed because the fresh Brain UI smoke
   could not bind to localhost in that sandbox.
 - Controller follow-up: `pnpm brain:smoke` and `pnpm release:check` passed.
-- GitHub Actions `Verify` run #40 on `8617bd3`: passed, including Test, Full smoke, and
+- GitHub Actions `Verify` run #43 on `9e6554c`: passed, including Test, Full smoke, and
   Release readiness check.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.

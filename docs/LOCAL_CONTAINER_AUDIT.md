@@ -61,5 +61,5 @@ The Brain UI keeps a bounded browser-local selected-audit history in
 counts, event name, and timestamp.
 
 This is still an audit preview. Editable real memory state needs write
-confirmation, wiki lint before save, and an agent-side audit log before any file
-write.
+confirmation and UI wiring. The wiki sync helper already lints before write and
+can append a content-free pre-write audit log when `auditLogPath` is supplied.
