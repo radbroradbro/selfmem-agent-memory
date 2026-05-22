@@ -33,6 +33,8 @@ Retry note:
   CI run `26297876735` on `62367a1`.
 - It was refreshed again after the release handoff gate passed GitHub Actions
   CI run `26298339106` on `aebd205`.
+- A direct PR body update was retried after GitHub Actions CI run
+  `26298491296` passed on `2175c6e`; it still returned the same 403.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 

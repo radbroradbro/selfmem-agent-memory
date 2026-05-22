@@ -10,6 +10,8 @@ Scope:
   controller refresh.
 - Retried the PR body update and blocker issue flow after the dynamic Brain UI
   layout evidence was added; the permission failure remained the same.
+- Retried the PR body update after the release handoff gate and PR-draft wording
+  cleanup passed CI; the permission failure remained the same.
 
 Result:
 
