@@ -72,6 +72,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   passed
 - Canary remediation diagnosis follow-up: `4f5a079`, CI run `26312283137`
   passed
+- GitHub live sync release gate follow-up: `b5c1e02`, CI run `26313942262`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 

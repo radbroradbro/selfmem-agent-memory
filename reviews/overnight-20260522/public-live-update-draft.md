@@ -89,9 +89,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `4f5a079`
-- GitHub Actions: CI run `26312283137` passed for the canary remediation
-  diagnosis gate
+- Latest verified code baseline: `b5c1e02`
+- GitHub Actions: CI run `26313942262` passed for the GitHub live sync release
+  gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -117,6 +117,8 @@ Latest verified head before this draft refresh:
   metrics-only remediation actions and keeps fleet/public rollout blocked
 - GitHub Actions CI run `26312283137` passed on `4f5a079`, the canary
   remediation diagnosis gate commit.
+- GitHub Actions CI run `26313942262` passed on `b5c1e02`, the GitHub live
+  sync release gate commit.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

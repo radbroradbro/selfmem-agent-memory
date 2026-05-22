@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "e765e8ff331475c6f91565f4e68577b011e4781a",
-    "ciRunId": 26313358962,
+    "headSha": "b5c1e025db072fca750dc6730741c23e1b981eca",
+    "ciRunId": 26313942262,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after Hermes and OpenClaw bounded read-through latency hardening. GitHub Actions run 26313358962 passed CI on e765e8f."
+    "note": "This is the latest inspected code/product baseline after the GitHub live sync release gate. GitHub Actions run 26313942262 passed CI on b5c1e02."
   },
   "releaseStateGuard": {
     "enabled": true,

@@ -9,12 +9,13 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `e765e8ff331475c6f91565f4e68577b011e4781a`.
+- Latest code/product baseline: `b5c1e025db072fca750dc6730741c23e1b981eca`.
+- GitHub Actions run `26313942262` passed CI after the GitHub live sync
+  release gate.
+- Previous code/product baseline before the live sync release gate:
+  `e765e8ff331475c6f91565f4e68577b011e4781a`.
 - GitHub Actions run `26313358962` passed CI after the Hermes and OpenClaw
   bounded read-through latency patch.
-- Latest docs/evidence refresh before this issue text update:
-  `a93a9f3cfc0293381f97798ecd87c6e192869b8c`.
-- GitHub Actions run `26313463135` passed CI.
 - Local release readiness, smoke, goal audit, hosted-baseline preflight, canary
   evidence intake, canary report generation, and canary diagnosis all passed in
   their safe fixture or metrics-only modes.

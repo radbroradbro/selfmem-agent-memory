@@ -17,7 +17,7 @@ is still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `e765e8f`, run `26313358962`, success.
+  `b5c1e02`, run `26313942262`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -49,6 +49,7 @@ is still required before any public live update.
 - GitHub Actions CI run `26311728246` on `77b3cee`: success.
 - GitHub Actions CI run `26312283137` on `4f5a079`: success.
 - GitHub Actions CI run `26313358962` on `e765e8f`: success.
+- GitHub Actions CI run `26313942262` on `b5c1e02`: success.
 
 ## Shipped Overnight Slices
 
@@ -248,7 +249,7 @@ Latest local verification before this summary:
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 17 proven requirements, 3 blocked
+  `mayCallUpdateGoalComplete: false`, 19 proven requirements, 3 blocked
   requirements, and 1 incomplete requirement, preserving the reviewer,
   human approval, hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.

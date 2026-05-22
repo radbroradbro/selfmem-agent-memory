@@ -366,3 +366,5 @@ Known limits:
   commit `0ec4396`.
 - GitHub Actions CI run `26301888111` passed on Brain UI Release Readiness
   commit `8c26de7`, including Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26313942262` passed on GitHub live sync gate commit
+  `b5c1e02`, including Test, Full smoke, and Release readiness check.

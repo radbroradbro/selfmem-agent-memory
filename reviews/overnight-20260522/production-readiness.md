@@ -323,7 +323,7 @@ evidence for:
   zero privacy leaks, and keeps `productionReady: false`. GitHub Actions CI
   runs `26308475033` on `6a33e62` and `26308588261` on `8efe4d0` passed.
 - goal completion audit evidence with `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 17 proven requirements, 3 blocked
+  `mayCallUpdateGoalComplete: false`, 19 proven requirements, 3 blocked
   requirements, and 1 incomplete requirement. This keeps production readiness
   separate from the native thread goal completion claim. GitHub Actions CI run
   `26308994908` passed on `13efb18`.
@@ -352,6 +352,9 @@ evidence for:
   report gate.
 - GitHub Actions CI run `26312283137` passed on `4f5a079`, including Test,
   Full smoke, and Release readiness check for the canary remediation diagnosis
+  gate.
+- GitHub Actions CI run `26313942262` passed on `b5c1e02`, including Test,
+  Full smoke, and Release readiness check for the GitHub live sync release
   gate.
 - GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
   Full smoke, and Release readiness check for the hosted baseline preflight

@@ -28,11 +28,11 @@ The code, fixture UI, release gate, and CI are healthy, but launch remains block
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `e765e8ff331475c6f91565f4e68577b011e4781a`.
+- Latest code/product baseline: `b5c1e025db072fca750dc6730741c23e1b981eca`.
+- GitHub Actions run `26313942262`: passed CI after the GitHub live sync release gate.
+- Previous verified baseline before the live sync release gate:
+  `e765e8ff331475c6f91565f4e68577b011e4781a`.
 - GitHub Actions run `26313358962`: passed CI after the bounded read-through latency patch.
-- Previous verified baseline before the adapter latency extension:
-  `581be61d8304ae0576554121aef28d9afefd73c1`.
-- GitHub Actions run `26312945295`: passed CI.
 - PR #5 body is live and current.
 - GitHub issue #6 exists for final release blockers.
 
