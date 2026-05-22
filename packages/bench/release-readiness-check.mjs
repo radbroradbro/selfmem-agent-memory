@@ -58,6 +58,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-local-memory-edit-review.md`,
   `${reviewDir}/brain-ui-local-edit-overlay-browse-evidence.md`,
   `${reviewDir}/gemini-brain-ui-local-edit-overlay-browse-review.md`,
+  `${reviewDir}/brain-ui-local-memory-materialize-evidence.md`,
+  `${reviewDir}/gemini-brain-ui-local-memory-materialize-review.md`,
   `${reviewDir}/brain-ui-selected-audit-history-evidence.md`,
   `${reviewDir}/gemini-brain-ui-selected-audit-history-review.md`,
   `${reviewDir}/brain-ui-selected-sync-dry-run-evidence.md`,
@@ -95,6 +97,7 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-review-queue.png`,
   `${reviewDir}/ui-evidence/brain-ui-local-memory-edit.png`,
   `${reviewDir}/ui-evidence/brain-ui-local-edit-overlay-browse.png`,
+  `${reviewDir}/ui-evidence/brain-ui-local-memory-materialize.png`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-edit-export.png`,
   `${reviewDir}/ui-evidence/brain-ui-sync-report-dom-evidence.json`,
@@ -382,8 +385,11 @@ check("dom evidence is sane", () => {
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedSyncApplyPath"));
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "selectedAuditPath"));
   assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "localEditPath"));
+  assert.ok(browserEvidence.evidence.inputs.some((input) => input.id === "localMaterializePath"));
   assert.equal(browserEvidence.evidence.checks.hasLocalEditOverlayBrowse, true);
   assert.equal(browserEvidence.evidence.checks.hasLocalEditOverlayPreview, true);
+  assert.equal(browserEvidence.evidence.checks.hasLocalMemoryMaterialize, true);
+  assert.equal(browserEvidence.evidence.checks.hasLocalMaterializeBackup, true);
 });
 
 check("release state is conservative", () => {
@@ -416,6 +422,7 @@ check("release state is conservative", () => {
     "brain-ui-memory-review-queue-apply",
     "brain-ui-selected-local-memory-edit",
     "brain-ui-local-edit-overlay-browse",
+    "brain-ui-selected-local-memory-materialize",
     "session-compaction-benchmark",
     "selfmem-update",
   ]) {
@@ -425,7 +432,7 @@ check("release state is conservative", () => {
     "claude-reviewer-route-blocked",
     "github-pr-body-update-blocked",
     "human-public-launch-approval-required",
-    "brain-ui-direct-local-memory-mutation-not-enabled",
+    "hosted-supermemory-baseline-not-current",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
   }
@@ -450,6 +457,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /review queue apply|selected memory review queue apply|selected review queue apply/i, `${file} missing review queue apply`);
     assert.match(text, /local memory edit|selected local memory edit/i, `${file} missing local memory edit`);
     assert.match(text, /overlay browse|edit overlay.*browse|browse.*edit overlay/i, `${file} missing edit overlay browse`);
+    assert.match(text, /materialize|materialization/i, `${file} missing local memory materialize`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });

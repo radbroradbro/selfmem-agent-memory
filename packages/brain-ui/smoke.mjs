@@ -38,6 +38,7 @@ try {
   assert.match(index, /Local Audit Preflight/);
   assert.match(index, /Selected local container browse/);
   assert.match(index, /Selected local memory edit/);
+  assert.match(index, /Selected local memory materialize/);
   assert.match(index, /Selected local container audit/);
   assert.match(index, /Draft Export/);
   assert.match(app, /renderGraph/);
@@ -57,6 +58,7 @@ try {
   assert.match(app, /renderLocalBrowse/);
   assert.match(app, /renderSelectedBrowse/);
   assert.match(app, /renderLocalEdit/);
+  assert.match(app, /renderLocalMaterialize/);
   assert.match(app, /renderSelectedAudit/);
   assert.match(app, /renderSelectedAuditHistory/);
   assert.match(app, /buildEditExport/);
@@ -169,6 +171,14 @@ try {
   assert.equal(disabledLocalEdit.status, 403);
   assert.equal(disabledLocalEdit.body.ok, false);
   assert.equal(disabledLocalEdit.body.code, "local_edit_disabled");
+  const disabledLocalMaterialize = await postJson(`${base}/local-container/materialize`, {
+    rootDir: "/tmp/recallweave-disabled-local-materialize-fixture",
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL MEMORY MATERIALIZE",
+  });
+  assert.equal(disabledLocalMaterialize.status, 403);
+  assert.equal(disabledLocalMaterialize.body.ok, false);
+  assert.equal(disabledLocalMaterialize.body.code, "local_materialize_disabled");
 
   const serialized = JSON.stringify({
     fixture,
@@ -183,6 +193,7 @@ try {
     disabledPolicyApply,
     disabledReviewApply,
     disabledLocalEdit,
+    disabledLocalMaterialize,
   });
   assert.doesNotMatch(serialized, /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
   console.log(
@@ -204,6 +215,7 @@ try {
           "lifecycle-policy-apply-disabled",
           "review-queue-apply-disabled",
           "selected-local-edit-disabled",
+          "selected-local-materialize-disabled",
           "local-container-audit",
           "local-container-browse",
           "selected-local-browse-disabled",

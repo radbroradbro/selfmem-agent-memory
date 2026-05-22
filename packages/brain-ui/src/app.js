@@ -27,6 +27,7 @@ const state = {
   selectedBrowse: null,
   selectedAudit: null,
   localEdit: null,
+  localMaterialize: null,
   selectedAuditHistory: readSelectedAuditHistory(),
   selectedSync: null,
   selectedSyncApply: null,
@@ -132,6 +133,13 @@ const localEditPhrase = document.querySelector("#localEditPhrase");
 const localEditStatus = document.querySelector("#localEditStatus");
 const localEditSummary = document.querySelector("#localEditSummary");
 const localEditActions = document.querySelector("#localEditActions");
+const localMaterializeForm = document.querySelector("#localMaterializeForm");
+const localMaterializePath = document.querySelector("#localMaterializePath");
+const localMaterializeConfirm = document.querySelector("#localMaterializeConfirm");
+const localMaterializePhrase = document.querySelector("#localMaterializePhrase");
+const localMaterializeStatus = document.querySelector("#localMaterializeStatus");
+const localMaterializeSummary = document.querySelector("#localMaterializeSummary");
+const localMaterializeActions = document.querySelector("#localMaterializeActions");
 const selectedAuditForm = document.querySelector("#selectedAuditForm");
 const selectedAuditPath = document.querySelector("#selectedAuditPath");
 const selectedAuditConfirm = document.querySelector("#selectedAuditConfirm");
@@ -380,6 +388,30 @@ localEditForm.addEventListener("submit", async (event) => {
   }
 });
 
+localMaterializeForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  state.localMaterialize = { ok: false, code: "loading", message: "Materializing selected local memory edits." };
+  renderLocalMaterialize();
+  try {
+    const response = await fetch("/local-container/materialize", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rootDir: localMaterializePath.value,
+        confirmWrite: localMaterializeConfirm.checked,
+        confirmationPhrase: localMaterializePhrase.value,
+      }),
+    });
+    state.localMaterialize = await response.json();
+  } catch (error) {
+    state.localMaterialize = { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  } finally {
+    localMaterializePath.value = "";
+    localMaterializePhrase.value = "";
+    renderLocalMaterialize();
+  }
+});
+
 selectedAuditForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   state.selectedAudit = { ok: false, code: "loading", message: "Checking selected local container." };
@@ -429,6 +461,7 @@ function render() {
   renderLocalBrowse();
   renderSelectedBrowse();
   renderLocalEdit();
+  renderLocalMaterialize();
   renderSelectedAudit();
   renderSelectedAuditHistory();
   renderEditExport();
@@ -1018,6 +1051,46 @@ function renderLocalEdit() {
     span.textContent = String(value);
     item.append(strong, span);
     localEditActions.append(item);
+  }
+}
+
+function renderLocalMaterialize() {
+  localMaterializeSummary.replaceChildren();
+  localMaterializeActions.replaceChildren();
+  const payload = state.localMaterialize;
+  if (!payload) {
+    localMaterializeStatus.textContent = "";
+    return;
+  }
+
+  if (!payload.ok) {
+    localMaterializeStatus.textContent = payload.message ?? payload.code ?? "Local memory materialize unavailable.";
+    return;
+  }
+
+  localMaterializeStatus.textContent = `${payload.selection.rootDisplay} materialized with backup.`;
+  localMaterializeSummary.replaceChildren(
+    stat("Applied", payload.report?.totals?.applied ?? 0),
+    stat("Replaced", payload.report?.totals?.replaced ?? 0),
+    stat("Appended", payload.report?.totals?.appended ?? 0),
+    stat("Skipped", payload.report?.totals?.skipped ?? 0),
+    stat("Audit entries", payload.report?.auditLog?.entriesWritten ?? 0),
+  );
+
+  const entries = [
+    ["Trail", payload.auditTrail?.event ?? "local_memory_materialize"],
+    ["Backup", payload.report?.backup?.path ?? "not-written"],
+    ["Audit log", payload.report?.auditLog?.path ?? ".recallweave/local-memory-materialize-audit.jsonl"],
+    ["Overlay log", payload.report?.editOverlay?.path ?? ".recallweave/local-memory-edits.jsonl"],
+  ];
+  for (const [label, value] of entries) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    strong.textContent = label;
+    span.textContent = String(value);
+    item.append(strong, span);
+    localMaterializeActions.append(item);
   }
 }
 

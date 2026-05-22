@@ -43,13 +43,19 @@ Use this flow for browser or computer-use evidence:
     response and audit trail are content-free.
 12. Browse the same selected fixture container and confirm the edit overlay is
     visible next to the matching memory line.
-13. Capture only sanitized screenshots or recordings.
+13. Optional: start with `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_MATERIALIZE=1`,
+    materialize the overlay in a throwaway fixture, and confirm the response
+    uses counts, relative paths, and a backup path only.
+14. Capture only sanitized screenshots or recordings.
 
 ## Current Scope
 
 This is a scaffold, not the final app. It proves the product surface and visual
-review loop before direct in-place memory editing. Selected local audits are
+review loop before broader real-container editing. Selected local audits are
 read-only and return counts, reasons, and redacted path labels only. Selected
 local memory edits write append-only overlays under `.recallweave/` and never
 rewrite `memories.jsonl` directly. The browse preview surfaces those overlays
 so an operator can see which memory line has a correction or suppression.
+Selected local materialize is the guarded write step: disabled by default,
+exact-phrase confirmed, backed up under `.recallweave/backups/`, and audited
+without memory content.

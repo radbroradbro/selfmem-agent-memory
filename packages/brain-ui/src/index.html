@@ -292,6 +292,24 @@
             <div id="localEditSummary" class="audit-summary" aria-label="Selected local memory edit summary"></div>
             <ol id="localEditActions" class="audit-reasons" aria-label="Selected local memory edit audit trail"></ol>
           </form>
+          <form id="localMaterializeForm" class="selected-audit local-edit" aria-label="Selected local memory materialize">
+            <label>
+              <span>Materialize container path</span>
+              <input id="localMaterializePath" name="localMaterializePath" type="text" autocomplete="off" spellcheck="false" aria-label="Selected local memory materialize path" />
+            </label>
+            <label class="check-row">
+              <input id="localMaterializeConfirm" name="localMaterializeConfirm" type="checkbox" />
+              <span>Write memory file with backup</span>
+            </label>
+            <label>
+              <span>Confirmation phrase</span>
+              <input id="localMaterializePhrase" name="localMaterializePhrase" type="text" autocomplete="off" aria-label="Selected local memory materialize confirmation phrase" />
+            </label>
+            <button id="applyLocalMaterialize" type="submit">Materialize edits</button>
+            <p id="localMaterializeStatus" role="status"></p>
+            <div id="localMaterializeSummary" class="audit-summary" aria-label="Selected local memory materialize summary"></div>
+            <ol id="localMaterializeActions" class="audit-reasons" aria-label="Selected local memory materialize audit trail"></ol>
+          </form>
           <form id="selectedAuditForm" class="selected-audit" aria-label="Selected local container audit">
             <label>
               <span>Local container path</span>

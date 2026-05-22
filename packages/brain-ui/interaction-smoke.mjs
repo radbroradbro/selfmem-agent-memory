@@ -31,6 +31,7 @@ const server = createBrainUiServer({
   enablePolicyApply: true,
   enableReviewApply: true,
   enableLocalEdit: true,
+  enableLocalMaterialize: true,
 });
 
 await writeFile(join(selectedRoot, "memories.jsonl"), "{\"kind\":\"decision\",\"text\":\"selected local writes only\"}\n", "utf8");
@@ -462,6 +463,39 @@ try {
     "selected browse should surface the local edit overlay",
   );
   assert.equal(selectedEditBrowse.report.rootDir?.includes?.(selectedEditRoot) ?? false, false);
+  const missingMaterializeConfirmation = await postJson(`${base}/local-container/materialize`, {
+    rootDir: selectedEditRoot,
+    confirmWrite: false,
+    confirmationPhrase: "APPLY LOCAL MEMORY MATERIALIZE",
+  });
+  assert.equal(missingMaterializeConfirmation.ok, false);
+  assert.equal(missingMaterializeConfirmation.code, "write_confirmation_required");
+  const selectedMaterialize = await postJson(`${base}/local-container/materialize`, {
+    rootDir: selectedEditRoot,
+    confirmWrite: true,
+    confirmationPhrase: "APPLY LOCAL MEMORY MATERIALIZE",
+  });
+  assert.equal(selectedMaterialize.ok, true);
+  assert.equal(selectedMaterialize.mode, "selected-local-memory-materialize");
+  assert.equal(selectedMaterialize.writesRealFiles, true);
+  assert.equal(selectedMaterialize.selection.rootPathRedacted, true);
+  assert.match(selectedMaterialize.selection.rootDisplay, /^\.\.\.\//);
+  assert.equal(selectedMaterialize.selection.rootDisplay.includes(selectedEditRoot), false);
+  assert.equal(selectedMaterialize.report.totals.applied, 1);
+  assert.equal(selectedMaterialize.report.totals.replaced, 1);
+  assert.equal(selectedMaterialize.report.totals.skipped, 0);
+  assert.equal(selectedMaterialize.report.backup.written, true);
+  assert.match(selectedMaterialize.report.backup.path, /^\.recallweave\/backups\/memories-/);
+  assert.equal(selectedMaterialize.report.auditLog.entriesWritten, 1);
+  assert.equal(selectedMaterialize.auditTrail.event, "local_memory_materialize");
+  assert.equal(selectedMaterialize.auditTrail.writesRealFiles, true);
+  const materializedMemory = await readFile(join(selectedEditRoot, "memories.jsonl"), "utf8");
+  const materializeAuditLog = await readFile(join(selectedEditRoot, ".recallweave/local-memory-materialize-audit.jsonl"), "utf8");
+  assert.match(materializedMemory, /new fixture memory text/);
+  assert.doesNotMatch(materializedMemory, /old fixture memory text/);
+  assert.match(materializeAuditLog, /local_memory_materialize/);
+  assert.equal(materializeAuditLog.includes("new fixture memory text"), false, "materialize audit must be content-free");
+  assert.equal(materializeAuditLog.includes(selectedEditRoot), false);
   const missingConfirmation = await postJson(`${base}/local-container/audit`, {
     rootDir: selectedRoot,
     confirmReadOnly: false,
@@ -541,6 +575,9 @@ try {
     selectedLocalEdit,
     localEditAuditLog,
     selectedEditBrowse,
+    missingMaterializeConfirmation,
+    selectedMaterialize,
+    materializeAuditLog,
     missingConfirmation,
     selectedAudit,
     selectedAuditHistory,
@@ -578,6 +615,7 @@ try {
           "selected-local-browse",
           "selected-local-memory-edit",
           "selected-local-edit-overlay-browse",
+          "selected-local-edit-materialize",
           "selected-local-audit",
           "selected-audit-history",
           "public-safe-serialization",

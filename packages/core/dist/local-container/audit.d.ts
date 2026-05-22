@@ -3,6 +3,7 @@ export type LocalContainerAuditFileName = (typeof DEFAULT_LOCAL_CONTAINER_AUDIT_
 export declare const DEFAULT_LOCAL_CONTAINER_BROWSE_FILES: readonly ["memories.jsonl", "trace.jsonl", "lossless_context.jsonl"];
 export type LocalContainerBrowseFileName = (typeof DEFAULT_LOCAL_CONTAINER_BROWSE_FILES)[number];
 declare const LOCAL_MEMORY_EDIT_OVERLAY_FILE = ".recallweave/local-memory-edits.jsonl";
+declare const LOCAL_MEMORY_MATERIALIZE_AUDIT_FILE = ".recallweave/local-memory-materialize-audit.jsonl";
 export interface LocalContainerAuditInput {
     rootDir: string;
     containerLabel?: string;
@@ -102,7 +103,52 @@ export interface LocalContainerBrowseReport {
         editOverlayRedactionCount: number;
     };
 }
+export interface LocalMemoryMaterializeInput {
+    rootDir: string;
+    maxFileBytes?: number;
+}
+export interface LocalMemoryMaterializeReport {
+    schemaVersion: 1;
+    mode: "local-memory-edit-materialize";
+    writesRealFiles: true;
+    rootPathRedacted: true;
+    sourceFile: "memories.jsonl";
+    editOverlay: {
+        path: typeof LOCAL_MEMORY_EDIT_OVERLAY_FILE;
+        exists: boolean;
+        bytes?: number;
+        inspectedLines: number;
+        skippedReason?: "missing" | "oversize" | "read_error";
+    };
+    backup: {
+        path?: string;
+        written: boolean;
+    };
+    auditLog: {
+        path: typeof LOCAL_MEMORY_MATERIALIZE_AUDIT_FILE;
+        entriesWritten: number;
+    };
+    totals: {
+        inspectedOverlays: number;
+        applied: number;
+        replaced: number;
+        appended: number;
+        suppressed: number;
+        skipped: number;
+        redactionCount: number;
+    };
+    actions: Array<{
+        action: "replace" | "append_correction" | "suppress";
+        sourceFile: "memories.jsonl";
+        line: number;
+        sourceId?: string;
+        reason: string;
+        status: "applied" | "skipped";
+        skippedReason?: "unsupported_action" | "private_or_key_shaped" | "target_missing" | "parse_error" | "already_materialized";
+    }>;
+}
 export declare function auditLocalContainer(input: LocalContainerAuditInput): Promise<LocalContainerAuditReport>;
 export declare function browseLocalContainer(input: LocalContainerBrowseInput): Promise<LocalContainerBrowseReport>;
+export declare function materializeLocalMemoryEdits(input: LocalMemoryMaterializeInput): Promise<LocalMemoryMaterializeReport>;
 export {};
 //# sourceMappingURL=audit.d.ts.map

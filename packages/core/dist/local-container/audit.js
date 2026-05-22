@@ -1,5 +1,5 @@
-import { readFile, stat } from "node:fs/promises";
-import { basename, join } from "node:path";
+import { appendFile, mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
 import { redactPrivate } from "../redaction/private.js";
 export const DEFAULT_LOCAL_CONTAINER_AUDIT_FILES = [
     "memories.jsonl",
@@ -13,6 +13,8 @@ export const DEFAULT_LOCAL_CONTAINER_BROWSE_FILES = [
     "lossless_context.jsonl",
 ];
 const LOCAL_MEMORY_EDIT_OVERLAY_FILE = ".recallweave/local-memory-edits.jsonl";
+const LOCAL_MEMORY_MATERIALIZE_AUDIT_FILE = ".recallweave/local-memory-materialize-audit.jsonl";
+const LOCAL_MEMORY_BACKUP_DIR = ".recallweave/backups";
 export async function auditLocalContainer(input) {
     const maxFileBytes = input.maxFileBytes ?? 1_000_000;
     const inspectFiles = input.inspectFiles ?? DEFAULT_LOCAL_CONTAINER_AUDIT_FILES;
@@ -116,6 +118,187 @@ export async function browseLocalContainer(input) {
             editOverlayRedactionCount: editOverlay.report.redactionCount,
         },
     };
+}
+export async function materializeLocalMemoryEdits(input) {
+    const maxFileBytes = input.maxFileBytes ?? 1_000_000;
+    const sourceFile = "memories.jsonl";
+    const sourcePath = join(input.rootDir, sourceFile);
+    const overlayPath = join(input.rootDir, ".recallweave", "local-memory-edits.jsonl");
+    const auditPath = join(input.rootDir, ".recallweave", "local-memory-materialize-audit.jsonl");
+    const backupRelativePath = join(LOCAL_MEMORY_BACKUP_DIR, `memories-${fileSafeTimestamp(new Date())}.jsonl`);
+    const backupPath = join(input.rootDir, backupRelativePath);
+    const emptyActions = [];
+    let sourceSize = 0;
+    try {
+        const info = await stat(sourcePath);
+        if (!info.isFile() || info.size > maxFileBytes) {
+            return materializeReport({
+                editOverlay: { exists: false, inspectedLines: 0, skippedReason: info.isFile() ? "oversize" : "missing" },
+                backupWritten: false,
+                actions: emptyActions,
+            });
+        }
+        sourceSize = info.size;
+    }
+    catch {
+        return materializeReport({
+            editOverlay: { exists: false, inspectedLines: 0, skippedReason: "missing" },
+            backupWritten: false,
+            actions: emptyActions,
+        });
+    }
+    let overlaySize = 0;
+    let overlayText = "";
+    try {
+        const info = await stat(overlayPath);
+        if (!info.isFile()) {
+            return materializeReport({
+                editOverlay: { exists: false, inspectedLines: 0, skippedReason: "missing" },
+                backupWritten: false,
+                actions: emptyActions,
+            });
+        }
+        overlaySize = info.size;
+        if (overlaySize > maxFileBytes) {
+            return materializeReport({
+                editOverlay: { exists: true, bytes: overlaySize, inspectedLines: 0, skippedReason: "oversize" },
+                backupWritten: false,
+                actions: emptyActions,
+            });
+        }
+        overlayText = await readFile(overlayPath, "utf8");
+    }
+    catch {
+        return materializeReport({
+            editOverlay: { exists: true, bytes: overlaySize, inspectedLines: 0, skippedReason: "read_error" },
+            backupWritten: false,
+            actions: emptyActions,
+        });
+    }
+    const sourceText = sourceSize > 0 ? await readFile(sourcePath, "utf8") : "";
+    const sourceLines = sourceText
+        .split(/\r?\n/)
+        .filter((line) => line.trim().length > 0);
+    const overlayLines = overlayText
+        .split(/\r?\n/)
+        .filter((line) => line.trim().length > 0);
+    const actions = [];
+    const previouslyMaterializedRefs = await readMaterializedOverlayRefs(auditPath, maxFileBytes);
+    const appliedOverlayRefs = [];
+    let redactionCount = 0;
+    for (const line of overlayLines) {
+        const overlay = materializeOverlayFromLine(line);
+        redactionCount += overlay.redactionCount;
+        if (!overlay.ok) {
+            actions.push({
+                action: overlay.action,
+                sourceFile,
+                line: overlay.line,
+                reason: overlay.reason,
+                status: "skipped",
+                skippedReason: overlay.skippedReason,
+            });
+            continue;
+        }
+        const overlayRef = stableShortHash(line);
+        if (previouslyMaterializedRefs.has(overlayRef)) {
+            actions.push(actionFromOverlay(overlay, "skipped", "already_materialized"));
+            continue;
+        }
+        if (overlay.action === "append_correction") {
+            sourceLines.push(JSON.stringify(correctionMemoryFromOverlay(overlay)));
+            actions.push(actionFromOverlay(overlay, "applied"));
+            appliedOverlayRefs.push(overlayRef);
+            continue;
+        }
+        const target = findMemoryLine(sourceLines, overlay);
+        if (target.index < 0) {
+            actions.push(actionFromOverlay(overlay, "skipped", "target_missing"));
+            continue;
+        }
+        const targetLine = sourceLines[target.index];
+        const parsed = targetLine ? parseJsonLine(targetLine) : undefined;
+        if (!parsed) {
+            actions.push(actionFromOverlay(overlay, "skipped", "parse_error"));
+            continue;
+        }
+        if (overlay.action === "replace") {
+            sourceLines[target.index] = JSON.stringify(replaceMemoryText(parsed, overlay));
+            actions.push(actionFromOverlay(overlay, "applied"));
+            appliedOverlayRefs.push(overlayRef);
+            continue;
+        }
+        if (overlay.action === "suppress") {
+            sourceLines[target.index] = JSON.stringify(suppressMemoryText(parsed, overlay));
+            actions.push(actionFromOverlay(overlay, "applied"));
+            appliedOverlayRefs.push(overlayRef);
+            continue;
+        }
+        actions.push(actionFromOverlay(overlay, "skipped", "unsupported_action"));
+    }
+    const applied = actions.filter((action) => action.status === "applied").length;
+    if (applied > 0) {
+        await mkdir(dirname(backupPath), { recursive: true });
+        await writeFile(backupPath, sourceText, "utf8");
+        await writeFile(sourcePath, `${sourceLines.join("\n")}\n`, "utf8");
+    }
+    await mkdir(dirname(auditPath), { recursive: true });
+    await appendFile(auditPath, `${JSON.stringify({
+        schemaVersion: 1,
+        event: "local_memory_materialize",
+        createdAt: new Date().toISOString(),
+        writesRealFiles: applied > 0,
+        sourceFile,
+        editOverlayPath: LOCAL_MEMORY_EDIT_OVERLAY_FILE,
+        backupPath: applied > 0 ? backupRelativePath : "",
+        inspectedOverlays: overlayLines.length,
+        applied,
+        skipped: actions.length - applied,
+        redactionCount,
+        appliedOverlayRefs,
+        contentIncludedInAudit: false,
+    })}\n`, "utf8");
+    const reportInput = {
+        editOverlay: { exists: true, bytes: overlaySize, inspectedLines: overlayLines.length },
+        backupWritten: applied > 0,
+        actions,
+        redactionCount,
+    };
+    if (applied > 0)
+        reportInput.backupPath = backupRelativePath;
+    return materializeReport(reportInput);
+}
+async function readMaterializedOverlayRefs(auditPath, maxFileBytes) {
+    const refs = new Set();
+    let size = 0;
+    try {
+        const info = await stat(auditPath);
+        if (!info.isFile() || info.size > maxFileBytes)
+            return refs;
+        size = info.size;
+    }
+    catch {
+        return refs;
+    }
+    try {
+        const text = size > 0 ? await readFile(auditPath, "utf8") : "";
+        for (const line of text.split(/\r?\n/)) {
+            if (!line.trim())
+                continue;
+            const parsed = parseJsonLine(line);
+            const rawRefs = parsed && typeof parsed === "object" ? parsed.appliedOverlayRefs : undefined;
+            if (!Array.isArray(rawRefs))
+                continue;
+            for (const ref of rawRefs) {
+                if (typeof ref === "string" && /^[a-f0-9]{8}$/.test(ref))
+                    refs.add(ref);
+            }
+        }
+    }
+    catch {
+        return refs;
+    }
+    return refs;
 }
 async function auditFile(rootDir, fileName, maxFileBytes) {
     const name = basename(fileName);
@@ -329,6 +512,188 @@ function safeBrowseFileName(value) {
     return DEFAULT_LOCAL_CONTAINER_BROWSE_FILES.includes(name)
         ? name
         : undefined;
+}
+function materializeOverlayFromLine(line) {
+    const parsed = parseJsonLine(line);
+    const action = safeMaterializeAction(entryValue(parsed, ["action"]));
+    const reason = sanitizeScalar(entryValue(parsed, ["reason"]) ?? "manual_correction") || "manual_correction";
+    const lineNumber = clampInteger(Number.parseInt(stringifyScalar(entryValue(parsed, ["line"])), 10), 1, 1_000_000);
+    const replacementValue = stringifyScalar(entryValue(parsed, ["replacementText"]));
+    const replacement = redactPrivate(replacementValue);
+    const redactionCount = replacement.redactionCount;
+    if (!parsed || !action) {
+        return {
+            ok: false,
+            action: "replace",
+            line: lineNumber,
+            reason,
+            redactionCount,
+            skippedReason: "parse_error",
+        };
+    }
+    const sourceFile = safeBrowseFileName(parsed.sourceFile);
+    if (sourceFile !== "memories.jsonl") {
+        return {
+            ok: false,
+            action,
+            line: lineNumber,
+            reason,
+            redactionCount,
+            skippedReason: "unsupported_action",
+        };
+    }
+    if (replacement.redacted) {
+        return {
+            ok: false,
+            action,
+            line: lineNumber,
+            reason,
+            redactionCount,
+            skippedReason: "private_or_key_shaped",
+        };
+    }
+    const needsReplacement = action === "replace" || action === "append_correction";
+    if (needsReplacement && replacement.text.trim().length === 0) {
+        return {
+            ok: false,
+            action,
+            line: lineNumber,
+            reason,
+            redactionCount,
+            skippedReason: "target_missing",
+        };
+    }
+    const overlay = {
+        ok: true,
+        action,
+        sourceFile,
+        line: lineNumber,
+        reason,
+        replacementText: action === "suppress" ? "" : replacement.text.trim(),
+        redactionCount,
+    };
+    const sourceId = sanitizeOptionalScalar(entryValue(parsed, ["sourceId"]));
+    const createdAt = sanitizeOptionalScalar(entryValue(parsed, ["createdAt"]));
+    if (sourceId)
+        overlay.sourceId = sourceId;
+    if (createdAt)
+        overlay.createdAt = createdAt;
+    return overlay;
+}
+function materializeReport(input) {
+    const applied = input.actions.filter((action) => action.status === "applied");
+    const backup = { written: input.backupWritten };
+    if (input.backupPath)
+        backup.path = input.backupPath;
+    return {
+        schemaVersion: 1,
+        mode: "local-memory-edit-materialize",
+        writesRealFiles: true,
+        rootPathRedacted: true,
+        sourceFile: "memories.jsonl",
+        editOverlay: {
+            path: LOCAL_MEMORY_EDIT_OVERLAY_FILE,
+            ...input.editOverlay,
+        },
+        backup,
+        auditLog: {
+            path: LOCAL_MEMORY_MATERIALIZE_AUDIT_FILE,
+            entriesWritten: input.editOverlay.exists ? 1 : 0,
+        },
+        totals: {
+            inspectedOverlays: input.editOverlay.inspectedLines,
+            applied: applied.length,
+            replaced: applied.filter((action) => action.action === "replace").length,
+            appended: applied.filter((action) => action.action === "append_correction").length,
+            suppressed: applied.filter((action) => action.action === "suppress").length,
+            skipped: input.actions.length - applied.length,
+            redactionCount: input.redactionCount ?? 0,
+        },
+        actions: input.actions,
+    };
+}
+function actionFromOverlay(overlay, status, skippedReason) {
+    const action = {
+        action: overlay.action,
+        sourceFile: "memories.jsonl",
+        line: overlay.line,
+        reason: overlay.reason,
+        status,
+    };
+    if (overlay.sourceId)
+        action.sourceId = overlay.sourceId;
+    if (skippedReason)
+        action.skippedReason = skippedReason;
+    return action;
+}
+function findMemoryLine(lines, overlay) {
+    if (overlay.sourceId) {
+        const index = lines.findIndex((line) => sanitizeOptionalScalar(entryValue(parseJsonLine(line), ["id", "sourceId"])) === overlay.sourceId);
+        if (index >= 0)
+            return { index };
+    }
+    const index = overlay.line - 1;
+    return index >= 0 && index < lines.length ? { index } : { index: -1 };
+}
+function replaceMemoryText(entry, overlay) {
+    return {
+        ...entry,
+        text: overlay.replacementText,
+        updatedAt: new Date().toISOString(),
+        materializedEdit: {
+            action: overlay.action,
+            reason: overlay.reason,
+            sourceId: overlay.sourceId ?? "",
+            createdAt: overlay.createdAt ?? "",
+            contentIncluded: true,
+        },
+    };
+}
+function suppressMemoryText(entry, overlay) {
+    return {
+        ...entry,
+        text: "[SUPPRESSED_LOCAL_MEMORY]",
+        suppressed: true,
+        updatedAt: new Date().toISOString(),
+        materializedEdit: {
+            action: "suppress",
+            reason: overlay.reason,
+            sourceId: overlay.sourceId ?? "",
+            createdAt: overlay.createdAt ?? "",
+            contentIncluded: false,
+        },
+    };
+}
+function correctionMemoryFromOverlay(overlay) {
+    const baseId = overlay.sourceId || `line-${overlay.line}`;
+    return {
+        id: `${baseId}-correction-${stableShortHash(`${overlay.replacementText}:${overlay.createdAt ?? ""}`)}`,
+        kind: "correction",
+        text: overlay.replacementText,
+        sourceId: overlay.sourceId ?? "",
+        sourceLine: overlay.line,
+        createdAt: new Date().toISOString(),
+        materializedEdit: {
+            action: "append_correction",
+            reason: overlay.reason,
+            createdAt: overlay.createdAt ?? "",
+            contentIncluded: true,
+        },
+    };
+}
+function safeMaterializeAction(value) {
+    const action = sanitizeScalar(value);
+    return action === "replace" || action === "append_correction" || action === "suppress" ? action : undefined;
+}
+function fileSafeTimestamp(date) {
+    return date.toISOString().replace(/[:.]/g, "-");
+}
+function stableShortHash(value) {
+    let hash = 0;
+    for (let index = 0; index < value.length; index += 1) {
+        hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+    }
+    return hash.toString(16).padStart(8, "0");
 }
 function parseJsonLine(line) {
     try {

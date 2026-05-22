@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "capturedAt": "2026-05-22T13:22:21.629Z",
-  "head": "96ae9ccd0ab6813025e2d5bf1d185a9b2cc6b340",
+  "capturedAt": "2026-05-22T14:57:35.257Z",
+  "head": "4de4649bfb998637d11c096edd47289720db1c27",
   "evidence": {
-    "bodyLength": 13136,
+    "bodyLength": 36937,
     "buttons": [
       "All",
       "Memory",
@@ -11,12 +11,17 @@
       "Trace",
       "Research",
       "Lifecycle",
-      "retrieval traceRetrieval trace for native memory optimization",
-      "derived docNative Memory Optimization Plan88% confidence",
+      "retrieval trace Retrieval trace for native memory optimization",
+      "derived doc Native Memory Optimization Plan 88% confidence",
       "Stage policy",
+      "Apply policy",
       "Stage review",
+      "Apply review",
       "Preview sync",
       "Apply sync",
+      "Browse entries",
+      "Apply edit",
+      "Materialize edits",
       "Audit",
       "Save fixture edit",
       "Reset"
@@ -49,7 +54,9 @@
       "hasLocalEditPhrase": true,
       "hasLocalEditOverlayBrowse": true,
       "hasLocalEditOverlayPreview": true,
-      "hasSelectedBrowsePanel": true
+      "hasSelectedBrowsePanel": true,
+      "hasLocalMemoryMaterialize": true,
+      "hasLocalMaterializeBackup": true
     },
     "h1": "Nucleus",
     "inputs": [
@@ -100,6 +107,24 @@
         "tag": "input",
         "type": "text",
         "ariaLabel": "Selected local lifecycle policy confirmation phrase"
+      },
+      {
+        "id": "review-candidate-maintenance-noise",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": ""
+      },
+      {
+        "id": "review-candidate-duplicate-recallweave-decision",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": ""
+      },
+      {
+        "id": "review-candidate-high-value-policy",
+        "tag": "select",
+        "type": "select",
+        "ariaLabel": ""
       },
       {
         "id": "reviewQueueApplyPath",
@@ -228,6 +253,24 @@
         "ariaLabel": "Selected local memory edit confirmation phrase"
       },
       {
+        "id": "localMaterializePath",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory materialize path"
+      },
+      {
+        "id": "localMaterializeConfirm",
+        "tag": "input",
+        "type": "checkbox",
+        "ariaLabel": ""
+      },
+      {
+        "id": "localMaterializePhrase",
+        "tag": "input",
+        "type": "text",
+        "ariaLabel": "Selected local memory materialize confirmation phrase"
+      },
+      {
         "id": "selectedAuditPath",
         "tag": "input",
         "type": "text",
@@ -249,16 +292,14 @@
     "sectionCount": 13,
     "title": "RecallWeave Brain",
     "url": "http://127.0.0.1:4177/",
-    "inputCount": 32,
-    "localEditText": "Edit container path\nSource file\nmemories.jsonl\nLine\nSource id\nAction\nAppend correction\nReplace derived memory\nSuppress\nNeeds review\nReason\nManual correction\nDuplicate\nStale\nNoise\nPrivacy\nOther\nReplacement text\nWrite edit overlay\nConfirmation phrase\nApply edit",
-    "localBrowseText": "DECISION\nUse local-only writes with hosted read-through disabled by default.\nmemories.jsonl:1\noverlay: replace | manual correction | Use local-only writes with visible edit overlays.\nPREFERENCE\nPrefer concise lifecycle recall for maintenance turns.\nmemories.jsonl:2\nTRACE\nmemory health\ntrace.jsonl:1 | search",
+    "inputCount": 38,
+    "localEditText": "Edit container path Source file memories.jsonl Line Source id Action Append correction Replace derived memory Suppress Needs review Reason Manual correction Duplicate Stale Noise Privacy Other Replacement text Write edit overlay Confirmation phrase Apply edit Materialize container path",
+    "localMaterializeText": "Materialize container path Write memory file with backup Confirmation phrase Materialize edits Local container path",
     "selectedBrowseText": ""
   },
   "screenshot": {
-    "ok": false,
-    "reason": "in-app browser Page.captureScreenshot timed out in the prior browser DOM pass; existing fixture screenshots remain in ui-evidence"
+    "ok": true,
+    "path": "ui-evidence/brain-ui-local-memory-materialize.png"
   },
-  "localEditCapturedAt": "2026-05-22T14:22:13.884Z",
-  "note": "Updated by Codex Browser against localhost fixture UI with selected local memory edit overlay controls visible. Screenshot path is fixture-only.",
-  "localEditOverlayBrowseCapturedAt": "2026-05-22T14:33:57.222Z"
+  "note": "Captured with headless Chrome against localhost fixture UI with selected local memory materialize controls visible. Screenshot is fixture-only."
 }

@@ -19,8 +19,8 @@ The current PR adds:
   lineage, vault preview, sync-report inspection, selected vault sync dry-run,
   selected vault sync apply, selected local-container browse, lifecycle policy
   preview, selected lifecycle policy apply, memory review queue preview, and
-  selected review queue apply, selected local memory edit overlay, and local
-  edit overlay browse visibility;
+  selected review queue apply, selected local memory edit overlay, local edit
+  overlay browse visibility, and selected local memory materialize;
 - a dry-run-first `selfmem_update` command for agent update workflows;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
@@ -78,9 +78,9 @@ Latest verified head before this draft refresh:
 ## Known Gaps
 
 - The Brain UI is still fixture mode.
-- Direct in-place local memory mutation remains disabled; selected local memory
-  edits use append-only overlays, and local edit overlay browse makes matching
-  overlays visible without mutating source memory files.
+- Direct local memory materialization is guarded by an environment flag, exact
+  phrase, backup, and content-free audit log; selected local memory edits still
+  start as append-only overlays before they are materialized.
 - The benchmark evidence is fixture-focused. Hosted Supermemory comparison
   claims require a fresh, valid, metrics-only baseline.
 - The public release should stay conservative until the owner approves it.

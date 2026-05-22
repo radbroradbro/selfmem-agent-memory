@@ -49,6 +49,8 @@ is still required before any public live update.
 | Brain UI selected local memory edit review | `reviews/overnight-20260522/gemini-brain-ui-local-memory-edit-review.md` |
 | Brain UI local edit overlay browse | `reviews/overnight-20260522/brain-ui-local-edit-overlay-browse-evidence.md` |
 | Brain UI local edit overlay browse review | `reviews/overnight-20260522/gemini-brain-ui-local-edit-overlay-browse-review.md` |
+| Brain UI selected local memory materialize | `reviews/overnight-20260522/brain-ui-local-memory-materialize-evidence.md` |
+| Brain UI selected local memory materialize review | `reviews/overnight-20260522/gemini-brain-ui-local-memory-materialize-review.md` |
 | Brain UI selected vault sync dry-run | `reviews/overnight-20260522/brain-ui-selected-sync-dry-run-evidence.md` |
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `reviews/overnight-20260522/ui-evidence/brain-ui-browser-dom-evidence.json` |
 | Selected vault sync apply review | `reviews/overnight-20260522/gemini-selected-sync-apply-review.md` |
@@ -161,6 +163,9 @@ Sanitized fixture evidence exists under
 - selected local edit overlay browse evidence is present in Browser DOM
   evidence and interaction smoke proves a matching append-only overlay appears
   in the selected local-container browse without mutating `memories.jsonl`
+- selected local memory materialize controls are present in Browser DOM
+  evidence and interaction smoke proves safe overlays can be written into
+  `memories.jsonl` with a backup and content-free audit log
 
 The evidence uses bundled fixture data only. It does not show raw memories,
 raw transcripts, credentials, private diagnostics, private agent paths, or real
@@ -192,6 +197,7 @@ local memory contents.
 - Gemini Brain UI review queue apply review: `CLEAN`.
 - Gemini Brain UI local memory edit review: `CLEAN`.
 - Gemini Brain UI local edit overlay browse review: `CLEAN`.
+- Gemini Brain UI local memory materialize review: `CLEAN`.
 - Gemini Nucleus snapshot review: first `CONCERNS`, then final `CLEAN` after
   object-key redaction was fixed and smoke-guarded.
 - Gemini research-lineage review: `CLEAN`.
@@ -233,6 +239,11 @@ local memory contents.
 - Brain UI local edit overlay browse surfaces matching append-only edit
   overlays beside selected local-container browse entries using redacted
   previews only, and still writes no files.
+- Brain UI selected local memory materialize is disabled by default, requires
+  the local materialize environment flag, requires write confirmation plus an
+  exact phrase, writes a backup, applies supported safe overlays to
+  `memories.jsonl`, appends a content-free audit line, skips private/key-shaped
+  overlays, and returns only redacted root labels and relative paths.
 - Brain UI selected audit history is browser-local and stores only redacted
   labels, counts, status, event name, and timestamp.
 - Brain UI selected vault sync dry-run is disabled by default, requires
@@ -277,7 +288,7 @@ local memory contents.
   browser-local audit history, plus write-confirmed selected vault sync apply,
   write-confirmed selected lifecycle policy apply, and write-confirmed selected
   review queue apply, plus write-confirmed selected local memory edit overlays
-  with read-only overlay browse visibility.
+  with read-only overlay browse visibility and guarded materialization.
   Direct in-place local memory mutation remains disabled.
 - The compaction benchmark uses public fixtures. Private local Codex or Claude
   session-history runs must stay local and may commit only aggregate metrics or

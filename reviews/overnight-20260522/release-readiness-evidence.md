@@ -46,6 +46,11 @@ Scope:
   while keeping browse read-only and source memory files unchanged.
 - Added Gemini review for local edit overlay browse and made that review packet
   a required release-readiness artifact.
+- Added Brain UI selected local memory materialize coverage so safe overlays
+  can be written into `memories.jsonl` only after an environment gate, exact
+  phrase, backup, and content-free audit log.
+- Added Gemini review for local memory materialize and made that review packet
+  a required release-readiness artifact.
 - Added Brain UI selected audit history evidence to the release gate so
   browser-local history is content-free, bounded, and does not expose raw local
   paths or private/key-shaped text.
@@ -107,6 +112,9 @@ What `release:check` verifies:
   interaction smoke and Browser DOM evidence,
 - Brain UI local edit overlay browse evidence exists and is covered by fresh
   interaction smoke and Browser DOM evidence,
+- Brain UI selected local memory materialize evidence exists and is covered by
+  fresh interaction smoke, local-container audit smoke, and Browser DOM
+  evidence,
 - Brain UI selected audit history DOM evidence is sane,
 - Brain UI selected vault sync dry-run DOM evidence is sane,
 - Brain UI selected vault sync apply controls are present in Browser DOM
@@ -184,7 +192,7 @@ Cold review response:
   lineage, lifecycle policy draft export, memory review queue draft export,
   vault path selection, selected local-container browse, write-confirmed
   selected local memory edit, private/key-shaped local edit rejection, selected
-  vault sync dry-run, write-confirmed selected vault sync apply,
+  local memory materialize, selected vault sync dry-run, write-confirmed selected vault sync apply,
   write-confirmed selected lifecycle policy apply, private/key-shaped policy
   rejection, dry-run sync reporting, write-confirmed selected review queue
   apply, private/key-shaped review rejection, audit-log write intent coverage,

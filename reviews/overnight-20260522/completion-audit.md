@@ -35,6 +35,8 @@ complete or publish a public live update.
   `26293533847` passed
 - Guarded local edit overlay browse follow-up: `b5352a0`, CI run
   `26294323086` passed
+- Guarded local memory materialize follow-up: local verification passed; CI
+  pending after push
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -56,6 +58,7 @@ complete or publish a public live update.
 | Brain UI selected local-container browse | `brain-ui-selected-local-browse-evidence.md`, `packages/brain-ui/interaction-smoke.mjs`, `tests/local-container/audit.test.ts` | Proven as disabled-by-default read-only redacted browse preview |
 | Brain UI selected local memory edit overlay | `brain-ui-local-memory-edit-evidence.md`, `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, Gemini review | Proven as disabled-by-default write-confirmed append-only overlay |
 | Brain UI local edit overlay browse | `brain-ui-local-edit-overlay-browse-evidence.md`, `packages/core/src/local-container/audit.ts`, `packages/brain-ui/interaction-smoke.mjs`, Gemini review | Proven as read-only selected browse visibility for matching append-only edit overlays |
+| Brain UI selected local memory materialize | `brain-ui-local-memory-materialize-evidence.md`, `packages/core/src/local-container/audit.ts`, `packages/brain-ui/interaction-smoke.mjs`, Gemini review | Proven locally as disabled-by-default write-confirmed materialization with backup and content-free audit |
 | Brain UI selected audit-history evidence | `brain-ui-selected-audit-history-*`, `brain-ui-selected-audit-history-evidence.md`, Gemini review | Proven as browser-local content-free history |
 | Brain UI selected vault sync dry-run evidence | `brain-ui-selected-sync-dry-run-*`, `brain-ui-selected-sync-dry-run-evidence.md`, Gemini review | Proven as disabled-by-default read-only dry-run |
 | Brain UI selected vault sync apply | `packages/brain-ui/server.mjs`, `packages/brain-ui/interaction-smoke.mjs`, `brain-ui-browser-dom-evidence.json` | Proven as disabled-by-default write-confirmed apply with content-free audit log |
@@ -102,9 +105,9 @@ complete or publish a public live update.
    overlays, browser-local audit history, selected vault sync dry-run,
    write-confirmed selected vault sync apply, lifecycle policy draft export,
    write-confirmed selected lifecycle policy apply, memory review queue draft
-   export, write-confirmed selected review queue apply, and write-confirmed
-   selected local memory edit overlays. Direct in-place local memory mutation
-   remains disabled.
+   export, write-confirmed selected review queue apply, write-confirmed
+   selected local memory edit overlays, and write-confirmed selected local
+   memory materialize with backup.
 7. Hosted Supermemory benchmark claims remain out of scope until a fresh,
    valid, metrics-only baseline is run.
 

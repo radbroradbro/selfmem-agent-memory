@@ -41,6 +41,8 @@ or explicitly accepted.
   selected local memory edit overlay slice became required.
 - GitHub Actions CI run `26294323086` on `b5352a0`: passed after the guarded
   local edit overlay browse slice became required.
+- Local checks passed for the guarded local memory materialize slice. CI is
+  pending until this slice is pushed.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was
@@ -60,7 +62,7 @@ local-container mode, and a public release note that does not overclaim.
   provenance, lifecycle/retrieval trace, derived doc edit, save/cancel behavior,
   Nucleus snapshot preview, research lineage, wiki/vault preview, sync conflict
   view, selected local-container browse, selected local memory edit overlay,
-  local edit overlay browse visibility,
+  local edit overlay browse visibility, selected local memory materialize,
   selected vault sync dry-run, selected vault sync apply, lifecycle policy
   preview, selected lifecycle policy apply, memory review queue preview, and
   selected review queue apply.

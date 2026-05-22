@@ -9,6 +9,7 @@ import {
   browseLocalContainer,
   compileNucleusWikiVault,
   lintCompiledWikiVault,
+  materializeLocalMemoryEdits,
   redactPrivate,
   syncCompiledWikiVault,
 } from "../core/dist/index.js";
@@ -30,6 +31,8 @@ export function createBrainUiServer(options = {}) {
   const enablePolicyApply = options.enablePolicyApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_POLICY_APPLY === "1";
   const enableReviewApply = options.enableReviewApply ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_REVIEW_APPLY === "1";
   const enableLocalEdit = options.enableLocalEdit ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_EDIT === "1";
+  const enableLocalMaterialize =
+    options.enableLocalMaterialize ?? process.env.RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_MATERIALIZE === "1";
 
   return createHttpServer(async (request, response) => {
     try {
@@ -234,6 +237,29 @@ export function createBrainUiServer(options = {}) {
         return;
       }
 
+      if (path === "__local_container_materialize") {
+        if (!enableLocalMaterialize) {
+          send(
+            response,
+            403,
+            "application/json; charset=utf-8",
+            JSON.stringify({
+              ok: false,
+              code: "local_materialize_disabled",
+              message: "Set RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_MATERIALIZE=1 to materialize selected local memory edit overlays.",
+            }),
+          );
+          return;
+        }
+        if (request.method !== "POST") {
+          send(response, 405, "application/json; charset=utf-8", JSON.stringify({ ok: false, code: "method_not_allowed" }));
+          return;
+        }
+        const result = await materializeSelectedLocalMemoryEdits(request);
+        send(response, 200, "application/json; charset=utf-8", JSON.stringify(result));
+        return;
+      }
+
       const filePath = resolve(root, path);
       if (!filePath.startsWith(root)) throw new Error("invalid path");
       const body = await readFile(filePath);
@@ -262,6 +288,7 @@ function routePath(pathname) {
   if (pathname === "/lifecycle-policy/apply") return "__lifecycle_policy_apply";
   if (pathname === "/review-queue/apply") return "__review_queue_apply";
   if (pathname === "/local-container/edit") return "__local_container_edit";
+  if (pathname === "/local-container/materialize") return "__local_container_materialize";
   if (pathname === "/favicon.ico") return "__favicon";
   if (pathname === "/healthz") return "__healthz";
 
@@ -824,6 +851,42 @@ async function applySelectedLocalMemoryEdit(request) {
         originalContentIncluded: false,
       },
     },
+  };
+}
+
+async function materializeSelectedLocalMemoryEdits(request) {
+  const body = await readJsonBody(request, 20_000);
+  const rootDir = typeof body.rootDir === "string" ? body.rootDir.trim() : "";
+  const confirmationPhrase = typeof body.confirmationPhrase === "string" ? body.confirmationPhrase.trim() : "";
+
+  if (body.confirmWrite !== true || confirmationPhrase !== "APPLY LOCAL MEMORY MATERIALIZE") {
+    return {
+      ok: false,
+      code: "write_confirmation_required",
+      message: "Confirm local materialize write and type APPLY LOCAL MEMORY MATERIALIZE before changing selected local memories.",
+    };
+  }
+
+  if (!rootDir) {
+    return { ok: false, code: "root_dir_required", message: "Choose a local container directory first." };
+  }
+
+  const report = await materializeLocalMemoryEdits({ rootDir });
+  return {
+    ok: true,
+    mode: "selected-local-memory-materialize",
+    writesRealFiles: report.totals.applied > 0,
+    selection: {
+      rootPathRedacted: true,
+      rootDisplay: redactPathForDisplay(rootDir),
+    },
+    auditTrail: {
+      event: "local_memory_materialize",
+      writesRealFiles: report.totals.applied > 0,
+      auditLog: report.auditLog,
+      backup: report.backup,
+    },
+    report,
   };
 }
 

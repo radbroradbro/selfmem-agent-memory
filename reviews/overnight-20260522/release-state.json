@@ -46,6 +46,7 @@
     "brain-ui-memory-review-queue-apply",
     "brain-ui-selected-local-memory-edit",
     "brain-ui-local-edit-overlay-browse",
+    "brain-ui-selected-local-memory-materialize",
     "session-compaction-benchmark",
     "selfmem-update"
   ],
@@ -54,7 +55,6 @@
     "github-pr-body-update-blocked",
     "github-issue-create-blocked",
     "human-public-launch-approval-required",
-    "brain-ui-direct-local-memory-mutation-not-enabled",
     "hosted-supermemory-baseline-not-current"
   ],
   "safetyBoundary": {

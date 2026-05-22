@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { auditLocalContainer, browseLocalContainer } from "../../packages/core/src/index.js";
+import { auditLocalContainer, browseLocalContainer, materializeLocalMemoryEdits } from "../../packages/core/src/index.js";
 
 describe("local container audit", () => {
   it("summarizes known local memory files without returning raw content or paths", async () => {
@@ -117,5 +117,85 @@ describe("local container audit", () => {
     expect(serialized).not.toContain(rootDir);
     expect(serialized).not.toContain("hidden");
     expect(serialized).not.toContain(keyLike);
+  });
+
+  it("materializes safe local edit overlays with backup and content-free audit", async () => {
+    const rootDir = await mkdtemp(join(tmpdir(), "recallweave-local-materialize-"));
+    const keyLike = `sm_${"C".repeat(42)}`;
+    await writeFile(
+      join(rootDir, "memories.jsonl"),
+      [
+        JSON.stringify({ id: "mem_1", kind: "decision", text: "old fixture memory text" }),
+        JSON.stringify({ id: "mem_2", kind: "preference", text: "keep fixture memory text" }),
+      ].join("\n"),
+      "utf8",
+    );
+    await mkdir(join(rootDir, ".recallweave"), { recursive: true });
+    await writeFile(
+      join(rootDir, ".recallweave/local-memory-edits.jsonl"),
+      [
+        JSON.stringify({
+          event: "local_memory_edit_overlay",
+          sourceFile: "memories.jsonl",
+          line: 1,
+          sourceId: "mem_1",
+          action: "replace",
+          reason: "manual_correction",
+          replacementText: "new fixture memory text",
+        }),
+        JSON.stringify({
+          event: "local_memory_edit_overlay",
+          sourceFile: "memories.jsonl",
+          line: 2,
+          sourceId: "mem_2",
+          action: "append_correction",
+          reason: "manual_correction",
+          replacementText: "appended fixture correction",
+        }),
+        JSON.stringify({
+          event: "local_memory_edit_overlay",
+          sourceFile: "memories.jsonl",
+          line: 2,
+          sourceId: "mem_2",
+          action: "replace",
+          reason: "privacy",
+          replacementText: `public ${keyLike}`,
+        }),
+      ].join("\n"),
+      "utf8",
+    );
+
+    const report = await materializeLocalMemoryEdits({ rootDir });
+    const memoryText = await readFile(join(rootDir, "memories.jsonl"), "utf8");
+    const auditText = await readFile(join(rootDir, ".recallweave/local-memory-materialize-audit.jsonl"), "utf8");
+    const serialized = JSON.stringify(report);
+    const rerunReport = await materializeLocalMemoryEdits({ rootDir });
+    const rerunMemoryText = await readFile(join(rootDir, "memories.jsonl"), "utf8");
+
+    expect(report.mode).toBe("local-memory-edit-materialize");
+    expect(report.writesRealFiles).toBe(true);
+    expect(report.rootPathRedacted).toBe(true);
+    expect(report.backup.written).toBe(true);
+    expect(report.backup.path).toMatch(/^\.recallweave\/backups\/memories-/);
+    expect(report.auditLog.entriesWritten).toBe(1);
+    expect(report.totals.inspectedOverlays).toBe(3);
+    expect(report.totals.applied).toBe(2);
+    expect(report.totals.replaced).toBe(1);
+    expect(report.totals.appended).toBe(1);
+    expect(report.totals.skipped).toBe(1);
+    expect(report.totals.redactionCount).toBeGreaterThanOrEqual(1);
+    expect(report.actions.some((action) => action.skippedReason === "private_or_key_shaped")).toBe(true);
+    expect(memoryText).toContain("new fixture memory text");
+    expect(memoryText).toContain("appended fixture correction");
+    expect(memoryText).not.toContain(keyLike);
+    expect(auditText).toContain("local_memory_materialize");
+    expect(auditText).not.toContain("new fixture memory text");
+    expect(auditText).not.toContain("appended fixture correction");
+    expect(serialized).not.toContain(rootDir);
+    expect(serialized).not.toContain(keyLike);
+    expect(serialized).not.toContain("new fixture memory text");
+    expect(rerunReport.totals.applied).toBe(0);
+    expect(rerunReport.actions.some((action) => action.skippedReason === "already_materialized")).toBe(true);
+    expect(rerunMemoryText).toBe(memoryText);
   });
 });

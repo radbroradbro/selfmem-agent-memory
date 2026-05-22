@@ -87,6 +87,14 @@ private/key-shaped payloads, and writes append-only overlay records under
 `.recallweave/local-memory-edit-audit.jsonl`. It does not mutate
 `memories.jsonl` in place.
 
-Direct in-place editable memory state remains intentionally disabled. The wiki
-sync helper already lints before write and can append a content-free pre-write
-audit log when `auditLogPath` is supplied.
+`materializeLocalMemoryEdits()` is the guarded write step. The Brain UI exposes
+it only when `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_MATERIALIZE=1` is set and the
+operator types `APPLY LOCAL MEMORY MATERIALIZE`. It applies supported safe
+overlays to `memories.jsonl`, writes a backup under `.recallweave/backups/`,
+and appends a content-free `.recallweave/local-memory-materialize-audit.jsonl`
+audit line. Private/key-shaped overlay payloads are skipped again at
+materialize time. The response reports counts, relative paths, and action
+statuses only.
+
+The wiki sync helper already lints before write and can append a content-free
+pre-write audit log when `auditLogPath` is supplied.

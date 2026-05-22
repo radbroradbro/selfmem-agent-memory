@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { auditLocalContainer, browseLocalContainer } from "../core/dist/index.js";
+import { auditLocalContainer, browseLocalContainer, materializeLocalMemoryEdits } from "../core/dist/index.js";
 
 const rootDir = await mkdtemp(join(tmpdir(), "recallweave-local-container-audit-smoke-"));
 const keyLike = `pa-${"A".repeat(44)}`;
@@ -41,8 +41,11 @@ const browse = await browseLocalContainer({
   containerLabel: `fixture ${keyLike}`,
   maxItems: 8,
 });
+const materialized = await materializeLocalMemoryEdits({ rootDir });
+const materializedMemory = await readFile(join(rootDir, "memories.jsonl"), "utf8");
 const serialized = JSON.stringify(report);
 const browseSerialized = JSON.stringify(browse);
+const materializedSerialized = JSON.stringify(materialized);
 
 assert.equal(report.ok, undefined);
 assert.equal(report.mode, "local-container-audit");
@@ -66,6 +69,15 @@ assert.equal(browse.totals.editOverlayCount, 1);
 assert.ok(browse.totals.redactionCount >= 1);
 assert.doesNotMatch(browseSerialized, /hidden|pa-[A-Z]{10,}/);
 assert.doesNotMatch(browseSerialized, new RegExp(rootDir.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+assert.equal(materialized.mode, "local-memory-edit-materialize");
+assert.equal(materialized.writesRealFiles, true);
+assert.equal(materialized.rootPathRedacted, true);
+assert.equal(materialized.totals.applied, 1);
+assert.equal(materialized.totals.replaced, 1);
+assert.equal(materialized.backup.written, true);
+assert.match(materializedMemory, /overlay visibility/);
+assert.doesNotMatch(materializedSerialized, /overlay visibility|hidden|pa-[A-Z]{10,}/);
+assert.doesNotMatch(materializedSerialized, new RegExp(rootDir.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 
 console.log(
   JSON.stringify(
@@ -83,6 +95,8 @@ console.log(
       browseItems: browse.totals.itemsReturned,
       browseRedactionCount: browse.totals.redactionCount,
       browseOverlayCount: browse.totals.editOverlayCount,
+      materializeApplied: materialized.totals.applied,
+      materializeBackup: materialized.backup.written,
     },
     null,
     2,

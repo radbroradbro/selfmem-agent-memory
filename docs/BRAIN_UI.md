@@ -19,6 +19,7 @@ The UI should expose:
 - memory review queue draft export,
 - selected memory review queue apply with explicit confirmation,
 - selected local memory edit overlay with explicit confirmation,
+- selected local memory materialize with explicit confirmation and backup,
 - sanitized Nucleus snapshot export,
 - derived docs and wiki pages,
 - compiled wiki/vault files,
@@ -75,7 +76,8 @@ Required visual review path:
 18. selected local vault sync dry-run,
 19. selected local vault sync apply confirmation,
 20. fixture local-container audit preflight,
-21. selected local memory edit overlay confirmation.
+21. selected local memory edit overlay confirmation,
+22. selected local memory materialize confirmation.
 
 Current public evidence lives under `reviews/overnight-20260522/ui-evidence/`
 and must stay fixture-only. The sync report endpoint uses a temporary fixture
@@ -159,6 +161,17 @@ summary counts, and an audit hash. The selected local-container browse preview
 can then show the overlay action, reason, and redacted replacement preview next
 to the matching memory line without mutating the source JSONL.
 
+Selected local memory materialize is disabled unless the server starts with
+`RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_MATERIALIZE=1`. When enabled, it requires a
+write checkbox and the exact confirmation phrase
+`APPLY LOCAL MEMORY MATERIALIZE`. It reads append-only local edit overlays,
+applies supported safe edits to `memories.jsonl`, writes a local backup under
+`.recallweave/backups/`, and appends a content-free
+`.recallweave/local-memory-materialize-audit.jsonl` audit line. It rejects
+private or key-shaped overlay payloads again before writing. The server
+response returns only counts, relative paths, action statuses, and a redacted
+`.../container` label.
+
 Selected local vault sync dry-run is also disabled unless
 `RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1` is set. When enabled, it requires
 read-only confirmation, clears the typed path after submit, runs
@@ -184,7 +197,7 @@ Before connecting real local containers, the UI needs:
 - explicit file picker or config path with read-only confirmation,
 - selected local-container browse preview,
 - selected local memory edit overlay,
-- direct in-place local memory mutation remains disabled,
+- selected local memory materialize with backup,
 - write confirmation for derived docs,
 - wiki lint before save,
 - Nucleus snapshot export against a selected redacted local container,
