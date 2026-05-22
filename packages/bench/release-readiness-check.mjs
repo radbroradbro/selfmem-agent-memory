@@ -18,6 +18,8 @@ const requiredFiles = [
   "docs/PRODUCTION_READINESS.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
   `${reviewDir}/kickoff.md`,
+  `${reviewDir}/summary.md`,
+  `${reviewDir}/claude-pr5-review-blocked.md`,
   `${reviewDir}/session-compaction-evidence.md`,
   `${reviewDir}/session-compaction-benchmark-evidence.md`,
   `${reviewDir}/wiki-vault-evidence.md`,
