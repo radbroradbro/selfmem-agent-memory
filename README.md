@@ -53,6 +53,11 @@ must run before making quality claims.
   decisions, and follow-up questions.
 - LLM-wiki compiler and explicit disk-sync rules for Obsidian-compatible vaults
   and the self-hosted brain UI.
+- Self-hosted Brain UI scaffold for graph search, container health, wiki/vault
+  preview, Nucleus snapshots, research lineage, local audit preflight, and
+  selected local-container audit preview.
+- Read-only selected local-container audit route, disabled by default, with
+  read-only confirmation and redacted `.../container` path display.
 - Fixture-safe session compaction benchmark for chronological durable memory
   extraction, exact identifier preservation, stale/private suppression, and
   duplicate merge behavior.

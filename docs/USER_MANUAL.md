@@ -130,6 +130,27 @@ Run the fixture check before enabling any live vault flow:
 npm exec --yes pnpm@10.23.0 -- wiki:sync:smoke
 ```
 
+## Brain UI
+
+Run the local Brain UI from a checkout:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- brain:serve
+```
+
+Open `http://127.0.0.1:4177`.
+
+By default the Brain UI uses bundled fixture data. To run a selected local
+container audit preview, start it with:
+
+```bash
+RECALLWEAVE_BRAIN_UI_ENABLE_LOCAL_AUDIT=1 npm exec --yes pnpm@10.23.0 -- brain:serve
+```
+
+The selected audit is read-only. It requires confirmation, clears the typed
+path after submit, and shows only a redacted `.../container` path, counts, and
+health reasons.
+
 On a live agent, inspect the runtime trace for:
 
 - `session_start`,
