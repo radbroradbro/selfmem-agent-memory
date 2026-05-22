@@ -63,10 +63,11 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Head: `2888f91`
-- GitHub Actions: CI run `26288370812` passed
+- Head: `3b5e140`
+- GitHub Actions: CI run `26292137539` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
-- Local release gate: `pnpm release:check` passed in the controller run
+- Local release gate: `node packages/bench/release-readiness-check.mjs` passed
+  in the controller run
 - Reviewer state: Gemini focused slice reviews passed; Claude route blocked by
   login
 - Completion audit: not complete, with public launch still blocked on human

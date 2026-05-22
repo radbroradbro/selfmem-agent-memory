@@ -82,6 +82,8 @@ Controller follow-up after that sandbox run:
   commit `103e7c6` passed Test, Full smoke, and Release readiness check.
 - GitHub Actions CI run `26291352800` on guarded selected local-container
   browse commit `04f1096` passed Test, Full smoke, and Release readiness check.
+- GitHub Actions CI run `26292137539` on guarded selected lifecycle policy
+  apply commit `3b5e140` passed Test, Full smoke, and Release readiness check.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.
 - Focused Gemini reviews for Brain UI local-audit preview and selected
@@ -98,6 +100,8 @@ Controller follow-up after that sandbox run:
   commit `103e7c6` passed.
 - GitHub Actions CI run `26291352800` on guarded selected local-container
   browse commit `04f1096` passed.
+- GitHub Actions CI run `26292137539` on guarded selected lifecycle policy
+  apply commit `3b5e140` passed.
 
 ## UI Evidence
 

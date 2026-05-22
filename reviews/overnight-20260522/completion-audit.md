@@ -27,6 +27,8 @@ complete or publish a public live update.
   `26290534116` passed
 - Guarded selected local-container browse follow-up: `04f1096`, CI run
   `26291352800` passed
+- Guarded selected lifecycle policy apply follow-up: `3b5e140`, CI run
+  `26292137539` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 

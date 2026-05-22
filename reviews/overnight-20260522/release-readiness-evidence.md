@@ -173,3 +173,5 @@ Known limits:
   apply commit `103e7c6`.
 - GitHub Actions CI run `26291352800` passed on guarded selected
   local-container browse commit `04f1096`.
+- GitHub Actions CI run `26292137539` passed on guarded selected lifecycle
+  policy apply commit `3b5e140`.

@@ -17,6 +17,8 @@ Retry note:
 - This draft was refreshed after CI run `26288370812` passed on `2888f91`.
 - It was refreshed again after release-state guard CI run `26289073223` passed
   on `dd17f44`.
+- It was refreshed again after guarded lifecycle policy apply CI run
+  `26292137539` passed on `3b5e140`.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -38,17 +40,17 @@ The code, fixture UI, release gate, and GitHub Actions pass. Public launch shoul
 
 ## Verification
 
-Latest local verification includes the memory review queue and status-trail refresh.
+Latest local verification includes the guarded lifecycle policy apply slice.
 
-- Local `pnpm test`: 6 files, 20 tests passed.
-- Local `pnpm smoke`: passed.
-- Local `pnpm container:audit:smoke`: passed.
-- Local `pnpm release:check`: passed.
+- Local `npm run test`: 6 files, 21 tests passed.
+- Local `npm exec --yes pnpm@10.23.0 -- smoke`: passed.
+- Local `node packages/bench/release-readiness-check.mjs`: passed.
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
 - Local private-name scan: no hits.
 - GitHub Actions CI: run `26288370812` passed on `2888f91`, the latest baseline inspected before this draft.
 - GitHub Actions CI: run `26289073223` passed on `dd17f44`, the release-state guard follow-up commit.
+- GitHub Actions CI: run `26292137539` passed on `3b5e140`, the guarded lifecycle policy apply commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, local-container audit, Nucleus snapshot, Research Lineage, browser evidence gate, and public live-update copy are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

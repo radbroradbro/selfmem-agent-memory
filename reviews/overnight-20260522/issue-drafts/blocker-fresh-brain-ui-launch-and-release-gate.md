@@ -33,6 +33,8 @@ or explicitly accepted.
   Full smoke, and Release readiness check.
 - GitHub Actions CI run `26289073223` on `dd17f44`: passed after the
   conservative release-state guard review became required.
+- GitHub Actions CI run `26292137539` on `3b5e140`: passed after the guarded
+  selected lifecycle policy apply slice became required.
 - GitHub issue creation from this draft was attempted and blocked by GitHub app
   permissions. See `reviews/overnight-20260522/github-issue-create-blocked.md`.
 - A top-level PR status comment was also attempted after CI run #44 and was
