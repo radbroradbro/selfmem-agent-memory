@@ -38,6 +38,9 @@ Scope:
 - Added Brain UI memory review queue evidence to the release gate so noisy,
   duplicate, and high-value candidate decisions are staged as fixture-only
   `writesRealFiles: false` draft exports.
+- Added `release-state.json` to the release gate so the current packet must
+  explicitly remain conservative: active goal, `FAIL` launch verdict, green
+  verified baseline, fixture-only safety boundary, and unresolved blockers.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
 - Kept the gate public-safe and evidence-based.
@@ -55,6 +58,8 @@ What `release:check` verifies:
 - Brain UI selected vault sync dry-run DOM evidence is sane,
 - Brain UI lifecycle policy DOM evidence is sane,
 - Brain UI memory review queue DOM evidence is sane,
+- release-state manifest is conservative and lists required blockers,
+- release docs mention current preview surfaces,
 - a fresh local-container audit smoke passes against current source,
 - a fresh Brain UI smoke passes against the current source,
 - a fresh Brain UI interaction smoke passes against the current source,
@@ -124,5 +129,5 @@ Known limits:
 
 - Private-name scans remain an operator-side release step because putting
   private names in public source would itself leak them.
-- GitHub Actions CI run `26288125249` passed on `cc9cee9` after the latest
-  code-changing push. Reinspect Actions after any later branch push.
+- GitHub Actions CI run `26288370812` passed on inspected baseline `2888f91`.
+  Reinspect Actions after any later branch push.

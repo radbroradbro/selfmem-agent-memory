@@ -14,7 +14,7 @@ Retry note:
   same 403.
 - A top-level PR comment with a concise status refresh was also attempted and
   returned the same 403.
-- This draft was refreshed after CI run `26288254580` passed on `13af176`.
+- This draft was refreshed after CI run `26288370812` passed on `2888f91`.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -45,7 +45,7 @@ Latest local verification includes the memory review queue and status-trail refr
 - Local `git diff --check`: passed.
 - Local secret-pattern scan: no hits.
 - Local private-name scan: no hits.
-- GitHub Actions CI: run `26288254580` passed on `13af176`, the latest head inspected before this draft.
+- GitHub Actions CI: run `26288370812` passed on `2888f91`, the latest baseline inspected before this draft.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI memory review queue, local-container audit, Nucleus snapshot, Research Lineage, and public live-update copy are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.
@@ -61,6 +61,7 @@ Latest local verification includes the memory review queue and status-trail refr
 
 - `reviews/overnight-20260522/summary.md`
 - `reviews/overnight-20260522/production-readiness.md`
+- `reviews/overnight-20260522/release-state.json`
 - `reviews/overnight-20260522/public-live-update-draft.md`
 - `reviews/overnight-20260522/dummy-brain-demo-storyboard.md`
 - `reviews/overnight-20260522/completion-audit.md`

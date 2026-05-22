@@ -73,8 +73,8 @@ Controller follow-up after that sandbox run:
 
 - `pnpm brain:smoke`: passed with the fresh Brain UI.
 - `pnpm release:check`: passed.
-- GitHub Actions `Verify` run #43 on `9e6554c` passed, including Test, Full smoke, and
-  Release readiness check.
+- GitHub Actions CI run `26288370812` on inspected baseline `2888f91` passed,
+  including Test, Full smoke, and Release readiness check.
 - Focused Gemini reviews for the Nucleus snapshot and Research Lineage slices
   returned final `CLEAN` verdicts.
 - Focused Gemini reviews for Brain UI local-audit preview and selected
@@ -83,7 +83,7 @@ Controller follow-up after that sandbox run:
 - Focused Gemini reviews for selected vault sync dry-run and lifecycle policy
   preview returned `CLEAN`.
 - Focused Gemini review for memory review queue returned `CLEAN`.
-- GitHub Actions CI run `26288125249` on latest head `cc9cee9` passed.
+- GitHub Actions CI run `26288370812` on inspected baseline `2888f91` passed.
 
 ## UI Evidence
 

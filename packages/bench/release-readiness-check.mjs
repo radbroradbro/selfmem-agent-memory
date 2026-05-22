@@ -56,6 +56,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-brain-ui-interaction-smoke-review.md`,
   `${reviewDir}/gemini-selfmem-update-command-review.md`,
   `${reviewDir}/release-readiness-evidence.md`,
+  `${reviewDir}/release-state.json`,
   `${reviewDir}/production-readiness.md`,
   `${reviewDir}/completion-audit.md`,
   `${reviewDir}/gemini-completion-audit-review.md`,
@@ -349,6 +350,59 @@ check("dom evidence is sane", () => {
   assert.ok(syncEvidence.evidence.conflictActionCount >= 1);
   assert.equal(syncEvidence.evidence.visibleTextHasPrivate, false);
   assert.equal(syncEvidence.consoleMessages.length, 0);
+});
+
+check("release state is conservative", () => {
+  const releaseState = JSON.parse(readFileSync(join(root, reviewDir, "release-state.json"), "utf8"));
+  assert.equal(releaseState.schemaVersion, 1);
+  assert.equal(releaseState.goalStatus, "active");
+  assert.equal(releaseState.publicLaunchVerdict, "FAIL");
+  assert.equal(releaseState.productionReady, false);
+  assert.equal(releaseState.pullRequest?.number, 5);
+  assert.equal(releaseState.pullRequest?.branch, "feat/nucleus-wiki-native-contract");
+  assert.equal(releaseState.latestVerifiedBaseline?.ciConclusion, "success");
+  assert.match(releaseState.latestVerifiedBaseline?.headSha ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(releaseState.latestVerifiedBaseline?.localReleaseCheck, "passed");
+  assert.equal(releaseState.latestVerifiedBaseline?.secretScan, "zero_hits");
+  assert.equal(releaseState.safetyBoundary?.usesFixtureUiEvidence, true);
+  assert.equal(releaseState.safetyBoundary?.commitsRawMemories, false);
+  assert.equal(releaseState.safetyBoundary?.commitsRawTranscripts, false);
+  assert.equal(releaseState.safetyBoundary?.commitsCredentials, false);
+  assert.equal(releaseState.safetyBoundary?.enablesHostedWriteBack, false);
+  for (const surface of [
+    "brain-ui-selected-vault-sync-dry-run",
+    "brain-ui-lifecycle-policy-preview",
+    "brain-ui-memory-review-queue",
+    "session-compaction-benchmark",
+    "selfmem-update",
+  ]) {
+    assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
+  }
+  for (const blocker of [
+    "claude-reviewer-route-blocked",
+    "github-pr-body-update-blocked",
+    "human-public-launch-approval-required",
+    "brain-ui-real-local-container-mode-not-enabled",
+  ]) {
+    assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
+  }
+});
+
+check("release docs mention current preview surfaces", () => {
+  const files = [
+    "completion-audit.md",
+    "production-readiness.md",
+    "summary.md",
+    "pr-body-update-draft.md",
+    "public-live-update-draft.md",
+  ];
+  for (const file of files) {
+    const text = readFileSync(join(root, reviewDir, file), "utf8");
+    assert.match(text, /selected vault sync dry-run|selected local vault sync dry-run/i, `${file} missing selected sync`);
+    assert.match(text, /lifecycle policy/i, `${file} missing lifecycle policy`);
+    assert.match(text, /memory review queue/i, `${file} missing memory review queue`);
+    assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
+  }
 });
 
 check("fresh brain UI smoke passes", () => {

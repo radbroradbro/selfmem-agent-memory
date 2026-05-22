@@ -16,10 +16,10 @@ is still required before any public live update.
 - Pull request: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
-- Latest CI-inspected code-changing head after the memory review queue slice:
-  `cc9cee9`
+- Latest CI-inspected public-draft baseline:
+  `2888f91`
 - PR API state when checked: open, not draft, mergeable, clean.
-- GitHub Actions CI run `26288125249` on `cc9cee9`: success.
+- GitHub Actions CI run `26288370812` on `2888f91`: success.
 
 ## Shipped Overnight Slices
 
@@ -45,6 +45,7 @@ is still required before any public live update.
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
+| Conservative release-state manifest | `reviews/overnight-20260522/release-state.json` |
 | Post-12-hour readiness verdict | `reviews/overnight-20260522/production-readiness.md` |
 | Public live-update draft | `reviews/overnight-20260522/public-live-update-draft.md` |
 | Dummy Brain demo storyboard | `reviews/overnight-20260522/dummy-brain-demo-storyboard.md` |
@@ -68,7 +69,7 @@ Latest local verification before this summary:
 - `git diff --check`: passed.
 - Public secret-pattern scan: no hits.
 - Private-name scan: no hits.
-- GitHub Actions CI: success on the latest code head, `cc9cee9`.
+- GitHub Actions CI: success on the latest inspected baseline, `2888f91`.
 
 ## UI Evidence
 
