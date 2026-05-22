@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T20:38:38Z",
+  "generatedAt": "2026-05-22T21:01:04Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "6ae4ce7e56ca04bb010f17c35316cb05aed35721",
-    "ciRunId": 26310773948,
+    "headSha": "77b3ceed1a54a872a170e3ee31df54e4fc2c4083",
+    "ciRunId": 26311728246,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the canary report generator gate was added. GitHub Actions run 26310773948 passed Test, Full smoke, and Release readiness check."
+    "note": "This is the latest inspected code/product baseline after diagnostic bundle canary reports were added. GitHub Actions run 26311728246 passed Test, Full smoke, and Release readiness check."
   },
   "releaseStateGuard": {
     "enabled": true,

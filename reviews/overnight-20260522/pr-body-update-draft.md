@@ -99,6 +99,8 @@ Retry note:
 - A canary report generator is now available through `canary:report`; it
   converts Hermes/OpenClaw traces into the sanitized report format needed for
   strict one-agent canary review.
+- The canary report generator now also accepts redacted diagnostic directories
+  and ZIP bundles, while relocated fixtures still fail strict-real intake.
 - GitHub Actions CI run `26308475033` passed on `6a33e62`, the GitHub handoff
   packet gate commit.
 - GitHub Actions CI run `26308588261` passed on `8efe4d0`, the dynamic handoff
@@ -111,6 +113,8 @@ Retry note:
   intake gate commit.
 - GitHub Actions CI run `26310773948` passed on `6ae4ce7`, the canary report
   generator gate commit.
+- GitHub Actions CI run `26311728246` passed on `77b3cee`, the diagnostic
+  bundle canary report gate commit.
 - The PR body below is therefore the public-safe source of truth until a human
   can paste it or GitHub integration permissions change.
 
@@ -260,6 +264,7 @@ Latest local verification includes the release handoff gate slice.
 - GitHub Actions CI: run `26309563159` passed on `02b3a13`, the hosted baseline preflight gate commit.
 - GitHub Actions CI: run `26310168571` passed on `d26eb78`, the canary evidence intake gate commit.
 - GitHub Actions CI: run `26310773948` passed on `6ae4ce7`, the canary report generator gate commit.
+- GitHub Actions CI: run `26311728246` passed on `77b3cee`, the diagnostic bundle canary report gate commit.
 - Gemini focused reviews: sync report, wiki sync audit log, update command, clean consumer smoke, release blocker doctor, current-head live browser evidence, edit export, Container Health, Brain UI local-audit preview, Brain UI selected local-audit preview, Brain UI selected local-container browse, Brain UI local memory edit, Brain UI local edit overlay browse, Brain UI local memory materialize, Brain UI Benchmark Dashboard, Brain UI Canary Rollout, Brain UI Research Source Lock, Brain UI Model Matrix, Brain UI Context Preview, Brain UI Release Readiness, Brain UI selected audit-history, Brain UI selected vault sync dry-run, Brain UI lifecycle policy preview, Brain UI lifecycle policy apply, Brain UI memory review queue, Brain UI review queue apply, local-container audit, session compaction local audit, Nucleus snapshot, Research Lineage, browser evidence gate, public live-update copy, and release handoff are `CLEAN` after fixes.
 - Claude route: blocked, recorded in `reviews/overnight-20260522/claude-pr5-review-blocked.md`.
 - Completion audit: `reviews/overnight-20260522/completion-audit.md` says the goal remains active and not complete.

@@ -342,6 +342,9 @@ evidence for:
   or local-path output.
 - GitHub Actions CI run `26310773948` passed on `6ae4ce7`, including Test,
   Full smoke, and Release readiness check for the canary report generator gate.
+- GitHub Actions CI run `26311728246` passed on `77b3cee`, including Test,
+  Full smoke, and Release readiness check for the diagnostic bundle canary
+  report gate.
 - GitHub Actions CI run `26309563159` passed on `02b3a13`, including Test,
   Full smoke, and Release readiness check for the hosted baseline preflight
   gate.

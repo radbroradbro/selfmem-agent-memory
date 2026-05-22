@@ -85,9 +85,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `6ae4ce7`
-- GitHub Actions: CI run `26310773948` passed for the canary report generator
-  gate
+- Latest verified code baseline: `77b3cee`
+- GitHub Actions: CI run `26311728246` passed for the diagnostic bundle
+  canary report gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -107,8 +107,8 @@ Latest verified head before this draft refresh:
 - Canary diagnostic bundle generator: redacted diagnostic directories and ZIP
   bundles can produce the same sanitized report shape, while relocated fixtures
   still fail `--strict-real`
-- GitHub Actions CI run `26310773948` passed on `6ae4ce7`, the canary report
-  generator gate commit.
+- GitHub Actions CI run `26311728246` passed on `77b3cee`, the diagnostic
+  bundle canary report gate commit.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
