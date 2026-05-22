@@ -1200,7 +1200,15 @@ check("remote url has no token", () => {
 });
 
 check("core package dry-run pack passes", () => {
-  run("npm", ["pack", "--dry-run"], { cwd: join(root, "packages/core") });
+  const npmCache = mkdtempSync(join(tmpdir(), "recallweave-release-npm-cache-"));
+  try {
+    run("npm", ["pack", "--dry-run"], {
+      cwd: join(root, "packages/core"),
+      env: { ...process.env, npm_config_cache: npmCache },
+    });
+  } finally {
+    rmSync(npmCache, { recursive: true, force: true });
+  }
 });
 
 const files = await listFiles(root);
@@ -1241,6 +1249,7 @@ function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd ?? root,
     encoding: "utf8",
+    env: options.env ?? process.env,
     stdio: ["ignore", "pipe", "pipe"],
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);

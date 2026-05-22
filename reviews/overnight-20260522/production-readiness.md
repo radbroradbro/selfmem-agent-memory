@@ -365,6 +365,73 @@ could not issue a PASS verdict by itself. The controller follow-up and GitHub CI
 now prove the fixture UI and release gate can pass, but public release should
 still wait for the remaining reviewer and human-approval gates.
 
+## Current Automation Recheck
+
+Run time: 2026-05-22 18:02:04 EDT.
+
+This follow-up ran from the PR branch worktree
+`feat/nucleus-wiki-native-contract` at
+`b5c1e025db072fca750dc6730741c23e1b981eca`. GitHub connector inspection found
+PR #5 open, not draft, mergeable, and with no unresolved inline review threads.
+The live PR body still records the conservative public launch verdict and issue
+#6 as the blocker trail.
+
+Passed locally in this automation environment:
+
+- `npm run build`
+- `npm run test`: 6 files, 22 tests
+- `npm run typecheck`
+- `npm run privacy:test`
+- `npm run smoke:openclaw`: `privacyLeakCount: 0`
+- `npm run smoke:hermes`: `privacyLeakCount: 0`
+- `npm run compaction:smoke:built`
+- `npm run compaction:benchmark:built`: 5 of 5 scenarios passed,
+  `privacyLeakCount: 0`, exact identifier accuracy 1
+- `npm run compaction:local-audit:built`
+- `npm run wiki:smoke:built`
+- `npm run wiki:sync:smoke:built`
+- `npm run container:audit:smoke:built`
+- `npm run update:smoke`
+- `npm run baseline:preflight`: no hosted provider call,
+  `publicBenchmarkClaimsAllowed: false`
+- `npm run canary:report -- --fixture`
+- `npm run canary:report -- --diagnostic-dir
+  packages/bench/fixtures/canary-diagnostic-export.fixture`
+- `npm run canary:intake`
+- `npm run canary:diagnose`
+- `npm run goal:audit`: `goalComplete: false`
+- `npm run release:handoff`
+- `npm_config_cache=/private/tmp/npm-cache npm pack --dry-run
+  ./packages/core`
+- `node --check packages/bench/release-readiness-check.mjs`
+- `git diff --check`
+
+Cleanup applied in this run:
+
+- `packages/bench/release-readiness-check.mjs` now runs the core package
+  `npm pack --dry-run` with an isolated temporary npm cache, avoiding false
+  release-gate failures from an unwritable user-level npm cache.
+
+Still blocked in this automation environment:
+
+- `npm run brain:smoke:built` and `npm run brain:interaction:built` fail at
+  localhost bind with `listen EPERM: operation not permitted 127.0.0.1`.
+- `npm run consumer:smoke` fails because the consumer smoke invokes the same
+  Brain UI localhost smoke.
+- `npm run release:github-sync` fails because this shell cannot resolve
+  `api.github.com`; GitHub connector inspection was used separately for PR #5.
+- `npm run release:doctor` fails only through the same GitHub live-sync DNS
+  dependency.
+- `npm run release:check` remains red in this sandbox for the localhost and
+  GitHub DNS failures above, while the package dry-run subcheck now passes.
+- `pnpm` is not installed globally, and `npm exec --package pnpm@10.23.0`
+  cannot download it because the shell cannot resolve `registry.npmjs.org`.
+
+These blockers do not justify a public PASS. They reinforce the existing FAIL
+verdict until a normal networked CI/controller environment, Claude reviewer
+route, hosted-baseline run, human approval, and real one-agent canary are all
+complete.
+
 ## Readiness Grades
 
 | Area | Grade | Reason |
