@@ -35,6 +35,12 @@ OpenClaw candidate for the next one-agent fresh window. The flag only prevents
 one malformed sibling bundle from aborting triage; it does not change the
 promotion result.
 
+On 2026-05-23, the controller refreshed that same batch audit from the current
+worktree and generated a current OpenClaw next-agent handoff packet. The audit
+again parsed eight of nine inputs, found zero strict-real passes, and selected
+the same privacy-clean OpenClaw candidate. The current handoff packet is
+metrics-only, public-safe, and intended only for one fresh OpenClaw canary.
+
 ## Commands
 
 The controller generated temporary metrics-only reports outside the repository:
@@ -130,6 +136,9 @@ The failure is actionable and matches the adapter hardening work:
   for diagnosis, but it must not count for or against strict rollout evidence.
 - The next operator should run `canary:diagnose` on any failing report and
   attach only the metrics-only output.
+- The current sendable handoff packet is
+  `recallweave-current-openclaw-next-agent-handoff-20260523.zip`, SHA256
+  `8fec92bdfc135e05c814ac34a5fc171e2b808c018ad07d0bc454e1dabb5c9de4`.
 
 ## Boundary
 

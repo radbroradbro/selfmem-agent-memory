@@ -77,6 +77,37 @@ name, or private local path content was written to the repo.
 - Batch failed inputs: 1.
 - Strict-real pass count: 0.
 
+## Current Returned Diagnostics Packet Result
+
+The controller reran the current returned diagnostic set from the active
+worktree on 2026-05-23 and generated a fresh sendable packet. This is the
+current packet to hand to the selected OpenClaw operator.
+
+- Packet label: `recallweave-current-openclaw-next-agent-handoff-20260523.zip`.
+- Packet SHA256:
+  `8fec92bdfc135e05c814ac34a5fc171e2b808c018ad07d0bc454e1dabb5c9de4`.
+- Mode: `canary-next-agent-handoff-packet`.
+- Public safe: true.
+- Metrics only: true.
+- Public launch allowed: false.
+- Fleet rollout allowed: false.
+- Host: OpenClaw.
+- Status: `READY_FOR_ONE_AGENT_FRESH_CANARY`.
+- One-agent canary allowed: true.
+- Selected candidate label: `bundle_8e90781bb060a889`.
+- Failed checks:
+  - `adapter-contract`
+  - `store-latency-instrumented`
+  - `store-p95`
+- Recall p95: 1567.346 ms.
+- Store p95: 0 ms.
+- Store latency samples: 0.
+- Privacy leak count: 0.
+- Batch inputs: 9.
+- Batch parsed inputs: 8.
+- Batch failed inputs: 1.
+- Strict-real pass count: 0.
+
 ## Interpretation
 
 This packet does not close the real-container rollout blocker by itself. It
