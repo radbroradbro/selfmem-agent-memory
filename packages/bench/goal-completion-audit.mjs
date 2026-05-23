@@ -34,6 +34,8 @@ const files = {
   canaryRemediationReview: `${reviewDir}/gemini-canary-remediation-review.md`,
   canaryReturnedPacketIntakeEvidence: `${reviewDir}/canary-returned-packet-intake-evidence.md`,
   canaryReturnedPacketIntakeReview: `${reviewDir}/gemini-canary-returned-packet-intake-review.md`,
+  canaryReturnedInboxEvidence: `${reviewDir}/canary-returned-inbox-evidence.md`,
+  canaryReturnedInboxReview: `${reviewDir}/gemini-canary-returned-inbox-review.md`,
   canaryNextAgentPlanEvidence: `${reviewDir}/canary-next-agent-plan-evidence.md`,
   canaryNextAgentPlanReview: `${reviewDir}/gemini-canary-next-agent-plan-review.md`,
   adapterBoundedReadThroughEvidence: `${reviewDir}/adapter-bounded-read-through-evidence.md`,
@@ -254,6 +256,11 @@ const requirements = [
     "packages/bench/canary-returned-packet-intake.mjs",
     files.canaryReturnedPacketIntakeEvidence,
     files.canaryReturnedPacketIntakeReview,
+  ]),
+  proven("canary-returned-inbox", "Returned one-agent canary evidence can be scanned from a mixed inbox while handoff packets and diagnostic bundles stay blocked from production evidence", [
+    "packages/bench/canary-returned-inbox.mjs",
+    files.canaryReturnedInboxEvidence,
+    files.canaryReturnedInboxReview,
   ]),
   proven("canary-next-agent-plan", "Returned diagnostic batches can be converted into a single metrics-only one-agent fresh-window update plan", [
     "packages/bench/canary-next-agent-plan.mjs",

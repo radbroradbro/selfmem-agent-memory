@@ -286,10 +286,19 @@ When the selected agent returns a canary evidence packet, run:
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --output /tmp/recallweave-returned-canary-intake.json
 ```
 
+If the agent sent a folder of zips, scan the inbox first. This classifies real
+returned evidence separately from handoff packets, diagnostics, and unrelated
+zips:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --output /tmp/recallweave-returned-canary-inbox.json
+```
+
 For release evidence, require a strict production canary:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
 ```
 
 This intake command does not read raw memories. It accepts only the metrics-only

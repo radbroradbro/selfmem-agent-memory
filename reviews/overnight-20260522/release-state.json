@@ -107,7 +107,8 @@
     "github-blocker-issue-live",
     "goal-completion-audit",
     "selfmem-update",
-    "canary-returned-packet-intake"
+    "canary-returned-packet-intake",
+    "canary-returned-inbox"
   ],
   "reviewerEvidence": {
     "freshCanaryWindow": {
