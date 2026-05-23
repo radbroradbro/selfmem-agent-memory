@@ -12,15 +12,18 @@ Date: 2026-05-23
   completed as metrics-only evidence with public benchmark claims still blocked.
 - PR #5 was refreshed again after `15e6657` passed CI and became the latest
   verified code/product baseline for the live hosted-vs-local Codex follow-up.
+- PR #5 and issue #6 were refreshed again after adding the baseline
+  source-alignment gate and current OpenClaw label-aligned/content-divergent
+  evidence.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T12:17:34Z
+- PR body refreshed at: 2026-05-23T13:45:48Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T11:18:31Z
-- PR body hash: 94df6b49621b680130f92d0169d9632b5879b0fe1836915cfb2ef3683251aa42
+- Issue updated at: 2026-05-23T13:45:49Z
+- PR body hash: 94ff82ec2a17cbbc50b836ec51231ba32e8f179f843598e84c456cbd10cd7d8d
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 20b5020eae11b3df873993f8f86228e19b102a0815cfeb887ce5904da99401ce
-- PR body length: 24729
-- Issue body length: 13919
+- Issue body hash: f236ad15e597ad86dd272e65849221c4a897685559faa7cdf898ac037be4355d
+- PR body length: 26670
+- Issue body length: 14478
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

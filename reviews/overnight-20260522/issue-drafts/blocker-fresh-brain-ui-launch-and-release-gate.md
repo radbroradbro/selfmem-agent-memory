@@ -176,6 +176,10 @@ requirements are resolved.
 - Local release readiness, smoke, goal audit, hosted-baseline preflight, canary
   evidence intake, canary report generation, and canary diagnosis all passed in
   their safe fixture or metrics-only modes.
+- Baseline source-alignment now separates a matching hosted/local container
+  label from matching benchmark content. The current OpenClaw attempt found
+  label alignment, but content alignment failed safely with 0 of 3
+  source-matched queries, 0 of 3 collectable queries, and no privacy leaks.
 - Hosted baseline operator packet now gives agents a public-safe collection
   handoff for aggregate-only hosted Supermemory baseline evidence.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`
@@ -221,7 +225,10 @@ requirements are resolved.
   update copy.
 - Hosted Supermemory comparison claims require a fresh metrics-only baseline.
   The current hosted-baseline preflight deliberately calls no hosted provider
-  and blocks public benchmark claims.
+  and blocks public benchmark claims. The current OpenClaw source-alignment
+  attempt also blocks a full hosted/local benchmark because the hosted label and
+  local mapping match, but the local RecallWeave source lacks the reviewed
+  expected refs needed for a fair comparison.
 - One real-container production canary remains incomplete. Fixture UI and
   report tooling are not a production rollout.
 - The available redacted real diagnostic bundle set was evaluated and rejected
@@ -241,7 +248,7 @@ requirements are resolved.
   report/intake path and passes privacy, lifecycle, hybrid search, latency,
   rollback, and write/read checks.
 - Any hosted comparison claim is backed by a fresh metrics-only baseline using
-  the same dataset, judge, settings, and scoring code.
+  the same source-aligned query set, dataset, judge, settings, and scoring code.
 - The owner approves merge and public release wording.
 - Public evidence contains no raw memories, transcripts, diagnostics,
   credentials, agent logs, private paths, or private container names.

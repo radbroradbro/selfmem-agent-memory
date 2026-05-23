@@ -407,12 +407,26 @@ npm exec --yes pnpm@10.23.0 -- baseline:author-queryset \
 npm exec --yes pnpm@10.23.0 -- baseline:queryset \
   -- --queryset /tmp/recallweave-hosted-baseline-queryset.json \
   --strict --output /tmp/recallweave-hosted-baseline-queryset-report.json
+
+RECALLWEAVE_BASELINE_LIVE=1 \
+RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:source-match \
+  -- --live --queryset /tmp/recallweave-hosted-baseline-queryset.json \
+  --container-dir <local-recallweave-container-dir> \
+  --strict --output /tmp/recallweave-baseline-source-match.json
+
+npm exec --yes pnpm@10.23.0 -- baseline:source-align \
+  -- --source-match /tmp/recallweave-baseline-source-match.json \
+  --local-map <local-container-map.json> \
+  --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
+  --strict --output /tmp/recallweave-baseline-source-alignment.json
 ```
 
 Review the private query set locally before collection. Then source
 `/tmp/recallweave-hosted-baseline.private.env` locally before the hosted
 collector. Do not attach that env file, the private map, or the private query
-set.
+set. Attach only the metrics-only query-set, source-match, and source-alignment
+reports.
 
 Prefer the one-command runner once those private inputs are ready:
 

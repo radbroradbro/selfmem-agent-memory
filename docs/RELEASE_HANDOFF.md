@@ -194,6 +194,10 @@ Before `baseline:run`, use `baseline:source-match --strict` with the reviewed
 query set and the selected local RecallWeave container. It emits only hashes,
 counts, readiness flags, and privacy counters. Do not spend hosted calls unless
 that report says `sourceMatchReady: true`.
+Then run `baseline:source-align --strict` with the source-match report, local
+container map, and private hosted map. It catches the subtle failure where the
+hosted label and local mapping match, but the local source still lacks the
+expected refs needed for a fair benchmark.
 
 Use `baseline:run` after the private hosted env file, reviewed private query
 set, source-match preflight, and local RecallWeave container are ready. It runs
@@ -220,7 +224,8 @@ The first live Codex-local run proved the chain too, but still does not support
 public claims because the selected hosted-source query labels did not retrieve
 non-zero evidence on either side. The next live run needs a source-matched
 local container or mirrored local export, proven by `baseline:source-match`,
-before quality claims are meaningful.
+and source-aligned by `baseline:source-align`, before quality claims are
+meaningful.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.

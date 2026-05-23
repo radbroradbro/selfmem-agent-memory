@@ -28,7 +28,16 @@
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true
+    "enforcePostBaselinePublicEvidenceOnly": true,
+    "allowedPostBaselineCodeReason": "hosted baseline source-alignment gate reviewed CLEAN",
+    "allowedPostBaselineCodePaths": [
+      "package.json",
+      "packages/bench/baseline-source-alignment.mjs",
+      "packages/bench/consumer-install-smoke.mjs",
+      "packages/bench/goal-completion-audit.mjs",
+      "packages/bench/release-blocker-doctor.mjs",
+      "packages/bench/release-readiness-check.mjs"
+    ]
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
@@ -84,6 +93,7 @@
     "baseline-queryset-inspect",
     "baseline-queryset-unique-gate",
     "baseline-source-match-preflight",
+    "baseline-source-alignment-gate",
     "hosted-baseline-discovery",
     "hosted-baseline-live-discovery",
     "hosted-baseline-container-select",
@@ -215,6 +225,14 @@
       "route": "gemini embedded public-safe diff, no tools",
       "evidence": "reviews/overnight-20260522/gemini-baseline-source-match-preflight-review.md",
       "completedAt": "2026-05-23T13:10:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "baselineSourceAlignment": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-baseline-source-alignment-review.md",
+      "completedAt": "2026-05-23T13:36:00Z",
       "countsAsPublicLaunchApproval": false
     },
     "canaryReturnedInbox": {

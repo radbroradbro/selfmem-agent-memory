@@ -21,8 +21,9 @@ Live status:
 - Adds output-file-safe baseline and canary evidence commands so package-manager banners cannot corrupt JSON artifacts or leak local checkout paths into preflight, comparison, intake, diagnosis, batch-audit, or next-agent plan files.
 - Adds a post-baseline public evidence guard. Once enabled in release-state, the release gate diffs the latest verified code baseline against `HEAD` and fails if any later change is outside public docs or review evidence.
 - Adds a release-readiness guard that verifies the current returned-diagnostics canary handoff packet label and SHA256 stay consistent across packet evidence, next-agent plan evidence, real diagnostic evidence, the PR body draft, and the blocker issue draft.
-- Adds `baseline:source-match` so a reviewed hosted-source query set must prove that the selected local RecallWeave source can collect matching expected references before hosted calls are spent on another matched run.
+- Adds `baseline:source-match` and `baseline:source-align` so a reviewed hosted-source query set must prove that the selected local RecallWeave source can collect matching expected references, and so a matching hosted/local container label cannot be mistaken for matching content before hosted calls are spent on another matched run.
 - Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
+- Adds current OpenClaw hosted/local source-alignment evidence. The selected local container map and hosted candidate label hash aligned, but the local source had 0 of 3 source-matched queries and 0 of 3 collectable queries, so the full hosted/local benchmark remains blocked until content alignment passes.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Adds fresh canary window isolation so strict-real reports can ignore pre-patch trace history, stale errors, and old missing-latency events after a patched adapter is applied.
 - Keeps public launch conservative: fixture evidence is allowed, real private memory text is not committed, and benchmark claims stay blocked until a matched source-locked canary or hosted baseline passes with reviewer sign-off.
@@ -257,6 +258,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   RecallWeave/selfmem bridge. It called the hosted provider, produced a
   strict-real packet, and had zero privacy leaks, but both arms scored 0, so it
   is source-match research evidence rather than a public benchmark claim.
+- Live OpenClaw source-alignment attempt: the local container map matched the
+  selected hosted candidate label hash, but content alignment failed safely with
+  `BLOCKED_CONTENT_DIVERGENT`, 0 of 3 source-matched queries, 0 of 3 collectable
+  queries, and 0 privacy leaks. This blocks a full hosted/local benchmark until
+  the local RecallWeave source is mirrored from the selected hosted source or a
+  reviewed local-source query set is rebuilt and checked against hosted
+  read-through.
 - `npm exec --yes pnpm@10.23.0 -- baseline:next-run`: passed, producing a state-aware hosted-baseline next-run plan that keeps fixture evidence as `FIXTURE_PLAN_ONLY` and does not authorize public claims.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet`: passed and produced a metrics-only zip with no hosted memories, local memories, transcripts, prompts, answers, keys, or private paths.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet:review`: passed on fixture packet review and kept fixture evidence from counting.
@@ -293,8 +301,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 - Claude/Opus review completed with `CONCERNS`; it supports alpha PR review only and does not approve public launch.
 - Human approval is required before merge, visibility changes, or public release messaging.
-- Hosted Supermemory comparison claims require a source-matched, non-zero,
-  reviewer-approved metrics-only baseline routed through the next-run planner.
+- Hosted Supermemory comparison claims require a source-aligned,
+  source-matched, non-zero, reviewer-approved metrics-only baseline routed
+  through the next-run planner.
 - One real-container production rollout remains incomplete; fixture UI and canary tooling are not enough for public launch.
 - The available redacted real diagnostic bundle set has been evaluated and rejected by the strict rollout gate. A fresh patched one-agent canary must pass before this blocker can close.
 - Gemini returned `CLEAN` on the fresh-window diff. Claude CLI review for that narrow diff returned no usable stdout and is recorded as blocked, not as approval.

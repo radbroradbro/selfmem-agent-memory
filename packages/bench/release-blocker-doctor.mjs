@@ -30,6 +30,8 @@ const requiredFiles = {
   hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
   baselineSourceMatchPreflight: "baseline-source-match-preflight-evidence.md",
   baselineSourceMatchPreflightReview: "gemini-baseline-source-match-preflight-review.md",
+  baselineSourceAlignment: "baseline-source-alignment-evidence.md",
+  baselineSourceAlignmentReview: "gemini-baseline-source-alignment-review.md",
   hostedBaselineLiveDiscovery: "hosted-baseline-live-discovery-evidence.md",
   hostedBaselineLiveDiscoveryReport: "hosted-baseline-live-discovery.json",
   hostedBaselineLiveDiscoveryReview: "gemini-hosted-baseline-live-discovery-review.md",
@@ -79,6 +81,8 @@ const issueDraftText = readFileSync(join(root, reviewDir, "issue-drafts/blocker-
 const hostedBaselineLiveDiscoveryText = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
 const baselineSourceMatchText = readFileSync(join(root, reviewDir, "baseline-source-match-preflight-evidence.md"), "utf8");
 const baselineSourceMatchReviewText = readFileSync(join(root, reviewDir, "gemini-baseline-source-match-preflight-review.md"), "utf8");
+const baselineSourceAlignmentText = readFileSync(join(root, reviewDir, "baseline-source-alignment-evidence.md"), "utf8");
+const baselineSourceAlignmentReviewText = readFileSync(join(root, reviewDir, "gemini-baseline-source-alignment-review.md"), "utf8");
 const hostedBaselineLiveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
 const hostedBaselineLivePrepText = readFileSync(join(root, reviewDir, "hosted-baseline-live-prep-evidence.md"), "utf8");
 const hostedBaselineLivePrepReviewText = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-prep-review.md"), "utf8");
@@ -103,6 +107,9 @@ assert.match(hostedBaselineLiveDiscoveryText, /does not close the hosted-baselin
 assert.match(baselineSourceMatchText, /baseline:source-match/i);
 assert.match(baselineSourceMatchText, /sourceMatchReady/i);
 assert.match(baselineSourceMatchReviewText, /(?:\*\*)?Verdict:?(?:\*\*)?\s*`?(?:CLEAN|PASS)`?/i);
+assert.match(baselineSourceAlignmentText, /baseline:source-align/i);
+assert.match(baselineSourceAlignmentText, /BLOCKED_CONTENT_DIVERGENT|matchedBaselineRunAllowed/i);
+assert.match(baselineSourceAlignmentReviewText, /(?:\*\*)?Verdict:?(?:\*\*)?\s*`?(?:CLEAN|PASS)`?/i);
 assert.equal(hostedBaselineLiveDiscoveryReport.mode, "hosted-baseline-discovery");
 assert.equal(hostedBaselineLiveDiscoveryReport.fixtureOnly, false);
 assert.equal(hostedBaselineLiveDiscoveryReport.callsHostedProvider, true);
@@ -152,6 +159,11 @@ assert.equal(baselineSourceMatch.mode, "baseline-source-match-preflight");
 assert.equal(baselineSourceMatch.sourceMatchReady, true);
 assert.equal(baselineSourceMatch.rawMemoryIncluded, false);
 assert.equal(baselineSourceMatch.sourceMatchEvidence?.collectableQueryCount, 3);
+const baselineSourceAlignment = JSON.parse(run("node", ["packages/bench/baseline-source-alignment.mjs"]).stdout);
+assert.equal(baselineSourceAlignment.mode, "baseline-source-alignment");
+assert.equal(baselineSourceAlignment.benchmarkGate?.matchedBaselineRunAllowed, true);
+assert.equal(baselineSourceAlignment.rawMemoryIncluded, false);
+assert.equal(baselineSourceAlignment.rawLabelsIncluded, false);
 const hostedBaselineCollector = JSON.parse(run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture"]).stdout);
 assert.equal(hostedBaselineCollector.metricsOnly, true);
 assert.equal(hostedBaselineCollector.rawMemoryIncluded, false);
@@ -203,7 +215,7 @@ const blockerReport = [
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
     evidence: "hosted-baseline-live-codex-local-run-evidence.md",
-    nextAction: "A live metrics-only hosted-vs-local Codex run completed and produced a strict-real packet, but both arms scored 0 and public benchmark claims remain blocked. The next step is a source-match research iteration: keep the private query set locally reviewed, run `baseline:source-match -- --live --queryset <reviewed-queryset> --container-dir <source-matched-local-container-dir> --strict --output <source-match-report>` and require sourceMatchReady=true so the local RecallWeave source matches the reviewed labels before hosted calls, rerun `baseline:run -- --live --container-env <private-env> --queryset <reviewed-queryset> --container-dir <source-matched-local-container-dir> --reviewed-queryset --output <run-report>`, then run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` and require a non-zero, reviewer-approved comparison before any public claim.",
+    nextAction: "A live metrics-only hosted-vs-local Codex run completed and produced a strict-real packet, but both arms scored 0 and public benchmark claims remain blocked. The next step is a source-match research iteration: keep the private query set locally reviewed, run `baseline:source-match -- --live --queryset <reviewed-queryset> --container-dir <source-matched-local-container-dir> --strict --output <source-match-report>`, then run `baseline:source-align -- --source-match <source-match-report> --local-map <container-map> --private-map <private-map> --strict --output <alignment-report>` and require matchedBaselineRunAllowed=true, proving the local RecallWeave source matches the selected hosted source, before hosted calls. Only then rerun `baseline:run -- --live --container-env <private-env> --queryset <reviewed-queryset> --container-dir <source-matched-local-container-dir> --reviewed-queryset --output <run-report>`, then run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` and require a non-zero, reviewer-approved comparison before any public claim.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -328,6 +340,7 @@ console.log(
         "RECALLWEAVE_BASELINE_LIVE=1 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset -- --live --discovery /tmp/recallweave-hosted-baseline-discovery.json --private-map /tmp/recallweave-hosted-container-map.private.jsonl --queryset-output /tmp/recallweave-hosted-baseline-queryset.json --output /tmp/recallweave-hosted-baseline-queryset-author-report.json",
         "npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset /tmp/recallweave-hosted-baseline-queryset.json --strict --output /tmp/recallweave-hosted-baseline-queryset-report.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:source-match -- --live --queryset /tmp/recallweave-hosted-baseline-queryset.json --container-dir <local-recallweave-container-dir> --strict --output /tmp/recallweave-baseline-source-match.json",
+        "npm exec --yes pnpm@10.23.0 -- baseline:source-align -- --source-match /tmp/recallweave-baseline-source-match.json --local-map <local-container-map.json> --private-map /tmp/recallweave-hosted-container-map.private.jsonl --strict --output /tmp/recallweave-baseline-source-alignment.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env /tmp/recallweave-hosted-baseline.private.env --queryset /tmp/recallweave-hosted-baseline-queryset.json --container-dir <local-recallweave-container-dir> --reviewed-queryset --output /tmp/recallweave-baseline-run.json",
         "npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture",

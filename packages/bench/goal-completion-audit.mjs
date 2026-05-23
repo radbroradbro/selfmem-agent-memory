@@ -51,6 +51,8 @@ const files = {
   hostedBaselineLiveQuerySetReport: `${reviewDir}/hosted-baseline-live-queryset-report.json`,
   baselineSourceMatchPreflightEvidence: `${reviewDir}/baseline-source-match-preflight-evidence.md`,
   baselineSourceMatchPreflightReview: `${reviewDir}/gemini-baseline-source-match-preflight-review.md`,
+  baselineSourceAlignmentEvidence: `${reviewDir}/baseline-source-alignment-evidence.md`,
+  baselineSourceAlignmentReview: `${reviewDir}/gemini-baseline-source-alignment-review.md`,
   hostedBaselineLiveCodexLocalRunEvidence: `${reviewDir}/hosted-baseline-live-codex-local-run-evidence.md`,
   hostedBaselineLiveCodexLocalRunReport: `${reviewDir}/hosted-baseline-live-codex-local-run.json`,
   hostedBaselineLiveCodexLocalRunReview: `${reviewDir}/gemini-hosted-baseline-live-codex-local-review.md`,
@@ -213,6 +215,11 @@ const requirements = [
     "packages/bench/baseline-source-match-preflight.mjs",
     files.baselineSourceMatchPreflightEvidence,
     files.baselineSourceMatchPreflightReview,
+  ]),
+  proven("baseline-source-alignment", "Hosted/local baseline source alignment distinguishes matching container labels from collectable matching content before another hosted comparison run", [
+    "packages/bench/baseline-source-alignment.mjs",
+    files.baselineSourceAlignmentEvidence,
+    files.baselineSourceAlignmentReview,
   ]),
   proven("hosted-baseline-live-codex-local-run", "Live hosted-vs-local Codex baseline chain is proven metrics-only but does not support public claims", [
     "packages/bench/hosted-baseline-run.mjs",

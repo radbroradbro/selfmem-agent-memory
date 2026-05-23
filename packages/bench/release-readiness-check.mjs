@@ -60,6 +60,7 @@ const requiredFiles = [
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-queryset-inspect.mjs",
   "packages/bench/baseline-source-match-preflight.mjs",
+  "packages/bench/baseline-source-alignment.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
   "packages/bench/recallweave-response-export.mjs",
   "packages/bench/recallweave-baseline-collector.mjs",
@@ -193,6 +194,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-queryset-inspect-review.md`,
   `${reviewDir}/baseline-source-match-preflight-evidence.md`,
   `${reviewDir}/gemini-baseline-source-match-preflight-review.md`,
+  `${reviewDir}/baseline-source-alignment-evidence.md`,
+  `${reviewDir}/gemini-baseline-source-alignment-review.md`,
   `${reviewDir}/hosted-baseline-discovery-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-discovery-review.md`,
   `${reviewDir}/hosted-baseline-container-select-evidence.md`,
@@ -337,6 +340,7 @@ const requiredScripts = [
   "canary:next-agent-packet",
   "baseline:queryset",
   "baseline:source-match",
+  "baseline:source-align",
   "baseline:discover",
   "baseline:select-container",
   "baseline:author-queryset",
@@ -923,6 +927,7 @@ check("release state is conservative", () => {
     "baseline-queryset-inspect",
     "baseline-queryset-unique-gate",
     "baseline-source-match-preflight",
+    "baseline-source-alignment-gate",
     "hosted-baseline-discovery",
     "hosted-baseline-live-discovery",
     "hosted-baseline-container-select",
@@ -2097,11 +2102,13 @@ check("fresh release blocker doctor passes", () => {
   assert.match(hostedBlocker.nextAction, /private query set locally/);
   assert.match(hostedBlocker.nextAction, /local RecallWeave source matches/);
   assert.match(hostedBlocker.nextAction, /baseline:source-match/);
+  assert.match(hostedBlocker.nextAction, /baseline:source-align/);
   assert.match(hostedBlocker.nextAction, /baseline:run -- --live/);
   assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
   assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:author-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:source-match/.test(item) && /--strict/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /baseline:source-align/.test(item) && /--strict/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /--reviewed-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
   assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --require-ready/);
@@ -2112,6 +2119,7 @@ check("fresh hosted baseline preflight passes", () => {
   const collectorTmp = mkdtempSync(join(tmpdir(), "recallweave-hosted-baseline-"));
   const querySetReportPath = join(collectorTmp, "queryset-report.json");
   const sourceMatchReportPath = join(collectorTmp, "baseline-source-match.json");
+  const sourceAlignmentReportPath = join(collectorTmp, "baseline-source-alignment.json");
   const discoveryResultPath = join(collectorTmp, "hosted-baseline-discovery.json");
   const discoveryPrivateMapPath = join(collectorTmp, "hosted-baseline-container-map.private.jsonl");
   const selectedContainerEnvPath = join(collectorTmp, "hosted-baseline.private.env");
@@ -2153,6 +2161,13 @@ check("fresh hosted baseline preflight passes", () => {
     "--fixture",
     "--output",
     sourceMatchReportPath,
+  ]);
+  const sourceAlignmentResult = run("node", [
+    "packages/bench/baseline-source-alignment.mjs",
+    "--source-match",
+    sourceMatchReportPath,
+    "--output",
+    sourceAlignmentReportPath,
   ]);
   writeFileSync(
     unlabeledQuerySetPath,
@@ -2514,6 +2529,7 @@ check("fresh hosted baseline preflight passes", () => {
   const report = JSON.parse(result.stdout);
   const querySetReport = JSON.parse(querySetInspectResult.stdout);
   const sourceMatchReport = JSON.parse(sourceMatchResult.stdout);
+  const sourceAlignmentReport = JSON.parse(sourceAlignmentResult.stdout);
   const missingSourceMatchReport = JSON.parse(missingSourceMatchResult.stdout);
   const discoveryReport = JSON.parse(discoveryResult.stdout);
   const privateMapDiscoveryReport = JSON.parse(privateMapDiscoveryResult.stdout);
@@ -2546,6 +2562,8 @@ check("fresh hosted baseline preflight passes", () => {
   const querySetGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-queryset-inspect-review.md"), "utf8");
   const sourceMatchEvidence = readFileSync(join(root, reviewDir, "baseline-source-match-preflight-evidence.md"), "utf8");
   const sourceMatchGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-source-match-preflight-review.md"), "utf8");
+  const sourceAlignmentEvidence = readFileSync(join(root, reviewDir, "baseline-source-alignment-evidence.md"), "utf8");
+  const sourceAlignmentGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-source-alignment-review.md"), "utf8");
   const discoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-discovery-evidence.md"), "utf8");
   const discoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-discovery-review.md"), "utf8");
   const containerSelectEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-container-select-evidence.md"), "utf8");
@@ -2620,6 +2638,17 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(sourceMatchReport.failedChecks?.length, 0);
   assert.doesNotMatch(sourceMatchResult.stdout, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
   assert.doesNotMatch(readFileSync(sourceMatchReportPath, "utf8"), /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
+  assert.equal(sourceAlignmentReport.mode, "baseline-source-alignment");
+  assert.equal(sourceAlignmentReport.metricsOnly, true);
+  assert.equal(sourceAlignmentReport.publicSafe, true);
+  assert.equal(sourceAlignmentReport.rawLabelsIncluded, false);
+  assert.equal(sourceAlignmentReport.rawMemoryIncluded, false);
+  assert.equal(sourceAlignmentReport.labelAlignment?.labelAligned, true);
+  assert.equal(sourceAlignmentReport.contentAlignment?.sourceMatchReady, true);
+  assert.equal(sourceAlignmentReport.benchmarkGate?.matchedBaselineRunAllowed, true);
+  assert.equal(sourceAlignmentReport.benchmarkGate?.publicBenchmarkClaimsAllowed, false);
+  assert.doesNotMatch(sourceAlignmentResult.stdout, /rawContainerTag|source_supermemory_container|sourceSupermemoryContainer|expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
+  assert.doesNotMatch(readFileSync(sourceAlignmentReportPath, "utf8"), /rawContainerTag|source_supermemory_container|sourceSupermemoryContainer|expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
   assert.notEqual(missingSourceMatchResult.status, 0);
   assert.equal(missingSourceMatchReport.mode, "baseline-source-match-preflight");
   assert.equal(missingSourceMatchReport.sourceMatchReady, false);
@@ -3190,6 +3219,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(sourceMatchEvidence, /baseline:source-match/i);
   assert.match(sourceMatchEvidence, /sourceMatchReady/i);
   assert.match(sourceMatchGeminiReview, /Verdict:\s*`?CLEAN`?|Verdict:\s*`?PASS`?|^CLEAN/m);
+  assert.match(sourceAlignmentEvidence, /baseline:source-align/i);
+  assert.match(sourceAlignmentEvidence, /BLOCKED_CONTENT_DIVERGENT|matchedBaselineRunAllowed/i);
+  assert.match(sourceAlignmentGeminiReview, /Verdict:\s*`?CLEAN`?|Verdict:\s*`?PASS`?|^CLEAN/m);
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
   assert.doesNotMatch(querySetInspectResult.stdout, secretPattern);
@@ -3198,9 +3230,15 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(sourceMatchResult.stdout, secretPattern);
   assert.doesNotMatch(sourceMatchEvidence, secretPattern);
   assert.doesNotMatch(sourceMatchGeminiReview, secretPattern);
+  assert.doesNotMatch(sourceAlignmentResult.stdout, secretPattern);
+  assert.doesNotMatch(sourceAlignmentEvidence, secretPattern);
+  assert.doesNotMatch(sourceAlignmentGeminiReview, secretPattern);
   assert.doesNotMatch(sourceMatchResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(sourceMatchEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(sourceMatchGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(sourceAlignmentResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(sourceAlignmentEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(sourceAlignmentGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(collectorResult.stdout, secretPattern);
   assert.doesNotMatch(recallWeaveExportResult.stdout, secretPattern);
   assert.doesNotMatch(recallWeaveExportCollectorResult.stdout, secretPattern);
