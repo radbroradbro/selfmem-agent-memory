@@ -88,9 +88,9 @@ The controller reran the current returned diagnostic set from the active
 worktree on 2026-05-23 and generated a fresh sendable packet. This is the
 current packet to hand to the selected OpenClaw operator.
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260523-current.zip`.
+- Packet label: `recallweave-openclaw-next-agent-canary-20260523-continued.zip`.
 - Packet SHA256:
-  `9d7fc80561630aa6edae9fd93954dfb032e422d85bc630b6b3c999a6943295d2`.
+  `5967d1fa0ce84aaf1d7890017c6e32cc6fb2960e2c2d0cbb38ae2522be6ec5bf`.
 - Mode: `canary-next-agent-handoff-packet`.
 - Public safe: true.
 - Metrics only: true.

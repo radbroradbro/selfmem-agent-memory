@@ -57,6 +57,16 @@ handoff packet was generated for that candidate. The packet is metrics-only,
 has no key-shaped text or private local paths, and is ready only for one fresh
 OpenClaw canary window.
 
+On 2026-05-23, after the hosted-baseline run orchestrator landed, the
+controller reran the returned Telegram diagnostic set again from commit
+`690e413`. The audit still inspected nine inputs, parsed eight, rejected one at
+report generation, found zero strict-real passes, and selected the same
+privacy-clean OpenClaw candidate. The selected candidate still proves
+lifecycle coverage, hybrid search, local writes, hosted read-through, zero
+privacy leaks, and recall p95 1567.346 ms. It still fails strict production
+intake because the returned window lacks the current v1 adapter contract marker
+and has zero store latency samples.
+
 ## Commands
 
 The controller generated temporary metrics-only reports outside the repository:
@@ -153,8 +163,8 @@ The failure is actionable and matches the adapter hardening work:
 - The next operator should run `canary:diagnose` on any failing report and
   attach only the metrics-only output.
 - The current sendable handoff packet is
-  `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
-  `9d7fc80561630aa6edae9fd93954dfb032e422d85bc630b6b3c999a6943295d2`.
+  `recallweave-openclaw-next-agent-canary-20260523-continued.zip`, SHA256
+  `5967d1fa0ce84aaf1d7890017c6e32cc6fb2960e2c2d0cbb38ae2522be6ec5bf`.
 
 ## Boundary
 
