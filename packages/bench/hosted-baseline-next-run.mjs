@@ -257,7 +257,7 @@ function commandsFor(status) {
     {
       id: "print-template",
       description: "Print the aggregate-only hosted result schema before any live provider call.",
-      command: `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template > ${templatePath}`,
+      command: `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output ${templatePath}`,
     },
     {
       id: "fixture-shape-check",
@@ -284,7 +284,7 @@ function commandsFor(status) {
     commands.push({
       id: "validate-hosted-baseline",
       description: "Validate the hosted result before collecting the local arm.",
-      command: `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} > ${preflightPath}`,
+      command: `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} --output ${preflightPath}`,
     });
   }
 
@@ -320,7 +320,7 @@ function commandsFor(status) {
     {
       id: "compare-matched-results",
       description: "Compare hosted and RecallWeave aggregate result files. This still cannot publish a claim by itself.",
-      command: `RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed> npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} > ${comparisonPath}`,
+      command: `RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed> npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
     },
     {
       id: "package-review-evidence",

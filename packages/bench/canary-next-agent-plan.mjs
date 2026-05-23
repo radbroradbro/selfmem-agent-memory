@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const format = String(args.format || "json").trim().toLowerCase();
+const outputPath = args.output ?? process.env.RECALLWEAVE_CANARY_NEXT_AGENT_OUTPUT_JSON ?? null;
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
 const secretPattern =
@@ -83,6 +84,7 @@ const serialized = format === "markdown"
   ? `${output.operatorMessage}\n`
   : `${JSON.stringify(output, null, 2)}\n`;
 assertSafeText(serialized, "next-agent plan output");
+if (outputPath) writeFileSync(resolvePath(outputPath), serialized, { encoding: "utf8", mode: 0o600 });
 process.stdout.write(serialized);
 if (!selected || blockReasons.some((item) => item.severity === "hard-block")) process.exitCode = 1;
 
@@ -262,7 +264,7 @@ function commandsFor(host) {
       description: "After at least 15 minutes of real use, collect strict-real metrics from the mapped live container.",
       command: [
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report /tmp/recallweave-canary-report.json --strict-real > /tmp/recallweave-canary-intake.json`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report /tmp/recallweave-canary-report.json --strict-real --output /tmp/recallweave-canary-intake.json`,
       ].join(" && "),
     },
     {
@@ -270,13 +272,13 @@ function commandsFor(host) {
       description: "Use only if the agent cannot collect from its live container but can provide a redacted diagnostic export.",
       command: [
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" ${diagnosticFlag} --canary-output /tmp/recallweave-canary-report.json`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report /tmp/recallweave-canary-report.json --strict-real > /tmp/recallweave-canary-intake.json`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report /tmp/recallweave-canary-report.json --strict-real --output /tmp/recallweave-canary-intake.json`,
       ].join(" && "),
     },
     {
       id: "diagnose-if-failed",
       description: "If strict intake fails, generate metrics-only remediation.",
-      command: "npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report /tmp/recallweave-canary-report.json > /tmp/recallweave-canary-diagnosis.json",
+      command: "npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report /tmp/recallweave-canary-report.json --output /tmp/recallweave-canary-diagnosis.json",
     },
     {
       id: "package-passing-evidence",

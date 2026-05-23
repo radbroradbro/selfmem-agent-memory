@@ -45,9 +45,9 @@ npm exec --yes pnpm@10.23.0 -- canary:diagnose
   rollout blocked until maintainer review.
 - The release gate now runs passing, failing, and summary-only diagnosis
   fixtures.
-- Strict-real intake now prints sanitized failure JSON before exiting nonzero,
-  so `canary:diagnose --report <strict-intake-output.json>` can consume failed
-  intake output directly.
+- Strict-real intake now writes sanitized failure JSON before exiting nonzero
+  when called with `--output`, so `canary:diagnose --report
+  <strict-intake-output.json>` can consume failed intake output directly.
 
 ## Review And Verification
 

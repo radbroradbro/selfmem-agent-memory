@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const fixtureRequested = Boolean(args.fixture);
+const outputPath = args.output ?? process.env.RECALLWEAVE_BASELINE_COMPARISON_OUTPUT_JSON ?? null;
 const hostedPath = resolveInputPath(
   args.hosted ??
     args.hostedResult ??
@@ -98,6 +99,7 @@ const result = {
 const serialized = `${JSON.stringify(result, null, 2)}\n`;
 assert.doesNotMatch(serialized, secretPattern, "comparison output contains a key-shaped secret");
 assert.doesNotMatch(serialized, privatePathPattern, "comparison output contains a private path");
+if (outputPath) writeFileSync(resolveOutputPath(outputPath), serialized, { encoding: "utf8", mode: 0o600 });
 process.stdout.write(serialized);
 
 function loadResult(inputPath, expectedProvider) {
@@ -243,6 +245,10 @@ function parseArgs(argv) {
 
 function resolveInputPath(value) {
   if (!value) return null;
+  return isAbsolute(value) ? value : resolve(root, value);
+}
+
+function resolveOutputPath(value) {
   return isAbsolute(value) ? value : resolve(root, value);
 }
 

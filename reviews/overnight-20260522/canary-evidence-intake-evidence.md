@@ -109,7 +109,7 @@ The bundled fixture proves the intake path. It does not count as real rollout
 evidence. A real one-agent canary must run:
 
 ```sh
-npm exec --yes pnpm@10.23.0 -- canary:intake -- --report <sanitized-report.json> --strict-real
+npm exec --yes pnpm@10.23.0 -- canary:intake -- --report <sanitized-report.json> --strict-real --output <strict-intake-output.json>
 ```
 
 Fleet rollout and public launch remain blocked until a maintainer reviews a

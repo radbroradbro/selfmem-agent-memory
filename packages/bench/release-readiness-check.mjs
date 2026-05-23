@@ -1425,6 +1425,11 @@ check("fresh canary operator packet passes", () => {
   assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-zip" && /--canary-diagnostic-zip/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "package-passing-evidence" && /canary:packet/.test(item.command) && /--strict-real/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "package-diagnostic-evidence" && /canary:packet/.test(item.command) && /--diagnosis/.test(item.command)));
+  for (const command of report.commands.map((item) => item.command).filter((command) => /canary:(intake|diagnose)/.test(command))) {
+    const toolSegment = command.slice(command.indexOf("canary:"));
+    assert.match(toolSegment, /--output\s+\/tmp\/recallweave-canary-/);
+    assert.doesNotMatch(toolSegment, /\s>\s/, "canary JSON evidence commands must use --output instead of shell redirection");
+  }
   assert.ok(report.acceptanceCriteria.includes("countsAsRealRolloutEvidence is true"));
   assert.ok(report.acceptanceCriteria.includes("fixtureOnly is false"));
   assert.ok(report.acceptanceCriteria.includes("adapter.strictCanaryContract is v1"));
@@ -1573,7 +1578,10 @@ check("fresh canary evidence packet review passes", () => {
 });
 
 check("fresh canary diagnostic batch audit passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-batch-output-check-"));
+  const batchOutputPath = join(tempRoot, "batch-audit.json");
   const batchRun = run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"]);
+  const batchOutputRun = run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs", "--output", batchOutputPath]);
   const requireRealPassRun = spawnSync("node", [
     "packages/bench/canary-diagnostic-batch-audit.mjs",
     "--require-real-pass",
@@ -1583,6 +1591,8 @@ check("fresh canary diagnostic batch audit passes", () => {
     stdio: ["ignore", "pipe", "pipe"],
   });
   const report = JSON.parse(batchRun.stdout);
+  const outputReport = JSON.parse(readFileSync(batchOutputPath, "utf8"));
+  const outputStdout = JSON.parse(batchOutputRun.stdout);
   const strictOutput = JSON.parse(requireRealPassRun.stdout);
   const evidence = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-diagnostic-batch-audit-review.md"), "utf8");
@@ -1597,6 +1607,9 @@ check("fresh canary diagnostic batch audit passes", () => {
   assert.equal(report.countsAsRealRolloutEvidence, false);
   assert.equal(report.publicLaunchAllowed, false);
   assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(outputReport.mode, "canary-diagnostic-batch-audit");
+  assert.equal(outputStdout.mode, "canary-diagnostic-batch-audit");
+  assert.equal(outputReport.metricsOnly, true);
   assert.equal(report.bestCandidate.fixtureOnly, true);
   assert.equal(report.bestCandidate.canaryPass, true);
   assert.equal(report.bestCandidate.countsAsRealRolloutEvidence, false);
@@ -1616,12 +1629,18 @@ check("fresh canary diagnostic batch audit passes", () => {
   assert.doesNotMatch(batchRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(requireRealPassRun.stdout, secretPattern);
   assert.doesNotMatch(requireRealPassRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  rmSync(tempRoot, { recursive: true, force: true });
 });
 
 check("fresh canary next-agent plan passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-next-agent-output-check-"));
+  const planOutputPath = join(tempRoot, "next-agent-plan.json");
   const planRun = run("node", ["packages/bench/canary-next-agent-plan.mjs"]);
+  const planOutputRun = run("node", ["packages/bench/canary-next-agent-plan.mjs", "--output", planOutputPath]);
   const markdownRun = run("node", ["packages/bench/canary-next-agent-plan.mjs", "--format", "markdown"]);
   const report = JSON.parse(planRun.stdout);
+  const outputReport = JSON.parse(readFileSync(planOutputPath, "utf8"));
+  const outputStdout = JSON.parse(planOutputRun.stdout);
   const evidence = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-next-agent-plan-review.md"), "utf8");
   assert.equal(report.ok, true);
@@ -1630,6 +1649,9 @@ check("fresh canary next-agent plan passes", () => {
   assert.equal(report.metricsOnly, true);
   assert.equal(report.publicLaunchAllowed, false);
   assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(outputReport.mode, "canary-next-agent-plan");
+  assert.equal(outputStdout.mode, "canary-next-agent-plan");
+  assert.equal(outputReport.metricsOnly, true);
   assert.equal(report.operatorPacketAvailable, true);
   assert.equal(report.oneAgentCanaryAllowed, false);
   assert.equal(report.selectedCandidate.fixtureOnly, true);
@@ -1641,6 +1663,11 @@ check("fresh canary next-agent plan passes", () => {
   assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window"));
   assert.ok(report.commandPlan.some((item) => item.id === "diagnose-if-failed"));
   assert.ok(report.commandPlan.some((item) => item.id === "package-passing-evidence"));
+  for (const command of report.commandPlan.map((item) => item.command).filter((command) => /canary:(intake|diagnose)/.test(command))) {
+    const toolSegment = command.slice(command.indexOf("canary:"));
+    assert.match(toolSegment, /--output\s+\/tmp\/recallweave-canary-/);
+    assert.doesNotMatch(toolSegment, /\s>\s/, "next-agent JSON evidence commands must use --output instead of shell redirection");
+  }
   assert.match(markdownRun.stdout, /RecallWeave Next Agent Canary Plan/);
   assert.match(markdownRun.stdout, /FRESH_WINDOW_START/);
   assert.match(evidence, /canary:next-agent/i);
@@ -1650,6 +1677,7 @@ check("fresh canary next-agent plan passes", () => {
   assert.doesNotMatch(planRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(markdownRun.stdout, secretPattern);
   assert.doesNotMatch(markdownRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  rmSync(tempRoot, { recursive: true, force: true });
 });
 
 check("fresh canary window reviewer evidence is explicit", () => {
@@ -1986,6 +2014,12 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.commands.some((item) => item.id === "collect-live-result" && /baseline:collect/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "package-baseline-evidence" && /baseline:packet/.test(item.command) && /--strict-real/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-live-result" && /RECALLWEAVE_BASELINE_NO_RAW_TEXT=1/.test(item.command)));
+  for (const command of operatorPacket.commands.map((item) => item.command).filter((command) => /baseline:(preflight|compare)/.test(command))) {
+    if (/--fixture/.test(command)) continue;
+    const toolSegment = command.slice(command.indexOf("baseline:"));
+    assert.match(toolSegment, /--output\s+\/tmp\/recallweave-/);
+    assert.doesNotMatch(toolSegment, /\s>\s/, "hosted baseline JSON evidence commands must use --output instead of shell redirection");
+  }
   assert.ok(operatorPacket.acceptanceCriteria.includes("reviewerApprovalCount is at least 2 before comparison claims"));
   assert.ok(operatorPacket.forbidden.includes("provider keys"));
   assert.match(operatorMarkdown.stdout, /RecallWeave Hosted Baseline Packet/);
@@ -2011,6 +2045,12 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "compare-matched-results" && /baseline:compare/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "package-review-evidence" && /baseline:packet/.test(item.command)));
+  for (const command of nextRunPlan.commandPlan.map((item) => item.command).filter((command) => /baseline:(preflight|compare)/.test(command))) {
+    if (/--fixture/.test(command)) continue;
+    const toolSegment = command.slice(command.indexOf("baseline:"));
+    assert.match(toolSegment, /--output\s+\/tmp\/recallweave-/);
+    assert.doesNotMatch(toolSegment, /\s>\s/, "baseline next-run JSON evidence commands must use --output instead of shell redirection");
+  }
   assert.match(nextRunMarkdown.stdout, /RecallWeave Hosted Baseline Next Run/);
   assert.match(nextRunMarkdown.stdout, /Planner authorizes public claims: no/);
   assert.match(nextRunMarkdown.stdout, /baseline:next-run/);

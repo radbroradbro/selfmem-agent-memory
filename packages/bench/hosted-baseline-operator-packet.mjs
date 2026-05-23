@@ -37,7 +37,7 @@ const packet = {
     {
       id: "print-template",
       description: "Print the exact aggregate-only result schema before any hosted run.",
-      command: `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template > ${templatePath}`,
+      command: `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output ${templatePath}`,
     },
     {
       id: "validate-fixture-shape",
@@ -71,7 +71,7 @@ const packet = {
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
         "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
         `RECALLWEAVE_BASELINE_OUTPUT_JSON=${resultPath}`,
-        `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} > ${preflightPath}`,
+        `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} --output ${preflightPath}`,
       ].join(" "),
     },
     {
@@ -104,7 +104,7 @@ const packet = {
       description: "Compare the aggregate hosted and RecallWeave result files. This still cannot authorize public claims without reviewer approvals.",
       command: [
         `RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed>`,
-        `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} > ${comparisonPath}`,
+        `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
       ].join(" "),
     },
     {
@@ -186,7 +186,7 @@ function buildMarkdown() {
     "First print the result template:",
     "",
     "```bash",
-    `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template > ${templatePath}`,
+    `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output ${templatePath}`,
     "```",
     "",
     "Then validate the parser without a hosted call:",
@@ -226,7 +226,7 @@ function buildMarkdown() {
     "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
     "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> \\",
     `RECALLWEAVE_BASELINE_OUTPUT_JSON=${resultPath} \\`,
-    `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} > ${preflightPath}`,
+    `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} --output ${preflightPath}`,
     "```",
     "",
     "Export RecallWeave search responses locally as hashed memory identifiers, content hashes, scores, timings, token estimates, and privacy counters. Do not include raw memory text. Save that response export here:",
@@ -264,7 +264,7 @@ function buildMarkdown() {
     "",
     "```bash",
     "RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed> \\",
-    `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} > ${comparisonPath}`,
+    `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
     "```",
     "",
     "Then package the aggregate evidence into one reviewer zip:",

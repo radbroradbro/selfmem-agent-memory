@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -14,6 +14,7 @@ const resultPath =
   readArgValue("--result") ??
   process.env.RECALLWEAVE_BASELINE_RESULT_JSON ??
   (fixtureRequested ? fixturePath : null);
+const outputPath = readArgValue("--output") ?? process.env.RECALLWEAVE_BASELINE_PREFLIGHT_OUTPUT_JSON ?? null;
 const liveRequested = process.argv.includes("--live") || process.env.RECALLWEAVE_BASELINE_LIVE === "1";
 
 const secretPattern =
@@ -199,9 +200,10 @@ const report = {
   ],
 };
 
-const serialized = JSON.stringify(report, null, 2);
+const serialized = `${JSON.stringify(report, null, 2)}\n`;
 assert.doesNotMatch(serialized, secretPattern);
-console.log(serialized);
+if (outputPath) writeFileSync(resolveOutputPath(outputPath), serialized, { encoding: "utf8", mode: 0o600 });
+process.stdout.write(serialized);
 
 function inspectBaselineResult(inputPath) {
   const path = isAbsolute(inputPath) ? inputPath : resolve(root, inputPath);
@@ -356,6 +358,10 @@ function readArgValue(name) {
   const index = process.argv.indexOf(name);
   if (index === -1) return null;
   return process.argv[index + 1] ?? null;
+}
+
+function resolveOutputPath(value) {
+  return isAbsolute(value) ? value : resolve(root, value);
 }
 
 function isFiniteNumber(value) {

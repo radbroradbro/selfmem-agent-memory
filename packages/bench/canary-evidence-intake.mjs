@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -8,6 +8,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const fixturePath = join(root, "packages/bench/fixtures/canary-runtime-report.fixture.json");
 const reportPath = readArgValue("--report") ?? process.env.RECALLWEAVE_CANARY_REPORT_JSON ?? fixturePath;
 const strictReal = process.argv.includes("--strict-real") || process.env.RECALLWEAVE_CANARY_STRICT_REAL === "1";
+const outputPath = readArgValue("--output") ?? process.env.RECALLWEAVE_CANARY_INTAKE_OUTPUT_JSON ?? null;
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -182,10 +183,11 @@ const output = {
     : ["Fix failed checks before any additional agent updates.", "Do not roll out to a second agent."],
 };
 
-const serialized = JSON.stringify(output, null, 2);
+const serialized = `${JSON.stringify(output, null, 2)}\n`;
 assert.doesNotMatch(serialized, secretPattern);
 assert.doesNotMatch(serialized, privatePathPattern);
-console.log(serialized);
+if (outputPath) writeFileSync(resolveOutputPath(outputPath), serialized, { encoding: "utf8", mode: 0o600 });
+process.stdout.write(serialized);
 if (strictFailureReason) {
   process.exitCode = 1;
 }
@@ -198,6 +200,10 @@ function readArgValue(name) {
   const index = process.argv.indexOf(name);
   if (index === -1) return null;
   return process.argv[index + 1] ?? null;
+}
+
+function resolveOutputPath(value) {
+  return isAbsolute(value) ? value : resolve(root, value);
 }
 
 function findForbiddenKeys(value, prefix = "") {

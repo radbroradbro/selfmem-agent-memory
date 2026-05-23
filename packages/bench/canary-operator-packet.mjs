@@ -49,7 +49,7 @@ const packet = {
       description: "After at least 15 minutes of real traffic on the patched agent, collect strict-real evidence from the fresh window.",
       command: [
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real > ${intakeReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
       ].join(" && "),
     },
     {
@@ -57,7 +57,7 @@ const packet = {
       description: "Shortcut only when the agent has already run for at least 15 minutes after the patch. Use a real timestamp, not the placeholder.",
       command: [
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --apply --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real > ${intakeReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
       ].join(" && "),
     },
     {
@@ -65,7 +65,7 @@ const packet = {
       description: "Use this instead when the agent exports a redacted diagnostic directory that includes old trace history.",
       command: [
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-diagnostic-dir <redacted-diagnostic-dir> --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real > ${intakeReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
       ].join(" && "),
     },
     {
@@ -73,13 +73,13 @@ const packet = {
       description: "Use this instead when the agent exports a redacted diagnostic zip that includes old trace history.",
       command: [
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real > ${intakeReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
       ].join(" && "),
     },
     {
       id: "diagnose-on-failure",
       description: "Run only if strict intake fails. Attach this metrics-only output, not raw logs.",
-      command: `npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report ${canaryReport} > ${diagnosisReport}`,
+      command: `npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report ${canaryReport} --output ${diagnosisReport}`,
     },
     {
       id: "package-passing-evidence",
@@ -167,7 +167,7 @@ function buildMarkdown() {
     "",
     "```bash",
     `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output ${canaryReport}`,
-    `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real > ${intakeReport}`,
+    `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
     "```",
     "",
     "If you only have a redacted diagnostic export, use one of these instead:",
@@ -180,7 +180,7 @@ function buildMarkdown() {
     "If strict intake fails, diagnose the metrics only:",
     "",
     "```bash",
-    `npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report ${canaryReport} > ${diagnosisReport}`,
+    `npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report ${canaryReport} --output ${diagnosisReport}`,
     "```",
     "",
     "Package a passing strict-real canary into one sanitized zip:",

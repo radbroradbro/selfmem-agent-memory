@@ -18,6 +18,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-batch-"));
 const requireRealPass = Boolean(args.requireRealPass);
+const outputPath = args.output ?? process.env.RECALLWEAVE_CANARY_BATCH_AUDIT_OUTPUT_JSON ?? null;
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -70,6 +71,7 @@ try {
 
   const serialized = `${JSON.stringify(output, null, 2)}\n`;
   assertSafeText(serialized, "batch audit output");
+  if (outputPath) writeFileSync(resolvePath(outputPath), serialized, { encoding: "utf8", mode: 0o600 });
   process.stdout.write(serialized);
   if (!ok) process.exitCode = 1;
 } finally {

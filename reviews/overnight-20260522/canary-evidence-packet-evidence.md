@@ -18,7 +18,7 @@ collection or failed-canary diagnosis.
 ```bash
 node --check packages/bench/canary-evidence-packet.mjs
 npm exec --yes pnpm@10.23.0 -- canary:packet -- --output <temporary-packet.zip>
-npm exec --yes pnpm@10.23.0 -- canary:intake > <temporary-intake.json>
+npm exec --yes pnpm@10.23.0 -- canary:intake -- --output <temporary-intake.json>
 npm exec --yes pnpm@10.23.0 -- canary:packet -- --report packages/bench/fixtures/canary-runtime-report.fixture.json --intake <temporary-intake.json> --output <temporary-packet-with-intake.zip>
 npm exec --yes pnpm@10.23.0 -- canary:packet -- --report packages/bench/fixtures/canary-runtime-report.fixture.json --intake <temporary-intake.json> --strict-real --output <temporary-strict-fixture.zip>
 unzip -Z1 <temporary-packet.zip>
