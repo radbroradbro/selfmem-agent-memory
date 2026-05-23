@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T21:28:55Z",
+  "generatedAt": "2026-05-23T21:47:42Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "4310e0ec7565abcf7eb4378fd165ecd5bab799f4",
-    "ciRunId": 26343998064,
+    "headSha": "67993f1d9eab7742ae70841d38ad9cd14021982c",
+    "ciRunId": 26344382488,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after expanding returned downloads findings into a per-inbox metrics table and next-action note. It preserves strict-real and public-launch blockers, and GitHub Actions run 26343998064 passed CI on 4310e0e. Local smoke, release:check, release:doctor, goal:audit, release:github-sync, diff check, and targeted secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after hardening the current OpenClaw one-agent canary handoff so the deterministic drill and native-memory/read-through contract are explicit in the main next-agent plan. It preserves strict-real and public-launch blockers, and GitHub Actions run 26344382488 passed CI on 67993f1. Local smoke, release:check, release:doctor, goal:audit, release:github-sync, diff check, and targeted secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

@@ -10,6 +10,14 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
+  `67993f1d9eab7742ae70841d38ad9cd14021982c`.
+- GitHub Actions run `26344382488` passed CI after hardening the current
+  OpenClaw one-agent handoff so deterministic drill execution and the
+  native-memory/read-through contract are explicit in the main next-agent plan.
+- Previous verified code/product baseline before current canary-drill handoff
+  hardening:
+  `4310e0ec7565abcf7eb4378fd165ecd5bab799f4`.
+- Earlier verified code/product baseline:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - GitHub Actions run `26342589049` passed CI after adding returned canary
   workspace generation, keeping fixture workspace output temporary,
@@ -78,6 +86,9 @@ requirements are resolved.
   supervision and the markdown findings note.
 - GitHub Actions run `26343998064` passed CI after expanding the returned
   downloads findings note with a per-inbox metrics table and next-action list.
+- GitHub Actions run `26344382488` passed CI after hardening the current
+  OpenClaw one-agent handoff so deterministic drill execution and the
+  native-memory/read-through contract are explicit in the main next-agent plan.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:
