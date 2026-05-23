@@ -72,6 +72,10 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after adding the public benchmark target
     lane for quota-locked Supermemory accounts. Updated at:
     2026-05-23T21:59:51Z.
+  - The PR body was refreshed again after clarifying that public memory claims
+    must use the same benchmark data, revision, split, labels, judge rule, and
+    scoring setup as the target row, while embedding and reranker leaderboards
+    are component evidence only. Updated at: 2026-05-23T22:06:40Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -90,10 +94,11 @@ Verdict: resolved for PR body and blocker issue writes.
     identity refresh, postwatch OpenClaw one-agent packet refresh, returned
     canary workspace refresh, latest verified baseline refresh, returned
     downloads findings baseline refresh, current deterministic-drill packet
-    refresh, latest canary-drill handoff baseline refresh, and public
-    benchmark target lane refresh
-  - Updated at: 2026-05-23T21:59:52Z
-  - Body length: 22730
+    refresh, latest canary-drill handoff baseline refresh, public benchmark
+    target lane refresh, and component-vs-memory benchmark clarification
+    refresh
+  - Updated at: 2026-05-23T22:06:41Z
+  - Body length: 23060
 
 ## Safety
 

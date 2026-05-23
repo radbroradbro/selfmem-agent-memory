@@ -51,6 +51,10 @@ Live status:
   against reported leaderboard/provider stats without requiring hosted
   Supermemory writes. Small wins may be described only as canary trends until a
   full comparable run is complete.
+- Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
+  component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
+  and Apple Silicon arms. Public memory claims still require the same benchmark
+  data, revision, split, labels, judge rule, and scoring setup as the target row.
 - Hardens `baseline:source-match` for real local selfmem exports that contain
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and

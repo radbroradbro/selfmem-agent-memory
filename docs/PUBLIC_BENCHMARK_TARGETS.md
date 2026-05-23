@@ -17,6 +17,11 @@ from MemoryBench, LongMemEval, LoCoMo, ConvoMem, BEAM, or another documented
 memory benchmark, then compare the metrics to published leaderboard or provider
 reports.
 
+Same data means same public benchmark source, repository or dataset revision,
+split, question ids where available, answer labels, judge rule, and scoring
+script. A custom memory set can be useful for product QA, but it is not the
+benchmark lane unless it is clearly labeled as a private canary.
+
 ## Claim Tiers
 
 | Tier | Evidence | Allowed wording |
@@ -29,6 +34,25 @@ reports.
 Do not call a canary trend a full benchmark win. Do not compare RecallWeave
 accuracy to a reported provider score unless the dataset variant, metric, judge,
 answer model, token budget, and scoring code are stated.
+
+## Component Benchmarks
+
+MTEB, MMTEB, BEIR, MIRACL, MS MARCO, and reranker leaderboards are component
+benchmarks. Use them to choose embedding and reranking arms, including Gemini
+Embedding 2, Voyage, NVIDIA, Qwen, Jina, BGE, GTE, and local Apple Silicon
+options. They do not prove full memory-system quality by themselves.
+
+Report component scores separately from memory scores:
+
+- `embeddingBenchmark`: MTEB/MMTEB/BEIR/MIRACL-style score,
+- `rerankerBenchmark`: reranker task score,
+- `memoryBenchmark`: MemoryBench, LongMemEval, LoCoMo, ConvoMem, BEAM, or
+  another end-to-end memory benchmark,
+- `productionCanary`: one-agent real runtime reliability and latency evidence.
+
+An embedding arm can win MTEB and still lose RecallWeave memory quality if
+chunking, query expansion, temporal handling, graph traversal, or prompt budget
+is wrong. The autoresearch loop should let the full memory benchmark decide.
 
 ## Seed Targets
 
@@ -56,6 +80,11 @@ harness we will use.
 - LongMemEval is a strong target because it uses 500 human-curated questions and
   tests information extraction, multi-session reasoning, knowledge update,
   temporal reasoning, and abstention.
+- LongMemEval-V2 is a May 2026 watch target for agent-work memory because it
+  focuses on state recall, dynamic state tracking, workflow knowledge,
+  environment gotchas, and premise awareness. Treat it as a custom-benchmark
+  candidate until its data, scoring code, and comparable target rows are
+  source-locked.
 - Reported provider scores are useful objective targets, but they are weaker
   than same-harness head-to-head runs. Every target row must keep its source URL
   and date checked.
@@ -67,3 +96,8 @@ harness we will use.
 - https://github.com/supermemoryai/supermemory/blob/main/README.md
 - https://mem0.ai/blog/state-of-ai-agent-memory-2026
 - https://openreview.net/pdf?id=wIonk5yTDq
+- https://ai.google.dev/gemini-api/docs/models/gemini-embedding-2
+- https://huggingface.co/Qwen/Qwen3-Embedding-0.6B
+- https://huggingface.co/mteb
+- https://arxiv.org/abs/2210.07316
+- https://arxiv.org/abs/2605.12493

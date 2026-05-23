@@ -4,6 +4,11 @@ RecallWeave treats model choice as an experiment, not a hidden fallback. Each
 provider arm keeps its own embedding space. If an embedding model changes, the
 index must be rebuilt or stored separately.
 
+Embedding and reranker benchmark scores are component evidence. MTEB/MMTEB,
+BEIR, MIRACL, MS MARCO, and reranker tasks help choose arms, but the final
+RecallWeave claim must come from a full memory or retrieval benchmark using the
+same public data, dataset revision, and scoring setup as the target row.
+
 ## Defaults
 
 | Lane | Default | Why |

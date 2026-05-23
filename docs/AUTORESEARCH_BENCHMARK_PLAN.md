@@ -63,6 +63,9 @@ too expensive for the next run.
    token budget if reported, and caveats.
 2. Freeze a small but real canary slice from MemoryBench, LongMemEval, LoCoMo,
    ConvoMem, BEAM, or another documented memory benchmark.
+   Use the same public data, repository or dataset revision, split, labels,
+   question ids where available, judge rule, and scoring script as the reported
+   target. Do not replace this with a private synthetic memory set.
 3. Run RecallWeave on that slice with a fixed provider arm.
 4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
    latency, context tokens, and cost against the reported target.
@@ -83,6 +86,13 @@ Disallowed wording:
 
 That wording needs full comparable benchmark runs, reviewer approval, and
 reproducible artifacts across the relevant benchmark suite.
+
+Embedding and reranker leaderboards are allowed only as component evidence.
+MTEB, MMTEB, BEIR, MIRACL, MS MARCO, and reranker task scores can justify why
+Gemini Embedding 2, Voyage, NVIDIA, Qwen, Jina, BGE, GTE, or a local Apple
+Silicon arm enters the matrix. They do not replace MemoryBench, LongMemEval,
+LoCoMo, ConvoMem, BEAM, or another end-to-end memory/retrieval benchmark for
+RecallWeave quality claims.
 
 ## Hosted Supermemory Parity Lane
 
