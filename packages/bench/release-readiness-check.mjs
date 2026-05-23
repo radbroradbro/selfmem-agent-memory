@@ -29,6 +29,7 @@ const requiredFiles = [
   "packages/bench/canary-operator-packet.mjs",
   "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/canary-evidence-packet-review.mjs",
+  "packages/bench/canary-returned-packet-intake.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/canary-next-agent-plan.mjs",
   "packages/bench/canary-next-agent-packet.mjs",
@@ -157,6 +158,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-evidence-packet-review.md`,
   `${reviewDir}/canary-evidence-packet-review-evidence.md`,
   `${reviewDir}/gemini-canary-evidence-packet-review-review.md`,
+  `${reviewDir}/canary-returned-packet-intake-evidence.md`,
+  `${reviewDir}/gemini-canary-returned-packet-intake-review.md`,
   `${reviewDir}/canary-diagnostic-batch-audit-evidence.md`,
   `${reviewDir}/gemini-canary-diagnostic-batch-audit-review.md`,
   `${reviewDir}/canary-next-agent-plan-evidence.md`,
@@ -286,6 +289,7 @@ const requiredScripts = [
   "canary:operator-packet",
   "canary:packet",
   "canary:packet:review",
+  "canary:returned-packet",
   "canary:batch-audit",
   "canary:next-agent",
   "canary:next-agent-packet",
@@ -1577,6 +1581,66 @@ check("fresh canary evidence packet review passes", () => {
     assert.match(geminiReview, /Verdict:\s*CLEAN/i);
     assert.doesNotMatch(reviewRun.stdout, secretPattern);
     assert.doesNotMatch(reviewRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+check("fresh returned canary packet intake passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-canary-packet-check-"));
+  try {
+    const packetPath = join(tempRoot, "packet.zip");
+    const outputPath = join(tempRoot, "returned-intake.json");
+    run("node", [
+      "packages/bench/canary-evidence-packet.mjs",
+      "--output",
+      packetPath,
+    ]);
+    const defaultRun = run("node", ["packages/bench/canary-returned-packet-intake.mjs"]);
+    const packetRun = run("node", [
+      "packages/bench/canary-returned-packet-intake.mjs",
+      "--packet",
+      packetPath,
+      "--output",
+      outputPath,
+    ]);
+    const requiredRun = spawnSync("node", [
+      "packages/bench/canary-returned-packet-intake.mjs",
+      "--packet",
+      packetPath,
+      "--require-production-canary",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const defaultReport = JSON.parse(defaultRun.stdout);
+    const packetReport = JSON.parse(packetRun.stdout);
+    const outputReport = JSON.parse(readFileSync(outputPath, "utf8"));
+    const requiredReport = JSON.parse(requiredRun.stdout);
+    const evidence = readFileSync(join(root, reviewDir, "canary-returned-packet-intake-evidence.md"), "utf8");
+    const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-returned-packet-intake-review.md"), "utf8");
+    assert.equal(defaultReport.mode, "canary-returned-packet-intake");
+    assert.equal(defaultReport.status, "NOT_PRODUCTION_EVIDENCE");
+    assert.equal(defaultReport.countsAsProductionCanaryEvidence, false);
+    assert.equal(defaultReport.publicLaunchAllowed, false);
+    assert.equal(defaultReport.fleetRolloutAllowed, false);
+    assert.equal(packetReport.mode, "canary-returned-packet-intake");
+    assert.equal(packetReport.reviewStrictReal, true);
+    assert.equal(packetReport.status, "NOT_PRODUCTION_EVIDENCE");
+    assert.equal(packetReport.countsAsProductionCanaryEvidence, false);
+    assert.equal(outputReport.mode, "canary-returned-packet-intake");
+    assert.notEqual(requiredRun.status, 0, "required production canary must fail closed for fixture packets");
+    assert.equal(requiredReport.ok, false);
+    assert.equal(requiredReport.requireProductionCanary, true);
+    assert.match(evidence, /canary:returned-packet/i);
+    assert.match(evidence, /returned evidence packet/i);
+    assert.match(evidence, /require-production-canary/i);
+    assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+    for (const text of [defaultRun.stdout, packetRun.stdout, requiredRun.stdout, evidence]) {
+      assert.doesNotMatch(text, secretPattern);
+      assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+    }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }

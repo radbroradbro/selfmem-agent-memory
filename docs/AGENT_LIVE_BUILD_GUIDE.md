@@ -250,6 +250,22 @@ fresh-window, strict intake, diagnosis, and packet commands for one agent only.
 If the selected candidate is fixture-only or privacy is not clean, the planner
 says so instead of pretending the evidence is production-ready.
 
+When the selected agent returns a canary evidence packet, run:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --output /tmp/recallweave-returned-canary-intake.json
+```
+
+For release evidence, require a strict production canary:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
+```
+
+This intake command does not read raw memories. It accepts only the metrics-only
+packet and fails closed unless the packet is non-fixture, privacy-clean, and
+strict-real.
+
 The strict review must fail for fixtures or diagnostic-only packets.
 
 ## Failed Canary Reports

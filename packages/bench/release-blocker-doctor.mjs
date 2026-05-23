@@ -150,7 +150,7 @@ const blockerReport = [
     id: "fresh-real-container-canary-not-current",
     status: "incomplete",
     evidence: "real-canary-diagnostic-evidence.md",
-    nextAction: "Run `canary:batch-audit` on redacted returned diagnostics, use `canary:next-agent` to pick one privacy-clean Hermes/OpenClaw target, apply the current adapter, then collect a fresh strict-real canary window and package metrics-only evidence.",
+    nextAction: "Run `canary:batch-audit` on redacted returned diagnostics, use `canary:next-agent` and `canary:next-agent-packet` to pick one privacy-clean Hermes/OpenClaw target, apply the current adapter, then collect a fresh strict-real canary window and verify the returned metrics-only packet with `canary:returned-packet -- --require-production-canary`.",
   },
 ];
 
@@ -241,6 +241,8 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw",
         "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --output /tmp/recallweave-canary-batch-audit.json",
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-canary-next-agent-plan.json",
+        "npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-next-agent-handoff.zip",
+        "npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /tmp/recallweave-canary-evidence-packet.zip --require-production-canary --output /tmp/recallweave-returned-canary-intake.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir <local-recallweave-container-dir> --output /tmp/recallweave-search-responses.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --live --responses /tmp/recallweave-search-responses.json --output /tmp/recallweave-result.json",

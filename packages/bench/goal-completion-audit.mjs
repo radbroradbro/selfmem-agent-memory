@@ -32,6 +32,8 @@ const files = {
   canaryEvidenceIntakeReview: `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   canaryRemediationEvidence: `${reviewDir}/canary-remediation-evidence.md`,
   canaryRemediationReview: `${reviewDir}/gemini-canary-remediation-review.md`,
+  canaryReturnedPacketIntakeEvidence: `${reviewDir}/canary-returned-packet-intake-evidence.md`,
+  canaryReturnedPacketIntakeReview: `${reviewDir}/gemini-canary-returned-packet-intake-review.md`,
   canaryNextAgentPlanEvidence: `${reviewDir}/canary-next-agent-plan-evidence.md`,
   canaryNextAgentPlanReview: `${reviewDir}/gemini-canary-next-agent-plan-review.md`,
   adapterBoundedReadThroughEvidence: `${reviewDir}/adapter-bounded-read-through-evidence.md`,
@@ -174,6 +176,11 @@ const requirements = [
     "packages/bench/fixtures/canary-runtime-report-failing.fixture.json",
     files.canaryRemediationEvidence,
     files.canaryRemediationReview,
+  ]),
+  proven("canary-returned-packet-intake", "Returned one-agent canary evidence packets have a maintainer-facing strict-real intake gate", [
+    "packages/bench/canary-returned-packet-intake.mjs",
+    files.canaryReturnedPacketIntakeEvidence,
+    files.canaryReturnedPacketIntakeReview,
   ]),
   proven("canary-next-agent-plan", "Returned diagnostic batches can be converted into a single metrics-only one-agent fresh-window update plan", [
     "packages/bench/canary-next-agent-plan.mjs",

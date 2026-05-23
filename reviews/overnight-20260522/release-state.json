@@ -92,7 +92,8 @@
     "github-pr-body-live",
     "github-blocker-issue-live",
     "goal-completion-audit",
-    "selfmem-update"
+    "selfmem-update",
+    "canary-returned-packet-intake"
   ],
   "reviewerEvidence": {
     "freshCanaryWindow": {

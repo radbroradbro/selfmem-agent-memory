@@ -280,6 +280,24 @@ strict-real operator instructions. It does not include raw diagnostics or memory
 content. The selected operator should return only the metrics-only canary report,
 intake JSON, optional diagnosis JSON, and canary evidence packet.
 
+When a returned evidence packet arrives, intake it before interpreting the
+result:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --output /tmp/recallweave-returned-canary-intake.json
+```
+
+For a release-blocking check, require production-grade evidence:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
+```
+
+The command fails closed unless the returned packet is non-fixture,
+metrics-only, privacy-clean, strict-real, and eligible to count as one-agent
+production canary evidence. Even then, public launch and fleet rollout remain
+blocked until maintainer approval.
+
 Current Hermes and OpenClaw adapters use local-first bounded hosted
 read-through. They search hosted Supermemory when local results are thin or the
 query explicitly asks for old, legacy, hosted, or Supermemory history. To prove
