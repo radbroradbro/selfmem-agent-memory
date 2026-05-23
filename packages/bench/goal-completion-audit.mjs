@@ -60,6 +60,10 @@ const files = {
   hostedBaselineLiveCodexLocalRunEvidence: `${reviewDir}/hosted-baseline-live-codex-local-run-evidence.md`,
   hostedBaselineLiveCodexLocalRunReport: `${reviewDir}/hosted-baseline-live-codex-local-run.json`,
   hostedBaselineLiveCodexLocalRunReview: `${reviewDir}/gemini-hosted-baseline-live-codex-local-review.md`,
+  hostedBaselineLiveMirrorRunEvidence: `${reviewDir}/hosted-baseline-live-mirror-run-evidence.md`,
+  hostedBaselineLiveMirrorRunReport: `${reviewDir}/hosted-baseline-live-mirror-run.json`,
+  hostedBaselineLiveMirrorPacketReport: `${reviewDir}/hosted-baseline-live-mirror-packet.json`,
+  hostedBaselineLiveMirrorGateReview: `${reviewDir}/codex-hosted-baseline-live-mirror-gate-review.md`,
   hostedBaselineNextRunEvidence: `${reviewDir}/hosted-baseline-next-run-evidence.md`,
   hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   baselineReturnedPacketIntakeEvidence: `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
@@ -81,6 +85,8 @@ const releaseState = JSON.parse(readFileSync(join(root, files.releaseState), "ut
 const hostedBaselineLiveDiscovery = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveDiscoveryReport), "utf8"));
 const hostedBaselineLiveQuerySet = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveQuerySetReport), "utf8"));
 const hostedBaselineLiveCodexLocalRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveCodexLocalRunReport), "utf8"));
+const hostedBaselineLiveMirrorRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveMirrorRunReport), "utf8"));
+const hostedBaselineLiveMirrorPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveMirrorPacketReport), "utf8"));
 const releaseReadinessEvidence = JSON.parse(readFileSync(join(root, files.releaseReadinessEvidence), "utf8"));
 const currentHeadLiveEvidence = JSON.parse(readFileSync(join(root, files.browserEvidence), "utf8"));
 const texts = Object.fromEntries(
@@ -123,6 +129,26 @@ assert.equal(hostedBaselineLiveCodexLocalRun.countsAsProductionBaselineEvidence,
 assert.equal(hostedBaselineLiveCodexLocalRun.countsAsPublicBenchmarkEvidence, false);
 assert.equal(hostedBaselineLiveCodexLocalRun.publicBenchmarkClaimsAllowed, false);
 assert.equal(hostedBaselineLiveCodexLocalRun.evidence?.comparison?.recallWeaveWin, false);
+assert.match(texts.hostedBaselineLiveMirrorRunEvidence, /not a public\s+superiority claim/i);
+assert.equal(hostedBaselineLiveMirrorRun.fixtureOnly, false);
+assert.equal(hostedBaselineLiveMirrorRun.callsHostedProvider, true);
+assert.equal(hostedBaselineLiveMirrorRun.metricsOnly, true);
+assert.equal(hostedBaselineLiveMirrorRun.countsAsProductionBaselineEvidence, true);
+assert.equal(hostedBaselineLiveMirrorRun.countsAsPublicBenchmarkEvidence, false);
+assert.equal(hostedBaselineLiveMirrorRun.publicBenchmarkClaimsAllowed, false);
+assert.equal(hostedBaselineLiveMirrorRun.evidence?.sourceMatch?.sourceMatchReady, true);
+assert.equal(hostedBaselineLiveMirrorRun.evidence?.sourceMatch?.collectableQueryCount, 8);
+assert.equal(hostedBaselineLiveMirrorRun.evidence?.comparison?.countsAsComparisonEvidence, true);
+assert.equal(hostedBaselineLiveMirrorRun.evidence?.comparison?.recallWeaveWin, true);
+assert.equal(hostedBaselineLiveMirrorRun.evidence?.comparison?.reviewerApprovalCount, 0);
+assert.ok(hostedBaselineLiveMirrorRun.evidence?.comparison?.failedChecks?.includes("two-reviewer-approvals"));
+assert.equal(hostedBaselineLiveMirrorRun.evidence?.hosted?.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveMirrorRun.evidence?.recallWeave?.privacyLeakCount, 0);
+assert.ok(Number(hostedBaselineLiveMirrorRun.evidence?.recallWeave?.metrics?.contextTokensAvg) > Number(hostedBaselineLiveMirrorRun.evidence?.hosted?.metrics?.contextTokensAvg));
+assert.equal(hostedBaselineLiveMirrorPacket.strictReal, true);
+assert.equal(hostedBaselineLiveMirrorPacket.packagePassesStrictReal, true);
+assert.equal(hostedBaselineLiveMirrorPacket.publicBenchmarkClaimsAllowed, false);
+assert.match(texts.hostedBaselineLiveMirrorGateReview, /Verdict:\s*`?CLEAN`?/i);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -236,6 +262,14 @@ const requirements = [
     files.hostedBaselineLiveCodexLocalRunReport,
     files.hostedBaselineLiveCodexLocalRunReview,
   ]),
+  proven("hosted-baseline-live-mirror-run", "Source-matched hosted mirror baseline is proven metrics-only with zero privacy leaks, but does not support public claims", [
+    "packages/bench/hosted-baseline-local-mirror.mjs",
+    "packages/bench/hosted-baseline-run.mjs",
+    files.hostedBaselineLiveMirrorRunEvidence,
+    files.hostedBaselineLiveMirrorRunReport,
+    files.hostedBaselineLiveMirrorPacketReport,
+    files.hostedBaselineLiveMirrorGateReview,
+  ]),
   proven("hosted-baseline-next-run", "Hosted baseline comparison has a state-aware next-run planner that keeps public claims blocked while producing the exact next metrics-only run packet", [
     "packages/bench/hosted-baseline-next-run.mjs",
     files.hostedBaselineNextRunEvidence,
@@ -305,10 +339,10 @@ const requirements = [
     files.releaseState,
     "docs/PUBLIC_RELEASE_CHECKLIST.md",
   ]),
-  blocked("hosted-supermemory-baseline", "Hosted Supermemory benchmark claims require a fresh metrics-only baseline", [
-    files.hostedBaselinePreflightEvidence,
-    files.hostedBaselineLivePrepEvidence,
-    files.hostedBaselineLiveCodexLocalRunEvidence,
+  blocked("hosted-baseline-review-approval", "Hosted benchmark claims require two independent reviewer approvals and context-budget review after the source-matched mirror run", [
+    files.hostedBaselineLiveMirrorRunEvidence,
+    files.hostedBaselineLiveMirrorRunReport,
+    files.hostedBaselineLiveMirrorPacketReport,
     files.hostedBaselineNextRunEvidence,
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
@@ -341,7 +375,7 @@ const report = {
   latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
   goalComplete: false,
   mayCallUpdateGoalComplete: false,
-  reason: "The core preview work is strongly evidenced, but human approval, hosted-baseline, and real rollout requirements remain unresolved.",
+  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, but human approval, two-reviewer benchmark approval, context-budget tuning, and real rollout requirements remain unresolved.",
   counts: {
     total: requirements.length,
     proven: requirements.filter((item) => item.status === "proven").length,

@@ -3964,7 +3964,7 @@ function isPublicEvidencePath(file) {
 }
 
 function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
-  return allowedCodePaths.has(file) && (file === "package.json" || file.startsWith("packages/bench/"));
+  return allowedCodePaths.has(file) && (file === ".gitignore" || file === "package.json" || file.startsWith("packages/bench/"));
 }
 
 async function listFiles(directory) {

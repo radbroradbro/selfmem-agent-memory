@@ -44,6 +44,10 @@ const requiredFiles = {
   hostedBaselineLiveCodexLocalRun: "hosted-baseline-live-codex-local-run-evidence.md",
   hostedBaselineLiveCodexLocalRunReport: "hosted-baseline-live-codex-local-run.json",
   hostedBaselineLiveCodexLocalRunReview: "gemini-hosted-baseline-live-codex-local-review.md",
+  hostedBaselineLiveMirrorRun: "hosted-baseline-live-mirror-run-evidence.md",
+  hostedBaselineLiveMirrorRunReport: "hosted-baseline-live-mirror-run.json",
+  hostedBaselineLiveMirrorPacketReport: "hosted-baseline-live-mirror-packet.json",
+  hostedBaselineLiveMirrorGateReview: "codex-hosted-baseline-live-mirror-gate-review.md",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
@@ -95,6 +99,10 @@ const hostedBaselineLiveQuerySetReport = JSON.parse(readFileSync(join(root, revi
 const hostedBaselineLiveCodexLocalRunText = readFileSync(join(root, reviewDir, "hosted-baseline-live-codex-local-run-evidence.md"), "utf8");
 const hostedBaselineLiveCodexLocalRunReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-codex-local-run.json"), "utf8"));
 const hostedBaselineLiveCodexLocalRunReviewText = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-codex-local-review.md"), "utf8");
+const hostedBaselineLiveMirrorRunText = readFileSync(join(root, reviewDir, "hosted-baseline-live-mirror-run-evidence.md"), "utf8");
+const hostedBaselineLiveMirrorRunReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-mirror-run.json"), "utf8"));
+const hostedBaselineLiveMirrorPacketReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-mirror-packet.json"), "utf8"));
+const hostedBaselineLiveMirrorGateReviewText = readFileSync(join(root, reviewDir, "codex-hosted-baseline-live-mirror-gate-review.md"), "utf8");
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
@@ -144,6 +152,26 @@ assert.equal(hostedBaselineLiveCodexLocalRunReport.publicBenchmarkClaimsAllowed,
 assert.equal(hostedBaselineLiveCodexLocalRunReport.evidence?.comparison?.recallWeaveWin, false);
 assert.equal(hostedBaselineLiveCodexLocalRunReport.evidence?.hosted?.privacyLeakCount, 0);
 assert.equal(hostedBaselineLiveCodexLocalRunReport.evidence?.recallWeave?.privacyLeakCount, 0);
+assert.match(hostedBaselineLiveMirrorRunText, /source-matched live hosted-vs-local baseline/i);
+assert.match(hostedBaselineLiveMirrorRunText, /not a public\s+superiority claim/i);
+assert.equal(hostedBaselineLiveMirrorRunReport.fixtureOnly, false);
+assert.equal(hostedBaselineLiveMirrorRunReport.callsHostedProvider, true);
+assert.equal(hostedBaselineLiveMirrorRunReport.metricsOnly, true);
+assert.equal(hostedBaselineLiveMirrorRunReport.countsAsProductionBaselineEvidence, true);
+assert.equal(hostedBaselineLiveMirrorRunReport.countsAsPublicBenchmarkEvidence, false);
+assert.equal(hostedBaselineLiveMirrorRunReport.publicBenchmarkClaimsAllowed, false);
+assert.equal(hostedBaselineLiveMirrorRunReport.evidence?.sourceMatch?.sourceMatchReady, true);
+assert.equal(hostedBaselineLiveMirrorRunReport.evidence?.sourceMatch?.collectableQueryCount, 8);
+assert.equal(hostedBaselineLiveMirrorRunReport.evidence?.comparison?.countsAsComparisonEvidence, true);
+assert.equal(hostedBaselineLiveMirrorRunReport.evidence?.comparison?.recallWeaveWin, true);
+assert.equal(hostedBaselineLiveMirrorRunReport.evidence?.comparison?.reviewerApprovalCount, 0);
+assert.ok(hostedBaselineLiveMirrorRunReport.evidence?.comparison?.failedChecks?.includes("two-reviewer-approvals"));
+assert.equal(hostedBaselineLiveMirrorRunReport.evidence?.hosted?.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveMirrorRunReport.evidence?.recallWeave?.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveMirrorPacketReport.strictReal, true);
+assert.equal(hostedBaselineLiveMirrorPacketReport.packagePassesStrictReal, true);
+assert.equal(hostedBaselineLiveMirrorPacketReport.publicBenchmarkClaimsAllowed, false);
+assert.match(hostedBaselineLiveMirrorGateReviewText, /Verdict:\s*`?CLEAN`?/i);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
@@ -227,8 +255,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "hosted-baseline-live-codex-local-run-evidence.md",
-    nextAction: "A live metrics-only hosted-vs-local Codex run completed and produced a strict-real packet, but both arms scored 0 and public benchmark claims remain blocked. The next step is a source-match research iteration: keep the private query set locally reviewed, run `baseline:mirror-hosted -- --live --discovery <discovery-report> --private-map <private-map> --output-dir <hosted-mirror-dir> --output <mirror-report>` if a mirrored source is needed, then run `baseline:source-match -- --live --queryset <reviewed-queryset> --container-dir <hosted-mirror-dir> --preserve-ids --strict --output <source-match-report>`, then run `baseline:source-align -- --source-match <source-match-report> --local-map <hosted-mirror-dir>/container-map.json --private-map <private-map> --strict --output <alignment-report>`, then run `baseline:source-gap -- --source-match <source-match-report> --source-alignment <alignment-report> --output <source-gap-report>` and require matchedBaselineRunAllowed=true, proving the local RecallWeave source matches the selected hosted source, before hosted calls. Only then rerun `baseline:run -- --live --container-env <private-env> --queryset <reviewed-queryset> --container-dir <hosted-mirror-dir> --local-map <hosted-mirror-dir>/container-map.json --private-map <private-map> --preserve-ids --reviewed-queryset --output <run-report>`, then run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` and require a non-zero, reviewer-approved comparison before any public claim.",
+    evidence: "hosted-baseline-live-mirror-run-evidence.md",
+    nextAction: "A source-matched live hosted mirror baseline completed with zero privacy leaks, RecallWeave non-zero quality, and a strict-real packet. Keep the private query set locally reviewed and do not commit it. Use `baseline:mirror-hosted` only in a private temp directory when rebuilding the source-matched mirror, then prove the local RecallWeave source matches with `baseline:source-match`, `baseline:source-align`, and `baseline:source-gap` before rerunning `baseline:run -- --live`. Public benchmark claims remain blocked because reviewerApprovalCount is 0 and the local arm used far more context tokens than hosted Supermemory. Next: run two independent reviewer approvals against the metrics-only packet, tune context budgeting, and rerun `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` with reviewerApprovalCount >= 2 before any public claim.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -307,6 +335,22 @@ console.log(
           recallWeaveWin: hostedBaselineLiveCodexLocalRunReport.evidence?.comparison?.recallWeaveWin,
           privacyLeakCount: Number(hostedBaselineLiveCodexLocalRunReport.evidence?.hosted?.privacyLeakCount ?? 0)
             + Number(hostedBaselineLiveCodexLocalRunReport.evidence?.recallWeave?.privacyLeakCount ?? 0),
+        },
+        hostedBaselineLiveMirrorRun: {
+          status: hostedBaselineLiveMirrorRunReport.status,
+          callsHostedProvider: hostedBaselineLiveMirrorRunReport.callsHostedProvider,
+          countsAsProductionBaselineEvidence: hostedBaselineLiveMirrorRunReport.countsAsProductionBaselineEvidence,
+          countsAsPublicBenchmarkEvidence: hostedBaselineLiveMirrorRunReport.countsAsPublicBenchmarkEvidence,
+          hostedQuality: hostedBaselineLiveMirrorRunReport.evidence?.hosted?.metrics?.quality,
+          recallWeaveQuality: hostedBaselineLiveMirrorRunReport.evidence?.recallWeave?.metrics?.quality,
+          recallWeaveWin: hostedBaselineLiveMirrorRunReport.evidence?.comparison?.recallWeaveWin,
+          reviewerApprovalCount: hostedBaselineLiveMirrorRunReport.evidence?.comparison?.reviewerApprovalCount,
+          failedChecks: hostedBaselineLiveMirrorRunReport.evidence?.comparison?.failedChecks,
+          hostedContextTokensAvg: hostedBaselineLiveMirrorRunReport.evidence?.hosted?.metrics?.contextTokensAvg,
+          recallWeaveContextTokensAvg: hostedBaselineLiveMirrorRunReport.evidence?.recallWeave?.metrics?.contextTokensAvg,
+          privacyLeakCount: Number(hostedBaselineLiveMirrorRunReport.evidence?.hosted?.privacyLeakCount ?? 0)
+            + Number(hostedBaselineLiveMirrorRunReport.evidence?.recallWeave?.privacyLeakCount ?? 0),
+          strictRealPacket: hostedBaselineLiveMirrorPacketReport.packagePassesStrictReal,
         },
         hostedBaselineCollector: {
           provider: hostedBaselineCollector.provider,
