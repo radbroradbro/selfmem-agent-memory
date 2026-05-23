@@ -1933,6 +1933,23 @@ check("fresh canary next-agent handoff packet passes", () => {
   rmSync(tempRoot, { recursive: true, force: true });
 });
 
+check("current canary handoff packet identity is consistent", () => {
+  const packetEvidence = readFileSync(join(root, reviewDir, "canary-next-agent-packet-evidence.md"), "utf8");
+  const planEvidence = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
+  const diagnosticEvidence = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
+  const prBodyDraft = readFileSync(join(root, reviewDir, "pr-body-update-draft.md"), "utf8");
+  const issueDraft = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
+  const identity = currentCanaryPacketIdentity(packetEvidence);
+  assert.match(identity.label, /^recallweave-openclaw-next-agent-canary-\d{8}.*\.zip$/);
+  assert.match(identity.sha256, /^[a-f0-9]{64}$/);
+  for (const text of [packetEvidence, planEvidence, diagnosticEvidence, prBodyDraft, issueDraft]) {
+    assert.match(text, new RegExp(escapeRegExp(identity.label)));
+    assert.match(text, new RegExp(identity.sha256));
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  }
+});
+
 check("fresh canary window reviewer evidence is explicit", () => {
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-fresh-canary-window-review.md"), "utf8");
   const claudeBlocked = readFileSync(join(root, reviewDir, "claude-fresh-canary-window-review-blocked.md"), "utf8");
@@ -3032,6 +3049,21 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
   return result;
+}
+
+function currentCanaryPacketIdentity(text) {
+  const section = text.match(/## Current Returned Diagnostics Packet Result\s+([\s\S]*?)(?:\n## |\n$)/i)?.[1] ?? "";
+  assert.ok(section, "current canary packet evidence must include a current returned-diagnostics section");
+  const match = section.match(/Packet label:\s*`([^`]+)`[\s\S]*?Packet SHA256:\s*\n\s*`([a-f0-9]{64})`/i);
+  assert.ok(match, "current canary packet evidence must include packet label and SHA256");
+  return {
+    label: match[1],
+    sha256: match[2],
+  };
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 async function listFiles(directory) {

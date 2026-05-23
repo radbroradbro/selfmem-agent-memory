@@ -161,6 +161,10 @@ Scope:
   converts batch findings into a single one-agent update and fresh-window plan,
   keeps fixture evidence from enabling a real canary, and keeps public and
   fleet rollout blocked.
+- Added current canary handoff packet identity coverage to the release gate.
+  The gate derives the current packet label and SHA256 from the current
+  returned-diagnostics section, then requires the next-agent plan evidence,
+  real diagnostic evidence, PR body draft, and blocker issue draft to match it.
 - Added baseline evidence packet coverage to the release gate. The packet
   command writes one metrics-only zip from hosted result, RecallWeave result,
   comparison, and preflight files, rejects raw-content keys, secrets, and
