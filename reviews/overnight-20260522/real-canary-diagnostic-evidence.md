@@ -41,6 +41,14 @@ again parsed eight of nine inputs, found zero strict-real passes, and selected
 the same privacy-clean OpenClaw candidate. The current handoff packet is
 metrics-only, public-safe, and intended only for one fresh OpenClaw canary.
 
+On 2026-05-23, the controller extended the same path once more from a clean
+worktree. The mixed-folder batch audit still parsed eight of nine inputs,
+ranked the same OpenClaw candidate, and produced a fresh one-agent handoff
+packet. The selected candidate still has zero privacy leaks, lifecycle
+coverage, hybrid search, local writes, hosted read-through, and recall p95
+1567.346 ms, but it still fails strict production intake until a post-update
+window proves the v1 adapter contract and positive store latency samples.
+
 ## Commands
 
 The controller generated temporary metrics-only reports outside the repository:
@@ -137,8 +145,8 @@ The failure is actionable and matches the adapter hardening work:
 - The next operator should run `canary:diagnose` on any failing report and
   attach only the metrics-only output.
 - The current sendable handoff packet is
-  `recallweave-current-openclaw-next-agent-handoff-20260523.zip`, SHA256
-  `8fec92bdfc135e05c814ac34a5fc171e2b808c018ad07d0bc454e1dabb5c9de4`.
+  `recallweave-openclaw-next-agent-canary-20260523.zip`, SHA256
+  `8af8fe4c9f029265c19982ef95175deab1fe2da360cb12074524e1f20df0fb67`.
 
 ## Boundary
 
