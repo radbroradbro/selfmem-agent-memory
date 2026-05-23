@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T12:43:00Z",
+  "generatedAt": "2026-05-23T14:33:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "fc76077f74793ddcf0e69b80617fc81b68d9bcd2",
-    "ciRunId": 26334827218,
+    "headSha": "e1f114e664e6bcf6d49ff32bd578c8eefef6e6ce",
+    "ciRunId": 26335300537,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after enforcing hosted baseline source gates in the operator packet, next-run planner, and one-command baseline runner. It preserves strict-real and public-launch blockers, requires source-match plus source-alignment before hosted collection, includes Gemini CLEAN review, and GitHub Actions run 26334827218 passed CI on fc76077. Local release:check, smoke, test, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after adding the hosted baseline source-gap planner on top of source-match and source-alignment. It preserves strict-real and public-launch blockers, requires a deterministic ready-or-repair source-gap result before hosted collection, includes Gemini CLEAN review, and GitHub Actions run 26335300537 passed CI on e1f114e. Local release:check, smoke, test, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-alignment gate reviewed CLEAN",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner reviewed CLEAN",
     "allowedPostBaselineCodePaths": [
       "package.json",
       "packages/bench/baseline-source-alignment.mjs",

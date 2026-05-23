@@ -9,9 +9,16 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline before this source-gap extension:
+- Latest verified code/product baseline:
+  `e1f114e664e6bcf6d49ff32bd578c8eefef6e6ce`.
+- GitHub Actions run `26335300537` passed CI after adding
+  `baseline:source-gap`, wiring it into clean consumer smoke, the hosted
+  baseline operator packet, next-run planner, one-command baseline runner,
+  release readiness assertions, public benchmark docs, PR/issue sync evidence,
+  and Gemini review, while preserving strict-real and public-launch blockers.
+- Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
-- Previous verified code baseline:
+- Previous verified source-gate code baseline:
   `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
 - GitHub Actions run `26334827218` passed CI after enforcing
   `baseline:source-match` plus `baseline:source-align` in the operator packet,
