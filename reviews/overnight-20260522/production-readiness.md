@@ -373,7 +373,8 @@ evidence for:
   `CLEAN` review.
 - hosted baseline query-set author evidence with fixture and bounded live smoke
   coverage, private 0600 query-set output outside the repository, public counts
-  and hashes only, strict query-set inspection, and Gemini `CLEAN` review.
+  and hashes only, strict query-set inspection, Gemini `CLEAN` review, and
+  GitHub Actions CI run `26329521666` on `c003647`.
 - canary evidence intake evidence with `fixtureOnly: true`,
   `countsAsRealRolloutEvidence: false`, lifecycle coverage, hybrid search
   coverage, local write observation, read-through mode, p50/p95 latency,

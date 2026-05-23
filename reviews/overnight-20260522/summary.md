@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `94be156`, run `26329113469`, success.
+  `c003647`, run `26329521666`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -81,6 +81,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26325210942` on `aedb81a`: success.
 - GitHub Actions CI run `26325592308` on `00836ec`: success.
 - GitHub Actions CI run `26329113469` on `94be156`: success.
+- GitHub Actions CI run `26329521666` on `c003647`: success.
 
 ## Shipped Overnight Slices
 
@@ -101,7 +102,7 @@ evidence are still required before any public live update.
 | Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `reviews/overnight-20260522/baseline-comparison-evidence.md`, `reviews/overnight-20260522/gemini-baseline-comparison-review.md` |
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md` |
 | Hosted baseline container selector | `packages/bench/hosted-baseline-container-select.mjs`, `baseline:select-container`, `reviews/overnight-20260522/hosted-baseline-container-select-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-container-select-review.md` |
-| Hosted baseline query-set author | `packages/bench/hosted-baseline-queryset-author.mjs`, `baseline:author-queryset`, `reviews/overnight-20260522/hosted-baseline-queryset-author-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-queryset-author-review.md` |
+| Hosted baseline query-set author | `packages/bench/hosted-baseline-queryset-author.mjs`, `baseline:author-queryset`, CI run `26329521666`, `reviews/overnight-20260522/hosted-baseline-queryset-author-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-queryset-author-review.md` |
 | Hosted baseline next-run planner | `packages/bench/hosted-baseline-next-run.mjs`, `baseline:next-run`, `reviews/overnight-20260522/hosted-baseline-next-run-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-next-run-review.md` |
 | Baseline evidence packet | `packages/bench/baseline-evidence-packet.mjs`, `baseline:packet`, `reviews/overnight-20260522/baseline-evidence-packet-evidence.md`, `reviews/overnight-20260522/gemini-baseline-evidence-packet-review.md` |
 | Baseline returned packet intake | `packages/bench/baseline-returned-packet-intake.mjs`, `baseline:returned-packet`, `reviews/overnight-20260522/baseline-returned-packet-intake-evidence.md`, `reviews/overnight-20260522/gemini-baseline-returned-packet-intake-review.md` |
