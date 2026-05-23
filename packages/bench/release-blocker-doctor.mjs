@@ -48,6 +48,9 @@ const requiredFiles = {
   hostedBaselineLiveMirrorRunReport: "hosted-baseline-live-mirror-run.json",
   hostedBaselineLiveMirrorPacketReport: "hosted-baseline-live-mirror-packet.json",
   hostedBaselineLiveMirrorGateReview: "codex-hosted-baseline-live-mirror-gate-review.md",
+  hostedBaselineLiveBudgetedRun: "hosted-baseline-live-budgeted-run-evidence.md",
+  hostedBaselineLiveBudgetedRunReport: "hosted-baseline-live-budgeted-run.json",
+  hostedBaselineLiveBudgetedPacketReport: "hosted-baseline-live-budgeted-packet.json",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
@@ -103,6 +106,9 @@ const hostedBaselineLiveMirrorRunText = readFileSync(join(root, reviewDir, "host
 const hostedBaselineLiveMirrorRunReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-mirror-run.json"), "utf8"));
 const hostedBaselineLiveMirrorPacketReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-mirror-packet.json"), "utf8"));
 const hostedBaselineLiveMirrorGateReviewText = readFileSync(join(root, reviewDir, "codex-hosted-baseline-live-mirror-gate-review.md"), "utf8");
+const hostedBaselineLiveBudgetedRunText = readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-run-evidence.md"), "utf8");
+const hostedBaselineLiveBudgetedRunReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-run.json"), "utf8"));
+const hostedBaselineLiveBudgetedPacketReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-packet.json"), "utf8"));
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
@@ -172,6 +178,27 @@ assert.equal(hostedBaselineLiveMirrorPacketReport.strictReal, true);
 assert.equal(hostedBaselineLiveMirrorPacketReport.packagePassesStrictReal, true);
 assert.equal(hostedBaselineLiveMirrorPacketReport.publicBenchmarkClaimsAllowed, false);
 assert.match(hostedBaselineLiveMirrorGateReviewText, /Verdict:\s*`?CLEAN`?/i);
+assert.match(hostedBaselineLiveBudgetedRunText, /context-token-budget 1600/i);
+assert.match(hostedBaselineLiveBudgetedRunText, /not a public superiority claim/i);
+assert.equal(hostedBaselineLiveBudgetedRunReport.fixtureOnly, false);
+assert.equal(hostedBaselineLiveBudgetedRunReport.callsHostedProvider, true);
+assert.equal(hostedBaselineLiveBudgetedRunReport.metricsOnly, true);
+assert.equal(hostedBaselineLiveBudgetedRunReport.countsAsProductionBaselineEvidence, true);
+assert.equal(hostedBaselineLiveBudgetedRunReport.countsAsPublicBenchmarkEvidence, false);
+assert.equal(hostedBaselineLiveBudgetedRunReport.publicBenchmarkClaimsAllowed, false);
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.recallWeaveResponses?.contextBudget?.applied, true);
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.recallWeaveResponses?.contextBudget?.tokenBudget, 1600);
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.recallWeave?.metrics?.contextTokensAvg, 1600);
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.comparison?.countsAsComparisonEvidence, true);
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.comparison?.recallWeaveWin, true);
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.comparison?.reviewerApprovalCount, 0);
+assert.ok(hostedBaselineLiveBudgetedRunReport.evidence?.comparison?.failedChecks?.includes("two-reviewer-approvals"));
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.hosted?.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveBudgetedRunReport.evidence?.recallWeave?.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveBudgetedPacketReport.strictReal, true);
+assert.equal(hostedBaselineLiveBudgetedPacketReport.strictRealPassed, true);
+assert.equal(hostedBaselineLiveBudgetedPacketReport.packagePassesStrictReal, true);
+assert.equal(hostedBaselineLiveBudgetedPacketReport.publicBenchmarkClaimsAllowed, false);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
@@ -255,8 +282,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "hosted-baseline-live-mirror-run-evidence.md",
-    nextAction: "A source-matched live hosted mirror baseline completed with zero privacy leaks, RecallWeave non-zero quality, and a strict-real packet. Keep the private query set locally reviewed and do not commit it. Use `baseline:mirror-hosted` only in a private temp directory when rebuilding the source-matched mirror, then prove the local RecallWeave source matches with `baseline:source-match`, `baseline:source-align`, and `baseline:source-gap` before rerunning `baseline:run -- --live`. Public benchmark claims remain blocked because reviewerApprovalCount is 0 and the old local arm used far more context tokens than hosted Supermemory. Next: rerun with `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=1600`, collect two independent reviewer approvals through `baseline:reviewer:openai-compatible` and `baseline:reviewer-intake` against the metrics-only packet, and rerun `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` with a reviewer approval report before any public claim.",
+    evidence: "hosted-baseline-live-budgeted-run-evidence.md",
+    nextAction: "A source-matched live hosted mirror baseline completed with zero privacy leaks, RecallWeave non-zero quality, a strict-real packet, and a 1600-token local context budget. Public benchmark claims remain blocked because reviewerApprovalCount is 0. Next: collect two independent reviewer approvals through `baseline:reviewer:openai-compatible` and `baseline:reviewer-intake` against the metrics-only packet, rerun `baseline:compare -- --reviewer-approval-report <report>`, and rerun `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` with the reviewer approval report before any public claim.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -351,6 +378,23 @@ console.log(
           privacyLeakCount: Number(hostedBaselineLiveMirrorRunReport.evidence?.hosted?.privacyLeakCount ?? 0)
             + Number(hostedBaselineLiveMirrorRunReport.evidence?.recallWeave?.privacyLeakCount ?? 0),
           strictRealPacket: hostedBaselineLiveMirrorPacketReport.packagePassesStrictReal,
+        },
+        hostedBaselineLiveBudgetedRun: {
+          status: hostedBaselineLiveBudgetedRunReport.status,
+          callsHostedProvider: hostedBaselineLiveBudgetedRunReport.callsHostedProvider,
+          countsAsProductionBaselineEvidence: hostedBaselineLiveBudgetedRunReport.countsAsProductionBaselineEvidence,
+          countsAsPublicBenchmarkEvidence: hostedBaselineLiveBudgetedRunReport.countsAsPublicBenchmarkEvidence,
+          hostedQuality: hostedBaselineLiveBudgetedRunReport.evidence?.hosted?.metrics?.quality,
+          recallWeaveQuality: hostedBaselineLiveBudgetedRunReport.evidence?.recallWeave?.metrics?.quality,
+          recallWeaveWin: hostedBaselineLiveBudgetedRunReport.evidence?.comparison?.recallWeaveWin,
+          reviewerApprovalCount: hostedBaselineLiveBudgetedRunReport.evidence?.comparison?.reviewerApprovalCount,
+          failedChecks: hostedBaselineLiveBudgetedRunReport.evidence?.comparison?.failedChecks,
+          hostedContextTokensAvg: hostedBaselineLiveBudgetedRunReport.evidence?.hosted?.metrics?.contextTokensAvg,
+          recallWeaveContextTokensAvg: hostedBaselineLiveBudgetedRunReport.evidence?.recallWeave?.metrics?.contextTokensAvg,
+          contextBudget: hostedBaselineLiveBudgetedRunReport.evidence?.recallWeaveResponses?.contextBudget,
+          privacyLeakCount: Number(hostedBaselineLiveBudgetedRunReport.evidence?.hosted?.privacyLeakCount ?? 0)
+            + Number(hostedBaselineLiveBudgetedRunReport.evidence?.recallWeave?.privacyLeakCount ?? 0),
+          strictRealPacket: hostedBaselineLiveBudgetedPacketReport.packagePassesStrictReal,
         },
         hostedBaselineCollector: {
           provider: hostedBaselineCollector.provider,

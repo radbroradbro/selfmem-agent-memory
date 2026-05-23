@@ -64,6 +64,9 @@ const files = {
   hostedBaselineLiveMirrorRunReport: `${reviewDir}/hosted-baseline-live-mirror-run.json`,
   hostedBaselineLiveMirrorPacketReport: `${reviewDir}/hosted-baseline-live-mirror-packet.json`,
   hostedBaselineLiveMirrorGateReview: `${reviewDir}/codex-hosted-baseline-live-mirror-gate-review.md`,
+  hostedBaselineLiveBudgetedRunEvidence: `${reviewDir}/hosted-baseline-live-budgeted-run-evidence.md`,
+  hostedBaselineLiveBudgetedRunReport: `${reviewDir}/hosted-baseline-live-budgeted-run.json`,
+  hostedBaselineLiveBudgetedPacketReport: `${reviewDir}/hosted-baseline-live-budgeted-packet.json`,
   hostedBaselineNextRunEvidence: `${reviewDir}/hosted-baseline-next-run-evidence.md`,
   hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   baselineReturnedPacketIntakeEvidence: `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
@@ -87,6 +90,8 @@ const hostedBaselineLiveQuerySet = JSON.parse(readFileSync(join(root, files.host
 const hostedBaselineLiveCodexLocalRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveCodexLocalRunReport), "utf8"));
 const hostedBaselineLiveMirrorRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveMirrorRunReport), "utf8"));
 const hostedBaselineLiveMirrorPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveMirrorPacketReport), "utf8"));
+const hostedBaselineLiveBudgetedRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedRunReport), "utf8"));
+const hostedBaselineLiveBudgetedPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedPacketReport), "utf8"));
 const releaseReadinessEvidence = JSON.parse(readFileSync(join(root, files.releaseReadinessEvidence), "utf8"));
 const currentHeadLiveEvidence = JSON.parse(readFileSync(join(root, files.browserEvidence), "utf8"));
 const texts = Object.fromEntries(
@@ -149,6 +154,35 @@ assert.equal(hostedBaselineLiveMirrorPacket.strictReal, true);
 assert.equal(hostedBaselineLiveMirrorPacket.packagePassesStrictReal, true);
 assert.equal(hostedBaselineLiveMirrorPacket.publicBenchmarkClaimsAllowed, false);
 assert.match(texts.hostedBaselineLiveMirrorGateReview, /Verdict:\s*`?CLEAN`?/i);
+assert.match(texts.hostedBaselineLiveBudgetedRunEvidence, /removes the earlier context-budget caveat/i);
+assert.equal(hostedBaselineLiveBudgetedRun.fixtureOnly, false);
+assert.equal(hostedBaselineLiveBudgetedRun.callsHostedProvider, true);
+assert.equal(hostedBaselineLiveBudgetedRun.metricsOnly, true);
+assert.equal(hostedBaselineLiveBudgetedRun.countsAsProductionBaselineEvidence, true);
+assert.equal(hostedBaselineLiveBudgetedRun.countsAsPublicBenchmarkEvidence, false);
+assert.equal(hostedBaselineLiveBudgetedRun.publicBenchmarkClaimsAllowed, false);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.sourceMatch?.sourceMatchReady, true);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.sourceMatch?.collectableQueryCount, 8);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.recallWeaveResponses?.contextBudget?.applied, true);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.recallWeaveResponses?.contextBudget?.tokenBudget, 1600);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.recallWeaveResponses?.contextBudget?.exportedContextTokensAvg, 1600);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.comparison?.countsAsComparisonEvidence, true);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.comparison?.recallWeaveWin, true);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.comparison?.reviewerApprovalCount, 0);
+assert.ok(hostedBaselineLiveBudgetedRun.evidence?.comparison?.failedChecks?.includes("two-reviewer-approvals"));
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.hosted?.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveBudgetedRun.evidence?.recallWeave?.privacyLeakCount, 0);
+assert.ok(
+  Number(hostedBaselineLiveBudgetedRun.evidence?.recallWeave?.metrics?.contextTokensAvg)
+    <= Math.max(
+      Number(hostedBaselineLiveBudgetedRun.evidence?.hosted?.metrics?.contextTokensAvg) * 1.5,
+      Number(hostedBaselineLiveBudgetedRun.evidence?.hosted?.metrics?.contextTokensAvg) + 512,
+    ),
+);
+assert.equal(hostedBaselineLiveBudgetedPacket.strictReal, true);
+assert.equal(hostedBaselineLiveBudgetedPacket.strictRealPassed, true);
+assert.equal(hostedBaselineLiveBudgetedPacket.packagePassesStrictReal, true);
+assert.equal(hostedBaselineLiveBudgetedPacket.publicBenchmarkClaimsAllowed, false);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -270,6 +304,13 @@ const requirements = [
     files.hostedBaselineLiveMirrorPacketReport,
     files.hostedBaselineLiveMirrorGateReview,
   ]),
+  proven("hosted-baseline-live-budgeted-run", "Source-matched hosted mirror baseline is rerun with local context budget enforcement and remains metrics-only", [
+    "packages/bench/hosted-baseline-run.mjs",
+    "packages/bench/recallweave-response-export.mjs",
+    files.hostedBaselineLiveBudgetedRunEvidence,
+    files.hostedBaselineLiveBudgetedRunReport,
+    files.hostedBaselineLiveBudgetedPacketReport,
+  ]),
   proven("hosted-baseline-next-run", "Hosted baseline comparison has a state-aware next-run planner that keeps public claims blocked while producing the exact next metrics-only run packet", [
     "packages/bench/hosted-baseline-next-run.mjs",
     files.hostedBaselineNextRunEvidence,
@@ -339,11 +380,12 @@ const requirements = [
     files.releaseState,
     "docs/PUBLIC_RELEASE_CHECKLIST.md",
   ]),
-  blocked("hosted-baseline-review-approval", "Hosted benchmark claims require two independent reviewer approvals and a fresh budgeted context rerun after the source-matched mirror run", [
-    files.hostedBaselineLiveMirrorRunEvidence,
-    files.hostedBaselineLiveMirrorRunReport,
-    files.hostedBaselineLiveMirrorPacketReport,
+  blocked("hosted-baseline-review-approval", "Hosted benchmark claims require two independent reviewer approvals after the source-matched budgeted-context run", [
+    files.hostedBaselineLiveBudgetedRunEvidence,
+    files.hostedBaselineLiveBudgetedRunReport,
+    files.hostedBaselineLiveBudgetedPacketReport,
     files.hostedBaselineNextRunEvidence,
+    "packages/bench/baseline-openai-compatible-reviewer.mjs",
     "packages/bench/baseline-reviewer-approval-intake.mjs",
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
@@ -376,7 +418,7 @@ const report = {
   latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
   goalComplete: false,
   mayCallUpdateGoalComplete: false,
-  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, but human approval, two-reviewer benchmark approval, a fresh budgeted-context rerun, and real rollout requirements remain unresolved.",
+  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, including a fresh budgeted-context rerun, but human approval, two-reviewer benchmark approval, and real rollout requirements remain unresolved.",
   counts: {
     total: requirements.length,
     proven: requirements.filter((item) => item.status === "proven").length,

@@ -47,6 +47,12 @@ reviewer can produce one of those approval files through
 `baseline:reviewer:openai-compatible`, but credentials must stay in environment
 variables and dry-run output never counts as approval.
 
+The latest private 2026-05-23 budgeted canary is ready for reviewer inspection:
+RecallWeave beat the selected hosted baseline on an 8-query source-matched
+slice with zero privacy failures and a 1600-token context budget. That is not a
+public benchmark claim until two independent reviewers approve the exact
+metrics-only packet.
+
 ## Features
 
 - Native Hermes memory provider surface.

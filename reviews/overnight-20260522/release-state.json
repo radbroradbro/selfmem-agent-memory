@@ -129,6 +129,7 @@
     "hosted-baseline-next-run-require-ready",
     "hosted-baseline-run-orchestrator",
     "hosted-baseline-live-codex-local-run",
+    "hosted-baseline-live-budgeted-run",
     "baseline-evidence-packet",
     "baseline-returned-packet-intake",
     "claude-opus-pr5-review",
@@ -310,6 +311,14 @@
       "route": "node packages/bench/baseline-openai-compatible-reviewer.mjs",
       "evidence": "reviews/overnight-20260522/baseline-openai-compatible-reviewer-evidence.md",
       "completedAt": "2026-05-23T19:10:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "hostedBaselineLiveBudgetedRun": {
+      "status": "ready_for_baseline_review",
+      "verdict": "BUDGETED_RUN_READY_NEEDS_REVIEWERS",
+      "route": "node packages/bench/hosted-baseline-run.mjs --live --context-token-budget 1600",
+      "evidence": "reviews/overnight-20260522/hosted-baseline-live-budgeted-run-evidence.md",
+      "completedAt": "2026-05-23T18:35:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

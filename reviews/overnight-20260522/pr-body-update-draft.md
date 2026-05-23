@@ -17,7 +17,7 @@ Live status:
 - Adds the self-hosted Brain UI preview for graph browsing, research lineage, research source lock, model matrix, compaction audit, benchmark dashboard, canary rollout, context preview, release readiness, lifecycle trail, current-head live browser evidence, local audit, selected local-container browse, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, selected local memory edit, local edit overlay browse, selected local memory materialize, dynamic graph layout, graph navigation, and provenance/timeline inspection.
 - Adds `selfmem_update`, clean consumer smoke coverage, metrics-only local-session batch compaction audit, release blocker doctor, GitHub handoff packet, goal completion audit, hosted baseline preflight, hosted baseline discovery for hashed source-container candidates, live hosted metadata discovery evidence for hashed candidates, `baseline:queryset` public-safe query-set inspection, `baseline:author-queryset` private query-set drafting with public counts and hashes only, a read-only hosted baseline collector, a RecallWeave response exporter, a RecallWeave baseline collector, a matched baseline comparison gate, a hosted baseline operator packet, a state-aware hosted baseline next-run planner with `--require-ready` owner-review gating, `baseline:run` one-command hosted/local/preflight/comparison/packet/intake orchestration, `baseline:packet` metrics-only zip packaging for hosted baseline evidence, `baseline:packet:review` validation for received hosted-baseline zips, `baseline:returned-packet` maintainer intake for returned hosted-baseline packets, canary evidence intake, strict-real fail-closed JSON output, strict v1 adapter contract markers, updater adapter digest verification, canary report generator from trace/diagnostic exports, `canary:diagnose` remediation guidance for failed reports, `canary:drill` deterministic fresh-window prompts, a public-safe canary operator packet, `canary:packet` metrics-only zip packaging for report/intake/diagnosis files, `canary:packet:review` validation for received canary zips, `canary:returned-packet` maintainer intake for returned evidence packets, `canary:returned-inbox` mixed-folder returned-evidence scanning, `canary:batch-audit` controller triage for folders of redacted diagnostic bundles, mixed-folder `--allow-failed-inputs` triage for returned diagnostic sets, `canary:next-agent` one-agent update planning from batch results, and `canary:next-agent-packet` public-safe zip packaging for the selected one-agent handoff. The updater now refuses `--strict-real` canary success unless a live mapped container or explicit diagnostic source produces a runtime report, and it can write the sanitized report, intake, optional diagnosis, and metrics-only evidence packet in one run.
 - Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
-- Extends the release blocker doctor so agents see the same three unresolved blockers as the goal audit: human approval, fresh hosted baseline, and fresh real-agent canary evidence.
+- Extends the release blocker doctor so agents see the same unresolved blockers as the goal audit: human approval, two-reviewer hosted baseline approval, and fresh real-agent canary evidence.
 - Adds output-file-safe baseline and canary evidence commands so package-manager banners cannot corrupt JSON artifacts or leak local checkout paths into preflight, comparison, intake, diagnosis, batch-audit, or next-agent plan files.
 - Adds a post-baseline public evidence guard. Once enabled in release-state, the release gate diffs the latest verified code baseline against `HEAD` and fails if any later change is outside public docs or review evidence.
 - Adds a release-readiness guard that verifies the current returned-diagnostics canary handoff packet label and SHA256 stay consistent across packet evidence, next-agent plan evidence, real diagnostic evidence, the PR body draft, and the blocker issue draft.
@@ -39,6 +39,12 @@ Live status:
   collection. Live runs now require the local container map and private hosted
   map through CLI flags or environment variables, while only public-safe
   source-match, source-alignment, and source-gap reports may be attached.
+- Adds a source-matched, budgeted live hosted-baseline canary from 2026-05-23.
+  It used a private hosted mirror, preserved hosted ids, a reviewed 8-query set,
+  no-raw-text mode, and a 1600-token RecallWeave context budget. Hosted
+  Supermemory scored 0.0000 quality; RecallWeave scored 0.1212 quality with
+  zero privacy failures. This is still metrics-only engineering evidence, not a
+  public benchmark claim, because reviewerApprovalCount remains 0.
 - Hardens `baseline:source-match` for real local selfmem exports that contain
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and
@@ -65,7 +71,7 @@ Live status:
 
 Not production ready for public launch yet.
 
-The code, fixture UI, release gate, CI, and Claude Opus review are healthy enough for an alpha PR, but launch remains blocked on human approval, hosted Supermemory baseline evidence for public comparison claims, and one real-container production canary.
+The code, fixture UI, release gate, CI, and Claude Opus review are healthy enough for an alpha PR, but launch remains blocked on human approval, two independent reviewer approvals for the hosted-baseline packet before any public comparison claim, and one real-container production canary.
 
 ## Latest Verified Baseline
 

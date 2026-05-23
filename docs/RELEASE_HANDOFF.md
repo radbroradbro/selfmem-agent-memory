@@ -146,14 +146,22 @@ reads hosted Supermemory, writes a private local RecallWeave-compatible mirror
 outside the repository, and emits only a metrics report. The mirror directory
 contains redacted memory text plus `container-map.json`; keep both files local
 and attach only the mirror report.
-The current live prep evidence found 14 hashed hosted candidate containers
-across 200 hosted documents, drafted 8 private queries, and strict inspection
+The current live prep evidence found a selected hashed hosted candidate,
+drafted 8 private queries from 46 text-bearing documents, and strict inspection
 reported 8 unique queries with 0 duplicate or unlabeled queries. That evidence
 narrows the blocker but does not replace a matched hosted-vs-RecallWeave run.
 The current exploratory live hosted-vs-local Codex run completed the full
 `baseline:run` chain without raw text or leaks, but both arms scored zero
 against the private labels. Treat that as a source-match/label-construction
 finding, not as public benchmark evidence.
+A later source-matched budgeted live run completed against a private hosted
+mirror with `--preserve-ids`, a reviewed query set, and
+`--context-token-budget 1600`. Hosted Supermemory scored 0.0000 quality with
+average context tokens 1397. RecallWeave scored 0.1212 quality, P@1 0.125,
+recall@5 0.125, recall@10 0.125, and average context tokens 1600. Both arms had
+zero privacy failures. This closes the earlier context-budget rerun task, but
+public benchmark claims remain blocked until two independent reviewers approve
+the exact metrics-only packet through `baseline:reviewer-intake`.
 You may attach a public-safe live discovery report when it contains only hashed
 candidate ids, counts, timestamps, status/type counts, and privacy flags. That
 report proves metadata access and candidate discovery only. It does not close
@@ -259,6 +267,11 @@ non-zero evidence on either side. The next live run needs a source-matched
 local container or mirrored local export, proven by `baseline:source-match`,
 source-aligned by `baseline:source-align`, and marked ready by
 `baseline:source-gap`, before quality claims are meaningful.
+The current source-matched budgeted run has now cleared that source-matched
+rerun step. The next benchmark task is not another hosted call by default. It is
+two independent reviewer approvals bound to the exact metrics-only packet, then
+a fresh `baseline:compare` and `baseline:next-run -- --require-ready` using the
+reviewer approval report.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.

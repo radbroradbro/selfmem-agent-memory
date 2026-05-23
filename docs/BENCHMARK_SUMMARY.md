@@ -4,7 +4,7 @@ This repository includes metrics-only benchmark notes. It does not include agent
 
 ## Current Claim Boundary
 
-RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. Quality claims require a matched, source-locked canary win before any public score, then a fuller benchmark before broad superiority language.
+RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. A 2026-05-23 source-matched, budgeted live canary beat the selected hosted baseline on this small private slice, but it is still metrics-only engineering evidence. Public quality claims require two independent reviewer approvals for that exact packet, then a fuller benchmark before broad superiority language.
 
 The current branch includes a hosted baseline preflight:
 
@@ -31,6 +31,16 @@ benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are
 present through `baseline:reviewer-intake`. Reports may contain aggregate
 metrics and hashes only.
+
+The latest budgeted live canary on 2026-05-23 used a source-matched private
+hosted mirror, a reviewed 8-query set, no-raw-text mode, preserved hosted ids,
+and a 1600-token RecallWeave context budget. Hosted Supermemory scored 0.0000
+quality with p50 latency 549 ms and average context tokens 1397. RecallWeave
+scored 0.1212 quality, P@1 0.125, recall@5 0.125, recall@10 0.125, p50 latency
+12 ms, p95 latency 17 ms, and average context tokens 1600. Privacy failures
+were zero for both arms. The result removes the earlier local context-mass
+caveat, but it is not a public benchmark claim because reviewerApprovalCount is
+0 and the packet still needs two independent approvals.
 
 `baseline:discover -- --live` is the read-only hosted metadata discovery step.
 It lists candidate containers as hashed ids, counts, timestamps, and status/type
@@ -64,6 +74,12 @@ claims: both arms scored 0 quality, so the result points to a source-match and
 label-construction problem rather than a retrieval-quality win. The public-safe
 run summary is in
 `reviews/overnight-20260522/hosted-baseline-live-codex-local-run-evidence.md`.
+
+A subsequent 2026-05-23 source-matched mirror run used hosted Supermemory as
+the read-only source for both arms and applied a 1600-token RecallWeave context
+budget. That run produced a strict-real packet and is the current benchmark
+evidence to send to reviewers. The public-safe run summary is in
+`reviews/overnight-20260522/hosted-baseline-live-budgeted-run-evidence.md`.
 
 To generate the hosted baseline operator packet with this discovery state
 attached, run:
@@ -180,6 +196,8 @@ proves the chain and remains blocked as real hosted-baseline evidence.
 | RecallWeave hybrid | deterministic fixture | 0.868 | 1.000 | 1.000 | 0 | Historical hybrid merge smoke. Rerun required on this release branch. |
 | Hosted Supermemory | live hosted-prep Codex-local run | 0.000 | 0.000 | 0.000 | 0 | Metrics-only live run completed, but labels did not match retrieved hosted results. Not public benchmark evidence. |
 | RecallWeave local Codex bridge | live hosted-prep Codex-local run | 0.000 | 0.000 | 0.000 | 0 | Much lower latency than hosted, but same zero-quality label result. Requires source-matched container before claims. |
+| Hosted Supermemory | live source-matched budgeted canary | 0.000 | 0.000 | 0.000 | 0 | Metrics-only hosted baseline on an 8-query private slice. Not public benchmark evidence until two reviewers approve the exact packet. |
+| RecallWeave hosted mirror | live source-matched budgeted canary | 0.125 | 0.125 | 0.125 | 0 | Beat the selected hosted baseline on the small canary with a 1600-token context budget. Not a broad or public superiority claim. |
 
 ## Historical Plugin-To-Plugin Smoke
 

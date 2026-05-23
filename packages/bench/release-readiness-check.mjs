@@ -237,6 +237,9 @@ const requiredFiles = [
   `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   `${reviewDir}/hosted-baseline-run-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-run-review.md`,
+  `${reviewDir}/hosted-baseline-live-budgeted-run-evidence.md`,
+  `${reviewDir}/hosted-baseline-live-budgeted-run.json`,
+  `${reviewDir}/hosted-baseline-live-budgeted-packet.json`,
   `${reviewDir}/baseline-evidence-packet-evidence.md`,
   `${reviewDir}/gemini-baseline-evidence-packet-review.md`,
   `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
@@ -2228,14 +2231,20 @@ check("fresh release blocker doctor passes", () => {
   const report = JSON.parse(doctorRun.stdout);
   const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
-  assert.match(hostedBlocker.nextAction, /private query set locally/);
-  assert.match(hostedBlocker.nextAction, /baseline:mirror-hosted/);
-  assert.match(hostedBlocker.nextAction, /local RecallWeave source matches/);
-  assert.match(hostedBlocker.nextAction, /baseline:source-match/);
-  assert.match(hostedBlocker.nextAction, /baseline:source-align/);
-  assert.match(hostedBlocker.nextAction, /baseline:source-gap/);
-  assert.match(hostedBlocker.nextAction, /baseline:run -- --live/);
+  assert.match(hostedBlocker.nextAction, /1600-token local context budget/);
+  assert.match(hostedBlocker.nextAction, /reviewerApprovalCount is 0/);
+  assert.match(hostedBlocker.nextAction, /baseline:reviewer:openai-compatible/);
+  assert.match(hostedBlocker.nextAction, /baseline:reviewer-intake/);
+  assert.match(hostedBlocker.nextAction, /baseline:compare -- --reviewer-approval-report/);
   assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
+  assert.equal(report.checks.hostedBaselineLiveBudgetedRun.status, "READY_FOR_BASELINE_REVIEW");
+  assert.equal(report.checks.hostedBaselineLiveBudgetedRun.callsHostedProvider, true);
+  assert.equal(report.checks.hostedBaselineLiveBudgetedRun.recallWeaveWin, true);
+  assert.equal(report.checks.hostedBaselineLiveBudgetedRun.reviewerApprovalCount, 0);
+  assert.equal(report.checks.hostedBaselineLiveBudgetedRun.recallWeaveContextTokensAvg, 1600);
+  assert.equal(report.checks.hostedBaselineLiveBudgetedRun.contextBudget.applied, true);
+  assert.equal(report.checks.hostedBaselineLiveBudgetedRun.contextBudget.tokenBudget, 1600);
+  assert.ok(report.checks.hostedBaselineLiveBudgetedRun.failedChecks.includes("two-reviewer-approvals"));
   assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:author-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:mirror-hosted/.test(item) && /--output-dir/.test(item)));
