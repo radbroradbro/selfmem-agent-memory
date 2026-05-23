@@ -20,6 +20,7 @@ const allowedEntries = new Set([
   "next-agent-plan.json",
   "next-agent-plan.md",
   "strict-real-operator-packet.md",
+  "strict-real-canary-drill.md",
 ]);
 
 const planJson = JSON.parse(runNode("packages/bench/canary-next-agent-plan.mjs", [...plannerArgs(), "--format", "json"]).stdout);
@@ -27,6 +28,7 @@ const planMarkdown = runNode("packages/bench/canary-next-agent-plan.mjs", [...pl
 const host = normalizeHost(args.host || planJson.decision?.host || planJson.selectedCandidate?.target?.host);
 assert.notEqual(host, "unknown", "cannot build handoff packet for unknown host");
 const operatorMarkdown = runNode("packages/bench/canary-operator-packet.mjs", ["--host", host, "--format", "markdown"]).stdout;
+const drillMarkdown = runNode("packages/bench/canary-drill.mjs", ["--host", host, "--format", "markdown"]).stdout;
 
 const files = [
   {
@@ -43,6 +45,11 @@ const files = [
     name: "strict-real-operator-packet.md",
     raw: operatorMarkdown,
     mode: "strict-real-canary-operator-packet-markdown",
+  },
+  {
+    name: "strict-real-canary-drill.md",
+    raw: drillMarkdown,
+    mode: "strict-real-canary-drill-markdown",
   },
 ];
 
@@ -96,6 +103,7 @@ const manifest = {
   },
   returnChecklist: [
     "apply the current adapter after recording FRESH_WINDOW_START",
+    "follow strict-real-canary-drill.md during the fresh window",
     "run one mapped live agent for at least 15 minutes after the update",
     "collect strict-real evidence with --canary-since \"$FRESH_WINDOW_START\"",
     "prove rollback-tested true",
@@ -199,9 +207,10 @@ function buildReadme(packetManifest) {
     "",
     "1. `next-agent-plan.md`",
     "2. `strict-real-operator-packet.md`",
-    "3. `manifest.json`",
+    "3. `strict-real-canary-drill.md`",
+    "4. `manifest.json`",
     "",
-    "The selected operator should run the dry-run first, apply the current adapter only if the dry-run is sane, run the agent for at least 15 minutes, collect strict-real canary evidence, and return only the metrics-only evidence packet.",
+    "The selected operator should run the dry-run first, apply the current adapter only if the dry-run is sane, follow the deterministic drill during at least 15 minutes of real use, collect strict-real canary evidence, and return only the metrics-only evidence packet.",
     "",
     "Fresh-window contract:",
     "",

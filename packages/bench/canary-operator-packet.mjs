@@ -14,6 +14,7 @@ const canaryReport = "/tmp/recallweave-canary-report.json";
 const intakeReport = "/tmp/recallweave-canary-intake.json";
 const diagnosisReport = "/tmp/recallweave-canary-diagnosis.json";
 const evidencePacket = "/tmp/recallweave-canary-evidence-packet.zip";
+const drillGuide = "/tmp/recallweave-canary-drill.md";
 const freshWindowStart = "<fresh-window-start-iso>";
 
 const packet = {
@@ -43,6 +44,11 @@ const packet = {
       id: "apply-live-container",
       description: "Apply the adapter and record the fresh canary window start timestamp.",
       command: `FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ") && bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --apply && printf "fresh canary window starts at %s\\n" "$FRESH_WINDOW_START"`,
+    },
+    {
+      id: "generate-drill",
+      description: "Generate the deterministic public-safe drill prompts that exercise local write, recall, hosted read-through, lifecycle, LCM/compression, and rollback coverage.",
+      command: `npm exec --yes pnpm@10.23.0 -- canary:drill -- --host ${host} --format markdown --output ${drillGuide}`,
     },
     {
       id: "collect-live-container-after-window",
@@ -162,6 +168,12 @@ function buildMarkdown() {
     "```",
     "",
     "Run the patched agent normally for at least 15 minutes. The canary needs real prompt-build, search, store, and rollback evidence from after that timestamp.",
+    "",
+    "For a deterministic exercise plan, generate and follow the drill:",
+    "",
+    "```bash",
+    `npm exec --yes pnpm@10.23.0 -- canary:drill -- --host ${host} --format markdown --output ${drillGuide}`,
+    "```",
     "",
     "Then collect from the fresh live window:",
     "",

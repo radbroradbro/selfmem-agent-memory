@@ -179,10 +179,15 @@ For one-agent canaries, generate a sanitized report, run strict intake, and
 diagnose failures before touching another agent:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host hermes --format markdown --output /tmp/recallweave-canary-drill.md
 npm exec --yes pnpm@10.23.0 -- canary:report -- --diagnostic-dir <redacted-diagnostic-dir> --rollback-tested --output sanitized-report.json
 npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
 npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
 ```
+
+The drill uses public test prompts to force local write, recall, hosted
+read-through, lifecycle or compression coverage, and rollback evidence in the
+fresh window.
 
 For hosted-vs-local baseline work, use the one-command runner only after the
 private hosted env file and reviewed query set are ready:

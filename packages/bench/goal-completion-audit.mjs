@@ -32,6 +32,8 @@ const files = {
   canaryEvidenceIntakeReview: `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   canaryRemediationEvidence: `${reviewDir}/canary-remediation-evidence.md`,
   canaryRemediationReview: `${reviewDir}/gemini-canary-remediation-review.md`,
+  canaryDrillEvidence: `${reviewDir}/canary-drill-evidence.md`,
+  canaryDrillReview: `${reviewDir}/gemini-canary-drill-review.md`,
   canaryReturnedPacketIntakeEvidence: `${reviewDir}/canary-returned-packet-intake-evidence.md`,
   canaryReturnedPacketIntakeReview: `${reviewDir}/gemini-canary-returned-packet-intake-review.md`,
   canaryReturnedInboxEvidence: `${reviewDir}/canary-returned-inbox-evidence.md`,
@@ -265,6 +267,11 @@ const requirements = [
     "packages/bench/fixtures/canary-runtime-report-failing.fixture.json",
     files.canaryRemediationEvidence,
     files.canaryRemediationReview,
+  ]),
+  proven("canary-strict-real-drill", "One-agent canaries have a deterministic public-safe drill for local write, recall, read-through, lifecycle, rollback, and strict-real packet collection", [
+    "packages/bench/canary-drill.mjs",
+    files.canaryDrillEvidence,
+    files.canaryDrillReview,
   ]),
   proven("canary-returned-packet-intake", "Returned one-agent canary evidence packets have a maintainer-facing strict-real intake gate", [
     "packages/bench/canary-returned-packet-intake.mjs",

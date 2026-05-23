@@ -144,6 +144,7 @@ npm exec --yes pnpm@10.23.0 -- update:smoke
 For a real one-agent canary, use metrics-only reports:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host hermes --format markdown --output /tmp/recallweave-canary-drill.md
 bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 npm exec --yes pnpm@10.23.0 -- canary:report -- --diagnostic-dir <redacted-diagnostic-dir> --rollback-tested --output sanitized-report.json
 npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
@@ -156,6 +157,9 @@ instrumentation. Summary-only exports and older traces that omit `elapsed_ms`
 can produce a useful diagnosis, but they cannot count as real rollout evidence.
 Use `selfmem_update --strict-real --rollback-tested` only after the agent has
 actually run a rollback drill and collected a fresh live window.
+The drill prompt file uses only public canary text and helps create the
+required local write, recall, hosted read-through, lifecycle, and rollback
+signals.
 
 ## Runtime Checks
 

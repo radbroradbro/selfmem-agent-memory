@@ -221,6 +221,18 @@ npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw --forma
 
 The operator packet is public-safe. It uses placeholders for runtime paths and
 lists only the metrics-only files the agent should attach after the run.
+For a deterministic fresh-window exercise, generate the canary drill and follow
+its public prompts after applying the adapter:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host hermes --format markdown --output /tmp/recallweave-canary-drill.md
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown --output /tmp/recallweave-canary-drill.md
+```
+
+The drill forces the window to touch local write, local recall, hosted
+read-through, lifecycle or LCM compression, rollback, strict intake, and
+metrics-only packaging. If hosted read-through returns zero results, keep the
+packet diagnostic instead of calling it production canary evidence.
 If you did not use `--canary-packet-output`, package the report and intake
 files with:
 
@@ -279,8 +291,9 @@ npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to
 ```
 
 The packet stays metrics-only. It includes a fresh-window contract, return
-checklist, and `readyForLiveHandoff`. `--require-ready` rejects fixture/demo
-packets, so use it for real agent handoffs.
+checklist, deterministic drill instructions, and `readyForLiveHandoff`.
+`--require-ready` rejects fixture/demo packets, so use it for real agent
+handoffs.
 
 When the selected agent returns a canary evidence packet, run:
 

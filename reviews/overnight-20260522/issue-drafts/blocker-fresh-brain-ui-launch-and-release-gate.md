@@ -224,6 +224,9 @@ requirements are resolved.
   source-lock hashes, and blocks fixture inputs from public benchmark claims.
 - Fresh canary window isolation now requires post-update `--since` evidence so
   old pre-patch trace history cannot prove or poison a patched one-agent canary.
+- `canary:drill` now gives the selected one-agent operator deterministic public
+  prompts for local write, local recall, hosted read-through, lifecycle/LCM
+  compression, rollback, and metrics-only packet collection.
 - Strict-real canary intake now exits nonzero while still printing sanitized
   JSON for fixture or weak real evidence, so agents can run remediation from
   failed metrics without attaching raw logs.
@@ -261,8 +264,8 @@ requirements are resolved.
 - The available redacted real diagnostic bundle set was evaluated and rejected
   by strict rollout intake. The closest privacy-clean candidate was under the
   recall p95 threshold, but still lacked current adapter-contract and store
-  latency evidence. The next canary must use a fresh patched runtime window and
-  pass strict intake.
+  latency evidence. The next canary must use a fresh patched runtime window,
+  follow `canary:drill`, and pass strict intake.
 - Current one-agent handoff packet:
   `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
   `98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`.
@@ -271,6 +274,9 @@ requirements are resolved.
 ## Acceptance Criteria
 
 - The owner accepts the Claude `CONCERNS` review as alpha-PR evidence.
+- The selected operator follows `canary:drill` during the fresh window so local
+  write, recall, hosted read-through, lifecycle/LCM, rollback, and packaging are
+  deliberately exercised.
 - A real one-agent canary report is collected through the sanitized canary
   report/intake path and passes privacy, lifecycle, hybrid search, latency,
   rollback, and write/read checks.

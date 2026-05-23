@@ -26,6 +26,7 @@ const requiredFiles = [
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
+  "packages/bench/canary-drill.mjs",
   "packages/bench/canary-operator-packet.mjs",
   "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/canary-evidence-packet-review.mjs",
@@ -169,6 +170,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-adapter-strict-canary-contract-review.md`,
   `${reviewDir}/canary-remediation-evidence.md`,
   `${reviewDir}/gemini-canary-remediation-review.md`,
+  `${reviewDir}/canary-drill-evidence.md`,
+  `${reviewDir}/gemini-canary-drill-review.md`,
   `${reviewDir}/canary-operator-packet-evidence.md`,
   `${reviewDir}/gemini-canary-operator-packet-review.md`,
   `${reviewDir}/canary-evidence-packet-evidence.md`,
@@ -333,6 +336,7 @@ const requiredScripts = [
   "canary:report",
   "canary:intake",
   "canary:diagnose",
+  "canary:drill",
   "canary:operator-packet",
   "canary:packet",
   "canary:packet:review",
@@ -983,6 +987,7 @@ check("post-baseline public evidence guard is honored", () => {
       releaseState.reviewerEvidence?.hostedBaselineLivePrep?.verdict,
       releaseState.reviewerEvidence?.baselineSourceMatchPreflight?.verdict,
       releaseState.reviewerEvidence?.baselineSourceGapPlan?.verdict,
+      releaseState.reviewerEvidence?.canaryStrictRealDrill?.verdict,
       releaseState.reviewerEvidence?.canaryReturnedInbox?.verdict,
     ].includes("CLEAN");
     assert.equal(hasCleanAllowedReviewer, true);
@@ -1534,6 +1539,53 @@ check("fresh canary remediation passes", () => {
   assert.doesNotMatch(geminiReview, /pending external review/i);
 });
 
+check("fresh canary drill passes", () => {
+  const hermesResult = run("node", ["packages/bench/canary-drill.mjs", "--host", "hermes"]);
+  const openclawMarkdown = run("node", ["packages/bench/canary-drill.mjs", "--host", "openclaw", "--format", "markdown"]);
+  const report = JSON.parse(hermesResult.stdout);
+  const evidence = readFileSync(join(root, reviewDir, "canary-drill-evidence.md"), "utf8");
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-drill-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "strict-real-canary-drill");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.publicSafe, true);
+  assert.equal(report.publicLaunchAllowed, false);
+  assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(report.host, "hermes");
+  assert.equal(report.minimumFreshWindowMinutes, 15);
+  assert.equal(report.drillContract.oneAgentOnly, true);
+  assert.equal(report.drillContract.requiresLocalWrite, true);
+  assert.equal(report.drillContract.requiresHostedReadThrough, true);
+  assert.equal(report.drillContract.requiresLcmOrCompressionCoverage, true);
+  assert.equal(report.drillContract.requiresMetricsOnlyReturn, true);
+  assert.ok(report.setupCommands.some((item) => item.id === "dry-run-update"));
+  assert.ok(report.setupCommands.some((item) => item.id === "apply-and-mark-window" && /FRESH_WINDOW_START/.test(item.command)));
+  assert.ok(report.operatorSteps.some((item) => item.id === "store-public-canary-fact" && /cobalt/.test(item.prompt)));
+  assert.ok(report.operatorSteps.some((item) => item.id === "recall-local-canary-fact" && /native memory recall/i.test(item.prompt)));
+  assert.ok(report.operatorSteps.some((item) => item.id === "exercise-hosted-read-through" && /result count/i.test(item.prompt)));
+  assert.ok(report.operatorSteps.some((item) => item.id === "exercise-lifecycle-compression" && /compression/i.test(item.prompt)));
+  assert.ok(report.operatorSteps.some((item) => item.id === "rollback-drill" && /--rollback --dry-run/.test(item.command)));
+  assert.ok(report.operatorSteps.some((item) => item.id === "collect-strict-real-evidence" && /--strict-real/.test(item.command) && /--canary-since/.test(item.command)));
+  assert.ok(report.acceptanceCriteria.some((item) => /hosted read-through is attempted/i.test(item)));
+  assert.ok(report.acceptanceCriteria.some((item) => /strict-real intake passes/i.test(item)));
+  assert.equal(report.expectedStrictIntakeFields["quality.hybridSearchCovered"], true);
+  assert.equal(report.expectedStrictIntakeFields["rollback.tested"], true);
+  assert.ok(report.forbidden.includes("raw memories"));
+  assert.ok(report.forbidden.includes("provider keys"));
+  assert.match(openclawMarkdown.stdout, /RecallWeave Strict-Real Canary Drill \(OpenClaw\)/);
+  assert.match(openclawMarkdown.stdout, /store-public-canary-fact/);
+  assert.match(openclawMarkdown.stdout, /exercise-hosted-read-through/);
+  assert.match(openclawMarkdown.stdout, /Attach Only/);
+  assert.match(evidence, /canary:drill/i);
+  assert.match(evidence, /strict-real canary drill/i);
+  assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+  for (const text of [hermesResult.stdout, openclawMarkdown.stdout, evidence, geminiReview]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  }
+});
+
 check("fresh canary operator packet passes", () => {
   const hermesResult = run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "hermes"]);
   const openclawMarkdown = run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "openclaw", "--format", "markdown"]);
@@ -1548,6 +1600,7 @@ check("fresh canary operator packet passes", () => {
   assert.match(report.requiredSource, /live mapped container/i);
   assert.equal(report.freshWindow?.minimumMinutes, 15);
   assert.ok(report.commands.some((item) => item.id === "apply-live-container" && /FRESH_WINDOW_START/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "generate-drill" && /canary:drill/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "collect-live-container-after-window" && /--canary-since <fresh-window-start-iso>/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "apply-and-collect-live-container" && /--strict-real/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-dir" && /--canary-diagnostic-dir/.test(item.command) && /--canary-since/.test(item.command)));
@@ -1569,6 +1622,7 @@ check("fresh canary operator packet passes", () => {
   assert.match(openclawMarkdown.stdout, /RecallWeave Strict-Real Canary Packet \(OpenClaw\)/);
   assert.match(openclawMarkdown.stdout, /--host openclaw/);
   assert.match(openclawMarkdown.stdout, /fresh-window timestamp/i);
+  assert.match(openclawMarkdown.stdout, /canary:drill/);
   assert.match(openclawMarkdown.stdout, /--canary-since "\$FRESH_WINDOW_START"/);
   assert.match(openclawMarkdown.stdout, /Attach Only/);
   assert.doesNotMatch(hermesResult.stdout, secretPattern);
@@ -2011,6 +2065,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   const readme = run("unzip", ["-p", packetPath, "README.md"]).stdout;
   const markdown = run("unzip", ["-p", packetPath, "next-agent-plan.md"]).stdout;
   const operator = run("unzip", ["-p", packetPath, "strict-real-operator-packet.md"]).stdout;
+  const drill = run("unzip", ["-p", packetPath, "strict-real-canary-drill.md"]).stdout;
   const evidence = readFileSync(join(root, reviewDir, "canary-next-agent-packet-evidence.md"), "utf8");
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-next-agent-packet-review.md"), "utf8");
   assert.equal(report.ok, true);
@@ -2034,6 +2089,7 @@ check("fresh canary next-agent handoff packet passes", () => {
     "manifest.json",
     "next-agent-plan.json",
     "next-agent-plan.md",
+    "strict-real-canary-drill.md",
     "strict-real-operator-packet.md",
   ]);
   assert.equal(manifest.mode, "canary-next-agent-handoff-packet");
@@ -2052,9 +2108,11 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(manifest.freshWindowContract.requiresRollbackTested, true);
   assert.match(manifest.freshWindowContract.returnedPacketIntakeCommand, /--require-production-canary/);
   assert.ok(manifest.returnChecklist.some((item) => /FRESH_WINDOW_START/.test(item)));
+  assert.ok(manifest.returnChecklist.some((item) => /strict-real-canary-drill\.md/.test(item)));
   assert.ok(manifest.returnChecklist.some((item) => /metrics-only/.test(item)));
   assert.match(readme, /one selected agent operator/i);
   assert.match(readme, /Canary means a bounded validation window/i);
+  assert.match(readme, /deterministic drill/i);
   assert.match(readme, /Fresh-window contract/i);
   assert.match(readme, /Ready for live handoff: no/i);
   assert.match(readme, /Do not attach raw memories/i);
@@ -2062,10 +2120,13 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(markdown, /FRESH_WINDOW_START/);
   assert.match(operator, /RecallWeave Strict-Real Canary Packet/);
   assert.match(operator, /canary:intake/);
+  assert.match(drill, /RecallWeave Strict-Real Canary Drill/);
+  assert.match(drill, /exercise-hosted-read-through/);
+  assert.match(drill, /store-public-canary-fact/);
   assert.match(evidence, /canary:next-agent-packet/i);
   assert.match(evidence, /single public-safe zip/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
-  for (const text of [packetRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, readme, markdown, operator, evidence]) {
+  for (const text of [packetRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, readme, markdown, operator, drill, evidence]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   }
@@ -2120,7 +2181,9 @@ check("fresh release blocker doctor passes", () => {
   assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /--reviewed-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
   assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --require-ready/);
+  assert.match(canaryBlocker.nextAction, /canary:drill/);
   assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--require-ready/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /canary:drill/.test(item) && /--format markdown/.test(item)));
 });
 
 check("fresh hosted baseline preflight passes", () => {
@@ -3503,6 +3566,16 @@ check("fresh goal completion audit passes", () => {
         item.evidence.includes("packages/bench/session-compaction-local-batch-audit.mjs") &&
         item.evidence.includes("reviews/overnight-20260522/session-compaction-local-batch-audit-evidence.md") &&
         item.evidence.includes("reviews/overnight-20260522/gemini-session-compaction-local-batch-audit-review.md"),
+    ),
+  );
+  assert.ok(
+    report.requirements.some(
+      (item) =>
+        item.id === "canary-strict-real-drill" &&
+        item.status === "proven" &&
+        item.evidence.includes("packages/bench/canary-drill.mjs") &&
+        item.evidence.includes("reviews/overnight-20260522/canary-drill-evidence.md") &&
+        item.evidence.includes("reviews/overnight-20260522/gemini-canary-drill-review.md"),
     ),
   );
   assert.ok(

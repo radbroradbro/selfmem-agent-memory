@@ -29,9 +29,13 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner reviewed CLEAN",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner and strict-real canary drill reviewed CLEAN",
     "allowedPostBaselineCodePaths": [
       "package.json",
+      "packages/bench/canary-drill.mjs",
+      "packages/bench/canary-next-agent-packet.mjs",
+      "packages/bench/canary-next-agent-plan.mjs",
+      "packages/bench/canary-operator-packet.mjs",
       "packages/bench/baseline-source-alignment.mjs",
       "packages/bench/baseline-source-gap-plan.mjs",
       "packages/bench/consumer-install-smoke.mjs",
@@ -82,6 +86,7 @@
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
     "canary-strict-fail-closed-intake",
+    "canary-strict-real-drill",
     "adapter-strict-canary-contract",
     "canary-remediation-plan",
     "canary-operator-packet",
@@ -246,6 +251,14 @@
       "route": "gemini --skip-trust --approval-mode plan",
       "evidence": "reviews/overnight-20260522/gemini-baseline-source-gap-plan-review.md",
       "completedAt": "2026-05-23T14:20:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "canaryStrictRealDrill": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-canary-drill-review.md",
+      "completedAt": "2026-05-23T14:45:00Z",
       "countsAsPublicLaunchApproval": false
     },
     "canaryReturnedInbox": {

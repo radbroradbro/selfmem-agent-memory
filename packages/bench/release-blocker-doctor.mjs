@@ -234,7 +234,7 @@ const blockerReport = [
     id: "fresh-real-container-canary-not-current",
     status: "incomplete",
     evidence: "real-canary-diagnostic-evidence.md",
-    nextAction: "Run `canary:batch-audit` on redacted returned diagnostics, use `canary:next-agent` and `canary:next-agent-packet -- --require-ready` to pick one privacy-clean Hermes/OpenClaw target, apply the current adapter, then collect a fresh strict-real canary window and verify the returned metrics-only packet with `canary:returned-inbox -- --require-production-canary` or `canary:returned-packet -- --require-production-canary`.",
+    nextAction: "Run `canary:batch-audit` on redacted returned diagnostics, use `canary:next-agent` and `canary:next-agent-packet -- --require-ready` to pick one privacy-clean Hermes/OpenClaw target, apply the current adapter, follow `canary:drill` during the fresh window, then collect a fresh strict-real canary window and verify the returned metrics-only packet with `canary:returned-inbox -- --require-production-canary` or `canary:returned-packet -- --require-production-canary`.",
   },
 ];
 
@@ -362,6 +362,7 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --output /tmp/recallweave-canary-batch-audit.json",
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-canary-next-agent-plan.json",
         "npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw",
+        "npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown --output /tmp/recallweave-canary-drill.md",
         "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --output /tmp/recallweave-canary-batch-audit.json",
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-canary-next-agent-plan.json",
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --require-ready --output /tmp/recallweave-next-agent-handoff.zip",

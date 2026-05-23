@@ -260,6 +260,11 @@ function commandsFor(host) {
       ].join(" && "),
     },
     {
+      id: "run-deterministic-drill",
+      description: "Generate the public-safe drill prompts and use them during the fresh window so required lifecycle, recall, write, read-through, and rollback coverage is not accidental.",
+      command: `npm exec --yes pnpm@10.23.0 -- canary:drill -- --host ${host} --format markdown --output /tmp/recallweave-canary-drill.md`,
+    },
+    {
       id: "collect-live-window",
       description: "After at least 15 minutes of real use, collect strict-real metrics and package the returned evidence from the mapped live container.",
       command: [

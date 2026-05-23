@@ -333,6 +333,19 @@ and packet in one run:
 bin/selfmem_update --host hermes --repo <runtime-checkout> --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
+Before collecting, use the deterministic drill to make the fresh window
+exercise the signals strict intake expects:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host hermes --format markdown --output /tmp/recallweave-canary-drill.md
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown --output /tmp/recallweave-canary-drill.md
+```
+
+The drill uses public test prompts only. It asks the agent to store and recall a
+public canary fact, run hosted read-through without quoting memory text,
+exercise lifecycle or LCM compression, run a rollback dry-run, and return only
+the metrics-only report, intake, diagnosis if needed, and packet.
+
 If the updater was not used for packaging, use `canary:packet` to create one
 metrics-only zip for reviewers:
 
@@ -404,10 +417,11 @@ evidence:
 npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --require-ready --output /tmp/recallweave-next-agent-handoff.zip
 ```
 
-The packet contains only README, manifest, next-agent plan JSON/Markdown, and
-strict-real operator instructions. It does not include raw diagnostics or memory
-content. The selected operator should return only the metrics-only canary report,
-intake JSON, optional diagnosis JSON, and canary evidence packet. Its manifest
+The packet contains only README, manifest, next-agent plan JSON/Markdown,
+strict-real operator instructions, and the deterministic canary drill. It does
+not include raw diagnostics or memory content. The selected operator should
+return only the metrics-only canary report, intake JSON, optional diagnosis
+JSON, and canary evidence packet. Its manifest
 records `readyForLiveHandoff`, a 15-minute fresh-window contract, and the exact
 returned-packet intake command. Fixture packets can still test tooling, but
 `--require-ready` rejects them before they can be sent as live operator work.

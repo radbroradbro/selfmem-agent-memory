@@ -19,6 +19,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-report-from-trace.mjs",
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
+  "packages/bench/canary-drill.mjs",
   "packages/bench/canary-operator-packet.mjs",
   "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/canary-evidence-packet-review.mjs",
@@ -69,6 +70,7 @@ try {
   assert.equal(packageJson.bin?.selfmem_update, "./bin/selfmem_update");
   assert.equal(typeof packageJson.scripts?.["consumer:smoke"], "string");
   assert.equal(typeof packageJson.scripts?.["update:smoke"], "string");
+  assert.equal(typeof packageJson.scripts?.["canary:drill"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:operator-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:packet"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:packet:review"], "string");
@@ -114,6 +116,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-report-from-trace.mjs", "--diagnostic-dir", "packages/bench/fixtures/canary-diagnostic-export.fixture"], "canary diagnostic report generator"));
   checks.push(run("node", ["packages/bench/canary-evidence-intake.mjs"], "canary evidence intake"));
   checks.push(run("node", ["packages/bench/canary-remediation.mjs"], "canary remediation plan"));
+  checks.push(run("node", ["packages/bench/canary-drill.mjs"], "canary strict-real drill"));
   checks.push(run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "hermes"], "canary operator packet"));
   checks.push(run("node", ["packages/bench/canary-evidence-packet.mjs"], "canary evidence packet"));
   checks.push(run("node", ["packages/bench/canary-evidence-packet-review.mjs"], "canary evidence packet review"));
@@ -160,6 +163,7 @@ try {
     "packages/bench/canary-report-from-trace.mjs",
     "packages/bench/canary-evidence-intake.mjs",
     "packages/bench/canary-remediation.mjs",
+    "packages/bench/canary-drill.mjs",
     "packages/bench/canary-operator-packet.mjs",
     "packages/bench/canary-evidence-packet.mjs",
     "packages/bench/canary-evidence-packet-review.mjs",
