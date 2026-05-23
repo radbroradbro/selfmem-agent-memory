@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T08:20:00Z",
+  "generatedAt": "2026-05-23T08:43:24Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "dd31fcb293fc8d591aa572fe5c77d4012a5fe630",
-    "ciRunId": 26327680816,
+    "headSha": "07cd61b009e85c071d2a54dc9de1b53db5525e6c",
+    "ciRunId": 26328348834,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding public-safe live hosted discovery evidence for hashed candidates, wiring release readiness and blocker doctor checks for that evidence, and preserving the hosted-baseline blocker. GitHub Actions run 26327680816 passed CI on dd31fcb. Local release:check, release:doctor, full smoke, Gemini review, diff check, and staged secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after hardening the one-agent next-agent handoff packet with --require-ready, a fresh-window contract, fail-closed fixture rejection, updated release doctor guidance, and public-safe evidence refresh. GitHub Actions run 26328348834 passed CI on 07cd61b. Local release:check, release:doctor, full smoke, goal:audit, Gemini review, diff check, and staged secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

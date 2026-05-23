@@ -32,7 +32,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `dd31fcb293fc8d591aa572fe5c77d4012a5fe630`.
+- Latest code/product baseline: `07cd61b009e85c071d2a54dc9de1b53db5525e6c`.
+- GitHub Actions run `26328348834`: passed CI after hardening the one-agent
+  next-agent handoff packet with `--require-ready`, a fresh-window contract,
+  fail-closed fixture rejection, updated release doctor guidance, and
+  public-safe evidence refresh.
+- Previous verified code baseline before the next-agent handoff hardening:
+  `dd31fcb293fc8d591aa572fe5c77d4012a5fe630`.
 - GitHub Actions run `26327680816`: passed CI after adding public-safe live
   hosted discovery evidence for hashed candidates, wiring release readiness and
   blocker doctor checks for that evidence, and preserving the hosted-baseline
