@@ -111,6 +111,13 @@ returned packet can close the one-agent canary blocker.
 
 ## Hosted Baseline Preflight
 
+This lane is optional when hosted Supermemory is quota-locked. The public
+benchmark lane in `docs/PUBLIC_BENCHMARK_TARGETS.md` is the main route for
+objective scoring: run RecallWeave on a source-locked public benchmark slice
+and compare the result to reported leaderboard or provider stats. Use hosted
+Supermemory for read-through parity, free-tier sanity checks, or historical
+container export only. Do not require hosted writes for the autoresearch loop.
+
 Run this before any hosted Supermemory comparison claim:
 
 ```bash

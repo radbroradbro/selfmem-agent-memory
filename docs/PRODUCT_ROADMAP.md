@@ -111,6 +111,27 @@ local rerank sidecar. Qwen3 4B and 8B arms should remain optional quality
 challengers until latency, memory pressure, and recall gains are measured on
 24GB-class Macs.
 
+## Public Benchmark Autoresearch
+
+The benchmark loop should optimize toward public benchmark targets, not toward
+spending a locked hosted Supermemory plan. Hosted Supermemory remains useful for
+read-through parity and old-history export, but the main quality target is a
+real public benchmark slice compared to reported leader stats.
+
+Current benchmark direction:
+
+- Source-lock MemoryBench, LongMemEval, LoCoMo, ConvoMem, BEAM, or another
+  documented memory benchmark.
+- Record the reported leader target, source URL, checked date, metric name,
+  judge, answer model, token budget, and caveats.
+- Run RecallWeave on a small canary slice first.
+- Use autoresearch to change one methodology element at a time until the canary
+  trend beats the reported target.
+- Expand only after the small slice is privacy-clean and reviewer-approved.
+
+The allowed claim after a narrow win is "canary trending toward a win." A broad
+SOTA claim needs full comparable benchmark evidence.
+
 ## Lifecycle Policy Controls
 
 Goal: make memory behavior editable by users instead of buried in code.

@@ -69,6 +69,9 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after GitHub Actions run `26344382488`
     passed on `67993f1` and the release-state baseline was promoted. Updated
     at: 2026-05-23T21:52:36Z.
+  - The PR body was refreshed again after adding the public benchmark target
+    lane for quota-locked Supermemory accounts. Updated at:
+    2026-05-23T21:59:51Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -87,9 +90,10 @@ Verdict: resolved for PR body and blocker issue writes.
     identity refresh, postwatch OpenClaw one-agent packet refresh, returned
     canary workspace refresh, latest verified baseline refresh, returned
     downloads findings baseline refresh, current deterministic-drill packet
-    refresh, and latest canary-drill handoff baseline refresh
-  - Updated at: 2026-05-23T21:52:37Z
-  - Body length: 22471
+    refresh, latest canary-drill handoff baseline refresh, and public
+    benchmark target lane refresh
+  - Updated at: 2026-05-23T21:59:52Z
+  - Body length: 22730
 
 ## Safety
 

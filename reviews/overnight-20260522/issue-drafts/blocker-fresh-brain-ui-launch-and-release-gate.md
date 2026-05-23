@@ -89,6 +89,10 @@ requirements are resolved.
 - GitHub Actions run `26344382488` passed CI after hardening the current
   OpenClaw one-agent handoff so deterministic drill execution and the
   native-memory/read-through contract are explicit in the main next-agent plan.
+- Current benchmark plan now separates the public benchmark target lane from
+  hosted Supermemory parity. The autoresearch loop can compare RecallWeave
+  canary results to reported leaderboard/provider stats when hosted
+  Supermemory writes are quota-locked.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:

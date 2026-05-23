@@ -52,15 +52,17 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
   `26344382488` passed on `67993f1` and the release-state baseline was
   promoted.
+- PR #5 and issue #6 were refreshed again after adding the public benchmark
+  target lane for quota-locked Supermemory accounts.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T21:52:36Z
+- PR body refreshed at: 2026-05-23T21:59:51Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T21:52:37Z
-- PR body hash: 576bb81300550484b8a33d50c7d8c15d1888ef414fa70426940051143cfb6a39
+- Issue updated at: 2026-05-23T21:59:52Z
+- PR body hash: aae6bc1231b7a2eb5081c04ba90e627df5329a83737c508ae4f9025af8357f27
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: daee2ca9cdc6ac8f3429023abf2e785abb6360c9e299c251eda519c2734c4461
-- PR body length: 37204
-- Issue body length: 22471
+- Issue body hash: 03327e4c1c1fa89650347b16d22a9ef57956ff206b9b000fda954184af9b3760
+- PR body length: 37544
+- Issue body length: 22730
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

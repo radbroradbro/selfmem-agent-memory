@@ -46,6 +46,11 @@ Live status:
   zero privacy failures. Two independent reviewers approved the metrics-only
   packet for owner review. This is still a narrow canary comparison, not broad
   benchmark superiority language.
+- Adds the public benchmark target lane for quota-locked Supermemory accounts:
+  RecallWeave can run on source-locked public benchmark slices and compare
+  against reported leaderboard/provider stats without requiring hosted
+  Supermemory writes. Small wins may be described only as canary trends until a
+  full comparable run is complete.
 - Hardens `baseline:source-match` for real local selfmem exports that contain
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and

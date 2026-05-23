@@ -4,6 +4,22 @@ This plan is the next implementation gate after the current public-alpha
 source-lock work. It does not claim RecallWeave is better than hosted memory
 systems. It defines how RecallWeave is allowed to prove or disprove that claim.
 
+## Primary Objective
+
+The benchmark goal is not to keep spending hosted Supermemory credits. The
+reason this repository exists is that hosted Supermemory writes can exhaust the
+available plan before the agents finish their work. RecallWeave must therefore
+prove itself against objective public memory benchmarks and reported leader
+stats, not only against the user's hosted Supermemory account.
+
+When hosted Supermemory is quota-locked, skip hosted write comparisons. Use the
+public benchmark target lane in `docs/PUBLIC_BENCHMARK_TARGETS.md`: run
+RecallWeave on a source-locked public benchmark slice, compare the result to
+published leaderboard or provider-reported stats with matching metric
+definitions, and iterate through autoresearch until the canary trend points
+toward a win. Hosted Supermemory remains a read-through compatibility and
+product-parity lane, not a required scoring dependency.
+
 ## Rule For Public Scores
 
 Use a matched source-locked canary before any public score.
@@ -36,6 +52,39 @@ A publishable canary must use:
 
 If RecallWeave does not win, write a private gap report and keep iterating. Do
 not market the score.
+
+## Public Leaderboard Target Lane
+
+Use this lane when the hosted Supermemory key is unavailable, quota-locked, or
+too expensive for the next run.
+
+1. Source-lock the benchmark and target row. Record the source URL, checked
+   date, benchmark variant, metric name, score, judge model, answer model,
+   token budget if reported, and caveats.
+2. Freeze a small but real canary slice from MemoryBench, LongMemEval, LoCoMo,
+   ConvoMem, BEAM, or another documented memory benchmark.
+3. Run RecallWeave on that slice with a fixed provider arm.
+4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
+   latency, context tokens, and cost against the reported target.
+5. If the canary beats the reported target under matching metric definitions,
+   label it `canary-trending-win`, not full SOTA.
+6. If it loses, run the autoresearch loop against the largest gap until a
+   canary trend beats the target or the stopping rule fires.
+
+Allowed wording after a small-slice win:
+
+> RecallWeave beat the source-locked reported target on this canary slice. This
+> is not a full benchmark run, but the canary is trending toward a win and
+> justifies expanding the slice.
+
+Disallowed wording:
+
+> RecallWeave is SOTA.
+
+That wording needs full comparable benchmark runs, reviewer approval, and
+reproducible artifacts across the relevant benchmark suite.
+
+## Hosted Supermemory Parity Lane
 
 Run the hosted baseline preflight before any live comparison:
 
