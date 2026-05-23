@@ -25,7 +25,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `aedb81a`
+- Latest public-draft baseline inspected before this audit refresh: `00836ec`
 - PR state from GitHub API: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -110,6 +110,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   CI run `26324442965` passed
 - Canary next-agent handoff packet: `7fdac2f`, CI run `26324810035` passed
 - Returned canary packet intake gate: `aedb81a`, CI run `26325210942` passed
+- Hosted baseline returned packet intake gate: `00836ec`, CI run
+  `26325592308` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -118,7 +120,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `aedb81a` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `00836ec` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
