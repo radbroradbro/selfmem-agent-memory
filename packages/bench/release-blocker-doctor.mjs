@@ -27,6 +27,8 @@ const requiredFiles = {
   claudeReview: "claude-pr5-review.md",
   hostedBaselinePreflight: "hosted-baseline-preflight-evidence.md",
   hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
+  hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
+  hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   releaseHandoff: "../../docs/RELEASE_HANDOFF.md",
 };
 
@@ -81,6 +83,10 @@ let claudeLiveHealth = null;
 const hostedBaselinePreflight = JSON.parse(run("node", ["packages/bench/hosted-baseline-preflight.mjs"]).stdout);
 assert.equal(hostedBaselinePreflight.callsHostedProvider, false);
 assert.equal(hostedBaselinePreflight.publicBenchmarkClaimsAllowed, false);
+const hostedBaselineCollector = JSON.parse(run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture"]).stdout);
+assert.equal(hostedBaselineCollector.metricsOnly, true);
+assert.equal(hostedBaselineCollector.rawMemoryIncluded, false);
+assert.equal(hostedBaselineCollector.fixtureOnly, true);
 const githubLiveSync = JSON.parse(run("node", ["packages/bench/github-live-sync-check.mjs"]).stdout);
 assert.equal(githubLiveSync.ok, true);
 assert.equal(githubLiveSync.prBodyMatches, true);
@@ -106,8 +112,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "hosted-baseline-preflight-evidence.md",
-    nextAction: "Run `baseline:preflight` with a sanitized live result after a fresh metrics-only hosted Supermemory baseline.",
+    evidence: "hosted-baseline-collector-evidence.md",
+    nextAction: "Run `baseline:collect -- --live` with a source-locked query set, then validate the metrics-only output with `baseline:preflight -- --result`.",
   },
 ];
 
@@ -151,6 +157,12 @@ console.log(
           callsHostedProvider: hostedBaselinePreflight.callsHostedProvider,
           benchmarkClaimsAllowed: hostedBaselinePreflight.benchmarkClaimsAllowed,
         },
+        hostedBaselineCollector: {
+          provider: hostedBaselineCollector.provider,
+          metricsOnly: hostedBaselineCollector.metricsOnly,
+          fixtureOnly: hostedBaselineCollector.fixtureOnly,
+          rawMemoryIncluded: hostedBaselineCollector.rawMemoryIncluded,
+        },
         githubLiveSync: {
           ok: githubLiveSync.ok,
           prBodyMatches: githubLiveSync.prBodyMatches,
@@ -168,6 +180,8 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template",
+        "npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture",
+        "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },

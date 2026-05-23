@@ -16,7 +16,10 @@ is rejected as real baseline evidence.
 ## Files Added Or Updated
 
 - `packages/bench/hosted-baseline-preflight.mjs`
+- `packages/bench/hosted-baseline-collector.mjs`
 - `packages/bench/hosted-baseline-operator-packet.mjs`
+- `packages/bench/fixtures/hosted-baseline-queryset.fixture.json`
+- `packages/bench/fixtures/hosted-baseline-search-responses.fixture.json`
 - `packages/bench/fixtures/hosted-baseline-result.fixture.json`
 - `package.json`
 - `packages/bench/release-readiness-check.mjs`
@@ -26,6 +29,7 @@ is rejected as real baseline evidence.
 - `docs/RELEASE_HANDOFF.md`
 - `reviews/overnight-20260522/release-state.json`
 - `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`
+- `reviews/overnight-20260522/hosted-baseline-collector-evidence.md`
 - `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md`
 - `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md`
 
@@ -35,6 +39,7 @@ is rejected as real baseline evidence.
 node packages/bench/hosted-baseline-preflight.mjs
 node packages/bench/hosted-baseline-preflight.mjs --fixture
 node packages/bench/hosted-baseline-preflight.mjs --print-template
+node packages/bench/hosted-baseline-collector.mjs --fixture
 node packages/bench/hosted-baseline-operator-packet.mjs
 node packages/bench/hosted-baseline-operator-packet.mjs --format markdown
 ```
@@ -65,6 +70,15 @@ Template result:
 - template includes provider, run id, source commit, dataset slice,
   query-set hash, scoring-code hash, model ids, privacy counters, aggregate
   metrics, and cost fields.
+
+Collector fixture result:
+
+- `provider: hosted-supermemory`
+- `metricsOnly: true`
+- `fixtureOnly: true`
+- `rawMemoryIncluded: false`
+- includes query-set hash, scoring-code hash, P@1, recall@5, recall@10,
+  NDCG@10, latency p50/p95, and result fingerprints.
 
 Operator packet result:
 
@@ -138,6 +152,10 @@ result is reviewed.
 
 The `baseline:preflight -- --fixture` path is now part of full smoke so this
 guard cannot silently regress.
+
+The `baseline:collect -- --fixture` path is now part of full smoke. It proves
+the read-only collector emits metrics-only output and that fixture output still
+cannot satisfy real hosted-baseline evidence.
 
 The `baseline:operator-packet` path is also part of full smoke. It exists so
 agents can send one clear hosted-baseline handoff without inventing ad hoc

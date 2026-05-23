@@ -72,6 +72,7 @@
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",
     "hosted-baseline-preflight",
+    "hosted-baseline-collector",
     "hosted-baseline-operator-packet",
     "claude-opus-pr5-review",
     "github-handoff-packet",

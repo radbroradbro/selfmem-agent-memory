@@ -236,7 +236,12 @@ inventing ad hoc instructions:
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 ```
 
-The packet calls no hosted provider. It only prints the aggregate-only result
-contract and validation command. Hosted credentials stay in local environment
-variables and must never appear in PRs, docs, diagnostics, screenshots, or
-attachments.
+The packet calls no hosted provider. It prints the aggregate-only collection
+contract and validation commands. The actual read-only collection command is:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json
+```
+
+Hosted credentials stay in local environment variables and must never appear in
+PRs, docs, diagnostics, screenshots, or attachments.

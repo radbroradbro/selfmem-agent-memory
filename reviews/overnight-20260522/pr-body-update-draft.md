@@ -68,6 +68,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `node packages/bench/github-live-sync-check.mjs`: passed with PR #5 and issue #6 matching checked-in drafts.
 - `node packages/bench/goal-completion-audit.mjs`: passed with `goalComplete: false`.
 - `node packages/bench/hosted-baseline-preflight.mjs`: passed with `callsHostedProvider: false` and benchmark claims blocked.
+- `npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture`: passed, producing metrics-only hosted baseline collector output without calling a hosted provider.
 - `npm exec --yes pnpm@10.23.0 -- baseline:operator-packet`: passed, producing a public-safe hosted baseline handoff without calling a hosted provider.
 - `node packages/bench/canary-evidence-intake.mjs`: passed in fixture mode and rejects raw memories/transcripts/prompts.
 - `node packages/bench/canary-report-from-trace.mjs`: passed for trace fixtures and redacted diagnostic export fixtures.

@@ -49,6 +49,9 @@ requirements are resolved.
   their safe fixture or metrics-only modes.
 - Hosted baseline operator packet now gives agents a public-safe collection
   handoff for aggregate-only hosted Supermemory baseline evidence.
+- Hosted baseline collector now gives agents a read-only `baseline:collect`
+  path that emits metrics and hashes only when live credentials are provided
+  through the local environment.
 - Fresh canary window isolation now requires post-update `--since` evidence so
   old pre-patch trace history cannot prove or poison a patched one-agent canary.
 - Adapter smokes now assert bounded read-through policy plus positive total,

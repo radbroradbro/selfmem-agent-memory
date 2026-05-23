@@ -65,6 +65,8 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Hosted baseline preflight that makes the Supermemory comparison path
   explicit while calling no hosted provider by default and keeping public
   benchmark claims blocked.
+- Hosted baseline collector that can run read-only hosted search only after
+  explicit live opt-in and emits aggregate metrics and hashes only.
 - Hosted baseline operator packet that gives agents a public-safe,
   aggregate-only hosted Supermemory baseline handoff without calling a hosted
   provider.
@@ -337,6 +339,10 @@ evidence for:
   `benchmarkClaimsAllowed: false`. The preflight accepts only aggregate
   metrics and hashes for later live results, never raw memory text or
   credentials.
+- hosted baseline collector evidence with fixture-mode metrics, query-set and
+  scoring-code hashes, result fingerprints, latency metrics, retrieval
+  metrics, and no raw memory, transcript, prompt, answer, credential, or
+  private-path output; Gemini returned `CLEAN`.
 - hosted baseline operator packet evidence with attach-only aggregate JSON
   outputs, env-only credential handling, no hosted provider call, and Gemini
   `CLEAN` review.
@@ -409,6 +415,8 @@ Passed locally in this automation environment:
 - `npm run update:smoke`
 - `npm run baseline:preflight`: no hosted provider call,
   `publicBenchmarkClaimsAllowed: false`
+- `npm run baseline:collect -- --fixture`: metrics-only collector output with
+  no hosted provider call
 - `npm run baseline:operator-packet`: no hosted provider call and public-safe
   hosted baseline handoff output
 - `npm run canary:report -- --fixture`

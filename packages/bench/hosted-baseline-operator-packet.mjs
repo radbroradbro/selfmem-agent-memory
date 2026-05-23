@@ -9,6 +9,7 @@ assert.ok(["json", "markdown"].includes(format), "--format must be json or markd
 const resultPath = "/tmp/recallweave-hosted-baseline-result.json";
 const preflightPath = "/tmp/recallweave-hosted-baseline-preflight.json";
 const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
+const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
 
 const packet = {
   ok: true,
@@ -22,6 +23,7 @@ const packet = {
     resultPath,
     preflightPath,
     templatePath,
+    querySetPath,
   },
   commands: [
     {
@@ -35,13 +37,28 @@ const packet = {
       command: "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
     },
     {
-      id: "validate-live-result",
-      description: "After an external hosted read-only collection writes aggregate metrics, validate the result.",
+      id: "collect-live-result",
+      description: "Run read-only hosted search through the metrics-only collector. SUPERMEMORY_API_KEY must already be set in the local environment.",
       command: [
         "RECALLWEAVE_BASELINE_LIVE=1",
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
         "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label>",
-        "RECALLWEAVE_BASELINE_QUERYSET=<source-locked-queryset-id-or-path>",
+        `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
+        "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
+        "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
+        "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
+        `RECALLWEAVE_BASELINE_OUTPUT_JSON=${resultPath}`,
+        `npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output ${resultPath}`,
+      ].join(" "),
+    },
+    {
+      id: "validate-live-result",
+      description: "Validate the metrics-only result after collection.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+        "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label>",
+        `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
         "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
         "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
@@ -118,13 +135,33 @@ function buildMarkdown() {
     "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
     "```",
     "",
-    "After an external read-only hosted collection writes aggregate metrics, validate the result:",
+    "Prepare a source-locked query set locally at this path:",
+    "",
+    "```text",
+    querySetPath,
+    "```",
+    "",
+    "Then run the read-only hosted collector. Set `SUPERMEMORY_API_KEY` in the local environment first; do not paste it into the command or any attachment.",
     "",
     "```bash",
     "RECALLWEAVE_BASELINE_LIVE=1 \\",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \\",
     "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label> \\",
-    "RECALLWEAVE_BASELINE_QUERYSET=<source-locked-queryset-id-or-path> \\",
+    `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
+    "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id> \\",
+    "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
+    "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> \\",
+    `RECALLWEAVE_BASELINE_OUTPUT_JSON=${resultPath} \\`,
+    `npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output ${resultPath}`,
+    "```",
+    "",
+    "Then validate the aggregate-only result:",
+    "",
+    "```bash",
+    "RECALLWEAVE_BASELINE_LIVE=1 \\",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \\",
+    "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label> \\",
+    `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
     "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id> \\",
     "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
     "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> \\",

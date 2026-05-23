@@ -12,6 +12,7 @@ The current branch includes a hosted baseline preflight:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 ```
 
 That command does not call hosted Supermemory by default. It keeps public
@@ -23,6 +24,11 @@ The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents
 should fill after a hosted run. A fixture can pass every shape check and still
 fail the real-evidence check because `fixtureOnly: true`.
+
+`baseline:collect -- --live` is the read-only collector for hosted baseline
+evidence. It uses hosted search only after explicit live flags and
+environment-only credentials are present, and it writes aggregate metrics and
+hashes only.
 
 ## Historical Controlled Local Baseline
 

@@ -113,6 +113,9 @@ Latest verified head before this draft refresh:
 - Hosted baseline preflight: `baseline:preflight` passes offline with
   `callsHostedProvider: false`, `metricsOnly: true`, and
   `benchmarkClaimsAllowed: false`
+- Hosted baseline collector: `baseline:collect -- --fixture` passes without a
+  hosted provider call and proves the collector emits aggregate metrics and
+  hashes only
 - Hosted baseline operator packet: `baseline:operator-packet` prints a
   public-safe handoff for aggregate-only hosted Supermemory baseline collection
   and calls no hosted provider

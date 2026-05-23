@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "fixtureOnly": true,
+  "datasetSlice": "fixture-memory-canary-slice",
+  "judgeModel": "fixture-judge",
+  "answerModel": "fixture-answer",
+  "queries": [
+    {
+      "id": "local-first-policy",
+      "q": "What is the RecallWeave write policy for hosted Supermemory?",
+      "expectedResultIds": ["mem_local_first_policy"]
+    },
+    {
+      "id": "strict-real-canary",
+      "q": "What must a strict real canary prove before public launch?",
+      "expectedResultIds": ["mem_strict_real_canary"]
+    },
+    {
+      "id": "brain-ui-proof",
+      "q": "What UI proof exists for the agent brain preview?",
+      "expectedResultIds": ["mem_brain_ui_fixture"]
+    }
+  ]
+}

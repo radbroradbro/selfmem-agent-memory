@@ -8,6 +8,8 @@ Scope:
 - Added `baseline:operator-packet` as a package script and smoke step.
 - The packet gives operators one public-safe baseline collection contract for
   hosted Supermemory comparison evidence.
+- The packet now points operators to `baseline:collect -- --live` instead of an
+  ad hoc external collector.
 - Gemini focused review returned `CLEAN`.
 
 Commands:
@@ -15,6 +17,7 @@ Commands:
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
+npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 ```
 
 Expected behavior:
@@ -24,7 +27,9 @@ Expected behavior:
 - `writesRealFiles` is false.
 - `callsHostedProvider` is false.
 - It tells operators to print the template, validate fixture parsing, then
-  validate a separately collected aggregate-only hosted result.
+  collect and validate an aggregate-only hosted result.
+- It tells operators to keep `SUPERMEMORY_API_KEY` in the local environment and
+  never paste it into the command or any attachment.
 - It requires env-only hosted credentials and never prints provider-key values.
 - It tells operators to attach only:
   - `/tmp/recallweave-hosted-baseline-result.json`
