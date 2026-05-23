@@ -165,6 +165,11 @@ Scope:
   The gate derives the current packet label and SHA256 from the current
   returned-diagnostics section, then requires the next-agent plan evidence,
   real diagnostic evidence, PR body draft, and blocker issue draft to match it.
+- Added an opt-in post-baseline public evidence guard to the release gate. When
+  `releaseStateGuard.enforcePostBaselinePublicEvidenceOnly` is enabled, the
+  gate diffs the latest verified code baseline against `HEAD` and fails if any
+  post-baseline change is outside public docs or review evidence. CI now uses a
+  full checkout so the guard can inspect the baseline commit.
 - Added baseline evidence packet coverage to the release gate. The packet
   command writes one metrics-only zip from hosted result, RecallWeave result,
   comparison, and preflight files, rejects raw-content keys, secrets, and

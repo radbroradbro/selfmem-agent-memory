@@ -930,6 +930,22 @@ check("release state is conservative", () => {
   }
 });
 
+check("post-baseline public evidence guard is honored", () => {
+  const releaseState = JSON.parse(readFileSync(join(root, reviewDir, "release-state.json"), "utf8"));
+  assert.equal(releaseState.releaseStateGuard?.allowsDocsOnlyCommitsAfterCodeBaseline, true);
+  if (releaseState.releaseStateGuard?.enforcePostBaselinePublicEvidenceOnly !== true) return;
+
+  const baselineSha = releaseState.latestVerifiedCodeBaseline?.headSha ?? "";
+  assert.match(baselineSha, /^[a-f0-9]{40}$/);
+  run("git", ["merge-base", "--is-ancestor", baselineSha, "HEAD"]);
+  const changedFiles = run("git", ["diff", "--name-only", `${baselineSha}..HEAD`])
+    .stdout.split(/\r?\n/)
+    .map((file) => file.trim())
+    .filter(Boolean);
+  const disallowed = changedFiles.filter((file) => !isPublicEvidencePath(file));
+  assert.deepEqual(disallowed, []);
+});
+
 check("release docs mention current preview surfaces", () => {
   const files = [
     "completion-audit.md",
@@ -3064,6 +3080,16 @@ function currentCanaryPacketIdentity(text) {
 
 function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function isPublicEvidencePath(file) {
+  return (
+    file.startsWith("reviews/") ||
+    file.startsWith("docs/") ||
+    file === "README.md" ||
+    file === "SECURITY.md" ||
+    file === "GITHUB_RULES.md"
+  );
 }
 
 async function listFiles(directory) {
