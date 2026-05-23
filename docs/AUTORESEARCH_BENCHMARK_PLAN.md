@@ -61,6 +61,9 @@ too expensive for the next run.
 1. Source-lock the benchmark and target row. Record the source URL, checked
    date, benchmark variant, metric name, score, judge model, answer model,
    token budget if reported, and caveats.
+   If the target file does not exist yet, create it with
+   `benchmark:public-target:author` from explicit source-lock fields rather
+   than by hand-editing JSON.
    Then run `benchmark:public-target -- --target <target.json> --strict` so the
    target cannot be confused with component-only evidence or a private fixture.
 2. Freeze a small but real canary slice from MemoryBench, LongMemEval, LoCoMo,

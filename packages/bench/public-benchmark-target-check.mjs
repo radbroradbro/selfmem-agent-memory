@@ -20,7 +20,7 @@ const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_TARGE
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
-  /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
+  /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const claimTiers = new Set(["fixture", "canary-trend", "canary-trending-win", "public-benchmark", "broad-sota"]);
 const memoryBenchmarks = new Set(["memorybench", "longmemeval", "longmemeval-v2", "locomo", "convomem", "beam"]);
 const componentBenchmarks = new Set(["mteb", "mmteb", "beir", "miracl", "ms marco", "ms-marco", "reranker"]);
@@ -44,9 +44,10 @@ const targetReadyForCanary =
   !fixtureOnly &&
   contract.benchmarkType === "memory" &&
   contract.sameDataReady &&
+  contract.sourceLockReady &&
   contract.reportedTargetReady &&
   contract.componentEvidenceOnly &&
-  ["canary-trend", "public-benchmark", "broad-sota"].includes(contract.claimTier);
+  contract.claimTier === "canary-trend";
 
 const report = {
   ok,
@@ -111,6 +112,7 @@ function inspectTarget(target, fixtureOnly) {
   const benchmark = target.benchmark && typeof target.benchmark === "object" ? target.benchmark : {};
   const reportedTarget = target.reportedTarget && typeof target.reportedTarget === "object" ? target.reportedTarget : {};
   const comparability = target.comparability && typeof target.comparability === "object" ? target.comparability : {};
+  const sourceLock = target.sourceLock && typeof target.sourceLock === "object" ? target.sourceLock : {};
   const components = Array.isArray(target.componentEvidence) ? target.componentEvidence : [];
   const benchmarkName = String(benchmark.name ?? target.benchmarkName ?? "").trim();
   const benchmarkFamily = normalizeBenchmarkName(benchmark.family ?? benchmarkName);
@@ -160,6 +162,10 @@ function inspectTarget(target, fixtureOnly) {
     memoryBenchmark,
     componentBenchmarkOnly,
     sameDataReady,
+    sourceLockReady:
+      requiredNonPlaceholderString(sourceLock.sameDataAttestation) &&
+      requiredDate(sourceLock.checkedAt ?? benchmark.checkedAt) &&
+      (!sourceLock.authorTool || requiredNonPlaceholderString(sourceLock.authorTool)),
     reportedTargetReady,
     componentEvidenceOnly,
     metricDefinitionsMatch: comparability.metricDefinitionsMatch === true,
@@ -186,6 +192,7 @@ function failedTargetChecks(contract) {
   if (contract.componentBenchmarkOnly) checks.push("component-benchmark-not-memory-claim");
   if (!contract.memoryBenchmark) checks.push("memory-benchmark-family");
   if (!contract.sameDataReady) checks.push("same-data-fields");
+  if (contract.claimTier !== "fixture" && !contract.sourceLockReady) checks.push("source-lock-attestation");
   if (!contract.reportedTargetReady) checks.push("reported-target-fields");
   if (!contract.componentEvidenceOnly) checks.push("component-evidence-model-selection-only");
   if (!contract.metricDefinitionsMatch) checks.push("metric-definitions-match");

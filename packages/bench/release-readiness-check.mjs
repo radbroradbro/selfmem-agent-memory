@@ -81,6 +81,7 @@ const requiredFiles = [
   "packages/bench/baseline-openai-compatible-reviewer.mjs",
   "packages/bench/baseline-reviewer-approval-intake.mjs",
   "packages/bench/public-benchmark-target-check.mjs",
+  "packages/bench/public-benchmark-target-author.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
   "packages/bench/release-blocker-doctor.mjs",
@@ -399,6 +400,7 @@ const requiredScripts = [
   "baseline:reviewer:openai-compatible",
   "baseline:reviewer-intake",
   "benchmark:public-target",
+  "benchmark:public-target:author",
   "goal:audit",
   "release:doctor",
   "release:handoff",
@@ -1147,10 +1149,17 @@ check("model matrix and autoresearch gate stay conservative", () => {
 });
 
 check("fresh public benchmark target check passes", () => {
+  const authored = run("node", ["packages/bench/public-benchmark-target-author.mjs"]);
+  const authoredMarkdown = run("node", ["packages/bench/public-benchmark-target-author.mjs", "--format", "markdown"]).stdout;
   const result = run("node", ["packages/bench/public-benchmark-target-check.mjs"]);
   const markdown = run("node", ["packages/bench/public-benchmark-target-check.mjs", "--format", "markdown"]).stdout;
   const evidence = readFileSync(join(root, reviewDir, "public-benchmark-target-evidence.md"), "utf8");
+  const authoredTarget = JSON.parse(authored.stdout);
   const report = JSON.parse(result.stdout);
+  assert.equal(authoredTarget.fixtureOnly, true);
+  assert.equal(authoredTarget.benchmark?.family, "longmemeval");
+  assert.match(authoredMarkdown, /Public Benchmark Target/);
+  assert.match(authoredMarkdown, /benchmark:public-target/);
   assert.equal(report.ok, true);
   assert.equal(report.mode, "public-benchmark-target-check");
   assert.equal(report.fixtureOnly, true);
@@ -1183,8 +1192,125 @@ check("fresh public benchmark target check passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-public-target-check-"));
   try {
     const baseTarget = JSON.parse(readFileSync(join(root, "packages/bench/fixtures/public-benchmark-target.fixture.json"), "utf8"));
+    const authoredTargetPath = join(tempRoot, "authored-fixture-target.json");
+    writeFileSync(authoredTargetPath, authored.stdout);
+    const authoredCheck = JSON.parse(run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", authoredTargetPath]).stdout);
+    assert.equal(authoredCheck.ok, true);
+    assert.equal(authoredCheck.fixtureOnly, true);
+    assert.equal(authoredCheck.targetReadyForCanary, false);
+
+    const questionIdsPath = join(tempRoot, "question-ids.txt");
+    const labelsPath = join(tempRoot, "labels.json");
+    const scorerPath = join(tempRoot, "scorer.js");
+    const authoredReadyPath = join(tempRoot, "authored-ready-target.json");
+    writeFileSync(questionIdsPath, "lme-001\nlme-002\n");
+    writeFileSync(labelsPath, "{\"labels\":[\"a\",\"b\"]}\n");
+    writeFileSync(scorerPath, "score_v1\n");
+    run("node", [
+      "packages/bench/public-benchmark-target-author.mjs",
+      "--benchmark",
+      "longmemeval",
+      "--source-url",
+      "https://github.com/supermemoryai/memorybench",
+      "--dataset-revision",
+      "memorybench-main-test-revision",
+      "--split",
+      "longmemeval-s-canary",
+      "--question-ids-file",
+      questionIdsPath,
+      "--answer-labels-ref",
+      "longmemeval-labels-public-test",
+      "--answer-labels-file",
+      labelsPath,
+      "--judge-model",
+      "gpt-4o",
+      "--answer-model",
+      "gpt-4o",
+      "--source-lock-note",
+      "same public MemoryBench data, labels, judge rule, and scoring script are source-locked for this test target",
+      "--judge-rule",
+      "exact-source-locked-memorybench-judge-rule",
+      "--scoring-script-ref",
+      "memorybench-official-scorer-test",
+      "--scoring-path",
+      scorerPath,
+      "--reported-source-name",
+      "supermemory-readme-reported-row",
+      "--reported-source-url",
+      "https://github.com/supermemoryai/supermemory",
+      "--reported-metric-name",
+      "quality",
+      "--reported-score",
+      "0.816",
+      "--reported-caveat",
+      "source-lock-required-before-public-claim",
+      "--output",
+      authoredReadyPath,
+    ]);
+    const authoredReady = JSON.parse(
+      run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", authoredReadyPath, "--strict"]).stdout,
+    );
+    assert.equal(authoredReady.ok, true);
+    assert.equal(authoredReady.fixtureOnly, false);
+    assert.equal(authoredReady.targetReadyForCanary, true);
+
+    const privateQuestionIdsPath = join(tempRoot, "private-question-ids.txt");
+    const rejectedPrivatePath = join(tempRoot, "rejected-private-target.json");
+    writeFileSync(privateQuestionIdsPath, "/tmp/private-agent-source\n");
+    const privatePathAttempt = spawnSync(
+      "node",
+      [
+        "packages/bench/public-benchmark-target-author.mjs",
+        "--benchmark",
+        "longmemeval",
+        "--source-url",
+        "https://github.com/supermemoryai/memorybench",
+        "--dataset-revision",
+        "memorybench-main-test-revision",
+        "--split",
+        "longmemeval-s-canary",
+        "--question-ids-file",
+        privateQuestionIdsPath,
+        "--answer-labels-ref",
+        "longmemeval-labels-public-test",
+        "--answer-labels-file",
+        labelsPath,
+        "--judge-model",
+        "gpt-4o",
+        "--answer-model",
+        "gpt-4o",
+        "--source-lock-note",
+        "same data attestation",
+        "--judge-rule",
+        "exact-source-locked-memorybench-judge-rule",
+        "--scoring-script-ref",
+        "memorybench-official-scorer-test",
+        "--scoring-path",
+        scorerPath,
+        "--reported-source-name",
+        "supermemory-readme-reported-row",
+        "--reported-source-url",
+        "https://github.com/supermemoryai/supermemory",
+        "--reported-metric-name",
+        "quality",
+        "--reported-score",
+        "0.816",
+        "--reported-caveat",
+        "source-lock-required-before-public-claim",
+        "--output",
+        rejectedPrivatePath,
+      ],
+      { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    );
+    assert.notEqual(privatePathAttempt.status, 0, "author must reject private paths in public question ids");
+
     baseTarget.fixtureOnly = false;
     baseTarget.claimTier = "canary-trending-win";
+    baseTarget.sourceLock = {
+      authorTool: "benchmark:public-target:author",
+      checkedAt: "2026-05-23",
+      sameDataAttestation: "same public benchmark data, labels, judge rule, and scoring script are source-locked for this test target",
+    };
     const readyTargetPath = join(tempRoot, "ready-target.json");
     writeFileSync(readyTargetPath, JSON.stringify(baseTarget, null, 2));
     const readyTarget = JSON.parse(
@@ -1194,6 +1320,24 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(readyTarget.fixtureOnly, false);
     assert.equal(readyTarget.targetReadyForCanary, true);
     assert.equal(readyTarget.contract?.claimTier, "canary-trend");
+    assert.equal(readyTarget.contract?.sourceLockReady, true);
+
+    const missingSourceLockTarget = structuredClone(baseTarget);
+    delete missingSourceLockTarget.sourceLock;
+    const missingSourceLockPath = join(tempRoot, "missing-source-lock-target.json");
+    writeFileSync(missingSourceLockPath, JSON.stringify(missingSourceLockTarget, null, 2));
+    const missingSourceLock = JSON.parse(run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", missingSourceLockPath]).stdout);
+    assert.equal(missingSourceLock.ok, false);
+    assert.equal(missingSourceLock.targetReadyForCanary, false);
+    assert.ok(missingSourceLock.failedChecks.includes("source-lock-attestation"));
+
+    const publicBenchmarkTarget = structuredClone(baseTarget);
+    publicBenchmarkTarget.claimTier = "public-benchmark";
+    const publicBenchmarkPath = join(tempRoot, "public-benchmark-target.json");
+    writeFileSync(publicBenchmarkPath, JSON.stringify(publicBenchmarkTarget, null, 2));
+    const publicBenchmark = JSON.parse(run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", publicBenchmarkPath]).stdout);
+    assert.equal(publicBenchmark.ok, true);
+    assert.equal(publicBenchmark.targetReadyForCanary, false);
 
     const componentTarget = structuredClone(baseTarget);
     componentTarget.benchmarkType = "component";
@@ -1231,10 +1375,14 @@ check("fresh public benchmark target check passes", () => {
   }
 
   assert.doesNotMatch(result.stdout, secretPattern);
+  assert.doesNotMatch(authored.stdout, secretPattern);
   assert.doesNotMatch(markdown, secretPattern);
+  assert.doesNotMatch(authoredMarkdown, secretPattern);
   assert.doesNotMatch(evidence, secretPattern);
   assert.doesNotMatch(result.stdout, privatePathPattern);
+  assert.doesNotMatch(authored.stdout, privatePathPattern);
   assert.doesNotMatch(markdown, privatePathPattern);
+  assert.doesNotMatch(authoredMarkdown, privatePathPattern);
   assert.doesNotMatch(evidence, privatePathPattern);
 });
 

@@ -104,10 +104,11 @@ requirements are resolved.
   leaderboards can choose model arms, but public RecallWeave claims still need
   the same public benchmark data, revision, split, labels, judge model, answer
   model, judge rule, and scoring setup as the target row.
-- Current benchmark tooling adds `benchmark:public-target`, a metrics-only
-  validator that checks source URL, dataset revision, split, labels, judge
-  model, answer model, judge rule, scoring code, claim tier, and component-evidence boundaries before a
-  public canary target can run.
+- Current benchmark tooling adds `benchmark:public-target:author` and
+  `benchmark:public-target`, a metrics-only target author-and-validator path
+  that checks source URL, dataset revision, split, labels, judge model, answer
+  model, judge rule, scoring code, claim tier, and component-evidence
+  boundaries before a public canary target can run.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:

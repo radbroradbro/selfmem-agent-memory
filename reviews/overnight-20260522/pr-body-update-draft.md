@@ -55,9 +55,10 @@ Live status:
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
   data, revision, split, labels, judge model, answer model, judge rule, and scoring setup as the target row.
-- Adds `benchmark:public-target`, a metrics-only validator for source-locked
-  public benchmark target rows. It keeps fixture targets and component-only
-  leaderboard evidence from turning into public memory-system claims.
+- Adds `benchmark:public-target:author` plus `benchmark:public-target`, a
+  metrics-only author-and-validator path for source-locked public benchmark
+  target rows. It keeps fixture targets and component-only leaderboard
+  evidence from turning into public memory-system claims.
 - Hardens `baseline:source-match` for real local selfmem exports that contain
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and

@@ -28,6 +28,32 @@ Run the target validator before starting a public canary:
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
 
+Use the target author when a benchmark slice has been source-locked but the
+target JSON does not exist yet:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
+  --benchmark longmemeval \
+  --source-url https://github.com/supermemoryai/memorybench \
+  --dataset-revision <source-locked-commit-or-dataset-version> \
+  --split <public-split-or-canary-slice> \
+  --question-ids-file <public-question-ids.txt> \
+  --answer-labels-ref <public-label-file-or-dataset-ref> \
+  --answer-labels-hash sha256:<label-hash> \
+  --judge-model <same-judge-model> \
+  --answer-model <same-answer-model> \
+  --source-lock-note <why-this-is-the-same-data-and-scorer> \
+  --judge-rule <source-locked-judge-rule> \
+  --scoring-script-ref <official-or-memorybench-scorer-ref> \
+  --scoring-code-hash sha256:<scorer-hash> \
+  --reported-source-name <leader-or-provider-row> \
+  --reported-source-url <reported-row-url> \
+  --reported-metric-name <matching-metric> \
+  --reported-score <score> \
+  --reported-caveat <why-this-row-is-comparable-or-limited> \
+  --output <target.json>
+```
+
 The validator is metrics-only. It prints hashes and counts, not raw labels,
 question text, memory text, transcripts, private paths, or credentials.
 
