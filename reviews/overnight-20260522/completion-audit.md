@@ -17,7 +17,7 @@ complete or publish a public live update.
 
 Machine-readable follow-up: `goal:audit` now runs
 `packages/bench/goal-completion-audit.mjs` and returns `goalComplete: false`,
-`mayCallUpdateGoalComplete: false`, 20 proven requirements, 2 blocked
+`mayCallUpdateGoalComplete: false`, 23 proven requirements, 2 blocked
 requirements, and 1 incomplete requirement. The release gate requires this
 audit so future agents cannot treat green CI as native-goal completion.
 
@@ -25,7 +25,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `4ed6c00`
+- Latest public-draft baseline inspected before this audit refresh: `aedb81a`
 - PR state from GitHub API: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -109,6 +109,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 - Real OpenClaw next-agent handoff and CI read-permission fix: `8f5910d`,
   CI run `26324442965` passed
 - Canary next-agent handoff packet: `7fdac2f`, CI run `26324810035` passed
+- Returned canary packet intake gate: `aedb81a`, CI run `26325210942` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -117,7 +118,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `7fdac2f` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `aedb81a` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |

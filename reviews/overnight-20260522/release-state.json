@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T05:21:03Z",
+  "generatedAt": "2026-05-23T06:00:22Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "7fdac2f287c589ba75731722edaee17cd154451c",
-    "ciRunId": 26324810035,
+    "headSha": "aedb81ab3a61ec7c70e3ac7cd07e8085637d5ea3",
+    "ciRunId": 26325210942,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the next-agent canary handoff packet. GitHub Actions run 26324810035 passed CI on 7fdac2f. Local release:check, release:doctor, goal:audit, full smoke, GitHub live sync, diff check, and staged secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after the returned canary packet intake gate. GitHub Actions run 26325210942 passed CI on aedb81a. Local release:check, release:doctor, goal:audit, full smoke, GitHub live sync, diff check, and staged secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
