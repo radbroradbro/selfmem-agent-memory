@@ -429,6 +429,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   `canary:returned-downloads`, wiring it into the release gate, consumer smoke,
   docs, and public-safe markdown findings, while preserving strict-real and
   public-launch blockers.
+- GitHub Actions run `26343998064`: passed CI after expanding the returned
+  downloads findings note with a per-inbox metrics table and next-action list,
+  while preserving strict-real and public-launch blockers.
 - Previous verified code baseline before returned downloads supervision:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:

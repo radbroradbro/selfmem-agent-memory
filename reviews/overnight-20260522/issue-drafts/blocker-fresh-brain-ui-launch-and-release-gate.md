@@ -76,6 +76,8 @@ requirements are resolved.
   metrics-only markdown findings note for the next-agent workspace.
 - GitHub Actions run `26343015277` passed CI after adding returned downloads
   supervision and the markdown findings note.
+- GitHub Actions run `26343998064` passed CI after expanding the returned
+  downloads findings note with a per-inbox metrics table and next-action list.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:
