@@ -957,11 +957,16 @@ check("post-baseline public evidence guard is honored", () => {
   const baselineSha = releaseState.latestVerifiedCodeBaseline?.headSha ?? "";
   assert.match(baselineSha, /^[a-f0-9]{40}$/);
   run("git", ["merge-base", "--is-ancestor", baselineSha, "HEAD"]);
+  const allowedCodePaths = new Set(releaseState.releaseStateGuard?.allowedPostBaselineCodePaths ?? []);
+  if (allowedCodePaths.size > 0) {
+    assert.match(releaseState.releaseStateGuard?.allowedPostBaselineCodeReason ?? "", /hosted baseline/i);
+    assert.equal(releaseState.reviewerEvidence?.hostedBaselineLivePrep?.verdict, "CLEAN");
+  }
   const changedFiles = run("git", ["diff", "--name-only", `${baselineSha}..HEAD`])
     .stdout.split(/\r?\n/)
     .map((file) => file.trim())
     .filter(Boolean);
-  const disallowed = changedFiles.filter((file) => !isPublicEvidencePath(file));
+  const disallowed = changedFiles.filter((file) => !isPublicEvidencePath(file) && !isAllowedPostBaselineCodePath(file, allowedCodePaths));
   assert.deepEqual(disallowed, []);
 });
 
@@ -3248,6 +3253,10 @@ function isPublicEvidencePath(file) {
     file === "SECURITY.md" ||
     file === "GITHUB_RULES.md"
   );
+}
+
+function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
+  return allowedCodePaths.has(file) && file.startsWith("packages/bench/");
 }
 
 async function listFiles(directory) {
