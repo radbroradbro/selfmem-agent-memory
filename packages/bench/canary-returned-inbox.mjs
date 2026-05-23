@@ -12,12 +12,18 @@ const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-canary-inbox-"
 const outputPath = args.output ? resolvePath(args.output) : null;
 const requireProductionCanary = Boolean(args.requireProductionCanary);
 const maxBytes = Number(args.maxBytes ?? 25 * 1024 * 1024);
+const exposeLabels = Boolean(args.exposeLabels);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\)/;
 const likelyReturnedNamePattern = /(?:canary|recallweave|selfmem|memory|openclaw|hermes)/i;
-const handoffEntries = new Set(["next-agent-plan.json", "next-agent-plan.md", "strict-real-operator-packet.md"]);
+const handoffEntries = new Set([
+  "next-agent-plan.json",
+  "next-agent-plan.md",
+  "strict-real-operator-packet.md",
+  "strict-real-canary-drill.md",
+]);
 const evidenceEntries = new Set(["README.md", "manifest.json", "canary-report.json", "canary-intake.json", "canary-diagnosis.json"]);
 
 try {
@@ -55,6 +61,7 @@ try {
       inputRootLabel: args.inputRoot || args.folder ? basename(resolvePath(args.inputRoot || args.folder)) : null,
       explicitPacketCount: (args.packet ?? []).length,
       candidateCount: candidates.length,
+      broadFolderLabelsRedacted: !exposeLabels,
     },
     counts: {
       scannedZipCount: candidates.length,
@@ -129,13 +136,15 @@ function collectCandidates() {
 function candidateFromPath(path, options) {
   assert.ok(existsSync(path), `returned canary packet is missing: ${basename(path)}`);
   const file = readFileSync(path);
+  const digest = sha256(file);
+  const shouldExposeLabel = exposeLabels || Boolean(options.explicit) || Boolean(options.generatedFixture);
   return {
     path,
-    pathLabel: basename(path),
+    pathLabel: shouldExposeLabel ? basename(path) : `zip-${digest.slice(0, 12)}`,
     explicit: Boolean(options.explicit),
     generatedFixture: Boolean(options.generatedFixture),
     size: statSync(path).size,
-    sha256: sha256(file),
+    sha256: digest,
   };
 }
 
@@ -288,7 +297,7 @@ function publicCandidate(candidate) {
 function listZip(zipPath) {
   const listed = spawnSync("unzip", ["-Z1", zipPath], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   assert.equal(listed.status, 0, `zip listing failed: ${listed.stderr}`);
-  assertSafeText(listed.stdout, `${basename(zipPath)} zip entries`);
+  assertSafeText(listed.stdout, "zip entries");
   return listed.stdout.split(/\r?\n/).filter(Boolean).sort();
 }
 
@@ -299,6 +308,7 @@ function parseArgs(argv) {
     if (item === "--") continue;
     if (item === "--require-production-canary") parsed.requireProductionCanary = true;
     else if (item === "--include-all-zips") parsed.includeAllZips = true;
+    else if (item === "--expose-labels") parsed.exposeLabels = true;
     else if (item === "--packet") {
       parsed.packet.push(argv[index + 1] ?? "");
       index += 1;

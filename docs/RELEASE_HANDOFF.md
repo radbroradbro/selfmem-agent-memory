@@ -505,7 +505,9 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-cana
 
 For a mixed folder of agent replies, scan the inbox first. The scanner separates
 returned evidence packets from handoff packets, diagnostic bundles, unreadable
-zips, and unrelated files without exposing raw paths or memory text:
+zips, and unrelated files without exposing raw paths or memory text. Candidate
+file names are redacted by default for folder scans; use `--expose-labels` only
+for local operator-only review:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --output /tmp/recallweave-returned-canary-inbox.json

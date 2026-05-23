@@ -42,13 +42,19 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --require-production-can
   redacted from the failure reason.
 - Output preserved `publicLaunchAllowed: false` and `fleetRolloutAllowed:
   false`.
+- Controller follow-up on the current local incoming folders found no returned
+  production canary packet. One broad folder contained handoff packets only;
+  the Telegram download folder contained no returned canary evidence. Candidate
+  file names were redacted to hash labels in both scans.
 
 ## Public Safety
 
 - No raw memories, prompts, transcripts, answers, env files, or tokens are
   emitted.
-- Output uses packet basenames, SHA-256 hashes, counts, known safe entry names,
-  and review summaries.
+- Folder scans redact candidate file names by default and use hash labels.
+  Explicit `--packet` reviews may show the provided packet basename.
+- Output uses SHA-256 hashes, counts, known safe entry names, and review
+  summaries.
 - Private local paths and key-shaped secrets are rejected before output is
   printed or written.
 

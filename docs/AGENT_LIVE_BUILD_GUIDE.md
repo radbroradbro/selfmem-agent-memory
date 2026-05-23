@@ -309,7 +309,8 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/retur
 
 If the agent sent a folder of zips, scan the inbox first. This classifies real
 returned evidence separately from handoff packets, diagnostics, and unrelated
-zips:
+zips. Folder scans redact candidate file names by default and use hash labels;
+add `--expose-labels` only for a local operator-only review:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --output /tmp/recallweave-returned-canary-inbox.json
