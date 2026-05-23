@@ -32,14 +32,20 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `2ac02fcbb9d321dc338e59d856abbcc3cfb6cd0a`.
-- GitHub Actions run `26327367386`: passed CI after adding `baseline:queryset`
-  public-safe query-set inspection and wiring its hashed report into hosted
-  baseline operator, next-run, consumer smoke, release readiness, and docs.
+- Latest code/product baseline: `dd31fcb293fc8d591aa572fe5c77d4012a5fe630`.
+- GitHub Actions run `26327680816`: passed CI after adding public-safe live
+  hosted discovery evidence for hashed candidates, wiring release readiness and
+  blocker doctor checks for that evidence, and preserving the hosted-baseline
+  blocker.
 - Latest live hosted discovery evidence: public-safe read-only discovery found
   4 hashed candidate containers across 100 hosted documents, with no raw labels
   or memory text. This narrows the next operator step but does not count as a
   hosted baseline or comparison result.
+- Previous verified code baseline before live hosted discovery evidence:
+  `2ac02fcbb9d321dc338e59d856abbcc3cfb6cd0a`.
+- GitHub Actions run `26327367386`: passed CI after adding `baseline:queryset`
+  public-safe query-set inspection and wiring its hashed report into hosted
+  baseline operator, next-run, consumer smoke, release readiness, and docs.
 - Previous verified code baseline before the query-set inspector:
   `c9c655049c036ca773a62e1c6498bc3438198986`.
 - GitHub Actions run `26327102787`: passed CI after requiring labeled
