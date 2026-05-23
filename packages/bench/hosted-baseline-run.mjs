@@ -20,6 +20,8 @@ const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\
 
 const paths = {
   querySetReport: join(outDir, "hosted-baseline-queryset-report.json"),
+  sourceMatch: join(outDir, "baseline-source-match.json"),
+  sourceAlignment: join(outDir, "baseline-source-alignment.json"),
   hosted: join(outDir, "hosted-baseline-result.json"),
   recallWeaveResponses: join(outDir, "recallweave-search-responses.json"),
   recallWeave: join(outDir, "recallweave-result.json"),
@@ -42,6 +44,8 @@ const querySetPath = resolveInputPath(
     (fixtureRequested ? "packages/bench/fixtures/hosted-baseline-queryset.fixture.json" : null),
 );
 const localContainerDir = resolveInputPath(args.containerDir ?? privateEnv.RECALLWEAVE_BASELINE_CONTAINER_DIR ?? process.env.RECALLWEAVE_BASELINE_CONTAINER_DIR ?? null);
+const localMapPath = resolveInputPath(args.localMap ?? privateEnv.RECALLWEAVE_BASELINE_LOCAL_MAP ?? process.env.RECALLWEAVE_BASELINE_LOCAL_MAP ?? null);
+const privateMapPath = resolveInputPath(args.privateMap ?? privateEnv.RECALLWEAVE_BASELINE_PRIVATE_MAP ?? process.env.RECALLWEAVE_BASELINE_PRIVATE_MAP ?? null);
 const memoriesPath = resolveInputPath(
   args.memories ??
     args.memoriesJsonl ??
@@ -85,6 +89,8 @@ if (!fixtureRequested) {
   assert.ok(judgeModel, "RECALLWEAVE_BASELINE_JUDGE_MODEL or --judge-model is required for live collection");
   assert.ok(answerModel, "RECALLWEAVE_BASELINE_ANSWER_MODEL or --answer-model is required for live collection");
   assert.ok(localContainerDir || memoriesPath, "live RecallWeave arm requires --container-dir, --memories, or matching env");
+  assert.ok(localMapPath, "live baseline run requires --local-map or RECALLWEAVE_BASELINE_LOCAL_MAP for source alignment");
+  assert.ok(privateMapPath, "live baseline run requires --private-map or RECALLWEAVE_BASELINE_PRIVATE_MAP for source alignment");
   assert.equal(
     Boolean(args.reviewedQueryset) || process.env.RECALLWEAVE_BASELINE_QUERYSET_REVIEWED === "1",
     true,
@@ -110,6 +116,29 @@ if (!fixtureRequested) {
 
 const steps = [];
 const querySetReport = runStep("validate-query-set", ["packages/bench/baseline-queryset-inspect.mjs", "--queryset", querySetPath, "--strict", "--output", paths.querySetReport], baseEnv);
+const sourceMatchArgs = [
+  "packages/bench/baseline-source-match-preflight.mjs",
+  fixtureRequested ? "--fixture" : "--live",
+  "--queryset",
+  querySetPath,
+  "--strict",
+  "--output",
+  paths.sourceMatch,
+];
+if (!fixtureRequested && localContainerDir) sourceMatchArgs.push("--container-dir", localContainerDir);
+if (!fixtureRequested && memoriesPath) sourceMatchArgs.push("--memories", memoriesPath);
+const sourceMatch = runStep("preflight-local-source-match", sourceMatchArgs, baseEnv);
+const sourceAlignmentArgs = [
+  "packages/bench/baseline-source-alignment.mjs",
+  "--source-match",
+  paths.sourceMatch,
+  "--strict",
+  "--output",
+  paths.sourceAlignment,
+];
+if (!fixtureRequested && localMapPath) sourceAlignmentArgs.push("--local-map", localMapPath);
+if (!fixtureRequested && privateMapPath) sourceAlignmentArgs.push("--private-map", privateMapPath);
+const sourceAlignment = runStep("preflight-source-alignment", sourceAlignmentArgs, baseEnv);
 const hosted = runStep(
   "collect-hosted-baseline",
   [
@@ -248,6 +277,8 @@ const output = {
   outputs: Object.fromEntries(Object.entries(paths).map(([key, value]) => [key, basename(value)])),
   evidence: {
     querySet: summarizeQuerySet(querySetReport.json),
+    sourceMatch: summarizeSourceMatch(sourceMatch.json),
+    sourceAlignment: summarizeSourceAlignment(sourceAlignment.json),
     hosted: summarizeResult(hosted.json),
     recallWeaveResponses: summarizeExport(recallWeaveResponses.json),
     recallWeave: summarizeResult(recallWeave.json),
@@ -287,6 +318,8 @@ const output = {
     "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 or --reviewed-queryset",
     "RECALLWEAVE_BASELINE_CONTAINER is provided through env, --container, or --container-env",
     "local RecallWeave memories are supplied through --container-dir or --memories",
+    "local container map is supplied through --local-map or RECALLWEAVE_BASELINE_LOCAL_MAP",
+    "private hosted container map is supplied through --private-map or RECALLWEAVE_BASELINE_PRIVATE_MAP",
   ],
   forbidden: [
     "provider keys",
@@ -334,6 +367,8 @@ function runStep(id, commandArgs, env) {
 function outputLabelFor(id) {
   const labels = {
     "validate-query-set": basename(paths.querySetReport),
+    "preflight-local-source-match": basename(paths.sourceMatch),
+    "preflight-source-alignment": basename(paths.sourceAlignment),
     "collect-hosted-baseline": basename(paths.hosted),
     "export-recallweave-responses": basename(paths.recallWeaveResponses),
     "collect-recallweave-result": basename(paths.recallWeave),
@@ -344,6 +379,28 @@ function outputLabelFor(id) {
     "review-returned-packet": basename(paths.intake),
   };
   return labels[id] ?? null;
+}
+
+function summarizeSourceMatch(json) {
+  return {
+    sourceMatchReady: Boolean(json.sourceMatchReady),
+    queryCount: Number(json.sourceMatchEvidence?.queryCount ?? 0),
+    sourceMatchedQueryCount: Number(json.sourceMatchEvidence?.sourceMatchedQueryCount ?? 0),
+    collectableQueryCount: Number(json.sourceMatchEvidence?.collectableQueryCount ?? 0),
+    failedChecks: json.failedChecks ?? [],
+    rawMemoryIncluded: Boolean(json.rawMemoryIncluded),
+  };
+}
+
+function summarizeSourceAlignment(json) {
+  return {
+    status: json.status ?? null,
+    labelAligned: Boolean(json.labelAlignment?.labelAligned),
+    sourceMatchReady: Boolean(json.contentAlignment?.sourceMatchReady),
+    matchedBaselineRunAllowed: Boolean(json.benchmarkGate?.matchedBaselineRunAllowed),
+    publicBenchmarkClaimsAllowed: Boolean(json.benchmarkGate?.publicBenchmarkClaimsAllowed),
+    privateLeakCount: Number(json.privateLeakCount ?? 0),
+  };
 }
 
 function summarizeQuerySet(json) {

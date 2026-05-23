@@ -20,6 +20,8 @@ A publishable canary must use:
   `expectedResultIds` or `expectedResultHashes` entry,
 - a source-match preflight proving the local RecallWeave source can collect at
   least one expected reference for every reviewed query,
+- a source-alignment gate proving the hosted label and local container map point
+  at the same source before hosted calls are spent,
 - the same judge and answer model,
 - the same scoring code,
 - the same privacy rules,
@@ -41,6 +43,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:source-match
+npm exec --yes pnpm@10.23.0 -- baseline:source-align
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -88,6 +91,12 @@ Then run `baseline:source-match -- --live --queryset <path> --container-dir
 collection. This report must also be metrics-only and public-safe. It blocks the
 run if the local RecallWeave source cannot satisfy the reviewed labels, which
 prevents another source-mismatched 0-0 comparison.
+
+Then run `baseline:source-align -- --source-match <report> --local-map
+<local-container-map.json> --private-map <private-hosted-map.jsonl> --strict
+--output <alignment-report>`. This report must stay metrics-only and
+public-safe. It blocks the run if a label match is not enough to prove matching
+content. Keep the private hosted map local and attach only the alignment report.
 
 After both result files exist, run the matched comparison gate:
 

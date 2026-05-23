@@ -17,6 +17,10 @@ Scope:
 - The planner now includes `validate-query-set`, which runs
   `baseline:queryset --strict` and writes a metrics-only query-set report before
   hosted or local collection.
+- The planner now includes `preflight-source-alignment`, which runs
+  `baseline:source-align --strict` after source-match and before the matched
+  run command. This prevents a matching container label from being treated as
+  matching benchmark content.
 - It calls no hosted provider, writes no files, and never authorizes public
   benchmark claims or public launch.
 - Added `--require-ready` so fixture, partial, privacy-unclean, mismatched,
@@ -46,7 +50,7 @@ Observed fixture-plan output:
   "readyForOwnerReview": false,
   "requireReadyPassed": true,
   "plannerAuthorizesPublicClaims": false,
-  "commandCount": 12,
+  "commandCount": 16,
   "privacyLeakCount": 0,
   "sameQuerySet": true
 }
@@ -98,11 +102,14 @@ Expected behavior:
   and secret/private-path absence in the fail-closed output.
 - The command plan includes hosted container discovery, optional local-only
   private map creation, private env selection, query-set validation, hosted
-  collection, hosted validation, RecallWeave export, RecallWeave aggregate
-  collection, matched comparison, and strict-real evidence packaging.
+  collection, hosted validation, source-match preflight, source-alignment
+  preflight, RecallWeave export, RecallWeave aggregate collection, matched
+  comparison, and strict-real evidence packaging.
 - Acceptance criteria require every query to have at least one expected result
   id or expected content hash, with `querySetEvidence.publicBenchmarkReady`
   true for both result files.
+- Acceptance criteria require `baseline:source-align` to report
+  `matchedBaselineRunAllowed: true` before a hosted/local comparison can count.
 - It forbids provider keys, raw hosted memories, raw local memories,
   transcripts, prompts, answers, cookies, bearer tokens, private local paths,
   private container maps, private env files, unredacted diagnostics, and raw

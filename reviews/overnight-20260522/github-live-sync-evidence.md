@@ -15,15 +15,18 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after adding the baseline
   source-alignment gate and current OpenClaw label-aligned/content-divergent
   evidence.
+- PR #5 and issue #6 were refreshed again after source-match and
+  source-alignment were wired into the operator packet, next-run planner, and
+  one-command baseline runner before hosted collection.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T13:45:48Z
+- PR body refreshed at: 2026-05-23T14:06:36Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T13:45:49Z
-- PR body hash: 94ff82ec2a17cbbc50b836ec51231ba32e8f179f843598e84c456cbd10cd7d8d
+- Issue updated at: 2026-05-23T14:06:36Z
+- PR body hash: 271af056aabc3ae4d7a6e894eab7aa1a4180a3f332ac91d9972fb73eaa7ba630
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: f236ad15e597ad86dd272e65849221c4a897685559faa7cdf898ac037be4355d
-- PR body length: 26670
-- Issue body length: 14478
+- Issue body hash: bc788ce6605d4a98ad1c07ef61f0749ea4a529292a3796369ed34cde4c64cb3e
+- PR body length: 27621
+- Issue body length: 14809
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

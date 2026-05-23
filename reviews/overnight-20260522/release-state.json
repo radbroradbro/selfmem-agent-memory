@@ -35,6 +35,9 @@
       "packages/bench/baseline-source-alignment.mjs",
       "packages/bench/consumer-install-smoke.mjs",
       "packages/bench/goal-completion-audit.mjs",
+      "packages/bench/hosted-baseline-next-run.mjs",
+      "packages/bench/hosted-baseline-operator-packet.mjs",
+      "packages/bench/hosted-baseline-run.mjs",
       "packages/bench/release-blocker-doctor.mjs",
       "packages/bench/release-readiness-check.mjs"
     ]

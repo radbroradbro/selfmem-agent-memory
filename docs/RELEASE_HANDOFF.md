@@ -200,9 +200,10 @@ hosted label and local mapping match, but the local source still lacks the
 expected refs needed for a fair benchmark.
 
 Use `baseline:run` after the private hosted env file, reviewed private query
-set, source-match preflight, and local RecallWeave container are ready. It runs
-hosted collection, local export, local collection, preflight, comparison, packet
-creation, and returned-packet intake in one metrics-only chain:
+set, source-match preflight, source-alignment gate, and local RecallWeave
+container are ready. It repeats the source gates, then runs hosted collection,
+local export, local collection, preflight, comparison, packet creation, and
+returned-packet intake in one metrics-only chain:
 
 ```bash
 . /tmp/recallweave-hosted-baseline.private.env
@@ -215,6 +216,8 @@ npm exec --yes pnpm@10.23.0 -- baseline:run -- \
   --container-env /tmp/recallweave-hosted-baseline.private.env \
   --queryset /tmp/recallweave-hosted-baseline-queryset.json \
   --container-dir <local-recallweave-container-dir> \
+  --local-map <local-container-map.json> \
+  --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
   --reviewed-queryset \
   --output /tmp/recallweave-baseline-run.json
 ```

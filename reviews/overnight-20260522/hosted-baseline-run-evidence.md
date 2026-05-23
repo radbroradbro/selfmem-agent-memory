@@ -24,8 +24,9 @@ complete:
 The command defaults to fixture mode. Live mode requires explicit
 `--live` or `RECALLWEAVE_BASELINE_LIVE=1`, `SUPERMEMORY_API_KEY`,
 `RECALLWEAVE_BASELINE_NO_RAW_TEXT=1`, a hosted container, a local RecallWeave
-container or memories file, judge and answer model ids, and
-`--reviewed-queryset` or `RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1`.
+container or memories file, a local container map, a private hosted container
+map, judge and answer model ids, and `--reviewed-queryset` or
+`RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1`.
 
 ## Verification
 
@@ -50,15 +51,21 @@ Observed fixture runner result:
 - publicLaunchAllowed: `false`
 - countsAsProductionBaselineEvidence: `false`
 - status: `NOT_BASELINE_EVIDENCE`
-- steps: 9
+- source-match ready: `true`
+- source-alignment matched baseline allowed: `true`
+- steps: 11
 - packet entries: 6
 - returned intake counts as production evidence: `false`
 
 The operator packet and next-run planner now include
 `run-matched-baseline-chain` with `baseline:run` and
-`--reviewed-queryset`. The release blocker doctor now recommends the
-orchestrated command once the private env file, reviewed private query set, and
-local RecallWeave container are ready.
+`--reviewed-queryset`, `--local-map`, and `--private-map`. The runner itself now
+executes `baseline:source-match` and `baseline:source-align` before any hosted
+collection, so a label-matched but content-divergent setup fails closed before
+spending hosted calls. The release blocker doctor now recommends the
+orchestrated command once the private env file, reviewed private query set,
+local container map, private hosted map, and local RecallWeave container are
+ready.
 
 ## Safety
 

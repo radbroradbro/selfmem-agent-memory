@@ -113,6 +113,7 @@ const output = {
     "/tmp/recallweave-hosted-baseline-queryset-author-report.json",
     "/tmp/recallweave-hosted-baseline-queryset-report.json",
     "/tmp/recallweave-baseline-source-match.json",
+    "/tmp/recallweave-baseline-source-alignment.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
     "/tmp/recallweave-baseline-run.json",
   ],
@@ -302,6 +303,7 @@ function commandsFor(status) {
   const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-author-report.json";
   const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
   const sourceMatchPath = "/tmp/recallweave-baseline-source-match.json";
+  const sourceAlignmentPath = "/tmp/recallweave-baseline-source-alignment.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
   const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
   const commands = [
@@ -374,8 +376,20 @@ function commandsFor(status) {
       ].join(" "),
     });
     commands.push({
+      id: "preflight-source-alignment",
+      description: "Verify the selected hosted label and local container map point at the same source, and that the local source-match report is ready for a fair run.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:source-align --",
+        `--source-match ${sourceMatchPath}`,
+        "--local-map <local-container-map.json>",
+        `--private-map ${privateContainerMapPath}`,
+        "--strict",
+        `--output ${sourceAlignmentPath}`,
+      ].join(" "),
+    });
+    commands.push({
       id: "run-matched-baseline-chain",
-      description: "After the private query set is reviewed, run hosted collection, local collection, comparison, packet creation, and returned-packet intake in one metrics-only command.",
+      description: "After the private query set, source-match preflight, and source-alignment gate pass, run hosted collection, local collection, comparison, packet creation, and returned-packet intake in one metrics-only command.",
       command: [
         `. ${privateContainerEnvPath} &&`,
         "RECALLWEAVE_BASELINE_LIVE=1",
@@ -385,7 +399,7 @@ function commandsFor(status) {
         "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
         "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
-        `npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env ${privateContainerEnvPath} --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --reviewed-queryset --output ${baselineRunReportPath}`,
+        `npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env ${privateContainerEnvPath} --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --local-map <local-container-map.json> --private-map ${privateContainerMapPath} --reviewed-queryset --output ${baselineRunReportPath}`,
       ].join(" "),
     });
     commands.push({
@@ -483,6 +497,7 @@ function acceptanceCriteria() {
     "every query has at least one expected result id or expected content hash",
     "querySetEvidence.publicBenchmarkReady is true for both runs",
     "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
+    "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
     "hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local",
     "any auto-authored private query set was locally reviewed before collection",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
@@ -516,7 +531,7 @@ function buildMarkdown(plan) {
   for (const item of plan.commandPlan) lines.push(`### ${item.id}`, "", item.description, "", "```bash", item.command, "```", "");
   lines.push("## Pass Criteria", "");
   for (const item of plan.acceptanceCriteria) lines.push(`- ${item}`);
-  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
+  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, source-match and source-alignment reports, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
   return lines.join("\n");
 }
 

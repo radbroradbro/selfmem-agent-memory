@@ -17,6 +17,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:source-match
+npm exec --yes pnpm@10.23.0 -- baseline:source-align
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
@@ -80,6 +81,12 @@ every reviewed query has at least one collectable expected reference in the
 local source. Use this before `baseline:run` whenever a hosted query set came
 from a hosted source.
 
+`baseline:source-align` then checks that the selected hosted label and local
+container map point at the same source and that the source-match report allows a
+matched run. It also emits hashes, counts, readiness flags, and privacy counters
+only. Use it before `baseline:run` and attach only the public-safe alignment
+report, never the private hosted map.
+
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents
 should fill after a hosted run. A fixture can pass every shape check and still
@@ -113,15 +120,18 @@ or when fewer than two reviewer approvals exist.
 `baseline:next-run` is the state-aware planner for this benchmark lane. It
 turns the current hosted/local evidence state into the next safe source-locked
 run packet without calling hosted Supermemory or authorizing public claims. The
-planner now places `baseline:source-match --strict` between query-set validation
-and the hosted/local run chain to prevent another unmatched 0-0 comparison.
+planner now places `baseline:source-match --strict` and
+`baseline:source-align --strict` between query-set validation and the
+hosted/local run chain to prevent another unmatched 0-0 comparison.
 
 `baseline:run` is the one-command runner after private setup is complete. It
 requires a reviewed private query set, a private hosted container env file, and
-a local RecallWeave container or memories file. It then runs hosted collection,
+a local RecallWeave container or memories file, plus the local and hosted
+container maps needed for source alignment. It repeats the source-match and
+source-alignment gates before hosted collection, then runs hosted collection,
 local export, local collection, preflight, comparison, packet creation, and
-returned-packet intake. Fixture mode proves the chain and remains blocked as
-real hosted-baseline evidence.
+returned-packet intake. Fixture mode proves the chain and remains blocked as real
+hosted-baseline evidence.
 
 ## Historical Controlled Local Baseline
 

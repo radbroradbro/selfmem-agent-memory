@@ -61,5 +61,7 @@ This proves that hosted discovery, private container selection, private query
 authoring, and strict labeled-query validation can run without public leakage.
 It still is not a hosted baseline result, a RecallWeave comparison, or a public
 benchmark claim. The next valid step is to review the private query set locally,
-prove the local RecallWeave container matches the selected hosted source, then
-run `baseline:run -- --live --reviewed-queryset` to collect both sides.
+prove the local RecallWeave container matches the selected hosted source with
+`baseline:source-match` and `baseline:source-align`, then run
+`baseline:run -- --live --reviewed-queryset --local-map <map> --private-map <map>`
+to collect both sides.

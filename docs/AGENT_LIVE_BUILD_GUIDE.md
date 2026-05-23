@@ -441,6 +441,8 @@ npm exec --yes pnpm@10.23.0 -- baseline:run -- \
   --container-env /tmp/recallweave-hosted-baseline.private.env \
   --queryset /tmp/recallweave-hosted-baseline-queryset.json \
   --container-dir <local-recallweave-container-dir> \
+  --local-map <local-container-map.json> \
+  --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
   --reviewed-queryset \
   --output /tmp/recallweave-baseline-run.json
 ```

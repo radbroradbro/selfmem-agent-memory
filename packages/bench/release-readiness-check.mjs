@@ -2977,14 +2977,19 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.commands.some((item) => item.id === "author-private-query-set" && /baseline:author-queryset/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "print-template" && /baseline:preflight/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "preflight-local-source-match" && /baseline:source-match/.test(item.command) && /--strict/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "preflight-source-alignment" && /baseline:source-align/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "run-matched-baseline-chain" && /baseline:run/.test(item.command) && /--reviewed-queryset/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "run-matched-baseline-chain" && /--local-map/.test(item.command) && /--private-map/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "collect-live-result" && /baseline:collect/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "package-baseline-evidence" && /baseline:packet/.test(item.command) && /--strict-real/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-live-result" && /RECALLWEAVE_BASELINE_NO_RAW_TEXT=1/.test(item.command)));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
-  for (const command of operatorPacket.commands.map((item) => item.command).filter((command) => /baseline:(preflight|compare)/.test(command))) {
+  assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-match.json"));
+  assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-alignment.json"));
+  for (const command of operatorPacket.commands.map((item) => item.command).filter((command) => /baseline:(preflight|compare|source-match|source-align)/.test(command))) {
     if (/--fixture/.test(command)) continue;
     const toolSegment = command.slice(command.indexOf("baseline:"));
     assert.match(toolSegment, /--output\s+\/tmp\/recallweave-/);
@@ -2993,6 +2998,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.acceptanceCriteria.includes("reviewerApprovalCount is at least 2 before comparison claims"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("querySetEvidence.publicBenchmarkReady is true"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("every query has at least one expectedResultId or expectedResultHash"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("private query set, if auto-authored, was reviewed locally before collection"));
   assert.ok(operatorPacket.forbidden.includes("provider keys"));
   assert.ok(operatorPacket.forbidden.includes("private container map"));
@@ -3003,6 +3010,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorMarkdown.stdout, /baseline:select-container/);
   assert.match(operatorMarkdown.stdout, /baseline:author-queryset/);
   assert.match(operatorMarkdown.stdout, /baseline:queryset/);
+  assert.match(operatorMarkdown.stdout, /baseline:source-match/);
+  assert.match(operatorMarkdown.stdout, /baseline:source-align/);
   assert.match(operatorMarkdown.stdout, /baseline:run/);
   assert.match(operatorMarkdown.stdout, /baseline:export:recallweave/);
   assert.match(operatorMarkdown.stdout, /baseline:packet/);
@@ -3031,13 +3040,16 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(nextRunPlan.acceptanceCriteria?.includes("querySetEvidence.publicBenchmarkReady is true for both runs"));
   assert.ok(nextRunPlan.acceptanceCriteria?.includes("every query has at least one expected result id or expected content hash"));
   assert.ok(nextRunPlan.acceptanceCriteria?.includes("source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source"));
+  assert.ok(nextRunPlan.acceptanceCriteria?.includes("source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true"));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "author-private-query-set" && /baseline:author-queryset/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "preflight-local-source-match" && /baseline:source-match/.test(item.command) && /--strict/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "preflight-source-alignment" && /baseline:source-align/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "run-matched-baseline-chain" && /baseline:run/.test(item.command) && /RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "run-matched-baseline-chain" && /--local-map/.test(item.command) && /--private-map/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "collect-hosted-baseline" && /baseline:collect/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "compare-matched-results" && /baseline:compare/.test(item.command)));
@@ -3045,7 +3057,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-match.json"));
-  for (const command of nextRunPlan.commandPlan.map((item) => item.command).filter((command) => /baseline:(preflight|compare|source-match)/.test(command))) {
+  assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-alignment.json"));
+  for (const command of nextRunPlan.commandPlan.map((item) => item.command).filter((command) => /baseline:(preflight|compare|source-match|source-align)/.test(command))) {
     if (/--fixture/.test(command)) continue;
     const toolSegment = command.slice(command.indexOf("baseline:"));
     assert.match(toolSegment, /--output\s+\/tmp\/recallweave-/);
@@ -3059,6 +3072,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(nextRunMarkdown.stdout, /baseline:select-container/);
   assert.match(nextRunMarkdown.stdout, /baseline:author-queryset/);
   assert.match(nextRunMarkdown.stdout, /baseline:source-match/);
+  assert.match(nextRunMarkdown.stdout, /baseline:source-align/);
   assert.match(nextRunMarkdown.stdout, /baseline:run/);
   assert.match(nextRunMarkdown.stdout, /private container maps/i);
   assert.equal(baselineRunPlan.ok, true);
@@ -3069,11 +3083,15 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(baselineRunPlan.publicLaunchAllowed, false);
   assert.equal(baselineRunPlan.countsAsProductionBaselineEvidence, false);
   assert.equal(baselineRunPlan.status, "NOT_BASELINE_EVIDENCE");
-  assert.equal(baselineRunPlan.steps?.length, 9);
+  assert.equal(baselineRunPlan.steps?.length, 11);
+  assert.ok(baselineRunPlan.steps?.some((item) => item.id === "preflight-local-source-match" && item.mode === "baseline-source-match-preflight"));
+  assert.ok(baselineRunPlan.steps?.some((item) => item.id === "preflight-source-alignment" && item.mode === "baseline-source-alignment"));
   assert.ok(baselineRunPlan.steps?.some((item) => item.id === "collect-hosted-baseline" && item.mode === "fixture-hosted-baseline-collector-result"));
   assert.ok(baselineRunPlan.steps?.some((item) => item.id === "export-recallweave-responses" && item.mode === "fixture-recallweave-response-export"));
   assert.ok(baselineRunPlan.steps?.some((item) => item.id === "review-returned-packet" && item.mode === "baseline-returned-packet-intake"));
   assert.equal(baselineRunPlan.evidence?.querySet?.publicBenchmarkReady, true);
+  assert.equal(baselineRunPlan.evidence?.sourceMatch?.sourceMatchReady, true);
+  assert.equal(baselineRunPlan.evidence?.sourceAlignment?.matchedBaselineRunAllowed, true);
   assert.equal(baselineRunPlan.evidence?.hosted?.provider, "hosted-supermemory");
   assert.equal(baselineRunPlan.evidence?.recallWeave?.provider, "recallweave");
   assert.equal(baselineRunPlan.evidence?.preflight?.countsAsHostedBaselineEvidence, false);
@@ -3081,6 +3099,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(baselineRunPlan.evidence?.packet?.entries?.length, 6);
   assert.equal(baselineRunPlan.evidence?.intake?.countsAsProductionBaselineEvidence, false);
   assert.ok(baselineRunPlan.liveRequirements?.includes("RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 or --reviewed-queryset"));
+  assert.ok(baselineRunPlan.liveRequirements?.includes("local container map is supplied through --local-map or RECALLWEAVE_BASELINE_LOCAL_MAP"));
+  assert.ok(baselineRunPlan.liveRequirements?.includes("private hosted container map is supplied through --private-map or RECALLWEAVE_BASELINE_PRIVATE_MAP"));
   assert.ok(baselineRunPlan.forbidden?.includes("private query sets"));
   assert.equal(baselineRunExportEnvPlan.ok, true);
   assert.equal(baselineRunExportEnvPlan.fixtureOnly, true);

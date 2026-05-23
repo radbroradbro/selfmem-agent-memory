@@ -180,6 +180,11 @@ requirements are resolved.
   label from matching benchmark content. The current OpenClaw attempt found
   label alignment, but content alignment failed safely with 0 of 3
   source-matched queries, 0 of 3 collectable queries, and no privacy leaks.
+- The hosted baseline operator packet, next-run planner, and `baseline:run`
+  orchestrator now repeat the source-match and source-alignment gates before
+  hosted collection. Live runs require both a local container map and the
+  private hosted map, but only public-safe source-match and source-alignment
+  reports may be attached.
 - Hosted baseline operator packet now gives agents a public-safe collection
   handoff for aggregate-only hosted Supermemory baseline evidence.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`
