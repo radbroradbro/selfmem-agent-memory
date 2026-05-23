@@ -2516,6 +2516,16 @@ check("fresh goal completion audit passes", () => {
   assert.ok(report.requirements.some((item) => item.id === "github-blocker-issue-created" && item.status === "proven"));
   assert.ok(report.requirements.some((item) => item.id === "github-live-sync-current" && item.status === "proven"));
   assert.ok(
+    report.requirements.some(
+      (item) =>
+        item.id === "local-only-compaction-benchmark" &&
+        item.status === "proven" &&
+        item.evidence.includes("packages/bench/session-compaction-local-batch-audit.mjs") &&
+        item.evidence.includes("reviews/overnight-20260522/session-compaction-local-batch-audit-evidence.md") &&
+        item.evidence.includes("reviews/overnight-20260522/gemini-session-compaction-local-batch-audit-review.md"),
+    ),
+  );
+  assert.ok(
     report.requirements.some((item) => item.id === "real-container-production-rollout" && item.status === "incomplete"),
   );
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);

@@ -44,6 +44,8 @@ const files = {
   hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   baselineReturnedPacketIntakeEvidence: `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
   baselineReturnedPacketIntakeReview: `${reviewDir}/gemini-baseline-returned-packet-intake-review.md`,
+  sessionCompactionLocalBatchAuditEvidence: `${reviewDir}/session-compaction-local-batch-audit-evidence.md`,
+  sessionCompactionLocalBatchAuditReview: `${reviewDir}/gemini-session-compaction-local-batch-audit-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
   browserEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
   releaseReadinessEvidence: `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
@@ -123,10 +125,13 @@ const requirements = [
     "packages/bench/update-flow-smoke.py",
     `${reviewDir}/update-flow-evidence.md`,
   ]),
-  proven("local-only-compaction-benchmark", "Local-only compaction benchmark and metrics-only local audit are covered", [
+  proven("local-only-compaction-benchmark", "Local-only compaction benchmark plus metrics-only local and batch audits are covered", [
     "packages/bench/session-compaction-benchmark.mjs",
     "packages/bench/session-compaction-local-audit.mjs",
+    "packages/bench/session-compaction-local-batch-audit.mjs",
     `${reviewDir}/session-compaction-local-audit-evidence.md`,
+    files.sessionCompactionLocalBatchAuditEvidence,
+    files.sessionCompactionLocalBatchAuditReview,
   ]),
   proven("browser-ui-evidence", "Browser/UI evidence exists with zero private or key-shaped visible text", [
     files.browserEvidence,
