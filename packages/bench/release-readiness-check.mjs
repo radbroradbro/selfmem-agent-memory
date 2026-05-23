@@ -34,6 +34,7 @@ const requiredFiles = [
   "packages/bench/canary-returned-workspace.mjs",
   "packages/bench/canary-returned-inbox.mjs",
   "packages/bench/canary-returned-watch.mjs",
+  "packages/bench/canary-returned-downloads.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/canary-next-agent-plan.mjs",
   "packages/bench/canary-next-agent-packet.mjs",
@@ -188,6 +189,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-returned-packet-intake-review.md`,
   `${reviewDir}/canary-returned-workspace-evidence.md`,
   `${reviewDir}/canary-returned-inbox-evidence.md`,
+  `${reviewDir}/canary-returned-downloads-evidence.md`,
   `${reviewDir}/gemini-canary-returned-inbox-review.md`,
   `${reviewDir}/canary-diagnostic-batch-audit-evidence.md`,
   `${reviewDir}/gemini-canary-diagnostic-batch-audit-review.md`,
@@ -367,6 +369,7 @@ const requiredScripts = [
   "canary:returned-workspace",
   "canary:returned-inbox",
   "canary:returned-watch",
+  "canary:returned-downloads",
   "canary:batch-audit",
   "canary:next-agent",
   "canary:next-agent-packet",
@@ -958,6 +961,7 @@ check("release state is conservative", () => {
     "canary-evidence-packet",
     "canary-evidence-packet-review",
     "canary-returned-workspace",
+    "canary-returned-downloads",
     "canary-diagnostic-batch-audit",
     "canary-next-agent-plan",
     "hosted-baseline-preflight",
@@ -2033,6 +2037,82 @@ check("fresh returned canary inbox watcher passes", () => {
     assert.equal(requiredReport.ok, false);
     assert.equal(requiredReport.requireFound, true);
     for (const text of [defaultRun.stdout, watchRun.stdout, requiredRun.stdout]) {
+      assert.doesNotMatch(text, secretPattern);
+      assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+      assert.doesNotMatch(text, /recallweave-openclaw-handoff-packet\.zip/);
+    }
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+check("fresh returned downloads scanner passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-downloads-check-"));
+  try {
+    const handoffPacketPath = join(tempRoot, "recallweave-openclaw-handoff-packet.zip");
+    const outputPath = join(tempRoot, "returned-downloads.json");
+    const findingsPath = join(tempRoot, "returned-downloads-findings.md");
+    run("node", [
+      "packages/bench/canary-next-agent-packet.mjs",
+      "--output",
+      handoffPacketPath,
+    ]);
+    const noDefaultsRun = run("node", [
+      "packages/bench/canary-returned-downloads.mjs",
+      "--skip-defaults",
+    ]);
+    const downloadsRun = run("node", [
+      "packages/bench/canary-returned-downloads.mjs",
+      "--skip-defaults",
+      "--input-root",
+      tempRoot,
+      "--iterations",
+      "1",
+      "--output",
+      outputPath,
+      "--findings-output",
+      findingsPath,
+    ]);
+    const requiredRun = spawnSync("node", [
+      "packages/bench/canary-returned-downloads.mjs",
+      "--skip-defaults",
+      "--input-root",
+      tempRoot,
+      "--require-found",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const noDefaultsReport = JSON.parse(noDefaultsRun.stdout);
+    const downloadsReport = JSON.parse(downloadsRun.stdout);
+    const outputReport = JSON.parse(readFileSync(outputPath, "utf8"));
+    const requiredReport = JSON.parse(requiredRun.stdout);
+    const findings = readFileSync(findingsPath, "utf8");
+    const evidence = readFileSync(join(root, reviewDir, "canary-returned-downloads-evidence.md"), "utf8");
+
+    assert.equal(noDefaultsReport.mode, "canary-returned-downloads");
+    assert.equal(noDefaultsReport.status, "NO_DEFAULT_INBOXES");
+    assert.equal(noDefaultsReport.defaultInboxScan, false);
+    assert.equal(noDefaultsReport.ok, true);
+    assert.equal(downloadsReport.mode, "canary-returned-downloads");
+    assert.equal(downloadsReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+    assert.equal(downloadsReport.defaultInboxScan, false);
+    assert.equal(downloadsReport.metricsOnly, true);
+    assert.equal(downloadsReport.counts.handoffPackets, 1);
+    assert.equal(downloadsReport.counts.productionEvidencePackets, 0);
+    assert.equal(downloadsReport.publicLaunchAllowed, false);
+    assert.equal(downloadsReport.fleetRolloutAllowed, false);
+    assert.equal(outputReport.mode, "canary-returned-downloads");
+    assert.match(findings, /Returned Downloads Findings/);
+    assert.match(findings, /Production evidence packets: 0/);
+    assert.notEqual(requiredRun.status, 0, "downloads scanner must fail closed with --require-found when no production canary exists");
+    assert.equal(requiredReport.ok, false);
+    assert.equal(requiredReport.requireFound, true);
+    assert.match(evidence, /canary:returned-downloads/i);
+    assert.match(evidence, /Downloads/);
+    assert.match(evidence, /markdown findings/i);
+    for (const text of [noDefaultsRun.stdout, downloadsRun.stdout, requiredRun.stdout, findings, evidence]) {
       assert.doesNotMatch(text, secretPattern);
       assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
       assert.doesNotMatch(text, /recallweave-openclaw-handoff-packet\.zip/);

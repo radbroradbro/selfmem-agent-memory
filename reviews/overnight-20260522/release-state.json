@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T16:12:09Z",
+  "generatedAt": "2026-05-23T20:36:34Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, and reviewed baseline owner-review packet gating; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, and reviewed baseline owner-review packet gating; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
     "allowedPostBaselineCodePaths": [
       ".gitignore",
       "package.json",
@@ -41,6 +41,7 @@
       "packages/bench/canary-returned-workspace.mjs",
       "packages/bench/canary-returned-inbox.mjs",
       "packages/bench/canary-returned-watch.mjs",
+      "packages/bench/canary-returned-downloads.mjs",
       "packages/bench/baseline-comparison.mjs",
       "packages/bench/baseline-evidence-packet.mjs",
       "packages/bench/baseline-evidence-packet-review.mjs",
@@ -148,7 +149,8 @@
     "selfmem-update",
     "canary-returned-packet-intake",
     "canary-returned-workspace",
-    "canary-returned-inbox"
+    "canary-returned-inbox",
+    "canary-returned-downloads"
   ],
   "reviewerEvidence": {
     "freshCanaryWindow": {

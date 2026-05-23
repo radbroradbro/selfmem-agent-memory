@@ -69,6 +69,11 @@ requirements are resolved.
 - Current returned-packet follow-up adds `canary:returned-workspace`, so a
   returned one-agent packet can fill public-safe markdown findings and intake
   notes without raw logs, memories, prompts, answers, private paths, or keys.
+- Current returned-packet follow-up also adds `canary:returned-downloads`, so a
+  maintainer can scan the standard Downloads and Telegram Desktop inboxes
+  without typing private folder paths into package-manager commands. The
+  current scan found 0 production canary evidence packets and wrote a
+  metrics-only markdown findings note for the next-agent workspace.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:

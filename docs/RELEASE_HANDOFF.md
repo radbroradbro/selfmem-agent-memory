@@ -553,12 +553,22 @@ set:
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --iterations 1 --output /tmp/recallweave-returned-canary-watch.json
 ```
 
+For the common local workflow, use the Downloads scanner. It checks the standard
+Downloads and Telegram Desktop inboxes without requiring private folder paths
+in the command, and it can write a markdown findings note for the review
+workspace:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --output /tmp/recallweave-returned-downloads.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
+```
+
 For a release-blocking check, require production-grade evidence:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --require-found --output /tmp/recallweave-returned-canary-watch.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json
 ```
 
 The command fails closed unless the returned packet is non-fixture,

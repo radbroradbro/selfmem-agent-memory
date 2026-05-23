@@ -28,6 +28,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-returned-workspace.mjs",
   "packages/bench/canary-returned-inbox.mjs",
   "packages/bench/canary-returned-watch.mjs",
+  "packages/bench/canary-returned-downloads.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/canary-next-agent-plan.mjs",
   "packages/bench/canary-next-agent-packet.mjs",
@@ -85,6 +86,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["canary:returned-workspace"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:returned-inbox"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:returned-watch"], "string");
+  assert.equal(typeof packageJson.scripts?.["canary:returned-downloads"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:batch-audit"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:next-agent"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:next-agent-packet"], "string");
@@ -136,6 +138,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-returned-workspace.mjs", "--workspace", returnedWorkspace], "returned canary workspace generator"));
   checks.push(run("node", ["packages/bench/canary-returned-inbox.mjs"], "returned canary inbox scanner"));
   checks.push(run("node", ["packages/bench/canary-returned-watch.mjs"], "returned canary inbox watcher"));
+  checks.push(run("node", ["packages/bench/canary-returned-downloads.mjs", "--skip-defaults"], "returned downloads scanner"));
   checks.push(run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"], "canary diagnostic batch audit"));
   checks.push(run("node", ["packages/bench/canary-next-agent-plan.mjs"], "canary next agent plan"));
   checks.push(run("node", ["packages/bench/canary-next-agent-packet.mjs"], "canary next agent handoff packet"));
@@ -187,6 +190,7 @@ try {
     "packages/bench/canary-returned-packet-intake.mjs",
     "packages/bench/canary-returned-inbox.mjs",
     "packages/bench/canary-returned-watch.mjs",
+    "packages/bench/canary-returned-downloads.mjs",
     "packages/bench/canary-diagnostic-batch-audit.mjs",
     "packages/bench/canary-next-agent-plan.mjs",
     "packages/bench/canary-next-agent-packet.mjs",

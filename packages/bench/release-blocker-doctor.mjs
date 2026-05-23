@@ -566,6 +566,7 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --require-ready --output /tmp/recallweave-next-agent-handoff.zip",
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --output /tmp/recallweave-next-agent-handoff.zip",
         "npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json",
+        "npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json",
         "npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /tmp/recallweave-canary-evidence-packet.zip --require-production-canary --output /tmp/recallweave-returned-canary-intake.json",
         "npm exec --yes pnpm@10.23.0 -- canary:returned-workspace -- --packet /tmp/recallweave-canary-evidence-packet.zip --workspace reviews/overnight-20260522/next-agent-workspace --output /tmp/recallweave-returned-workspace.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json",

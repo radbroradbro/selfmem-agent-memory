@@ -324,12 +324,20 @@ is set:
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --iterations 1 --output /tmp/recallweave-returned-canary-watch.json
 ```
 
+On the maintainer machine, the standard Downloads and Telegram Desktop scan can
+be run without typing private folder paths:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --output /tmp/recallweave-returned-downloads.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
+```
+
 For release evidence, require a strict production canary:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --require-found --output /tmp/recallweave-returned-canary-watch.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json
 ```
 
 This intake command does not read raw memories. It accepts only the metrics-only
