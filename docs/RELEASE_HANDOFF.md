@@ -250,6 +250,17 @@ prints raw memories, transcripts, prompts, answers, credentials, or private
 paths. Add `--require-real-pass` only when the batch is meant to prove the
 real one-agent canary blocker is closed; otherwise it is a triage tool.
 
+After ranking the batch, generate one next-agent update plan:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --input-root <redacted-diagnostics-folder> --format markdown
+```
+
+The next-agent plan is safe to paste to one operator. It keeps public launch
+and fleet rollout blocked, selects the closest privacy-clean candidate, and
+prints only placeholder-based commands for dry-run, adapter apply, fresh-window
+collection, strict intake, diagnosis, and metrics-only packet packaging.
+
 Current Hermes and OpenClaw adapters use local-first bounded hosted
 read-through. They search hosted Supermemory when local results are thin or the
 query explicitly asks for old, legacy, hosted, or Supermemory history. To prove

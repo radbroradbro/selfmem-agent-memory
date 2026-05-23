@@ -34,6 +34,7 @@ Commands proven inside the clean checkout:
 - `node packages/bench/canary-evidence-packet.mjs`
 - `node packages/bench/canary-evidence-packet-review.mjs`
 - `node packages/bench/canary-diagnostic-batch-audit.mjs`
+- `node packages/bench/canary-next-agent-plan.mjs`
 - `node packages/bench/hosted-baseline-collector.mjs --fixture`
 - `node packages/bench/recallweave-response-export.mjs --fixture`
 - `node packages/bench/recallweave-baseline-collector.mjs --fixture`
@@ -56,6 +57,7 @@ Required package entries verified:
 - `packages/bench/canary-evidence-packet.mjs`
 - `packages/bench/canary-evidence-packet-review.mjs`
 - `packages/bench/canary-diagnostic-batch-audit.mjs`
+- `packages/bench/canary-next-agent-plan.mjs`
 - `packages/bench/baseline-evidence-packet.mjs`
 - `plugins/selfmem-fallback/scripts/selfmem_update.py`
 
@@ -72,4 +74,7 @@ Notes:
 - Latest smoke also verified the canary diagnostic batch audit command in a
   clean consumer-style copy. The clean checkout had 431 files, npm dry-run pack
   had 427 files, forbidden runtime files were 0, and secret hits were 0.
+- Latest smoke also verified the canary next-agent planner command in a clean
+  consumer-style copy. The clean checkout had 434 files, npm dry-run pack had
+  430 files, forbidden runtime files were 0, and secret hits were 0.
 - The release gate now reruns this smoke directly.

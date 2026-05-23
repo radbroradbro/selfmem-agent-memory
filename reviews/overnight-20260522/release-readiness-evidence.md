@@ -157,6 +157,10 @@ Scope:
   strict intake, and diagnosis, ranks the closest candidate, and keeps
   production rollout blocked unless a non-fixture bundle passes strict-real
   evidence.
+- Added canary next-agent planner coverage to the release gate. The planner
+  converts batch findings into a single one-agent update and fresh-window plan,
+  keeps fixture evidence from enabling a real canary, and keeps public and
+  fleet rollout blocked.
 - Added baseline evidence packet coverage to the release gate. The packet
   command writes one metrics-only zip from hosted result, RecallWeave result,
   comparison, and preflight files, rejects raw-content keys, secrets, and
@@ -241,6 +245,9 @@ What `release:check` verifies:
   parsed diagnostic input, zero privacy leaks, lifecycle coverage, hybrid search
   coverage, positive store latency samples, and fails closed when
   `--require-real-pass` is used on fixture evidence,
+- Canary next-agent plan exists and a fresh fixture plan emits placeholder
+  update commands, fresh-window strict-real intake, metrics-only packet steps,
+  and `oneAgentCanaryAllowed: false`,
 - Canary report generator exists and a fresh fixture pass reports hashed
   labels, lifecycle counts, hybrid-search coverage, p50/p95 recall and store
   latency, privacy counters, rollback readiness, and strict-real fixture

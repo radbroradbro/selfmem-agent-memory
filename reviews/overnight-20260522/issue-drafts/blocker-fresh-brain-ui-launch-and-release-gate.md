@@ -106,6 +106,9 @@ requirements are resolved.
 - Canary diagnostic batch audit now lets the controller process a folder of
   redacted returned diagnostic bundles, rank the closest candidate, and keep
   `--require-real-pass` blocked unless a non-fixture strict-real canary passes.
+- Canary next-agent planning now converts the batch result into one OpenClaw or
+  Hermes fresh-window update plan with placeholder commands and metrics-only
+  attachment rules, while fixture evidence and fleet rollout remain blocked.
 - Adapter smokes now assert bounded read-through policy plus positive total,
   local, and remote recall timings.
 - Secret and private-name scans found no actual credential or private memory

@@ -73,6 +73,7 @@
     "canary-evidence-packet",
     "canary-evidence-packet-review",
     "canary-diagnostic-batch-audit",
+    "canary-next-agent-plan",
     "fresh-canary-window-gate",
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",

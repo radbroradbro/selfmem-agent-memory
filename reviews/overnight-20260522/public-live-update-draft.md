@@ -56,6 +56,8 @@ The current PR adds:
   zip before it can count as one-agent canary evidence;
 - a canary diagnostic batch audit command that ranks folders of returned
   redacted diagnostic bundles without exposing raw content;
+- a canary next-agent planner that converts batch findings into a single
+  one-agent update, fresh-window, strict-intake, and evidence-packet plan;
 - an adapter store-latency gate so Hermes and OpenClaw smokes prove store
   events include positive `elapsed_ms` samples before the next real canary;
 - a strict v1 adapter contract marker plus updater digest reporting so stale
@@ -171,6 +173,9 @@ Latest verified head before this draft refresh:
   redacted diagnostics through report, intake, and diagnosis, then ranks the
   closest candidate while `--require-real-pass` fails closed without a
   non-fixture strict-real pass
+- Canary next-agent plan: `canary:next-agent` converts the batch result into a
+  bounded OpenClaw/Hermes one-agent command plan; fixture evidence cannot enable
+  a real canary and fleet rollout remains blocked
 - Adapter store-latency gate: Hermes and OpenClaw standalone smokes now assert
   positive store `elapsed_ms` samples, and `release:check` enforces the result
 - Fresh canary window gate: strict-real canary collection now records a

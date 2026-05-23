@@ -30,6 +30,7 @@ const requiredFiles = [
   "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/canary-evidence-packet-review.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
+  "packages/bench/canary-next-agent-plan.mjs",
   "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
   "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
@@ -156,6 +157,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-evidence-packet-review-review.md`,
   `${reviewDir}/canary-diagnostic-batch-audit-evidence.md`,
   `${reviewDir}/gemini-canary-diagnostic-batch-audit-review.md`,
+  `${reviewDir}/canary-next-agent-plan-evidence.md`,
+  `${reviewDir}/gemini-canary-next-agent-plan-review.md`,
   `${reviewDir}/gemini-adapter-store-latency-review.md`,
   `${reviewDir}/gemini-fresh-canary-window-review.md`,
   `${reviewDir}/claude-fresh-canary-window-review-blocked.md`,
@@ -277,6 +280,7 @@ const requiredScripts = [
   "canary:packet",
   "canary:packet:review",
   "canary:batch-audit",
+  "canary:next-agent",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -847,6 +851,8 @@ check("release state is conservative", () => {
     "canary-operator-packet",
     "canary-evidence-packet",
     "canary-evidence-packet-review",
+    "canary-diagnostic-batch-audit",
+    "canary-next-agent-plan",
     "hosted-baseline-preflight",
     "hosted-baseline-collector",
     "recallweave-response-export",
@@ -1605,6 +1611,40 @@ check("fresh canary diagnostic batch audit passes", () => {
   assert.doesNotMatch(batchRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(requireRealPassRun.stdout, secretPattern);
   assert.doesNotMatch(requireRealPassRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+});
+
+check("fresh canary next-agent plan passes", () => {
+  const planRun = run("node", ["packages/bench/canary-next-agent-plan.mjs"]);
+  const markdownRun = run("node", ["packages/bench/canary-next-agent-plan.mjs", "--format", "markdown"]);
+  const report = JSON.parse(planRun.stdout);
+  const evidence = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-next-agent-plan-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "canary-next-agent-plan");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.publicLaunchAllowed, false);
+  assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(report.operatorPacketAvailable, true);
+  assert.equal(report.oneAgentCanaryAllowed, false);
+  assert.equal(report.selectedCandidate.fixtureOnly, true);
+  assert.equal(report.decision.status, "FIXTURE_PLAN_ONLY");
+  assert.equal(report.decision.requiredFreshWindowMinutes, 15);
+  assert.equal(report.decision.recommendedScope, "one-agent-fresh-canary");
+  assert.ok(report.decision.blockReasons.some((item) => item.reason.includes("fixture-only")));
+  assert.ok(report.commandPlan.some((item) => item.id === "apply-current-adapter"));
+  assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window"));
+  assert.ok(report.commandPlan.some((item) => item.id === "diagnose-if-failed"));
+  assert.ok(report.commandPlan.some((item) => item.id === "package-passing-evidence"));
+  assert.match(markdownRun.stdout, /RecallWeave Next Agent Canary Plan/);
+  assert.match(markdownRun.stdout, /FRESH_WINDOW_START/);
+  assert.match(evidence, /canary:next-agent/i);
+  assert.match(evidence, /one-agent/i);
+  assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+  assert.doesNotMatch(planRun.stdout, secretPattern);
+  assert.doesNotMatch(planRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(markdownRun.stdout, secretPattern);
+  assert.doesNotMatch(markdownRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
 });
 
 check("fresh canary window reviewer evidence is explicit", () => {

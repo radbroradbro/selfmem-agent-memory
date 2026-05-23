@@ -233,6 +233,18 @@ without passing strict-real intake must fail closed. The output is metrics-only:
 hashed agent/container labels, lifecycle counts, latency, instrumentation,
 privacy counters, failed checks, and remediation categories.
 
+To turn the batch result into one paste-ready next-agent plan, run:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --input-root /path/to/redacted-diagnostics --format markdown
+```
+
+This planner does not promote the fleet. It selects the closest privacy-clean
+candidate, names the failed checks, and prints the exact dry-run, apply,
+fresh-window, strict intake, diagnosis, and packet commands for one agent only.
+If the selected candidate is fixture-only or privacy is not clean, the planner
+says so instead of pretending the evidence is production-ready.
+
 The strict review must fail for fixtures or diagnostic-only packets.
 
 ## Failed Canary Reports

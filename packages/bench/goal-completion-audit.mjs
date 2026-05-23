@@ -32,6 +32,8 @@ const files = {
   canaryEvidenceIntakeReview: `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   canaryRemediationEvidence: `${reviewDir}/canary-remediation-evidence.md`,
   canaryRemediationReview: `${reviewDir}/gemini-canary-remediation-review.md`,
+  canaryNextAgentPlanEvidence: `${reviewDir}/canary-next-agent-plan-evidence.md`,
+  canaryNextAgentPlanReview: `${reviewDir}/gemini-canary-next-agent-plan-review.md`,
   adapterBoundedReadThroughEvidence: `${reviewDir}/adapter-bounded-read-through-evidence.md`,
   realCanaryDiagnosticEvidence: `${reviewDir}/real-canary-diagnostic-evidence.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
@@ -165,6 +167,11 @@ const requirements = [
     "packages/bench/fixtures/canary-runtime-report-failing.fixture.json",
     files.canaryRemediationEvidence,
     files.canaryRemediationReview,
+  ]),
+  proven("canary-next-agent-plan", "Returned diagnostic batches can be converted into a single metrics-only one-agent fresh-window update plan", [
+    "packages/bench/canary-next-agent-plan.mjs",
+    files.canaryNextAgentPlanEvidence,
+    files.canaryNextAgentPlanReview,
   ]),
   proven("adapter-bounded-read-through", "Hermes and OpenClaw adapters bound hosted read-through and trace local, remote, and total recall latency for fresh canaries", [
     "packages/adapters/hermes/selfmem_canary/__init__.py",
