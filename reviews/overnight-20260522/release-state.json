@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T07:38:00Z",
+  "generatedAt": "2026-05-23T07:52:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "c9c655049c036ca773a62e1c6498bc3438198986",
-    "ciRunId": 26327102787,
+    "headSha": "2ac02fcbb9d321dc338e59d856abbcc3cfb6cd0a",
+    "ciRunId": 26327367386,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after requiring labeled source-locked query sets for hosted and RecallWeave baseline evidence. GitHub Actions run 26327102787 passed CI on c9c6550. Local release:check, full smoke, Gemini review, diff check, and staged secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after adding the public-safe baseline:queryset inspector and wiring its hashed query-set report into hosted baseline operator, next-run, consumer smoke, release readiness, and docs. GitHub Actions run 26327367386 passed CI on 2ac02fc. Local release:check, full smoke, Gemini review, diff check, and staged secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -80,6 +80,7 @@
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",
     "hosted-baseline-preflight",
+    "baseline-queryset-inspect",
     "hosted-baseline-discovery",
     "hosted-baseline-collector",
     "recallweave-response-export",
@@ -139,6 +140,14 @@
       "route": "gemini --skip-trust --approval-mode plan",
       "evidence": "reviews/overnight-20260522/gemini-baseline-labeled-queryset-gate-review.md",
       "completedAt": "2026-05-23T07:32:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "baselineQuerySetInspect": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-baseline-queryset-inspect-review.md",
+      "completedAt": "2026-05-23T07:45:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

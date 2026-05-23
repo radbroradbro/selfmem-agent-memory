@@ -17,10 +17,10 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T07:38:05Z
-  - Body length: 17396
-  - Latest refresh adds the labeled query-set baseline gate:
-    `c9c655049c036ca773a62e1c6498bc3438198986`, CI run `26327102787`.
+  - Updated at: 2026-05-23T07:52:38Z
+  - Body length: 17793
+  - Latest local refresh adds the public-safe `baseline:queryset` inspector:
+    `2ac02fcbb9d321dc338e59d856abbcc3cfb6cd0a`, CI run `26327367386`.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
