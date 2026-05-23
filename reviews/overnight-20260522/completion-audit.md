@@ -25,7 +25,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `7fc3be2`
+- Latest public-draft baseline inspected before this audit refresh: `5a5107f`
 - PR state from GitHub API: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
@@ -88,6 +88,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   passed after rerun attempt 2
 - RecallWeave response export follow-up: `7fc3be2`, CI run `26320492619`
   passed
+- Strict adapter canary contract follow-up: `5a5107f`, CI run `26321087248`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -96,7 +98,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `7fc3be2` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `5a5107f` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
@@ -152,7 +154,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `baseline:operator-packet`, `hosted-baseline-operator-packet-evidence.md`, Gemini review | Proven locally as a public-safe handoff for aggregate-only hosted Supermemory baseline collection. It calls no hosted provider, keeps credentials in local environment variables only, and received a focused Gemini `CLEAN` review |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `canary:intake`, `canary-evidence-intake-evidence.md`, Gemini review | Proven locally as a metrics-only intake gate for one-agent runtime canary reports. The fixture pass reports lifecycle coverage, hybrid search coverage, local writes, read-through mode, latency, rollback readiness, and zero privacy leaks, but `countsAsRealRolloutEvidence: false` keeps the real rollout requirement incomplete until a live sanitized report is reviewed |
 | Strict-real fail-closed intake output | `packages/bench/canary-evidence-intake.mjs`, `canary-evidence-intake-evidence.md`, Gemini review | Proven locally and reviewed by Gemini as a fail-closed strict-real path that exits nonzero for fixture or weak real evidence while still printing sanitized metrics-only JSON for remediation. It does not make failed canaries pass |
-| Adapter strict canary contract | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `canary-evidence-intake.mjs`, `selfmem_update.py`, `adapter-strict-canary-contract-evidence.md`, Gemini review | Proven locally and reviewed by Gemini as a public-safe strict v1 adapter contract marker plus updater digest check. It helps detect stale installed adapters before one-agent canary evidence can count as real rollout proof. |
+| Adapter strict canary contract | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `canary-evidence-intake.mjs`, `selfmem_update.py`, `adapter-strict-canary-contract-evidence.md`, Gemini review | Proven locally and in CI run `26321087248`, and reviewed by Gemini as a public-safe strict v1 adapter contract marker plus updater digest check. It helps detect stale installed adapters before one-agent canary evidence can count as real rollout proof. |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `canary:report`, `canary-report-generator-evidence.md`, Gemini review | Proven locally and in CI run `26310773948` as the producer side for runtime canary evidence. It converts Hermes/OpenClaw traces into a metrics-only report with hashes, counts, latency, quality rates, privacy counters, and rollback readiness, while fixture-derived reports still fail `--strict-real` |
 | Canary diagnostic bundle report | `packages/bench/canary-report-from-trace.mjs`, `packages/bench/fixtures/canary-diagnostic-export.fixture/`, `canary-report-generator-evidence.md`, Gemini diagnostic-bundle re-review | Proven locally and in CI run `26311728246` as a redacted diagnostic directory and ZIP intake path. Metadata-only diagnostic exports produce sanitized metrics-only canary reports, relocated fixtures remain `fixtureOnly: true`, and strict-real intake rejects those fixtures so copied bundles cannot satisfy real rollout evidence |
 | Canary remediation plan | `packages/bench/canary-remediation.mjs`, `packages/bench/fixtures/canary-runtime-report-failing.fixture.json`, `canary-remediation-evidence.md`, Gemini review | Proven locally as a metrics-only diagnosis path for failed one-agent canary reports. It maps failed checks such as `recall-p95` and `store-p95` to safe remediation actions, keeps public and fleet rollout disabled, and emits no raw memory, transcript, prompt, answer, credential, or local-path content |

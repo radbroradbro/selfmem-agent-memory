@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T02:03:00Z",
+  "generatedAt": "2026-05-23T02:30:40Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "7fc3be269e5e26d0fb0fb58fdcebcabb6b4f1744",
-    "ciRunId": 26320492619,
+    "headSha": "5a5107fa4bdb710ad71db678d7336192845f0d4e",
+    "ciRunId": 26321087248,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the RecallWeave response export gate. GitHub Actions run 26320492619 passed CI on 7fc3be2 after the live PR sync was refreshed. Local test, smoke, release:check, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after the strict adapter canary contract gate. GitHub Actions run 26321087248 passed CI on 5a5107f after the live PR sync was refreshed. Local test, smoke, release:check, release:doctor, goal:audit, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
