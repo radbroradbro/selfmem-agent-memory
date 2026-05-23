@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T23:26:40Z",
+  "generatedAt": "2026-05-23T23:43:10Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "9de4ebd1b792092b30d0d6cd8100fc8a791d1bba",
-    "ciRunId": 26346310930,
+    "headSha": "8eb69e848d442b08ebf4f5204d6ed17224161683",
+    "ciRunId": 26346613433,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding the current MemoryBench source lock, optional checkout hash verification, and machine-readable source-lock evidence for public memory benchmark canaries. It preserves strict-real and public-launch blockers, and GitHub Actions run 26346310930 passed CI on 9de4ebd. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and targeted secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after adding the public LongMemEval-S slice manifest, deterministic question-id policy, answer-label hash, scoring-code hash, and focused Codex review for public benchmark canaries. It preserves strict-real and public-launch blockers, and GitHub Actions run 26346613433 passed CI on 8eb69e8. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and targeted secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

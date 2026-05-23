@@ -80,15 +80,18 @@ Date: 2026-05-23
   promoted.
 - PR #5 and issue #6 were refreshed again after adding the public
   LongMemEval-S slice manifest and the focused Codex slice review.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26346613433` passed on `8eb69e8` and the release-state baseline was
+  promoted.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T23:40:25Z
+- PR body refreshed at: 2026-05-23T23:44:21Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T23:40:24Z
-- PR body hash: 7a766fa3c97164f17271ee2ff5cdd653bfd71f2f7c649bb55f0227133ce52677
+- Issue updated at: 2026-05-23T23:44:21Z
+- PR body hash: 3c39d9c6649badf65bc283dc034f2d6afe3104882f782e8a1a10bbfa959de312
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: d1edee511586d80e4b6fd3fcdece470fff4f64c530a472e8b549a9ef91a9e4c7
-- PR body length: 39617
-- Issue body length: 24852
+- Issue body hash: 1a462ed88a84a7f9b3f25c91dd854089318f5d874ca171fb4962668e00d77457
+- PR body length: 39841
+- Issue body length: 25075
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

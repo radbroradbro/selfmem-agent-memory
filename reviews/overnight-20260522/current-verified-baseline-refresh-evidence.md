@@ -6,14 +6,14 @@ Date: 2026-05-23
 
 This refresh updates the checked-in release state, PR body draft, and blocker
 issue draft so the latest verified code/product baseline matches the current PR
-head after the MemoryBench source-lock lane, optional checkout hash
-verification, and source-lock evidence refresh.
+head after the public LongMemEval-S slice manifest, deterministic question-id
+policy, answer-label hash, scoring-code hash, and focused Codex review.
 
 ## Verified Head
 
-- Commit: `9de4ebd1b792092b30d0d6cd8100fc8a791d1bba`
-- Commit title: `docs: refresh benchmark source-lock sync evidence`
-- GitHub Actions run: `26346310930`
+- Commit: `8eb69e848d442b08ebf4f5204d6ed17224161683`
+- Commit title: `docs: refresh longmemeval slice sync evidence`
+- GitHub Actions run: `26346613433`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -33,19 +33,20 @@ evidence-only refresh:
 
 Gemini previously ran a focused cold review for the source-match
 private-path-redaction baseline refresh. A focused Codex reviewer also checked
-the MemoryBench source-lock hardening and found no blockers. This
-2026-05-23T23:26Z refresh was validated by local release gates and CI, but the
-external Gemini reviewer route was not rerun.
+the MemoryBench source-lock hardening and the public LongMemEval-S slice
+manifest and found no blockers. This 2026-05-23T23:43Z refresh was validated
+by local release gates and CI, but the external Gemini reviewer route was not
+rerun.
 
 - Route: `gemini --skip-trust --approval-mode plan`.
 - Verdict: previous `CLEAN`; focused Codex reviewer found no blocker on the
-  source-lock checkout verifier.
+  source-lock checkout verifier or public LongMemEval-S slice manifest.
 - Evidence:
   `reviews/overnight-20260522/gemini-current-verified-baseline-refresh-review.md`.
 - Current findings: the release-state, PR draft, blocker issue draft, and
   refresh evidence accurately name commit
-  `9de4ebd1b792092b30d0d6cd8100fc8a791d1bba` and GitHub Actions run
-  `26346310930`, preserve `productionReady: false` and public launch verdict
+  `8eb69e848d442b08ebf4f5204d6ed17224161683` and GitHub Actions run
+  `26346613433`, preserve `productionReady: false` and public launch verdict
   `FAIL`, keep the human and real-canary blockers, and do not include raw
   memories, transcripts, prompts, answers, credentials, private local paths, or
   key-shaped secrets.

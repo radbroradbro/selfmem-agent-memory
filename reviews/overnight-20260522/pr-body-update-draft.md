@@ -115,10 +115,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
-  `9de4ebd1b792092b30d0d6cd8100fc8a791d1bba`.
-- GitHub Actions run `26346310930`: passed CI after adding the current
-  MemoryBench source lock, optional checkout hash verification, and
-  machine-readable source-lock evidence.
+  `8eb69e848d442b08ebf4f5204d6ed17224161683`.
+- GitHub Actions run `26346613433`: passed CI after adding the public
+  LongMemEval-S slice manifest, deterministic question-id policy,
+  answer-label hash, scoring-code hash, and focused Codex review.
 - Previous verified code/product baseline before public benchmark target
   gating:
   `67993f1d9eab7742ae70841d38ad9cd14021982c`.
@@ -482,6 +482,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - GitHub Actions run `26346310930`: passed CI after adding the current
   MemoryBench source lock, optional checkout hash verification, and
   machine-readable source-lock evidence.
+- GitHub Actions run `26346613433`: passed CI after adding the public
+  LongMemEval-S slice manifest, deterministic question-id policy,
+  answer-label hash, scoring-code hash, and focused Codex review.
 - Previous verified code baseline before returned downloads supervision:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
