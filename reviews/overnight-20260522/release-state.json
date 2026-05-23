@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T11:52:00Z",
+  "generatedAt": "2026-05-23T11:50:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,32 +14,21 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "e7ce4f1c1a05b6e416b16234784f8694b83615bf",
-    "ciRunId": 26331102535,
+    "headSha": "aeaa5aadfc8b92e764f910704b34eea3e6e22b50",
+    "ciRunId": 26331865543,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding the one-command hosted-baseline run orchestrator. baseline:run now chains query-set inspection, hosted collection, local RecallWeave export and collection, preflight, comparison, next-run planning, packet creation, and returned-packet intake while preserving fixture-only non-evidence behavior. GitHub Actions run 26331102535 passed CI on e7ce4f1. Local full smoke, release:check, consumer:smoke, release:doctor, goal:audit, node syntax checks, diff check, and secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after hardening hosted baseline live-prep. Query-set authoring now requires distinct queries, collectors carry unique/duplicate query evidence, release:doctor and goal:audit report the live-prep gate, and the release guard records the reviewed benchmark-harness exception without weakening public-launch blockers. GitHub Actions run 26331865543 passed CI on aeaa5aa. Local release:check, test, release:doctor, goal:audit, release:github-sync, diff check, and staged secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "Hosted baseline live-prep hardening only: unique query-set gates, live-prep evidence checks, and release-doctor/audit reporting. Gemini reviewed this public-safe patch as CLEAN under hostedBaselineLivePrep.",
-    "allowedPostBaselineCodePaths": [
-      "packages/bench/baseline-queryset-inspect.mjs",
-      "packages/bench/goal-completion-audit.mjs",
-      "packages/bench/hosted-baseline-collector.mjs",
-      "packages/bench/hosted-baseline-preflight.mjs",
-      "packages/bench/hosted-baseline-queryset-author.mjs",
-      "packages/bench/recallweave-baseline-collector.mjs",
-      "packages/bench/release-blocker-doctor.mjs",
-      "packages/bench/release-readiness-check.mjs"
-    ]
+    "enforcePostBaselinePublicEvidenceOnly": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
