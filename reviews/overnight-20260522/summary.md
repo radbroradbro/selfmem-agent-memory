@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `cdf4615`, run `26329828449`, success.
+  `c3e9487`, run `26330234781`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -83,6 +83,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26329113469` on `94be156`: success.
 - GitHub Actions CI run `26329521666` on `c003647`: success.
 - GitHub Actions CI run `26329828449` on `cdf4615`: success.
+- GitHub Actions CI run `26330234781` on `c3e9487`: success.
 
 ## Shipped Overnight Slices
 
@@ -121,6 +122,7 @@ evidence are still required before any public live update.
 | Canary next-agent plan | `packages/bench/canary-next-agent-plan.mjs`, `reviews/overnight-20260522/canary-next-agent-plan-evidence.md`, `reviews/overnight-20260522/gemini-canary-next-agent-plan-review.md` |
 | Real OpenClaw next-agent handoff | `reviews/overnight-20260522/real-next-agent-openclaw-canary-plan.md`, selected from redacted metrics-only batch evidence |
 | Canary next-agent handoff packet | `packages/bench/canary-next-agent-packet.mjs`, `reviews/overnight-20260522/canary-next-agent-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-next-agent-packet-review.md` |
+| Current canary handoff packet identity gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/canary-next-agent-packet-evidence.md`, `reviews/overnight-20260522/canary-next-agent-plan-evidence.md`, `reviews/overnight-20260522/real-canary-diagnostic-evidence.md`, `reviews/overnight-20260522/pr-body-update-draft.md`, `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`, CI run `26330234781` |
 | Fresh canary window isolation | `packages/bench/canary-report-from-trace.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/gemini-fresh-canary-window-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
