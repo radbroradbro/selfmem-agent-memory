@@ -1,0 +1,4 @@
+{"event":"session_start","timestamp":"2026-05-22T14:00:00.000Z","content":"Procedure: Hermes native memory should run recall before prompt build and store compact summaries after agent end."}
+{"event":"before_prompt_build","timestamp":"2026-05-22T14:01:00.000Z","content":"Bug: recall trace HERMES-7712 returned too many status memories when lifecycle summaries were not deduped."}
+{"event":"agent_end","timestamp":"2026-05-22T14:02:00.000Z","content":"Fix: batch compaction should count duplicate status chatter as noise and preserve only durable lifecycle decisions."}
+{"event":"agent_end","timestamp":"2026-05-22T14:03:00.000Z","content":"thanks"}

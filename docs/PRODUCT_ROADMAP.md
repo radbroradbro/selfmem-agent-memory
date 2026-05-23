@@ -20,6 +20,8 @@ This roadmap tracks useful user-facing features without mixing them into the cur
 - Disabled-by-default selected local-container audit preview with read-only
   confirmation and redacted `.../container` path display.
 - Browser-local selected-audit history with content-free metadata only.
+- Metrics-only local-session batch compaction audit for several private Codex,
+  Claude, Hermes, or OpenClaw exports at once.
 - Disabled-by-default selected local vault sync dry-run with read-only
   confirmation and redacted `.../container` path display.
 - Fixture-safe lifecycle policy preview that stages recall/write settings as a

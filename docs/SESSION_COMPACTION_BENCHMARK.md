@@ -60,6 +60,37 @@ That smoke uses
 requires chronological output, at least two redactions, exact-identifier
 coverage, and zero privacy leaks.
 
+## Batch Local Session Audit
+
+Use the batch audit when you want to inspect a folder of recent private Codex,
+Claude, Hermes, or OpenClaw exports without exposing session text or local
+paths:
+
+```bash
+node packages/bench/session-compaction-local-batch-audit.mjs \
+  --input-dir /private/path/to/session-exports \
+  --limit 25 \
+  --output /private/path/to/recallweave-batch-audit.json
+```
+
+The report stays metrics-only. It emits source counts, aggregate event and
+candidate counts, average noise reduction, chronological failures, privacy
+counts, exact-identifier coverage, and per-session candidate fingerprints. It
+does not emit raw session text, candidate memory text, full local paths, or raw
+session ids. Input files are represented by hashes and a redacted extension
+label.
+
+The fixture-safe public gate runs:
+
+```bash
+pnpm compaction:batch-audit
+```
+
+That gate covers Codex rollout-style JSONL, Claude transcript-style JSON, and
+Hermes trace-style JSONL shapes. It requires multiple sources, chronological
+output, exact-identifier coverage, useful noise reduction, and zero privacy
+leaks.
+
 ## What It Measures
 
 - input event count,

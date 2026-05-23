@@ -93,6 +93,7 @@ try {
   checks.push(run("node", ["packages/brain-ui/interaction-smoke.mjs"], "Brain UI interaction smoke"));
   checks.push(run("node", ["packages/bench/local-container-audit-smoke.mjs"], "local-container audit smoke"));
   checks.push(run("node", ["packages/bench/session-compaction-local-audit.mjs", "--strict"], "local-session compaction audit"));
+  checks.push(run("node", ["packages/bench/session-compaction-local-batch-audit.mjs", "--strict"], "local-session batch compaction audit"));
   checks.push(run("node", ["packages/bench/canary-report-from-trace.mjs", "--fixture"], "canary report generator"));
   checks.push(run("node", ["packages/bench/canary-report-from-trace.mjs", "--diagnostic-dir", "packages/bench/fixtures/canary-diagnostic-export.fixture"], "canary diagnostic report generator"));
   checks.push(run("node", ["packages/bench/canary-evidence-intake.mjs"], "canary evidence intake"));
@@ -128,6 +129,10 @@ try {
     "packages/core/dist/index.js",
     "packages/brain-ui/src/index.html",
     "packages/brain-ui/fixtures/model-matrix.json",
+    "packages/bench/session-compaction-local-batch-audit.mjs",
+    "packages/bench/fixtures/session-compaction-local-batch.fixture/codex-rollout.fixture.jsonl",
+    "packages/bench/fixtures/session-compaction-local-batch.fixture/claude-transcript.fixture.json",
+    "packages/bench/fixtures/session-compaction-local-batch.fixture/hermes-trace.fixture.jsonl",
     "packages/bench/canary-report-from-trace.mjs",
     "packages/bench/canary-evidence-intake.mjs",
     "packages/bench/canary-remediation.mjs",

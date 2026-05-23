@@ -1,0 +1,31 @@
+{
+  "sessionId": "fixture-claude-batch",
+  "source": "claude",
+  "startedAt": "2026-05-22T13:00:00.000Z",
+  "events": [
+    {
+      "id": "claude-001",
+      "role": "user",
+      "timestamp": "2026-05-22T13:01:00.000Z",
+      "content": "Preference: keep Spring 2026 class material as high-level background only; do not bulk-inject old school notes."
+    },
+    {
+      "id": "claude-002",
+      "role": "assistant",
+      "timestamp": "2026-05-22T13:02:00.000Z",
+      "content": "Research hypothesis: topic paths and wiki links should help RecallWeave retrieve related law, code, and agent-memory branches without flooding the prompt."
+    },
+    {
+      "id": "claude-003",
+      "role": "assistant",
+      "timestamp": "2026-05-22T13:03:00.000Z",
+      "content": "Never store <private>fixture claude private note</private> in compaction audit output."
+    },
+    {
+      "id": "claude-004",
+      "role": "user",
+      "timestamp": "2026-05-22T13:04:00.000Z",
+      "content": "ok thanks"
+    }
+  ]
+}

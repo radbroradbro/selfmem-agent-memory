@@ -72,6 +72,8 @@ scoring code, privacy rules, and reviewer sign-off.
   duplicate merge behavior.
 - Metrics-only local-session compaction audit for private Codex, Claude,
   Hermes, or OpenClaw exports without printing candidate memory text.
+- Metrics-only batch compaction audit for several private session exports at
+  once, with redacted file hashes, source counts, and aggregate quality flags.
 - Lifecycle logs for recall, writes, compression checkpoints, provider errors,
   and privacy counts.
 - Dry-run update command for deployed agents.

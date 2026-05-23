@@ -48,6 +48,10 @@ const requiredFiles = [
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary_metadata/trace_metadata_only.jsonl",
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/containers/selfmem_fixture_agent/container-map.json",
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/reliability_reports/latest.json",
+  "packages/bench/fixtures/session-compaction-local-batch.fixture/codex-rollout.fixture.jsonl",
+  "packages/bench/fixtures/session-compaction-local-batch.fixture/claude-transcript.fixture.json",
+  "packages/bench/fixtures/session-compaction-local-batch.fixture/hermes-trace.fixture.jsonl",
+  "packages/bench/session-compaction-local-batch-audit.mjs",
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/hosted-baseline-discovery.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
@@ -71,7 +75,9 @@ const requiredFiles = [
   `${reviewDir}/session-compaction-evidence.md`,
   `${reviewDir}/session-compaction-benchmark-evidence.md`,
   `${reviewDir}/session-compaction-local-audit-evidence.md`,
+  `${reviewDir}/session-compaction-local-batch-audit-evidence.md`,
   `${reviewDir}/gemini-session-compaction-local-audit-review.md`,
+  `${reviewDir}/gemini-session-compaction-local-batch-audit-review.md`,
   `${reviewDir}/wiki-vault-evidence.md`,
   `${reviewDir}/wiki-vault-sync-evidence.md`,
   `${reviewDir}/gemini-wiki-sync-audit-log-review.md`,
@@ -284,6 +290,8 @@ const requiredScripts = [
   "compaction:benchmark:built",
   "compaction:local-audit",
   "compaction:local-audit:built",
+  "compaction:batch-audit",
+  "compaction:batch-audit:built",
   "wiki:smoke",
   "wiki:smoke:built",
   "wiki:sync:smoke",
@@ -1001,6 +1009,25 @@ check("model matrix and autoresearch gate stay conservative", () => {
 
 check("fresh local session compaction audit passes", () => {
   run("node", ["packages/bench/session-compaction-local-audit.mjs", "--strict"]);
+});
+
+check("fresh local session batch compaction audit passes", () => {
+  const report = JSON.parse(run("node", ["packages/bench/session-compaction-local-batch-audit.mjs", "--strict"]).stdout);
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "local-session-compaction-batch-audit");
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.writesRealFiles, false);
+  assert.ok(report.aggregate.sessionCount >= 3);
+  assert.ok(report.aggregate.eventCount >= 8);
+  assert.ok(report.aggregate.outputCandidates >= 7);
+  assert.ok(report.aggregate.averageNoiseReductionRatio >= 0.2);
+  assert.equal(report.quality.privacyLeakCount, 0);
+  assert.equal(report.quality.chronologicalFailureCount, 0);
+  assert.ok(report.quality.sourceCounts.codex >= 1);
+  assert.ok(report.quality.sourceCounts.claude >= 1);
+  assert.ok(report.quality.sourceCounts.hermes >= 1);
+  assert.ok(report.quality.exactIdentifierCandidateCount >= 2);
+  assert.equal(JSON.stringify(report).includes("fixture claude private note"), false);
 });
 
 check("fresh static brain UI evidence passes", () => {
