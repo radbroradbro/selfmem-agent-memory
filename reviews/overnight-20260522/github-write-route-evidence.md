@@ -53,6 +53,10 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after `daac851` passed CI as the latest
     verified code/product baseline and PR #5 was fast-forwarded to that head.
     Updated at: 2026-05-23T20:24:06Z.
+  - The PR body was refreshed again after adding `canary:returned-downloads`,
+    which scans the standard Downloads and Telegram Desktop inboxes and writes
+    metrics-only markdown findings for the next-agent workspace. Updated at:
+    2026-05-23T20:37:57Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -70,8 +74,8 @@ Verdict: resolved for PR body and blocker issue writes.
     handoff packet identity refresh, five-packet returned-diagnostics packet
     identity refresh, postwatch OpenClaw one-agent packet refresh, and returned
     canary workspace refresh, and latest verified baseline refresh
-  - Updated at: 2026-05-23T20:24:07Z
-  - Body length: 21159
+  - Updated at: 2026-05-23T20:37:58Z
+  - Body length: 21525
 
 ## Safety
 

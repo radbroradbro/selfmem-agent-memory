@@ -36,15 +36,19 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after `daac851` passed CI as the
   latest verified code/product baseline and the PR branch was fast-forwarded to
   that head.
+- PR #5 and issue #6 were refreshed again after adding
+  `canary:returned-downloads`, the standard Downloads and Telegram Desktop
+  returned-packet scanner, plus metrics-only markdown findings for the
+  next-agent workspace.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T20:24:06Z
+- PR body refreshed at: 2026-05-23T20:37:57Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T20:24:07Z
-- PR body hash: 8bf972b9c595b5ae0d899f817585c9dae05871c885ada5be0c94be4952ed4946
+- Issue updated at: 2026-05-23T20:37:58Z
+- PR body hash: 328cb5995add22d656a1df7570b1f062f73652ad83a4d2305929233c95406b9e
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: bc58c6782b69b53fcfbf01dc550e87d2643c43172dd5e3835dcd696d6c34b263
-- PR body length: 35370
-- Issue body length: 21159
+- Issue body hash: af220fbc5d2509ad1a666b09968867a66f49bd1cee6465a8f3f8b1c3428b38f6
+- PR body length: 35958
+- Issue body length: 21525
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
