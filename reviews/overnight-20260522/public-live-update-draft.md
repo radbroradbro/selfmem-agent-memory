@@ -111,8 +111,8 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `e2388f0`
-- GitHub Actions: CI run `26321472056` passed for the canary evidence
+- Latest verified code baseline: `aa0e1d3`
+- GitHub Actions: CI run `26321818276` passed for the baseline evidence
   packet gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
@@ -196,7 +196,7 @@ Latest verified head before this draft refresh:
   response export gate.
 - GitHub Actions CI run `26321087248` passed on `5a5107f`, the strict adapter
   canary contract gate.
-- GitHub Actions CI run `26321472056` passed on `e2388f0`, the canary
+- GitHub Actions CI run `26321818276` passed on `aa0e1d3`, the baseline
   evidence packet gate.
 - GitHub Actions CI run `26320054524` passed on `3b1870e`, the RecallWeave
   baseline collector gate after rerun attempt 2.
