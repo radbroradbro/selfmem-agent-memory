@@ -1,0 +1,233 @@
+{
+  "ok": true,
+  "mode": "hosted-baseline-run",
+  "writesRealFiles": true,
+  "fixtureOnly": false,
+  "callsHostedProvider": true,
+  "metricsOnly": true,
+  "publicLaunchAllowed": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "requiresHumanApprovalForPublicClaims": true,
+  "strictRealAttempted": true,
+  "countsAsProductionBaselineEvidence": true,
+  "countsAsPublicBenchmarkEvidence": false,
+  "status": "READY_FOR_BASELINE_REVIEW",
+  "steps": [
+    {
+      "id": "validate-query-set",
+      "ok": true,
+      "mode": "baseline-queryset-inspect",
+      "writesRealFiles": true,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "hosted-baseline-queryset-report.json"
+    },
+    {
+      "id": "collect-hosted-baseline",
+      "ok": true,
+      "mode": "live-hosted-baseline-collector-result",
+      "writesRealFiles": true,
+      "callsHostedProvider": true,
+      "metricsOnly": true,
+      "output": "hosted-baseline-result.json"
+    },
+    {
+      "id": "export-recallweave-responses",
+      "ok": true,
+      "mode": "live-recallweave-response-export",
+      "writesRealFiles": true,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "recallweave-search-responses.json"
+    },
+    {
+      "id": "collect-recallweave-result",
+      "ok": true,
+      "mode": "live-recallweave-baseline-collector-result",
+      "writesRealFiles": true,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "recallweave-result.json"
+    },
+    {
+      "id": "validate-hosted-baseline",
+      "ok": true,
+      "mode": "hosted-baseline-preflight",
+      "writesRealFiles": false,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "hosted-baseline-preflight.json"
+    },
+    {
+      "id": "compare-matched-results",
+      "ok": true,
+      "mode": "baseline-comparison",
+      "writesRealFiles": false,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "baseline-comparison.json"
+    },
+    {
+      "id": "plan-next-run",
+      "ok": true,
+      "mode": "hosted-baseline-next-run",
+      "writesRealFiles": false,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "hosted-baseline-next-run.json"
+    },
+    {
+      "id": "package-baseline-evidence",
+      "ok": true,
+      "mode": "baseline-evidence-packet",
+      "writesRealFiles": true,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "recallweave-baseline-evidence-packet.zip"
+    },
+    {
+      "id": "review-returned-packet",
+      "ok": true,
+      "mode": "baseline-returned-packet-intake",
+      "writesRealFiles": true,
+      "callsHostedProvider": false,
+      "metricsOnly": true,
+      "output": "returned-baseline-intake.json"
+    }
+  ],
+  "outputs": {
+    "querySetReport": "hosted-baseline-queryset-report.json",
+    "hosted": "hosted-baseline-result.json",
+    "recallWeaveResponses": "recallweave-search-responses.json",
+    "recallWeave": "recallweave-result.json",
+    "preflight": "hosted-baseline-preflight.json",
+    "comparison": "baseline-comparison.json",
+    "nextRun": "hosted-baseline-next-run.json",
+    "packet": "recallweave-baseline-evidence-packet.zip",
+    "intake": "returned-baseline-intake.json"
+  },
+  "evidence": {
+    "querySet": {
+      "publicBenchmarkReady": true,
+      "queryCount": 8,
+      "unlabeledQueryCount": 0,
+      "querySetHash": "sha256:52a7f54511631b079585accde83aa7817704f253abd990ced9d64dbcd31fc97a"
+    },
+    "hosted": {
+      "provider": "hosted-supermemory",
+      "fixtureOnly": false,
+      "metricsOnly": true,
+      "evidenceType": "live-hosted-baseline-collector-result",
+      "queryCount": 8,
+      "querySetHash": "sha256:52a7f54511631b079585accde83aa7817704f253abd990ced9d64dbcd31fc97a",
+      "scoringCodeHash": "sha256:9de01fccd0241199b4ec82dfc03fe13f3249b3028f71cc1d644fbfbd3302c75d",
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "rawMemoryIncluded": false,
+      "rawTranscriptIncluded": false,
+      "rawPromptIncluded": false,
+      "rawAnswerIncluded": false,
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 634,
+        "latencyP95Ms": 721,
+        "contextTokensAvg": 1228
+      }
+    },
+    "recallWeaveResponses": {
+      "evidenceType": "live-recallweave-response-export",
+      "fixtureOnly": false,
+      "metricsOnly": true,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "responseCount": 8,
+      "skippedFullyPrivate": 0
+    },
+    "recallWeave": {
+      "provider": "recallweave",
+      "fixtureOnly": false,
+      "metricsOnly": true,
+      "evidenceType": "live-recallweave-baseline-collector-result",
+      "queryCount": 8,
+      "querySetHash": "sha256:52a7f54511631b079585accde83aa7817704f253abd990ced9d64dbcd31fc97a",
+      "scoringCodeHash": "sha256:9de01fccd0241199b4ec82dfc03fe13f3249b3028f71cc1d644fbfbd3302c75d",
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "rawMemoryIncluded": false,
+      "rawTranscriptIncluded": false,
+      "rawPromptIncluded": false,
+      "rawAnswerIncluded": false,
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 8,
+        "latencyP95Ms": 17,
+        "contextTokensAvg": 386
+      }
+    },
+    "preflight": {
+      "countsAsHostedBaselineEvidence": true,
+      "publicBenchmarkClaimsAllowed": false,
+      "failedResultChecks": []
+    },
+    "comparison": {
+      "countsAsComparisonEvidence": true,
+      "publicBenchmarkClaimsAllowed": false,
+      "recallWeaveWin": false,
+      "reviewerApprovalCount": 0,
+      "failedChecks": [
+        "recallweave-win",
+        "two-reviewer-approvals"
+      ]
+    },
+    "nextRun": {
+      "status": "NEEDS_RESEARCH_ITERATION",
+      "readyForOwnerReview": false,
+      "blockerPreserved": true
+    },
+    "packet": {
+      "pathLabel": "recallweave-baseline-evidence-packet.zip",
+      "sha256": "0838d80fc851d3751e6eecc99a62c2b94a5607d4f1244e1a5466b08f9d60d34c",
+      "entries": [
+        "README.md",
+        "baseline-comparison.json",
+        "hosted-baseline-preflight.json",
+        "hosted-baseline-result.json",
+        "manifest.json",
+        "recallweave-result.json"
+      ],
+      "packagePassesStrictReal": true
+    },
+    "intake": {
+      "status": "READY_FOR_BASELINE_REVIEW",
+      "countsAsProductionBaselineEvidence": true,
+      "countsAsPublicBenchmarkEvidence": false,
+      "publicLaunchAllowed": false
+    }
+  },
+  "liveRequirements": [
+    "SUPERMEMORY_API_KEY is set locally",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+    "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 or --reviewed-queryset",
+    "RECALLWEAVE_BASELINE_CONTAINER is provided through env, --container, or --container-env",
+    "local RecallWeave memories are supplied through --container-dir or --memories"
+  ],
+  "forbidden": [
+    "provider keys",
+    "raw hosted memories",
+    "raw local memories",
+    "raw transcripts",
+    "raw prompts",
+    "raw answers",
+    "private local paths",
+    "private container maps",
+    "private query sets"
+  ]
+}

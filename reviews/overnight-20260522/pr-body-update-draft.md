@@ -234,6 +234,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- baseline:select-container`: passed in fixture smoke and live metadata-only selector smoke, writing the selected raw hosted label only to a 0600 private env file while stdout/public reports kept raw labels out.
 - `npm exec --yes pnpm@10.23.0 -- baseline:author-queryset`: passed in fixture smoke and bounded live smoke, writing a private 0600 query set outside the repository while stdout/public reports kept raw queries, expected ids, expected hashes, raw labels, memory text, keys, and private paths out.
 - Live hosted prep extension: scanned 200 hosted docs, found 14 hashed candidate containers, drafted 8 distinct private queries from 47 text-bearing docs, strict query-set inspection passed with 0 duplicates and 0 unlabeled queries, and Gemini returned `CLEAN`. This still is not a matched baseline.
+- Live hosted-vs-local Codex baseline attempt: completed the full metrics-only
+  `baseline:run` chain against hosted Supermemory plus the local Codex
+  RecallWeave/selfmem bridge. It called the hosted provider, produced a
+  strict-real packet, and had zero privacy leaks, but both arms scored 0, so it
+  is source-match research evidence rather than a public benchmark claim.
 - `npm exec --yes pnpm@10.23.0 -- baseline:next-run`: passed, producing a state-aware hosted-baseline next-run plan that keeps fixture evidence as `FIXTURE_PLAN_ONLY` and does not authorize public claims.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet`: passed and produced a metrics-only zip with no hosted memories, local memories, transcripts, prompts, answers, keys, or private paths.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet:review`: passed on fixture packet review and kept fixture evidence from counting.
@@ -270,7 +275,8 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 - Claude/Opus review completed with `CONCERNS`; it supports alpha PR review only and does not approve public launch.
 - Human approval is required before merge, visibility changes, or public release messaging.
-- Hosted Supermemory comparison claims require a fresh metrics-only baseline routed through the next-run planner.
+- Hosted Supermemory comparison claims require a source-matched, non-zero,
+  reviewer-approved metrics-only baseline routed through the next-run planner.
 - One real-container production rollout remains incomplete; fixture UI and canary tooling are not enough for public launch.
 - The available redacted real diagnostic bundle set has been evaluated and rejected by the strict rollout gate. A fresh patched one-agent canary must pass before this blocker can close.
 - Gemini returned `CLEAN` on the fresh-window diff. Claude CLI review for that narrow diff returned no usable stdout and is recorded as blocked, not as approval.

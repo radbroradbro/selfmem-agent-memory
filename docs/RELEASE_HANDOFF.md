@@ -142,6 +142,10 @@ The current live prep evidence found 14 hashed hosted candidate containers
 across 200 hosted documents, drafted 8 private queries, and strict inspection
 reported 8 unique queries with 0 duplicate or unlabeled queries. That evidence
 narrows the blocker but does not replace a matched hosted-vs-RecallWeave run.
+The current exploratory live hosted-vs-local Codex run completed the full
+`baseline:run` chain without raw text or leaks, but both arms scored zero
+against the private labels. Treat that as a source-match/label-construction
+finding, not as public benchmark evidence.
 You may attach a public-safe live discovery report when it contains only hashed
 candidate ids, counts, timestamps, status/type counts, and privacy flags. That
 report proves metadata access and candidate discovery only. It does not close
@@ -207,6 +211,10 @@ npm exec --yes pnpm@10.23.0 -- baseline:run -- \
 ```
 
 Fixture mode proves the chain, but does not count as a fresh hosted baseline.
+The first live Codex-local run proved the chain too, but still does not support
+public claims because the selected hosted-source query labels did not retrieve
+non-zero evidence on either side. The next live run needs a source-matched
+local container or mirrored local export before quality claims are meaningful.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.

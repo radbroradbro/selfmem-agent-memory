@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T11:50:00Z",
+  "generatedAt": "2026-05-23T12:00:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -28,7 +28,15 @@
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true
+    "enforcePostBaselinePublicEvidenceOnly": true,
+    "allowedPostBaselineCodeReason": "Hosted baseline live Codex-local follow-up only: parse generated export-style private env files, keep preflight outputs free of temp machine paths, surface the live Codex-local run in release doctor and goal audit, and keep public benchmark claims blocked.",
+    "allowedPostBaselineCodePaths": [
+      "packages/bench/goal-completion-audit.mjs",
+      "packages/bench/hosted-baseline-preflight.mjs",
+      "packages/bench/hosted-baseline-run.mjs",
+      "packages/bench/release-blocker-doctor.mjs",
+      "packages/bench/release-readiness-check.mjs"
+    ]
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
@@ -96,6 +104,7 @@
     "hosted-baseline-next-run",
     "hosted-baseline-next-run-require-ready",
     "hosted-baseline-run-orchestrator",
+    "hosted-baseline-live-codex-local-run",
     "baseline-evidence-packet",
     "baseline-returned-packet-intake",
     "claude-opus-pr5-review",
@@ -204,6 +213,14 @@
       "route": "gemini --skip-trust --approval-mode plan",
       "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-live-prep-review.md",
       "completedAt": "2026-05-23T11:56:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "hostedBaselineLiveCodexLocalRun": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-live-codex-local-review.md",
+      "completedAt": "2026-05-23T12:03:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

@@ -35,6 +35,9 @@ const requiredFiles = {
   hostedBaselineLivePrepReview: "gemini-hosted-baseline-live-prep-review.md",
   hostedBaselineLiveQuerySetAuthor: "hosted-baseline-live-queryset-author.json",
   hostedBaselineLiveQuerySetReport: "hosted-baseline-live-queryset-report.json",
+  hostedBaselineLiveCodexLocalRun: "hosted-baseline-live-codex-local-run-evidence.md",
+  hostedBaselineLiveCodexLocalRunReport: "hosted-baseline-live-codex-local-run.json",
+  hostedBaselineLiveCodexLocalRunReview: "gemini-hosted-baseline-live-codex-local-review.md",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
@@ -77,6 +80,9 @@ const hostedBaselineLivePrepText = readFileSync(join(root, reviewDir, "hosted-ba
 const hostedBaselineLivePrepReviewText = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-prep-review.md"), "utf8");
 const hostedBaselineLiveQuerySetAuthor = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-queryset-author.json"), "utf8"));
 const hostedBaselineLiveQuerySetReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-queryset-report.json"), "utf8"));
+const hostedBaselineLiveCodexLocalRunText = readFileSync(join(root, reviewDir, "hosted-baseline-live-codex-local-run-evidence.md"), "utf8");
+const hostedBaselineLiveCodexLocalRunReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-codex-local-run.json"), "utf8"));
+const hostedBaselineLiveCodexLocalRunReviewText = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-codex-local-review.md"), "utf8");
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
@@ -100,12 +106,23 @@ assert.equal(hostedBaselineLiveDiscoveryReport.privacyLeakCount, 0);
 assert.ok(Number(hostedBaselineLiveDiscoveryReport.sourceStats?.documentsSeen) > 0);
 assert.ok(Number(hostedBaselineLiveDiscoveryReport.containerCandidateCount) > 0);
 assert.match(hostedBaselineLivePrepText, /Unique drafted query count:\s*8/i);
-assert.match(hostedBaselineLivePrepReviewText, /Verdict:\s*`?CLEAN`?/i);
+assert.match(hostedBaselineLivePrepReviewText, /(?:\*\*)?Verdict:?(?:\*\*)?\s*`?CLEAN`?/i);
 assert.equal(hostedBaselineLiveQuerySetAuthor.querySetEvidence?.uniqueQueryCount, 8);
 assert.equal(hostedBaselineLiveQuerySetAuthor.querySetEvidence?.duplicateQueryCount, 0);
 assert.equal(hostedBaselineLiveQuerySetReport.querySetEvidence?.publicBenchmarkReady, true);
 assert.equal(hostedBaselineLiveQuerySetReport.querySetEvidence?.uniqueQueryCount, 8);
 assert.equal(hostedBaselineLiveQuerySetReport.querySetEvidence?.duplicateQueryCount, 0);
+assert.match(hostedBaselineLiveCodexLocalRunText, /not public benchmark\s+evidence/i);
+assert.match(hostedBaselineLiveCodexLocalRunReviewText, /(?:\*\*)?Verdict:?(?:\*\*)?\s*`?CLEAN`?/i);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.fixtureOnly, false);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.callsHostedProvider, true);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.metricsOnly, true);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.countsAsProductionBaselineEvidence, true);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.countsAsPublicBenchmarkEvidence, false);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.publicBenchmarkClaimsAllowed, false);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.evidence?.comparison?.recallWeaveWin, false);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.evidence?.hosted?.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveCodexLocalRunReport.evidence?.recallWeave?.privacyLeakCount, 0);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
@@ -173,8 +190,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "hosted-baseline-live-prep-evidence.md",
-    nextAction: "Live hosted discovery and private query-set prep now pass with 8 distinct labeled queries and no public leakage. Review the private query set locally, prove the local RecallWeave source matches the selected hosted container, then run `baseline:run -- --live --container-env <private-env> --queryset <reviewed-queryset> --container-dir <local-recallweave-container-dir> --reviewed-queryset --output <run-report>` to collect hosted, collect RecallWeave, compare, package, and intake in one metrics-only chain. If debugging one stage, run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` before packaging and returned-packet intake.",
+    evidence: "hosted-baseline-live-codex-local-run-evidence.md",
+    nextAction: "A live metrics-only hosted-vs-local Codex run completed and produced a strict-real packet, but both arms scored 0 and public benchmark claims remain blocked. The next step is a source-match research iteration: keep the private query set locally reviewed, build or select a local RecallWeave container where the local RecallWeave source matches the selected hosted source, rerun `baseline:run -- --live --container-env <private-env> --queryset <reviewed-queryset> --container-dir <source-matched-local-container-dir> --reviewed-queryset --output <run-report>`, then run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` and require a non-zero, reviewer-approved comparison before any public claim.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -236,6 +253,17 @@ console.log(
           uniqueQueryCount: hostedBaselineLiveQuerySetReport.querySetEvidence?.uniqueQueryCount,
           duplicateQueryCount: hostedBaselineLiveQuerySetReport.querySetEvidence?.duplicateQueryCount,
           publicBenchmarkReady: hostedBaselineLiveQuerySetReport.querySetEvidence?.publicBenchmarkReady,
+        },
+        hostedBaselineLiveCodexLocalRun: {
+          status: hostedBaselineLiveCodexLocalRunReport.status,
+          callsHostedProvider: hostedBaselineLiveCodexLocalRunReport.callsHostedProvider,
+          countsAsProductionBaselineEvidence: hostedBaselineLiveCodexLocalRunReport.countsAsProductionBaselineEvidence,
+          countsAsPublicBenchmarkEvidence: hostedBaselineLiveCodexLocalRunReport.countsAsPublicBenchmarkEvidence,
+          hostedQuality: hostedBaselineLiveCodexLocalRunReport.evidence?.hosted?.metrics?.quality,
+          recallWeaveQuality: hostedBaselineLiveCodexLocalRunReport.evidence?.recallWeave?.metrics?.quality,
+          recallWeaveWin: hostedBaselineLiveCodexLocalRunReport.evidence?.comparison?.recallWeaveWin,
+          privacyLeakCount: Number(hostedBaselineLiveCodexLocalRunReport.evidence?.hosted?.privacyLeakCount ?? 0)
+            + Number(hostedBaselineLiveCodexLocalRunReport.evidence?.recallWeave?.privacyLeakCount ?? 0),
         },
         hostedBaselineCollector: {
           provider: hostedBaselineCollector.provider,

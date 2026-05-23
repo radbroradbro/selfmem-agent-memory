@@ -411,8 +411,9 @@ function loadPrivateEnv(inputPath) {
   const raw = readFileSync(inputPath, "utf8");
   assert.doesNotMatch(raw, secretPattern, "container env file contains a key-shaped secret");
   for (const line of raw.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("export ")) continue;
+    let trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    if (trimmed.startsWith("export ")) trimmed = trimmed.slice("export ".length).trim();
     const match = /^([A-Z0-9_]+)=(.*)$/.exec(trimmed);
     if (!match) continue;
     const [, key, value] = match;

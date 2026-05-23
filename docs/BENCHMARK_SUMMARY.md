@@ -51,6 +51,15 @@ queries, 0 duplicates, and 0 unlabeled queries. This proves safe hosted
 metadata access and private query-set preparation only. It is not a hosted
 baseline or a comparison result.
 
+A later 2026-05-23 live run used that query set against hosted Supermemory and
+the local Codex RecallWeave/selfmem bridge container. The one-command chain
+completed, called the hosted provider, wrote metrics-only outputs, and produced
+a strict-real evidence packet. It still does not support public benchmark
+claims: both arms scored 0 quality, so the result points to a source-match and
+label-construction problem rather than a retrieval-quality win. The public-safe
+run summary is in
+`reviews/overnight-20260522/hosted-baseline-live-codex-local-run-evidence.md`.
+
 To generate the hosted baseline operator packet with this discovery state
 attached, run:
 
@@ -110,6 +119,8 @@ real hosted-baseline evidence.
 |---|---|---:|---:|---:|---:|---|
 | RecallWeave local | deterministic fixture | 0.763 | 0.895 | 0.921 | 0 | Historical local lexical baseline. Rerun required on this release branch. |
 | RecallWeave hybrid | deterministic fixture | 0.868 | 1.000 | 1.000 | 0 | Historical hybrid merge smoke. Rerun required on this release branch. |
+| Hosted Supermemory | live hosted-prep Codex-local run | 0.000 | 0.000 | 0.000 | 0 | Metrics-only live run completed, but labels did not match retrieved hosted results. Not public benchmark evidence. |
+| RecallWeave local Codex bridge | live hosted-prep Codex-local run | 0.000 | 0.000 | 0.000 | 0 | Much lower latency than hosted, but same zero-quality label result. Requires source-matched container before claims. |
 
 ## Historical Plugin-To-Plugin Smoke
 

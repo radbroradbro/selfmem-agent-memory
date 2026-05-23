@@ -281,7 +281,7 @@ function inspectBaselineResult(inputPath) {
     failedResultChecks.length === 0;
 
   return {
-    path: relative(root, path).replaceAll("\\", "/"),
+    pathLabel: resultPathLabel(path),
     provider,
     fixtureOnly,
     metricsOnly,
@@ -312,6 +312,12 @@ function inspectBaselineResult(inputPath) {
     reviewerApprovalCount: Number(result.reviewerApprovalCount ?? result.reviewers?.approvedCount ?? 0),
     recallWeaveWin: Boolean(result.recallWeaveWin ?? result.comparison?.recallWeaveWin),
   };
+}
+
+function resultPathLabel(path) {
+  const relativePath = relative(root, path).replaceAll("\\", "/");
+  if (relativePath.startsWith("packages/bench/fixtures/")) return relativePath;
+  return "provided-hosted-baseline-result";
 }
 
 function buildBaselineResultTemplate({ branch, head }) {

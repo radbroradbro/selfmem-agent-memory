@@ -2284,6 +2284,44 @@ check("fresh hosted baseline preflight passes", () => {
     "--out-dir",
     baselineRunDir,
   ]);
+  const baselineRunEnvDir = mkdtempSync(join(tmpdir(), "recallweave-baseline-env-"));
+  const baselineRunEnvQuerySetPath = join(baselineRunEnvDir, "queryset.json");
+  const baselineRunEnvPath = join(baselineRunEnvDir, "container.env");
+  writeFileSync(
+    baselineRunEnvQuerySetPath,
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        fixtureOnly: true,
+        datasetSlice: "fixture-baseline-env-export-slice",
+        judgeModel: "fixture-judge",
+        answerModel: "fixture-answer",
+        queries: [
+          {
+            id: "local-first-policy",
+            q: "What is the RecallWeave write policy for hosted Supermemory?",
+            expectedResultIds: ["mem_local_first_policy"],
+          },
+        ],
+      },
+      null,
+      2,
+    )}\n`,
+    { mode: 0o600 },
+  );
+  writeFileSync(
+    baselineRunEnvPath,
+    `# fixture private env\nexport RECALLWEAVE_BASELINE_QUERYSET='${baselineRunEnvQuerySetPath}'\n`,
+    { mode: 0o600 },
+  );
+  const baselineRunExportEnvResult = run("node", [
+    "packages/bench/hosted-baseline-run.mjs",
+    "--fixture",
+    "--container-env",
+    baselineRunEnvPath,
+    "--out-dir",
+    join(baselineRunEnvDir, "run"),
+  ]);
   const baselineRunMarkdown = run("node", ["packages/bench/hosted-baseline-run.mjs", "--fixture", "--format", "markdown"]);
   const nextRunRequireReadyFixture = spawnSync(
     "node",
@@ -2360,6 +2398,7 @@ check("fresh hosted baseline preflight passes", () => {
   const operatorDiscoveryPacket = JSON.parse(operatorDiscoveryResult.stdout);
   const nextRunPlan = JSON.parse(nextRunResult.stdout);
   const baselineRunPlan = JSON.parse(baselineRunResult.stdout);
+  const baselineRunExportEnvPlan = JSON.parse(baselineRunExportEnvResult.stdout);
   const nextRunRequireReadyFixtureReport = JSON.parse(nextRunRequireReadyFixture.stdout);
   const baselinePacket = JSON.parse(baselinePacketResult.stdout);
   const baselinePacketReview = JSON.parse(baselinePacketReviewResult.stdout);
@@ -2850,6 +2889,10 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(baselineRunPlan.evidence?.intake?.countsAsProductionBaselineEvidence, false);
   assert.ok(baselineRunPlan.liveRequirements?.includes("RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 or --reviewed-queryset"));
   assert.ok(baselineRunPlan.forbidden?.includes("private query sets"));
+  assert.equal(baselineRunExportEnvPlan.ok, true);
+  assert.equal(baselineRunExportEnvPlan.fixtureOnly, true);
+  assert.equal(baselineRunExportEnvPlan.evidence?.querySet?.queryCount, 1);
+  assert.equal(baselineRunExportEnvPlan.callsHostedProvider, false);
   assert.match(baselineRunMarkdown.stdout, /RecallWeave Hosted Baseline Run/);
   assert.match(baselineRunMarkdown.stdout, /Production baseline evidence: no/);
   assert.match(baselineRunMarkdown.stdout, /Public launch allowed: no/);
@@ -3029,8 +3072,10 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(operatorResult.stdout, secretPattern);
   assert.doesNotMatch(operatorMarkdown.stdout, secretPattern);
   assert.doesNotMatch(baselineRunResult.stdout, secretPattern);
+  assert.doesNotMatch(baselineRunExportEnvResult.stdout, secretPattern);
   assert.doesNotMatch(baselineRunMarkdown.stdout, secretPattern);
   assert.doesNotMatch(baselineRunResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(baselineRunExportEnvResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(baselineRunMarkdown.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(operatorEvidence, secretPattern);
   assert.doesNotMatch(operatorGeminiReview, secretPattern);
