@@ -40,15 +40,18 @@ Date: 2026-05-23
   `canary:returned-downloads`, the standard Downloads and Telegram Desktop
   returned-packet scanner, plus metrics-only markdown findings for the
   next-agent workspace.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26343015277` passed on `13cac9a` and the release-state baseline was
+  promoted.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T20:37:57Z
+- PR body refreshed at: 2026-05-23T20:42:54Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T20:37:58Z
-- PR body hash: 328cb5995add22d656a1df7570b1f062f73652ad83a4d2305929233c95406b9e
+- Issue updated at: 2026-05-23T20:42:55Z
+- PR body hash: 8f2d36021ae3149f4a782aad92ac7e6aa9548aad69b32d1b5acd3b9aa040c2c5
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: af220fbc5d2509ad1a666b09968867a66f49bd1cee6465a8f3f8b1c3428b38f6
-- PR body length: 35958
-- Issue body length: 21525
+- Issue body hash: 091c3e1940ee8e0a6e5ff0573fe7d95548e838f8a9c63ea050753178f5a8686f
+- PR body length: 36318
+- Issue body length: 21648
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
