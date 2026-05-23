@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "8f5910d49a6f1fe4d8967e014c5dd8e1df3e7b6e",
-    "ciRunId": 26324442965,
+    "headSha": "7fdac2f287c589ba75731722edaee17cd154451c",
+    "ciRunId": 26324810035,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the real OpenClaw next-agent handoff and CI read-permission fix. GitHub Actions run 26324442965 passed CI on 8f5910d. Local release:check, release:doctor, goal:audit, GitHub live sync, diff check, and staged secret/private-path scans passed; the preceding full smoke passed for the handoff slice before the CI-only permission fix."
+    "note": "This is the latest inspected code/product baseline after the next-agent canary handoff packet. GitHub Actions run 26324810035 passed CI on 7fdac2f. Local release:check, release:doctor, goal:audit, full smoke, GitHub live sync, diff check, and staged secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

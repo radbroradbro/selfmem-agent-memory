@@ -32,7 +32,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `8f5910d49a6f1fe4d8967e014c5dd8e1df3e7b6e`.
+- Latest code/product baseline: `7fdac2f287c589ba75731722edaee17cd154451c`.
+- GitHub Actions run `26324810035`: passed CI after the canary next-agent
+  handoff packet.
+- Previous verified code baseline before the canary next-agent handoff packet:
+  `8f5910d49a6f1fe4d8967e014c5dd8e1df3e7b6e`.
 - GitHub Actions run `26324442965`: passed CI after the real OpenClaw
   next-agent handoff and CI read-permission fix.
 - Previous verified code baseline before the real OpenClaw next-agent handoff
