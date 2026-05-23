@@ -47,6 +47,8 @@ const files = {
   hostedBaselineLivePrepReview: `${reviewDir}/gemini-hosted-baseline-live-prep-review.md`,
   hostedBaselineLiveQuerySetAuthorReport: `${reviewDir}/hosted-baseline-live-queryset-author.json`,
   hostedBaselineLiveQuerySetReport: `${reviewDir}/hosted-baseline-live-queryset-report.json`,
+  baselineSourceMatchPreflightEvidence: `${reviewDir}/baseline-source-match-preflight-evidence.md`,
+  baselineSourceMatchPreflightReview: `${reviewDir}/gemini-baseline-source-match-preflight-review.md`,
   hostedBaselineLiveCodexLocalRunEvidence: `${reviewDir}/hosted-baseline-live-codex-local-run-evidence.md`,
   hostedBaselineLiveCodexLocalRunReport: `${reviewDir}/hosted-baseline-live-codex-local-run.json`,
   hostedBaselineLiveCodexLocalRunReview: `${reviewDir}/gemini-hosted-baseline-live-codex-local-review.md`,
@@ -204,6 +206,11 @@ const requirements = [
     files.hostedBaselineLivePrepReview,
     files.hostedBaselineLiveQuerySetAuthorReport,
     files.hostedBaselineLiveQuerySetReport,
+  ]),
+  proven("baseline-source-match-preflight", "Local RecallWeave source-match preflight blocks hosted/local runs when reviewed query labels are not collectable from the selected local source", [
+    "packages/bench/baseline-source-match-preflight.mjs",
+    files.baselineSourceMatchPreflightEvidence,
+    files.baselineSourceMatchPreflightReview,
   ]),
   proven("hosted-baseline-live-codex-local-run", "Live hosted-vs-local Codex baseline chain is proven metrics-only but does not support public claims", [
     "packages/bench/hosted-baseline-run.mjs",

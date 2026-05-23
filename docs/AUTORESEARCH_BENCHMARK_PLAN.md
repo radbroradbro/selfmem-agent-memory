@@ -18,6 +18,8 @@ A publishable canary must use:
 - the same queries,
 - relevance-labeled queries, where every query includes at least one
   `expectedResultIds` or `expectedResultHashes` entry,
+- a source-match preflight proving the local RecallWeave source can collect at
+  least one expected reference for every reviewed query,
 - the same judge and answer model,
 - the same scoring code,
 - the same privacy rules,
@@ -38,6 +40,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
+npm exec --yes pnpm@10.23.0 -- baseline:source-match
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -79,6 +82,12 @@ Use `baseline:queryset -- --queryset <path> --strict --output <report>` on the
 frozen query file before either collector runs. The report must be metrics-only
 and public-safe: hashes, counts, readiness flags, and no raw query text or
 expected-result identifiers.
+
+Then run `baseline:source-match -- --live --queryset <path> --container-dir
+<local-recallweave-container-dir> --strict --output <report>` before hosted
+collection. This report must also be metrics-only and public-safe. It blocks the
+run if the local RecallWeave source cannot satisfy the reviewed labels, which
+prevents another source-mismatched 0-0 comparison.
 
 After both result files exist, run the matched comparison gate:
 
@@ -123,6 +132,8 @@ agent has partial evidence and needs the next safe step. It inspects hosted,
 RecallWeave, preflight, and comparison state when available, then prints the
 exact source-locked run sequence. It never calls a hosted provider, never
 authorizes public claims, and keeps fixtures useful only for parser validation.
+It prints `baseline:source-match --strict` as a required step before the
+hosted/local run chain when a reviewed query set is present.
 Use `baseline:next-run -- --require-ready` after the hosted, RecallWeave,
 preflight, and comparison files are available. It must fail for fixtures,
 partial evidence, privacy failures, harness mismatches, missing reviewer

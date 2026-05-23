@@ -28,6 +28,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-next-agent-packet.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-queryset-inspect.mjs",
+  "packages/bench/baseline-source-match-preflight.mjs",
   "packages/bench/hosted-baseline-discovery.mjs",
   "packages/bench/hosted-baseline-container-select.mjs",
   "packages/bench/hosted-baseline-queryset-author.mjs",
@@ -73,6 +74,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["canary:next-agent"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:next-agent-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:queryset"], "string");
+  assert.equal(typeof packageJson.scripts?.["baseline:source-match"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:discover"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:select-container"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:author-queryset"], "string");
@@ -114,6 +116,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-next-agent-plan.mjs"], "canary next agent plan"));
   checks.push(run("node", ["packages/bench/canary-next-agent-packet.mjs"], "canary next agent handoff packet"));
   checks.push(run("node", ["packages/bench/baseline-queryset-inspect.mjs"], "baseline query-set inspect"));
+  checks.push(run("node", ["packages/bench/baseline-source-match-preflight.mjs", "--fixture"], "baseline source-match preflight"));
   checks.push(run("node", ["packages/bench/hosted-baseline-discovery.mjs"], "hosted baseline discovery"));
   checks.push(run("node", ["packages/bench/hosted-baseline-container-select.mjs"], "hosted baseline container selector"));
   checks.push(run("node", ["packages/bench/hosted-baseline-queryset-author.mjs"], "hosted baseline query-set author"));
@@ -157,6 +160,7 @@ try {
     "packages/bench/canary-next-agent-packet.mjs",
     "packages/bench/baseline-scoring-contract.mjs",
     "packages/bench/baseline-queryset-inspect.mjs",
+    "packages/bench/baseline-source-match-preflight.mjs",
     "packages/bench/hosted-baseline-discovery.mjs",
     "packages/bench/hosted-baseline-container-select.mjs",
     "packages/bench/hosted-baseline-queryset-author.mjs",

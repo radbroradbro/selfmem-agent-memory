@@ -16,6 +16,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
+npm exec --yes pnpm@10.23.0 -- baseline:source-match
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
@@ -72,6 +73,13 @@ collects results. It emits hashes and counts only, marks whether every query is
 labeled, and fails under `--strict` if any query lacks an expected result id or
 content hash or if two queries have the same text.
 
+`baseline:source-match` checks the reviewed query labels against the selected
+local RecallWeave container before hosted calls are spent. It emits only hashes,
+counts, readiness flags, and privacy counters. It fails under `--strict` unless
+every reviewed query has at least one collectable expected reference in the
+local source. Use this before `baseline:run` whenever a hosted query set came
+from a hosted source.
+
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents
 should fill after a hosted run. A fixture can pass every shape check and still
@@ -104,7 +112,9 @@ or when fewer than two reviewer approvals exist.
 
 `baseline:next-run` is the state-aware planner for this benchmark lane. It
 turns the current hosted/local evidence state into the next safe source-locked
-run packet without calling hosted Supermemory or authorizing public claims.
+run packet without calling hosted Supermemory or authorizing public claims. The
+planner now places `baseline:source-match --strict` between query-set validation
+and the hosted/local run chain to prevent another unmatched 0-0 comparison.
 
 `baseline:run` is the one-command runner after private setup is complete. It
 requires a reviewed private query set, a private hosted container env file, and
@@ -164,6 +174,8 @@ A stronger claim requires:
 - the same judge and answer model,
 - the same scoring code,
 - the same settings,
+- a source-match preflight showing the local RecallWeave source can score the
+  reviewed labels,
 - two independent reviewer approvals,
 - no memory text in shared reports,
 - zero redaction failures,

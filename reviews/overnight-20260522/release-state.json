@@ -28,7 +28,17 @@
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true
+    "enforcePostBaselinePublicEvidenceOnly": true,
+    "allowedPostBaselineCodeReason": "Hosted baseline source-match preflight reduces the current hosted-baseline blocker by preventing another unmatched 0-0 run before live hosted calls.",
+    "allowedPostBaselineCodePaths": [
+      "package.json",
+      "packages/bench/baseline-source-match-preflight.mjs",
+      "packages/bench/consumer-install-smoke.mjs",
+      "packages/bench/goal-completion-audit.mjs",
+      "packages/bench/hosted-baseline-next-run.mjs",
+      "packages/bench/release-blocker-doctor.mjs",
+      "packages/bench/release-readiness-check.mjs"
+    ]
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
@@ -83,6 +93,7 @@
     "hosted-baseline-preflight",
     "baseline-queryset-inspect",
     "baseline-queryset-unique-gate",
+    "baseline-source-match-preflight",
     "hosted-baseline-discovery",
     "hosted-baseline-live-discovery",
     "hosted-baseline-container-select",
@@ -205,6 +216,14 @@
       "route": "gemini --skip-trust --approval-mode plan",
       "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-live-prep-review.md",
       "completedAt": "2026-05-23T11:56:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "baselineSourceMatchPreflight": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini embedded public-safe diff, no tools",
+      "evidence": "reviews/overnight-20260522/gemini-baseline-source-match-preflight-review.md",
+      "completedAt": "2026-05-23T13:10:00Z",
       "countsAsPublicLaunchApproval": false
     },
     "hostedBaselineLiveCodexLocalRun": {

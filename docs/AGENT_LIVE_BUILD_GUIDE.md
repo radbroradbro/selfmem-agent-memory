@@ -53,6 +53,8 @@ Share:
   baseline container.
 - metrics-only `baseline:queryset` output when proving a benchmark query set
   is source-locked and relevance-labeled.
+- metrics-only `baseline:source-match` output when proving the selected local
+  RecallWeave container can score a reviewed hosted-source query set.
 - source-locked benchmark query-set summaries showing every query has at least
   one expected result id or expected content hash.
 
@@ -70,6 +72,7 @@ Do not share:
 - browser state,
 - private container mappings.
 - private hosted container maps created by `baseline:discover`.
+- private query sets created by `baseline:author-queryset`.
 - unlabeled natural-question benchmark files offered as performance evidence.
 
 ## Branch And PR Flow

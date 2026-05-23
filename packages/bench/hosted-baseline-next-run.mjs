@@ -112,6 +112,7 @@ const output = {
     "/tmp/recallweave-hosted-baseline-discovery.json",
     "/tmp/recallweave-hosted-baseline-queryset-author-report.json",
     "/tmp/recallweave-hosted-baseline-queryset-report.json",
+    "/tmp/recallweave-baseline-source-match.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
     "/tmp/recallweave-baseline-run.json",
   ],
@@ -300,6 +301,7 @@ function commandsFor(status) {
   const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
   const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-author-report.json";
   const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
+  const sourceMatchPath = "/tmp/recallweave-baseline-source-match.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
   const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
   const commands = [
@@ -359,6 +361,17 @@ function commandsFor(status) {
       id: "validate-query-set",
       description: "Inspect the source-locked query set as hashes and counts only. This fails under --strict if any query is unlabeled.",
       command: `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
+    });
+    commands.push({
+      id: "preflight-local-source-match",
+      description: "Verify the reviewed query labels can be satisfied by the selected local RecallWeave container before spending hosted calls on a matched run.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+        `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
+        "RECALLWEAVE_BASELINE_CONTAINER_DIR=<local-recallweave-container-dir>",
+        `npm exec --yes pnpm@10.23.0 -- baseline:source-match -- --live --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --strict --output ${sourceMatchPath}`,
+      ].join(" "),
     });
     commands.push({
       id: "run-matched-baseline-chain",
@@ -469,6 +482,7 @@ function acceptanceCriteria() {
     "same dataset slice, query-set hash, scoring-code hash, judge model, and answer model",
     "every query has at least one expected result id or expected content hash",
     "querySetEvidence.publicBenchmarkReady is true for both runs",
+    "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local",
     "any auto-authored private query set was locally reviewed before collection",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
