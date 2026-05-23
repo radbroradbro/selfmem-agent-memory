@@ -22,15 +22,17 @@ Date: 2026-05-23
   `26334827218` passed on `fc76077`.
 - PR #5 and issue #6 were refreshed again after source-match private-path
   redaction evidence was added to the public-safe drafts.
+- PR #5 and issue #6 were refreshed again after `a56449d` passed CI and became
+  the latest verified code/product baseline.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T16:34:31Z
+- PR body refreshed at: 2026-05-23T16:41:34Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T16:35:13Z
-- PR body hash: e34616729526f5fd01418a4df789ba4e59a6982200677f4d9d70c0370c305ce0
+- Issue updated at: 2026-05-23T16:41:35Z
+- PR body hash: 6c807abb8de26690a7140ebe26db0e7409af3aeed335e350e1d92e52fd5342c6
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 6bc3eb14731660e75d635d50064f6d418cdf179bc5b34346c5f63261ee5c47fc
-- PR body length: 33432
-- Issue body length: 19972
+- Issue body hash: f40b884cb0201a3183cc189969b2ecd0c04b0f10eb48d31f926a76cee4e16788
+- PR body length: 33805
+- Issue body length: 20344
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

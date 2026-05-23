@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "59ebb53824ce0e90cf9b54fbd9621d5e2e381c54",
-    "ciRunId": 26337456058,
+    "headSha": "a56449db786a334db3554f7fd66721ae44261073",
+    "ciRunId": 26338015421,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after hardening empty, handoff-only, and no-candidate canary batch and next-agent packet behavior on top of the mixed-folder next-agent handoff packet extension. It preserves strict-real and public-launch blockers, removes blocked output zips, includes Gemini CLEAN review for the fail-closed behavior, and GitHub Actions run 26337456058 passed CI on 59ebb53. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after hardening baseline source-match private-path redaction for real local selfmem exports. It preserves strict-real and public-launch blockers, includes Gemini CLEAN review for the source-match redaction behavior, records the blocked Claude CLI reviewer attempt, and GitHub Actions run 26338015421 passed CI on a56449d. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

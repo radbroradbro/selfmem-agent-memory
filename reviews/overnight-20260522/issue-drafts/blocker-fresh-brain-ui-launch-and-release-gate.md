@@ -10,6 +10,13 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
+  `a56449db786a334db3554f7fd66721ae44261073`.
+- GitHub Actions run `26338015421` passed CI after hardening
+  `baseline:source-match` for real local selfmem exports with path-bearing
+  provenance, preserving metrics-only output, source-mismatch blockers, and
+  public-launch blockers.
+- Previous verified code/product baseline before source-match private-path
+  redaction:
   `59ebb53824ce0e90cf9b54fbd9621d5e2e381c54`.
 - GitHub Actions run `26337456058` passed CI after hardening empty,
   handoff-only, and no-candidate canary batch and next-agent packet behavior,
