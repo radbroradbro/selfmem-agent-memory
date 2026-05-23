@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T07:23:00Z",
+  "generatedAt": "2026-05-23T07:38:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "a5d300ad1986e166d214e5c4dae537ad7f2f1bcb",
-    "ciRunId": 26326805194,
+    "headSha": "c9c655049c036ca773a62e1c6498bc3438198986",
+    "ciRunId": 26327102787,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after wiring the local-session batch compaction audit into the formal goal audit and release-readiness gate. GitHub Actions run 26326805194 passed CI on a5d300a. Local release:check, goal:audit, full smoke, Gemini review, diff check, and staged secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after requiring labeled source-locked query sets for hosted and RecallWeave baseline evidence. GitHub Actions run 26327102787 passed CI on c9c6550. Local release:check, full smoke, Gemini review, diff check, and staged secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -131,6 +131,14 @@
       "route": "gemini --skip-trust --approval-mode plan",
       "evidence": "reviews/overnight-20260522/gemini-goal-audit-batch-compaction-extension-review.md",
       "completedAt": "2026-05-23T07:20:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "baselineLabeledQuerySetGate": {
+      "status": "gemini_pass",
+      "verdict": "PASS",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-baseline-labeled-queryset-gate-review.md",
+      "completedAt": "2026-05-23T07:32:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

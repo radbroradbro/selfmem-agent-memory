@@ -32,7 +32,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `a5d300ad1986e166d214e5c4dae537ad7f2f1bcb`.
+- Latest code/product baseline: `c9c655049c036ca773a62e1c6498bc3438198986`.
+- GitHub Actions run `26327102787`: passed CI after requiring labeled
+  source-locked query sets for hosted and RecallWeave baseline evidence.
+- Previous verified code baseline before the labeled query-set baseline gate:
+  `a5d300ad1986e166d214e5c4dae537ad7f2f1bcb`.
 - GitHub Actions run `26326805194`: passed CI after wiring the local-session
   batch compaction audit into the formal goal audit and release-readiness gate.
 - Previous verified code baseline before the goal-audit batch compaction
