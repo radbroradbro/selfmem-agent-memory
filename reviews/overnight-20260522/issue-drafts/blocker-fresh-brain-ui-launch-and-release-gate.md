@@ -9,7 +9,11 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.
+- Latest code/product baseline: `2b7fc92d43e1aeff1211dba7eb0c5727bce2fd7b`.
+- GitHub Actions run `26318177698` passed CI after the fresh canary window
+  isolation gate.
+- Previous code/product baseline before the fresh canary window isolation gate:
+  `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.
 - GitHub Actions run `26317637761` passed CI after the adapter store latency
   trace gate.
 - Previous code/product baseline before the adapter store latency trace gate:
@@ -39,6 +43,8 @@ requirements are resolved.
 - Local release readiness, smoke, goal audit, hosted-baseline preflight, canary
   evidence intake, canary report generation, and canary diagnosis all passed in
   their safe fixture or metrics-only modes.
+- Fresh canary window isolation now requires post-update `--since` evidence so
+  old pre-patch trace history cannot prove or poison a patched one-agent canary.
 - Adapter smokes now assert bounded read-through policy plus positive total,
   local, and remote recall timings.
 - Secret and private-name scans found no actual credential or private memory

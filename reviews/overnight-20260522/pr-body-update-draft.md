@@ -19,6 +19,7 @@ Live status:
 - Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
 - Adds real diagnostic canary evaluation evidence from two redacted external Hermes bundles. Both were metrics-only and privacy-clean, and both failed strict rollout intake, so they do not count as production rollout evidence.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
+- Adds fresh canary window isolation so strict-real reports can ignore pre-patch trace history, stale errors, and old missing-latency events after a patched adapter is applied.
 - Keeps public launch conservative: fixture evidence is allowed, real private memory text is not committed, and benchmark claims stay blocked until a matched source-locked canary or hosted baseline passes with reviewer sign-off.
 
 ## Current Verdict
@@ -29,7 +30,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.
+- Latest code/product baseline: `2b7fc92d43e1aeff1211dba7eb0c5727bce2fd7b`.
+- GitHub Actions run `26318177698`: passed CI after the fresh canary window isolation gate.
+- Previous verified baseline before the fresh canary window isolation gate:
+  `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.
 - GitHub Actions run `26317637761`: passed CI after the adapter store latency trace gate.
 - Previous verified baseline before the adapter store latency trace gate:
   `6b772936f57fbe31e33aaeb18bb4696da90b8185`.
@@ -64,6 +68,8 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `node packages/bench/canary-evidence-intake.mjs`: passed in fixture mode and rejects raw memories/transcripts/prompts.
 - `node packages/bench/canary-report-from-trace.mjs`: passed for trace fixtures and redacted diagnostic export fixtures.
 - `npm exec --yes pnpm@10.23.0 -- canary:diagnose`: passed, producing metrics-only remediation guidance for a failing canary report.
+- `npm exec --yes pnpm@10.23.0 -- canary:operator-packet`: passed with fresh-window timestamp instructions.
+- Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.
 - `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.
 - `npm exec --yes pnpm@10.23.0 -- smoke:hermes`: passed with bounded read-through policy and local/remote/total recall timing assertions.
 - `git diff --check`: clean.
@@ -76,6 +82,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Hosted Supermemory comparison claims require a fresh metrics-only baseline.
 - One real-container production rollout remains incomplete; fixture UI and canary tooling are not enough for public launch.
 - Two redacted real diagnostic bundles have been evaluated and rejected by the strict rollout gate. A fresh patched one-agent canary must pass before this blocker can close.
+- Gemini returned `CLEAN` on the fresh-window diff. Claude CLI review for that narrow diff returned no usable stdout and is recorded as blocked, not as approval.
 
 ## Evidence Packet
 

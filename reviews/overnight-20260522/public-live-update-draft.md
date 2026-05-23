@@ -99,9 +99,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `9eeed9e`
-- GitHub Actions: CI run `26317637761` passed for the adapter store latency
-  trace gate
+- Latest verified code baseline: `2b7fc92`
+- GitHub Actions: CI run `26318177698` passed for the fresh canary window
+  isolation gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -127,6 +127,9 @@ Latest verified head before this draft refresh:
   metrics-only remediation actions and keeps fleet/public rollout blocked
 - Adapter store-latency gate: Hermes and OpenClaw standalone smokes now assert
   positive store `elapsed_ms` samples, and `release:check` enforces the result
+- Fresh canary window gate: strict-real canary collection now records a
+  post-update timestamp and uses `--since`/`--canary-since` so old trace
+  history cannot prove or poison patched adapter evidence
 - Real diagnostic canary evaluation: two redacted external Hermes bundles were
   converted into temporary metrics-only reports. Both were real inputs,
   privacy-clean, and rejected by strict rollout intake on missing store latency
@@ -145,6 +148,8 @@ Latest verified head before this draft refresh:
   canary operator packet.
 - GitHub Actions CI run `26317637761` passed on `9eeed9e`, the adapter store
   latency trace gate.
+- GitHub Actions CI run `26318177698` passed on `2b7fc92`, the fresh canary
+  window isolation gate.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

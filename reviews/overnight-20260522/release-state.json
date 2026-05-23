@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T23:58:43Z",
+  "generatedAt": "2026-05-23T00:20:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "9eeed9e8e6665588efba9d2dfdfbb57785d05b17",
-    "ciRunId": 26317637761,
+    "headSha": "2b7fc92d43e1aeff1211dba7eb0c5727bce2fd7b",
+    "ciRunId": 26318177698,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the adapter store latency trace gate. GitHub Actions run 26317637761 passed CI on 9eeed9e."
+    "note": "This is the latest inspected code/product baseline after the fresh canary window isolation gate. GitHub Actions run 26318177698 passed CI on 2b7fc92."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -68,6 +68,7 @@
     "canary-evidence-intake",
     "canary-remediation-plan",
     "canary-operator-packet",
+    "fresh-canary-window-gate",
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",
     "hosted-baseline-preflight",
@@ -80,6 +81,15 @@
     "selfmem-update"
   ],
   "reviewerEvidence": {
+    "freshCanaryWindow": {
+      "status": "gemini_clean_claude_blocked",
+      "verdict": "CLEAN_WITH_BLOCKED_CLAUDE_ROUTE",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-fresh-canary-window-review.md",
+      "blockedRouteEvidence": "reviews/overnight-20260522/claude-fresh-canary-window-review-blocked.md",
+      "completedAt": "2026-05-23T00:16:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
     "claudeOpus": {
       "status": "completed_with_concerns",
       "verdict": "CONCERNS",

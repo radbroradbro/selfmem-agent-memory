@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `9eeed9e`, run `26317637761`, success.
+  `2b7fc92`, run `26318177698`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -56,6 +56,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26316961518` on `4b2ec83`: success.
 - GitHub Actions CI run `26317344140` on `6b77293`: success.
 - GitHub Actions CI run `26317637761` on `9eeed9e`: success.
+- GitHub Actions CI run `26318177698` on `2b7fc92`: success.
 
 ## Shipped Overnight Slices
 
@@ -73,6 +74,7 @@ evidence are still required before any public live update.
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |
 | Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `reviews/overnight-20260522/canary-operator-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-operator-packet-review.md` |
+| Fresh canary window isolation | `packages/bench/canary-report-from-trace.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/gemini-fresh-canary-window-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
 | Adapter store latency gate | `packages/adapters/hermes/selfmem_canary_standalone_smoke.py`, `packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs`, `reviews/overnight-20260522/gemini-adapter-store-latency-review.md` |
