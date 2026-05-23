@@ -9,7 +9,11 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `b5ad1b8f9e25832cbdc9afcaa6ad6c71685e7e68`.
+- Latest code/product baseline: `0c881257923eb813e904ff11f364648c94823080`.
+- GitHub Actions run `26322830311` passed CI after the canary next-agent
+  planner gate.
+- Previous verified code baseline before the canary next-agent planner gate:
+  `b5ad1b8f9e25832cbdc9afcaa6ad6c71685e7e68`.
 - GitHub Actions run `26322521697` passed CI after the canary diagnostic batch
   audit gate.
 - Previous verified code baseline before the canary diagnostic batch audit gate:

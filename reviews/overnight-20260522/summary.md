@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `b5ad1b8`, run `26322521697`, success.
+  `0c88125`, run `26322830311`, success after rerun attempt 2.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -70,6 +70,8 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26321912900` on `c278419`: success.
 - GitHub Actions CI run `26322155069` on `4ed6c00`: success.
 - GitHub Actions CI run `26322521697` on `b5ad1b8`: success.
+- GitHub Actions CI run `26322830311` on `0c88125`: success after rerun
+  attempt 2.
 
 ## Shipped Overnight Slices
 
@@ -207,6 +209,11 @@ Latest local verification before this summary:
   Gemini review returned `CLEAN`. GitHub Actions CI run `26322521697` passed on
   `b5ad1b8`. The best real candidate remains blocked by adapter contract and
   store-latency evidence.
+- Canary next-agent planner verification: fixture planner passed without
+  enabling a real canary, the real redacted batch produced a one-agent OpenClaw
+  fresh-window plan focused on adapter-contract and store-latency evidence, and
+  Gemini review returned `CLEAN`. GitHub Actions CI run `26322830311` passed on
+  `0c88125` after rerun attempt 2.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
   `103e7c6`, run `26290534116`.
 - GitHub Actions CI: success on guarded selected local-container browse commit

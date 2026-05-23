@@ -96,6 +96,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   `26321912900` passed
 - Canary packet review gate: `4ed6c00`, CI run `26322155069` passed
 - Canary diagnostic batch audit gate: `b5ad1b8`, CI run `26322521697` passed
+- Canary next-agent planner gate: `0c88125`, CI run `26322830311` passed after
+  rerun attempt 2
 - Worktree at audit start: clean
 - Native Codex goal state: active
 

@@ -117,9 +117,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `b5ad1b8`
-- GitHub Actions: CI run `26322521697` passed for the canary diagnostic batch
-  audit gate
+- Latest verified code baseline: `0c88125`
+- GitHub Actions: CI run `26322830311` passed for the canary next-agent
+  planner gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -210,6 +210,8 @@ Latest verified head before this draft refresh:
   response export gate.
 - GitHub Actions CI run `26321087248` passed on `5a5107f`, the strict adapter
   canary contract gate.
+- GitHub Actions CI run `26322830311` passed on `0c88125`, the canary
+  next-agent planner gate.
 - GitHub Actions CI run `26322521697` passed on `b5ad1b8`, the canary
   diagnostic batch audit gate.
 - GitHub Actions CI run `26322155069` passed on `4ed6c00`, the canary packet
