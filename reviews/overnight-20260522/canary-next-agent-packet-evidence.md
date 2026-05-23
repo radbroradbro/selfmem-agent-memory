@@ -25,6 +25,7 @@ contents.
 ```bash
 node --check packages/bench/canary-next-agent-packet.mjs
 npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --output <packet.zip>
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --require-ready --output <packet.zip>
 npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch <metrics-only-batch.json> --output <packet.zip>
 ```
 
@@ -39,6 +40,9 @@ npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch <metrics-only
 - Host: Hermes.
 - Status: `FIXTURE_PLAN_ONLY`.
 - One-agent canary allowed: false.
+- Ready for live handoff: false.
+- `--require-ready` result: rejected fixture evidence with
+  `READY_FOR_ONE_AGENT_FRESH_CANARY` required.
 - Entries:
   - `README.md`
   - `manifest.json`
@@ -63,6 +67,7 @@ name, or private local path content was written to the repo.
 - Host: OpenClaw.
 - Status: `READY_FOR_ONE_AGENT_FRESH_CANARY`.
 - One-agent canary allowed: true.
+- Ready for live handoff: true.
 - Selected candidate label: `bundle_8e90781bb060a889`.
 - Failed checks:
   - `adapter-contract`
@@ -83,9 +88,9 @@ The controller reran the current returned diagnostic set from the active
 worktree on 2026-05-23 and generated a fresh sendable packet. This is the
 current packet to hand to the selected OpenClaw operator.
 
-- Packet label: `recallweave-current-openclaw-next-agent-handoff-20260523.zip`.
+- Packet label: `recallweave-current-openclaw-next-agent-handoff-20260523-v2.zip`.
 - Packet SHA256:
-  `8fec92bdfc135e05c814ac34a5fc171e2b808c018ad07d0bc454e1dabb5c9de4`.
+  `93e50d31c5e7c53948508a637c73410cc92c254a37e584b2cd9e8a20a9635d2e`.
 - Mode: `canary-next-agent-handoff-packet`.
 - Public safe: true.
 - Metrics only: true.
@@ -94,6 +99,8 @@ current packet to hand to the selected OpenClaw operator.
 - Host: OpenClaw.
 - Status: `READY_FOR_ONE_AGENT_FRESH_CANARY`.
 - One-agent canary allowed: true.
+- Ready for live handoff: true.
+- `--require-ready` result: passed for the non-fixture OpenClaw handoff packet.
 - Selected candidate label: `bundle_8e90781bb060a889`.
 - Failed checks:
   - `adapter-contract`
@@ -112,10 +119,11 @@ current packet to hand to the selected OpenClaw operator.
 
 This packet does not close the real-container rollout blocker by itself. It
 reduces the next operator error rate by bundling the fresh-window instructions,
-strict-real collection commands, and attach-back policy into one metrics-only
-artifact. The selected OpenClaw agent still must install the current adapter,
-run a fresh window for at least 15 minutes, and return a passing strict-real
-canary evidence packet before the rollout blocker can close.
+strict-real collection commands, return checklist, fresh-window contract, and
+attach-back policy into one metrics-only artifact. The selected OpenClaw agent
+still must install the current adapter, run a fresh window for at least 15
+minutes, and return a passing strict-real canary evidence packet before the
+rollout blocker can close.
 
 ## Guardrails
 
@@ -123,7 +131,13 @@ canary evidence packet before the rollout blocker can close.
   local paths before writing the zip.
 - The packet contains no raw diagnostic input.
 - The packet keeps public launch and fleet rollout false.
+- The packet records `readyForLiveHandoff` separately from
+  `oneAgentCanaryAllowed`.
+- `--require-ready` fails closed for fixture/demo evidence and passes only when
+  the planner reports `READY_FOR_ONE_AGENT_FRESH_CANARY`.
+- The manifest includes a fresh-window contract and return checklist.
 - The release gate now checks the script, packet entries, README, manifest,
-  planner output, operator packet, evidence text, and reviewer verdict.
+  planner output, operator packet, `--require-ready` fail-closed behavior,
+  evidence text, and reviewer verdict.
 - The clean-consumer smoke now verifies the packet builder exists, runs, and is
   included in the public package dry run.

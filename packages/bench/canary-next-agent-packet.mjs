@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const outputPath = args.output ? resolvePath(args.output) : join(tmpdir(), "recallweave-next-agent-handoff-packet.zip");
+const requireReady = Boolean(args.requireReady);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -57,6 +58,9 @@ const manifest = {
   publicLaunchAllowed: false,
   fleetRolloutAllowed: false,
   oneAgentCanaryAllowed: Boolean(planJson.oneAgentCanaryAllowed),
+  readyForLiveHandoff: Boolean(planJson.oneAgentCanaryAllowed && planJson.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"),
+  requireReadyPassed: !requireReady || Boolean(planJson.oneAgentCanaryAllowed && planJson.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"),
+  blockerPreserved: true,
   operatorPacketAvailable: Boolean(planJson.operatorPacketAvailable),
   host,
   status: planJson.decision?.status ?? null,
@@ -78,6 +82,26 @@ const manifest = {
     failedInputCount: numberValue(planJson.batch?.failedInputCount),
     strictRealPassCount: numberValue(planJson.batch?.strictRealPassCount),
   },
+  freshWindowContract: {
+    purpose: "prove one real agent after the current adapter update",
+    minimumMinutes: 15,
+    requiresFreshPostUpdateWindow: true,
+    requiresStrictReal: true,
+    requiresNonFixtureEvidence: true,
+    requiresRollbackTested: true,
+    windowStartVariable: "FRESH_WINDOW_START",
+    collectCommandId: "collect-live-window",
+    returnedPacketIntakeCommand:
+      "npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --output /tmp/recallweave-returned-canary-intake.json",
+  },
+  returnChecklist: [
+    "apply the current adapter after recording FRESH_WINDOW_START",
+    "run one mapped live agent for at least 15 minutes after the update",
+    "collect strict-real evidence with --canary-since \"$FRESH_WINDOW_START\"",
+    "prove rollback-tested true",
+    "package only metrics-only canary evidence",
+    "return no raw memories, transcripts, prompts, answers, credentials, cookies, or private local paths",
+  ],
   files: files.map((file) => ({
     name: file.name,
     mode: file.mode,
@@ -109,6 +133,13 @@ const manifestRaw = `${JSON.stringify(manifest, null, 2)}\n`;
 const readmeRaw = buildReadme(manifest);
 assertSafeText(manifestRaw, "manifest");
 assertSafeText(readmeRaw, "README");
+const readyFailure = requireReadyFailure(manifest);
+if (readyFailure) {
+  const serialized = `${JSON.stringify(readyFailure, null, 2)}\n`;
+  assertSafeText(serialized, "require-ready failure output");
+  process.stdout.write(serialized);
+  process.exit(1);
+}
 
 const tmpRoot = mkdtempSync(join(tmpdir(), "recallweave-next-agent-packet-"));
 try {
@@ -134,6 +165,8 @@ try {
     publicLaunchAllowed: false,
     fleetRolloutAllowed: false,
     oneAgentCanaryAllowed: manifest.oneAgentCanaryAllowed,
+    readyForLiveHandoff: manifest.readyForLiveHandoff,
+    requireReadyPassed: manifest.requireReadyPassed,
     host,
     status: manifest.status,
     selectedCandidate: manifest.selectedCandidate,
@@ -156,6 +189,7 @@ function buildReadme(packetManifest) {
     "",
     "This packet gives one selected agent operator the exact fresh-canary steps.",
     "It is public-safe and metrics-only. It does not authorize fleet rollout or public launch.",
+    "Canary means a bounded validation window, not the memory provider name.",
     "",
     `Host: ${packetManifest.host}.`,
     `Status: ${packetManifest.status}.`,
@@ -169,9 +203,20 @@ function buildReadme(packetManifest) {
     "",
     "The selected operator should run the dry-run first, apply the current adapter only if the dry-run is sane, run the agent for at least 15 minutes, collect strict-real canary evidence, and return only the metrics-only evidence packet.",
     "",
+    "Fresh-window contract:",
+    "",
+    `- Minimum runtime after update: ${packetManifest.freshWindowContract.minimumMinutes} minutes.`,
+    "- Evidence must be post-update, strict-real, non-fixture, rollback-tested, and metrics-only.",
+    `- Record the update timestamp in \`${packetManifest.freshWindowContract.windowStartVariable}\` before applying the adapter.`,
+    `- Collect evidence with the \`${packetManifest.freshWindowContract.collectCommandId}\` command in \`next-agent-plan.md\`.`,
+    "",
+    "Return checklist:",
+    "",
+    ...packetManifest.returnChecklist.map((item) => `- ${item}`),
+    "",
     "When the operator returns a canary evidence packet, run:",
     "",
-    "`npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --output /tmp/recallweave-returned-canary-intake.json`",
+    `\`${packetManifest.freshWindowContract.returnedPacketIntakeCommand}\``,
     "",
     "Attach back only:",
     "",
@@ -180,10 +225,37 @@ function buildReadme(packetManifest) {
     "Do not attach raw memories, transcripts, prompts, answers, provider keys, cookies, private local paths, or unredacted diagnostic archives.",
     "",
     `One-agent canary allowed by planner: ${packetManifest.oneAgentCanaryAllowed ? "yes" : "no"}.`,
+    `Ready for live handoff: ${packetManifest.readyForLiveHandoff ? "yes" : "no"}.`,
     `Public launch allowed: ${packetManifest.publicLaunchAllowed ? "yes" : "no"}.`,
     `Fleet rollout allowed: ${packetManifest.fleetRolloutAllowed ? "yes" : "no"}.`,
     "",
   ].join("\n");
+}
+
+function requireReadyFailure(packetManifest) {
+  if (!requireReady) return null;
+  if (
+    packetManifest.readyForLiveHandoff
+    && packetManifest.oneAgentCanaryAllowed
+    && packetManifest.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"
+    && packetManifest.freshWindowContract.requiresNonFixtureEvidence
+  ) {
+    return null;
+  }
+  return {
+    ok: false,
+    mode: "canary-next-agent-handoff-packet",
+    publicSafe: true,
+    metricsOnly: true,
+    publicLaunchAllowed: false,
+    fleetRolloutAllowed: false,
+    oneAgentCanaryAllowed: packetManifest.oneAgentCanaryAllowed,
+    readyForLiveHandoff: packetManifest.readyForLiveHandoff,
+    requireReadyPassed: false,
+    host: packetManifest.host,
+    status: packetManifest.status,
+    reason: "--require-ready needs READY_FOR_ONE_AGENT_FRESH_CANARY from non-fixture evidence",
+  };
 }
 
 function plannerArgs() {
@@ -231,11 +303,16 @@ function listZip(zipPath) {
 
 function parseArgs(argv) {
   const parsed = {};
+  const booleanFlags = new Set(["requireReady"]);
   for (let index = 0; index < argv.length; index += 1) {
     const item = argv[index];
     if (item === "--") continue;
     if (item.startsWith("--")) {
       const key = toCamel(item.slice(2));
+      if (booleanFlags.has(key)) {
+        parsed[key] = true;
+        continue;
+      }
       const value = argv[index + 1] ?? "";
       if (key === "input") parsed.input = [...asArray(parsed.input), value];
       else parsed[key] = value;

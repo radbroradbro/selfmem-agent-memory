@@ -260,6 +260,17 @@ fresh-window, strict intake, diagnosis, and packet commands for one agent only.
 If the selected candidate is fixture-only or privacy is not clean, the planner
 says so instead of pretending the evidence is production-ready.
 
+To send the work to one live operator, build a packet and require live-ready
+evidence:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to/redacted-diagnostics --require-ready --output /tmp/recallweave-next-agent-handoff.zip
+```
+
+The packet stays metrics-only. It includes a fresh-window contract, return
+checklist, and `readyForLiveHandoff`. `--require-ready` rejects fixture/demo
+packets, so use it for real agent handoffs.
+
 When the selected agent returns a canary evidence packet, run:
 
 ```bash

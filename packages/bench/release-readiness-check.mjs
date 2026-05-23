@@ -1847,7 +1847,17 @@ check("fresh canary next-agent handoff packet passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-next-agent-packet-check-"));
   const packetPath = join(tempRoot, "next-agent-handoff.zip");
   const packetRun = run("node", ["packages/bench/canary-next-agent-packet.mjs", "--output", packetPath]);
+  const requireReadyFixtureRun = spawnSync(
+    "node",
+    ["packages/bench/canary-next-agent-packet.mjs", "--require-ready", "--output", join(tempRoot, "fixture-should-not-pass.zip")],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
   const report = JSON.parse(packetRun.stdout);
+  const requireReadyFixtureReport = JSON.parse(requireReadyFixtureRun.stdout);
   const entries = run("unzip", ["-Z1", packetPath]).stdout.split(/\r?\n/).filter(Boolean).sort();
   const manifest = JSON.parse(run("unzip", ["-p", packetPath, "manifest.json"]).stdout);
   const readme = run("unzip", ["-p", packetPath, "README.md"]).stdout;
@@ -1862,8 +1872,15 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(report.metricsOnly, true);
   assert.equal(report.publicLaunchAllowed, false);
   assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(report.readyForLiveHandoff, false);
+  assert.equal(report.requireReadyPassed, true);
   assert.equal(report.host, "hermes");
   assert.equal(report.status, "FIXTURE_PLAN_ONLY");
+  assert.notEqual(requireReadyFixtureRun.status, 0);
+  assert.equal(requireReadyFixtureReport.ok, false);
+  assert.equal(requireReadyFixtureReport.requireReadyPassed, false);
+  assert.equal(requireReadyFixtureReport.readyForLiveHandoff, false);
+  assert.match(requireReadyFixtureReport.reason, /--require-ready needs READY_FOR_ONE_AGENT_FRESH_CANARY/);
   assert.deepEqual(entries, [
     "README.md",
     "manifest.json",
@@ -1876,8 +1893,22 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(manifest.metricsOnly, true);
   assert.equal(manifest.publicLaunchAllowed, false);
   assert.equal(manifest.fleetRolloutAllowed, false);
+  assert.equal(manifest.readyForLiveHandoff, false);
+  assert.equal(manifest.requireReadyPassed, true);
+  assert.equal(manifest.blockerPreserved, true);
   assert.equal(manifest.host, "hermes");
+  assert.equal(manifest.freshWindowContract.minimumMinutes, 15);
+  assert.equal(manifest.freshWindowContract.requiresFreshPostUpdateWindow, true);
+  assert.equal(manifest.freshWindowContract.requiresStrictReal, true);
+  assert.equal(manifest.freshWindowContract.requiresNonFixtureEvidence, true);
+  assert.equal(manifest.freshWindowContract.requiresRollbackTested, true);
+  assert.match(manifest.freshWindowContract.returnedPacketIntakeCommand, /--require-production-canary/);
+  assert.ok(manifest.returnChecklist.some((item) => /FRESH_WINDOW_START/.test(item)));
+  assert.ok(manifest.returnChecklist.some((item) => /metrics-only/.test(item)));
   assert.match(readme, /one selected agent operator/i);
+  assert.match(readme, /Canary means a bounded validation window/i);
+  assert.match(readme, /Fresh-window contract/i);
+  assert.match(readme, /Ready for live handoff: no/i);
   assert.match(readme, /Do not attach raw memories/i);
   assert.match(markdown, /RecallWeave Next Agent Canary Plan/);
   assert.match(markdown, /FRESH_WINDOW_START/);
@@ -1886,7 +1917,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(evidence, /canary:next-agent-packet/i);
   assert.match(evidence, /single public-safe zip/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
-  for (const text of [packetRun.stdout, readme, markdown, operator, evidence]) {
+  for (const text of [packetRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, readme, markdown, operator, evidence]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   }
@@ -1905,7 +1936,11 @@ check("fresh canary window reviewer evidence is explicit", () => {
 });
 
 check("fresh release blocker doctor passes", () => {
-  run("node", ["packages/bench/release-blocker-doctor.mjs"]);
+  const doctorRun = run("node", ["packages/bench/release-blocker-doctor.mjs"]);
+  const report = JSON.parse(doctorRun.stdout);
+  const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
+  assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --require-ready/);
+  assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--require-ready/.test(item)));
 });
 
 check("fresh hosted baseline preflight passes", () => {
