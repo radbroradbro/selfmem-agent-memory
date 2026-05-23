@@ -198,12 +198,17 @@ Then run `baseline:source-align --strict` with the source-match report, local
 container map, and private hosted map. It catches the subtle failure where the
 hosted label and local mapping match, but the local source still lacks the
 expected refs needed for a fair benchmark.
+Then run `baseline:source-gap` with the source-match and source-alignment
+reports. That public-safe report must say `READY_FOR_MATCHED_BASELINE` before a
+hosted collection run is meaningful. If it reports a blocked state, follow its
+repair path instead of spending more hosted calls.
 
 Use `baseline:run` after the private hosted env file, reviewed private query
-set, source-match preflight, source-alignment gate, and local RecallWeave
-container are ready. It repeats the source gates, then runs hosted collection,
-local export, local collection, preflight, comparison, packet creation, and
-returned-packet intake in one metrics-only chain:
+set, source-match preflight, source-alignment gate, source-gap plan, and local
+RecallWeave container are ready. It repeats the source gates, writes the
+source-gap plan, then runs hosted collection, local export, local collection,
+preflight, comparison, packet creation, and returned-packet intake in one
+metrics-only chain:
 
 ```bash
 . /tmp/recallweave-hosted-baseline.private.env
@@ -227,8 +232,8 @@ The first live Codex-local run proved the chain too, but still does not support
 public claims because the selected hosted-source query labels did not retrieve
 non-zero evidence on either side. The next live run needs a source-matched
 local container or mirrored local export, proven by `baseline:source-match`,
-and source-aligned by `baseline:source-align`, before quality claims are
-meaningful.
+source-aligned by `baseline:source-align`, and marked ready by
+`baseline:source-gap`, before quality claims are meaningful.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.

@@ -25,6 +25,7 @@ const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-auth
 const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
 const sourceMatchPath = "/tmp/recallweave-baseline-source-match.json";
 const sourceAlignmentPath = "/tmp/recallweave-baseline-source-alignment.json";
+const sourceGapPath = "/tmp/recallweave-baseline-source-gap.json";
 const evidencePacketPath = "/tmp/recallweave-baseline-evidence-packet.zip";
 const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
 
@@ -51,6 +52,7 @@ const packet = {
     querySetReportPath,
     sourceMatchPath,
     sourceAlignmentPath,
+    sourceGapPath,
     evidencePacketPath,
     baselineRunReportPath,
   },
@@ -135,8 +137,18 @@ const packet = {
       ].join(" "),
     },
     {
+      id: "plan-source-gap",
+      description: "Turn source-match and source-alignment reports into a public-safe repair plan before spending hosted comparison calls.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:source-gap --",
+        `--source-match ${sourceMatchPath}`,
+        `--source-alignment ${sourceAlignmentPath}`,
+        `--output ${sourceGapPath}`,
+      ].join(" "),
+    },
+    {
       id: "run-matched-baseline-chain",
-      description: "After the private query set, source-match preflight, and source-alignment gate pass, run the hosted arm, local RecallWeave arm, comparison, packet, and returned-packet intake in one metrics-only chain.",
+      description: "After the private query set, source-match preflight, source-alignment gate, and source-gap plan pass, run the hosted arm, local RecallWeave arm, comparison, packet, and returned-packet intake in one metrics-only chain.",
       command: [
         `. ${privateContainerEnvPath} &&`,
         "RECALLWEAVE_BASELINE_LIVE=1",
@@ -250,6 +262,7 @@ const packet = {
     "baseline discovery output contains hashed container candidates only",
     "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
+    "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready",
     "private container map, if created, stays local and is not attached",
     "private env file, if created, stays local and is not attached",
     "private query set, if created, stays local and is not attached",
@@ -269,6 +282,7 @@ const packet = {
     querySetReportPath,
     sourceMatchPath,
     sourceAlignmentPath,
+    sourceGapPath,
     evidencePacketPath,
     baselineRunReportPath,
   ],
@@ -389,7 +403,16 @@ function buildMarkdown() {
     `  --output ${sourceAlignmentPath}`,
     "```",
     "",
-    "Once the private env file, reviewed query set, source-match preflight, source-alignment gate, and local RecallWeave container path are ready, prefer the one-command runner. It repeats the source gates, then performs hosted collection, local export, local collection, comparison, preflight, packet creation, and returned-packet intake together.",
+    "Then write the public-safe source-gap plan. If it is not READY_FOR_MATCHED_BASELINE, stop and follow its repair path before hosted collection:",
+    "",
+    "```bash",
+    "npm exec --yes pnpm@10.23.0 -- baseline:source-gap -- \\",
+    `  --source-match ${sourceMatchPath} \\`,
+    `  --source-alignment ${sourceAlignmentPath} \\`,
+    `  --output ${sourceGapPath}`,
+    "```",
+    "",
+    "Once the private env file, reviewed query set, source-match preflight, source-alignment gate, source-gap plan, and local RecallWeave container path are ready, prefer the one-command runner. It repeats the source gates, then performs hosted collection, local export, local collection, comparison, preflight, packet creation, and returned-packet intake together.",
     "",
     "```bash",
     `. ${privateContainerEnvPath}`,
@@ -494,6 +517,7 @@ function buildMarkdown() {
     `- ${querySetReportPath}`,
     `- ${sourceMatchPath}`,
     `- ${sourceAlignmentPath}`,
+    `- ${sourceGapPath}`,
     `- ${evidencePacketPath}`,
     `- ${baselineRunReportPath}`,
     "",
@@ -540,6 +564,7 @@ function packetAcceptanceLines() {
     "- querySetEvidence.publicBenchmarkReady is true for both runs",
     "- source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "- source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
+    "- source-gap plan reports READY_FOR_MATCHED_BASELINE or a blocked repair path before hosted collection",
     "- baseline discovery output contains hashed container candidates only",
     "- private container maps stay local and are not attached",
     "- private hosted baseline env files stay local and are not attached",

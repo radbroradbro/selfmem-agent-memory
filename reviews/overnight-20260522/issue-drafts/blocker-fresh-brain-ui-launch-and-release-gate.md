@@ -9,7 +9,10 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
+- Latest code/product baseline before this source-gap extension:
+  `3f2eed0c6245f3827f423225478c95a71db67725`.
+- Previous verified code baseline:
+  `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
 - GitHub Actions run `26334827218` passed CI after enforcing
   `baseline:source-match` plus `baseline:source-align` in the operator packet,
   next-run planner, one-command baseline runner, release readiness assertions,
@@ -193,10 +196,10 @@ requirements are resolved.
   label alignment, but content alignment failed safely with 0 of 3
   source-matched queries, 0 of 3 collectable queries, and no privacy leaks.
 - The hosted baseline operator packet, next-run planner, and `baseline:run`
-  orchestrator now repeat the source-match and source-alignment gates before
-  hosted collection. Live runs require both a local container map and the
-  private hosted map, but only public-safe source-match and source-alignment
-  reports may be attached.
+  orchestrator now repeat the source-match and source-alignment gates and write
+  a source-gap ready-or-repair plan before hosted collection. Live runs require
+  both a local container map and the private hosted map, but only public-safe
+  source-match, source-alignment, and source-gap reports may be attached.
 - Hosted baseline operator packet now gives agents a public-safe collection
   handoff for aggregate-only hosted Supermemory baseline evidence.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`

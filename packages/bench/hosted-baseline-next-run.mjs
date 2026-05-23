@@ -114,6 +114,7 @@ const output = {
     "/tmp/recallweave-hosted-baseline-queryset-report.json",
     "/tmp/recallweave-baseline-source-match.json",
     "/tmp/recallweave-baseline-source-alignment.json",
+    "/tmp/recallweave-baseline-source-gap.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
     "/tmp/recallweave-baseline-run.json",
   ],
@@ -304,6 +305,7 @@ function commandsFor(status) {
   const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
   const sourceMatchPath = "/tmp/recallweave-baseline-source-match.json";
   const sourceAlignmentPath = "/tmp/recallweave-baseline-source-alignment.json";
+  const sourceGapPath = "/tmp/recallweave-baseline-source-gap.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
   const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
   const commands = [
@@ -388,8 +390,18 @@ function commandsFor(status) {
       ].join(" "),
     });
     commands.push({
+      id: "plan-source-gap",
+      description: "Turn the public-safe source reports into a deterministic ready-or-repair plan before spending hosted comparison calls.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:source-gap --",
+        `--source-match ${sourceMatchPath}`,
+        `--source-alignment ${sourceAlignmentPath}`,
+        `--output ${sourceGapPath}`,
+      ].join(" "),
+    });
+    commands.push({
       id: "run-matched-baseline-chain",
-      description: "After the private query set, source-match preflight, and source-alignment gate pass, run hosted collection, local collection, comparison, packet creation, and returned-packet intake in one metrics-only command.",
+      description: "After the private query set, source-match preflight, source-alignment gate, and source-gap plan pass, run hosted collection, local collection, comparison, packet creation, and returned-packet intake in one metrics-only command.",
       command: [
         `. ${privateContainerEnvPath} &&`,
         "RECALLWEAVE_BASELINE_LIVE=1",
@@ -498,6 +510,7 @@ function acceptanceCriteria() {
     "querySetEvidence.publicBenchmarkReady is true for both runs",
     "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
+    "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready",
     "hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local",
     "any auto-authored private query set was locally reviewed before collection",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
@@ -531,7 +544,7 @@ function buildMarkdown(plan) {
   for (const item of plan.commandPlan) lines.push(`### ${item.id}`, "", item.description, "", "```bash", item.command, "```", "");
   lines.push("## Pass Criteria", "");
   for (const item of plan.acceptanceCriteria) lines.push(`- ${item}`);
-  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, source-match and source-alignment reports, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
+  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, source-match, source-alignment, and source-gap reports, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
   return lines.join("\n");
 }
 

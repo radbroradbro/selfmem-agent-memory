@@ -18,6 +18,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:source-match
 npm exec --yes pnpm@10.23.0 -- baseline:source-align
+npm exec --yes pnpm@10.23.0 -- baseline:source-gap
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
@@ -87,6 +88,13 @@ matched run. It also emits hashes, counts, readiness flags, and privacy counters
 only. Use it before `baseline:run` and attach only the public-safe alignment
 report, never the private hosted map.
 
+`baseline:source-gap` reads the public-safe source-match and source-alignment
+reports and prints one deterministic next path: run the matched baseline, select
+a different hosted candidate, rebuild labels as content hashes, mirror the
+hosted source locally, or rerun the source gates. Attach this report with the
+source-match and source-alignment reports when a hosted baseline is still
+blocked.
+
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents
 should fill after a hosted run. A fixture can pass every shape check and still
@@ -121,17 +129,18 @@ or when fewer than two reviewer approvals exist.
 turns the current hosted/local evidence state into the next safe source-locked
 run packet without calling hosted Supermemory or authorizing public claims. The
 planner now places `baseline:source-match --strict` and
-`baseline:source-align --strict` between query-set validation and the
+`baseline:source-align --strict`, followed by `baseline:source-gap`, between
+query-set validation and the
 hosted/local run chain to prevent another unmatched 0-0 comparison.
 
 `baseline:run` is the one-command runner after private setup is complete. It
 requires a reviewed private query set, a private hosted container env file, and
 a local RecallWeave container or memories file, plus the local and hosted
 container maps needed for source alignment. It repeats the source-match and
-source-alignment gates before hosted collection, then runs hosted collection,
-local export, local collection, preflight, comparison, packet creation, and
-returned-packet intake. Fixture mode proves the chain and remains blocked as real
-hosted-baseline evidence.
+source-alignment gates and writes the source-gap plan before hosted collection,
+then runs hosted collection, local export, local collection, preflight,
+comparison, packet creation, and returned-packet intake. Fixture mode proves the
+chain and remains blocked as real hosted-baseline evidence.
 
 ## Historical Controlled Local Baseline
 

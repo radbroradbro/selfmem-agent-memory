@@ -33,6 +33,7 @@
     "allowedPostBaselineCodePaths": [
       "package.json",
       "packages/bench/baseline-source-alignment.mjs",
+      "packages/bench/baseline-source-gap-plan.mjs",
       "packages/bench/consumer-install-smoke.mjs",
       "packages/bench/goal-completion-audit.mjs",
       "packages/bench/hosted-baseline-next-run.mjs",
@@ -97,6 +98,7 @@
     "baseline-queryset-unique-gate",
     "baseline-source-match-preflight",
     "baseline-source-alignment-gate",
+    "baseline-source-gap-plan",
     "hosted-baseline-discovery",
     "hosted-baseline-live-discovery",
     "hosted-baseline-container-select",
@@ -236,6 +238,14 @@
       "route": "gemini --skip-trust --approval-mode plan",
       "evidence": "reviews/overnight-20260522/gemini-baseline-source-alignment-review.md",
       "completedAt": "2026-05-23T13:36:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "baselineSourceGapPlan": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-baseline-source-gap-plan-review.md",
+      "completedAt": "2026-05-23T14:20:00Z",
       "countsAsPublicLaunchApproval": false
     },
     "canaryReturnedInbox": {

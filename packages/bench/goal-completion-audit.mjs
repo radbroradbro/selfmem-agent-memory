@@ -53,6 +53,8 @@ const files = {
   baselineSourceMatchPreflightReview: `${reviewDir}/gemini-baseline-source-match-preflight-review.md`,
   baselineSourceAlignmentEvidence: `${reviewDir}/baseline-source-alignment-evidence.md`,
   baselineSourceAlignmentReview: `${reviewDir}/gemini-baseline-source-alignment-review.md`,
+  baselineSourceGapPlanEvidence: `${reviewDir}/baseline-source-gap-plan-evidence.md`,
+  baselineSourceGapPlanReview: `${reviewDir}/gemini-baseline-source-gap-plan-review.md`,
   hostedBaselineLiveCodexLocalRunEvidence: `${reviewDir}/hosted-baseline-live-codex-local-run-evidence.md`,
   hostedBaselineLiveCodexLocalRunReport: `${reviewDir}/hosted-baseline-live-codex-local-run.json`,
   hostedBaselineLiveCodexLocalRunReview: `${reviewDir}/gemini-hosted-baseline-live-codex-local-review.md`,
@@ -220,6 +222,11 @@ const requirements = [
     "packages/bench/baseline-source-alignment.mjs",
     files.baselineSourceAlignmentEvidence,
     files.baselineSourceAlignmentReview,
+  ]),
+  proven("baseline-source-gap-plan", "Hosted/local baseline source-gap planner turns public-safe source-match and source-alignment reports into a deterministic repair path before another hosted comparison run", [
+    "packages/bench/baseline-source-gap-plan.mjs",
+    files.baselineSourceGapPlanEvidence,
+    files.baselineSourceGapPlanReview,
   ]),
   proven("hosted-baseline-live-codex-local-run", "Live hosted-vs-local Codex baseline chain is proven metrics-only but does not support public claims", [
     "packages/bench/hosted-baseline-run.mjs",

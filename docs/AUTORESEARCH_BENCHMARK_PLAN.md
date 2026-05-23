@@ -22,6 +22,8 @@ A publishable canary must use:
   least one expected reference for every reviewed query,
 - a source-alignment gate proving the hosted label and local container map point
   at the same source before hosted calls are spent,
+- a source-gap plan proving the source reports either allow a matched baseline
+  run or name the exact repair path,
 - the same judge and answer model,
 - the same scoring code,
 - the same privacy rules,
@@ -44,6 +46,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:source-match
 npm exec --yes pnpm@10.23.0 -- baseline:source-align
+npm exec --yes pnpm@10.23.0 -- baseline:source-gap
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -98,6 +101,12 @@ Then run `baseline:source-align -- --source-match <report> --local-map
 public-safe. It blocks the run if a label match is not enough to prove matching
 content. Keep the private hosted map local and attach only the alignment report.
 
+Then run `baseline:source-gap -- --source-match <report> --source-alignment
+<alignment-report> --output <gap-report>`. The report is also public-safe. It
+must say `READY_FOR_MATCHED_BASELINE` before a hosted collection run can be
+treated as source-matched. If it reports a blocked state, follow its repair path
+instead of spending more hosted calls.
+
 After both result files exist, run the matched comparison gate:
 
 Use the exporter's `--output` flag for the RecallWeave response file. Do not
@@ -142,7 +151,9 @@ RecallWeave, preflight, and comparison state when available, then prints the
 exact source-locked run sequence. It never calls a hosted provider, never
 authorizes public claims, and keeps fixtures useful only for parser validation.
 It prints `baseline:source-match --strict` as a required step before the
-hosted/local run chain when a reviewed query set is present.
+hosted/local run chain when a reviewed query set is present, then prints
+`baseline:source-gap` so operators can tell whether the source gate is ready or
+still blocked.
 Use `baseline:next-run -- --require-ready` after the hosted, RecallWeave,
 preflight, and comparison files are available. It must fail for fixtures,
 partial evidence, privacy failures, harness mismatches, missing reviewer

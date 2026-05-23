@@ -22,6 +22,7 @@ const paths = {
   querySetReport: join(outDir, "hosted-baseline-queryset-report.json"),
   sourceMatch: join(outDir, "baseline-source-match.json"),
   sourceAlignment: join(outDir, "baseline-source-alignment.json"),
+  sourceGap: join(outDir, "baseline-source-gap.json"),
   hosted: join(outDir, "hosted-baseline-result.json"),
   recallWeaveResponses: join(outDir, "recallweave-search-responses.json"),
   recallWeave: join(outDir, "recallweave-result.json"),
@@ -139,6 +140,19 @@ const sourceAlignmentArgs = [
 if (!fixtureRequested && localMapPath) sourceAlignmentArgs.push("--local-map", localMapPath);
 if (!fixtureRequested && privateMapPath) sourceAlignmentArgs.push("--private-map", privateMapPath);
 const sourceAlignment = runStep("preflight-source-alignment", sourceAlignmentArgs, baseEnv);
+const sourceGap = runStep(
+  "plan-source-gap",
+  [
+    "packages/bench/baseline-source-gap-plan.mjs",
+    "--source-match",
+    paths.sourceMatch,
+    "--source-alignment",
+    paths.sourceAlignment,
+    "--output",
+    paths.sourceGap,
+  ],
+  baseEnv,
+);
 const hosted = runStep(
   "collect-hosted-baseline",
   [
@@ -279,6 +293,7 @@ const output = {
     querySet: summarizeQuerySet(querySetReport.json),
     sourceMatch: summarizeSourceMatch(sourceMatch.json),
     sourceAlignment: summarizeSourceAlignment(sourceAlignment.json),
+    sourceGap: summarizeSourceGap(sourceGap.json),
     hosted: summarizeResult(hosted.json),
     recallWeaveResponses: summarizeExport(recallWeaveResponses.json),
     recallWeave: summarizeResult(recallWeave.json),
@@ -320,6 +335,7 @@ const output = {
     "local RecallWeave memories are supplied through --container-dir or --memories",
     "local container map is supplied through --local-map or RECALLWEAVE_BASELINE_LOCAL_MAP",
     "private hosted container map is supplied through --private-map or RECALLWEAVE_BASELINE_PRIVATE_MAP",
+    "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection",
   ],
   forbidden: [
     "provider keys",
@@ -369,6 +385,7 @@ function outputLabelFor(id) {
     "validate-query-set": basename(paths.querySetReport),
     "preflight-local-source-match": basename(paths.sourceMatch),
     "preflight-source-alignment": basename(paths.sourceAlignment),
+    "plan-source-gap": basename(paths.sourceGap),
     "collect-hosted-baseline": basename(paths.hosted),
     "export-recallweave-responses": basename(paths.recallWeaveResponses),
     "collect-recallweave-result": basename(paths.recallWeave),
@@ -400,6 +417,16 @@ function summarizeSourceAlignment(json) {
     matchedBaselineRunAllowed: Boolean(json.benchmarkGate?.matchedBaselineRunAllowed),
     publicBenchmarkClaimsAllowed: Boolean(json.benchmarkGate?.publicBenchmarkClaimsAllowed),
     privateLeakCount: Number(json.privateLeakCount ?? 0),
+  };
+}
+
+function summarizeSourceGap(json) {
+  return {
+    status: json.repairPlan?.status ?? null,
+    recommendedPath: json.repairPlan?.recommendedPath ?? null,
+    baselineRunBlocked: Boolean(json.baselineRunBlocked),
+    matchedBaselineRunAllowed: Boolean(json.benchmarkGate?.matchedBaselineRunAllowed),
+    publicBenchmarkClaimsAllowed: Boolean(json.benchmarkGate?.publicBenchmarkClaimsAllowed),
   };
 }
 

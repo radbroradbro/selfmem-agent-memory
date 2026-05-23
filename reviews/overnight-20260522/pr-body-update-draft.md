@@ -21,13 +21,18 @@ Live status:
 - Adds output-file-safe baseline and canary evidence commands so package-manager banners cannot corrupt JSON artifacts or leak local checkout paths into preflight, comparison, intake, diagnosis, batch-audit, or next-agent plan files.
 - Adds a post-baseline public evidence guard. Once enabled in release-state, the release gate diffs the latest verified code baseline against `HEAD` and fails if any later change is outside public docs or review evidence.
 - Adds a release-readiness guard that verifies the current returned-diagnostics canary handoff packet label and SHA256 stay consistent across packet evidence, next-agent plan evidence, real diagnostic evidence, the PR body draft, and the blocker issue draft.
-- Adds `baseline:source-match` and `baseline:source-align` so a reviewed hosted-source query set must prove that the selected local RecallWeave source can collect matching expected references, and so a matching hosted/local container label cannot be mistaken for matching content before hosted calls are spent on another matched run.
+- Adds `baseline:source-match`, `baseline:source-align`, and
+  `baseline:source-gap` so a reviewed hosted-source query set must prove that
+  the selected local RecallWeave source can collect matching expected
+  references, that a matching hosted/local container label is not mistaken for
+  matching content, and that agents get a deterministic ready-or-repair path
+  before hosted calls are spent on another matched run.
 - Extends the hosted baseline operator packet, next-run planner, and
-  `baseline:run` orchestrator so `baseline:source-match` and
-  `baseline:source-align` run before hosted collection. Live runs now require
-  the local container map and private hosted map through CLI flags or
-  environment variables, while only public-safe source-match and
-  source-alignment reports may be attached.
+  `baseline:run` orchestrator so `baseline:source-match`,
+  `baseline:source-align`, and `baseline:source-gap` run before hosted
+  collection. Live runs now require the local container map and private hosted
+  map through CLI flags or environment variables, while only public-safe
+  source-match, source-alignment, and source-gap reports may be attached.
 - Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
 - Adds current OpenClaw hosted/local source-alignment evidence. The selected local container map and hosted candidate label hash aligned, but the local source had 0 of 3 source-matched queries and 0 of 3 collectable queries, so the full hosted/local benchmark remains blocked until content alignment passes.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
@@ -42,7 +47,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
+- Latest code/product baseline before this source-gap extension:
+  `3f2eed0c6245f3827f423225478c95a71db67725`.
+- Previous verified code baseline:
+  `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
 - GitHub Actions run `26334827218`: passed CI after enforcing
   `baseline:source-match` plus `baseline:source-align` in the operator packet,
   next-run planner, one-command baseline runner, release readiness assertions,
@@ -270,8 +278,8 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- baseline:operator-packet`: passed, producing
   a public-safe hosted baseline handoff without calling a hosted provider. It
   now includes `preflight-local-source-match`, `preflight-source-alignment`,
-  and a `baseline:run` command that passes `--local-map` and `--private-map`
-  before any hosted collection.
+  `plan-source-gap`, and a `baseline:run` command that passes `--local-map`
+  and `--private-map` before any hosted collection.
 - `npm exec --yes pnpm@10.23.0 -- baseline:select-container`: passed in fixture smoke and live metadata-only selector smoke, writing the selected raw hosted label only to a 0600 private env file while stdout/public reports kept raw labels out.
 - `npm exec --yes pnpm@10.23.0 -- baseline:author-queryset`: passed in fixture smoke and bounded live smoke, writing a private 0600 query set outside the repository while stdout/public reports kept raw queries, expected ids, expected hashes, raw labels, memory text, keys, and private paths out.
 - Live hosted prep extension: scanned 200 hosted docs, found 14 hashed candidate containers, drafted 8 distinct private queries from 47 text-bearing docs, strict query-set inspection passed with 0 duplicates and 0 unlabeled queries, and Gemini returned `CLEAN`. This still is not a matched baseline.
@@ -287,10 +295,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   the local RecallWeave source is mirrored from the selected hosted source or a
   reviewed local-source query set is rebuilt and checked against hosted
   read-through.
-- `npm exec --yes pnpm@10.23.0 -- baseline:next-run`: passed, producing a state-aware hosted-baseline next-run plan that keeps fixture evidence as `FIXTURE_PLAN_ONLY`, requires source-match and source-alignment before the matched run chain, and does not authorize public claims.
+- `npm exec --yes pnpm@10.23.0 -- baseline:next-run`: passed, producing a state-aware hosted-baseline next-run plan that keeps fixture evidence as `FIXTURE_PLAN_ONLY`, requires source-match, source-alignment, and source-gap before the matched run chain, and does not authorize public claims.
 - `npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture`: passed with
-  11 steps, including `preflight-local-source-match` and
-  `preflight-source-alignment` before hosted collection.
+  12 steps, including `preflight-local-source-match`,
+  `preflight-source-alignment`, and `plan-source-gap` before hosted collection.
 - Gemini returned `CLEAN` for the source-gate enforcement diff after reviewing
   the public-safe diff payload.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet`: passed and produced a metrics-only zip with no hosted memories, local memories, transcripts, prompts, answers, keys, or private paths.

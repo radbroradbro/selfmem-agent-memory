@@ -31,6 +31,7 @@ const extraCurrentFiles = [
   "packages/bench/baseline-queryset-inspect.mjs",
   "packages/bench/baseline-source-match-preflight.mjs",
   "packages/bench/baseline-source-alignment.mjs",
+  "packages/bench/baseline-source-gap-plan.mjs",
   "packages/bench/hosted-baseline-discovery.mjs",
   "packages/bench/hosted-baseline-container-select.mjs",
   "packages/bench/hosted-baseline-queryset-author.mjs",
@@ -79,6 +80,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["baseline:queryset"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:source-match"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:source-align"], "string");
+  assert.equal(typeof packageJson.scripts?.["baseline:source-gap"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:discover"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:select-container"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:author-queryset"], "string");
@@ -123,6 +125,7 @@ try {
   checks.push(run("node", ["packages/bench/baseline-queryset-inspect.mjs"], "baseline query-set inspect"));
   checks.push(run("node", ["packages/bench/baseline-source-match-preflight.mjs", "--fixture"], "baseline source-match preflight"));
   checks.push(run("node", ["packages/bench/baseline-source-alignment.mjs"], "baseline source-alignment gate"));
+  checks.push(run("node", ["packages/bench/baseline-source-gap-plan.mjs"], "baseline source-gap plan"));
   checks.push(run("node", ["packages/bench/hosted-baseline-discovery.mjs"], "hosted baseline discovery"));
   checks.push(run("node", ["packages/bench/hosted-baseline-container-select.mjs"], "hosted baseline container selector"));
   checks.push(run("node", ["packages/bench/hosted-baseline-queryset-author.mjs"], "hosted baseline query-set author"));
@@ -169,6 +172,7 @@ try {
     "packages/bench/baseline-queryset-inspect.mjs",
     "packages/bench/baseline-source-match-preflight.mjs",
     "packages/bench/baseline-source-alignment.mjs",
+    "packages/bench/baseline-source-gap-plan.mjs",
     "packages/bench/hosted-baseline-discovery.mjs",
     "packages/bench/hosted-baseline-container-select.mjs",
     "packages/bench/hosted-baseline-queryset-author.mjs",

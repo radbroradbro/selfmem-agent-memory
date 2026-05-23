@@ -55,6 +55,8 @@ Share:
   is source-locked and relevance-labeled.
 - metrics-only `baseline:source-match` output when proving the selected local
   RecallWeave container can score a reviewed hosted-source query set.
+- metrics-only `baseline:source-gap` output when turning source-match and
+  source-alignment reports into a ready-or-repair path.
 - source-locked benchmark query-set summaries showing every query has at least
   one expected result id or expected content hash.
 
@@ -420,13 +422,18 @@ npm exec --yes pnpm@10.23.0 -- baseline:source-align \
   --local-map <local-container-map.json> \
   --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
   --strict --output /tmp/recallweave-baseline-source-alignment.json
+
+npm exec --yes pnpm@10.23.0 -- baseline:source-gap \
+  -- --source-match /tmp/recallweave-baseline-source-match.json \
+  --source-alignment /tmp/recallweave-baseline-source-alignment.json \
+  --output /tmp/recallweave-baseline-source-gap.json
 ```
 
 Review the private query set locally before collection. Then source
 `/tmp/recallweave-hosted-baseline.private.env` locally before the hosted
 collector. Do not attach that env file, the private map, or the private query
-set. Attach only the metrics-only query-set, source-match, and source-alignment
-reports.
+set. Attach only the metrics-only query-set, source-match, source-alignment, and
+source-gap reports.
 
 Prefer the one-command runner once those private inputs are ready:
 
