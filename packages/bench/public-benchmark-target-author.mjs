@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
-const fixtureRequested = Boolean(args.fixture) || (!args.benchmark && !args.output);
+const fixtureRequested = Boolean(args.fixture) || (!args.benchmark && !args.output && !args.sliceManifest);
 const format = String(args.format ?? "json").toLowerCase();
 const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_TARGET_OUTPUT ?? null;
 const today = new Date().toISOString().slice(0, 10);
@@ -49,43 +49,56 @@ if (outputPath) {
 process.stdout.write(serialized);
 
 function realTargetFromArgs(options) {
-  const benchmarkFamily = normalizeBenchmarkName(requiredOption(options.benchmark, "--benchmark"));
+  const sliceManifest = options.sliceManifest ? readSliceManifest(options.sliceManifest) : null;
+  const benchmarkFamily = normalizeBenchmarkName(options.benchmark ?? sliceManifest?.benchmark);
+  assert.ok(requiredString(benchmarkFamily), "--benchmark or --slice-manifest is required");
   const benchmarkName = options.benchmarkName ?? displayBenchmarkName(benchmarkFamily);
-  const checkedAt = options.checkedAt ?? today;
+  const checkedAt = options.checkedAt ?? sliceManifest?.checkedAt ?? today;
   const reportedCheckedAt = options.reportedCheckedAt ?? checkedAt;
   const questionIds = readQuestionIds(options);
-  const questionIdPolicy = options.questionIdPolicy;
+  const questionIdPolicy = options.questionIdPolicy ?? sliceManifest?.dataset?.questionIdPolicy;
   assert.ok(questionIds.length > 0 || requiredString(questionIdPolicy), "--question-ids, --question-ids-file, or --question-id-policy is required");
 
   const answerLabelsHash = hashInput({
     hash: options.answerLabelsHash,
     path: options.answerLabelsFile,
+    fallbackHash: sliceManifest?.labels?.answerLabelsHash,
     label: "--answer-labels-hash or --answer-labels-file",
   });
   const scoringCodeHash = hashInput({
     hash: options.scoringCodeHash,
     path: options.scoringPath,
+    fallbackHash: sliceManifest?.scoring?.scoringCodeHash,
     label: "--scoring-code-hash or --scoring-path",
   });
-  const answerLabelsRef = options.answerLabelsRef ?? safeBasename(options.answerLabelsFile);
-  const scoringScriptRef = options.scoringScriptRef ?? safeBasename(options.scoringPath);
+  const answerLabelsRef =
+    options.answerLabelsRef ??
+    (sliceManifest ? `${sliceManifest.sourceName ?? "public benchmark"} selected answer labels hash` : safeBasename(options.answerLabelsFile));
+  const scoringScriptRef = options.scoringScriptRef ?? sliceManifest?.scoring?.scoringScriptRef ?? safeBasename(options.scoringPath);
 
   const judgeModel = requiredOption(options.judgeModel, "--judge-model");
   const answerModel = requiredOption(options.answerModel, "--answer-model");
-  const sourceLockNote = requiredOption(options.sourceLockNote, "--source-lock-note");
+  const sourceLockNote =
+    options.sourceLockNote ??
+    (sliceManifest ? sourceLockNoteFromManifest(sliceManifest) : requiredOption(options.sourceLockNote, "--source-lock-note"));
   const metrics = listOption(options.metrics, defaultMetrics);
-  const reportedScore = Number(requiredOption(options.reportedScore, "--reported-score"));
-  assert.ok(Number.isFinite(reportedScore), "--reported-score must be a finite number");
+  const claimTier = options.claimTier ?? "canary-trend";
+  const allowMissingReportedTarget = claimTier === "run-only" || Boolean(options.allowMissingReportedTarget);
+  const reportedScore = options.reportedScore === undefined ? null : Number(requiredOption(options.reportedScore, "--reported-score"));
+  if (!allowMissingReportedTarget || options.reportedScore !== undefined) {
+    assert.ok(Number.isFinite(reportedScore), "--reported-score must be a finite number");
+  }
   const reportedTokenBudget = options.reportedTokenBudget ? Number(options.reportedTokenBudget) : null;
   if (options.reportedTokenBudget) assert.ok(Number.isFinite(reportedTokenBudget), "--reported-token-budget must be a finite number");
   const targetId =
     options.targetId ??
-    `${benchmarkFamily}-${slug(options.split ?? "split")}-${slug(checkedAt)}-${shortHash([
-      options.datasetRevision,
-      options.split,
+    `${benchmarkFamily}-${slug(options.split ?? splitFromManifest(sliceManifest) ?? "split")}-${slug(checkedAt)}-${shortHash([
+      options.datasetRevision ?? datasetRevisionFromManifest(sliceManifest),
+      options.split ?? splitFromManifest(sliceManifest),
       judgeModel,
       answerModel,
       questionIds.join(","),
+      questionIdPolicy ?? "",
       scoringCodeHash,
     ].join("|"))}`;
 
@@ -94,14 +107,14 @@ function realTargetFromArgs(options) {
     fixtureOnly: false,
     targetId,
     benchmarkType: "memory",
-    claimTier: options.claimTier ?? "canary-trend",
+    claimTier,
     benchmark: {
       name: benchmarkName,
       family: benchmarkFamily,
-      sourceUrl: requiredOption(options.sourceUrl, "--source-url"),
+      sourceUrl: requiredOption(options.sourceUrl ?? sliceManifest?.sourceUrl, "--source-url or --slice-manifest sourceUrl"),
       checkedAt,
-      datasetRevision: requiredOption(options.datasetRevision, "--dataset-revision"),
-      split: requiredOption(options.split, "--split"),
+      datasetRevision: requiredOption(options.datasetRevision ?? datasetRevisionFromManifest(sliceManifest), "--dataset-revision or --slice-manifest dataset hash"),
+      split: requiredOption(options.split ?? splitFromManifest(sliceManifest), "--split or --slice-manifest selected-count policy"),
       judgeModel,
       answerModel,
       ...(questionIds.length > 0 ? { questionIds } : { questionIdPolicy }),
@@ -117,19 +130,23 @@ function realTargetFromArgs(options) {
       checkedAt,
       sameDataAttestation: sourceLockNote,
     },
-    reportedTarget: {
-      sourceName: requiredOption(options.reportedSourceName, "--reported-source-name"),
-      sourceUrl: requiredOption(options.reportedSourceUrl, "--reported-source-url"),
-      checkedAt: reportedCheckedAt,
-      metricName: requiredOption(options.reportedMetricName, "--reported-metric-name"),
-      score: reportedScore,
-      judgeModel,
-      answerModel,
-      ...(options.reportedTokenBudget
-        ? { tokenBudget: reportedTokenBudget }
-        : { tokenBudgetReported: false }),
-      caveat: requiredOption(options.reportedCaveat, "--reported-caveat"),
-    },
+    ...(allowMissingReportedTarget && !options.reportedSourceName
+      ? { reportedTarget: { pending: true, caveat: "Run-only target. Attach a source-locked reported target row before comparison claims." } }
+      : {
+          reportedTarget: {
+            sourceName: requiredOption(options.reportedSourceName, "--reported-source-name"),
+            sourceUrl: requiredOption(options.reportedSourceUrl, "--reported-source-url"),
+            checkedAt: reportedCheckedAt,
+            metricName: requiredOption(options.reportedMetricName, "--reported-metric-name"),
+            score: reportedScore,
+            judgeModel,
+            answerModel,
+            ...(options.reportedTokenBudget
+              ? { tokenBudget: reportedTokenBudget }
+              : { tokenBudgetReported: false }),
+            caveat: requiredOption(options.reportedCaveat, "--reported-caveat"),
+          },
+        }),
     comparability: {
       metricDefinitionsMatch: true,
       sameDatasetSource: true,
@@ -146,6 +163,20 @@ function realTargetFromArgs(options) {
 
 function fixtureTarget() {
   return JSON.parse(readFileSync(resolve(root, "packages/bench/fixtures/public-benchmark-target.fixture.json"), "utf8"));
+}
+
+function readSliceManifest(inputPath) {
+  const file = resolveInputPath(inputPath);
+  assert.ok(existsSync(file), `slice manifest missing: ${displayPath(file)}`);
+  const raw = readFileSync(file, "utf8");
+  assertSafePublicText(raw, "slice manifest");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.mode, "public-benchmark-slice-manifest", "slice manifest must come from benchmark:public-slice");
+  assert.equal(parsed.publicSafety?.publicSafe, true, "slice manifest must be public safe");
+  assert.equal(parsed.publicSafety?.rawQuestionIdsIncluded, false, "slice manifest must not include raw question ids");
+  assert.equal(parsed.publicSafety?.rawQuestionsIncluded, false, "slice manifest must not include raw questions");
+  assert.equal(parsed.publicSafety?.rawAnswersIncluded, false, "slice manifest must not include raw answers");
+  return parsed;
 }
 
 function readQuestionIds(options) {
@@ -185,13 +216,18 @@ function readComponentEvidence(inputPath) {
   return parsed;
 }
 
-function hashInput({ hash, path, label }) {
+function hashInput({ hash, path, fallbackHash, label }) {
   if (hash) {
     const normalized = normalizeHash(hash);
     assert.ok(sha256Pattern.test(normalized), `${label} must be a sha256 hash`);
     return normalized;
   }
   if (path) return `sha256:${hashPath(resolveInputPath(path))}`;
+  if (fallbackHash) {
+    const normalized = normalizeHash(fallbackHash);
+    assert.ok(sha256Pattern.test(normalized), `${label} fallback must be a sha256 hash`);
+    return normalized;
+  }
   throw new Error(`${label} is required`);
 }
 
@@ -227,6 +263,8 @@ function listFiles(dir) {
 }
 
 function renderMarkdown(value) {
+  const usesPolicy = Boolean(value.benchmark?.questionIdPolicy) && !Array.isArray(value.benchmark?.questionIds);
+  const validationFlag = value.claimTier === "run-only" ? "--strict-run" : "--strict";
   return [
     "# Public Benchmark Target",
     "",
@@ -235,15 +273,15 @@ function renderMarkdown(value) {
     `- Benchmark: ${value.benchmark?.name}`,
     `- Family: ${value.benchmark?.family}`,
     `- Claim tier: ${value.claimTier}`,
-    `- Question count: ${value.benchmark?.questionIds?.length ?? 0}`,
-    `- Reported source: ${value.reportedTarget?.sourceName}`,
-    `- Reported metric: ${value.reportedTarget?.metricName}`,
-    `- Reported score: ${value.reportedTarget?.score}`,
+    `- Question selector: ${usesPolicy ? "deterministic policy" : `${value.benchmark?.questionIds?.length ?? 0} explicit ids`}`,
+    `- Reported source: ${value.reportedTarget?.sourceName ?? "pending"}`,
+    `- Reported metric: ${value.reportedTarget?.metricName ?? "pending"}`,
+    `- Reported score: ${value.reportedTarget?.score ?? "pending"}`,
     "",
     "Run this through:",
     "",
     "```bash",
-    "npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict",
+    `npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> ${validationFlag}`,
     "```",
   ].join("\n");
 }
@@ -299,6 +337,33 @@ function displayBenchmarkName(family) {
 
 function safeBasename(value) {
   return value ? basename(String(value)) : "";
+}
+
+function datasetRevisionFromManifest(manifest) {
+  if (!manifest) return "";
+  const parts = [];
+  if (manifest.sourceCommit) parts.push(`memorybench:${manifest.sourceCommit}`);
+  if (manifest.dataset?.hash) parts.push(`dataset:${manifest.dataset.hash}`);
+  return parts.join(";");
+}
+
+function splitFromManifest(manifest) {
+  if (!manifest) return "";
+  const count = manifest.dataset?.selectedCount;
+  const checkedAt = manifest.checkedAt;
+  return `longmemeval-s-cleaned-canary-${count ?? "unknown"}-first-per-type-${checkedAt ?? "undated"}`;
+}
+
+function sourceLockNoteFromManifest(manifest) {
+  if (!manifest) return "";
+  return [
+    `same public ${manifest.benchmark} data source is locked by ${manifest.sourceName ?? "source manifest"}`,
+    `MemoryBench commit ${manifest.sourceCommit ?? "unknown"}`,
+    `dataset hash ${manifest.dataset?.hash ?? "unknown"}`,
+    `selected-id policy hash ${manifest.dataset?.selectedQuestionIdsHash ?? "unknown"}`,
+    `answer-label hash ${manifest.labels?.answerLabelsHash ?? "unknown"}`,
+    `scoring-code hash ${manifest.scoring?.scoringCodeHash ?? "unknown"}`,
+  ].join("; ");
 }
 
 function slug(value) {

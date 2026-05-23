@@ -92,6 +92,10 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-slice-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-slice-review.md`,
+  `${reviewDir}/public-longmemeval-run-target.json`,
+  `${reviewDir}/public-longmemeval-run-target-check.json`,
+  `${reviewDir}/public-longmemeval-run-target-evidence.md`,
+  `${reviewDir}/codex-public-longmemeval-run-target-review.md`,
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -1015,6 +1019,7 @@ check("release state is conservative", () => {
     "selfmem-update",
     "public-benchmark-source-lock",
     "public-benchmark-slice",
+    "public-longmemeval-run-target",
     "public-benchmark-target-author",
     "public-benchmark-target-check",
   ]) {
@@ -1259,6 +1264,10 @@ check("fresh public benchmark target check passes", () => {
   const result = run("node", ["packages/bench/public-benchmark-target-check.mjs"]);
   const markdown = run("node", ["packages/bench/public-benchmark-target-check.mjs", "--format", "markdown"]).stdout;
   const evidence = readFileSync(join(root, reviewDir, "public-benchmark-target-evidence.md"), "utf8");
+  const liveRunTargetPath = join(root, reviewDir, "public-longmemeval-run-target.json");
+  const liveRunTargetEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-run-target-evidence.md"), "utf8");
+  const liveRunTargetReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-run-target-check.json"), "utf8"));
+  const liveRunTargetReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-run-target-review.md"), "utf8");
   const authoredTarget = JSON.parse(authored.stdout);
   const report = JSON.parse(result.stdout);
   assert.equal(authoredTarget.fixtureOnly, true);
@@ -1287,6 +1296,32 @@ check("fresh public benchmark target check passes", () => {
   assert.match(evidence, /benchmark:public-target/);
   assert.match(evidence, /Component evidence is model-selection only/);
   assert.match(evidence, /same data, revision, split, labels, judge model, answer model, judge rule, and scoring setup/i);
+  assert.equal(liveRunTargetReport.ok, true);
+  assert.equal(liveRunTargetReport.fixtureOnly, false);
+  assert.equal(liveRunTargetReport.publicSliceRunReady, true);
+  assert.equal(liveRunTargetReport.targetReadyForCanary, false);
+  assert.equal(liveRunTargetReport.contract?.claimTier, "run-only");
+  assert.equal(liveRunTargetReport.contract?.benchmarkFamily, "longmemeval");
+  assert.equal(liveRunTargetReport.contract?.sameDataReady, true);
+  assert.equal(liveRunTargetReport.contract?.usesQuestionIdPolicy, true);
+  assert.equal(liveRunTargetReport.contract?.reportedTargetRequired, false);
+  assert.equal(liveRunTargetReport.contract?.reportedTargetReady, false);
+  assert.match(liveRunTargetEvidence, /Public slice run ready: true/);
+  assert.match(liveRunTargetEvidence, /Public benchmark claims allowed: false/);
+  assert.match(liveRunTargetEvidence, /same-data/i);
+  assert.match(liveRunTargetReview, /PASS WITH CONCERNS/);
+  assert.match(liveRunTargetReview, /fails `--strict`/);
+  assert.match(liveRunTargetReview, /Do not claim release readiness/i);
+  const liveRunTargetStrict = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", liveRunTargetPath, "--strict-run"]).stdout,
+  );
+  assert.equal(liveRunTargetStrict.publicSliceRunReady, true);
+  const strictRunOnlyComparison = spawnSync("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", liveRunTargetPath, "--strict"], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.notEqual(strictRunOnlyComparison.status, 0, "comparison strict mode must reject run-only targets");
   const strictFixture = spawnSync("node", ["packages/bench/public-benchmark-target-check.mjs", "--strict"], {
     cwd: root,
     encoding: "utf8",
@@ -1308,6 +1343,30 @@ check("fresh public benchmark target check passes", () => {
     const labelsPath = join(tempRoot, "labels.json");
     const scorerPath = join(tempRoot, "scorer.js");
     const authoredReadyPath = join(tempRoot, "authored-ready-target.json");
+    const authoredRunOnlyPath = join(tempRoot, "authored-run-only-target.json");
+    run("node", [
+      "packages/bench/public-benchmark-target-author.mjs",
+      "--slice-manifest",
+      join(root, reviewDir, "public-longmemeval-slice-evidence.json"),
+      "--claim-tier",
+      "run-only",
+      "--judge-model",
+      "gpt-4o",
+      "--answer-model",
+      "gpt-4o",
+      "--judge-rule",
+      "MemoryBench LongMemEval source-locked judge and scoring contract at commit 118209a746d97d0d85e5a7234267f0b6962857e9",
+      "--output",
+      authoredRunOnlyPath,
+    ]);
+    const authoredRunOnly = JSON.parse(
+      run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", authoredRunOnlyPath, "--strict-run"]).stdout,
+    );
+    assert.equal(authoredRunOnly.ok, true);
+    assert.equal(authoredRunOnly.fixtureOnly, false);
+    assert.equal(authoredRunOnly.publicSliceRunReady, true);
+    assert.equal(authoredRunOnly.targetReadyForCanary, false);
+    assert.equal(authoredRunOnly.contract?.usesQuestionIdPolicy, true);
     writeFileSync(questionIdsPath, "lme-001\nlme-002\n");
     writeFileSync(labelsPath, "{\"labels\":[\"a\",\"b\"]}\n");
     writeFileSync(scorerPath, "score_v1\n");
@@ -1484,11 +1543,17 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(markdown, secretPattern);
   assert.doesNotMatch(authoredMarkdown, secretPattern);
   assert.doesNotMatch(evidence, secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveRunTargetReport), secretPattern);
+  assert.doesNotMatch(liveRunTargetEvidence, secretPattern);
+  assert.doesNotMatch(liveRunTargetReview, secretPattern);
   assert.doesNotMatch(result.stdout, privatePathPattern);
   assert.doesNotMatch(authored.stdout, privatePathPattern);
   assert.doesNotMatch(markdown, privatePathPattern);
   assert.doesNotMatch(authoredMarkdown, privatePathPattern);
   assert.doesNotMatch(evidence, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(liveRunTargetReport), privatePathPattern);
+  assert.doesNotMatch(liveRunTargetEvidence, privatePathPattern);
+  assert.doesNotMatch(liveRunTargetReview, privatePathPattern);
 });
 
 check("fresh local session compaction audit passes", () => {

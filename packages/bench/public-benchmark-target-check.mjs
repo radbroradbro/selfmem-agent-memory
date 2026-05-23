@@ -8,6 +8,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const fixtureRequested = Boolean(args.fixture) || !args.target;
 const strict = Boolean(args.strict);
+const strictRun = Boolean(args.strictRun);
 const format = String(args.format ?? "json").toLowerCase();
 const targetPath = resolveInputPath(
   args.target ??
@@ -21,7 +22,7 @@ const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
-const claimTiers = new Set(["fixture", "canary-trend", "canary-trending-win", "public-benchmark", "broad-sota"]);
+const claimTiers = new Set(["fixture", "run-only", "canary-trend", "canary-trending-win", "public-benchmark", "broad-sota"]);
 const memoryBenchmarks = new Set(["memorybench", "longmemeval", "longmemeval-v2", "locomo", "convomem", "beam"]);
 const componentBenchmarks = new Set(["mteb", "mmteb", "beir", "miracl", "ms marco", "ms-marco", "reranker"]);
 const sha256Pattern = /^sha256:[a-f0-9]{64}$/i;
@@ -48,6 +49,14 @@ const targetReadyForCanary =
   contract.reportedTargetReady &&
   contract.componentEvidenceOnly &&
   contract.claimTier === "canary-trend";
+const publicSliceRunReady =
+  ok &&
+  !fixtureOnly &&
+  contract.benchmarkType === "memory" &&
+  contract.sameDataReady &&
+  contract.sourceLockReady &&
+  contract.componentEvidenceOnly &&
+  contract.claimTier === "run-only";
 
 const report = {
   ok,
@@ -62,6 +71,7 @@ const report = {
   rawMemoryIncluded: false,
   rawTranscriptIncluded: false,
   publicBenchmarkClaimsAllowed,
+  publicSliceRunReady,
   targetReadyForCanary,
   targetSummary: {
     targetIdHash: shortHash(target.targetId ?? target.id ?? "missing-target-id"),
@@ -72,14 +82,18 @@ const report = {
     sourceUrlHost: urlHost(target.benchmark?.sourceUrl ?? target.sourceUrl ?? ""),
     checkedAt: safeText(target.benchmark?.checkedAt ?? target.checkedAt ?? ""),
     questionIdCount: contract.questionIdCount,
+    usesQuestionIdPolicy: contract.usesQuestionIdPolicy,
     componentEvidenceCount: contract.componentEvidenceCount,
     metricCount: contract.metricCount,
+    reportedTargetRequired: contract.reportedTargetRequired,
+    reportedTargetReady: contract.reportedTargetReady,
   },
   hashes: {
     targetFileHash: `sha256:${stableHash(raw)}`,
     datasetRevisionHash: target.benchmark?.datasetRevision ? `sha256:${shortHash(target.benchmark.datasetRevision)}` : null,
     splitHash: target.benchmark?.split ? `sha256:${shortHash(target.benchmark.split)}` : null,
     questionIdsHash: contract.questionIdsHash,
+    questionIdPolicyHash: contract.questionIdPolicyHash,
     answerLabelsHash: normalizeHash(target.benchmark?.answerLabelsHash),
     scoringCodeHash: normalizeHash(target.benchmark?.scoringCodeHash),
   },
@@ -107,6 +121,7 @@ if (outputPath) {
 }
 process.stdout.write(serialized);
 if (strict && !targetReadyForCanary) process.exit(1);
+if (strictRun && !publicSliceRunReady) process.exit(1);
 
 function inspectTarget(target, fixtureOnly) {
   const benchmark = target.benchmark && typeof target.benchmark === "object" ? target.benchmark : {};
@@ -118,7 +133,9 @@ function inspectTarget(target, fixtureOnly) {
   const benchmarkFamily = normalizeBenchmarkName(benchmark.family ?? benchmarkName);
   const benchmarkType = String(target.benchmarkType ?? "").trim().toLowerCase();
   const claimTier = normalizeClaimTier(target.claimTier ?? (fixtureOnly ? "fixture" : ""));
+  const reportedTargetRequired = !fixtureOnly && !["fixture", "run-only"].includes(claimTier);
   const questionIds = Array.isArray(benchmark.questionIds) ? benchmark.questionIds.filter((item) => String(item).trim()) : [];
+  const questionIdPolicy = requiredString(benchmark.questionIdPolicy) ? String(benchmark.questionIdPolicy).trim() : "";
   const metrics = Array.isArray(benchmark.metrics) ? benchmark.metrics.filter((item) => String(item).trim()) : [];
   const componentEvidenceOnly = components.every((item) => {
     const claimUse = String(item?.claimUse ?? item?.claimUsage ?? "").trim().toLowerCase();
@@ -126,15 +143,15 @@ function inspectTarget(target, fixtureOnly) {
   });
   const componentBenchmarkOnly = benchmarkType === "component" || componentBenchmarks.has(benchmarkFamily);
   const memoryBenchmark = benchmarkType === "memory" && memoryBenchmarks.has(benchmarkFamily);
-  const sameJudgeModel = sameComparableText(benchmark.judgeModel, reportedTarget.judgeModel);
-  const sameAnswerModel = sameComparableText(benchmark.answerModel, reportedTarget.answerModel);
+  const sameJudgeModel = reportedTargetRequired ? sameComparableText(benchmark.judgeModel, reportedTarget.judgeModel) : true;
+  const sameAnswerModel = reportedTargetRequired ? sameComparableText(benchmark.answerModel, reportedTarget.answerModel) : true;
   const sameDataReady =
     memoryBenchmark &&
     requiredUrl(benchmark.sourceUrl) &&
     requiredDate(benchmark.checkedAt) &&
     requiredNonPlaceholderString(benchmark.datasetRevision) &&
     requiredNonPlaceholderString(benchmark.split) &&
-    (questionIds.length > 0 || requiredString(benchmark.questionIdPolicy)) &&
+    (questionIds.length > 0 || requiredString(questionIdPolicy)) &&
     requiredNonPlaceholderString(benchmark.answerLabelsRef) &&
     requiredSha256(benchmark.answerLabelsHash) &&
     requiredNonPlaceholderString(benchmark.judgeModel) &&
@@ -147,17 +164,18 @@ function inspectTarget(target, fixtureOnly) {
     metrics.length > 0;
   const reportedTargetReady =
     requiredNonPlaceholderString(reportedTarget.sourceName) &&
-    requiredUrl(reportedTarget.sourceUrl) &&
-    requiredDate(reportedTarget.checkedAt) &&
-    requiredNonPlaceholderString(reportedTarget.metricName) &&
-    Number.isFinite(Number(reportedTarget.score)) &&
-    requiredNonPlaceholderString(reportedTarget.judgeModel) &&
-    requiredNonPlaceholderString(reportedTarget.answerModel) &&
-    (Number.isFinite(Number(reportedTarget.tokenBudget)) || reportedTarget.tokenBudgetReported === false) &&
-    requiredNonPlaceholderString(reportedTarget.caveat);
+      requiredUrl(reportedTarget.sourceUrl) &&
+      requiredDate(reportedTarget.checkedAt) &&
+      requiredNonPlaceholderString(reportedTarget.metricName) &&
+      Number.isFinite(Number(reportedTarget.score)) &&
+      requiredNonPlaceholderString(reportedTarget.judgeModel) &&
+      requiredNonPlaceholderString(reportedTarget.answerModel) &&
+      (Number.isFinite(Number(reportedTarget.tokenBudget)) || reportedTarget.tokenBudgetReported === false) &&
+      requiredNonPlaceholderString(reportedTarget.caveat);
   return {
     benchmarkType,
     claimTier,
+    reportedTargetRequired,
     benchmarkFamily,
     memoryBenchmark,
     componentBenchmarkOnly,
@@ -178,7 +196,9 @@ function inspectTarget(target, fixtureOnly) {
     sameJudgeRule: comparability.sameJudgeRule === true,
     sameScoringCode: comparability.sameScoringCode === true,
     questionIdCount: questionIds.length,
+    usesQuestionIdPolicy: questionIds.length === 0 && requiredString(questionIdPolicy),
     questionIdsHash: questionIds.length > 0 ? `sha256:${shortHash(questionIds.join("\n"))}` : null,
+    questionIdPolicyHash: questionIdPolicy ? `sha256:${shortHash(questionIdPolicy)}` : null,
     metricCount: metrics.length,
     componentEvidenceCount: components.length,
     fullComparableBenchmarkCount: Number(target.fullComparableBenchmarkCount ?? 0),
@@ -193,7 +213,7 @@ function failedTargetChecks(contract) {
   if (!contract.memoryBenchmark) checks.push("memory-benchmark-family");
   if (!contract.sameDataReady) checks.push("same-data-fields");
   if (contract.claimTier !== "fixture" && !contract.sourceLockReady) checks.push("source-lock-attestation");
-  if (!contract.reportedTargetReady) checks.push("reported-target-fields");
+  if (contract.reportedTargetRequired && !contract.reportedTargetReady) checks.push("reported-target-fields");
   if (!contract.componentEvidenceOnly) checks.push("component-evidence-model-selection-only");
   if (!contract.metricDefinitionsMatch) checks.push("metric-definitions-match");
   if (!contract.sameDatasetSource) checks.push("same-dataset-source");
@@ -223,6 +243,13 @@ function nextActions({ ok, fixtureOnly, contract, failedChecks }) {
       "Keep MTEB/MMTEB/BEIR/MIRACL/MS MARCO evidence separate as model-arm selection evidence.",
     ];
   }
+  if (contract.claimTier === "run-only") {
+    return [
+      "Run RecallWeave on this source-locked public slice and attach metrics-only results.",
+      "Do not compare the result to a reported leader row until a canary-trend target with matching reported-target fields passes strict validation.",
+      "Keep MTEB/MMTEB/BEIR/MIRACL/MS MARCO evidence separate as model-arm selection evidence.",
+    ];
+  }
   if (contract.claimTier === "canary-trend") {
     return [
       "Run the source-locked canary slice and attach metrics-only results.",
@@ -244,6 +271,7 @@ function renderMarkdown(report) {
     `- Benchmark: ${report.targetSummary.benchmarkName}`,
     `- Benchmark type: ${report.targetSummary.benchmarkType}`,
     `- Claim tier: ${report.targetSummary.claimTier}`,
+    `- Public slice run ready: ${report.publicSliceRunReady}`,
     `- Target ready for canary: ${report.targetReadyForCanary}`,
     `- Public benchmark claims allowed: ${report.publicBenchmarkClaimsAllowed}`,
     `- Failed checks: ${report.failedChecks.length === 0 ? "none" : report.failedChecks.join(", ")}`,

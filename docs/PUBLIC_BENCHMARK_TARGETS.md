@@ -29,6 +29,16 @@ npm exec --yes pnpm@10.23.0 -- benchmark:source-lock -- --strict
 npm exec --yes pnpm@10.23.0 -- benchmark:public-slice -- --live \
   --output reviews/overnight-20260522/public-longmemeval-slice-evidence.json \
   --markdown-output reviews/overnight-20260522/public-longmemeval-slice-evidence.md
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
+  --slice-manifest reviews/overnight-20260522/public-longmemeval-slice-evidence.json \
+  --claim-tier run-only \
+  --judge-model gpt-4o \
+  --answer-model gpt-4o \
+  --judge-rule <source-locked-judge-rule> \
+  --output reviews/overnight-20260522/public-longmemeval-run-target.json
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --strict-run
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
 
@@ -66,6 +76,7 @@ question text, memory text, transcripts, private paths, or credentials.
 | Tier | Evidence | Allowed wording |
 | --- | --- | --- |
 | Fixture | Parser or UI fixture only. | "The harness shape works." |
+| Run only | A real source-locked benchmark slice is ready to run, but no reported comparison row is attached yet. | "RecallWeave can now run on the same public benchmark slice." |
 | Canary trend | RecallWeave beats a reported target on a small source-locked slice with matching metric definitions. | "The canary is trending toward a win against reported leaders." |
 | Public benchmark | Full or officially comparable benchmark run with source lock, metric parity, reviewer approval, and privacy scan. | "RecallWeave beat the reported target on this benchmark setup." |
 | Broad SOTA | Multiple full comparable benchmarks, same metric definitions, reviewer approval, and reproducible artifacts. | "RecallWeave is stronger across the tested benchmark suite." |
@@ -133,6 +144,11 @@ harness we will use.
   `sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518`.
   The manifest does not commit raw question ids, question text, answers,
   memories, or transcripts.
+- Current LongMemEval-S run target:
+  `reviews/overnight-20260522/public-longmemeval-run-target.json`. It is
+  generated from the slice manifest with `claimTier: run-only`; it passes
+  `benchmark:public-target -- --strict-run` and keeps comparison claims blocked
+  until a source-locked reported target row passes `--strict`.
 - LongMemEval is a strong target because it uses 500 human-curated questions and
   tests information extraction, multi-session reasoning, knowledge update,
   temporal reasoning, and abstention.

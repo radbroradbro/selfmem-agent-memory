@@ -66,16 +66,21 @@ Live status:
   answer-label hash
   `sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e`,
   and no raw question ids, question text, answers, memories, or transcripts.
+- Adds a real LongMemEval-S run-only target generated from that slice
+  manifest. It passes `benchmark:public-target -- --strict-run`, so
+  RecallWeave can run on the same public benchmark data now. It still blocks
+  public comparison claims until a source-locked reported target row passes
+  the stricter comparison gate.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
   data, revision, split, labels, judge model, answer model, judge rule, and scoring setup as the target row.
 - Adds `benchmark:source-lock`, `benchmark:public-slice`,
   `benchmark:public-target:author`, and `benchmark:public-target`, a
-  metrics-only source-lock, slice-manifest, plus
+  metrics-only source-lock, slice-manifest, run-only target mode, plus
   author-and-validator path for source-locked public benchmark target rows. It
-  keeps fixture targets and component-only leaderboard evidence from turning
-  into public memory-system claims.
+  keeps fixture targets, run-only targets, and component-only leaderboard
+  evidence from turning into public memory-system claims.
 - Hardens `baseline:source-match` for real local selfmem exports that contain
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and

@@ -68,9 +68,12 @@ too expensive for the next run.
    answer-label, and scoring-code hashes without raw question or answer text.
    If the target file does not exist yet, create it with
    `benchmark:public-target:author` from explicit source-lock fields rather
-   than by hand-editing JSON.
-   Then run `benchmark:public-target -- --target <target.json> --strict` so the
-   target cannot be confused with component-only evidence or a private fixture.
+   than by hand-editing JSON. Use `--claim-tier run-only` and `--strict-run`
+   when the slice is ready for RecallWeave but no source-locked reported target
+   row is attached yet. Then run
+   `benchmark:public-target -- --target <target.json> --strict` only after a
+   reported comparison row is attached, so the target cannot be confused with
+   component-only evidence or a private fixture.
 2. Freeze a small but real canary slice from MemoryBench, LongMemEval, LoCoMo,
    ConvoMem, BEAM, or another documented memory benchmark.
    Use the same public data, repository or dataset revision, split, labels,

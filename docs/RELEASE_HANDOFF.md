@@ -127,6 +127,18 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-slice -- --live \
   --markdown-output reviews/overnight-20260522/public-longmemeval-slice-evidence.md
 
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
+  --slice-manifest reviews/overnight-20260522/public-longmemeval-slice-evidence.json \
+  --claim-tier run-only \
+  --judge-model gpt-4o \
+  --answer-model gpt-4o \
+  --judge-rule <source-locked-judge-rule> \
+  --output reviews/overnight-20260522/public-longmemeval-run-target.json
+
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --strict-run
+
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
   --benchmark longmemeval \
   --source-url https://github.com/supermemoryai/memorybench \
   --dataset-revision <source-locked-commit-or-dataset-version> \
@@ -149,6 +161,10 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
 
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
+
+Use `--strict-run` for a real same-data run target without comparison claims.
+Use `--strict` only when a reported leaderboard or provider row is attached and
+the result will be compared.
 
 Run this before any hosted Supermemory comparison claim:
 

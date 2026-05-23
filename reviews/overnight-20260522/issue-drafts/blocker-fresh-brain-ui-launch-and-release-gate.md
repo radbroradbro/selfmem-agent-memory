@@ -119,6 +119,11 @@ requirements are resolved.
   answer-label hash
   `sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e`,
   and no raw question ids, question text, answers, memories, or transcripts.
+- Current public LongMemEval-S run-only target is generated from that slice
+  manifest and passes `benchmark:public-target -- --strict-run`. It is ready
+  for a RecallWeave run on the same public benchmark data, but it does not
+  permit public comparison claims until a source-locked reported target row
+  passes `--strict`.
 - Current benchmark plan also separates component model evidence from
   memory-system evidence. MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker
   leaderboards can choose model arms, but public RecallWeave claims still need
@@ -126,9 +131,9 @@ requirements are resolved.
   model, judge rule, and scoring setup as the target row.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
-  `benchmark:public-target`, a metrics-only source-lock, slice-manifest, plus
-  target author-and-validator path that checks source URL, dataset revision,
-  split, labels, judge model, answer model,
+  `benchmark:public-target`, a metrics-only source-lock, slice-manifest,
+  run-only target mode, plus target author-and-validator path that checks
+  source URL, dataset revision, split, labels, judge model, answer model,
   judge rule, scoring code, claim tier, and component-evidence boundaries
   before a public canary target can run.
 - Previous checked-in evidence refresh before source-gap:
