@@ -31,6 +31,7 @@ const requiredFiles = [
   "packages/bench/canary-evidence-packet-review.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/canary-next-agent-plan.mjs",
+  "packages/bench/canary-next-agent-packet.mjs",
   "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
   "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
@@ -161,6 +162,8 @@ const requiredFiles = [
   `${reviewDir}/canary-next-agent-plan-evidence.md`,
   `${reviewDir}/real-next-agent-openclaw-canary-plan.md`,
   `${reviewDir}/gemini-canary-next-agent-plan-review.md`,
+  `${reviewDir}/canary-next-agent-packet-evidence.md`,
+  `${reviewDir}/gemini-canary-next-agent-packet-review.md`,
   `${reviewDir}/gemini-adapter-store-latency-review.md`,
   `${reviewDir}/gemini-fresh-canary-window-review.md`,
   `${reviewDir}/claude-fresh-canary-window-review-blocked.md`,
@@ -285,6 +288,7 @@ const requiredScripts = [
   "canary:packet:review",
   "canary:batch-audit",
   "canary:next-agent",
+  "canary:next-agent-packet",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -1726,6 +1730,56 @@ check("fresh canary next-agent plan passes", () => {
   assert.doesNotMatch(markdownRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(realPlanEvidence, secretPattern);
   assert.doesNotMatch(realPlanEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  rmSync(tempRoot, { recursive: true, force: true });
+});
+
+check("fresh canary next-agent handoff packet passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-next-agent-packet-check-"));
+  const packetPath = join(tempRoot, "next-agent-handoff.zip");
+  const packetRun = run("node", ["packages/bench/canary-next-agent-packet.mjs", "--output", packetPath]);
+  const report = JSON.parse(packetRun.stdout);
+  const entries = run("unzip", ["-Z1", packetPath]).stdout.split(/\r?\n/).filter(Boolean).sort();
+  const manifest = JSON.parse(run("unzip", ["-p", packetPath, "manifest.json"]).stdout);
+  const readme = run("unzip", ["-p", packetPath, "README.md"]).stdout;
+  const markdown = run("unzip", ["-p", packetPath, "next-agent-plan.md"]).stdout;
+  const operator = run("unzip", ["-p", packetPath, "strict-real-operator-packet.md"]).stdout;
+  const evidence = readFileSync(join(root, reviewDir, "canary-next-agent-packet-evidence.md"), "utf8");
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-next-agent-packet-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "canary-next-agent-handoff-packet");
+  assert.equal(report.writesRealFiles, true);
+  assert.equal(report.publicSafe, true);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.publicLaunchAllowed, false);
+  assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(report.host, "hermes");
+  assert.equal(report.status, "FIXTURE_PLAN_ONLY");
+  assert.deepEqual(entries, [
+    "README.md",
+    "manifest.json",
+    "next-agent-plan.json",
+    "next-agent-plan.md",
+    "strict-real-operator-packet.md",
+  ]);
+  assert.equal(manifest.mode, "canary-next-agent-handoff-packet");
+  assert.equal(manifest.publicSafe, true);
+  assert.equal(manifest.metricsOnly, true);
+  assert.equal(manifest.publicLaunchAllowed, false);
+  assert.equal(manifest.fleetRolloutAllowed, false);
+  assert.equal(manifest.host, "hermes");
+  assert.match(readme, /one selected agent operator/i);
+  assert.match(readme, /Do not attach raw memories/i);
+  assert.match(markdown, /RecallWeave Next Agent Canary Plan/);
+  assert.match(markdown, /FRESH_WINDOW_START/);
+  assert.match(operator, /RecallWeave Strict-Real Canary Packet/);
+  assert.match(operator, /canary:intake/);
+  assert.match(evidence, /canary:next-agent-packet/i);
+  assert.match(evidence, /single public-safe zip/i);
+  assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+  for (const text of [packetRun.stdout, readme, markdown, operator, evidence]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  }
   rmSync(tempRoot, { recursive: true, force: true });
 });
 

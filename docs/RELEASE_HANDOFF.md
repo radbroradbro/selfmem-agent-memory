@@ -268,6 +268,18 @@ and fleet rollout blocked, selects the closest privacy-clean candidate, and
 prints only placeholder-based commands for dry-run, adapter apply, fresh-window
 collection, strict intake, diagnosis, and metrics-only packet packaging.
 
+When sending the handoff to another agent, prefer one packet over loose pasted
+commands:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --output /tmp/recallweave-next-agent-handoff.zip
+```
+
+The packet contains only README, manifest, next-agent plan JSON/Markdown, and
+strict-real operator instructions. It does not include raw diagnostics or memory
+content. The selected operator should return only the metrics-only canary report,
+intake JSON, optional diagnosis JSON, and canary evidence packet.
+
 Current Hermes and OpenClaw adapters use local-first bounded hosted
 read-through. They search hosted Supermemory when local results are thin or the
 query explicitly asks for old, legacy, hosted, or Supermemory history. To prove

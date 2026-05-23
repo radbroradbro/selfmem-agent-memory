@@ -110,6 +110,7 @@ evidence are still required before any public live update.
 | Canary mixed-folder triage | `packages/bench/canary-diagnostic-batch-audit.mjs`, `--allow-failed-inputs`, `reviews/overnight-20260522/canary-diagnostic-batch-audit-evidence.md`, `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Canary next-agent plan | `packages/bench/canary-next-agent-plan.mjs`, `reviews/overnight-20260522/canary-next-agent-plan-evidence.md`, `reviews/overnight-20260522/gemini-canary-next-agent-plan-review.md` |
 | Real OpenClaw next-agent handoff | `reviews/overnight-20260522/real-next-agent-openclaw-canary-plan.md`, selected from redacted metrics-only batch evidence |
+| Canary next-agent handoff packet | `packages/bench/canary-next-agent-packet.mjs`, `reviews/overnight-20260522/canary-next-agent-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-next-agent-packet-review.md` |
 | Fresh canary window isolation | `packages/bench/canary-report-from-trace.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/gemini-fresh-canary-window-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |

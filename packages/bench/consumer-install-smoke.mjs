@@ -24,6 +24,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-evidence-packet-review.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/canary-next-agent-plan.mjs",
+  "packages/bench/canary-next-agent-packet.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-comparison.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
@@ -61,6 +62,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["canary:packet:review"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:batch-audit"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:next-agent"], "string");
+  assert.equal(typeof packageJson.scripts?.["canary:next-agent-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:collect"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:export:recallweave"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:collect:recallweave"], "string");
@@ -92,6 +94,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-evidence-packet-review.mjs"], "canary evidence packet review"));
   checks.push(run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"], "canary diagnostic batch audit"));
   checks.push(run("node", ["packages/bench/canary-next-agent-plan.mjs"], "canary next agent plan"));
+  checks.push(run("node", ["packages/bench/canary-next-agent-packet.mjs"], "canary next agent handoff packet"));
   checks.push(run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture"], "hosted baseline collector"));
   checks.push(run("node", ["packages/bench/recallweave-response-export.mjs", "--fixture"], "RecallWeave response export"));
   checks.push(run("node", ["packages/bench/recallweave-baseline-collector.mjs", "--fixture"], "RecallWeave baseline collector"));
@@ -121,6 +124,7 @@ try {
     "packages/bench/canary-evidence-packet-review.mjs",
     "packages/bench/canary-diagnostic-batch-audit.mjs",
     "packages/bench/canary-next-agent-plan.mjs",
+    "packages/bench/canary-next-agent-packet.mjs",
     "packages/bench/baseline-scoring-contract.mjs",
     "packages/bench/baseline-comparison.mjs",
     "packages/bench/hosted-baseline-collector.mjs",
