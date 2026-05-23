@@ -33,6 +33,8 @@ The current PR adds:
 - a hosted baseline preflight for future Supermemory comparisons, offline by
   default and blocked from public score claims until a metrics-only live result
   is reviewed;
+- a read-only hosted baseline collector that emits aggregate metrics and hashes
+  only after explicit live opt-in and local environment credentials;
 - a canary evidence intake for sanitized one-agent runtime reports, blocked
   from fleet rollout and public launch when the report is only a fixture;
 - a canary report generator that converts Hermes/OpenClaw traces into the
@@ -99,9 +101,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `39feae5`
-- GitHub Actions: CI run `26318633036` passed for the hosted baseline
-  operator packet gate
+- Latest verified code baseline: `95f7fea`
+- GitHub Actions: CI run `26319050876` passed for the hosted baseline
+  collector gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -158,6 +160,10 @@ Latest verified head before this draft refresh:
   window isolation gate.
 - GitHub Actions CI run `26318633036` passed on `39feae5`, the hosted
   baseline operator packet gate.
+- GitHub Actions CI run `26318710488` passed on `adfd435`, the hosted
+  baseline operator packet evidence refresh.
+- GitHub Actions CI run `26319050876` passed on `95f7fea`, the hosted
+  baseline collector gate.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

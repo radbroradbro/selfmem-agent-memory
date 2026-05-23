@@ -9,7 +9,15 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `39feae5f825c045e681aa93f6e71b02ebf4b32c1`.
+- Latest code/product baseline: `95f7fea7519574427c7f26e94f00a1085f7c6fb2`.
+- GitHub Actions run `26319050876` passed CI after the hosted baseline
+  collector gate.
+- Previous code/product baseline before the hosted baseline collector:
+  `adfd4352d63810daecfa72a58ccb2c2641b89580`.
+- GitHub Actions run `26318710488` passed CI after the hosted baseline
+  operator packet evidence refresh.
+- Previous code/product baseline before the hosted baseline operator packet
+  evidence refresh: `39feae5f825c045e681aa93f6e71b02ebf4b32c1`.
 - GitHub Actions run `26318633036` passed CI after the hosted baseline
   operator packet gate.
 - Previous code/product baseline before the hosted baseline operator packet:

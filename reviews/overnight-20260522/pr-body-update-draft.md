@@ -15,7 +15,7 @@ Live status:
 - Adds the Nucleus Index contract for memory nodes, lifecycle events, retrieval traces, wiki pages, research questions, hypotheses, decisions, and evidence.
 - Adds LLM-wiki compile and vault sync flows with Obsidian-style frontmatter, wikilinks, provenance, linting, reviewed-page conflict handling, and content-free pre-write audit logging.
 - Adds the self-hosted Brain UI preview for graph browsing, research lineage, research source lock, model matrix, compaction audit, benchmark dashboard, canary rollout, context preview, release readiness, lifecycle trail, current-head live browser evidence, local audit, selected local-container browse, selected vault sync dry-run, selected vault sync apply, lifecycle policy preview, selected lifecycle policy apply, memory review queue preview, selected review queue apply, selected local memory edit, local edit overlay browse, selected local memory materialize, dynamic graph layout, graph navigation, and provenance/timeline inspection.
-- Adds `selfmem_update`, clean consumer smoke coverage, release blocker doctor, GitHub handoff packet, goal completion audit, hosted baseline preflight, a hosted baseline operator packet, canary evidence intake, canary report generator from trace/diagnostic exports, `canary:diagnose` remediation guidance for failed reports, and a public-safe canary operator packet. The updater now refuses `--strict-real` canary success unless a live mapped container or explicit diagnostic source produces a runtime report.
+- Adds `selfmem_update`, clean consumer smoke coverage, release blocker doctor, GitHub handoff packet, goal completion audit, hosted baseline preflight, a read-only hosted baseline collector, a hosted baseline operator packet, canary evidence intake, canary report generator from trace/diagnostic exports, `canary:diagnose` remediation guidance for failed reports, and a public-safe canary operator packet. The updater now refuses `--strict-real` canary success unless a live mapped container or explicit diagnostic source produces a runtime report.
 - Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
 - Adds real diagnostic canary evaluation evidence from two redacted external Hermes bundles. Both were metrics-only and privacy-clean, and both failed strict rollout intake, so they do not count as production rollout evidence.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
@@ -30,7 +30,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `39feae5f825c045e681aa93f6e71b02ebf4b32c1`.
+- Latest code/product baseline: `95f7fea7519574427c7f26e94f00a1085f7c6fb2`.
+- GitHub Actions run `26319050876`: passed CI after the hosted baseline collector gate.
+- Previous verified baseline before the hosted baseline collector:
+  `adfd4352d63810daecfa72a58ccb2c2641b89580`.
+- GitHub Actions run `26318710488`: passed CI after the hosted baseline operator packet evidence refresh.
+- Previous verified baseline before the hosted baseline operator packet:
+  `39feae5f825c045e681aa93f6e71b02ebf4b32c1`.
 - GitHub Actions run `26318633036`: passed CI after the hosted baseline operator packet gate.
 - Previous verified baseline before the hosted baseline operator packet:
   `2b7fc92d43e1aeff1211dba7eb0c5727bce2fd7b`.
