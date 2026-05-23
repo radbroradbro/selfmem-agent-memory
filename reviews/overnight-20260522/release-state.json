@@ -83,6 +83,7 @@
     "baseline-queryset-inspect",
     "hosted-baseline-discovery",
     "hosted-baseline-live-discovery",
+    "hosted-baseline-container-select",
     "hosted-baseline-collector",
     "recallweave-response-export",
     "recallweave-baseline-collector",
@@ -158,6 +159,14 @@
       "route": "gemini --skip-trust --approval-mode plan",
       "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-live-discovery-review.md",
       "completedAt": "2026-05-23T08:00:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "hostedBaselineContainerSelect": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini embedded public-safe slice review",
+      "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-container-select-review.md",
+      "completedAt": "2026-05-23T09:20:00Z",
       "countsAsPublicLaunchApproval": false
     },
     "hostedBaselineNextRunRequireReady": {

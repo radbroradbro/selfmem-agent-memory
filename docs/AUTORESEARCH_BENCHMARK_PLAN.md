@@ -54,7 +54,11 @@ cookies, or bearer tokens.
 Before collection, `baseline:discover -- --live` may be used as a safe metadata
 step when the source container is unknown. A public discovery report may show
 hashed candidate ids and counts only. It does not count as a hosted baseline
-and does not support benchmark language.
+and does not support benchmark language. If a raw hosted label is needed, use
+the private-map discovery flow outside the repository, then run
+`baseline:select-container` to write the selected label into a 0600 private env
+file without printing it. The private map and env file are local operator
+material only.
 
 The fixture path proves that the result shape is parseable. It must never count
 as hosted baseline evidence, even if all metrics fields are present. Use

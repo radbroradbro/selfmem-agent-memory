@@ -18,6 +18,7 @@ const comparisonPath = "/tmp/recallweave-baseline-comparison.json";
 const preflightPath = "/tmp/recallweave-hosted-baseline-preflight.json";
 const discoveryPath = "/tmp/recallweave-hosted-baseline-discovery.json";
 const privateContainerMapPath = "/tmp/recallweave-hosted-container-map.private.jsonl";
+const privateContainerEnvPath = "/tmp/recallweave-hosted-baseline.private.env";
 const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
 const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
 const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
@@ -39,6 +40,7 @@ const packet = {
     preflightPath,
     discoveryPath,
     privateContainerMapPath,
+    privateContainerEnvPath,
     templatePath,
     querySetPath,
     querySetReportPath,
@@ -64,6 +66,16 @@ const packet = {
       ].join(" "),
     },
     {
+      id: "select-private-container",
+      description: "Local-only step: select one hashed candidate into a sourceable 0600 env file without printing the raw label.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:select-container --",
+        `--discovery ${discoveryPath}`,
+        `--private-map ${privateContainerMapPath}`,
+        `--env-output ${privateContainerEnvPath}`,
+      ].join(" "),
+    },
+    {
       id: "print-template",
       description: "Print the exact aggregate-only result schema before any hosted run.",
       command: `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output ${templatePath}`,
@@ -82,9 +94,9 @@ const packet = {
       id: "collect-live-result",
       description: "Run read-only hosted search through the metrics-only collector. SUPERMEMORY_API_KEY must already be set in the local environment.",
       command: [
+        `. ${privateContainerEnvPath} &&`,
         "RECALLWEAVE_BASELINE_LIVE=1",
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
-        "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label>",
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
         "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
@@ -97,9 +109,9 @@ const packet = {
       id: "validate-live-result",
       description: "Validate the metrics-only result after collection.",
       command: [
+        `. ${privateContainerEnvPath} &&`,
         "RECALLWEAVE_BASELINE_LIVE=1",
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
-        "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label>",
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
         "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
@@ -176,6 +188,7 @@ const packet = {
     "resultInspection.hasCostLatency is true",
     "baseline discovery output contains hashed container candidates only",
     "private container map, if created, stays local and is not attached",
+    "private env file, if created, stays local and is not attached",
     "matchedRecallWeaveRunPresent is true before comparison claims",
     "RecallWeave result provider is recallweave",
     "RecallWeave result shares dataset, query-set hash, scoring-code hash, judge model, and answer model",
@@ -204,6 +217,7 @@ const packet = {
     "unredacted diagnostic archives",
     "raw RecallWeave response exports that contain memory text",
     "private container map",
+    "private hosted baseline env file",
   ],
   operatorMessage: buildMarkdown(),
 };
@@ -244,12 +258,21 @@ function buildMarkdown() {
     `npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output ${discoveryPath}`,
     "```",
     "",
-    "Optional local-only step: write a private raw-label map outside git, then use that map to set `RECALLWEAVE_BASELINE_CONTAINER`. Do not attach this file.",
+    "Optional local-only step: write a private raw-label map outside git, then select one hashed candidate into a private env file. Do not attach either file.",
     "",
     "```bash",
     "RECALLWEAVE_BASELINE_LIVE=1 \\",
     "RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1 \\",
     `npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output ${discoveryPath} --private-map-output ${privateContainerMapPath}`,
+    "```",
+    "",
+    "Then write the selected raw label into a sourceable private env file without printing it:",
+    "",
+    "```bash",
+    "npm exec --yes pnpm@10.23.0 -- baseline:select-container -- \\",
+    `  --discovery ${discoveryPath} \\`,
+    `  --private-map ${privateContainerMapPath} \\`,
+    `  --env-output ${privateContainerEnvPath}`,
     "```",
     "",
     "Prepare a source-locked query set locally at this path:",
@@ -267,9 +290,9 @@ function buildMarkdown() {
     "Then run the read-only hosted collector. Set `SUPERMEMORY_API_KEY` in the local environment first; do not paste it into the command or any attachment.",
     "",
     "```bash",
+    `. ${privateContainerEnvPath}`,
     "RECALLWEAVE_BASELINE_LIVE=1 \\",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \\",
-    "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label> \\",
     `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
     "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id> \\",
     "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
@@ -281,9 +304,9 @@ function buildMarkdown() {
     "Then validate the aggregate-only result:",
     "",
     "```bash",
+    `. ${privateContainerEnvPath}`,
     "RECALLWEAVE_BASELINE_LIVE=1 \\",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \\",
-    "RECALLWEAVE_BASELINE_CONTAINER=<hosted-container-label> \\",
     `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
     "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id> \\",
     "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
@@ -356,7 +379,7 @@ function buildMarkdown() {
     "",
     ...packetAcceptanceLines(),
     "",
-    "Do not attach provider keys, raw hosted memories, raw local memories, raw RecallWeave response exports containing memory text, transcripts, prompts, answers, cookies, bearer tokens, private local paths, private container maps, or unredacted diagnostic archives.",
+    "Do not attach provider keys, raw hosted memories, raw local memories, raw RecallWeave response exports containing memory text, transcripts, prompts, answers, cookies, bearer tokens, private local paths, private container maps, private env files, or unredacted diagnostic archives.",
   ].join("\n");
 }
 
@@ -375,7 +398,7 @@ function discoveryMarkdownLines() {
     "- Raw memory included: no",
     "- Privacy leaks: 0",
     "",
-    "Use the optional private-map command only on the local operator machine to translate a hashed candidate into the raw hosted label. Do not attach that private map.",
+    "Use the optional private-map and selector commands only on the local operator machine to translate a hashed candidate into a private env file. Do not attach that private map or env file.",
     "",
   ];
 }
@@ -394,6 +417,7 @@ function packetAcceptanceLines() {
     "- querySetEvidence.publicBenchmarkReady is true for both runs",
     "- baseline discovery output contains hashed container candidates only",
     "- private container maps stay local and are not attached",
+    "- private hosted baseline env files stay local and are not attached",
     "- matched RecallWeave result shares query-set and scoring-code hashes",
     "- cost and latency fields present",
     "- matched RecallWeave run, two reviewer approvals, and RecallWeave win before public comparison claims",

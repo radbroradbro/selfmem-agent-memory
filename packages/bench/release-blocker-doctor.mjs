@@ -159,7 +159,7 @@ const blockerReport = [
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
     evidence: "hosted-baseline-live-discovery-evidence.md",
-    nextAction: "Live hosted discovery succeeded with hashed candidates only. Use the private-map flow outside the repository to choose the raw label, prepare the source-locked query set, run `baseline:collect -- --live --output <hosted-result>` for hosted, run `baseline:export:recallweave -- --live --output <metrics-only-export>` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export> --output <recallweave-result>`, validate with `baseline:preflight -- --result <hosted-result> --output <preflight>` and `baseline:compare -- --hosted <hosted-result> --recallweave <recallweave-result> --output <comparison>`, then run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` before packaging and reviewing the returned metrics-only zip with `baseline:packet` and `baseline:returned-packet -- --require-production-baseline`.",
+    nextAction: "Live hosted discovery succeeded with hashed candidates only. Use the private-map flow outside the repository, then run `baseline:select-container` to choose the raw label into a local-only env file without printing it. Prepare the source-locked query set, run `baseline:collect -- --live --output <hosted-result>` for hosted, run `baseline:export:recallweave -- --live --output <metrics-only-export>` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export> --output <recallweave-result>`, validate with `baseline:preflight -- --result <hosted-result> --output <preflight>` and `baseline:compare -- --hosted <hosted-result> --recallweave <recallweave-result> --output <comparison>`, then run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` before packaging and reviewing the returned metrics-only zip with `baseline:packet` and `baseline:returned-packet -- --require-production-baseline`.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -255,6 +255,9 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output /tmp/recallweave-hosted-baseline-template.json",
+        "RECALLWEAVE_BASELINE_LIVE=1 npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output /tmp/recallweave-hosted-baseline-discovery.json",
+        "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1 npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output /tmp/recallweave-hosted-baseline-discovery.json --private-map-output /tmp/recallweave-hosted-container-map.private.jsonl",
+        "npm exec --yes pnpm@10.23.0 -- baseline:select-container -- --discovery /tmp/recallweave-hosted-baseline-discovery.json --private-map /tmp/recallweave-hosted-container-map.private.jsonl --env-output /tmp/recallweave-hosted-baseline.private.env",
         "npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture",

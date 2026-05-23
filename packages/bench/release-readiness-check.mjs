@@ -54,6 +54,7 @@ const requiredFiles = [
   "packages/bench/session-compaction-local-batch-audit.mjs",
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/hosted-baseline-discovery.mjs",
+  "packages/bench/hosted-baseline-container-select.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-queryset-inspect.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
@@ -186,6 +187,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-queryset-inspect-review.md`,
   `${reviewDir}/hosted-baseline-discovery-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-discovery-review.md`,
+  `${reviewDir}/hosted-baseline-container-select-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-container-select-review.md`,
   `${reviewDir}/hosted-baseline-live-discovery.json`,
   `${reviewDir}/hosted-baseline-live-discovery-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-live-discovery-review.md`,
@@ -317,6 +320,7 @@ const requiredScripts = [
   "canary:next-agent-packet",
   "baseline:queryset",
   "baseline:discover",
+  "baseline:select-container",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -984,6 +988,7 @@ check("release handoff documents blocked launch path", () => {
   assert.match(text, /handoff packet/i);
   assert.match(text, /release:github-sync/);
   assert.match(text, /live GitHub sync|GitHub live sync/i);
+  assert.match(text, /baseline:select-container/);
   assert.match(text, /one-agent canary/i);
   assert.match(text, /Do not paste private diagnostics/);
 });
@@ -1940,7 +1945,9 @@ check("fresh release blocker doctor passes", () => {
   const report = JSON.parse(doctorRun.stdout);
   const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
+  assert.match(hostedBlocker.nextAction, /baseline:select-container/);
   assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
+  assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
   assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --require-ready/);
   assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--require-ready/.test(item)));
@@ -1951,6 +1958,9 @@ check("fresh hosted baseline preflight passes", () => {
   const querySetReportPath = join(collectorTmp, "queryset-report.json");
   const discoveryResultPath = join(collectorTmp, "hosted-baseline-discovery.json");
   const discoveryPrivateMapPath = join(collectorTmp, "hosted-baseline-container-map.private.jsonl");
+  const selectedContainerEnvPath = join(collectorTmp, "hosted-baseline.private.env");
+  const selectedContainerReportPath = join(collectorTmp, "hosted-baseline-container-select.json");
+  const selectedContainerInsideRepoPath = join(root, ".tmp-hosted-baseline.private.env");
   const collectorResultPath = join(collectorTmp, "collector-result.json");
   const recallWeaveResultPath = join(collectorTmp, "recallweave-result.json");
   const recallWeaveExportPath = join(collectorTmp, "recallweave-export.json");
@@ -1999,6 +2009,34 @@ check("fresh hosted baseline preflight passes", () => {
         ...process.env,
         RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS: "1",
       },
+    },
+  );
+  const containerSelectResult = run("node", [
+    "packages/bench/hosted-baseline-container-select.mjs",
+    "--discovery",
+    discoveryResultPath,
+    "--private-map",
+    discoveryPrivateMapPath,
+    "--env-output",
+    selectedContainerEnvPath,
+    "--output",
+    selectedContainerReportPath,
+  ]);
+  const containerSelectInsideRepoResult = spawnSync(
+    "node",
+    [
+      "packages/bench/hosted-baseline-container-select.mjs",
+      "--discovery",
+      discoveryResultPath,
+      "--private-map",
+      discoveryPrivateMapPath,
+      "--env-output",
+      selectedContainerInsideRepoPath,
+    ],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
     },
   );
   const fixtureResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--fixture"]);
@@ -2194,6 +2232,7 @@ check("fresh hosted baseline preflight passes", () => {
   const querySetReport = JSON.parse(querySetInspectResult.stdout);
   const discoveryReport = JSON.parse(discoveryResult.stdout);
   const privateMapDiscoveryReport = JSON.parse(privateMapDiscoveryResult.stdout);
+  const containerSelectReport = JSON.parse(containerSelectResult.stdout);
   const fixtureReport = JSON.parse(fixtureResult.stdout);
   const templateReport = JSON.parse(templateResult.stdout);
   const collectorReport = JSON.parse(collectorResult.stdout);
@@ -2218,6 +2257,8 @@ check("fresh hosted baseline preflight passes", () => {
   const querySetGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-queryset-inspect-review.md"), "utf8");
   const discoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-discovery-evidence.md"), "utf8");
   const discoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-discovery-review.md"), "utf8");
+  const containerSelectEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-container-select-evidence.md"), "utf8");
+  const containerSelectGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-container-select-review.md"), "utf8");
   const liveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
   const liveDiscoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
   const liveDiscoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-discovery-review.md"), "utf8");
@@ -2283,6 +2324,29 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(privateMapDiscoveryResult.stdout, /fixture-personal|fixture-agent/);
   assert.doesNotMatch(discoveryResult.stdout, secretPattern);
   assert.doesNotMatch(privateMapDiscoveryResult.stdout, secretPattern);
+  assert.equal(containerSelectReport.mode, "hosted-baseline-container-select");
+  assert.equal(containerSelectReport.fixtureOnly, true);
+  assert.equal(containerSelectReport.callsHostedProvider, false);
+  assert.equal(containerSelectReport.metricsOnly, true);
+  assert.equal(containerSelectReport.publicSafe, true);
+  assert.equal(containerSelectReport.rawLabelsIncluded, false);
+  assert.equal(containerSelectReport.rawMemoryIncluded, false);
+  assert.equal(containerSelectReport.privateEnv?.written, true);
+  assert.equal(containerSelectReport.privateEnv?.mode, "0600");
+  assert.equal(containerSelectReport.privateEnv?.containsRawLabels, true);
+  assert.equal(containerSelectReport.privateEnv?.attachToPublicEvidence, false);
+  assert.equal(containerSelectReport.selectedCandidate?.candidateId, discoveryReport.recommendedCandidateId);
+  assert.equal(containerSelectReport.selectedCandidate?.rawLabelLength, "fixture-personal".length);
+  assert.equal(statSync(selectedContainerEnvPath).mode & 0o777, 0o600);
+  const selectedContainerEnv = readFileSync(selectedContainerEnvPath, "utf8");
+  assert.match(selectedContainerEnv, /RECALLWEAVE_BASELINE_CONTAINER='fixture-personal'/);
+  assert.match(selectedContainerEnv, /RECALLWEAVE_BASELINE_LIVE=1/);
+  assert.doesNotMatch(containerSelectResult.stdout, /fixture-personal|fixture-agent/);
+  assert.doesNotMatch(readFileSync(selectedContainerReportPath, "utf8"), /fixture-personal|fixture-agent/);
+  assert.doesNotMatch(containerSelectResult.stdout, secretPattern);
+  assert.doesNotMatch(containerSelectResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.notEqual(containerSelectInsideRepoResult.status, 0);
+  assert.match(`${containerSelectInsideRepoResult.stderr}\n${containerSelectInsideRepoResult.stdout}`, /outside the repository/);
   assert.equal(fixtureReport.resultInspection?.fixtureOnly, true);
   assert.deepEqual(fixtureReport.resultInspection?.failedResultChecks, ["not-fixture"]);
   assert.equal(fixtureReport.countsAsHostedBaselineEvidence, false);
@@ -2479,6 +2543,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorDiscoveryPacket.liveDiscovery?.candidateIds?.every((id) => /^c_[a-f0-9]{16}$/.test(id)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "print-template" && /baseline:preflight/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
@@ -2500,6 +2565,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorMarkdown.stdout, /RecallWeave Hosted Baseline Packet/);
   assert.match(operatorMarkdown.stdout, /baseline:discover/);
   assert.match(operatorMarkdown.stdout, /private raw-label map/i);
+  assert.match(operatorMarkdown.stdout, /baseline:select-container/);
   assert.match(operatorMarkdown.stdout, /baseline:queryset/);
   assert.match(operatorMarkdown.stdout, /baseline:export:recallweave/);
   assert.match(operatorMarkdown.stdout, /baseline:packet/);
@@ -2529,6 +2595,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(nextRunPlan.acceptanceCriteria?.includes("every query has at least one expected result id or expected content hash"));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "collect-hosted-baseline" && /baseline:collect/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
@@ -2546,6 +2613,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(nextRunMarkdown.stdout, /Planner authorizes public claims: no/);
   assert.match(nextRunMarkdown.stdout, /baseline:next-run/);
   assert.match(nextRunMarkdown.stdout, /baseline:discover/);
+  assert.match(nextRunMarkdown.stdout, /baseline:select-container/);
   assert.match(nextRunMarkdown.stdout, /private container maps/i);
   assert.notEqual(nextRunRequireReadyFixture.status, 0);
   assert.equal(nextRunRequireReadyFixtureReport.ok, false);
@@ -2595,6 +2663,11 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(discoveryEvidence, /Raw labels included.*no/i);
   assert.match(discoveryEvidence, /Private map mode:\s*`0600`/i);
   assert.match(discoveryGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(containerSelectEvidence, /hosted baseline container selector/i);
+  assert.match(containerSelectEvidence, /baseline:select-container/i);
+  assert.match(containerSelectEvidence, /Private env mode:\s*`0600`/i);
+  assert.match(containerSelectEvidence, /Raw labels included.*no/i);
+  assert.match(containerSelectGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
   assert.equal(liveDiscoveryReport.mode, "hosted-baseline-discovery");
   assert.equal(liveDiscoveryReport.fixtureOnly, false);
   assert.equal(liveDiscoveryReport.callsHostedProvider, true);
@@ -2646,6 +2719,11 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(collectorPreflightResult.stdout, secretPattern);
   assert.doesNotMatch(discoveryEvidence, secretPattern);
   assert.doesNotMatch(discoveryGeminiReview, secretPattern);
+  assert.doesNotMatch(containerSelectResult.stdout, secretPattern);
+  assert.doesNotMatch(containerSelectEvidence, secretPattern);
+  assert.doesNotMatch(containerSelectGeminiReview, secretPattern);
+  assert.doesNotMatch(containerSelectEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(containerSelectGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), secretPattern);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(liveDiscoveryEvidence, secretPattern);

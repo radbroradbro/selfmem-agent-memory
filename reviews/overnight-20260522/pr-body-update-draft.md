@@ -188,6 +188,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture`: passed, producing metrics-only RecallWeave baseline collector output with the same query-set and scoring-code hashes.
 - `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture`: passed, proving matched comparison checks stay metrics-only and fixture-blocked.
 - `npm exec --yes pnpm@10.23.0 -- baseline:operator-packet`: passed, producing a public-safe hosted baseline handoff without calling a hosted provider.
+- `npm exec --yes pnpm@10.23.0 -- baseline:select-container`: passed in fixture smoke and live metadata-only selector smoke, writing the selected raw hosted label only to a 0600 private env file while stdout/public reports kept raw labels out.
 - `npm exec --yes pnpm@10.23.0 -- baseline:next-run`: passed, producing a state-aware hosted-baseline next-run plan that keeps fixture evidence as `FIXTURE_PLAN_ONLY` and does not authorize public claims.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet`: passed and produced a metrics-only zip with no hosted memories, local memories, transcripts, prompts, answers, keys, or private paths.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet:review`: passed on fixture packet review and kept fixture evidence from counting.

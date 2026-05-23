@@ -363,6 +363,26 @@ means owner-review ready, not public-launch ready.
 Both commands call no hosted provider. They print aggregate-only collection
 contracts and validation commands. The actual read-only collection command is:
 
+If the correct hosted container is unknown, first create the public discovery
+report and private raw-label map outside the repository, then select the
+candidate into a private env file without printing the label:
+
+```bash
+RECALLWEAVE_BASELINE_LIVE=1 \
+RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:discover \
+  -- --live --output /tmp/recallweave-hosted-baseline-discovery.json \
+  --private-map-output /tmp/recallweave-hosted-container-map.private.jsonl
+
+npm exec --yes pnpm@10.23.0 -- baseline:select-container \
+  -- --discovery /tmp/recallweave-hosted-baseline-discovery.json \
+  --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
+  --env-output /tmp/recallweave-hosted-baseline.private.env
+```
+
+Then source `/tmp/recallweave-hosted-baseline.private.env` locally before the
+hosted collector. Do not attach that env file or the private map.
+
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json
 ```

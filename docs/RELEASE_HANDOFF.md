@@ -86,6 +86,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 npm exec --yes pnpm@10.23.0 -- baseline:discover
+npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -117,7 +118,10 @@ documents but the correct source container is unknown. It prints hashed
 container candidates only. To recover the raw label locally, set
 `RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1` and pass `--private-map-output`
 to a path outside the repository. The private map is local operator material,
-not reviewer or GitHub evidence.
+not reviewer or GitHub evidence. Then run `baseline:select-container` with the
+public discovery report and private map. It writes the selected raw label into a
+0600 private env file without printing the label. Source that env file locally
+before `baseline:collect`, and never attach it to public evidence.
 You may attach a public-safe live discovery report when it contains only hashed
 candidate ids, counts, timestamps, status/type counts, and privacy flags. That
 report proves metadata access and candidate discovery only. It does not close

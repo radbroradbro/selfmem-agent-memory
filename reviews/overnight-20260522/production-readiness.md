@@ -78,6 +78,8 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Hosted baseline operator packet that gives agents a public-safe,
   aggregate-only hosted Supermemory baseline handoff without calling a hosted
   provider.
+- Hosted baseline container selector that keeps raw hosted labels in a
+  local-only 0600 env file and keeps public reports hash-and-metrics only.
 - Baseline evidence packet that turns hosted result, RecallWeave result,
   matched comparison, and preflight output into one metrics-only reviewer zip
   and fails closed for fixtures under `--strict-real`.

@@ -12,6 +12,8 @@ Scope:
   state into one state-aware next-run packet.
 - The planner now includes the same safe hosted-container discovery and
   private-map opt-in flow as the operator packet.
+- The planner now includes `baseline:select-container`, which writes the chosen
+  raw hosted label into a local-only 0600 env file without printing it.
 - The planner now includes `validate-query-set`, which runs
   `baseline:queryset --strict` and writes a metrics-only query-set report before
   hosted or local collection.
@@ -44,7 +46,7 @@ Observed fixture-plan output:
   "readyForOwnerReview": false,
   "requireReadyPassed": true,
   "plannerAuthorizesPublicClaims": false,
-  "commandCount": 10,
+  "commandCount": 12,
   "privacyLeakCount": 0,
   "sameQuerySet": true
 }
@@ -95,16 +97,16 @@ Expected behavior:
 - `release:check` covers the fixture failure path, doctor next-action command,
   and secret/private-path absence in the fail-closed output.
 - The command plan includes hosted container discovery, optional local-only
-  private map creation, query-set validation, hosted collection, hosted
-  validation, RecallWeave export, RecallWeave aggregate collection, matched
-  comparison, and strict-real evidence packaging.
+  private map creation, private env selection, query-set validation, hosted
+  collection, hosted validation, RecallWeave export, RecallWeave aggregate
+  collection, matched comparison, and strict-real evidence packaging.
 - Acceptance criteria require every query to have at least one expected result
   id or expected content hash, with `querySetEvidence.publicBenchmarkReady`
   true for both result files.
 - It forbids provider keys, raw hosted memories, raw local memories,
   transcripts, prompts, answers, cookies, bearer tokens, private local paths,
-  private container maps, unredacted diagnostics, and raw RecallWeave exports
-  containing memory text.
+  private container maps, private env files, unredacted diagnostics, and raw
+  RecallWeave exports containing memory text.
 - Clean-consumer smoke now runs the planner from a packaged checkout without
   `.git` metadata and reports zero forbidden runtime files and zero secret
   hits.

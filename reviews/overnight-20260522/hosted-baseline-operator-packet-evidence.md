@@ -13,6 +13,8 @@ Scope:
   hosted source containers without exposing raw hosted labels or memory text.
 - The packet documents the optional private map flow and states that the
   private map stays local and must not be attached.
+- The packet now includes `baseline:select-container` so the chosen raw hosted
+  label is written to a 0600 private env file without printing the label.
 - The packet now includes `baseline:queryset --strict` before collection so
   operators can attach a metrics-only query-set report without exposing raw
   query text or expected ids.
@@ -36,6 +38,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --discovery reviews/overnight-20260522/hosted-baseline-live-discovery.json --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:discover
+npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
@@ -58,7 +61,7 @@ Expected behavior:
   discover candidate hosted containers, collect, and validate aggregate-only
   hosted and RecallWeave results.
 - It tells operators that discovery output may be attached but private raw-label
-  maps must stay local.
+  maps and private env files must stay local.
 - It tells operators to create a local RecallWeave search export with
   `baseline:export:recallweave`, then convert that export into a metrics-only
   result before comparison.
@@ -89,7 +92,7 @@ Expected behavior:
 - It forbids provider keys, raw hosted memories, raw RecallWeave response
   exports containing memory text, raw local memories, transcripts, prompts,
   answers, cookies, bearer tokens, private local paths, private container maps,
-  and unredacted
+  private env files, and unredacted
   diagnostic archives.
 
 Boundary:

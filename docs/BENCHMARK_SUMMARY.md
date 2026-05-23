@@ -29,8 +29,10 @@ It lists candidate containers as hashed ids, counts, timestamps, and status/type
 counts only. It does not print raw container labels or memory text. Operators
 who need the raw label can opt into a local-only private map with
 `RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1` and `--private-map-output`, then
-copy the selected label into `RECALLWEAVE_BASELINE_CONTAINER` on that machine.
-Do not attach the private map to public evidence.
+run `baseline:select-container` to write the selected label into a local-only
+0600 env file without printing it. Source that env file on the operator machine
+before collection. Do not attach the private map or private env file to public
+evidence.
 
 The latest live discovery on 2026-05-23 found 4 hashed candidate containers
 across 100 hosted documents, with no raw labels or memory text in the report.

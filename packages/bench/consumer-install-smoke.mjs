@@ -29,6 +29,7 @@ const extraCurrentFiles = [
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-queryset-inspect.mjs",
   "packages/bench/hosted-baseline-discovery.mjs",
+  "packages/bench/hosted-baseline-container-select.mjs",
   "packages/bench/baseline-comparison.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
   "packages/bench/recallweave-response-export.mjs",
@@ -71,6 +72,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["canary:next-agent-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:queryset"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:discover"], "string");
+  assert.equal(typeof packageJson.scripts?.["baseline:select-container"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:collect"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:export:recallweave"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:collect:recallweave"], "string");
@@ -109,6 +111,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-next-agent-packet.mjs"], "canary next agent handoff packet"));
   checks.push(run("node", ["packages/bench/baseline-queryset-inspect.mjs"], "baseline query-set inspect"));
   checks.push(run("node", ["packages/bench/hosted-baseline-discovery.mjs"], "hosted baseline discovery"));
+  checks.push(run("node", ["packages/bench/hosted-baseline-container-select.mjs"], "hosted baseline container selector"));
   checks.push(run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture"], "hosted baseline collector"));
   checks.push(run("node", ["packages/bench/recallweave-response-export.mjs", "--fixture"], "RecallWeave response export"));
   checks.push(run("node", ["packages/bench/recallweave-baseline-collector.mjs", "--fixture"], "RecallWeave baseline collector"));
@@ -149,6 +152,7 @@ try {
     "packages/bench/baseline-scoring-contract.mjs",
     "packages/bench/baseline-queryset-inspect.mjs",
     "packages/bench/hosted-baseline-discovery.mjs",
+    "packages/bench/hosted-baseline-container-select.mjs",
     "packages/bench/baseline-comparison.mjs",
     "packages/bench/hosted-baseline-collector.mjs",
     "packages/bench/recallweave-response-export.mjs",

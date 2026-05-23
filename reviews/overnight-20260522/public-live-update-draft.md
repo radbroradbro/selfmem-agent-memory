@@ -149,6 +149,9 @@ Latest verified head before this draft refresh:
 - Hosted baseline operator packet: `baseline:operator-packet` prints a
   public-safe handoff for aggregate-only hosted Supermemory baseline collection
   and calls no hosted provider
+- Hosted baseline selector: `baseline:select-container` converts a hashed
+  hosted candidate plus local-only private map into a 0600 private env file
+  without printing the raw label
 - Baseline evidence packet: `baseline:packet` creates a metrics-only hosted
   baseline reviewer zip and fails closed for fixture strict-real evidence
 - Canary evidence intake: `canary:intake` passes on the public fixture with
