@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "3c9ef0806e5a454783140e1ac821b40edd5776cf",
-    "ciRunId": 26333740615,
+    "headSha": "fc76077f74793ddcf0e69b80617fc81b68d9bcd2",
+    "ciRunId": 26334827218,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the returned canary inbox scanner follow-up. It adds canary:returned-inbox for public-safe mixed-folder returned evidence triage, preserves strict-real and public-launch blockers, and includes Gemini CLEAN review. GitHub Actions run 26333740615 passed CI on 3c9ef08. Local release:check, smoke, test, release:doctor, goal:audit, diff check, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after enforcing hosted baseline source gates in the operator packet, next-run planner, and one-command baseline runner. It preserves strict-real and public-launch blockers, requires source-match plus source-alignment before hosted collection, includes Gemini CLEAN review, and GitHub Actions run 26334827218 passed CI on fc76077. Local release:check, smoke, test, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

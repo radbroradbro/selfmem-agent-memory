@@ -9,7 +9,19 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `e7ce4f1c1a05b6e416b16234784f8694b83615bf`.
+- Latest code/product baseline: `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
+- GitHub Actions run `26334827218` passed CI after enforcing
+  `baseline:source-match` plus `baseline:source-align` in the operator packet,
+  next-run planner, one-command baseline runner, release readiness assertions,
+  public benchmark docs, PR/issue sync evidence, and Gemini review.
+- Previous verified code baseline before source-gate enforcement:
+  `d234a566354615155dcdc0043404a14b160d4cb3`.
+- GitHub Actions run `26334426951` passed CI after adding the baseline
+  source-alignment gate and current OpenClaw label-aligned/content-divergent
+  evidence.
+- Previous verified code baseline before baseline source-alignment:
+  `3c9ef0806e5a454783140e1ac821b40edd5776cf`.
+- Earlier code/product baseline: `e7ce4f1c1a05b6e416b16234784f8694b83615bf`.
 - GitHub Actions run `26331102535` passed CI after adding the
   `baseline:run` hosted-baseline orchestrator.
 - Previous verified code baseline before hosted baseline run orchestration:

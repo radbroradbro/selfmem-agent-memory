@@ -42,7 +42,19 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `3c9ef0806e5a454783140e1ac821b40edd5776cf`.
+- Latest code/product baseline: `fc76077f74793ddcf0e69b80617fc81b68d9bcd2`.
+- GitHub Actions run `26334827218`: passed CI after enforcing
+  `baseline:source-match` plus `baseline:source-align` in the operator packet,
+  next-run planner, one-command baseline runner, release readiness assertions,
+  public benchmark docs, PR/issue sync evidence, and Gemini review, while
+  preserving strict-real and public-launch blockers.
+- Previous verified baseline before source-gate enforcement:
+  `d234a566354615155dcdc0043404a14b160d4cb3`.
+- GitHub Actions run `26334426951`: passed CI after adding the baseline
+  source-alignment gate and current OpenClaw label-aligned/content-divergent
+  evidence.
+- Previous verified baseline before baseline source-alignment:
+  `3c9ef0806e5a454783140e1ac821b40edd5776cf`.
 - GitHub Actions run `26333740615`: passed CI after adding
   `canary:returned-inbox`, wiring it into the release gate, clean consumer
   smoke, docs, goal audit, and Gemini review, and preserving strict-real and
