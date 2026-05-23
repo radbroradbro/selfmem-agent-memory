@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T10:45:07Z",
+  "generatedAt": "2026-05-23T11:10:16Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,21 +14,21 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "14030ddd9c88020c114a3e5fd3d32735f31557a6",
-    "ciRunId": 26330646504,
+    "headSha": "e7ce4f1c1a05b6e416b16234784f8694b83615bf",
+    "ciRunId": 26331102535,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding one-command canary evidence packaging to selfmem_update. The updater can now write sanitized report, intake, optional diagnosis, and metrics-only packet outputs in one run, and the next-agent plan uses that path for the selected fresh canary. GitHub Actions run 26330646504 passed CI on 14030dd. Local full smoke, update smoke, release:check, node/Python syntax checks, diff check, and added-line secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after adding the one-command hosted-baseline run orchestrator. baseline:run now chains query-set inspection, hosted collection, local RecallWeave export and collection, preflight, comparison, next-run planning, packet creation, and returned-packet intake while preserving fixture-only non-evidence behavior. GitHub Actions run 26331102535 passed CI on e7ce4f1. Local full smoke, release:check, consumer:smoke, release:doctor, goal:audit, node syntax checks, diff check, and secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": false
+    "enforcePostBaselinePublicEvidenceOnly": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",

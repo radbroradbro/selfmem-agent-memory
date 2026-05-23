@@ -122,6 +122,7 @@ audit so future agents cannot treat green CI as native-goal completion.
   passed
 - One-command canary evidence packaging: `14030dd`, CI run `26330646504`
   passed
+- Hosted baseline run orchestrator: `e7ce4f1`, CI run `26331102535` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 

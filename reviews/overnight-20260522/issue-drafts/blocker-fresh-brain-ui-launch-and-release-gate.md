@@ -9,7 +9,102 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `0c881257923eb813e904ff11f364648c94823080`.
+- Latest code/product baseline: `e7ce4f1c1a05b6e416b16234784f8694b83615bf`.
+- GitHub Actions run `26331102535` passed CI after adding the
+  `baseline:run` hosted-baseline orchestrator.
+- Previous verified code baseline before hosted baseline run orchestration:
+  `14030ddd9c88020c114a3e5fd3d32735f31557a6`.
+- GitHub Actions run `26330646504` passed CI after one-command canary evidence
+  packaging.
+- Previous verified code baseline before one-command canary evidence
+  packaging: `54f59ee18094d824e3696e13621ac4070e795a7b`.
+- GitHub Actions run `26330433491` passed CI after the post-baseline public
+  evidence guard.
+- Previous verified code baseline before post-baseline public evidence
+  enforcement: `c3e948735c1d91c1eacfbc1e7bebba22622bf993`.
+- GitHub Actions run `26330234781` passed CI after current canary handoff
+  packet identity coverage.
+- Previous verified code baseline before current canary handoff identity
+  coverage: `cdf4615de1e9e3c7fa161d70f40fe5bf3e4cea76`.
+- GitHub Actions run `26329828449` passed CI after matched baseline
+  counterpart-run hardening.
+- Previous verified code baseline before matched-counterpart hardening:
+  `c0036470512950fa77900221f08d0cbafeab6d7b`.
+- GitHub Actions run `26329521666` passed CI after hosted baseline query-set
+  authoring.
+- Previous verified code baseline before hosted baseline query-set authoring:
+  `94be156c52904e9379372023037cb7cccff8c7ad`.
+- GitHub Actions run `26329113469` passed CI after the hosted baseline
+  container selector.
+- Previous verified code baseline before hosted baseline container selection:
+  `e9a483af3a416c5d5db17ae511d25c40f52d4c12`.
+- GitHub Actions run `26328719263` passed CI after hosted baseline next-run
+  readiness gating.
+- Previous verified code baseline before hosted baseline next-run readiness:
+  `c19e4dc7be0f45d9d1b29a6e5381cd48fc82c1eb`.
+- GitHub Actions run `26328477985` passed CI after refreshing release-state
+  and PR-body evidence for the one-agent handoff hardening baseline.
+- Previous verified code baseline before the release-state refresh:
+  `07cd61b009e85c071d2a54dc9de1b53db5525e6c`.
+- GitHub Actions run `26328348834` passed CI after the one-agent next-agent
+  handoff hardening.
+- Previous verified code baseline before one-agent next-agent handoff
+  hardening: `dd31fcb293fc8d591aa572fe5c77d4012a5fe630`.
+- GitHub Actions run `26327680816` passed CI after public-safe live hosted
+  discovery evidence for hashed candidates.
+- Previous verified code baseline before live hosted discovery evidence:
+  `2ac02fcbb9d321dc338e59d856abbcc3cfb6cd0a`.
+- GitHub Actions run `26327367386` passed CI after public-safe query-set
+  inspection.
+- Previous verified code baseline before the query-set inspector:
+  `c9c655049c036ca773a62e1c6498bc3438198986`.
+- GitHub Actions run `26327102787` passed CI after labeled query-set gating.
+- Previous verified code baseline before labeled query-set gating:
+  `a5d300ad1986e166d214e5c4dae537ad7f2f1bcb`.
+- GitHub Actions run `26326805194` passed CI after adding local-session batch
+  compaction audit to the formal goal audit and release gate.
+- Previous verified code baseline before the goal-audit batch compaction
+  extension: `8d49cf35af0aeeb34b37e913041c723035ff8cca`.
+- GitHub Actions run `26326589900` passed CI after the local-session batch
+  compaction audit gate.
+- Previous verified code baseline before local-session batch compaction:
+  `c01513ff37f17562b4fe9f9930332439d5404ec0`.
+- GitHub Actions run `26326199048` passed CI after hosted baseline discovery
+  and next-run planner extension.
+- Previous verified code baseline before hosted baseline discovery and
+  next-run planner extension: `00836ec3105c84814aa65885a1d6828aa298f6a6`.
+- GitHub Actions run `26325592308` passed CI after hosted baseline returned
+  packet intake.
+- Previous verified code baseline before hosted baseline returned packet
+  intake: `aedb81ab3a61ec7c70e3ac7cd07e8085637d5ea3`.
+- GitHub Actions run `26325210942` passed CI after returned canary packet
+  intake.
+- Previous verified code baseline before returned canary packet intake:
+  `7fdac2f287c589ba75731722edaee17cd154451c`.
+- GitHub Actions run `26324810035` passed CI after the canary next-agent
+  handoff packet.
+- Previous verified code baseline before the canary next-agent handoff packet:
+  `8f5910d49a6f1fe4d8967e014c5dd8e1df3e7b6e`.
+- GitHub Actions run `26324442965` passed CI after the real OpenClaw
+  next-agent handoff and CI read-permission fix.
+- Previous verified code baseline before the real OpenClaw next-agent handoff:
+  `1d8375a8dbcc9027d48d7e6821ff24d99fcdb916`.
+- GitHub Actions run `26324201679` passed CI after mixed canary diagnostic
+  batch triage.
+- Previous verified code baseline before mixed canary diagnostic batch triage:
+  `d7e2e13304cd81b9ae3b6013915f13d727f88ebe`.
+- GitHub Actions run `26323991060` passed CI after package-script-safe
+  evidence output.
+- Previous verified code baseline before package-script-safe evidence output:
+  `6c44714e5af4bc578f50070c51d40201303ad6c4`.
+- GitHub Actions run `26323533153` passed CI after release blocker doctor
+  real-canary blocker gate.
+- Previous verified code baseline before release blocker doctor real-canary
+  blocker gate: `4aa363dcb6e95e3f3a3e94d9b5297bca639211e8`.
+- GitHub Actions run `26323255585` passed CI after hosted baseline next-run
+  planner gate.
+- Previous verified code baseline before hosted baseline next-run planner:
+  `0c881257923eb813e904ff11f364648c94823080`.
 - GitHub Actions run `26322830311` passed CI after the canary next-agent
   planner gate.
 - Previous verified code baseline before the canary next-agent planner gate:
