@@ -35,5 +35,10 @@ Findings:
   private leaks.
 - Release readiness enforcement: `release-readiness-check.mjs` runs the audit
   and asserts the remaining blockers and incomplete rollout requirement.
+- Follow-up live-discovery audit review: Gemini CLI returned `CLEAN` after
+  `hosted-baseline-live-discovery` was added as a proven metadata-only
+  requirement. It confirmed the counts are consistent at 25 proven
+  requirements, that the hosted-baseline blocker remains open, and that no raw
+  labels, raw memory, or secret data are introduced.
 
 Required fixes: none.

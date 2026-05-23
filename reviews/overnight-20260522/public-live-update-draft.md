@@ -128,7 +128,7 @@ Latest verified head before this draft refresh:
   no file writes and no secret-pattern hits
 - GitHub live sync: `release:github-sync` confirms PR #5 and issue #6 match
   the checked-in public-safe drafts, with hashes and booleans only
-- Goal completion audit: `goal:audit` reports `goalComplete: false`, 20 proven
+- Goal completion audit: `goal:audit` reports `goalComplete: false`, 25 proven
   requirements, 2 blocked requirements, and 1 incomplete requirement, so this
   remains a public-readiness candidate rather than a completed production goal
 - Hosted baseline preflight: `baseline:preflight` passes offline with

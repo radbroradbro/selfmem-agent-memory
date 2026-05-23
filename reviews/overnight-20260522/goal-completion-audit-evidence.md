@@ -20,6 +20,8 @@ hosted-baseline, and real-rollout requirements.
 - Added `goal-completion-audit` to `release-state.json` proven surfaces.
 - Added `hosted-baseline-preflight` as a proven surface while preserving the
   hosted Supermemory baseline as a blocker.
+- Added `hosted-baseline-live-discovery` as a proven surface after a live
+  hosted metadata discovery run produced only hashed candidate metadata.
 - Added `canary-evidence-intake` as a proven surface while preserving the real
   production rollout as incomplete until a live sanitized report is reviewed.
 - Added `canary-report-generator` as a proven surface so deployed agents can
@@ -42,7 +44,7 @@ hosted-baseline, and real-rollout requirements.
 - `writesRealFiles: false`
 - `goalComplete: false`
 - `mayCallUpdateGoalComplete: false`
-- 20 proven requirements
+- 25 proven requirements
 - 2 blocked requirements
 - 1 incomplete requirement
 - `privateLeakCount: 0`
@@ -61,6 +63,10 @@ hosted-baseline, and real-rollout requirements.
 - Hosted Supermemory benchmark claims need a fresh metrics-only baseline that
   passes `baseline:preflight` and is reviewed against a matched RecallWeave
   run.
+- Live hosted discovery is now proven with 4 hashed candidate containers across
+  100 hosted documents, zero privacy leaks, no raw labels, and no memory text.
+  It narrows the next operator step but does not close the hosted baseline
+  blocker.
 - Canary evidence intake can verify a metrics-only one-agent report, but the
   bundled fixture reports `countsAsRealRolloutEvidence: false`.
 - Canary report generation can produce that report from Hermes/OpenClaw traces,

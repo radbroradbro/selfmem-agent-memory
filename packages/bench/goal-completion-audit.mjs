@@ -40,6 +40,9 @@ const files = {
   realCanaryDiagnosticEvidence: `${reviewDir}/real-canary-diagnostic-evidence.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
+  hostedBaselineLiveDiscoveryReport: `${reviewDir}/hosted-baseline-live-discovery.json`,
+  hostedBaselineLiveDiscoveryEvidence: `${reviewDir}/hosted-baseline-live-discovery-evidence.md`,
+  hostedBaselineLiveDiscoveryReview: `${reviewDir}/gemini-hosted-baseline-live-discovery-review.md`,
   hostedBaselineNextRunEvidence: `${reviewDir}/hosted-baseline-next-run-evidence.md`,
   hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   baselineReturnedPacketIntakeEvidence: `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
@@ -58,6 +61,7 @@ for (const [name, file] of Object.entries(files)) {
 }
 
 const releaseState = JSON.parse(readFileSync(join(root, files.releaseState), "utf8"));
+const hostedBaselineLiveDiscovery = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveDiscoveryReport), "utf8"));
 const releaseReadinessEvidence = JSON.parse(readFileSync(join(root, files.releaseReadinessEvidence), "utf8"));
 const currentHeadLiveEvidence = JSON.parse(readFileSync(join(root, files.browserEvidence), "utf8"));
 const texts = Object.fromEntries(
@@ -79,6 +83,17 @@ assert.equal(releaseReadinessEvidence.evidence?.productionReady, false);
 assert.equal(releaseReadinessEvidence.evidence?.fixtureOnly, true);
 assert.equal(currentHeadLiveEvidence.fixtureOnly, true);
 assert.equal(currentHeadLiveEvidence.privateLeakCount, 0);
+assert.equal(hostedBaselineLiveDiscovery.mode, "hosted-baseline-discovery");
+assert.equal(hostedBaselineLiveDiscovery.fixtureOnly, false);
+assert.equal(hostedBaselineLiveDiscovery.callsHostedProvider, true);
+assert.equal(hostedBaselineLiveDiscovery.publicSafe, true);
+assert.equal(hostedBaselineLiveDiscovery.metricsOnly, true);
+assert.equal(hostedBaselineLiveDiscovery.rawLabelsIncluded, false);
+assert.equal(hostedBaselineLiveDiscovery.rawMemoryIncluded, false);
+assert.equal(hostedBaselineLiveDiscovery.privacyLeakCount, 0);
+assert.equal(hostedBaselineLiveDiscovery.redactionFailureCount, 0);
+assert.ok(Number(hostedBaselineLiveDiscovery.sourceStats?.documentsSeen) > 0);
+assert.ok(Number(hostedBaselineLiveDiscovery.containerCandidateCount) > 0);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -156,6 +171,12 @@ const requirements = [
     "packages/bench/hosted-baseline-preflight.mjs",
     files.hostedBaselinePreflightEvidence,
     files.hostedBaselinePreflightReview,
+  ]),
+  proven("hosted-baseline-live-discovery", "Hosted Supermemory metadata discovery is proven live with hashed candidates only", [
+    "packages/bench/hosted-baseline-discovery.mjs",
+    files.hostedBaselineLiveDiscoveryReport,
+    files.hostedBaselineLiveDiscoveryEvidence,
+    files.hostedBaselineLiveDiscoveryReview,
   ]),
   proven("hosted-baseline-next-run", "Hosted baseline comparison has a state-aware next-run planner that keeps public claims blocked while producing the exact next metrics-only run packet", [
     "packages/bench/hosted-baseline-next-run.mjs",

@@ -347,7 +347,7 @@ Latest local verification before this summary:
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 24 proven requirements, 2 blocked
+  `mayCallUpdateGoalComplete: false`, 25 proven requirements, 2 blocked
   requirements, and 1 incomplete requirement, preserving the human approval,
   hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.

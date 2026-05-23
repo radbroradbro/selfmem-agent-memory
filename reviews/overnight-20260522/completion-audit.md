@@ -17,7 +17,7 @@ complete or publish a public live update.
 
 Machine-readable follow-up: `goal:audit` now runs
 `packages/bench/goal-completion-audit.mjs` and returns `goalComplete: false`,
-`mayCallUpdateGoalComplete: false`, 24 proven requirements, 2 blocked
+`mayCallUpdateGoalComplete: false`, 25 proven requirements, 2 blocked
 requirements, and 1 incomplete requirement. The release gate requires this
 audit so future agents cannot treat green CI as native-goal completion.
 

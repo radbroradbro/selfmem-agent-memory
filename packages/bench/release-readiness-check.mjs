@@ -2675,6 +2675,16 @@ check("fresh goal completion audit passes", () => {
   assert.ok(
     report.requirements.some(
       (item) =>
+        item.id === "hosted-baseline-live-discovery" &&
+        item.status === "proven" &&
+        item.evidence.includes("packages/bench/hosted-baseline-discovery.mjs") &&
+        item.evidence.includes("reviews/overnight-20260522/hosted-baseline-live-discovery.json") &&
+        item.evidence.includes("reviews/overnight-20260522/gemini-hosted-baseline-live-discovery-review.md"),
+    ),
+  );
+  assert.ok(
+    report.requirements.some(
+      (item) =>
         item.id === "local-only-compaction-benchmark" &&
         item.status === "proven" &&
         item.evidence.includes("packages/bench/session-compaction-local-batch-audit.mjs") &&
