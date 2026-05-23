@@ -69,6 +69,9 @@ requirements are resolved.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`
   path that emits metrics and hashes only when live credentials are provided
   through the local environment.
+- RecallWeave response exporter now gives agents a `baseline:export:recallweave`
+  path that turns a local `memories.jsonl` container into a metrics-only
+  response export without raw memory text.
 - RecallWeave baseline collector now gives agents a
   `baseline:collect:recallweave` path that converts local metrics-only
   search-response exports into matched result files and rejects raw response

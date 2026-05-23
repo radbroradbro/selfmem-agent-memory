@@ -32,6 +32,7 @@ const requiredFiles = [
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
   "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
   "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json",
+  "packages/bench/fixtures/recallweave-local-container.fixture/local-memories.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
   "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
@@ -44,6 +45,7 @@ const requiredFiles = [
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
+  "packages/bench/recallweave-response-export.mjs",
   "packages/bench/recallweave-baseline-collector.mjs",
   "packages/bench/baseline-comparison.mjs",
   "packages/bench/hosted-baseline-operator-packet.mjs",
@@ -148,6 +150,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/hosted-baseline-collector-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-collector-review.md`,
+  `${reviewDir}/recallweave-response-export-evidence.md`,
+  `${reviewDir}/gemini-recallweave-response-export-review.md`,
   `${reviewDir}/recallweave-baseline-collector-evidence.md`,
   `${reviewDir}/gemini-recallweave-baseline-collector-review.md`,
   `${reviewDir}/baseline-comparison-evidence.md`,
@@ -257,6 +261,7 @@ const requiredScripts = [
   "canary:operator-packet",
   "baseline:preflight",
   "baseline:collect",
+  "baseline:export:recallweave",
   "baseline:collect:recallweave",
   "baseline:compare",
   "baseline:operator-packet",
@@ -821,6 +826,7 @@ check("release state is conservative", () => {
     "canary-operator-packet",
     "hosted-baseline-preflight",
     "hosted-baseline-collector",
+    "recallweave-response-export",
     "recallweave-baseline-collector",
     "baseline-comparison-gate",
     "hosted-baseline-operator-packet",
@@ -1366,6 +1372,9 @@ check("fresh hosted baseline preflight passes", () => {
   const collectorTmp = mkdtempSync(join(tmpdir(), "recallweave-hosted-baseline-"));
   const collectorResultPath = join(collectorTmp, "collector-result.json");
   const recallWeaveResultPath = join(collectorTmp, "recallweave-result.json");
+  const recallWeaveExportPath = join(collectorTmp, "recallweave-export.json");
+  const recallWeaveExportCollectorResultPath = join(collectorTmp, "recallweave-export-collector-result.json");
+  const recallWeaveLiveExportPath = join(collectorTmp, "recallweave-live-export.json");
   const recallWeaveLiveResponsesPath = join(collectorTmp, "recallweave-live-responses.json");
   const recallWeaveRawResponsesPath = join(collectorTmp, "recallweave-raw-responses.json");
   const recallWeaveLiveResultPath = join(collectorTmp, "recallweave-live-result.json");
@@ -1376,7 +1385,36 @@ check("fresh hosted baseline preflight passes", () => {
   const fixtureResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--fixture"]);
   const templateResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--print-template"]);
   const collectorResult = run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture", "--output", collectorResultPath]);
+  const recallWeaveExportResult = run("node", ["packages/bench/recallweave-response-export.mjs", "--fixture", "--output", recallWeaveExportPath]);
   const recallWeaveCollectorResult = run("node", ["packages/bench/recallweave-baseline-collector.mjs", "--fixture", "--output", recallWeaveResultPath]);
+  const recallWeaveExportCollectorResult = run("node", [
+    "packages/bench/recallweave-baseline-collector.mjs",
+    "--fixture",
+    "--responses",
+    recallWeaveExportPath,
+    "--output",
+    recallWeaveExportCollectorResultPath,
+  ]);
+  const recallWeaveLiveExportResult = run(
+    "node",
+    [
+      "packages/bench/recallweave-response-export.mjs",
+      "--live",
+      "--queryset",
+      "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
+      "--memories",
+      "packages/bench/fixtures/recallweave-local-container.fixture/local-memories.fixture.jsonl",
+      "--output",
+      recallWeaveLiveExportPath,
+    ],
+    {
+      env: {
+        ...process.env,
+        RECALLWEAVE_BASELINE_LIVE: "1",
+        RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+      },
+    },
+  );
   const sanitizedRecallWeaveResponses = JSON.parse(readFileSync(join(root, "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json"), "utf8"));
   sanitizedRecallWeaveResponses.fixtureOnly = false;
   sanitizedRecallWeaveResponses.evidenceType = "sanitized-recallweave-response-export";
@@ -1452,7 +1490,10 @@ check("fresh hosted baseline preflight passes", () => {
   const fixtureReport = JSON.parse(fixtureResult.stdout);
   const templateReport = JSON.parse(templateResult.stdout);
   const collectorReport = JSON.parse(collectorResult.stdout);
+  const recallWeaveExportReport = JSON.parse(recallWeaveExportResult.stdout);
   const recallWeaveCollectorReport = JSON.parse(recallWeaveCollectorResult.stdout);
+  const recallWeaveExportCollectorReport = JSON.parse(recallWeaveExportCollectorResult.stdout);
+  const recallWeaveLiveExportReport = JSON.parse(recallWeaveLiveExportResult.stdout);
   const recallWeaveLiveReport = JSON.parse(recallWeaveLiveResult.stdout);
   const collectorPreflightReport = JSON.parse(collectorPreflightResult.stdout);
   const comparisonReport = JSON.parse(comparisonResult.stdout);
@@ -1461,6 +1502,8 @@ check("fresh hosted baseline preflight passes", () => {
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
   const collectorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-collector-evidence.md"), "utf8");
   const collectorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-collector-review.md"), "utf8");
+  const recallWeaveExportEvidence = readFileSync(join(root, reviewDir, "recallweave-response-export-evidence.md"), "utf8");
+  const recallWeaveExportGeminiReview = readFileSync(join(root, reviewDir, "gemini-recallweave-response-export-review.md"), "utf8");
   const recallWeaveCollectorEvidence = readFileSync(join(root, reviewDir, "recallweave-baseline-collector-evidence.md"), "utf8");
   const recallWeaveCollectorGeminiReview = readFileSync(join(root, reviewDir, "gemini-recallweave-baseline-collector-review.md"), "utf8");
   const comparisonEvidence = readFileSync(join(root, reviewDir, "baseline-comparison-evidence.md"), "utf8");
@@ -1502,6 +1545,24 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(collectorReport.resultFingerprints?.length, 3);
   assert.equal(collectorReport.searchConfig?.endpoint, "fixture");
   assert.ok(Number(collectorReport.metrics?.pAt1) > 0);
+  assert.equal(recallWeaveExportReport.evidenceType, "fixture-recallweave-response-export");
+  assert.equal(recallWeaveExportReport.metricsOnly, true);
+  assert.equal(recallWeaveExportReport.rawMemoryIncluded, false);
+  assert.equal(recallWeaveExportReport.rawTranscriptIncluded, false);
+  assert.equal(recallWeaveExportReport.rawPromptIncluded, false);
+  assert.equal(recallWeaveExportReport.rawAnswerIncluded, false);
+  assert.equal(recallWeaveExportReport.privacyLeakCount, 0);
+  assert.equal(recallWeaveExportReport.redactionFailureCount, 0);
+  assert.equal(recallWeaveExportReport.inputStats?.skippedFullyPrivate, 1);
+  assert.equal(recallWeaveExportReport.source?.preserveIds, true);
+  assert.equal(Object.keys(recallWeaveExportReport.responses ?? {}).length, 3);
+  assert.doesNotMatch(recallWeaveExportResult.stdout, /\b(memory|content|chunk|text|raw|rawText|document)"\s*:/);
+  assert.equal(recallWeaveExportCollectorReport.provider, "recallweave");
+  assert.equal(recallWeaveExportCollectorReport.metricsOnly, true);
+  assert.equal(recallWeaveExportCollectorReport.rawMemoryIncluded, false);
+  assert.equal(recallWeaveExportCollectorReport.querySetHash, collectorReport.querySetHash);
+  assert.equal(recallWeaveExportCollectorReport.scoringCodeHash, collectorReport.scoringCodeHash);
+  assert.ok(Number(recallWeaveExportCollectorReport.metrics?.pAt1) > 0);
   assert.equal(recallWeaveCollectorReport.provider, "recallweave");
   assert.equal(recallWeaveCollectorReport.metricsOnly, true);
   assert.equal(recallWeaveCollectorReport.fixtureOnly, true);
@@ -1518,6 +1579,14 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(recallWeaveCollectorReport.retrievalConfig?.source, "fixture");
   assert.equal(recallWeaveCollectorReport.retrievalConfig?.rawResponseTextAllowed, false);
   assert.ok(Number(recallWeaveCollectorReport.metrics?.pAt1) > 0);
+  assert.equal(recallWeaveLiveExportReport.evidenceType, "live-recallweave-response-export");
+  assert.equal(recallWeaveLiveExportReport.metricsOnly, true);
+  assert.equal(recallWeaveLiveExportReport.rawMemoryIncluded, false);
+  assert.equal(recallWeaveLiveExportReport.source?.kind, "local-container-memories-jsonl");
+  assert.equal(recallWeaveLiveExportReport.source?.preserveIds, false);
+  assert.ok(recallWeaveLiveExportReport.source?.memoriesFileHash?.startsWith("sha256:"));
+  assert.equal(recallWeaveLiveExportReport.inputStats?.skippedFullyPrivate, 1);
+  assert.doesNotMatch(recallWeaveLiveExportResult.stdout, /\b(memory|content|chunk|text|raw|rawText|document)"\s*:/);
   assert.equal(recallWeaveLiveReport.provider, "recallweave");
   assert.equal(recallWeaveLiveReport.fixtureOnly, true);
   assert.equal(recallWeaveLiveReport.metricsOnly, true);
@@ -1594,14 +1663,18 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(operatorPacket.callsHostedProvider, false);
   assert.equal(operatorPacket.publicSafe, true);
   assert.ok(operatorPacket.commands.some((item) => item.id === "print-template" && /baseline:preflight/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "collect-live-result" && /baseline:collect/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-live-result" && /RECALLWEAVE_BASELINE_NO_RAW_TEXT=1/.test(item.command)));
   assert.ok(operatorPacket.acceptanceCriteria.includes("reviewerApprovalCount is at least 2 before comparison claims"));
   assert.ok(operatorPacket.forbidden.includes("provider keys"));
   assert.match(operatorMarkdown.stdout, /RecallWeave Hosted Baseline Packet/);
+  assert.match(operatorMarkdown.stdout, /baseline:export:recallweave/);
   assert.match(operatorMarkdown.stdout, /Attach Only/);
   assert.match(collectorEvidence, /hosted baseline collector/i);
   assert.match(collectorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(recallWeaveExportEvidence, /RecallWeave response export/i);
+  assert.match(recallWeaveExportGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(recallWeaveCollectorEvidence, /RecallWeave baseline collector/i);
   assert.match(recallWeaveCollectorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(comparisonEvidence, /baseline comparison/i);
@@ -1611,11 +1684,16 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
   assert.doesNotMatch(collectorResult.stdout, secretPattern);
+  assert.doesNotMatch(recallWeaveExportResult.stdout, secretPattern);
+  assert.doesNotMatch(recallWeaveExportCollectorResult.stdout, secretPattern);
+  assert.doesNotMatch(recallWeaveLiveExportResult.stdout, secretPattern);
   assert.doesNotMatch(recallWeaveCollectorResult.stdout, secretPattern);
   assert.doesNotMatch(recallWeaveLiveResult.stdout, secretPattern);
   assert.doesNotMatch(collectorPreflightResult.stdout, secretPattern);
   assert.doesNotMatch(collectorEvidence, secretPattern);
   assert.doesNotMatch(collectorGeminiReview, secretPattern);
+  assert.doesNotMatch(recallWeaveExportEvidence, secretPattern);
+  assert.doesNotMatch(recallWeaveExportGeminiReview, secretPattern);
   assert.doesNotMatch(recallWeaveCollectorEvidence, secretPattern);
   assert.doesNotMatch(recallWeaveCollectorGeminiReview, secretPattern);
   assert.doesNotMatch(comparisonResult.stdout, secretPattern);

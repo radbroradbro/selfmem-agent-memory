@@ -33,6 +33,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 ```
@@ -53,7 +54,16 @@ fields and source-lock hashes.
 
 After both result files exist, run the matched comparison gate:
 
+Use the exporter's `--output` flag for the RecallWeave response file. Do not
+redirect the package-manager command's stdout into the JSON file, because
+wrapper banners can corrupt the evidence file before the collector reads it.
+
 ```bash
+RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave \
+  -- --live --container-dir <local-recallweave-container-dir> \
+  --output /tmp/recallweave-search-responses.json
+
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave \
   -- --live --responses /tmp/recallweave-search-responses.json \
@@ -69,10 +79,11 @@ slice, query-set hash, scoring-code hash, judge model, answer model, and
 harness flags before it can count as comparison evidence. `--fixture` always
 blocks public claims, even if the loaded files look real.
 
-The RecallWeave collector accepts a local search-response export with ids,
-scores, timings, token estimates, privacy counters, and content hashes. It
-rejects raw response text by default so a local run cannot quietly become a raw
-memory attachment.
+`baseline:export:recallweave` creates the local search-response export from a
+local `memories.jsonl` container. It emits ids or hashed ids, content hashes,
+scores, timings, token estimates, privacy counters, and no raw memory text. The
+RecallWeave collector accepts that export and rejects raw response text by
+default so a local run cannot quietly become a raw memory attachment.
 
 Allowed public wording after a win:
 

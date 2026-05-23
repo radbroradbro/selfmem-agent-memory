@@ -87,6 +87,11 @@ const hostedBaselineCollector = JSON.parse(run("node", ["packages/bench/hosted-b
 assert.equal(hostedBaselineCollector.metricsOnly, true);
 assert.equal(hostedBaselineCollector.rawMemoryIncluded, false);
 assert.equal(hostedBaselineCollector.fixtureOnly, true);
+const recallWeaveResponseExport = JSON.parse(run("node", ["packages/bench/recallweave-response-export.mjs", "--fixture"]).stdout);
+assert.equal(recallWeaveResponseExport.metricsOnly, true);
+assert.equal(recallWeaveResponseExport.rawMemoryIncluded, false);
+assert.equal(recallWeaveResponseExport.fixtureOnly, true);
+assert.equal(recallWeaveResponseExport.privacyLeakCount, 0);
 const recallWeaveBaselineCollector = JSON.parse(run("node", ["packages/bench/recallweave-baseline-collector.mjs", "--fixture"]).stdout);
 assert.equal(recallWeaveBaselineCollector.metricsOnly, true);
 assert.equal(recallWeaveBaselineCollector.rawMemoryIncluded, false);
@@ -119,7 +124,7 @@ const blockerReport = [
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
     evidence: "hosted-baseline-collector-evidence.md",
-    nextAction: "Run `baseline:collect -- --live` for hosted, run `baseline:collect:recallweave -- --live --responses <metrics-only-export>`, then validate with `baseline:preflight -- --result` and `baseline:compare`.",
+    nextAction: "Run `baseline:collect -- --live` for hosted, run `baseline:export:recallweave -- --live` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export>`, then validate with `baseline:preflight -- --result` and `baseline:compare`.",
   },
 ];
 
@@ -187,8 +192,10 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template",
         "npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture",
+        "npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json",
+        "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir <local-recallweave-container-dir> --output /tmp/recallweave-search-responses.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --live --responses /tmp/recallweave-search-responses.json --output /tmp/recallweave-result.json",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],

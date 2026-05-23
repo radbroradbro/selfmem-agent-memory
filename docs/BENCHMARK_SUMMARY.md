@@ -31,6 +31,11 @@ evidence. It uses hosted search only after explicit live flags and
 environment-only credentials are present, and it writes aggregate metrics and
 hashes only.
 
+`baseline:export:recallweave -- --live` creates the local RecallWeave
+search-response export from a local container. It emits ids or hashed ids,
+content hashes, scores, timings, token estimates, and privacy counters only.
+It does not emit raw memory text.
+
 `baseline:collect:recallweave -- --live` converts a local RecallWeave
 search-response export into the matched aggregate result file. The export must
 use ids, scores, timings, token estimates, privacy counters, and content

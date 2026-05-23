@@ -10,6 +10,7 @@ Scope:
   hosted Supermemory comparison evidence, matched RecallWeave collection, and
   metrics-only comparison.
 - The packet now points operators to `baseline:collect -- --live`,
+  `baseline:export:recallweave -- --live`,
   `baseline:collect:recallweave -- --live`, and `baseline:compare` instead of
   ad hoc external collectors.
 - Gemini focused review returned `CLEAN`.
@@ -20,6 +21,7 @@ Commands:
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 ```
 
@@ -31,8 +33,12 @@ Expected behavior:
 - `callsHostedProvider` is false.
 - It tells operators to print the template, validate fixture parsing, then
   collect and validate aggregate-only hosted and RecallWeave results.
-- It tells operators to convert a local RecallWeave search export into a
-  metrics-only result before comparison.
+- It tells operators to create a local RecallWeave search export with
+  `baseline:export:recallweave`, then convert that export into a metrics-only
+  result before comparison.
+- It tells operators to use the exporter's `--output` flag and not shell-redirect
+  the package-manager command's stdout into JSON, because wrapper banners can
+  corrupt the evidence file.
 - It tells operators to run `baseline:compare` only after hosted and
   RecallWeave outputs share the same dataset, query-set hash, scoring-code
   hash, judge model, and answer model.

@@ -246,7 +246,16 @@ npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallwe
 Create the matched local result from a RecallWeave response export that has no
 raw memory text:
 
+Use the exporter's `--output` flag. Do not redirect the package-manager
+command's stdout into the JSON file, because wrapper banners can corrupt the
+evidence file before the collector reads it.
+
 ```bash
+RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave \
+  -- --live --container-dir <local-recallweave-container-dir> \
+  --output /tmp/recallweave-search-responses.json
+
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave \
   -- --live --responses /tmp/recallweave-search-responses.json \

@@ -121,6 +121,9 @@ Latest verified head before this draft refresh:
 - Hosted baseline collector: `baseline:collect -- --fixture` passes without a
   hosted provider call and proves the collector emits aggregate metrics and
   hashes only
+- RecallWeave response exporter: `baseline:export:recallweave -- --fixture`
+  passes and proves a local `memories.jsonl` container can produce a
+  metrics-only response export without raw memory text
 - RecallWeave baseline collector: `baseline:collect:recallweave -- --fixture`
   passes and proves local RecallWeave result files use the same query-set and
   scoring-code hashes while rejecting raw response text in live mode
