@@ -1,0 +1,157 @@
+{
+  "ok": true,
+  "mode": "public-benchmark-source-lock-check",
+  "schemaVersion": 1,
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawLabelsIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "sourceLockReadyForTargetAuthoring": true,
+  "sourceSummary": {
+    "name": "MemoryBench",
+    "repoHost": "github.com",
+    "branch": "main",
+    "commit": "118209a746d97d0d85e5a7234267f0b6962857e9",
+    "checkedAt": "2026-05-23",
+    "availableBenchmarks": [
+      "locomo",
+      "longmemeval",
+      "convomem"
+    ],
+    "datasetSourceCount": 3,
+    "keyFileHashCount": 15
+  },
+  "hashes": {
+    "sourceLockFileHash": "sha256:dae7e055cfa65b82e9ee1d03a8cab874839c740789a4a19d2b1501ae454824e4",
+    "commitHash": "sha256:a468c497e8510c5d"
+  },
+  "checks": [
+    {
+      "name": "schema-version",
+      "ok": true
+    },
+    {
+      "name": "public-safe",
+      "ok": true
+    },
+    {
+      "name": "no-raw-private-data",
+      "ok": true
+    },
+    {
+      "name": "checked-date",
+      "ok": true
+    },
+    {
+      "name": "repo-url",
+      "ok": true
+    },
+    {
+      "name": "repo-commit",
+      "ok": true
+    },
+    {
+      "name": "repo-branch",
+      "ok": true
+    },
+    {
+      "name": "license",
+      "ok": true
+    },
+    {
+      "name": "required-benchmarks",
+      "ok": true
+    },
+    {
+      "name": "benchmark-contract-methods",
+      "ok": true
+    },
+    {
+      "name": "provider-contract-methods",
+      "ok": true
+    },
+    {
+      "name": "memscore-components",
+      "ok": true
+    },
+    {
+      "name": "pipeline",
+      "ok": true
+    },
+    {
+      "name": "key-file-hashes",
+      "ok": true
+    },
+    {
+      "name": "locomo-dataset-url",
+      "ok": true
+    },
+    {
+      "name": "locomo-source-file",
+      "ok": true
+    },
+    {
+      "name": "locomo-question-types",
+      "ok": true
+    },
+    {
+      "name": "longmemeval-dataset-url",
+      "ok": true
+    },
+    {
+      "name": "longmemeval-source-file",
+      "ok": true
+    },
+    {
+      "name": "longmemeval-question-types",
+      "ok": true
+    },
+    {
+      "name": "convomem-dataset-url",
+      "ok": true
+    },
+    {
+      "name": "convomem-source-file",
+      "ok": true
+    },
+    {
+      "name": "convomem-question-types",
+      "ok": true
+    },
+    {
+      "name": "next-target-recommendation",
+      "ok": true
+    },
+    {
+      "name": "repo-checkout-verification",
+      "ok": true
+    }
+  ],
+  "failedChecks": [],
+  "checkoutVerification": {
+    "requested": true,
+    "ok": true,
+    "commitMatches": true,
+    "requiredFileCount": 15,
+    "checkedFileCount": 15,
+    "failedFileCount": 0
+  },
+  "nextActions": [
+    "Materialize the selected public dataset slice.",
+    "Hash the answer label source and exact scoring script.",
+    "Create a target with benchmark:public-target:author.",
+    "Validate the target with benchmark:public-target --strict before running RecallWeave."
+  ],
+  "safety": {
+    "printsCredentials": false,
+    "includesPrivatePaths": false,
+    "includesRawQuestionIds": false,
+    "includesRawLabels": false,
+    "includesRawMemoryText": false,
+    "includesRawTranscriptText": false
+  }
+}

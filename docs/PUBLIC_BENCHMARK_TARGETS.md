@@ -25,6 +25,7 @@ benchmark lane unless it is clearly labeled as a private canary.
 Run the target validator before starting a public canary:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:source-lock -- --strict
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
 
@@ -110,6 +111,12 @@ harness we will use.
   judge, answer model, run id, question limits, and checkpointed
   ingest-index-search-answer-evaluate-report phases. Its documented benchmark
   names are `locomo`, `longmemeval`, and `convomem`.
+- Current MemoryBench source lock: `supermemoryai/memorybench` `main` at
+  `118209a746d97d0d85e5a7234267f0b6962857e9`, checked on 2026-05-23.
+  The source-lock artifact records the benchmark contract, provider contract,
+  dataset source URLs, and key file hashes without raw questions or labels. For
+  independent verification, run the source-lock checker with
+  `--repo-checkout <memorybench-checkout>` against a local MemoryBench clone.
 - MemoryBench's MemScore is a triple: quality, latency, and context tokens. Do
   not collapse that into one score.
 - LongMemEval is a strong target because it uses 500 human-curated questions and

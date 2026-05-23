@@ -99,16 +99,23 @@ requirements are resolved.
   hosted Supermemory parity. The autoresearch loop can compare RecallWeave
   canary results to reported leaderboard/provider stats when hosted
   Supermemory writes are quota-locked.
+- Current source lock pins MemoryBench `main` at
+  `118209a746d97d0d85e5a7234267f0b6962857e9`, with public-safe hashes for
+  harness files, benchmark/provider contracts, dataset source URLs, and
+  `locomo` / `longmemeval` / `convomem` availability. The checker also has an
+  optional checkout-verification mode that re-hashes a local MemoryBench clone
+  without printing private paths.
 - Current benchmark plan also separates component model evidence from
   memory-system evidence. MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker
   leaderboards can choose model arms, but public RecallWeave claims still need
   the same public benchmark data, revision, split, labels, judge model, answer
   model, judge rule, and scoring setup as the target row.
-- Current benchmark tooling adds `benchmark:public-target:author` and
-  `benchmark:public-target`, a metrics-only target author-and-validator path
-  that checks source URL, dataset revision, split, labels, judge model, answer
-  model, judge rule, scoring code, claim tier, and component-evidence
-  boundaries before a public canary target can run.
+- Current benchmark tooling adds `benchmark:source-lock`,
+  `benchmark:public-target:author`, and `benchmark:public-target`, a
+  metrics-only source-lock plus target author-and-validator path that checks
+  source URL, dataset revision, split, labels, judge model, answer model,
+  judge rule, scoring code, claim tier, and component-evidence boundaries
+  before a public canary target can run.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:

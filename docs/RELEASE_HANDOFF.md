@@ -121,6 +121,8 @@ container export only. Do not require hosted writes for the autoresearch loop.
 Validate the target first:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:source-lock -- --strict
+
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
   --benchmark longmemeval \
   --source-url https://github.com/supermemoryai/memorybench \

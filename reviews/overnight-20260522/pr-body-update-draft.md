@@ -51,14 +51,21 @@ Live status:
   against reported leaderboard/provider stats without requiring hosted
   Supermemory writes. Small wins may be described only as canary trends until a
   full comparable run is complete.
+- Adds a current MemoryBench source lock at commit
+  `118209a746d97d0d85e5a7234267f0b6962857e9`, with public-safe hashes for the
+  harness files, benchmark/provider contracts, dataset source URLs, and
+  `locomo` / `longmemeval` / `convomem` availability. The checker also has an
+  optional checkout-verification mode that re-hashes a local MemoryBench clone
+  without printing private paths.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
   data, revision, split, labels, judge model, answer model, judge rule, and scoring setup as the target row.
-- Adds `benchmark:public-target:author` plus `benchmark:public-target`, a
-  metrics-only author-and-validator path for source-locked public benchmark
-  target rows. It keeps fixture targets and component-only leaderboard
-  evidence from turning into public memory-system claims.
+- Adds `benchmark:source-lock`, `benchmark:public-target:author`, and
+  `benchmark:public-target`, a metrics-only source-lock plus
+  author-and-validator path for source-locked public benchmark target rows. It
+  keeps fixture targets and component-only leaderboard evidence from turning
+  into public memory-system claims.
 - Hardens `baseline:source-match` for real local selfmem exports that contain
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and

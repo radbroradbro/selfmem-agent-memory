@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark target validation, and public benchmark target authoring; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark source-lock validation, public benchmark target validation, and public benchmark target authoring; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
     "allowedPostBaselineCodePaths": [
       ".gitignore",
       "package.json",
@@ -60,6 +60,7 @@
       "packages/bench/hosted-baseline-preflight.mjs",
       "packages/bench/hosted-baseline-queryset-author.mjs",
       "packages/bench/hosted-baseline-run.mjs",
+      "packages/bench/public-benchmark-source-lock-check.mjs",
       "packages/bench/public-benchmark-target-author.mjs",
       "packages/bench/public-benchmark-target-check.mjs",
       "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -154,6 +155,7 @@
     "canary-returned-workspace",
     "canary-returned-inbox",
     "canary-returned-downloads",
+    "public-benchmark-source-lock",
     "public-benchmark-target-author",
     "public-benchmark-target-check"
   ],

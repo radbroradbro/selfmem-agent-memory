@@ -61,6 +61,8 @@ too expensive for the next run.
 1. Source-lock the benchmark and target row. Record the source URL, checked
    date, benchmark variant, metric name, score, judge model, answer model,
    token budget if reported, and caveats.
+   Start with `benchmark:source-lock -- --strict` to verify the checked-in
+   MemoryBench source lock before authoring a target.
    If the target file does not exist yet, create it with
    `benchmark:public-target:author` from explicit source-lock fields rather
    than by hand-editing JSON.

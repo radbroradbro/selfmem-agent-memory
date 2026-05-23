@@ -80,10 +80,14 @@ const requiredFiles = [
   "packages/bench/baseline-returned-packet-intake.mjs",
   "packages/bench/baseline-openai-compatible-reviewer.mjs",
   "packages/bench/baseline-reviewer-approval-intake.mjs",
+  "packages/bench/public-benchmark-source-lock-check.mjs",
   "packages/bench/public-benchmark-target-check.mjs",
   "packages/bench/public-benchmark-target-author.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
+  `${reviewDir}/public-memorybench-source-lock.json`,
+  `${reviewDir}/public-memorybench-source-lock-evidence.md`,
+  `${reviewDir}/public-memorybench-source-lock-checkout-evidence.json`,
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -399,6 +403,7 @@ const requiredScripts = [
   "baseline:returned-packet",
   "baseline:reviewer:openai-compatible",
   "baseline:reviewer-intake",
+  "benchmark:source-lock",
   "benchmark:public-target",
   "benchmark:public-target:author",
   "goal:audit",
@@ -1003,6 +1008,7 @@ check("release state is conservative", () => {
     "github-blocker-issue-live",
     "goal-completion-audit",
     "selfmem-update",
+    "public-benchmark-source-lock",
     "public-benchmark-target-author",
     "public-benchmark-target-check",
   ]) {
@@ -1135,6 +1141,8 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(autoresearchPlan, /same public data, repository or dataset revision/i);
   assert.match(publicTargets, /Component Benchmarks/i);
   assert.match(publicTargets, /MTEB, MMTEB, BEIR, MIRACL, MS MARCO/i);
+  assert.match(publicTargets, /118209a746d97d0d85e5a7234267f0b6962857e9/);
+  assert.match(autoresearchPlan, /benchmark:source-lock -- --strict/);
   assert.match(publicTargets, /same public benchmark source, repository or dataset revision/i);
   assert.match(publicTargets, /LongMemEval-V2/i);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
@@ -1147,6 +1155,58 @@ check("model matrix and autoresearch gate stay conservative", () => {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }
+});
+
+check("fresh public MemoryBench source lock passes", () => {
+  const result = run("node", ["packages/bench/public-benchmark-source-lock-check.mjs", "--strict"]);
+  const markdown = run("node", ["packages/bench/public-benchmark-source-lock-check.mjs", "--format", "markdown"]).stdout;
+  const evidence = readFileSync(join(root, reviewDir, "public-memorybench-source-lock-evidence.md"), "utf8");
+  const sourceLock = JSON.parse(readFileSync(join(root, reviewDir, "public-memorybench-source-lock.json"), "utf8"));
+  const checkoutEvidence = JSON.parse(readFileSync(join(root, reviewDir, "public-memorybench-source-lock-checkout-evidence.json"), "utf8"));
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "public-benchmark-source-lock-check");
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.publicSafe, true);
+  assert.equal(report.publicBenchmarkClaimsAllowed, false);
+  assert.equal(report.sourceLockReadyForTargetAuthoring, true);
+  assert.equal(report.checkoutVerification?.requested, false);
+  assert.equal(report.checkoutVerification?.requiredFileCount, 15);
+  assert.equal(checkoutEvidence.ok, true);
+  assert.equal(checkoutEvidence.mode, "public-benchmark-source-lock-check");
+  assert.equal(checkoutEvidence.checkoutVerification?.requested, true);
+  assert.equal(checkoutEvidence.checkoutVerification?.ok, true);
+  assert.equal(checkoutEvidence.checkoutVerification?.commitMatches, true);
+  assert.equal(checkoutEvidence.checkoutVerification?.requiredFileCount, 15);
+  assert.equal(checkoutEvidence.checkoutVerification?.checkedFileCount, 15);
+  assert.equal(checkoutEvidence.checkoutVerification?.failedFileCount, 0);
+  assert.equal(report.sourceSummary.commit, "118209a746d97d0d85e5a7234267f0b6962857e9");
+  assert.deepEqual(report.failedChecks, []);
+  assert.deepEqual(checkoutEvidence.failedChecks, []);
+  assert.equal(sourceLock.source?.commit, "118209a746d97d0d85e5a7234267f0b6962857e9");
+  assert.equal(sourceLock.datasetSources?.longmemeval?.datasetUrl, "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json");
+  assert.ok(sourceLock.availableBenchmarks?.includes("locomo"));
+  assert.ok(sourceLock.availableBenchmarks?.includes("longmemeval"));
+  assert.ok(sourceLock.availableBenchmarks?.includes("convomem"));
+  assert.match(markdown, /Public Benchmark Source Lock Check/);
+  assert.match(markdown, /Checkout verified: not requested/);
+  assert.match(evidence, /public-benchmark-source-lock-check/);
+  assert.match(evidence, /Checkout verification requested by default: `false`/);
+  assert.match(evidence, /Independent checkout verification command/);
+  assert.match(evidence, /Checkout verification requested: `true`/);
+  assert.match(evidence, /Commit matched: `true`/);
+  assert.match(evidence, /Failed file count: 0/);
+  assert.match(evidence, /Raw question ids included: `false`/);
+  assert.doesNotMatch(result.stdout, secretPattern);
+  assert.doesNotMatch(markdown, secretPattern);
+  assert.doesNotMatch(evidence, secretPattern);
+  assert.doesNotMatch(JSON.stringify(checkoutEvidence), secretPattern);
+  assert.doesNotMatch(JSON.stringify(sourceLock), secretPattern);
+  assert.doesNotMatch(result.stdout, privatePathPattern);
+  assert.doesNotMatch(markdown, privatePathPattern);
+  assert.doesNotMatch(evidence, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(checkoutEvidence), privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(sourceLock), privatePathPattern);
 });
 
 check("fresh public benchmark target check passes", () => {
