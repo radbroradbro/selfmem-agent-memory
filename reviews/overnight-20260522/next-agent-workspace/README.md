@@ -18,6 +18,8 @@ contents.
 
 ## What Goes Here
 
+- `send-to-selected-agent.md`: paste-ready instructions for exactly one
+  selected OpenClaw operator.
 - `operator-findings-returned.md`: filled from `operator-findings-template.md`
   after the selected agent runs the fresh window.
 - `returned-packet-intake.md`: filled from
