@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `4ed6c00`, run `26322155069`, success.
+  `b5ad1b8`, run `26322521697`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -69,6 +69,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26321818276` on `aa0e1d3`: success.
 - GitHub Actions CI run `26321912900` on `c278419`: success.
 - GitHub Actions CI run `26322155069` on `4ed6c00`: success.
+- GitHub Actions CI run `26322521697` on `b5ad1b8`: success.
 
 ## Shipped Overnight Slices
 
@@ -202,8 +203,9 @@ Latest local verification before this summary:
 - Canary diagnostic batch audit verification: default fixture batch passed,
   `--require-real-pass` failed closed for fixture evidence, a real redacted
   batch triage parsed 8 of 9 inputs and found zero strict-real passes, and
-  Gemini review returned `CLEAN`. The best real candidate remains blocked by
-  adapter contract and store-latency evidence.
+  Gemini review returned `CLEAN`. GitHub Actions CI run `26322521697` passed on
+  `b5ad1b8`. The best real candidate remains blocked by adapter contract and
+  store-latency evidence.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
   `103e7c6`, run `26290534116`.
 - GitHub Actions CI: success on guarded selected local-container browse commit

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T03:34:49Z",
+  "generatedAt": "2026-05-23T03:40:54Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "4ed6c006ac8e69f55bd91f5541dc127b7f0b272d",
-    "ciRunId": 26322155069,
+    "headSha": "b5ad1b8f9e25832cbdc9afcaa6ad6c71685e7e68",
+    "ciRunId": 26322521697,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the canary packet review gate. GitHub Actions run 26322155069 passed CI on 4ed6c00. Local test, smoke, release:check, release:doctor, goal:audit, clean consumer smoke, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after the canary diagnostic batch audit gate. GitHub Actions run 26322521697 passed CI on b5ad1b8. Local test, smoke, release:check, release:doctor, goal:audit, clean consumer smoke, GitHub live sync, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
