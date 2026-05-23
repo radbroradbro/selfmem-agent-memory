@@ -30,7 +30,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `95f7fea7519574427c7f26e94f00a1085f7c6fb2`.
+- Latest code/product baseline: `8520140bfcb4cb08bed16ee3c34bcb6705fd9310`.
+- GitHub Actions run `26319551404`: passed CI after the baseline comparison gate.
+- Previous verified baseline before the baseline comparison gate:
+  `95f7fea7519574427c7f26e94f00a1085f7c6fb2`.
 - GitHub Actions run `26319050876`: passed CI after the hosted baseline collector gate.
 - Previous verified baseline before the hosted baseline collector:
   `adfd4352d63810daecfa72a58ccb2c2641b89580`.

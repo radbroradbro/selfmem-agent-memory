@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T00:55:55Z",
+  "generatedAt": "2026-05-23T01:18:06Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "95f7fea7519574427c7f26e94f00a1085f7c6fb2",
-    "ciRunId": 26319050876,
+    "headSha": "8520140bfcb4cb08bed16ee3c34bcb6705fd9310",
+    "ciRunId": 26319551404,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the hosted baseline collector gate. GitHub Actions run 26319050876 passed CI on 95f7fea."
+    "note": "This is the latest inspected code/product baseline after the baseline comparison gate. GitHub Actions run 26319551404 passed CI on 8520140."
   },
   "releaseStateGuard": {
     "enabled": true,

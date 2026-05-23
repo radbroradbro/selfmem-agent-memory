@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `95f7fea`, run `26319050876`, success.
+  `8520140`, run `26319551404`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -60,6 +60,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26318633036` on `39feae5`: success.
 - GitHub Actions CI run `26318710488` on `adfd435`: success.
 - GitHub Actions CI run `26319050876` on `95f7fea`: success.
+- GitHub Actions CI run `26319551404` on `8520140`: success.
 
 ## Shipped Overnight Slices
 
@@ -162,7 +163,7 @@ Latest local verification before this summary:
 - Local-session compaction audit: `pnpm compaction:local-audit:built` passed
   in metrics-only mode with 6 input events, 2 redactions, 4 candidate
   fingerprints, chronological output, and zero privacy leaks.
-- GitHub Actions CI: success on the latest inspected baseline, `95f7fea`.
+- GitHub Actions CI: success on the latest inspected baseline, `8520140`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit

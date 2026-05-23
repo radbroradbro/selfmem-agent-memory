@@ -25,8 +25,8 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
 - Branch: `feat/nucleus-wiki-native-contract`
-- Latest public-draft baseline inspected before this audit refresh: `4cee083`
-- PR state from GitHub connector: open, not draft, mergeable
+- Latest public-draft baseline inspected before this audit refresh: `8520140`
+- PR state from GitHub API: open, not draft, mergeable
 - GitHub Actions on `2888f91`: CI run `26288370812` passed
 - Release-state guard follow-up: `dd17f44`, CI run `26289073223` passed
 - Guarded selected vault sync apply follow-up: `103e7c6`, CI run
@@ -82,6 +82,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   `26318710488` passed
 - Hosted baseline collector follow-up: `95f7fea`, CI run `26319050876`
   passed
+- Baseline comparison gate follow-up: `8520140`, CI run `26319551404`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -90,7 +92,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `95f7fea` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `8520140` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
@@ -149,7 +151,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `canary:operator-packet`, `canary-operator-packet-evidence.md`, Gemini review | Proven locally as a public-safe handoff generator for Hermes/OpenClaw strict-real canary collection. It emits placeholders, attach-only metrics paths, pass criteria, and forbidden raw artifacts; it does not count as rollout evidence by itself. |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` | Two real redacted Hermes diagnostic bundles were converted into metrics-only reports. Both proved lifecycle, hybrid-search, local-write, hosted read-through, and zero privacy leaks, but both failed strict rollout intake because store latency was missing and recall p95 exceeded the strict threshold. This keeps real-container rollout incomplete. |
 | Goal completion audit gate | `packages/bench/goal-completion-audit.mjs`, `goal:audit`, `goal-completion-audit-evidence.md`, Gemini review | Proven locally and in CI run `26308994908` as a machine-readable requirement audit that keeps `goalComplete: false` while human approval, hosted baseline, and real rollout requirements remain unresolved |
-| PR body reflects current state | PR #5, `reviews/overnight-20260522/pr-body-update-draft.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: PR #5 body update returned GitHub status 200 at 2026-05-22T21:21:15Z |
+| PR body reflects current state | PR #5, `reviews/overnight-20260522/pr-body-update-draft.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: PR #5 body update returned GitHub status 200 at 2026-05-23T01:19:14Z |
 | External blocker issue exists | Issue #6, `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: release blocker issue creation returned GitHub status 201 at 2026-05-22T21:21:16Z |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
 | Dynamic graph layout release gate | `packages/bench/release-readiness-check.mjs` now requires dynamic layout evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297064340` |
@@ -179,17 +181,11 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 1. Claude/Opus cold review completed with `CONCERNS`; it supports alpha PR
    review only and does not approve public launch or goal completion.
-2. PR #5 body is stale. A paste-ready replacement exists, but the GitHub app
-   cannot update the PR body or add a top-level PR status comment with its
-   current permissions. The PR comment retry after `1074bfd` and CI run
-   `26300868065` still returned 403. A PR review comment retry after
-   `8927df0` and CI run `26301206074` also returned 403. A direct PR body
-   update retry after `13cbe8d` also returned 403. A generated manual GitHub
-   handoff packet now exists through `release:handoff`.
-3. PR #5 and issue #6 are now live, but public launch remains blocked. Human
+2. PR #5 and issue #6 are now live and current, but public launch remains
+   blocked. Human
    approval is required before
    making a live update or changing repository visibility.
-4. The Brain UI has read-only selected local-container audit and browse
+3. The Brain UI has read-only selected local-container audit and browse
    previews, read-only overlay browse visibility for matching local edit
    overlays, browser-local audit history, selected vault sync dry-run,
    write-confirmed selected vault sync apply, lifecycle policy draft export,
@@ -199,7 +195,7 @@ audit so future agents cannot treat green CI as native-goal completion.
    memory materialize with backup. The graph now uses a dynamic layout and
    fixture-safe navigation controls; real-container clustering and pagination
    remain future work.
-6. Hosted Supermemory benchmark claims remain out of scope until the hosted
+4. Hosted Supermemory benchmark claims remain out of scope until the hosted
    baseline preflight accepts a fresh, valid, metrics-only result and the
    matched RecallWeave run receives reviewer approval.
 
@@ -207,9 +203,8 @@ audit so future agents cannot treat green CI as native-goal completion.
 
 The owner can choose one of three paths:
 
-1. Keep the Claude `CONCERNS` review visible, update the PR body manually from
-   `pr-body-update-draft.md`, and merge PR #5 as an alpha/public-readiness
-   candidate.
+1. Keep the Claude `CONCERNS` review visible and merge PR #5 as an
+   alpha/public-readiness candidate after owner approval.
 2. Log in Claude CLI and rerun the final cold review before merge.
-3. Keep PR #5 open and create issues manually from the blocking issue draft
-   before any public launch.
+3. Keep PR #5 and issue #6 open while collecting the hosted baseline and fresh
+   real-container canary before any public launch.
