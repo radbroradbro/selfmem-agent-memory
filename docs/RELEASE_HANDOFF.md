@@ -200,9 +200,20 @@ post-update window of at least 15 minutes. Use `--since`, `--canary-since`, or
 `--last-minutes` to avoid
 letting old trace history prove or poison the patched adapter. The canary report
 generator reads local trace files or metadata-only diagnostic summaries but does
-not print raw memories, transcripts, prompts, answers, local paths,
-credentials, cookies, or bearer tokens. A fixture pass is useful for the tooling
-path, but it is not real rollout evidence.
+not make a raw diagnostic export safe to attach.
+
+After report and intake generation, use `canary:packet` to create one
+metrics-only zip for reviewers:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --output /tmp/recallweave-canary-evidence-packet.zip
+```
+
+If strict intake failed, include the diagnosis file with `--diagnosis`. The
+packet still does not authorize public launch or fleet rollout by itself. It
+must not print raw memories, transcripts, prompts, answers, local paths,
+credentials, cookies, or bearer tokens. A fixture pass is useful for the
+tooling path, but it is not real rollout evidence.
 
 The live adapter must expose `adapter.name: recallweave-selfmem-canary`,
 `strictCanaryContract: v1`, and search/store latency instrumentation markers.

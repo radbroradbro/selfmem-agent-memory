@@ -94,6 +94,9 @@ requirements are resolved.
 - Strict v1 adapter contract markers and updater adapter digests now make stale
   installed adapters visible before a one-agent canary report can count as real
   rollout evidence.
+- Canary evidence packet packaging now gives agents one metrics-only zip for
+  report, intake, and optional diagnosis files, while blocking raw logs and
+  keeping fixture/failing packets from counting as rollout evidence.
 - Adapter smokes now assert bounded read-through policy plus positive total,
   local, and remote recall timings.
 - Secret and private-name scans found no actual credential or private memory

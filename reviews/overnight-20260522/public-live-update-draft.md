@@ -47,6 +47,9 @@ The current PR adds:
 - a canary operator packet that prints public-safe Hermes/OpenClaw strict-real
   collection commands, attach-only metrics files, pass criteria, and forbidden
   raw artifacts;
+- a canary evidence packet builder that creates one metrics-only zip from
+  report, intake, and optional diagnosis files while keeping fixture/failing
+  packets from counting as rollout proof;
 - an adapter store-latency gate so Hermes and OpenClaw smokes prove store
   events include positive `elapsed_ms` samples before the next real canary;
 - a strict v1 adapter contract marker plus updater digest reporting so stale
@@ -153,6 +156,9 @@ Latest verified head before this draft refresh:
   still fail `--strict-real`
 - Canary diagnosis: `canary:diagnose` turns failed canary reports into
   metrics-only remediation actions and keeps fleet/public rollout blocked
+- Canary evidence packet: `canary:packet` creates a metrics-only zip for
+  report/intake/diagnosis files and rejects raw memory-shaped keys,
+  key-shaped secrets, and private local paths
 - Adapter store-latency gate: Hermes and OpenClaw standalone smokes now assert
   positive store `elapsed_ms` samples, and `release:check` enforces the result
 - Fresh canary window gate: strict-real canary collection now records a

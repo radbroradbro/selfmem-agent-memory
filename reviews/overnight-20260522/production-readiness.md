@@ -84,6 +84,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   lifecycle, hybrid-search, local-write, read-through, latency, privacy, and
   rollback metrics, while refusing raw memories, transcripts, prompts,
   answers, secrets, and local paths.
+- Canary evidence packet packaging that turns metrics-only report/intake and
+  optional diagnosis files into one attachable zip, while keeping fixture or
+  failed diagnostic packets from authorizing rollout.
 - Canary report generator that turns Hermes/OpenClaw trace files into the
   sanitized runtime report needed by `canary:intake --strict-real`, without
   printing raw memories, transcripts, prompts, answers, local paths, or
@@ -379,6 +382,9 @@ evidence for:
 - canary operator packet evidence with public-safe Hermes/OpenClaw strict-real
   collection commands, attach-only metrics files, pass criteria, and forbidden
   raw artifacts. This helps collect the next live canary but does not satisfy it.
+- canary evidence packet evidence with `canary:packet`, a metrics-only zip
+  builder for report/intake/diagnosis files that rejects raw-content keys,
+  key-shaped secrets, and private local paths.
 - real canary diagnostic evidence from two redacted external Hermes bundles,
   both privacy-clean and both rejected by strict rollout intake because store
   latency was missing and recall p95 exceeded the strict threshold.

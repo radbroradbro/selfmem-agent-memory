@@ -70,6 +70,7 @@
     "adapter-strict-canary-contract",
     "canary-remediation-plan",
     "canary-operator-packet",
+    "canary-evidence-packet",
     "fresh-canary-window-gate",
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",

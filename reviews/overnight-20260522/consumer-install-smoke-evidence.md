@@ -13,7 +13,7 @@ Result:
 
 - Mode: `clean-consumer-smoke`
 - Writes real files: false
-- Temporary checkout files: 337
+- Temporary checkout files: 422
 - Required npm package files present: true
 - Forbidden runtime files: 0
 - Secret/key-shaped hits: 0
@@ -26,6 +26,17 @@ Commands proven inside the clean checkout:
 - `node packages/brain-ui/interaction-smoke.mjs`
 - `node packages/bench/local-container-audit-smoke.mjs`
 - `node packages/bench/session-compaction-local-audit.mjs --strict`
+- `node packages/bench/canary-report-from-trace.mjs --fixture`
+- `node packages/bench/canary-report-from-trace.mjs --diagnostic-dir packages/bench/fixtures/canary-diagnostic-export.fixture`
+- `node packages/bench/canary-evidence-intake.mjs`
+- `node packages/bench/canary-remediation.mjs`
+- `node packages/bench/canary-operator-packet.mjs --host hermes`
+- `node packages/bench/canary-evidence-packet.mjs`
+- `node packages/bench/hosted-baseline-collector.mjs --fixture`
+- `node packages/bench/recallweave-response-export.mjs --fixture`
+- `node packages/bench/recallweave-baseline-collector.mjs --fixture`
+- `node packages/bench/baseline-comparison.mjs --fixture`
+- `node packages/bench/hosted-baseline-operator-packet.mjs`
 - `npm pack --dry-run --json`
 
 Required package entries verified:
@@ -39,6 +50,7 @@ Required package entries verified:
 - `packages/core/dist/index.js`
 - `packages/brain-ui/src/index.html`
 - `packages/brain-ui/fixtures/model-matrix.json`
+- `packages/bench/canary-evidence-packet.mjs`
 - `plugins/selfmem-fallback/scripts/selfmem_update.py`
 
 Notes:

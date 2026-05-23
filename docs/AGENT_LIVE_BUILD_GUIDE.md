@@ -199,6 +199,16 @@ npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw --forma
 
 The operator packet is public-safe. It uses placeholders for runtime paths and
 lists only the metrics-only files the agent should attach after the run.
+After generating the report and intake files, package them with:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --output /tmp/recallweave-canary-evidence-packet.zip
+```
+
+If strict intake failed and you generated a diagnosis file, add
+`--diagnosis /tmp/recallweave-canary-diagnosis.json`. The packet is a
+metrics-only zip; it must not contain raw logs, memories, prompts, answers,
+keys, cookies, or private paths.
 
 ## Failed Canary Reports
 

@@ -27,6 +27,7 @@ const requiredFiles = [
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
   "packages/bench/canary-operator-packet.mjs",
+  "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
   "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
@@ -146,6 +147,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-remediation-review.md`,
   `${reviewDir}/canary-operator-packet-evidence.md`,
   `${reviewDir}/gemini-canary-operator-packet-review.md`,
+  `${reviewDir}/canary-evidence-packet-evidence.md`,
+  `${reviewDir}/gemini-canary-evidence-packet-review.md`,
   `${reviewDir}/gemini-adapter-store-latency-review.md`,
   `${reviewDir}/gemini-fresh-canary-window-review.md`,
   `${reviewDir}/claude-fresh-canary-window-review-blocked.md`,
@@ -262,6 +265,7 @@ const requiredScripts = [
   "canary:intake",
   "canary:diagnose",
   "canary:operator-packet",
+  "canary:packet",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -829,6 +833,7 @@ check("release state is conservative", () => {
     "adapter-strict-canary-contract",
     "canary-remediation-plan",
     "canary-operator-packet",
+    "canary-evidence-packet",
     "hosted-baseline-preflight",
     "hosted-baseline-collector",
     "recallweave-response-export",
@@ -885,6 +890,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /canary evidence intake|canary:intake|runtime canary evidence/i, `${file} missing canary evidence intake`);
     assert.match(text, /canary diagnose|canary:diagnose|remediation/i, `${file} missing canary remediation`);
     assert.match(text, /operator packet|canary operator|strict-real.*packet/i, `${file} missing canary operator packet`);
+    assert.match(text, /canary evidence packet|canary:packet|metrics-only.*zip/i, `${file} missing canary evidence packet`);
     assert.match(text, /research source lock|source-lock|source lock/i, `${file} missing research source lock`);
     assert.match(text, /model matrix|model\/autoresearch|model-autoresearch/i, `${file} missing model matrix`);
     assert.match(text, /context preview|prompt context|recall packet/i, `${file} missing context preview`);
@@ -1391,6 +1397,8 @@ check("fresh canary operator packet passes", () => {
   assert.ok(report.commands.some((item) => item.id === "apply-and-collect-live-container" && /--strict-real/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-dir" && /--canary-diagnostic-dir/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-zip" && /--canary-diagnostic-zip/.test(item.command) && /--canary-since/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "package-passing-evidence" && /canary:packet/.test(item.command) && /--strict-real/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "package-diagnostic-evidence" && /canary:packet/.test(item.command) && /--diagnosis/.test(item.command)));
   assert.ok(report.acceptanceCriteria.includes("countsAsRealRolloutEvidence is true"));
   assert.ok(report.acceptanceCriteria.includes("fixtureOnly is false"));
   assert.ok(report.acceptanceCriteria.includes("adapter.strictCanaryContract is v1"));
@@ -1410,6 +1418,73 @@ check("fresh canary operator packet passes", () => {
   assert.match(evidence, /strict-real canary operator packet/i);
   assert.match(evidence, /canary:operator-packet/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+});
+
+check("fresh canary evidence packet passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-packet-check-"));
+  try {
+    const packetPath = join(tempRoot, "packet.zip");
+    const intakePath = join(tempRoot, "intake.json");
+    const fixtureReportPath = join(root, "packages/bench/fixtures/canary-runtime-report.fixture.json");
+    writeFileSync(intakePath, run("node", ["packages/bench/canary-evidence-intake.mjs"]).stdout, { encoding: "utf8", mode: 0o600 });
+    const packetRun = run("node", [
+      "packages/bench/canary-evidence-packet.mjs",
+      "--output",
+      packetPath,
+    ]);
+    const packetWithIntakePath = join(tempRoot, "packet-with-intake.zip");
+    const packetWithIntakeRun = run("node", [
+      "packages/bench/canary-evidence-packet.mjs",
+      "--report",
+      fixtureReportPath,
+      "--intake",
+      intakePath,
+      "--output",
+      packetWithIntakePath,
+    ]);
+    const strictFixture = spawnSync("node", [
+      "packages/bench/canary-evidence-packet.mjs",
+      "--report",
+      fixtureReportPath,
+      "--intake",
+      intakePath,
+      "--strict-real",
+      "--output",
+      join(tempRoot, "strict-fixture.zip"),
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const packet = JSON.parse(packetRun.stdout);
+    const packetWithIntake = JSON.parse(packetWithIntakeRun.stdout);
+    const zipEntries = run("unzip", ["-Z1", packetPath]).stdout.split(/\r?\n/).filter(Boolean).sort();
+    const zipWithIntakeEntries = run("unzip", ["-Z1", packetWithIntakePath]).stdout.split(/\r?\n/).filter(Boolean).sort();
+    const evidence = readFileSync(join(root, reviewDir, "canary-evidence-packet-evidence.md"), "utf8");
+    const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-evidence-packet-review.md"), "utf8");
+    assert.equal(packet.ok, true);
+    assert.equal(packet.mode, "canary-evidence-packet");
+    assert.equal(packet.writesRealFiles, true);
+    assert.equal(packet.metricsOnly, true);
+    assert.equal(packet.fixtureOnly, true);
+    assert.equal(packet.countsAsRealRolloutEvidence, false);
+    assert.equal(packet.publicLaunchAllowed, false);
+    assert.equal(packet.fleetRolloutAllowed, false);
+    assert.deepEqual(zipEntries, ["README.md", "canary-report.json", "manifest.json"]);
+    assert.deepEqual(packet.packet.entries, zipEntries);
+    assert.equal(packetWithIntake.countsAsRealRolloutEvidence, false);
+    assert.deepEqual(zipWithIntakeEntries, ["README.md", "canary-intake.json", "canary-report.json", "manifest.json"]);
+    assert.notEqual(strictFixture.status, 0, "strict-real fixture packet must fail closed");
+    assert.match(strictFixture.stderr, /strict-real packet requires passing live canary intake evidence/);
+    assert.match(evidence, /canary evidence packet/i);
+    assert.match(evidence, /canary:packet/i);
+    assert.match(evidence, /metrics-only zip/i);
+    assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+    assert.doesNotMatch(packetRun.stdout, secretPattern);
+    assert.doesNotMatch(packetRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
 });
 
 check("fresh canary window reviewer evidence is explicit", () => {

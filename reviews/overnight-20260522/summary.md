@@ -89,6 +89,7 @@ evidence are still required before any public live update.
 | Adapter strict canary contract | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `packages/bench/canary-evidence-intake.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/adapter-strict-canary-contract-evidence.md`, `reviews/overnight-20260522/gemini-adapter-strict-canary-contract-review.md` |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |
 | Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `reviews/overnight-20260522/canary-operator-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-operator-packet-review.md` |
+| Canary evidence packet | `packages/bench/canary-evidence-packet.mjs`, `reviews/overnight-20260522/canary-evidence-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-packet-review.md` |
 | Fresh canary window isolation | `packages/bench/canary-report-from-trace.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/gemini-fresh-canary-window-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
@@ -262,10 +263,12 @@ Latest local verification before this summary:
   `26306469240` passed on `ff6f343`.
 - Clean consumer smoke verification: a temporary public-style checkout ran
   `selfmem_update --help`, update smoke, Brain UI smoke, Brain UI interaction
-  smoke, local-container audit smoke, local-session compaction audit, and
-  `npm pack --dry-run --json`. It verified required user-facing docs, updater
-  files, built core runtime, Brain UI model-matrix fixture, zero forbidden
-  runtime files, and zero key-shaped hits. GitHub Actions CI run
+  smoke, local-container audit smoke, local-session compaction audit,
+  canary report/intake/diagnose/operator/packet checks, hosted/RecallWeave
+  baseline fixture checks, and `npm pack --dry-run --json`. It verified
+  required user-facing docs, updater files, built core runtime, Brain UI
+  model-matrix fixture, zero forbidden runtime files, and zero key-shaped hits.
+  GitHub Actions CI run
   `26306827655` passed on `4cee083`.
 - Release blocker doctor verification: local `release:doctor` now checks the
   conservative release state, required blocker evidence, token-free remote URL,

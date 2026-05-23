@@ -143,6 +143,10 @@ Scope:
   turns failed canary reports into metrics-only action plans, verifies a failing
   fixture with `recall-p95` and `store-p95`, verifies a passing fixture, and
   keeps fleet and public rollout disabled.
+- Added canary evidence packet coverage to the release gate. The packet command
+  writes one metrics-only zip from report, intake, and optional diagnosis files,
+  rejects raw-content keys, secrets, and private paths, and keeps fixture or
+  failing packets from authorizing rollout.
 - Added GitHub live sync coverage to the release gate. The checker calls the
   GitHub API in read-only mode, verifies PR #5 and issue #6 match the
   checked-in drafts, and prints hashes and booleans instead of body text,

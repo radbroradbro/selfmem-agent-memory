@@ -20,6 +20,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
   "packages/bench/canary-operator-packet.mjs",
+  "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-comparison.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
@@ -51,6 +52,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["consumer:smoke"], "string");
   assert.equal(typeof packageJson.scripts?.["update:smoke"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:operator-packet"], "string");
+  assert.equal(typeof packageJson.scripts?.["canary:packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:collect"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:export:recallweave"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:collect:recallweave"], "string");
@@ -76,6 +78,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-evidence-intake.mjs"], "canary evidence intake"));
   checks.push(run("node", ["packages/bench/canary-remediation.mjs"], "canary remediation plan"));
   checks.push(run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "hermes"], "canary operator packet"));
+  checks.push(run("node", ["packages/bench/canary-evidence-packet.mjs"], "canary evidence packet"));
   checks.push(run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture"], "hosted baseline collector"));
   checks.push(run("node", ["packages/bench/recallweave-response-export.mjs", "--fixture"], "RecallWeave response export"));
   checks.push(run("node", ["packages/bench/recallweave-baseline-collector.mjs", "--fixture"], "RecallWeave baseline collector"));
@@ -99,6 +102,7 @@ try {
     "packages/bench/canary-evidence-intake.mjs",
     "packages/bench/canary-remediation.mjs",
     "packages/bench/canary-operator-packet.mjs",
+    "packages/bench/canary-evidence-packet.mjs",
     "packages/bench/baseline-scoring-contract.mjs",
     "packages/bench/baseline-comparison.mjs",
     "packages/bench/hosted-baseline-collector.mjs",

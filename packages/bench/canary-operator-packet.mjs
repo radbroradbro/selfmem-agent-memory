@@ -13,6 +13,7 @@ const repoPlaceholder = host === "hermes" ? "<hermes-checkout>" : "<openclaw-che
 const canaryReport = "/tmp/recallweave-canary-report.json";
 const intakeReport = "/tmp/recallweave-canary-intake.json";
 const diagnosisReport = "/tmp/recallweave-canary-diagnosis.json";
+const evidencePacket = "/tmp/recallweave-canary-evidence-packet.zip";
 const freshWindowStart = "<fresh-window-start-iso>";
 
 const packet = {
@@ -80,6 +81,16 @@ const packet = {
       description: "Run only if strict intake fails. Attach this metrics-only output, not raw logs.",
       command: `npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report ${canaryReport} > ${diagnosisReport}`,
     },
+    {
+      id: "package-passing-evidence",
+      description: "Create one sanitized evidence zip from a passing strict-real canary. This never includes raw logs or memories.",
+      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --strict-real --output ${evidencePacket}`,
+    },
+    {
+      id: "package-diagnostic-evidence",
+      description: "Create one sanitized diagnostic zip when strict intake fails. This does not count as rollout evidence.",
+      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --diagnosis ${diagnosisReport} --output ${evidencePacket}`,
+    },
   ],
   acceptanceCriteria: [
     "canaryPass is true",
@@ -105,6 +116,7 @@ const packet = {
     canaryReport,
     intakeReport,
     diagnosisReport,
+    evidencePacket,
   ],
   forbidden: [
     "raw memories",
@@ -171,11 +183,24 @@ function buildMarkdown() {
     `npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report ${canaryReport} > ${diagnosisReport}`,
     "```",
     "",
+    "Package a passing strict-real canary into one sanitized zip:",
+    "",
+    "```bash",
+    `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --strict-real --output ${evidencePacket}`,
+    "```",
+    "",
+    "If strict intake failed, package the diagnostic metrics instead:",
+    "",
+    "```bash",
+    `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --diagnosis ${diagnosisReport} --output ${evidencePacket}`,
+    "```",
+    "",
     "## Attach Only",
     "",
     `- ${canaryReport}`,
     `- ${intakeReport}`,
     `- ${diagnosisReport} if strict intake failed`,
+    `- ${evidencePacket}`,
     "",
     "## Pass Criteria",
     "",
