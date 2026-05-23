@@ -163,8 +163,8 @@ The failure is actionable and matches the adapter hardening work:
 - The next operator should run `canary:diagnose` on any failing report and
   attach only the metrics-only output.
 - The current sendable handoff packet is
-  `recallweave-openclaw-next-agent-canary-20260523-continued.zip`, SHA256
-  `5967d1fa0ce84aaf1d7890017c6e32cc6fb2960e2c2d0cbb38ae2522be6ec5bf`.
+  `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
+  `66826f3ea14be6db3bc60cd08c2998628283dfa40dc3c2da89450bb9ae5778c1`.
 
 ## Boundary
 

@@ -17,7 +17,7 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T12:43:49Z
+  - Updated at: 2026-05-23T12:50:23Z
   - Latest local refresh records `667ed57052eab4bf05f2bbed738f4b4b9c8155a4`
     and CI run `26332952176` as the latest verified code/product baseline for
     the baseline source-match preflight follow-up. It does not close the
@@ -33,6 +33,8 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after adding `baseline:source-match`, which
     blocks another hosted/local run unless the selected local RecallWeave source
     can collect the reviewed expected references.
+  - The PR body was refreshed again after regenerating the current OpenClaw
+    next-agent canary handoff packet identity.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -45,10 +47,11 @@ Verdict: resolved for PR body and blocker issue writes.
     refresh, strict adapter CI baseline refresh, canary evidence packet
     refresh, e2388f0 CI baseline refresh, baseline evidence packet refresh,
     aa0e1d3 CI baseline refresh, canary packet review refresh, 4ed6c00 CI
-    baseline refresh, hosted-baseline run orchestrator refresh, and continued
-    one-agent canary packet identity refresh
-  - Updated at: 2026-05-23T11:18:31Z
-  - Body length: 13919
+    baseline refresh, hosted-baseline run orchestrator refresh, continued
+    one-agent canary packet identity refresh, and current OpenClaw next-agent
+    handoff packet identity refresh
+  - Updated at: 2026-05-23T12:50:24Z
+  - Body length: 13917
 
 ## Safety
 
