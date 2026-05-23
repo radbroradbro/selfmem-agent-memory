@@ -1938,7 +1938,10 @@ check("fresh canary window reviewer evidence is explicit", () => {
 check("fresh release blocker doctor passes", () => {
   const doctorRun = run("node", ["packages/bench/release-blocker-doctor.mjs"]);
   const report = JSON.parse(doctorRun.stdout);
+  const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
+  assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
+  assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
   assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --require-ready/);
   assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--require-ready/.test(item)));
 });
@@ -2134,6 +2137,15 @@ check("fresh hosted baseline preflight passes", () => {
   const operatorMarkdown = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs", "--format", "markdown"]);
   const nextRunResult = run("node", ["packages/bench/hosted-baseline-next-run.mjs"]);
   const nextRunMarkdown = run("node", ["packages/bench/hosted-baseline-next-run.mjs", "--format", "markdown"]);
+  const nextRunRequireReadyFixture = spawnSync(
+    "node",
+    ["packages/bench/hosted-baseline-next-run.mjs", "--fixture", "--require-ready"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
   const baselinePacketResult = run("node", ["packages/bench/baseline-evidence-packet.mjs", "--output", baselinePacketPath]);
   const baselinePacketReviewResult = run("node", ["packages/bench/baseline-evidence-packet-review.mjs"]);
   const returnedBaselinePacketResult = run("node", ["packages/bench/baseline-returned-packet-intake.mjs"]);
@@ -2196,6 +2208,7 @@ check("fresh hosted baseline preflight passes", () => {
   const operatorPacket = JSON.parse(operatorResult.stdout);
   const operatorDiscoveryPacket = JSON.parse(operatorDiscoveryResult.stdout);
   const nextRunPlan = JSON.parse(nextRunResult.stdout);
+  const nextRunRequireReadyFixtureReport = JSON.parse(nextRunRequireReadyFixture.stdout);
   const baselinePacket = JSON.parse(baselinePacketResult.stdout);
   const baselinePacketReview = JSON.parse(baselinePacketReviewResult.stdout);
   const returnedBaselinePacket = JSON.parse(returnedBaselinePacketResult.stdout);
@@ -2498,6 +2511,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(nextRunPlan.metricsOnly, true);
   assert.equal(nextRunPlan.plannerAuthorizesPublicClaims, false);
   assert.equal(nextRunPlan.publicLaunchAllowed, false);
+  assert.equal(nextRunPlan.readyForOwnerReview, false);
+  assert.equal(nextRunPlan.requireReadyPassed, true);
+  assert.equal(nextRunPlan.blockerPreserved, true);
   assert.equal(nextRunPlan.status, "FIXTURE_PLAN_ONLY");
   assert.equal(nextRunPlan.evidence?.hosted?.provider, "hosted-supermemory");
   assert.equal(nextRunPlan.evidence?.recallWeave?.provider, "recallweave");
@@ -2506,6 +2522,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(nextRunPlan.evidence?.comparison?.countsAsComparisonEvidence, false);
   assert.equal(nextRunPlan.privacy?.privacyLeakCount, 0);
   assert.equal(nextRunPlan.comparability?.sameQuerySet, true);
+  assert.equal(nextRunPlan.strictRealEvidenceRequired?.hostedNonFixture, false);
+  assert.equal(nextRunPlan.strictRealEvidenceRequired?.recallWeaveNonFixture, false);
+  assert.equal(nextRunPlan.strictRealEvidenceRequired?.reviewersRequired, 2);
   assert.ok(nextRunPlan.acceptanceCriteria?.includes("querySetEvidence.publicBenchmarkReady is true for both runs"));
   assert.ok(nextRunPlan.acceptanceCriteria?.includes("every query has at least one expected result id or expected content hash"));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
@@ -2523,10 +2542,20 @@ check("fresh hosted baseline preflight passes", () => {
     assert.doesNotMatch(toolSegment, /\s>\s/, "baseline next-run JSON evidence commands must use --output instead of shell redirection");
   }
   assert.match(nextRunMarkdown.stdout, /RecallWeave Hosted Baseline Next Run/);
+  assert.match(nextRunMarkdown.stdout, /Ready for owner review: no/);
   assert.match(nextRunMarkdown.stdout, /Planner authorizes public claims: no/);
   assert.match(nextRunMarkdown.stdout, /baseline:next-run/);
   assert.match(nextRunMarkdown.stdout, /baseline:discover/);
   assert.match(nextRunMarkdown.stdout, /private container maps/i);
+  assert.notEqual(nextRunRequireReadyFixture.status, 0);
+  assert.equal(nextRunRequireReadyFixtureReport.ok, false);
+  assert.equal(nextRunRequireReadyFixtureReport.mode, "hosted-baseline-next-run");
+  assert.equal(nextRunRequireReadyFixtureReport.readyForOwnerReview, false);
+  assert.equal(nextRunRequireReadyFixtureReport.requireReadyPassed, false);
+  assert.equal(nextRunRequireReadyFixtureReport.blockerPreserved, true);
+  assert.match(nextRunRequireReadyFixtureReport.reason, /--require-ready needs READY_FOR_OWNER_REVIEW/);
+  assert.doesNotMatch(`${nextRunRequireReadyFixture.stdout}\n${nextRunRequireReadyFixture.stderr}`, secretPattern);
+  assert.doesNotMatch(`${nextRunRequireReadyFixture.stdout}\n${nextRunRequireReadyFixture.stderr}`, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.equal(baselinePacket.mode, "baseline-evidence-packet");
   assert.equal(baselinePacket.metricsOnly, true);
   assert.equal(baselinePacket.fixtureOnly, true);

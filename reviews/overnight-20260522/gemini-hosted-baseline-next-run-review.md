@@ -9,6 +9,11 @@ Reviewer route:
   hosted-discovery planner extension
 - Scope: hosted baseline next-run planner, docs, evidence, release wiring, and
   release-state surface
+- Refresh scope: `--require-ready` fail-closed readiness extension for hosted
+  baseline owner-review readiness
+- Refresh command mode: embedded public-safe diff with explicit no-tool
+  instruction, after a first workspace-inspection attempt hit unavailable
+  Gemini shell tools
 
 Verdict: `CLEAN`
 
@@ -35,6 +40,20 @@ Findings:
   without executing hosted calls itself. Discovery remains read-only and
   metrics-only, while the raw-label map requires explicit opt-in and stays
   outside the repository with `0600` permissions.
+- Fail-closed readiness: safe. `--require-ready` rejects fixture/partial
+  evidence with public-safe JSON, preserves the hosted-baseline blocker, and
+  can pass only after non-fixture hosted, RecallWeave, preflight, comparison,
+  source-lock, privacy-clean, RecallWeave-win, and two-reviewer evidence all
+  pass. Even then, the planner marks only owner-review readiness, not public
+  launch.
+- Verification coverage: safe. The release readiness check verifies the
+  fixture failure path, the new `readyForOwnerReview` and
+  `strictRealEvidenceRequired` fields, doctor guidance, and absence of secrets
+  or private local paths in the fail-closed output.
+- Positive-path shape: safe. A synthetic non-fixture hosted plus RecallWeave
+  result, preflight, comparison, and two-reviewer contract passed
+  `--require-ready` as `READY_FOR_OWNER_REVIEW` while keeping
+  `publicLaunchAllowed: false`.
 
 Notes:
 

@@ -9,6 +9,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const format = String(args.format || "json").trim().toLowerCase();
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+const requireReady = Boolean(args.requireReady);
 
 const fixtureMode = Boolean(args.fixture) || noEvidenceArgs(args);
 const hostedPath = resolveInputPath(
@@ -48,6 +49,20 @@ const reviewerApprovalCount = Number(comparison?.reviewerApprovalCount ?? prefli
 const status = chooseStatus({ hosted, recallWeave, comparison, preflight, privacy, comparability, recallWeaveWin, reviewerApprovalCount });
 const blockReasons = blockReasonsFor({ hosted, recallWeave, comparison, preflight, privacy, comparability, recallWeaveWin, reviewerApprovalCount });
 const commandPlan = commandsFor(status);
+const fixtureEvidence = Boolean(hosted?.fixtureOnly || recallWeave?.fixtureOnly || comparison?.fixtureOnly || fixtureMode);
+const readyForOwnerReview = readyForOwnerReviewFor({
+  hosted,
+  recallWeave,
+  comparison,
+  preflight,
+  privacy,
+  comparability,
+  status,
+  comparisonPublicReady,
+  recallWeaveWin,
+  reviewerApprovalCount,
+  fixtureEvidence,
+});
 
 const output = {
   ok: true,
@@ -58,16 +73,31 @@ const output = {
   plannerAuthorizesPublicClaims: false,
   publicLaunchAllowed: false,
   fleetRolloutAllowed: false,
+  readyForOwnerReview,
+  requireReadyPassed: !requireReady || readyForOwnerReview,
+  blockerPreserved: true,
   liveHostedCollectionAllowed: !blockReasons.some((item) => item.severity === "hard-block"),
   comparisonPublicClaimsReady: comparisonPublicReady,
   status,
   recommendedScope: recommendedScope(status),
   evidence: {
-    fixtureOnly: Boolean(hosted?.fixtureOnly || recallWeave?.fixtureOnly || comparison?.fixtureOnly || fixtureMode),
+    fixtureOnly: fixtureEvidence,
     hosted: hosted ? summarizeRun(hosted) : null,
     recallWeave: recallWeave ? summarizeRun(recallWeave) : null,
     preflight: preflight ? summarizePreflight(preflight) : null,
     comparison: comparison ? summarizeComparison(comparison) : null,
+  },
+  strictRealEvidenceRequired: {
+    hostedNonFixture: hosted ? hosted.fixtureOnly === false : false,
+    recallWeaveNonFixture: recallWeave ? recallWeave.fixtureOnly === false : false,
+    hostedPreflightCounts: Boolean(preflight?.countsAsHostedBaselineEvidence),
+    comparisonCounts: Boolean(comparison?.countsAsComparisonEvidence),
+    comparisonPublicClaimsReady: comparisonPublicReady,
+    recallWeaveWin,
+    reviewerApprovalCount,
+    reviewersRequired: 2,
+    privacyClean: privacyClean(privacy),
+    sameHarness: Object.values(comparability).every(Boolean),
   },
   comparability,
   privacy,
@@ -100,6 +130,13 @@ const output = {
 };
 
 output.operatorMessage = buildMarkdown(output);
+const readyFailure = requireReadyFailure(output);
+if (readyFailure) {
+  const serialized = `${JSON.stringify(readyFailure, null, 2)}\n`;
+  assertSafeText(serialized, "require-ready failure output");
+  process.stdout.write(serialized);
+  process.exit(1);
+}
 const serialized = format === "markdown" ? `${output.operatorMessage}\n` : `${JSON.stringify(output, null, 2)}\n`;
 assertSafeText(serialized, "next-run planner output");
 process.stdout.write(serialized);
@@ -403,6 +440,7 @@ function buildMarkdown(plan) {
     "",
     `Status: ${plan.status}`,
     `Scope: ${plan.recommendedScope}`,
+    `Ready for owner review: ${plan.readyForOwnerReview ? "yes" : "no"}`,
     `Public launch allowed: ${plan.publicLaunchAllowed ? "yes" : "no"}`,
     `Planner authorizes public claims: ${plan.plannerAuthorizesPublicClaims ? "yes" : "no"}`,
     "",
@@ -422,6 +460,62 @@ function buildMarkdown(plan) {
   for (const item of plan.acceptanceCriteria) lines.push(`- ${item}`);
   lines.push("", "Attach only aggregate result files, discovery output, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, cookies, or unredacted diagnostics.");
   return lines.join("\n");
+}
+
+function readyForOwnerReviewFor(input) {
+  const {
+    hosted,
+    recallWeave,
+    comparison,
+    preflight,
+    privacy,
+    comparability,
+    status,
+    comparisonPublicReady,
+    recallWeaveWin,
+    reviewerApprovalCount,
+    fixtureEvidence,
+  } = input;
+  return status === "READY_FOR_OWNER_REVIEW" &&
+    fixtureEvidence === false &&
+    hosted?.fixtureOnly === false &&
+    recallWeave?.fixtureOnly === false &&
+    hosted?.metricsOnly === true &&
+    recallWeave?.metricsOnly === true &&
+    preflight?.countsAsHostedBaselineEvidence === true &&
+    comparison?.countsAsComparisonEvidence === true &&
+    comparisonPublicReady === true &&
+    recallWeaveWin === true &&
+    reviewerApprovalCount >= 2 &&
+    privacyClean(privacy) &&
+    Object.values(comparability).every(Boolean);
+}
+
+function requireReadyFailure(plan) {
+  if (!requireReady) return null;
+  if (plan.readyForOwnerReview && plan.status === "READY_FOR_OWNER_REVIEW" && plan.comparisonPublicClaimsReady) return null;
+  return {
+    ok: false,
+    mode: "hosted-baseline-next-run",
+    publicSafe: true,
+    metricsOnly: true,
+    publicLaunchAllowed: false,
+    fleetRolloutAllowed: false,
+    readyForOwnerReview: plan.readyForOwnerReview,
+    requireReadyPassed: false,
+    blockerPreserved: true,
+    status: plan.status,
+    comparisonPublicClaimsReady: plan.comparisonPublicClaimsReady,
+    evidence: {
+      fixtureOnly: plan.evidence.fixtureOnly,
+      hostedPresent: Boolean(plan.evidence.hosted),
+      recallWeavePresent: Boolean(plan.evidence.recallWeave),
+      preflightPresent: Boolean(plan.evidence.preflight),
+      comparisonPresent: Boolean(plan.evidence.comparison),
+    },
+    strictRealEvidenceRequired: plan.strictRealEvidenceRequired,
+    reason: "--require-ready needs READY_FOR_OWNER_REVIEW from non-fixture hosted, RecallWeave, preflight, comparison, and two-reviewer evidence",
+  };
 }
 
 function runLine(run) {

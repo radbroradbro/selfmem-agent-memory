@@ -17,6 +17,9 @@ Scope:
   hosted or local collection.
 - It calls no hosted provider, writes no files, and never authorizes public
   benchmark claims or public launch.
+- Added `--require-ready` so fixture, partial, privacy-unclean, mismatched,
+  losing, or unreviewed evidence exits nonzero with public-safe JSON before an
+  operator can treat the plan as owner-review-ready.
 
 Commands:
 
@@ -24,7 +27,11 @@ Commands:
 node --check packages/bench/hosted-baseline-next-run.mjs
 node packages/bench/hosted-baseline-next-run.mjs
 node packages/bench/hosted-baseline-next-run.mjs --format markdown
+node packages/bench/hosted-baseline-next-run.mjs --fixture --require-ready
+# synthetic non-fixture hosted plus RecallWeave result, preflight, comparison,
+# and two-reviewer shape check through hosted-baseline-next-run --require-ready
 node packages/bench/consumer-install-smoke.mjs
+npm exec --yes pnpm@10.23.0 -- release:check
 ```
 
 Observed fixture-plan output:
@@ -34,10 +41,39 @@ Observed fixture-plan output:
   "status": "FIXTURE_PLAN_ONLY",
   "mode": "hosted-baseline-next-run",
   "publicLaunchAllowed": false,
+  "readyForOwnerReview": false,
+  "requireReadyPassed": true,
   "plannerAuthorizesPublicClaims": false,
   "commandCount": 10,
   "privacyLeakCount": 0,
   "sameQuerySet": true
+}
+```
+
+Observed `--require-ready` fixture output:
+
+```json
+{
+  "ok": false,
+  "mode": "hosted-baseline-next-run",
+  "publicLaunchAllowed": false,
+  "readyForOwnerReview": false,
+  "requireReadyPassed": false,
+  "blockerPreserved": true,
+  "status": "FIXTURE_PLAN_ONLY"
+}
+```
+
+Observed synthetic ready-shape output:
+
+```json
+{
+  "ok": true,
+  "status": "READY_FOR_OWNER_REVIEW",
+  "readyForOwnerReview": true,
+  "requireReadyPassed": true,
+  "publicLaunchAllowed": false,
+  "comparisonPublicClaimsReady": true
 }
 ```
 
@@ -51,6 +87,13 @@ Expected behavior:
 - Fixture hosted and RecallWeave results remain `FIXTURE_PLAN_ONLY`.
 - Fixture evidence can validate parser behavior but cannot close the hosted
   baseline blocker.
+- `--require-ready` fails closed for the fixture plan and returns safe JSON, not
+  a stack trace.
+- `readyForOwnerReview` can become true only after non-fixture hosted,
+  RecallWeave, preflight, comparison, source-lock, privacy-clean, RecallWeave
+  win, and two-reviewer evidence all pass.
+- `release:check` covers the fixture failure path, doctor next-action command,
+  and secret/private-path absence in the fail-closed output.
 - The command plan includes hosted container discovery, optional local-only
   private map creation, query-set validation, hosted collection, hosted
   validation, RecallWeave export, RecallWeave aggregate collection, matched
@@ -73,3 +116,5 @@ Boundary:
 - Public comparison claims still require non-fixture hosted and RecallWeave
   results, matching query-set and scoring-code hashes, labeled query sets, a
   RecallWeave win, and two independent reviewer approvals.
+- A `--require-ready` pass means ready for owner review only. It does not
+  authorize public launch.

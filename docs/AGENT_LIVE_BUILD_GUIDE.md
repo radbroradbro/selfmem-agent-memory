@@ -349,6 +349,17 @@ safe command sequence:
 npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --format markdown
 ```
 
+When you think the hosted and local evidence is complete, require a hard ready
+check before sending it upstream:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --preflight /tmp/recallweave-hosted-baseline-preflight.json --comparison /tmp/recallweave-baseline-comparison.json --require-ready
+```
+
+That command must fail for fixtures, partial evidence, privacy failures,
+harness mismatches, missing reviewer approval, or a RecallWeave loss. Passing
+means owner-review ready, not public-launch ready.
+
 Both commands call no hosted provider. They print aggregate-only collection
 contracts and validation commands. The actual read-only collection command is:
 

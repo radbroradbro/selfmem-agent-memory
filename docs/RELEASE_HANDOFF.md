@@ -92,6 +92,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
+npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --fixture --require-ready
 npm exec --yes pnpm@10.23.0 -- baseline:packet
 npm exec --yes pnpm@10.23.0 -- baseline:packet:review
 npm exec --yes pnpm@10.23.0 -- baseline:returned-packet
@@ -157,6 +158,10 @@ Use `baseline:next-run` when an agent has partial hosted or RecallWeave
 evidence and needs the next exact command sequence. It is state-aware, calls no
 hosted provider, keeps fixture evidence from closing the blocker, and never
 authorizes public comparison claims by itself.
+Use `baseline:next-run -- --require-ready` only after hosted, RecallWeave,
+preflight, and comparison files exist. That switch fails closed for fixture,
+partial, privacy-unclean, mismatched, losing, or unreviewed evidence. A passing
+result means the comparison is ready for owner review, not public launch.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.

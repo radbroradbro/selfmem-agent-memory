@@ -109,6 +109,11 @@ agent has partial evidence and needs the next safe step. It inspects hosted,
 RecallWeave, preflight, and comparison state when available, then prints the
 exact source-locked run sequence. It never calls a hosted provider, never
 authorizes public claims, and keeps fixtures useful only for parser validation.
+Use `baseline:next-run -- --require-ready` after the hosted, RecallWeave,
+preflight, and comparison files are available. It must fail for fixtures,
+partial evidence, privacy failures, harness mismatches, missing reviewer
+approval, or a RecallWeave loss. A passing result means the evidence is ready
+for owner review, not public launch.
 
 Allowed public wording after a win:
 
