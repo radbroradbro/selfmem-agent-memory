@@ -4,8 +4,8 @@ Use this with exactly one OpenClaw agent. Attach the zip named below in the same
 
 Packet:
 
-- `recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`
-- SHA256: `f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`
+- `recallweave-openclaw-next-agent-canary-20260523-latest.zip`
+- SHA256: `c4720114dd1a50674e9bb8577490abfdee18903d4eae19a3a6d52bb9881bcd91`
 
 Paste:
 
@@ -16,7 +16,7 @@ Important: this packet is for one fresh canary window only. Do not roll it out t
 
 Do this in order:
 
-1. Unzip and read README.md, next-agent-plan.md, and strict-real-operator-packet.md.
+1. Unzip and read README.md, next-agent-plan.md, strict-real-operator-packet.md, and strict-real-canary-drill.md.
 2. Run the dry-run command first and confirm it targets your OpenClaw checkout.
 3. Record FRESH_WINDOW_START immediately before applying the adapter.
 4. Apply the current adapter only if the dry-run is sane.
