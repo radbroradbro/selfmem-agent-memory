@@ -18,6 +18,8 @@ A publishable canary must use:
 - the same queries,
 - relevance-labeled queries, where every query includes at least one
   `expectedResultIds` or `expectedResultHashes` entry,
+- a private hosted mirror or source-matched local RecallWeave source when the
+  query labels were authored from hosted history,
 - a source-match preflight proving the local RecallWeave source can collect at
   least one expected reference for every reviewed query,
 - a source-alignment gate proving the hosted label and local container map point
@@ -44,6 +46,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
+npm exec --yes pnpm@10.23.0 -- baseline:mirror-hosted
 npm exec --yes pnpm@10.23.0 -- baseline:source-match
 npm exec --yes pnpm@10.23.0 -- baseline:source-align
 npm exec --yes pnpm@10.23.0 -- baseline:source-gap
@@ -78,6 +81,11 @@ hosted container, but the draft itself is not benchmark evidence. It must be
 reviewed locally, then checked with `baseline:queryset --strict`, before hosted
 or RecallWeave collection starts. Attach only the public author report and the
 strict query-set inspection report.
+If the canary uses hosted history as its source, run `baseline:mirror-hosted`
+next. It reads hosted Supermemory in read-only mode, writes a redacted local
+RecallWeave-compatible mirror outside the repository, and emits a public-safe
+metrics report. The mirror's `memories.jsonl` and `container-map.json` are
+private local inputs, not reviewer attachments.
 
 The fixture path proves that the result shape is parseable. It must never count
 as hosted baseline evidence, even if all metrics fields are present. Use
@@ -90,10 +98,12 @@ and public-safe: hashes, counts, readiness flags, and no raw query text or
 expected-result identifiers.
 
 Then run `baseline:source-match -- --live --queryset <path> --container-dir
-<local-recallweave-container-dir> --strict --output <report>` before hosted
-collection. This report must also be metrics-only and public-safe. It blocks the
-run if the local RecallWeave source cannot satisfy the reviewed labels, which
-prevents another source-mismatched 0-0 comparison.
+<hosted-mirror-or-source-matched-container> --preserve-ids --strict --output
+<report>` before hosted collection when using the private hosted mirror. Omit
+`--preserve-ids` only when the local source intentionally emits hashed ids and
+the query set uses content hashes. This report must also be metrics-only and
+public-safe. It blocks the run if the local RecallWeave source cannot satisfy
+the reviewed labels, which prevents another source-mismatched 0-0 comparison.
 
 Then run `baseline:source-align -- --source-match <report> --local-map
 <local-container-map.json> --private-map <private-hosted-map.jsonl> --strict
@@ -116,7 +126,8 @@ wrapper banners can corrupt the evidence file before the collector reads it.
 ```bash
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave \
-  -- --live --container-dir <local-recallweave-container-dir> \
+  -- --live --container-dir <hosted-mirror-or-source-matched-container> \
+  --preserve-ids \
   --output /tmp/recallweave-search-responses.json
 
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \

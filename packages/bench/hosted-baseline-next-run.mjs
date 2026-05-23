@@ -112,6 +112,7 @@ const output = {
     "/tmp/recallweave-hosted-baseline-discovery.json",
     "/tmp/recallweave-hosted-baseline-queryset-author-report.json",
     "/tmp/recallweave-hosted-baseline-queryset-report.json",
+    "/tmp/recallweave-hosted-local-mirror.json",
     "/tmp/recallweave-baseline-source-match.json",
     "/tmp/recallweave-baseline-source-alignment.json",
     "/tmp/recallweave-baseline-source-gap.json",
@@ -303,6 +304,8 @@ function commandsFor(status) {
   const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
   const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-author-report.json";
   const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
+  const hostedMirrorDir = "/tmp/recallweave-hosted-local-mirror";
+  const hostedMirrorReportPath = "/tmp/recallweave-hosted-local-mirror.json";
   const sourceMatchPath = "/tmp/recallweave-baseline-source-match.json";
   const sourceAlignmentPath = "/tmp/recallweave-baseline-source-alignment.json";
   const sourceGapPath = "/tmp/recallweave-baseline-source-gap.json";
@@ -362,6 +365,18 @@ function commandsFor(status) {
       ].join(" "),
     });
     commands.push({
+      id: "mirror-hosted-source-local",
+      description: "Mirror the selected hosted source into a private local RecallWeave-compatible directory with 0600 files so source-match and the local arm can use the same source without attaching raw memory data.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "npm exec --yes pnpm@10.23.0 -- baseline:mirror-hosted --",
+        `--live --discovery ${discoveryPath}`,
+        `--private-map ${privateContainerMapPath}`,
+        `--output-dir ${hostedMirrorDir}`,
+        `--output ${hostedMirrorReportPath}`,
+      ].join(" "),
+    });
+    commands.push({
       id: "validate-query-set",
       description: "Inspect the source-locked query set as hashes and counts only. This fails under --strict if any query is unlabeled.",
       command: `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
@@ -373,8 +388,9 @@ function commandsFor(status) {
         "RECALLWEAVE_BASELINE_LIVE=1",
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
-        "RECALLWEAVE_BASELINE_CONTAINER_DIR=<local-recallweave-container-dir>",
-        `npm exec --yes pnpm@10.23.0 -- baseline:source-match -- --live --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --strict --output ${sourceMatchPath}`,
+        `RECALLWEAVE_BASELINE_CONTAINER_DIR=${hostedMirrorDir}`,
+        "RECALLWEAVE_BASELINE_PRESERVE_IDS=1",
+        `npm exec --yes pnpm@10.23.0 -- baseline:source-match -- --live --queryset ${querySetPath} --container-dir ${hostedMirrorDir} --preserve-ids --strict --output ${sourceMatchPath}`,
       ].join(" "),
     });
     commands.push({
@@ -383,7 +399,7 @@ function commandsFor(status) {
       command: [
         "npm exec --yes pnpm@10.23.0 -- baseline:source-align --",
         `--source-match ${sourceMatchPath}`,
-        "--local-map <local-container-map.json>",
+        `--local-map ${hostedMirrorDir}/container-map.json`,
         `--private-map ${privateContainerMapPath}`,
         "--strict",
         `--output ${sourceAlignmentPath}`,
@@ -411,7 +427,8 @@ function commandsFor(status) {
         "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
         "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
-        `npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env ${privateContainerEnvPath} --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --local-map <local-container-map.json> --private-map ${privateContainerMapPath} --reviewed-queryset --output ${baselineRunReportPath}`,
+        "RECALLWEAVE_BASELINE_PRESERVE_IDS=1",
+        `npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env ${privateContainerEnvPath} --queryset ${querySetPath} --container-dir ${hostedMirrorDir} --local-map ${hostedMirrorDir}/container-map.json --private-map ${privateContainerMapPath} --preserve-ids --reviewed-queryset --output ${baselineRunReportPath}`,
       ].join(" "),
     });
     commands.push({
@@ -443,8 +460,9 @@ function commandsFor(status) {
         "RECALLWEAVE_BASELINE_LIVE=1",
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
-        "RECALLWEAVE_BASELINE_CONTAINER_DIR=<local-recallweave-container-dir>",
-        `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir <local-recallweave-container-dir> --output ${recallWeaveResponsesPath}`,
+        `RECALLWEAVE_BASELINE_CONTAINER_DIR=${hostedMirrorDir}`,
+        "RECALLWEAVE_BASELINE_PRESERVE_IDS=1",
+        `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir ${hostedMirrorDir} --preserve-ids --output ${recallWeaveResponsesPath}`,
       ].join(" "),
     });
     commands.push({
@@ -511,6 +529,7 @@ function acceptanceCriteria() {
     "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
     "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready",
+    "private hosted mirror is created locally with 0600 files before source-match and local-arm export when hosted history is the source",
     "hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local",
     "any auto-authored private query set was locally reviewed before collection",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
@@ -544,7 +563,7 @@ function buildMarkdown(plan) {
   for (const item of plan.commandPlan) lines.push(`### ${item.id}`, "", item.description, "", "```bash", item.command, "```", "");
   lines.push("## Pass Criteria", "");
   for (const item of plan.acceptanceCriteria) lines.push(`- ${item}`);
-  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, source-match, source-alignment, and source-gap reports, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
+  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, hosted mirror report, source-match, source-alignment, and source-gap reports, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
   return lines.join("\n");
 }
 

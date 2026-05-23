@@ -58,6 +58,7 @@ const requiredFiles = [
   "packages/bench/hosted-baseline-discovery.mjs",
   "packages/bench/hosted-baseline-container-select.mjs",
   "packages/bench/hosted-baseline-queryset-author.mjs",
+  "packages/bench/hosted-baseline-local-mirror.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-queryset-inspect.mjs",
   "packages/bench/baseline-source-match-preflight.mjs",
@@ -208,6 +209,9 @@ const requiredFiles = [
   `${reviewDir}/gemini-hosted-baseline-container-select-review.md`,
   `${reviewDir}/hosted-baseline-queryset-author-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-queryset-author-review.md`,
+  `${reviewDir}/hosted-baseline-local-mirror-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-local-mirror-review.md`,
+  `${reviewDir}/codex-hosted-baseline-local-mirror-review.md`,
   `${reviewDir}/hosted-baseline-live-discovery.json`,
   `${reviewDir}/hosted-baseline-live-discovery-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-live-discovery-review.md`,
@@ -352,6 +356,7 @@ const requiredScripts = [
   "baseline:discover",
   "baseline:select-container",
   "baseline:author-queryset",
+  "baseline:mirror-hosted",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -2217,6 +2222,7 @@ check("fresh release blocker doctor passes", () => {
   const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
   assert.match(hostedBlocker.nextAction, /private query set locally/);
+  assert.match(hostedBlocker.nextAction, /baseline:mirror-hosted/);
   assert.match(hostedBlocker.nextAction, /local RecallWeave source matches/);
   assert.match(hostedBlocker.nextAction, /baseline:source-match/);
   assert.match(hostedBlocker.nextAction, /baseline:source-align/);
@@ -2225,8 +2231,10 @@ check("fresh release blocker doctor passes", () => {
   assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
   assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:author-queryset/.test(item)));
-  assert.ok(report.manualCommands.some((item) => /baseline:source-match/.test(item) && /--strict/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /baseline:mirror-hosted/.test(item) && /--output-dir/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /baseline:source-match/.test(item) && /--preserve-ids/.test(item) && /--strict/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:source-align/.test(item) && /--strict/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /recallweave-hosted-local-mirror/.test(item) && /--preserve-ids/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:source-gap/.test(item) && /--output/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /--reviewed-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
@@ -2251,6 +2259,10 @@ check("fresh hosted baseline preflight passes", () => {
   const authoredQuerySetReportPath = join(collectorTmp, "hosted-baseline-queryset-author-report.json");
   const authoredQuerySetInspectPath = join(collectorTmp, "hosted-baseline-authored-queryset-inspect.json");
   const authoredQuerySetInsideRepoPath = join(root, ".tmp-hosted-baseline-queryset.private.json");
+  const hostedMirrorDir = join(collectorTmp, "hosted-baseline-local-mirror");
+  const hostedMirrorReportPath = join(collectorTmp, "hosted-baseline-local-mirror.json");
+  const hostedMirrorSourceMatchPath = join(collectorTmp, "hosted-mirror-source-match.json");
+  const hostedMirrorSourceAlignmentPath = join(collectorTmp, "hosted-mirror-source-alignment.json");
   const collectorResultPath = join(collectorTmp, "collector-result.json");
   const recallWeaveResultPath = join(collectorTmp, "recallweave-result.json");
   const recallWeaveExportPath = join(collectorTmp, "recallweave-export.json");
@@ -2493,6 +2505,52 @@ check("fresh hosted baseline preflight passes", () => {
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
+  const hostedMirrorResult = run("node", [
+    "packages/bench/hosted-baseline-local-mirror.mjs",
+    "--fixture",
+    "--discovery",
+    discoveryResultPath,
+    "--private-map",
+    discoveryPrivateMapPath,
+    "--output-dir",
+    hostedMirrorDir,
+    "--output",
+    hostedMirrorReportPath,
+  ]);
+  const hostedMirrorSourceMatchResult = run(
+    "node",
+    [
+      "packages/bench/baseline-source-match-preflight.mjs",
+      "--live",
+      "--queryset",
+      authoredQuerySetPath,
+      "--container-dir",
+      hostedMirrorDir,
+      "--preserve-ids",
+      "--strict",
+      "--output",
+      hostedMirrorSourceMatchPath,
+    ],
+    {
+      env: {
+        ...process.env,
+        RECALLWEAVE_BASELINE_LIVE: "1",
+        RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+      },
+    },
+  );
+  const hostedMirrorSourceAlignmentResult = run("node", [
+    "packages/bench/baseline-source-alignment.mjs",
+    "--source-match",
+    hostedMirrorSourceMatchPath,
+    "--local-map",
+    join(hostedMirrorDir, "container-map.json"),
+    "--private-map",
+    discoveryPrivateMapPath,
+    "--strict",
+    "--output",
+    hostedMirrorSourceAlignmentPath,
+  ]);
   const fixtureResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--fixture"]);
   const templateResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--print-template"]);
   const collectorResult = run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture", "--output", collectorResultPath]);
@@ -2754,6 +2812,9 @@ check("fresh hosted baseline preflight passes", () => {
   const containerSelectReport = JSON.parse(containerSelectResult.stdout);
   const querySetAuthorReport = JSON.parse(querySetAuthorResult.stdout);
   const authoredQuerySetInspectReport = JSON.parse(authoredQuerySetInspectResult.stdout);
+  const hostedMirrorReport = JSON.parse(hostedMirrorResult.stdout);
+  const hostedMirrorSourceMatchReport = JSON.parse(hostedMirrorSourceMatchResult.stdout);
+  const hostedMirrorSourceAlignmentReport = JSON.parse(hostedMirrorSourceAlignmentResult.stdout);
   const fixtureReport = JSON.parse(fixtureResult.stdout);
   const templateReport = JSON.parse(templateResult.stdout);
   const collectorReport = JSON.parse(collectorResult.stdout);
@@ -2791,6 +2852,9 @@ check("fresh hosted baseline preflight passes", () => {
   const containerSelectGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-container-select-review.md"), "utf8");
   const querySetAuthorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-queryset-author-evidence.md"), "utf8");
   const querySetAuthorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-queryset-author-review.md"), "utf8");
+  const hostedMirrorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-local-mirror-evidence.md"), "utf8");
+  const hostedMirrorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-local-mirror-review.md"), "utf8");
+  const hostedMirrorCodexReview = readFileSync(join(root, reviewDir, "codex-hosted-baseline-local-mirror-review.md"), "utf8");
   const liveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
   const liveDiscoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
   const liveDiscoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-discovery-review.md"), "utf8");
@@ -2985,6 +3049,32 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(readFileSync(authoredQuerySetReportPath, "utf8"), /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:/);
   assert.notEqual(querySetAuthorInsideRepoResult.status, 0);
   assert.match(`${querySetAuthorInsideRepoResult.stderr}\n${querySetAuthorInsideRepoResult.stdout}`, /outside the repository/);
+  assert.equal(hostedMirrorReport.mode, "hosted-baseline-local-mirror");
+  assert.equal(hostedMirrorReport.fixtureOnly, true);
+  assert.equal(hostedMirrorReport.callsHostedProvider, false);
+  assert.equal(hostedMirrorReport.publicSafe, true);
+  assert.equal(hostedMirrorReport.metricsOnly, true);
+  assert.equal(hostedMirrorReport.rawLabelsIncluded, false);
+  assert.equal(hostedMirrorReport.rawMemoryIncluded, false);
+  assert.equal(hostedMirrorReport.localMirror?.containsRedactedMemoryText, true);
+  assert.equal(hostedMirrorReport.localMirror?.attachToPublicEvidence, false);
+  assert.equal(hostedMirrorReport.localMirror?.outputIdMode, "preserve-hosted-ids");
+  assert.equal(hostedMirrorReport.sourceStats?.mirroredMemoryCount, 3);
+  assert.equal(statSync(join(hostedMirrorDir, "memories.jsonl")).mode & 0o777, 0o600);
+  assert.equal(statSync(join(hostedMirrorDir, "container-map.json")).mode & 0o777, 0o600);
+  assert.match(readFileSync(join(hostedMirrorDir, "container-map.json"), "utf8"), /fixture-personal/);
+  assert.match(readFileSync(join(hostedMirrorDir, "memories.jsonl"), "utf8"), /RecallWeave keeps local writes/);
+  assert.doesNotMatch(hostedMirrorResult.stdout, /fixture-personal|fixture-doc-alpha|fixture-doc-beta|fixture-doc-gamma|RecallWeave keeps local writes/);
+  assert.doesNotMatch(readFileSync(hostedMirrorReportPath, "utf8"), /fixture-personal|fixture-doc-alpha|fixture-doc-beta|fixture-doc-gamma|RecallWeave keeps local writes/);
+  assert.equal(hostedMirrorSourceMatchReport.mode, "baseline-source-match-preflight");
+  assert.equal(hostedMirrorSourceMatchReport.sourceMatchReady, true);
+  assert.equal(hostedMirrorSourceMatchReport.sourceMatchEvidence?.collectableQueryCount, 3);
+  assert.equal(hostedMirrorSourceMatchReport.sourceMatchEvidence?.missingQueryCount, 0);
+  assert.equal(hostedMirrorSourceMatchReport.failedChecks?.length, 0);
+  assert.equal(hostedMirrorSourceAlignmentReport.mode, "baseline-source-alignment");
+  assert.equal(hostedMirrorSourceAlignmentReport.status, "READY_FOR_MATCHED_BASELINE_FIXTURE");
+  assert.equal(hostedMirrorSourceAlignmentReport.benchmarkGate?.matchedBaselineRunAllowed, true);
+  assert.equal(hostedMirrorSourceAlignmentReport.benchmarkGate?.publicBenchmarkClaimsAllowed, false);
   const duplicateQuerySetPath = join(collectorTmp, "duplicate-queryset.json");
   writeFileSync(
     duplicateQuerySetPath,
@@ -3239,20 +3329,22 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.commands.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "author-private-query-set" && /baseline:author-queryset/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "mirror-hosted-source-local" && /baseline:mirror-hosted/.test(item.command) && /--output-dir/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "print-template" && /baseline:preflight/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
-  assert.ok(operatorPacket.commands.some((item) => item.id === "preflight-local-source-match" && /baseline:source-match/.test(item.command) && /--strict/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "preflight-local-source-match" && /baseline:source-match/.test(item.command) && /--preserve-ids/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "preflight-source-alignment" && /baseline:source-align/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "plan-source-gap" && /baseline:source-gap/.test(item.command) && /--output/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "reload-source-gap-repair" && /baseline:operator-packet/.test(item.command) && /--source-gap/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "run-matched-baseline-chain" && /baseline:run/.test(item.command) && /--reviewed-queryset/.test(item.command)));
-  assert.ok(operatorPacket.commands.some((item) => item.id === "run-matched-baseline-chain" && /--local-map/.test(item.command) && /--private-map/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "run-matched-baseline-chain" && /--local-map/.test(item.command) && /--private-map/.test(item.command) && /--preserve-ids/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "collect-live-result" && /baseline:collect/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "package-baseline-evidence" && /baseline:packet/.test(item.command) && /--strict-real/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-live-result" && /RECALLWEAVE_BASELINE_NO_RAW_TEXT=1/.test(item.command)));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
+  assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-local-mirror.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-match.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-alignment.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-gap.json"));
@@ -3278,6 +3370,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorMarkdown.stdout, /private raw-label map/i);
   assert.match(operatorMarkdown.stdout, /baseline:select-container/);
   assert.match(operatorMarkdown.stdout, /baseline:author-queryset/);
+  assert.match(operatorMarkdown.stdout, /baseline:mirror-hosted/);
+  assert.match(operatorMarkdown.stdout, /private hosted mirror|hosted mirror/i);
   assert.match(operatorMarkdown.stdout, /baseline:queryset/);
   assert.match(operatorMarkdown.stdout, /baseline:source-match/);
   assert.match(operatorMarkdown.stdout, /baseline:source-align/);
@@ -3322,18 +3416,20 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "author-private-query-set" && /baseline:author-queryset/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "mirror-hosted-source-local" && /baseline:mirror-hosted/.test(item.command) && /--output-dir/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
-  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "preflight-local-source-match" && /baseline:source-match/.test(item.command) && /--strict/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "preflight-local-source-match" && /baseline:source-match/.test(item.command) && /--preserve-ids/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "preflight-source-alignment" && /baseline:source-align/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "plan-source-gap" && /baseline:source-gap/.test(item.command) && /--output/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "run-matched-baseline-chain" && /baseline:run/.test(item.command) && /RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1/.test(item.command)));
-  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "run-matched-baseline-chain" && /--local-map/.test(item.command) && /--private-map/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "run-matched-baseline-chain" && /--local-map/.test(item.command) && /--private-map/.test(item.command) && /--preserve-ids/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "collect-hosted-baseline" && /baseline:collect/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "compare-matched-results" && /baseline:compare/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "package-review-evidence" && /baseline:packet/.test(item.command)));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
+  assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-local-mirror.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-match.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-alignment.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-gap.json"));
@@ -3350,6 +3446,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(nextRunMarkdown.stdout, /baseline:discover/);
   assert.match(nextRunMarkdown.stdout, /baseline:select-container/);
   assert.match(nextRunMarkdown.stdout, /baseline:author-queryset/);
+  assert.match(nextRunMarkdown.stdout, /baseline:mirror-hosted/);
   assert.match(nextRunMarkdown.stdout, /baseline:source-match/);
   assert.match(nextRunMarkdown.stdout, /baseline:source-align/);
   assert.match(nextRunMarkdown.stdout, /baseline:source-gap/);
@@ -3449,6 +3546,12 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(querySetAuthorEvidence, /Private query set mode:\s*`0600`/i);
   assert.match(querySetAuthorEvidence, /Raw queries included.*no/i);
   assert.match(querySetAuthorGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(hostedMirrorEvidence, /hosted baseline local mirror/i);
+  assert.match(hostedMirrorEvidence, /baseline:mirror-hosted/i);
+  assert.match(hostedMirrorEvidence, /Private mirror files mode:\s*`0600`/i);
+  assert.match(hostedMirrorEvidence, /Raw memory included.*no/i);
+  assert.match(hostedMirrorEvidence, /source-match.*collectable/i);
+  assert.match(hostedMirrorCodexReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
   assert.equal(liveDiscoveryReport.mode, "hosted-baseline-discovery");
   assert.equal(liveDiscoveryReport.fixtureOnly, false);
   assert.equal(liveDiscoveryReport.callsHostedProvider, true);
@@ -3570,6 +3673,14 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(querySetAuthorGeminiReview, secretPattern);
   assert.doesNotMatch(querySetAuthorEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(querySetAuthorGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(hostedMirrorResult.stdout, secretPattern);
+  assert.doesNotMatch(hostedMirrorResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(hostedMirrorEvidence, secretPattern);
+  assert.doesNotMatch(hostedMirrorGeminiReview, secretPattern);
+  assert.doesNotMatch(hostedMirrorCodexReview, secretPattern);
+  assert.doesNotMatch(hostedMirrorEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(hostedMirrorGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(hostedMirrorCodexReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), secretPattern);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(JSON.stringify(liveQuerySetAuthorReport), secretPattern);

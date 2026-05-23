@@ -425,6 +425,13 @@ npm exec --yes pnpm@10.23.0 -- baseline:author-queryset \
   --queryset-output /tmp/recallweave-hosted-baseline-queryset.json \
   --output /tmp/recallweave-hosted-baseline-queryset-author-report.json
 
+RECALLWEAVE_BASELINE_LIVE=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:mirror-hosted \
+  -- --live --discovery /tmp/recallweave-hosted-baseline-discovery.json \
+  --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
+  --output-dir /tmp/recallweave-hosted-local-mirror \
+  --output /tmp/recallweave-hosted-local-mirror.json
+
 npm exec --yes pnpm@10.23.0 -- baseline:queryset \
   -- --queryset /tmp/recallweave-hosted-baseline-queryset.json \
   --strict --output /tmp/recallweave-hosted-baseline-queryset-report.json
@@ -433,12 +440,13 @@ RECALLWEAVE_BASELINE_LIVE=1 \
 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
 npm exec --yes pnpm@10.23.0 -- baseline:source-match \
   -- --live --queryset /tmp/recallweave-hosted-baseline-queryset.json \
-  --container-dir <local-recallweave-container-dir> \
+  --container-dir /tmp/recallweave-hosted-local-mirror \
+  --preserve-ids \
   --strict --output /tmp/recallweave-baseline-source-match.json
 
 npm exec --yes pnpm@10.23.0 -- baseline:source-align \
   -- --source-match /tmp/recallweave-baseline-source-match.json \
-  --local-map <local-container-map.json> \
+  --local-map /tmp/recallweave-hosted-local-mirror/container-map.json \
   --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
   --strict --output /tmp/recallweave-baseline-source-alignment.json
 
@@ -451,8 +459,11 @@ npm exec --yes pnpm@10.23.0 -- baseline:source-gap \
 Review the private query set locally before collection. Then source
 `/tmp/recallweave-hosted-baseline.private.env` locally before the hosted
 collector. Do not attach that env file, the private map, or the private query
-set. Attach only the metrics-only query-set, source-match, source-alignment, and
-source-gap reports. If `baseline:source-gap` is blocked, use only the hashed
+set. The hosted mirror contains redacted memory text and a raw container map, so
+keep the mirror directory local and attach only
+`/tmp/recallweave-hosted-local-mirror.json` plus the metrics-only query-set,
+source-match, source-alignment, and source-gap reports. If
+`baseline:source-gap` is blocked, use only the hashed
 `repairQueue` in that report to decide which private query labels need mirrored
 hosted source content, rebuilt local-source labels, or collectable content
 hashes.
@@ -479,9 +490,10 @@ npm exec --yes pnpm@10.23.0 -- baseline:run -- \
   --live \
   --container-env /tmp/recallweave-hosted-baseline.private.env \
   --queryset /tmp/recallweave-hosted-baseline-queryset.json \
-  --container-dir <local-recallweave-container-dir> \
-  --local-map <local-container-map.json> \
+  --container-dir /tmp/recallweave-hosted-local-mirror \
+  --local-map /tmp/recallweave-hosted-local-mirror/container-map.json \
   --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
+  --preserve-ids \
   --reviewed-queryset \
   --output /tmp/recallweave-baseline-run.json
 ```
@@ -506,7 +518,8 @@ evidence file before the collector reads it.
 ```bash
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave \
-  -- --live --container-dir <local-recallweave-container-dir> \
+  -- --live --container-dir /tmp/recallweave-hosted-local-mirror \
+  --preserve-ids \
   --output /tmp/recallweave-search-responses.json
 
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \

@@ -219,7 +219,7 @@ function normalizeDocumentForQuestion(document) {
   const redacted = redactForPrivateQuery(document.text);
   return {
     id: String(document.id ?? ""),
-    contentHash: document.text ? `sha256:${stableHash(document.text)}` : null,
+    contentHash: redacted ? `sha256:${stableHash(normalizeText(redacted))}` : null,
     text: redacted,
     updatedAt: stringOrNull(document.updatedAt),
   };
@@ -436,6 +436,13 @@ function redactForPrivateQuery(text) {
     .replace(/<private>[\s\S]*?(?:<\/private>|$)/gi, " ")
     .replace(secretPattern, " ")
     .replace(privatePathPattern, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeText(text) {
+  return String(text)
+    .toLowerCase()
     .replace(/\s+/g, " ")
     .trim();
 }

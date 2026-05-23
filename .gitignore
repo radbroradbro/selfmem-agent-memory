@@ -21,6 +21,7 @@ trace.jsonl
 *.sqlite3
 *.zip
 .goal-loop-review/
+.automation-worktrees/
 reviews/**/logs/
 reviews/**/checks.ndjson
 reviews/**/architecture-verification-rerun.json

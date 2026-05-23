@@ -75,8 +75,16 @@ collects results. It emits hashes and counts only, marks whether every query is
 labeled, and fails under `--strict` if any query lacks an expected result id or
 content hash or if two queries have the same text.
 
+`baseline:mirror-hosted` is the private read-only bridge for source-matched
+hosted canaries. It reads the selected hosted Supermemory source, redacts
+private spans, key-shaped strings, and private local paths, then writes a local
+RecallWeave-compatible mirror outside the repository with 0700 directory mode
+and 0600 files. Only its metrics report may be attached. The mirror files
+contain redacted memory text and a raw container map, so they stay local.
+
 `baseline:source-match` checks the reviewed query labels against the selected
-local RecallWeave container before hosted calls are spent. It emits only hashes,
+local RecallWeave source or private hosted mirror before hosted calls are spent.
+Use `--preserve-ids` when the source is the hosted mirror. It emits only hashes,
 counts, readiness flags, and privacy counters. It fails under `--strict` unless
 every reviewed query has at least one collectable expected reference in the
 local source. Use this before `baseline:run` whenever a hosted query set came
@@ -137,16 +145,18 @@ run packet without calling hosted Supermemory or authorizing public claims. The
 planner now places `baseline:source-match --strict` and
 `baseline:source-align --strict`, followed by `baseline:source-gap`, between
 query-set validation and the
-hosted/local run chain to prevent another unmatched 0-0 comparison.
+hosted/local run chain to prevent another unmatched 0-0 comparison. For hosted
+history, it now includes `baseline:mirror-hosted` so the local arm can prove the
+same source before collection.
 
 `baseline:run` is the one-command runner after private setup is complete. It
 requires a reviewed private query set, a private hosted container env file, and
-a local RecallWeave container or memories file, plus the local and hosted
-container maps needed for source alignment. It repeats the source-match and
-source-alignment gates and writes the source-gap plan before hosted collection,
-then runs hosted collection, local export, local collection, preflight,
-comparison, packet creation, and returned-packet intake. Fixture mode proves the
-chain and remains blocked as real hosted-baseline evidence.
+a private hosted mirror or source-matched local RecallWeave container, plus the
+local and hosted container maps needed for source alignment. It repeats the
+source-match and source-alignment gates and writes the source-gap plan before
+hosted collection, then runs hosted collection, local export, local collection,
+preflight, comparison, packet creation, and returned-packet intake. Fixture mode
+proves the chain and remains blocked as real hosted-baseline evidence.
 
 ## Historical Controlled Local Baseline
 

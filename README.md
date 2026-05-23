@@ -190,7 +190,8 @@ read-through, lifecycle or compression coverage, and rollback evidence in the
 fresh window.
 
 For hosted-vs-local baseline work, use the one-command runner only after the
-private hosted env file and reviewed query set are ready:
+private hosted env file, reviewed query set, and private hosted mirror or
+source-matched local container are ready:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
@@ -199,6 +200,8 @@ npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
 Fixture mode proves the chain. Live mode still requires explicit hosted
 credentials, no-raw-text mode, a reviewed query set, and local RecallWeave
 input, and it does not approve public claims by itself.
+Use `baseline:mirror-hosted` when hosted Supermemory history is the source. It
+writes redacted mirror files locally and emits only a metrics report.
 
 ## Safety Rules
 

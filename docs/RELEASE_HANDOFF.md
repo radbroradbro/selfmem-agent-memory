@@ -89,6 +89,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
+npm exec --yes pnpm@10.23.0 -- baseline:mirror-hosted
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -138,6 +139,12 @@ npm exec --yes pnpm@10.23.0 -- baseline:author-queryset \
 Review the private query set locally before any collection. Attach only the
 public author report and the strict `baseline:queryset` report. Do not attach
 the private query set.
+When the hosted source is the intended baseline source, run
+`baseline:mirror-hosted -- --live` after authoring the private query set. It
+reads hosted Supermemory, writes a private local RecallWeave-compatible mirror
+outside the repository, and emits only a metrics report. The mirror directory
+contains redacted memory text plus `container-map.json`; keep both files local
+and attach only the mirror report.
 The current live prep evidence found 14 hashed hosted candidate containers
 across 200 hosted documents, drafted 8 private queries, and strict inspection
 reported 8 unique queries with 0 duplicate or unlabeled queries. That evidence
@@ -191,13 +198,15 @@ preflight, and comparison files exist. That switch fails closed for fixture,
 partial, privacy-unclean, mismatched, losing, or unreviewed evidence. A passing
 result means the comparison is ready for owner review, not public launch.
 Before `baseline:run`, use `baseline:source-match --strict` with the reviewed
-query set and the selected local RecallWeave container. It emits only hashes,
-counts, readiness flags, and privacy counters. Do not spend hosted calls unless
-that report says `sourceMatchReady: true`.
+query set and the selected private hosted mirror or source-matched local
+RecallWeave container. Use `--preserve-ids` when the source is a hosted mirror.
+It emits only hashes, counts, readiness flags, and privacy counters. Do not
+spend hosted calls unless that report says `sourceMatchReady: true`.
 Then run `baseline:source-align --strict` with the source-match report, local
-container map, and private hosted map. It catches the subtle failure where the
-hosted label and local mapping match, but the local source still lacks the
-expected refs needed for a fair benchmark.
+container map from the mirror or source-matched local container, and private
+hosted map. It catches the subtle failure where the hosted label and local
+mapping match, but the local source still lacks the expected refs needed for a
+fair benchmark.
 Then run `baseline:source-gap` with the source-match and source-alignment
 reports. That public-safe report must say `READY_FOR_MATCHED_BASELINE` before a
 hosted collection run is meaningful. If it reports a blocked state, follow its
@@ -215,9 +224,9 @@ npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- \
 ```
 
 Use `baseline:run` after the private hosted env file, reviewed private query
-set, source-match preflight, source-alignment gate, source-gap plan, and local
-RecallWeave container are ready. It repeats the source gates, writes the
-source-gap plan, then runs hosted collection, local export, local collection,
+set, private hosted mirror or source-matched local container, source-match
+preflight, source-alignment gate, and source-gap plan are ready. It repeats the
+source gates, writes the source-gap plan, then runs hosted collection, local export, local collection,
 preflight, comparison, packet creation, and returned-packet intake in one
 metrics-only chain:
 
@@ -227,13 +236,15 @@ RECALLWEAVE_BASELINE_LIVE=1 \
 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
 RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 \
 RECALLWEAVE_BASELINE_QUERYSET=/tmp/recallweave-hosted-baseline-queryset.json \
+RECALLWEAVE_BASELINE_PRESERVE_IDS=1 \
 npm exec --yes pnpm@10.23.0 -- baseline:run -- \
   --live \
   --container-env /tmp/recallweave-hosted-baseline.private.env \
   --queryset /tmp/recallweave-hosted-baseline-queryset.json \
-  --container-dir <local-recallweave-container-dir> \
-  --local-map <local-container-map.json> \
+  --container-dir /tmp/recallweave-hosted-local-mirror \
+  --local-map /tmp/recallweave-hosted-local-mirror/container-map.json \
   --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
+  --preserve-ids \
   --reviewed-queryset \
   --output /tmp/recallweave-baseline-run.json
 ```

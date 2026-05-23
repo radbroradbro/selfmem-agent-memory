@@ -13,6 +13,7 @@ const format = String(args.format ?? "json").toLowerCase();
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 const outDir = resolvePath(args.outDir ?? process.env.RECALLWEAVE_BASELINE_RUN_DIR ?? "/tmp/recallweave-baseline-run");
 const outputPath = args.output ? resolvePath(args.output) : null;
+const preserveIds = Boolean(args.preserveIds) || process.env.RECALLWEAVE_BASELINE_PRESERVE_IDS === "1";
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -128,6 +129,7 @@ const sourceMatchArgs = [
 ];
 if (!fixtureRequested && localContainerDir) sourceMatchArgs.push("--container-dir", localContainerDir);
 if (!fixtureRequested && memoriesPath) sourceMatchArgs.push("--memories", memoriesPath);
+if (!fixtureRequested && preserveIds) sourceMatchArgs.push("--preserve-ids");
 const sourceMatch = runStep("preflight-local-source-match", sourceMatchArgs, baseEnv);
 const sourceAlignmentArgs = [
   "packages/bench/baseline-source-alignment.mjs",
@@ -182,6 +184,7 @@ const recallWeaveExportArgs = [
 ];
 if (!fixtureRequested && localContainerDir) recallWeaveExportArgs.push("--container-dir", localContainerDir);
 if (!fixtureRequested && memoriesPath) recallWeaveExportArgs.push("--memories", memoriesPath);
+if (!fixtureRequested && preserveIds) recallWeaveExportArgs.push("--preserve-ids");
 const recallWeaveResponses = runStep("export-recallweave-responses", recallWeaveExportArgs, baseEnv);
 const recallWeave = runStep(
   "collect-recallweave-result",
@@ -335,6 +338,7 @@ const output = {
     "local RecallWeave memories are supplied through --container-dir or --memories",
     "local container map is supplied through --local-map or RECALLWEAVE_BASELINE_LOCAL_MAP",
     "private hosted container map is supplied through --private-map or RECALLWEAVE_BASELINE_PRIVATE_MAP",
+    "use --preserve-ids or RECALLWEAVE_BASELINE_PRESERVE_IDS=1 when the local arm is a hosted mirror with preserved hosted ids",
     "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection",
   ],
   forbidden: [
