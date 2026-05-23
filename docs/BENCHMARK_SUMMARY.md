@@ -12,6 +12,7 @@ The current branch includes a hosted baseline preflight:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
@@ -21,6 +22,14 @@ That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are
 present. Reports may contain aggregate metrics and hashes only.
+
+`baseline:discover -- --live` is the read-only hosted metadata discovery step.
+It lists candidate containers as hashed ids, counts, timestamps, and status/type
+counts only. It does not print raw container labels or memory text. Operators
+who need the raw label can opt into a local-only private map with
+`RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1` and `--private-map-output`, then
+copy the selected label into `RECALLWEAVE_BASELINE_CONTAINER` on that machine.
+Do not attach the private map to public evidence.
 
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents

@@ -9,6 +9,10 @@ Scope:
 - The packet gives operators one public-safe baseline collection contract for
   hosted Supermemory comparison evidence, matched RecallWeave collection, and
   metrics-only comparison.
+- The packet now starts with `baseline:discover` so an operator can find likely
+  hosted source containers without exposing raw hosted labels or memory text.
+- The packet documents the optional private map flow and states that the
+  private map stays local and must not be attached.
 - The packet now points operators to `baseline:collect -- --live`,
   `baseline:export:recallweave -- --live`,
   `baseline:collect:recallweave -- --live`, and `baseline:compare` instead of
@@ -23,6 +27,7 @@ Commands:
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
+npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -36,7 +41,10 @@ Expected behavior:
 - `writesRealFiles` is false.
 - `callsHostedProvider` is false.
 - It tells operators to print the template, validate fixture parsing, then
-  collect and validate aggregate-only hosted and RecallWeave results.
+  discover candidate hosted containers, collect, and validate aggregate-only
+  hosted and RecallWeave results.
+- It tells operators that discovery output may be attached but private raw-label
+  maps must stay local.
 - It tells operators to create a local RecallWeave search export with
   `baseline:export:recallweave`, then convert that export into a metrics-only
   result before comparison.
@@ -54,12 +62,14 @@ Expected behavior:
 - It tells operators to attach only:
   - `/tmp/recallweave-hosted-baseline-result.json`
   - `/tmp/recallweave-hosted-baseline-preflight.json`
+  - `/tmp/recallweave-hosted-baseline-discovery.json`
   - `/tmp/recallweave-result.json`
   - `/tmp/recallweave-baseline-comparison.json`
   - `/tmp/recallweave-baseline-evidence-packet.zip`
 - It forbids provider keys, raw hosted memories, raw RecallWeave response
   exports containing memory text, raw local memories, transcripts, prompts,
-  answers, cookies, bearer tokens, private local paths, and unredacted
+  answers, cookies, bearer tokens, private local paths, private container maps,
+  and unredacted
   diagnostic archives.
 
 Boundary:

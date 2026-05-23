@@ -79,6 +79,7 @@ const output = {
     "/tmp/recallweave-result.json",
     "/tmp/recallweave-baseline-comparison.json",
     "/tmp/recallweave-hosted-baseline-preflight.json",
+    "/tmp/recallweave-hosted-baseline-discovery.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
   ],
   forbidden: [
@@ -91,6 +92,7 @@ const output = {
     "cookies",
     "bearer tokens",
     "private local paths",
+    "private container maps",
     "unredacted diagnostics",
     "raw RecallWeave response exports that contain memory text",
   ],
@@ -250,6 +252,8 @@ function commandsFor(status) {
   const recallWeaveResponsesPath = "/tmp/recallweave-search-responses.json";
   const comparisonPath = "/tmp/recallweave-baseline-comparison.json";
   const preflightPath = "/tmp/recallweave-hosted-baseline-preflight.json";
+  const discoveryPath = "/tmp/recallweave-hosted-baseline-discovery.json";
+  const privateContainerMapPath = "/tmp/recallweave-hosted-container-map.private.jsonl";
   const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
   const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
@@ -267,6 +271,23 @@ function commandsFor(status) {
   ];
 
   if (["NEEDS_HOSTED_BASELINE", "FIXTURE_PLAN_ONLY", "NEEDS_VALID_HOSTED_PREFLIGHT"].includes(status)) {
+    commands.push({
+      id: "discover-hosted-containers",
+      description: "List hosted Supermemory container candidates as counts and hashes only before choosing RECALLWEAVE_BASELINE_CONTAINER.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        `npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output ${discoveryPath}`,
+      ].join(" "),
+    });
+    commands.push({
+      id: "write-private-container-map",
+      description: "Optional local-only raw-label map. Keep it off GitHub and out of reviewer packets.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1",
+        `npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output ${discoveryPath} --private-map-output ${privateContainerMapPath}`,
+      ].join(" "),
+    });
     commands.push({
       id: "collect-hosted-baseline",
       description: "Run read-only hosted Supermemory search with metrics and hashes only.",
@@ -359,6 +380,7 @@ function acceptanceCriteria() {
     "hosted and RecallWeave results are non-fixture",
     "both results are metrics-only and privacy-clean",
     "same dataset slice, query-set hash, scoring-code hash, judge model, and answer model",
+    "hosted container discovery emits hashed candidates only and any private raw-label map stays local",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
     "RecallWeave beats hosted baseline without any quality metric regressing more than the comparison gate allows",
     "two independent reviewers approve the setup and result before any public comparison language",
@@ -389,7 +411,7 @@ function buildMarkdown(plan) {
   for (const item of plan.commandPlan) lines.push(`### ${item.id}`, "", item.description, "", "```bash", item.command, "```", "");
   lines.push("## Pass Criteria", "");
   for (const item of plan.acceptanceCriteria) lines.push(`- ${item}`);
-  lines.push("", "Attach only aggregate result files, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, cookies, or unredacted diagnostics.");
+  lines.push("", "Attach only aggregate result files, discovery output, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, cookies, or unredacted diagnostics.");
   return lines.join("\n");
 }
 

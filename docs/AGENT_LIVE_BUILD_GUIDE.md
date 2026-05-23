@@ -49,6 +49,8 @@ Share:
   evidence.
 - metrics-only `baseline:returned-packet` output when checking a returned
   hosted-baseline packet.
+- metrics-only `baseline:discover` output when choosing a hosted Supermemory
+  baseline container.
 
 Do not share:
 
@@ -63,6 +65,7 @@ Do not share:
 - auth files,
 - browser state,
 - private container mappings.
+- private hosted container maps created by `baseline:discover`.
 
 ## Branch And PR Flow
 

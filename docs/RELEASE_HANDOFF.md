@@ -85,6 +85,7 @@ Run this before any hosted Supermemory comparison claim:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -106,6 +107,12 @@ Use `--fixture` to verify the parser and result-shape gate without using a
 provider key. Use `--print-template` before a live collection run and fill that
 shape with aggregate metrics, source commits, model ids, costs, latency, and
 hashes. The fixture is intentionally rejected as real hosted-baseline evidence.
+Use `baseline:discover -- --live` first when the hosted Supermemory key can list
+documents but the correct source container is unknown. It prints hashed
+container candidates only. To recover the raw label locally, set
+`RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1` and pass `--private-map-output`
+to a path outside the repository. The private map is local operator material,
+not reviewer or GitHub evidence.
 Use `baseline:collect -- --live` for the read-only hosted search collection
 once `SUPERMEMORY_API_KEY` and the source-locked query-set environment are
 configured. It writes metrics and hashes only.
