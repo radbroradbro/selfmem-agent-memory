@@ -65,6 +65,22 @@ content was written to the repo.
   - `store-latency-instrumented`
   - `store-p95`
 
+## Current Handoff Packet
+
+The current next-agent handoff packet is
+`recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
+`9d7fc80561630aa6edae9fd93954dfb032e422d85bc630b6b3c999a6943295d2`.
+
+It contains only:
+
+- `README.md`
+- `manifest.json`
+- `next-agent-plan.json`
+- `next-agent-plan.md`
+- `strict-real-operator-packet.md`
+
+The packet scan found zero key-shaped text and zero private local paths.
+
 ## Interpretation
 
 The next real canary should be one OpenClaw runtime with the current adapter

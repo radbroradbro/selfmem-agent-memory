@@ -49,6 +49,14 @@ coverage, hybrid search, local writes, hosted read-through, and recall p95
 1567.346 ms, but it still fails strict production intake until a post-update
 window proves the v1 adapter contract and positive store latency samples.
 
+On 2026-05-23, the controller reran the available Telegram returned-diagnostic
+folder from the current worktree. The batch again inspected nine inputs, parsed
+eight, rejected one at report generation, found zero strict-real passes, and
+selected the same privacy-clean OpenClaw candidate. A new current one-agent
+handoff packet was generated for that candidate. The packet is metrics-only,
+has no key-shaped text or private local paths, and is ready only for one fresh
+OpenClaw canary window.
+
 ## Commands
 
 The controller generated temporary metrics-only reports outside the repository:
@@ -145,8 +153,8 @@ The failure is actionable and matches the adapter hardening work:
 - The next operator should run `canary:diagnose` on any failing report and
   attach only the metrics-only output.
 - The current sendable handoff packet is
-  `recallweave-openclaw-next-agent-canary-20260523.zip`, SHA256
-  `8af8fe4c9f029265c19982ef95175deab1fe2da360cb12074524e1f20df0fb67`.
+  `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
+  `9d7fc80561630aa6edae9fd93954dfb032e422d85bc630b6b3c999a6943295d2`.
 
 ## Boundary
 
