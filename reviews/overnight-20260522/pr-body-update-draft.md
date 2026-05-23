@@ -425,6 +425,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- canary:returned-downloads`: passed, scanned
   the standard Downloads and Telegram Desktop inboxes, found 0 production
   evidence packets, and wrote a metrics-only markdown findings note.
+- GitHub Actions run `26343015277`: passed CI after adding
+  `canary:returned-downloads`, wiring it into the release gate, consumer smoke,
+  docs, and public-safe markdown findings, while preserving strict-real and
+  public-launch blockers.
+- Previous verified code baseline before returned downloads supervision:
+  `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
   `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`, SHA256
   `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`.

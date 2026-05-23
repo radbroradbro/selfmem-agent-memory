@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T20:36:34Z",
+  "generatedAt": "2026-05-23T20:41:14Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "daac851d031d5a2a8c95a307aa7db2a6d2d00762",
-    "ciRunId": 26342589049,
+    "headSha": "13cac9a3aef27651690ff161c2fc0244501ff943",
+    "ciRunId": 26343015277,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding returned canary workspace generation, keeping fixture workspace output temporary, fast-forwarding PR #5 to the helper code, and recording the post-12h readiness recheck. It preserves strict-real and public-launch blockers, and GitHub Actions run 26342589049 passed CI on daac851. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after adding returned downloads supervision, metrics-only markdown findings for the next-agent workspace, and release-gate coverage for the new command. It preserves strict-real and public-launch blockers, and GitHub Actions run 26343015277 passed CI on 13cac9a. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

@@ -74,6 +74,8 @@ requirements are resolved.
   without typing private folder paths into package-manager commands. The
   current scan found 0 production canary evidence packets and wrote a
   metrics-only markdown findings note for the next-agent workspace.
+- GitHub Actions run `26343015277` passed CI after adding returned downloads
+  supervision and the markdown findings note.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:
