@@ -1003,6 +1003,7 @@ check("release state is conservative", () => {
     "github-blocker-issue-live",
     "goal-completion-audit",
     "selfmem-update",
+    "public-benchmark-target-author",
     "public-benchmark-target-check",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);

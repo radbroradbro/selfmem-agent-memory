@@ -110,10 +110,11 @@ Verdict: resolved for PR body and blocker issue writes.
     refresh, latest canary-drill handoff baseline refresh, public benchmark
     target lane refresh, component-vs-memory benchmark clarification refresh,
     public benchmark target validator refresh, same judge and answer model
-    validator refresh, latest public benchmark target CI baseline refresh, and
-    current OpenClaw Downloads handoff packet refresh
-  - Updated at: 2026-05-23T22:47:01Z
-  - Body length: 23660
+    validator refresh, latest public benchmark target CI baseline refresh,
+    current OpenClaw Downloads handoff packet refresh, and public benchmark
+    target author/source-lock attestation refresh
+  - Updated at: 2026-05-23T23:03:48Z
+  - Body length: 23722
 
 ## Safety
 

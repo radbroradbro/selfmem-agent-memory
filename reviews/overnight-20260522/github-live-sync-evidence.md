@@ -69,15 +69,18 @@ Date: 2026-05-23
   promoted.
 - PR #5 and issue #6 were refreshed again after regenerating the current
   OpenClaw next-agent handoff packet in the standard Downloads location.
+- PR #5 and issue #6 were refreshed again after adding
+  `benchmark:public-target:author`, source-lock attestations, and the stricter
+  public canary validator.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T22:47:01Z
+- PR body refreshed at: 2026-05-23T23:03:48Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T22:47:01Z
-- PR body hash: d4e647083b1d04a227071754b8a5df2a30ed687a3df4547152e3ec3086f4ba18
+- Issue updated at: 2026-05-23T23:03:48Z
+- PR body hash: 591308b6dd139456fcdb530cb79ee66083b5214a24dc6c2caf7f2d59a553c838
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 12af4ae46ccbbc04f64e0fe8625dd00899a2bdefe71a4f2a4c440808940ed267
-- PR body length: 38403
-- Issue body length: 23660
+- Issue body hash: b18ed0dfc7f902f57d1e0952b59455d25c307e574cc0fecf340fac225a9f18a4
+- PR body length: 38459
+- Issue body length: 23722
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
