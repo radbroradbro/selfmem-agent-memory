@@ -35,6 +35,9 @@ The current PR adds:
   is reviewed;
 - a read-only hosted baseline collector that emits aggregate metrics and hashes
   only after explicit live opt-in and local environment credentials;
+- a matched baseline comparison gate that blocks public claims unless hosted
+  and RecallWeave result files are non-fixture, source-matched, privacy-clean,
+  and reviewer-approved;
 - a canary evidence intake for sanitized one-agent runtime reports, blocked
   from fleet rollout and public launch when the report is only a fixture;
 - a canary report generator that converts Hermes/OpenClaw traces into the
@@ -118,6 +121,9 @@ Latest verified head before this draft refresh:
 - Hosted baseline collector: `baseline:collect -- --fixture` passes without a
   hosted provider call and proves the collector emits aggregate metrics and
   hashes only
+- Baseline comparison: `baseline:compare -- --fixture` passes without a hosted
+  provider call and proves fixture inputs cannot authorize public benchmark
+  claims
 - Hosted baseline operator packet: `baseline:operator-packet` prints a
   public-safe handoff for aggregate-only hosted Supermemory baseline collection
   and calls no hosted provider

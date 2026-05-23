@@ -60,6 +60,9 @@ requirements are resolved.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`
   path that emits metrics and hashes only when live credentials are provided
   through the local environment.
+- Baseline comparison now gives agents a `baseline:compare` gate that compares
+  only aggregate hosted and RecallWeave result files, requires matched
+  source-lock hashes, and blocks fixture inputs from public benchmark claims.
 - Fresh canary window isolation now requires post-update `--since` evidence so
   old pre-patch trace history cannot prove or poison a patched one-agent canary.
 - Adapter smokes now assert bounded read-through policy plus positive total,

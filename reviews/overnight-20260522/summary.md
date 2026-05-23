@@ -75,6 +75,7 @@ evidence are still required before any public live update.
 | Model/autoresearch matrix gate | `docs/MODEL_MATRIX.md`, `docs/AUTORESEARCH_BENCHMARK_PLAN.md`, `configs/provider-matrix.yaml`, `configs/bench-budget.yaml` |
 | Hosted baseline preflight | `packages/bench/hosted-baseline-preflight.mjs`, `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md` |
 | Hosted baseline collector | `packages/bench/hosted-baseline-collector.mjs`, `reviews/overnight-20260522/hosted-baseline-collector-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-collector-review.md` |
+| Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `reviews/overnight-20260522/baseline-comparison-evidence.md`, `reviews/overnight-20260522/gemini-baseline-comparison-review.md` |
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |

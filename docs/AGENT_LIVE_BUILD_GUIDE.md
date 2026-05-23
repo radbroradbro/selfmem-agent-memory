@@ -243,5 +243,13 @@ contract and validation commands. The actual read-only collection command is:
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json
 ```
 
+After the matched RecallWeave result exists, compare the two aggregate files:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:compare \
+  -- --hosted /tmp/recallweave-hosted-baseline-result.json \
+  --recallweave /tmp/recallweave-result.json
+```
+
 Hosted credentials stay in local environment variables and must never appear in
 PRs, docs, diagnostics, screenshots, or attachments.

@@ -20,8 +20,10 @@ const extraCurrentFiles = [
   "packages/bench/canary-evidence-intake.mjs",
   "packages/bench/canary-remediation.mjs",
   "packages/bench/canary-operator-packet.mjs",
+  "packages/bench/baseline-comparison.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
   "packages/bench/hosted-baseline-operator-packet.mjs",
+  "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
   "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
   "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
   "packages/bench/github-live-sync-check.mjs",
@@ -45,6 +47,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["update:smoke"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:operator-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:collect"], "string");
+  assert.equal(typeof packageJson.scripts?.["baseline:compare"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:operator-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["release:github-sync"], "string");
   assert.ok(existsSync(join(checkout, "README.md")), "README.md missing from consumer checkout");
@@ -67,6 +70,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-remediation.mjs"], "canary remediation plan"));
   checks.push(run("node", ["packages/bench/canary-operator-packet.mjs", "--host", "hermes"], "canary operator packet"));
   checks.push(run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture"], "hosted baseline collector"));
+  checks.push(run("node", ["packages/bench/baseline-comparison.mjs", "--fixture"], "baseline comparison"));
   checks.push(run("node", ["packages/bench/hosted-baseline-operator-packet.mjs"], "hosted baseline operator packet"));
 
   const pack = run("npm", ["pack", "--dry-run", "--json", "--cache", npmCache], "npm package dry run");
@@ -86,8 +90,10 @@ try {
     "packages/bench/canary-evidence-intake.mjs",
     "packages/bench/canary-remediation.mjs",
     "packages/bench/canary-operator-packet.mjs",
+    "packages/bench/baseline-comparison.mjs",
     "packages/bench/hosted-baseline-collector.mjs",
     "packages/bench/hosted-baseline-operator-packet.mjs",
+    "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
     "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
     "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
     "packages/bench/github-live-sync-check.mjs",

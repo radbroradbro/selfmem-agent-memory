@@ -13,6 +13,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 ```
 
 That command does not call hosted Supermemory by default. It keeps public
@@ -29,6 +30,11 @@ fail the real-evidence check because `fixtureOnly: true`.
 evidence. It uses hosted search only after explicit live flags and
 environment-only credentials are present, and it writes aggregate metrics and
 hashes only.
+
+`baseline:compare` is the matched comparison gate. It compares only aggregate
+hosted and RecallWeave result files. It blocks public claims when either result
+is a fixture, when any metric or privacy flag is missing, when the query-set or
+scoring-code hash differs, or when fewer than two reviewer approvals exist.
 
 ## Historical Controlled Local Baseline
 

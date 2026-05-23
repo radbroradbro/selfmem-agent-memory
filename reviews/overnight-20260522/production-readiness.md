@@ -67,6 +67,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   benchmark claims blocked.
 - Hosted baseline collector that can run read-only hosted search only after
   explicit live opt-in and emits aggregate metrics and hashes only.
+- Baseline comparison gate that compares only aggregate hosted and RecallWeave
+  result files, requires source-matched harness fields, and blocks fixture
+  inputs from public benchmark claims.
 - Hosted baseline operator packet that gives agents a public-safe,
   aggregate-only hosted Supermemory baseline handoff without calling a hosted
   provider.
@@ -343,6 +346,9 @@ evidence for:
   scoring-code hashes, result fingerprints, latency metrics, retrieval
   metrics, and no raw memory, transcript, prompt, answer, credential, or
   private-path output; Gemini returned `CLEAN`.
+- baseline comparison evidence with matched fixture metrics, explicit
+  fixture-blocked public claims, required metric/privacy fields, and Gemini
+  review coverage.
 - hosted baseline operator packet evidence with attach-only aggregate JSON
   outputs, env-only credential handling, no hosted provider call, and Gemini
   `CLEAN` review.
@@ -417,6 +423,8 @@ Passed locally in this automation environment:
   `publicBenchmarkClaimsAllowed: false`
 - `npm run baseline:collect -- --fixture`: metrics-only collector output with
   no hosted provider call
+- `npm run baseline:compare -- --fixture`: metrics-only comparison output with
+  fixture public claims blocked
 - `npm run baseline:operator-packet`: no hosted provider call and public-safe
   hosted baseline handoff output
 - `npm run canary:report -- --fixture`

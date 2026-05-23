@@ -32,6 +32,7 @@ Run the hosted baseline preflight before any live comparison:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 ```
 
 The preflight is offline by default. It must report `callsHostedProvider:
@@ -47,6 +48,19 @@ The fixture path proves that the result shape is parseable. It must never count
 as hosted baseline evidence, even if all metrics fields are present. Use
 `--print-template` before live collection so the agent writes only aggregate
 fields and source-lock hashes.
+
+After both result files exist, run the matched comparison gate:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:compare \
+  -- --hosted /tmp/recallweave-hosted-baseline-result.json \
+  --recallweave /tmp/recallweave-result.json
+```
+
+The comparison gate is also metrics-only. It must report the same dataset
+slice, query-set hash, scoring-code hash, judge model, answer model, and
+harness flags before it can count as comparison evidence. `--fixture` always
+blocks public claims, even if the loaded files look real.
 
 Allowed public wording after a win:
 

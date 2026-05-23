@@ -30,6 +30,7 @@ const requiredFiles = [
   "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
   "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
+  "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
   "packages/bench/fixtures/canary-runtime-container-map.fixture.json",
   "packages/bench/fixtures/canary-runtime-trace.fixture.jsonl",
   "packages/bench/fixtures/canary-runtime-raw.fixture.jsonl",
@@ -41,6 +42,7 @@ const requiredFiles = [
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/reliability_reports/latest.json",
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
+  "packages/bench/baseline-comparison.mjs",
   "packages/bench/hosted-baseline-operator-packet.mjs",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
@@ -143,6 +145,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/hosted-baseline-collector-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-collector-review.md`,
+  `${reviewDir}/baseline-comparison-evidence.md`,
+  `${reviewDir}/gemini-baseline-comparison-review.md`,
   `${reviewDir}/hosted-baseline-operator-packet-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-operator-packet-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
@@ -248,6 +252,7 @@ const requiredScripts = [
   "canary:operator-packet",
   "baseline:preflight",
   "baseline:collect",
+  "baseline:compare",
   "baseline:operator-packet",
   "goal:audit",
   "release:doctor",
@@ -810,6 +815,7 @@ check("release state is conservative", () => {
     "canary-operator-packet",
     "hosted-baseline-preflight",
     "hosted-baseline-collector",
+    "baseline-comparison-gate",
     "hosted-baseline-operator-packet",
     "claude-opus-pr5-review",
     "github-handoff-packet",
@@ -870,6 +876,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
     assert.match(text, /hosted baseline preflight|baseline preflight/i, `${file} missing hosted baseline preflight`);
     assert.match(text, /hosted baseline collector|baseline:collect|baseline collect/i, `${file} missing hosted baseline collector`);
+    assert.match(text, /baseline compare|baseline:compare|matched.*comparison/i, `${file} missing baseline comparison`);
     assert.match(text, /hosted baseline operator|baseline:operator-packet|baseline operator packet/i, `${file} missing hosted baseline operator packet`);
     assert.match(text, /github handoff|handoff packet|manual GitHub/i, `${file} missing GitHub handoff packet`);
     assert.match(text, /github live sync|release:github-sync|live GitHub sync/i, `${file} missing GitHub live sync`);
@@ -1351,11 +1358,15 @@ check("fresh release blocker doctor passes", () => {
 check("fresh hosted baseline preflight passes", () => {
   const collectorTmp = mkdtempSync(join(tmpdir(), "recallweave-hosted-baseline-"));
   const collectorResultPath = join(collectorTmp, "collector-result.json");
+  const forcedHostedPath = join(collectorTmp, "forced-hosted-live.json");
+  const forcedRecallWeavePath = join(collectorTmp, "forced-recallweave-live.json");
+  const missingMetricPath = join(collectorTmp, "missing-metric.json");
   const result = run("node", ["packages/bench/hosted-baseline-preflight.mjs"]);
   const fixtureResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--fixture"]);
   const templateResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--print-template"]);
   const collectorResult = run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture", "--output", collectorResultPath]);
   const collectorPreflightResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--result", collectorResultPath]);
+  const comparisonResult = run("node", ["packages/bench/baseline-comparison.mjs", "--fixture"]);
   const operatorResult = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs"]);
   const operatorMarkdown = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs", "--format", "markdown"]);
   const report = JSON.parse(result.stdout);
@@ -1363,10 +1374,13 @@ check("fresh hosted baseline preflight passes", () => {
   const templateReport = JSON.parse(templateResult.stdout);
   const collectorReport = JSON.parse(collectorResult.stdout);
   const collectorPreflightReport = JSON.parse(collectorPreflightResult.stdout);
+  const comparisonReport = JSON.parse(comparisonResult.stdout);
   const operatorPacket = JSON.parse(operatorResult.stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
   const collectorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-collector-evidence.md"), "utf8");
   const collectorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-collector-review.md"), "utf8");
+  const comparisonEvidence = readFileSync(join(root, reviewDir, "baseline-comparison-evidence.md"), "utf8");
+  const comparisonGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-comparison-review.md"), "utf8");
   const operatorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-operator-packet-evidence.md"), "utf8");
   const operatorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-operator-packet-review.md"), "utf8");
   assert.equal(report.ok, true);
@@ -1409,6 +1423,51 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(collectorPreflightReport.resultInspection?.metricsOnly, true);
   assert.deepEqual(collectorPreflightReport.resultInspection?.failedResultChecks, ["not-fixture"]);
   assert.equal(collectorPreflightReport.countsAsHostedBaselineEvidence, false);
+  assert.equal(comparisonReport.ok ?? true, true);
+  assert.equal(comparisonReport.mode, "baseline-comparison");
+  assert.equal(comparisonReport.writesRealFiles, false);
+  assert.equal(comparisonReport.callsHostedProvider, false);
+  assert.equal(comparisonReport.metricsOnly, true);
+  assert.equal(comparisonReport.fixtureOnly, true);
+  assert.equal(comparisonReport.hosted?.provider, "hosted-supermemory");
+  assert.equal(comparisonReport.recallWeave?.provider, "recallweave");
+  assert.equal(comparisonReport.comparability?.sameDataset, true);
+  assert.equal(comparisonReport.comparability?.sameQuerySet, true);
+  assert.equal(comparisonReport.comparability?.sameScoringCode, true);
+  assert.equal(comparisonReport.comparability?.sameJudge, true);
+  assert.equal(comparisonReport.comparability?.sameAnswerModel, true);
+  assert.equal(comparisonReport.privacy?.privacyLeakCount, 0);
+  assert.equal(comparisonReport.privacy?.redactionFailureCount, 0);
+  assert.equal(comparisonReport.recallWeaveWin, true);
+  assert.equal(comparisonReport.countsAsComparisonEvidence, false);
+  assert.equal(comparisonReport.publicBenchmarkClaimsAllowed, false);
+  assert.ok(comparisonReport.failedChecks?.includes("hosted-not-fixture"));
+  assert.ok(comparisonReport.failedChecks?.includes("recallweave-not-fixture"));
+  assert.ok(Number(comparisonReport.deltas?.quality) > 0);
+  const forcedHosted = JSON.parse(readFileSync(join(root, "packages/bench/fixtures/hosted-baseline-result.fixture.json"), "utf8"));
+  const forcedRecallWeave = JSON.parse(readFileSync(join(root, "packages/bench/fixtures/recallweave-baseline-result.fixture.json"), "utf8"));
+  forcedHosted.fixtureOnly = false;
+  forcedHosted.evidenceType = "live-hosted-baseline-result";
+  forcedRecallWeave.fixtureOnly = false;
+  forcedRecallWeave.evidenceType = "live-recallweave-result";
+  writeFileSync(forcedHostedPath, JSON.stringify(forcedHosted, null, 2));
+  writeFileSync(forcedRecallWeavePath, JSON.stringify(forcedRecallWeave, null, 2));
+  const forcedFixtureComparison = JSON.parse(
+    run("node", ["packages/bench/baseline-comparison.mjs", "--fixture", "--hosted", forcedHostedPath, "--recallweave", forcedRecallWeavePath]).stdout,
+  );
+  assert.equal(forcedFixtureComparison.fixtureOnly, true);
+  assert.equal(forcedFixtureComparison.countsAsComparisonEvidence, false);
+  assert.equal(forcedFixtureComparison.publicBenchmarkClaimsAllowed, false);
+  const missingMetric = structuredClone(forcedRecallWeave);
+  delete missingMetric.metrics.quality;
+  writeFileSync(missingMetricPath, JSON.stringify(missingMetric, null, 2));
+  const missingMetricResult = spawnSync("node", ["packages/bench/baseline-comparison.mjs", "--hosted", forcedHostedPath, "--recallweave", missingMetricPath], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.notEqual(missingMetricResult.status, 0);
+  assert.match(`${missingMetricResult.stderr}\n${missingMetricResult.stdout}`, /metrics\.quality must be present and finite/);
   assert.equal(operatorPacket.ok, true);
   assert.equal(operatorPacket.mode, "hosted-baseline-operator-packet");
   assert.equal(operatorPacket.writesRealFiles, false);
@@ -1423,6 +1482,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorMarkdown.stdout, /Attach Only/);
   assert.match(collectorEvidence, /hosted baseline collector/i);
   assert.match(collectorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(comparisonEvidence, /baseline comparison/i);
+  assert.match(comparisonGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(operatorEvidence, /hosted baseline operator packet/i);
   assert.match(operatorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
@@ -1431,6 +1492,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(collectorPreflightResult.stdout, secretPattern);
   assert.doesNotMatch(collectorEvidence, secretPattern);
   assert.doesNotMatch(collectorGeminiReview, secretPattern);
+  assert.doesNotMatch(comparisonResult.stdout, secretPattern);
+  assert.doesNotMatch(comparisonEvidence, secretPattern);
+  assert.doesNotMatch(comparisonGeminiReview, secretPattern);
   assert.doesNotMatch(operatorResult.stdout, secretPattern);
   assert.doesNotMatch(operatorMarkdown.stdout, secretPattern);
   assert.doesNotMatch(operatorEvidence, secretPattern);

@@ -73,6 +73,7 @@
     "adapter-store-latency-gate",
     "hosted-baseline-preflight",
     "hosted-baseline-collector",
+    "baseline-comparison-gate",
     "hosted-baseline-operator-packet",
     "claude-opus-pr5-review",
     "github-handoff-packet",
