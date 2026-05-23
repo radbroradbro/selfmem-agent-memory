@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `aa0e1d3`, run `26321818276`, success.
+  `4ed6c00`, run `26322155069`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -67,6 +67,8 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26321087248` on `5a5107f`: success.
 - GitHub Actions CI run `26321472056` on `e2388f0`: success.
 - GitHub Actions CI run `26321818276` on `aa0e1d3`: success.
+- GitHub Actions CI run `26321912900` on `c278419`: success.
+- GitHub Actions CI run `26322155069` on `4ed6c00`: success.
 
 ## Shipped Overnight Slices
 
@@ -176,7 +178,7 @@ Latest local verification before this summary:
 - Local-session compaction audit: `pnpm compaction:local-audit:built` passed
   in metrics-only mode with 6 input events, 2 redactions, 4 candidate
   fingerprints, chronological output, and zero privacy leaks.
-- GitHub Actions CI: success on the latest inspected baseline, `aa0e1d3`.
+- GitHub Actions CI: success on the latest inspected baseline, `4ed6c00`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - Strict adapter contract verification: local tests, full smoke,
@@ -188,9 +190,14 @@ Latest local verification before this summary:
   `e2388f0`.
 - Baseline evidence packet verification: local packet smoke and strict fixture
   rejection passed. Gemini review returned `CLEAN`. GitHub Actions CI run
-  `26321818276` passed on `aa0e1d3`. The packet keeps public benchmark claims
+  `26321818276` passed on `aa0e1d3`, and the docs refresh run
+  `26321912900` passed on `c278419`. The packet keeps public benchmark claims
   disabled unless a strict-real hosted baseline, RecallWeave result,
   comparison, and preflight all pass.
+- Canary packet review verification: packet review smoke, strict fixture
+  rejection, clean consumer smoke, full smoke, `release:check`,
+  `release:doctor`, `goal:audit`, Gemini review, PR/issue live sync, and
+  GitHub Actions CI run `26322155069` passed on `4ed6c00`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
   `103e7c6`, run `26290534116`.
 - GitHub Actions CI: success on guarded selected local-container browse commit

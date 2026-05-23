@@ -9,11 +9,11 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `aa0e1d3ddec3ee239764c1b7926f195a65a91cc7`.
-- GitHub Actions run `26321818276` passed CI after the baseline evidence
-  packet gate.
-- Previous verified code baseline before the baseline evidence packet:
-  `e2388f09ae6f2f208d234284814a30f6d3d81a39`.
+- Latest code/product baseline: `4ed6c006ac8e69f55bd91f5541dc127b7f0b272d`.
+- GitHub Actions run `26322155069` passed CI after the canary packet review
+  gate.
+- Previous verified code baseline before the canary packet review gate:
+  `c278419cee62520513a66a06e7e0ecaad27096c5`.
 - Previous code/product baseline before the strict adapter canary contract:
   `7fc3be269e5e26d0fb0fb58fdcebcabb6b4f1744`.
 - GitHub Actions run `26320492619` passed CI after the RecallWeave response
