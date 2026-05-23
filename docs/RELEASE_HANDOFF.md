@@ -169,9 +169,11 @@ once `SUPERMEMORY_API_KEY` and the source-locked query-set environment are
 configured. It writes metrics and hashes only.
 Use `baseline:export:recallweave -- --live --container-dir <path>` to create a
 local RecallWeave search-response export from `memories.jsonl` without raw
-memory text. Use the exporter's `--output` flag for this file. Do not redirect
-the package-manager command's stdout into JSON, because wrapper banners can
-corrupt the evidence file before the collector reads it.
+memory text. Use the exporter's `--output` flag for this file, and pass
+`--context-token-budget` or set `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET`
+for matched hosted comparisons. Do not redirect the package-manager command's
+stdout into JSON, because wrapper banners can corrupt the evidence file before
+the collector reads it.
 Use `baseline:collect:recallweave -- --live --responses <path>` after the
 local RecallWeave run exports ids, scores, timings, token estimates, privacy
 counters, and content hashes. The collector rejects raw response text by

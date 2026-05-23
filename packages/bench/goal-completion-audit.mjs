@@ -339,7 +339,7 @@ const requirements = [
     files.releaseState,
     "docs/PUBLIC_RELEASE_CHECKLIST.md",
   ]),
-  blocked("hosted-baseline-review-approval", "Hosted benchmark claims require two independent reviewer approvals and context-budget review after the source-matched mirror run", [
+  blocked("hosted-baseline-review-approval", "Hosted benchmark claims require two independent reviewer approvals and a fresh budgeted context rerun after the source-matched mirror run", [
     files.hostedBaselineLiveMirrorRunEvidence,
     files.hostedBaselineLiveMirrorRunReport,
     files.hostedBaselineLiveMirrorPacketReport,
@@ -376,7 +376,7 @@ const report = {
   latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
   goalComplete: false,
   mayCallUpdateGoalComplete: false,
-  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, but human approval, two-reviewer benchmark approval, context-budget tuning, and real rollout requirements remain unresolved.",
+  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, but human approval, two-reviewer benchmark approval, a fresh budgeted-context rerun, and real rollout requirements remain unresolved.",
   counts: {
     total: requirements.length,
     proven: requirements.filter((item) => item.status === "proven").length,

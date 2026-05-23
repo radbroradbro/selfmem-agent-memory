@@ -49,11 +49,12 @@ const privacy = {
   rawAnswerIncluded: hosted.rawAnswerIncluded || recallWeave.rawAnswerIncluded,
 };
 const deltas = metricDeltas(hosted.metrics, recallWeave.metrics, hosted.cost, recallWeave.cost);
+const contextBudget = contextBudgetParity(hosted, recallWeave);
 const recallWeaveWin = deltas.quality > 0 && noQualityRegression(deltas);
 const bothReal = !hosted.fixtureOnly && !recallWeave.fixtureOnly;
 const sameHarness = Object.values(comparability).every(Boolean);
 const labeledQuerySets = hosted.querySetEvidence.publicBenchmarkReady && recallWeave.querySetEvidence.publicBenchmarkReady;
-const countsAsComparisonEvidence = !fixtureRequested && bothReal && sameHarness && labeledQuerySets && privacyClean(privacy);
+const countsAsComparisonEvidence = !fixtureRequested && bothReal && sameHarness && labeledQuerySets && privacyClean(privacy) && contextBudget.ok;
 const publicBenchmarkClaimsAllowed = countsAsComparisonEvidence && recallWeaveWin && reviewerApprovalCount >= 2;
 const failedChecks = [
   check("hosted-not-fixture", !hosted.fixtureOnly),
@@ -68,6 +69,7 @@ const failedChecks = [
   check("labeled-query-sets", labeledQuerySets),
   check("metrics-only", hosted.metricsOnly && recallWeave.metricsOnly),
   check("privacy-clean", privacyClean(privacy)),
+  check("context-token-parity", contextBudget.ok),
   check("recallweave-win", recallWeaveWin),
   check("two-reviewer-approvals", reviewerApprovalCount >= 2),
 ]
@@ -88,6 +90,7 @@ const result = {
   recallWeave: resultSummary(recallWeave),
   comparability,
   deltas,
+  contextBudget,
   privacy,
   countsAsComparisonEvidence,
   recallWeaveWin,
@@ -153,10 +156,43 @@ function loadResult(inputPath, expectedProvider) {
     rawPromptIncluded: requiredBoolean(result, ["rawPromptIncluded", "includesRawPromptText"], inputPath),
     rawAnswerIncluded: requiredBoolean(result, ["rawAnswerIncluded", "includesRawAnswerText"], inputPath),
     metrics: normalizeMetrics(result.metrics ?? result),
+    retrievalConfig: normalizeRetrievalConfig(result.retrievalConfig),
     cost: {
       ingestUsd: requiredNumber(result.cost?.ingestUsd ?? result.ingestCostUsd, "cost.ingestUsd", inputPath),
       queryUsd: requiredNumber(result.cost?.queryUsd ?? result.queryCostUsd, "cost.queryUsd", inputPath),
     },
+  };
+}
+
+function normalizeRetrievalConfig(value) {
+  if (!value || typeof value !== "object") return null;
+  return {
+    source: String(value.source ?? ""),
+    retrievalMode: String(value.retrievalMode ?? ""),
+    limit: finiteNumberOrNull(value.limit),
+    contextBudget: normalizeContextBudget(value.contextBudget),
+  };
+}
+
+function normalizeContextBudget(value) {
+  if (!value || typeof value !== "object") {
+    return {
+      applied: false,
+      tokenBudget: null,
+      strategy: "not-reported",
+      exportedContextTokensAvg: null,
+    };
+  }
+  return {
+    applied: Boolean(value.applied),
+    tokenBudget: finiteNumberOrNull(value.tokenBudget),
+    strategy: String(value.strategy ?? ""),
+    queryCount: finiteNumberOrNull(value.queryCount),
+    queriesClipped: finiteNumberOrNull(value.queriesClipped),
+    clippedResultCount: finiteNumberOrNull(value.clippedResultCount),
+    skippedByBudgetCount: finiteNumberOrNull(value.skippedByBudgetCount),
+    fullCandidateTokensAvg: finiteNumberOrNull(value.fullCandidateTokensAvg),
+    exportedContextTokensAvg: finiteNumberOrNull(value.exportedContextTokensAvg),
   };
 }
 
@@ -257,6 +293,30 @@ function metricDeltas(hostedMetrics, recallWeaveMetrics, hostedCost, recallWeave
   };
 }
 
+function contextBudgetParity(hosted, recallWeave) {
+  const hostedAvg = Number(hosted.metrics.contextTokensAvg);
+  const recallWeaveAvg = Number(recallWeave.metrics.contextTokensAvg);
+  const maxRatio = finiteNumberOrDefault(process.env.RECALLWEAVE_CONTEXT_TOKEN_MAX_RATIO, 1.5);
+  const maxDelta = finiteNumberOrDefault(process.env.RECALLWEAVE_CONTEXT_TOKEN_MAX_DELTA, 512);
+  const allowedContextTokensAvg = Math.round(Math.max(hostedAvg * maxRatio, hostedAvg + maxDelta));
+  const ratio = hostedAvg > 0 ? round(recallWeaveAvg / hostedAvg) : null;
+  const overageTokensAvg = Math.max(0, Math.round(recallWeaveAvg - allowedContextTokensAvg));
+  const applied = Boolean(recallWeave.retrievalConfig?.contextBudget?.applied);
+  const ok = Number.isFinite(hostedAvg) && Number.isFinite(recallWeaveAvg) && recallWeaveAvg <= allowedContextTokensAvg;
+  return {
+    ok,
+    hostedContextTokensAvg: hostedAvg,
+    recallWeaveContextTokensAvg: recallWeaveAvg,
+    ratio,
+    maxRatio,
+    maxDelta,
+    allowedContextTokensAvg,
+    overageTokensAvg,
+    recallWeaveBudgetApplied: applied,
+    recallWeaveBudget: recallWeave.retrievalConfig?.contextBudget ?? null,
+  };
+}
+
 function noQualityRegression(deltas) {
   return deltas.pAt1 >= -0.05 && deltas.recallAt5 >= -0.05 && deltas.recallAt10 >= -0.05 && deltas.ndcgAt10 >= -0.05;
 }
@@ -335,6 +395,16 @@ function requiredNumber(value, label, inputPath = null) {
   const number = Number(value);
   assert.ok(Number.isFinite(number), `${inputPath ? `${displayPath(inputPath)} ` : ""}${label} must be present and finite`);
   return number;
+}
+
+function finiteNumberOrDefault(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function finiteNumberOrNull(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
 }
 
 function requiredBoolean(result, keys, inputPath) {

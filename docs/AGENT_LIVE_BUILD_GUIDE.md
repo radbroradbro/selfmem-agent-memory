@@ -517,9 +517,11 @@ evidence file before the collector reads it.
 
 ```bash
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=1600 \
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave \
   -- --live --container-dir /tmp/recallweave-hosted-local-mirror \
   --preserve-ids \
+  --context-token-budget 1600 \
   --output /tmp/recallweave-search-responses.json
 
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \

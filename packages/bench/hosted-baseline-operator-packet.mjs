@@ -32,6 +32,7 @@ const sourceGapPath = "/tmp/recallweave-baseline-source-gap.json";
 const evidencePacketPath = "/tmp/recallweave-baseline-evidence-packet.zip";
 const reviewerApprovalReportPath = "/tmp/recallweave-reviewer-approval-report.json";
 const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
+const contextTokenBudget = "1600";
 
 const packet = {
   ok: true,
@@ -185,6 +186,7 @@ const packet = {
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
         "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1",
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
+        `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=${contextTokenBudget}`,
         "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
         "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
@@ -230,7 +232,8 @@ const packet = {
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
         `RECALLWEAVE_BASELINE_CONTAINER_DIR=${hostedMirrorDir}`,
         "RECALLWEAVE_BASELINE_PRESERVE_IDS=1",
-        `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir ${hostedMirrorDir} --preserve-ids --output ${recallWeaveResponsesPath}`,
+        `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=${contextTokenBudget}`,
+        `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir ${hostedMirrorDir} --preserve-ids --context-token-budget ${contextTokenBudget} --output ${recallWeaveResponsesPath}`,
       ].join(" "),
     },
     {
@@ -316,6 +319,7 @@ const packet = {
     "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
     "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready",
+    "RecallWeave local response export applies a context-token budget before comparison claims",
     "blocked source-gap reports are reloaded with --source-gap before repair handoff, showing only hashed repair labels and counts",
     "private container map, if created, stays local and is not attached",
     "private env file, if created, stays local and is not attached",
@@ -497,6 +501,7 @@ function buildMarkdown() {
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \\",
     "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 \\",
     `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
+    `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=${contextTokenBudget} \\`,
     "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id> \\",
     "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
     "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> \\",
@@ -549,7 +554,8 @@ function buildMarkdown() {
     `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
     `RECALLWEAVE_BASELINE_CONTAINER_DIR=${hostedMirrorDir} \\`,
     "RECALLWEAVE_BASELINE_PRESERVE_IDS=1 \\",
-    `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir ${hostedMirrorDir} --preserve-ids --output ${recallWeaveResponsesPath}`,
+    `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=${contextTokenBudget} \\`,
+    `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir ${hostedMirrorDir} --preserve-ids --context-token-budget ${contextTokenBudget} --output ${recallWeaveResponsesPath}`,
     "```",
     "",
     "Then convert it into the matched RecallWeave aggregate result:",

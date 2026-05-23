@@ -120,6 +120,7 @@ const result = {
     localContainerHash: localContainer ? shortHash(localContainer) : null,
     responsesHash: `sha256:${fileHash(responsesPath)}`,
     rawResponseTextAllowed: allowRawResponseText,
+    contextBudget: normalizeContextBudget(responsesEnvelope.contextBudget),
   },
   metrics: {
     quality: aggregate.quality,
@@ -270,6 +271,28 @@ function normalizeResults(results, options) {
   });
 }
 
+function normalizeContextBudget(value) {
+  if (!value || typeof value !== "object") {
+    return {
+      applied: false,
+      tokenBudget: null,
+      strategy: "not-reported",
+      exportedContextTokensAvg: null,
+    };
+  }
+  return {
+    applied: Boolean(value.applied),
+    tokenBudget: finiteNumberOrNull(value.tokenBudget),
+    strategy: String(value.strategy ?? ""),
+    queryCount: finiteNumberOrNull(value.queryCount),
+    queriesClipped: finiteNumberOrNull(value.queriesClipped),
+    clippedResultCount: finiteNumberOrNull(value.clippedResultCount),
+    skippedByBudgetCount: finiteNumberOrNull(value.skippedByBudgetCount),
+    fullCandidateTokensAvg: finiteNumberOrNull(value.fullCandidateTokensAvg),
+    exportedContextTokensAvg: finiteNumberOrNull(value.exportedContextTokensAvg),
+  };
+}
+
 function isRelevant(result, expectedIds, expectedHashes) {
   return (result.id && expectedIds.has(result.id)) || (result.contentHash && expectedHashes.has(result.contentHash));
 }
@@ -366,6 +389,11 @@ function shortHash(value) {
 function finiteNumberOrDefault(value, fallback) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
+}
+
+function finiteNumberOrNull(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
 }
 
 function positiveInt(value, label) {

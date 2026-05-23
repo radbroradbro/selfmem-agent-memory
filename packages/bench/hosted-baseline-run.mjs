@@ -77,6 +77,13 @@ const answerModel =
   process.env.RECALLWEAVE_BASELINE_ANSWER_MODEL ??
   (fixtureRequested ? "fixture-answer" : null);
 const reviewerApprovalCount = String(args.reviewerApprovalCount ?? process.env.RECALLWEAVE_REVIEWER_APPROVAL_COUNT ?? "0");
+const contextTokenBudget = optionalPositiveInt(
+  args.contextTokenBudget ??
+    privateEnv.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ??
+    process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ??
+    null,
+  "context token budget",
+);
 
 assert.ok(querySetPath, "query set is required. Pass --queryset or RECALLWEAVE_BASELINE_QUERYSET");
 assert.ok(existsSync(querySetPath), "query set is missing");
@@ -109,6 +116,7 @@ const baseEnv = {
   RECALLWEAVE_BASELINE_ANSWER_MODEL: answerModel ?? "",
   RECALLWEAVE_REVIEWER_APPROVAL_COUNT: reviewerApprovalCount,
 };
+if (contextTokenBudget) baseEnv.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET = String(contextTokenBudget);
 if (!fixtureRequested) {
   baseEnv.RECALLWEAVE_BASELINE_LIVE = "1";
   baseEnv.RECALLWEAVE_BASELINE_NO_RAW_TEXT = "1";
@@ -185,6 +193,7 @@ const recallWeaveExportArgs = [
 if (!fixtureRequested && localContainerDir) recallWeaveExportArgs.push("--container-dir", localContainerDir);
 if (!fixtureRequested && memoriesPath) recallWeaveExportArgs.push("--memories", memoriesPath);
 if (!fixtureRequested && preserveIds) recallWeaveExportArgs.push("--preserve-ids");
+if (contextTokenBudget) recallWeaveExportArgs.push("--context-token-budget", String(contextTokenBudget));
 const recallWeaveResponses = runStep("export-recallweave-responses", recallWeaveExportArgs, baseEnv);
 const recallWeave = runStep(
   "collect-recallweave-result",
@@ -339,6 +348,7 @@ const output = {
     "local container map is supplied through --local-map or RECALLWEAVE_BASELINE_LOCAL_MAP",
     "private hosted container map is supplied through --private-map or RECALLWEAVE_BASELINE_PRIVATE_MAP",
     "use --preserve-ids or RECALLWEAVE_BASELINE_PRESERVE_IDS=1 when the local arm is a hosted mirror with preserved hosted ids",
+    "RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET or --context-token-budget is set for matched local response export",
     "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection",
   ],
   forbidden: [
@@ -471,6 +481,7 @@ function summarizeExport(json) {
     redactionFailureCount: Number(json.redactionFailureCount ?? 0),
     responseCount: Object.keys(json.responses ?? {}).length,
     skippedFullyPrivate: Number(json.inputStats?.skippedFullyPrivate ?? 0),
+    contextBudget: json.contextBudget ?? null,
   };
 }
 
@@ -533,6 +544,13 @@ function parseArgs(argv) {
     }
   }
   return parsed;
+}
+
+function optionalPositiveInt(value, label) {
+  if (value == null || value === "" || value === false) return null;
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
+  return number;
 }
 
 function toCamel(value) {

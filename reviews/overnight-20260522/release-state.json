@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, and hosted baseline local mirror/source-matched run gating reviewed CLEAN",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, hosted baseline local mirror/source-matched run gating, and local context-budget comparison gating reviewed CLEAN",
     "allowedPostBaselineCodePaths": [
       ".gitignore",
       "package.json",
@@ -38,9 +38,12 @@
       "packages/bench/canary-next-agent-packet.mjs",
       "packages/bench/canary-next-agent-plan.mjs",
       "packages/bench/canary-operator-packet.mjs",
+      "packages/bench/baseline-comparison.mjs",
+      "packages/bench/baseline-reviewer-approval-intake.mjs",
       "packages/bench/baseline-source-alignment.mjs",
       "packages/bench/baseline-source-gap-plan.mjs",
       "packages/bench/baseline-source-match-preflight.mjs",
+      "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
       "packages/bench/consumer-install-smoke.mjs",
       "packages/bench/goal-completion-audit.mjs",
       "packages/bench/hosted-baseline-next-run.mjs",
@@ -48,6 +51,8 @@
       "packages/bench/hosted-baseline-local-mirror.mjs",
       "packages/bench/hosted-baseline-queryset-author.mjs",
       "packages/bench/hosted-baseline-run.mjs",
+      "packages/bench/recallweave-baseline-collector.mjs",
+      "packages/bench/recallweave-response-export.mjs",
       "packages/bench/release-blocker-doctor.mjs",
       "packages/bench/release-readiness-check.mjs"
     ]

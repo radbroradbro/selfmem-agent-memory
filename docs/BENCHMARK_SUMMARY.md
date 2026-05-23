@@ -128,7 +128,10 @@ before producing aggregate metrics.
 `baseline:export:recallweave -- --live` creates the local RecallWeave
 search-response export from a local container. It emits ids or hashed ids,
 content hashes, scores, timings, token estimates, and privacy counters only.
-It does not emit raw memory text.
+It does not emit raw memory text. For matched hosted comparisons, set
+`RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET` or pass `--context-token-budget`
+so the local arm reports budgeted context tokens instead of full-memory token
+mass.
 
 `baseline:collect:recallweave -- --live` converts a local RecallWeave
 search-response export into the matched aggregate result file. The export must
@@ -139,7 +142,8 @@ hashes. Raw response text is rejected by default.
 hosted and RecallWeave result files. It blocks public claims when either result
 is a fixture, when any metric or privacy flag is missing, when the query-set or
 scoring-code hash differs, when either result lacks labeled query-set evidence,
-or when fewer than two reviewer approvals exist.
+when RecallWeave exceeds the context-token parity allowance, or when fewer than
+two reviewer approvals exist.
 
 `baseline:next-run` is the state-aware planner for this benchmark lane. It
 turns the current hosted/local evidence state into the next safe source-locked
@@ -213,6 +217,8 @@ A stronger claim requires:
 - the same settings,
 - a source-match preflight showing the local RecallWeave source can score the
   reviewed labels,
+- context-token parity between hosted and local arms, or an explicit local
+  context budget recorded in the RecallWeave export,
 - two independent reviewer approvals bound to the exact metrics-only packet
   through `baseline:reviewer-intake`,
 - no memory text in shared reports,

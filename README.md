@@ -200,7 +200,10 @@ npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
 
 Fixture mode proves the chain. Live mode still requires explicit hosted
 credentials, no-raw-text mode, a reviewed query set, and local RecallWeave
-input, and it does not approve public claims by itself.
+input, and it does not approve public claims by itself. For matched live runs,
+set `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET` or pass
+`--context-token-budget` so the local arm is judged on the context it would
+actually inject, not on full-memory token mass.
 Use `baseline:mirror-hosted` when hosted Supermemory history is the source. It
 writes redacted mirror files locally and emits only a metrics report.
 

@@ -25,6 +25,10 @@ const containerDir = resolveInputPath(args.containerDir ?? process.env.RECALLWEA
 const outputPath = args.output ?? process.env.RECALLWEAVE_BASELINE_RESPONSES_JSON ?? null;
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 const preserveIds = fixtureRequested || args.preserveIds === true || process.env.RECALLWEAVE_BASELINE_PRESERVE_IDS === "1";
+const contextTokenBudget = optionalPositiveInt(
+  args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? null,
+  "context token budget",
+);
 const generatedAt = new Date().toISOString();
 
 const secretPattern =
@@ -63,17 +67,22 @@ const loaded = loadMemories(effectiveMemoriesPath, { preserveIds });
 assert.ok(loaded.candidates.length > 0, "memories input produced no searchable candidates");
 
 const responses = {};
+const contextBudgetStats = [];
 for (const query of queries) {
   const startedAt = performance.now();
   const ranked = rankCandidates(query.q, loaded.candidates).slice(0, limit);
+  const budgeted = applyContextBudget(ranked, { contextTokenBudget });
+  contextBudgetStats.push({ queryIdHash: shortHash(query.id), ...budgeted.stats });
   responses[query.id] = {
     timing: Math.max(1, Math.round(performance.now() - startedAt)),
-    total: ranked.length,
-    results: ranked.map((candidate) => ({
+    total: budgeted.results.length,
+    totalBeforeBudget: ranked.length,
+    contextBudget: budgeted.stats,
+    results: budgeted.results.map((candidate) => ({
       id: candidate.outputId,
       contentHash: candidate.contentHash,
       score: candidate.score,
-      estimatedTokens: candidate.estimatedTokens,
+      estimatedTokens: candidate.contextEstimatedTokens,
       source: "local_selfmem",
     })),
   };
@@ -117,6 +126,7 @@ const result = {
     redactionCount: loaded.redactionCount,
     keyRedactionCount: loaded.keyRedactionCount,
   },
+  contextBudget: summarizeContextBudget(contextBudgetStats, { contextTokenBudget }),
   responses,
 };
 
@@ -215,6 +225,68 @@ function rankCandidates(query, candidates) {
     .sort((left, right) => right.score - left.score || left.outputId.localeCompare(right.outputId));
 }
 
+function applyContextBudget(candidates, options) {
+  const fullTokens = sumTokens(candidates.map((candidate) => candidate.estimatedTokens));
+  if (!options.contextTokenBudget) {
+    return {
+      results: candidates.map((candidate) => ({ ...candidate, contextEstimatedTokens: candidate.estimatedTokens })),
+      stats: {
+        applied: false,
+        tokenBudget: null,
+        selectedCount: candidates.length,
+        skippedByBudgetCount: 0,
+        clippedResultCount: 0,
+        fullCandidateTokens: fullTokens,
+        exportedContextTokens: fullTokens,
+      },
+    };
+  }
+
+  let remaining = options.contextTokenBudget;
+  let clippedResultCount = 0;
+  let skippedByBudgetCount = 0;
+  const results = [];
+  for (const candidate of candidates) {
+    if (remaining <= 0) {
+      skippedByBudgetCount += 1;
+      continue;
+    }
+    const full = Math.max(1, Number(candidate.estimatedTokens ?? 1));
+    const contextEstimatedTokens = Math.min(full, remaining);
+    if (contextEstimatedTokens < full) clippedResultCount += 1;
+    results.push({ ...candidate, contextEstimatedTokens });
+    remaining -= contextEstimatedTokens;
+  }
+
+  return {
+    results,
+    stats: {
+      applied: true,
+      tokenBudget: options.contextTokenBudget,
+      selectedCount: results.length,
+      skippedByBudgetCount,
+      clippedResultCount,
+      fullCandidateTokens: fullTokens,
+      exportedContextTokens: sumTokens(results.map((candidate) => candidate.contextEstimatedTokens)),
+    },
+  };
+}
+
+function summarizeContextBudget(stats, options) {
+  const applied = Boolean(options.contextTokenBudget);
+  return {
+    applied,
+    tokenBudget: options.contextTokenBudget ?? null,
+    strategy: applied ? "ranked-prefix-with-last-result-clipping" : "unbounded-full-memory-token-estimate",
+    queryCount: stats.length,
+    queriesClipped: stats.filter((item) => item.clippedResultCount > 0 || item.skippedByBudgetCount > 0).length,
+    clippedResultCount: sumTokens(stats.map((item) => item.clippedResultCount)),
+    skippedByBudgetCount: sumTokens(stats.map((item) => item.skippedByBudgetCount)),
+    fullCandidateTokensAvg: Math.round(average(stats.map((item) => item.fullCandidateTokens))),
+    exportedContextTokensAvg: Math.round(average(stats.map((item) => item.exportedContextTokens))),
+  };
+}
+
 function redactForExport(text) {
   const privateMatches = text.match(privateTagPattern) ?? [];
   let redacted = text.replace(privateTagPattern, " ");
@@ -243,6 +315,15 @@ function normalizeText(text) {
 
 function estimateTokens(text) {
   return Math.max(1, Math.ceil(String(text).length / 4));
+}
+
+function sumTokens(values) {
+  return values.reduce((sum, value) => sum + Number(value ?? 0), 0);
+}
+
+function average(values) {
+  const valid = values.filter((value) => Number.isFinite(value));
+  return valid.length ? valid.reduce((sum, value) => sum + value, 0) / valid.length : 0;
 }
 
 function safeScalar(value) {
@@ -288,6 +369,11 @@ function positiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
   return number;
+}
+
+function optionalPositiveInt(value, label) {
+  if (value == null || value === "" || value === false) return null;
+  return positiveInt(value, label);
 }
 
 function parseArgs(argv) {

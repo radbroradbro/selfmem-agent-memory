@@ -313,6 +313,7 @@ function commandsFor(status) {
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
   const reviewerApprovalReportPath = "/tmp/recallweave-reviewer-approval-report.json";
   const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
+  const contextTokenBudget = "1600";
   const commands = [
     {
       id: "print-template",
@@ -426,6 +427,7 @@ function commandsFor(status) {
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
         "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1",
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
+        `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=${contextTokenBudget}`,
         "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
         "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
         "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
@@ -464,7 +466,8 @@ function commandsFor(status) {
         `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
         `RECALLWEAVE_BASELINE_CONTAINER_DIR=${hostedMirrorDir}`,
         "RECALLWEAVE_BASELINE_PRESERVE_IDS=1",
-        `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir ${hostedMirrorDir} --preserve-ids --output ${recallWeaveResponsesPath}`,
+        `RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=${contextTokenBudget}`,
+        `npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir ${hostedMirrorDir} --preserve-ids --context-token-budget ${contextTokenBudget} --output ${recallWeaveResponsesPath}`,
       ].join(" "),
     });
     commands.push({
@@ -556,6 +559,7 @@ function acceptanceCriteria() {
     "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
     "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready",
     "private hosted mirror is created locally with 0600 files before source-match and local-arm export when hosted history is the source",
+    "RecallWeave local response export applies a context-token budget before comparison claims",
     "hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local",
     "any auto-authored private query set was locally reviewed before collection",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",

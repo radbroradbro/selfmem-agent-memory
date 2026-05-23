@@ -2277,6 +2277,7 @@ check("fresh hosted baseline preflight passes", () => {
   const recallWeaveLiveResultPath = join(collectorTmp, "recallweave-live-result.json");
   const forcedHostedPath = join(collectorTmp, "forced-hosted-live.json");
   const forcedRecallWeavePath = join(collectorTmp, "forced-recallweave-live.json");
+  const bloatedRecallWeavePath = join(collectorTmp, "bloated-recallweave-live.json");
   const missingCounterpartRunPath = join(collectorTmp, "missing-counterpart-run.json");
   const missingMetricPath = join(collectorTmp, "missing-metric.json");
   const missingQuerySetEvidencePath = join(collectorTmp, "missing-query-set-evidence.json");
@@ -2578,6 +2579,8 @@ check("fresh hosted baseline preflight passes", () => {
       "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
       "--memories",
       "packages/bench/fixtures/recallweave-local-container.fixture/local-memories.fixture.jsonl",
+      "--context-token-budget",
+      "40",
       "--output",
       recallWeaveLiveExportPath,
     ],
@@ -3198,6 +3201,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(recallWeaveLiveExportReport.source?.preserveIds, false);
   assert.ok(recallWeaveLiveExportReport.source?.memoriesFileHash?.startsWith("sha256:"));
   assert.equal(recallWeaveLiveExportReport.inputStats?.skippedFullyPrivate, 1);
+  assert.equal(recallWeaveLiveExportReport.contextBudget?.applied, true);
+  assert.equal(recallWeaveLiveExportReport.contextBudget?.tokenBudget, 40);
+  assert.ok(Number(recallWeaveLiveExportReport.contextBudget?.exportedContextTokensAvg) <= 40);
   assert.doesNotMatch(recallWeaveLiveExportResult.stdout, /\b(memory|content|chunk|text|raw|rawText|document)"\s*:/);
   assert.equal(recallWeaveLiveReport.provider, "recallweave");
   assert.equal(recallWeaveLiveReport.fixtureOnly, true);
@@ -3287,6 +3293,16 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(forcedFixtureComparison.fixtureOnly, true);
   assert.equal(forcedFixtureComparison.countsAsComparisonEvidence, false);
   assert.equal(forcedFixtureComparison.publicBenchmarkClaimsAllowed, false);
+  const bloatedRecallWeave = structuredClone(forcedRecallWeave);
+  bloatedRecallWeave.metrics.contextTokensAvg = forcedHosted.metrics.contextTokensAvg * 10;
+  writeFileSync(bloatedRecallWeavePath, JSON.stringify(bloatedRecallWeave, null, 2));
+  const bloatedComparison = JSON.parse(
+    run("node", ["packages/bench/baseline-comparison.mjs", "--hosted", forcedHostedPath, "--recallweave", bloatedRecallWeavePath]).stdout,
+  );
+  assert.equal(bloatedComparison.contextBudget?.ok, false);
+  assert.equal(bloatedComparison.countsAsComparisonEvidence, false);
+  assert.ok(bloatedComparison.failedChecks?.includes("context-token-parity"));
+  assert.ok(Number(bloatedComparison.contextBudget?.overageTokensAvg) > 0);
   const missingCounterpartRun = structuredClone(forcedHosted);
   missingCounterpartRun.matchedRecallWeaveRunPresent = false;
   writeFileSync(missingCounterpartRunPath, JSON.stringify(missingCounterpartRun, null, 2));

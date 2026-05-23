@@ -127,9 +127,11 @@ wrapper banners can corrupt the evidence file before the collector reads it.
 
 ```bash
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=1600 \
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave \
   -- --live --container-dir <hosted-mirror-or-source-matched-container> \
   --preserve-ids \
+  --context-token-budget 1600 \
   --output /tmp/recallweave-search-responses.json
 
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
@@ -219,7 +221,8 @@ quality result.
    ConvoMem, or a documented real benchmark subset.
 3. Run the matched baseline and one RecallWeave arm.
 4. Record accuracy, P@1, recall@5, recall@10, NDCG@10 where available, p50 and
-   p95 latency, context tokens, ingest cost, query cost, and failures.
+   p95 latency, context tokens, context-budget settings, ingest cost, query
+   cost, and failures.
 5. Pick the largest quality gap. If quality is tied, pick the largest latency
    or cost gap.
 6. Propose exactly one methodology change.
