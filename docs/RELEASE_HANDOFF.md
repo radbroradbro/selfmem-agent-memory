@@ -108,9 +108,9 @@ baseline result is supplied. Live baseline outputs must contain aggregate
 metrics only. Do not include raw memory text, transcripts, prompts, answers,
 credentials, cookies, or bearer tokens.
 Every query in the source-locked query set must include at least one
-`expectedResultIds` or `expectedResultHashes` entry. The collectors reject
-unlabeled query sets so a live-looking run cannot create meaningless benchmark
-metrics.
+`expectedResultIds` or `expectedResultHashes` entry, and every query text must
+be distinct. The collectors reject unlabeled or duplicate query sets so a
+live-looking run cannot create meaningless benchmark metrics.
 
 Use `--fixture` to verify the parser and result-shape gate without using a
 provider key. Use `--print-template` before a live collection run and fill that
@@ -138,6 +138,10 @@ npm exec --yes pnpm@10.23.0 -- baseline:author-queryset \
 Review the private query set locally before any collection. Attach only the
 public author report and the strict `baseline:queryset` report. Do not attach
 the private query set.
+The current live prep evidence found 14 hashed hosted candidate containers
+across 200 hosted documents, drafted 8 private queries, and strict inspection
+reported 8 unique queries with 0 duplicate or unlabeled queries. That evidence
+narrows the blocker but does not replace a matched hosted-vs-RecallWeave run.
 You may attach a public-safe live discovery report when it contains only hashed
 candidate ids, counts, timestamps, status/type counts, and privacy flags. That
 report proves metadata access and candidate discovery only. It does not close
@@ -147,7 +151,7 @@ Use `baseline:queryset -- --queryset <path> --strict --output
 /tmp/recallweave-hosted-baseline-queryset-report.json` before either side
 collects results. The report is public-safe because it prints hashes and counts
 only, and strict mode fails if any query lacks an expected result id or content
-hash.
+hash or duplicates another query.
 Use `baseline:collect -- --live` for the read-only hosted search collection
 once `SUPERMEMORY_API_KEY` and the source-locked query-set environment are
 configured. It writes metrics and hashes only.

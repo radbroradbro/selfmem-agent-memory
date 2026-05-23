@@ -50,11 +50,11 @@ const source = fixtureOnly
       maxPages,
       timeoutMs,
     });
-const candidates = source.documents
+const textDocuments = source.documents
   .map(normalizeDocumentForQuestion)
   .filter((document) => document.text.length >= 40)
-  .slice(0, maxQueries);
-assert.ok(candidates.length >= minQueries, `not enough text-bearing hosted documents to author query set: ${candidates.length} < ${minQueries}`);
+const queries = buildUniqueQueries(textDocuments, maxQueries);
+assert.ok(queries.length >= minQueries, `not enough unique hosted documents to author query set: ${queries.length} < ${minQueries}`);
 
 const querySet = {
   schemaVersion: 1,
@@ -68,7 +68,7 @@ const querySet = {
     selectedCandidateId: candidateId,
     sourceDocumentCount: source.documents.length,
   },
-  queries: candidates.map((document, index) => buildQuery(document, index)),
+  queries,
 };
 const querySetPath = writePrivateQuerySet(querySetOutput, querySet);
 const querySetHash = stableHash({
@@ -114,7 +114,8 @@ const report = {
     endpoint: fixtureOnly ? "fixture" : "https://api.supermemory.ai/v3/documents/list",
     pagesRead: source.pagesRead,
     documentsSeen: source.documents.length,
-    textBearingDocuments: candidates.length,
+    textBearingDocuments: textDocuments.length,
+    authoredQueryCount: querySet.queries.length,
     errors: source.errors,
   },
   privateQuerySet: {
@@ -127,6 +128,8 @@ const report = {
   },
   querySetEvidence: {
     queryCount: querySet.queries.length,
+    uniqueQueryCount: uniqueCount(querySet.queries.map((query) => query.q)),
+    duplicateQueryCount: querySet.queries.length - uniqueCount(querySet.queries.map((query) => query.q)),
     expectedResultRefCount: querySet.queries.reduce((sum, query) => sum + arrayLength(query.expectedResultIds) + arrayLength(query.expectedResultHashes), 0),
     minExpectedRefsPerQuery: Math.min(...querySet.queries.map((query) => arrayLength(query.expectedResultIds) + arrayLength(query.expectedResultHashes))),
     publicBenchmarkReadyAfterReview: true,
@@ -239,8 +242,31 @@ function extractDocumentText(memory) {
   return candidates.sort((left, right) => right.length - left.length)[0] ?? "";
 }
 
-function buildQuery(document, index) {
-  const phrase = makeQuestionPhrase(document.text);
+function buildUniqueQueries(documents, maxQueries) {
+  const queries = [];
+  const usedContentHashes = new Set();
+  const usedQueryHashes = new Set();
+
+  for (const document of documents) {
+    if (document.contentHash && usedContentHashes.has(document.contentHash)) continue;
+
+    const phrase = makeQuestionPhraseCandidates(document.text).find((candidate) => {
+      const queryHash = stableHash(`What memory discusses ${candidate}?`);
+      return !usedQueryHashes.has(queryHash);
+    });
+    if (!phrase) continue;
+
+    const query = buildQuery(document, queries.length, phrase);
+    usedQueryHashes.add(stableHash(query.q));
+    if (document.contentHash) usedContentHashes.add(document.contentHash);
+    queries.push(query);
+    if (queries.length >= maxQueries) break;
+  }
+
+  return queries;
+}
+
+function buildQuery(document, index, phrase) {
   const expectedResultIds = document.id ? [document.id] : [];
   const expectedResultHashes = document.contentHash ? [document.contentHash] : [];
   return {
@@ -251,15 +277,42 @@ function buildQuery(document, index) {
   };
 }
 
-function makeQuestionPhrase(text) {
-  const words = text
+function makeQuestionPhraseCandidates(text) {
+  const seen = new Set();
+  const phrases = [];
+  const sentences = String(text)
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  const pools = [...sentences, String(text)];
+
+  for (const pool of pools) {
+    const words = tokenizeQuestionWords(pool);
+    for (const size of [10, 8, 6]) {
+      for (let start = 0; start <= Math.max(0, words.length - size); start += Math.max(1, Math.floor(size / 2))) {
+        const phrase = words.slice(start, start + size).join(" ").trim();
+        if (!phrase || seen.has(phrase)) continue;
+        seen.add(phrase);
+        phrases.push(phrase);
+      }
+    }
+  }
+
+  if (phrases.length === 0) {
+    const fallback = tokenizeQuestionWords(text).slice(0, 10).join(" ").trim();
+    if (fallback) phrases.push(fallback);
+  }
+
+  return phrases;
+}
+
+function tokenizeQuestionWords(text) {
+  return String(text)
     .replace(/https?:\/\/\S+/g, " ")
     .replace(/[^\w\s.'-]/g, " ")
     .split(/\s+/)
     .map((word) => word.trim())
-    .filter((word) => word.length >= 3 && !/^(the|and|that|this|with|from|into|about|should|would|could|there|their|when|where|what)$/i.test(word));
-  const phrase = words.slice(0, 10).join(" ").trim();
-  return phrase || "the selected hosted baseline item";
+    .filter((word) => word.length >= 3 && !/^(the|and|that|this|with|from|into|about|should|would|could|there|their|when|where|what|memory|remember|stored|user|agent|assistant)$/i.test(word));
 }
 
 function fixtureDiscovery() {
@@ -394,6 +447,10 @@ function normalizeTags(value) {
 
 function arrayLength(value) {
   return Array.isArray(value) ? value.filter((item) => String(item).trim()).length : 0;
+}
+
+function uniqueCount(values) {
+  return new Set(values.map((value) => stableHash(String(value)))).size;
 }
 
 function stringOrNull(value) {

@@ -1,0 +1,105 @@
+{
+  "ok": true,
+  "mode": "baseline-queryset-inspect",
+  "schemaVersion": 1,
+  "fixtureOnly": false,
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "rawQueryIncluded": false,
+  "rawExpectedIdsIncluded": false,
+  "rawExpectedHashesIncluded": false,
+  "privateLeakCount": 0,
+  "hasSecretPattern": false,
+  "source": {
+    "inputFile": "external:recallweave-hosted-baseline-queryset-20260523-v2.private.json",
+    "datasetSliceHash": "sha256:b0519f771ea91e6b",
+    "judgeModelHash": "sha256:6ef1cfe949cb3f97",
+    "answerModelHash": "sha256:6ef1cfe949cb3f97",
+    "querySetHash": "sha256:52a7f54511631b079585accde83aa7817704f253abd990ced9d64dbcd31fc97a"
+  },
+  "querySetEvidence": {
+    "queryCount": 8,
+    "uniqueQueryCount": 8,
+    "duplicateQueryCount": 0,
+    "labeledQueryCount": 8,
+    "unlabeledQueryCount": 0,
+    "expectedResultRefCount": 16,
+    "minExpectedRefsPerQuery": 2,
+    "maxExpectedRefsPerQuery": 2,
+    "usesExpectedIds": true,
+    "usesExpectedHashes": true,
+    "publicBenchmarkReady": true
+  },
+  "queryFingerprints": [
+    {
+      "queryIdHash": "e01d7e23699f62af",
+      "queryHash": "fa8d78b2ae376d09",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    },
+    {
+      "queryIdHash": "f1ddf6efc952d0e9",
+      "queryHash": "4595e1abcca15958",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    },
+    {
+      "queryIdHash": "b5eedbc985320917",
+      "queryHash": "81f9ca5aa8572109",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    },
+    {
+      "queryIdHash": "66ccc1d02abb09bc",
+      "queryHash": "b7497bbe20b65748",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    },
+    {
+      "queryIdHash": "a70d819da1a182e9",
+      "queryHash": "8a1f59aa74474052",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    },
+    {
+      "queryIdHash": "f9668a429b0cf133",
+      "queryHash": "f478a9c6f7b7d9fb",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    },
+    {
+      "queryIdHash": "f0a83cc937a6c455",
+      "queryHash": "5dcb599ae504d65e",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    },
+    {
+      "queryIdHash": "f1dfd511be62bb34",
+      "queryHash": "cfee352fac0b979a",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1,
+      "expectedResultRefCount": 2,
+      "labeled": true
+    }
+  ],
+  "failedChecks": [],
+  "nextActions": [
+    "Use this query set for hosted and RecallWeave collection with the same judge, answer model, scoring code, and privacy settings.",
+    "Attach this metrics-only report with hosted baseline evidence packets when reviewers need query-set proof."
+  ]
+}

@@ -41,12 +41,15 @@ evidence.
 the selected hosted container. It writes the private query set outside the
 repository with 0600 permissions and prints only counts and hashes. The draft
 does not count as benchmark evidence until a human reviews it locally and
-`baseline:queryset --strict` reports that every query is labeled.
+`baseline:queryset --strict` reports that every query is labeled and distinct.
 
-The latest live discovery on 2026-05-23 found 4 hashed candidate containers
-across 100 hosted documents, with no raw labels or memory text in the report.
-This proves safe hosted metadata access only. It is not a hosted baseline or a
-comparison result.
+The latest live prep on 2026-05-23 found 14 hashed candidate containers across
+200 hosted documents, with no raw labels or memory text in the public report.
+It then drafted a private 8-query source-locked query set from 47 text-bearing
+hosted documents. The strict public-safe query-set report shows 8 unique
+queries, 0 duplicates, and 0 unlabeled queries. This proves safe hosted
+metadata access and private query-set preparation only. It is not a hosted
+baseline or a comparison result.
 
 To generate the hosted baseline operator packet with this discovery state
 attached, run:
@@ -58,7 +61,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --discovery reviews/o
 `baseline:queryset` inspects the source-locked query set before either side
 collects results. It emits hashes and counts only, marks whether every query is
 labeled, and fails under `--strict` if any query lacks an expected result id or
-content hash.
+content hash or if two queries have the same text.
 
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents
@@ -70,8 +73,9 @@ evidence. It uses hosted search only after explicit live flags and
 environment-only credentials are present, and it writes aggregate metrics and
 hashes only.
 Every query in the source-locked query set must carry at least one expected
-result id or expected content hash. The hosted and RecallWeave collectors reject
-unlabeled query sets before producing aggregate metrics.
+result id or expected content hash, and every query text must be distinct. The
+hosted and RecallWeave collectors reject unlabeled or duplicate query sets
+before producing aggregate metrics.
 
 `baseline:export:recallweave -- --live` creates the local RecallWeave
 search-response export from a local container. It emits ids or hashed ids,

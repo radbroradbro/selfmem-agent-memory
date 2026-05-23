@@ -72,7 +72,7 @@ const report = {
     expectedResultRefCount: queryExpectedRefCount(query),
     labeled: queryExpectedRefCount(query) > 0,
   })),
-  failedChecks: querySetEvidence.publicBenchmarkReady ? [] : ["labeled-query-set"],
+  failedChecks: failedQuerySetChecks(querySetEvidence),
   nextActions: querySetEvidence.publicBenchmarkReady
     ? [
         "Use this query set for hosted and RecallWeave collection with the same judge, answer model, scoring code, and privacy settings.",
@@ -80,6 +80,7 @@ const report = {
       ]
     : [
         "Add at least one expected result id or expected content hash entry to every query.",
+        "Make every query text distinct before using the query set for a benchmark.",
         "Rerun baseline:queryset -- --queryset <path> --strict before collecting hosted or RecallWeave results.",
       ],
 };
@@ -94,10 +95,24 @@ if (outputPath) {
 process.stdout.write(serialized);
 if (strict && !querySetEvidence.publicBenchmarkReady) process.exit(1);
 
+function failedQuerySetChecks(querySetEvidence) {
+  const checks = [];
+  if (querySetEvidence.unlabeledQueryCount > 0 || querySetEvidence.minExpectedRefsPerQuery <= 0) checks.push("labeled-query-set");
+  if (querySetEvidence.duplicateQueryCount > 0) checks.push("unique-query-text");
+  return checks;
+}
+
 function summarizeQuerySetEvidence(queries) {
   const expectedRefCounts = queries.map(queryExpectedRefCount);
+  const queryHashes = queries.map((query) => shortHash(query.q));
+  const uniqueQueryCount = new Set(queryHashes).size;
+  const duplicateQueryCount = queries.length - uniqueQueryCount;
+  const labeled = expectedRefCounts.every((count) => count > 0);
+  const unique = duplicateQueryCount === 0;
   return {
     queryCount: queries.length,
+    uniqueQueryCount,
+    duplicateQueryCount,
     labeledQueryCount: expectedRefCounts.filter((count) => count > 0).length,
     unlabeledQueryCount: expectedRefCounts.filter((count) => count === 0).length,
     expectedResultRefCount: expectedRefCounts.reduce((sum, count) => sum + count, 0),
@@ -105,7 +120,7 @@ function summarizeQuerySetEvidence(queries) {
     maxExpectedRefsPerQuery: Math.max(...expectedRefCounts),
     usesExpectedIds: queries.some((query) => arrayLength(query.expectedResultIds) > 0),
     usesExpectedHashes: queries.some((query) => arrayLength(query.expectedResultHashes) > 0),
-    publicBenchmarkReady: expectedRefCounts.every((count) => count > 0),
+    publicBenchmarkReady: labeled && unique,
   };
 }
 

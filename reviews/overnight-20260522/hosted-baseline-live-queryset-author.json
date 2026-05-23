@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "mode": "hosted-baseline-queryset-author",
+  "schemaVersion": 1,
+  "fixtureOnly": false,
+  "evidenceType": "live-hosted-baseline-queryset-author",
+  "writesRealFiles": true,
+  "callsHostedProvider": true,
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawLabelsIncluded": false,
+  "rawTitlesIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawAnswerIncluded": false,
+  "rawQueryIncluded": false,
+  "rawExpectedIdsIncluded": false,
+  "rawExpectedHashesIncluded": false,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "countsAsBenchmarkEvidence": false,
+  "authoringReviewRequired": true,
+  "selectedCandidate": {
+    "candidateId": "c_4b1f9e153ffcd35e",
+    "rawLabelLength": 67,
+    "selectionFingerprint": "sha256:f13069012f19f93b"
+  },
+  "sourceStats": {
+    "endpoint": "https://api.supermemory.ai/v3/documents/list",
+    "pagesRead": 3,
+    "documentsSeen": 47,
+    "textBearingDocuments": 47,
+    "authoredQueryCount": 8,
+    "errors": []
+  },
+  "privateQuerySet": {
+    "written": true,
+    "basename": "recallweave-hosted-baseline-queryset-20260523-v2.private.json",
+    "mode": "0600",
+    "containsRawQueries": true,
+    "containsExpectedResultRefs": true,
+    "attachToPublicEvidence": false
+  },
+  "querySetEvidence": {
+    "queryCount": 8,
+    "uniqueQueryCount": 8,
+    "duplicateQueryCount": 0,
+    "expectedResultRefCount": 16,
+    "minExpectedRefsPerQuery": 2,
+    "publicBenchmarkReadyAfterReview": true,
+    "querySetHash": "sha256:52a7f54511631b079585accde83aa7817704f253abd990ced9d64dbcd31fc97a"
+  },
+  "queryFingerprints": [
+    {
+      "queryIdHash": "e01d7e23699f62af",
+      "queryHash": "fa8d78b2ae376d09",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    },
+    {
+      "queryIdHash": "f1ddf6efc952d0e9",
+      "queryHash": "4595e1abcca15958",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    },
+    {
+      "queryIdHash": "b5eedbc985320917",
+      "queryHash": "81f9ca5aa8572109",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    },
+    {
+      "queryIdHash": "66ccc1d02abb09bc",
+      "queryHash": "b7497bbe20b65748",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    },
+    {
+      "queryIdHash": "a70d819da1a182e9",
+      "queryHash": "8a1f59aa74474052",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    },
+    {
+      "queryIdHash": "f9668a429b0cf133",
+      "queryHash": "f478a9c6f7b7d9fb",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    },
+    {
+      "queryIdHash": "f0a83cc937a6c455",
+      "queryHash": "5dcb599ae504d65e",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    },
+    {
+      "queryIdHash": "f1dfd511be62bb34",
+      "queryHash": "cfee352fac0b979a",
+      "expectedResultIdCount": 1,
+      "expectedResultHashCount": 1
+    }
+  ],
+  "safety": {
+    "printsCredentialValues": false,
+    "printsRawContainerLabels": false,
+    "printsMemoryText": false,
+    "privateMapRejectedInsideRepository": true,
+    "privateQuerySetRejectedInsideRepository": true,
+    "liveHostedWriteBack": false
+  },
+  "nextActions": [
+    "Review the private query set locally before collecting metrics.",
+    "Run baseline:queryset -- --queryset <private-query-set> --strict --output <public-queryset-report>.",
+    "Use the same private query set for hosted and RecallWeave collection.",
+    "Attach only the metrics-only author report and query-set inspection report, not the private query set."
+  ]
+}

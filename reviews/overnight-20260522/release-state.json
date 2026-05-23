@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T11:10:16Z",
+  "generatedAt": "2026-05-23T11:52:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -82,10 +82,12 @@
     "adapter-store-latency-gate",
     "hosted-baseline-preflight",
     "baseline-queryset-inspect",
+    "baseline-queryset-unique-gate",
     "hosted-baseline-discovery",
     "hosted-baseline-live-discovery",
     "hosted-baseline-container-select",
     "hosted-baseline-queryset-author",
+    "hosted-baseline-live-prep",
     "hosted-baseline-collector",
     "recallweave-response-export",
     "recallweave-baseline-collector",
@@ -194,6 +196,14 @@
       "route": "gemini embedded public-safe diff, no tools",
       "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-run-review.md",
       "completedAt": "2026-05-23T11:05:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "hostedBaselineLivePrep": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-live-prep-review.md",
+      "completedAt": "2026-05-23T11:56:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

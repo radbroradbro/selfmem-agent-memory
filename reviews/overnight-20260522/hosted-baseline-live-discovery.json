@@ -16,23 +16,40 @@
   "rawAnswerIncluded": false,
   "privacyLeakCount": 0,
   "redactionFailureCount": 0,
-  "runAt": "2026-05-23T07:56:19.060Z",
+  "runAt": "2026-05-23T11:23:16.458Z",
   "discoveryConfig": {
     "endpoint": "https://api.supermemory.ai/v3/documents/list",
     "includeContent": false,
     "limit": 50,
-    "maxPages": 2,
+    "maxPages": 4,
     "sort": "updatedAt",
     "order": "desc"
   },
   "sourceStats": {
-    "pagesRead": 2,
-    "documentsSeen": 100,
+    "pagesRead": 4,
+    "documentsSeen": 200,
     "errors": []
   },
-  "containerCandidateCount": 4,
-  "recommendedCandidateId": "c_6a2feb97651dd64b",
+  "containerCandidateCount": 14,
+  "recommendedCandidateId": "c_4b1f9e153ffcd35e",
   "containerCandidates": [
+    {
+      "candidateId": "c_4b1f9e153ffcd35e",
+      "documentCount": 47,
+      "firstCreatedAt": "2026-05-17T00:33:02.977Z",
+      "lastUpdatedAt": "2026-05-17T00:34:56.906Z",
+      "typeCounts": {
+        "text": 47
+      },
+      "statusCounts": {
+        "done": 47
+      },
+      "sampleDocumentHashes": [
+        "sha256:2786ca7e6e587883",
+        "sha256:ee9f3a6d1f80cc46",
+        "sha256:8bd929ab819acc75"
+      ]
+    },
     {
       "candidateId": "c_6a2feb97651dd64b",
       "documentCount": 46,
@@ -48,6 +65,23 @@
         "sha256:22d99a8990c3332d",
         "sha256:2162ea40281ab9a8",
         "sha256:d521a915866a8341"
+      ]
+    },
+    {
+      "candidateId": "c_47366fb480cde42d",
+      "documentCount": 44,
+      "firstCreatedAt": "2026-05-17T00:32:06.393Z",
+      "lastUpdatedAt": "2026-05-17T00:33:53.687Z",
+      "typeCounts": {
+        "text": 44
+      },
+      "statusCounts": {
+        "done": 44
+      },
+      "sampleDocumentHashes": [
+        "sha256:f92c698bb1b46f9c",
+        "sha256:911111905c5f2b97",
+        "sha256:72c5f72a8801bf08"
       ]
     },
     {
@@ -68,20 +102,37 @@
       ]
     },
     {
-      "candidateId": "c_4b1f9e153ffcd35e",
-      "documentCount": 10,
-      "firstCreatedAt": "2026-05-17T00:33:48.511Z",
-      "lastUpdatedAt": "2026-05-17T00:34:56.906Z",
+      "candidateId": "c_35502fc52ddaf573",
+      "documentCount": 9,
+      "firstCreatedAt": "2026-05-16T15:51:54.562Z",
+      "lastUpdatedAt": "2026-05-17T00:30:05.553Z",
       "typeCounts": {
-        "text": 10
+        "text": 9
       },
       "statusCounts": {
-        "done": 10
+        "done": 9
       },
       "sampleDocumentHashes": [
-        "sha256:2786ca7e6e587883",
-        "sha256:ee9f3a6d1f80cc46",
-        "sha256:8bd929ab819acc75"
+        "sha256:c39e9cfd5eec750d",
+        "sha256:1f5376d5adc1cec9",
+        "sha256:b2d896e3bc6054ea"
+      ]
+    },
+    {
+      "candidateId": "c_502c10434de1fadf",
+      "documentCount": 3,
+      "firstCreatedAt": "2026-05-16T23:17:19.706Z",
+      "lastUpdatedAt": "2026-05-16T23:38:01.718Z",
+      "typeCounts": {
+        "text": 3
+      },
+      "statusCounts": {
+        "done": 3
+      },
+      "sampleDocumentHashes": [
+        "sha256:51f42ccfac1f39ba",
+        "sha256:8c704346e26ad69c",
+        "sha256:9f3708a277e1dc8c"
       ]
     },
     {
@@ -98,11 +149,119 @@
       "sampleDocumentHashes": [
         "sha256:d7351845cb8ddeba"
       ]
+    },
+    {
+      "candidateId": "c_9b07e9d97d306599",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:44:01.212Z",
+      "lastUpdatedAt": "2026-05-16T23:44:01.212Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:84b344588ba7f0bc"
+      ]
+    },
+    {
+      "candidateId": "c_0db8a9604dc3e20b",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:37:55.090Z",
+      "lastUpdatedAt": "2026-05-16T23:37:55.090Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:7834ace3a491652b"
+      ]
+    },
+    {
+      "candidateId": "c_da35f8f6cc482480",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:34:10.922Z",
+      "lastUpdatedAt": "2026-05-16T23:35:07.328Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:3e1cee2f38b0fcc1"
+      ]
+    },
+    {
+      "candidateId": "c_5f5e7a635fcb7497",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:33:09.291Z",
+      "lastUpdatedAt": "2026-05-16T23:33:09.291Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:f701c320752608ec"
+      ]
+    },
+    {
+      "candidateId": "c_b6d1ac60f6765bb4",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:30:50.365Z",
+      "lastUpdatedAt": "2026-05-16T23:30:50.365Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:73b05d5c0c40bf77"
+      ]
+    },
+    {
+      "candidateId": "c_5b0c2a9ac5e6e7d5",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:15:08.464Z",
+      "lastUpdatedAt": "2026-05-16T23:15:08.464Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:32c58d60dc0237ca"
+      ]
+    },
+    {
+      "candidateId": "c_c28a26aa268b0274",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-16T23:13:56.444Z",
+      "lastUpdatedAt": "2026-05-16T23:13:56.444Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:ed4b77014986d172"
+      ]
     }
   ],
   "privateMap": {
-    "written": false,
-    "containsRawLabels": false,
+    "written": true,
+    "basename": "recallweave-hosted-container-map-20260523.private.jsonl",
+    "mode": "0600",
+    "entryCount": 14,
+    "containsRawLabels": true,
     "attachToPublicEvidence": false
   },
   "nextActions": [

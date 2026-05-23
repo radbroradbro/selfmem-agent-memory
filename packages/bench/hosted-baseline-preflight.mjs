@@ -397,8 +397,12 @@ function normalizeQuerySetEvidence(value) {
   const unlabeledQueryCount = Number(value?.unlabeledQueryCount ?? Number.POSITIVE_INFINITY);
   const expectedResultRefCount = Number(value?.expectedResultRefCount ?? 0);
   const minExpectedRefsPerQuery = Number(value?.minExpectedRefsPerQuery ?? 0);
+  const uniqueQueryCount = Number(value?.uniqueQueryCount ?? queryCount);
+  const duplicateQueryCount = Number(value?.duplicateQueryCount ?? Math.max(0, queryCount - uniqueQueryCount));
   return {
     queryCount,
+    uniqueQueryCount,
+    duplicateQueryCount,
     labeledQueryCount,
     unlabeledQueryCount,
     expectedResultRefCount,
@@ -411,6 +415,8 @@ function normalizeQuerySetEvidence(value) {
       queryCount > 0 &&
       labeledQueryCount === queryCount &&
       unlabeledQueryCount === 0 &&
+      uniqueQueryCount === queryCount &&
+      duplicateQueryCount === 0 &&
       minExpectedRefsPerQuery > 0 &&
       expectedResultRefCount >= queryCount,
   };

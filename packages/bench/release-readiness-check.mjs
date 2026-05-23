@@ -196,6 +196,10 @@ const requiredFiles = [
   `${reviewDir}/hosted-baseline-live-discovery.json`,
   `${reviewDir}/hosted-baseline-live-discovery-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-live-discovery-review.md`,
+  `${reviewDir}/hosted-baseline-live-queryset-author.json`,
+  `${reviewDir}/hosted-baseline-live-queryset-report.json`,
+  `${reviewDir}/hosted-baseline-live-prep-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-live-prep-review.md`,
   `${reviewDir}/hosted-baseline-collector-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-collector-review.md`,
   `${reviewDir}/recallweave-response-export-evidence.md`,
@@ -908,6 +912,13 @@ check("release state is conservative", () => {
     "canary-diagnostic-batch-audit",
     "canary-next-agent-plan",
     "hosted-baseline-preflight",
+    "baseline-queryset-inspect",
+    "baseline-queryset-unique-gate",
+    "hosted-baseline-discovery",
+    "hosted-baseline-live-discovery",
+    "hosted-baseline-container-select",
+    "hosted-baseline-queryset-author",
+    "hosted-baseline-live-prep",
     "hosted-baseline-collector",
     "recallweave-response-export",
     "recallweave-baseline-collector",
@@ -1991,8 +2002,8 @@ check("fresh release blocker doctor passes", () => {
   const report = JSON.parse(doctorRun.stdout);
   const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
-  assert.match(hostedBlocker.nextAction, /baseline:select-container/);
-  assert.match(hostedBlocker.nextAction, /baseline:author-queryset/);
+  assert.match(hostedBlocker.nextAction, /private query set locally/);
+  assert.match(hostedBlocker.nextAction, /local RecallWeave source matches/);
   assert.match(hostedBlocker.nextAction, /baseline:run -- --live/);
   assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
   assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
@@ -2361,6 +2372,10 @@ check("fresh hosted baseline preflight passes", () => {
   const liveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
   const liveDiscoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
   const liveDiscoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-discovery-review.md"), "utf8");
+  const livePrepEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-live-prep-evidence.md"), "utf8");
+  const livePrepGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-prep-review.md"), "utf8");
+  const liveQuerySetAuthorReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-queryset-author.json"), "utf8"));
+  const liveQuerySetReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-queryset-report.json"), "utf8"));
   const collectorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-collector-evidence.md"), "utf8");
   const collectorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-collector-review.md"), "utf8");
   const recallWeaveExportEvidence = readFileSync(join(root, reviewDir, "recallweave-response-export-evidence.md"), "utf8");
@@ -2401,6 +2416,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(querySetReport.rawExpectedIdsIncluded, false);
   assert.equal(querySetReport.rawExpectedHashesIncluded, false);
   assert.equal(querySetReport.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(querySetReport.querySetEvidence?.uniqueQueryCount, 3);
+  assert.equal(querySetReport.querySetEvidence?.duplicateQueryCount, 0);
   assert.equal(querySetReport.querySetEvidence?.unlabeledQueryCount, 0);
   assert.equal(querySetReport.queryFingerprints?.length, 3);
   assert.ok(querySetReport.source?.querySetHash?.startsWith("sha256:"));
@@ -2471,6 +2488,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(statSync(authoredQuerySetPath).mode & 0o777, 0o600);
   assert.equal(authoredQuerySetInspectReport.mode, "baseline-queryset-inspect");
   assert.equal(authoredQuerySetInspectReport.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(authoredQuerySetInspectReport.querySetEvidence?.uniqueQueryCount, 3);
+  assert.equal(authoredQuerySetInspectReport.querySetEvidence?.duplicateQueryCount, 0);
   assert.equal(authoredQuerySetInspectReport.querySetEvidence?.unlabeledQueryCount, 0);
   assert.doesNotMatch(querySetAuthorResult.stdout, /fixture-personal|fixture-doc-alpha|fixture-doc-beta|fixture-doc-gamma/);
   assert.doesNotMatch(readFileSync(authoredQuerySetReportPath, "utf8"), /fixture-personal|fixture-doc-alpha|fixture-doc-beta|fixture-doc-gamma/);
@@ -2478,6 +2497,38 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(readFileSync(authoredQuerySetReportPath, "utf8"), /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:/);
   assert.notEqual(querySetAuthorInsideRepoResult.status, 0);
   assert.match(`${querySetAuthorInsideRepoResult.stderr}\n${querySetAuthorInsideRepoResult.stdout}`, /outside the repository/);
+  const duplicateQuerySetPath = join(collectorTmp, "duplicate-queryset.json");
+  writeFileSync(
+    duplicateQuerySetPath,
+    JSON.stringify(
+      {
+        schemaVersion: 1,
+        datasetSlice: "duplicate-query-fixture-slice",
+        judgeModel: "fixture-judge",
+        answerModel: "fixture-answer",
+        queries: [
+          { id: "duplicate-a", q: "Which memory describes duplicate query gating?", expectedResultIds: ["duplicate-a"] },
+          { id: "duplicate-b", q: "Which memory describes duplicate query gating?", expectedResultIds: ["duplicate-b"] },
+        ],
+      },
+      null,
+      2,
+    ),
+  );
+  const duplicateQuerySetResult = spawnSync(
+    "node",
+    ["packages/bench/baseline-queryset-inspect.mjs", "--queryset", duplicateQuerySetPath, "--strict"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  const duplicateQuerySetReport = JSON.parse(duplicateQuerySetResult.stdout);
+  assert.notEqual(duplicateQuerySetResult.status, 0);
+  assert.equal(duplicateQuerySetReport.querySetEvidence?.publicBenchmarkReady, false);
+  assert.equal(duplicateQuerySetReport.querySetEvidence?.duplicateQueryCount, 1);
+  assert.ok(duplicateQuerySetReport.failedChecks?.includes("unique-query-text"));
   assert.equal(fixtureReport.resultInspection?.fixtureOnly, true);
   assert.deepEqual(fixtureReport.resultInspection?.failedResultChecks, ["not-fixture"]);
   assert.equal(fixtureReport.countsAsHostedBaselineEvidence, false);
@@ -2679,8 +2730,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(operatorDiscoveryPacket.mode, "hosted-baseline-operator-packet");
   assert.equal(operatorDiscoveryPacket.liveDiscovery?.fixtureOnly, false);
   assert.equal(operatorDiscoveryPacket.liveDiscovery?.callsHostedProvider, true);
-  assert.equal(operatorDiscoveryPacket.liveDiscovery?.documentsSeen, 100);
-  assert.equal(operatorDiscoveryPacket.liveDiscovery?.containerCandidateCount, 4);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.documentsSeen, 200);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.containerCandidateCount, 14);
   assert.equal(operatorDiscoveryPacket.liveDiscovery?.rawLabelsIncluded, false);
   assert.equal(operatorDiscoveryPacket.liveDiscovery?.rawMemoryIncluded, false);
   assert.equal(operatorDiscoveryPacket.liveDiscovery?.privacyLeakCount, 0);
@@ -2864,11 +2915,39 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(liveDiscoveryReport.rawMemoryIncluded, false);
   assert.equal(liveDiscoveryReport.privacyLeakCount, 0);
   assert.equal(liveDiscoveryReport.redactionFailureCount, 0);
-  assert.ok(Number(liveDiscoveryReport.sourceStats?.documentsSeen) > 0);
-  assert.ok(Number(liveDiscoveryReport.containerCandidateCount) > 0);
+  assert.equal(Number(liveDiscoveryReport.sourceStats?.documentsSeen), 200);
+  assert.equal(Number(liveDiscoveryReport.containerCandidateCount), 14);
   assert.deepEqual(liveDiscoveryReport.sourceStats?.errors ?? [], []);
   assert.match(liveDiscoveryEvidence, /does not close the hosted-baseline blocker/i);
   assert.match(liveDiscoveryGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(livePrepEvidence, /Unique drafted query count:\s*8/i);
+  assert.match(livePrepEvidence, /Duplicate drafted query count:\s*0/i);
+  assert.match(livePrepGeminiReview, /Verdict:\s*`?CLEAN`?/i);
+  assert.equal(liveQuerySetAuthorReport.mode, "hosted-baseline-queryset-author");
+  assert.equal(liveQuerySetAuthorReport.fixtureOnly, false);
+  assert.equal(liveQuerySetAuthorReport.callsHostedProvider, true);
+  assert.equal(liveQuerySetAuthorReport.publicSafe, true);
+  assert.equal(liveQuerySetAuthorReport.metricsOnly, true);
+  assert.equal(liveQuerySetAuthorReport.rawLabelsIncluded, false);
+  assert.equal(liveQuerySetAuthorReport.rawQueryIncluded, false);
+  assert.equal(liveQuerySetAuthorReport.rawExpectedIdsIncluded, false);
+  assert.equal(liveQuerySetAuthorReport.rawExpectedHashesIncluded, false);
+  assert.equal(liveQuerySetAuthorReport.privacyLeakCount, 0);
+  assert.equal(liveQuerySetAuthorReport.querySetEvidence?.queryCount, 8);
+  assert.equal(liveQuerySetAuthorReport.querySetEvidence?.uniqueQueryCount, 8);
+  assert.equal(liveQuerySetAuthorReport.querySetEvidence?.duplicateQueryCount, 0);
+  assert.equal(liveQuerySetReport.mode, "baseline-queryset-inspect");
+  assert.equal(liveQuerySetReport.fixtureOnly, false);
+  assert.equal(liveQuerySetReport.publicSafe, true);
+  assert.equal(liveQuerySetReport.metricsOnly, true);
+  assert.equal(liveQuerySetReport.rawQueryIncluded, false);
+  assert.equal(liveQuerySetReport.rawExpectedIdsIncluded, false);
+  assert.equal(liveQuerySetReport.rawExpectedHashesIncluded, false);
+  assert.equal(liveQuerySetReport.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(liveQuerySetReport.querySetEvidence?.queryCount, 8);
+  assert.equal(liveQuerySetReport.querySetEvidence?.uniqueQueryCount, 8);
+  assert.equal(liveQuerySetReport.querySetEvidence?.duplicateQueryCount, 0);
+  assert.equal(liveQuerySetReport.querySetEvidence?.unlabeledQueryCount, 0);
   assert.match(collectorEvidence, /hosted baseline collector/i);
   assert.match(collectorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(recallWeaveExportEvidence, /RecallWeave response export/i);
@@ -2923,7 +3002,13 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(querySetAuthorGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), secretPattern);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(JSON.stringify(liveQuerySetAuthorReport), secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveQuerySetAuthorReport), /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(JSON.stringify(liveQuerySetReport), secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveQuerySetReport), /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(liveDiscoveryEvidence, secretPattern);
+  assert.doesNotMatch(livePrepEvidence, secretPattern);
+  assert.doesNotMatch(livePrepGeminiReview, secretPattern);
   assert.doesNotMatch(liveDiscoveryGeminiReview, secretPattern);
   assert.doesNotMatch(collectorEvidence, secretPattern);
   assert.doesNotMatch(collectorGeminiReview, secretPattern);
@@ -3044,6 +3129,16 @@ check("fresh goal completion audit passes", () => {
         item.evidence.includes("packages/bench/hosted-baseline-discovery.mjs") &&
         item.evidence.includes("reviews/overnight-20260522/hosted-baseline-live-discovery.json") &&
         item.evidence.includes("reviews/overnight-20260522/gemini-hosted-baseline-live-discovery-review.md"),
+    ),
+  );
+  assert.ok(
+    report.requirements.some(
+      (item) =>
+        item.id === "hosted-baseline-live-prep" &&
+        item.status === "proven" &&
+        item.evidence.includes("packages/bench/hosted-baseline-queryset-author.mjs") &&
+        item.evidence.includes("packages/bench/baseline-queryset-inspect.mjs") &&
+        item.evidence.includes("reviews/overnight-20260522/hosted-baseline-live-prep-evidence.md"),
     ),
   );
   assert.ok(

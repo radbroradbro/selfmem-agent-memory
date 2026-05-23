@@ -31,6 +31,10 @@ const requiredFiles = {
   hostedBaselineLiveDiscovery: "hosted-baseline-live-discovery-evidence.md",
   hostedBaselineLiveDiscoveryReport: "hosted-baseline-live-discovery.json",
   hostedBaselineLiveDiscoveryReview: "gemini-hosted-baseline-live-discovery-review.md",
+  hostedBaselineLivePrep: "hosted-baseline-live-prep-evidence.md",
+  hostedBaselineLivePrepReview: "gemini-hosted-baseline-live-prep-review.md",
+  hostedBaselineLiveQuerySetAuthor: "hosted-baseline-live-queryset-author.json",
+  hostedBaselineLiveQuerySetReport: "hosted-baseline-live-queryset-report.json",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
@@ -69,6 +73,10 @@ const prBodyDraftText = readFileSync(join(root, reviewDir, "pr-body-update-draft
 const issueDraftText = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
 const hostedBaselineLiveDiscoveryText = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
 const hostedBaselineLiveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
+const hostedBaselineLivePrepText = readFileSync(join(root, reviewDir, "hosted-baseline-live-prep-evidence.md"), "utf8");
+const hostedBaselineLivePrepReviewText = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-prep-review.md"), "utf8");
+const hostedBaselineLiveQuerySetAuthor = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-queryset-author.json"), "utf8"));
+const hostedBaselineLiveQuerySetReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-queryset-report.json"), "utf8"));
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
@@ -91,6 +99,13 @@ assert.equal(hostedBaselineLiveDiscoveryReport.rawMemoryIncluded, false);
 assert.equal(hostedBaselineLiveDiscoveryReport.privacyLeakCount, 0);
 assert.ok(Number(hostedBaselineLiveDiscoveryReport.sourceStats?.documentsSeen) > 0);
 assert.ok(Number(hostedBaselineLiveDiscoveryReport.containerCandidateCount) > 0);
+assert.match(hostedBaselineLivePrepText, /Unique drafted query count:\s*8/i);
+assert.match(hostedBaselineLivePrepReviewText, /Verdict:\s*`?CLEAN`?/i);
+assert.equal(hostedBaselineLiveQuerySetAuthor.querySetEvidence?.uniqueQueryCount, 8);
+assert.equal(hostedBaselineLiveQuerySetAuthor.querySetEvidence?.duplicateQueryCount, 0);
+assert.equal(hostedBaselineLiveQuerySetReport.querySetEvidence?.publicBenchmarkReady, true);
+assert.equal(hostedBaselineLiveQuerySetReport.querySetEvidence?.uniqueQueryCount, 8);
+assert.equal(hostedBaselineLiveQuerySetReport.querySetEvidence?.duplicateQueryCount, 0);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
@@ -158,8 +173,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "hosted-baseline-live-discovery-evidence.md",
-    nextAction: "Live hosted discovery succeeded with hashed candidates only. Use the private-map flow outside the repository, then run `baseline:select-container` to choose the raw label into a local-only env file without printing it. Draft or prepare the source-locked query set with `baseline:author-queryset`, review that private query set locally, run `baseline:queryset -- --strict`, then prefer `baseline:run -- --live --container-env <private-env> --queryset <reviewed-queryset> --container-dir <local-recallweave-container-dir> --reviewed-queryset --output <run-report>` to collect hosted, collect RecallWeave, compare, package, and intake in one metrics-only chain. If debugging one stage, run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` before packaging and returned-packet intake.",
+    evidence: "hosted-baseline-live-prep-evidence.md",
+    nextAction: "Live hosted discovery and private query-set prep now pass with 8 distinct labeled queries and no public leakage. Review the private query set locally, prove the local RecallWeave source matches the selected hosted container, then run `baseline:run -- --live --container-env <private-env> --queryset <reviewed-queryset> --container-dir <local-recallweave-container-dir> --reviewed-queryset --output <run-report>` to collect hosted, collect RecallWeave, compare, package, and intake in one metrics-only chain. If debugging one stage, run `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` before packaging and returned-packet intake.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -215,6 +230,12 @@ console.log(
           containerCandidateCount: hostedBaselineLiveDiscoveryReport.containerCandidateCount,
           rawLabelsIncluded: hostedBaselineLiveDiscoveryReport.rawLabelsIncluded,
           rawMemoryIncluded: hostedBaselineLiveDiscoveryReport.rawMemoryIncluded,
+        },
+        hostedBaselineLivePrep: {
+          queryCount: hostedBaselineLiveQuerySetReport.querySetEvidence?.queryCount,
+          uniqueQueryCount: hostedBaselineLiveQuerySetReport.querySetEvidence?.uniqueQueryCount,
+          duplicateQueryCount: hostedBaselineLiveQuerySetReport.querySetEvidence?.duplicateQueryCount,
+          publicBenchmarkReady: hostedBaselineLiveQuerySetReport.querySetEvidence?.publicBenchmarkReady,
         },
         hostedBaselineCollector: {
           provider: hostedBaselineCollector.provider,

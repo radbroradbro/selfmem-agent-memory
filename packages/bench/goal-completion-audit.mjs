@@ -43,6 +43,10 @@ const files = {
   hostedBaselineLiveDiscoveryReport: `${reviewDir}/hosted-baseline-live-discovery.json`,
   hostedBaselineLiveDiscoveryEvidence: `${reviewDir}/hosted-baseline-live-discovery-evidence.md`,
   hostedBaselineLiveDiscoveryReview: `${reviewDir}/gemini-hosted-baseline-live-discovery-review.md`,
+  hostedBaselineLivePrepEvidence: `${reviewDir}/hosted-baseline-live-prep-evidence.md`,
+  hostedBaselineLivePrepReview: `${reviewDir}/gemini-hosted-baseline-live-prep-review.md`,
+  hostedBaselineLiveQuerySetAuthorReport: `${reviewDir}/hosted-baseline-live-queryset-author.json`,
+  hostedBaselineLiveQuerySetReport: `${reviewDir}/hosted-baseline-live-queryset-report.json`,
   hostedBaselineNextRunEvidence: `${reviewDir}/hosted-baseline-next-run-evidence.md`,
   hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   baselineReturnedPacketIntakeEvidence: `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
@@ -62,6 +66,7 @@ for (const [name, file] of Object.entries(files)) {
 
 const releaseState = JSON.parse(readFileSync(join(root, files.releaseState), "utf8"));
 const hostedBaselineLiveDiscovery = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveDiscoveryReport), "utf8"));
+const hostedBaselineLiveQuerySet = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveQuerySetReport), "utf8"));
 const releaseReadinessEvidence = JSON.parse(readFileSync(join(root, files.releaseReadinessEvidence), "utf8"));
 const currentHeadLiveEvidence = JSON.parse(readFileSync(join(root, files.browserEvidence), "utf8"));
 const texts = Object.fromEntries(
@@ -94,6 +99,9 @@ assert.equal(hostedBaselineLiveDiscovery.privacyLeakCount, 0);
 assert.equal(hostedBaselineLiveDiscovery.redactionFailureCount, 0);
 assert.ok(Number(hostedBaselineLiveDiscovery.sourceStats?.documentsSeen) > 0);
 assert.ok(Number(hostedBaselineLiveDiscovery.containerCandidateCount) > 0);
+assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.publicBenchmarkReady, true);
+assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.uniqueQueryCount, 8);
+assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.duplicateQueryCount, 0);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -178,6 +186,14 @@ const requirements = [
     files.hostedBaselineLiveDiscoveryEvidence,
     files.hostedBaselineLiveDiscoveryReview,
   ]),
+  proven("hosted-baseline-live-prep", "Hosted Supermemory private-map query-set preparation is proven live with public-safe reports and distinct labeled queries", [
+    "packages/bench/hosted-baseline-queryset-author.mjs",
+    "packages/bench/baseline-queryset-inspect.mjs",
+    files.hostedBaselineLivePrepEvidence,
+    files.hostedBaselineLivePrepReview,
+    files.hostedBaselineLiveQuerySetAuthorReport,
+    files.hostedBaselineLiveQuerySetReport,
+  ]),
   proven("hosted-baseline-next-run", "Hosted baseline comparison has a state-aware next-run planner that keeps public claims blocked while producing the exact next metrics-only run packet", [
     "packages/bench/hosted-baseline-next-run.mjs",
     files.hostedBaselineNextRunEvidence,
@@ -239,6 +255,7 @@ const requirements = [
   ]),
   blocked("hosted-supermemory-baseline", "Hosted Supermemory benchmark claims require a fresh metrics-only baseline", [
     files.hostedBaselinePreflightEvidence,
+    files.hostedBaselineLivePrepEvidence,
     files.hostedBaselineNextRunEvidence,
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),

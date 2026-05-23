@@ -34,9 +34,9 @@ Observed result:
 - `rawAnswerIncluded: false`
 - `privacyLeakCount: 0`
 - `redactionFailureCount: 0`
-- `pagesRead: 2`
-- `documentsSeen: 100`
-- `containerCandidateCount: 4`
+- `pagesRead: 4`
+- `documentsSeen: 200`
+- `containerCandidateCount: 14`
 - `errors: []`
 
 Boundary:
@@ -50,7 +50,8 @@ Boundary:
 
 Next required step:
 
-Use the private-map flow outside the repository to select the raw container
-label locally, prepare the source-locked query set, run hosted and RecallWeave
-collectors with the same query set, then package the metrics-only evidence for
-review.
+The private-map flow has now been exercised in
+`hosted-baseline-live-prep-evidence.md`. The remaining step is a matched
+hosted and RecallWeave collection run after the private query set is reviewed
+locally and the local RecallWeave source is proven to match the selected hosted
+container.

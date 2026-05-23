@@ -233,15 +233,20 @@ function scoreQuery(query, response, options) {
 
 function summarizeQuerySetEvidence(queries) {
   const expectedRefCounts = queries.map(queryExpectedRefCount);
+  const queryHashes = queries.map((query) => shortHash(query.q));
+  const uniqueQueryCount = new Set(queryHashes).size;
+  const duplicateQueryCount = queries.length - uniqueQueryCount;
   return {
     queryCount: queries.length,
+    uniqueQueryCount,
+    duplicateQueryCount,
     labeledQueryCount: expectedRefCounts.filter((count) => count > 0).length,
     unlabeledQueryCount: expectedRefCounts.filter((count) => count === 0).length,
     expectedResultRefCount: expectedRefCounts.reduce((sum, count) => sum + count, 0),
     minExpectedRefsPerQuery: Math.min(...expectedRefCounts),
     usesExpectedIds: queries.some((query) => Array.isArray(query.expectedResultIds) && query.expectedResultIds.length > 0),
     usesExpectedHashes: queries.some((query) => Array.isArray(query.expectedResultHashes) && query.expectedResultHashes.length > 0),
-    publicBenchmarkReady: expectedRefCounts.every((count) => count > 0),
+    publicBenchmarkReady: expectedRefCounts.every((count) => count > 0) && duplicateQueryCount === 0,
   };
 }
 
