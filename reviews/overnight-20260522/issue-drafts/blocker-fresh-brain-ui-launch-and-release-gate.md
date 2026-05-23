@@ -134,6 +134,10 @@ requirements are resolved.
   recall p95 threshold, but still lacked current adapter-contract and store
   latency evidence. The next canary must use a fresh patched runtime window and
   pass strict intake.
+- Current one-agent handoff packet:
+  `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
+  `9d7fc80561630aa6edae9fd93954dfb032e422d85bc630b6b3c999a6943295d2`.
+  It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 
 ## Acceptance Criteria
 
