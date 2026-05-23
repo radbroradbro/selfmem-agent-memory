@@ -30,7 +30,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `2b7fc92d43e1aeff1211dba7eb0c5727bce2fd7b`.
+- Latest code/product baseline: `39feae5f825c045e681aa93f6e71b02ebf4b32c1`.
+- GitHub Actions run `26318633036`: passed CI after the hosted baseline operator packet gate.
+- Previous verified baseline before the hosted baseline operator packet:
+  `2b7fc92d43e1aeff1211dba7eb0c5727bce2fd7b`.
 - GitHub Actions run `26318177698`: passed CI after the fresh canary window isolation gate.
 - Previous verified baseline before the fresh canary window isolation gate:
   `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.

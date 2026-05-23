@@ -99,9 +99,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `2b7fc92`
-- GitHub Actions: CI run `26318177698` passed for the fresh canary window
-  isolation gate
+- Latest verified code baseline: `39feae5`
+- GitHub Actions: CI run `26318633036` passed for the hosted baseline
+  operator packet gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -153,6 +153,8 @@ Latest verified head before this draft refresh:
   latency trace gate.
 - GitHub Actions CI run `26318177698` passed on `2b7fc92`, the fresh canary
   window isolation gate.
+- GitHub Actions CI run `26318633036` passed on `39feae5`, the hosted
+  baseline operator packet gate.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed
