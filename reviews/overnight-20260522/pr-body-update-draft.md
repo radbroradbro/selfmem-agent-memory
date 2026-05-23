@@ -52,6 +52,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `db7f531b72c6a5fe347b89f537d69df49de4bb8a`.
+- GitHub Actions run `26335844586`: passed CI after adding the
+  deterministic strict-real canary drill, wiring it into clean consumer smoke,
+  canary operator and next-agent packets, release readiness assertions, release
+  blocker guidance, goal audit, public docs, PR/issue sync evidence, and Gemini
+  review, while preserving strict-real and public-launch blockers.
+- Previous verified code/product baseline before the strict-real canary drill:
   `e1f114e664e6bcf6d49ff32bd578c8eefef6e6ce`.
 - GitHub Actions run `26335300537`: passed CI after adding
   `baseline:source-gap`, wiring it into clean consumer smoke, the hosted
