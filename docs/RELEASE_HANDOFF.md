@@ -102,6 +102,10 @@ false` and `benchmarkClaimsAllowed: false` until a fresh metrics-only hosted
 baseline result is supplied. Live baseline outputs must contain aggregate
 metrics only. Do not include raw memory text, transcripts, prompts, answers,
 credentials, cookies, or bearer tokens.
+Every query in the source-locked query set must include at least one
+`expectedResultIds` or `expectedResultHashes` entry. The collectors reject
+unlabeled query sets so a live-looking run cannot create meaningless benchmark
+metrics.
 
 Use `--fixture` to verify the parser and result-shape gate without using a
 provider key. Use `--print-template` before a live collection run and fill that

@@ -37,6 +37,8 @@ npm exec --yes pnpm@10.23.0 -- release:doctor
   response hashes, and result fingerprints only.
 - Fixture result shares the hosted collector query-set hash and scoring-code
   hash.
+- Output includes `querySetEvidence` and rejects unlabeled query sets, matching
+  the hosted collector's relevance-label requirement.
 - Raw memory, transcript, prompt, and answer flags remain false.
 - Fixture comparisons remain blocked from public benchmark claims.
 
@@ -63,6 +65,8 @@ attachments.
 - The output rejects key-shaped secrets and private local paths.
 - The release gate includes a negative check proving raw response text is
   rejected in live mode.
+- The release gate includes a negative check proving unlabeled query sets are
+  rejected before hosted or RecallWeave aggregate metrics can be produced.
 - The operator packet forbids raw hosted memories, raw local memories,
   transcripts, prompts, answers, credentials, cookies, bearer tokens, private
   paths, and unredacted diagnostics.

@@ -16,6 +16,16 @@
   "sameDataset": true,
   "sameJudge": true,
   "sameAnswerModel": true,
+  "querySetEvidence": {
+    "queryCount": 3,
+    "labeledQueryCount": 3,
+    "unlabeledQueryCount": 0,
+    "expectedResultRefCount": 3,
+    "minExpectedRefsPerQuery": 1,
+    "usesExpectedIds": true,
+    "usesExpectedHashes": false,
+    "publicBenchmarkReady": true
+  },
   "privacyLeakCount": 0,
   "redactionFailureCount": 0,
   "rawMemoryIncluded": false,

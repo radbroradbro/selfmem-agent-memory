@@ -169,6 +169,7 @@ const report = {
       "same judge model",
       "same answer model",
       "same scoring code",
+      "labeled query set",
       "same redaction policy",
       "same latency and cost accounting",
     ],
@@ -236,6 +237,7 @@ function inspectBaselineResult(inputPath) {
   const hasDatasetSlice = nonEmpty(result.datasetSlice ?? result.benchmarkSlice ?? result.datasetVersion);
   const hasQuerySetHash = hashLike(result.querySetHash ?? result.queryHash ?? result.questionSetHash);
   const hasScoringCodeHash = hashLike(result.scoringCodeHash ?? result.harnessHash ?? result.scoringHash);
+  const querySetEvidence = normalizeQuerySetEvidence(result.querySetEvidence);
   const ingestCost = result.ingestCostUsd ?? result.cost?.ingestUsd;
   const queryCost = result.queryCostUsd ?? result.cost?.queryUsd;
   const hasCostLatency =
@@ -268,6 +270,7 @@ function inspectBaselineResult(inputPath) {
     resultCheck("dataset-slice", hasDatasetSlice),
     resultCheck("query-set-hash", hasQuerySetHash),
     resultCheck("scoring-code-hash", hasScoringCodeHash),
+    resultCheck("labeled-query-set", querySetEvidence.publicBenchmarkReady),
     resultCheck("cost-latency", hasCostLatency),
     resultCheck("retrieval-or-quality-metric", hasRetrievalMetric),
     resultCheck("fresh-window", freshWindow),
@@ -296,6 +299,7 @@ function inspectBaselineResult(inputPath) {
     hasDatasetSlice,
     hasQuerySetHash,
     hasScoringCodeHash,
+    querySetEvidence,
     hasCostLatency,
     hasRetrievalMetric,
     ageHours: Number.isFinite(ageHours) ? Number(ageHours.toFixed(2)) : null,
@@ -328,6 +332,16 @@ function buildBaselineResultTemplate({ branch, head }) {
     sameDataset: true,
     sameJudge: true,
     sameAnswerModel: true,
+    querySetEvidence: {
+      queryCount: 0,
+      labeledQueryCount: 0,
+      unlabeledQueryCount: 0,
+      expectedResultRefCount: 0,
+      minExpectedRefsPerQuery: 0,
+      usesExpectedIds: false,
+      usesExpectedHashes: false,
+      publicBenchmarkReady: false,
+    },
     privacyLeakCount: 0,
     redactionFailureCount: 0,
     rawMemoryIncluded: false,
@@ -374,6 +388,31 @@ function nonEmpty(value) {
 
 function hashLike(value) {
   return typeof value === "string" && /^(sha256:)?[A-Za-z0-9_-]{8,}$/.test(value.trim());
+}
+
+function normalizeQuerySetEvidence(value) {
+  const queryCount = Number(value?.queryCount ?? 0);
+  const labeledQueryCount = Number(value?.labeledQueryCount ?? 0);
+  const unlabeledQueryCount = Number(value?.unlabeledQueryCount ?? Number.POSITIVE_INFINITY);
+  const expectedResultRefCount = Number(value?.expectedResultRefCount ?? 0);
+  const minExpectedRefsPerQuery = Number(value?.minExpectedRefsPerQuery ?? 0);
+  return {
+    queryCount,
+    labeledQueryCount,
+    unlabeledQueryCount,
+    expectedResultRefCount,
+    minExpectedRefsPerQuery,
+    usesExpectedIds: Boolean(value?.usesExpectedIds),
+    usesExpectedHashes: Boolean(value?.usesExpectedHashes),
+    publicBenchmarkReady:
+      value?.publicBenchmarkReady === true &&
+      Number.isFinite(queryCount) &&
+      queryCount > 0 &&
+      labeledQueryCount === queryCount &&
+      unlabeledQueryCount === 0 &&
+      minExpectedRefsPerQuery > 0 &&
+      expectedResultRefCount >= queryCount,
+  };
 }
 
 function resultCheck(name, ok) {

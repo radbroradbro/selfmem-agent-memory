@@ -191,6 +191,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-recallweave-baseline-collector-review.md`,
   `${reviewDir}/baseline-comparison-evidence.md`,
   `${reviewDir}/gemini-baseline-comparison-review.md`,
+  `${reviewDir}/gemini-baseline-labeled-queryset-gate-review.md`,
   `${reviewDir}/hosted-baseline-operator-packet-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-operator-packet-review.md`,
   `${reviewDir}/hosted-baseline-next-run-evidence.md`,
@@ -1915,10 +1916,26 @@ check("fresh hosted baseline preflight passes", () => {
   const forcedHostedPath = join(collectorTmp, "forced-hosted-live.json");
   const forcedRecallWeavePath = join(collectorTmp, "forced-recallweave-live.json");
   const missingMetricPath = join(collectorTmp, "missing-metric.json");
+  const missingQuerySetEvidencePath = join(collectorTmp, "missing-query-set-evidence.json");
+  const unlabeledQuerySetPath = join(collectorTmp, "unlabeled-queryset.json");
   const baselinePacketPath = join(collectorTmp, "baseline-evidence-packet.zip");
   const strictFixtureBaselinePacketPath = join(collectorTmp, "strict-fixture-baseline-evidence-packet.zip");
   const returnedBaselineIntakePath = join(collectorTmp, "returned-baseline-packet-intake.json");
   const result = run("node", ["packages/bench/hosted-baseline-preflight.mjs"]);
+  writeFileSync(
+    unlabeledQuerySetPath,
+    JSON.stringify(
+      {
+        schemaVersion: 1,
+        datasetSlice: "unlabeled-fixture-slice",
+        judgeModel: "fixture-judge",
+        answerModel: "fixture-answer",
+        queries: [{ id: "unlabeled", q: "This query has no expected result references." }],
+      },
+      null,
+      2,
+    ),
+  );
   const discoveryResult = run("node", ["packages/bench/hosted-baseline-discovery.mjs", "--output", discoveryResultPath]);
   const privateMapDiscoveryResult = run(
     "node",
@@ -2023,6 +2040,31 @@ check("fresh hosted baseline preflight passes", () => {
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
+  const unlabeledHostedCollectorResult = spawnSync(
+    "node",
+    ["packages/bench/hosted-baseline-collector.mjs", "--fixture", "--queryset", unlabeledQuerySetPath],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  const unlabeledRecallWeaveCollectorResult = spawnSync(
+    "node",
+    [
+      "packages/bench/recallweave-baseline-collector.mjs",
+      "--fixture",
+      "--queryset",
+      unlabeledQuerySetPath,
+      "--responses",
+      "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json",
+    ],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
   const collectorPreflightResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--result", collectorResultPath]);
   const comparisonResult = run("node", ["packages/bench/baseline-comparison.mjs", "--fixture"]);
   const matchedCollectorComparison = run("node", [
@@ -2111,6 +2153,7 @@ check("fresh hosted baseline preflight passes", () => {
   const recallWeaveCollectorGeminiReview = readFileSync(join(root, reviewDir, "gemini-recallweave-baseline-collector-review.md"), "utf8");
   const comparisonEvidence = readFileSync(join(root, reviewDir, "baseline-comparison-evidence.md"), "utf8");
   const comparisonGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-comparison-review.md"), "utf8");
+  const labeledQuerySetGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-labeled-queryset-gate-review.md"), "utf8");
   const operatorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-operator-packet-evidence.md"), "utf8");
   const operatorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-operator-packet-review.md"), "utf8");
   const nextRunEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-next-run-evidence.md"), "utf8");
@@ -2159,6 +2202,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(templateReport.resultTemplateIncluded, true);
   assert.equal(templateReport.baselineResultTemplate?.provider, "hosted-supermemory");
   assert.equal(templateReport.baselineResultTemplate?.metricsOnly, true);
+  assert.equal(templateReport.baselineResultTemplate?.querySetEvidence?.publicBenchmarkReady, false);
   assert.equal(templateReport.baselineResultTemplate?.rawMemoryIncluded, false);
   assert.equal(collectorReport.provider, "hosted-supermemory");
   assert.equal(collectorReport.metricsOnly, true);
@@ -2171,6 +2215,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(collectorReport.querySetHash?.startsWith("sha256:"));
   assert.ok(collectorReport.scoringCodeHash?.startsWith("sha256:"));
   assert.equal(collectorReport.resultFingerprints?.length, 3);
+  assert.equal(collectorReport.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(collectorReport.querySetEvidence?.unlabeledQueryCount, 0);
+  assert.equal(collectorReport.querySetEvidence?.minExpectedRefsPerQuery, 1);
   assert.equal(collectorReport.searchConfig?.endpoint, "fixture");
   assert.ok(Number(collectorReport.metrics?.pAt1) > 0);
   assert.equal(recallWeaveExportReport.evidenceType, "fixture-recallweave-response-export");
@@ -2190,6 +2237,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(recallWeaveExportCollectorReport.rawMemoryIncluded, false);
   assert.equal(recallWeaveExportCollectorReport.querySetHash, collectorReport.querySetHash);
   assert.equal(recallWeaveExportCollectorReport.scoringCodeHash, collectorReport.scoringCodeHash);
+  assert.equal(recallWeaveExportCollectorReport.querySetEvidence?.publicBenchmarkReady, true);
   assert.ok(Number(recallWeaveExportCollectorReport.metrics?.pAt1) > 0);
   assert.equal(recallWeaveCollectorReport.provider, "recallweave");
   assert.equal(recallWeaveCollectorReport.metricsOnly, true);
@@ -2204,6 +2252,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(recallWeaveCollectorReport.querySetHash, collectorReport.querySetHash);
   assert.equal(recallWeaveCollectorReport.scoringCodeHash, collectorReport.scoringCodeHash);
   assert.equal(recallWeaveCollectorReport.resultFingerprints?.length, 3);
+  assert.equal(recallWeaveCollectorReport.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(recallWeaveCollectorReport.querySetEvidence?.unlabeledQueryCount, 0);
+  assert.equal(recallWeaveCollectorReport.querySetEvidence?.minExpectedRefsPerQuery, 1);
   assert.equal(recallWeaveCollectorReport.retrievalConfig?.source, "fixture");
   assert.equal(recallWeaveCollectorReport.retrievalConfig?.rawResponseTextAllowed, false);
   assert.ok(Number(recallWeaveCollectorReport.metrics?.pAt1) > 0);
@@ -2221,13 +2272,19 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(recallWeaveLiveReport.rawMemoryIncluded, false);
   assert.equal(recallWeaveLiveReport.querySetHash, collectorReport.querySetHash);
   assert.equal(recallWeaveLiveReport.scoringCodeHash, collectorReport.scoringCodeHash);
+  assert.equal(recallWeaveLiveReport.querySetEvidence?.publicBenchmarkReady, true);
   assert.equal(recallWeaveLiveReport.retrievalConfig?.source, "recallweave-response-export");
   assert.equal(recallWeaveLiveReport.retrievalConfig?.rawResponseTextAllowed, false);
   assert.notEqual(rawResponseResult.status, 0);
   assert.match(`${rawResponseResult.stderr}\n${rawResponseResult.stdout}`, /contains raw response text/);
+  assert.notEqual(unlabeledHostedCollectorResult.status, 0);
+  assert.match(`${unlabeledHostedCollectorResult.stderr}\n${unlabeledHostedCollectorResult.stdout}`, /needs at least one expectedResultId or expectedResultHash/);
+  assert.notEqual(unlabeledRecallWeaveCollectorResult.status, 0);
+  assert.match(`${unlabeledRecallWeaveCollectorResult.stderr}\n${unlabeledRecallWeaveCollectorResult.stdout}`, /needs at least one expectedResultId or expectedResultHash/);
   assert.equal(collectorPreflightReport.resultInspection?.fixtureOnly, true);
   assert.equal(collectorPreflightReport.resultInspection?.provider, "hosted-supermemory");
   assert.equal(collectorPreflightReport.resultInspection?.metricsOnly, true);
+  assert.equal(collectorPreflightReport.resultInspection?.querySetEvidence?.publicBenchmarkReady, true);
   assert.deepEqual(collectorPreflightReport.resultInspection?.failedResultChecks, ["not-fixture"]);
   assert.equal(collectorPreflightReport.countsAsHostedBaselineEvidence, false);
   assert.equal(comparisonReport.ok ?? true, true);
@@ -2243,6 +2300,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(comparisonReport.comparability?.sameScoringCode, true);
   assert.equal(comparisonReport.comparability?.sameJudge, true);
   assert.equal(comparisonReport.comparability?.sameAnswerModel, true);
+  assert.equal(comparisonReport.hosted?.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(comparisonReport.recallWeave?.querySetEvidence?.publicBenchmarkReady, true);
   assert.equal(comparisonReport.privacy?.privacyLeakCount, 0);
   assert.equal(comparisonReport.privacy?.redactionFailureCount, 0);
   assert.equal(comparisonReport.recallWeaveWin, true);
@@ -2285,6 +2344,20 @@ check("fresh hosted baseline preflight passes", () => {
   });
   assert.notEqual(missingMetricResult.status, 0);
   assert.match(`${missingMetricResult.stderr}\n${missingMetricResult.stdout}`, /metrics\.quality must be present and finite/);
+  const missingQuerySetEvidence = structuredClone(forcedRecallWeave);
+  delete missingQuerySetEvidence.querySetEvidence;
+  writeFileSync(missingQuerySetEvidencePath, JSON.stringify(missingQuerySetEvidence, null, 2));
+  const missingQuerySetEvidenceResult = spawnSync(
+    "node",
+    ["packages/bench/baseline-comparison.mjs", "--hosted", forcedHostedPath, "--recallweave", missingQuerySetEvidencePath],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  assert.notEqual(missingQuerySetEvidenceResult.status, 0);
+  assert.match(`${missingQuerySetEvidenceResult.stderr}\n${missingQuerySetEvidenceResult.stdout}`, /missing querySetEvidence/);
   assert.equal(operatorPacket.ok, true);
   assert.equal(operatorPacket.mode, "hosted-baseline-operator-packet");
   assert.equal(operatorPacket.writesRealFiles, false);
@@ -2304,6 +2377,8 @@ check("fresh hosted baseline preflight passes", () => {
     assert.doesNotMatch(toolSegment, /\s>\s/, "hosted baseline JSON evidence commands must use --output instead of shell redirection");
   }
   assert.ok(operatorPacket.acceptanceCriteria.includes("reviewerApprovalCount is at least 2 before comparison claims"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("querySetEvidence.publicBenchmarkReady is true"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("every query has at least one expectedResultId or expectedResultHash"));
   assert.ok(operatorPacket.forbidden.includes("provider keys"));
   assert.ok(operatorPacket.forbidden.includes("private container map"));
   assert.match(operatorMarkdown.stdout, /RecallWeave Hosted Baseline Packet/);
@@ -2327,6 +2402,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(nextRunPlan.evidence?.comparison?.countsAsComparisonEvidence, false);
   assert.equal(nextRunPlan.privacy?.privacyLeakCount, 0);
   assert.equal(nextRunPlan.comparability?.sameQuerySet, true);
+  assert.ok(nextRunPlan.acceptanceCriteria?.includes("querySetEvidence.publicBenchmarkReady is true for both runs"));
+  assert.ok(nextRunPlan.acceptanceCriteria?.includes("every query has at least one expected result id or expected content hash"));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "collect-hosted-baseline" && /baseline:collect/.test(item.command)));
@@ -2391,6 +2468,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(recallWeaveCollectorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(comparisonEvidence, /baseline comparison/i);
   assert.match(comparisonGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(labeledQuerySetGeminiReview, /Verdict:\s*`?PASS`?/i);
   assert.match(operatorEvidence, /hosted baseline operator packet/i);
   assert.match(operatorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(nextRunEvidence, /hosted baseline next-run/i);
@@ -2423,6 +2501,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(matchedCollectorComparison.stdout, secretPattern);
   assert.doesNotMatch(comparisonEvidence, secretPattern);
   assert.doesNotMatch(comparisonGeminiReview, secretPattern);
+  assert.doesNotMatch(labeledQuerySetGeminiReview, secretPattern);
   assert.doesNotMatch(operatorResult.stdout, secretPattern);
   assert.doesNotMatch(operatorMarkdown.stdout, secretPattern);
   assert.doesNotMatch(operatorEvidence, secretPattern);

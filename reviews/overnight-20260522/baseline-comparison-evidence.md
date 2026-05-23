@@ -25,6 +25,7 @@ The fixture comparison reports:
 - same scoring-code hash;
 - same judge model;
 - same answer model;
+- labeled query-set proof on both sides;
 - metrics-only input and output;
 - zero privacy leaks;
 - zero redaction failures;
@@ -39,5 +40,5 @@ Boundary:
 - This gate writes no real files.
 - This gate does not close the hosted-baseline blocker by itself.
 - Public comparison claims still require non-fixture hosted and RecallWeave
-  results, the same harness settings, a RecallWeave win, zero privacy failures,
-  and two independent reviewer approvals.
+  results, labeled query sets, the same harness settings, a RecallWeave win,
+  zero privacy failures, and two independent reviewer approvals.

@@ -47,7 +47,8 @@ const deltas = metricDeltas(hosted.metrics, recallWeave.metrics, hosted.cost, re
 const recallWeaveWin = deltas.quality > 0 && noQualityRegression(deltas);
 const bothReal = !hosted.fixtureOnly && !recallWeave.fixtureOnly;
 const sameHarness = Object.values(comparability).every(Boolean);
-const countsAsComparisonEvidence = !fixtureRequested && bothReal && sameHarness && privacyClean(privacy);
+const labeledQuerySets = hosted.querySetEvidence.publicBenchmarkReady && recallWeave.querySetEvidence.publicBenchmarkReady;
+const countsAsComparisonEvidence = !fixtureRequested && bothReal && sameHarness && labeledQuerySets && privacyClean(privacy);
 const publicBenchmarkClaimsAllowed = countsAsComparisonEvidence && recallWeaveWin && reviewerApprovalCount >= 2;
 const failedChecks = [
   check("hosted-not-fixture", !hosted.fixtureOnly),
@@ -58,6 +59,7 @@ const failedChecks = [
   check("same-judge", comparability.sameJudge),
   check("same-answer-model", comparability.sameAnswerModel),
   check("same-harness-flags", comparability.sameHarnessFlags),
+  check("labeled-query-sets", labeledQuerySets),
   check("metrics-only", hosted.metricsOnly && recallWeave.metricsOnly),
   check("privacy-clean", privacyClean(privacy)),
   check("recallweave-win", recallWeaveWin),
@@ -131,6 +133,7 @@ function loadResult(inputPath, expectedProvider) {
     sameDataset: result.sameDataset === true || result.comparability?.sameDataset === true,
     sameJudge: result.sameJudge === true || result.comparability?.sameJudge === true,
     sameAnswerModel: result.sameAnswerModel === true || result.comparability?.sameAnswerModel === true,
+    querySetEvidence: normalizeQuerySetEvidence(result.querySetEvidence, inputPath),
     privacyLeakCount: requiredNumber(result.privacyLeakCount ?? result.privacy?.leakCount, "privacyLeakCount", inputPath),
     redactionFailureCount: requiredNumber(result.redactionFailureCount ?? result.redactionFailures, "redactionFailureCount", inputPath),
     rawMemoryIncluded: requiredBoolean(result, ["rawMemoryIncluded", "includesRawMemoryText"], inputPath),
@@ -155,6 +158,26 @@ function normalizeMetrics(metrics) {
     latencyP50Ms: requiredNumber(metrics.latencyP50Ms, "metrics.latencyP50Ms"),
     latencyP95Ms: requiredNumber(metrics.latencyP95Ms, "metrics.latencyP95Ms"),
     contextTokensAvg: requiredNumber(metrics.contextTokensAvg, "metrics.contextTokensAvg"),
+  };
+}
+
+function normalizeQuerySetEvidence(value, inputPath) {
+  assert.ok(value && typeof value === "object", `${displayPath(inputPath)} missing querySetEvidence`);
+  return {
+    queryCount: requiredNumber(value.queryCount, "querySetEvidence.queryCount", inputPath),
+    labeledQueryCount: requiredNumber(value.labeledQueryCount, "querySetEvidence.labeledQueryCount", inputPath),
+    unlabeledQueryCount: requiredNumber(value.unlabeledQueryCount, "querySetEvidence.unlabeledQueryCount", inputPath),
+    expectedResultRefCount: requiredNumber(value.expectedResultRefCount, "querySetEvidence.expectedResultRefCount", inputPath),
+    minExpectedRefsPerQuery: requiredNumber(value.minExpectedRefsPerQuery, "querySetEvidence.minExpectedRefsPerQuery", inputPath),
+    usesExpectedIds: Boolean(value.usesExpectedIds),
+    usesExpectedHashes: Boolean(value.usesExpectedHashes),
+    publicBenchmarkReady:
+      value.publicBenchmarkReady === true &&
+      Number(value.queryCount) > 0 &&
+      Number(value.unlabeledQueryCount) === 0 &&
+      Number(value.labeledQueryCount) === Number(value.queryCount) &&
+      Number(value.minExpectedRefsPerQuery) > 0 &&
+      Number(value.expectedResultRefCount) >= Number(value.queryCount),
   };
 }
 
@@ -219,6 +242,7 @@ function resultSummary(result) {
     scoringCodeHash: result.scoringCodeHash,
     judgeModel: result.judgeModel,
     answerModel: result.answerModel,
+    querySetEvidence: result.querySetEvidence,
     metrics: result.metrics,
     cost: result.cost,
   };

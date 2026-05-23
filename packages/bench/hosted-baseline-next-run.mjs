@@ -380,6 +380,8 @@ function acceptanceCriteria() {
     "hosted and RecallWeave results are non-fixture",
     "both results are metrics-only and privacy-clean",
     "same dataset slice, query-set hash, scoring-code hash, judge model, and answer model",
+    "every query has at least one expected result id or expected content hash",
+    "querySetEvidence.publicBenchmarkReady is true for both runs",
     "hosted container discovery emits hashed candidates only and any private raw-label map stays local",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
     "RecallWeave beats hosted baseline without any quality metric regressing more than the comparison gate allows",

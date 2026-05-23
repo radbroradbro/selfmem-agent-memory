@@ -31,20 +31,21 @@ RECALLWEAVE_BASELINE_LIVE=1 node packages/bench/hosted-baseline-discovery.mjs --
 RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1 node packages/bench/hosted-baseline-discovery.mjs --live --limit 10 --max-pages 1 --output /tmp/recallweave-hosted-baseline-discovery-private-map-check.json --private-map-output /tmp/recallweave-hosted-container-map.private.jsonl
 ```
 
-Live metadata result:
+Latest live metadata result:
 
 - Hosted provider call: yes.
 - Hosted write-back: no.
 - Content requested: no, `includeContent: false`.
-- Pages read: 1.
-- Documents seen: 10.
-- Candidate containers found: 2.
-- Candidate counts: 9 and 1 documents.
+- Run time: 2026-05-23T07:26:32Z.
+- Pages read: 2.
+- Documents seen: 100.
+- Candidate containers found: 4.
+- Candidate counts: 46, 43, 10, and 1 documents.
 - Errors: 0.
 - Raw labels included in stdout or output JSON: no.
 - Raw memory/title/prompt/answer text included: no.
-- Private map written in opt-in run: yes.
-- Private map mode: `0600`.
+- Private map written in opt-in run: yes in the earlier safety check.
+- Private map mode: `0600` when requested.
 
 Boundary:
 

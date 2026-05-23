@@ -50,6 +50,11 @@ Expected behavior:
 - Output is aggregate metrics and hashes only.
 - Output includes query-set hash, scoring-code hash, latency p50/p95, P@1,
   recall@5, recall@10, NDCG@10, query count, and result fingerprints.
+- Output includes `querySetEvidence` with labeled query counts,
+  expected-result reference counts, and `publicBenchmarkReady`.
+- The collector rejects any query that lacks both `expectedResultIds` and
+  `expectedResultHashes`, so a live run cannot produce a benchmark-shaped score
+  from unlabeled questions.
 - Output sets `rawMemoryIncluded`, `rawTranscriptIncluded`,
   `rawPromptIncluded`, and `rawAnswerIncluded` to false.
 - Output does not include query text, result text, raw memory ids, provider

@@ -69,7 +69,7 @@ Template result:
 - `resultTemplateIncluded: true`
 - template includes provider, run id, source commit, dataset slice,
   query-set hash, scoring-code hash, model ids, privacy counters, aggregate
-  metrics, and cost fields.
+  metrics, cost fields, and `querySetEvidence`.
 
 Collector fixture result:
 
@@ -79,6 +79,9 @@ Collector fixture result:
 - `rawMemoryIncluded: false`
 - includes query-set hash, scoring-code hash, P@1, recall@5, recall@10,
   NDCG@10, latency p50/p95, and result fingerprints.
+- includes `querySetEvidence.publicBenchmarkReady: true`.
+- fails closed if any query lacks both `expectedResultIds` and
+  `expectedResultHashes`.
 
 Operator packet result:
 
@@ -140,6 +143,7 @@ Required live-run inputs are recorded as names only:
 - no raw memory, transcript, prompt, or answer text
 - same harness, dataset, judge, and answer model
 - run id, source commit, dataset slice, query-set hash, and scoring-code hash
+- labeled query-set evidence
 - cost and latency fields
 - at least one quality or retrieval metric
 - fresh collection window

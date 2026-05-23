@@ -63,7 +63,9 @@ assert.ok(queries.length > 0, "query set must contain at least one query");
 for (const query of queries) {
   assert.ok(typeof query.id === "string" && query.id.trim(), "each query needs an id");
   assert.ok(typeof query.q === "string" && query.q.trim(), `query ${query.id} needs q`);
+  assert.ok(queryExpectedRefCount(query) > 0, `query ${query.id} needs at least one expectedResultId or expectedResultHash`);
 }
+const querySetEvidence = summarizeQuerySetEvidence(queries);
 
 const responsesEnvelope = loadResponses(responsesPath, { fixture: fixtureRequested, allowRawResponseText });
 const responses = responsesEnvelope.responses;
@@ -110,6 +112,7 @@ const result = {
   rawPromptIncluded: privacy.rawPromptIncluded,
   rawAnswerIncluded: privacy.rawAnswerIncluded,
   queryCount: queries.length,
+  querySetEvidence,
   retrievalConfig: {
     source: fixtureRequested ? "fixture" : "recallweave-response-export",
     retrievalMode,
@@ -226,6 +229,28 @@ function scoreQuery(query, response, options) {
       ndcgAt10: cap01(ndcgAt10),
     },
   };
+}
+
+function summarizeQuerySetEvidence(queries) {
+  const expectedRefCounts = queries.map(queryExpectedRefCount);
+  return {
+    queryCount: queries.length,
+    labeledQueryCount: expectedRefCounts.filter((count) => count > 0).length,
+    unlabeledQueryCount: expectedRefCounts.filter((count) => count === 0).length,
+    expectedResultRefCount: expectedRefCounts.reduce((sum, count) => sum + count, 0),
+    minExpectedRefsPerQuery: Math.min(...expectedRefCounts),
+    usesExpectedIds: queries.some((query) => Array.isArray(query.expectedResultIds) && query.expectedResultIds.length > 0),
+    usesExpectedHashes: queries.some((query) => Array.isArray(query.expectedResultHashes) && query.expectedResultHashes.length > 0),
+    publicBenchmarkReady: expectedRefCounts.every((count) => count > 0),
+  };
+}
+
+function queryExpectedRefCount(query) {
+  return arrayLength(query.expectedResultIds) + arrayLength(query.expectedResultHashes);
+}
+
+function arrayLength(value) {
+  return Array.isArray(value) ? value.filter((item) => String(item).trim()).length : 0;
 }
 
 function normalizeResults(results, options) {

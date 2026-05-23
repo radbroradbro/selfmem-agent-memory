@@ -54,6 +54,9 @@ Expected behavior:
 - It tells operators to run `baseline:compare` only after hosted and
   RecallWeave outputs share the same dataset, query-set hash, scoring-code
   hash, judge model, and answer model.
+- It tells operators every query must have at least one expected result id or
+  expected content hash, and that `querySetEvidence.publicBenchmarkReady` must
+  be true for both hosted and RecallWeave results.
 - It tells operators to run `baseline:packet --strict-real` after comparison so
   reviewers receive one metrics-only zip instead of loose ad hoc JSON.
 - It tells operators to keep `SUPERMEMORY_API_KEY` in the local environment and
@@ -77,5 +80,5 @@ Boundary:
 - This packet does not call hosted Supermemory.
 - This packet does not close the hosted-baseline blocker.
 - Public comparison claims still require a non-fixture metrics-only hosted
-  baseline, a matched RecallWeave run, a RecallWeave win, and two independent
-  reviewer approvals.
+  baseline, a matched RecallWeave run, labeled query sets, a RecallWeave win,
+  and two independent reviewer approvals.

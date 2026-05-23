@@ -40,6 +40,9 @@ fail the real-evidence check because `fixtureOnly: true`.
 evidence. It uses hosted search only after explicit live flags and
 environment-only credentials are present, and it writes aggregate metrics and
 hashes only.
+Every query in the source-locked query set must carry at least one expected
+result id or expected content hash. The hosted and RecallWeave collectors reject
+unlabeled query sets before producing aggregate metrics.
 
 `baseline:export:recallweave -- --live` creates the local RecallWeave
 search-response export from a local container. It emits ids or hashed ids,
@@ -54,7 +57,8 @@ hashes. Raw response text is rejected by default.
 `baseline:compare` is the matched comparison gate. It compares only aggregate
 hosted and RecallWeave result files. It blocks public claims when either result
 is a fixture, when any metric or privacy flag is missing, when the query-set or
-scoring-code hash differs, or when fewer than two reviewer approvals exist.
+scoring-code hash differs, when either result lacks labeled query-set evidence,
+or when fewer than two reviewer approvals exist.
 
 `baseline:next-run` is the state-aware planner for this benchmark lane. It
 turns the current hosted/local evidence state into the next safe source-locked
@@ -105,6 +109,7 @@ A stronger claim requires:
 - a RecallWeave win against the matched baseline,
 - the same memory set,
 - the same queries,
+- relevance labels for every query,
 - the same judge and answer model,
 - the same scoring code,
 - the same settings,

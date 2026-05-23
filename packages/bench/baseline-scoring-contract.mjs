@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 
 export const baselineScoringContract = Object.freeze({
-  id: "recallweave-baseline-scoring-v1",
+  id: "recallweave-baseline-scoring-v2",
   relevance: ["expectedResultIds", "expectedResultHashes"],
+  querySet: "every query must include at least one expectedResultIds or expectedResultHashes entry",
   metrics: ["quality", "pAt1", "recallAt5", "recallAt10", "ndcgAt10", "latencyP50Ms", "latencyP95Ms", "contextTokensAvg"],
   quality: "mean(pAt1, recallAt5, recallAt10, ndcgAt10)",
   ndcg: "binary relevance over top 10",

@@ -51,6 +51,8 @@ Share:
   hosted-baseline packet.
 - metrics-only `baseline:discover` output when choosing a hosted Supermemory
   baseline container.
+- source-locked benchmark query-set summaries showing every query has at least
+  one expected result id or expected content hash.
 
 Do not share:
 
@@ -66,6 +68,7 @@ Do not share:
 - browser state,
 - private container mappings.
 - private hosted container maps created by `baseline:discover`.
+- unlabeled natural-question benchmark files offered as performance evidence.
 
 ## Branch And PR Flow
 

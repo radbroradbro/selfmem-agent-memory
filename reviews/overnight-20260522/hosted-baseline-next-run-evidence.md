@@ -52,6 +52,9 @@ Expected behavior:
   private map creation, hosted collection, hosted validation, RecallWeave
   export, RecallWeave aggregate collection, matched comparison, and strict-real
   evidence packaging.
+- Acceptance criteria require every query to have at least one expected result
+  id or expected content hash, with `querySetEvidence.publicBenchmarkReady`
+  true for both result files.
 - It forbids provider keys, raw hosted memories, raw local memories,
   transcripts, prompts, answers, cookies, bearer tokens, private local paths,
   private container maps, unredacted diagnostics, and raw RecallWeave exports
@@ -65,5 +68,5 @@ Boundary:
 - This planner does not run a live hosted baseline.
 - This planner does not close the hosted-baseline blocker.
 - Public comparison claims still require non-fixture hosted and RecallWeave
-  results, matching query-set and scoring-code hashes, a RecallWeave win, and
-  two independent reviewer approvals.
+  results, matching query-set and scoring-code hashes, labeled query sets, a
+  RecallWeave win, and two independent reviewer approvals.

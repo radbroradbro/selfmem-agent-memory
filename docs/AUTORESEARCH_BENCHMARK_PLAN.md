@@ -16,6 +16,8 @@ A publishable canary must use:
 - the same dataset slice,
 - the same memory set,
 - the same queries,
+- relevance-labeled queries, where every query includes at least one
+  `expectedResultIds` or `expectedResultHashes` entry,
 - the same judge and answer model,
 - the same scoring code,
 - the same privacy rules,
@@ -79,6 +81,11 @@ The comparison gate is also metrics-only. It must report the same dataset
 slice, query-set hash, scoring-code hash, judge model, answer model, and
 harness flags before it can count as comparison evidence. `--fixture` always
 blocks public claims, even if the loaded files look real.
+
+The hosted and RecallWeave collectors reject unlabeled query sets before they
+produce aggregate metrics. A live run with natural questions but no expected
+ids or content hashes is useful for debugging search shape only; it is not
+benchmark evidence and must not feed public comparison language.
 
 `baseline:export:recallweave` creates the local search-response export from a
 local `memories.jsonl` container. It emits ids or hashed ids, content hashes,
