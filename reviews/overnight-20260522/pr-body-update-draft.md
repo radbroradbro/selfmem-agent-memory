@@ -32,7 +32,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `d7e2e13304cd81b9ae3b6013915f13d727f88ebe`.
+- Latest code/product baseline: `1d8375a8dbcc9027d48d7e6821ff24d99fcdb916`.
+- GitHub Actions run `26324201679`: passed CI after the mixed canary
+  diagnostic batch triage extension.
+- Previous verified code baseline before the mixed canary diagnostic batch
+  triage extension: `d7e2e13304cd81b9ae3b6013915f13d727f88ebe`.
 - GitHub Actions run `26323991060`: passed CI after the package-script-safe
   evidence output extension.
 - Previous verified code baseline before the package-script-safe evidence
