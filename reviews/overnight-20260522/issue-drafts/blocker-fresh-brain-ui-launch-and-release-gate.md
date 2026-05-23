@@ -10,6 +10,13 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
+  `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
+- GitHub Actions run `26342589049` passed CI after adding returned canary
+  workspace generation, keeping fixture workspace output temporary,
+  fast-forwarding PR #5 to the helper code, and recording the post-12h
+  readiness recheck while preserving strict-real and public-launch blockers.
+- Previous verified code/product baseline before the returned-workspace
+  follow-up:
   `a56449db786a334db3554f7fd66721ae44261073`.
 - GitHub Actions run `26338015421` passed CI after hardening
   `baseline:source-match` for real local selfmem exports with path-bearing

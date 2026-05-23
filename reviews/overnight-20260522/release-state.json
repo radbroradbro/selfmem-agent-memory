@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "a56449db786a334db3554f7fd66721ae44261073",
-    "ciRunId": 26338015421,
+    "headSha": "daac851d031d5a2a8c95a307aa7db2a6d2d00762",
+    "ciRunId": 26342589049,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after hardening baseline source-match private-path redaction for real local selfmem exports. It preserves strict-real and public-launch blockers, includes Gemini CLEAN review for the source-match redaction behavior, records the blocked Claude CLI reviewer attempt, and GitHub Actions run 26338015421 passed CI on a56449d. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after adding returned canary workspace generation, keeping fixture workspace output temporary, fast-forwarding PR #5 to the helper code, and recording the post-12h readiness recheck. It preserves strict-real and public-launch blockers, and GitHub Actions run 26342589049 passed CI on daac851. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,

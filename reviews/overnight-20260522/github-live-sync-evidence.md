@@ -33,15 +33,18 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after the returned canary workspace
   helper added markdown and JSON intake generation for the selected agent
   packet.
+- PR #5 and issue #6 were refreshed again after `daac851` passed CI as the
+  latest verified code/product baseline and the PR branch was fast-forwarded to
+  that head.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T20:10:40Z
+- PR body refreshed at: 2026-05-23T20:24:06Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T20:10:41Z
-- PR body hash: 8505214e5766fdaa6e1d1878fe65e9d5cf78f410f01eb121a969857a0d508080
+- Issue updated at: 2026-05-23T20:24:07Z
+- PR body hash: 8bf972b9c595b5ae0d899f817585c9dae05871c885ada5be0c94be4952ed4946
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 7063da8f6af533d4a34794ef75ae0f89eeb6a0d465f3e57293e9d7502192b29b
-- PR body length: 34948
-- Issue body length: 20738
+- Issue body hash: bc58c6782b69b53fcfbf01dc550e87d2643c43172dd5e3835dcd696d6c34b263
+- PR body length: 35370
+- Issue body length: 21159
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

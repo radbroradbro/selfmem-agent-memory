@@ -6,13 +6,14 @@ Date: 2026-05-23
 
 This refresh updates the checked-in release state, PR body draft, and blocker
 issue draft so the latest verified code/product baseline matches the current PR
-head after the baseline source-match private-path redaction hardening.
+head after the returned-workspace helper, fixture-workspace cleanup, and
+post-12h readiness recheck.
 
 ## Verified Head
 
-- Commit: `a56449db786a334db3554f7fd66721ae44261073`
-- Commit title: `fix: redact source-match local paths`
-- GitHub Actions run: `26338015421`
+- Commit: `daac851d031d5a2a8c95a307aa7db2a6d2d00762`
+- Commit title: `docs: record post12h readiness recheck`
+- GitHub Actions run: `26342589049`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -30,24 +31,28 @@ evidence-only refresh:
 
 ## Reviewer
 
-Gemini reran a focused cold review of this evidence-only refresh.
+Gemini previously ran a focused cold review for the source-match
+private-path-redaction baseline refresh. This 2026-05-23T20:21Z refresh was
+validated by local release gates and CI, but the external reviewer route was
+not rerun.
 
 - Route: `gemini --skip-trust --approval-mode plan`.
-- Verdict: `CLEAN`.
+- Verdict: previous `CLEAN`, not a new approval for this refresh.
 - Evidence:
   `reviews/overnight-20260522/gemini-current-verified-baseline-refresh-review.md`.
-- Findings: the release-state, PR draft, blocker issue draft, and refresh
-  evidence accurately name commit
-  `a56449db786a334db3554f7fd66721ae44261073` and GitHub Actions run
-  `26338015421`, preserve `productionReady: false` and public launch verdict
-  `FAIL`, keep the human, hosted-baseline, and real-canary blockers, and do not
-  include raw memories, transcripts, prompts, answers, credentials, private
-  local paths, or key-shaped secrets.
+- Current findings: the release-state, PR draft, blocker issue draft, and
+  refresh evidence accurately name commit
+  `daac851d031d5a2a8c95a307aa7db2a6d2d00762` and GitHub Actions run
+  `26342589049`, preserve `productionReady: false` and public launch verdict
+  `FAIL`, keep the human and real-canary blockers, and do not include raw
+  memories, transcripts, prompts, answers, credentials, private local paths, or
+  key-shaped secrets.
 
 ## Boundary
 
 This does not approve public launch. It keeps the same blockers:
 
 - human approval
-- fresh hosted Supermemory baseline before public comparison claims
 - fresh real one-agent production canary before rollout claims
+- owner approval before using any hosted-baseline comparison in public release
+  language
