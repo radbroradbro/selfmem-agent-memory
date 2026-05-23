@@ -72,15 +72,18 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after adding
   `benchmark:public-target:author`, source-lock attestations, and the stricter
   public canary validator.
+- PR #5 and issue #6 were refreshed again after adding the current MemoryBench
+  source lock, optional checkout hash verification, and machine-readable
+  source-lock evidence for `locomo`, `longmemeval`, and `convomem`.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T23:03:48Z
+- PR body refreshed at: 2026-05-23T23:23:44Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T23:03:48Z
-- PR body hash: 591308b6dd139456fcdb530cb79ee66083b5214a24dc6c2caf7f2d59a553c838
+- Issue updated at: 2026-05-23T23:23:43Z
+- PR body hash: d4c7c0e31d0fdeac21bb7a447694dead9263aaadeb2b9693e0d08bd6c051951f
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: b18ed0dfc7f902f57d1e0952b59455d25c307e574cc0fecf340fac225a9f18a4
-- PR body length: 38459
-- Issue body length: 23722
+- Issue body hash: c9d21ede69437afc12166e94b93bf7274b98ed07df260586a402068d71c34f82
+- PR body length: 38895
+- Issue body length: 24153
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

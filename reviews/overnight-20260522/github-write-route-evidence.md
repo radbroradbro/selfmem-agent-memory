@@ -89,6 +89,9 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after regenerating the current OpenClaw
     next-agent handoff packet in the standard Downloads location. Updated at:
     2026-05-23T22:47:01Z.
+  - The PR body was refreshed again after adding the current MemoryBench source
+    lock, optional checkout hash verification, and machine-readable source-lock
+    evidence. Updated at: 2026-05-23T23:23:44Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -111,10 +114,11 @@ Verdict: resolved for PR body and blocker issue writes.
     target lane refresh, component-vs-memory benchmark clarification refresh,
     public benchmark target validator refresh, same judge and answer model
     validator refresh, latest public benchmark target CI baseline refresh,
-    current OpenClaw Downloads handoff packet refresh, and public benchmark
-    target author/source-lock attestation refresh
-  - Updated at: 2026-05-23T23:03:48Z
-  - Body length: 23722
+    current OpenClaw Downloads handoff packet refresh, public benchmark target
+    author/source-lock attestation refresh, and MemoryBench source-lock
+    checkout verification refresh
+  - Updated at: 2026-05-23T23:23:43Z
+  - Body length: 24153
 
 ## Safety
 
