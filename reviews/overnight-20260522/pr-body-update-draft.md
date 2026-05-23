@@ -32,8 +32,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `c0036470512950fa77900221f08d0cbafeab6d7b`.
-- GitHub Actions run `26329521666`: passed CI after adding the hosted-baseline
+- Latest code/product baseline: `cdf4615de1e9e3c7fa161d70f40fe5bf3e4cea76`.
+- GitHub Actions run `26329828449`: passed CI after requiring hosted and
+  RecallWeave baseline comparison results to prove matched counterpart runs
+  before any comparison can count as evidence.
+- Previous verified baseline before matched-counterpart hardening:
+  `c0036470512950fa77900221f08d0cbafeab6d7b`, GitHub Actions run
+  `26329521666`, passed after adding the hosted-baseline
   query-set author, wiring it into operator, next-run, release doctor, release
   readiness, clean consumer smoke, and docs, and proving fixture plus bounded
   live author smokes.

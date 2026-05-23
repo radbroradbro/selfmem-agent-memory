@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `c003647`, run `26329521666`, success.
+  `cdf4615`, run `26329828449`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -82,6 +82,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26325592308` on `00836ec`: success.
 - GitHub Actions CI run `26329113469` on `94be156`: success.
 - GitHub Actions CI run `26329521666` on `c003647`: success.
+- GitHub Actions CI run `26329828449` on `cdf4615`: success.
 
 ## Shipped Overnight Slices
 
@@ -99,7 +100,7 @@ evidence are still required before any public live update.
 | Hosted baseline collector | `packages/bench/hosted-baseline-collector.mjs`, `reviews/overnight-20260522/hosted-baseline-collector-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-collector-review.md` |
 | RecallWeave response export | `packages/bench/recallweave-response-export.mjs`, `baseline:export:recallweave`, `reviews/overnight-20260522/recallweave-response-export-evidence.md`, `reviews/overnight-20260522/gemini-recallweave-response-export-review.md` |
 | RecallWeave baseline collector | `packages/bench/recallweave-baseline-collector.mjs`, `baseline:collect:recallweave`, `reviews/overnight-20260522/recallweave-baseline-collector-evidence.md`, `reviews/overnight-20260522/gemini-recallweave-baseline-collector-review.md` |
-| Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `reviews/overnight-20260522/baseline-comparison-evidence.md`, `reviews/overnight-20260522/gemini-baseline-comparison-review.md` |
+| Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `reviews/overnight-20260522/baseline-comparison-evidence.md`, `reviews/overnight-20260522/gemini-baseline-comparison-review.md`, CI run `26329828449` |
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md` |
 | Hosted baseline container selector | `packages/bench/hosted-baseline-container-select.mjs`, `baseline:select-container`, `reviews/overnight-20260522/hosted-baseline-container-select-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-container-select-review.md` |
 | Hosted baseline query-set author | `packages/bench/hosted-baseline-queryset-author.mjs`, `baseline:author-queryset`, CI run `26329521666`, `reviews/overnight-20260522/hosted-baseline-queryset-author-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-queryset-author-review.md` |
