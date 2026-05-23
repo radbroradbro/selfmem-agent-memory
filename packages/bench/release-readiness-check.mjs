@@ -159,6 +159,7 @@ const requiredFiles = [
   `${reviewDir}/canary-diagnostic-batch-audit-evidence.md`,
   `${reviewDir}/gemini-canary-diagnostic-batch-audit-review.md`,
   `${reviewDir}/canary-next-agent-plan-evidence.md`,
+  `${reviewDir}/real-next-agent-openclaw-canary-plan.md`,
   `${reviewDir}/gemini-canary-next-agent-plan-review.md`,
   `${reviewDir}/gemini-adapter-store-latency-review.md`,
   `${reviewDir}/gemini-fresh-canary-window-review.md`,
@@ -1678,6 +1679,7 @@ check("fresh canary next-agent plan passes", () => {
   const outputReport = JSON.parse(readFileSync(planOutputPath, "utf8"));
   const outputStdout = JSON.parse(planOutputRun.stdout);
   const evidence = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
+  const realPlanEvidence = readFileSync(join(root, reviewDir, "real-next-agent-openclaw-canary-plan.md"), "utf8");
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-next-agent-plan-review.md"), "utf8");
   assert.equal(report.ok, true);
   assert.equal(report.mode, "canary-next-agent-plan");
@@ -1708,11 +1710,22 @@ check("fresh canary next-agent plan passes", () => {
   assert.match(markdownRun.stdout, /FRESH_WINDOW_START/);
   assert.match(evidence, /canary:next-agent/i);
   assert.match(evidence, /one-agent/i);
+  assert.match(realPlanEvidence, /READY_FOR_ONE_AGENT_FRESH_CANARY/);
+  assert.match(realPlanEvidence, /Host:\s*`?openclaw`?/i);
+  assert.match(realPlanEvidence, /adapter-contract/);
+  assert.match(realPlanEvidence, /store-latency-instrumented/);
+  assert.match(realPlanEvidence, /Recall p95:\s*1567\.346 ms/i);
+  assert.match(realPlanEvidence, /FRESH_WINDOW_START/);
+  assert.match(realPlanEvidence, /--strict-real/);
+  assert.match(realPlanEvidence, /--output\s+\/tmp\/recallweave-canary-intake\.json/);
+  assert.match(realPlanEvidence, /Do not attach raw logs/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
   assert.doesNotMatch(planRun.stdout, secretPattern);
   assert.doesNotMatch(planRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(markdownRun.stdout, secretPattern);
   assert.doesNotMatch(markdownRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(realPlanEvidence, secretPattern);
+  assert.doesNotMatch(realPlanEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   rmSync(tempRoot, { recursive: true, force: true });
 });
 

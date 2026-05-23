@@ -19,7 +19,7 @@ Live status:
 - Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
 - Extends the release blocker doctor so agents see the same three unresolved blockers as the goal audit: human approval, fresh hosted baseline, and fresh real-agent canary evidence.
 - Adds output-file-safe baseline and canary evidence commands so package-manager banners cannot corrupt JSON artifacts or leak local checkout paths into preflight, comparison, intake, diagnosis, batch-audit, or next-agent plan files.
-- Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, and ranked the closest privacy-clean candidate; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
+- Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Adds fresh canary window isolation so strict-real reports can ignore pre-patch trace history, stale errors, and old missing-latency events after a patched adapter is applied.
 - Keeps public launch conservative: fixture evidence is allowed, real private memory text is not committed, and benchmark claims stay blocked until a matched source-locked canary or hosted baseline passes with reviewer sign-off.
@@ -141,6 +141,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- canary:operator-packet`: passed with fresh-window timestamp instructions.
 - `npm exec --yes pnpm@10.23.0 -- canary:packet`: passed and produced a metrics-only zip with no raw memories, transcripts, prompts, answers, keys, or private paths.
 - `npm exec --yes pnpm@10.23.0 -- canary:batch-audit`: passed on the fixture batch, failed closed with `--require-real-pass`, supported explicit mixed-folder `--allow-failed-inputs` triage, and triaged the available redacted real diagnostics without exposing raw content.
+- `reviews/overnight-20260522/real-next-agent-openclaw-canary-plan.md`: added a paste-ready OpenClaw fresh-window canary handoff selected from redacted metrics-only evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:next-agent`: passed on the fixture planner and converted the real redacted batch into a one-agent OpenClaw fresh-window plan focused on adapter-contract and store-latency evidence.
 - Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.
 - `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.
