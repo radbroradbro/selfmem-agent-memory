@@ -7,6 +7,9 @@ const format = String(args.format || "json").trim().toLowerCase();
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
 const resultPath = "/tmp/recallweave-hosted-baseline-result.json";
+const recallWeaveResultPath = "/tmp/recallweave-result.json";
+const recallWeaveResponsesPath = "/tmp/recallweave-search-responses.json";
+const comparisonPath = "/tmp/recallweave-baseline-comparison.json";
 const preflightPath = "/tmp/recallweave-hosted-baseline-preflight.json";
 const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
 const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
@@ -21,6 +24,9 @@ const packet = {
   requiredSource: "isolated hosted test container or explicit read-only hosted source container plus a source-locked query set",
   outputs: {
     resultPath,
+    recallWeaveResultPath,
+    recallWeaveResponsesPath,
+    comparisonPath,
     preflightPath,
     templatePath,
     querySetPath,
@@ -66,6 +72,28 @@ const packet = {
         `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} > ${preflightPath}`,
       ].join(" "),
     },
+    {
+      id: "collect-recallweave-result",
+      description: "Convert a metrics-only RecallWeave search response export into the matched RecallWeave result file.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+        `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
+        `RECALLWEAVE_BASELINE_RESPONSES_JSON=${recallWeaveResponsesPath}`,
+        "RECALLWEAVE_BASELINE_RUN_ID=<same-run-id-or-matched-run-id>",
+        "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
+        "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
+        `npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --live --responses ${recallWeaveResponsesPath} --output ${recallWeaveResultPath}`,
+      ].join(" "),
+    },
+    {
+      id: "compare-matched-results",
+      description: "Compare the aggregate hosted and RecallWeave result files. This still cannot authorize public claims without reviewer approvals.",
+      command: [
+        `RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed>`,
+        `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} > ${comparisonPath}`,
+      ].join(" "),
+    },
   ],
   acceptanceCriteria: [
     "resultInspection.fixtureOnly is false",
@@ -85,11 +113,15 @@ const packet = {
     "resultInspection.hasScoringCodeHash is true",
     "resultInspection.hasCostLatency is true",
     "matchedRecallWeaveRunPresent is true before comparison claims",
+    "RecallWeave result provider is recallweave",
+    "RecallWeave result shares dataset, query-set hash, scoring-code hash, judge model, and answer model",
     "reviewerApprovalCount is at least 2 before comparison claims",
     "recallWeaveWin is true before public comparison claims",
   ],
   attachOnly: [
     resultPath,
+    recallWeaveResultPath,
+    comparisonPath,
     preflightPath,
   ],
   forbidden: [
@@ -103,6 +135,7 @@ const packet = {
     "bearer tokens",
     "private local paths",
     "unredacted diagnostic archives",
+    "raw RecallWeave response exports that contain memory text",
   ],
   operatorMessage: buildMarkdown(),
 };
@@ -169,9 +202,37 @@ function buildMarkdown() {
     `npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result ${resultPath} > ${preflightPath}`,
     "```",
     "",
+    "Export RecallWeave search responses locally as IDs, content hashes, scores, timings, token estimates, and privacy counters. Do not include raw memory text. Save that response export here:",
+    "",
+    "```text",
+    recallWeaveResponsesPath,
+    "```",
+    "",
+    "Then convert it into the matched RecallWeave aggregate result:",
+    "",
+    "```bash",
+    "RECALLWEAVE_BASELINE_LIVE=1 \\",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \\",
+    `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
+    `RECALLWEAVE_BASELINE_RESPONSES_JSON=${recallWeaveResponsesPath} \\`,
+    "RECALLWEAVE_BASELINE_RUN_ID=<same-run-id-or-matched-run-id> \\",
+    "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
+    "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> \\",
+    `npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --live --responses ${recallWeaveResponsesPath} --output ${recallWeaveResultPath}`,
+    "```",
+    "",
+    "Then compare the matched aggregate files:",
+    "",
+    "```bash",
+    "RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed> \\",
+    `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} > ${comparisonPath}`,
+    "```",
+    "",
     "## Attach Only",
     "",
     `- ${resultPath}`,
+    `- ${recallWeaveResultPath}`,
+    `- ${comparisonPath}`,
     `- ${preflightPath}`,
     "",
     "## Pass Criteria",
@@ -191,6 +252,7 @@ function packetAcceptanceLines() {
     "- no raw memory, transcript, prompt, or answer text",
     "- same harness, dataset, judge, and answer model as the RecallWeave run",
     "- query-set and scoring-code hashes present",
+    "- matched RecallWeave result shares query-set and scoring-code hashes",
     "- cost and latency fields present",
     "- matched RecallWeave run, two reviewer approvals, and RecallWeave win before public comparison claims",
   ];

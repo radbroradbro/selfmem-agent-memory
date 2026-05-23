@@ -7,9 +7,11 @@ Scope:
 - Added `packages/bench/hosted-baseline-operator-packet.mjs`.
 - Added `baseline:operator-packet` as a package script and smoke step.
 - The packet gives operators one public-safe baseline collection contract for
-  hosted Supermemory comparison evidence.
-- The packet now points operators to `baseline:collect -- --live` instead of an
-  ad hoc external collector.
+  hosted Supermemory comparison evidence, matched RecallWeave collection, and
+  metrics-only comparison.
+- The packet now points operators to `baseline:collect -- --live`,
+  `baseline:collect:recallweave -- --live`, and `baseline:compare` instead of
+  ad hoc external collectors.
 - Gemini focused review returned `CLEAN`.
 
 Commands:
@@ -18,6 +20,7 @@ Commands:
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 ```
 
 Expected behavior:
@@ -27,16 +30,24 @@ Expected behavior:
 - `writesRealFiles` is false.
 - `callsHostedProvider` is false.
 - It tells operators to print the template, validate fixture parsing, then
-  collect and validate an aggregate-only hosted result.
+  collect and validate aggregate-only hosted and RecallWeave results.
+- It tells operators to convert a local RecallWeave search export into a
+  metrics-only result before comparison.
+- It tells operators to run `baseline:compare` only after hosted and
+  RecallWeave outputs share the same dataset, query-set hash, scoring-code
+  hash, judge model, and answer model.
 - It tells operators to keep `SUPERMEMORY_API_KEY` in the local environment and
   never paste it into the command or any attachment.
 - It requires env-only hosted credentials and never prints provider-key values.
 - It tells operators to attach only:
   - `/tmp/recallweave-hosted-baseline-result.json`
   - `/tmp/recallweave-hosted-baseline-preflight.json`
-- It forbids provider keys, raw hosted memories, raw local memories,
-  transcripts, prompts, answers, cookies, bearer tokens, private local paths,
-  and unredacted diagnostic archives.
+  - `/tmp/recallweave-result.json`
+  - `/tmp/recallweave-baseline-comparison.json`
+- It forbids provider keys, raw hosted memories, raw RecallWeave response
+  exports containing memory text, raw local memories, transcripts, prompts,
+  answers, cookies, bearer tokens, private local paths, and unredacted
+  diagnostic archives.
 
 Boundary:
 

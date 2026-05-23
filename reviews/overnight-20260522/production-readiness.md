@@ -67,6 +67,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
   benchmark claims blocked.
 - Hosted baseline collector that can run read-only hosted search only after
   explicit live opt-in and emits aggregate metrics and hashes only.
+- RecallWeave baseline collector that converts a local metrics-only
+  search-response export into the matched RecallWeave result file, using the
+  same source-locked query set and scoring contract as hosted.
 - Baseline comparison gate that compares only aggregate hosted and RecallWeave
   result files, requires source-matched harness fields, and blocks fixture
   inputs from public benchmark claims.
@@ -346,6 +349,9 @@ evidence for:
   scoring-code hashes, result fingerprints, latency metrics, retrieval
   metrics, and no raw memory, transcript, prompt, answer, credential, or
   private-path output; Gemini returned `CLEAN`.
+- RecallWeave baseline collector evidence with matched query-set and
+  scoring-code hashes, raw-response-text rejection in live mode, metrics-only
+  output, and Gemini `CLEAN` review.
 - baseline comparison evidence with matched fixture metrics, explicit
   fixture-blocked public claims, required metric/privacy fields, and Gemini
   review coverage.
@@ -423,6 +429,8 @@ Passed locally in this automation environment:
   `publicBenchmarkClaimsAllowed: false`
 - `npm run baseline:collect -- --fixture`: metrics-only collector output with
   no hosted provider call
+- `npm run baseline:collect:recallweave -- --fixture`: metrics-only
+  RecallWeave collector output with matched query-set and scoring-code hashes
 - `npm run baseline:compare -- --fixture`: metrics-only comparison output with
   fixture public claims blocked
 - `npm run baseline:operator-packet`: no hosted provider call and public-safe

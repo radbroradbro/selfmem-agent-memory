@@ -31,6 +31,11 @@ evidence. It uses hosted search only after explicit live flags and
 environment-only credentials are present, and it writes aggregate metrics and
 hashes only.
 
+`baseline:collect:recallweave -- --live` converts a local RecallWeave
+search-response export into the matched aggregate result file. The export must
+use ids, scores, timings, token estimates, privacy counters, and content
+hashes. Raw response text is rejected by default.
+
 `baseline:compare` is the matched comparison gate. It compares only aggregate
 hosted and RecallWeave result files. It blocks public claims when either result
 is a fixture, when any metric or privacy flag is missing, when the query-set or

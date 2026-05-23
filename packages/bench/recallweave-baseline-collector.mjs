@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { baselineScoringContractHash } from "./baseline-scoring-contract.mjs";
 
@@ -16,23 +16,24 @@ const querySetPath = resolveInputPath(
     process.env.RECALLWEAVE_BASELINE_QUERYSET ??
     (fixtureRequested ? "packages/bench/fixtures/hosted-baseline-queryset.fixture.json" : null),
 );
-const fixtureResponsesPath = resolveInputPath(
-  args.fixtureResponses ?? "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
+const responsesPath = resolveInputPath(
+  args.responses ??
+    args.searchResponses ??
+    process.env.RECALLWEAVE_BASELINE_RESPONSES_JSON ??
+    (fixtureRequested ? "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json" : null),
 );
-const outputPath = args.output ?? process.env.RECALLWEAVE_BASELINE_OUTPUT_JSON ?? null;
-const searchMode = String(args.searchMode ?? process.env.RECALLWEAVE_BASELINE_SEARCH_MODE ?? "hybrid");
+const outputPath = args.output ?? process.env.RECALLWEAVE_RESULT_OUTPUT_JSON ?? null;
+const retrievalMode = String(args.retrievalMode ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_MODE ?? "hybrid-local-first");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
-const threshold = finiteNumber(args.threshold ?? process.env.RECALLWEAVE_BASELINE_THRESHOLD ?? 0.5, "threshold");
-const rerank = parseBoolean(args.rerank ?? process.env.RECALLWEAVE_BASELINE_RERANK ?? "true");
-const timeoutMs = positiveInt(args.timeoutMs ?? process.env.RECALLWEAVE_BASELINE_TIMEOUT_MS ?? 15000, "timeoutMs");
 const runAt = new Date().toISOString();
 const runId =
   args.runId ??
   process.env.RECALLWEAVE_BASELINE_RUN_ID ??
-  (fixtureRequested ? "fixture-supermemory-baseline-collector" : `supermemory-baseline-${runAt.replace(/[-:.TZ]/g, "").slice(0, 12)}`);
+  (fixtureRequested ? "fixture-recallweave-baseline-collector" : `recallweave-baseline-${runAt.replace(/[-:.TZ]/g, "").slice(0, 12)}`);
 const judgeModel = args.judgeModel ?? process.env.RECALLWEAVE_BASELINE_JUDGE_MODEL ?? null;
 const answerModel = args.answerModel ?? process.env.RECALLWEAVE_BASELINE_ANSWER_MODEL ?? null;
-const containerTag = args.container ?? args.containerTag ?? process.env.RECALLWEAVE_BASELINE_CONTAINER ?? null;
+const localContainer = args.container ?? args.containerTag ?? process.env.RECALLWEAVE_BASELINE_CONTAINER ?? null;
+const allowRawResponseText = process.env.RECALLWEAVE_BASELINE_ALLOW_RAW_RESPONSE_TEXT === "1";
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -42,17 +43,21 @@ const privatePathPattern =
 assert.ok(querySetPath, "query set is required. Pass --queryset or RECALLWEAVE_BASELINE_QUERYSET");
 assert.ok(existsSync(querySetPath), `query set missing: ${displayPath(querySetPath)}`);
 assert.ok(statSync(querySetPath).size > 0, `query set empty: ${displayPath(querySetPath)}`);
+assert.ok(responsesPath, "RecallWeave responses are required. Pass --responses or RECALLWEAVE_BASELINE_RESPONSES_JSON");
+assert.ok(existsSync(responsesPath), `RecallWeave responses missing: ${displayPath(responsesPath)}`);
+assert.ok(statSync(responsesPath).size > 0, `RecallWeave responses empty: ${displayPath(responsesPath)}`);
 
 if (!fixtureRequested) {
-  assert.equal(liveRequested, true, "live hosted baseline collection requires --live or RECALLWEAVE_BASELINE_LIVE=1");
+  assert.equal(liveRequested, true, "live RecallWeave baseline collection requires --live or RECALLWEAVE_BASELINE_LIVE=1");
   assert.equal(process.env.RECALLWEAVE_BASELINE_NO_RAW_TEXT, "1", "set RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 before live collection");
-  assert.ok(process.env.SUPERMEMORY_API_KEY, "SUPERMEMORY_API_KEY must be present in the environment for live collection");
-  assert.ok(containerTag, "RECALLWEAVE_BASELINE_CONTAINER or --container is required for live collection");
   assert.ok(judgeModel, "RECALLWEAVE_BASELINE_JUDGE_MODEL or --judge-model is required for live collection");
   assert.ok(answerModel, "RECALLWEAVE_BASELINE_ANSWER_MODEL or --answer-model is required for live collection");
 }
 
-const querySet = JSON.parse(readFileSync(querySetPath, "utf8"));
+const querySetRaw = readFileSync(querySetPath, "utf8");
+assert.doesNotMatch(querySetRaw, secretPattern, `${displayPath(querySetPath)} contains a key-shaped secret`);
+assert.doesNotMatch(querySetRaw, privatePathPattern, `${displayPath(querySetPath)} contains a private path`);
+const querySet = JSON.parse(querySetRaw);
 const queries = Array.isArray(querySet.queries) ? querySet.queries : [];
 assert.ok(queries.length > 0, "query set must contain at least one query");
 for (const query of queries) {
@@ -60,11 +65,10 @@ for (const query of queries) {
   assert.ok(typeof query.q === "string" && query.q.trim(), `query ${query.id} needs q`);
 }
 
-const responses = fixtureRequested
-  ? loadFixtureResponses(fixtureResponsesPath)
-  : await collectLiveResponses({ queries, containerTag, searchMode, limit, threshold, rerank, timeoutMs });
-
-const scored = queries.map((query) => scoreQuery(query, responses.get(query.id) ?? emptyResponse()));
+const responsesEnvelope = loadResponses(responsesPath, { fixture: fixtureRequested, allowRawResponseText });
+const responses = responsesEnvelope.responses;
+const privacy = privacyFromEnvelope(responsesEnvelope, fixtureRequested);
+const scored = queries.map((query) => scoreQuery(query, responses.get(query.id) ?? emptyResponse(), { fixture: fixtureRequested, allowRawResponseText }));
 const aggregate = aggregateScores(scored);
 const head = git(["rev-parse", "HEAD"]);
 const branch = git(["branch", "--show-current"]);
@@ -82,9 +86,9 @@ const querySetHash = stableHash({
 
 const result = {
   schemaVersion: 1,
-  fixtureOnly: fixtureRequested || querySet.fixtureOnly === true,
-  evidenceType: fixtureRequested ? "fixture-hosted-baseline-collector-result" : "live-hosted-baseline-collector-result",
-  provider: "hosted-supermemory",
+  fixtureOnly: fixtureRequested || querySet.fixtureOnly === true || responsesEnvelope.fixtureOnly === true,
+  evidenceType: fixtureRequested ? "fixture-recallweave-baseline-collector-result" : "live-recallweave-baseline-collector-result",
+  provider: "recallweave",
   metricsOnly: true,
   runId,
   runAt,
@@ -99,20 +103,20 @@ const result = {
   sameDataset: true,
   sameJudge: true,
   sameAnswerModel: true,
-  privacyLeakCount: 0,
-  redactionFailureCount: 0,
-  rawMemoryIncluded: false,
-  rawTranscriptIncluded: false,
-  rawPromptIncluded: false,
-  rawAnswerIncluded: false,
+  privacyLeakCount: privacy.privacyLeakCount,
+  redactionFailureCount: privacy.redactionFailureCount,
+  rawMemoryIncluded: privacy.rawMemoryIncluded,
+  rawTranscriptIncluded: privacy.rawTranscriptIncluded,
+  rawPromptIncluded: privacy.rawPromptIncluded,
+  rawAnswerIncluded: privacy.rawAnswerIncluded,
   queryCount: queries.length,
-  searchConfig: {
-    endpoint: fixtureRequested ? "fixture" : "https://api.supermemory.ai/v4/search",
-    searchMode,
+  retrievalConfig: {
+    source: fixtureRequested ? "fixture" : "recallweave-response-export",
+    retrievalMode,
     limit,
-    threshold,
-    rerank,
-    containerTagHash: containerTag ? shortHash(containerTag) : null,
+    localContainerHash: localContainer ? shortHash(localContainer) : null,
+    responsesHash: `sha256:${fileHash(responsesPath)}`,
+    rawResponseTextAllowed: allowRawResponseText,
   },
   metrics: {
     quality: aggregate.quality,
@@ -129,17 +133,16 @@ const result = {
     queryUsd: finiteNumberOrDefault(process.env.RECALLWEAVE_BASELINE_QUERY_COST_USD, 0),
   },
   costAssumptions: {
-    source: process.env.RECALLWEAVE_BASELINE_QUERY_COST_USD ? "env" : "provider_did_not_return_cost_assumed_zero_for_read_only_search",
+    source: process.env.RECALLWEAVE_BASELINE_QUERY_COST_USD ? "env" : "local_response_export_cost_assumed_zero",
   },
   resultFingerprints: scored.map((item) => item.fingerprint),
-  matchedRecallWeaveRunPresent: process.env.RECALLWEAVE_MATCHED_RUN_PRESENT === "1",
+  matchedHostedRunPresent: process.env.RECALLWEAVE_MATCHED_HOSTED_RUN_PRESENT === "1",
   reviewerApprovalCount: Number(process.env.RECALLWEAVE_REVIEWER_APPROVAL_COUNT ?? 0),
-  recallWeaveWin: process.env.RECALLWEAVE_WIN === "1",
 };
 
 const serialized = `${JSON.stringify(result, null, 2)}\n`;
-assert.doesNotMatch(serialized, secretPattern, "baseline collector output contains a key-shaped secret");
-assert.doesNotMatch(serialized, privatePathPattern, "baseline collector output contains a private path");
+assert.doesNotMatch(serialized, secretPattern, "RecallWeave baseline output contains a key-shaped secret");
+assert.doesNotMatch(serialized, privatePathPattern, "RecallWeave baseline output contains a private path");
 
 if (outputPath) {
   const resolvedOutput = resolve(outputPath);
@@ -148,53 +151,47 @@ if (outputPath) {
 }
 process.stdout.write(serialized);
 
-async function collectLiveResponses({ queries, containerTag, searchMode, limit, threshold, rerank, timeoutMs }) {
-  const collected = new Map();
-  for (const query of queries) {
-    const started = performance.now();
-    const response = await fetch("https://api.supermemory.ai/v4/search", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${process.env.SUPERMEMORY_API_KEY}`,
-        "content-type": "application/json",
-        "user-agent": "recallweave-hosted-baseline-collector",
-      },
-      body: JSON.stringify({
-        q: query.q,
-        containerTag,
-        searchMode,
-        limit,
-        threshold,
-        rerank,
-      }),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (!response.ok) {
-      throw new Error(`Supermemory search failed for query ${query.id}: HTTP ${response.status}`);
-    }
-    const payload = await response.json();
-    collected.set(query.id, {
-      timing: Number(payload.timing ?? Math.round(performance.now() - started)),
-      total: Number(payload.total ?? payload.results?.length ?? 0),
-      results: Array.isArray(payload.results) ? payload.results : [],
-    });
-  }
-  return collected;
-}
-
-function loadFixtureResponses(inputPath) {
-  assert.ok(inputPath, "fixture responses path is required");
-  assert.ok(existsSync(inputPath), `fixture responses missing: ${displayPath(inputPath)}`);
-  const fixture = JSON.parse(readFileSync(inputPath, "utf8"));
+function loadResponses(inputPath, options) {
+  const raw = readFileSync(inputPath, "utf8");
+  assert.doesNotMatch(raw, secretPattern, `${displayPath(inputPath)} contains a key-shaped secret`);
+  assert.doesNotMatch(raw, privatePathPattern, `${displayPath(inputPath)} contains a private path`);
+  const envelope = JSON.parse(raw);
+  if (!options.fixture && !options.allowRawResponseText) assertNoRawResponseText(envelope);
   const responses = new Map();
-  for (const [queryId, response] of Object.entries(fixture.responses ?? {})) {
+  for (const [queryId, response] of Object.entries(envelope.responses ?? {})) {
     responses.set(queryId, response);
   }
-  return responses;
+  return { ...envelope, responses };
 }
 
-function scoreQuery(query, response) {
-  const results = normalizeResults(response.results ?? []);
+function assertNoRawResponseText(value, path = "$") {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoRawResponseText(item, `${path}[${index}]`));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  for (const [key, child] of Object.entries(value)) {
+    const nextPath = `${path}.${key}`;
+    if (["memory", "content", "chunk", "text", "raw", "rawText", "document"].includes(key) && typeof child === "string" && child.trim()) {
+      throw new Error(`${nextPath} contains raw response text; provide contentHash and estimatedTokens or set RECALLWEAVE_BASELINE_ALLOW_RAW_RESPONSE_TEXT=1 for local-only experiments`);
+    }
+    assertNoRawResponseText(child, nextPath);
+  }
+}
+
+function privacyFromEnvelope(envelope, fixture) {
+  return {
+    privacyLeakCount: fixture ? Number(envelope.privacyLeakCount ?? 0) : requiredNumber(envelope.privacyLeakCount, "privacyLeakCount"),
+    redactionFailureCount: fixture ? Number(envelope.redactionFailureCount ?? 0) : requiredNumber(envelope.redactionFailureCount, "redactionFailureCount"),
+    rawMemoryIncluded: fixture ? Boolean(envelope.rawMemoryIncluded ?? false) : requiredBoolean(envelope, "rawMemoryIncluded"),
+    rawTranscriptIncluded: fixture ? Boolean(envelope.rawTranscriptIncluded ?? false) : requiredBoolean(envelope, "rawTranscriptIncluded"),
+    rawPromptIncluded: fixture ? Boolean(envelope.rawPromptIncluded ?? false) : requiredBoolean(envelope, "rawPromptIncluded"),
+    rawAnswerIncluded: fixture ? Boolean(envelope.rawAnswerIncluded ?? false) : requiredBoolean(envelope, "rawAnswerIncluded"),
+  };
+}
+
+function scoreQuery(query, response, options) {
+  const results = normalizeResults(response.results ?? [], options);
   const expectedIds = new Set(query.expectedResultIds ?? []);
   const expectedHashes = new Set(query.expectedResultHashes ?? []);
   const expectedCount = expectedIds.size + expectedHashes.size;
@@ -212,14 +209,14 @@ function scoreQuery(query, response) {
     recallAt5: cap01(recallAt5),
     recallAt10: cap01(recallAt10),
     ndcgAt10: cap01(ndcgAt10),
-    latencyMs: Number(response.timing ?? 0),
+    latencyMs: Number(response.timing ?? response.latencyMs ?? 0),
     contextTokens: estimateContextTokens(results),
     fingerprint: {
       queryIdHash: shortHash(query.id),
       queryHash: shortHash(query.q),
       resultCount: results.length,
       total: Number(response.total ?? results.length),
-      latencyMs: Number(response.timing ?? 0),
+      latencyMs: Number(response.timing ?? response.latencyMs ?? 0),
       topResultIdHash: top?.id ? shortHash(top.id) : null,
       topResultContentHash: top?.contentHash ?? null,
       expectedCount,
@@ -231,14 +228,14 @@ function scoreQuery(query, response) {
   };
 }
 
-function normalizeResults(results) {
+function normalizeResults(results, options) {
   return results.map((result) => {
-    const text = String(result.memory ?? result.chunk ?? result.content ?? "");
+    const text = options.fixture || options.allowRawResponseText ? String(result.memory ?? result.chunk ?? result.content ?? result.text ?? "") : "";
     return {
       id: String(result.id ?? result.memoryId ?? result.chunkId ?? ""),
       similarity: Number(result.similarity ?? result.score ?? 0),
-      contentHash: text ? `sha256:${stableHash(text)}` : null,
-      estimatedTokens: estimateTokens(text),
+      contentHash: String(result.contentHash ?? result.hash ?? (text ? `sha256:${stableHash(text)}` : "")) || null,
+      estimatedTokens: Number(result.estimatedTokens ?? result.tokens ?? (text ? estimateTokens(text) : 0)),
     };
   });
 }
@@ -323,6 +320,10 @@ function git(args) {
   return result.status === 0 ? result.stdout.trim() : "unknown";
 }
 
+function fileHash(path) {
+  return stableHash(readFileSync(path, "utf8"));
+}
+
 function stableHash(value) {
   const text = typeof value === "string" ? value : JSON.stringify(value);
   return createHash("sha256").update(text).digest("hex");
@@ -330,12 +331,6 @@ function stableHash(value) {
 
 function shortHash(value) {
   return stableHash(String(value)).slice(0, 16);
-}
-
-function finiteNumber(value, label) {
-  const number = Number(value);
-  assert.ok(Number.isFinite(number), `${label} must be a finite number`);
-  return number;
 }
 
 function finiteNumberOrDefault(value, fallback) {
@@ -349,8 +344,15 @@ function positiveInt(value, label) {
   return number;
 }
 
-function parseBoolean(value) {
-  return ["1", "true", "yes", "on"].includes(String(value).toLowerCase());
+function requiredNumber(value, label) {
+  const number = Number(value);
+  assert.ok(Number.isFinite(number), `${label} must be present and finite`);
+  return number;
+}
+
+function requiredBoolean(value, label) {
+  assert.equal(typeof value[label], "boolean", `${label} must be present and boolean`);
+  return value[label];
 }
 
 function parseArgs(argv) {
@@ -359,7 +361,7 @@ function parseArgs(argv) {
     const item = argv[index];
     if (item === "--") continue;
     if (item.startsWith("--")) {
-      const key = toCamel(item.slice(2));
+      const key = item.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
       const next = argv[index + 1];
       if (!next || next.startsWith("--")) {
         parsed[key] = true;
@@ -370,8 +372,4 @@ function parseArgs(argv) {
     }
   }
   return parsed;
-}
-
-function toCamel(value) {
-  return value.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }

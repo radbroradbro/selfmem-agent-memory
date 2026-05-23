@@ -60,6 +60,10 @@ requirements are resolved.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`
   path that emits metrics and hashes only when live credentials are provided
   through the local environment.
+- RecallWeave baseline collector now gives agents a
+  `baseline:collect:recallweave` path that converts local metrics-only
+  search-response exports into matched result files and rejects raw response
+  text by default.
 - Baseline comparison now gives agents a `baseline:compare` gate that compares
   only aggregate hosted and RecallWeave result files, requires matched
   source-lock hashes, and blocks fixture inputs from public benchmark claims.

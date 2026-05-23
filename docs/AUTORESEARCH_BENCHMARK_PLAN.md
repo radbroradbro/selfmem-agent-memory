@@ -32,6 +32,8 @@ Run the hosted baseline preflight before any live comparison:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 ```
 
@@ -52,6 +54,11 @@ fields and source-lock hashes.
 After both result files exist, run the matched comparison gate:
 
 ```bash
+RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave \
+  -- --live --responses /tmp/recallweave-search-responses.json \
+  --output /tmp/recallweave-result.json
+
 npm exec --yes pnpm@10.23.0 -- baseline:compare \
   -- --hosted /tmp/recallweave-hosted-baseline-result.json \
   --recallweave /tmp/recallweave-result.json
@@ -61,6 +68,11 @@ The comparison gate is also metrics-only. It must report the same dataset
 slice, query-set hash, scoring-code hash, judge model, answer model, and
 harness flags before it can count as comparison evidence. `--fixture` always
 blocks public claims, even if the loaded files look real.
+
+The RecallWeave collector accepts a local search-response export with ids,
+scores, timings, token estimates, privacy counters, and content hashes. It
+rejects raw response text by default so a local run cannot quietly become a raw
+memory attachment.
 
 Allowed public wording after a win:
 

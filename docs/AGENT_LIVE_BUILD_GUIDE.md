@@ -243,7 +243,17 @@ contract and validation commands. The actual read-only collection command is:
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json
 ```
 
-After the matched RecallWeave result exists, compare the two aggregate files:
+Create the matched local result from a RecallWeave response export that has no
+raw memory text:
+
+```bash
+RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave \
+  -- --live --responses /tmp/recallweave-search-responses.json \
+  --output /tmp/recallweave-result.json
+```
+
+Then compare the two aggregate files:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:compare \
