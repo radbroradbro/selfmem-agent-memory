@@ -15,6 +15,7 @@ const discoveryPath = "/tmp/recallweave-hosted-baseline-discovery.json";
 const privateContainerMapPath = "/tmp/recallweave-hosted-container-map.private.jsonl";
 const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
 const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
+const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
 const evidencePacketPath = "/tmp/recallweave-baseline-evidence-packet.zip";
 
 const packet = {
@@ -35,6 +36,7 @@ const packet = {
     privateContainerMapPath,
     templatePath,
     querySetPath,
+    querySetReportPath,
     evidencePacketPath,
   },
   commands: [
@@ -64,6 +66,11 @@ const packet = {
       id: "validate-fixture-shape",
       description: "Validate parser and gate behavior without calling a hosted provider.",
       command: "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
+    },
+    {
+      id: "validate-query-set",
+      description: "Inspect the source-locked query set as hashes and counts only. This fails under --strict if any query is unlabeled.",
+      command: `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
     },
     {
       id: "collect-live-result",
@@ -175,6 +182,7 @@ const packet = {
     comparisonPath,
     preflightPath,
     discoveryPath,
+    querySetReportPath,
     evidencePacketPath,
   ],
   forbidden: [
@@ -241,6 +249,12 @@ function buildMarkdown() {
     "",
     "```text",
     querySetPath,
+    "```",
+    "",
+    "Validate the query set before either side collects results. The report prints hashes and counts only, and strict mode fails when any query lacks a relevance label.",
+    "",
+    "```bash",
+    `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
     "```",
     "",
     "Then run the read-only hosted collector. Set `SUPERMEMORY_API_KEY` in the local environment first; do not paste it into the command or any attachment.",
@@ -328,6 +342,7 @@ function buildMarkdown() {
     `- ${comparisonPath}`,
     `- ${preflightPath}`,
     `- ${discoveryPath}`,
+    `- ${querySetReportPath}`,
     `- ${evidencePacketPath}`,
     "",
     "## Pass Criteria",
@@ -347,6 +362,7 @@ function packetAcceptanceLines() {
     "- no raw memory, transcript, prompt, or answer text",
     "- same harness, dataset, judge, and answer model as the RecallWeave run",
     "- query-set and scoring-code hashes present",
+    "- query-set report is metrics-only and publicBenchmarkReady is true",
     "- every query has at least one expected result id or expected content hash",
     "- querySetEvidence.publicBenchmarkReady is true for both runs",
     "- baseline discovery output contains hashed container candidates only",

@@ -17,6 +17,7 @@ is rejected as real baseline evidence.
 
 - `packages/bench/hosted-baseline-preflight.mjs`
 - `packages/bench/hosted-baseline-collector.mjs`
+- `packages/bench/baseline-queryset-inspect.mjs`
 - `packages/bench/hosted-baseline-operator-packet.mjs`
 - `packages/bench/fixtures/hosted-baseline-queryset.fixture.json`
 - `packages/bench/fixtures/hosted-baseline-search-responses.fixture.json`
@@ -39,6 +40,7 @@ is rejected as real baseline evidence.
 node packages/bench/hosted-baseline-preflight.mjs
 node packages/bench/hosted-baseline-preflight.mjs --fixture
 node packages/bench/hosted-baseline-preflight.mjs --print-template
+node packages/bench/baseline-queryset-inspect.mjs
 node packages/bench/hosted-baseline-collector.mjs --fixture
 node packages/bench/hosted-baseline-operator-packet.mjs
 node packages/bench/hosted-baseline-operator-packet.mjs --format markdown
@@ -82,6 +84,16 @@ Collector fixture result:
 - includes `querySetEvidence.publicBenchmarkReady: true`.
 - fails closed if any query lacks both `expectedResultIds` and
   `expectedResultHashes`.
+
+Query-set inspect result:
+
+- `mode: baseline-queryset-inspect`
+- `metricsOnly: true`
+- `publicSafe: true`
+- `rawQueryIncluded: false`
+- `rawExpectedIdsIncluded: false`
+- `querySetEvidence.publicBenchmarkReady: true`
+- strict mode fails closed when any query is unlabeled.
 
 Operator packet result:
 

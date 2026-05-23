@@ -51,6 +51,8 @@ Share:
   hosted-baseline packet.
 - metrics-only `baseline:discover` output when choosing a hosted Supermemory
   baseline container.
+- metrics-only `baseline:queryset` output when proving a benchmark query set
+  is source-locked and relevance-labeled.
 - source-locked benchmark query-set summaries showing every query has at least
   one expected result id or expected content hash.
 

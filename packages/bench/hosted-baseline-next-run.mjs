@@ -80,6 +80,7 @@ const output = {
     "/tmp/recallweave-baseline-comparison.json",
     "/tmp/recallweave-hosted-baseline-preflight.json",
     "/tmp/recallweave-hosted-baseline-discovery.json",
+    "/tmp/recallweave-hosted-baseline-queryset-report.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
   ],
   forbidden: [
@@ -256,6 +257,7 @@ function commandsFor(status) {
   const privateContainerMapPath = "/tmp/recallweave-hosted-container-map.private.jsonl";
   const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
   const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
+  const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
   const commands = [
     {
@@ -287,6 +289,11 @@ function commandsFor(status) {
         "RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1",
         `npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output ${discoveryPath} --private-map-output ${privateContainerMapPath}`,
       ].join(" "),
+    });
+    commands.push({
+      id: "validate-query-set",
+      description: "Inspect the source-locked query set as hashes and counts only. This fails under --strict if any query is unlabeled.",
+      command: `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
     });
     commands.push({
       id: "collect-hosted-baseline",

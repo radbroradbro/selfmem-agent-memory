@@ -13,6 +13,9 @@ Scope:
   hosted source containers without exposing raw hosted labels or memory text.
 - The packet documents the optional private map flow and states that the
   private map stays local and must not be attached.
+- The packet now includes `baseline:queryset --strict` before collection so
+  operators can attach a metrics-only query-set report without exposing raw
+  query text or expected ids.
 - The packet now points operators to `baseline:collect -- --live`,
   `baseline:export:recallweave -- --live`,
   `baseline:collect:recallweave -- --live`, and `baseline:compare` instead of
@@ -28,6 +31,7 @@ Commands:
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:discover
+npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -54,6 +58,8 @@ Expected behavior:
 - It tells operators to run `baseline:compare` only after hosted and
   RecallWeave outputs share the same dataset, query-set hash, scoring-code
   hash, judge model, and answer model.
+- It tells operators to run `baseline:queryset --strict` and attach the
+  metrics-only query-set report, not the raw query file.
 - It tells operators every query must have at least one expected result id or
   expected content hash, and that `querySetEvidence.publicBenchmarkReady` must
   be true for both hosted and RecallWeave results.
@@ -66,6 +72,7 @@ Expected behavior:
   - `/tmp/recallweave-hosted-baseline-result.json`
   - `/tmp/recallweave-hosted-baseline-preflight.json`
   - `/tmp/recallweave-hosted-baseline-discovery.json`
+  - `/tmp/recallweave-hosted-baseline-queryset-report.json`
   - `/tmp/recallweave-result.json`
   - `/tmp/recallweave-baseline-comparison.json`
   - `/tmp/recallweave-baseline-evidence-packet.zip`

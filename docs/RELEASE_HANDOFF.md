@@ -117,6 +117,11 @@ container candidates only. To recover the raw label locally, set
 `RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1` and pass `--private-map-output`
 to a path outside the repository. The private map is local operator material,
 not reviewer or GitHub evidence.
+Use `baseline:queryset -- --queryset <path> --strict --output
+/tmp/recallweave-hosted-baseline-queryset-report.json` before either side
+collects results. The report is public-safe because it prints hashes and counts
+only, and strict mode fails if any query lacks an expected result id or content
+hash.
 Use `baseline:collect -- --live` for the read-only hosted search collection
 once `SUPERMEMORY_API_KEY` and the source-locked query-set environment are
 configured. It writes metrics and hashes only.

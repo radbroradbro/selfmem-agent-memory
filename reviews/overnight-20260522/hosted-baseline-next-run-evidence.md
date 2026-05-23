@@ -12,6 +12,9 @@ Scope:
   state into one state-aware next-run packet.
 - The planner now includes the same safe hosted-container discovery and
   private-map opt-in flow as the operator packet.
+- The planner now includes `validate-query-set`, which runs
+  `baseline:queryset --strict` and writes a metrics-only query-set report before
+  hosted or local collection.
 - It calls no hosted provider, writes no files, and never authorizes public
   benchmark claims or public launch.
 
@@ -49,9 +52,9 @@ Expected behavior:
 - Fixture evidence can validate parser behavior but cannot close the hosted
   baseline blocker.
 - The command plan includes hosted container discovery, optional local-only
-  private map creation, hosted collection, hosted validation, RecallWeave
-  export, RecallWeave aggregate collection, matched comparison, and strict-real
-  evidence packaging.
+  private map creation, query-set validation, hosted collection, hosted
+  validation, RecallWeave export, RecallWeave aggregate collection, matched
+  comparison, and strict-real evidence packaging.
 - Acceptance criteria require every query to have at least one expected result
   id or expected content hash, with `querySetEvidence.publicBenchmarkReady`
   true for both result files.

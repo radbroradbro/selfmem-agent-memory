@@ -34,6 +34,7 @@ Run the hosted baseline preflight before any live comparison:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -54,6 +55,11 @@ The fixture path proves that the result shape is parseable. It must never count
 as hosted baseline evidence, even if all metrics fields are present. Use
 `--print-template` before live collection so the agent writes only aggregate
 fields and source-lock hashes.
+
+Use `baseline:queryset -- --queryset <path> --strict --output <report>` on the
+frozen query file before either collector runs. The report must be metrics-only
+and public-safe: hashes, counts, readiness flags, and no raw query text or
+expected-result identifiers.
 
 After both result files exist, run the matched comparison gate:
 

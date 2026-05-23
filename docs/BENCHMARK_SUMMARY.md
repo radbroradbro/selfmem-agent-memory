@@ -13,6 +13,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 npm exec --yes pnpm@10.23.0 -- baseline:discover
+npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
@@ -30,6 +31,11 @@ who need the raw label can opt into a local-only private map with
 `RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1` and `--private-map-output`, then
 copy the selected label into `RECALLWEAVE_BASELINE_CONTAINER` on that machine.
 Do not attach the private map to public evidence.
+
+`baseline:queryset` inspects the source-locked query set before either side
+collects results. It emits hashes and counts only, marks whether every query is
+labeled, and fails under `--strict` if any query lacks an expected result id or
+content hash.
 
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents
