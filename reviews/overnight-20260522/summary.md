@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `4aa363d`, run `26323255585`, success.
+  `6c44714`, run `26323533153`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -73,6 +73,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26322830311` on `0c88125`: success after rerun
   attempt 2.
 - GitHub Actions CI run `26323255585` on `4aa363d`: success.
+- GitHub Actions CI run `26323533153` on `6c44714`: success.
 
 ## Shipped Overnight Slices
 
@@ -221,6 +222,11 @@ Latest local verification before this summary:
   public claims remain disabled by default, clean consumer smoke includes the
   planner, and Gemini review returned `CLEAN`. GitHub Actions CI run
   `26323255585` passed on `4aa363d`.
+- Release blocker doctor real-canary blocker verification: the doctor now
+  reports human approval, hosted baseline, and fresh real-agent canary blockers
+  in the same report, fixture canary output cannot count as real rollout
+  evidence, and Gemini review returned `CLEAN`. GitHub Actions CI run
+  `26323533153` passed on `6c44714`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
   `103e7c6`, run `26290534116`.
 - GitHub Actions CI: success on guarded selected local-container browse commit

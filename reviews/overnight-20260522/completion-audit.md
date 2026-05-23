@@ -100,6 +100,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   rerun attempt 2
 - Hosted baseline next-run planner gate: `4aa363d`, CI run `26323255585`
   passed
+- Release blocker doctor real-canary blocker gate: `6c44714`, CI run
+  `26323533153` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -108,7 +110,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `4aa363d` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `6c44714` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
@@ -194,7 +196,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Brain UI current-head live browser evidence | `reviews/overnight-20260522/brain-ui-current-head-live-evidence.md`, `reviews/overnight-20260522/ui-evidence/brain-ui-current-head-live-evidence.json`, and screenshot evidence from `8777290` | Proven locally and in CI run `26316074705`; the refreshed slice includes lifecycle trail, lifecycle event card, retrieval trace card, and `on_pre_compress` fixture checks |
 | Brain UI static evidence fallback gate | `packages/bench/release-readiness-check.mjs` now requires the static evidence script, package script, and review evidence, and runs the static check before live server-backed Brain UI smoke | Proven locally; live server-backed checks can still fail independently |
 | Clean consumer smoke release gate | `packages/bench/release-readiness-check.mjs` now requires the clean consumer smoke script, evidence, Gemini review, release-doc references, and a fresh consumer-style checkout run | Proven locally |
-| Release blocker doctor gate | `packages/bench/release-readiness-check.mjs` now requires `packages/bench/release-blocker-doctor.mjs`, release blocker evidence, Gemini review evidence, release-doc references, and a fresh conservative blocker-doctor run | Proven locally and in CI run `26307335652` |
+| Release blocker doctor gate | `packages/bench/release-readiness-check.mjs` now requires `packages/bench/release-blocker-doctor.mjs`, release blocker evidence, Gemini review evidence, release-doc references, and a fresh conservative blocker-doctor run that reports human approval, hosted baseline, and fresh real-canary blockers | Proven locally and in CI runs `26307335652` and `26323533153` |
 | GitHub handoff packet gate | `packages/bench/release-readiness-check.mjs` now requires `packages/bench/github-handoff-packet.mjs`, release handoff evidence, Gemini review evidence, release-doc references, and a fresh generated packet run | Proven locally and in CI runs `26308475033` and `26308588261` |
 | GitHub live sync gate | `packages/bench/github-live-sync-check.mjs`, `reviews/overnight-20260522/github-live-sync-evidence.md`, and `release:github-sync` | Proven locally: PR #5 and issue #6 match the checked-in public-safe drafts, and output is hashes/booleans only |
 | GitHub Actions | CI run `26304465466` on `e043d6b` passed Test, Full smoke, and Release readiness check | Proven |

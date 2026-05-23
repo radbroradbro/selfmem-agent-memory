@@ -31,7 +31,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `4aa363dcb6e95e3f3a3e94d9b5297bca639211e8`.
+- Latest code/product baseline: `6c44714e5af4bc578f50070c51d40201303ad6c4`.
+- GitHub Actions run `26323533153`: passed CI after the release blocker doctor
+  real-canary blocker gate.
+- Previous verified code baseline before the release blocker doctor
+  real-canary blocker gate: `4aa363dcb6e95e3f3a3e94d9b5297bca639211e8`.
 - GitHub Actions run `26323255585`: passed CI after the hosted baseline
   next-run planner gate.
 - Previous verified code baseline before the hosted baseline next-run planner
