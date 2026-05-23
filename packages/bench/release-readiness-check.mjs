@@ -32,6 +32,7 @@ const requiredFiles = [
   "packages/bench/canary-evidence-packet-review.mjs",
   "packages/bench/canary-returned-packet-intake.mjs",
   "packages/bench/canary-returned-inbox.mjs",
+  "packages/bench/canary-returned-watch.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/canary-next-agent-plan.mjs",
   "packages/bench/canary-next-agent-packet.mjs",
@@ -362,6 +363,7 @@ const requiredScripts = [
   "canary:packet:review",
   "canary:returned-packet",
   "canary:returned-inbox",
+  "canary:returned-watch",
   "canary:batch-audit",
   "canary:next-agent",
   "canary:next-agent-packet",
@@ -1911,6 +1913,62 @@ check("fresh returned canary inbox scanner passes", () => {
     for (const text of [defaultRun.stdout, inboxRun.stdout, requiredRun.stdout, evidence]) {
       assert.doesNotMatch(text, secretPattern);
       assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+    }
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+check("fresh returned canary inbox watcher passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-canary-watch-check-"));
+  try {
+    const handoffPacketPath = join(tempRoot, "recallweave-openclaw-handoff-packet.zip");
+    const outputPath = join(tempRoot, "returned-watch.json");
+    run("node", [
+      "packages/bench/canary-next-agent-packet.mjs",
+      "--output",
+      handoffPacketPath,
+    ]);
+    const defaultRun = run("node", ["packages/bench/canary-returned-watch.mjs"]);
+    const watchRun = run("node", [
+      "packages/bench/canary-returned-watch.mjs",
+      "--input-root",
+      tempRoot,
+      "--include-all-zips",
+      "--iterations",
+      "1",
+      "--output",
+      outputPath,
+    ]);
+    const requiredRun = spawnSync("node", [
+      "packages/bench/canary-returned-watch.mjs",
+      "--input-root",
+      tempRoot,
+      "--include-all-zips",
+      "--require-found",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const defaultReport = JSON.parse(defaultRun.stdout);
+    const watchReport = JSON.parse(watchRun.stdout);
+    const outputReport = JSON.parse(readFileSync(outputPath, "utf8"));
+    const requiredReport = JSON.parse(requiredRun.stdout);
+    assert.equal(defaultReport.mode, "canary-returned-watch");
+    assert.equal(defaultReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+    assert.equal(watchReport.mode, "canary-returned-watch");
+    assert.equal(watchReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+    assert.equal(watchReport.counts.handoffPackets, 1);
+    assert.equal(watchReport.counts.productionEvidencePackets, 0);
+    assert.equal(outputReport.mode, "canary-returned-watch");
+    assert.notEqual(requiredRun.status, 0, "watcher must fail closed with --require-found when no production canary exists");
+    assert.equal(requiredReport.ok, false);
+    assert.equal(requiredReport.requireFound, true);
+    for (const text of [defaultRun.stdout, watchRun.stdout, requiredRun.stdout]) {
+      assert.doesNotMatch(text, secretPattern);
+      assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+      assert.doesNotMatch(text, /recallweave-openclaw-handoff-packet\.zip/);
     }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });

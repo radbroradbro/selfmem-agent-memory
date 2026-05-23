@@ -22,6 +22,9 @@ node --check packages/bench/goal-completion-audit.mjs
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <mixed-temp-folder> --include-all-zips
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --require-production-canary
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <mixed-temp-folder> --include-all-zips --iterations 1
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <mixed-temp-folder> --include-all-zips --require-found
 ```
 
 ## Results
@@ -42,6 +45,9 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --require-production-can
   redacted from the failure reason.
 - Output preserved `publicLaunchAllowed: false` and `fleetRolloutAllowed:
   false`.
+- `canary:returned-watch` wraps the inbox scanner for repeated supervision. It
+  reports aggregate counts per watched folder, keeps labels hash-redacted, and
+  fails closed with `--require-found` when no production canary packet exists.
 - Controller follow-up on the current local incoming folders found no returned
   production canary packet. One broad folder contained handoff packets only;
   the Telegram download folder contained no returned canary evidence. Candidate

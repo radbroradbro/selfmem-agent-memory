@@ -41,3 +41,4 @@ prompts, raw answers, raw memories, credentials, or private paths.
 
 - `claude-opus-blocked-by-hooks.md`
 - `reviewer-findings.md`
+- `returned-canary-watch-findings.md`

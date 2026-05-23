@@ -316,11 +316,20 @@ add `--expose-labels` only for a local operator-only review:
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --output /tmp/recallweave-returned-canary-inbox.json
 ```
 
+To poll one or more returned-zip folders without exposing candidate filenames,
+use the watcher. It exits successfully while waiting unless `--require-found`
+is set:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --iterations 1 --output /tmp/recallweave-returned-canary-watch.json
+```
+
 For release evidence, require a strict production canary:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --require-found --output /tmp/recallweave-returned-canary-watch.json
 ```
 
 This intake command does not read raw memories. It accepts only the metrics-only

@@ -513,11 +513,20 @@ for local operator-only review:
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --output /tmp/recallweave-returned-canary-inbox.json
 ```
 
+For repeated supervision, use the watcher. It keeps candidate filenames
+hash-redacted and exits successfully while waiting unless `--require-found` is
+set:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --iterations 1 --output /tmp/recallweave-returned-canary-watch.json
+```
+
 For a release-blocking check, require production-grade evidence:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --require-found --output /tmp/recallweave-returned-canary-watch.json
 ```
 
 The command fails closed unless the returned packet is non-fixture,
