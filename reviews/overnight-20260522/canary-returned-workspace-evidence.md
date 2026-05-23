@@ -23,9 +23,16 @@ promotion.
 
 ```bash
 node --check packages/bench/canary-returned-workspace.mjs
+node packages/bench/canary-returned-workspace.mjs
 node packages/bench/canary-returned-workspace.mjs --workspace <temp-workspace> --output <temp-summary.json>
 node packages/bench/canary-returned-workspace.mjs --workspace <temp-workspace> --require-production-canary
 ```
+
+When no returned packet is supplied, the helper generates a fixture packet and
+writes fixture workspace files to a temporary directory by default. This keeps
+routine fixture verification from creating review-workspace files that could be
+mistaken for returned operator evidence. When `--packet` is supplied, the
+default workspace remains `reviews/overnight-20260522/next-agent-workspace/`.
 
 ## Fixture Result
 
@@ -51,3 +58,23 @@ node packages/bench/canary-returned-workspace.mjs --workspace <temp-workspace> -
   local paths, private container names, and unredacted diagnostics remain
   forbidden.
 - Fixture packets never count as production canary evidence.
+
+## Recheck 2026-05-23T20:17Z
+
+- `node --check packages/bench/canary-returned-workspace.mjs`: passed.
+- `node packages/bench/canary-returned-workspace.mjs --output
+  /tmp/recallweave-returned-workspace-default-smoke.json`: passed, used a
+  temporary default workspace for the generated fixture packet, and did not
+  leave files in `reviews/overnight-20260522/next-agent-workspace/`.
+- `node packages/bench/canary-returned-workspace.mjs --workspace
+  /tmp/recallweave-returned-workspace-check --output
+  /tmp/recallweave-returned-workspace-check.json`: passed and reported
+  `countsAsProductionCanaryEvidence: false`.
+- `node packages/bench/canary-returned-workspace.mjs --workspace
+  /tmp/recallweave-returned-workspace-required
+  --require-production-canary`: exited nonzero, as expected, because the
+  generated fixture packet is not production canary evidence.
+- `npm exec --yes pnpm@10.23.0 -- release:check`: passed, including the fresh
+  returned canary workspace generator subcheck.
+- `npm exec --yes pnpm@10.23.0 -- release:github-sync`: passed after the PR
+  branch was fast-forwarded to include the returned-workspace helper.

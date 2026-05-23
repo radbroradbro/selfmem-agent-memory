@@ -682,6 +682,63 @@ fresh Brain UI replay, shell or CI GitHub live sync, human owner approval,
 fresh metrics-only hosted baseline evidence, and one non-fixture real-agent
 canary that passes strict intake.
 
+## Automation Recheck 2026-05-23T20:17Z
+
+Verdict remains: FAIL.
+
+This recheck used the active PR/readiness worktree on
+`automation/recallweave-post12h-readiness-review-20260523-b68d`. The actual
+PR #5 branch, `feat/nucleus-wiki-native-contract`, was fast-forwarded to
+include the returned-workspace helper so the live PR code matches the
+checked-in PR body. The GitHub live-sync check passed after that fast-forward:
+PR #5 is open, issue #6 is open, the expected PR head branch matches, and the
+live PR/issue text matches the checked-in public-safe drafts by hash.
+
+Small cleanup applied in this run:
+
+- `packages/bench/canary-returned-workspace.mjs` now writes generated fixture
+  workspace files to a temporary workspace by default when no returned packet is
+  supplied. A real returned packet still defaults to
+  `reviews/overnight-20260522/next-agent-workspace/`. This avoids leaving
+  fixture-generated maintainer notes in the review workspace where they could
+  be mistaken for returned operator evidence.
+- `reviews/overnight-20260522/canary-returned-workspace-evidence.md` now
+  documents that default behavior and the 2026-05-23T20:17Z recheck.
+
+Fresh checks passed in this recheck:
+
+- `node --check packages/bench/canary-returned-workspace.mjs`
+- `node packages/bench/canary-returned-workspace.mjs --output
+  /tmp/recallweave-returned-workspace-default-smoke.json`: passed, used a
+  temporary default workspace for the generated fixture packet, and left
+  `reviews/overnight-20260522/next-agent-workspace/` clean.
+- `node packages/bench/canary-returned-workspace.mjs --workspace
+  /tmp/recallweave-returned-workspace-check --output
+  /tmp/recallweave-returned-workspace-check.json`
+- `node packages/bench/canary-returned-workspace.mjs --workspace
+  /tmp/recallweave-returned-workspace-required
+  --require-production-canary`: exited nonzero as expected for fixture input
+- `npm exec --yes pnpm@10.23.0 -- release:check`: passed, including the fresh
+  returned canary workspace generator, consumer smoke, release doctor, GitHub
+  live sync, goal audit, secret scan, and forbidden runtime file scan
+- `npm exec --yes pnpm@10.23.0 -- release:doctor`: passed with
+  `publicLaunchAllowed: false` and `productionReady: false`
+- `npm exec --yes pnpm@10.23.0 -- release:github-sync`: passed after the PR
+  branch fast-forward
+- `npm exec --yes pnpm@10.23.0 -- goal:audit`: `goalComplete: false`,
+  `mayCallUpdateGoalComplete: false`
+- `git diff --check`
+
+Fresh checks not rerun in this recheck:
+
+- Browser screenshot replay was not recaptured. The earlier checked-in Brain UI
+  evidence remains the current UI evidence for this PR.
+- Claude/Gemini reviewer routes were not rerun. Earlier blocked/completed
+  reviewer evidence remains the current reviewer evidence for this PR.
+
+The public launch blocker is narrower than earlier runs, but it is still real:
+owner approval and one non-fixture production canary remain unresolved.
+
 ## Readiness Grades
 
 | Area | Grade | Reason |
