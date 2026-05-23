@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T05:07:57Z",
+  "generatedAt": "2026-05-23T05:21:03Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "1d8375a8dbcc9027d48d7e6821ff24d99fcdb916",
-    "ciRunId": 26324201679,
+    "headSha": "8f5910d49a6f1fe4d8967e014c5dd8e1df3e7b6e",
+    "ciRunId": 26324442965,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the mixed canary diagnostic batch triage extension. GitHub Actions run 26324201679 passed CI on 1d8375a. Local test, smoke, release:check, release:doctor, goal:audit, clean consumer smoke, GitHub live sync, Gemini review, and secret scans passed."
+    "note": "This is the latest inspected code/product baseline after the real OpenClaw next-agent handoff and CI read-permission fix. GitHub Actions run 26324442965 passed CI on 8f5910d. Local release:check, release:doctor, goal:audit, GitHub live sync, diff check, and staged secret/private-path scans passed; the preceding full smoke passed for the handoff slice before the CI-only permission fix."
   },
   "releaseStateGuard": {
     "enabled": true,
