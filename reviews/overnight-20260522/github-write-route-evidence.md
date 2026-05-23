@@ -92,6 +92,9 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after adding the current MemoryBench source
     lock, optional checkout hash verification, and machine-readable source-lock
     evidence. Updated at: 2026-05-23T23:23:44Z.
+  - The PR body was refreshed again after GitHub Actions run `26346310930`
+    passed on `9de4ebd` and the release-state baseline was promoted.
+    Updated at: 2026-05-23T23:28:03Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -116,9 +119,10 @@ Verdict: resolved for PR body and blocker issue writes.
     validator refresh, latest public benchmark target CI baseline refresh,
     current OpenClaw Downloads handoff packet refresh, public benchmark target
     author/source-lock attestation refresh, and MemoryBench source-lock
-    checkout verification refresh
-  - Updated at: 2026-05-23T23:23:43Z
-  - Body length: 24153
+    checkout verification refresh, latest MemoryBench source-lock CI baseline
+    refresh
+  - Updated at: 2026-05-23T23:28:03Z
+  - Body length: 24319
 
 ## Safety
 

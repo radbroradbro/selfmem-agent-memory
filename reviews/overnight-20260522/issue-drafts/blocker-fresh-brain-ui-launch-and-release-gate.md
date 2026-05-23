@@ -10,10 +10,10 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
-  `90b6bc953b6ebc125311838238e8f80d8603665f`.
-- GitHub Actions run `26345383489` passed CI after adding the public benchmark
-  target validator for source-locked memory benchmarks, same judge model, and
-  same answer model comparability.
+  `9de4ebd1b792092b30d0d6cd8100fc8a791d1bba`.
+- GitHub Actions run `26346310930` passed CI after adding the current
+  MemoryBench source lock, optional checkout hash verification, and
+  machine-readable source-lock evidence.
 - Previous verified code/product baseline before public benchmark target
   gating:
   `67993f1d9eab7742ae70841d38ad9cd14021982c`.
@@ -95,6 +95,9 @@ requirements are resolved.
 - GitHub Actions run `26345383489` passed CI after adding the public benchmark
   target validator for source-locked memory benchmarks, same judge model, and
   same answer model comparability.
+- GitHub Actions run `26346310930` passed CI after adding the current
+  MemoryBench source lock, optional checkout hash verification, and
+  machine-readable source-lock evidence.
 - Current benchmark plan now separates the public benchmark target lane from
   hosted Supermemory parity. The autoresearch loop can compare RecallWeave
   canary results to reported leaderboard/provider stats when hosted

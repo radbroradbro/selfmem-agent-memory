@@ -6,14 +6,14 @@ Date: 2026-05-23
 
 This refresh updates the checked-in release state, PR body draft, and blocker
 issue draft so the latest verified code/product baseline matches the current PR
-head after the returned-workspace helper, fixture-workspace cleanup, and
-post-12h readiness recheck.
+head after the MemoryBench source-lock lane, optional checkout hash
+verification, and source-lock evidence refresh.
 
 ## Verified Head
 
-- Commit: `daac851d031d5a2a8c95a307aa7db2a6d2d00762`
-- Commit title: `docs: record post12h readiness recheck`
-- GitHub Actions run: `26342589049`
+- Commit: `9de4ebd1b792092b30d0d6cd8100fc8a791d1bba`
+- Commit title: `docs: refresh benchmark source-lock sync evidence`
+- GitHub Actions run: `26346310930`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -32,18 +32,20 @@ evidence-only refresh:
 ## Reviewer
 
 Gemini previously ran a focused cold review for the source-match
-private-path-redaction baseline refresh. This 2026-05-23T20:21Z refresh was
-validated by local release gates and CI, but the external reviewer route was
-not rerun.
+private-path-redaction baseline refresh. A focused Codex reviewer also checked
+the MemoryBench source-lock hardening and found no blockers. This
+2026-05-23T23:26Z refresh was validated by local release gates and CI, but the
+external Gemini reviewer route was not rerun.
 
 - Route: `gemini --skip-trust --approval-mode plan`.
-- Verdict: previous `CLEAN`, not a new approval for this refresh.
+- Verdict: previous `CLEAN`; focused Codex reviewer found no blocker on the
+  source-lock checkout verifier.
 - Evidence:
   `reviews/overnight-20260522/gemini-current-verified-baseline-refresh-review.md`.
 - Current findings: the release-state, PR draft, blocker issue draft, and
   refresh evidence accurately name commit
-  `daac851d031d5a2a8c95a307aa7db2a6d2d00762` and GitHub Actions run
-  `26342589049`, preserve `productionReady: false` and public launch verdict
+  `9de4ebd1b792092b30d0d6cd8100fc8a791d1bba` and GitHub Actions run
+  `26346310930`, preserve `productionReady: false` and public launch verdict
   `FAIL`, keep the human and real-canary blockers, and do not include raw
   memories, transcripts, prompts, answers, credentials, private local paths, or
   key-shaped secrets.
