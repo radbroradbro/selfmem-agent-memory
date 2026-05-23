@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T09:22:00Z",
+  "generatedAt": "2026-05-23T09:36:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -84,6 +84,7 @@
     "hosted-baseline-discovery",
     "hosted-baseline-live-discovery",
     "hosted-baseline-container-select",
+    "hosted-baseline-queryset-author",
     "hosted-baseline-collector",
     "recallweave-response-export",
     "recallweave-baseline-collector",
@@ -167,6 +168,14 @@
       "route": "gemini embedded public-safe slice review",
       "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-container-select-review.md",
       "completedAt": "2026-05-23T09:20:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "hostedBaselineQuerySetAuthor": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-queryset-author-review.md",
+      "completedAt": "2026-05-23T09:36:00Z",
       "countsAsPublicLaunchApproval": false
     },
     "hostedBaselineNextRunRequireReady": {

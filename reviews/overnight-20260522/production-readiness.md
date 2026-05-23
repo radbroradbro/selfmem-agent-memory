@@ -371,6 +371,9 @@ evidence for:
 - hosted baseline operator packet evidence with attach-only aggregate JSON
   outputs, env-only credential handling, no hosted provider call, and Gemini
   `CLEAN` review.
+- hosted baseline query-set author evidence with fixture and bounded live smoke
+  coverage, private 0600 query-set output outside the repository, public counts
+  and hashes only, strict query-set inspection, and Gemini `CLEAN` review.
 - canary evidence intake evidence with `fixtureOnly: true`,
   `countsAsRealRolloutEvidence: false`, lifecycle coverage, hybrid search
   coverage, local write observation, read-through mode, p50/p95 latency,
@@ -460,7 +463,7 @@ Passed locally in this automation environment:
 - `npm run canary:diagnose`
 - `npm run goal:audit`: `goalComplete: false`
 - `npm run release:handoff`
-- `npm_config_cache=/private/tmp/npm-cache npm pack --dry-run
+- `npm_config_cache=/tmp/npm-cache npm pack --dry-run
   ./packages/core`
 - `node --check packages/bench/release-readiness-check.mjs`
 - `git diff --check`
@@ -544,7 +547,7 @@ Fresh checks passed in this rerun:
   `mayCallUpdateGoalComplete: false`
 - `npm run release:handoff`
 - `git diff --check`
-- `npm_config_cache=/private/tmp/npm-cache npm pack --dry-run` from
+- `npm_config_cache=/tmp/npm-cache npm pack --dry-run` from
   `packages/core`
 
 Fresh checks blocked or failed in this rerun:
@@ -595,7 +598,7 @@ Current launch blockers after this rerun:
 Verdict remains: FAIL.
 
 This recheck used the existing writable PR worktree at
-`/private/tmp/selfmem-agent-memory-publish` on
+`/tmp/selfmem-agent-memory-publish` on
 `automation/recallweave-post12h-readiness-rerun-20260523`. GitHub connector
 inspection found PR #5 open, not draft, mergeable, with head
 `aedb81ab3a61ec7c70e3ac7cd07e8085637d5ea3`. The connector reported read-only
@@ -643,7 +646,7 @@ Fresh checks passed in this recheck:
 - `npm run baseline:packet`
 - `npm run goal:audit`
 - `npm run release:handoff`
-- `npm_config_cache=/private/tmp/npm-cache npm pack --dry-run ./packages/core`
+- `npm_config_cache=/tmp/npm-cache npm pack --dry-run ./packages/core`
 - `git diff --check`
 
 Fresh checks blocked or failed in this recheck:

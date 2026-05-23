@@ -13,6 +13,8 @@ npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 npm exec --yes pnpm@10.23.0 -- baseline:discover
+npm exec --yes pnpm@10.23.0 -- baseline:select-container
+npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
@@ -33,6 +35,12 @@ run `baseline:select-container` to write the selected label into a local-only
 0600 env file without printing it. Source that env file on the operator machine
 before collection. Do not attach the private map or private env file to public
 evidence.
+
+`baseline:author-queryset` can draft a private, review-required query set from
+the selected hosted container. It writes the private query set outside the
+repository with 0600 permissions and prints only counts and hashes. The draft
+does not count as benchmark evidence until a human reviews it locally and
+`baseline:queryset --strict` reports that every query is labeled.
 
 The latest live discovery on 2026-05-23 found 4 hashed candidate containers
 across 100 hosted documents, with no raw labels or memory text in the report.

@@ -35,6 +35,9 @@ The current PR adds:
   is reviewed;
 - a read-only hosted baseline collector that emits aggregate metrics and hashes
   only after explicit live opt-in and local environment credentials;
+- a private hosted baseline query-set author that drafts review-required query
+  sets from a selected hosted container while public output stays counts and
+  hashes only;
 - a matched baseline comparison gate that blocks public claims unless hosted
   and RecallWeave result files are non-fixture, source-matched, privacy-clean,
   and reviewer-approved;
@@ -152,6 +155,9 @@ Latest verified head before this draft refresh:
 - Hosted baseline selector: `baseline:select-container` converts a hashed
   hosted candidate plus local-only private map into a 0600 private env file
   without printing the raw label
+- Hosted baseline query-set author: `baseline:author-queryset` drafts a private
+  review-required query set, prints no raw queries or expected ids, and keeps
+  the hosted-baseline blocker open until full matched results exist
 - Baseline evidence packet: `baseline:packet` creates a metrics-only hosted
   baseline reviewer zip and fails closed for fixture strict-real evidence
 - Canary evidence intake: `canary:intake` passes on the public fixture with

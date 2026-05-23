@@ -21,6 +21,7 @@ const privateContainerMapPath = "/tmp/recallweave-hosted-container-map.private.j
 const privateContainerEnvPath = "/tmp/recallweave-hosted-baseline.private.env";
 const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
 const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
+const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-author-report.json";
 const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
 const evidencePacketPath = "/tmp/recallweave-baseline-evidence-packet.zip";
 
@@ -43,6 +44,7 @@ const packet = {
     privateContainerEnvPath,
     templatePath,
     querySetPath,
+    querySetAuthorReportPath,
     querySetReportPath,
     evidencePacketPath,
   },
@@ -84,6 +86,18 @@ const packet = {
       id: "validate-fixture-shape",
       description: "Validate parser and gate behavior without calling a hosted provider.",
       command: "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
+    },
+    {
+      id: "author-private-query-set",
+      description: "Optional local-only step: draft a review-required private query set from the selected hosted container while printing only hashes and counts.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "npm exec --yes pnpm@10.23.0 -- baseline:author-queryset --",
+        `--live --discovery ${discoveryPath}`,
+        `--private-map ${privateContainerMapPath}`,
+        `--queryset-output ${querySetPath}`,
+        `--output ${querySetAuthorReportPath}`,
+      ].join(" "),
     },
     {
       id: "validate-query-set",
@@ -184,11 +198,13 @@ const packet = {
     "resultInspection.hasQuerySetHash is true",
     "resultInspection.hasScoringCodeHash is true",
     "querySetEvidence.publicBenchmarkReady is true",
+    "private query set, if auto-authored, was reviewed locally before collection",
     "every query has at least one expectedResultId or expectedResultHash",
     "resultInspection.hasCostLatency is true",
     "baseline discovery output contains hashed container candidates only",
     "private container map, if created, stays local and is not attached",
     "private env file, if created, stays local and is not attached",
+    "private query set, if created, stays local and is not attached",
     "matchedRecallWeaveRunPresent is true before comparison claims",
     "RecallWeave result provider is recallweave",
     "RecallWeave result shares dataset, query-set hash, scoring-code hash, judge model, and answer model",
@@ -201,6 +217,7 @@ const packet = {
     comparisonPath,
     preflightPath,
     discoveryPath,
+    querySetAuthorReportPath,
     querySetReportPath,
     evidencePacketPath,
   ],
@@ -218,6 +235,7 @@ const packet = {
     "raw RecallWeave response exports that contain memory text",
     "private container map",
     "private hosted baseline env file",
+    "private hosted baseline query set",
   ],
   operatorMessage: buildMarkdown(),
 };
@@ -275,7 +293,18 @@ function buildMarkdown() {
     `  --env-output ${privateContainerEnvPath}`,
     "```",
     "",
-    "Prepare a source-locked query set locally at this path:",
+    "Optionally draft a review-required private query set from the selected hosted container. The command prints only hashes and counts. Review the private file locally before collection, and do not attach it.",
+    "",
+    "```bash",
+    "RECALLWEAVE_BASELINE_LIVE=1 \\",
+    "npm exec --yes pnpm@10.23.0 -- baseline:author-queryset -- \\",
+    `  --live --discovery ${discoveryPath} \\`,
+    `  --private-map ${privateContainerMapPath} \\`,
+    `  --queryset-output ${querySetPath} \\`,
+    `  --output ${querySetAuthorReportPath}`,
+    "```",
+    "",
+    "Prepare or review the source-locked query set locally at this path:",
     "",
     "```text",
     querySetPath,
@@ -372,6 +401,7 @@ function buildMarkdown() {
     `- ${comparisonPath}`,
     `- ${preflightPath}`,
     `- ${discoveryPath}`,
+    `- ${querySetAuthorReportPath}`,
     `- ${querySetReportPath}`,
     `- ${evidencePacketPath}`,
     "",
@@ -379,7 +409,7 @@ function buildMarkdown() {
     "",
     ...packetAcceptanceLines(),
     "",
-    "Do not attach provider keys, raw hosted memories, raw local memories, raw RecallWeave response exports containing memory text, transcripts, prompts, answers, cookies, bearer tokens, private local paths, private container maps, private env files, or unredacted diagnostic archives.",
+    "Do not attach provider keys, raw hosted memories, raw local memories, raw RecallWeave response exports containing memory text, transcripts, prompts, answers, cookies, bearer tokens, private local paths, private container maps, private env files, private query sets, or unredacted diagnostic archives.",
   ].join("\n");
 }
 
@@ -413,11 +443,13 @@ function packetAcceptanceLines() {
     "- same harness, dataset, judge, and answer model as the RecallWeave run",
     "- query-set and scoring-code hashes present",
     "- query-set report is metrics-only and publicBenchmarkReady is true",
+    "- any auto-authored private query set was locally reviewed before collection",
     "- every query has at least one expected result id or expected content hash",
     "- querySetEvidence.publicBenchmarkReady is true for both runs",
     "- baseline discovery output contains hashed container candidates only",
     "- private container maps stay local and are not attached",
     "- private hosted baseline env files stay local and are not attached",
+    "- private hosted baseline query sets stay local and are not attached",
     "- matched RecallWeave result shares query-set and scoring-code hashes",
     "- cost and latency fields present",
     "- matched RecallWeave run, two reviewer approvals, and RecallWeave win before public comparison claims",

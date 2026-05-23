@@ -55,6 +55,7 @@ const requiredFiles = [
   "packages/bench/hosted-baseline-preflight.mjs",
   "packages/bench/hosted-baseline-discovery.mjs",
   "packages/bench/hosted-baseline-container-select.mjs",
+  "packages/bench/hosted-baseline-queryset-author.mjs",
   "packages/bench/baseline-scoring-contract.mjs",
   "packages/bench/baseline-queryset-inspect.mjs",
   "packages/bench/hosted-baseline-collector.mjs",
@@ -189,6 +190,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-hosted-baseline-discovery-review.md`,
   `${reviewDir}/hosted-baseline-container-select-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-container-select-review.md`,
+  `${reviewDir}/hosted-baseline-queryset-author-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-queryset-author-review.md`,
   `${reviewDir}/hosted-baseline-live-discovery.json`,
   `${reviewDir}/hosted-baseline-live-discovery-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-live-discovery-review.md`,
@@ -321,6 +324,7 @@ const requiredScripts = [
   "baseline:queryset",
   "baseline:discover",
   "baseline:select-container",
+  "baseline:author-queryset",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -1946,8 +1950,10 @@ check("fresh release blocker doctor passes", () => {
   const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
   assert.match(hostedBlocker.nextAction, /baseline:select-container/);
+  assert.match(hostedBlocker.nextAction, /baseline:author-queryset/);
   assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
   assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /baseline:author-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
   assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --require-ready/);
   assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--require-ready/.test(item)));
@@ -1961,6 +1967,10 @@ check("fresh hosted baseline preflight passes", () => {
   const selectedContainerEnvPath = join(collectorTmp, "hosted-baseline.private.env");
   const selectedContainerReportPath = join(collectorTmp, "hosted-baseline-container-select.json");
   const selectedContainerInsideRepoPath = join(root, ".tmp-hosted-baseline.private.env");
+  const authoredQuerySetPath = join(collectorTmp, "hosted-baseline-queryset.private.json");
+  const authoredQuerySetReportPath = join(collectorTmp, "hosted-baseline-queryset-author-report.json");
+  const authoredQuerySetInspectPath = join(collectorTmp, "hosted-baseline-authored-queryset-inspect.json");
+  const authoredQuerySetInsideRepoPath = join(root, ".tmp-hosted-baseline-queryset.private.json");
   const collectorResultPath = join(collectorTmp, "collector-result.json");
   const recallWeaveResultPath = join(collectorTmp, "recallweave-result.json");
   const recallWeaveExportPath = join(collectorTmp, "recallweave-export.json");
@@ -2032,6 +2042,36 @@ check("fresh hosted baseline preflight passes", () => {
       discoveryPrivateMapPath,
       "--env-output",
       selectedContainerInsideRepoPath,
+    ],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  const querySetAuthorResult = run("node", [
+    "packages/bench/hosted-baseline-queryset-author.mjs",
+    "--fixture",
+    "--queryset-output",
+    authoredQuerySetPath,
+    "--output",
+    authoredQuerySetReportPath,
+  ]);
+  const authoredQuerySetInspectResult = run("node", [
+    "packages/bench/baseline-queryset-inspect.mjs",
+    "--queryset",
+    authoredQuerySetPath,
+    "--strict",
+    "--output",
+    authoredQuerySetInspectPath,
+  ]);
+  const querySetAuthorInsideRepoResult = spawnSync(
+    "node",
+    [
+      "packages/bench/hosted-baseline-queryset-author.mjs",
+      "--fixture",
+      "--queryset-output",
+      authoredQuerySetInsideRepoPath,
     ],
     {
       cwd: root,
@@ -2233,6 +2273,8 @@ check("fresh hosted baseline preflight passes", () => {
   const discoveryReport = JSON.parse(discoveryResult.stdout);
   const privateMapDiscoveryReport = JSON.parse(privateMapDiscoveryResult.stdout);
   const containerSelectReport = JSON.parse(containerSelectResult.stdout);
+  const querySetAuthorReport = JSON.parse(querySetAuthorResult.stdout);
+  const authoredQuerySetInspectReport = JSON.parse(authoredQuerySetInspectResult.stdout);
   const fixtureReport = JSON.parse(fixtureResult.stdout);
   const templateReport = JSON.parse(templateResult.stdout);
   const collectorReport = JSON.parse(collectorResult.stdout);
@@ -2259,6 +2301,8 @@ check("fresh hosted baseline preflight passes", () => {
   const discoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-discovery-review.md"), "utf8");
   const containerSelectEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-container-select-evidence.md"), "utf8");
   const containerSelectGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-container-select-review.md"), "utf8");
+  const querySetAuthorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-queryset-author-evidence.md"), "utf8");
+  const querySetAuthorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-queryset-author-review.md"), "utf8");
   const liveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
   const liveDiscoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
   const liveDiscoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-discovery-review.md"), "utf8");
@@ -2347,6 +2391,36 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(containerSelectResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.notEqual(containerSelectInsideRepoResult.status, 0);
   assert.match(`${containerSelectInsideRepoResult.stderr}\n${containerSelectInsideRepoResult.stdout}`, /outside the repository/);
+  assert.equal(querySetAuthorReport.mode, "hosted-baseline-queryset-author");
+  assert.equal(querySetAuthorReport.fixtureOnly, true);
+  assert.equal(querySetAuthorReport.callsHostedProvider, false);
+  assert.equal(querySetAuthorReport.publicSafe, true);
+  assert.equal(querySetAuthorReport.metricsOnly, true);
+  assert.equal(querySetAuthorReport.rawLabelsIncluded, false);
+  assert.equal(querySetAuthorReport.rawQueryIncluded, false);
+  assert.equal(querySetAuthorReport.rawExpectedIdsIncluded, false);
+  assert.equal(querySetAuthorReport.rawExpectedHashesIncluded, false);
+  assert.equal(querySetAuthorReport.rawMemoryIncluded, false);
+  assert.equal(querySetAuthorReport.privateQuerySet?.written, true);
+  assert.equal(querySetAuthorReport.privateQuerySet?.mode, "0600");
+  assert.equal(querySetAuthorReport.privateQuerySet?.containsRawQueries, true);
+  assert.equal(querySetAuthorReport.privateQuerySet?.containsExpectedResultRefs, true);
+  assert.equal(querySetAuthorReport.privateQuerySet?.attachToPublicEvidence, false);
+  assert.equal(querySetAuthorReport.countsAsBenchmarkEvidence, false);
+  assert.equal(querySetAuthorReport.authoringReviewRequired, true);
+  assert.equal(querySetAuthorReport.querySetEvidence?.queryCount, 3);
+  assert.ok(Number(querySetAuthorReport.querySetEvidence?.minExpectedRefsPerQuery) >= 1);
+  assert.ok(querySetAuthorReport.querySetEvidence?.querySetHash?.startsWith("sha256:"));
+  assert.equal(statSync(authoredQuerySetPath).mode & 0o777, 0o600);
+  assert.equal(authoredQuerySetInspectReport.mode, "baseline-queryset-inspect");
+  assert.equal(authoredQuerySetInspectReport.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(authoredQuerySetInspectReport.querySetEvidence?.unlabeledQueryCount, 0);
+  assert.doesNotMatch(querySetAuthorResult.stdout, /fixture-personal|fixture-doc-alpha|fixture-doc-beta|fixture-doc-gamma/);
+  assert.doesNotMatch(readFileSync(authoredQuerySetReportPath, "utf8"), /fixture-personal|fixture-doc-alpha|fixture-doc-beta|fixture-doc-gamma/);
+  assert.doesNotMatch(querySetAuthorResult.stdout, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:/);
+  assert.doesNotMatch(readFileSync(authoredQuerySetReportPath, "utf8"), /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:/);
+  assert.notEqual(querySetAuthorInsideRepoResult.status, 0);
+  assert.match(`${querySetAuthorInsideRepoResult.stderr}\n${querySetAuthorInsideRepoResult.stdout}`, /outside the repository/);
   assert.equal(fixtureReport.resultInspection?.fixtureOnly, true);
   assert.deepEqual(fixtureReport.resultInspection?.failedResultChecks, ["not-fixture"]);
   assert.equal(fixtureReport.countsAsHostedBaselineEvidence, false);
@@ -2544,12 +2618,14 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.commands.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "author-private-query-set" && /baseline:author-queryset/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "print-template" && /baseline:preflight/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "collect-live-result" && /baseline:collect/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "package-baseline-evidence" && /baseline:packet/.test(item.command) && /--strict-real/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-live-result" && /RECALLWEAVE_BASELINE_NO_RAW_TEXT=1/.test(item.command)));
+  assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
   for (const command of operatorPacket.commands.map((item) => item.command).filter((command) => /baseline:(preflight|compare)/.test(command))) {
     if (/--fixture/.test(command)) continue;
@@ -2560,12 +2636,15 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.acceptanceCriteria.includes("reviewerApprovalCount is at least 2 before comparison claims"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("querySetEvidence.publicBenchmarkReady is true"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("every query has at least one expectedResultId or expectedResultHash"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("private query set, if auto-authored, was reviewed locally before collection"));
   assert.ok(operatorPacket.forbidden.includes("provider keys"));
   assert.ok(operatorPacket.forbidden.includes("private container map"));
+  assert.ok(operatorPacket.forbidden.some((item) => /private.*query set/i.test(item)));
   assert.match(operatorMarkdown.stdout, /RecallWeave Hosted Baseline Packet/);
   assert.match(operatorMarkdown.stdout, /baseline:discover/);
   assert.match(operatorMarkdown.stdout, /private raw-label map/i);
   assert.match(operatorMarkdown.stdout, /baseline:select-container/);
+  assert.match(operatorMarkdown.stdout, /baseline:author-queryset/);
   assert.match(operatorMarkdown.stdout, /baseline:queryset/);
   assert.match(operatorMarkdown.stdout, /baseline:export:recallweave/);
   assert.match(operatorMarkdown.stdout, /baseline:packet/);
@@ -2596,11 +2675,13 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "author-private-query-set" && /baseline:author-queryset/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "validate-query-set" && /baseline:queryset/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "collect-hosted-baseline" && /baseline:collect/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "compare-matched-results" && /baseline:compare/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "package-review-evidence" && /baseline:packet/.test(item.command)));
+  assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
   for (const command of nextRunPlan.commandPlan.map((item) => item.command).filter((command) => /baseline:(preflight|compare)/.test(command))) {
     if (/--fixture/.test(command)) continue;
@@ -2614,6 +2695,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(nextRunMarkdown.stdout, /baseline:next-run/);
   assert.match(nextRunMarkdown.stdout, /baseline:discover/);
   assert.match(nextRunMarkdown.stdout, /baseline:select-container/);
+  assert.match(nextRunMarkdown.stdout, /baseline:author-queryset/);
   assert.match(nextRunMarkdown.stdout, /private container maps/i);
   assert.notEqual(nextRunRequireReadyFixture.status, 0);
   assert.equal(nextRunRequireReadyFixtureReport.ok, false);
@@ -2668,6 +2750,11 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(containerSelectEvidence, /Private env mode:\s*`0600`/i);
   assert.match(containerSelectEvidence, /Raw labels included.*no/i);
   assert.match(containerSelectGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(querySetAuthorEvidence, /hosted baseline query-set author/i);
+  assert.match(querySetAuthorEvidence, /baseline:author-queryset/i);
+  assert.match(querySetAuthorEvidence, /Private query set mode:\s*`0600`/i);
+  assert.match(querySetAuthorEvidence, /Raw queries included.*no/i);
+  assert.match(querySetAuthorGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
   assert.equal(liveDiscoveryReport.mode, "hosted-baseline-discovery");
   assert.equal(liveDiscoveryReport.fixtureOnly, false);
   assert.equal(liveDiscoveryReport.callsHostedProvider, true);
@@ -2724,6 +2811,12 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(containerSelectGeminiReview, secretPattern);
   assert.doesNotMatch(containerSelectEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(containerSelectGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(querySetAuthorResult.stdout, secretPattern);
+  assert.doesNotMatch(querySetAuthorResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(querySetAuthorEvidence, secretPattern);
+  assert.doesNotMatch(querySetAuthorGeminiReview, secretPattern);
+  assert.doesNotMatch(querySetAuthorEvidence, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(querySetAuthorGeminiReview, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), secretPattern);
   assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(liveDiscoveryEvidence, secretPattern);

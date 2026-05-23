@@ -34,6 +34,9 @@ Run the hosted baseline preflight before any live comparison:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:discover
+npm exec --yes pnpm@10.23.0 -- baseline:select-container
+npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
@@ -59,6 +62,13 @@ the private-map discovery flow outside the repository, then run
 `baseline:select-container` to write the selected label into a 0600 private env
 file without printing it. The private map and env file are local operator
 material only.
+
+If a new query set is needed, run `baseline:author-queryset` after container
+selection. It may draft a private, review-required query set from the selected
+hosted container, but the draft itself is not benchmark evidence. It must be
+reviewed locally, then checked with `baseline:queryset --strict`, before hosted
+or RecallWeave collection starts. Attach only the public author report and the
+strict query-set inspection report.
 
 The fixture path proves that the result shape is parseable. It must never count
 as hosted baseline evidence, even if all metrics fields are present. Use

@@ -378,10 +378,23 @@ npm exec --yes pnpm@10.23.0 -- baseline:select-container \
   -- --discovery /tmp/recallweave-hosted-baseline-discovery.json \
   --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
   --env-output /tmp/recallweave-hosted-baseline.private.env
+
+RECALLWEAVE_BASELINE_LIVE=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:author-queryset \
+  -- --live --discovery /tmp/recallweave-hosted-baseline-discovery.json \
+  --private-map /tmp/recallweave-hosted-container-map.private.jsonl \
+  --queryset-output /tmp/recallweave-hosted-baseline-queryset.json \
+  --output /tmp/recallweave-hosted-baseline-queryset-author-report.json
+
+npm exec --yes pnpm@10.23.0 -- baseline:queryset \
+  -- --queryset /tmp/recallweave-hosted-baseline-queryset.json \
+  --strict --output /tmp/recallweave-hosted-baseline-queryset-report.json
 ```
 
-Then source `/tmp/recallweave-hosted-baseline.private.env` locally before the
-hosted collector. Do not attach that env file or the private map.
+Review the private query set locally before collection. Then source
+`/tmp/recallweave-hosted-baseline.private.env` locally before the hosted
+collector. Do not attach that env file, the private map, or the private query
+set.
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json

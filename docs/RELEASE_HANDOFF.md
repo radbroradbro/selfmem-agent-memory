@@ -87,6 +87,8 @@ npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:select-container
+npm exec --yes pnpm@10.23.0 -- baseline:author-queryset
+npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
@@ -122,6 +124,19 @@ not reviewer or GitHub evidence. Then run `baseline:select-container` with the
 public discovery report and private map. It writes the selected raw label into a
 0600 private env file without printing the label. Source that env file locally
 before `baseline:collect`, and never attach it to public evidence.
+If the query set needs to be drafted from the selected hosted container, run:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:author-queryset \
+  -- --live --discovery <public-discovery> \
+  --private-map <private-map> \
+  --queryset-output <private-query-set> \
+  --output <public-author-report>
+```
+
+Review the private query set locally before any collection. Attach only the
+public author report and the strict `baseline:queryset` report. Do not attach
+the private query set.
 You may attach a public-safe live discovery report when it contains only hashed
 candidate ids, counts, timestamps, status/type counts, and privacy flags. That
 report proves metadata access and candidate discovery only. It does not close

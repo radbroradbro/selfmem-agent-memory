@@ -110,6 +110,7 @@ const output = {
     "/tmp/recallweave-baseline-comparison.json",
     "/tmp/recallweave-hosted-baseline-preflight.json",
     "/tmp/recallweave-hosted-baseline-discovery.json",
+    "/tmp/recallweave-hosted-baseline-queryset-author-report.json",
     "/tmp/recallweave-hosted-baseline-queryset-report.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
   ],
@@ -124,6 +125,7 @@ const output = {
     "bearer tokens",
     "private local paths",
     "private container maps",
+    "private query sets",
     "unredacted diagnostics",
     "raw RecallWeave response exports that contain memory text",
   ],
@@ -295,6 +297,7 @@ function commandsFor(status) {
   const privateContainerEnvPath = "/tmp/recallweave-hosted-baseline.private.env";
   const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
   const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
+  const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-author-report.json";
   const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
   const commands = [
@@ -336,6 +339,18 @@ function commandsFor(status) {
         `--discovery ${discoveryPath}`,
         `--private-map ${privateContainerMapPath}`,
         `--env-output ${privateContainerEnvPath}`,
+      ].join(" "),
+    });
+    commands.push({
+      id: "author-private-query-set",
+      description: "Optional local-only step: draft a review-required private query set from the selected hosted container while printing only hashes and counts.",
+      command: [
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "npm exec --yes pnpm@10.23.0 -- baseline:author-queryset --",
+        `--live --discovery ${discoveryPath}`,
+        `--private-map ${privateContainerMapPath}`,
+        `--queryset-output ${querySetPath}`,
+        `--output ${querySetAuthorReportPath}`,
       ].join(" "),
     });
     commands.push({
@@ -437,7 +452,8 @@ function acceptanceCriteria() {
     "same dataset slice, query-set hash, scoring-code hash, judge model, and answer model",
     "every query has at least one expected result id or expected content hash",
     "querySetEvidence.publicBenchmarkReady is true for both runs",
-    "hosted container discovery emits hashed candidates only and any private raw-label map or env file stays local",
+    "hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local",
+    "any auto-authored private query set was locally reviewed before collection",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
     "RecallWeave beats hosted baseline without any quality metric regressing more than the comparison gate allows",
     "two independent reviewers approve the setup and result before any public comparison language",
@@ -469,7 +485,7 @@ function buildMarkdown(plan) {
   for (const item of plan.commandPlan) lines.push(`### ${item.id}`, "", item.description, "", "```bash", item.command, "```", "");
   lines.push("## Pass Criteria", "");
   for (const item of plan.acceptanceCriteria) lines.push(`- ${item}`);
-  lines.push("", "Attach only aggregate result files, discovery output, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, cookies, or unredacted diagnostics.");
+  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
   return lines.join("\n");
 }
 
