@@ -1,0 +1,125 @@
+{
+  "ok": true,
+  "mode": "baseline-evidence-packet-review",
+  "writesRealFiles": false,
+  "metricsOnly": true,
+  "strictReal": true,
+  "strictRealPassed": true,
+  "strictFailureReason": null,
+  "generatedFixturePacket": false,
+  "fixtureOnly": false,
+  "countsAsHostedBaselineEvidence": true,
+  "countsAsComparisonEvidence": true,
+  "packagePassesStrictReal": true,
+  "recallWeaveWin": true,
+  "reviewerApprovalCount": 2,
+  "publicBenchmarkClaimsAllowed": true,
+  "countsAsProductionBaselineEvidence": true,
+  "countsAsPublicBenchmarkEvidence": true,
+  "publicLaunchAllowed": false,
+  "packet": {
+    "pathLabel": "recallweave-reviewed-baseline-evidence-packet.zip",
+    "sha256": "c2dc57a94a82801a82a40c60ec9d7a7a9aecf17094d61f266f9e19d568d963e6",
+    "entries": [
+      "README.md",
+      "baseline-comparison.json",
+      "hosted-baseline-preflight.json",
+      "hosted-baseline-result.json",
+      "manifest.json",
+      "recallweave-result.json"
+    ]
+  },
+  "target": {
+    "hostedProvider": "hosted-supermemory",
+    "recallWeaveProvider": "recallweave",
+    "datasetSlice": "hosted-container-canary-c_6a2feb97651dd64b-2026-05-23",
+    "querySetHash": "sha256:9403d36215cb92e643bd0c640690695d57d98fe946f3dfef30b54aafc0eea5e4",
+    "scoringCodeHash": "sha256:9de01fccd0241199b4ec82dfc03fe13f3249b3028f71cc1d644fbfbd3302c75d",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o"
+  },
+  "comparison": {
+    "recallWeaveWin": true,
+    "reviewerApprovalCount": 2,
+    "failedChecks": []
+  },
+  "checks": [
+    {
+      "name": "expected-entries",
+      "ok": true
+    },
+    {
+      "name": "manifest-metrics-only",
+      "ok": true
+    },
+    {
+      "name": "manifest-no-launch",
+      "ok": true
+    },
+    {
+      "name": "hosted-provider",
+      "ok": true
+    },
+    {
+      "name": "recallweave-provider",
+      "ok": true
+    },
+    {
+      "name": "comparison-mode",
+      "ok": true
+    },
+    {
+      "name": "preflight-mode",
+      "ok": true
+    },
+    {
+      "name": "hosted-baseline-evidence",
+      "ok": true
+    },
+    {
+      "name": "comparison-evidence",
+      "ok": true
+    },
+    {
+      "name": "recallweave-win",
+      "ok": true
+    },
+    {
+      "name": "zero-privacy-leaks",
+      "ok": true
+    },
+    {
+      "name": "zero-redaction-failures",
+      "ok": true
+    },
+    {
+      "name": "no-raw-memory",
+      "ok": true
+    },
+    {
+      "name": "no-raw-transcript",
+      "ok": true
+    },
+    {
+      "name": "no-raw-prompt",
+      "ok": true
+    },
+    {
+      "name": "no-raw-answer",
+      "ok": true
+    },
+    {
+      "name": "fixture-does-not-count",
+      "ok": true
+    },
+    {
+      "name": "strict-real-passed",
+      "ok": true
+    }
+  ],
+  "failedChecks": [],
+  "nextActions": [
+    "Attach this metrics-only review output with the packet for maintainer approval.",
+    "Public benchmark comparison language may move to owner review, but public launch remains blocked until explicit approval."
+  ]
+}

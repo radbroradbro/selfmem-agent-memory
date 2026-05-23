@@ -1,0 +1,235 @@
+{
+  "ok": true,
+  "mode": "hosted-baseline-next-run",
+  "writesRealFiles": false,
+  "callsHostedProvider": false,
+  "metricsOnly": true,
+  "plannerAuthorizesPublicClaims": false,
+  "publicLaunchAllowed": false,
+  "fleetRolloutAllowed": false,
+  "readyForOwnerReview": true,
+  "requireReadyPassed": true,
+  "blockerPreserved": true,
+  "liveHostedCollectionAllowed": true,
+  "comparisonPublicClaimsReady": true,
+  "status": "READY_FOR_OWNER_REVIEW",
+  "recommendedScope": "owner-review-not-public-launch",
+  "evidence": {
+    "fixtureOnly": false,
+    "hosted": {
+      "provider": "hosted-supermemory",
+      "fixtureOnly": false,
+      "metricsOnly": true,
+      "runIdHash": "ecce6d252d3bd7f9",
+      "sourceCommit": "a3673e25e3996ec2bf7b62513c551ec75f572910",
+      "datasetSlice": "hosted-container-canary-c_6a2feb97651dd64b-2026-05-23",
+      "querySetHash": "sha256:9403d36215cb92e643bd0c640690695d57d98fe946f3dfef30b54aafc0eea5e4",
+      "scoringCodeHash": "sha256:9de01fccd0241199b4ec82dfc03fe13f3249b3028f71cc1d644fbfbd3302c75d",
+      "judgeModel": "gpt-4o",
+      "answerModel": "gpt-4o",
+      "privacy": {
+        "privacyLeakCount": 0,
+        "redactionFailureCount": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "metrics": {
+        "quality": 0,
+        "pAt1": 0,
+        "recallAt5": 0,
+        "recallAt10": 0,
+        "ndcgAt10": 0,
+        "latencyP50Ms": 549,
+        "latencyP95Ms": 1078,
+        "contextTokensAvg": 1397
+      },
+      "cost": {
+        "ingestUsd": 0,
+        "queryUsd": 0
+      }
+    },
+    "recallWeave": {
+      "provider": "recallweave",
+      "fixtureOnly": false,
+      "metricsOnly": true,
+      "runIdHash": "ecce6d252d3bd7f9",
+      "sourceCommit": "a3673e25e3996ec2bf7b62513c551ec75f572910",
+      "datasetSlice": "hosted-container-canary-c_6a2feb97651dd64b-2026-05-23",
+      "querySetHash": "sha256:9403d36215cb92e643bd0c640690695d57d98fe946f3dfef30b54aafc0eea5e4",
+      "scoringCodeHash": "sha256:9de01fccd0241199b4ec82dfc03fe13f3249b3028f71cc1d644fbfbd3302c75d",
+      "judgeModel": "gpt-4o",
+      "answerModel": "gpt-4o",
+      "privacy": {
+        "privacyLeakCount": 0,
+        "redactionFailureCount": 0,
+        "rawMemoryIncluded": false,
+        "rawTranscriptIncluded": false,
+        "rawPromptIncluded": false,
+        "rawAnswerIncluded": false
+      },
+      "metrics": {
+        "quality": 0.1212,
+        "pAt1": 0.125,
+        "recallAt5": 0.125,
+        "recallAt10": 0.125,
+        "ndcgAt10": 0.1096,
+        "latencyP50Ms": 12,
+        "latencyP95Ms": 17,
+        "contextTokensAvg": 1600
+      },
+      "cost": {
+        "ingestUsd": 0,
+        "queryUsd": 0
+      }
+    },
+    "preflight": {
+      "mode": "hosted-baseline-preflight",
+      "fixtureOnly": false,
+      "metricsOnly": true,
+      "countsAsHostedBaselineEvidence": true,
+      "publicBenchmarkClaimsAllowed": false,
+      "failedResultChecks": []
+    },
+    "comparison": {
+      "mode": "baseline-comparison",
+      "fixtureOnly": false,
+      "metricsOnly": true,
+      "countsAsComparisonEvidence": true,
+      "recallWeaveWin": true,
+      "reviewerApprovalCount": 2,
+      "publicBenchmarkClaimsAllowed": true,
+      "failedChecks": [],
+      "deltas": {
+        "quality": 0.1212,
+        "pAt1": 0.125,
+        "recallAt5": 0.125,
+        "recallAt10": 0.125,
+        "ndcgAt10": 0.1096,
+        "latencyP50Ms": -537,
+        "latencyP95Ms": -1061,
+        "contextTokensAvg": 203,
+        "ingestCostUsd": 0,
+        "queryCostUsd": 0
+      }
+    }
+  },
+  "strictRealEvidenceRequired": {
+    "hostedNonFixture": true,
+    "recallWeaveNonFixture": true,
+    "hostedPreflightCounts": true,
+    "comparisonCounts": true,
+    "comparisonPublicClaimsReady": true,
+    "recallWeaveWin": true,
+    "reviewerApprovalCount": 2,
+    "reviewersRequired": 2,
+    "privacyClean": true,
+    "sameHarness": true
+  },
+  "comparability": {
+    "sameDataset": true,
+    "sameQuerySet": true,
+    "sameScoringCode": true,
+    "sameJudge": true,
+    "sameAnswerModel": true,
+    "sameHarnessFlags": true,
+    "matchedCounterpartRuns": true
+  },
+  "privacy": {
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPromptIncluded": false,
+    "rawAnswerIncluded": false
+  },
+  "blockReasons": [
+    {
+      "severity": "owner-block",
+      "reason": "Evidence is ready for owner review. The planner still does not authorize public launch."
+    }
+  ],
+  "commandPlan": [
+    {
+      "id": "print-template",
+      "description": "Print the aggregate-only hosted result schema before any live provider call.",
+      "command": "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output /tmp/recallweave-hosted-baseline-template.json"
+    },
+    {
+      "id": "fixture-shape-check",
+      "description": "Validate the local parser and gate behavior without using a hosted provider.",
+      "command": "npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --fixture"
+    },
+    {
+      "id": "compare-matched-results",
+      "description": "Compare hosted and RecallWeave aggregate result files before review. This still cannot publish a claim by itself.",
+      "command": "npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --output /tmp/recallweave-baseline-comparison.json"
+    },
+    {
+      "id": "package-review-evidence",
+      "description": "Package only aggregate hosted, local, comparison, and preflight files for reviewer intake.",
+      "command": "npm exec --yes pnpm@10.23.0 -- baseline:packet -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --comparison /tmp/recallweave-baseline-comparison.json --preflight /tmp/recallweave-hosted-baseline-preflight.json --strict-real --output /tmp/recallweave-baseline-evidence-packet.zip"
+    },
+    {
+      "id": "collect-reviewer-approvals",
+      "description": "Validate two independent reviewer approval artifacts against the exact metrics-only packet. This accepts Claude, Codex, Gemini, DeepSeek, or another reviewer only through sanitized JSON approval files.",
+      "command": "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet /tmp/recallweave-baseline-evidence-packet.zip --comparison /tmp/recallweave-baseline-comparison.json --strict-target --review <reviewer-a-approval.json> --review <reviewer-b-approval.json> --output /tmp/recallweave-reviewer-approval-report.json"
+    },
+    {
+      "id": "rerun-reviewed-comparison",
+      "description": "Rerun the aggregate comparison with the reviewer approval report bound to the packet before any public comparison language moves to owner review.",
+      "command": "npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --reviewer-approval-report /tmp/recallweave-reviewer-approval-report.json --output /tmp/recallweave-baseline-comparison.json"
+    }
+  ],
+  "acceptanceCriteria": [
+    "hosted and RecallWeave results are non-fixture",
+    "both results are metrics-only and privacy-clean",
+    "same dataset slice, query-set hash, scoring-code hash, judge model, and answer model",
+    "every query has at least one expected result id or expected content hash",
+    "querySetEvidence.publicBenchmarkReady is true for both runs",
+    "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
+    "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
+    "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready",
+    "private hosted mirror is created locally with 0600 files before source-match and local-arm export when hosted history is the source",
+    "RecallWeave local response export applies a context-token budget before comparison claims",
+    "hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local",
+    "any auto-authored private query set was locally reviewed before collection",
+    "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
+    "RecallWeave beats hosted baseline without any quality metric regressing more than the comparison gate allows",
+    "two independent reviewers approve the setup and result through baseline:reviewer-intake before any public comparison language",
+    "owner approval remains required for public launch or visibility changes"
+  ],
+  "attachOnly": [
+    "/tmp/recallweave-hosted-baseline-result.json",
+    "/tmp/recallweave-result.json",
+    "/tmp/recallweave-baseline-comparison.json",
+    "/tmp/recallweave-hosted-baseline-preflight.json",
+    "/tmp/recallweave-hosted-baseline-discovery.json",
+    "/tmp/recallweave-hosted-baseline-queryset-author-report.json",
+    "/tmp/recallweave-hosted-baseline-queryset-report.json",
+    "/tmp/recallweave-hosted-local-mirror.json",
+    "/tmp/recallweave-baseline-source-match.json",
+    "/tmp/recallweave-baseline-source-alignment.json",
+    "/tmp/recallweave-baseline-source-gap.json",
+    "/tmp/recallweave-baseline-evidence-packet.zip",
+    "/tmp/recallweave-reviewer-approval-report.json",
+    "/tmp/recallweave-baseline-run.json"
+  ],
+  "forbidden": [
+    "provider keys",
+    "raw hosted memories",
+    "raw local memories",
+    "raw transcripts",
+    "raw prompts",
+    "raw answers",
+    "cookies",
+    "bearer tokens",
+    "private local paths",
+    "private container maps",
+    "private query sets",
+    "unredacted diagnostics",
+    "raw RecallWeave response exports that contain memory text"
+  ],
+  "operatorMessage": "# RecallWeave Hosted Baseline Next Run\n\nStatus: READY_FOR_OWNER_REVIEW\nScope: owner-review-not-public-launch\nReady for owner review: yes\nPublic launch allowed: no\nPlanner authorizes public claims: no\n\n## Evidence State\n\n- Hosted: hosted-supermemory, fixture=false, metricsOnly=true, privacyLeaks=0, quality=0\n- RecallWeave: recallweave, fixture=false, metricsOnly=true, privacyLeaks=0, quality=0.1212\n- Comparison: win=true, strictEvidence=true, reviewers=2\n\n## Blocks\n\n- owner-block: Evidence is ready for owner review. The planner still does not authorize public launch.\n\n## Commands\n\n### print-template\n\nPrint the aggregate-only hosted result schema before any live provider call.\n\n```bash\nnpm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output /tmp/recallweave-hosted-baseline-template.json\n```\n\n### fixture-shape-check\n\nValidate the local parser and gate behavior without using a hosted provider.\n\n```bash\nnpm exec --yes pnpm@10.23.0 -- baseline:next-run -- --fixture\n```\n\n### compare-matched-results\n\nCompare hosted and RecallWeave aggregate result files before review. This still cannot publish a claim by itself.\n\n```bash\nnpm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --output /tmp/recallweave-baseline-comparison.json\n```\n\n### package-review-evidence\n\nPackage only aggregate hosted, local, comparison, and preflight files for reviewer intake.\n\n```bash\nnpm exec --yes pnpm@10.23.0 -- baseline:packet -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --comparison /tmp/recallweave-baseline-comparison.json --preflight /tmp/recallweave-hosted-baseline-preflight.json --strict-real --output /tmp/recallweave-baseline-evidence-packet.zip\n```\n\n### collect-reviewer-approvals\n\nValidate two independent reviewer approval artifacts against the exact metrics-only packet. This accepts Claude, Codex, Gemini, DeepSeek, or another reviewer only through sanitized JSON approval files.\n\n```bash\nnpm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet /tmp/recallweave-baseline-evidence-packet.zip --comparison /tmp/recallweave-baseline-comparison.json --strict-target --review <reviewer-a-approval.json> --review <reviewer-b-approval.json> --output /tmp/recallweave-reviewer-approval-report.json\n```\n\n### rerun-reviewed-comparison\n\nRerun the aggregate comparison with the reviewer approval report bound to the packet before any public comparison language moves to owner review.\n\n```bash\nnpm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --reviewer-approval-report /tmp/recallweave-reviewer-approval-report.json --output /tmp/recallweave-baseline-comparison.json\n```\n\n## Pass Criteria\n\n- hosted and RecallWeave results are non-fixture\n- both results are metrics-only and privacy-clean\n- same dataset slice, query-set hash, scoring-code hash, judge model, and answer model\n- every query has at least one expected result id or expected content hash\n- querySetEvidence.publicBenchmarkReady is true for both runs\n- source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source\n- source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true\n- source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready\n- private hosted mirror is created locally with 0600 files before source-match and local-arm export when hosted history is the source\n- RecallWeave local response export applies a context-token budget before comparison claims\n- hosted container discovery emits hashed candidates only and any private raw-label map, env file, or query set stays local\n- any auto-authored private query set was locally reviewed before collection\n- latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present\n- RecallWeave beats hosted baseline without any quality metric regressing more than the comparison gate allows\n- two independent reviewers approve the setup and result through baseline:reviewer-intake before any public comparison language\n- owner approval remains required for public launch or visibility changes\n\nAttach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, hosted mirror report, source-match, source-alignment, and source-gap reports, the comparison, preflight, baseline packet zip, and reviewer approval report. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics."
+}

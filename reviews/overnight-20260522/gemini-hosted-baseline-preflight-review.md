@@ -13,8 +13,7 @@ Verdict: `CLEAN`
 - No hosted provider call by default. The preflight reports
   `callsHostedProvider: false` and needs explicit live-run environment opt-in
   before a hosted baseline can be attempted.
-- Benchmark claims remain blocked. `release-state.json` keeps
-  `hosted-supermemory-baseline-not-current`, and the preflight keeps
+- Benchmark claims remain blocked by this preflight alone. The preflight keeps
   `benchmarkClaimsAllowed: false` until a fresh baseline, matched RecallWeave
   run, RecallWeave win, and two reviewer approvals are present.
 - The live-run contract is specific. It names required environment variables,

@@ -40,6 +40,7 @@ assert.ok(recallWeavePath, "RecallWeave result is required. Pass --recallweave o
 const hosted = loadResult(hostedPath, "hosted-supermemory");
 const recallWeave = loadResult(recallWeavePath, "recallweave");
 const comparability = compareHarness(hosted, recallWeave);
+const reviewerApprovalTarget = compareReviewerApprovalTarget(reviewerApprovalReport, hosted, recallWeave);
 const privacy = {
   privacyLeakCount: hosted.privacyLeakCount + recallWeave.privacyLeakCount,
   redactionFailureCount: hosted.redactionFailureCount + recallWeave.redactionFailureCount,
@@ -71,6 +72,7 @@ const failedChecks = [
   check("privacy-clean", privacyClean(privacy)),
   check("context-token-parity", contextBudget.ok),
   check("recallweave-win", recallWeaveWin),
+  check("reviewer-approval-target-match", reviewerApprovalTarget.ok),
   check("two-reviewer-approvals", reviewerApprovalCount >= 2),
 ]
   .filter((item) => !item.ok)
@@ -97,6 +99,7 @@ const result = {
   reviewerApprovalCount,
   legacyReviewerApprovalCount,
   reviewerApprovalReport,
+  reviewerApprovalTarget,
   publicBenchmarkClaimsAllowed,
   failedChecks,
   safety: {
@@ -222,6 +225,38 @@ function loadReviewerApprovalReport(inputPath) {
       querySetHash: report.target?.querySetHash ?? null,
       scoringCodeHash: report.target?.scoringCodeHash ?? null,
     },
+  };
+}
+
+function compareReviewerApprovalTarget(report, hosted, recallWeave) {
+  if (!report) {
+    return {
+      ok: true,
+      required: false,
+      checks: [],
+    };
+  }
+  const target = report.target ?? {};
+  const checks = [
+    check(
+      "query-set-hash",
+      nonEmpty(target.querySetHash) &&
+        target.querySetHash === hosted.querySetHash &&
+        target.querySetHash === recallWeave.querySetHash,
+    ),
+    check(
+      "scoring-code-hash",
+      nonEmpty(target.scoringCodeHash) &&
+        target.scoringCodeHash === hosted.scoringCodeHash &&
+        target.scoringCodeHash === recallWeave.scoringCodeHash,
+    ),
+    check("public-benchmark-ready", report.publicBenchmarkApprovalReady === true),
+    check("no-reviewer-intake-failures", Array.isArray(report.failedChecks) && report.failedChecks.length === 0),
+  ];
+  return {
+    ok: checks.every((item) => item.ok),
+    required: true,
+    checks,
   };
 }
 

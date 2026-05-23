@@ -246,6 +246,14 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-returned-packet-intake-review.md`,
   `${reviewDir}/baseline-openai-compatible-reviewer-evidence.md`,
   `${reviewDir}/baseline-reviewer-approval-intake-evidence.md`,
+  `${reviewDir}/reviewer-work/reviewer-findings.md`,
+  `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-evidence.md`,
+  `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json`,
+  `${reviewDir}/reviewer-work/reviewed-baseline-owner-review-evidence.md`,
+  `${reviewDir}/reviewer-work/budgeted-baseline-reviewed-comparison.json`,
+  `${reviewDir}/reviewer-work/budgeted-baseline-reviewed-packet-review.json`,
+  `${reviewDir}/reviewer-work/budgeted-baseline-reviewed-returned-packet-intake.json`,
+  `${reviewDir}/reviewer-work/budgeted-baseline-reviewed-next-run.json`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
   `${reviewDir}/gemini-github-handoff-packet-review.md`,
   `${reviewDir}/github-live-sync-evidence.md`,
@@ -981,10 +989,11 @@ check("release state is conservative", () => {
   assert.equal(releaseState.reviewerEvidence?.claudeOpus?.countsAsPublicLaunchApproval, false);
   for (const blocker of [
     "human-public-launch-approval-required",
-    "hosted-supermemory-baseline-not-current",
+    "fresh-real-container-canary-not-current",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
   }
+  assert.equal(releaseState.remainingBlockers?.includes("hosted-supermemory-baseline-not-current"), false);
 });
 
 check("post-baseline public evidence guard is honored", () => {
@@ -2229,13 +2238,8 @@ check("fresh canary window reviewer evidence is explicit", () => {
 check("fresh release blocker doctor passes", () => {
   const doctorRun = run("node", ["packages/bench/release-blocker-doctor.mjs"]);
   const report = JSON.parse(doctorRun.stdout);
-  const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
-  assert.match(hostedBlocker.nextAction, /1600-token local context budget/);
-  assert.match(hostedBlocker.nextAction, /Two independent reviewer approvals are now collected/);
-  assert.match(hostedBlocker.nextAction, /--reviewer-approval-report/);
-  assert.match(hostedBlocker.nextAction, /metrics-only packet is rebuilt/);
-  assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
+  assert.equal(report.blockers.some((item) => item.id === "hosted-supermemory-baseline-not-current"), false);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.status, "READY_FOR_BASELINE_REVIEW");
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.callsHostedProvider, true);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.recallWeaveWin, true);
@@ -2248,6 +2252,17 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.budgetedBaselineReviewerIntake.reviewerApprovalCount, 2);
   assert.equal(report.checks.budgetedBaselineReviewerIntake.independentReviewerCount, 2);
   assert.deepEqual(report.checks.budgetedBaselineReviewerIntake.failedChecks, []);
+  assert.equal(report.checks.budgetedBaselineReviewedComparison.countsAsComparisonEvidence, true);
+  assert.equal(report.checks.budgetedBaselineReviewedComparison.publicBenchmarkClaimsAllowed, true);
+  assert.equal(report.checks.budgetedBaselineReviewedComparison.reviewerApprovalCount, 2);
+  assert.deepEqual(report.checks.budgetedBaselineReviewedComparison.failedChecks, []);
+  assert.equal(report.checks.budgetedBaselineReviewedPacketReview.countsAsPublicBenchmarkEvidence, true);
+  assert.equal(report.checks.budgetedBaselineReviewedPacketReview.publicBenchmarkClaimsAllowed, true);
+  assert.equal(report.checks.budgetedBaselineReviewedPacketReview.publicLaunchAllowed, false);
+  assert.equal(report.checks.budgetedBaselineReviewedNextRun.readyForOwnerReview, true);
+  assert.equal(report.checks.budgetedBaselineReviewedNextRun.requireReadyPassed, true);
+  assert.equal(report.checks.budgetedBaselineReviewedNextRun.status, "READY_FOR_OWNER_REVIEW");
+  assert.equal(report.checks.budgetedBaselineReviewedNextRun.publicLaunchAllowed, false);
   assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:author-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:mirror-hosted/.test(item) && /--output-dir/.test(item)));
@@ -2967,7 +2982,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(report.writesRealFiles, false);
   assert.equal(report.callsHostedProvider, false);
   assert.equal(report.metricsOnly, true);
-  assert.equal(report.releaseBlockerPresent, true);
+  assert.equal(report.releaseBlockerPresent, false);
+  assert.equal(report.reviewedHostedBaselineReady, true);
   assert.equal(report.hostedBaselineFresh, false);
   assert.equal(report.benchmarkClaimsAllowed, false);
   assert.equal(report.publicBenchmarkClaimsAllowed, false);
@@ -3943,7 +3959,7 @@ check("fresh goal completion audit passes", () => {
   assert.equal(report.goalComplete, false);
   assert.equal(report.mayCallUpdateGoalComplete, false);
   assert.ok(report.counts?.proven >= 8);
-  assert.ok(report.counts?.blocked >= 2);
+  assert.ok(report.counts?.blocked >= 1);
   assert.ok(report.counts?.incomplete >= 1);
   assert.equal(report.safety?.privateLeakCount, 0);
   assert.equal(report.safety?.hasSecretPattern, false);
@@ -4009,6 +4025,16 @@ check("fresh goal completion audit passes", () => {
         item.evidence.includes("packages/bench/canary-drill.mjs") &&
         item.evidence.includes("reviews/overnight-20260522/canary-drill-evidence.md") &&
         item.evidence.includes("reviews/overnight-20260522/gemini-canary-drill-review.md"),
+    ),
+  );
+  assert.ok(
+    report.requirements.some(
+      (item) =>
+        item.id === "hosted-baseline-reviewed-comparison" &&
+        item.status === "proven" &&
+        item.evidence.includes("reviews/overnight-20260522/reviewer-work/budgeted-baseline-reviewed-comparison.json") &&
+        item.evidence.includes("reviews/overnight-20260522/reviewer-work/budgeted-baseline-reviewed-packet-review.json") &&
+        item.evidence.includes("reviews/overnight-20260522/reviewer-work/budgeted-baseline-reviewed-next-run.json"),
     ),
   );
   assert.ok(

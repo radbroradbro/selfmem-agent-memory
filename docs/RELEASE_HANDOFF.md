@@ -160,8 +160,9 @@ mirror with `--preserve-ids`, a reviewed query set, and
 average context tokens 1397. RecallWeave scored 0.1212 quality, P@1 0.125,
 recall@5 0.125, recall@10 0.125, and average context tokens 1600. Both arms had
 zero privacy failures. This closes the earlier context-budget rerun task, but
-public benchmark claims remain blocked until two independent reviewers approve
-the exact metrics-only packet through `baseline:reviewer-intake`.
+does not authorize launch. Two independent reviewers have now approved the
+exact metrics-only packet through `baseline:reviewer-intake`, and the reviewed
+comparison is ready for owner review.
 You may attach a public-safe live discovery report when it contains only hashed
 candidate ids, counts, timestamps, status/type counts, and privacy flags. That
 report proves metadata access and candidate discovery only. It does not close
@@ -268,20 +269,19 @@ local container or mirrored local export, proven by `baseline:source-match`,
 source-aligned by `baseline:source-align`, and marked ready by
 `baseline:source-gap`, before quality claims are meaningful.
 The current source-matched budgeted run has now cleared that source-matched
-rerun step. The next benchmark task is not another hosted call by default. It is
-two independent reviewer approvals bound to the exact metrics-only packet, then
-a fresh `baseline:compare` and `baseline:next-run -- --require-ready` using the
-reviewer approval report.
+rerun step and the reviewer-approval step. The next benchmark task is not
+another hosted call by default. It is owner review of the metrics-only canary
+packet, then a broader benchmark only if the owner approves the claim scope.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.
 Use `baseline:packet:review` to inspect a received hosted-baseline packet
 without unpacking raw evidence by hand. Use `baseline:returned-packet -- --packet
-<returned-baseline-evidence-packet.zip> --require-production-baseline --output
+<returned-baseline-evidence-packet.zip> --require-public-benchmark --output
 /tmp/recallweave-returned-baseline-intake.json` when an agent returns a packet.
 That command fails closed unless the packet is non-fixture, metrics-only,
 privacy-clean, and contains hosted, RecallWeave, comparison, and preflight
-evidence. Public benchmark language still requires reviewer and owner approval.
+evidence. Public launch still requires owner approval.
 Use `baseline:reviewer-intake` only with sanitized approval JSON files that
 bind to the packet SHA or run hash. It can accept approvals produced after
 Claude, Codex, Gemini, DeepSeek, or another reviewer inspects the metrics-only

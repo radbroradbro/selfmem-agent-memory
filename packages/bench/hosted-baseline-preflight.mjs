@@ -33,9 +33,13 @@ const benchmarkSummary = readFileSync(benchmarkSummaryPath, "utf8");
 assert.equal(releaseState.goalStatus, "active");
 assert.equal(releaseState.publicLaunchVerdict, "FAIL");
 assert.equal(releaseState.productionReady, false);
-assert.ok(
+const hostedBaselineBlockerPresent = Boolean(
   releaseState.remainingBlockers?.includes("hosted-supermemory-baseline-not-current"),
-  "release-state must keep the hosted baseline blocker until a live metrics-only baseline is reviewed",
+);
+const reviewedHostedBaselineReady = releaseState.reviewerEvidence?.hostedBaselineLiveBudgetedRun?.status === "ready_for_owner_review";
+assert.ok(
+  hostedBaselineBlockerPresent || reviewedHostedBaselineReady,
+  "release-state must keep the hosted baseline blocker until a live metrics-only baseline is reviewed, then record owner-review-ready evidence",
 );
 assert.match(productionReadiness, /hosted[- ]baseline|Supermemory baseline|fresh.*baseline/i);
 assert.match(benchmarkPlan, /same dataset slice/i);
@@ -135,7 +139,8 @@ const report = {
   reviewDir,
   branch,
   head,
-  releaseBlockerPresent: true,
+  releaseBlockerPresent: hostedBaselineBlockerPresent,
+  reviewedHostedBaselineReady,
   liveRequested,
   liveInputReady,
   missingLiveEnv,

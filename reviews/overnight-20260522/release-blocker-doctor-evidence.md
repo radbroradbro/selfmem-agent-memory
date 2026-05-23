@@ -29,13 +29,16 @@ Result:
 - Canary next-agent plan: ok true, metrics only true, fixture plan status
   `FIXTURE_PLAN_ONLY`, one-agent canary allowed false, public launch allowed
   false, fleet rollout allowed false
+- Reviewed budgeted baseline: comparison evidence true, public benchmark
+  claims allowed true for owner review, reviewerApprovalCount 2, returned packet
+  status `READY_FOR_PUBLIC_BENCHMARK_REVIEW`, next-run status
+  `READY_FOR_OWNER_REVIEW`, public launch allowed false
 - GitHub live sync: ok true, PR body matches true, issue title matches true,
   issue body matches true
 
 Current blockers:
 
 - `human-public-launch-approval-required`
-- `hosted-supermemory-baseline-not-current`
 - `fresh-real-container-canary-not-current`
 
 Resolved in this extension:
@@ -47,6 +50,9 @@ Resolved in this extension:
 - Live hosted discovery succeeded against the hosted Supermemory key and
   produced only hashed candidate metadata. It narrows the next operator step but
   does not close the hosted-baseline blocker.
+- The source-matched budgeted hosted canary now has two independent reviewer
+  approvals, a rebuilt reviewed comparison, a strict-real packet review, and a
+  returned-packet intake result ready for owner review.
 - Claude Opus review completed with `CONCERNS` and is recorded in
   `claude-pr5-review.md`.
 - The old GitHub 403 packet remains historical evidence only.
@@ -56,12 +62,8 @@ Manual next actions:
 - Treat the Claude `CONCERNS` review as alpha-PR evidence only.
 - Run `release:github-sync` and verify PR #5 and issue #6 still match the
   checked-in drafts.
-- Use the private-map flow outside the repository to choose the raw hosted
-  source container label from the hashed candidates, prepare the source-locked
-  query set, then run hosted and RecallWeave collectors before any public
-  head-to-head benchmark claim.
-- Run `baseline:preflight` with a sanitized live result after that fresh
-  metrics-only hosted Supermemory baseline.
+- Treat the reviewed canary comparison as owner-review evidence only. It is not
+  public launch approval and not a broad benchmark claim.
 - Run `canary:batch-audit` against redacted returned diagnostics, then
   `canary:next-agent` to select one privacy-clean Hermes/OpenClaw target for a
   fresh strict-real window.

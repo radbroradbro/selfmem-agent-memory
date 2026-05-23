@@ -12,7 +12,6 @@ const releaseStatePath = join(root, reviewDir, "release-state.json");
 const releaseState = JSON.parse(readFileSync(releaseStatePath, "utf8"));
 const requiredBlockers = [
   "human-public-launch-approval-required",
-  "hosted-supermemory-baseline-not-current",
   "fresh-real-container-canary-not-current",
 ];
 
@@ -54,9 +53,14 @@ const requiredFiles = {
   budgetedBaselineReviewerFindings: "reviewer-work/reviewer-findings.md",
   budgetedBaselineReviewerIntakeEvidence: "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md",
   budgetedBaselineReviewerIntakeReport: "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json",
+  budgetedBaselineReviewedOwnerReviewEvidence: "reviewer-work/reviewed-baseline-owner-review-evidence.md",
   budgetedBaselineCodexApproval: "reviewer-work/codex-5-5-budgeted-baseline-approval.json",
   budgetedBaselineGeminiApproval: "reviewer-work/gemini-3-1-pro-budgeted-baseline-approval.json",
   budgetedBaselineClaudeBlocked: "reviewer-work/claude-opus-blocked-by-hooks.md",
+  budgetedBaselineReviewedComparison: "reviewer-work/budgeted-baseline-reviewed-comparison.json",
+  budgetedBaselineReviewedPacketReview: "reviewer-work/budgeted-baseline-reviewed-packet-review.json",
+  budgetedBaselineReviewedReturnedPacketIntake: "reviewer-work/budgeted-baseline-reviewed-returned-packet-intake.json",
+  budgetedBaselineReviewedNextRun: "reviewer-work/budgeted-baseline-reviewed-next-run.json",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
@@ -119,6 +123,10 @@ const budgetedBaselineReviewerFindingsText = readFileSync(join(root, reviewDir, 
 const budgetedBaselineReviewerIntakeText = readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md"), "utf8");
 const budgetedBaselineReviewerIntakeReport = JSON.parse(readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json"), "utf8"));
 const budgetedBaselineClaudeBlockedText = readFileSync(join(root, reviewDir, "reviewer-work/claude-opus-blocked-by-hooks.md"), "utf8");
+const budgetedBaselineReviewedComparison = JSON.parse(readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewed-comparison.json"), "utf8"));
+const budgetedBaselineReviewedPacketReview = JSON.parse(readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewed-packet-review.json"), "utf8"));
+const budgetedBaselineReviewedReturnedPacketIntake = JSON.parse(readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewed-returned-packet-intake.json"), "utf8"));
+const budgetedBaselineReviewedNextRun = JSON.parse(readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewed-next-run.json"), "utf8"));
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
@@ -220,6 +228,26 @@ assert.equal(budgetedBaselineReviewerIntakeReport.publicBenchmarkApprovalReady, 
 assert.equal(budgetedBaselineReviewerIntakeReport.reviewerApprovalCount, 2);
 assert.equal(budgetedBaselineReviewerIntakeReport.independentReviewerCount, 2);
 assert.deepEqual(budgetedBaselineReviewerIntakeReport.failedChecks, []);
+assert.equal(budgetedBaselineReviewedComparison.mode, "baseline-comparison");
+assert.equal(budgetedBaselineReviewedComparison.countsAsComparisonEvidence, true);
+assert.equal(budgetedBaselineReviewedComparison.publicBenchmarkClaimsAllowed, true);
+assert.equal(budgetedBaselineReviewedComparison.reviewerApprovalCount, 2);
+assert.equal(budgetedBaselineReviewedComparison.reviewerApprovalTarget?.ok, true);
+assert.deepEqual(budgetedBaselineReviewedComparison.failedChecks, []);
+assert.equal(budgetedBaselineReviewedPacketReview.mode, "baseline-evidence-packet-review");
+assert.equal(budgetedBaselineReviewedPacketReview.countsAsPublicBenchmarkEvidence, true);
+assert.equal(budgetedBaselineReviewedPacketReview.publicBenchmarkClaimsAllowed, true);
+assert.equal(budgetedBaselineReviewedPacketReview.publicLaunchAllowed, false);
+assert.deepEqual(budgetedBaselineReviewedPacketReview.failedChecks, []);
+assert.equal(budgetedBaselineReviewedReturnedPacketIntake.mode, "baseline-returned-packet-intake");
+assert.equal(budgetedBaselineReviewedReturnedPacketIntake.status, "READY_FOR_PUBLIC_BENCHMARK_REVIEW");
+assert.equal(budgetedBaselineReviewedReturnedPacketIntake.countsAsPublicBenchmarkEvidence, true);
+assert.equal(budgetedBaselineReviewedReturnedPacketIntake.publicLaunchAllowed, false);
+assert.equal(budgetedBaselineReviewedNextRun.mode, "hosted-baseline-next-run");
+assert.equal(budgetedBaselineReviewedNextRun.readyForOwnerReview, true);
+assert.equal(budgetedBaselineReviewedNextRun.requireReadyPassed, true);
+assert.equal(budgetedBaselineReviewedNextRun.status, "READY_FOR_OWNER_REVIEW");
+assert.equal(budgetedBaselineReviewedNextRun.publicLaunchAllowed, false);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
@@ -299,12 +327,6 @@ const blockerReport = [
     status: "blocked",
     evidence: "release-state.json",
     nextAction: "Owner must approve merge, visibility, and any public live update with the blocker list visible.",
-  },
-  {
-    id: "hosted-supermemory-baseline-not-current",
-    status: "blocked",
-    evidence: "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json",
-    nextAction: "A source-matched live hosted mirror baseline completed with zero privacy leaks, RecallWeave non-zero quality, a strict-real packet, and a 1600-token local context budget. Two independent reviewer approvals are now collected in reviewer-work, but public benchmark claims remain blocked until the matched comparison is rerun with `--reviewer-approval-report`, the metrics-only packet is rebuilt, and `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` passes with the reviewer approval report attached.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -424,6 +446,24 @@ console.log(
           independentReviewerCount: budgetedBaselineReviewerIntakeReport.independentReviewerCount,
           failedChecks: budgetedBaselineReviewerIntakeReport.failedChecks,
         },
+        budgetedBaselineReviewedComparison: {
+          countsAsComparisonEvidence: budgetedBaselineReviewedComparison.countsAsComparisonEvidence,
+          publicBenchmarkClaimsAllowed: budgetedBaselineReviewedComparison.publicBenchmarkClaimsAllowed,
+          reviewerApprovalCount: budgetedBaselineReviewedComparison.reviewerApprovalCount,
+          failedChecks: budgetedBaselineReviewedComparison.failedChecks,
+        },
+        budgetedBaselineReviewedPacketReview: {
+          countsAsPublicBenchmarkEvidence: budgetedBaselineReviewedPacketReview.countsAsPublicBenchmarkEvidence,
+          publicBenchmarkClaimsAllowed: budgetedBaselineReviewedPacketReview.publicBenchmarkClaimsAllowed,
+          publicLaunchAllowed: budgetedBaselineReviewedPacketReview.publicLaunchAllowed,
+          failedChecks: budgetedBaselineReviewedPacketReview.failedChecks,
+        },
+        budgetedBaselineReviewedNextRun: {
+          readyForOwnerReview: budgetedBaselineReviewedNextRun.readyForOwnerReview,
+          requireReadyPassed: budgetedBaselineReviewedNextRun.requireReadyPassed,
+          status: budgetedBaselineReviewedNextRun.status,
+          publicLaunchAllowed: budgetedBaselineReviewedNextRun.publicLaunchAllowed,
+        },
         hostedBaselineCollector: {
           provider: hostedBaselineCollector.provider,
           metricsOnly: hostedBaselineCollector.metricsOnly,
@@ -497,7 +537,7 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet /tmp/recallweave-baseline-evidence-packet.zip --comparison /tmp/recallweave-baseline-comparison.json --strict-target --review /tmp/reviewer-a-approval.json --review /tmp/reviewer-b-approval.json --output /tmp/recallweave-reviewer-approval-report.json",
         "npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --reviewer-approval-report /tmp/recallweave-reviewer-approval-report.json --output /tmp/recallweave-baseline-comparison.json",
         "npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --preflight /tmp/recallweave-hosted-baseline-preflight.json --comparison /tmp/recallweave-baseline-comparison.json --require-ready",
-        "npm exec --yes pnpm@10.23.0 -- baseline:returned-packet -- --packet /tmp/recallweave-baseline-evidence-packet.zip --require-production-baseline --output /tmp/recallweave-returned-baseline-intake.json",
+        "npm exec --yes pnpm@10.23.0 -- baseline:returned-packet -- --packet /tmp/recallweave-baseline-evidence-packet.zip --require-public-benchmark --output /tmp/recallweave-returned-baseline-intake.json",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },

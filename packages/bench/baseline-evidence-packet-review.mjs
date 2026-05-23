@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, isAbsolute, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -10,6 +10,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const strictReal = Boolean(args.strictReal);
 const packetInput = args.packet || process.env.RECALLWEAVE_BASELINE_PACKET_ZIP || "";
+const outputPath = args.output ? resolvePath(args.output) : null;
 const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-baseline-packet-review-"));
 
 const secretPattern =
@@ -65,7 +66,11 @@ try {
   const countsAsHostedBaselineEvidence = Boolean(manifest.countsAsHostedBaselineEvidence && preflight.countsAsHostedBaselineEvidence);
   const countsAsComparisonEvidence = Boolean(manifest.countsAsComparisonEvidence && comparison.countsAsComparisonEvidence);
   const packagePassesStrictReal = Boolean(manifest.packagePassesStrictReal);
-  const publicBenchmarkClaimsAllowed = Boolean(manifest.publicBenchmarkClaimsAllowed && comparison.publicBenchmarkClaimsAllowed && preflight.publicBenchmarkClaimsAllowed);
+  const publicBenchmarkClaimsAllowed = Boolean(
+    manifest.publicBenchmarkClaimsAllowed &&
+      comparison.publicBenchmarkClaimsAllowed &&
+      countsAsHostedBaselineEvidence,
+  );
   const recallWeaveWin = Boolean(comparison.recallWeaveWin);
   const reviewerApprovalCount = Number(comparison.reviewerApprovalCount ?? preflight.reviewerApprovalCount ?? 0);
   const strictRealPassed = !fixtureOnly && countsAsHostedBaselineEvidence && countsAsComparisonEvidence && packagePassesStrictReal;
@@ -164,6 +169,7 @@ try {
 
   const serialized = `${JSON.stringify(output, null, 2)}\n`;
   assertSafeText(serialized, "review output");
+  if (outputPath) writeFileSync(outputPath, serialized, { encoding: "utf8", mode: 0o600 });
   process.stdout.write(serialized);
   if (strictFailureReason) process.exitCode = 1;
 } finally {

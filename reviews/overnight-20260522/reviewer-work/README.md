@@ -17,6 +17,11 @@ same metrics-only run, query-set hash, and scoring-code hash. Markdown notes in
 this folder explain route status and blocked attempts; they do not count as
 benchmark approvals by themselves.
 
+Future native CLI reviewers should write concise markdown findings in this
+folder, then export any countable approval as JSON only after the markdown
+findings are complete. Keep CLI transcripts summarized. Do not paste raw
+prompts, raw answers, raw memories, credentials, or private paths.
+
 ## Current Findings
 
 - Codex GPT-5.5 produced a countable source-matched canary approval.
@@ -36,4 +41,3 @@ benchmark approvals by themselves.
 
 - `claude-opus-blocked-by-hooks.md`
 - `reviewer-findings.md`
-

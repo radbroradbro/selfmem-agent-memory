@@ -314,17 +314,16 @@
       "countsAsPublicLaunchApproval": false
     },
     "hostedBaselineLiveBudgetedRun": {
-      "status": "ready_for_baseline_review",
-      "verdict": "BUDGETED_RUN_READY_NEEDS_REVIEWERS",
+      "status": "ready_for_owner_review",
+      "verdict": "BUDGETED_CANARY_REVIEWED_OWNER_REVIEW_REQUIRED",
       "route": "node packages/bench/hosted-baseline-run.mjs --live --context-token-budget 1600",
-      "evidence": "reviews/overnight-20260522/hosted-baseline-live-budgeted-run-evidence.md",
-      "completedAt": "2026-05-23T18:35:00Z",
+      "evidence": "reviews/overnight-20260522/reviewer-work/budgeted-baseline-reviewed-next-run.json",
+      "completedAt": "2026-05-23T20:20:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },
   "remainingBlockers": [
     "human-public-launch-approval-required",
-    "hosted-supermemory-baseline-not-current",
     "fresh-real-container-canary-not-current"
   ],
   "safetyBoundary": {

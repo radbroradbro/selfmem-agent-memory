@@ -53,7 +53,9 @@ Result:
 - `writesRealFiles: false`
 - `callsHostedProvider: false`
 - `metricsOnly: true`
-- `releaseBlockerPresent: true`
+- `releaseBlockerPresent: false` after the reviewed budgeted canary moved to
+  owner-review state
+- `reviewedHostedBaselineReady: true`
 - `hostedBaselineFresh: false`
 - `countsAsHostedBaselineEvidence: false`
 - `benchmarkClaimsAllowed: false`
@@ -162,9 +164,9 @@ Required live-run inputs are recorded as names only:
 
 ## Boundary
 
-This is a preflight and release gate, not a live hosted benchmark. The blocker
-`hosted-supermemory-baseline-not-current` remains valid until a sanitized live
-result is reviewed.
+This is a preflight and release gate, not a live hosted benchmark. It did not
+close the hosted-baseline blocker by itself. A later source-matched budgeted
+canary with reviewer approvals moved that benchmark evidence to owner review.
 
 The `baseline:preflight -- --fixture` path is now part of full smoke so this
 guard cannot silently regress.

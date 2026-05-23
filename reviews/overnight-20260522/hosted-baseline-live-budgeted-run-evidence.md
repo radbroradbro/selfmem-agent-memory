@@ -73,8 +73,11 @@ baseline:packet:review -- --packet <strict-real-packet> --strict-real
 - Skipped-by-budget candidate count: 41.
 - Strict-real packet review: passed.
 - Reviewer intake: two independent approvals collected after this run.
-- Remaining comparison blocker: rerun the matched comparison and packet with
-  the reviewer approval report attached.
+- Reviewed comparison: rerun with reviewer approvals, passed.
+- Reviewed returned packet intake: `READY_FOR_PUBLIC_BENCHMARK_REVIEW`.
+- Reviewed next-run planner: `READY_FOR_OWNER_REVIEW`.
+- Remaining release blockers: owner approval and one real-container production
+  canary.
 
 ## Artifact Hashes
 

@@ -4,7 +4,7 @@ This repository includes metrics-only benchmark notes. It does not include agent
 
 ## Current Claim Boundary
 
-RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. A 2026-05-23 source-matched, budgeted live canary beat the selected hosted baseline on this small private slice, but it is still metrics-only engineering evidence. Public quality claims require two independent reviewer approvals for that exact packet, then a fuller benchmark before broad superiority language.
+RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. A 2026-05-23 source-matched, budgeted live canary beat the selected hosted baseline on this small private slice, and two independent reviewers approved the metrics-only packet for owner review. That supports a narrow canary comparison only. Broad superiority language still needs a fuller benchmark and owner approval.
 
 The current branch includes a hosted baseline preflight:
 
@@ -39,8 +39,10 @@ quality with p50 latency 549 ms and average context tokens 1397. RecallWeave
 scored 0.1212 quality, P@1 0.125, recall@5 0.125, recall@10 0.125, p50 latency
 12 ms, p95 latency 17 ms, and average context tokens 1600. Privacy failures
 were zero for both arms. The result removes the earlier local context-mass
-caveat, but it is not a public benchmark claim because reviewerApprovalCount is
-0 and the packet still needs two independent approvals.
+caveat. A reviewed comparison now records reviewerApprovalCount 2,
+`publicBenchmarkClaimsAllowed: true`, and `READY_FOR_OWNER_REVIEW`. Public
+launch and broad benchmark language remain blocked by owner approval and the
+fresh real-container rollout gate.
 
 `baseline:discover -- --live` is the read-only hosted metadata discovery step.
 It lists candidate containers as hashed ids, counts, timestamps, and status/type
@@ -77,8 +79,8 @@ run summary is in
 
 A subsequent 2026-05-23 source-matched mirror run used hosted Supermemory as
 the read-only source for both arms and applied a 1600-token RecallWeave context
-budget. That run produced a strict-real packet and is the current benchmark
-evidence to send to reviewers. The public-safe run summary is in
+budget. That run produced a strict-real packet, two reviewer approvals, and a
+reviewed owner-review packet. The public-safe run summary is in
 `reviews/overnight-20260522/hosted-baseline-live-budgeted-run-evidence.md`.
 
 To generate the hosted baseline operator packet with this discovery state

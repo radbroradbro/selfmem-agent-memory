@@ -40,6 +40,10 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after the controller reran the current
     five-packet returned-diagnostics batch and regenerated the OpenClaw
     next-agent handoff packet. Updated at: 2026-05-23T13:28:07Z.
+  - The PR body was refreshed again after the source-matched budgeted hosted
+    canary collected two independent reviewer approvals, rebuilt the reviewed
+    comparison packet, and reached owner-review state. Updated at:
+    2026-05-23T19:18:20Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -74,6 +78,6 @@ Verdict: resolved for PR body and blocker issue writes.
   as blocked evidence.
 - Human approval is still required before merge, visibility change, or public
   release messaging.
-- Hosted Supermemory comparison claims still require a fresh metrics-only
-  baseline.
+- The hosted Supermemory canary comparison is now ready for owner review, but
+  does not authorize launch or broad superiority language.
 - One real-container production canary remains incomplete.

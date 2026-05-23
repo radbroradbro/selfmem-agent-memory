@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "mode": "baseline-returned-packet-intake",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "reviewStrictReal": true,
+  "requireProductionBaseline": false,
+  "requirePublicBenchmark": true,
+  "status": "READY_FOR_PUBLIC_BENCHMARK_REVIEW",
+  "countsAsProductionBaselineEvidence": true,
+  "countsAsPublicBenchmarkEvidence": true,
+  "publicLaunchAllowed": false,
+  "packet": {
+    "pathLabel": "recallweave-reviewed-baseline-evidence-packet.zip",
+    "sha256": "c2dc57a94a82801a82a40c60ec9d7a7a9aecf17094d61f266f9e19d568d963e6",
+    "entries": [
+      "README.md",
+      "baseline-comparison.json",
+      "hosted-baseline-preflight.json",
+      "hosted-baseline-result.json",
+      "manifest.json",
+      "recallweave-result.json"
+    ]
+  },
+  "review": {
+    "ok": true,
+    "strictReal": true,
+    "strictRealPassed": true,
+    "fixtureOnly": false,
+    "countsAsHostedBaselineEvidence": true,
+    "countsAsComparisonEvidence": true,
+    "packagePassesStrictReal": true,
+    "recallWeaveWin": true,
+    "reviewerApprovalCount": 2,
+    "publicBenchmarkClaimsAllowed": true,
+    "failedChecks": [],
+    "strictFailureReason": null
+  },
+  "nextActions": [
+    "Attach this metrics-only intake output and the packet for owner launch review.",
+    "Public launch remains blocked until the owner explicitly approves visibility, merge, and live update language."
+  ]
+}

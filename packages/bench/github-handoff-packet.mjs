@@ -15,7 +15,7 @@ const secretPattern =
 
 const requiredBlockers = [
   "human-public-launch-approval-required",
-  "hosted-supermemory-baseline-not-current",
+  "fresh-real-container-canary-not-current",
 ];
 
 const paths = {
@@ -95,7 +95,7 @@ const statusComment = [
   "- Current production readiness: false.",
   `- Latest verified code baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
   "- PR #5 has been updated and release blocker issue #6 has been created. The generated handoff packet remains useful for auditing or refreshing those public-safe fields later.",
-  "- Claude Opus review completed with CONCERNS. Remaining blockers: human public-launch approval required, hosted Supermemory baseline not current, and one real-container canary still incomplete. Use baseline:preflight before any comparison claim.",
+  "- Claude Opus review completed with CONCERNS. Remaining blockers: human public-launch approval required and one real-container canary still incomplete. The source-matched budgeted hosted canary is ready for owner review, but it does not authorize public launch or broad benchmark language.",
   "",
   "Do not treat green CI as public launch approval. The repo evidence is fixture-only and contains no raw memories, transcripts, credentials, or private diagnostics.",
 ].join("\n");

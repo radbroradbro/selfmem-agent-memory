@@ -39,7 +39,9 @@ need for owner approval.
 
 ## Next Gate
 
-Run the strict intake gate against the two JSON approvals. If it passes, rerun
-the matched comparison with the reviewer approval report attached. Public launch
-still remains blocked until the owner explicitly approves it.
+The strict intake gate passed, the matched comparison was rerun with the
+reviewer approval report attached, the strict-real packet review passed, and
+the next-run planner reached `READY_FOR_OWNER_REVIEW`.
 
+Public launch still remains blocked until the owner explicitly approves it, and
+the real-container production rollout remains incomplete.

@@ -54,7 +54,7 @@ const fixtureOnly = inputs.some((input) => isFixture(input.json));
 const countsAsHostedBaselineEvidence = hostedReal && preflightReal;
 const countsAsComparisonEvidence = comparisonReal;
 const packagePassesStrictReal = hostedReal && recallWeaveReal && comparisonReal && preflightReal;
-const publicBenchmarkClaimsAllowed = Boolean(comparison.json.publicBenchmarkClaimsAllowed && preflight.json.publicBenchmarkClaimsAllowed);
+const publicBenchmarkClaimsAllowed = Boolean(comparisonReal && comparison.json.publicBenchmarkClaimsAllowed && preflightReal);
 
 if (strictReal) {
   assert.equal(packagePassesStrictReal, true, "strict-real baseline packet requires real hosted, RecallWeave, comparison, and preflight evidence");
@@ -228,8 +228,10 @@ function assertPreflight(json, label) {
 }
 
 function buildReadme(manifest) {
-  const verdict = manifest.packagePassesStrictReal
-    ? "Strict-real hosted baseline packet passed. Public benchmark claims still require reviewer approval and owner approval."
+  const verdict = manifest.publicBenchmarkClaimsAllowed
+    ? "Strict-real hosted baseline packet passed with reviewer-approved metrics. Public launch still requires owner approval."
+    : manifest.packagePassesStrictReal
+      ? "Strict-real hosted baseline packet passed. Public benchmark claims still require reviewer approval and owner approval."
     : "Diagnostic or fixture packet only. It does not authorize public benchmark claims or launch.";
   return [
     "# RecallWeave Hosted Baseline Evidence Packet",

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,6 +10,7 @@ const args = parseArgs(process.argv.slice(2));
 const format = String(args.format || "json").trim().toLowerCase();
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 const requireReady = Boolean(args.requireReady);
+const outputPath = args.output ? resolveOutputPath(args.output) : null;
 
 const fixtureMode = Boolean(args.fixture) || noEvidenceArgs(args);
 const hostedPath = resolveInputPath(
@@ -142,11 +143,13 @@ const readyFailure = requireReadyFailure(output);
 if (readyFailure) {
   const serialized = `${JSON.stringify(readyFailure, null, 2)}\n`;
   assertSafeText(serialized, "require-ready failure output");
+  if (outputPath) writeFileSync(outputPath, serialized, { encoding: "utf8", mode: 0o600 });
   process.stdout.write(serialized);
   process.exit(1);
 }
 const serialized = format === "markdown" ? `${output.operatorMessage}\n` : `${JSON.stringify(output, null, 2)}\n`;
 assertSafeText(serialized, "next-run planner output");
+if (outputPath) writeFileSync(outputPath, serialized, { encoding: "utf8", mode: 0o600 });
 process.stdout.write(serialized);
 
 function loadResult(inputPath, expectedProvider) {
@@ -812,6 +815,10 @@ function resultCheck(name, ok) {
 
 function resolveInputPath(value) {
   if (!value) return null;
+  return isAbsolute(value) ? value : resolve(root, value);
+}
+
+function resolveOutputPath(value) {
   return isAbsolute(value) ? value : resolve(root, value);
 }
 

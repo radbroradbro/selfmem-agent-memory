@@ -43,8 +43,9 @@ Live status:
   It used a private hosted mirror, preserved hosted ids, a reviewed 8-query set,
   no-raw-text mode, and a 1600-token RecallWeave context budget. Hosted
   Supermemory scored 0.0000 quality; RecallWeave scored 0.1212 quality with
-  zero privacy failures. This is still metrics-only engineering evidence, not a
-  public benchmark claim, because reviewerApprovalCount remains 0.
+  zero privacy failures. Two independent reviewers approved the metrics-only
+  packet for owner review. This is still a narrow canary comparison, not broad
+  benchmark superiority language.
 - Hardens `baseline:source-match` for real local selfmem exports that contain
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and
@@ -71,7 +72,7 @@ Live status:
 
 Not production ready for public launch yet.
 
-The code, fixture UI, release gate, CI, and Claude Opus review are healthy enough for an alpha PR, but launch remains blocked on human approval, two independent reviewer approvals for the hosted-baseline packet before any public comparison claim, and one real-container production canary.
+The code, fixture UI, release gate, CI, and Claude Opus review are healthy enough for an alpha PR, but launch remains blocked on human approval and one real-container production canary.
 
 ## Latest Verified Baseline
 
