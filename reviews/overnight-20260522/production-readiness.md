@@ -65,6 +65,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Hosted baseline preflight that makes the Supermemory comparison path
   explicit while calling no hosted provider by default and keeping public
   benchmark claims blocked.
+- Hosted baseline operator packet that gives agents a public-safe,
+  aggregate-only hosted Supermemory baseline handoff without calling a hosted
+  provider.
 - GitHub live sync check that compares live PR #5 and blocker issue #6 against
   checked-in release drafts without printing body text or credentials.
 - Canary evidence intake that accepts sanitized one-agent runtime reports with
@@ -334,6 +337,9 @@ evidence for:
   `benchmarkClaimsAllowed: false`. The preflight accepts only aggregate
   metrics and hashes for later live results, never raw memory text or
   credentials.
+- hosted baseline operator packet evidence with attach-only aggregate JSON
+  outputs, env-only credential handling, no hosted provider call, and Gemini
+  `CLEAN` review.
 - canary evidence intake evidence with `fixtureOnly: true`,
   `countsAsRealRolloutEvidence: false`, lifecycle coverage, hybrid search
   coverage, local write observation, read-through mode, p50/p95 latency,
@@ -403,6 +409,8 @@ Passed locally in this automation environment:
 - `npm run update:smoke`
 - `npm run baseline:preflight`: no hosted provider call,
   `publicBenchmarkClaimsAllowed: false`
+- `npm run baseline:operator-packet`: no hosted provider call and public-safe
+  hosted baseline handoff output
 - `npm run canary:report -- --fixture`
 - `npm run canary:report -- --diagnostic-dir
   packages/bench/fixtures/canary-diagnostic-export.fixture`

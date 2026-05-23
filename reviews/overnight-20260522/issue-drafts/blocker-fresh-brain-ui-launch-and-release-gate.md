@@ -43,6 +43,8 @@ requirements are resolved.
 - Local release readiness, smoke, goal audit, hosted-baseline preflight, canary
   evidence intake, canary report generation, and canary diagnosis all passed in
   their safe fixture or metrics-only modes.
+- Hosted baseline operator packet now gives agents a public-safe collection
+  handoff for aggregate-only hosted Supermemory baseline evidence.
 - Fresh canary window isolation now requires post-update `--since` evidence so
   old pre-patch trace history cannot prove or poison a patched one-agent canary.
 - Adapter smokes now assert bounded read-through policy plus positive total,

@@ -38,6 +38,7 @@ const requiredFiles = [
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/containers/selfmem_fixture_agent/container-map.json",
   "packages/bench/fixtures/canary-diagnostic-export.fixture/selfmem_canary/reliability_reports/latest.json",
   "packages/bench/hosted-baseline-preflight.mjs",
+  "packages/bench/hosted-baseline-operator-packet.mjs",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -137,6 +138,8 @@ const requiredFiles = [
   `${reviewDir}/claude-fresh-canary-window-review-blocked.md`,
   `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
+  `${reviewDir}/hosted-baseline-operator-packet-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-operator-packet-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
   `${reviewDir}/gemini-github-handoff-packet-review.md`,
   `${reviewDir}/github-live-sync-evidence.md`,
@@ -239,6 +242,7 @@ const requiredScripts = [
   "canary:diagnose",
   "canary:operator-packet",
   "baseline:preflight",
+  "baseline:operator-packet",
   "goal:audit",
   "release:doctor",
   "release:handoff",
@@ -799,6 +803,7 @@ check("release state is conservative", () => {
     "canary-remediation-plan",
     "canary-operator-packet",
     "hosted-baseline-preflight",
+    "hosted-baseline-operator-packet",
     "claude-opus-pr5-review",
     "github-handoff-packet",
     "github-live-sync-check",
@@ -857,6 +862,7 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /clean consumer|consumer smoke|clean checkout/i, `${file} missing clean consumer smoke`);
     assert.match(text, /blocker doctor|release doctor|release blocker/i, `${file} missing release blocker doctor`);
     assert.match(text, /hosted baseline preflight|baseline preflight/i, `${file} missing hosted baseline preflight`);
+    assert.match(text, /hosted baseline operator|baseline:operator-packet|baseline operator packet/i, `${file} missing hosted baseline operator packet`);
     assert.match(text, /github handoff|handoff packet|manual GitHub/i, `${file} missing GitHub handoff packet`);
     assert.match(text, /github live sync|release:github-sync|live GitHub sync/i, `${file} missing GitHub live sync`);
     assert.match(text, /goal completion audit|goal:audit|completion audit/i, `${file} missing goal completion audit`);
@@ -1338,10 +1344,15 @@ check("fresh hosted baseline preflight passes", () => {
   const result = run("node", ["packages/bench/hosted-baseline-preflight.mjs"]);
   const fixtureResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--fixture"]);
   const templateResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--print-template"]);
+  const operatorResult = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs"]);
+  const operatorMarkdown = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs", "--format", "markdown"]);
   const report = JSON.parse(result.stdout);
   const fixtureReport = JSON.parse(fixtureResult.stdout);
   const templateReport = JSON.parse(templateResult.stdout);
+  const operatorPacket = JSON.parse(operatorResult.stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
+  const operatorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-operator-packet-evidence.md"), "utf8");
+  const operatorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-operator-packet-review.md"), "utf8");
   assert.equal(report.ok, true);
   assert.equal(report.mode, "hosted-baseline-preflight");
   assert.equal(report.writesRealFiles, false);
@@ -1364,8 +1375,25 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(templateReport.baselineResultTemplate?.provider, "hosted-supermemory");
   assert.equal(templateReport.baselineResultTemplate?.metricsOnly, true);
   assert.equal(templateReport.baselineResultTemplate?.rawMemoryIncluded, false);
+  assert.equal(operatorPacket.ok, true);
+  assert.equal(operatorPacket.mode, "hosted-baseline-operator-packet");
+  assert.equal(operatorPacket.writesRealFiles, false);
+  assert.equal(operatorPacket.callsHostedProvider, false);
+  assert.equal(operatorPacket.publicSafe, true);
+  assert.ok(operatorPacket.commands.some((item) => item.id === "print-template" && /baseline:preflight/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "validate-live-result" && /RECALLWEAVE_BASELINE_NO_RAW_TEXT=1/.test(item.command)));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("reviewerApprovalCount is at least 2 before comparison claims"));
+  assert.ok(operatorPacket.forbidden.includes("provider keys"));
+  assert.match(operatorMarkdown.stdout, /RecallWeave Hosted Baseline Packet/);
+  assert.match(operatorMarkdown.stdout, /Attach Only/);
+  assert.match(operatorEvidence, /hosted baseline operator packet/i);
+  assert.match(operatorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
+  assert.doesNotMatch(operatorResult.stdout, secretPattern);
+  assert.doesNotMatch(operatorMarkdown.stdout, secretPattern);
+  assert.doesNotMatch(operatorEvidence, secretPattern);
+  assert.doesNotMatch(operatorGeminiReview, secretPattern);
 });
 
 check("fresh GitHub handoff packet passes", () => {

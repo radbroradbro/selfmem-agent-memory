@@ -16,6 +16,7 @@ is rejected as real baseline evidence.
 ## Files Added Or Updated
 
 - `packages/bench/hosted-baseline-preflight.mjs`
+- `packages/bench/hosted-baseline-operator-packet.mjs`
 - `packages/bench/fixtures/hosted-baseline-result.fixture.json`
 - `package.json`
 - `packages/bench/release-readiness-check.mjs`
@@ -25,6 +26,7 @@ is rejected as real baseline evidence.
 - `docs/RELEASE_HANDOFF.md`
 - `reviews/overnight-20260522/release-state.json`
 - `reviews/overnight-20260522/hosted-baseline-preflight-evidence.md`
+- `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md`
 - `reviews/overnight-20260522/gemini-hosted-baseline-preflight-review.md`
 
 ## Local Command
@@ -33,6 +35,8 @@ is rejected as real baseline evidence.
 node packages/bench/hosted-baseline-preflight.mjs
 node packages/bench/hosted-baseline-preflight.mjs --fixture
 node packages/bench/hosted-baseline-preflight.mjs --print-template
+node packages/bench/hosted-baseline-operator-packet.mjs
+node packages/bench/hosted-baseline-operator-packet.mjs --format markdown
 ```
 
 Result:
@@ -61,6 +65,16 @@ Template result:
 - template includes provider, run id, source commit, dataset slice,
   query-set hash, scoring-code hash, model ids, privacy counters, aggregate
   metrics, and cost fields.
+
+Operator packet result:
+
+- `mode: hosted-baseline-operator-packet`
+- `writesRealFiles: false`
+- `callsHostedProvider: false`
+- attach-only paths are metrics-only `/tmp` JSON files.
+- forbidden artifacts include provider keys, raw hosted memories, raw local
+  memories, transcripts, prompts, answers, cookies, bearer tokens, private local
+  paths, and unredacted diagnostic archives.
 
 ## Safety Contract
 
@@ -124,6 +138,10 @@ result is reviewed.
 
 The `baseline:preflight -- --fixture` path is now part of full smoke so this
 guard cannot silently regress.
+
+The `baseline:operator-packet` path is also part of full smoke. It exists so
+agents can send one clear hosted-baseline handoff without inventing ad hoc
+instructions or leaking keys.
 
 ## Current Local Verification
 

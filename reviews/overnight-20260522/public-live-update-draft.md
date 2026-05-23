@@ -113,6 +113,9 @@ Latest verified head before this draft refresh:
 - Hosted baseline preflight: `baseline:preflight` passes offline with
   `callsHostedProvider: false`, `metricsOnly: true`, and
   `benchmarkClaimsAllowed: false`
+- Hosted baseline operator packet: `baseline:operator-packet` prints a
+  public-safe handoff for aggregate-only hosted Supermemory baseline collection
+  and calls no hosted provider
 - Canary evidence intake: `canary:intake` passes on the public fixture with
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   p50/p95 latency, rollback readiness, zero privacy leaks, and

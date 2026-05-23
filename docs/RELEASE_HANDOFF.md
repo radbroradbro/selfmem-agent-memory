@@ -85,6 +85,7 @@ Run this before any hosted Supermemory comparison claim:
 npm exec --yes pnpm@10.23.0 -- baseline:preflight
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 ```
 
 The preflight is offline by default. It should report `callsHostedProvider:
@@ -97,6 +98,9 @@ Use `--fixture` to verify the parser and result-shape gate without using a
 provider key. Use `--print-template` before a live collection run and fill that
 shape with aggregate metrics, source commits, model ids, costs, latency, and
 hashes. The fixture is intentionally rejected as real hosted-baseline evidence.
+Use `baseline:operator-packet` when an agent needs a paste-ready, public-safe
+handoff for hosted baseline collection. The packet is a contract and validation
+guide only. It does not call hosted Supermemory or close the blocker.
 
 ## Goal Completion Audit
 

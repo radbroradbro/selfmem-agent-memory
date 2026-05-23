@@ -228,3 +228,15 @@ Do not publish benchmark scores from a patch unless RecallWeave beats the
 matched baseline on a source-locked canary with the same dataset slice, memory
 set, queries, judge, answer model, scoring code, settings, privacy scan, and
 reviewer sign-off.
+
+For hosted Supermemory baseline work, use the operator packet instead of
+inventing ad hoc instructions:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
+```
+
+The packet calls no hosted provider. It only prints the aggregate-only result
+contract and validation command. Hosted credentials stay in local environment
+variables and must never appear in PRs, docs, diagnostics, screenshots, or
+attachments.
