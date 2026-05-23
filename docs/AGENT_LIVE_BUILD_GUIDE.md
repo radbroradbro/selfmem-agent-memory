@@ -544,6 +544,18 @@ can review, but the gate trusts only the JSON approval file and never a loose
 counter:
 
 ```bash
+# Set this in your shell, password manager, or CI secret store first. Do not
+# paste the value into docs, issue comments, PRs, screenshots, or command logs.
+export RECALLWEAVE_REVIEW_OPENAI_API_KEY="..."
+
+RECALLWEAVE_REVIEW_OPENAI_PROVIDER=deepseek \
+RECALLWEAVE_REVIEW_OPENAI_MODEL=deepseek-v4-pro \
+npm exec --yes pnpm@10.23.0 -- baseline:reviewer:openai-compatible \
+  -- --packet /tmp/recallweave-baseline-evidence-packet.zip \
+  --comparison /tmp/recallweave-baseline-comparison.json \
+  --reviewer-id deepseek-reviewer-a \
+  --output /tmp/reviewer-a-approval.json
+
 npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake \
   -- --packet /tmp/recallweave-baseline-evidence-packet.zip \
   --comparison /tmp/recallweave-baseline-comparison.json \
@@ -559,5 +571,10 @@ npm exec --yes pnpm@10.23.0 -- baseline:compare \
   --output /tmp/recallweave-baseline-comparison.json
 ```
 
-Hosted credentials stay in local environment variables and must never appear in
-PRs, docs, diagnostics, screenshots, or attachments.
+`baseline:reviewer:openai-compatible` is env-only. In dry-run mode it writes a
+non-countable fixture review so agents can test the path without spending or
+creating fake approvals. In live mode it reads aggregate hashes and metrics,
+calls the reviewer provider, writes one sanitized approval JSON, and leaves
+`baseline:reviewer-intake` to decide whether the approval counts. Hosted and
+reviewer credentials stay in local environment variables and must never appear
+in PRs, docs, diagnostics, screenshots, or attachments.

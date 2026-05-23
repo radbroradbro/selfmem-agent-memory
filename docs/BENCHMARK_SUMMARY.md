@@ -145,6 +145,14 @@ scoring-code hash differs, when either result lacks labeled query-set evidence,
 when RecallWeave exceeds the context-token parity allowance, or when fewer than
 two reviewer approvals exist.
 
+`baseline:reviewer:openai-compatible` is the optional direct-review generator
+for DeepSeek and other OpenAI-compatible reviewers. It reads only metrics,
+hashes, safety counters, and target metadata, then writes one sanitized approval
+JSON for `baseline:reviewer-intake`. The API key must live in
+`RECALLWEAVE_REVIEW_OPENAI_API_KEY` or a provider-specific environment variable.
+The command never needs the key in a shell argument, doc, PR comment, or packet.
+Dry-run mode calls no provider and produces a non-countable fixture artifact.
+
 `baseline:next-run` is the state-aware planner for this benchmark lane. It
 turns the current hosted/local evidence state into the next safe source-locked
 run packet without calling hosted Supermemory or authorizing public claims. The

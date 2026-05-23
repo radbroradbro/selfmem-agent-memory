@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, hosted baseline local mirror/source-matched run gating, and local context-budget comparison gating reviewed CLEAN",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, hosted baseline local mirror/source-matched run gating, and local context-budget comparison gating reviewed CLEAN; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
     "allowedPostBaselineCodePaths": [
       ".gitignore",
       "package.json",
@@ -39,6 +39,7 @@
       "packages/bench/canary-next-agent-plan.mjs",
       "packages/bench/canary-operator-packet.mjs",
       "packages/bench/baseline-comparison.mjs",
+      "packages/bench/baseline-openai-compatible-reviewer.mjs",
       "packages/bench/baseline-reviewer-approval-intake.mjs",
       "packages/bench/baseline-source-alignment.mjs",
       "packages/bench/baseline-source-gap-plan.mjs",
@@ -301,6 +302,14 @@
       "route": "node packages/bench/baseline-reviewer-approval-intake.mjs",
       "evidence": "reviews/overnight-20260522/baseline-reviewer-approval-intake-evidence.md",
       "completedAt": "2026-05-23T18:45:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "baselineOpenAiCompatibleReviewer": {
+      "status": "local_clean",
+      "verdict": "MECHANISM_READY_ENV_ONLY",
+      "route": "node packages/bench/baseline-openai-compatible-reviewer.mjs",
+      "evidence": "reviews/overnight-20260522/baseline-openai-compatible-reviewer-evidence.md",
+      "completedAt": "2026-05-23T19:10:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

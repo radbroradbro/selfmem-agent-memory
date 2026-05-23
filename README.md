@@ -42,7 +42,10 @@ Do not treat this release as a proven Supermemory replacement. The included
 benchmark notes are metrics-only engineering evidence. A public score requires
 a matched, source-locked canary win with the same judge, answer model, queries,
 scoring code, privacy rules, and two reviewer approvals recorded through the
-metrics-only `baseline:reviewer-intake` gate.
+metrics-only `baseline:reviewer-intake` gate. DeepSeek or any OpenAI-compatible
+reviewer can produce one of those approval files through
+`baseline:reviewer:openai-compatible`, but credentials must stay in environment
+variables and dry-run output never counts as approval.
 
 ## Features
 
@@ -152,6 +155,7 @@ Runtime keys can enable:
 - NVIDIA hosted embedding, rerank, or query-expansion benchmark arms.
 - Local Apple Silicon embedding and rerank services.
 - Supermemory read-only history search.
+- DeepSeek or another OpenAI-compatible reviewer for benchmark approval checks.
 - Optional query expansion through a configured provider, disabled by default
   until a controlled canary proves it helps.
 

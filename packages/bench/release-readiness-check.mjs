@@ -74,6 +74,7 @@ const requiredFiles = [
   "packages/bench/baseline-evidence-packet.mjs",
   "packages/bench/baseline-evidence-packet-review.mjs",
   "packages/bench/baseline-returned-packet-intake.mjs",
+  "packages/bench/baseline-openai-compatible-reviewer.mjs",
   "packages/bench/baseline-reviewer-approval-intake.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/release-blocker-doctor.mjs",
@@ -240,6 +241,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-evidence-packet-review.md`,
   `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
   `${reviewDir}/gemini-baseline-returned-packet-intake-review.md`,
+  `${reviewDir}/baseline-openai-compatible-reviewer-evidence.md`,
   `${reviewDir}/baseline-reviewer-approval-intake-evidence.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
   `${reviewDir}/gemini-github-handoff-packet-review.md`,
@@ -371,6 +373,7 @@ const requiredScripts = [
   "baseline:packet",
   "baseline:packet:review",
   "baseline:returned-packet",
+  "baseline:reviewer:openai-compatible",
   "baseline:reviewer-intake",
   "goal:audit",
   "release:doctor",
@@ -2290,6 +2293,8 @@ check("fresh hosted baseline preflight passes", () => {
   const missingSourceGapReportPath = join(collectorTmp, "missing-source-gap.json");
   const baselinePacketPath = join(collectorTmp, "baseline-evidence-packet.zip");
   const baselineReviewerApprovalReportPath = join(collectorTmp, "baseline-reviewer-approval-template.json");
+  const baselineOpenAiReviewerDryRunPath = join(collectorTmp, "baseline-openai-compatible-reviewer-dry-run.json");
+  const baselineOpenAiReviewerIntakePath = join(collectorTmp, "baseline-openai-compatible-reviewer-intake.json");
   const strictFixtureBaselinePacketPath = join(collectorTmp, "strict-fixture-baseline-evidence-packet.zip");
   const returnedBaselineIntakePath = join(collectorTmp, "returned-baseline-packet-intake.json");
   const result = run("node", ["packages/bench/hosted-baseline-preflight.mjs"]);
@@ -2778,6 +2783,43 @@ check("fresh hosted baseline preflight passes", () => {
     "--output",
     baselineReviewerApprovalReportPath,
   ]);
+  const baselineOpenAiReviewerDryRunResult = run("node", [
+    "packages/bench/baseline-openai-compatible-reviewer.mjs",
+    "--dry-run",
+    "--packet",
+    baselinePacketPath,
+    "--output",
+    baselineOpenAiReviewerDryRunPath,
+  ]);
+  const baselineOpenAiReviewerIntakeResult = run("node", [
+    "packages/bench/baseline-reviewer-approval-intake.mjs",
+    "--packet",
+    baselinePacketPath,
+    "--review",
+    baselineOpenAiReviewerDryRunPath,
+    "--strict-target",
+    "--output",
+    baselineOpenAiReviewerIntakePath,
+  ]);
+  const baselineOpenAiReviewerMissingKey = spawnSync(
+    "node",
+    [
+      "packages/bench/baseline-openai-compatible-reviewer.mjs",
+      "--packet",
+      baselinePacketPath,
+    ],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: {
+        ...process.env,
+        RECALLWEAVE_REVIEW_OPENAI_API_KEY: "",
+        RECALLWEAVE_REVIEW_DEEPSEEK_API_KEY: "",
+        DEEPSEEK_API_KEY: "",
+      },
+    },
+  );
   const returnedBaselinePacketPathResult = run("node", [
     "packages/bench/baseline-returned-packet-intake.mjs",
     "--packet",
@@ -2858,6 +2900,8 @@ check("fresh hosted baseline preflight passes", () => {
   const baselinePacketReview = JSON.parse(baselinePacketReviewResult.stdout);
   const baselineReviewerIntake = JSON.parse(baselineReviewerIntakeResult.stdout);
   const baselineReviewerTemplate = JSON.parse(baselineReviewerTemplateResult.stdout);
+  const baselineOpenAiReviewerDryRun = JSON.parse(baselineOpenAiReviewerDryRunResult.stdout);
+  const baselineOpenAiReviewerIntake = JSON.parse(baselineOpenAiReviewerIntakeResult.stdout);
   const returnedBaselinePacket = JSON.parse(returnedBaselinePacketResult.stdout);
   const returnedBaselinePacketFromPath = JSON.parse(returnedBaselinePacketPathResult.stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
@@ -2904,6 +2948,7 @@ check("fresh hosted baseline preflight passes", () => {
   const baselinePacketGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-evidence-packet-review.md"), "utf8");
   const baselineReturnedPacketEvidence = readFileSync(join(root, reviewDir, "baseline-returned-packet-intake-evidence.md"), "utf8");
   const baselineReturnedPacketGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-returned-packet-intake-review.md"), "utf8");
+  const baselineOpenAiReviewerEvidence = readFileSync(join(root, reviewDir, "baseline-openai-compatible-reviewer-evidence.md"), "utf8");
   const baselineReviewerApprovalIntakeEvidence = readFileSync(join(root, reviewDir, "baseline-reviewer-approval-intake-evidence.md"), "utf8");
   assert.equal(report.ok, true);
   assert.equal(report.mode, "hosted-baseline-preflight");
@@ -3582,6 +3627,26 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(baselineReviewerTemplate.publicLaunchAllowed, false);
   assert.equal(baselineReviewerTemplate.target?.packetSha256, baselinePacket.packet?.sha256);
   assert.equal(baselineReviewerTemplate.template?.attestations?.contextTokenCaveatReviewed, true);
+  assert.equal(baselineOpenAiReviewerDryRun.mode, "baseline-openai-compatible-reviewer");
+  assert.equal(baselineOpenAiReviewerDryRun.dryRun, true);
+  assert.equal(baselineOpenAiReviewerDryRun.callsReviewerProvider, false);
+  assert.equal(baselineOpenAiReviewerDryRun.metricsOnly, true);
+  assert.equal(baselineOpenAiReviewerDryRun.publicLaunchAllowed, false);
+  assert.equal(baselineOpenAiReviewerDryRun.provider, "deepseek");
+  assert.equal(baselineOpenAiReviewerDryRun.model, "deepseek-v4-pro");
+  assert.equal(baselineOpenAiReviewerDryRun.target?.packetSha256, baselinePacket.packet?.sha256);
+  assert.equal(baselineOpenAiReviewerDryRun.reviewArtifact?.fixtureOnly, true);
+  assert.equal(baselineOpenAiReviewerDryRun.reviewArtifact?.countsAsBenchmarkApproval, false);
+  assert.equal(baselineOpenAiReviewerIntake.mode, "baseline-reviewer-approval-intake");
+  assert.equal(baselineOpenAiReviewerIntake.reviewerApprovalCount, 0);
+  assert.equal(baselineOpenAiReviewerIntake.publicBenchmarkApprovalReady, false);
+  assert.ok(baselineOpenAiReviewerIntake.reviews?.[0]?.failedChecks?.includes("not-fixture"));
+  assert.notEqual(baselineOpenAiReviewerMissingKey.status, 0);
+  assert.match(
+    `${baselineOpenAiReviewerMissingKey.stderr}\n${baselineOpenAiReviewerMissingKey.stdout}`,
+    /set RECALLWEAVE_REVIEW_OPENAI_API_KEY or the provider-specific key/i,
+  );
+  assert.doesNotMatch(`${baselineOpenAiReviewerMissingKey.stderr}\n${baselineOpenAiReviewerMissingKey.stdout}`, secretPattern);
   assert.equal(returnedBaselinePacket.mode, "baseline-returned-packet-intake");
   assert.equal(returnedBaselinePacket.status, "NOT_BASELINE_EVIDENCE");
   assert.equal(returnedBaselinePacket.countsAsProductionBaselineEvidence, false);
@@ -3678,6 +3743,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(baselineReturnedPacketEvidence, /returned baseline evidence packet|returned hosted baseline packet/i);
   assert.match(baselineReturnedPacketEvidence, /baseline:returned-packet/i);
   assert.match(baselineReturnedPacketGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(baselineOpenAiReviewerEvidence, /OpenAI-compatible reviewer/i);
+  assert.match(baselineOpenAiReviewerEvidence, /baseline:reviewer:openai-compatible/i);
+  assert.match(baselineOpenAiReviewerEvidence, /env-only/i);
   assert.match(baselineReviewerApprovalIntakeEvidence, /reviewer approval intake/i);
   assert.match(baselineReviewerApprovalIntakeEvidence, /baseline-reviewer-approval-intake|baseline:reviewer-intake/i);
   assert.match(querySetEvidence, /baseline:queryset/i);
@@ -3795,6 +3863,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(baselinePacketGeminiReview, secretPattern);
   assert.doesNotMatch(baselineReturnedPacketEvidence, secretPattern);
   assert.doesNotMatch(baselineReturnedPacketGeminiReview, secretPattern);
+  assert.doesNotMatch(baselineOpenAiReviewerEvidence, secretPattern);
   assert.doesNotMatch(baselineReviewerApprovalIntakeEvidence, secretPattern);
   rmSync(collectorTmp, { recursive: true, force: true });
 });

@@ -275,6 +275,26 @@ Claude, Codex, Gemini, DeepSeek, or another reviewer inspects the metrics-only
 packet, but it does not accept raw memories, keys, private paths, or a loose
 reviewer count.
 
+For DeepSeek or another OpenAI-compatible reviewer, generate the approval file
+with an env-only direct call:
+
+```bash
+# Set the real value outside the repo and outside pasted command logs.
+export RECALLWEAVE_REVIEW_OPENAI_API_KEY="..."
+
+RECALLWEAVE_REVIEW_OPENAI_PROVIDER=deepseek \
+RECALLWEAVE_REVIEW_OPENAI_MODEL=deepseek-v4-pro \
+npm exec --yes pnpm@10.23.0 -- baseline:reviewer:openai-compatible \
+  -- --packet /tmp/recallweave-baseline-evidence-packet.zip \
+  --comparison /tmp/recallweave-baseline-comparison.json \
+  --reviewer-id deepseek-reviewer-a \
+  --output /tmp/reviewer-a-approval.json
+```
+
+Run the same command with `--dry-run` first when checking a fresh install. The
+dry-run artifact is intentionally non-countable, so it cannot fake a benchmark
+approval.
+
 ## Goal Completion Audit
 
 Run this before anyone claims the active goal is complete:
