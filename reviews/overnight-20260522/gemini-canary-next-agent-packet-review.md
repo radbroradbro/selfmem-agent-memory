@@ -51,3 +51,29 @@ Additional findings:
   operator work.
 
 Required fixes: none.
+
+## Allow-Failed Inputs Extension Review
+
+Gemini reran a focused cold review after the packet builder and planner gained
+direct `--input-root ... --allow-failed-inputs --require-ready` support for
+mixed returned-diagnostics folders.
+
+Verdict: CLEAN
+
+Additional findings:
+
+- `--allow-failed-inputs` is parsed as a boolean by both the planner and packet
+  builder.
+- The flag is scoped to the diagnostic batch audit path and is not used to
+  relax returned-packet or production-canary intake.
+- Mixed-folder packet creation can tolerate one failed sibling diagnostic while
+  still reporting `failedInputCount` and preventing the failed input from
+  counting as rollout evidence.
+- Generated outputs remain metrics-only and public-safe; raw memories,
+  transcripts, prompts, answers, keys, cookies, private local paths, and raw
+  diagnostics stay forbidden.
+- `--require-ready` still fails closed for fixture or demo packets.
+- Public launch and fleet rollout remain blocked.
+- Docs match the implemented command shape.
+
+Required fixes: none.

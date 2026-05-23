@@ -2048,7 +2048,16 @@ check("fresh canary next-agent plan passes", () => {
 check("fresh canary next-agent handoff packet passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-next-agent-packet-check-"));
   const packetPath = join(tempRoot, "next-agent-handoff.zip");
+  const allowFailedPacketPath = join(tempRoot, "next-agent-handoff-allow-failed.zip");
   const packetRun = run("node", ["packages/bench/canary-next-agent-packet.mjs", "--output", packetPath]);
+  const allowFailedPacketRun = run("node", [
+    "packages/bench/canary-next-agent-packet.mjs",
+    "--input-root",
+    "packages/bench/fixtures/canary-diagnostic-export.fixture",
+    "--allow-failed-inputs",
+    "--output",
+    allowFailedPacketPath,
+  ]);
   const requireReadyFixtureRun = spawnSync(
     "node",
     ["packages/bench/canary-next-agent-packet.mjs", "--require-ready", "--output", join(tempRoot, "fixture-should-not-pass.zip")],
@@ -2059,9 +2068,12 @@ check("fresh canary next-agent handoff packet passes", () => {
     },
   );
   const report = JSON.parse(packetRun.stdout);
+  const allowFailedReport = JSON.parse(allowFailedPacketRun.stdout);
   const requireReadyFixtureReport = JSON.parse(requireReadyFixtureRun.stdout);
   const entries = run("unzip", ["-Z1", packetPath]).stdout.split(/\r?\n/).filter(Boolean).sort();
   const manifest = JSON.parse(run("unzip", ["-p", packetPath, "manifest.json"]).stdout);
+  const allowFailedManifest = JSON.parse(run("unzip", ["-p", allowFailedPacketPath, "manifest.json"]).stdout);
+  const allowFailedPlan = JSON.parse(run("unzip", ["-p", allowFailedPacketPath, "next-agent-plan.json"]).stdout);
   const readme = run("unzip", ["-p", packetPath, "README.md"]).stdout;
   const markdown = run("unzip", ["-p", packetPath, "next-agent-plan.md"]).stdout;
   const operator = run("unzip", ["-p", packetPath, "strict-real-operator-packet.md"]).stdout;
@@ -2079,6 +2091,10 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(report.requireReadyPassed, true);
   assert.equal(report.host, "hermes");
   assert.equal(report.status, "FIXTURE_PLAN_ONLY");
+  assert.equal(allowFailedReport.ok, true);
+  assert.equal(allowFailedReport.mode, "canary-next-agent-handoff-packet");
+  assert.equal(allowFailedManifest.batch.allowFailedInputs, true);
+  assert.equal(allowFailedPlan.batch.allowFailedInputs, true);
   assert.notEqual(requireReadyFixtureRun.status, 0);
   assert.equal(requireReadyFixtureReport.ok, false);
   assert.equal(requireReadyFixtureReport.requireReadyPassed, false);
@@ -2125,8 +2141,9 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(drill, /store-public-canary-fact/);
   assert.match(evidence, /canary:next-agent-packet/i);
   assert.match(evidence, /single public-safe zip/i);
+  assert.match(evidence, /--allow-failed-inputs/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
-  for (const text of [packetRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, readme, markdown, operator, drill, evidence]) {
+  for (const text of [packetRun.stdout, allowFailedPacketRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, readme, markdown, operator, drill, evidence]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   }
@@ -2180,9 +2197,9 @@ check("fresh release blocker doctor passes", () => {
   assert.ok(report.manualCommands.some((item) => /baseline:source-gap/.test(item) && /--output/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /--reviewed-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
-  assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --require-ready/);
+  assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --allow-failed-inputs --require-ready/);
   assert.match(canaryBlocker.nextAction, /canary:drill/);
-  assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--require-ready/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--allow-failed-inputs/.test(item) && /--require-ready/.test(item)));
   assert.ok(report.manualCommands.some((item) => /canary:drill/.test(item) && /--format markdown/.test(item)));
 });
 

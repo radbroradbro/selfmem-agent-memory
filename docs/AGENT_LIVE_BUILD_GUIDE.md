@@ -277,6 +277,12 @@ To turn the batch result into one paste-ready next-agent plan, run:
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --input-root /path/to/redacted-diagnostics --format markdown
 ```
 
+For mixed return folders, use the same triage flag here too:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --input-root /path/to/redacted-diagnostics --allow-failed-inputs --format markdown
+```
+
 This planner does not promote the fleet. It selects the closest privacy-clean
 candidate, names the failed checks, and prints the exact dry-run, apply,
 fresh-window, strict intake, diagnosis, and packet commands for one agent only.
@@ -287,7 +293,7 @@ To send the work to one live operator, build a packet and require live-ready
 evidence:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to/redacted-diagnostics --require-ready --output /tmp/recallweave-next-agent-handoff.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to/redacted-diagnostics --allow-failed-inputs --require-ready --output /tmp/recallweave-next-agent-handoff.zip
 ```
 
 The packet stays metrics-only. It includes a fresh-window contract, return

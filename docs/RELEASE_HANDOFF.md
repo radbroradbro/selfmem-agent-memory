@@ -409,6 +409,13 @@ After ranking the batch, generate one next-agent update plan:
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --input-root <redacted-diagnostics-folder> --format markdown
 ```
 
+For mixed return folders, pass the triage flag through the planner so one bad
+archive does not block the best privacy-clean candidate:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --format markdown
+```
+
 The next-agent plan is safe to paste to one operator. It keeps public launch
 and fleet rollout blocked, selects the closest privacy-clean candidate, and
 prints only placeholder-based commands for dry-run, adapter apply, fresh-window
@@ -425,7 +432,7 @@ For a live handoff, require the planner to prove the packet is not fixture/demo
 evidence:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --require-ready --output /tmp/recallweave-next-agent-handoff.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --output /tmp/recallweave-next-agent-handoff.zip
 ```
 
 The packet contains only README, manifest, next-agent plan JSON/Markdown,

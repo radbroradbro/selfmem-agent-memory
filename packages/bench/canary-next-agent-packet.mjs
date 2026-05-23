@@ -84,6 +84,7 @@ const manifest = {
     : null,
   batch: {
     sha256: planJson.batch?.sha256 ?? null,
+    allowFailedInputs: Boolean(planJson.batch?.allowFailedInputs),
     inputCount: numberValue(planJson.batch?.inputCount),
     parsedInputCount: numberValue(planJson.batch?.parsedInputCount),
     failedInputCount: numberValue(planJson.batch?.failedInputCount),
@@ -273,6 +274,7 @@ function plannerArgs() {
   if (args.inputRoot) result.push("--input-root", args.inputRoot);
   if (args.diagnosticRoot) result.push("--diagnostic-root", args.diagnosticRoot);
   for (const input of asArray(args.input)) result.push("--input", input);
+  if (args.allowFailedInputs) result.push("--allow-failed-inputs");
   if (args.candidateLabel) result.push("--candidate-label", args.candidateLabel);
   if (args.host) result.push("--host", args.host);
   return result;
@@ -312,7 +314,7 @@ function listZip(zipPath) {
 
 function parseArgs(argv) {
   const parsed = {};
-  const booleanFlags = new Set(["requireReady"]);
+  const booleanFlags = new Set(["allowFailedInputs", "requireReady"]);
   for (let index = 0; index < argv.length; index += 1) {
     const item = argv[index];
     if (item === "--") continue;

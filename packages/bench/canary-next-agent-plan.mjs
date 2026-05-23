@@ -39,6 +39,7 @@ const output = {
   selectedCandidate: selected ? summarizeSelected(selected) : null,
   batch: {
     sha256: sha256(JSON.stringify(batch)),
+    allowFailedInputs: Boolean(batch.allowFailedInputs),
     inputCount: numberValue(batch.inputCount),
     parsedInputCount: numberValue(batch.parsedInputCount),
     failedInputCount: numberValue(batch.failedInputCount),
@@ -101,6 +102,7 @@ function loadBatch(parsed) {
   if (parsed.inputRoot) batchArgs.push("--input-root", parsed.inputRoot);
   if (parsed.diagnosticRoot) batchArgs.push("--diagnostic-root", parsed.diagnosticRoot);
   for (const input of asArray(parsed.input)) batchArgs.push("--input", input);
+  if (parsed.allowFailedInputs) batchArgs.push("--allow-failed-inputs");
   const run = spawnSync("node", batchArgs, {
     cwd: root,
     encoding: "utf8",
@@ -360,11 +362,16 @@ function buildMarkdown(plan) {
 
 function parseArgs(argv) {
   const parsed = {};
+  const booleanFlags = new Set(["allowFailedInputs"]);
   for (let index = 0; index < argv.length; index += 1) {
     const item = argv[index];
     if (item === "--") continue;
     if (item.startsWith("--")) {
       const key = toCamel(item.slice(2));
+      if (booleanFlags.has(key)) {
+        parsed[key] = true;
+        continue;
+      }
       const value = argv[index + 1] ?? "";
       if (key === "input") parsed.input = [...asArray(parsed.input), value];
       else parsed[key] = value;

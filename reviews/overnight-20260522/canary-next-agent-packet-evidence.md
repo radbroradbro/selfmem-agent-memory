@@ -14,6 +14,7 @@ The packet includes only:
 - `manifest.json`
 - `next-agent-plan.json`
 - `next-agent-plan.md`
+- `strict-real-canary-drill.md`
 - `strict-real-operator-packet.md`
 
 It does not include raw diagnostic bundles, raw memories, transcripts, prompts,
@@ -27,6 +28,7 @@ node --check packages/bench/canary-next-agent-packet.mjs
 npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --output <packet.zip>
 npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --require-ready --output <packet.zip>
 npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch <metrics-only-batch.json> --output <packet.zip>
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --output <packet.zip>
 ```
 
 ## Fixture Packet Result
@@ -86,12 +88,13 @@ name, or private local path content was written to the repo.
 ## Current Returned Diagnostics Packet Result
 
 The controller reran the current returned diagnostic set from the active
-worktree on 2026-05-23 and generated a fresh sendable packet. This is the
-current packet to hand to the selected OpenClaw operator.
+worktree on 2026-05-23 and generated a fresh sendable packet through the
+single-command `--input-root ... --allow-failed-inputs --require-ready` path.
+This is the current packet to hand to the selected OpenClaw operator.
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260523-current.zip`.
+- Packet label: `recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`.
 - Packet SHA256:
-  `98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`.
+  `f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`.
 - Mode: `canary-next-agent-handoff-packet`.
 - Public safe: true.
 - Metrics only: true.
@@ -102,6 +105,9 @@ current packet to hand to the selected OpenClaw operator.
 - One-agent canary allowed: true.
 - Ready for live handoff: true.
 - `--require-ready` result: passed for the non-fixture OpenClaw handoff packet.
+- `--allow-failed-inputs` result: passed the mixed-folder triage flag through
+  the packet builder and planner without allowing the failed sibling bundle to
+  count as rollout evidence.
 - Selected candidate label: `bundle_8e90781bb060a889`.
 - Failed checks:
   - `adapter-contract`
@@ -111,8 +117,8 @@ current packet to hand to the selected OpenClaw operator.
 - Store p95: 0 ms.
 - Store latency samples: 0.
 - Privacy leak count: 0.
-- Batch inputs: 5.
-- Batch parsed inputs: 4.
+- Batch inputs: 9.
+- Batch parsed inputs: 8.
 - Batch failed inputs: 1.
 - Strict-real pass count: 0.
 
@@ -134,6 +140,8 @@ rollout blocker can close.
 - The packet keeps public launch and fleet rollout false.
 - The packet records `readyForLiveHandoff` separately from
   `oneAgentCanaryAllowed`.
+- `--allow-failed-inputs` is preserved in the planner and packet manifest so
+  mixed diagnostic folders can be triaged directly without hiding failed inputs.
 - `--require-ready` fails closed for fixture/demo evidence and passes only when
   the planner reports `READY_FOR_ONE_AGENT_FRESH_CANARY`.
 - The manifest includes a fresh-window contract and return checklist.

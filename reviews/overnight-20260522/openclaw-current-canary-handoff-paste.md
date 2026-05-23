@@ -4,8 +4,8 @@ Use this with exactly one OpenClaw agent. Attach the zip named below in the same
 
 Packet:
 
-- `recallweave-openclaw-next-agent-canary-20260523-current.zip`
-- SHA256: `98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`
+- `recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`
+- SHA256: `f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`
 
 Paste:
 

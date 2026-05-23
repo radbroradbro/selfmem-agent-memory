@@ -285,8 +285,11 @@ requirements are resolved.
   latency evidence. The next canary must use a fresh patched runtime window,
   follow `canary:drill`, and pass strict intake.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
-  `98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`.
+  `recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`, SHA256
+  `f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`.
+  It was built with `--allow-failed-inputs --require-ready` from the mixed
+  redacted diagnostics folder, so one bad sibling archive does not block the
+  selected privacy-clean OpenClaw handoff.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 
 ## Acceptance Criteria

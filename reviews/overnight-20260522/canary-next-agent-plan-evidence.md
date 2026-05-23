@@ -71,8 +71,12 @@ content was written to the repo.
 ## Current Handoff Packet
 
 The current next-agent handoff packet is
-`recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
-`98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`.
+`recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`, SHA256
+`f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`.
+
+The packet was generated directly from the mixed redacted diagnostics folder
+with `--allow-failed-inputs --require-ready`, so one failed sibling bundle did
+not block the selected privacy-clean OpenClaw candidate.
 
 It contains only:
 
@@ -80,6 +84,7 @@ It contains only:
 - `manifest.json`
 - `next-agent-plan.json`
 - `next-agent-plan.md`
+- `strict-real-canary-drill.md`
 - `strict-real-operator-packet.md`
 
 The packet scan found zero key-shaped text and zero private local paths.
