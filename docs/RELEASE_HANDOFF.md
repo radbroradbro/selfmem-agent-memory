@@ -219,6 +219,17 @@ must not print raw memories, transcripts, prompts, answers, local paths,
 credentials, cookies, or bearer tokens. A fixture pass is useful for the
 tooling path, but it is not real rollout evidence.
 
+When a reviewer receives the zip, validate the packet before treating it as
+canary evidence:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip
+```
+
+Use `--strict-real` only when the packet is being offered as production canary
+evidence. A fixture packet, failed intake packet, or packet without passing
+strict-real intake must fail closed and remain diagnostic only.
+
 The live adapter must expose `adapter.name: recallweave-selfmem-canary`,
 `strictCanaryContract: v1`, and search/store latency instrumentation markers.
 If those fields are absent, update the runtime with `selfmem_update` before

@@ -52,6 +52,8 @@ The current PR adds:
 - a canary evidence packet builder that creates one metrics-only zip from
   report, intake, and optional diagnosis files while keeping fixture/failing
   packets from counting as rollout proof;
+- a canary evidence packet review command that validates a received metrics-only
+  zip before it can count as one-agent canary evidence;
 - an adapter store-latency gate so Hermes and OpenClaw smokes prove store
   events include positive `elapsed_ms` samples before the next real canary;
 - a strict v1 adapter contract marker plus updater digest reporting so stale

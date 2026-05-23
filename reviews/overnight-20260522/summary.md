@@ -93,6 +93,7 @@ evidence are still required before any public live update.
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |
 | Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `reviews/overnight-20260522/canary-operator-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-operator-packet-review.md` |
 | Canary evidence packet | `packages/bench/canary-evidence-packet.mjs`, `reviews/overnight-20260522/canary-evidence-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-packet-review.md` |
+| Canary evidence packet review | `packages/bench/canary-evidence-packet-review.mjs`, `reviews/overnight-20260522/canary-evidence-packet-review-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-packet-review-review.md` |
 | Fresh canary window isolation | `packages/bench/canary-report-from-trace.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/gemini-fresh-canary-window-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |

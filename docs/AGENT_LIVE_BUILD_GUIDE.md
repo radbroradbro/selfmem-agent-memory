@@ -212,6 +212,15 @@ If strict intake failed and you generated a diagnosis file, add
 metrics-only zip; it must not contain raw logs, memories, prompts, answers,
 keys, cookies, or private paths.
 
+The controller should validate any received packet before it counts:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip
+npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip --strict-real
+```
+
+The strict review must fail for fixtures or diagnostic-only packets.
+
 ## Failed Canary Reports
 
 If a live canary report fails strict intake, do not summarize the private logs

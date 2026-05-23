@@ -71,6 +71,7 @@
     "canary-remediation-plan",
     "canary-operator-packet",
     "canary-evidence-packet",
+    "canary-evidence-packet-review",
     "fresh-canary-window-gate",
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",

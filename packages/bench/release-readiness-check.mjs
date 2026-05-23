@@ -28,6 +28,7 @@ const requiredFiles = [
   "packages/bench/canary-remediation.mjs",
   "packages/bench/canary-operator-packet.mjs",
   "packages/bench/canary-evidence-packet.mjs",
+  "packages/bench/canary-evidence-packet-review.mjs",
   "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
   "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
@@ -150,6 +151,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-operator-packet-review.md`,
   `${reviewDir}/canary-evidence-packet-evidence.md`,
   `${reviewDir}/gemini-canary-evidence-packet-review.md`,
+  `${reviewDir}/canary-evidence-packet-review-evidence.md`,
+  `${reviewDir}/gemini-canary-evidence-packet-review-review.md`,
   `${reviewDir}/gemini-adapter-store-latency-review.md`,
   `${reviewDir}/gemini-fresh-canary-window-review.md`,
   `${reviewDir}/claude-fresh-canary-window-review-blocked.md`,
@@ -269,6 +272,7 @@ const requiredScripts = [
   "canary:diagnose",
   "canary:operator-packet",
   "canary:packet",
+  "canary:packet:review",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -838,6 +842,7 @@ check("release state is conservative", () => {
     "canary-remediation-plan",
     "canary-operator-packet",
     "canary-evidence-packet",
+    "canary-evidence-packet-review",
     "hosted-baseline-preflight",
     "hosted-baseline-collector",
     "recallweave-response-export",
@@ -1488,6 +1493,65 @@ check("fresh canary evidence packet passes", () => {
     assert.match(geminiReview, /Verdict:\s*CLEAN/i);
     assert.doesNotMatch(packetRun.stdout, secretPattern);
     assert.doesNotMatch(packetRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+check("fresh canary evidence packet review passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-packet-review-check-"));
+  try {
+    const packetPath = join(tempRoot, "packet.zip");
+    const packetRun = run("node", [
+      "packages/bench/canary-evidence-packet.mjs",
+      "--output",
+      packetPath,
+    ]);
+    const reviewRun = run("node", [
+      "packages/bench/canary-evidence-packet-review.mjs",
+      "--packet",
+      packetPath,
+    ]);
+    const strictReview = spawnSync("node", [
+      "packages/bench/canary-evidence-packet-review.mjs",
+      "--packet",
+      packetPath,
+      "--strict-real",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const generatedFixtureReview = run("node", ["packages/bench/canary-evidence-packet-review.mjs"]);
+    const packet = JSON.parse(packetRun.stdout);
+    const review = JSON.parse(reviewRun.stdout);
+    const fixtureReview = JSON.parse(generatedFixtureReview.stdout);
+    const strictOutput = JSON.parse(strictReview.stdout);
+    const evidence = readFileSync(join(root, reviewDir, "canary-evidence-packet-review-evidence.md"), "utf8");
+    const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-evidence-packet-review-review.md"), "utf8");
+    assert.equal(packet.mode, "canary-evidence-packet");
+    assert.equal(review.ok, true);
+    assert.equal(review.mode, "canary-evidence-packet-review");
+    assert.equal(review.writesRealFiles, false);
+    assert.equal(review.metricsOnly, true);
+    assert.equal(review.fixtureOnly, true);
+    assert.equal(review.countsAsRealRolloutEvidence, false);
+    assert.equal(review.countsAsProductionCanaryEvidence, false);
+    assert.equal(review.publicLaunchAllowed, false);
+    assert.equal(review.fleetRolloutAllowed, false);
+    assert.deepEqual(review.packet.entries, ["README.md", "canary-report.json", "manifest.json"]);
+    assert.equal(fixtureReview.generatedFixturePacket, true);
+    assert.equal(fixtureReview.writesRealFiles, true);
+    assert.notEqual(strictReview.status, 0, "strict-real packet review must fail closed for fixture packets");
+    assert.equal(strictOutput.ok, false);
+    assert.match(strictOutput.strictFailureReason, /non-fixture packet with passing strict-real intake evidence/);
+    assert.ok(strictOutput.failedChecks.includes("strict-real-passed"));
+    assert.match(evidence, /canary evidence packet review/i);
+    assert.match(evidence, /canary:packet:review/i);
+    assert.match(evidence, /strict-real/i);
+    assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+    assert.doesNotMatch(reviewRun.stdout, secretPattern);
+    assert.doesNotMatch(reviewRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }

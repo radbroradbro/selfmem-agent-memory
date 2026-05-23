@@ -147,6 +147,11 @@ Scope:
   writes one metrics-only zip from report, intake, and optional diagnosis files,
   rejects raw-content keys, secrets, and private paths, and keeps fixture or
   failing packets from authorizing rollout.
+- Added canary evidence packet review coverage to the release gate. The review
+  command opens a received packet zip, validates expected entries and manifest
+  consistency, rejects raw-content keys, secrets, and private paths, and fails
+  closed under `--strict-real` unless the packet contains passing non-fixture
+  strict-real intake evidence.
 - Added baseline evidence packet coverage to the release gate. The packet
   command writes one metrics-only zip from hosted result, RecallWeave result,
   comparison, and preflight files, rejects raw-content keys, secrets, and

@@ -17,8 +17,8 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T03:08:02Z
-  - Body length: 10891
+  - Updated at: 2026-05-23T03:19:18Z
+  - Body length: 10951
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -30,7 +30,7 @@ Verdict: resolved for PR body and blocker issue writes.
     RecallWeave response export refresh, adapter strict canary contract
     refresh, strict adapter CI baseline refresh, canary evidence packet
     refresh, e2388f0 CI baseline refresh, baseline evidence packet refresh,
-    and aa0e1d3 CI baseline refresh
+    aa0e1d3 CI baseline refresh, and canary packet review refresh
   - Updated at: 2026-05-23T03:08:02Z
   - Body length: 7263
 
