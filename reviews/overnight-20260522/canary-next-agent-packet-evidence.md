@@ -50,9 +50,10 @@ npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch <metrics-only
   - `next-agent-plan.md`
   - `strict-real-operator-packet.md`
 
-## Real Redacted Batch Packet Result
+## Earlier Real Redacted Batch Packet Result
 
-The command was also run against the latest redacted diagnostic batch output.
+The command was also run against an earlier broader redacted diagnostic batch
+output. The current returned-diagnostics packet is recorded in the next section.
 No raw diagnostic, memory, transcript, prompt, answer, credential, container
 name, or private local path content was written to the repo.
 
@@ -90,7 +91,7 @@ current packet to hand to the selected OpenClaw operator.
 
 - Packet label: `recallweave-openclaw-next-agent-canary-20260523-current.zip`.
 - Packet SHA256:
-  `66826f3ea14be6db3bc60cd08c2998628283dfa40dc3c2da89450bb9ae5778c1`.
+  `98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`.
 - Mode: `canary-next-agent-handoff-packet`.
 - Public safe: true.
 - Metrics only: true.
@@ -110,8 +111,8 @@ current packet to hand to the selected OpenClaw operator.
 - Store p95: 0 ms.
 - Store latency samples: 0.
 - Privacy leak count: 0.
-- Batch inputs: 9.
-- Batch parsed inputs: 8.
+- Batch inputs: 5.
+- Batch parsed inputs: 4.
 - Batch failed inputs: 1.
 - Strict-real pass count: 0.
 

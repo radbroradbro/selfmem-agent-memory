@@ -281,7 +281,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- canary:next-agent`: passed on the fixture planner and converted the real redacted batch into a one-agent OpenClaw fresh-window plan focused on adapter-contract and store-latency evidence.
 - Current one-agent handoff packet:
   `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
-  `66826f3ea14be6db3bc60cd08c2998628283dfa40dc3c2da89450bb9ae5778c1`.
+  `98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 - Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.
 - `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.

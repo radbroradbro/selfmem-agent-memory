@@ -37,6 +37,9 @@ Verdict: resolved for PR body and blocker issue writes.
     next-agent canary handoff packet identity.
   - The PR body was refreshed again after adding `canary:returned-inbox` and
     verifying CI run `26333740615`.
+  - The PR body was refreshed again after the controller reran the current
+    five-packet returned-diagnostics batch and regenerated the OpenClaw
+    next-agent handoff packet. Updated at: 2026-05-23T13:28:07Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -50,9 +53,10 @@ Verdict: resolved for PR body and blocker issue writes.
     refresh, e2388f0 CI baseline refresh, baseline evidence packet refresh,
     aa0e1d3 CI baseline refresh, canary packet review refresh, 4ed6c00 CI
     baseline refresh, hosted-baseline run orchestrator refresh, continued
-    one-agent canary packet identity refresh, and current OpenClaw next-agent
-    handoff packet identity refresh
-  - Updated at: 2026-05-23T12:50:24Z
+    one-agent canary packet identity refresh, current OpenClaw next-agent
+    handoff packet identity refresh, and five-packet returned-diagnostics
+    packet identity refresh
+  - Updated at: 2026-05-23T13:28:08Z
   - Body length: 13917
 
 ## Safety

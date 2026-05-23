@@ -164,7 +164,7 @@ The failure is actionable and matches the adapter hardening work:
   attach only the metrics-only output.
 - The current sendable handoff packet is
   `recallweave-openclaw-next-agent-canary-20260523-current.zip`, SHA256
-  `66826f3ea14be6db3bc60cd08c2998628283dfa40dc3c2da89450bb9ae5778c1`.
+  `98a3e2263fd4803b35e00ee672587e89c05887bed8726d40539531f40f3c9a4c`.
 
 ## Boundary
 

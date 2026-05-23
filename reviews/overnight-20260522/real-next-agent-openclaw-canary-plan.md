@@ -27,7 +27,7 @@ exactly how to collect the evidence that could close that blocker later.
 - Store p95: 0 ms.
 - Store latency samples: 0.
 - Privacy leak count: 0.
-- Batch parsed inputs: 8.
+- Batch parsed inputs: 4.
 - Batch failed inputs: 1.
 - Strict-real pass count: 0.
 

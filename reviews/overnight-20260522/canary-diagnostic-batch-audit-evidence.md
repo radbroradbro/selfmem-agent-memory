@@ -55,8 +55,8 @@ The controller also ran the command against the available local redacted
 diagnostic return set. No raw diagnostic, memory, transcript, prompt, answer,
 credential, or local path content was written to the repo.
 
-- Input count: 9.
-- Parsed input count: 8.
+- Input count: 5.
+- Parsed input count: 4.
 - Failed input count: 1.
 - Strict-real pass count: 0.
 - Counts as real rollout evidence: false.
