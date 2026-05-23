@@ -58,10 +58,19 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `afcc0f44f28c00ea155cf542a22c7c7ac8530e32`.
+- GitHub Actions run `26336780942`: passed CI after adding direct
+  mixed-folder next-agent handoff packet support, wiring
+  `--allow-failed-inputs` through the planner and packet builder, refreshing the
+  sendable OpenClaw packet evidence, release readiness assertions, release
+  blocker guidance, PR/issue sync evidence, and Gemini review, while preserving
+  strict-real and public-launch blockers.
+- Previous verified code/product baseline before the mixed-folder next-agent
+  handoff packet extension:
   `db7f531b72c6a5fe347b89f537d69df49de4bb8a`.
-- GitHub Actions run `26335844586`: passed CI after adding the
-  deterministic strict-real canary drill, wiring it into clean consumer smoke,
-  canary operator and next-agent packets, release readiness assertions, release
+- GitHub Actions run `26335844586`: passed CI after adding the deterministic
+  strict-real canary drill, wiring it into clean consumer smoke, canary
+  operator and next-agent packets, release readiness assertions, release
   blocker guidance, goal audit, public docs, PR/issue sync evidence, and Gemini
   review, while preserving strict-real and public-launch blockers.
 - Previous verified code/product baseline before the strict-real canary drill:
