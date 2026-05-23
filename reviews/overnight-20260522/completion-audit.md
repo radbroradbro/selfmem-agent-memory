@@ -118,6 +118,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   passed
 - Current canary handoff packet identity guard: `c3e9487`, CI run
   `26330234781` passed
+- Post-baseline public evidence guard: `54f59ee`, CI run `26330433491`
+  passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -205,6 +207,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | PR body reflects current state | PR #5, `reviews/overnight-20260522/pr-body-update-draft.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: PR #5 body update returned GitHub status 200 at 2026-05-23T01:40:11Z |
 | External blocker issue exists | Issue #6, `reviews/overnight-20260522/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`, `reviews/overnight-20260522/github-write-route-evidence.md` | Proven live: release blocker issue creation returned GitHub status 201 at 2026-05-22T21:21:16Z |
 | Release gate | `packages/bench/release-readiness-check.mjs` | Proven locally and in CI |
+| Post-baseline public evidence guard | `packages/bench/release-readiness-check.mjs`, `.github/workflows/ci.yml`, `release-state.json` | Proven locally and in CI run `26330433491` as an opt-in release-state guard. When enabled, it diffs the latest verified code baseline against `HEAD`, permits only public docs and review evidence after that baseline, and relies on full CI checkout history to inspect the baseline commit. |
 | Dynamic graph layout release gate | `packages/bench/release-readiness-check.mjs` now requires dynamic layout evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297064340` |
 | Graph navigation release gate | `packages/bench/release-readiness-check.mjs` now requires graph navigation evidence, screenshot, Gemini review, and release-doc references | Proven locally and in CI run `26297876735` |
 | Release handoff gate | `packages/bench/release-readiness-check.mjs` now requires `docs/RELEASE_HANDOFF.md`, release-handoff evidence, and Gemini review evidence | Proven locally and in CI run `26298339106` |

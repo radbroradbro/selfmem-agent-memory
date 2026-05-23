@@ -19,6 +19,7 @@ Live status:
 - Adds a GitHub live sync check so PR #5 and blocker issue #6 can be compared against checked-in public-safe drafts without printing body text or credentials.
 - Extends the release blocker doctor so agents see the same three unresolved blockers as the goal audit: human approval, fresh hosted baseline, and fresh real-agent canary evidence.
 - Adds output-file-safe baseline and canary evidence commands so package-manager banners cannot corrupt JSON artifacts or leak local checkout paths into preflight, comparison, intake, diagnosis, batch-audit, or next-agent plan files.
+- Adds a post-baseline public evidence guard. Once enabled in release-state, the release gate diffs the latest verified code baseline against `HEAD` and fails if any later change is outside public docs or review evidence.
 - Adds a release-readiness guard that verifies the current returned-diagnostics canary handoff packet label and SHA256 stay consistent across packet evidence, next-agent plan evidence, real diagnostic evidence, the PR body draft, and the blocker issue draft.
 - Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
@@ -33,7 +34,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `c3e948735c1d91c1eacfbc1e7bebba22622bf993`.
+- Latest code/product baseline: `54f59ee18094d824e3696e13621ac4070e795a7b`.
+- GitHub Actions run `26330433491`: passed CI after adding the
+  post-baseline public evidence guard and switching CI checkout to full
+  history so the guard can inspect the verified code baseline.
+- Previous verified baseline before post-baseline public evidence enforcement:
+  `c3e948735c1d91c1eacfbc1e7bebba22622bf993`.
 - GitHub Actions run `26330234781`: passed CI after adding current canary
   handoff packet identity coverage across packet evidence, next-agent plan
   evidence, real diagnostic evidence, the PR body draft, and the blocker issue

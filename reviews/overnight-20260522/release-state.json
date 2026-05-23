@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T10:24:46Z",
+  "generatedAt": "2026-05-23T10:33:37Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,20 +14,21 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "c3e948735c1d91c1eacfbc1e7bebba22622bf993",
-    "ciRunId": 26330234781,
+    "headSha": "54f59ee18094d824e3696e13621ac4070e795a7b",
+    "ciRunId": 26330433491,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding current canary handoff packet identity coverage. The release gate now derives the current returned-diagnostics packet label and SHA256 from canary packet evidence, then requires the packet evidence, next-agent plan evidence, real diagnostic evidence, PR body draft, and blocker issue draft to match. GitHub Actions run 26330234781 passed CI on c3e9487. Local release:check, full smoke, diff check, and secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after adding the post-baseline public evidence guard. The release gate can now enforce that commits after the latest verified code baseline are limited to public docs and review evidence, and CI uses a full checkout so the guard can inspect the baseline commit. GitHub Actions run 26330433491 passed CI on 54f59ee. Local release:check, node syntax check, diff check, and added-line secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
-    "allowsDocsOnlyCommitsAfterCodeBaseline": true
+    "allowsDocsOnlyCommitsAfterCodeBaseline": true,
+    "enforcePostBaselinePublicEvidenceOnly": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",

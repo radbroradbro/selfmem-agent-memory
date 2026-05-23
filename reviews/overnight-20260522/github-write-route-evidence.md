@@ -17,12 +17,12 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T10:25:42Z
-  - Body length: 21963
-  - Latest local refresh records `c3e948735c1d91c1eacfbc1e7bebba22622bf993`
-    and CI run `26330234781` as the latest verified canary handoff identity
-    guard baseline. It does not close the human-approval, hosted-baseline, or
-    real-canary blockers.
+  - Updated at: 2026-05-23T10:33:37Z
+  - Body length: 22508
+  - Latest local refresh records `54f59ee18094d824e3696e13621ac4070e795a7b`
+    and CI run `26330433491` as the latest verified post-baseline public
+    evidence guard baseline. It does not close the human-approval,
+    hosted-baseline, or real-canary blockers.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

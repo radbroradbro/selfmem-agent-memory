@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `c3e9487`, run `26330234781`, success.
+  `54f59ee`, run `26330433491`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -84,6 +84,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26329521666` on `c003647`: success.
 - GitHub Actions CI run `26329828449` on `cdf4615`: success.
 - GitHub Actions CI run `26330234781` on `c3e9487`: success.
+- GitHub Actions CI run `26330433491` on `54f59ee`: success.
 
 ## Shipped Overnight Slices
 
@@ -169,6 +170,7 @@ evidence are still required before any public live update.
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Local-session compaction audit | `packages/bench/session-compaction-local-audit.mjs`, `reviews/overnight-20260522/session-compaction-local-audit-evidence.md` |
 | Public release gate | `packages/bench/release-readiness-check.mjs`, `reviews/overnight-20260522/release-readiness-evidence.md` |
+| Post-baseline public evidence guard | `packages/bench/release-readiness-check.mjs`, `.github/workflows/ci.yml`, `reviews/overnight-20260522/release-state.json`, CI run `26330433491` |
 | Release handoff | `docs/RELEASE_HANDOFF.md`, `reviews/overnight-20260522/release-handoff-evidence.md` |
 | Conservative release-state manifest | `reviews/overnight-20260522/release-state.json` |
 | Release-state guard review | `reviews/overnight-20260522/gemini-release-state-guard-review.md` |
