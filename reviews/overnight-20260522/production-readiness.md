@@ -493,6 +493,189 @@ These blockers do not justify a public PASS. They reinforce the existing FAIL
 verdict until the hosted-baseline run, human approval, and real one-agent
 canary are all complete.
 
+## Automation Rerun 2026-05-23T03:13:13Z
+
+Verdict remains: FAIL.
+
+This rerun used a fresh branch from PR #5,
+`automation/recallweave-post12h-readiness-rerun-20260523`, at
+`c278419cee62520513a66a06e7e0ecaad27096c5`. GitHub connector inspection found
+PR #5 open, not draft, and mergeable, with issue #6 open as the blocker trail.
+The live PR body and checked-in `release-state.json` both preserve the
+conservative state: public launch verdict `FAIL`, `productionReady: false`,
+and hosted write-back disabled.
+
+Fresh checks passed in this rerun:
+
+- `npm run build`
+- `npm run test`: 6 files, 22 tests
+- `npm run typecheck`
+- `npm run privacy:test`: 1 file, 5 tests
+- `npm run smoke:openclaw`: `privacyLeakCount: 0`
+- `npm run smoke:hermes`: `privacyLeakCount: 0`
+- `npm run brain:evidence:static`: 9 fixture nodes, 9 edges, required sections
+  and controls present, `privacyLeakCount: 0`, `productionReady: false`
+- `npm run container:audit:smoke:built`
+- `npm run compaction:smoke:built`
+- `npm run compaction:benchmark:built`: 5 of 5 scenarios passed,
+  `privacyLeakCount: 0`
+- `npm run compaction:local-audit:built`
+- `npm run wiki:smoke:built`
+- `npm run wiki:sync:smoke:built`
+- `npm run update:smoke`
+- `npm run canary:report -- --fixture`
+- `npm run canary:report -- --diagnostic-dir
+  packages/bench/fixtures/canary-diagnostic-export.fixture`
+- `npm run canary:intake`
+- `npm run canary:diagnose`
+- `npm run canary:operator-packet`
+- `npm run canary:packet`
+- `npm run baseline:preflight`
+- `npm run baseline:preflight -- --fixture`
+- `npm run baseline:collect -- --fixture`
+- `npm run baseline:export:recallweave -- --fixture`
+- `npm run baseline:collect:recallweave -- --fixture`
+- `npm run baseline:compare -- --fixture`
+- `npm run baseline:operator-packet`
+- `npm run baseline:packet`
+- `npm run goal:audit`: `goalComplete: false`,
+  `mayCallUpdateGoalComplete: false`
+- `npm run release:handoff`
+- `git diff --check`
+- `npm_config_cache=/private/tmp/npm-cache npm pack --dry-run` from
+  `packages/core`
+
+Fresh checks blocked or failed in this rerun:
+
+- `npm run brain:smoke:built` failed with `listen EPERM: operation not
+  permitted 127.0.0.1`.
+- `npm run brain:interaction:built` failed with the same localhost bind error.
+- `npm run consumer:smoke` failed because it invokes the same Brain UI
+  localhost smoke.
+- `npm run release:check` failed on fresh Brain UI smoke, Brain UI interaction
+  smoke, clean consumer smoke, release doctor, and GitHub live sync. The
+  localhost failures are `127.0.0.1` bind restrictions in this sandbox; the
+  live-sync failures are shell DNS failures to `api.github.com`.
+- `npm run release:github-sync` failed with `getaddrinfo ENOTFOUND
+  api.github.com`; GitHub connector evidence was used separately for live PR
+  and issue state.
+- A local secret-pattern scan found only placeholders or test strings in
+  `.env.example`, privacy tests, and docs. No real credential was found in this
+  rerun.
+
+Reviewer rerun status:
+
+- `claude --print --model opus ... --setting-sources local` was attempted with
+  a sanitized evidence summary and returned `Not logged in`; this route is
+  blocked, not approval.
+- `gemini --skip-trust --approval-mode plan` was attempted with the same
+  sanitized evidence summary and requested browser authentication; it produced
+  no usable verdict and is blocked, not approval.
+- Existing checked-in reviewer evidence remains relevant but narrow: Claude
+  previously returned `CONCERNS` for PR #5 alpha review, while Gemini returned
+  `CLEAN` for the fresh-canary-window slice only. Neither approves public
+  launch.
+
+Current launch blockers after this rerun:
+
+- Human owner approval is still required before merge or public live update
+  copy.
+- Hosted Supermemory comparison claims still require a fresh metrics-only
+  hosted baseline, matched RecallWeave run, and reviewer approval.
+- A real one-agent production canary is still incomplete; fixture canary and
+  metrics-only diagnostic tooling do not count as production rollout evidence.
+- This sandbox cannot produce fresh localhost Browser/Playwright evidence, so
+  the existing sanitized UI screenshots and DOM packet remain historical PR
+  evidence rather than a fresh local replay from this environment.
+
+## Automation Recheck 2026-05-23T05:58:49Z
+
+Verdict remains: FAIL.
+
+This recheck used the existing writable PR worktree at
+`/private/tmp/selfmem-agent-memory-publish` on
+`automation/recallweave-post12h-readiness-rerun-20260523`. GitHub connector
+inspection found PR #5 open, not draft, mergeable, with head
+`aedb81ab3a61ec7c70e3ac7cd07e8085637d5ea3`. The connector reported read-only
+permissions for this repo, so no new PR branch, issue, or PR comment was
+created from this run. PR #5 and blocker issue #6 remain the public trail.
+
+Fresh checks passed in this recheck:
+
+- `npm run build`
+- `npm run test`: 6 files, 22 tests
+- `npm run typecheck`
+- `npm run privacy:test`: 1 file, 5 tests
+- `npm run smoke:openclaw`: `privacyLeakCount: 0`
+- `npm run smoke:hermes`: `privacyLeakCount: 0`
+- `npm run brain:evidence:static`: 9 fixture nodes, 9 edges, required UI
+  sections and controls present, `privacyLeakCount: 0`, `productionReady:
+  false`
+- `npm run compaction:smoke:built`
+- `npm run compaction:benchmark:built`: 5 of 5 scenarios passed,
+  `privacyLeakCount: 0`, exact identifier accuracy 1
+- `npm run compaction:local-audit:built`
+- `npm run wiki:smoke:built`
+- `npm run wiki:sync:smoke:built`
+- `npm run update:smoke`
+- `npm run canary:report -- --fixture`
+- `npm run canary:report -- --diagnostic-dir
+  packages/bench/fixtures/canary-diagnostic-export.fixture`
+- `npm run canary:intake`
+- `npm run canary:diagnose`
+- `npm run canary:operator-packet`
+- `npm run canary:packet`
+- `npm run canary:packet:review`
+- `npm run canary:returned-packet`
+- `npm run canary:batch-audit`
+- `npm run canary:next-agent`
+- `npm run canary:next-agent-packet`
+- `npm run baseline:preflight`
+- `npm run baseline:preflight -- --fixture`
+- `npm run baseline:collect -- --fixture`
+- `npm run baseline:export:recallweave -- --fixture`
+- `npm run baseline:collect:recallweave -- --fixture`
+- `npm run baseline:compare -- --fixture`
+- `npm run baseline:operator-packet`
+- `npm run baseline:next-run`
+- `npm run baseline:packet`
+- `npm run goal:audit`
+- `npm run release:handoff`
+- `npm_config_cache=/private/tmp/npm-cache npm pack --dry-run ./packages/core`
+- `git diff --check`
+
+Fresh checks blocked or failed in this recheck:
+
+- `npm run brain:smoke:built`: failed with `listen EPERM: operation not
+  permitted 127.0.0.1`.
+- `npm run brain:interaction:built`: failed with the same localhost bind
+  restriction.
+- `npm run consumer:smoke`: failed because it invokes the same Brain UI
+  localhost smoke.
+- `npm run release:github-sync`: failed with `getaddrinfo ENOTFOUND
+  api.github.com`; GitHub connector inspection supplied live PR state instead.
+- `npm run release:doctor`: failed through the same shell DNS dependency.
+- `npm run release:check`: failed on the localhost Brain UI routes, consumer
+  smoke, release doctor, and GitHub live sync. The release gate still passed
+  required file/script checks, static Brain UI evidence, conservative release
+  state, local-container audit, canary/report/packet/returned-packet gates,
+  hosted-baseline preflight, handoff packet, goal audit, `git diff --check`,
+  remote-token check, core package dry-run, forbidden runtime file scan, and
+  secret scan.
+
+Reviewer status in this recheck:
+
+- `claude --print --model opus --setting-sources local ...` returned `Not
+  logged in`; this route is blocked, not approval.
+- Gemini CLI attempted browser authentication and did not return a verdict;
+  this route is blocked, not approval.
+
+No evidence from this recheck supports a public live update. The next
+production-readiness attempt still needs a localhost-capable environment for
+fresh Brain UI replay, shell or CI GitHub live sync, human owner approval,
+fresh metrics-only hosted baseline evidence, and one non-fixture real-agent
+canary that passes strict intake.
+
 ## Readiness Grades
 
 | Area | Grade | Reason |
