@@ -42,6 +42,8 @@ The current PR adds:
 - a canary operator packet that prints public-safe Hermes/OpenClaw strict-real
   collection commands, attach-only metrics files, pass criteria, and forbidden
   raw artifacts;
+- an adapter store-latency gate so Hermes and OpenClaw smokes prove store
+  events include positive `elapsed_ms` samples before the next real canary;
 - real diagnostic canary evaluation evidence from two redacted external Hermes
   bundles, both privacy-clean and both rejected by strict rollout intake;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
@@ -97,9 +99,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `6b77293`
-- GitHub Actions: CI run `26317344140` passed for the strict-real canary
-  operator packet
+- Latest verified code baseline: `9eeed9e`
+- GitHub Actions: CI run `26317637761` passed for the adapter store latency
+  trace gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -123,6 +125,8 @@ Latest verified head before this draft refresh:
   still fail `--strict-real`
 - Canary diagnosis: `canary:diagnose` turns failed canary reports into
   metrics-only remediation actions and keeps fleet/public rollout blocked
+- Adapter store-latency gate: Hermes and OpenClaw standalone smokes now assert
+  positive store `elapsed_ms` samples, and `release:check` enforces the result
 - Real diagnostic canary evaluation: two redacted external Hermes bundles were
   converted into temporary metrics-only reports. Both were real inputs,
   privacy-clean, and rejected by strict rollout intake on missing store latency
@@ -139,6 +143,8 @@ Latest verified head before this draft refresh:
   update guard.
 - GitHub Actions CI run `26317344140` passed on `6b77293`, the strict-real
   canary operator packet.
+- GitHub Actions CI run `26317637761` passed on `9eeed9e`, the adapter store
+  latency trace gate.
 - Previous clean consumer smoke head: `4cee083`, CI run `26306827655` passed
 - Previous model/autoresearch matrix gate: `13cbe8d`, CI run `26305284384`
   passed

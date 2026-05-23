@@ -29,7 +29,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `6b772936f57fbe31e33aaeb18bb4696da90b8185`.
+- Latest code/product baseline: `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.
+- GitHub Actions run `26317637761`: passed CI after the adapter store latency trace gate.
+- Previous verified baseline before the adapter store latency trace gate:
+  `6b772936f57fbe31e33aaeb18bb4696da90b8185`.
 - GitHub Actions run `26317344140`: passed CI after the strict-real canary operator packet.
 - Previous verified baseline before the strict-real canary operator packet:
   `4b2ec839cddbce73540d3aea02b4b81f2a474e6a`.

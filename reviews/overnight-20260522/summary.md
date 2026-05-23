@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `6b77293`, run `26317344140`, success.
+  `9eeed9e`, run `26317637761`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -55,6 +55,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26316450928` on `6a8bbf0`: success.
 - GitHub Actions CI run `26316961518` on `4b2ec83`: success.
 - GitHub Actions CI run `26317344140` on `6b77293`: success.
+- GitHub Actions CI run `26317637761` on `9eeed9e`: success.
 
 ## Shipped Overnight Slices
 
@@ -74,6 +75,7 @@ evidence are still required before any public live update.
 | Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `reviews/overnight-20260522/canary-operator-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-operator-packet-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
+| Adapter store latency gate | `packages/adapters/hermes/selfmem_canary_standalone_smoke.py`, `packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs`, `reviews/overnight-20260522/gemini-adapter-store-latency-review.md` |
 | Brain UI model matrix | `packages/brain-ui/fixtures/model-matrix.json`, `reviews/overnight-20260522/brain-ui-model-matrix-evidence.md`, `reviews/overnight-20260522/gemini-brain-ui-model-matrix-review.md` |
 | Brain UI vault preview | `reviews/overnight-20260522/brain-ui-vault-preview-evidence.md` |
 | Brain UI sync report | `reviews/overnight-20260522/brain-ui-sync-report-evidence.md` |

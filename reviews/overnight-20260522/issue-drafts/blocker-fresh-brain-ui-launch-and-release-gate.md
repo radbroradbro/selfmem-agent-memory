@@ -9,7 +9,11 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `6b772936f57fbe31e33aaeb18bb4696da90b8185`.
+- Latest code/product baseline: `9eeed9e8e6665588efba9d2dfdfbb57785d05b17`.
+- GitHub Actions run `26317637761` passed CI after the adapter store latency
+  trace gate.
+- Previous code/product baseline before the adapter store latency trace gate:
+  `6b772936f57fbe31e33aaeb18bb4696da90b8185`.
 - GitHub Actions run `26317344140` passed CI after the strict-real canary
   operator packet.
 - Previous code/product baseline before the strict-real canary operator packet:

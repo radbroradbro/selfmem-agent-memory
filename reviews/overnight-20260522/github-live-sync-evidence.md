@@ -42,12 +42,12 @@ Observed public-safe output:
   "prBodyMatches": true,
   "issueTitleMatches": true,
   "issueBodyMatches": true,
-  "prBodyHash": "e70e2630617eab6b89fc1180181f49ffea2c2587ec416422f77a5e7079cfd747",
+  "prBodyHash": "651340ee724195ba323431408e6eae9482bf71c420c1c16df5127e6999baed2f",
   "issueTitleHash": "e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c",
-  "issueBodyHash": "5b85a8be563d392eb074a9a5b97880dcaa6d31a1fb86d9ba1fd697b3dd6b006a",
+  "issueBodyHash": "90806086c5017c153de644bf0f534c2fabcf7aba4693b011497114aea71a87c5",
   "liveUpdatedAt": {
-    "pullRequest": "2026-05-22T23:49:30Z",
-    "issue": "2026-05-22T23:49:30Z"
+    "pullRequest": "2026-05-22T23:59:55Z",
+    "issue": "2026-05-22T23:59:55Z"
   },
   "safety": {
     "printsBodyText": false,
