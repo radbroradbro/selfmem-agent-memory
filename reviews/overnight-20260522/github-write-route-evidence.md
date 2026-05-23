@@ -17,8 +17,10 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T03:24:34Z
-  - Body length: 10948
+  - Updated at: 2026-05-23T07:12:26Z
+  - Body length: 16842
+  - Latest refresh added the local-session batch compaction audit baseline:
+    `8d49cf35af0aeeb34b37e913041c723035ff8cca`, CI run `26326589900`.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

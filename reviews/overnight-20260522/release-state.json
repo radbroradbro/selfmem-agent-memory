@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T06:54:00Z",
+  "generatedAt": "2026-05-23T07:12:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "c01513ff37f17562b4fe9f9930332439d5404ec0",
-    "ciRunId": 26326199048,
+    "headSha": "8d49cf35af0aeeb34b37e913041c723035ff8cca",
+    "ciRunId": 26326589900,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the hosted baseline discovery and next-run planner extension. GitHub Actions run 26326199048 passed CI on c01513f after rerunning a checkout flake. Local release:check, goal:audit, full smoke, live hosted metadata discovery, Gemini review, diff check, and staged secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after the local-session batch compaction audit gate. GitHub Actions run 26326589900 passed CI on 8d49cf3. Local release:check, goal:audit, full smoke, clean consumer smoke, Gemini review, diff check, and staged secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -61,6 +61,7 @@
     "model-autoresearch-matrix",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
+    "session-compaction-local-batch-audit",
     "clean-consumer-smoke",
     "release-blocker-doctor",
     "canary-report-generator",
@@ -114,6 +115,14 @@
       "evidence": "reviews/overnight-20260522/claude-pr5-review.md",
       "costUsd": 2.0719125,
       "completedAt": "2026-05-22T22:12:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "localSessionBatchCompactionAudit": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-session-compaction-local-batch-audit-review.md",
+      "completedAt": "2026-05-23T07:08:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },
