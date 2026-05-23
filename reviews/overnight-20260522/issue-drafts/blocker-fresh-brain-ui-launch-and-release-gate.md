@@ -108,15 +108,24 @@ requirements are resolved.
   `locomo` / `longmemeval` / `convomem` availability. The checker also has an
   optional checkout-verification mode that re-hashes a local MemoryBench clone
   without printing private paths.
+- Current public LongMemEval-S slice manifest records 500 public dataset rows,
+  6 selected canary rows, one per question type, dataset hash
+  `sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442`,
+  selected-id hash
+  `sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23`,
+  answer-label hash
+  `sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e`,
+  and no raw question ids, question text, answers, memories, or transcripts.
 - Current benchmark plan also separates component model evidence from
   memory-system evidence. MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker
   leaderboards can choose model arms, but public RecallWeave claims still need
   the same public benchmark data, revision, split, labels, judge model, answer
   model, judge rule, and scoring setup as the target row.
 - Current benchmark tooling adds `benchmark:source-lock`,
-  `benchmark:public-target:author`, and `benchmark:public-target`, a
-  metrics-only source-lock plus target author-and-validator path that checks
-  source URL, dataset revision, split, labels, judge model, answer model,
+  `benchmark:public-slice`, `benchmark:public-target:author`, and
+  `benchmark:public-target`, a metrics-only source-lock, slice-manifest, plus
+  target author-and-validator path that checks source URL, dataset revision,
+  split, labels, judge model, answer model,
   judge rule, scoring code, claim tier, and component-evidence boundaries
   before a public canary target can run.
 - Previous checked-in evidence refresh before source-gap:

@@ -57,12 +57,22 @@ Live status:
   `locomo` / `longmemeval` / `convomem` availability. The checker also has an
   optional checkout-verification mode that re-hashes a local MemoryBench clone
   without printing private paths.
+- Adds a live public LongMemEval-S slice manifest from the source-locked
+  dataset: 500 public rows, 6 selected canary rows, one per question type,
+  dataset hash
+  `sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442`,
+  selected-id hash
+  `sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23`,
+  answer-label hash
+  `sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e`,
+  and no raw question ids, question text, answers, memories, or transcripts.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
   data, revision, split, labels, judge model, answer model, judge rule, and scoring setup as the target row.
-- Adds `benchmark:source-lock`, `benchmark:public-target:author`, and
-  `benchmark:public-target`, a metrics-only source-lock plus
+- Adds `benchmark:source-lock`, `benchmark:public-slice`,
+  `benchmark:public-target:author`, and `benchmark:public-target`, a
+  metrics-only source-lock, slice-manifest, plus
   author-and-validator path for source-locked public benchmark target rows. It
   keeps fixture targets and component-only leaderboard evidence from turning
   into public memory-system claims.

@@ -81,6 +81,7 @@ const requiredFiles = [
   "packages/bench/baseline-openai-compatible-reviewer.mjs",
   "packages/bench/baseline-reviewer-approval-intake.mjs",
   "packages/bench/public-benchmark-source-lock-check.mjs",
+  "packages/bench/public-benchmark-slice-author.mjs",
   "packages/bench/public-benchmark-target-check.mjs",
   "packages/bench/public-benchmark-target-author.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
@@ -88,6 +89,9 @@ const requiredFiles = [
   `${reviewDir}/public-memorybench-source-lock.json`,
   `${reviewDir}/public-memorybench-source-lock-evidence.md`,
   `${reviewDir}/public-memorybench-source-lock-checkout-evidence.json`,
+  `${reviewDir}/public-longmemeval-slice-evidence.json`,
+  `${reviewDir}/public-longmemeval-slice-evidence.md`,
+  `${reviewDir}/codex-public-longmemeval-slice-review.md`,
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -404,6 +408,7 @@ const requiredScripts = [
   "baseline:reviewer:openai-compatible",
   "baseline:reviewer-intake",
   "benchmark:source-lock",
+  "benchmark:public-slice",
   "benchmark:public-target",
   "benchmark:public-target:author",
   "goal:audit",
@@ -1009,6 +1014,7 @@ check("release state is conservative", () => {
     "goal-completion-audit",
     "selfmem-update",
     "public-benchmark-source-lock",
+    "public-benchmark-slice",
     "public-benchmark-target-author",
     "public-benchmark-target-check",
   ]) {
@@ -1207,6 +1213,44 @@ check("fresh public MemoryBench source lock passes", () => {
   assert.doesNotMatch(evidence, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(checkoutEvidence), privatePathPattern);
   assert.doesNotMatch(JSON.stringify(sourceLock), privatePathPattern);
+});
+
+check("fresh public LongMemEval slice manifest passes", () => {
+  const fixture = JSON.parse(run("node", ["packages/bench/public-benchmark-slice-author.mjs"]).stdout);
+  const markdown = run("node", ["packages/bench/public-benchmark-slice-author.mjs", "--format", "markdown"]).stdout;
+  const evidence = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-slice-evidence.json"), "utf8"));
+  const evidenceMarkdown = readFileSync(join(root, reviewDir, "public-longmemeval-slice-evidence.md"), "utf8");
+  const review = readFileSync(join(root, reviewDir, "codex-public-longmemeval-slice-review.md"), "utf8");
+  assert.equal(fixture.mode, "public-benchmark-slice-manifest");
+  assert.equal(fixture.fixtureOnly, true);
+  assert.equal(fixture.publicSafety?.rawQuestionsIncluded, false);
+  assert.equal(fixture.publicSafety?.rawAnswersIncluded, false);
+  assert.equal(evidence.mode, "public-benchmark-slice-manifest");
+  assert.equal(evidence.fixtureOnly, false);
+  assert.equal(evidence.benchmark, "longmemeval");
+  assert.equal(evidence.sourceCommit, "118209a746d97d0d85e5a7234267f0b6962857e9");
+  assert.equal(evidence.dataset?.hash, "sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442");
+  assert.equal(evidence.dataset?.itemCount, 500);
+  assert.equal(evidence.dataset?.selectedCount, 6);
+  assert.equal(evidence.dataset?.questionTypeCount, 6);
+  assert.equal(evidence.dataset?.selectedQuestionIdsHash, "sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23");
+  assert.equal(evidence.labels?.answerLabelsHash, "sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e");
+  assert.equal(evidence.scoring?.scoringCodeHash, "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518");
+  assert.equal(evidence.publicSafety?.metricsOnly, true);
+  assert.equal(evidence.publicSafety?.rawQuestionIdsIncluded, false);
+  assert.equal(evidence.publicSafety?.rawQuestionsIncluded, false);
+  assert.equal(evidence.publicSafety?.rawAnswersIncluded, false);
+  assert.match(evidence.dataset?.questionIdPolicy ?? "", /selection=first-per-type-round-robin/);
+  assert.match(markdown, /Public Benchmark Slice Manifest/);
+  assert.match(evidenceMarkdown, /Public Benchmark Slice Manifest/);
+  assert.match(evidenceMarkdown, /Selected count: 6/);
+  assert.match(review, /Verdict: PASS WITH CONCERNS/);
+  assert.match(review, /does not prove a RecallWeave quality score/i);
+  for (const text of [JSON.stringify(fixture), markdown, JSON.stringify(evidence), evidenceMarkdown, review]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, privatePathPattern);
+    assert.doesNotMatch(text, /What degree did I|Business Administration/);
+  }
 });
 
 check("fresh public benchmark target check passes", () => {

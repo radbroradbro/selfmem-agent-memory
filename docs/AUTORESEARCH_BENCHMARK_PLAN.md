@@ -63,6 +63,9 @@ too expensive for the next run.
    token budget if reported, and caveats.
    Start with `benchmark:source-lock -- --strict` to verify the checked-in
    MemoryBench source lock before authoring a target.
+   Then run `benchmark:public-slice -- --live` for the current LongMemEval-S
+   canary slice. The slice manifest records dataset, selected-id,
+   answer-label, and scoring-code hashes without raw question or answer text.
    If the target file does not exist yet, create it with
    `benchmark:public-target:author` from explicit source-lock fields rather
    than by hand-editing JSON.
@@ -73,6 +76,9 @@ too expensive for the next run.
    Use the same public data, repository or dataset revision, split, labels,
    question ids where available, judge rule, and scoring script as the reported
    target. Do not replace this with a private synthetic memory set.
+   The current starter slice is LongMemEval-S, six rows, one per source-locked
+   question type, selected by deterministic first-per-type round-robin after
+   sorting by `question_id`.
 3. Run RecallWeave on that slice with a fixed provider arm.
 4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
    latency, context tokens, and cost against the reported target.

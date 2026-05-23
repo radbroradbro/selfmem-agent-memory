@@ -122,6 +122,9 @@ Validate the target first:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:source-lock -- --strict
+npm exec --yes pnpm@10.23.0 -- benchmark:public-slice -- --live \
+  --output reviews/overnight-20260522/public-longmemeval-slice-evidence.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-slice-evidence.md
 
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
   --benchmark longmemeval \

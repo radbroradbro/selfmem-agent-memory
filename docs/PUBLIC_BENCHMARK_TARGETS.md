@@ -26,6 +26,9 @@ Run the target validator before starting a public canary:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:source-lock -- --strict
+npm exec --yes pnpm@10.23.0 -- benchmark:public-slice -- --live \
+  --output reviews/overnight-20260522/public-longmemeval-slice-evidence.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-slice-evidence.md
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
 
@@ -119,6 +122,17 @@ harness we will use.
   `--repo-checkout <memorybench-checkout>` against a local MemoryBench clone.
 - MemoryBench's MemScore is a triple: quality, latency, and context tokens. Do
   not collapse that into one score.
+- Current LongMemEval-S public slice manifest: dataset hash
+  `sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442`,
+  500 public dataset rows, 6 selected canary rows, one row per source-locked
+  question type, selected-id hash
+  `sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23`,
+  answer-label hash
+  `sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e`,
+  and scoring-code hash
+  `sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518`.
+  The manifest does not commit raw question ids, question text, answers,
+  memories, or transcripts.
 - LongMemEval is a strong target because it uses 500 human-curated questions and
   tests information extraction, multi-session reasoning, knowledge update,
   temporal reasoning, and abstention.
