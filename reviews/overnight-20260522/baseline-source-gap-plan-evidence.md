@@ -4,7 +4,10 @@ Date: 2026-05-23
 
 Added `baseline:source-gap`, a metrics-only planner that reads public-safe
 `baseline:source-match` and `baseline:source-align` reports and emits one
-ready-or-repair path before another hosted Supermemory baseline run.
+ready-or-repair path before another hosted Supermemory baseline run. The latest
+slice adds a hashed per-query repair queue for blocked source gaps, so private
+operators can repair the exact failed query labels without attaching raw query
+text, expected refs, memory text, or container labels.
 
 ## Commands
 
@@ -31,6 +34,8 @@ node packages/bench/baseline-source-gap-plan.mjs \
 - Repair status: `READY_FOR_MATCHED_BASELINE`.
 - Recommended path: `run-matched-baseline`.
 - Baseline run blocked: false.
+- Repair queue count: `0`.
+- Ready query count: `3`.
 - Private leak count: 0.
 
 ## Blocked Fixture Result
@@ -42,6 +47,9 @@ node packages/bench/baseline-source-gap-plan.mjs \
 - Query count: 1.
 - Source-matched query count: 0.
 - Collectable query count: 0.
+- Repair queue count: `1`.
+- Repair queue status count:
+  - `missing-source-match`: `1`.
 - Failed checks:
   - `local-source-missing-expected-refs`
   - `local-export-cannot-score-every-query`
@@ -57,7 +65,8 @@ node packages/bench/baseline-source-gap-plan.mjs \
 - `goal:audit` records `baseline-source-gap-plan` as proven but keeps the native
   goal incomplete.
 - `release:check` verifies the source-gap report, operator packet, next-run
-  planner, one-command baseline runner, evidence docs, and public-safe output.
+  planner, one-command baseline runner, evidence docs, the blocked repair queue,
+  and public-safe output.
 - `baseline:operator-packet` and `baseline:next-run` now include a
   `plan-source-gap` step and attach-only path.
 - `baseline:run` writes `baseline-source-gap.json` after source alignment and
@@ -69,4 +78,5 @@ The source-gap planner does not read raw memories, raw transcripts, raw prompts,
 raw answers, provider keys, private env files, private query sets, private
 container maps, or private local paths. It rejects key-shaped strings, private
 paths, raw container labels, raw query text, raw memory text, and raw expected
-result refs in its inputs and output.
+result refs in its inputs and output. Repair entries contain only query hashes,
+match counts, status labels, and private repair actions.

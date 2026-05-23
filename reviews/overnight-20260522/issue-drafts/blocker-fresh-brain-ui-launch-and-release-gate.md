@@ -213,7 +213,10 @@ requirements are resolved.
   orchestrator now repeat the source-match and source-alignment gates and write
   a source-gap ready-or-repair plan before hosted collection. Live runs require
   both a local container map and the private hosted map, but only public-safe
-  source-match, source-alignment, and source-gap reports may be attached.
+  source-match, source-alignment, and source-gap reports may be attached. Blocked
+  source-gap reports include a hashed per-query repair queue so private
+  operators can repair exact source gaps without attaching raw memory text,
+  query text, expected refs, or container labels.
 - Hosted baseline operator packet now gives agents a public-safe collection
   handoff for aggregate-only hosted Supermemory baseline evidence.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`

@@ -446,7 +446,10 @@ Review the private query set locally before collection. Then source
 `/tmp/recallweave-hosted-baseline.private.env` locally before the hosted
 collector. Do not attach that env file, the private map, or the private query
 set. Attach only the metrics-only query-set, source-match, source-alignment, and
-source-gap reports.
+source-gap reports. If `baseline:source-gap` is blocked, use only the hashed
+`repairQueue` in that report to decide which private query labels need mirrored
+hosted source content, rebuilt local-source labels, or collectable content
+hashes.
 
 Prefer the one-command runner once those private inputs are ready:
 

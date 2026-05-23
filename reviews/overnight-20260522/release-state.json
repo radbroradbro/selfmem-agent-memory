@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner and strict-real canary drill reviewed CLEAN",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, hashed repair queue, and strict-real canary drill reviewed CLEAN",
     "allowedPostBaselineCodePaths": [
       "package.json",
       "packages/bench/canary-drill.mjs",

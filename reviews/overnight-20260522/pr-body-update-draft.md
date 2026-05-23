@@ -26,7 +26,9 @@ Live status:
   the selected local RecallWeave source can collect matching expected
   references, that a matching hosted/local container label is not mistaken for
   matching content, and that agents get a deterministic ready-or-repair path
-  before hosted calls are spent on another matched run.
+  before hosted calls are spent on another matched run. Blocked source-gap
+  reports now include a hashed per-query repair queue so private operators can
+  repair the exact source gap without exposing raw query text or memory text.
 - Extends the hosted baseline operator packet, next-run planner, and
   `baseline:run` orchestrator so `baseline:source-match`,
   `baseline:source-align`, and `baseline:source-gap` run before hosted

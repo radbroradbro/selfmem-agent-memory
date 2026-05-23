@@ -201,7 +201,10 @@ expected refs needed for a fair benchmark.
 Then run `baseline:source-gap` with the source-match and source-alignment
 reports. That public-safe report must say `READY_FOR_MATCHED_BASELINE` before a
 hosted collection run is meaningful. If it reports a blocked state, follow its
-repair path instead of spending more hosted calls.
+repair path instead of spending more hosted calls. For blocked reports, use the
+hashed `repairQueue` to decide whether each private query needs mirrored hosted
+source content, rebuilt local-source labels, or converted collectable content
+hashes. Do not attach the private query set or raw memory text.
 
 Use `baseline:run` after the private hosted env file, reviewed private query
 set, source-match preflight, source-alignment gate, source-gap plan, and local

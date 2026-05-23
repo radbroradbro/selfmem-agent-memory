@@ -15,7 +15,8 @@ const sourceMatch = loadSourceMatch(args.sourceMatch ?? args.sourceMatchReport);
 const sourceAlignment = loadSourceAlignment(args.sourceAlignment ?? args.sourceAlignmentReport);
 
 const sourceState = summarizeSourceState(sourceMatch, sourceAlignment);
-const repairPlan = buildRepairPlan(sourceState);
+const repairQueue = buildRepairQueue(sourceMatch.queryFingerprints ?? []);
+const repairPlan = buildRepairPlan(sourceState, repairQueue);
 const baselineRunBlocked = !sourceState.matchedBaselineRunAllowed;
 
 const output = {
@@ -146,7 +147,8 @@ function summarizeSourceState(match, alignment) {
   };
 }
 
-function buildRepairPlan(state) {
+function buildRepairPlan(state, repairQueue) {
+  const repairSummary = summarizeRepairQueue(state, repairQueue);
   if (state.matchedBaselineRunAllowed) {
     return {
       status: "READY_FOR_MATCHED_BASELINE",
@@ -154,6 +156,8 @@ function buildRepairPlan(state) {
       reason: "Hosted label, local container map, and collectable local evidence are aligned.",
       nextStep: "Run baseline:run with the reviewed query set, local map, private hosted map, and source-matched local container.",
       blocksHostedCalls: false,
+      repairSummary,
+      repairQueue,
     };
   }
   if (!state.labelAligned) {
@@ -163,6 +167,8 @@ function buildRepairPlan(state) {
       reason: "The selected hosted label hash does not match the local container source label hash.",
       nextStep: "Select the hosted candidate that matches the agent local container map before authoring or running the query set.",
       blocksHostedCalls: true,
+      repairSummary,
+      repairQueue,
     };
   }
   if (state.sourceIdOnlyMatchCount > 0 && state.collectableQueryCount < state.queryCount) {
@@ -172,6 +178,8 @@ function buildRepairPlan(state) {
       reason: "Some reviewed labels match only source ids, which the current result export cannot score as collectable evidence.",
       nextStep: "Rebuild the reviewed query set with expected content hashes or export ids, then rerun source-match and source-align.",
       blocksHostedCalls: true,
+      repairSummary,
+      repairQueue,
     };
   }
   if (state.queryCount > 0 && state.sourceMatchedQueryCount < state.queryCount) {
@@ -181,6 +189,8 @@ function buildRepairPlan(state) {
       reason: "The hosted/local labels may align, but the local RecallWeave source cannot satisfy every reviewed expected reference.",
       nextStep: "Mirror the selected hosted source into local RecallWeave or rebuild the query labels from the local source.",
       blocksHostedCalls: true,
+      repairSummary,
+      repairQueue,
     };
   }
   if (state.collectableQueryCount < state.queryCount) {
@@ -190,6 +200,8 @@ function buildRepairPlan(state) {
       reason: "The local source has some source evidence but cannot score every reviewed query with collectable refs.",
       nextStep: "Use export ids or content hashes that the RecallWeave result exporter can return, then rerun the source gates.",
       blocksHostedCalls: true,
+      repairSummary,
+      repairQueue,
     };
   }
   return {
@@ -198,6 +210,60 @@ function buildRepairPlan(state) {
     reason: "The source reports do not prove a matched baseline run.",
     nextStep: "Rerun baseline:source-match and baseline:source-align with fresh reports before any hosted comparison run.",
     blocksHostedCalls: true,
+    repairSummary,
+    repairQueue,
+  };
+}
+
+function buildRepairQueue(queryFingerprints) {
+  return queryFingerprints
+    .map((query) => {
+      const status = queryRepairStatus(query);
+      return {
+        queryIdHash: String(query.queryIdHash ?? ""),
+        queryHash: String(query.queryHash ?? ""),
+        repairStatus: status,
+        expectedRefCount: numberValue(query.expectedRefCount),
+        expectedIdRefCount: numberValue(query.expectedIdRefCount),
+        expectedHashRefCount: numberValue(query.expectedHashRefCount),
+        exportIdMatchCount: numberValue(query.exportIdMatchCount),
+        sourceIdMatchCount: numberValue(query.sourceIdMatchCount),
+        contentHashMatchCount: numberValue(query.contentHashMatchCount),
+        sourceIdOnlyMatchCount: numberValue(query.sourceIdOnlyMatchCount),
+        collectableMatchCount: numberValue(query.collectableMatchCount),
+        recommendedAction: queryRepairAction(status),
+      };
+    })
+    .filter((query) => query.repairStatus !== "ready");
+}
+
+function queryRepairStatus(query) {
+  if (query.hasCollectableMatch) return "ready";
+  if (query.hasSourceMatch && numberValue(query.sourceIdOnlyMatchCount) > 0) return "source-id-only";
+  if (query.hasSourceMatch) return "not-collectable";
+  return "missing-source-match";
+}
+
+function queryRepairAction(status) {
+  if (status === "source-id-only") return "replace source-id-only expected refs with export ids or content hashes";
+  if (status === "not-collectable") return "convert the matched local evidence into a collectable expected ref";
+  if (status === "missing-source-match") return "mirror the selected hosted source locally or rebuild this query from the local source";
+  return "none";
+}
+
+function summarizeRepairQueue(state, repairQueue) {
+  const statusCounts = repairQueue.reduce((counts, item) => {
+    counts[item.repairStatus] = (counts[item.repairStatus] ?? 0) + 1;
+    return counts;
+  }, {});
+  return {
+    totalQueries: state.queryCount,
+    repairQueueCount: repairQueue.length,
+    readyQueryCount: Math.max(0, state.queryCount - repairQueue.length),
+    statusCounts,
+    publicSafe: true,
+    rawQueryIncluded: false,
+    rawMemoryIncluded: false,
   };
 }
 

@@ -1,33 +1,35 @@
-# Gemini Review: Baseline Source-Gap Plan
+# Gemini Review: Baseline Source-Gap Repair Queue
 
-Verdict: CLEAN
+Date: 2026-05-23
 
-Findings:
+Verdict: `CLEAN`
 
-- Private data and key exposure: no exposure introduced. Release checks assert
-  that source-gap stdout and saved JSON do not leak secrets, absolute local
-  paths, or environment variables.
-- Raw memory and query leaks: safe. The source-gap report asserts
-  `rawMemoryIncluded: false` and `rawLabelsIncluded: false`, and rejects raw
-  expected result refs and raw text fields.
-- Public benchmark claim weakening: no weakening. The change strengthens the
-  benchmark loop by requiring a proven `READY_FOR_MATCHED_BASELINE` state before
-  a hosted comparison can be treated as source-matched.
-- False goal completion: safe. The source-gap planner is added as a proven
-  requirement and does not close the remaining native-goal blockers.
-- Release-state blocker weakening: safe. Doctor and release-state checks include
-  `baseline:source-gap` and keep the hosted-baseline blocker active.
-- Docs and operator clarity: high. The docs explain that source-gap turns
-  match/alignment reports into a deterministic next step, either blocking hosted
-  calls with a repair path or authorizing the matched baseline path.
-- Hosted call blocking: effective. The planner is inserted between alignment and
-  collection in the operator and runner surfaces.
+## Scope
 
-Residual risks:
+Cold review of the RecallWeave source-gap repair-queue slice. The review
+focused on whether the changed source-gap planner and release docs remain
+public-safe, reduce the hosted-baseline blocker, and avoid leaking raw query
+text, expected refs, memory text, private paths, keys, or container labels.
 
-- Operator bypass: an operator can still manually skip the planner and spend
-  hosted calls. The release gates catch that after the fact, but the budget could
-  already be spent.
-- Plan correctness: if the new planner misclassifies a divergent container as
-  ready, downstream gates should still fail, but the source-gap diagnosis would
-  need a fix.
+## Findings
+
+- Public safety: the `repairQueue` and `repairSummary` in `baseline:source-gap`
+  are metrics-driven. The implementation uses query fingerprints rather than
+  raw text, so the reports remain safe for public attachment.
+- Utility: the hashed per-query repair queue reduces the hosted-baseline
+  blocker by giving private operators specific repair guidance for each failing
+  query without requiring them to share the private query set.
+- Leak prevention: the code maps only hashes, counts, and static action strings
+  into the output. Release checks validate that raw query text, expected refs,
+  and memory/content fields are absent from successful and blocked reports.
+- Documentation: `AGENT_LIVE_BUILD_GUIDE.md`, `RELEASE_HANDOFF.md`, and
+  `BENCHMARK_SUMMARY.md` reinforce that operators may attach only public-safe
+  reports while using the private repair queue locally.
+- Integrity: the tool keeps the `READY_FOR_MATCHED_BASELINE` gate before hosted
+  calls are permitted.
+
+## Result
+
+This review supports treating the source-gap repair queue as public-safe
+hosted-baseline blocker reduction work. It does not approve public launch or
+public benchmark claims.

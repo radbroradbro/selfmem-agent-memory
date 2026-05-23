@@ -93,7 +93,10 @@ reports and prints one deterministic next path: run the matched baseline, select
 a different hosted candidate, rebuild labels as content hashes, mirror the
 hosted source locally, or rerun the source gates. Attach this report with the
 source-match and source-alignment reports when a hosted baseline is still
-blocked.
+blocked. When the source is blocked, the report also includes a hashed
+per-query repair queue with match counts and a recommended private repair
+action. It does not include raw query text, expected refs, memory text, or
+container labels.
 
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents

@@ -2216,6 +2216,8 @@ check("fresh hosted baseline preflight passes", () => {
   const missingQuerySetEvidencePath = join(collectorTmp, "missing-query-set-evidence.json");
   const unlabeledQuerySetPath = join(collectorTmp, "unlabeled-queryset.json");
   const missingSourceMatchQuerySetPath = join(collectorTmp, "missing-source-match-queryset.json");
+  const missingSourceAlignmentReportPath = join(collectorTmp, "missing-source-alignment.json");
+  const missingSourceGapReportPath = join(collectorTmp, "missing-source-gap.json");
   const baselinePacketPath = join(collectorTmp, "baseline-evidence-packet.zip");
   const strictFixtureBaselinePacketPath = join(collectorTmp, "strict-fixture-baseline-evidence-packet.zip");
   const returnedBaselineIntakePath = join(collectorTmp, "returned-baseline-packet-intake.json");
@@ -2302,6 +2304,24 @@ check("fresh hosted baseline preflight passes", () => {
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
+  const missingSourceMatchReportPath = join(collectorTmp, "missing-source-match.json");
+  writeFileSync(missingSourceMatchReportPath, missingSourceMatchResult.stdout);
+  const missingSourceAlignmentResult = run("node", [
+    "packages/bench/baseline-source-alignment.mjs",
+    "--source-match",
+    missingSourceMatchReportPath,
+    "--output",
+    missingSourceAlignmentReportPath,
+  ]);
+  const missingSourceGapResult = run("node", [
+    "packages/bench/baseline-source-gap-plan.mjs",
+    "--source-match",
+    missingSourceMatchReportPath,
+    "--source-alignment",
+    missingSourceAlignmentReportPath,
+    "--output",
+    missingSourceGapReportPath,
+  ]);
   const discoveryResult = run("node", ["packages/bench/hosted-baseline-discovery.mjs", "--output", discoveryResultPath]);
   const privateMapDiscoveryResult = run(
     "node",
@@ -2613,6 +2633,8 @@ check("fresh hosted baseline preflight passes", () => {
   const sourceAlignmentReport = JSON.parse(sourceAlignmentResult.stdout);
   const sourceGapReport = JSON.parse(sourceGapResult.stdout);
   const missingSourceMatchReport = JSON.parse(missingSourceMatchResult.stdout);
+  const missingSourceAlignmentReport = JSON.parse(missingSourceAlignmentResult.stdout);
+  const missingSourceGapReport = JSON.parse(missingSourceGapResult.stdout);
   const discoveryReport = JSON.parse(discoveryResult.stdout);
   const privateMapDiscoveryReport = JSON.parse(privateMapDiscoveryResult.stdout);
   const containerSelectReport = JSON.parse(containerSelectResult.stdout);
@@ -2740,6 +2762,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(sourceGapReport.rawMemoryIncluded, false);
   assert.equal(sourceGapReport.baselineRunBlocked, false);
   assert.equal(sourceGapReport.repairPlan?.status, "READY_FOR_MATCHED_BASELINE");
+  assert.equal(sourceGapReport.repairPlan?.repairSummary?.repairQueueCount, 0);
+  assert.equal(sourceGapReport.repairPlan?.repairSummary?.readyQueryCount, 3);
+  assert.deepEqual(sourceGapReport.repairPlan?.repairQueue, []);
   assert.equal(sourceGapReport.benchmarkGate?.matchedBaselineRunAllowed, true);
   assert.equal(sourceGapReport.benchmarkGate?.publicBenchmarkClaimsAllowed, false);
   assert.ok(sourceGapReport.operatorCommands?.some((item) => item.id === "plan-source-gap" && /baseline:source-gap/.test(item.command)));
@@ -2751,8 +2776,18 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(missingSourceMatchReport.sourceMatchReady, false);
   assert.ok(missingSourceMatchReport.failedChecks?.includes("local-source-missing-expected-refs"));
   assert.ok(missingSourceMatchReport.failedChecks?.includes("local-export-cannot-score-every-query"));
+  assert.equal(missingSourceAlignmentReport.status, "BLOCKED_CONTENT_DIVERGENT");
+  assert.equal(missingSourceAlignmentReport.benchmarkGate?.matchedBaselineRunAllowed, false);
+  assert.equal(missingSourceGapReport.repairPlan?.status, "BLOCKED_CONTENT_DIVERGENT");
+  assert.equal(missingSourceGapReport.baselineRunBlocked, true);
+  assert.equal(missingSourceGapReport.repairPlan?.repairSummary?.repairQueueCount, 1);
+  assert.equal(missingSourceGapReport.repairPlan?.repairSummary?.statusCounts?.["missing-source-match"], 1);
+  assert.equal(missingSourceGapReport.repairPlan?.repairQueue?.[0]?.repairStatus, "missing-source-match");
+  assert.match(missingSourceGapReport.repairPlan?.repairQueue?.[0]?.recommendedAction ?? "", /mirror|rebuild/i);
   assert.doesNotMatch(missingSourceMatchResult.stdout, secretPattern);
   assert.doesNotMatch(missingSourceMatchResult.stdout, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
+  assert.doesNotMatch(missingSourceGapResult.stdout, secretPattern);
+  assert.doesNotMatch(missingSourceGapResult.stdout, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
   assert.equal(discoveryReport.mode, "hosted-baseline-discovery");
   assert.equal(discoveryReport.fixtureOnly, true);
   assert.equal(discoveryReport.callsHostedProvider, false);
