@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `54f59ee`, run `26330433491`, success.
+  `14030dd`, run `26330646504`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -85,6 +85,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26329828449` on `cdf4615`: success.
 - GitHub Actions CI run `26330234781` on `c3e9487`: success.
 - GitHub Actions CI run `26330433491` on `54f59ee`: success.
+- GitHub Actions CI run `26330646504` on `14030dd`: success.
 
 ## Shipped Overnight Slices
 
@@ -166,6 +167,7 @@ evidence are still required before any public live update.
 | Browser evidence gate review | `reviews/overnight-20260522/gemini-browser-evidence-gate-review.md` |
 | Local container audit preflight | `packages/core/src/local-container/audit.ts`, `reviews/overnight-20260522/local-container-audit-evidence.md` |
 | Agent update command | `bin/selfmem_update`, `reviews/overnight-20260522/update-flow-evidence.md` |
+| One-command canary evidence packaging | `plugins/selfmem-fallback/scripts/selfmem_update.py`, `packages/bench/update-flow-smoke.py`, `reviews/overnight-20260522/update-flow-evidence.md`, CI run `26330646504` |
 | Clean consumer smoke | `packages/bench/consumer-install-smoke.mjs`, `reviews/overnight-20260522/consumer-install-smoke-evidence.md`, `reviews/overnight-20260522/gemini-consumer-install-smoke-review.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Local-session compaction audit | `packages/bench/session-compaction-local-audit.mjs`, `reviews/overnight-20260522/session-compaction-local-audit-evidence.md` |

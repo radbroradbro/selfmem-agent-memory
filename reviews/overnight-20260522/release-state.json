@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T10:33:37Z",
+  "generatedAt": "2026-05-23T10:45:07Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,21 +14,21 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "54f59ee18094d824e3696e13621ac4070e795a7b",
-    "ciRunId": 26330433491,
+    "headSha": "14030ddd9c88020c114a3e5fd3d32735f31557a6",
+    "ciRunId": 26330646504,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding the post-baseline public evidence guard. The release gate can now enforce that commits after the latest verified code baseline are limited to public docs and review evidence, and CI uses a full checkout so the guard can inspect the baseline commit. GitHub Actions run 26330433491 passed CI on 54f59ee. Local release:check, node syntax check, diff check, and added-line secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after adding one-command canary evidence packaging to selfmem_update. The updater can now write sanitized report, intake, optional diagnosis, and metrics-only packet outputs in one run, and the next-agent plan uses that path for the selected fresh canary. GitHub Actions run 26330646504 passed CI on 14030dd. Local full smoke, update smoke, release:check, node/Python syntax checks, diff check, and added-line secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": false
+    "enforcePostBaselinePublicEvidenceOnly": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
