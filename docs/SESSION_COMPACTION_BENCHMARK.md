@@ -27,7 +27,7 @@ OpenClaw session exports without printing candidate memory text:
 
 ```bash
 node packages/bench/session-compaction-local-audit.mjs \
-  --input /private/path/to/session-events.jsonl \
+  --input <private-session-events.jsonl> \
   --source codex \
   --session-id private-run-001
 ```
@@ -68,9 +68,9 @@ paths:
 
 ```bash
 node packages/bench/session-compaction-local-batch-audit.mjs \
-  --input-dir /private/path/to/session-exports \
+  --input-dir <private-session-export-folder> \
   --limit 25 \
-  --output /private/path/to/recallweave-batch-audit.json
+  --output <private-batch-audit-output.json>
 ```
 
 The report stays metrics-only. It emits source counts, aggregate event and

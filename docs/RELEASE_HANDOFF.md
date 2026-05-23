@@ -118,6 +118,12 @@ and compare the result to reported leaderboard or provider stats. Use hosted
 Supermemory for read-through parity, free-tier sanity checks, or historical
 container export only. Do not require hosted writes for the autoresearch loop.
 
+Validate the target first:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
+```
+
 Run this before any hosted Supermemory comparison claim:
 
 ```bash

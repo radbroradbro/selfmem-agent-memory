@@ -277,3 +277,14 @@ Public GitHub benchmark scores are allowed only after a real matched canary win
 with two independent reviewer approvals recorded by `baseline:reviewer-intake`.
 A canary win may justify a full benchmark; it does not prove general SOTA
 superiority.
+
+The public target itself must pass before a canary starts:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
+```
+
+This gate separates component evidence from memory-system evidence. MTEB,
+MMTEB, BEIR, MIRACL, MS MARCO, and reranker scores can choose model arms, but
+they cannot replace MemoryBench, LongMemEval, LoCoMo, ConvoMem, BEAM, or another
+end-to-end memory benchmark.

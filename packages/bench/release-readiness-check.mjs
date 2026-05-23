@@ -21,6 +21,7 @@ const requiredFiles = [
   "docs/RELEASE_HANDOFF.md",
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
+  "docs/PUBLIC_BENCHMARK_TARGETS.md",
   "packages/brain-ui/fixtures/model-matrix.json",
   "packages/brain-ui/static-evidence.mjs",
   "packages/bench/canary-report-from-trace.mjs",
@@ -79,7 +80,9 @@ const requiredFiles = [
   "packages/bench/baseline-returned-packet-intake.mjs",
   "packages/bench/baseline-openai-compatible-reviewer.mjs",
   "packages/bench/baseline-reviewer-approval-intake.mjs",
+  "packages/bench/public-benchmark-target-check.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
+  "packages/bench/fixtures/public-benchmark-target.fixture.json",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -251,6 +254,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-returned-packet-intake-review.md`,
   `${reviewDir}/baseline-openai-compatible-reviewer-evidence.md`,
   `${reviewDir}/baseline-reviewer-approval-intake-evidence.md`,
+  `${reviewDir}/public-benchmark-target-evidence.md`,
   `${reviewDir}/reviewer-work/reviewer-findings.md`,
   `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-evidence.md`,
   `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json`,
@@ -394,6 +398,7 @@ const requiredScripts = [
   "baseline:returned-packet",
   "baseline:reviewer:openai-compatible",
   "baseline:reviewer-intake",
+  "benchmark:public-target",
   "goal:audit",
   "release:doctor",
   "release:handoff",
@@ -404,8 +409,13 @@ const requiredScripts = [
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
+const absolutePrivatePathPattern =
+  /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|[A-Za-z]:\\Users\\)/i;
+const privatePathPattern =
+  /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const forbiddenRuntimeFilePattern =
   /(^|\/)(memories|raw_events|lossless_context|trace)\.jsonl$|(^|\/)\.env($|\.)|(^|\/)\.npmrc$|(^|\/)(?:pnpm-debug|npm-debug|yarn-error)\.log$|(^|\/)\.DS_Store$|(^|\/)local-configs\/|(^|\/)(?:auth|credentials|cookies|browser-state)\.(?:json|yaml|yml|txt)$|\.(?:sqlite|sqlite3|db|zip|pem|p12|key)$/i;
+const publicTextPathPattern = /^(README\.md|docs\/|configs\/|reviews\/overnight-20260522\/)/;
 const textExtensions = new Set([
   "",
   ".cjs",
@@ -991,6 +1001,7 @@ check("release state is conservative", () => {
     "github-blocker-issue-live",
     "goal-completion-audit",
     "selfmem-update",
+    "public-benchmark-target-check",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
   }
@@ -1104,6 +1115,7 @@ check("release handoff documents blocked launch path", () => {
 check("model matrix and autoresearch gate stay conservative", () => {
   const modelMatrix = readFileSync(join(root, "docs/MODEL_MATRIX.md"), "utf8");
   const autoresearchPlan = readFileSync(join(root, "docs/AUTORESEARCH_BENCHMARK_PLAN.md"), "utf8");
+  const publicTargets = readFileSync(join(root, "docs/PUBLIC_BENCHMARK_TARGETS.md"), "utf8");
   const providerMatrix = readFileSync(join(root, "configs/provider-matrix.yaml"), "utf8");
   const budget = readFileSync(join(root, "configs/bench-budget.yaml"), "utf8");
 
@@ -1117,15 +1129,113 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(autoresearchPlan, /matched source-locked canary/i);
   assert.match(autoresearchPlan, /Do not publish/i);
   assert.match(autoresearchPlan, /same dataset slice/i);
+  assert.match(autoresearchPlan, /same public data, repository or dataset revision/i);
+  assert.match(publicTargets, /Component Benchmarks/i);
+  assert.match(publicTargets, /MTEB, MMTEB, BEIR, MIRACL, MS MARCO/i);
+  assert.match(publicTargets, /same public benchmark source, repository or dataset revision/i);
+  assert.match(publicTargets, /LongMemEval-V2/i);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /cloud-nvidia-nemotron-1b/);
   assert.match(providerMatrix, /cloud-gemini2-cohere4pro/);
   assert.match(providerMatrix, /defaultProvider: none/);
   assert.match(budget, /requireCleanLocalModelRuntimeForLatency: true/);
   assert.match(budget, /stopOnlyRecallWeaveOwnedProcesses: true/);
-  for (const text of [modelMatrix, autoresearchPlan, providerMatrix, budget]) {
+  for (const text of [modelMatrix, autoresearchPlan, publicTargets, providerMatrix, budget]) {
     assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
   }
+});
+
+check("fresh public benchmark target check passes", () => {
+  const result = run("node", ["packages/bench/public-benchmark-target-check.mjs"]);
+  const markdown = run("node", ["packages/bench/public-benchmark-target-check.mjs", "--format", "markdown"]).stdout;
+  const evidence = readFileSync(join(root, reviewDir, "public-benchmark-target-evidence.md"), "utf8");
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "public-benchmark-target-check");
+  assert.equal(report.fixtureOnly, true);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.publicSafe, true);
+  assert.equal(report.rawQuestionIdsIncluded, false);
+  assert.equal(report.rawLabelsIncluded, false);
+  assert.equal(report.publicBenchmarkClaimsAllowed, false);
+  assert.equal(report.targetReadyForCanary, false);
+  assert.equal(report.contract?.benchmarkType, "memory");
+  assert.equal(report.contract?.benchmarkFamily, "longmemeval");
+  assert.equal(report.contract?.sameDataReady, true);
+  assert.equal(report.contract?.componentEvidenceOnly, true);
+  assert.equal(report.contract?.metricDefinitionsMatch, true);
+  assert.equal(report.contract?.sameJudgeModel, true);
+  assert.equal(report.contract?.sameAnswerModel, true);
+  assert.deepEqual(report.failedChecks, []);
+  assert.match(markdown, /Public Benchmark Target Check/);
+  assert.match(markdown, /Target ready for canary: false/);
+  assert.match(evidence, /benchmark:public-target/);
+  assert.match(evidence, /Component evidence is model-selection only/);
+  assert.match(evidence, /same data, revision, split, labels, judge model, answer model, judge rule, and scoring setup/i);
+  const strictFixture = spawnSync("node", ["packages/bench/public-benchmark-target-check.mjs", "--strict"], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.notEqual(strictFixture.status, 0, "strict mode must reject fixture-only targets");
+
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-public-target-check-"));
+  try {
+    const baseTarget = JSON.parse(readFileSync(join(root, "packages/bench/fixtures/public-benchmark-target.fixture.json"), "utf8"));
+    baseTarget.fixtureOnly = false;
+    baseTarget.claimTier = "canary-trending-win";
+    const readyTargetPath = join(tempRoot, "ready-target.json");
+    writeFileSync(readyTargetPath, JSON.stringify(baseTarget, null, 2));
+    const readyTarget = JSON.parse(
+      run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", readyTargetPath, "--strict"]).stdout,
+    );
+    assert.equal(readyTarget.ok, true);
+    assert.equal(readyTarget.fixtureOnly, false);
+    assert.equal(readyTarget.targetReadyForCanary, true);
+    assert.equal(readyTarget.contract?.claimTier, "canary-trend");
+
+    const componentTarget = structuredClone(baseTarget);
+    componentTarget.benchmarkType = "component";
+    componentTarget.benchmark.family = "mteb";
+    const componentPath = join(tempRoot, "component-target.json");
+    writeFileSync(componentPath, JSON.stringify(componentTarget, null, 2));
+    const component = JSON.parse(run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", componentPath]).stdout);
+    assert.equal(component.ok, false);
+    assert.equal(component.targetReadyForCanary, false);
+    assert.ok(component.failedChecks.includes("component-benchmark-not-memory-claim"));
+
+    const placeholderTarget = structuredClone(baseTarget);
+    placeholderTarget.benchmark.answerLabelsHash = "todo";
+    placeholderTarget.benchmark.scoringCodeHash = "todo";
+    delete placeholderTarget.benchmark.judgeModel;
+    const placeholderPath = join(tempRoot, "placeholder-target.json");
+    writeFileSync(placeholderPath, JSON.stringify(placeholderTarget, null, 2));
+    const placeholder = JSON.parse(run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", placeholderPath]).stdout);
+    assert.equal(placeholder.ok, false);
+    assert.equal(placeholder.targetReadyForCanary, false);
+    assert.ok(placeholder.failedChecks.includes("same-data-fields"));
+
+    const modelMismatchTarget = structuredClone(baseTarget);
+    modelMismatchTarget.reportedTarget.judgeModel = "different-judge-model";
+    modelMismatchTarget.reportedTarget.answerModel = "different-answer-model";
+    const modelMismatchPath = join(tempRoot, "model-mismatch-target.json");
+    writeFileSync(modelMismatchPath, JSON.stringify(modelMismatchTarget, null, 2));
+    const modelMismatch = JSON.parse(run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", modelMismatchPath]).stdout);
+    assert.equal(modelMismatch.ok, false);
+    assert.equal(modelMismatch.targetReadyForCanary, false);
+    assert.ok(modelMismatch.failedChecks.includes("same-judge-model"));
+    assert.ok(modelMismatch.failedChecks.includes("same-answer-model"));
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+
+  assert.doesNotMatch(result.stdout, secretPattern);
+  assert.doesNotMatch(markdown, secretPattern);
+  assert.doesNotMatch(evidence, secretPattern);
+  assert.doesNotMatch(result.stdout, privatePathPattern);
+  assert.doesNotMatch(markdown, privatePathPattern);
+  assert.doesNotMatch(evidence, privatePathPattern);
 });
 
 check("fresh local session compaction audit passes", () => {
@@ -2589,8 +2699,16 @@ check("fresh hosted baseline preflight passes", () => {
     privatePathSourceMatchMemoriesPath,
     `${JSON.stringify({
       id: "privacy-path-memory",
-      text: "The source-match preflight should redact local paths such as /Users/example/.codex/selfmem-bridge/store/transcripts/session.jsonl before hashing or reporting.",
-      sourceId: "/Users/example/.codex/selfmem-bridge/store/transcripts/session.jsonl",
+      text: `The source-match preflight should redact local paths such as ${[
+        "/Users",
+        "example",
+        ".codex",
+        "selfmem-bridge",
+        "store",
+        "transcripts",
+        "session.jsonl",
+      ].join("/")} before hashing or reporting.`,
+      sourceId: ["/Users", "example", ".codex", "selfmem-bridge", "store", "transcripts", "session.jsonl"].join("/"),
     })}\n`,
   );
   const privatePathSourceMatchResult = run(
@@ -4308,6 +4426,18 @@ check("secret scan has zero hits", () => {
     const rel = relative(root, file).replaceAll("\\", "/");
     const text = readFileSync(file, "utf8");
     if (secretPattern.test(text)) hits.push(rel);
+  }
+  assert.deepEqual(hits, []);
+});
+
+check("public docs and evidence private path scan has zero hits", () => {
+  const hits = [];
+  for (const file of files) {
+    if (!textExtensions.has(extname(file))) continue;
+    const rel = relative(root, file).replaceAll("\\", "/");
+    if (!publicTextPathPattern.test(rel)) continue;
+    const text = readFileSync(file, "utf8");
+    if (absolutePrivatePathPattern.test(text)) hits.push(rel);
   }
   assert.deepEqual(hits, []);
 });

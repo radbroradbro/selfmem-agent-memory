@@ -808,3 +808,83 @@ Use only bundled fixture data:
 
 Do not record real local memories, raw session history, private diagnostics,
 credentials, private paths, or real agent logs.
+
+## Post-12h Gate Recheck 2026-05-23T22:10Z
+
+Verdict remains: FAIL.
+
+This recheck inspected the populated automation worktree branch
+`automation/recallweave-post12h-readiness-review-20260523-b68d` at
+`b3cc2f210dce356a3e33dcd372c3295eb1912e41` plus the current uncommitted
+public benchmark clarification edits already present in that worktree. The
+detached Codex workspace used for that recheck did not contain the overnight
+review packet and could not create a branch because git metadata writes were
+denied by the sandbox.
+
+Fresh checks passed in this recheck:
+
+- `npm run build`
+- `npm run test`: 6 files, 22 tests
+- `npm run typecheck`
+- `npm run privacy:test`
+- `npm run smoke:openclaw`: `privacyLeakCount: 0`
+- `npm run smoke:hermes`: `privacyLeakCount: 0`
+- `npm run compaction:smoke:built`
+- `npm run compaction:benchmark:built`: 5 of 5 scenarios passed,
+  `privacyLeakCount: 0`, exact identifier accuracy 1
+- `npm run compaction:local-audit:built`: metrics-only strict local audit,
+  `privacyLeakCount: 0`
+- `npm run compaction:batch-audit:built`: metrics-only strict batch audit,
+  `privacyLeakCount: 0`
+- `npm run wiki:smoke:built`
+- `npm run wiki:sync:smoke:built`: 12 audit entries, dry-run covered
+- `npm run container:audit:smoke:built`
+- `npm run brain:evidence:static`: 9 nodes, 9 edges, all expected sections and
+  controls present, `privacyLeakCount: 0`, `productionReady: false`
+- `git diff --check`
+- `npm pack --dry-run` from `packages/core` using a temporary npm cache
+- `npm run release:handoff`: passed and kept `publicLaunchAllowed: false`
+- `npm run goal:audit`: `goalComplete: false`,
+  `mayCallUpdateGoalComplete: false`
+
+Fresh checks blocked or failed in this sandbox:
+
+- Supermemory recall: blocked by DNS, `api.supermemory.ai` could not resolve.
+- `pnpm install --frozen-lockfile` / `npm exec --yes pnpm@10.23.0`: blocked by
+  DNS, `registry.npmjs.org` could not resolve.
+- `npm run brain:smoke:built`: blocked by `listen EPERM` on `127.0.0.1`.
+- `npm run brain:interaction:built`: not reached after the Brain UI smoke
+  failed for `listen EPERM` on `127.0.0.1`.
+- `npm run release:check`: failed because fresh Brain UI smoke,
+  Brain UI interaction smoke, clean consumer smoke, release doctor, and live
+  GitHub sync could not complete under localhost/network restrictions.
+- `npm run release:doctor`: failed because `api.github.com` could not resolve.
+- Fresh localhost browser evidence: not captured because this sandbox denies
+  localhost binding. Existing checked-in sanitized Brain UI screenshots and
+  DOM evidence remain historical evidence, not fresh proof from this recheck.
+
+Secret/private scans:
+
+- The release gate's built-in secret scan reached `ok: true` before later
+  environment-blocked checks failed.
+- A broad grep found only expected placeholders, redaction regexes, safety
+  docs, and test fixtures. It did not identify committed credential values.
+- No hosted Supermemory write-back was attempted.
+
+Current blocking criteria:
+
+- Human approval is still required before merge, visibility change, or public
+  live update.
+- One real-container production rollout remains incomplete. Fixture UI and
+  metrics-only canary tooling are strong enough for alpha PR review, but they
+  are not production rollout evidence.
+- Fresh browser proof and live GitHub sync could not be recaptured in this
+  sandbox, so this run cannot upgrade the verdict.
+
+Issue/PR trail for this recheck:
+
+- Existing PR trail: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
+- Existing blocker issue trail:
+  <https://github.com/radbroradbro/selfmem-agent-memory/issues/6>
+- New local issue draft:
+  `reviews/overnight-20260522/issue-drafts/post12h-production-readiness-remains-blocked.md`

@@ -22,6 +22,15 @@ split, question ids where available, answer labels, judge rule, and scoring
 script. A custom memory set can be useful for product QA, but it is not the
 benchmark lane unless it is clearly labeled as a private canary.
 
+Run the target validator before starting a public canary:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
+```
+
+The validator is metrics-only. It prints hashes and counts, not raw labels,
+question text, memory text, transcripts, private paths, or credentials.
+
 ## Claim Tiers
 
 | Tier | Evidence | Allowed wording |

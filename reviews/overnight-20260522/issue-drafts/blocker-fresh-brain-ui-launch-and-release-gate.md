@@ -96,8 +96,12 @@ requirements are resolved.
 - Current benchmark plan also separates component model evidence from
   memory-system evidence. MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker
   leaderboards can choose model arms, but public RecallWeave claims still need
-  the same public benchmark data, revision, split, labels, judge rule, and
-  scoring setup as the target row.
+  the same public benchmark data, revision, split, labels, judge model, answer
+  model, judge rule, and scoring setup as the target row.
+- Current benchmark tooling adds `benchmark:public-target`, a metrics-only
+  validator that checks source URL, dataset revision, split, labels, judge
+  model, answer model, judge rule, scoring code, claim tier, and component-evidence boundaries before a
+  public canary target can run.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:

@@ -61,6 +61,8 @@ too expensive for the next run.
 1. Source-lock the benchmark and target row. Record the source URL, checked
    date, benchmark variant, metric name, score, judge model, answer model,
    token budget if reported, and caveats.
+   Then run `benchmark:public-target -- --target <target.json> --strict` so the
+   target cannot be confused with component-only evidence or a private fixture.
 2. Freeze a small but real canary slice from MemoryBench, LongMemEval, LoCoMo,
    ConvoMem, BEAM, or another documented memory benchmark.
    Use the same public data, repository or dataset revision, split, labels,
