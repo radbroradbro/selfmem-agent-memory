@@ -47,6 +47,9 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after the postwatch real-diagnostics pass
     selected the current OpenClaw one-agent handoff packet. Updated at:
     2026-05-23T19:53:03Z.
+  - The PR body was refreshed again after adding the returned canary workspace
+    helper, which converts one returned agent packet into public-safe markdown
+    and JSON findings for review. Updated at: 2026-05-23T20:10:40Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -62,9 +65,10 @@ Verdict: resolved for PR body and blocker issue writes.
     baseline refresh, hosted-baseline run orchestrator refresh, continued
     one-agent canary packet identity refresh, current OpenClaw next-agent
     handoff packet identity refresh, five-packet returned-diagnostics packet
-    identity refresh, and postwatch OpenClaw one-agent packet refresh
-  - Updated at: 2026-05-23T19:53:03Z
-  - Body length: 20379
+    identity refresh, postwatch OpenClaw one-agent packet refresh, and returned
+    canary workspace refresh
+  - Updated at: 2026-05-23T20:10:41Z
+  - Body length: 20738
 
 ## Safety
 

@@ -53,6 +53,7 @@
     "canary:packet": "node packages/bench/canary-evidence-packet.mjs",
     "canary:packet:review": "node packages/bench/canary-evidence-packet-review.mjs",
     "canary:returned-packet": "node packages/bench/canary-returned-packet-intake.mjs",
+    "canary:returned-workspace": "node packages/bench/canary-returned-workspace.mjs",
     "canary:returned-inbox": "node packages/bench/canary-returned-inbox.mjs",
     "canary:returned-watch": "node packages/bench/canary-returned-watch.mjs",
     "canary:batch-audit": "node packages/bench/canary-diagnostic-batch-audit.mjs",

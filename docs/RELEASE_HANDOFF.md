@@ -97,6 +97,18 @@ The current handoff packet remains:
 The returned packet must pass `canary:returned-packet` with
 `--require-production-canary` before the real rollout blocker can close.
 
+To convert a returned packet into public-safe workspace notes, run:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-workspace -- \
+  --packet <returned-canary-evidence-packet.zip> \
+  --workspace reviews/overnight-20260522/next-agent-workspace \
+  --output /tmp/recallweave-returned-workspace.json
+```
+
+Add `--require-production-canary` when the command should fail unless the
+returned packet can close the one-agent canary blocker.
+
 ## Hosted Baseline Preflight
 
 Run this before any hosted Supermemory comparison claim:

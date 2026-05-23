@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const checkout = mkdtempSync(join(tmpdir(), "recallweave-consumer-checkout-"));
 const npmCache = mkdtempSync(join(tmpdir(), "recallweave-consumer-npm-cache-"));
+const returnedWorkspace = mkdtempSync(join(tmpdir(), "recallweave-consumer-returned-workspace-"));
 const forbiddenRuntimeFilePattern =
   /(^|\/)(memories|raw_events|lossless_context|trace)\.jsonl$|(^|\/)\.env($|\.)|(^|\/)\.npmrc$|(^|\/)(?:pnpm-debug|npm-debug|yarn-error)\.log$|(^|\/)\.DS_Store$|(^|\/)local-configs\/|(^|\/)(?:auth|credentials|cookies|browser-state)\.(?:json|yaml|yml|txt)$|\.(?:sqlite|sqlite3|db|zip|pem|p12|key)$/i;
 const secretPattern =
@@ -24,6 +25,7 @@ const extraCurrentFiles = [
   "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/canary-evidence-packet-review.mjs",
   "packages/bench/canary-returned-packet-intake.mjs",
+  "packages/bench/canary-returned-workspace.mjs",
   "packages/bench/canary-returned-inbox.mjs",
   "packages/bench/canary-returned-watch.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
@@ -80,6 +82,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["canary:packet"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:packet:review"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:returned-packet"], "string");
+  assert.equal(typeof packageJson.scripts?.["canary:returned-workspace"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:returned-inbox"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:returned-watch"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:batch-audit"], "string");
@@ -130,6 +133,7 @@ try {
   checks.push(run("node", ["packages/bench/canary-evidence-packet.mjs"], "canary evidence packet"));
   checks.push(run("node", ["packages/bench/canary-evidence-packet-review.mjs"], "canary evidence packet review"));
   checks.push(run("node", ["packages/bench/canary-returned-packet-intake.mjs"], "returned canary packet intake"));
+  checks.push(run("node", ["packages/bench/canary-returned-workspace.mjs", "--workspace", returnedWorkspace], "returned canary workspace generator"));
   checks.push(run("node", ["packages/bench/canary-returned-inbox.mjs"], "returned canary inbox scanner"));
   checks.push(run("node", ["packages/bench/canary-returned-watch.mjs"], "returned canary inbox watcher"));
   checks.push(run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"], "canary diagnostic batch audit"));
@@ -264,6 +268,7 @@ try {
 } finally {
   rmSync(checkout, { recursive: true, force: true });
   rmSync(npmCache, { recursive: true, force: true });
+  rmSync(returnedWorkspace, { recursive: true, force: true });
 }
 
 function copyPublicCheckout() {

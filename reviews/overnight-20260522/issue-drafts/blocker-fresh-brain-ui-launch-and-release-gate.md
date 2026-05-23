@@ -59,6 +59,9 @@ requirements are resolved.
   folders: batch audit and next-agent packet commands fail closed as
   metrics-only JSON, remove requested output zip paths on blocked packet
   creation, avoid stack traces, and preserve public/fleet launch blockers.
+- Current returned-packet follow-up adds `canary:returned-workspace`, so a
+  returned one-agent packet can fill public-safe markdown findings and intake
+  notes without raw logs, memories, prompts, answers, private paths, or keys.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:
@@ -339,6 +342,8 @@ requirements are resolved.
 - A real one-agent canary report is collected through the sanitized canary
   report/intake path and passes privacy, lifecycle, hybrid search, latency,
   rollback, and write/read checks.
+- The returned packet is converted with `canary:returned-workspace` into
+  public-safe markdown findings for maintainer review.
 - Any hosted comparison claim is backed by a fresh metrics-only baseline using
   the same source-aligned query set, dataset, judge, settings, and scoring code.
 - The owner approves merge and public release wording.

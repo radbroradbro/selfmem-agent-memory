@@ -31,6 +31,7 @@ const requiredFiles = [
   "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/canary-evidence-packet-review.mjs",
   "packages/bench/canary-returned-packet-intake.mjs",
+  "packages/bench/canary-returned-workspace.mjs",
   "packages/bench/canary-returned-inbox.mjs",
   "packages/bench/canary-returned-watch.mjs",
   "packages/bench/canary-diagnostic-batch-audit.mjs",
@@ -185,6 +186,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-evidence-packet-review-review.md`,
   `${reviewDir}/canary-returned-packet-intake-evidence.md`,
   `${reviewDir}/gemini-canary-returned-packet-intake-review.md`,
+  `${reviewDir}/canary-returned-workspace-evidence.md`,
   `${reviewDir}/canary-returned-inbox-evidence.md`,
   `${reviewDir}/gemini-canary-returned-inbox-review.md`,
   `${reviewDir}/canary-diagnostic-batch-audit-evidence.md`,
@@ -362,6 +364,7 @@ const requiredScripts = [
   "canary:packet",
   "canary:packet:review",
   "canary:returned-packet",
+  "canary:returned-workspace",
   "canary:returned-inbox",
   "canary:returned-watch",
   "canary:batch-audit",
@@ -954,6 +957,7 @@ check("release state is conservative", () => {
     "canary-operator-packet",
     "canary-evidence-packet",
     "canary-evidence-packet-review",
+    "canary-returned-workspace",
     "canary-diagnostic-batch-audit",
     "canary-next-agent-plan",
     "hosted-baseline-preflight",
@@ -1838,6 +1842,69 @@ check("fresh returned canary packet intake passes", () => {
     assert.match(evidence, /require-production-canary/i);
     assert.match(geminiReview, /Verdict:\s*CLEAN/i);
     for (const text of [defaultRun.stdout, packetRun.stdout, requiredRun.stdout, evidence]) {
+      assert.doesNotMatch(text, secretPattern);
+      assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+    }
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+check("fresh returned canary workspace generator passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-workspace-check-"));
+  try {
+    const workspace = join(tempRoot, "workspace");
+    const outputPath = join(tempRoot, "workspace-result.json");
+    const scriptRun = run("node", [
+      "packages/bench/canary-returned-workspace.mjs",
+      "--workspace",
+      workspace,
+      "--output",
+      outputPath,
+    ]);
+    const requiredRun = spawnSync("node", [
+      "packages/bench/canary-returned-workspace.mjs",
+      "--workspace",
+      join(tempRoot, "required-workspace"),
+      "--require-production-canary",
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const report = JSON.parse(scriptRun.stdout);
+    const outputReport = JSON.parse(readFileSync(outputPath, "utf8"));
+    const requiredReport = JSON.parse(requiredRun.stdout);
+    const operatorMarkdown = readFileSync(join(workspace, "operator-findings-returned.md"), "utf8");
+    const intakeMarkdown = readFileSync(join(workspace, "returned-packet-intake.md"), "utf8");
+    const intakeJson = JSON.parse(readFileSync(join(workspace, "returned-packet-intake.json"), "utf8"));
+    const evidence = readFileSync(join(root, reviewDir, "canary-returned-workspace-evidence.md"), "utf8");
+
+    assert.equal(report.mode, "canary-returned-workspace");
+    assert.equal(report.writesRealFiles, true);
+    assert.equal(report.metricsOnly, true);
+    assert.equal(report.generatedFixturePacket, true);
+    assert.equal(report.countsAsProductionCanaryEvidence, false);
+    assert.equal(report.publicLaunchAllowed, false);
+    assert.equal(report.fleetRolloutAllowed, false);
+    assert.deepEqual(report.workspace.files, [
+      "operator-findings-returned.md",
+      "returned-packet-intake.md",
+      "returned-packet-intake.json",
+    ]);
+    assert.equal(outputReport.mode, "canary-returned-workspace");
+    assert.equal(intakeJson.mode, "canary-returned-packet-intake");
+    assert.equal(intakeJson.countsAsProductionCanaryEvidence, false);
+    assert.notEqual(requiredRun.status, 0, "required production workspace must fail closed for fixture packets");
+    assert.equal(requiredReport.ok, false);
+    assert.equal(requiredReport.countsAsProductionCanaryEvidence, false);
+    assert.match(operatorMarkdown, /# Operator Findings/);
+    assert.match(operatorMarkdown, /not production canary evidence/i);
+    assert.match(intakeMarkdown, /# Returned Packet Intake/);
+    assert.match(intakeMarkdown, /Close real rollout blocker: no/i);
+    assert.match(evidence, /canary:returned-workspace/i);
+    assert.match(evidence, /Fixture packets never count as production canary evidence/i);
+    for (const text of [scriptRun.stdout, requiredRun.stdout, operatorMarkdown, intakeMarkdown, JSON.stringify(intakeJson), evidence]) {
       assert.doesNotMatch(text, secretPattern);
       assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
     }

@@ -30,15 +30,18 @@ Date: 2026-05-23
   collected two independent reviewer approvals and moved to owner-review state.
 - PR #5 and issue #6 were refreshed again after postwatch real-diagnostics
   triage selected the current OpenClaw one-agent handoff packet.
+- PR #5 and issue #6 were refreshed again after the returned canary workspace
+  helper added markdown and JSON intake generation for the selected agent
+  packet.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T19:53:03Z
+- PR body refreshed at: 2026-05-23T20:10:40Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T19:53:03Z
-- PR body hash: 9c80f9e0280781cbce27e41531c5b7b644e3fb02cb056091374c144b0c87ad97
+- Issue updated at: 2026-05-23T20:10:41Z
+- PR body hash: 8505214e5766fdaa6e1d1878fe65e9d5cf78f410f01eb121a969857a0d508080
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 658e17ac0efae777dfd95cc5e60bddd876995a799d24c4272e907eeba7c77c01
-- PR body length: 34367
-- Issue body length: 20379
+- Issue body hash: 7063da8f6af533d4a34794ef75ae0f89eeb6a0d465f3e57293e9d7502192b29b
+- PR body length: 34948
+- Issue body length: 20738
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

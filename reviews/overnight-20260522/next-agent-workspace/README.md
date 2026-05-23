@@ -43,5 +43,14 @@ After a packet comes back, run the returned-packet intake command from the
 handoff packet. The packet must pass with production-canary evidence before this
 workspace can support closing the real rollout blocker.
 
+The safer path is to let the workspace generator fill the markdown:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-workspace -- --packet <returned-canary-evidence-packet.zip> --workspace reviews/overnight-20260522/next-agent-workspace --output /tmp/recallweave-returned-workspace.json
+```
+
+Use `--require-production-canary` when this should fail unless the returned
+packet proves production canary evidence.
+
 The goal stays active until the returned packet passes and the owner approves
 promotion.
