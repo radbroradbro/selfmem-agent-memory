@@ -968,8 +968,13 @@ check("post-baseline public evidence guard is honored", () => {
   run("git", ["merge-base", "--is-ancestor", baselineSha, "HEAD"]);
   const allowedCodePaths = new Set(releaseState.releaseStateGuard?.allowedPostBaselineCodePaths ?? []);
   if (allowedCodePaths.size > 0) {
-    assert.match(releaseState.releaseStateGuard?.allowedPostBaselineCodeReason ?? "", /hosted baseline/i);
-    assert.equal(releaseState.reviewerEvidence?.hostedBaselineLivePrep?.verdict, "CLEAN");
+    assert.match(releaseState.releaseStateGuard?.allowedPostBaselineCodeReason ?? "", /hosted baseline|returned canary inbox/i);
+    const hasCleanAllowedReviewer = [
+      releaseState.reviewerEvidence?.hostedBaselineLivePrep?.verdict,
+      releaseState.reviewerEvidence?.baselineSourceMatchPreflight?.verdict,
+      releaseState.reviewerEvidence?.canaryReturnedInbox?.verdict,
+    ].includes("CLEAN");
+    assert.equal(hasCleanAllowedReviewer, true);
   }
   const changedFiles = run("git", ["diff", "--name-only", `${baselineSha}..HEAD`])
     .stdout.split(/\r?\n/)

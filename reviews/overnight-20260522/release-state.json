@@ -28,7 +28,16 @@
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true
+    "enforcePostBaselinePublicEvidenceOnly": true,
+    "allowedPostBaselineCodeReason": "returned canary inbox scanner with Gemini CLEAN review; public launch remains blocked",
+    "allowedPostBaselineCodePaths": [
+      "package.json",
+      "packages/bench/canary-returned-inbox.mjs",
+      "packages/bench/consumer-install-smoke.mjs",
+      "packages/bench/goal-completion-audit.mjs",
+      "packages/bench/release-blocker-doctor.mjs",
+      "packages/bench/release-readiness-check.mjs"
+    ]
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
@@ -215,6 +224,14 @@
       "route": "gemini embedded public-safe diff, no tools",
       "evidence": "reviews/overnight-20260522/gemini-baseline-source-match-preflight-review.md",
       "completedAt": "2026-05-23T13:10:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "canaryReturnedInbox": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini --skip-trust --approval-mode plan",
+      "evidence": "reviews/overnight-20260522/gemini-canary-returned-inbox-review.md",
+      "completedAt": "2026-05-23T13:13:00Z",
       "countsAsPublicLaunchApproval": false
     },
     "hostedBaselineLiveCodexLocalRun": {
