@@ -27,9 +27,20 @@ exactly how to collect the evidence that could close that blocker later.
 - Store p95: 0 ms.
 - Store latency samples: 0.
 - Privacy leak count: 0.
-- Batch parsed inputs: 4.
+- Batch parsed inputs: 8.
 - Batch failed inputs: 1.
 - Strict-real pass count: 0.
+
+## Markdown Workspace
+
+Use `reviews/overnight-20260522/next-agent-workspace/` for the next operator's
+markdown findings. The folder keeps the native CLI outputs, operator notes, and
+returned-packet intake summary separate from broader release notes.
+
+The workspace is public-safe by design. It must contain aggregate metrics,
+hashes, pass/fail flags, timestamps, and command ids only. Do not place raw
+memories, transcripts, prompts, answers, private paths, keys, cookies, or
+unredacted diagnostics there.
 
 ## Paste-Ready Plan
 

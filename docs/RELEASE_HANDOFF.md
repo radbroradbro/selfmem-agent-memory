@@ -77,6 +77,26 @@ The doctor is intentionally conservative. It should report
 hosted-baseline blockers are resolved or explicitly accepted.
 Use its `manualCommands` list as the next-action checklist for agents.
 
+## One-Agent Canary Workspace
+
+Use `reviews/overnight-20260522/next-agent-workspace/` when the selected agent
+returns canary evidence. That folder is for native CLI markdown findings and
+maintainer intake notes only. It should contain aggregate metrics, hashes,
+pass/fail flags, command ids, and timestamps.
+
+Do not put raw memories, transcripts, prompts, answers, provider keys, cookies,
+private local paths, private container names, or unredacted diagnostics in that
+workspace.
+
+The current handoff packet remains:
+
+- `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`
+- SHA-256:
+  `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`
+
+The returned packet must pass `canary:returned-packet` with
+`--require-production-canary` before the real rollout blocker can close.
+
 ## Hosted Baseline Preflight
 
 Run this before any hosted Supermemory comparison claim:
