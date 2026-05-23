@@ -137,6 +137,9 @@ Latest verified head before this draft refresh:
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   p50/p95 latency, rollback readiness, zero privacy leaks, and
   `countsAsRealRolloutEvidence: false`
+- Strict-real canary intake: failed fixture or weak real reports exit nonzero
+  but still print sanitized JSON with failed checks, latency, instrumentation,
+  quality, and privacy counters for `canary:diagnose`
 - Canary report generator: `canary:report -- --fixture` creates the sanitized
   report shape from trace fixtures and proves fixture-derived reports fail
   `--strict-real`

@@ -84,6 +84,7 @@ evidence are still required before any public live update.
 | Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `reviews/overnight-20260522/baseline-comparison-evidence.md`, `reviews/overnight-20260522/gemini-baseline-comparison-review.md` |
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
+| Strict-real fail-closed intake output | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-strict-real-fail-closed-intake-review.md` |
 | Canary report generator | `packages/bench/canary-report-from-trace.mjs`, `reviews/overnight-20260522/canary-report-generator-evidence.md`, `reviews/overnight-20260522/gemini-canary-report-generator-review.md` |
 | Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `reviews/overnight-20260522/canary-operator-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-operator-packet-review.md` |
 | Fresh canary window isolation | `packages/bench/canary-report-from-trace.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/gemini-fresh-canary-window-review.md` |

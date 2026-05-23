@@ -66,6 +66,7 @@
     "canary-report-generator",
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
+    "canary-strict-fail-closed-intake",
     "canary-remediation-plan",
     "canary-operator-packet",
     "fresh-canary-window-gate",

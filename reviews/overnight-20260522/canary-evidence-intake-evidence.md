@@ -53,6 +53,29 @@ The intake rejects:
 The accepted report may contain only hashes, counts, booleans, aggregate
 latency, aggregate quality rates, redaction counts, and rollback readiness.
 
+## Strict Failure Output
+
+`--strict-real` remains fail-closed: fixture reports and weak real reports
+still exit nonzero. The command now prints the same sanitized JSON shape before
+exiting so agents can attach a public-safe failure report and run
+`canary:diagnose` without guessing from a stack trace.
+
+Required failure fields:
+
+- `ok: false`
+- `strictReal: true`
+- `strictRealPassed: false`
+- `strictFailureReason`
+- `failedChecks`
+- metrics-only lifecycle, latency, instrumentation, quality, and privacy
+  sections
+
+A real redacted OpenClaw diagnostic bundle was scanned locally after this
+change. The strict intake still failed, as it should, but the output named only
+metrics: `store-latency-instrumented` and `store-p95` failed, recall p95 was
+1567.346 ms, privacy leaks were zero, and no raw memory, transcript, prompt,
+answer, credential, or private path was printed.
+
 ## Required Runtime Signals
 
 - one runtime host,

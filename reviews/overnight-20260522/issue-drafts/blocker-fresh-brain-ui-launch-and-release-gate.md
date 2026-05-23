@@ -84,6 +84,9 @@ requirements are resolved.
   source-lock hashes, and blocks fixture inputs from public benchmark claims.
 - Fresh canary window isolation now requires post-update `--since` evidence so
   old pre-patch trace history cannot prove or poison a patched one-agent canary.
+- Strict-real canary intake now exits nonzero while still printing sanitized
+  JSON for fixture or weak real evidence, so agents can run remediation from
+  failed metrics without attaching raw logs.
 - Adapter smokes now assert bounded read-through policy plus positive total,
   local, and remote recall timings.
 - Secret and private-name scans found no actual credential or private memory

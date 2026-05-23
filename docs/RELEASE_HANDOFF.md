@@ -173,6 +173,11 @@ Then run the intake gate:
 npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
 ```
 
+If strict-real intake fails, keep its JSON output. The command exits nonzero
+but still writes a sanitized failure report with failed checks, latency,
+instrumentation, quality, and privacy counters. Feed that metrics-only output
+to `canary:diagnose`; do not attach raw traces or memories.
+
 If the intake gate fails, generate a metrics-only remediation plan:
 
 ```bash

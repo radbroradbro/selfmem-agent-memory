@@ -76,16 +76,20 @@ const checks = [
 
 const failedChecks = checks.filter((item) => !item.ok).map((item) => item.name);
 const canaryPass = failedChecks.length === 0;
-if (strictReal) {
-  assert.equal(fixtureOnly, false, "--strict-real cannot use the bundled fixture report");
-  assert.equal(canaryPass, true, `real canary report failed checks: ${failedChecks.join(", ")}`);
-}
+const strictFailureReason = strictReal && fixtureOnly
+  ? "--strict-real cannot use the bundled fixture report"
+  : strictReal && !canaryPass
+    ? `real canary report failed checks: ${failedChecks.join(", ")}`
+    : null;
 
 const output = {
-  ok: true,
+  ok: !strictFailureReason,
   mode: "canary-evidence-intake",
   writesRealFiles: false,
   metricsOnly: true,
+  strictReal,
+  strictRealPassed: strictReal ? !strictFailureReason : null,
+  strictFailureReason,
   fixtureOnly,
   countsAsRealRolloutEvidence: !fixtureOnly && canaryPass,
   canaryPass,
@@ -167,6 +171,9 @@ const serialized = JSON.stringify(output, null, 2);
 assert.doesNotMatch(serialized, secretPattern);
 assert.doesNotMatch(serialized, privatePathPattern);
 console.log(serialized);
+if (strictFailureReason) {
+  process.exitCode = 1;
+}
 
 function check(name, ok) {
   return { name, ok: Boolean(ok) };

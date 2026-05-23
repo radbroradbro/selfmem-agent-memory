@@ -139,6 +139,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-report-generator-review.md`,
   `${reviewDir}/canary-evidence-intake-evidence.md`,
   `${reviewDir}/gemini-canary-evidence-intake-review.md`,
+  `${reviewDir}/gemini-strict-real-fail-closed-intake-review.md`,
   `${reviewDir}/canary-remediation-evidence.md`,
   `${reviewDir}/gemini-canary-remediation-review.md`,
   `${reviewDir}/canary-operator-packet-evidence.md`,
@@ -822,6 +823,7 @@ check("release state is conservative", () => {
     "canary-report-generator",
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
+    "canary-strict-fail-closed-intake",
     "canary-remediation-plan",
     "canary-operator-packet",
     "hosted-baseline-preflight",
@@ -1101,7 +1103,11 @@ check("fresh canary report generator passes", () => {
       stdio: ["ignore", "pipe", "pipe"],
     });
     assert.notEqual(diagnosticZipStrict.status, 0, "relocated fixture zip must fail --strict-real");
-    assert.match(diagnosticZipStrict.stderr, /strict-real cannot use.*fixture/i);
+    const diagnosticZipStrictReport = JSON.parse(diagnosticZipStrict.stdout);
+    assert.equal(diagnosticZipStrictReport.ok, false);
+    assert.equal(diagnosticZipStrictReport.strictReal, true);
+    assert.match(diagnosticZipStrictReport.strictFailureReason, /strict-real cannot use.*fixture/i);
+    assert.equal(diagnosticZipStrictReport.fixtureOnly, true);
 
     const windowFixtureDir = join(tempRoot, "fresh-window-diagnostic");
     mkdirSync(join(windowFixtureDir, "reliability_reports"), { recursive: true });
@@ -1236,13 +1242,47 @@ check("fresh canary report generator passes", () => {
     assert.ok(summaryDiagnosisReport.failedChecks.includes("store-latency-instrumented"));
     assert.ok(summaryDiagnosisReport.actions.some((item) => item.check === "search-latency-instrumented"));
     assert.ok(summaryDiagnosisReport.actions.some((item) => item.check === "store-latency-instrumented"));
+    const weakRealReportPath = join(tempRoot, "weak-real-report.json");
+    const weakRealReport = {
+      ...windowedReport,
+      latencyMs: {
+        ...windowedReport.latencyMs,
+        storeP50: 0,
+        storeP95: 0,
+      },
+      instrumentation: {
+        ...windowedReport.instrumentation,
+        storeLatencySampleCount: 0,
+        missingStoreLatencyCount: 1,
+      },
+    };
+    writeFileSync(weakRealReportPath, JSON.stringify(weakRealReport), { encoding: "utf8" });
+    const summaryStrict = spawnSync("node", ["packages/bench/canary-evidence-intake.mjs", "--report", weakRealReportPath, "--strict-real"], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(summaryStrict.status, 0, "weak real report must fail --strict-real");
+    const summaryStrictReport = JSON.parse(summaryStrict.stdout);
+    assert.equal(summaryStrictReport.ok, false);
+    assert.equal(summaryStrictReport.strictReal, true);
+    assert.equal(summaryStrictReport.strictRealPassed, false);
+    assert.match(summaryStrictReport.strictFailureReason, /real canary report failed checks/i);
+    assert.ok(summaryStrictReport.failedChecks.includes("store-latency-instrumented"));
+    assert.ok(summaryStrictReport.failedChecks.includes("store-p95"));
+    assert.doesNotMatch(summaryStrict.stdout, secretPattern);
+    assert.doesNotMatch(summaryStrict.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
     const strict = spawnSync("node", ["packages/bench/canary-evidence-intake.mjs", "--report", reportPath, "--strict-real"], {
       cwd: root,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
     });
     assert.notEqual(strict.status, 0, "fixture-derived report must fail --strict-real");
-    assert.match(strict.stderr, /strict-real cannot use.*fixture/i);
+    const strictReport = JSON.parse(strict.stdout);
+    assert.equal(strictReport.ok, false);
+    assert.equal(strictReport.strictReal, true);
+    assert.match(strictReport.strictFailureReason, /strict-real cannot use.*fixture/i);
+    assert.equal(strictReport.fixtureOnly, true);
     assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
     assert.doesNotMatch(geminiReview, /pending external review/i);
   } finally {

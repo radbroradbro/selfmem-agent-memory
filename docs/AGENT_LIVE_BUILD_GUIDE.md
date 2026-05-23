@@ -166,6 +166,11 @@ for install sanity, but it is not rollout evidence. If the updater cannot find
 a mapped live container and no diagnostic source is provided, `--strict-real`
 fails instead of treating the adapter smoke as a pass.
 
+When strict-real intake fails, keep the generated JSON. The command exits
+nonzero but still writes a sanitized failure report with `failedChecks`,
+latency, instrumentation, quality, and privacy counters. Attach that metrics
+file, then run `canary:diagnose` on it. Do not send raw traces or memories.
+
 Use `--keys-file` only with a local private file on that runtime machine. Never
 put keys in the repository.
 
