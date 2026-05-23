@@ -65,6 +65,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--install-audit", action="store_true", default=True)
     parser.add_argument("--run-canary", action="store_true")
     parser.add_argument("--canary-output", default="", help="Optional path for a sanitized canary report JSON.")
+    parser.add_argument("--canary-intake-output", default="", help="Optional path for sanitized canary intake JSON.")
+    parser.add_argument("--canary-diagnosis-output", default="", help="Optional path for sanitized canary diagnosis JSON when strict intake fails.")
+    parser.add_argument("--canary-packet-output", default="", help="Optional path for a metrics-only canary evidence packet zip.")
     parser.add_argument("--canary-diagnostic-dir", default="", help="Optional redacted diagnostic directory to convert into canary evidence.")
     parser.add_argument("--canary-diagnostic-zip", default="", help="Optional redacted diagnostic zip to convert into canary evidence.")
     parser.add_argument("--canary-since", default="", help="Only count canary trace events at or after this ISO timestamp.")
@@ -231,7 +234,7 @@ def run_canary(host: str, home: Path, args: argparse.Namespace) -> dict[str, Any
         output["runtimeReport"] = runtime
         if args.strict_real and not runtime["ok"]:
             output["ok"] = False
-    elif args.strict_real or args.canary_output:
+    elif args.strict_real or args.canary_output or args.canary_intake_output or args.canary_diagnosis_output or args.canary_packet_output:
         output["ok"] = False
         output["runtimeReport"] = {
             "ok": False,
@@ -255,12 +258,29 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
         return None
     output_path = Path(args.canary_output).expanduser().resolve() if args.canary_output else None
     temp_file = None
+    temp_intake_file = None
+    temp_diagnosis_file = None
     if output_path is None:
         temp_file = tempfile.NamedTemporaryFile(prefix="recallweave-canary-", suffix=".json", delete=False)
         temp_file.close()
         output_path = Path(temp_file.name)
     else:
         output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    intake_output_path = Path(args.canary_intake_output).expanduser().resolve() if args.canary_intake_output else None
+    if intake_output_path is None:
+        temp_intake_file = tempfile.NamedTemporaryFile(prefix="recallweave-canary-intake-", suffix=".json", delete=False)
+        temp_intake_file.close()
+        intake_output_path = Path(temp_intake_file.name)
+    else:
+        intake_output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    diagnosis_output_path = Path(args.canary_diagnosis_output).expanduser().resolve() if args.canary_diagnosis_output else None
+    if diagnosis_output_path is not None:
+        diagnosis_output_path.parent.mkdir(parents=True, exist_ok=True)
+    packet_output_path = Path(args.canary_packet_output).expanduser().resolve() if args.canary_packet_output else None
+    if packet_output_path is not None:
+        packet_output_path.parent.mkdir(parents=True, exist_ok=True)
 
     report_command = [
         "node",
@@ -287,6 +307,8 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
     }
     if report.returncode != 0:
         cleanup_temp(temp_file)
+        cleanup_temp(temp_intake_file)
+        cleanup_temp(temp_diagnosis_file)
         return runtime
 
     runtime["report"] = summarize_canary_report(parse_json(report.stdout))
@@ -295,23 +317,61 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
         str(REPO_ROOT / "packages" / "bench" / "canary-evidence-intake.mjs"),
         "--report",
         str(output_path),
+        "--output",
+        str(intake_output_path),
     ]
     if args.strict_real:
         intake_command.append("--strict-real")
     intake = subprocess.run(intake_command, cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=30)
     runtime["intake"] = summarize_canary_intake(parse_json(intake.stdout))
+    runtime["intakePath"] = str(intake_output_path) if args.canary_intake_output else ""
     runtime["intakeOk"] = intake.returncode == 0
     runtime["intakeStderr"] = intake.stderr[-1000:]
+    diagnosis_ran = False
     if intake.returncode != 0:
+        if diagnosis_output_path is None:
+            temp_diagnosis_file = tempfile.NamedTemporaryFile(prefix="recallweave-canary-diagnosis-", suffix=".json", delete=False)
+            temp_diagnosis_file.close()
+            diagnosis_output_path = Path(temp_diagnosis_file.name)
         diagnosis = subprocess.run([
             "node",
             str(REPO_ROOT / "packages" / "bench" / "canary-remediation.mjs"),
             "--report",
             str(output_path),
+            "--output",
+            str(diagnosis_output_path),
         ], cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=30)
         runtime["diagnosis"] = summarize_canary_diagnosis(parse_json(diagnosis.stdout))
+        runtime["diagnosisPath"] = str(diagnosis_output_path) if args.canary_diagnosis_output else ""
+        diagnosis_ran = True
         runtime["ok"] = False
+
+    if packet_output_path is not None:
+        packet_command = [
+            "node",
+            str(REPO_ROOT / "packages" / "bench" / "canary-evidence-packet.mjs"),
+            "--report",
+            str(output_path),
+            "--intake",
+            str(intake_output_path),
+            "--output",
+            str(packet_output_path),
+        ]
+        if diagnosis_ran and diagnosis_output_path is not None:
+            packet_command.extend(["--diagnosis", str(diagnosis_output_path)])
+        if args.strict_real and intake.returncode == 0:
+            packet_command.append("--strict-real")
+        packet = subprocess.run(packet_command, cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=30)
+        runtime["packet"] = summarize_canary_packet(parse_json(packet.stdout))
+        runtime["packetPath"] = str(packet_output_path)
+        runtime["packetOk"] = packet.returncode == 0
+        runtime["packetStderr"] = packet.stderr[-1000:]
+        if packet.returncode != 0:
+            runtime["ok"] = False
+
     cleanup_temp(temp_file)
+    cleanup_temp(temp_intake_file)
+    cleanup_temp(temp_diagnosis_file)
     return runtime
 
 
@@ -397,6 +457,23 @@ def summarize_canary_diagnosis(value: Any) -> Any:
         "measurements": value.get("measurements"),
         "actions": value.get("actions"),
         "operatorSummary": value.get("operatorSummary"),
+    }
+
+
+def summarize_canary_packet(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    return {
+        "ok": value.get("ok"),
+        "mode": value.get("mode"),
+        "strictReal": value.get("strictReal"),
+        "fixtureOnly": value.get("fixtureOnly"),
+        "canaryPass": value.get("canaryPass"),
+        "countsAsRealRolloutEvidence": value.get("countsAsRealRolloutEvidence"),
+        "packagePassesStrictReal": value.get("packagePassesStrictReal"),
+        "publicLaunchAllowed": value.get("publicLaunchAllowed"),
+        "fleetRolloutAllowed": value.get("fleetRolloutAllowed"),
+        "packet": value.get("packet"),
     }
 
 

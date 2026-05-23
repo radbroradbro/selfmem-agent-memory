@@ -154,11 +154,14 @@ bin/selfmem_update \
   --rollback-tested \
   --strict-real \
   --canary-since "$FRESH_WINDOW_START" \
-  --canary-output /tmp/recallweave-canary-report.json
+  --canary-output /tmp/recallweave-canary-report.json \
+  --canary-intake-output /tmp/recallweave-canary-intake.json \
+  --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json \
+  --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 To produce a shareable metrics-only canary artifact during the same update,
-write a sanitized report and run intake:
+write a sanitized report, intake, and packet:
 
 ```bash
 bin/selfmem_update \
@@ -166,7 +169,9 @@ bin/selfmem_update \
   --repo /path/to/hermes \
   --apply \
   --run-canary \
-  --canary-output /tmp/recallweave-canary-report.json
+  --canary-output /tmp/recallweave-canary-report.json \
+  --canary-intake-output /tmp/recallweave-canary-intake.json \
+  --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 After a rollback drill, add `--rollback-tested --strict-real`. Strict-real
@@ -211,7 +216,8 @@ npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw --forma
 
 The operator packet is public-safe. It uses placeholders for runtime paths and
 lists only the metrics-only files the agent should attach after the run.
-After generating the report and intake files, package them with:
+If you did not use `--canary-packet-output`, package the report and intake
+files with:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --output /tmp/recallweave-canary-evidence-packet.zip

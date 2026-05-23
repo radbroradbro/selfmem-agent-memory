@@ -92,6 +92,8 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
     assert_strict_real_requires_runtime_source(root, host, runtime, keys_file)
 
     canary_output = root / f"{host}-canary-report.json"
+    canary_intake_output = root / f"{host}-canary-intake.json"
+    canary_packet_output = root / f"{host}-canary-packet.zip"
     canary = run_update(
         host,
         home,
@@ -104,6 +106,10 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
             str(REPO_ROOT / "packages" / "bench" / "fixtures" / "canary-diagnostic-export.fixture"),
             "--canary-output",
             str(canary_output),
+            "--canary-intake-output",
+            str(canary_intake_output),
+            "--canary-packet-output",
+            str(canary_packet_output),
             "--canary-since",
             "2026-05-22T18:59:00.000Z",
             "--rollback-tested",
@@ -117,7 +123,12 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
     assert canary["canary"]["runtimeReport"]["intakeOk"] is True
     assert canary["canary"]["runtimeReport"]["intake"]["canaryPass"] is True
     assert canary["canary"]["runtimeReport"]["intake"]["countsAsRealRolloutEvidence"] is False
+    assert canary["canary"]["runtimeReport"]["packetOk"] is True
+    assert canary["canary"]["runtimeReport"]["packet"]["mode"] == "canary-evidence-packet"
+    assert canary["canary"]["runtimeReport"]["packet"]["countsAsRealRolloutEvidence"] is False
     assert canary_output.exists(), "canary output should be written when requested"
+    assert canary_intake_output.exists(), "canary intake output should be written when requested"
+    assert canary_packet_output.exists(), "canary packet output should be written when requested"
 
     return {
         "ok": True,
@@ -127,6 +138,7 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
         "secondApplySteps": [step["step"] for step in second_apply["steps"]],
         "canarySource": canary["canary"]["runtimeReport"]["source"],
         "canaryIntakePass": canary["canary"]["runtimeReport"]["intake"]["canaryPass"],
+        "canaryPacketCreated": canary["canary"]["runtimeReport"]["packetOk"],
         "strictRealSourceRequired": True,
         "mappingFound": applied["preservedMapping"]["found"],
         "keyMode": oct(stat.S_IMODE(installed_key_path(host, home).stat().st_mode)),

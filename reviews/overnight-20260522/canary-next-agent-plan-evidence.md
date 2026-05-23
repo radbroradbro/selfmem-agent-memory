@@ -9,7 +9,10 @@ audit into a single next-agent update plan. The command is meant for the
 controller after multiple agents return redacted diagnostics. It chooses the
 closest privacy-clean candidate, names the failed strict checks, and prints a
 paste-ready one-agent command sequence for dry-run, adapter apply, fresh-window
-collection, strict intake, diagnosis, and metrics-only packet packaging.
+collection, strict intake, diagnosis, and metrics-only packet packaging. The
+fresh-window collection step now uses `selfmem_update` to write the report,
+intake, optional diagnosis, and evidence packet in one run, which reduces the
+chance that an agent returns only partial canary evidence.
 
 This does not approve fleet rollout or public launch. It reduces operator
 confusion by producing one bounded plan from the batch evidence.
@@ -37,7 +40,7 @@ node packages/bench/canary-next-agent-plan.mjs --input-root <redacted-diagnostic
 - Selected candidate privacy leak count: 0.
 - Selected candidate store latency samples: positive.
 - The generated Markdown includes the fresh-window timestamp step and the
-  strict-real intake step.
+  strict-real intake and packet-output paths.
 
 ## Real Redacted Batch Result
 
@@ -99,5 +102,9 @@ window.
 - Public launch and fleet rollout stay false in every output.
 - The generated command plan includes rollback-tested strict intake and a
   diagnosis path for failed evidence.
+- The generated fresh-window command includes `--canary-intake-output`,
+  `--canary-diagnosis-output`, and `--canary-packet-output` so the selected
+  agent can return one metrics-only evidence packet without hand-running
+  separate packaging commands.
 - Only metrics-only report, intake, diagnosis, and packet files are permitted
   attachments.

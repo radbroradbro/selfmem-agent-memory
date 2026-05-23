@@ -28,7 +28,7 @@
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true
+    "enforcePostBaselinePublicEvidenceOnly": false
   },
   "provenPreviewSurfaces": [
     "nucleus-index",

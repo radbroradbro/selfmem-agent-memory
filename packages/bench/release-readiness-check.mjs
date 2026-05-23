@@ -395,6 +395,9 @@ check("selfmem_update command is mapped", () => {
   const help = run(command, ["--help"]).stdout;
   assert.match(help, /--run-canary/);
   assert.match(help, /--canary-output/);
+  assert.match(help, /--canary-intake-output/);
+  assert.match(help, /--canary-diagnosis-output/);
+  assert.match(help, /--canary-packet-output/);
   assert.match(help, /--canary-since/);
   assert.match(help, /--canary-last-minutes/);
   assert.match(help, /--strict-real/);
@@ -1837,7 +1840,7 @@ check("fresh canary next-agent plan passes", () => {
   assert.equal(report.decision.recommendedScope, "one-agent-fresh-canary");
   assert.ok(report.decision.blockReasons.some((item) => item.reason.includes("fixture-only")));
   assert.ok(report.commandPlan.some((item) => item.id === "apply-current-adapter"));
-  assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window"));
+  assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window" && /--canary-packet-output/.test(item.command)));
   assert.ok(report.commandPlan.some((item) => item.id === "diagnose-if-failed"));
   assert.ok(report.commandPlan.some((item) => item.id === "package-passing-evidence"));
   for (const command of report.commandPlan.map((item) => item.command).filter((command) => /canary:(intake|diagnose)/.test(command))) {
@@ -1856,7 +1859,8 @@ check("fresh canary next-agent plan passes", () => {
   assert.match(realPlanEvidence, /Recall p95:\s*1567\.346 ms/i);
   assert.match(realPlanEvidence, /FRESH_WINDOW_START/);
   assert.match(realPlanEvidence, /--strict-real/);
-  assert.match(realPlanEvidence, /--output\s+\/tmp\/recallweave-canary-intake\.json/);
+  assert.match(realPlanEvidence, /--canary-intake-output\s+\/tmp\/recallweave-canary-intake\.json/);
+  assert.match(realPlanEvidence, /--canary-packet-output\s+\/tmp\/recallweave-canary-evidence-packet\.zip/);
   assert.match(realPlanEvidence, /Do not attach raw logs/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
   assert.doesNotMatch(planRun.stdout, secretPattern);

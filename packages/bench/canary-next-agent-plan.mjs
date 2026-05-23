@@ -261,18 +261,16 @@ function commandsFor(host) {
     },
     {
       id: "collect-live-window",
-      description: "After at least 15 minutes of real use, collect strict-real metrics from the mapped live container.",
+      description: "After at least 15 minutes of real use, collect strict-real metrics and package the returned evidence from the mapped live container.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report /tmp/recallweave-canary-report.json --strict-real --output /tmp/recallweave-canary-intake.json`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip`,
       ].join(" && "),
     },
     {
       id: "collect-from-redacted-export",
       description: "Use only if the agent cannot collect from its live container but can provide a redacted diagnostic export.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" ${diagnosticFlag} --canary-output /tmp/recallweave-canary-report.json`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report /tmp/recallweave-canary-report.json --strict-real --output /tmp/recallweave-canary-intake.json`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" ${diagnosticFlag} --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip`,
       ].join(" && "),
     },
     {

@@ -8,8 +8,8 @@ Scope:
 - Added `bin/selfmem_update` as the user-facing command wrapper and package
   binary mapping.
 - Exercised Hermes and OpenClaw updater paths in temporary runtime directories.
-- Exercised updater-triggered canary report and intake generation against a
-  fixture diagnostic export.
+- Exercised updater-triggered canary report, intake, and metrics-only packet
+  generation against a fixture diagnostic export.
 - Verified dry-run and apply behavior without touching real agent homes.
 
 Public-safety boundary:
@@ -32,9 +32,12 @@ Verification expectations:
   install step if the copied target digest does not match the reviewed source.
 - Apply and dry-run report the strict v1 canary contract so stale runtime
   adapters are visible before a live canary window starts.
-- `--run-canary --canary-output <path>` runs adapter smoke, writes a sanitized
-  canary report, runs intake, and keeps fixture output from counting as real
-  rollout evidence.
+- `--run-canary --canary-output <path> --canary-intake-output <path>
+  --canary-packet-output <path>` runs adapter smoke, writes a sanitized canary
+  report, runs intake, packages a metrics-only canary evidence zip, and keeps
+  fixture output from counting as real rollout evidence.
+- `--canary-diagnosis-output <path>` is used when strict intake fails so a
+  one-agent operator can return a diagnosis packet without a second command.
 - `--canary-since <iso-timestamp>` is forwarded to the report generator and
   recorded in the summarized runtime report so a patched agent can collect a
   fresh window without old trace history poisoning strict intake.
@@ -54,13 +57,17 @@ Verification:
 - `python3 -m py_compile packages/bench/update-flow-smoke.py plugins/selfmem-fallback/scripts/selfmem_update.py`: passed.
 - `bin/selfmem_update --help`: covered by the release-readiness gate.
 - `bin/selfmem_update --help`: now exposes `--run-canary`, `--canary-output`,
-  `--canary-since`, `--canary-last-minutes`, `--strict-real`, and
-  `--rollback-tested`.
+  `--canary-intake-output`, `--canary-diagnosis-output`,
+  `--canary-packet-output`, `--canary-since`, `--canary-last-minutes`,
+  `--strict-real`, and `--rollback-tested`.
 - `pnpm update:smoke`: now asserts `adapterContract.strictCanaryContract: v1`,
   store latency instrumentation, `installedMatchesSource: true`, and matching
   source/target adapter digests for Hermes and OpenClaw.
 - Strict-real missing-source guard: passed for Hermes and OpenClaw fixture
   runtimes.
+- One-command canary packet path: passed for Hermes and OpenClaw fixture
+  runtimes, producing report JSON, intake JSON, and a metrics-only canary
+  packet zip without counting fixture evidence as real rollout evidence.
 - `pnpm smoke`: passed with update smoke included.
 - `pnpm test`: 14 tests passed.
 - `git diff --check`: passed.

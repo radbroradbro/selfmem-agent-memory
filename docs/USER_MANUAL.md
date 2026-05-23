@@ -108,7 +108,7 @@ For local update scripts:
 ```bash
 bin/selfmem_update --host hermes --repo /path/to/hermes
 bin/selfmem_update --host hermes --repo /path/to/hermes --apply
-bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary --canary-output /tmp/recallweave-canary-report.json
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 After linking or installing the package, use `selfmem_update` directly.
@@ -132,7 +132,7 @@ npm exec --yes pnpm@10.23.0 -- update:smoke
 For a real one-agent canary, use metrics-only reports:
 
 ```bash
-bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary --canary-output /tmp/recallweave-canary-report.json
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 npm exec --yes pnpm@10.23.0 -- canary:report -- --diagnostic-dir <redacted-diagnostic-dir> --rollback-tested --output sanitized-report.json
 npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json --strict-real
 npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json

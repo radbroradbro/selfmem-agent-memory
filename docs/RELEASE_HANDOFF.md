@@ -273,7 +273,14 @@ letting old trace history prove or poison the patched adapter. The canary report
 generator reads local trace files or metadata-only diagnostic summaries but does
 not make a raw diagnostic export safe to attach.
 
-After report and intake generation, use `canary:packet` to create one
+The one-command updater path can write the report, intake, optional diagnosis,
+and packet in one run:
+
+```bash
+bin/selfmem_update --host hermes --repo <runtime-checkout> --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+```
+
+If the updater was not used for packaging, use `canary:packet` to create one
 metrics-only zip for reviewers:
 
 ```bash
