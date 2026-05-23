@@ -152,6 +152,11 @@ Scope:
   consistency, rejects raw-content keys, secrets, and private paths, and fails
   closed under `--strict-real` unless the packet contains passing non-fixture
   strict-real intake evidence.
+- Added canary diagnostic batch audit coverage to the release gate. The batch
+  command audits a folder of redacted diagnostic bundles through report,
+  strict intake, and diagnosis, ranks the closest candidate, and keeps
+  production rollout blocked unless a non-fixture bundle passes strict-real
+  evidence.
 - Added baseline evidence packet coverage to the release gate. The packet
   command writes one metrics-only zip from hosted result, RecallWeave result,
   comparison, and preflight files, rejects raw-content keys, secrets, and
@@ -232,6 +237,10 @@ What `release:check` verifies:
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   p50/p95 latency, rollback readiness, zero privacy leaks, and
   `countsAsRealRolloutEvidence: false`,
+- Canary diagnostic batch audit exists and a fresh fixture batch reports one
+  parsed diagnostic input, zero privacy leaks, lifecycle coverage, hybrid search
+  coverage, positive store latency samples, and fails closed when
+  `--require-real-pass` is used on fixture evidence,
 - Canary report generator exists and a fresh fixture pass reports hashed
   labels, lifecycle counts, hybrid-search coverage, p50/p95 recall and store
   latency, privacy counters, rollback readiness, and strict-real fixture

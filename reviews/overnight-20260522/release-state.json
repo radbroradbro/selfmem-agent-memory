@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T03:22:59Z",
+  "generatedAt": "2026-05-23T03:34:49Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -72,6 +72,7 @@
     "canary-operator-packet",
     "canary-evidence-packet",
     "canary-evidence-packet-review",
+    "canary-diagnostic-batch-audit",
     "fresh-canary-window-gate",
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",

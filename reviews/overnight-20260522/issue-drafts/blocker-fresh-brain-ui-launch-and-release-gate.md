@@ -99,6 +99,9 @@ requirements are resolved.
 - Canary evidence packet packaging now gives agents one metrics-only zip for
   report, intake, and optional diagnosis files, while blocking raw logs and
   keeping fixture/failing packets from counting as rollout evidence.
+- Canary diagnostic batch audit now lets the controller process a folder of
+  redacted returned diagnostic bundles, rank the closest candidate, and keep
+  `--require-real-pass` blocked unless a non-fixture strict-real canary passes.
 - Adapter smokes now assert bounded read-through policy plus positive total,
   local, and remote recall timings.
 - Secret and private-name scans found no actual credential or private memory
@@ -115,9 +118,11 @@ requirements are resolved.
   and blocks public benchmark claims.
 - One real-container production canary remains incomplete. Fixture UI and
   report tooling are not a production rollout.
-- Two redacted real diagnostic bundles were evaluated and rejected by strict
-  rollout intake on missing store latency and recall p95. The next canary must
-  use a fresh patched runtime window and pass strict intake.
+- The available redacted real diagnostic bundle set was evaluated and rejected
+  by strict rollout intake. The closest privacy-clean candidate was under the
+  recall p95 threshold, but still lacked current adapter-contract and store
+  latency evidence. The next canary must use a fresh patched runtime window and
+  pass strict intake.
 
 ## Acceptance Criteria
 

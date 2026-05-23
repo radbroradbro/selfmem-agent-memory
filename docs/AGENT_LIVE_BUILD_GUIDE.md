@@ -219,6 +219,20 @@ npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave
 npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip --strict-real
 ```
 
+If several agents send redacted diagnostic bundles at once, audit them as a
+batch before picking the next runtime to patch:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root /path/to/redacted-diagnostics
+npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input /path/to/agent-a.zip --input /path/to/agent-b
+```
+
+Use `--require-real-pass` only when the batch is being offered as production
+one-agent canary evidence. Fixture bundles, stale pre-patch bundles, or bundles
+without passing strict-real intake must fail closed. The output is metrics-only:
+hashed agent/container labels, lifecycle counts, latency, instrumentation,
+privacy counters, failed checks, and remediation categories.
+
 The strict review must fail for fixtures or diagnostic-only packets.
 
 ## Failed Canary Reports

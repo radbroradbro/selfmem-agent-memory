@@ -21,6 +21,13 @@ real inputs still failed strict rollout intake, and the closest OpenClaw
 diagnostic was under the recall latency threshold but lacked store latency
 samples.
 
+After the canary batch auditor landed, the controller reran the available
+redacted return set through `canary:batch-audit`. The batch run processed nine
+diagnostic inputs, parsed eight, rejected one at report generation, found zero
+strict-real passes, and ranked the closest privacy-clean candidate. That best
+candidate had recall p95 1567.346 ms but still failed `adapter-contract`,
+`store-latency-instrumented`, and `store-p95`, so it remains diagnostic only.
+
 ## Commands
 
 The controller generated temporary metrics-only reports outside the repository:

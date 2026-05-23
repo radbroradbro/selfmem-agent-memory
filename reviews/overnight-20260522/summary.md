@@ -96,6 +96,7 @@ evidence are still required before any public live update.
 | Canary operator packet | `packages/bench/canary-operator-packet.mjs`, `reviews/overnight-20260522/canary-operator-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-operator-packet-review.md` |
 | Canary evidence packet | `packages/bench/canary-evidence-packet.mjs`, `reviews/overnight-20260522/canary-evidence-packet-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-packet-review.md` |
 | Canary evidence packet review | `packages/bench/canary-evidence-packet-review.mjs`, `reviews/overnight-20260522/canary-evidence-packet-review-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-packet-review-review.md` |
+| Canary diagnostic batch audit | `packages/bench/canary-diagnostic-batch-audit.mjs`, `reviews/overnight-20260522/canary-diagnostic-batch-audit-evidence.md`, `reviews/overnight-20260522/gemini-canary-diagnostic-batch-audit-review.md` |
 | Fresh canary window isolation | `packages/bench/canary-report-from-trace.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/gemini-fresh-canary-window-review.md` |
 | Real canary diagnostic evaluation | `reviews/overnight-20260522/real-canary-diagnostic-evidence.md` |
 | Adapter bounded read-through | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `reviews/overnight-20260522/adapter-bounded-read-through-evidence.md` |
@@ -198,6 +199,11 @@ Latest local verification before this summary:
   rejection, clean consumer smoke, full smoke, `release:check`,
   `release:doctor`, `goal:audit`, Gemini review, PR/issue live sync, and
   GitHub Actions CI run `26322155069` passed on `4ed6c00`.
+- Canary diagnostic batch audit verification: default fixture batch passed,
+  `--require-real-pass` failed closed for fixture evidence, a real redacted
+  batch triage parsed 8 of 9 inputs and found zero strict-real passes, and
+  Gemini review returned `CLEAN`. The best real candidate remains blocked by
+  adapter contract and store-latency evidence.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
   `103e7c6`, run `26290534116`.
 - GitHub Actions CI: success on guarded selected local-container browse commit

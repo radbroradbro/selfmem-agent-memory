@@ -49,6 +49,7 @@
     "canary:operator-packet": "node packages/bench/canary-operator-packet.mjs",
     "canary:packet": "node packages/bench/canary-evidence-packet.mjs",
     "canary:packet:review": "node packages/bench/canary-evidence-packet-review.mjs",
+    "canary:batch-audit": "node packages/bench/canary-diagnostic-batch-audit.mjs",
     "baseline:preflight": "node packages/bench/hosted-baseline-preflight.mjs",
     "baseline:collect": "node packages/bench/hosted-baseline-collector.mjs",
     "baseline:export:recallweave": "node packages/bench/recallweave-response-export.mjs",
@@ -61,7 +62,7 @@
     "release:handoff": "node packages/bench/github-handoff-packet.mjs",
     "release:github-sync": "node packages/bench/github-live-sync-check.mjs",
     "release:check": "node packages/bench/release-readiness-check.mjs",
-    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm brain:interaction:built && pnpm container:audit:smoke:built && pnpm compaction:smoke:built && pnpm compaction:benchmark:built && pnpm compaction:local-audit:built && pnpm wiki:smoke:built && pnpm wiki:sync:smoke:built && pnpm update:smoke && pnpm canary:report -- --fixture && pnpm canary:report -- --diagnostic-dir packages/bench/fixtures/canary-diagnostic-export.fixture && pnpm canary:intake && pnpm canary:diagnose && pnpm canary:operator-packet && pnpm canary:packet && pnpm canary:packet:review && pnpm baseline:preflight && pnpm baseline:preflight -- --fixture && pnpm baseline:collect -- --fixture && pnpm baseline:export:recallweave -- --fixture && pnpm baseline:collect:recallweave -- --fixture && pnpm baseline:compare -- --fixture && pnpm baseline:operator-packet && pnpm baseline:packet && pnpm consumer:smoke"
+    "smoke": "pnpm privacy:test && pnpm build && pnpm typecheck && pnpm smoke:openclaw && pnpm smoke:hermes && pnpm brain:smoke:built && pnpm brain:interaction:built && pnpm container:audit:smoke:built && pnpm compaction:smoke:built && pnpm compaction:benchmark:built && pnpm compaction:local-audit:built && pnpm wiki:smoke:built && pnpm wiki:sync:smoke:built && pnpm update:smoke && pnpm canary:report -- --fixture && pnpm canary:report -- --diagnostic-dir packages/bench/fixtures/canary-diagnostic-export.fixture && pnpm canary:intake && pnpm canary:diagnose && pnpm canary:operator-packet && pnpm canary:packet && pnpm canary:packet:review && pnpm canary:batch-audit && pnpm baseline:preflight && pnpm baseline:preflight -- --fixture && pnpm baseline:collect -- --fixture && pnpm baseline:export:recallweave -- --fixture && pnpm baseline:collect:recallweave -- --fixture && pnpm baseline:compare -- --fixture && pnpm baseline:operator-packet && pnpm baseline:packet && pnpm consumer:smoke"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

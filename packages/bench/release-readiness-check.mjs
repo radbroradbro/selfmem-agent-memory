@@ -29,6 +29,7 @@ const requiredFiles = [
   "packages/bench/canary-operator-packet.mjs",
   "packages/bench/canary-evidence-packet.mjs",
   "packages/bench/canary-evidence-packet-review.mjs",
+  "packages/bench/canary-diagnostic-batch-audit.mjs",
   "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
   "packages/bench/fixtures/hosted-baseline-search-responses.fixture.json",
   "packages/bench/fixtures/hosted-baseline-result.fixture.json",
@@ -153,6 +154,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-canary-evidence-packet-review.md`,
   `${reviewDir}/canary-evidence-packet-review-evidence.md`,
   `${reviewDir}/gemini-canary-evidence-packet-review-review.md`,
+  `${reviewDir}/canary-diagnostic-batch-audit-evidence.md`,
+  `${reviewDir}/gemini-canary-diagnostic-batch-audit-review.md`,
   `${reviewDir}/gemini-adapter-store-latency-review.md`,
   `${reviewDir}/gemini-fresh-canary-window-review.md`,
   `${reviewDir}/claude-fresh-canary-window-review-blocked.md`,
@@ -273,6 +276,7 @@ const requiredScripts = [
   "canary:operator-packet",
   "canary:packet",
   "canary:packet:review",
+  "canary:batch-audit",
   "baseline:preflight",
   "baseline:collect",
   "baseline:export:recallweave",
@@ -1555,6 +1559,52 @@ check("fresh canary evidence packet review passes", () => {
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
+});
+
+check("fresh canary diagnostic batch audit passes", () => {
+  const batchRun = run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"]);
+  const requireRealPassRun = spawnSync("node", [
+    "packages/bench/canary-diagnostic-batch-audit.mjs",
+    "--require-real-pass",
+  ], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  const report = JSON.parse(batchRun.stdout);
+  const strictOutput = JSON.parse(requireRealPassRun.stdout);
+  const evidence = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-diagnostic-batch-audit-review.md"), "utf8");
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "canary-diagnostic-batch-audit");
+  assert.equal(report.writesRealFiles, false);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.inputCount, 1);
+  assert.equal(report.parsedInputCount, 1);
+  assert.equal(report.failedInputCount, 0);
+  assert.equal(report.strictRealPassCount, 0);
+  assert.equal(report.countsAsRealRolloutEvidence, false);
+  assert.equal(report.publicLaunchAllowed, false);
+  assert.equal(report.fleetRolloutAllowed, false);
+  assert.equal(report.bestCandidate.fixtureOnly, true);
+  assert.equal(report.bestCandidate.canaryPass, true);
+  assert.equal(report.bestCandidate.countsAsRealRolloutEvidence, false);
+  assert.equal(report.bestCandidate.privacy.privacyLeakCount, 0);
+  assert.equal(report.bestCandidate.privacy.secretPatternHits, 0);
+  assert.equal(report.bestCandidate.quality.lifecycleCovered, true);
+  assert.equal(report.bestCandidate.quality.hybridSearchCovered, true);
+  assert.equal(report.bestCandidate.instrumentation.storeLatencySampleCount > 0, true);
+  assert.notEqual(requireRealPassRun.status, 0, "fixture batch must fail --require-real-pass");
+  assert.equal(strictOutput.ok, false);
+  assert.equal(strictOutput.requireRealPass, true);
+  assert.equal(strictOutput.countsAsRealRolloutEvidence, false);
+  assert.match(evidence, /canary diagnostic batch audit/i);
+  assert.match(evidence, /canary:batch-audit/i);
+  assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+  assert.doesNotMatch(batchRun.stdout, secretPattern);
+  assert.doesNotMatch(batchRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(requireRealPassRun.stdout, secretPattern);
+  assert.doesNotMatch(requireRealPassRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
 });
 
 check("fresh canary window reviewer evidence is explicit", () => {

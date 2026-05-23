@@ -54,12 +54,14 @@ The current PR adds:
   packets from counting as rollout proof;
 - a canary evidence packet review command that validates a received metrics-only
   zip before it can count as one-agent canary evidence;
+- a canary diagnostic batch audit command that ranks folders of returned
+  redacted diagnostic bundles without exposing raw content;
 - an adapter store-latency gate so Hermes and OpenClaw smokes prove store
   events include positive `elapsed_ms` samples before the next real canary;
 - a strict v1 adapter contract marker plus updater digest reporting so stale
   installed adapters are visible before a live canary can count;
-- real diagnostic canary evaluation evidence from two redacted external Hermes
-  bundles, both privacy-clean and both rejected by strict rollout intake;
+- real diagnostic canary evaluation evidence from returned redacted external
+  bundles, with zero strict-real passes in the latest batch audit;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
   release readiness.
 - a metrics-only local-session compaction audit path for private Codex, Claude,
@@ -165,15 +167,20 @@ Latest verified head before this draft refresh:
 - Canary evidence packet: `canary:packet` creates a metrics-only zip for
   report/intake/diagnosis files and rejects raw memory-shaped keys,
   key-shaped secrets, and private local paths
+- Canary diagnostic batch audit: `canary:batch-audit` processes returned
+  redacted diagnostics through report, intake, and diagnosis, then ranks the
+  closest candidate while `--require-real-pass` fails closed without a
+  non-fixture strict-real pass
 - Adapter store-latency gate: Hermes and OpenClaw standalone smokes now assert
   positive store `elapsed_ms` samples, and `release:check` enforces the result
 - Fresh canary window gate: strict-real canary collection now records a
   post-update timestamp and uses `--since`/`--canary-since` so old trace
   history cannot prove or poison patched adapter evidence
-- Real diagnostic canary evaluation: two redacted external Hermes bundles were
-  converted into temporary metrics-only reports. Both were real inputs,
-  privacy-clean, and rejected by strict rollout intake on missing store latency
-  and recall p95. They do not count as real rollout evidence
+- Real diagnostic canary evaluation: the returned redacted bundle set was
+  converted into temporary metrics-only reports where parseable. The best
+  privacy-clean candidate was under the recall p95 threshold but still failed
+  adapter-contract and store-latency checks, so it does not count as real
+  rollout evidence
 - GitHub Actions CI run `26312283137` passed on `4f5a079`, the canary
   remediation diagnosis gate commit.
 - GitHub Actions CI run `26313942262` passed on `b5c1e02`, the GitHub live

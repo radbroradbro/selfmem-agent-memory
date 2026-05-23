@@ -235,6 +235,21 @@ The live adapter must expose `adapter.name: recallweave-selfmem-canary`,
 If those fields are absent, update the runtime with `selfmem_update` before
 collecting a fresh canary window.
 
+When several redacted agent diagnostic bundles are available, rank them before
+deciding which agent should be the next real canary:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <redacted-diagnostics-folder>
+npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input <agent-a.zip> --input <agent-b-dir>
+```
+
+The batch audit converts each bundle through `canary:report`,
+`canary:intake --strict-real`, and `canary:diagnose`, then prints only hashed
+labels, counts, latency, failed checks, and remediation categories. It never
+prints raw memories, transcripts, prompts, answers, credentials, or private
+paths. Add `--require-real-pass` only when the batch is meant to prove the
+real one-agent canary blocker is closed; otherwise it is a triage tool.
+
 Current Hermes and OpenClaw adapters use local-first bounded hosted
 read-through. They search hosted Supermemory when local results are thin or the
 query explicitly asks for old, legacy, hosted, or Supermemory history. To prove
