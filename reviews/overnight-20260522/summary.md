@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `5a5107f`, run `26321087248`, success.
+  `e2388f0`, run `26321472056`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -65,6 +65,7 @@ evidence are still required before any public live update.
   attempt 2.
 - GitHub Actions CI run `26320492619` on `7fc3be2`: success.
 - GitHub Actions CI run `26321087248` on `5a5107f`: success.
+- GitHub Actions CI run `26321472056` on `e2388f0`: success.
 
 ## Shipped Overnight Slices
 
@@ -172,12 +173,16 @@ Latest local verification before this summary:
 - Local-session compaction audit: `pnpm compaction:local-audit:built` passed
   in metrics-only mode with 6 input events, 2 redactions, 4 candidate
   fingerprints, chronological output, and zero privacy leaks.
-- GitHub Actions CI: success on the latest inspected baseline, `5a5107f`.
+- GitHub Actions CI: success on the latest inspected baseline, `e2388f0`.
 - GitHub Actions CI: success on release-state guard commit `dd17f44`, run
   `26289073223`.
 - Strict adapter contract verification: local tests, full smoke,
   `release:check`, `release:doctor`, `goal:audit`, Gemini review, PR/issue
   live sync, and GitHub Actions CI run `26321087248` passed on `5a5107f`.
+- Canary evidence packet verification: local packet smoke, clean consumer smoke,
+  full smoke, `release:check`, `release:doctor`, `goal:audit`, Gemini review,
+  PR/issue live sync, and GitHub Actions CI run `26321472056` passed on
+  `e2388f0`.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
   `103e7c6`, run `26290534116`.
 - GitHub Actions CI: success on guarded selected local-container browse commit
