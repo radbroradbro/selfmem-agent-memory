@@ -38,6 +38,8 @@ const files = {
   realCanaryDiagnosticEvidence: `${reviewDir}/real-canary-diagnostic-evidence.md`,
   hostedBaselinePreflightEvidence: `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
+  hostedBaselineNextRunEvidence: `${reviewDir}/hosted-baseline-next-run-evidence.md`,
+  hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
   browserEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
   releaseReadinessEvidence: `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
@@ -146,6 +148,11 @@ const requirements = [
     files.hostedBaselinePreflightEvidence,
     files.hostedBaselinePreflightReview,
   ]),
+  proven("hosted-baseline-next-run", "Hosted baseline comparison has a state-aware next-run planner that keeps public claims blocked while producing the exact next metrics-only run packet", [
+    "packages/bench/hosted-baseline-next-run.mjs",
+    files.hostedBaselineNextRunEvidence,
+    files.hostedBaselineNextRunReview,
+  ]),
   proven("canary-evidence-intake", "One-agent runtime canary reports have a metrics-only, sanitized intake gate that does not count fixtures as real rollout evidence", [
     "packages/bench/canary-evidence-intake.mjs",
     files.canaryEvidenceIntakeEvidence,
@@ -192,6 +199,7 @@ const requirements = [
   ]),
   blocked("hosted-supermemory-baseline", "Hosted Supermemory benchmark claims require a fresh metrics-only baseline", [
     files.hostedBaselinePreflightEvidence,
+    files.hostedBaselineNextRunEvidence,
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [

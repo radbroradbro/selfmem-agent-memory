@@ -53,6 +53,7 @@ const requiredFiles = [
   "packages/bench/recallweave-baseline-collector.mjs",
   "packages/bench/baseline-comparison.mjs",
   "packages/bench/hosted-baseline-operator-packet.mjs",
+  "packages/bench/hosted-baseline-next-run.mjs",
   "packages/bench/baseline-evidence-packet.mjs",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
@@ -174,6 +175,8 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-comparison-review.md`,
   `${reviewDir}/hosted-baseline-operator-packet-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-operator-packet-review.md`,
+  `${reviewDir}/hosted-baseline-next-run-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   `${reviewDir}/baseline-evidence-packet-evidence.md`,
   `${reviewDir}/gemini-baseline-evidence-packet-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
@@ -287,6 +290,7 @@ const requiredScripts = [
   "baseline:collect:recallweave",
   "baseline:compare",
   "baseline:operator-packet",
+  "baseline:next-run",
   "baseline:packet",
   "goal:audit",
   "release:doctor",
@@ -859,6 +863,7 @@ check("release state is conservative", () => {
     "recallweave-baseline-collector",
     "baseline-comparison-gate",
     "hosted-baseline-operator-packet",
+    "hosted-baseline-next-run",
     "baseline-evidence-packet",
     "claude-opus-pr5-review",
     "github-handoff-packet",
@@ -1782,6 +1787,8 @@ check("fresh hosted baseline preflight passes", () => {
   ]);
   const operatorResult = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs"]);
   const operatorMarkdown = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs", "--format", "markdown"]);
+  const nextRunResult = run("node", ["packages/bench/hosted-baseline-next-run.mjs"]);
+  const nextRunMarkdown = run("node", ["packages/bench/hosted-baseline-next-run.mjs", "--format", "markdown"]);
   const baselinePacketResult = run("node", ["packages/bench/baseline-evidence-packet.mjs", "--output", baselinePacketPath]);
   const strictFixtureBaselinePacket = spawnSync(
     "node",
@@ -1805,6 +1812,7 @@ check("fresh hosted baseline preflight passes", () => {
   const comparisonReport = JSON.parse(comparisonResult.stdout);
   const matchedCollectorComparisonReport = JSON.parse(matchedCollectorComparison.stdout);
   const operatorPacket = JSON.parse(operatorResult.stdout);
+  const nextRunPlan = JSON.parse(nextRunResult.stdout);
   const baselinePacket = JSON.parse(baselinePacketResult.stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
   const collectorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-collector-evidence.md"), "utf8");
@@ -1817,6 +1825,8 @@ check("fresh hosted baseline preflight passes", () => {
   const comparisonGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-comparison-review.md"), "utf8");
   const operatorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-operator-packet-evidence.md"), "utf8");
   const operatorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-operator-packet-review.md"), "utf8");
+  const nextRunEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-next-run-evidence.md"), "utf8");
+  const nextRunGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-next-run-review.md"), "utf8");
   const baselinePacketEvidence = readFileSync(join(root, reviewDir, "baseline-evidence-packet-evidence.md"), "utf8");
   const baselinePacketGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-evidence-packet-review.md"), "utf8");
   assert.equal(report.ok, true);
@@ -1982,6 +1992,28 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorMarkdown.stdout, /baseline:export:recallweave/);
   assert.match(operatorMarkdown.stdout, /baseline:packet/);
   assert.match(operatorMarkdown.stdout, /Attach Only/);
+  assert.equal(nextRunPlan.ok, true);
+  assert.equal(nextRunPlan.mode, "hosted-baseline-next-run");
+  assert.equal(nextRunPlan.writesRealFiles, false);
+  assert.equal(nextRunPlan.callsHostedProvider, false);
+  assert.equal(nextRunPlan.metricsOnly, true);
+  assert.equal(nextRunPlan.plannerAuthorizesPublicClaims, false);
+  assert.equal(nextRunPlan.publicLaunchAllowed, false);
+  assert.equal(nextRunPlan.status, "FIXTURE_PLAN_ONLY");
+  assert.equal(nextRunPlan.evidence?.hosted?.provider, "hosted-supermemory");
+  assert.equal(nextRunPlan.evidence?.recallWeave?.provider, "recallweave");
+  assert.equal(nextRunPlan.evidence?.preflight?.countsAsHostedBaselineEvidence, false);
+  assert.equal(nextRunPlan.evidence?.comparison?.recallWeaveWin, true);
+  assert.equal(nextRunPlan.evidence?.comparison?.countsAsComparisonEvidence, false);
+  assert.equal(nextRunPlan.privacy?.privacyLeakCount, 0);
+  assert.equal(nextRunPlan.comparability?.sameQuerySet, true);
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "collect-hosted-baseline" && /baseline:collect/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "compare-matched-results" && /baseline:compare/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "package-review-evidence" && /baseline:packet/.test(item.command)));
+  assert.match(nextRunMarkdown.stdout, /RecallWeave Hosted Baseline Next Run/);
+  assert.match(nextRunMarkdown.stdout, /Planner authorizes public claims: no/);
+  assert.match(nextRunMarkdown.stdout, /baseline:next-run/);
   assert.equal(baselinePacket.mode, "baseline-evidence-packet");
   assert.equal(baselinePacket.metricsOnly, true);
   assert.equal(baselinePacket.fixtureOnly, true);
@@ -2012,6 +2044,9 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(comparisonGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(operatorEvidence, /hosted baseline operator packet/i);
   assert.match(operatorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(nextRunEvidence, /hosted baseline next-run/i);
+  assert.match(nextRunEvidence, /baseline:next-run/i);
+  assert.match(nextRunGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(baselinePacketEvidence, /baseline evidence packet/i);
   assert.match(baselinePacketEvidence, /baseline:packet/i);
   assert.match(baselinePacketGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
@@ -2038,6 +2073,12 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(operatorMarkdown.stdout, secretPattern);
   assert.doesNotMatch(operatorEvidence, secretPattern);
   assert.doesNotMatch(operatorGeminiReview, secretPattern);
+  assert.doesNotMatch(nextRunResult.stdout, secretPattern);
+  assert.doesNotMatch(nextRunMarkdown.stdout, secretPattern);
+  assert.doesNotMatch(nextRunEvidence, secretPattern);
+  assert.doesNotMatch(nextRunGeminiReview, secretPattern);
+  assert.doesNotMatch(nextRunResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(nextRunMarkdown.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(baselinePacketResult.stdout, secretPattern);
   assert.doesNotMatch(baselinePacketEvidence, secretPattern);
   assert.doesNotMatch(baselinePacketGeminiReview, secretPattern);

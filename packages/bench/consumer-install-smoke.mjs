@@ -30,6 +30,7 @@ const extraCurrentFiles = [
   "packages/bench/recallweave-response-export.mjs",
   "packages/bench/recallweave-baseline-collector.mjs",
   "packages/bench/hosted-baseline-operator-packet.mjs",
+  "packages/bench/hosted-baseline-next-run.mjs",
   "packages/bench/baseline-evidence-packet.mjs",
   "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
   "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json",
@@ -65,6 +66,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["baseline:collect:recallweave"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:compare"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:operator-packet"], "string");
+  assert.equal(typeof packageJson.scripts?.["baseline:next-run"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:packet"], "string");
   assert.equal(typeof packageJson.scripts?.["release:github-sync"], "string");
   assert.ok(existsSync(join(checkout, "README.md")), "README.md missing from consumer checkout");
@@ -95,6 +97,7 @@ try {
   checks.push(run("node", ["packages/bench/recallweave-baseline-collector.mjs", "--fixture"], "RecallWeave baseline collector"));
   checks.push(run("node", ["packages/bench/baseline-comparison.mjs", "--fixture"], "baseline comparison"));
   checks.push(run("node", ["packages/bench/hosted-baseline-operator-packet.mjs"], "hosted baseline operator packet"));
+  checks.push(run("node", ["packages/bench/hosted-baseline-next-run.mjs"], "hosted baseline next-run planner"));
   checks.push(run("node", ["packages/bench/baseline-evidence-packet.mjs"], "hosted baseline evidence packet"));
 
   const pack = run("npm", ["pack", "--dry-run", "--json", "--cache", npmCache], "npm package dry run");
@@ -124,6 +127,7 @@ try {
     "packages/bench/recallweave-response-export.mjs",
     "packages/bench/recallweave-baseline-collector.mjs",
     "packages/bench/hosted-baseline-operator-packet.mjs",
+    "packages/bench/hosted-baseline-next-run.mjs",
     "packages/bench/baseline-evidence-packet.mjs",
     "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
     "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json",

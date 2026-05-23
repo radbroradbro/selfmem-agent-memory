@@ -14,6 +14,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:next-run
 ```
 
 That command does not call hosted Supermemory by default. It keeps public
@@ -45,6 +46,10 @@ hashes. Raw response text is rejected by default.
 hosted and RecallWeave result files. It blocks public claims when either result
 is a fixture, when any metric or privacy flag is missing, when the query-set or
 scoring-code hash differs, or when fewer than two reviewer approvals exist.
+
+`baseline:next-run` is the state-aware planner for this benchmark lane. It
+turns the current hosted/local evidence state into the next safe source-locked
+run packet without calling hosted Supermemory or authorizing public claims.
 
 ## Historical Controlled Local Baseline
 

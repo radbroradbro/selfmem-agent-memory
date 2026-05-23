@@ -36,6 +36,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:next-run
 ```
 
 The preflight is offline by default. It must report `callsHostedProvider:
@@ -84,6 +85,12 @@ local `memories.jsonl` container. It emits ids or hashed ids, content hashes,
 scores, timings, token estimates, privacy counters, and no raw memory text. The
 RecallWeave collector accepts that export and rejects raw response text by
 default so a local run cannot quietly become a raw memory attachment.
+
+`baseline:next-run` is the state-aware planner for this lane. Use it when an
+agent has partial evidence and needs the next safe step. It inspects hosted,
+RecallWeave, preflight, and comparison state when available, then prints the
+exact source-locked run sequence. It never calls a hosted provider, never
+authorizes public claims, and keeps fixtures useful only for parser validation.
 
 Allowed public wording after a win:
 

@@ -106,6 +106,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture`: passed, producing metrics-only RecallWeave baseline collector output with the same query-set and scoring-code hashes.
 - `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture`: passed, proving matched comparison checks stay metrics-only and fixture-blocked.
 - `npm exec --yes pnpm@10.23.0 -- baseline:operator-packet`: passed, producing a public-safe hosted baseline handoff without calling a hosted provider.
+- `npm exec --yes pnpm@10.23.0 -- baseline:next-run`: passed, producing a state-aware hosted-baseline next-run plan that keeps fixture evidence as `FIXTURE_PLAN_ONLY` and does not authorize public claims.
 - `npm exec --yes pnpm@10.23.0 -- baseline:packet`: passed and produced a metrics-only zip with no hosted memories, local memories, transcripts, prompts, answers, keys, or private paths.
 - `node packages/bench/canary-evidence-intake.mjs`: passed in fixture mode and rejects raw memories/transcripts/prompts.
 - Strict-real intake now exits nonzero while still printing sanitized JSON for
@@ -130,7 +131,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 - Claude/Opus review completed with `CONCERNS`; it supports alpha PR review only and does not approve public launch.
 - Human approval is required before merge, visibility changes, or public release messaging.
-- Hosted Supermemory comparison claims require a fresh metrics-only baseline.
+- Hosted Supermemory comparison claims require a fresh metrics-only baseline routed through the next-run planner.
 - One real-container production rollout remains incomplete; fixture UI and canary tooling are not enough for public launch.
 - The available redacted real diagnostic bundle set has been evaluated and rejected by the strict rollout gate. A fresh patched one-agent canary must pass before this blocker can close.
 - Gemini returned `CLEAN` on the fresh-window diff. Claude CLI review for that narrow diff returned no usable stdout and is recorded as blocked, not as approval.

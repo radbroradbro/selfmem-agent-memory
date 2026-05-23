@@ -38,6 +38,9 @@ The current PR adds:
 - a matched baseline comparison gate that blocks public claims unless hosted
   and RecallWeave result files are non-fixture, source-matched, privacy-clean,
   and reviewer-approved;
+- a hosted baseline next-run planner that turns partial hosted/local evidence
+  into the next safe source-locked command sequence without calling hosted
+  Supermemory or authorizing public claims;
 - a baseline evidence packet builder that creates one metrics-only zip from
   hosted result, RecallWeave result, comparison, and preflight files;
 - a canary evidence intake for sanitized one-agent runtime reports, blocked

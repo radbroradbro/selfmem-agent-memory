@@ -293,8 +293,15 @@ inventing ad hoc instructions:
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 ```
 
-The packet calls no hosted provider. It prints the aggregate-only collection
-contract and validation commands. The actual read-only collection command is:
+Use the next-run planner when you have partial evidence and need the exact next
+safe command sequence:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --format markdown
+```
+
+Both commands call no hosted provider. They print aggregate-only collection
+contracts and validation commands. The actual read-only collection command is:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json

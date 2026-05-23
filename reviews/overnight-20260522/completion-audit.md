@@ -160,6 +160,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | RecallWeave baseline collector | `packages/bench/recallweave-baseline-collector.mjs`, `baseline:collect:recallweave`, `recallweave-baseline-collector-evidence.md`, Gemini review | Proven locally in fixture mode and release gate with shared scoring-code hash, matched query-set hash, raw-response-text rejection in live mode, and metrics-only output |
 | Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `baseline-comparison-evidence.md`, Gemini review | Proven locally in fixture mode as a metrics-only matched comparison gate. It requires the same dataset slice, query-set hash, scoring-code hash, judge model, answer model, privacy flags, and reviewer approvals before any public comparison claim can pass. |
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `baseline:operator-packet`, `hosted-baseline-operator-packet-evidence.md`, Gemini review | Proven locally as a public-safe handoff for aggregate-only hosted Supermemory baseline collection. It calls no hosted provider, keeps credentials in local environment variables only, and received a focused Gemini `CLEAN` review |
+| Hosted baseline next-run planner | `packages/bench/hosted-baseline-next-run.mjs`, `baseline:next-run`, `hosted-baseline-next-run-evidence.md`, Gemini review | Proven locally as a state-aware planner for partial hosted, RecallWeave, preflight, and comparison evidence. It calls no hosted provider, keeps fixture evidence as `FIXTURE_PLAN_ONLY`, never authorizes public claims, and received a focused Gemini `CLEAN` review |
 | Baseline evidence packet | `packages/bench/baseline-evidence-packet.mjs`, `baseline:packet`, `baseline-evidence-packet-evidence.md`, Gemini review | Proven locally as a metrics-only zip builder for hosted result, RecallWeave result, comparison, and preflight files. It rejects raw-content keys, key-shaped secrets, and private local paths, and keeps fixture packets from counting as strict-real baseline evidence. |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `canary:intake`, `canary-evidence-intake-evidence.md`, Gemini review | Proven locally as a metrics-only intake gate for one-agent runtime canary reports. The fixture pass reports lifecycle coverage, hybrid search coverage, local writes, read-through mode, latency, rollback readiness, and zero privacy leaks, but `countsAsRealRolloutEvidence: false` keeps the real rollout requirement incomplete until a live sanitized report is reviewed |
 | Strict-real fail-closed intake output | `packages/bench/canary-evidence-intake.mjs`, `canary-evidence-intake-evidence.md`, Gemini review | Proven locally and reviewed by Gemini as a fail-closed strict-real path that exits nonzero for fixture or weak real evidence while still printing sanitized metrics-only JSON for remediation. It does not make failed canaries pass |
@@ -219,8 +220,9 @@ audit so future agents cannot treat green CI as native-goal completion.
    fixture-safe navigation controls; real-container clustering and pagination
    remain future work.
 4. Hosted Supermemory benchmark claims remain out of scope until the hosted
-   baseline preflight accepts a fresh, valid, metrics-only result and the
-   matched RecallWeave run receives reviewer approval.
+   baseline preflight accepts a fresh, valid, metrics-only result, the
+   next-run planner routes the matched run, and the matched RecallWeave run
+   receives reviewer approval.
 
 ## Next Human Decision
 

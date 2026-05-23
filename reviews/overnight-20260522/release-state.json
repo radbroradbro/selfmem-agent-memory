@@ -83,6 +83,7 @@
     "recallweave-baseline-collector",
     "baseline-comparison-gate",
     "hosted-baseline-operator-packet",
+    "hosted-baseline-next-run",
     "baseline-evidence-packet",
     "claude-opus-pr5-review",
     "github-handoff-packet",

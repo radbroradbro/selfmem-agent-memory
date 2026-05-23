@@ -91,6 +91,7 @@ evidence are still required before any public live update.
 | RecallWeave baseline collector | `packages/bench/recallweave-baseline-collector.mjs`, `baseline:collect:recallweave`, `reviews/overnight-20260522/recallweave-baseline-collector-evidence.md`, `reviews/overnight-20260522/gemini-recallweave-baseline-collector-review.md` |
 | Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `reviews/overnight-20260522/baseline-comparison-evidence.md`, `reviews/overnight-20260522/gemini-baseline-comparison-review.md` |
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md` |
+| Hosted baseline next-run planner | `packages/bench/hosted-baseline-next-run.mjs`, `baseline:next-run`, `reviews/overnight-20260522/hosted-baseline-next-run-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-next-run-review.md` |
 | Baseline evidence packet | `packages/bench/baseline-evidence-packet.mjs`, `baseline:packet`, `reviews/overnight-20260522/baseline-evidence-packet-evidence.md`, `reviews/overnight-20260522/gemini-baseline-evidence-packet-review.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Strict-real fail-closed intake output | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-strict-real-fail-closed-intake-review.md` |
@@ -332,6 +333,10 @@ Latest local verification before this summary:
   `hostedBaselineFresh: false`, and `benchmarkClaimsAllowed: false`, so future
   comparison claims need a sanitized live result plus reviewer approval.
   GitHub Actions CI run `26309563159` passed on `02b3a13`.
+- Hosted baseline next-run verification: local `baseline:next-run` now turns
+  partial hosted, RecallWeave, preflight, and comparison evidence into the next
+  safe source-locked run plan. Fixture evidence stays `FIXTURE_PLAN_ONLY`,
+  public launch stays disabled, and Gemini returned `CLEAN`.
 - Canary evidence intake verification: local `canary:intake` accepts only
   metrics-only one-agent runtime canary reports. The bundled fixture reports
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
@@ -624,7 +629,8 @@ local memory contents.
   metrics-only path without candidate text.
 - Benchmark comparison against hosted Supermemory is not a release claim. The
   current public docs correctly require a fresh valid metrics-only baseline
-  accepted by the hosted baseline preflight before quality marketing.
+  accepted by the hosted baseline preflight, then routed through the next-run
+  planner, before quality marketing.
 - The post-12-hour production-ready verdict remains `FAIL` for public launch.
   Fresh controller and CI checks pass, Claude Opus returned `CONCERNS`, PR #5
   and issue #6 are live, and a human release decision has not been made. Use
