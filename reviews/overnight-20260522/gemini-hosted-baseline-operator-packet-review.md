@@ -35,8 +35,15 @@ Findings:
   the recommended id format and requires it to appear in the hashed candidate
   list; the release gate asserts both conditions.
 - Second focused review after the fix returned `CLEAN`.
+- Latest focused review covered the `--source-gap` reload path. Verdict:
+  `CLEAN`. Gemini found that the packet exposes only hashed query ids, status,
+  counts, and repair actions; preserves `publicBenchmarkClaimsAllowed: false`;
+  and keeps the hosted-baseline blocker intact while giving the private operator
+  enough information to repair source mismatch locally.
 
 Notes:
 
 - Terminal warnings reported limited color support and missing ripgrep inside
   Gemini. They did not affect the verdict.
+- The latest run first hit a temporary Gemini 3.1 Pro capacity retry, then
+  completed with `CLEAN`.

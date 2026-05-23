@@ -205,6 +205,14 @@ repair path instead of spending more hosted calls. For blocked reports, use the
 hashed `repairQueue` to decide whether each private query needs mirrored hosted
 source content, rebuilt local-source labels, or converted collectable content
 hashes. Do not attach the private query set or raw memory text.
+To hand that state to another agent without leaking private labels, reload only
+the public-safe source-gap report into the operator packet:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- \
+  --source-gap /tmp/recallweave-baseline-source-gap.json \
+  --format markdown
+```
 
 Use `baseline:run` after the private hosted env file, reviewed private query
 set, source-match preflight, source-alignment gate, source-gap plan, and local

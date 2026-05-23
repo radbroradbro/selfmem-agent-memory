@@ -29,6 +29,10 @@ Live status:
   before hosted calls are spent on another matched run. Blocked source-gap
   reports now include a hashed per-query repair queue so private operators can
   repair the exact source gap without exposing raw query text or memory text.
+- Extends the hosted baseline operator packet so agents can reload a blocked
+  `baseline:source-gap` report with `--source-gap <report> --format markdown`
+  and hand off the repair queue as short query hashes, match counts, status
+  labels, and repair actions only.
 - Extends the hosted baseline operator packet, next-run planner, and
   `baseline:run` orchestrator so `baseline:source-match`,
   `baseline:source-align`, and `baseline:source-gap` run before hosted
@@ -300,6 +304,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   now includes `preflight-local-source-match`, `preflight-source-alignment`,
   `plan-source-gap`, and a `baseline:run` command that passes `--local-map`
   and `--private-map` before any hosted collection.
+- `npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --source-gap
+  <blocked-source-gap-report> --format markdown`: passed, rendering a
+  public-safe repair table with only short query hashes, status labels, match
+  counts, and repair actions.
 - `npm exec --yes pnpm@10.23.0 -- baseline:select-container`: passed in fixture smoke and live metadata-only selector smoke, writing the selected raw hosted label only to a 0600 private env file while stdout/public reports kept raw labels out.
 - `npm exec --yes pnpm@10.23.0 -- baseline:author-queryset`: passed in fixture smoke and bounded live smoke, writing a private 0600 query set outside the repository while stdout/public reports kept raw queries, expected ids, expected hashes, raw labels, memory text, keys, and private paths out.
 - Live hosted prep extension: scanned 200 hosted docs, found 14 hashed candidate containers, drafted 8 distinct private queries from 47 text-bearing docs, strict query-set inspection passed with 0 duplicates and 0 unlabeled queries, and Gemini returned `CLEAN`. This still is not a matched baseline.

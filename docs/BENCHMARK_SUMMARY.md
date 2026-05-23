@@ -97,6 +97,9 @@ blocked. When the source is blocked, the report also includes a hashed
 per-query repair queue with match counts and a recommended private repair
 action. It does not include raw query text, expected refs, memory text, or
 container labels.
+Use `baseline:operator-packet -- --source-gap <source-gap-report> --format
+markdown` to turn a blocked source-gap report into a paste-ready repair handoff.
+That handoff still shows only query hashes, match counts, and repair actions.
 
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents

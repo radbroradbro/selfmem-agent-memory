@@ -8,6 +8,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const format = String(args.format || "json").trim().toLowerCase();
 const discoverySummary = args.discovery ? loadDiscoverySummary(args.discovery) : null;
+const sourceGapSummary = args.sourceGap ? loadSourceGapSummary(args.sourceGap) : null;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
@@ -57,6 +58,7 @@ const packet = {
     baselineRunReportPath,
   },
   liveDiscovery: discoverySummary,
+  sourceGapSummary,
   commands: [
     {
       id: "discover-hosted-containers",
@@ -144,6 +146,15 @@ const packet = {
         `--source-match ${sourceMatchPath}`,
         `--source-alignment ${sourceAlignmentPath}`,
         `--output ${sourceGapPath}`,
+      ].join(" "),
+    },
+    {
+      id: "reload-source-gap-repair",
+      description: "When source-gap blocks, reload that public-safe report into the operator packet so the agent sees only hashed repair labels and counts.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:operator-packet --",
+        `--source-gap ${sourceGapPath}`,
+        "--format markdown",
       ].join(" "),
     },
     {
@@ -263,6 +274,7 @@ const packet = {
     "source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
     "source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready",
+    "blocked source-gap reports are reloaded with --source-gap before repair handoff, showing only hashed repair labels and counts",
     "private container map, if created, stays local and is not attached",
     "private env file, if created, stays local and is not attached",
     "private query set, if created, stays local and is not attached",
@@ -412,6 +424,15 @@ function buildMarkdown() {
     `  --output ${sourceGapPath}`,
     "```",
     "",
+    "When source-gap blocks, reload that public-safe report into this operator packet so the next agent sees the exact hashed repair queue without private text:",
+    "",
+    "```bash",
+    "npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- \\",
+    `  --source-gap ${sourceGapPath} \\`,
+    "  --format markdown",
+    "```",
+    "",
+    ...sourceGapMarkdownLines(),
     "Once the private env file, reviewed query set, source-match preflight, source-alignment gate, source-gap plan, and local RecallWeave container path are ready, prefer the one-command runner. It repeats the source gates, then performs hosted collection, local export, local collection, comparison, preflight, packet creation, and returned-packet intake together.",
     "",
     "```bash",
@@ -549,6 +570,36 @@ function discoveryMarkdownLines() {
   ];
 }
 
+function sourceGapMarkdownLines() {
+  if (!sourceGapSummary) return [];
+  const lines = [
+    "## Current Source-Gap Repair Queue",
+    "",
+    `- Report: ${sourceGapSummary.reportLabel}`,
+    `- Status: ${sourceGapSummary.status}`,
+    `- Recommended path: ${sourceGapSummary.recommendedPath}`,
+    `- Baseline run blocked: ${sourceGapSummary.baselineRunBlocked ? "yes" : "no"}`,
+    `- Repair queue count: ${sourceGapSummary.repairSummary.repairQueueCount}`,
+    `- Ready query count: ${sourceGapSummary.repairSummary.readyQueryCount}`,
+    "- Raw query text included: no",
+    "- Raw memory included: no",
+    "- Raw expected refs included: no",
+    "- Private paths included: no",
+    "",
+  ];
+  if (sourceGapSummary.repairQueue.length > 0) {
+    lines.push("| Query id hash | Query hash | Status | Action |");
+    lines.push("|---|---|---|---|");
+    for (const item of sourceGapSummary.repairQueue) {
+      lines.push(`| ${item.queryIdHash} | ${item.queryHash} | ${item.repairStatus} | ${item.recommendedAction} |`);
+    }
+    lines.push("");
+  }
+  lines.push("Use this table to find the matching private query label locally. Do not paste the private query text, expected refs, or memory contents back into the public packet.");
+  lines.push("");
+  return lines;
+}
+
 function packetAcceptanceLines() {
   return [
     "- not a fixture",
@@ -565,6 +616,7 @@ function packetAcceptanceLines() {
     "- source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source",
     "- source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true",
     "- source-gap plan reports READY_FOR_MATCHED_BASELINE or a blocked repair path before hosted collection",
+    "- blocked source-gap reports are reloaded with --source-gap before repair handoff, showing only hashed repair labels and counts",
     "- baseline discovery output contains hashed container candidates only",
     "- private container maps stay local and are not attached",
     "- private hosted baseline env files stay local and are not attached",
@@ -634,6 +686,73 @@ function loadDiscoverySummary(inputPath) {
   };
 }
 
+function loadSourceGapSummary(inputPath) {
+  const resolved = isAbsolute(inputPath) ? inputPath : resolve(root, inputPath);
+  assert.ok(existsSync(resolved), `source-gap report missing: ${displayPath(resolved)}`);
+  const raw = readFileSync(resolved, "utf8");
+  assertSafeText(raw, "source-gap report");
+  assertNoPrivateBenchmarkFields(raw, "source-gap report");
+  const json = JSON.parse(raw);
+  assert.equal(json.mode, "baseline-source-gap-plan", "source-gap report mode mismatch");
+  assert.equal(json.publicSafe, true, "source-gap report must be public-safe");
+  assert.equal(json.metricsOnly, true, "source-gap report must be metrics-only");
+  assert.equal(json.rawLabelsIncluded, false, "source-gap report must not include raw labels");
+  assert.equal(json.rawMemoryIncluded, false, "source-gap report must not include raw memory");
+  assert.equal(json.rawTranscriptIncluded, false, "source-gap report must not include raw transcripts");
+  assert.equal(json.rawPromptIncluded, false, "source-gap report must not include raw prompts");
+  assert.equal(json.rawAnswerIncluded, false, "source-gap report must not include raw answers");
+  assert.equal(Number(json.privateLeakCount ?? 0), 0, "source-gap report privacy leaks must be zero");
+  assert.equal(json.hasSecretPattern, false, "source-gap report must have no secret-shaped strings");
+  const repairPlan = json.repairPlan ?? {};
+  const repairSummary = repairPlan.repairSummary ?? {};
+  const repairQueue = Array.isArray(repairPlan.repairQueue)
+    ? repairPlan.repairQueue.map((item) => summarizeRepairItem(item))
+    : [];
+  assert.equal(repairQueue.length, Number(repairSummary.repairQueueCount ?? repairQueue.length), "repair queue count mismatch");
+  return {
+    reportLabel: displayPath(resolved),
+    fixtureOnly: Boolean(json.fixtureOnly),
+    baselineRunBlocked: Boolean(json.baselineRunBlocked),
+    status: String(repairPlan.status ?? "UNKNOWN"),
+    recommendedPath: String(repairPlan.recommendedPath ?? "unknown"),
+    repairSummary: {
+      totalQueries: Number(repairSummary.totalQueries ?? 0),
+      repairQueueCount: Number(repairSummary.repairQueueCount ?? repairQueue.length),
+      readyQueryCount: Number(repairSummary.readyQueryCount ?? 0),
+      statusCounts: repairSummary.statusCounts ?? {},
+    },
+    repairQueue,
+    publicSafe: true,
+    rawQueryIncluded: false,
+    rawMemoryIncluded: false,
+    rawExpectedRefsIncluded: false,
+    privateLeakCount: 0,
+  };
+}
+
+function summarizeRepairItem(item) {
+  const summary = {
+    queryIdHash: String(item.queryIdHash ?? ""),
+    queryHash: String(item.queryHash ?? ""),
+    repairStatus: String(item.repairStatus ?? ""),
+    expectedRefCount: Number(item.expectedRefCount ?? 0),
+    expectedIdRefCount: Number(item.expectedIdRefCount ?? 0),
+    expectedHashRefCount: Number(item.expectedHashRefCount ?? 0),
+    exportIdMatchCount: Number(item.exportIdMatchCount ?? 0),
+    sourceIdMatchCount: Number(item.sourceIdMatchCount ?? 0),
+    contentHashMatchCount: Number(item.contentHashMatchCount ?? 0),
+    sourceIdOnlyMatchCount: Number(item.sourceIdOnlyMatchCount ?? 0),
+    collectableMatchCount: Number(item.collectableMatchCount ?? 0),
+    recommendedAction: String(item.recommendedAction ?? ""),
+  };
+  assert.match(summary.queryIdHash, /^[a-f0-9]{16}$/, "repair query id hash must be a short hash");
+  assert.match(summary.queryHash, /^[a-f0-9]{16}$/, "repair query hash must be a short hash");
+  assert.ok(["source-id-only", "not-collectable", "missing-source-match"].includes(summary.repairStatus), "repair status must be known");
+  assert.doesNotMatch(summary.recommendedAction, secretPattern(), "repair action contains a key-shaped secret");
+  assert.doesNotMatch(summary.recommendedAction, privatePathPattern(), "repair action contains a private path");
+  return summary;
+}
+
 function displayPath(value) {
   const rel = relative(root, value).replaceAll("\\", "/");
   if (!rel.startsWith("../") && rel !== "..") return rel;
@@ -643,6 +762,13 @@ function displayPath(value) {
 function assertSafeText(text, label) {
   assert.doesNotMatch(text, secretPattern(), `${label} contains a key-shaped secret`);
   assert.doesNotMatch(text, privatePathPattern(), `${label} contains a raw private path`);
+}
+
+function assertNoPrivateBenchmarkFields(text, label) {
+  assert.doesNotMatch(text, /rawContainerTag|source_supermemory_container|sourceSupermemoryContainer/, `${label} contains raw container label fields`);
+  assert.doesNotMatch(text, /expectedResultIds|expectedResultHashes/, `${label} contains raw expected refs`);
+  assert.doesNotMatch(text, /"\s*q"\s*:/, `${label} contains raw query text`);
+  assert.doesNotMatch(text, /"\s*(?:content|memory|text|raw|rawText|document)"\s*:/, `${label} contains raw memory text`);
 }
 
 function secretPattern() {

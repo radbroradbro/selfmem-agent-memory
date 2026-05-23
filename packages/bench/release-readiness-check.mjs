@@ -2524,7 +2524,19 @@ check("fresh hosted baseline preflight passes", () => {
     "--discovery",
     "reviews/overnight-20260522/hosted-baseline-live-discovery.json",
   ]);
+  const operatorSourceGapResult = run("node", [
+    "packages/bench/hosted-baseline-operator-packet.mjs",
+    "--source-gap",
+    missingSourceGapReportPath,
+  ]);
   const operatorMarkdown = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs", "--format", "markdown"]);
+  const operatorSourceGapMarkdown = run("node", [
+    "packages/bench/hosted-baseline-operator-packet.mjs",
+    "--source-gap",
+    missingSourceGapReportPath,
+    "--format",
+    "markdown",
+  ]);
   const nextRunResult = run("node", ["packages/bench/hosted-baseline-next-run.mjs"]);
   const nextRunMarkdown = run("node", ["packages/bench/hosted-baseline-next-run.mjs", "--format", "markdown"]);
   const baselineRunDir = "/tmp/recallweave-release-baseline-run";
@@ -2653,6 +2665,7 @@ check("fresh hosted baseline preflight passes", () => {
   const matchedCollectorComparisonReport = JSON.parse(matchedCollectorComparison.stdout);
   const operatorPacket = JSON.parse(operatorResult.stdout);
   const operatorDiscoveryPacket = JSON.parse(operatorDiscoveryResult.stdout);
+  const operatorSourceGapPacket = JSON.parse(operatorSourceGapResult.stdout);
   const nextRunPlan = JSON.parse(nextRunResult.stdout);
   const baselineRunPlan = JSON.parse(baselineRunResult.stdout);
   const baselineRunExportEnvPlan = JSON.parse(baselineRunExportEnvResult.stdout);
@@ -3103,6 +3116,15 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorDiscoveryPacket.liveDiscovery?.recommendedCandidateId ?? "", /^c_[a-f0-9]{16}$/);
   assert.ok(operatorDiscoveryPacket.liveDiscovery?.candidateIds?.includes(operatorDiscoveryPacket.liveDiscovery?.recommendedCandidateId));
   assert.ok(operatorDiscoveryPacket.liveDiscovery?.candidateIds?.every((id) => /^c_[a-f0-9]{16}$/.test(id)));
+  assert.equal(operatorSourceGapPacket.mode, "hosted-baseline-operator-packet");
+  assert.equal(operatorSourceGapPacket.sourceGapSummary?.status, "BLOCKED_CONTENT_DIVERGENT");
+  assert.equal(operatorSourceGapPacket.sourceGapSummary?.baselineRunBlocked, true);
+  assert.equal(operatorSourceGapPacket.sourceGapSummary?.repairSummary?.repairQueueCount, 1);
+  assert.equal(operatorSourceGapPacket.sourceGapSummary?.repairSummary?.readyQueryCount, 0);
+  assert.equal(operatorSourceGapPacket.sourceGapSummary?.repairQueue?.[0]?.repairStatus, "missing-source-match");
+  assert.match(operatorSourceGapPacket.sourceGapSummary?.repairQueue?.[0]?.queryIdHash ?? "", /^[a-f0-9]{16}$/);
+  assert.match(operatorSourceGapPacket.sourceGapSummary?.repairQueue?.[0]?.queryHash ?? "", /^[a-f0-9]{16}$/);
+  assert.doesNotMatch(operatorSourceGapResult.stdout, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
   assert.ok(operatorPacket.commands.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "select-private-container" && /baseline:select-container/.test(item.command)));
@@ -3112,6 +3134,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.commands.some((item) => item.id === "preflight-local-source-match" && /baseline:source-match/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "preflight-source-alignment" && /baseline:source-align/.test(item.command) && /--strict/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "plan-source-gap" && /baseline:source-gap/.test(item.command) && /--output/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "reload-source-gap-repair" && /baseline:operator-packet/.test(item.command) && /--source-gap/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "run-matched-baseline-chain" && /baseline:run/.test(item.command) && /--reviewed-queryset/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "run-matched-baseline-chain" && /--local-map/.test(item.command) && /--private-map/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
@@ -3135,6 +3158,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.acceptanceCriteria.includes("source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("blocked source-gap reports are reloaded with --source-gap before repair handoff, showing only hashed repair labels and counts"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("private query set, if auto-authored, was reviewed locally before collection"));
   assert.ok(operatorPacket.forbidden.includes("provider keys"));
   assert.ok(operatorPacket.forbidden.includes("private container map"));
@@ -3148,10 +3172,16 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorMarkdown.stdout, /baseline:source-match/);
   assert.match(operatorMarkdown.stdout, /baseline:source-align/);
   assert.match(operatorMarkdown.stdout, /baseline:source-gap/);
+  assert.match(operatorMarkdown.stdout, /--source-gap/);
   assert.match(operatorMarkdown.stdout, /baseline:run/);
   assert.match(operatorMarkdown.stdout, /baseline:export:recallweave/);
   assert.match(operatorMarkdown.stdout, /baseline:packet/);
   assert.match(operatorMarkdown.stdout, /Attach Only/);
+  assert.match(operatorSourceGapMarkdown.stdout, /Current Source-Gap Repair Queue/);
+  assert.match(operatorSourceGapMarkdown.stdout, /BLOCKED_CONTENT_DIVERGENT/);
+  assert.match(operatorSourceGapMarkdown.stdout, /missing-source-match/);
+  assert.match(operatorSourceGapMarkdown.stdout, /mirror the selected hosted source locally or rebuild this query from the local source/);
+  assert.doesNotMatch(operatorSourceGapMarkdown.stdout, /expectedResultIds|expectedResultHashes|Which memory proves|missing-source-match-memory|"\s*q"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
   assert.equal(nextRunPlan.ok, true);
   assert.equal(nextRunPlan.mode, "hosted-baseline-next-run");
   assert.equal(nextRunPlan.writesRealFiles, false);

@@ -451,6 +451,16 @@ source-gap reports. If `baseline:source-gap` is blocked, use only the hashed
 hosted source content, rebuilt local-source labels, or collectable content
 hashes.
 
+For a paste-ready handoff after a blocked source-gap report, reload that report
+into the operator packet. It prints only hashed query fingerprints, counts, and
+repair actions:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- \
+  --source-gap /tmp/recallweave-baseline-source-gap.json \
+  --format markdown
+```
+
 Prefer the one-command runner once those private inputs are ready:
 
 ```bash

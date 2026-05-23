@@ -23,6 +23,10 @@ requirements are resolved.
   baseline operator packet, next-run planner, one-command baseline runner,
   release readiness assertions, public benchmark docs, PR/issue sync evidence,
   and Gemini review, while preserving strict-real and public-launch blockers.
+- Current post-baseline extension reloads blocked `baseline:source-gap`
+  reports into the hosted baseline operator packet, so agents can hand off
+  exact hashed repair targets without raw query text, expected refs, memory
+  text, private paths, or keys.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:
@@ -217,6 +221,10 @@ requirements are resolved.
   source-gap reports include a hashed per-query repair queue so private
   operators can repair exact source gaps without attaching raw memory text,
   query text, expected refs, or container labels.
+- Blocked source-gap reports can now be reloaded into
+  `baseline:operator-packet -- --source-gap <report> --format markdown`,
+  producing a paste-ready repair handoff with hashed query ids, match counts,
+  status labels, and repair actions only.
 - Hosted baseline operator packet now gives agents a public-safe collection
   handoff for aggregate-only hosted Supermemory baseline evidence.
 - Hosted baseline collector now gives agents a read-only `baseline:collect`

@@ -18,6 +18,10 @@ Scope:
 - The packet now includes `baseline:queryset --strict` before collection so
   operators can attach a metrics-only query-set report without exposing raw
   query text or expected ids.
+- The packet can now reload a blocked `baseline:source-gap` report with
+  `--source-gap <report> --format markdown`, producing a paste-ready repair
+  queue with only query hashes, match counts, status labels, and repair
+  actions.
 - The packet now points operators to `baseline:collect -- --live`,
   `baseline:export:recallweave -- --live`,
   `baseline:collect:recallweave -- --live`, and `baseline:compare` instead of
@@ -27,7 +31,7 @@ Scope:
   metrics-only reviewer zip.
 - The packet can now accept `--discovery
   reviews/overnight-20260522/hosted-baseline-live-discovery.json` and include
-  the already-proven live hosted metadata state: 100 documents seen, 4 hashed
+  the already-proven live hosted metadata state: 200 documents seen, 14 hashed
   candidate containers, no raw labels, no raw memory, and zero privacy leaks.
 - Gemini focused review returned `CLEAN`.
 
@@ -37,6 +41,7 @@ Commands:
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --discovery reviews/overnight-20260522/hosted-baseline-live-discovery.json --format markdown
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --source-gap <blocked-source-gap-report> --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:select-container
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
@@ -53,8 +58,13 @@ Expected behavior:
 - Discovery mode summarizes live hosted metadata discovery without raw hosted
   labels or memory text.
 - Discovery mode reports `fixtureOnly: false`, `callsHostedProvider: true`,
-  `documentsSeen: 100`, `containerCandidateCount: 4`, hashed candidate ids,
+  `documentsSeen: 200`, `containerCandidateCount: 14`, hashed candidate ids,
   and zero privacy leaks.
+- Source-gap mode reports `sourceGapSummary.status`,
+  `sourceGapSummary.baselineRunBlocked`, `repairSummary.repairQueueCount`, and
+  a `repairQueue` with short query hashes only.
+- Source-gap Markdown prints `Current Source-Gap Repair Queue` and omits raw
+  query text, expected refs, memory text, and private paths.
 - `writesRealFiles` is false.
 - `callsHostedProvider` is false.
 - It tells operators to print the template, validate fixture parsing, then
@@ -78,6 +88,9 @@ Expected behavior:
   be true for both hosted and RecallWeave results.
 - It tells operators to run `baseline:packet --strict-real` after comparison so
   reviewers receive one metrics-only zip instead of loose ad hoc JSON.
+- It tells operators to reload blocked source-gap reports into the packet before
+  repair handoff, so the next operator gets exact hashed repair targets without
+  raw labels.
 - It tells operators to keep `SUPERMEMORY_API_KEY` in the local environment and
   never paste it into the command or any attachment.
 - It requires env-only hosted credentials and never prints provider-key values.
