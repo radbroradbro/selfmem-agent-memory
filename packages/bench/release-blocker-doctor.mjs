@@ -13,6 +13,7 @@ const releaseState = JSON.parse(readFileSync(releaseStatePath, "utf8"));
 const requiredBlockers = [
   "human-public-launch-approval-required",
   "hosted-supermemory-baseline-not-current",
+  "fresh-real-container-canary-not-current",
 ];
 
 const requiredFiles = {
@@ -29,6 +30,9 @@ const requiredFiles = {
   hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
+  realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
+  canaryDiagnosticBatchAudit: "canary-diagnostic-batch-audit-evidence.md",
+  canaryNextAgentPlan: "canary-next-agent-plan-evidence.md",
   releaseHandoff: "../../docs/RELEASE_HANDOFF.md",
 };
 
@@ -60,6 +64,9 @@ const claudeBlockedText = readFileSync(join(root, reviewDir, "claude-pr5-review-
 const claudeReviewText = readFileSync(join(root, reviewDir, "claude-pr5-review.md"), "utf8");
 const prBodyDraftText = readFileSync(join(root, reviewDir, "pr-body-update-draft.md"), "utf8");
 const issueDraftText = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
+const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
+const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
+const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
 
 assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
@@ -69,6 +76,9 @@ assert.match(claudeReviewText, /Verdict:\s*CONCERNS/i);
 assert.match(claudeReviewText, /Can mark native goal complete:\s*no/i);
 assert.match(prBodyDraftText, /clean consumer smoke/i);
 assert.match(issueDraftText, /Acceptance Criteria/);
+assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
+assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
+assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
 const branch = run("git", ["branch", "--show-current"]).stdout.trim();
@@ -98,6 +108,16 @@ assert.equal(recallWeaveBaselineCollector.rawMemoryIncluded, false);
 assert.equal(recallWeaveBaselineCollector.fixtureOnly, true);
 assert.equal(recallWeaveBaselineCollector.querySetHash, hostedBaselineCollector.querySetHash);
 assert.equal(recallWeaveBaselineCollector.scoringCodeHash, hostedBaselineCollector.scoringCodeHash);
+const canaryDiagnosticBatchAudit = JSON.parse(run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"]).stdout);
+assert.equal(canaryDiagnosticBatchAudit.metricsOnly, true);
+assert.equal(canaryDiagnosticBatchAudit.publicLaunchAllowed, false);
+assert.equal(canaryDiagnosticBatchAudit.fleetRolloutAllowed, false);
+assert.equal(canaryDiagnosticBatchAudit.countsAsRealRolloutEvidence, false);
+const canaryNextAgentPlan = JSON.parse(run("node", ["packages/bench/canary-next-agent-plan.mjs"]).stdout);
+assert.equal(canaryNextAgentPlan.metricsOnly, true);
+assert.equal(canaryNextAgentPlan.publicLaunchAllowed, false);
+assert.equal(canaryNextAgentPlan.fleetRolloutAllowed, false);
+assert.equal(canaryNextAgentPlan.oneAgentCanaryAllowed, false);
 const githubLiveSync = JSON.parse(run("node", ["packages/bench/github-live-sync-check.mjs"]).stdout);
 assert.equal(githubLiveSync.ok, true);
 assert.equal(githubLiveSync.prBodyMatches, true);
@@ -125,6 +145,12 @@ const blockerReport = [
     status: "blocked",
     evidence: "hosted-baseline-collector-evidence.md",
     nextAction: "Run `baseline:collect -- --live` for hosted, run `baseline:export:recallweave -- --live` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export>`, then validate with `baseline:preflight -- --result` and `baseline:compare`.",
+  },
+  {
+    id: "fresh-real-container-canary-not-current",
+    status: "incomplete",
+    evidence: "real-canary-diagnostic-evidence.md",
+    nextAction: "Run `canary:batch-audit` on redacted returned diagnostics, use `canary:next-agent` to pick one privacy-clean Hermes/OpenClaw target, apply the current adapter, then collect a fresh strict-real canary window and package metrics-only evidence.",
   },
 ];
 
@@ -174,6 +200,22 @@ console.log(
           fixtureOnly: hostedBaselineCollector.fixtureOnly,
           rawMemoryIncluded: hostedBaselineCollector.rawMemoryIncluded,
         },
+        canaryDiagnosticBatchAudit: {
+          ok: canaryDiagnosticBatchAudit.ok,
+          metricsOnly: canaryDiagnosticBatchAudit.metricsOnly,
+          fixtureOnly: Boolean(canaryDiagnosticBatchAudit.bestCandidate?.fixtureOnly),
+          countsAsRealRolloutEvidence: canaryDiagnosticBatchAudit.countsAsRealRolloutEvidence,
+          publicLaunchAllowed: canaryDiagnosticBatchAudit.publicLaunchAllowed,
+          fleetRolloutAllowed: canaryDiagnosticBatchAudit.fleetRolloutAllowed,
+        },
+        canaryNextAgentPlan: {
+          ok: canaryNextAgentPlan.ok,
+          metricsOnly: canaryNextAgentPlan.metricsOnly,
+          oneAgentCanaryAllowed: canaryNextAgentPlan.oneAgentCanaryAllowed,
+          publicLaunchAllowed: canaryNextAgentPlan.publicLaunchAllowed,
+          fleetRolloutAllowed: canaryNextAgentPlan.fleetRolloutAllowed,
+          status: canaryNextAgentPlan.decision?.status,
+        },
         githubLiveSync: {
           ok: githubLiveSync.ok,
           prBodyMatches: githubLiveSync.prBodyMatches,
@@ -194,6 +236,11 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture",
         "npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture",
+        "npm exec --yes pnpm@10.23.0 -- canary:batch-audit",
+        "npm exec --yes pnpm@10.23.0 -- canary:next-agent",
+        "npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw",
+        "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <redacted-diagnostics-folder>",
+        "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --input-root <redacted-diagnostics-folder>",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir <local-recallweave-container-dir> --output /tmp/recallweave-search-responses.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --live --responses /tmp/recallweave-search-responses.json --output /tmp/recallweave-result.json",

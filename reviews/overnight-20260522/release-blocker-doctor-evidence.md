@@ -7,6 +7,7 @@ Scope:
 - Machine-readable release blocker status for PR #5.
 - Conservative launch boundary after GitHub write-route recovery.
 - Hosted baseline preflight status folded into the blocker report.
+- Real one-agent canary status folded into the blocker report.
 - GitHub live sync status folded into the blocker report.
 
 Result:
@@ -19,6 +20,12 @@ Result:
 - Remote has no token: true
 - Hosted baseline preflight: ok true, calls hosted provider false, benchmark
   claims allowed false
+- Canary diagnostic batch audit: ok true, metrics only true, fixture evidence
+  cannot count as real rollout evidence, public launch allowed false, fleet
+  rollout allowed false
+- Canary next-agent plan: ok true, metrics only true, fixture plan status
+  `FIXTURE_PLAN_ONLY`, one-agent canary allowed false, public launch allowed
+  false, fleet rollout allowed false
 - GitHub live sync: ok true, PR body matches true, issue title matches true,
   issue body matches true
 
@@ -26,6 +33,7 @@ Current blockers:
 
 - `human-public-launch-approval-required`
 - `hosted-supermemory-baseline-not-current`
+- `fresh-real-container-canary-not-current`
 
 Resolved in this extension:
 
@@ -45,6 +53,11 @@ Manual next actions:
 - Run `baseline:preflight` with a sanitized live result after a fresh
   metrics-only hosted Supermemory baseline and before any public head-to-head
   benchmark claim.
+- Run `canary:batch-audit` against redacted returned diagnostics, then
+  `canary:next-agent` to select one privacy-clean Hermes/OpenClaw target for a
+  fresh strict-real window.
+- Do not treat fixture canary output or old diagnostic history as production
+  rollout evidence.
 
 Notes:
 
