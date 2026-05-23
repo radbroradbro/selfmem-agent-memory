@@ -1,6 +1,6 @@
 # GitHub Live Sync Evidence
 
-Date: 2026-05-22
+Date: 2026-05-23
 
 Command:
 
@@ -42,12 +42,12 @@ Observed public-safe output:
   "prBodyMatches": true,
   "issueTitleMatches": true,
   "issueBodyMatches": true,
-  "prBodyHash": "2577d8156b4afcc57e99b076aaacfa290dc057c9342a4ea5e53de1ce96e88ea7",
+  "prBodyHash": "69ed5bcb3b0308a7e7d23263439fe6f9e1be341e7ef21b260bf22a310e3dbfa0",
   "issueTitleHash": "e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c",
-  "issueBodyHash": "3091802617b15919af146c3999f5318c38688e497d9538302e4d9293334fa72e",
+  "issueBodyHash": "b1e99a540f0deb0c9f3e26306f0a3d1c3c47cea5639d1ac5e2d89a7b3c70d6ab",
   "liveUpdatedAt": {
-    "pullRequest": "2026-05-23T01:19:14Z",
-    "issue": "2026-05-23T01:12:51Z"
+    "pullRequest": "2026-05-23T01:44:14Z",
+    "issue": "2026-05-23T01:44:14Z"
   },
   "safety": {
     "printsBodyText": false,

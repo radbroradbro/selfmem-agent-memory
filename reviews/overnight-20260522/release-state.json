@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T01:18:06Z",
+  "generatedAt": "2026-05-23T01:42:01Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "8520140bfcb4cb08bed16ee3c34bcb6705fd9310",
-    "ciRunId": 26319551404,
+    "headSha": "3b1870eb71fe406b77eabd380d9d786886b60236",
+    "ciRunId": 26320054524,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the baseline comparison gate. GitHub Actions run 26319551404 passed CI on 8520140."
+    "note": "This is the latest inspected code/product baseline after the RecallWeave baseline collector gate. GitHub Actions run 26320054524 passed CI on 3b1870e after the live PR sync was refreshed."
   },
   "releaseStateGuard": {
     "enabled": true,

@@ -9,7 +9,16 @@ requirements are resolved.
 
 ## Current Evidence
 
-- Latest code/product baseline: `95f7fea7519574427c7f26e94f00a1085f7c6fb2`.
+- Latest code/product baseline: `3b1870eb71fe406b77eabd380d9d786886b60236`.
+- GitHub Actions run `26320054524` passed CI after the RecallWeave baseline
+  collector gate. The first attempt failed because CI started before the live
+  PR body was refreshed; rerun attempt 2 passed after live sync.
+- Previous code/product baseline before the RecallWeave baseline collector:
+  `8520140bfcb4cb08bed16ee3c34bcb6705fd9310`.
+- GitHub Actions run `26319551404` passed CI after the baseline comparison
+  gate.
+- Previous code/product baseline before the baseline comparison gate:
+  `95f7fea7519574427c7f26e94f00a1085f7c6fb2`.
 - GitHub Actions run `26319050876` passed CI after the hosted baseline
   collector gate.
 - Previous code/product baseline before the hosted baseline collector:

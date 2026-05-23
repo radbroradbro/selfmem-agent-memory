@@ -1,6 +1,6 @@
 # GitHub Write Route Evidence
 
-Date: 2026-05-22
+Date: 2026-05-23
 
 Verdict: resolved for PR body and blocker issue writes.
 
@@ -17,18 +17,18 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T01:19:14Z
-  - Body length: 8581
+  - Updated at: 2026-05-23T01:44:14Z
+  - Body length: 9149
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
     evidence refresh, 200 on real-canary diagnostic evidence refresh, 200 on
     strict-real source-guard refresh, canary operator packet refresh,
     latest-baseline refresh, adapter store-latency gate refresh, hosted
-    baseline collector refresh, baseline comparison refresh, and latest
-    verified-baseline refresh
-  - Updated at: 2026-05-23T01:12:51Z
-  - Body length: 5272
+    baseline collector refresh, baseline comparison refresh, latest
+    verified-baseline refresh, and RecallWeave baseline collector refresh
+  - Updated at: 2026-05-23T01:44:14Z
+  - Body length: 6031
 
 ## Safety
 
