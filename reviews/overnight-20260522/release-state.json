@@ -29,10 +29,11 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, and mixed-folder next-agent handoff packets reviewed CLEAN",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, and empty or handoff-only canary batch fail-closed behavior reviewed CLEAN",
     "allowedPostBaselineCodePaths": [
       "package.json",
       "packages/bench/canary-drill.mjs",
+      "packages/bench/canary-diagnostic-batch-audit.mjs",
       "packages/bench/canary-next-agent-packet.mjs",
       "packages/bench/canary-next-agent-plan.mjs",
       "packages/bench/canary-operator-packet.mjs",
