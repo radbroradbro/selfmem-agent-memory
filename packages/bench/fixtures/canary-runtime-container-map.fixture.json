@@ -4,6 +4,15 @@
   "fixture_only": true,
   "source_supermemory_container": "fixture_source_container",
   "local_container": "selfmem_fixture_agent",
+  "adapter_contract": {
+    "name": "recallweave-selfmem-canary",
+    "version": "2026.05.23.store-latency-v1",
+    "strictCanaryContract": "v1",
+    "searchLatencyInstrumentation": true,
+    "storeLatencyInstrumentation": true
+  },
+  "adapter_contract_version": "2026.05.23.store-latency-v1",
+  "strict_canary_contract": "v1",
   "mode": "voyage-4-large+rerank-2.5+supermemory-read-through",
   "read_only": false
 }

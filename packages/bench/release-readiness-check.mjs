@@ -140,6 +140,8 @@ const requiredFiles = [
   `${reviewDir}/canary-evidence-intake-evidence.md`,
   `${reviewDir}/gemini-canary-evidence-intake-review.md`,
   `${reviewDir}/gemini-strict-real-fail-closed-intake-review.md`,
+  `${reviewDir}/adapter-strict-canary-contract-evidence.md`,
+  `${reviewDir}/gemini-adapter-strict-canary-contract-review.md`,
   `${reviewDir}/canary-remediation-evidence.md`,
   `${reviewDir}/gemini-canary-remediation-review.md`,
   `${reviewDir}/canary-operator-packet-evidence.md`,
@@ -824,6 +826,7 @@ check("release state is conservative", () => {
     "canary-diagnostic-bundle-report",
     "canary-evidence-intake",
     "canary-strict-fail-closed-intake",
+    "adapter-strict-canary-contract",
     "canary-remediation-plan",
     "canary-operator-packet",
     "hosted-baseline-preflight",
@@ -978,8 +981,10 @@ check("fresh adapter store latency instrumentation passes", () => {
   const openclaw = JSON.parse(run("node", ["packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs"]).stdout);
   const hermes = JSON.parse(run("python3", ["packages/adapters/hermes/selfmem_canary_standalone_smoke.py"]).stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-adapter-store-latency-review.md"), "utf8");
+  const contractReview = readFileSync(join(root, reviewDir, "gemini-adapter-strict-canary-contract-review.md"), "utf8");
   for (const report of [openclaw, hermes]) {
     assert.equal(report.ok, true);
+    assert.equal(report.adapterContractCovered, true);
     assert.equal(report.searchLatencyInstrumentationCovered, true);
     assert.equal(report.storeLatencyInstrumentationCovered, true);
     assert.equal(Number(report.storeLatencySampleCount) > 0, true);
@@ -987,6 +992,8 @@ check("fresh adapter store latency instrumentation passes", () => {
   }
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
   assert.match(geminiReview, /positive `elapsed_ms`|positive elapsed_ms/i);
+  assert.match(contractReview, /Verdict:\s*CLEAN/i);
+  assert.match(contractReview, /strict.*canary.*contract|adapter.*contract/i);
 });
 
 check("fresh canary report generator passes", () => {
@@ -1002,6 +1009,10 @@ check("fresh canary report generator passes", () => {
     assert.equal(generatedReport.fixtureOnly, true);
     assert.equal(generatedReport.evidenceType, "fixture-trace-derived-canary-report");
     assert.match(generatedReport.agent.agentIdentityHash, /^agent_[a-f0-9]{8,}$/);
+    assert.equal(generatedReport.adapter.name, "recallweave-selfmem-canary");
+    assert.equal(generatedReport.adapter.strictCanaryContract, "v1");
+    assert.equal(generatedReport.adapter.searchLatencyInstrumentation, true);
+    assert.equal(generatedReport.adapter.storeLatencyInstrumentation, true);
     assert.equal(generatedReport.provider.hostedSupermemoryMode, "read-through-only");
     assert.equal(generatedReport.counts.sessionStart > 0, true);
     assert.equal(generatedReport.counts.beforePromptBuild > 0, true);
@@ -1118,6 +1129,13 @@ check("fresh canary report generator passes", () => {
         agent_identity: "window-real-agent",
         source_supermemory_container: "window_source_history",
         local_container: "selfmem_window_source_history",
+        adapter_contract: {
+          name: "recallweave-selfmem-canary",
+          version: "2026.05.23.store-latency-v1",
+          strictCanaryContract: "v1",
+          searchLatencyInstrumentation: true,
+          storeLatencyInstrumentation: true,
+        },
         provider_mode: "voyage-4-large+rerank-2.5+supermemory-read-through",
       }),
     );
@@ -1375,6 +1393,7 @@ check("fresh canary operator packet passes", () => {
   assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-zip" && /--canary-diagnostic-zip/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.acceptanceCriteria.includes("countsAsRealRolloutEvidence is true"));
   assert.ok(report.acceptanceCriteria.includes("fixtureOnly is false"));
+  assert.ok(report.acceptanceCriteria.includes("adapter.strictCanaryContract is v1"));
   assert.ok(report.acceptanceCriteria.includes("window.durationMinutes is at least 15"));
   assert.ok(report.acceptanceCriteria.includes("instrumentation.missingStoreLatencyCount is 0"));
   assert.ok(report.forbidden.includes("raw memories"));

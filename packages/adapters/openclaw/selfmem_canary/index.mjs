@@ -15,6 +15,13 @@ const VOYAGE_RERANK_MODEL = "rerank-2.5";
 const VOYAGE_DIMENSIONS = 1024;
 const DEFAULT_SUPERMEMORY_TIMEOUT_MS = 1200;
 const DEFAULT_RECALL_LATENCY_BUDGET_MS = 2200;
+const ADAPTER_CONTRACT = Object.freeze({
+  name: "recallweave-selfmem-canary",
+  version: "2026.05.23.store-latency-v1",
+  strictCanaryContract: "v1",
+  searchLatencyInstrumentation: true,
+  storeLatencyInstrumentation: true,
+});
 const COMPRESSION_EVENT_NAMES = [
   "pre_compress",
   "before_compress",
@@ -59,6 +66,9 @@ export function createSelfmemOpenClawCanary(options = {}) {
     agent_identity: agentIdentity,
     source_supermemory_container: sourceSupermemoryContainer || null,
     local_container: localContainer,
+    adapter_contract: ADAPTER_CONTRACT,
+    adapter_contract_version: ADAPTER_CONTRACT.version,
+    strict_canary_contract: ADAPTER_CONTRACT.strictCanaryContract,
     store_dir: storeDir,
     mode: "local-write-supermemory-read-through",
     search_policy: "local_first_then_bounded_supermemory_read_through",
@@ -69,6 +79,7 @@ export function createSelfmemOpenClawCanary(options = {}) {
   }, null, 2));
 
   const state = { home, agentIdentity, identityResolved, readOnly, sourceSupermemoryContainer, localContainer, storeDir, paths };
+  state.adapterContract = ADAPTER_CONTRACT;
   state.supermemoryKey = options.supermemoryKey || process.env.SELFMEM_SUPERMEMORY_READ_KEY || process.env.SUPERMEMORY_READ_API_KEY || process.env.SUPERMEMORY_API_KEY || process.env.SUPERMEMORY_CC_API_KEY || "";
   state.supermemoryReadThrough = Boolean(state.supermemoryKey && sourceSupermemoryContainer && process.env.SELFMEM_SUPERMEMORY_READ_THROUGH !== "0");
   state.voyageKeys = options.voyageKeys || voyageKeysFromEnv();
@@ -90,7 +101,12 @@ export function createSelfmemOpenClawCanary(options = {}) {
     id: "selfmem_canary",
     tools: makeTools(state),
     session_start(session = {}) {
-      trace(state, "session_start", { session_id: session.id || session.session_id || "", local_container: localContainer });
+      trace(state, "session_start", {
+        session_id: session.id || session.session_id || "",
+        local_container: localContainer,
+        adapter_contract_version: ADAPTER_CONTRACT.version,
+        strict_canary_contract: ADAPTER_CONTRACT.strictCanaryContract,
+      });
       return status(state);
     },
     async before_prompt_build(input = {}) {
@@ -167,7 +183,13 @@ function store(state, content, metadata = {}) {
   const existing = findDuplicate(state, distilled);
   if (existing) {
     state.usage.dedupe_suppressed += 1;
-    trace(state, "store_deduped", { id: existing.id, local_container: state.localContainer, elapsed_ms: elapsedMs(startedAt) });
+    trace(state, "store_deduped", {
+      id: existing.id,
+      local_container: state.localContainer,
+      elapsed_ms: elapsedMs(startedAt),
+      adapter_contract_version: ADAPTER_CONTRACT.version,
+      store_latency_instrumentation: true,
+    });
     return existing;
   }
   const item = {
@@ -185,7 +207,13 @@ function store(state, content, metadata = {}) {
     },
   };
   appendFileSync(state.paths.memories, `${JSON.stringify(item)}\n`);
-  trace(state, "store", { id: item.id, local_container: state.localContainer, elapsed_ms: elapsedMs(startedAt) });
+  trace(state, "store", {
+    id: item.id,
+    local_container: state.localContainer,
+    elapsed_ms: elapsedMs(startedAt),
+    adapter_contract_version: ADAPTER_CONTRACT.version,
+    store_latency_instrumentation: true,
+  });
   return item;
 }
 
@@ -249,6 +277,8 @@ async function search(state, query, limit) {
     elapsed_ms: elapsedMs(startedAt),
     local_elapsed_ms: localElapsedMs,
     remote_elapsed_ms: remoteElapsedMs,
+    adapter_contract_version: ADAPTER_CONTRACT.version,
+    search_latency_instrumentation: true,
     supermemory_read_through: state.supermemoryReadThrough,
     supermemory_attempted: remoteAttempted,
     supermemory_skip_reason: remoteAttempted ? "" : (state.supermemoryReadThrough ? remoteDecision.reason : "read_through_disabled"),
@@ -527,6 +557,7 @@ function status(state) {
     success: true,
     provider: "selfmem_canary",
     host: "openclaw",
+    adapter_contract: state.adapterContract,
     agent_identity: state.agentIdentity,
     identity_resolved: state.identityResolved,
     read_only: state.readOnly,

@@ -66,6 +66,13 @@ const output = {
     providerMode: report.provider?.mode ?? input.target?.providerMode ?? null,
     hostedSupermemoryMode: report.provider?.hostedSupermemoryMode ?? input.target?.hostedSupermemoryMode ?? null,
   },
+  adapter: {
+    name: report.adapter?.name ?? input.adapter?.name ?? null,
+    contractVersion: report.adapter?.contractVersion ?? input.adapter?.contractVersion ?? null,
+    strictCanaryContract: report.adapter?.strictCanaryContract ?? input.adapter?.strictCanaryContract ?? null,
+    searchLatencyInstrumentation: Boolean(report.adapter?.searchLatencyInstrumentation ?? input.adapter?.searchLatencyInstrumentation),
+    storeLatencyInstrumentation: Boolean(report.adapter?.storeLatencyInstrumentation ?? input.adapter?.storeLatencyInstrumentation),
+  },
   failedChecks,
   measurements: {
     windowMinutes: numberValue(report.window?.durationMinutes),
@@ -128,6 +135,7 @@ function normalizeReport(value) {
         localWriteMode: "enabled",
         hostedSupermemoryMode: value.target?.hostedSupermemoryMode,
       },
+      adapter: value.adapter,
       counts: {
         sessionStart: value.lifecycle?.sessionStart,
         beforePromptBuild: value.lifecycle?.beforePromptBuild,
@@ -157,6 +165,7 @@ function evaluateChecks(report) {
   const privacy = report.privacy ?? {};
   const agent = report.agent ?? {};
   const provider = report.provider ?? {};
+  const adapter = report.adapter ?? {};
   const window = report.window ?? {};
   return [
     check("schema-version", report.schemaVersion === 1),
@@ -165,6 +174,13 @@ function evaluateChecks(report) {
     check("identity-hash", /^agent_[a-f0-9]{8,}$/i.test(String(agent.agentIdentityHash ?? ""))),
     check("local-container-hash", /^container_[a-f0-9]{8,}$/i.test(String(agent.localContainerHash ?? ""))),
     check("source-container-hash", /^source_[a-f0-9]{8,}$/i.test(String(agent.sourceContainerHash ?? ""))),
+    check(
+      "adapter-contract",
+      adapter.name === "recallweave-selfmem-canary"
+        && adapter.strictCanaryContract === "v1"
+        && adapter.searchLatencyInstrumentation === true
+        && adapter.storeLatencyInstrumentation === true,
+    ),
     check("window-duration", numberValue(window.durationMinutes) >= 15),
     check("local-write-mode", provider.localWriteMode === "enabled"),
     check("hosted-read-only", provider.hostedSupermemoryMode === "read-through-only"),
@@ -211,6 +227,7 @@ function actionFor(name, report) {
     "identity-hash": [{ ...base, category: "identity", recommendation: "Regenerate the report with hashed identity metadata from the current adapter." }],
     "local-container-hash": [{ ...base, category: "identity", recommendation: "Regenerate the report after confirming the local container mapping is present." }],
     "source-container-hash": [{ ...base, category: "identity", recommendation: "Regenerate the report after confirming the hosted read-through source container mapping is present." }],
+    "adapter-contract": [{ ...base, category: "installed-version", recommendation: "Run selfmem_update from the current package and collect a fresh report. The live adapter must expose the strict v1 canary contract and search/store latency instrumentation markers." }],
     "window-duration": [{ ...base, category: "evidence-window", recommendation: "Collect at least 15 minutes of active runtime after applying the patch." }],
     "local-write-mode": [{ ...base, category: "write-lane", recommendation: "Make RecallWeave the local write lane for this agent before claiming native memory coverage." }],
     "hosted-read-only": [{ ...base, category: "supermemory-bridge", recommendation: "Keep hosted Supermemory in read-through-only mode. Do not enable hosted write-back for canary evidence." }],

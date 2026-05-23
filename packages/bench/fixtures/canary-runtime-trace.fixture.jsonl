@@ -1,9 +1,9 @@
-{"ts":"2026-05-22T19:00:00.000Z","event":"initialize","data":{"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through","supermemory_read_through":true}}
+{"ts":"2026-05-22T19:00:00.000Z","event":"initialize","data":{"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through","supermemory_read_through":true,"adapter_contract_version":"2026.05.23.store-latency-v1","strict_canary_contract":"v1"}}
 {"ts":"2026-05-22T19:02:00.000Z","event":"search","data":{"query":"fixture query","result_count":4,"local_result_count":2,"supermemory_result_count":2,"elapsed_ms":210,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through","supermemory_read_through":true}}
 {"ts":"2026-05-22T19:02:01.000Z","event":"prefetch","data":{"query":"fixture query","result_count":4,"elapsed_ms":230,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through"}}
-{"ts":"2026-05-22T19:04:00.000Z","event":"store","data":{"id":"fixture-store-1","local_container":"selfmem_fixture_agent","elapsed_ms":120,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through"}}
+{"ts":"2026-05-22T19:04:00.000Z","event":"store","data":{"id":"fixture-store-1","local_container":"selfmem_fixture_agent","elapsed_ms":120,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through","adapter_contract_version":"2026.05.23.store-latency-v1","store_latency_instrumentation":true}}
 {"ts":"2026-05-22T19:08:00.000Z","event":"search","data":{"query":"fixture follow-up","result_count":3,"local_result_count":2,"supermemory_result_count":1,"elapsed_ms":320,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through","supermemory_read_through":true}}
 {"ts":"2026-05-22T19:08:01.000Z","event":"prefetch","data":{"query":"fixture follow-up","result_count":3,"elapsed_ms":340,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through"}}
 {"ts":"2026-05-22T19:13:00.000Z","event":"pre_compress","data":{"message_count":18}}
-{"ts":"2026-05-22T19:18:00.000Z","event":"store","data":{"id":"fixture-store-2","local_container":"selfmem_fixture_agent","elapsed_ms":140,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through"}}
+{"ts":"2026-05-22T19:18:00.000Z","event":"store","data":{"id":"fixture-store-2","local_container":"selfmem_fixture_agent","elapsed_ms":140,"provider_mode":"voyage-4-large+rerank-2.5+supermemory-read-through","adapter_contract_version":"2026.05.23.store-latency-v1","store_latency_instrumentation":true}}
 {"ts":"2026-05-22T19:23:00.000Z","event":"session_end","data":{"message_count":6}}

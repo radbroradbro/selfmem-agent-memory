@@ -35,6 +35,13 @@ _VOYAGE_RERANK_URL = "https://api.voyageai.com/v1/rerank"
 _SUPERMEMORY_SEARCH_URL = "https://api.supermemory.ai/v4/search"
 _SUPERMEMORY_TIMEOUT_SECONDS = 1.2
 _RECALL_LATENCY_BUDGET_MS = 2200
+_ADAPTER_CONTRACT = {
+    "name": "recallweave-selfmem-canary",
+    "version": "2026.05.23.store-latency-v1",
+    "strictCanaryContract": "v1",
+    "searchLatencyInstrumentation": True,
+    "storeLatencyInstrumentation": True,
+}
 _PRIVATE_RE = re.compile(r"<private>[\s\S]*?(?:</private>|$)", re.IGNORECASE)
 _TRIVIAL_RE = re.compile(
     r"^(ok|okay|thanks|thank you|got it|sure|yes|no|yep|nope|k|ty|thx|np)\.?$",
@@ -220,6 +227,8 @@ class SelfmemCanaryProvider(MemoryProvider):
             "agent_identity": self._agent_identity,
             "source_supermemory_container": self._source_supermemory_container or None,
             "local_container": self._local_container,
+            "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+            "strict_canary_contract": _ADAPTER_CONTRACT["strictCanaryContract"],
             "supermemory_read_through": self._supermemory_read_through,
             "search_policy": "local_first_then_bounded_supermemory_read_through",
             "recall_latency_budget_ms": _recall_latency_budget_ms(),
@@ -521,6 +530,8 @@ class SelfmemCanaryProvider(MemoryProvider):
             "has_embedding": bool(embedding),
             "local_container": self._local_container,
             "source_supermemory_container": self._source_supermemory_container or None,
+            "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+            "store_latency_instrumentation": True,
             "usage": self._usage,
             "elapsed_ms": _elapsed_ms(start),
         })
@@ -531,6 +542,7 @@ class SelfmemCanaryProvider(MemoryProvider):
             "success": True,
             "provider": self.name,
             "provider_mode": self._provider_mode,
+            "adapter_contract": _ADAPTER_CONTRACT,
             "agent_identity": self._agent_identity,
             "local_container": self._local_container,
             "source_supermemory_container": self._source_supermemory_container or None,
@@ -570,6 +582,9 @@ class SelfmemCanaryProvider(MemoryProvider):
             "agent_identity": self._agent_identity,
             "source_supermemory_container": self._source_supermemory_container or None,
             "local_container": self._local_container,
+            "adapter_contract": _ADAPTER_CONTRACT,
+            "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+            "strict_canary_contract": _ADAPTER_CONTRACT["strictCanaryContract"],
             "hermes_home": self._hermes_home,
             "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "mode": "local-write-supermemory-read-through",
@@ -623,6 +638,8 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "elapsed_ms": _elapsed_ms(start),
                 "local_elapsed_ms": local_elapsed_ms,
                 "remote_elapsed_ms": remote_elapsed_ms,
+                "adapter_contract_version": _ADAPTER_CONTRACT["version"],
+                "search_latency_instrumentation": True,
                 "provider_mode": self._provider_mode,
                 "supermemory_read_through": self._supermemory_read_through,
                 "supermemory_attempted": remote_attempted,

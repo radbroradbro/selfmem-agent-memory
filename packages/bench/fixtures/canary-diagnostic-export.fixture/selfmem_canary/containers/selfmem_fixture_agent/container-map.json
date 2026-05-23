@@ -1,5 +1,13 @@
 {
   "agent_identity": "fixture-agent",
+  "adapter_contract": {
+    "name": "recallweave-selfmem-canary",
+    "version": "2026.05.23.store-latency-v1",
+    "strictCanaryContract": "v1",
+    "searchLatencyInstrumentation": true,
+    "storeLatencyInstrumentation": true
+  },
+  "adapter_contract_version": "2026.05.23.store-latency-v1",
   "fixture_only": true,
   "host": "hermes",
   "local_container": "selfmem_fixture_agent",

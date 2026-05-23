@@ -9,6 +9,13 @@
     "localContainerHash": "container_1ab439d0",
     "sourceContainerHash": "source_6c7a3019"
   },
+  "adapter": {
+    "name": "recallweave-selfmem-canary",
+    "contractVersion": "2026.05.23.store-latency-v1",
+    "strictCanaryContract": "v1",
+    "searchLatencyInstrumentation": true,
+    "storeLatencyInstrumentation": true
+  },
   "window": {
     "startedAt": "2026-05-22T19:00:00.000Z",
     "endedAt": "2026-05-22T20:00:00.000Z",

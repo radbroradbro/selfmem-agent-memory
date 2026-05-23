@@ -62,6 +62,9 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
     assert dry["startedAt"].endswith("Z")
     assert dry["freshCanarySince"] == dry["startedAt"]
     assert dry["preservedMapping"]["found"] is True
+    dry_adapter = next(step for step in dry["steps"] if step["step"] == "install_adapter")
+    assert dry_adapter["adapterContract"]["strictCanaryContract"] == "v1"
+    assert dry_adapter["adapterContract"]["storeLatencyInstrumentation"] is True
     assert not installed_key_path(host, home).exists(), "dry-run must not copy keys"
     assert (adapter_target(host, runtime) / "OLD_ADAPTER.txt").exists(), "dry-run must not replace adapter"
 
@@ -69,6 +72,11 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
     assert applied["ok"] is True
     assert applied["dryRun"] is False
     assert applied["preservedMapping"]["found"] is True
+    applied_adapter = next(step for step in applied["steps"] if step["step"] == "install_adapter")
+    assert applied_adapter["installedMatchesSource"] is True
+    assert applied_adapter["sourceDigest"] == applied_adapter["targetDigest"]
+    assert applied_adapter["adapterContract"]["strictCanaryContract"] == "v1"
+    assert applied_adapter["adapterContract"]["storeLatencyInstrumentation"] is True
     assert installed_key_path(host, home).read_text(encoding="utf-8").strip() == "RECALLWEAVE_FIXTURE_KEY=fixture"
     assert stat.S_IMODE(installed_key_path(host, home).stat().st_mode) == 0o600
     assert adapter_target(host, runtime).exists(), "apply must install adapter"

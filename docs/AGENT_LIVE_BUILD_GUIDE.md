@@ -117,6 +117,10 @@ Apply only after review:
 bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary
 ```
 
+The updater reports adapter source and installed digests plus the strict canary
+contract. Treat a missing `adapterContract.strictCanaryContract: v1` or
+`installedMatchesSource: true` as a stale install, even if adapter smoke passes.
+
 For strict live rollout evidence, start a fresh canary window at the update
 time. Old trace history can include pre-patch missing latency samples, stale
 errors, or earlier identity mistakes. Do not let that old history count for or
@@ -155,8 +159,9 @@ bin/selfmem_update \
 
 After a rollback drill, add `--rollback-tested --strict-real`. Strict-real
 passes only when the selected live container has a fresh runtime window with
-search/store latency samples, lifecycle coverage, hybrid search coverage, local
-writes, read-through mode, and zero privacy leaks. If an agent sends a redacted
+search/store latency samples, strict v1 adapter contract markers, lifecycle
+coverage, hybrid search coverage, local writes, read-through mode, and zero
+privacy leaks. If an agent sends a redacted
 diagnostic export instead of a live container path, use
 `--canary-diagnostic-dir` or `--canary-diagnostic-zip` together with
 `--canary-since` so the report ignores pre-patch events inside the export.

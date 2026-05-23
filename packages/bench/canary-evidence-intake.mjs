@@ -36,6 +36,7 @@ const privacy = report.privacy ?? {};
 const agent = report.agent ?? {};
 const provider = report.provider ?? {};
 const window = report.window ?? {};
+const adapter = report.adapter ?? {};
 
 const checks = [
   check("schema-version", report.schemaVersion === 1),
@@ -44,6 +45,13 @@ const checks = [
   check("identity-hash", /^agent_[a-f0-9]{8,}$/i.test(String(agent.agentIdentityHash ?? ""))),
   check("local-container-hash", /^container_[a-f0-9]{8,}$/i.test(String(agent.localContainerHash ?? ""))),
   check("source-container-hash", /^source_[a-f0-9]{8,}$/i.test(String(agent.sourceContainerHash ?? ""))),
+  check(
+    "adapter-contract",
+    adapter.name === "recallweave-selfmem-canary"
+      && adapter.strictCanaryContract === "v1"
+      && adapter.searchLatencyInstrumentation === true
+      && adapter.storeLatencyInstrumentation === true,
+  ),
   check("window-duration", Number(window.durationMinutes) >= 15),
   check("local-write-mode", provider.localWriteMode === "enabled"),
   check("hosted-read-only", provider.hostedSupermemoryMode === "read-through-only"),
@@ -108,6 +116,13 @@ const output = {
     sourceContainerHash: agent.sourceContainerHash,
     providerMode: provider.mode,
     hostedSupermemoryMode: provider.hostedSupermemoryMode,
+  },
+  adapter: {
+    name: adapter.name ?? null,
+    contractVersion: adapter.contractVersion ?? null,
+    strictCanaryContract: adapter.strictCanaryContract ?? null,
+    searchLatencyInstrumentation: adapter.searchLatencyInstrumentation === true,
+    storeLatencyInstrumentation: adapter.storeLatencyInstrumentation === true,
   },
   window: {
     startedAt: window.startedAt ?? null,

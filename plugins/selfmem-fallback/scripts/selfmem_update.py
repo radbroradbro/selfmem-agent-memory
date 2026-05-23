@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -123,17 +124,39 @@ def install_adapter(host: str, repo: Path, *, apply: bool) -> dict[str, Any]:
         target = repo / "plugins" / "selfmem_canary"
     if not source.exists():
         return {"step": "install_adapter", "ok": False, "reason": "adapter source missing", "source": str(source)}
+    source_digest = directory_digest(source)
+    source_contract = adapter_contract_from_source(host, source)
     backup = None
     if target.exists():
         backup = unique_backup_path(target)
     if not apply:
-        return {"step": "install_adapter", "ok": True, "dryRun": True, "source": str(source), "target": str(target), "backup": str(backup) if backup else None}
+        return {
+            "step": "install_adapter",
+            "ok": True,
+            "dryRun": True,
+            "source": str(source),
+            "target": str(target),
+            "backup": str(backup) if backup else None,
+            "sourceDigest": source_digest,
+            "adapterContract": source_contract,
+        }
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
         assert backup is not None
         shutil.move(str(target), str(backup))
     shutil.copytree(source, target)
-    return {"step": "install_adapter", "ok": True, "source": str(source), "target": str(target), "backup": str(backup) if backup else None}
+    target_digest = directory_digest(target)
+    return {
+        "step": "install_adapter",
+        "ok": target_digest == source_digest,
+        "source": str(source),
+        "target": str(target),
+        "backup": str(backup) if backup else None,
+        "sourceDigest": source_digest,
+        "targetDigest": target_digest,
+        "adapterContract": source_contract,
+        "installedMatchesSource": target_digest == source_digest,
+    }
 
 
 def unique_backup_path(target: Path) -> Path:
@@ -145,6 +168,31 @@ def unique_backup_path(target: Path) -> Path:
         if not candidate.exists():
             return candidate
     raise RuntimeError(f"could not allocate backup path for {target}")
+
+
+def directory_digest(root: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        relative = path.relative_to(root).as_posix()
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def adapter_contract_from_source(host: str, source: Path) -> dict[str, Any]:
+    file = source / ("__init__.py" if host == "hermes" else "index.mjs")
+    if not file.exists():
+        return {"found": False}
+    text = file.read_text(encoding="utf-8", errors="ignore")
+    return {
+        "found": "recallweave-selfmem-canary" in text,
+        "name": "recallweave-selfmem-canary" if "recallweave-selfmem-canary" in text else "unknown",
+        "strictCanaryContract": "v1" if "strictCanaryContract" in text and ('"v1"' in text or "'v1'" in text) else "unknown",
+        "searchLatencyInstrumentation": "searchLatencyInstrumentation" in text or "search_latency_instrumentation" in text,
+        "storeLatencyInstrumentation": "storeLatencyInstrumentation" in text or "store_latency_instrumentation" in text,
+    }
 
 
 def install_openclaw_audit(home: Path, *, apply: bool) -> dict[str, Any]:

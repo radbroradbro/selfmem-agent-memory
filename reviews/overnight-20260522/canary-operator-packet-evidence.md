@@ -37,10 +37,10 @@ Expected behavior:
 - It names the pass criteria that matter for the current blocker:
   `canaryPass: true`, `fixtureOnly: false`,
   `countsAsRealRolloutEvidence: true`, a post-update `windowFilter.since`,
-  fresh duration of at least 15 minutes, store latency samples present, no
-  missing store latency, recall/store p95 at or below 2500 ms, lifecycle
-  coverage, hybrid search coverage, local writes, hosted read-through, and
-  rollback coverage.
+  strict v1 adapter contract markers, fresh duration of at least 15 minutes,
+  store latency samples present, no missing store latency, recall/store p95 at
+  or below 2500 ms, lifecycle coverage, hybrid search coverage, local writes,
+  hosted read-through, and rollback coverage.
 
 Boundary:
 

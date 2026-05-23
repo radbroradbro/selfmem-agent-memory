@@ -98,6 +98,7 @@ def main() -> None:
         provider.shutdown()
 
         memories = Path(status["memories_path"]).read_text(encoding="utf-8", errors="ignore")
+        container_map = json.loads(Path(status["container_map_path"]).read_text(encoding="utf-8", errors="ignore"))
         trace = Path(status["trace_path"]).read_text(encoding="utf-8", errors="ignore")
         lossless = Path(status["lossless_path"]).read_text(encoding="utf-8", errors="ignore")
         raw = Path(status["raw_path"]).read_text(encoding="utf-8", errors="ignore")
@@ -127,6 +128,11 @@ def main() -> None:
             "hybridSearchCovered": any(item.get("memory_source") == "supermemory_read_through" for item in alias_search.get("results", [])),
             "sourceSupermemoryContainer": status.get("source_supermemory_container"),
             "localContainer": status.get("local_container"),
+            "adapterContractCovered": status.get("adapter_contract", {}).get("name") == "recallweave-selfmem-canary"
+            and status.get("adapter_contract", {}).get("strictCanaryContract") == "v1"
+            and status.get("adapter_contract", {}).get("searchLatencyInstrumentation") is True
+            and status.get("adapter_contract", {}).get("storeLatencyInstrumentation") is True
+            and container_map.get("adapter_contract", {}).get("strictCanaryContract") == "v1",
             "boundedReadThroughPolicyCovered": status.get("search_policy") == "local_first_then_bounded_supermemory_read_through"
             and status.get("recall_policy", {}).get("remote_read_through") == "explicit_history_intent_or_thin_local_results",
             "searchLatencyInstrumentationCovered": float(search_trace_data.get("elapsed_ms") or 0) > 0
@@ -159,6 +165,7 @@ def main() -> None:
         print(json.dumps(output, indent=2, sort_keys=True))
         if not all([
             output["toolAliasCoverage"],
+            output["adapterContractCovered"],
             output["aliasStoreSuccess"],
             output["aliasSearchResultCount"] > 0,
             output["hybridSearchCovered"],

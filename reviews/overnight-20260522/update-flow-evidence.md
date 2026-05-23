@@ -28,6 +28,10 @@ Verification expectations:
 - Apply preserves local container mapping reports.
 - Apply copies local key files with `0600`.
 - OpenClaw apply installs the audit helper by default.
+- Apply reports adapter source and installed digests, and fails the adapter
+  install step if the copied target digest does not match the reviewed source.
+- Apply and dry-run report the strict v1 canary contract so stale runtime
+  adapters are visible before a live canary window starts.
 - `--run-canary --canary-output <path>` runs adapter smoke, writes a sanitized
   canary report, runs intake, and keeps fixture output from counting as real
   rollout evidence.
@@ -52,6 +56,9 @@ Verification:
 - `bin/selfmem_update --help`: now exposes `--run-canary`, `--canary-output`,
   `--canary-since`, `--canary-last-minutes`, `--strict-real`, and
   `--rollback-tested`.
+- `pnpm update:smoke`: now asserts `adapterContract.strictCanaryContract: v1`,
+  store latency instrumentation, `installedMatchesSource: true`, and matching
+  source/target adapter digests for Hermes and OpenClaw.
 - Strict-real missing-source guard: passed for Hermes and OpenClaw fixture
   runtimes.
 - `pnpm smoke`: passed with update smoke included.

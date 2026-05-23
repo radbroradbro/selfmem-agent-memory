@@ -108,6 +108,7 @@ pluginDefinition.register({
 
 const traceText = readFileSync(join(home, "selfmem", "containers", "selfmem_openclaw_standalone_source", "trace.jsonl"), "utf8");
 const rawText = readFileSync(join(home, "selfmem", "containers", "selfmem_openclaw_standalone_source", "raw_events.jsonl"), "utf8");
+const containerMap = JSON.parse(readFileSync(join(home, "selfmem", "containers", "selfmem_openclaw_standalone_source", "container-map.json"), "utf8"));
 const traceEvents = traceText.split(/\n+/).filter(Boolean).map((line) => JSON.parse(line));
 const searchTrace = traceEvents.find((item) => item.event === "search" && item.data?.supermemory_attempted === true);
 const storeTraces = traceEvents.filter((item) => item.event === "store");
@@ -123,6 +124,11 @@ const output = {
   sessionLocalContainer: session.local_container,
   sourceSupermemoryContainer: status.source_supermemory_container,
   localContainer: status.local_container,
+  adapterContractCovered: status.adapter_contract?.name === "recallweave-selfmem-canary"
+    && status.adapter_contract?.strictCanaryContract === "v1"
+    && status.adapter_contract?.searchLatencyInstrumentation === true
+    && status.adapter_contract?.storeLatencyInstrumentation === true
+    && containerMap.adapter_contract?.strictCanaryContract === "v1",
   boundedReadThroughPolicyCovered: status.search_policy === "local_first_then_bounded_supermemory_read_through"
     && status.recall_policy?.remote_read_through === "explicit_history_intent_or_thin_local_results",
   searchLatencyInstrumentationCovered: Number(searchTrace?.data?.elapsed_ms || 0) > 0
@@ -153,7 +159,7 @@ const output = {
 
 console.log(JSON.stringify(output, null, 2));
 
-if (!output.boundedReadThroughPolicyCovered || !output.searchLatencyInstrumentationCovered || !output.storeLatencyInstrumentationCovered || !output.aliasStoreSuccess || output.aliasSearchResultCount < 1 || !output.hybridSearchCovered || !output.voyageEnabled || !output.voyageCallsCovered || !output.embeddingCacheCovered || !output.maintenanceRecallGateCovered || !output.statusLikeRecallCovered || !output.openclawStateDirCovered || !output.identityPinCovered || !output.readOnlyCovered || !output.pluginEntryCovered || !output.compressionCheckpointCovered || !output.auditCovered || !output.beforePromptHasContext || !output.lifecycleCovered || !output.rawAuditCovered || output.privacyLeakCount !== 0) {
+if (!output.adapterContractCovered || !output.boundedReadThroughPolicyCovered || !output.searchLatencyInstrumentationCovered || !output.storeLatencyInstrumentationCovered || !output.aliasStoreSuccess || output.aliasSearchResultCount < 1 || !output.hybridSearchCovered || !output.voyageEnabled || !output.voyageCallsCovered || !output.embeddingCacheCovered || !output.maintenanceRecallGateCovered || !output.statusLikeRecallCovered || !output.openclawStateDirCovered || !output.identityPinCovered || !output.readOnlyCovered || !output.pluginEntryCovered || !output.compressionCheckpointCovered || !output.auditCovered || !output.beforePromptHasContext || !output.lifecycleCovered || !output.rawAuditCovered || output.privacyLeakCount !== 0) {
   process.exit(1);
 }
 

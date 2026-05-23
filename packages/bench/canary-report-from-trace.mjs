@@ -106,6 +106,11 @@ const sourceContainer = firstString(
   monitorSummary.sourceSupermemoryContainer,
   "not-detected",
 );
+const adapterContract = objectValue(containerMap.adapter_contract)
+  || objectValue(containerMap.adapterContract)
+  || objectValue(reliability.adapter_contract)
+  || objectValue(reliability.adapterContract)
+  || {};
 const providerMode = latestString(trace, "provider_mode")
   || providerModeFromSummary(traceSummary)
   || firstString(containerMap.provider_mode, containerMap.mode, reliability.mode, monitorSummary.mode, "unknown");
@@ -159,6 +164,41 @@ const report = {
     agentIdentityHash: hashLabel("agent", agentIdentity),
     localContainerHash: hashLabel("container", localContainer),
     sourceContainerHash: hashLabel("source", sourceContainer),
+  },
+  adapter: {
+    name: firstString(
+      containerMap.adapter_name,
+      containerMap.adapterName,
+      adapterContract.name,
+      latestString(trace, "adapter_name"),
+      "unknown",
+    ),
+    contractVersion: firstString(
+      containerMap.adapter_contract_version,
+      containerMap.adapterContractVersion,
+      adapterContract.version,
+      latestString(trace, "adapter_contract_version"),
+      "unknown",
+    ),
+    strictCanaryContract: firstString(
+      containerMap.strict_canary_contract,
+      containerMap.strictCanaryContract,
+      adapterContract.strictCanaryContract,
+      latestString(trace, "strict_canary_contract"),
+      "unknown",
+    ),
+    searchLatencyInstrumentation: firstBoolean(
+      containerMap.search_latency_instrumentation,
+      containerMap.searchLatencyInstrumentation,
+      adapterContract.searchLatencyInstrumentation,
+      latestBoolean(trace, "search_latency_instrumentation"),
+    ),
+    storeLatencyInstrumentation: firstBoolean(
+      containerMap.store_latency_instrumentation,
+      containerMap.storeLatencyInstrumentation,
+      adapterContract.storeLatencyInstrumentation,
+      latestBoolean(trace, "store_latency_instrumentation"),
+    ),
   },
   window: {
     startedAt,
@@ -568,6 +608,23 @@ function latestString(items, key) {
     if (value) return value;
   }
   return "";
+}
+
+function latestBoolean(items, key) {
+  for (const item of [...items].reverse()) {
+    const direct = item[key];
+    const nested = item.data && typeof item.data === "object" ? item.data[key] : undefined;
+    const value = direct ?? nested;
+    if (value === true || value === false) return value;
+  }
+  return undefined;
+}
+
+function firstBoolean(...values) {
+  for (const value of values) {
+    if (value === true || value === false) return value;
+  }
+  return false;
 }
 
 function percentile(values, p) {

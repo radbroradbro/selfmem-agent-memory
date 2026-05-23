@@ -53,6 +53,11 @@ The intake rejects:
 The accepted report may contain only hashes, counts, booleans, aggregate
 latency, aggregate quality rates, redaction counts, and rollback readiness.
 
+The accepted report must also expose the reviewed adapter contract:
+`recallweave-selfmem-canary`, strict canary contract `v1`, and positive
+search/store latency instrumentation markers. This catches stale installed
+adapters before a canary report can count as real rollout evidence.
+
 ## Strict Failure Output
 
 `--strict-real` remains fail-closed: fixture reports and weak real reports
@@ -86,6 +91,7 @@ answer, credential, or private path was printed.
 - before-prompt-build events,
 - agent-end events,
 - search and store counts,
+- strict v1 adapter contract marker,
 - LCM/pre-compression evidence,
 - search and store latency sample counts,
 - missing search and store latency counts,

@@ -87,6 +87,9 @@ requirements are resolved.
 - Strict-real canary intake now exits nonzero while still printing sanitized
   JSON for fixture or weak real evidence, so agents can run remediation from
   failed metrics without attaching raw logs.
+- Strict v1 adapter contract markers and updater adapter digests now make stale
+  installed adapters visible before a one-agent canary report can count as real
+  rollout evidence.
 - Adapter smokes now assert bounded read-through policy plus positive total,
   local, and remote recall timings.
 - Secret and private-name scans found no actual credential or private memory

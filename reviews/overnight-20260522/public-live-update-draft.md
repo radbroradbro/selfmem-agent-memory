@@ -49,6 +49,8 @@ The current PR adds:
   raw artifacts;
 - an adapter store-latency gate so Hermes and OpenClaw smokes prove store
   events include positive `elapsed_ms` samples before the next real canary;
+- a strict v1 adapter contract marker plus updater digest reporting so stale
+  installed adapters are visible before a live canary can count;
 - real diagnostic canary evaluation evidence from two redacted external Hermes
   bundles, both privacy-clean and both rejected by strict rollout intake;
 - fixture smokes for Hermes, OpenClaw, wiki sync, compaction, update flow, and
@@ -140,6 +142,9 @@ Latest verified head before this draft refresh:
 - Strict-real canary intake: failed fixture or weak real reports exit nonzero
   but still print sanitized JSON with failed checks, latency, instrumentation,
   quality, and privacy counters for `canary:diagnose`
+- Adapter contract gate: Hermes/OpenClaw smokes pass with strict v1 canary
+  markers, canary reports expose the marker, and the updater reports adapter
+  source/target digests
 - Canary report generator: `canary:report -- --fixture` creates the sanitized
   report shape from trace fixtures and proves fixture-derived reports fail
   `--strict-real`

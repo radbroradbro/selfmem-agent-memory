@@ -194,14 +194,20 @@ credentials, cookies, or bearer tokens.
 
 The report must contain aggregate metrics only: hashed agent/container labels,
 lifecycle event counts, hybrid-search coverage, local-write observation,
-hosted read-through mode, p50 and p95 latency, privacy counters, and rollback
-readiness. Strict-real evidence must use a fresh post-update window of at least
-15 minutes. Use `--since`, `--canary-since`, or `--last-minutes` to avoid
+hosted read-through mode, adapter contract markers, p50 and p95 latency,
+privacy counters, and rollback readiness. Strict-real evidence must use a fresh
+post-update window of at least 15 minutes. Use `--since`, `--canary-since`, or
+`--last-minutes` to avoid
 letting old trace history prove or poison the patched adapter. The canary report
 generator reads local trace files or metadata-only diagnostic summaries but does
 not print raw memories, transcripts, prompts, answers, local paths,
 credentials, cookies, or bearer tokens. A fixture pass is useful for the tooling
 path, but it is not real rollout evidence.
+
+The live adapter must expose `adapter.name: recallweave-selfmem-canary`,
+`strictCanaryContract: v1`, and search/store latency instrumentation markers.
+If those fields are absent, update the runtime with `selfmem_update` before
+collecting a fresh canary window.
 
 Current Hermes and OpenClaw adapters use local-first bounded hosted
 read-through. They search hosted Supermemory when local results are thin or the
