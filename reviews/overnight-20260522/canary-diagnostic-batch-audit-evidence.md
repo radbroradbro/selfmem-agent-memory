@@ -21,6 +21,7 @@ node --check packages/bench/canary-diagnostic-batch-audit.mjs
 node packages/bench/canary-diagnostic-batch-audit.mjs
 node packages/bench/canary-diagnostic-batch-audit.mjs --require-real-pass
 node packages/bench/canary-diagnostic-batch-audit.mjs --input-root <redacted-diagnostics-folder>
+node packages/bench/canary-diagnostic-batch-audit.mjs --input-root <redacted-diagnostics-folder> --allow-failed-inputs
 ```
 
 ## Fixture Result
@@ -42,6 +43,11 @@ node packages/bench/canary-diagnostic-batch-audit.mjs --input-root <redacted-dia
 - Best fixture store latency samples: positive.
 - `--require-real-pass` fails closed for the fixture with
   `countsAsRealRolloutEvidence: false`.
+- Mixed-bundle triage without `--allow-failed-inputs` exits nonzero when one
+  sibling input cannot be parsed.
+- Mixed-bundle triage with `--allow-failed-inputs` exits successfully when at
+  least one bundle parses, but still reports `countsAsRealRolloutEvidence:
+  false`.
 
 ## Real Redacted Batch Result
 
@@ -77,6 +83,8 @@ metrics-only result.
   strict-real rollout evidence.
 - Fixture inputs never count as real rollout evidence.
 - Failed inputs are listed by hashed label and failed stage only.
+- `--allow-failed-inputs` lets a mixed returned-diagnostics folder rank parsed
+  bundles without promoting the batch.
 - Bundle labels are hashes, not filenames or local paths.
 - Results include hashed agent/container labels, lifecycle counts, latency,
   instrumentation, quality, privacy counters, failed checks, and remediation

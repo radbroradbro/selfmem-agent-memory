@@ -252,8 +252,10 @@ The batch audit converts each bundle through `canary:report`,
 `canary:intake --strict-real`, and `canary:diagnose`, then prints only hashed
 labels, counts, latency, failed checks, and remediation categories. It never
 prints raw memories, transcripts, prompts, answers, credentials, or private
-paths. Add `--require-real-pass` only when the batch is meant to prove the
-real one-agent canary blocker is closed; otherwise it is a triage tool.
+paths. Add `--allow-failed-inputs` when a mixed returned-diagnostics folder has
+one bad archive but still contains usable parsed bundles. Add
+`--require-real-pass` only when the batch is meant to prove the real one-agent
+canary blocker is closed; otherwise it is a triage tool.
 
 After ranking the batch, generate one next-agent update plan:
 

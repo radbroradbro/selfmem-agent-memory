@@ -28,6 +28,13 @@ strict-real passes, and ranked the closest privacy-clean candidate. That best
 candidate had recall p95 1567.346 ms but still failed `adapter-contract`,
 `store-latency-instrumented`, and `store-p95`, so it remains diagnostic only.
 
+On 2026-05-23, the controller reran the same available returned diagnostics
+with the explicit mixed-folder triage flag. The batch still parsed eight of
+nine inputs, still had zero strict-real passes, and still selected the same
+OpenClaw candidate for the next one-agent fresh window. The flag only prevents
+one malformed sibling bundle from aborting triage; it does not change the
+promotion result.
+
 ## Commands
 
 The controller generated temporary metrics-only reports outside the repository:

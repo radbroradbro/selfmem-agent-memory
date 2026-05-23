@@ -227,6 +227,11 @@ npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root /path/to/redac
 npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input /path/to/agent-a.zip --input /path/to/agent-b
 ```
 
+Add `--allow-failed-inputs` for a mixed return folder where one broken or
+irrelevant diagnostic should not prevent ranking the privacy-clean parsed
+bundles. This is only a triage mode. It does not make a failed or partial batch
+count as rollout evidence.
+
 Use `--require-real-pass` only when the batch is being offered as production
 one-agent canary evidence. Fixture bundles, stale pre-patch bundles, or bundles
 without passing strict-real intake must fail closed. The output is metrics-only:

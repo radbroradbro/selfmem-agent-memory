@@ -1582,6 +1582,27 @@ check("fresh canary diagnostic batch audit passes", () => {
   const batchOutputPath = join(tempRoot, "batch-audit.json");
   const batchRun = run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs"]);
   const batchOutputRun = run("node", ["packages/bench/canary-diagnostic-batch-audit.mjs", "--output", batchOutputPath]);
+  const mixedBadInputPath = join(tempRoot, "selfmem-bad-diagnostic.zip");
+  writeFileSync(mixedBadInputPath, "not a zip");
+  const mixedStrictRun = spawnSync("node", [
+    "packages/bench/canary-diagnostic-batch-audit.mjs",
+    "--input",
+    "packages/bench/fixtures/canary-diagnostic-export.fixture",
+    "--input",
+    mixedBadInputPath,
+  ], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  const mixedAllowedRun = run("node", [
+    "packages/bench/canary-diagnostic-batch-audit.mjs",
+    "--input",
+    "packages/bench/fixtures/canary-diagnostic-export.fixture",
+    "--input",
+    mixedBadInputPath,
+    "--allow-failed-inputs",
+  ]);
   const requireRealPassRun = spawnSync("node", [
     "packages/bench/canary-diagnostic-batch-audit.mjs",
     "--require-real-pass",
@@ -1593,6 +1614,8 @@ check("fresh canary diagnostic batch audit passes", () => {
   const report = JSON.parse(batchRun.stdout);
   const outputReport = JSON.parse(readFileSync(batchOutputPath, "utf8"));
   const outputStdout = JSON.parse(batchOutputRun.stdout);
+  const mixedStrictOutput = JSON.parse(mixedStrictRun.stdout);
+  const mixedAllowedOutput = JSON.parse(mixedAllowedRun.stdout);
   const strictOutput = JSON.parse(requireRealPassRun.stdout);
   const evidence = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-diagnostic-batch-audit-review.md"), "utf8");
@@ -1610,6 +1633,16 @@ check("fresh canary diagnostic batch audit passes", () => {
   assert.equal(outputReport.mode, "canary-diagnostic-batch-audit");
   assert.equal(outputStdout.mode, "canary-diagnostic-batch-audit");
   assert.equal(outputReport.metricsOnly, true);
+  assert.notEqual(mixedStrictRun.status, 0, "mixed batch without --allow-failed-inputs must report nonzero status");
+  assert.equal(mixedStrictOutput.ok, false);
+  assert.equal(mixedStrictOutput.parsedInputCount, 1);
+  assert.equal(mixedStrictOutput.failedInputCount, 1);
+  assert.equal(mixedStrictOutput.allowFailedInputs, false);
+  assert.equal(mixedAllowedOutput.ok, true);
+  assert.equal(mixedAllowedOutput.parsedInputCount, 1);
+  assert.equal(mixedAllowedOutput.failedInputCount, 1);
+  assert.equal(mixedAllowedOutput.allowFailedInputs, true);
+  assert.equal(mixedAllowedOutput.countsAsRealRolloutEvidence, false);
   assert.equal(report.bestCandidate.fixtureOnly, true);
   assert.equal(report.bestCandidate.canaryPass, true);
   assert.equal(report.bestCandidate.countsAsRealRolloutEvidence, false);
@@ -1624,9 +1657,12 @@ check("fresh canary diagnostic batch audit passes", () => {
   assert.equal(strictOutput.countsAsRealRolloutEvidence, false);
   assert.match(evidence, /canary diagnostic batch audit/i);
   assert.match(evidence, /canary:batch-audit/i);
+  assert.match(evidence, /allow-failed-inputs/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
   assert.doesNotMatch(batchRun.stdout, secretPattern);
   assert.doesNotMatch(batchRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(mixedAllowedRun.stdout, secretPattern);
+  assert.doesNotMatch(mixedAllowedRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(requireRealPassRun.stdout, secretPattern);
   assert.doesNotMatch(requireRealPassRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   rmSync(tempRoot, { recursive: true, force: true });

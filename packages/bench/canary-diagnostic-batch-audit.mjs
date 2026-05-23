@@ -18,6 +18,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-batch-"));
 const requireRealPass = Boolean(args.requireRealPass);
+const allowFailedInputs = Boolean(args.allowFailedInputs);
 const outputPath = args.output ?? process.env.RECALLWEAVE_CANARY_BATCH_AUDIT_OUTPUT_JSON ?? null;
 
 const secretPattern =
@@ -34,7 +35,10 @@ try {
   const strictRealPasses = parsedResults.filter((item) => item.countsAsRealRolloutEvidence);
   const bestCandidate = rankCandidates(parsedResults)[0] ?? null;
   const failedInputs = results.filter((item) => item.status !== "parsed");
-  const ok = failedInputs.length === 0 && (!requireRealPass || strictRealPasses.length > 0);
+  const inputGateOk = allowFailedInputs
+    ? parsedResults.length > 0
+    : failedInputs.length === 0;
+  const ok = inputGateOk && (!requireRealPass || strictRealPasses.length > 0);
 
   const output = {
     ok,
@@ -42,6 +46,7 @@ try {
     writesRealFiles: false,
     metricsOnly: true,
     requireRealPass,
+    allowFailedInputs,
     publicLaunchAllowed: false,
     fleetRolloutAllowed: false,
     inputCount: inputs.length,
@@ -63,6 +68,9 @@ try {
           "Keep fleet rollout blocked until the maintainer explicitly promotes the one-agent canary.",
         ]
       : [
+          ...(failedInputs.length && !allowFailedInputs
+            ? ["Rerun with --allow-failed-inputs if this is a mixed returned-diagnostics folder and at least one parsed bundle is enough for triage."]
+            : []),
           "Do not promote any audited diagnostic to production canary evidence.",
           "Pick the best candidate by failed-check count and collect a fresh post-update runtime window.",
           "Run canary:diagnose on each failing report and attach only metrics-only output.",
@@ -267,6 +275,7 @@ function parseArgs(argv) {
     const item = argv[index];
     if (item === "--") continue;
     if (item === "--require-real-pass") parsed.requireRealPass = true;
+    else if (item === "--allow-failed-inputs") parsed.allowFailedInputs = true;
     else if (item.startsWith("--")) {
       const key = toCamel(item.slice(2));
       const value = argv[index + 1] ?? "";
