@@ -28,54 +28,80 @@ const defaultFixtureInput = join(root, "packages/bench/fixtures/canary-diagnosti
 
 try {
   const inputs = collectInputs(args);
-  assert.ok(inputs.length > 0, "no diagnostic inputs found");
+  let ok = false;
+  let output;
+  if (inputs.length === 0) {
+    output = {
+      ok: false,
+      mode: "canary-diagnostic-batch-audit",
+      writesRealFiles: false,
+      metricsOnly: true,
+      requireRealPass,
+      allowFailedInputs,
+      publicLaunchAllowed: false,
+      fleetRolloutAllowed: false,
+      inputCount: 0,
+      parsedInputCount: 0,
+      failedInputCount: 0,
+      strictRealPassCount: 0,
+      countsAsRealRolloutEvidence: false,
+      bestCandidate: null,
+      results: [],
+      failedInputs: [],
+      nextActions: [
+        "No diagnostic inputs were found.",
+        "Attach a returned metrics-only canary evidence packet or a redacted diagnostic export before planning the next agent.",
+        "Do not promote any canary or install packet from an empty input folder.",
+      ],
+    };
+  } else {
+    const results = inputs.map((input, index) => auditInput(input, index));
+    const parsedResults = results.filter((item) => item.status === "parsed");
+    const strictRealPasses = parsedResults.filter((item) => item.countsAsRealRolloutEvidence);
+    const bestCandidate = rankCandidates(parsedResults)[0] ?? null;
+    const failedInputs = results.filter((item) => item.status !== "parsed");
+    const inputGateOk = allowFailedInputs
+      ? parsedResults.length > 0
+      : failedInputs.length === 0;
+    ok = inputGateOk && (!requireRealPass || strictRealPasses.length > 0);
 
-  const results = inputs.map((input, index) => auditInput(input, index));
-  const parsedResults = results.filter((item) => item.status === "parsed");
-  const strictRealPasses = parsedResults.filter((item) => item.countsAsRealRolloutEvidence);
-  const bestCandidate = rankCandidates(parsedResults)[0] ?? null;
-  const failedInputs = results.filter((item) => item.status !== "parsed");
-  const inputGateOk = allowFailedInputs
-    ? parsedResults.length > 0
-    : failedInputs.length === 0;
-  const ok = inputGateOk && (!requireRealPass || strictRealPasses.length > 0);
-
-  const output = {
-    ok,
-    mode: "canary-diagnostic-batch-audit",
-    writesRealFiles: false,
-    metricsOnly: true,
-    requireRealPass,
-    allowFailedInputs,
-    publicLaunchAllowed: false,
-    fleetRolloutAllowed: false,
-    inputCount: inputs.length,
-    parsedInputCount: parsedResults.length,
-    failedInputCount: failedInputs.length,
-    strictRealPassCount: strictRealPasses.length,
-    countsAsRealRolloutEvidence: strictRealPasses.length > 0,
-    bestCandidate: bestCandidate ? summarizeCandidate(bestCandidate) : null,
-    results: parsedResults.map(summarizeCandidate),
-    failedInputs: failedInputs.map((item) => ({
-      label: item.label,
-      inputKind: item.inputKind,
-      status: item.status,
-      failedStage: item.failedStage,
-    })),
-    nextActions: strictRealPasses.length > 0
-      ? [
-          "Attach this metrics-only batch audit and the winning canary packet for maintainer review.",
-          "Keep fleet rollout blocked until the maintainer explicitly promotes the one-agent canary.",
-        ]
-      : [
-          ...(failedInputs.length && !allowFailedInputs
-            ? ["Rerun with --allow-failed-inputs if this is a mixed returned-diagnostics folder and at least one parsed bundle is enough for triage."]
-            : []),
-          "Do not promote any audited diagnostic to production canary evidence.",
-          "Pick the best candidate by failed-check count and collect a fresh post-update runtime window.",
-          "Run canary:diagnose on each failing report and attach only metrics-only output.",
-        ],
-  };
+    output = {
+      ok,
+      mode: "canary-diagnostic-batch-audit",
+      writesRealFiles: false,
+      metricsOnly: true,
+      requireRealPass,
+      allowFailedInputs,
+      publicLaunchAllowed: false,
+      fleetRolloutAllowed: false,
+      inputCount: inputs.length,
+      parsedInputCount: parsedResults.length,
+      failedInputCount: failedInputs.length,
+      strictRealPassCount: strictRealPasses.length,
+      countsAsRealRolloutEvidence: strictRealPasses.length > 0,
+      bestCandidate: bestCandidate ? summarizeCandidate(bestCandidate) : null,
+      results: parsedResults.map(summarizeCandidate),
+      failedInputs: failedInputs.map((item) => ({
+        label: item.label,
+        inputKind: item.inputKind,
+        status: item.status,
+        failedStage: item.failedStage,
+      })),
+      nextActions: strictRealPasses.length > 0
+        ? [
+            "Attach this metrics-only batch audit and the winning canary packet for maintainer review.",
+            "Keep fleet rollout blocked until the maintainer explicitly promotes the one-agent canary.",
+          ]
+        : [
+            ...(failedInputs.length && !allowFailedInputs
+              ? ["Rerun with --allow-failed-inputs if this is a mixed returned-diagnostics folder and at least one parsed bundle is enough for triage."]
+              : []),
+            "Do not promote any audited diagnostic to production canary evidence.",
+            "Pick the best candidate by failed-check count and collect a fresh post-update runtime window.",
+            "Run canary:diagnose on each failing report and attach only metrics-only output.",
+          ],
+    };
+  }
 
   const serialized = `${JSON.stringify(output, null, 2)}\n`;
   assertSafeText(serialized, "batch audit output");

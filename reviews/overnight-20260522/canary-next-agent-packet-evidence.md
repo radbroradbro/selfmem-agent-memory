@@ -122,6 +122,40 @@ This is the current packet to hand to the selected OpenClaw operator.
 - Batch failed inputs: 1.
 - Strict-real pass count: 0.
 
+## Fail-Closed Empty or Handoff-Only Folders
+
+The controller then tested the operator mistake case that caused confusion in
+practice: a mixed folder with handoff packets, old diagnostic archives, or no
+parseable current canary candidate. The packet path now fails closed with
+structured metrics-only JSON rather than an assertion stack trace or stale zip.
+
+Commands:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <mixed-agent-zip-folder> --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <mixed-agent-zip-folder> --allow-failed-inputs --output /tmp/recallweave-next-agent-handoff-current.zip
+```
+
+Results:
+
+- Returned inbox status: `HANDOFF_PACKETS_ONLY`.
+- Returned evidence packets: 0.
+- Production evidence packets: 0.
+- Handoff packets: 6.
+- Diagnostic bundles: 4.
+- `canary:next-agent-packet` status: `NO_CANDIDATE`.
+- Packet created: false.
+- Requested output path is removed on blocked packet creation, preventing stale
+  handoff zips from being mistaken for current evidence.
+- Public launch allowed: false.
+- Fleet rollout allowed: false.
+- Blocker preserved: true.
+- Stack trace: none in the patched path.
+
+The lower-level `canary:batch-audit` path now also emits a metrics-only empty
+folder report with `inputCount: 0`, `parsedInputCount: 0`, and
+`countsAsRealRolloutEvidence: false` instead of throwing.
+
 ## Interpretation
 
 This packet does not close the real-container rollout blocker by itself. It
@@ -144,9 +178,11 @@ rollout blocker can close.
   mixed diagnostic folders can be triaged directly without hiding failed inputs.
 - `--require-ready` fails closed for fixture/demo evidence and passes only when
   the planner reports `READY_FOR_ONE_AGENT_FRESH_CANARY`.
+- Empty or handoff-only folders fail closed as structured JSON and remove the
+  requested output zip path.
 - The manifest includes a fresh-window contract and return checklist.
 - The release gate now checks the script, packet entries, README, manifest,
   planner output, operator packet, `--require-ready` fail-closed behavior,
-  evidence text, and reviewer verdict.
+  empty-folder fail-closed behavior, evidence text, and reviewer verdict.
 - The clean-consumer smoke now verifies the packet builder exists, runs, and is
   included in the public package dry run.

@@ -40,6 +40,10 @@ Live status:
   map through CLI flags or environment variables, while only public-safe
   source-match, source-alignment, and source-gap reports may be attached.
 - Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
+- Hardens the canary batch-audit and next-agent packet paths so empty,
+  handoff-only, or no-candidate folders fail closed as metrics-only JSON,
+  remove requested output zip paths on blocked packet creation, avoid stack
+  traces, and preserve public/fleet launch blockers.
 - Adds current OpenClaw hosted/local source-alignment evidence. The selected local container map and hosted candidate label hash aligned, but the local source had 0 of 3 source-matched queries and 0 of 3 collectable queries, so the full hosted/local benchmark remains blocked until content alignment passes.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Adds fresh canary window isolation so strict-real reports can ignore pre-patch trace history, stale errors, and old missing-latency events after a patched adapter is applied.

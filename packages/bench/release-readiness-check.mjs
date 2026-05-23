@@ -2049,6 +2049,10 @@ check("fresh canary next-agent handoff packet passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-next-agent-packet-check-"));
   const packetPath = join(tempRoot, "next-agent-handoff.zip");
   const allowFailedPacketPath = join(tempRoot, "next-agent-handoff-allow-failed.zip");
+  const noCandidateRoot = join(tempRoot, "empty-diagnostics");
+  const noCandidatePacketPath = join(tempRoot, "no-candidate.zip");
+  const requireReadyPacketPath = join(tempRoot, "fixture-should-not-pass.zip");
+  mkdirSync(noCandidateRoot, { recursive: true });
   const packetRun = run("node", ["packages/bench/canary-next-agent-packet.mjs", "--output", packetPath]);
   const allowFailedPacketRun = run("node", [
     "packages/bench/canary-next-agent-packet.mjs",
@@ -2060,7 +2064,23 @@ check("fresh canary next-agent handoff packet passes", () => {
   ]);
   const requireReadyFixtureRun = spawnSync(
     "node",
-    ["packages/bench/canary-next-agent-packet.mjs", "--require-ready", "--output", join(tempRoot, "fixture-should-not-pass.zip")],
+    ["packages/bench/canary-next-agent-packet.mjs", "--require-ready", "--output", requireReadyPacketPath],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  const noCandidateRun = spawnSync(
+    "node",
+    [
+      "packages/bench/canary-next-agent-packet.mjs",
+      "--input-root",
+      noCandidateRoot,
+      "--allow-failed-inputs",
+      "--output",
+      noCandidatePacketPath,
+    ],
     {
       cwd: root,
       encoding: "utf8",
@@ -2070,6 +2090,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   const report = JSON.parse(packetRun.stdout);
   const allowFailedReport = JSON.parse(allowFailedPacketRun.stdout);
   const requireReadyFixtureReport = JSON.parse(requireReadyFixtureRun.stdout);
+  const noCandidateReport = JSON.parse(noCandidateRun.stdout);
   const entries = run("unzip", ["-Z1", packetPath]).stdout.split(/\r?\n/).filter(Boolean).sort();
   const manifest = JSON.parse(run("unzip", ["-p", packetPath, "manifest.json"]).stdout);
   const allowFailedManifest = JSON.parse(run("unzip", ["-p", allowFailedPacketPath, "manifest.json"]).stdout);
@@ -2100,6 +2121,18 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(requireReadyFixtureReport.requireReadyPassed, false);
   assert.equal(requireReadyFixtureReport.readyForLiveHandoff, false);
   assert.match(requireReadyFixtureReport.reason, /--require-ready needs READY_FOR_ONE_AGENT_FRESH_CANARY/);
+  assert.equal(existsSync(requireReadyPacketPath), false);
+  assert.notEqual(noCandidateRun.status, 0);
+  assert.equal(noCandidateReport.ok, false);
+  assert.equal(noCandidateReport.mode, "canary-next-agent-handoff-packet");
+  assert.equal(noCandidateReport.packetCreated, false);
+  assert.equal(noCandidateReport.writesRealFiles, false);
+  assert.equal(noCandidateReport.publicLaunchAllowed, false);
+  assert.equal(noCandidateReport.fleetRolloutAllowed, false);
+  assert.equal(noCandidateReport.blockerPreserved, true);
+  assert.match(noCandidateReport.reason, /No parsed canary candidate/);
+  assert.equal(existsSync(noCandidatePacketPath), false);
+  assert.doesNotMatch(`${noCandidateRun.stdout}\n${noCandidateRun.stderr}`, /AssertionError|triggerUncaughtException|node:internal/);
   assert.deepEqual(entries, [
     "README.md",
     "manifest.json",
@@ -2143,7 +2176,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(evidence, /single public-safe zip/i);
   assert.match(evidence, /--allow-failed-inputs/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
-  for (const text of [packetRun.stdout, allowFailedPacketRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, readme, markdown, operator, drill, evidence]) {
+  for (const text of [packetRun.stdout, allowFailedPacketRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, noCandidateRun.stdout, noCandidateRun.stderr, readme, markdown, operator, drill, evidence]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   }

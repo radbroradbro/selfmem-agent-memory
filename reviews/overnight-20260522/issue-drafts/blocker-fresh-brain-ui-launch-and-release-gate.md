@@ -36,6 +36,10 @@ requirements are resolved.
   reports into the hosted baseline operator packet, so agents can hand off
   exact hashed repair targets without raw query text, expected refs, memory
   text, private paths, or keys.
+- Current canary follow-up hardens empty, handoff-only, and no-candidate
+  folders: batch audit and next-agent packet commands fail closed as
+  metrics-only JSON, remove requested output zip paths on blocked packet
+  creation, avoid stack traces, and preserve public/fleet launch blockers.
 - Previous checked-in evidence refresh before source-gap:
   `3f2eed0c6245f3827f423225478c95a71db67725`.
 - Previous verified source-gate code baseline:

@@ -77,3 +77,38 @@ Additional findings:
 - Docs match the implemented command shape.
 
 Required fixes: none.
+
+## Empty or Handoff-Only Folder Fail-Closed Refresh
+
+Gemini reran a focused cold review on the follow-up patch that makes empty or
+handoff-only diagnostic folders fail closed as structured metrics-only JSON.
+
+Verdict: BLOCKED
+
+Finding:
+
+- The no-candidate path removed stale output zips, but the separate
+  `--require-ready` failure path did not. A stale zip from a previous successful
+  run could remain at the requested output path.
+
+Resolution:
+
+- Patched `canary-next-agent-packet` so `--require-ready` failures also remove
+  the requested output path before printing the metrics-only failure JSON.
+- Added release-gate assertions that both no-candidate failures and
+  `--require-ready` failures leave no output zip.
+- Replaced the local mixed-folder path in this evidence packet with a
+  placeholder command so public evidence remains path-safe.
+
+Gemini reran the cold review after the fix.
+
+Verdict: CLEAN
+
+Additional findings:
+
+- Both no-candidate and `--require-ready` failure paths remove the requested
+  output zip before returning.
+- Rejected paths serialize metrics-only JSON and avoid stack traces.
+- Fixture packet behavior still works.
+- Public launch and fleet rollout remain blocked.
+- Generated output still goes through secret and private-path scanning.

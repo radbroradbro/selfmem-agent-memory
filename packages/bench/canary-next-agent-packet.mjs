@@ -23,10 +23,19 @@ const allowedEntries = new Set([
   "strict-real-canary-drill.md",
 ]);
 
-const planJson = JSON.parse(runNode("packages/bench/canary-next-agent-plan.mjs", [...plannerArgs(), "--format", "json"]).stdout);
-const planMarkdown = runNode("packages/bench/canary-next-agent-plan.mjs", [...plannerArgs(), "--format", "markdown"]).stdout;
+const planJsonRun = runNode("packages/bench/canary-next-agent-plan.mjs", [...plannerArgs(), "--format", "json"], { allowFailure: true });
+const planJson = parseJsonStdout(planJsonRun, "next-agent plan JSON");
+const planMarkdownRun = runNode("packages/bench/canary-next-agent-plan.mjs", [...plannerArgs(), "--format", "markdown"], { allowFailure: true });
+const planMarkdown = planMarkdownRun.stdout || `${planJson.operatorMessage ?? ""}\n`;
 const host = normalizeHost(args.host || planJson.decision?.host || planJson.selectedCandidate?.target?.host);
-assert.notEqual(host, "unknown", "cannot build handoff packet for unknown host");
+const blockedPlan = cannotBuildPacketFailure(planJson, host);
+if (blockedPlan) {
+  rmSync(outputPath, { force: true });
+  const serialized = `${JSON.stringify(blockedPlan, null, 2)}\n`;
+  assertSafeText(serialized, "blocked packet output");
+  process.stdout.write(serialized);
+  process.exit(1);
+}
 const operatorMarkdown = runNode("packages/bench/canary-operator-packet.mjs", ["--host", host, "--format", "markdown"]).stdout;
 const drillMarkdown = runNode("packages/bench/canary-drill.mjs", ["--host", host, "--format", "markdown"]).stdout;
 
@@ -144,6 +153,7 @@ assertSafeText(manifestRaw, "manifest");
 assertSafeText(readmeRaw, "README");
 const readyFailure = requireReadyFailure(manifest);
 if (readyFailure) {
+  rmSync(outputPath, { force: true });
   const serialized = `${JSON.stringify(readyFailure, null, 2)}\n`;
   assertSafeText(serialized, "require-ready failure output");
   process.stdout.write(serialized);
@@ -268,6 +278,60 @@ function requireReadyFailure(packetManifest) {
   };
 }
 
+function cannotBuildPacketFailure(plan, normalizedHost) {
+  const hasCandidate = Boolean(plan.selectedCandidate);
+  const hasHost = normalizedHost !== "unknown";
+  const operatorPacketAvailable = Boolean(plan.operatorPacketAvailable);
+  if (hasCandidate && hasHost && operatorPacketAvailable) return null;
+  return {
+    ok: false,
+    mode: "canary-next-agent-handoff-packet",
+    writesRealFiles: false,
+    publicSafe: true,
+    metricsOnly: true,
+    publicLaunchAllowed: false,
+    fleetRolloutAllowed: false,
+    oneAgentCanaryAllowed: false,
+    readyForLiveHandoff: false,
+    requireReadyPassed: false,
+    blockerPreserved: true,
+    packetCreated: false,
+    host: normalizedHost,
+    status: plan.decision?.status ?? "NO_CANDIDATE",
+    recommendedScope: plan.decision?.recommendedScope ?? "blocked-before-agent-update",
+    reason: !hasCandidate
+      ? "No parsed canary candidate exists in the batch audit, so no handoff packet was created."
+      : !hasHost
+        ? "The candidate host is unknown, so no handoff packet was created."
+        : "The next-agent planner did not make an operator packet available, so no handoff packet was created.",
+    batch: {
+      sha256: plan.batch?.sha256 ?? null,
+      allowFailedInputs: Boolean(plan.batch?.allowFailedInputs),
+      inputCount: numberValue(plan.batch?.inputCount),
+      parsedInputCount: numberValue(plan.batch?.parsedInputCount),
+      failedInputCount: numberValue(plan.batch?.failedInputCount),
+      strictRealPassCount: numberValue(plan.batch?.strictRealPassCount),
+    },
+    blockReasons: Array.isArray(plan.decision?.blockReasons) ? plan.decision.blockReasons : [],
+    nextActions: [
+      "Do not install or promote an adapter from this packet command.",
+      "Run canary:batch-audit on a redacted diagnostics folder that contains parseable canary reports.",
+      "If the folder contains only handoff packets, send one handoff to a selected agent and wait for a returned evidence packet.",
+      "If the host is known but not detected, rerun with --host hermes or --host openclaw after confirming the runtime.",
+    ],
+    forbidden: [
+      "raw memories",
+      "raw transcripts",
+      "raw prompts",
+      "raw answers",
+      "provider keys",
+      "cookies",
+      "private local paths",
+      "unredacted diagnostic archives",
+    ],
+  };
+}
+
 function plannerArgs() {
   const result = [];
   if (args.batch) result.push("--batch", args.batch);
@@ -280,16 +344,22 @@ function plannerArgs() {
   return result;
 }
 
-function runNode(script, scriptArgs) {
+function runNode(script, scriptArgs, options = {}) {
   const result = spawnSync("node", [script, ...scriptArgs], {
     cwd: root,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   });
   assert.ok(result.stdout, `${script} produced no stdout`);
-  assert.equal(result.status, 0, `${script} failed: ${result.stderr || result.stdout}`);
+  if (!options.allowFailure) assert.equal(result.status, 0, `${script} failed: ${result.stderr || result.stdout}`);
   assertSafeText(result.stdout, `${script} stdout`);
   return result;
+}
+
+function parseJsonStdout(result, label) {
+  assert.ok(result.stdout, `${label} missing`);
+  assertSafeText(result.stdout, label);
+  return JSON.parse(result.stdout);
 }
 
 function assertSafeZip(zipPath) {
