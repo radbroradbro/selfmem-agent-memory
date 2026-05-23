@@ -66,6 +66,11 @@ const requiredFiles = {
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
   canaryDiagnosticBatchAudit: "canary-diagnostic-batch-audit-evidence.md",
   canaryNextAgentPlan: "canary-next-agent-plan-evidence.md",
+  realDiagnosticsPostwatchEvidence: "real-diagnostics-postwatch-evidence.md",
+  realDiagnosticsPostwatchReturnedWatch: "real-diagnostics-postwatch-returned-watch.json",
+  realDiagnosticsPostwatchBatchAudit: "real-diagnostics-postwatch-batch-audit.json",
+  realDiagnosticsPostwatchNextAgentPlan: "real-diagnostics-postwatch-next-agent-plan.json",
+  realDiagnosticsPostwatchNextAgentPlanMarkdown: "real-diagnostics-postwatch-next-agent-plan.md",
   releaseHandoff: "../../docs/RELEASE_HANDOFF.md",
 };
 
@@ -130,6 +135,10 @@ const budgetedBaselineReviewedNextRun = JSON.parse(readFileSync(join(root, revie
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
+const realDiagnosticsPostwatchEvidenceText = readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-evidence.md"), "utf8");
+const realDiagnosticsPostwatchReturnedWatch = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-returned-watch.json"), "utf8"));
+const realDiagnosticsPostwatchBatchAudit = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-batch-audit.json"), "utf8"));
+const realDiagnosticsPostwatchNextAgentPlan = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-next-agent-plan.json"), "utf8"));
 
 assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
@@ -251,6 +260,22 @@ assert.equal(budgetedBaselineReviewedNextRun.publicLaunchAllowed, false);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
+assert.match(realDiagnosticsPostwatchEvidenceText, /READY_FOR_ONE_AGENT_FRESH_CANARY/i);
+assert.equal(realDiagnosticsPostwatchReturnedWatch.mode, "canary-returned-watch");
+assert.equal(realDiagnosticsPostwatchReturnedWatch.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+assert.equal(realDiagnosticsPostwatchReturnedWatch.counts?.productionEvidencePackets, 0);
+assert.equal(realDiagnosticsPostwatchBatchAudit.mode, "canary-diagnostic-batch-audit");
+assert.equal(realDiagnosticsPostwatchBatchAudit.metricsOnly, true);
+assert.equal(realDiagnosticsPostwatchBatchAudit.allowFailedInputs, true);
+assert.equal(realDiagnosticsPostwatchBatchAudit.strictRealPassCount, 0);
+assert.equal(realDiagnosticsPostwatchBatchAudit.countsAsRealRolloutEvidence, false);
+assert.equal(realDiagnosticsPostwatchBatchAudit.bestCandidate?.target?.host, "openclaw");
+assert.equal(realDiagnosticsPostwatchBatchAudit.bestCandidate?.privacy?.privacyLeakCount, 0);
+assert.equal(realDiagnosticsPostwatchNextAgentPlan.mode, "canary-next-agent-plan");
+assert.equal(realDiagnosticsPostwatchNextAgentPlan.oneAgentCanaryAllowed, true);
+assert.equal(realDiagnosticsPostwatchNextAgentPlan.decision?.status, "READY_FOR_ONE_AGENT_FRESH_CANARY");
+assert.equal(realDiagnosticsPostwatchNextAgentPlan.publicLaunchAllowed, false);
+assert.equal(realDiagnosticsPostwatchNextAgentPlan.fleetRolloutAllowed, false);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
 const branch = run("git", ["branch", "--show-current"]).stdout.trim();
@@ -321,6 +346,10 @@ const reviewerReport = [
   },
 ];
 
+const realCanaryNextAction = realDiagnosticsPostwatchNextAgentPlan.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"
+  ? "Send the generated postwatch OpenClaw next-agent handoff packet to exactly one selected agent, apply the current adapter, follow the strict-real drill for a fresh 15-minute runtime window, then verify the returned metrics-only packet with `canary:returned-inbox -- --require-production-canary` or `canary:returned-packet -- --require-production-canary`."
+  : "Run `canary:batch-audit` on redacted returned diagnostics, use `canary:next-agent` and `canary:next-agent-packet -- --allow-failed-inputs --require-ready` to pick one privacy-clean Hermes/OpenClaw target from a mixed folder, apply the current adapter, follow `canary:drill` during the fresh window, then collect a fresh strict-real canary window and verify the returned metrics-only packet with `canary:returned-inbox -- --require-production-canary` or `canary:returned-packet -- --require-production-canary`.";
+
 const blockerReport = [
   {
     id: "human-public-launch-approval-required",
@@ -331,8 +360,8 @@ const blockerReport = [
   {
     id: "fresh-real-container-canary-not-current",
     status: "incomplete",
-    evidence: "real-canary-diagnostic-evidence.md",
-    nextAction: "Run `canary:batch-audit` on redacted returned diagnostics, use `canary:next-agent` and `canary:next-agent-packet -- --allow-failed-inputs --require-ready` to pick one privacy-clean Hermes/OpenClaw target from a mixed folder, apply the current adapter, follow `canary:drill` during the fresh window, then collect a fresh strict-real canary window and verify the returned metrics-only packet with `canary:returned-inbox -- --require-production-canary` or `canary:returned-packet -- --require-production-canary`.",
+    evidence: "real-diagnostics-postwatch-evidence.md",
+    nextAction: realCanaryNextAction,
   },
 ];
 
@@ -485,6 +514,18 @@ console.log(
           publicLaunchAllowed: canaryNextAgentPlan.publicLaunchAllowed,
           fleetRolloutAllowed: canaryNextAgentPlan.fleetRolloutAllowed,
           status: canaryNextAgentPlan.decision?.status,
+        },
+        realDiagnosticsPostwatch: {
+          returnedWatchStatus: realDiagnosticsPostwatchReturnedWatch.status,
+          productionEvidencePackets: realDiagnosticsPostwatchReturnedWatch.counts?.productionEvidencePackets,
+          diagnosticInputCount: realDiagnosticsPostwatchBatchAudit.inputCount,
+          parsedInputCount: realDiagnosticsPostwatchBatchAudit.parsedInputCount,
+          strictRealPassCount: realDiagnosticsPostwatchBatchAudit.strictRealPassCount,
+          selectedHost: realDiagnosticsPostwatchBatchAudit.bestCandidate?.target?.host,
+          selectedFailedChecks: realDiagnosticsPostwatchBatchAudit.bestCandidate?.failedChecks,
+          oneAgentCanaryAllowed: realDiagnosticsPostwatchNextAgentPlan.oneAgentCanaryAllowed,
+          status: realDiagnosticsPostwatchNextAgentPlan.decision?.status,
+          publicLaunchAllowed: realDiagnosticsPostwatchNextAgentPlan.publicLaunchAllowed,
         },
         githubLiveSync: {
           ok: githubLiveSync.ok,

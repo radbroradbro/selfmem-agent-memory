@@ -2330,8 +2330,23 @@ check("fresh release blocker doctor passes", () => {
   assert.ok(report.manualCommands.some((item) => /baseline:source-gap/.test(item) && /--output/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /--reviewed-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
-  assert.match(canaryBlocker.nextAction, /canary:next-agent-packet -- --allow-failed-inputs --require-ready/);
-  assert.match(canaryBlocker.nextAction, /canary:drill/);
+  assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent handoff packet/);
+  assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
+  assert.match(canaryBlocker.nextAction, /canary:returned-(?:inbox|packet).*--require-production-canary/);
+  assert.equal(report.checks.realDiagnosticsPostwatch.returnedWatchStatus, "AWAITING_RETURNED_PRODUCTION_CANARY");
+  assert.equal(report.checks.realDiagnosticsPostwatch.productionEvidencePackets, 0);
+  assert.equal(report.checks.realDiagnosticsPostwatch.diagnosticInputCount, 9);
+  assert.equal(report.checks.realDiagnosticsPostwatch.parsedInputCount, 8);
+  assert.equal(report.checks.realDiagnosticsPostwatch.strictRealPassCount, 0);
+  assert.equal(report.checks.realDiagnosticsPostwatch.selectedHost, "openclaw");
+  assert.deepEqual(report.checks.realDiagnosticsPostwatch.selectedFailedChecks, [
+    "adapter-contract",
+    "store-latency-instrumented",
+    "store-p95",
+  ]);
+  assert.equal(report.checks.realDiagnosticsPostwatch.oneAgentCanaryAllowed, true);
+  assert.equal(report.checks.realDiagnosticsPostwatch.status, "READY_FOR_ONE_AGENT_FRESH_CANARY");
+  assert.equal(report.checks.realDiagnosticsPostwatch.publicLaunchAllowed, false);
   assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--allow-failed-inputs/.test(item) && /--require-ready/.test(item)));
   assert.ok(report.manualCommands.some((item) => /canary:drill/.test(item) && /--format markdown/.test(item)));
 });
