@@ -17,10 +17,10 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T07:52:38Z
-  - Body length: 17793
-  - Latest local refresh adds the public-safe `baseline:queryset` inspector:
-    `2ac02fcbb9d321dc338e59d856abbcc3cfb6cd0a`, CI run `26327367386`.
+  - Updated at: 2026-05-23T08:03:13Z
+  - Body length: 18133
+  - Latest local refresh adds public-safe live hosted discovery evidence for
+    hashed candidates only. It does not close the hosted-baseline blocker.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

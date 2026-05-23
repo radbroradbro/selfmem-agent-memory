@@ -1,0 +1,122 @@
+{
+  "ok": true,
+  "mode": "hosted-baseline-discovery",
+  "schemaVersion": 1,
+  "fixtureOnly": false,
+  "evidenceType": "live-hosted-baseline-discovery",
+  "writesRealFiles": true,
+  "callsHostedProvider": true,
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawLabelsIncluded": false,
+  "rawTitlesIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawAnswerIncluded": false,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "runAt": "2026-05-23T07:56:19.060Z",
+  "discoveryConfig": {
+    "endpoint": "https://api.supermemory.ai/v3/documents/list",
+    "includeContent": false,
+    "limit": 50,
+    "maxPages": 2,
+    "sort": "updatedAt",
+    "order": "desc"
+  },
+  "sourceStats": {
+    "pagesRead": 2,
+    "documentsSeen": 100,
+    "errors": []
+  },
+  "containerCandidateCount": 4,
+  "recommendedCandidateId": "c_6a2feb97651dd64b",
+  "containerCandidates": [
+    {
+      "candidateId": "c_6a2feb97651dd64b",
+      "documentCount": 46,
+      "firstCreatedAt": "2026-05-17T00:34:08.131Z",
+      "lastUpdatedAt": "2026-05-17T00:36:07.314Z",
+      "typeCounts": {
+        "text": 46
+      },
+      "statusCounts": {
+        "done": 46
+      },
+      "sampleDocumentHashes": [
+        "sha256:22d99a8990c3332d",
+        "sha256:2162ea40281ab9a8",
+        "sha256:d521a915866a8341"
+      ]
+    },
+    {
+      "candidateId": "c_bfb68a9e8aa2a4b6",
+      "documentCount": 43,
+      "firstCreatedAt": "2026-05-17T00:35:12.128Z",
+      "lastUpdatedAt": "2026-05-17T00:36:54.865Z",
+      "typeCounts": {
+        "text": 43
+      },
+      "statusCounts": {
+        "done": 43
+      },
+      "sampleDocumentHashes": [
+        "sha256:7ad54b5e09961ce9",
+        "sha256:051725c194bd2ccd",
+        "sha256:c42b7b370f4c9dcb"
+      ]
+    },
+    {
+      "candidateId": "c_4b1f9e153ffcd35e",
+      "documentCount": 10,
+      "firstCreatedAt": "2026-05-17T00:33:48.511Z",
+      "lastUpdatedAt": "2026-05-17T00:34:56.906Z",
+      "typeCounts": {
+        "text": 10
+      },
+      "statusCounts": {
+        "done": 10
+      },
+      "sampleDocumentHashes": [
+        "sha256:2786ca7e6e587883",
+        "sha256:ee9f3a6d1f80cc46",
+        "sha256:8bd929ab819acc75"
+      ]
+    },
+    {
+      "candidateId": "c_e277ec04b7265b52",
+      "documentCount": 1,
+      "firstCreatedAt": "2026-05-18T02:16:38.713Z",
+      "lastUpdatedAt": "2026-05-18T02:16:38.713Z",
+      "typeCounts": {
+        "text": 1
+      },
+      "statusCounts": {
+        "done": 1
+      },
+      "sampleDocumentHashes": [
+        "sha256:d7351845cb8ddeba"
+      ]
+    }
+  ],
+  "privateMap": {
+    "written": false,
+    "containsRawLabels": false,
+    "attachToPublicEvidence": false
+  },
+  "nextActions": [
+    "Use the candidate ids and counts to choose the likely hosted baseline source.",
+    "If raw hosted container labels are needed, rerun with RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1 and --private-map-output pointing outside the repository.",
+    "Copy the selected raw label from the private map into RECALLWEAVE_BASELINE_CONTAINER on that local machine only.",
+    "Run baseline:collect with the same source-locked query set and metrics-only flags."
+  ],
+  "safety": {
+    "printsCredentialValues": false,
+    "printsRawContainerLabels": false,
+    "printsMemoryText": false,
+    "privateMapRequiresExplicitOptIn": true,
+    "privateMapRejectedInsideRepository": true,
+    "liveHostedWriteBack": false
+  }
+}

@@ -117,6 +117,11 @@ container candidates only. To recover the raw label locally, set
 `RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1` and pass `--private-map-output`
 to a path outside the repository. The private map is local operator material,
 not reviewer or GitHub evidence.
+You may attach a public-safe live discovery report when it contains only hashed
+candidate ids, counts, timestamps, status/type counts, and privacy flags. That
+report proves metadata access and candidate discovery only. It does not close
+the hosted-baseline blocker, pick the source container, or support any
+comparison claim.
 Use `baseline:queryset -- --queryset <path> --strict --output
 /tmp/recallweave-hosted-baseline-queryset-report.json` before either side
 collects results. The report is public-safe because it prints hashes and counts

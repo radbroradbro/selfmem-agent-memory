@@ -28,6 +28,9 @@ const requiredFiles = {
   claudeReview: "claude-pr5-review.md",
   hostedBaselinePreflight: "hosted-baseline-preflight-evidence.md",
   hostedBaselinePreflightReview: "gemini-hosted-baseline-preflight-review.md",
+  hostedBaselineLiveDiscovery: "hosted-baseline-live-discovery-evidence.md",
+  hostedBaselineLiveDiscoveryReport: "hosted-baseline-live-discovery.json",
+  hostedBaselineLiveDiscoveryReview: "gemini-hosted-baseline-live-discovery-review.md",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
@@ -64,6 +67,8 @@ const claudeBlockedText = readFileSync(join(root, reviewDir, "claude-pr5-review-
 const claudeReviewText = readFileSync(join(root, reviewDir, "claude-pr5-review.md"), "utf8");
 const prBodyDraftText = readFileSync(join(root, reviewDir, "pr-body-update-draft.md"), "utf8");
 const issueDraftText = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
+const hostedBaselineLiveDiscoveryText = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
+const hostedBaselineLiveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
@@ -76,6 +81,16 @@ assert.match(claudeReviewText, /Verdict:\s*CONCERNS/i);
 assert.match(claudeReviewText, /Can mark native goal complete:\s*no/i);
 assert.match(prBodyDraftText, /clean consumer smoke/i);
 assert.match(issueDraftText, /Acceptance Criteria/);
+assert.match(hostedBaselineLiveDiscoveryText, /does not close the hosted-baseline blocker/i);
+assert.equal(hostedBaselineLiveDiscoveryReport.mode, "hosted-baseline-discovery");
+assert.equal(hostedBaselineLiveDiscoveryReport.fixtureOnly, false);
+assert.equal(hostedBaselineLiveDiscoveryReport.callsHostedProvider, true);
+assert.equal(hostedBaselineLiveDiscoveryReport.publicSafe, true);
+assert.equal(hostedBaselineLiveDiscoveryReport.rawLabelsIncluded, false);
+assert.equal(hostedBaselineLiveDiscoveryReport.rawMemoryIncluded, false);
+assert.equal(hostedBaselineLiveDiscoveryReport.privacyLeakCount, 0);
+assert.ok(Number(hostedBaselineLiveDiscoveryReport.sourceStats?.documentsSeen) > 0);
+assert.ok(Number(hostedBaselineLiveDiscoveryReport.containerCandidateCount) > 0);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
@@ -143,8 +158,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "hosted-baseline-collector-evidence.md",
-    nextAction: "Run `baseline:collect -- --live --output <hosted-result>` for hosted, run `baseline:export:recallweave -- --live --output <metrics-only-export>` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export> --output <recallweave-result>`, validate with `baseline:preflight -- --result <hosted-result> --output <preflight>` and `baseline:compare -- --hosted <hosted-result> --recallweave <recallweave-result> --output <comparison>`, then package and review the returned metrics-only zip with `baseline:packet` and `baseline:returned-packet -- --require-production-baseline`.",
+    evidence: "hosted-baseline-live-discovery-evidence.md",
+    nextAction: "Live hosted discovery succeeded with hashed candidates only. Use the private-map flow outside the repository to choose the raw label, prepare the source-locked query set, run `baseline:collect -- --live --output <hosted-result>` for hosted, run `baseline:export:recallweave -- --live --output <metrics-only-export>` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export> --output <recallweave-result>`, validate with `baseline:preflight -- --result <hosted-result> --output <preflight>` and `baseline:compare -- --hosted <hosted-result> --recallweave <recallweave-result> --output <comparison>`, then package and review the returned metrics-only zip with `baseline:packet` and `baseline:returned-packet -- --require-production-baseline`.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -193,6 +208,13 @@ console.log(
           ok: hostedBaselinePreflight.ok,
           callsHostedProvider: hostedBaselinePreflight.callsHostedProvider,
           benchmarkClaimsAllowed: hostedBaselinePreflight.benchmarkClaimsAllowed,
+        },
+        hostedBaselineLiveDiscovery: {
+          callsHostedProvider: hostedBaselineLiveDiscoveryReport.callsHostedProvider,
+          documentsSeen: hostedBaselineLiveDiscoveryReport.sourceStats?.documentsSeen,
+          containerCandidateCount: hostedBaselineLiveDiscoveryReport.containerCandidateCount,
+          rawLabelsIncluded: hostedBaselineLiveDiscoveryReport.rawLabelsIncluded,
+          rawMemoryIncluded: hostedBaselineLiveDiscoveryReport.rawMemoryIncluded,
         },
         hostedBaselineCollector: {
           provider: hostedBaselineCollector.provider,

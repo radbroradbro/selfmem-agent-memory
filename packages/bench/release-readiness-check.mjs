@@ -186,6 +186,9 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-queryset-inspect-review.md`,
   `${reviewDir}/hosted-baseline-discovery-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-discovery-review.md`,
+  `${reviewDir}/hosted-baseline-live-discovery.json`,
+  `${reviewDir}/hosted-baseline-live-discovery-evidence.md`,
+  `${reviewDir}/gemini-hosted-baseline-live-discovery-review.md`,
   `${reviewDir}/hosted-baseline-collector-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-collector-review.md`,
   `${reviewDir}/recallweave-response-export-evidence.md`,
@@ -2161,6 +2164,9 @@ check("fresh hosted baseline preflight passes", () => {
   const querySetGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-queryset-inspect-review.md"), "utf8");
   const discoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-discovery-evidence.md"), "utf8");
   const discoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-discovery-review.md"), "utf8");
+  const liveDiscoveryReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery.json"), "utf8"));
+  const liveDiscoveryEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-live-discovery-evidence.md"), "utf8");
+  const liveDiscoveryGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-live-discovery-review.md"), "utf8");
   const collectorEvidence = readFileSync(join(root, reviewDir, "hosted-baseline-collector-evidence.md"), "utf8");
   const collectorGeminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-collector-review.md"), "utf8");
   const recallWeaveExportEvidence = readFileSync(join(root, reviewDir, "recallweave-response-export-evidence.md"), "utf8");
@@ -2508,6 +2514,20 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(discoveryEvidence, /Raw labels included.*no/i);
   assert.match(discoveryEvidence, /Private map mode:\s*`0600`/i);
   assert.match(discoveryGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
+  assert.equal(liveDiscoveryReport.mode, "hosted-baseline-discovery");
+  assert.equal(liveDiscoveryReport.fixtureOnly, false);
+  assert.equal(liveDiscoveryReport.callsHostedProvider, true);
+  assert.equal(liveDiscoveryReport.publicSafe, true);
+  assert.equal(liveDiscoveryReport.metricsOnly, true);
+  assert.equal(liveDiscoveryReport.rawLabelsIncluded, false);
+  assert.equal(liveDiscoveryReport.rawMemoryIncluded, false);
+  assert.equal(liveDiscoveryReport.privacyLeakCount, 0);
+  assert.equal(liveDiscoveryReport.redactionFailureCount, 0);
+  assert.ok(Number(liveDiscoveryReport.sourceStats?.documentsSeen) > 0);
+  assert.ok(Number(liveDiscoveryReport.containerCandidateCount) > 0);
+  assert.deepEqual(liveDiscoveryReport.sourceStats?.errors ?? [], []);
+  assert.match(liveDiscoveryEvidence, /does not close the hosted-baseline blocker/i);
+  assert.match(liveDiscoveryGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
   assert.match(collectorEvidence, /hosted baseline collector/i);
   assert.match(collectorGeminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.match(recallWeaveExportEvidence, /RecallWeave response export/i);
@@ -2545,6 +2565,10 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(collectorPreflightResult.stdout, secretPattern);
   assert.doesNotMatch(discoveryEvidence, secretPattern);
   assert.doesNotMatch(discoveryGeminiReview, secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveDiscoveryReport), /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  assert.doesNotMatch(liveDiscoveryEvidence, secretPattern);
+  assert.doesNotMatch(liveDiscoveryGeminiReview, secretPattern);
   assert.doesNotMatch(collectorEvidence, secretPattern);
   assert.doesNotMatch(collectorGeminiReview, secretPattern);
   assert.doesNotMatch(recallWeaveExportEvidence, secretPattern);

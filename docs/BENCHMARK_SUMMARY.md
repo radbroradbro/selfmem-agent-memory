@@ -32,6 +32,11 @@ who need the raw label can opt into a local-only private map with
 copy the selected label into `RECALLWEAVE_BASELINE_CONTAINER` on that machine.
 Do not attach the private map to public evidence.
 
+The latest live discovery on 2026-05-23 found 4 hashed candidate containers
+across 100 hosted documents, with no raw labels or memory text in the report.
+This proves safe hosted metadata access only. It is not a hosted baseline or a
+comparison result.
+
 `baseline:queryset` inspects the source-locked query set before either side
 collects results. It emits hashes and counts only, marks whether every query is
 labeled, and fails under `--strict` if any query lacks an expected result id or

@@ -51,6 +51,11 @@ ids, aggregate scores, cost, latency, and hashes. It must not include raw
 memories, raw transcripts, private prompts, private answers, credentials,
 cookies, or bearer tokens.
 
+Before collection, `baseline:discover -- --live` may be used as a safe metadata
+step when the source container is unknown. A public discovery report may show
+hashed candidate ids and counts only. It does not count as a hosted baseline
+and does not support benchmark language.
+
 The fixture path proves that the result shape is parseable. It must never count
 as hosted baseline evidence, even if all metrics fields are present. Use
 `--print-template` before live collection so the agent writes only aggregate
