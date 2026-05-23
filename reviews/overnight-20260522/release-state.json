@@ -86,6 +86,7 @@
     "hosted-baseline-operator-packet",
     "hosted-baseline-next-run",
     "baseline-evidence-packet",
+    "baseline-returned-packet-intake",
     "claude-opus-pr5-review",
     "github-handoff-packet",
     "github-live-sync-check",

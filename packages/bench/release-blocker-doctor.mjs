@@ -144,7 +144,7 @@ const blockerReport = [
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
     evidence: "hosted-baseline-collector-evidence.md",
-    nextAction: "Run `baseline:collect -- --live --output <hosted-result>` for hosted, run `baseline:export:recallweave -- --live --output <metrics-only-export>` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export> --output <recallweave-result>`, then validate with `baseline:preflight -- --result <hosted-result> --output <preflight>` and `baseline:compare -- --hosted <hosted-result> --recallweave <recallweave-result> --output <comparison>`.",
+    nextAction: "Run `baseline:collect -- --live --output <hosted-result>` for hosted, run `baseline:export:recallweave -- --live --output <metrics-only-export>` for local response export, run `baseline:collect:recallweave -- --live --responses <metrics-only-export> --output <recallweave-result>`, validate with `baseline:preflight -- --result <hosted-result> --output <preflight>` and `baseline:compare -- --hosted <hosted-result> --recallweave <recallweave-result> --output <comparison>`, then package and review the returned metrics-only zip with `baseline:packet` and `baseline:returned-packet -- --require-production-baseline`.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -248,6 +248,8 @@ console.log(
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --live --responses /tmp/recallweave-search-responses.json --output /tmp/recallweave-result.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result /tmp/recallweave-hosted-baseline-result.json --output /tmp/recallweave-hosted-baseline-preflight.json",
         "RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed> npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --output /tmp/recallweave-baseline-comparison.json",
+        "npm exec --yes pnpm@10.23.0 -- baseline:packet -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --comparison /tmp/recallweave-baseline-comparison.json --preflight /tmp/recallweave-hosted-baseline-preflight.json --strict-real --output /tmp/recallweave-baseline-evidence-packet.zip",
+        "npm exec --yes pnpm@10.23.0 -- baseline:returned-packet -- --packet /tmp/recallweave-baseline-evidence-packet.zip --require-production-baseline --output /tmp/recallweave-returned-baseline-intake.json",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },

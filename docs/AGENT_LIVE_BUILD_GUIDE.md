@@ -47,6 +47,8 @@ Share:
 - metrics-only `canary:diagnose` output when strict canary intake fails.
 - metrics-only `baseline:packet` output when sending hosted-baseline comparison
   evidence.
+- metrics-only `baseline:returned-packet` output when checking a returned
+  hosted-baseline packet.
 
 Do not share:
 

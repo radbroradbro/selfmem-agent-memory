@@ -42,6 +42,8 @@ const files = {
   hostedBaselinePreflightReview: `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   hostedBaselineNextRunEvidence: `${reviewDir}/hosted-baseline-next-run-evidence.md`,
   hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
+  baselineReturnedPacketIntakeEvidence: `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
+  baselineReturnedPacketIntakeReview: `${reviewDir}/gemini-baseline-returned-packet-intake-review.md`,
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
   browserEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
   releaseReadinessEvidence: `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
@@ -154,6 +156,11 @@ const requirements = [
     "packages/bench/hosted-baseline-next-run.mjs",
     files.hostedBaselineNextRunEvidence,
     files.hostedBaselineNextRunReview,
+  ]),
+  proven("baseline-returned-packet-intake", "Returned hosted-baseline evidence packets have a maintainer-facing strict-real intake gate", [
+    "packages/bench/baseline-returned-packet-intake.mjs",
+    files.baselineReturnedPacketIntakeEvidence,
+    files.baselineReturnedPacketIntakeReview,
   ]),
   proven("canary-evidence-intake", "One-agent runtime canary reports have a metrics-only, sanitized intake gate that does not count fixtures as real rollout evidence", [
     "packages/bench/canary-evidence-intake.mjs",

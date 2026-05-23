@@ -92,6 +92,8 @@ npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
 npm exec --yes pnpm@10.23.0 -- baseline:packet
+npm exec --yes pnpm@10.23.0 -- baseline:packet:review
+npm exec --yes pnpm@10.23.0 -- baseline:returned-packet
 ```
 
 The preflight is offline by default. It should report `callsHostedProvider:
@@ -129,6 +131,13 @@ authorizes public comparison claims by itself.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.
+Use `baseline:packet:review` to inspect a received hosted-baseline packet
+without unpacking raw evidence by hand. Use `baseline:returned-packet -- --packet
+<returned-baseline-evidence-packet.zip> --require-production-baseline --output
+/tmp/recallweave-returned-baseline-intake.json` when an agent returns a packet.
+That command fails closed unless the packet is non-fixture, metrics-only,
+privacy-clean, and contains hosted, RecallWeave, comparison, and preflight
+evidence. Public benchmark language still requires reviewer and owner approval.
 
 ## Goal Completion Audit
 

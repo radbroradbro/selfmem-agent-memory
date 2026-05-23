@@ -100,6 +100,7 @@ evidence are still required before any public live update.
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md` |
 | Hosted baseline next-run planner | `packages/bench/hosted-baseline-next-run.mjs`, `baseline:next-run`, `reviews/overnight-20260522/hosted-baseline-next-run-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-next-run-review.md` |
 | Baseline evidence packet | `packages/bench/baseline-evidence-packet.mjs`, `baseline:packet`, `reviews/overnight-20260522/baseline-evidence-packet-evidence.md`, `reviews/overnight-20260522/gemini-baseline-evidence-packet-review.md` |
+| Baseline returned packet intake | `packages/bench/baseline-returned-packet-intake.mjs`, `baseline:returned-packet`, `reviews/overnight-20260522/baseline-returned-packet-intake-evidence.md`, `reviews/overnight-20260522/gemini-baseline-returned-packet-intake-review.md` |
 | Baseline/canary output path safety | `packages/bench/hosted-baseline-preflight.mjs`, `packages/bench/baseline-comparison.mjs`, `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/baseline-output-path-evidence.md`, `reviews/overnight-20260522/gemini-baseline-output-path-review.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Strict-real fail-closed intake output | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-strict-real-fail-closed-intake-review.md` |
@@ -345,7 +346,7 @@ Latest local verification before this summary:
   `26308588261` passed on `8efe4d0`.
 - Goal completion audit verification: local `goal:audit` now maps the full
   active objective to current evidence. It reports `goalComplete: false`,
-  `mayCallUpdateGoalComplete: false`, 23 proven requirements, 2 blocked
+  `mayCallUpdateGoalComplete: false`, 24 proven requirements, 2 blocked
   requirements, and 1 incomplete requirement, preserving the human approval,
   hosted-baseline, and real-rollout blockers. GitHub Actions CI
   run `26308994908` passed on `13efb18`.
