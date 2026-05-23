@@ -32,7 +32,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `8d49cf35af0aeeb34b37e913041c723035ff8cca`.
+- Latest code/product baseline: `a5d300ad1986e166d214e5c4dae537ad7f2f1bcb`.
+- GitHub Actions run `26326805194`: passed CI after wiring the local-session
+  batch compaction audit into the formal goal audit and release-readiness gate.
+- Previous verified code baseline before the goal-audit batch compaction
+  extension: `8d49cf35af0aeeb34b37e913041c723035ff8cca`.
 - GitHub Actions run `26326589900`: passed CI after the local-session batch
   compaction audit gate.
 - Previous verified code baseline before the local-session batch compaction
