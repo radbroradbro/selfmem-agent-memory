@@ -24,8 +24,8 @@ Verdict: resolved for PR body and blocker issue writes.
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
     evidence refresh, 200 on real-canary diagnostic evidence refresh, 200 on
     strict-real source-guard refresh, canary operator packet refresh,
-    latest-baseline refresh, adapter store-latency gate refresh, hosted
-    baseline collector refresh, baseline comparison refresh, latest
+    latest-baseline refresh, hosted baseline discovery refresh, adapter
+    store-latency gate refresh, hosted baseline collector refresh, baseline comparison refresh, latest
     verified-baseline refresh, RecallWeave baseline collector refresh,
     RecallWeave response export refresh, adapter strict canary contract
     refresh, strict adapter CI baseline refresh, canary evidence packet
