@@ -17,10 +17,10 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T12:50:23Z
-  - Latest local refresh records `667ed57052eab4bf05f2bbed738f4b4b9c8155a4`
-    and CI run `26332952176` as the latest verified code/product baseline for
-    the baseline source-match preflight follow-up. It does not close the
+  - Updated at: 2026-05-23T13:21:12Z
+  - Latest local refresh records `3c9ef0806e5a454783140e1ac821b40edd5776cf`
+    and CI run `26333740615` as the latest verified code/product baseline for
+    the returned canary inbox scanner follow-up. It does not close the
     human-approval, source-matched hosted-baseline, or real-canary blockers.
   - The PR body was refreshed again after live hosted prep evidence added
     duplicate-query fail-closed behavior and an 8-query public-safe prep
@@ -35,6 +35,8 @@ Verdict: resolved for PR body and blocker issue writes.
     can collect the reviewed expected references.
   - The PR body was refreshed again after regenerating the current OpenClaw
     next-agent canary handoff packet identity.
+  - The PR body was refreshed again after adding `canary:returned-inbox` and
+    verifying CI run `26333740615`.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

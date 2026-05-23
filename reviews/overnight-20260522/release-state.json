@@ -14,30 +14,21 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "667ed57052eab4bf05f2bbed738f4b4b9c8155a4",
-    "ciRunId": 26332952176,
+    "headSha": "3c9ef0806e5a454783140e1ac821b40edd5776cf",
+    "ciRunId": 26333740615,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after the baseline source-match preflight follow-up. It adds baseline:source-match to block source-mismatched hosted/local runs before hosted calls, keeps reports metrics-only and raw-memory-free, preserves public benchmark claim blockers, and includes Gemini CLEAN review. GitHub Actions run 26332952176 passed CI on 667ed57. Local release:check, test, release:doctor, goal:audit, diff check, and staged secret scans passed."
+    "note": "This is the latest inspected code/product baseline after the returned canary inbox scanner follow-up. It adds canary:returned-inbox for public-safe mixed-folder returned evidence triage, preserves strict-real and public-launch blockers, and includes Gemini CLEAN review. GitHub Actions run 26333740615 passed CI on 3c9ef08. Local release:check, smoke, test, release:doctor, goal:audit, diff check, and secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "returned canary inbox scanner with Gemini CLEAN review; public launch remains blocked",
-    "allowedPostBaselineCodePaths": [
-      "package.json",
-      "packages/bench/canary-returned-inbox.mjs",
-      "packages/bench/consumer-install-smoke.mjs",
-      "packages/bench/goal-completion-audit.mjs",
-      "packages/bench/release-blocker-doctor.mjs",
-      "packages/bench/release-readiness-check.mjs"
-    ]
+    "enforcePostBaselinePublicEvidenceOnly": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
