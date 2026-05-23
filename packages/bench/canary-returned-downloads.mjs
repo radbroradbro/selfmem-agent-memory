@@ -203,6 +203,8 @@ function safeRootLabel(path) {
 
 function toMarkdown(report) {
   const counts = report.counts ?? {};
+  const latestScans = report.returnedWatch?.latestScans ?? [];
+  const nextActions = report.nextActions ?? [];
   const lines = [
     "# Returned Downloads Findings",
     "",
@@ -222,6 +224,32 @@ function toMarkdown(report) {
     "",
     ...report.rootLabels.map((label) => `- ${label}`),
     "",
+    "## Root Scan Summary",
+    "",
+    "| Inbox | Status | Candidates | Scanned zips | Production evidence | Handoff packets | Diagnostics | Unknown | Unreadable |",
+    "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+    ...latestScans.map((scan) =>
+      [
+        `| ${scan.rootLabel}`,
+        scan.status,
+        scan.candidateCount,
+        scan.scannedZipCount,
+        scan.productionEvidencePackets,
+        scan.handoffPackets,
+        scan.diagnosticBundles,
+        scan.unknownPackets,
+        `${scan.unreadablePackets} |`,
+      ].join(" | "),
+    ),
+    latestScans.length === 0
+      ? "| none | NO_DEFAULT_INBOXES | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
+      : null,
+    "",
+    "## Next Actions",
+    "",
+    ...nextActions.map((item) => `- ${item}`),
+    nextActions.length === 0 ? "- No next action was emitted by the scanner." : null,
+    "",
     "## Release Meaning",
     "",
     report.status === "PRODUCTION_CANARY_EVIDENCE_FOUND"
@@ -229,7 +257,7 @@ function toMarkdown(report) {
       : "No production canary evidence was found. Public launch and fleet rollout remain blocked.",
     "",
   ];
-  return `${lines.join("\n")}\n`;
+  return `${lines.filter((line) => line !== null).join("\n")}\n`;
 }
 
 function sha256(value) {
