@@ -102,6 +102,8 @@ audit so future agents cannot treat green CI as native-goal completion.
   passed
 - Release blocker doctor real-canary blocker gate: `6c44714`, CI run
   `26323533153` passed
+- Package-script-safe evidence output extension: `d7e2e13`, CI run
+  `26323991060` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 
@@ -110,7 +112,7 @@ audit so future agents cannot treat green CI as native-goal completion.
 | Requirement | Evidence | Status |
 | --- | --- | --- |
 | Native Codex goal exists and remains supervised | Active goal state checked in this thread; `reviews/overnight-20260522/summary.md` tracks that the goal remains active | Proven active, not complete |
-| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `6c44714` | Proven |
+| Safe PR-based implementation | PR #5 is open, not draft, mergeable, and contains all slices through the inspected baseline `d7e2e13` | Proven |
 | Nucleus Index | `packages/core/src/nucleus/index.ts`, `docs/NUCLEUS_INDEX.md`, `reviews/overnight-20260522/wiki-vault-evidence.md` | Proven by code, docs, and tests |
 | Wiki/vault sync | `packages/core/src/wiki/compiler.ts`, `packages/core/src/wiki/sync.ts`, `packages/bench/wiki-vault-smoke.mjs`, `packages/bench/wiki-vault-sync-smoke.mjs`, `reviews/overnight-20260522/wiki-vault-sync-evidence.md` | Proven for fixture-safe flow |
 | Wiki sync audit log | `packages/core/src/wiki/sync.ts`, `reviews/overnight-20260522/gemini-wiki-sync-audit-log-review.md` | Proven as optional content-free pre-write intent log |
