@@ -95,6 +95,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
+npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --fixture --require-ready
 npm exec --yes pnpm@10.23.0 -- baseline:packet
 npm exec --yes pnpm@10.23.0 -- baseline:packet:review
@@ -181,6 +182,27 @@ Use `baseline:next-run -- --require-ready` only after hosted, RecallWeave,
 preflight, and comparison files exist. That switch fails closed for fixture,
 partial, privacy-unclean, mismatched, losing, or unreviewed evidence. A passing
 result means the comparison is ready for owner review, not public launch.
+Use `baseline:run` after the private hosted env file, reviewed private query
+set, and local RecallWeave container are ready. It runs hosted collection,
+local export, local collection, preflight, comparison, packet creation, and
+returned-packet intake in one metrics-only chain:
+
+```bash
+. /tmp/recallweave-hosted-baseline.private.env
+RECALLWEAVE_BASELINE_LIVE=1 \
+RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 \
+RECALLWEAVE_BASELINE_QUERYSET=/tmp/recallweave-hosted-baseline-queryset.json \
+npm exec --yes pnpm@10.23.0 -- baseline:run -- \
+  --live \
+  --container-env /tmp/recallweave-hosted-baseline.private.env \
+  --queryset /tmp/recallweave-hosted-baseline-queryset.json \
+  --container-dir <local-recallweave-container-dir> \
+  --reviewed-queryset \
+  --output /tmp/recallweave-baseline-run.json
+```
+
+Fixture mode proves the chain, but does not count as a fresh hosted baseline.
 Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
 and compared. It creates one metrics-only zip for reviewer intake and rejects
 fixture packets under `--strict-real`.

@@ -37,6 +37,7 @@ const extraCurrentFiles = [
   "packages/bench/recallweave-baseline-collector.mjs",
   "packages/bench/hosted-baseline-operator-packet.mjs",
   "packages/bench/hosted-baseline-next-run.mjs",
+  "packages/bench/hosted-baseline-run.mjs",
   "packages/bench/baseline-evidence-packet.mjs",
   "packages/bench/baseline-evidence-packet-review.mjs",
   "packages/bench/baseline-returned-packet-intake.mjs",
@@ -81,6 +82,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["baseline:compare"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:operator-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:next-run"], "string");
+  assert.equal(typeof packageJson.scripts?.["baseline:run"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:packet:review"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:returned-packet"], "string");
@@ -121,6 +123,7 @@ try {
   checks.push(run("node", ["packages/bench/baseline-comparison.mjs", "--fixture"], "baseline comparison"));
   checks.push(run("node", ["packages/bench/hosted-baseline-operator-packet.mjs"], "hosted baseline operator packet"));
   checks.push(run("node", ["packages/bench/hosted-baseline-next-run.mjs"], "hosted baseline next-run planner"));
+  checks.push(run("node", ["packages/bench/hosted-baseline-run.mjs", "--fixture"], "hosted baseline run orchestrator"));
   checks.push(run("node", ["packages/bench/baseline-evidence-packet.mjs"], "hosted baseline evidence packet"));
   checks.push(run("node", ["packages/bench/baseline-evidence-packet-review.mjs"], "hosted baseline evidence packet review"));
   checks.push(run("node", ["packages/bench/baseline-returned-packet-intake.mjs"], "returned hosted baseline packet intake"));
@@ -163,6 +166,7 @@ try {
     "packages/bench/recallweave-baseline-collector.mjs",
     "packages/bench/hosted-baseline-operator-packet.mjs",
     "packages/bench/hosted-baseline-next-run.mjs",
+    "packages/bench/hosted-baseline-run.mjs",
     "packages/bench/baseline-evidence-packet.mjs",
     "packages/bench/baseline-evidence-packet-review.mjs",
     "packages/bench/baseline-returned-packet-intake.mjs",

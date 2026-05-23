@@ -402,6 +402,29 @@ Review the private query set locally before collection. Then source
 collector. Do not attach that env file, the private map, or the private query
 set.
 
+Prefer the one-command runner once those private inputs are ready:
+
+```bash
+. /tmp/recallweave-hosted-baseline.private.env
+RECALLWEAVE_BASELINE_LIVE=1 \
+RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 \
+RECALLWEAVE_BASELINE_QUERYSET=/tmp/recallweave-hosted-baseline-queryset.json \
+npm exec --yes pnpm@10.23.0 -- baseline:run -- \
+  --live \
+  --container-env /tmp/recallweave-hosted-baseline.private.env \
+  --queryset /tmp/recallweave-hosted-baseline-queryset.json \
+  --container-dir <local-recallweave-container-dir> \
+  --reviewed-queryset \
+  --output /tmp/recallweave-baseline-run.json
+```
+
+This creates hosted, local, comparison, preflight, packet, and returned-intake
+outputs together. It still does not allow public benchmark claims or public
+launch by itself.
+
+Use the individual commands below only when you need to debug a stage.
+
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json
 ```

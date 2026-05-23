@@ -184,6 +184,17 @@ npm exec --yes pnpm@10.23.0 -- canary:intake -- --report sanitized-report.json -
 npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report sanitized-report.json
 ```
 
+For hosted-vs-local baseline work, use the one-command runner only after the
+private hosted env file and reviewed query set are ready:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
+```
+
+Fixture mode proves the chain. Live mode still requires explicit hosted
+credentials, no-raw-text mode, a reviewed query set, and local RecallWeave
+input, and it does not approve public claims by itself.
+
 ## Safety Rules
 
 Do not commit keys, raw memories, raw transcripts, `.env`, auth files, browser

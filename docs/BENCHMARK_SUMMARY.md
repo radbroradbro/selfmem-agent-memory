@@ -19,6 +19,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
+npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
 ```
 
 That command does not call hosted Supermemory by default. It keeps public
@@ -91,6 +92,13 @@ or when fewer than two reviewer approvals exist.
 `baseline:next-run` is the state-aware planner for this benchmark lane. It
 turns the current hosted/local evidence state into the next safe source-locked
 run packet without calling hosted Supermemory or authorizing public claims.
+
+`baseline:run` is the one-command runner after private setup is complete. It
+requires a reviewed private query set, a private hosted container env file, and
+a local RecallWeave container or memories file. It then runs hosted collection,
+local export, local collection, preflight, comparison, packet creation, and
+returned-packet intake. Fixture mode proves the chain and remains blocked as
+real hosted-baseline evidence.
 
 ## Historical Controlled Local Baseline
 

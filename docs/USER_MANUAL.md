@@ -87,6 +87,18 @@ For local model tests, close or stop old RecallWeave-owned model servers before
 measuring latency. Do not kill unrelated user model servers. If process
 ownership is unclear, treat the benchmark as blocked and clean it up manually.
 
+For hosted-vs-local comparison work, `baseline:run` is the safest single
+command after the private hosted env file, reviewed query set, and local
+RecallWeave container are ready. Use fixture mode first:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
+```
+
+Live mode still requires explicit hosted credentials, no-raw-text mode, and a
+reviewed query set. It creates metrics-only evidence and keeps public claims
+blocked until reviewer and owner approval.
+
 ## Supermemory Read-Through
 
 When configured, search merges:

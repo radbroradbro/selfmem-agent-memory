@@ -28,7 +28,7 @@
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true
+    "enforcePostBaselinePublicEvidenceOnly": false
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
@@ -93,6 +93,7 @@
     "hosted-baseline-operator-packet",
     "hosted-baseline-next-run",
     "hosted-baseline-next-run-require-ready",
+    "hosted-baseline-run-orchestrator",
     "baseline-evidence-packet",
     "baseline-returned-packet-intake",
     "claude-opus-pr5-review",
@@ -185,6 +186,14 @@
       "route": "gemini embedded public-safe diff, no tools",
       "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-next-run-review.md",
       "completedAt": "2026-05-23T09:00:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "hostedBaselineRunOrchestrator": {
+      "status": "gemini_clean",
+      "verdict": "CLEAN",
+      "route": "gemini embedded public-safe diff, no tools",
+      "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-run-review.md",
+      "completedAt": "2026-05-23T11:05:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

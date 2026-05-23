@@ -113,6 +113,7 @@ const output = {
     "/tmp/recallweave-hosted-baseline-queryset-author-report.json",
     "/tmp/recallweave-hosted-baseline-queryset-report.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
+    "/tmp/recallweave-baseline-run.json",
   ],
   forbidden: [
     "provider keys",
@@ -300,6 +301,7 @@ function commandsFor(status) {
   const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-author-report.json";
   const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
+  const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
   const commands = [
     {
       id: "print-template",
@@ -357,6 +359,21 @@ function commandsFor(status) {
       id: "validate-query-set",
       description: "Inspect the source-locked query set as hashes and counts only. This fails under --strict if any query is unlabeled.",
       command: `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
+    });
+    commands.push({
+      id: "run-matched-baseline-chain",
+      description: "After the private query set is reviewed, run hosted collection, local collection, comparison, packet creation, and returned-packet intake in one metrics-only command.",
+      command: [
+        `. ${privateContainerEnvPath} &&`,
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+        "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1",
+        `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
+        "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
+        "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
+        "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
+        `npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env ${privateContainerEnvPath} --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --reviewed-queryset --output ${baselineRunReportPath}`,
+      ].join(" "),
     });
     commands.push({
       id: "collect-hosted-baseline",

@@ -42,8 +42,8 @@ assert.match(benchmarkPlan, /same dataset slice/i);
 assert.match(benchmarkPlan, /same judge and answer model/i);
 assert.match(benchmarkSummary, /valid Supermemory baseline/i);
 
-const head = run("git", ["rev-parse", "HEAD"]).stdout.trim();
-const branch = run("git", ["branch", "--show-current"]).stdout.trim();
+const head = gitOrFallback(["rev-parse", "HEAD"], process.env.RECALLWEAVE_SOURCE_COMMIT ?? process.env.GITHUB_SHA ?? "unknown");
+const branch = gitOrFallback(["branch", "--show-current"], process.env.RECALLWEAVE_SOURCE_BRANCH ?? process.env.GITHUB_REF_NAME ?? "unknown");
 
 const liveEnv = [
   {
@@ -233,7 +233,8 @@ function inspectBaselineResult(inputPath) {
   const sameJudge = result.sameJudge === true || result.comparability?.sameJudge === true;
   const sameAnswerModel = result.sameAnswerModel === true || result.comparability?.sameAnswerModel === true;
   const hasRunId = nonEmpty(result.runId);
-  const hasSourceCommit = nonEmpty(result.sourceCommit ?? result.commit);
+  const sourceCommit = String(result.sourceCommit ?? result.commit ?? "");
+  const hasSourceCommit = fixtureOnly ? nonEmpty(sourceCommit) : nonEmpty(sourceCommit) && sourceCommit !== "unknown";
   const hasDatasetSlice = nonEmpty(result.datasetSlice ?? result.benchmarkSlice ?? result.datasetVersion);
   const hasQuerySetHash = hashLike(result.querySetHash ?? result.queryHash ?? result.questionSetHash);
   const hasScoringCodeHash = hashLike(result.scoringCodeHash ?? result.harnessHash ?? result.scoringHash);
@@ -427,6 +428,16 @@ function run(command, args) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
   return result;
+}
+
+function gitOrFallback(args, fallback) {
+  const result = spawnSync("git", args, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
+  const value = result.status === 0 ? result.stdout.trim() : "";
+  return value || fallback;
 }
 
 async function latestReviewDir() {

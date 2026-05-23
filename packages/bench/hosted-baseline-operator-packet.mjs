@@ -24,6 +24,7 @@ const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
 const querySetAuthorReportPath = "/tmp/recallweave-hosted-baseline-queryset-author-report.json";
 const querySetReportPath = "/tmp/recallweave-hosted-baseline-queryset-report.json";
 const evidencePacketPath = "/tmp/recallweave-baseline-evidence-packet.zip";
+const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
 
 const packet = {
   ok: true,
@@ -47,6 +48,7 @@ const packet = {
     querySetAuthorReportPath,
     querySetReportPath,
     evidencePacketPath,
+    baselineRunReportPath,
   },
   liveDiscovery: discoverySummary,
   commands: [
@@ -103,6 +105,21 @@ const packet = {
       id: "validate-query-set",
       description: "Inspect the source-locked query set as hashes and counts only. This fails under --strict if any query is unlabeled.",
       command: `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
+    },
+    {
+      id: "run-matched-baseline-chain",
+      description: "After the private query set is reviewed, run the hosted arm, local RecallWeave arm, comparison, packet, and returned-packet intake in one metrics-only chain.",
+      command: [
+        `. ${privateContainerEnvPath} &&`,
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+        "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1",
+        `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath}`,
+        "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id>",
+        "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model>",
+        "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model>",
+        `npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env ${privateContainerEnvPath} --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --reviewed-queryset --output ${baselineRunReportPath}`,
+      ].join(" "),
     },
     {
       id: "collect-live-result",
@@ -199,6 +216,7 @@ const packet = {
     "resultInspection.hasScoringCodeHash is true",
     "querySetEvidence.publicBenchmarkReady is true",
     "private query set, if auto-authored, was reviewed locally before collection",
+    "baseline:run was used for one-command hosted/local/compare/packet/intake collection when private inputs were ready",
     "every query has at least one expectedResultId or expectedResultHash",
     "resultInspection.hasCostLatency is true",
     "baseline discovery output contains hashed container candidates only",
@@ -220,6 +238,7 @@ const packet = {
     querySetAuthorReportPath,
     querySetReportPath,
     evidencePacketPath,
+    baselineRunReportPath,
   ],
   forbidden: [
     "provider keys",
@@ -316,6 +335,22 @@ function buildMarkdown() {
     `npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset ${querySetPath} --strict --output ${querySetReportPath}`,
     "```",
     "",
+    "Once the private env file, reviewed query set, and local RecallWeave container path are ready, prefer the one-command runner. It performs hosted collection, local export, local collection, comparison, preflight, packet creation, and returned-packet intake together.",
+    "",
+    "```bash",
+    `. ${privateContainerEnvPath}`,
+    "RECALLWEAVE_BASELINE_LIVE=1 \\",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \\",
+    "RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 \\",
+    `RECALLWEAVE_BASELINE_QUERYSET=${querySetPath} \\`,
+    "RECALLWEAVE_BASELINE_RUN_ID=<unique-run-id> \\",
+    "RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> \\",
+    "RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> \\",
+    `npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env ${privateContainerEnvPath} --queryset ${querySetPath} --container-dir <local-recallweave-container-dir> --reviewed-queryset --output ${baselineRunReportPath}`,
+    "```",
+    "",
+    "The individual commands below remain available when you need to debug one stage.",
+    "",
     "Then run the read-only hosted collector. Set `SUPERMEMORY_API_KEY` in the local environment first; do not paste it into the command or any attachment.",
     "",
     "```bash",
@@ -404,6 +439,7 @@ function buildMarkdown() {
     `- ${querySetAuthorReportPath}`,
     `- ${querySetReportPath}`,
     `- ${evidencePacketPath}`,
+    `- ${baselineRunReportPath}`,
     "",
     "## Pass Criteria",
     "",
