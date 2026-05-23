@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,7 @@ REPO_ROOT = ROOT.parent
 
 def main() -> None:
     args = parse_args()
+    started_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     home = resolve_home(args.host, args.home)
     result: dict[str, Any] = {
         "ok": True,
@@ -28,6 +30,8 @@ def main() -> None:
         "host": args.host,
         "home": str(home),
         "repo": args.repo or "",
+        "startedAt": started_at,
+        "freshCanarySince": args.canary_since or started_at,
         "preservedMapping": current_mapping(args.host, home),
         "steps": [],
     }
@@ -62,6 +66,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--canary-output", default="", help="Optional path for a sanitized canary report JSON.")
     parser.add_argument("--canary-diagnostic-dir", default="", help="Optional redacted diagnostic directory to convert into canary evidence.")
     parser.add_argument("--canary-diagnostic-zip", default="", help="Optional redacted diagnostic zip to convert into canary evidence.")
+    parser.add_argument("--canary-since", default="", help="Only count canary trace events at or after this ISO timestamp.")
+    parser.add_argument("--canary-last-minutes", default="", help="Only count canary trace events from the last N minutes.")
     parser.add_argument("--strict-real", action="store_true", help="Require strict real canary intake to pass.")
     parser.add_argument("--rollback-tested", action="store_true", help="Mark the canary report rollback drill as tested.")
     parser.add_argument("--apply", action="store_true", help="Actually copy files. Without this, the updater is a dry run.")
@@ -215,6 +221,10 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
         "--output",
         str(output_path),
     ]
+    if args.canary_since:
+        report_command.extend(["--since", args.canary_since])
+    if args.canary_last_minutes:
+        report_command.extend(["--last-minutes", args.canary_last_minutes])
     if args.rollback_tested:
         report_command.append("--rollback-tested")
     report = subprocess.run(report_command, cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=45)
@@ -300,6 +310,7 @@ def summarize_canary_report(value: Any) -> Any:
         "mode": value.get("mode"),
         "fixtureOnly": value.get("fixtureOnly"),
         "evidenceType": value.get("evidenceType"),
+        "evidenceSource": value.get("evidenceSource"),
         "host": ((value.get("agent") or {}).get("host")),
         "window": value.get("window"),
         "counts": value.get("counts"),

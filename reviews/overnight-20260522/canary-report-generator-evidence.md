@@ -31,6 +31,7 @@ paths, or credentials.
 node packages/bench/canary-report-from-trace.mjs --fixture
 node packages/bench/canary-report-from-trace.mjs --fixture --output /tmp/report.json
 node packages/bench/canary-report-from-trace.mjs --diagnostic-dir packages/bench/fixtures/canary-diagnostic-export.fixture
+node packages/bench/canary-report-from-trace.mjs --diagnostic-dir <redacted-diagnostic-dir> --since <fresh-window-start-iso>
 node packages/bench/canary-evidence-intake.mjs --report /tmp/report.json
 node packages/bench/canary-evidence-intake.mjs --report /tmp/report.json --strict-real
 ```
@@ -50,6 +51,10 @@ Expected behavior:
   input. It remains fixture-only and cannot count as real rollout proof.
 - The release gate zips a relocated copy of the diagnostic fixture and confirms
   it still reports `fixtureOnly: true` and still fails strict-real intake.
+- The release gate also builds a non-fixture diagnostic with old pre-patch
+  errors and old store events outside a fresh window, then proves `--since`
+  excludes those events while strict-real intake passes on the post-update
+  window.
 
 ## Controller Spot Checks
 
@@ -72,6 +77,7 @@ For a real agent, run the generator against the selected local container:
 node packages/bench/canary-report-from-trace.mjs \
   --host hermes \
   --container <agent-selfmem-container-dir> \
+  --since <fresh-window-start-iso> \
   --rollback-tested \
   --output sanitized-report.json
 ```
@@ -87,11 +93,13 @@ For a redacted diagnostic bundle from an agent, run:
 ```sh
 node packages/bench/canary-report-from-trace.mjs \
   --diagnostic-dir <unzipped-agent-diagnostics-dir> \
+  --since <fresh-window-start-iso> \
   --rollback-tested \
   --output sanitized-report.json
 
 node packages/bench/canary-report-from-trace.mjs \
   --zip <agent-diagnostics.zip> \
+  --since <fresh-window-start-iso> \
   --rollback-tested \
   --output sanitized-report.json
 ```
@@ -112,6 +120,13 @@ The generator now also accepts summary-only sanitized trace exports such as
 `trace_summary_sanitized.json`. Those exports can prove event counts and error
 classes, but they produce zero latency samples and therefore fail strict canary
 intake until the agent recollects a fresh patched runtime window.
+
+The generator supports `--since`, `--window-start`, `--last-minutes`,
+`--until`, and `--window-end`. When a window is active, only timestamped events
+inside the window contribute counts, latency, privacy, and quality proof. It
+does not merge old reliability summaries or monitor counters into the fresh
+window. This prevents pre-patch missing store latency, stale errors, or old
+zero-result rates from blocking a patched canary.
 
 ## Adapter Change
 

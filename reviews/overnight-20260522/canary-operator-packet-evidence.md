@@ -25,6 +25,9 @@ Expected behavior:
 - `writesRealFiles` is false.
 - The packet requires a live mapped container or explicit redacted diagnostic
   directory/zip.
+- It requires operators to record a fresh-window timestamp when the patched
+  adapter is applied, run the agent for at least 15 minutes, and collect with
+  `--canary-since` so old trace history cannot prove or poison the run.
 - It tells operators to attach only:
   - `/tmp/recallweave-canary-report.json`
   - `/tmp/recallweave-canary-intake.json`
@@ -33,7 +36,8 @@ Expected behavior:
   cookies, private local paths, and unredacted diagnostic archives.
 - It names the pass criteria that matter for the current blocker:
   `canaryPass: true`, `fixtureOnly: false`,
-  `countsAsRealRolloutEvidence: true`, store latency samples present, no
+  `countsAsRealRolloutEvidence: true`, a post-update `windowFilter.since`,
+  fresh duration of at least 15 minutes, store latency samples present, no
   missing store latency, recall/store p95 at or below 2500 ms, lifecycle
   coverage, hybrid search coverage, local writes, hosted read-through, and
   rollback coverage.

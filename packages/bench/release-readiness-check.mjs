@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -133,6 +133,8 @@ const requiredFiles = [
   `${reviewDir}/canary-operator-packet-evidence.md`,
   `${reviewDir}/gemini-canary-operator-packet-review.md`,
   `${reviewDir}/gemini-adapter-store-latency-review.md`,
+  `${reviewDir}/gemini-fresh-canary-window-review.md`,
+  `${reviewDir}/claude-fresh-canary-window-review-blocked.md`,
   `${reviewDir}/hosted-baseline-preflight-evidence.md`,
   `${reviewDir}/gemini-hosted-baseline-preflight-review.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
@@ -297,6 +299,8 @@ check("selfmem_update command is mapped", () => {
   const help = run(command, ["--help"]).stdout;
   assert.match(help, /--run-canary/);
   assert.match(help, /--canary-output/);
+  assert.match(help, /--canary-since/);
+  assert.match(help, /--canary-last-minutes/);
   assert.match(help, /--strict-real/);
   assert.match(help, /--rollback-tested/);
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-bin-check-"));
@@ -1064,6 +1068,110 @@ check("fresh canary report generator passes", () => {
     });
     assert.notEqual(diagnosticZipStrict.status, 0, "relocated fixture zip must fail --strict-real");
     assert.match(diagnosticZipStrict.stderr, /strict-real cannot use.*fixture/i);
+
+    const windowFixtureDir = join(tempRoot, "fresh-window-diagnostic");
+    mkdirSync(join(windowFixtureDir, "reliability_reports"), { recursive: true });
+    writeFileSync(
+      join(windowFixtureDir, "container-map.json"),
+      JSON.stringify({
+        host: "hermes",
+        agent_identity: "window-real-agent",
+        source_supermemory_container: "window_source_history",
+        local_container: "selfmem_window_source_history",
+        provider_mode: "voyage-4-large+rerank-2.5+supermemory-read-through",
+      }),
+    );
+    writeFileSync(
+      join(windowFixtureDir, "reliability_reports/latest.json"),
+      JSON.stringify({
+        event_counts: { search: 100, store: 100, memory_write_failed: 2 },
+        issues: ["old pre-patch issue outside fresh canary window"],
+        privacy_leak_count: 0,
+        reliability_metrics: { zero_result_rate: 0.9 },
+      }),
+    );
+    writeFileSync(
+      join(windowFixtureDir, "trace.jsonl"),
+      [
+        {
+          ts: "2026-05-22T19:50:00.000Z",
+          event: "store",
+          data: { result_count: 1 },
+        },
+        {
+          ts: "2026-05-22T19:51:00.000Z",
+          event: "memory_write_failed",
+          data: { error_class: "old_pre_patch_failure" },
+        },
+        {
+          ts: "2026-05-22T20:00:00.000Z",
+          event: "session_start",
+          data: { provider_mode: "voyage-4-large+rerank-2.5+supermemory-read-through" },
+        },
+        {
+          ts: "2026-05-22T20:01:00.000Z",
+          event: "before_prompt_build",
+          data: { result_count: 3 },
+        },
+        {
+          ts: "2026-05-22T20:02:00.000Z",
+          event: "search",
+          data: {
+            elapsed_ms: 180,
+            result_count: 4,
+            local_result_count: 2,
+            supermemory_result_count: 2,
+            supermemory_read_through: true,
+          },
+        },
+        {
+          ts: "2026-05-22T20:05:00.000Z",
+          event: "pre_compress",
+          data: { reason: "fresh-window-fixture" },
+        },
+        {
+          ts: "2026-05-22T20:15:00.000Z",
+          event: "agent_end",
+          data: { result_count: 1 },
+        },
+        {
+          ts: "2026-05-22T20:16:00.000Z",
+          event: "store",
+          data: { elapsed_ms: 140, result_count: 1 },
+        },
+      ].map((item) => JSON.stringify(item)).join("\n"),
+    );
+    const windowedReportPath = join(tempRoot, "fresh-window-report.json");
+    const windowedRun = run("node", [
+      "packages/bench/canary-report-from-trace.mjs",
+      "--diagnostic-dir",
+      windowFixtureDir,
+      "--host",
+      "hermes",
+      "--since",
+      "2026-05-22T20:00:00.000Z",
+      "--rollback-tested",
+      "--output",
+      windowedReportPath,
+    ]);
+    const windowedReport = JSON.parse(windowedRun.stdout);
+    assert.equal(windowedReport.fixtureOnly, false);
+    assert.equal(windowedReport.evidenceSource.windowFilter.since, "2026-05-22T20:00:00.000Z");
+    assert.equal(windowedReport.counts.store, 1);
+    assert.equal(windowedReport.counts.errors, 0);
+    assert.equal(windowedReport.quality.zeroResultRate, 0);
+    assert.equal(windowedReport.instrumentation.storeLatencySampleCount, 1);
+    assert.equal(windowedReport.instrumentation.missingStoreLatencyCount, 0);
+    assert.equal(windowedReport.quality.hybridSearchCovered, true);
+    assert.equal(windowedReport.quality.hostedReadThroughObserved, true);
+    assert.equal(windowedReport.window.durationMinutes >= 15, true);
+    const windowedIntake = run("node", ["packages/bench/canary-evidence-intake.mjs", "--report", windowedReportPath, "--strict-real"]);
+    const windowedIntakeReport = JSON.parse(windowedIntake.stdout);
+    assert.equal(windowedIntakeReport.canaryPass, true);
+    assert.equal(windowedIntakeReport.countsAsRealRolloutEvidence, true);
+    assert.doesNotMatch(windowedRun.stdout, secretPattern);
+    assert.doesNotMatch(windowedRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+
     const summaryDiagnosticReportPath = join(tempRoot, "summary-diagnostic-report.json");
     const summaryDiagnostic = run("node", [
       "packages/bench/canary-report-from-trace.mjs",
@@ -1185,16 +1293,22 @@ check("fresh canary operator packet passes", () => {
   assert.equal(report.publicSafe, true);
   assert.equal(report.host, "hermes");
   assert.match(report.requiredSource, /live mapped container/i);
-  assert.ok(report.commands.some((item) => item.id === "apply-and-collect-live-container" && /--strict-real/.test(item.command)));
-  assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-dir" && /--canary-diagnostic-dir/.test(item.command)));
-  assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-zip" && /--canary-diagnostic-zip/.test(item.command)));
+  assert.equal(report.freshWindow?.minimumMinutes, 15);
+  assert.ok(report.commands.some((item) => item.id === "apply-live-container" && /FRESH_WINDOW_START/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "collect-live-container-after-window" && /--canary-since <fresh-window-start-iso>/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "apply-and-collect-live-container" && /--strict-real/.test(item.command) && /--canary-since/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-dir" && /--canary-diagnostic-dir/.test(item.command) && /--canary-since/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-zip" && /--canary-diagnostic-zip/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.acceptanceCriteria.includes("countsAsRealRolloutEvidence is true"));
   assert.ok(report.acceptanceCriteria.includes("fixtureOnly is false"));
+  assert.ok(report.acceptanceCriteria.includes("window.durationMinutes is at least 15"));
   assert.ok(report.acceptanceCriteria.includes("instrumentation.missingStoreLatencyCount is 0"));
   assert.ok(report.forbidden.includes("raw memories"));
   assert.ok(report.forbidden.includes("provider keys"));
   assert.match(openclawMarkdown.stdout, /RecallWeave Strict-Real Canary Packet \(OpenClaw\)/);
   assert.match(openclawMarkdown.stdout, /--host openclaw/);
+  assert.match(openclawMarkdown.stdout, /fresh-window timestamp/i);
+  assert.match(openclawMarkdown.stdout, /--canary-since "\$FRESH_WINDOW_START"/);
   assert.match(openclawMarkdown.stdout, /Attach Only/);
   assert.doesNotMatch(hermesResult.stdout, secretPattern);
   assert.doesNotMatch(openclawMarkdown.stdout, secretPattern);
@@ -1203,6 +1317,17 @@ check("fresh canary operator packet passes", () => {
   assert.match(evidence, /strict-real canary operator packet/i);
   assert.match(evidence, /canary:operator-packet/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+});
+
+check("fresh canary window reviewer evidence is explicit", () => {
+  const geminiReview = readFileSync(join(root, reviewDir, "gemini-fresh-canary-window-review.md"), "utf8");
+  const claudeBlocked = readFileSync(join(root, reviewDir, "claude-fresh-canary-window-review-blocked.md"), "utf8");
+  assert.match(geminiReview, /Verdict:\s*CLEAN/i);
+  assert.match(geminiReview, /strict, bounded canary windows/i);
+  assert.match(claudeBlocked, /not counted as reviewer approval/i);
+  assert.match(claudeBlocked, /empty stdout/i);
+  assert.doesNotMatch(geminiReview, secretPattern);
+  assert.doesNotMatch(claudeBlocked, secretPattern);
 });
 
 check("fresh release blocker doctor passes", () => {

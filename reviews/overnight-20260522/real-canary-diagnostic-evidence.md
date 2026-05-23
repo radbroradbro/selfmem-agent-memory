@@ -111,6 +111,9 @@ The failure is actionable and matches the adapter hardening work:
 - Fresh adapters must keep recall p95 under the strict canary threshold.
 - The next canary must collect a fresh runtime window after the bounded
   read-through and store-latency patches are installed.
+- The next canary must pass `--since` or `--canary-since` with the timestamp
+  recorded at adapter apply time. Older diagnostic history should stay useful
+  for diagnosis, but it must not count for or against strict rollout evidence.
 - The next operator should run `canary:diagnose` on any failing report and
   attach only the metrics-only output.
 

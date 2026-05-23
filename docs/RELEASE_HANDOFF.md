@@ -116,9 +116,13 @@ current evidence.
 First generate a sanitized runtime report from the selected agent container:
 
 ```bash
+FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+# Apply the reviewed adapter, then run the patched agent for at least 15 minutes.
+
 npm exec --yes pnpm@10.23.0 -- canary:report -- \
   --host hermes \
   --container <agent-selfmem-container-dir> \
+  --since "$FRESH_WINDOW_START" \
   --rollback-tested \
   --output sanitized-report.json
 ```
@@ -129,11 +133,13 @@ use the bundle directly:
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:report -- \
   --diagnostic-dir <unzipped-agent-diagnostics-dir> \
+  --since "$FRESH_WINDOW_START" \
   --rollback-tested \
   --output sanitized-report.json
 
 npm exec --yes pnpm@10.23.0 -- canary:report -- \
   --zip <agent-diagnostics.zip> \
+  --since "$FRESH_WINDOW_START" \
   --rollback-tested \
   --output sanitized-report.json
 ```
@@ -161,10 +167,13 @@ credentials, cookies, or bearer tokens.
 The report must contain aggregate metrics only: hashed agent/container labels,
 lifecycle event counts, hybrid-search coverage, local-write observation,
 hosted read-through mode, p50 and p95 latency, privacy counters, and rollback
-readiness. The canary report generator reads local trace files or metadata-only
-diagnostic summaries but does not print raw memories, transcripts, prompts,
-answers, local paths, credentials, cookies, or bearer tokens. A fixture pass is
-useful for the tooling path, but it is not real rollout evidence.
+readiness. Strict-real evidence must use a fresh post-update window of at least
+15 minutes. Use `--since`, `--canary-since`, or `--last-minutes` to avoid
+letting old trace history prove or poison the patched adapter. The canary report
+generator reads local trace files or metadata-only diagnostic summaries but does
+not print raw memories, transcripts, prompts, answers, local paths,
+credentials, cookies, or bearer tokens. A fixture pass is useful for the tooling
+path, but it is not real rollout evidence.
 
 Current Hermes and OpenClaw adapters use local-first bounded hosted
 read-through. They search hosted Supermemory when local results are thin or the
@@ -218,19 +227,22 @@ For each deployed agent:
 
 1. Update from the merged commit.
 2. Run `selfmem_update` in dry-run mode.
-3. Apply to one agent with `--apply --run-canary`.
-4. Prefer `--canary-output /tmp/recallweave-canary-report.json` so the update
+3. Record `FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")`.
+4. Apply to one agent with `--apply`.
+5. Run normal traffic for at least 15 minutes.
+6. Prefer `--canary-output /tmp/recallweave-canary-report.json` plus
+   `--canary-since "$FRESH_WINDOW_START"` so the update
    command writes a metrics-only report while it runs adapter smoke.
-5. Verify the agent can still answer normal traffic and then collect a fresh
+7. Verify the agent can still answer normal traffic and then collect a fresh
    live window with event counts, redaction count, provider mode, search/store
    latency samples, and errors.
-6. Run `canary:report` for the selected agent container if the update command
+8. Run `canary:report` for the selected agent container if the update command
    did not already write a report.
-7. Run `canary:intake -- --report sanitized-report.json --strict-real`.
-8. If strict intake fails, run
+9. Run `canary:intake -- --report sanitized-report.json --strict-real`.
+10. If strict intake fails, run
    `canary:diagnose -- --report sanitized-report.json` and attach only the
    metrics-only remediation output to the PR or issue.
-9. Open a PR or issue if any runtime behavior diverges.
+11. Open a PR or issue if any runtime behavior diverges.
 
 Do not roll the same change to every agent until one-agent canary evidence is
 clean.

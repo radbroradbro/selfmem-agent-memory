@@ -117,6 +117,30 @@ Apply only after review:
 bin/selfmem_update --host hermes --repo /path/to/hermes --apply --run-canary
 ```
 
+For strict live rollout evidence, start a fresh canary window at the update
+time. Old trace history can include pre-patch missing latency samples, stale
+errors, or earlier identity mistakes. Do not let that old history count for or
+against the patched build:
+
+```bash
+FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+bin/selfmem_update --host hermes --repo /path/to/hermes --apply
+```
+
+Run the patched agent normally for at least 15 minutes, then collect only events
+from after that timestamp:
+
+```bash
+bin/selfmem_update \
+  --host hermes \
+  --repo /path/to/hermes \
+  --run-canary \
+  --rollback-tested \
+  --strict-real \
+  --canary-since "$FRESH_WINDOW_START" \
+  --canary-output /tmp/recallweave-canary-report.json
+```
+
 To produce a shareable metrics-only canary artifact during the same update,
 write a sanitized report and run intake:
 
@@ -134,7 +158,8 @@ passes only when the selected live container has a fresh runtime window with
 search/store latency samples, lifecycle coverage, hybrid search coverage, local
 writes, read-through mode, and zero privacy leaks. If an agent sends a redacted
 diagnostic export instead of a live container path, use
-`--canary-diagnostic-dir` or `--canary-diagnostic-zip`.
+`--canary-diagnostic-dir` or `--canary-diagnostic-zip` together with
+`--canary-since` so the report ignores pre-patch events inside the export.
 
 Strict-real must produce a runtime report. Adapter standalone smoke is useful
 for install sanity, but it is not rollout evidence. If the updater cannot find

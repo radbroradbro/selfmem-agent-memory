@@ -59,6 +59,8 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
     dry = run_update(host, home, runtime, keys_file, apply=False)
     assert dry["ok"] is True
     assert dry["dryRun"] is True
+    assert dry["startedAt"].endswith("Z")
+    assert dry["freshCanarySince"] == dry["startedAt"]
     assert dry["preservedMapping"]["found"] is True
     assert not installed_key_path(host, home).exists(), "dry-run must not copy keys"
     assert (adapter_target(host, runtime) / "OLD_ADAPTER.txt").exists(), "dry-run must not replace adapter"
@@ -94,12 +96,16 @@ def run_host_case(root: Path, host: str) -> dict[str, Any]:
             str(REPO_ROOT / "packages" / "bench" / "fixtures" / "canary-diagnostic-export.fixture"),
             "--canary-output",
             str(canary_output),
+            "--canary-since",
+            "2026-05-22T18:59:00.000Z",
             "--rollback-tested",
         ],
     )
     assert canary["ok"] is True
+    assert canary["freshCanarySince"] == "2026-05-22T18:59:00.000Z"
     assert canary["canary"]["adapterSmoke"]["ok"] is True
     assert canary["canary"]["runtimeReport"]["reportGenerated"] is True
+    assert canary["canary"]["runtimeReport"]["report"]["evidenceSource"]["windowFilter"]["since"] == "2026-05-22T18:59:00.000Z"
     assert canary["canary"]["runtimeReport"]["intakeOk"] is True
     assert canary["canary"]["runtimeReport"]["intake"]["canaryPass"] is True
     assert canary["canary"]["runtimeReport"]["intake"]["countsAsRealRolloutEvidence"] is False

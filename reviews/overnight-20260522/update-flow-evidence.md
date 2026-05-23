@@ -31,6 +31,9 @@ Verification expectations:
 - `--run-canary --canary-output <path>` runs adapter smoke, writes a sanitized
   canary report, runs intake, and keeps fixture output from counting as real
   rollout evidence.
+- `--canary-since <iso-timestamp>` is forwarded to the report generator and
+  recorded in the summarized runtime report so a patched agent can collect a
+  fresh window without old trace history poisoning strict intake.
 - `--run-canary --strict-real` fails if no live container, diagnostic directory,
   or diagnostic zip is available. Adapter standalone smoke alone cannot satisfy
   strict-real rollout evidence.
@@ -47,7 +50,8 @@ Verification:
 - `python3 -m py_compile packages/bench/update-flow-smoke.py plugins/selfmem-fallback/scripts/selfmem_update.py`: passed.
 - `bin/selfmem_update --help`: covered by the release-readiness gate.
 - `bin/selfmem_update --help`: now exposes `--run-canary`, `--canary-output`,
-  `--strict-real`, and `--rollback-tested`.
+  `--canary-since`, `--canary-last-minutes`, `--strict-real`, and
+  `--rollback-tested`.
 - Strict-real missing-source guard: passed for Hermes and OpenClaw fixture
   runtimes.
 - `pnpm smoke`: passed with update smoke included.

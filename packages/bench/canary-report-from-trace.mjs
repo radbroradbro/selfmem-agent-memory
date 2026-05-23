@@ -36,9 +36,10 @@ const fixturePathOnly = Boolean(args.fixture)
     && containerMapPath === fixture.containerMap
   );
 
-const trace = readTrace(tracePath, true);
-const rawEvents = readJsonl(rawPath, false);
-const memories = readJsonl(memoriesPath, false);
+const windowFilter = makeWindowFilter(args);
+const trace = filterEventsByWindow(readTrace(tracePath, true), windowFilter);
+const rawEvents = filterEventsByWindow(readJsonl(rawPath, false), windowFilter);
+const memories = filterEventsByWindow(readJsonl(memoriesPath, false), windowFilter);
 const containerMap = readJson(containerMapPath);
 const reliability = readJson(reliabilityPath);
 const monitor = readJson(monitorPath);
@@ -46,12 +47,15 @@ const traceSummary = tracePath.endsWith(".json") ? readJson(tracePath) : {};
 const fixtureOnly = fixturePathOnly || hasFixtureMarker(containerMap, reliability, trace);
 const monitorContainer = activeMonitorContainer(monitor);
 const monitorSummary = objectValue(monitor.stdout_json?.summary) || objectValue(monitor.summary) || {};
+const allowSupplementalEvidence = !windowFilter.active;
 const eventCounts = mergeCounts(
   countEvents(trace),
-  objectValue(traceSummary.event_counts),
-  objectValue(traceSummary.recent_event_counts),
-  objectValue(reliability.event_counts),
-  objectValue(monitorContainer.eventCounts),
+  ...(allowSupplementalEvidence ? [
+    objectValue(traceSummary.event_counts),
+    objectValue(traceSummary.recent_event_counts),
+    objectValue(reliability.event_counts),
+    objectValue(monitorContainer.eventCounts),
+  ] : []),
 );
 const rawEventCounts = countEvents(rawEvents);
 const searchEvents = trace.filter((item) => item.event === "search");
@@ -61,14 +65,18 @@ const errorEvents = trace.filter((item) => isErrorEvent(item.event));
 const redactionCount = countRedactions(trace, rawEvents, memories);
 const privacyLeakCount = Math.max(
   countLeaks(trace, rawEvents, memories),
-  Number(reliability.privacy_leak_count ?? 0),
-  Number(monitorSummary.privacyLeakCount ?? 0),
-  Number(monitorContainer.privacyLeakCount ?? 0),
+  ...(allowSupplementalEvidence ? [
+    Number(reliability.privacy_leak_count ?? 0),
+    Number(monitorSummary.privacyLeakCount ?? 0),
+    Number(monitorContainer.privacyLeakCount ?? 0),
+  ] : []),
 );
 const timestamps = [
   ...trace.map((item) => timestampMs(item.ts ?? item.timestamp ?? item.created_at)),
-  timestampMs(traceSummary.first_ts),
-  timestampMs(traceSummary.last_ts),
+  ...(allowSupplementalEvidence ? [
+    timestampMs(traceSummary.first_ts),
+    timestampMs(traceSummary.last_ts),
+  ] : []),
 ].filter(Number.isFinite);
 const startedAt = timestamps.length ? new Date(Math.min(...timestamps)).toISOString() : new Date(0).toISOString();
 const endedAt = timestamps.length ? new Date(Math.max(...timestamps)).toISOString() : startedAt;
@@ -103,18 +111,18 @@ const providerMode = latestString(trace, "provider_mode")
   || firstString(containerMap.provider_mode, containerMap.mode, reliability.mode, monitorSummary.mode, "unknown");
 const readOnly = Boolean(containerMap.read_only ?? containerMap.readOnly);
 const localResultSeen = searchEvents.some((item) => nestedNumber(item, "data", "local_result_count") > 0)
-  || Boolean(monitorContainer.hybridSearchCovered)
-  || Boolean(reliability.checks?.hybrid_search_observed);
+  || (allowSupplementalEvidence && Boolean(monitorContainer.hybridSearchCovered))
+  || (allowSupplementalEvidence && Boolean(reliability.checks?.hybrid_search_observed));
 const remoteResultSeen = searchEvents.some((item) => nestedNumber(item, "data", "supermemory_result_count") > 0)
-  || Boolean(monitorContainer.supermemoryReadThroughReturnedResults)
-  || Number(reliability.reliability_metrics?.hybrid_local_plus_supermemory_search_count ?? 0) > 0
-  || Boolean(reliability.checks?.hybrid_search_observed);
+  || (allowSupplementalEvidence && Boolean(monitorContainer.supermemoryReadThroughReturnedResults))
+  || (allowSupplementalEvidence && Number(reliability.reliability_metrics?.hybrid_local_plus_supermemory_search_count ?? 0) > 0)
+  || (allowSupplementalEvidence && Boolean(reliability.checks?.hybrid_search_observed));
 const hostedReadThroughObserved = trace.some((item) => nestedBoolean(item, "data", "supermemory_read_through"))
   || providerMode.includes("supermemory-read-through")
-  || String(reliability.mode ?? "").includes("Supermemory read-through")
-  || String(monitorSummary.mode ?? "").includes("supermemory-read-through")
-  || Boolean(monitorContainer.supermemoryReadThroughReturnedResults)
-  || Boolean(reliability.checks?.hybrid_search_observed);
+  || (allowSupplementalEvidence && String(reliability.mode ?? "").includes("Supermemory read-through"))
+  || (allowSupplementalEvidence && String(monitorSummary.mode ?? "").includes("supermemory-read-through"))
+  || (allowSupplementalEvidence && Boolean(monitorContainer.supermemoryReadThroughReturnedResults))
+  || (allowSupplementalEvidence && Boolean(reliability.checks?.hybrid_search_observed));
 const sessionStartCount = countNamed(eventCounts, ["session_start", "initialize"]);
 const beforePromptCount = Math.max(beforePromptEvents.length, countNamed(eventCounts, ["before_prompt_build", "prefetch"]));
 const preCompressCount = countNamed(eventCounts, ["pre_compress", "compression_checkpoint", "lcm_after_compression_prompt_build"]);
@@ -127,8 +135,8 @@ const zeroResultSearches = searchEvents.filter((item) => nestedNumber(item, "dat
 const rejectedWrites = countNamed(eventCounts, ["agent_end_write_suppressed", "memory_write_rejected"]);
 const writeDenominator = Math.max(1, storeCount + rejectedWrites);
 const zeroResultRate = numericValue(
-  reliability.reliability_metrics?.zero_result_rate,
-  monitorContainer.zeroResultRate,
+  allowSupplementalEvidence ? reliability.reliability_metrics?.zero_result_rate : undefined,
+  allowSupplementalEvidence ? monitorContainer.zeroResultRate : undefined,
   searchCount ? zeroResultSearches / searchCount : 1,
 );
 const generatedAt = new Date().toISOString();
@@ -144,6 +152,7 @@ const report = {
     inputKind: source.kind,
     traceKind: tracePath ? basename(tracePath) : "missing",
     metadataOnly: /metadata_only|summary/i.test(tracePath),
+    windowFilter: describeWindowFilter(windowFilter),
   },
   agent: {
     host: host || inferHost(containerMap, tracePath, reliability, monitor),
@@ -174,9 +183,11 @@ const report = {
     errors: Math.max(
       errorEvents.length,
       countErrorLikeEvents(eventCounts),
-      Number(monitorContainer.errorCount ?? 0),
-      Number(reliability.issues?.length ?? 0),
-      Number(traceSummary.error_like_events?.length ?? 0),
+      ...(allowSupplementalEvidence ? [
+        Number(monitorContainer.errorCount ?? 0),
+        Number(reliability.issues?.length ?? 0),
+        Number(traceSummary.error_like_events?.length ?? 0),
+      ] : []),
     ),
     skippedUnknownIdentity: agentIdentity === "unknown-agent" ? 1 : 0,
     unknownContainerWrites: localContainer.includes("unknown") && storeCount > 0 ? storeCount : 0,
@@ -256,6 +267,40 @@ function parseArgs(argv) {
     if (item.startsWith("--") && !["--fixture", "--rollback-tested"].includes(item)) index += 1;
   }
   return parsed;
+}
+
+function makeWindowFilter(parsed) {
+  const now = Date.now();
+  const sinceFromArg = timestampMs(parsed.since || parsed.canarySince || parsed.windowStart);
+  const lastMinutes = Number(parsed.lastMinutes || parsed.canaryLastMinutes || 0);
+  const sinceMs = Number.isFinite(sinceFromArg)
+    ? sinceFromArg
+    : Number.isFinite(lastMinutes) && lastMinutes > 0
+      ? now - (lastMinutes * 60 * 1000)
+      : Number.NaN;
+  const untilMs = timestampMs(parsed.until || parsed.windowEnd);
+  const active = Number.isFinite(sinceMs) || Number.isFinite(untilMs);
+  return {
+    active,
+    sinceMs: Number.isFinite(sinceMs) ? sinceMs : Number.NEGATIVE_INFINITY,
+    untilMs: Number.isFinite(untilMs) ? untilMs : Number.POSITIVE_INFINITY,
+  };
+}
+
+function filterEventsByWindow(items, filter) {
+  if (!filter.active) return items;
+  return items.filter((item) => {
+    const observedAt = timestampMs(item.ts ?? item.timestamp ?? item.created_at);
+    return Number.isFinite(observedAt) && observedAt >= filter.sinceMs && observedAt <= filter.untilMs;
+  });
+}
+
+function describeWindowFilter(filter) {
+  if (!filter.active) return null;
+  return {
+    since: Number.isFinite(filter.sinceMs) ? new Date(filter.sinceMs).toISOString() : null,
+    until: Number.isFinite(filter.untilMs) ? new Date(filter.untilMs).toISOString() : null,
+  };
 }
 
 function prepareSource(parsed) {
