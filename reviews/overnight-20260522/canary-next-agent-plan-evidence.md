@@ -71,12 +71,13 @@ content was written to the repo.
 ## Current Handoff Packet
 
 The current next-agent handoff packet is
-`recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`, SHA256
-`f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`.
+`recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`, SHA256
+`2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`.
 
-The packet was generated directly from the mixed redacted diagnostics folder
-with `--allow-failed-inputs --require-ready`, so one failed sibling bundle did
-not block the selected privacy-clean OpenClaw candidate.
+The packet was regenerated from the postwatch batch report with
+`--batch ... --require-ready`. The underlying batch was collected with
+`--allow-failed-inputs`, so one failed sibling bundle did not block the selected
+privacy-clean OpenClaw candidate.
 
 It contains only:
 

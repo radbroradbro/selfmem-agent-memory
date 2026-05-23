@@ -88,13 +88,14 @@ name, or private local path content was written to the repo.
 ## Current Returned Diagnostics Packet Result
 
 The controller reran the current returned diagnostic set from the active
-worktree on 2026-05-23 and generated a fresh sendable packet through the
-single-command `--input-root ... --allow-failed-inputs --require-ready` path.
+worktree on 2026-05-23, scanned the local incoming folders, wrote a postwatch
+batch report, and generated a fresh sendable packet through the
+`--batch ... --require-ready` path.
 This is the current packet to hand to the selected OpenClaw operator.
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`.
+- Packet label: `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`.
 - Packet SHA256:
-  `f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`.
+  `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`.
 - Mode: `canary-next-agent-handoff-packet`.
 - Public safe: true.
 - Metrics only: true.
@@ -105,9 +106,8 @@ This is the current packet to hand to the selected OpenClaw operator.
 - One-agent canary allowed: true.
 - Ready for live handoff: true.
 - `--require-ready` result: passed for the non-fixture OpenClaw handoff packet.
-- `--allow-failed-inputs` result: passed the mixed-folder triage flag through
-  the packet builder and planner without allowing the failed sibling bundle to
-  count as rollout evidence.
+- Postwatch batch result: preserved mixed-folder triage without allowing the
+  failed sibling bundle to count as rollout evidence.
 - Selected candidate label: `bundle_8e90781bb060a889`.
 - Failed checks:
   - `adapter-contract`

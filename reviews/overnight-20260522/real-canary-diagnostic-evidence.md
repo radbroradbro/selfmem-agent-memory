@@ -163,10 +163,12 @@ The failure is actionable and matches the adapter hardening work:
 - The next operator should run `canary:diagnose` on any failing report and
   attach only the metrics-only output.
 - The current sendable handoff packet is
-  `recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`, SHA256
-  `f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`.
-  It was generated through the direct mixed-folder
-  `--input-root ... --allow-failed-inputs --require-ready` packet path.
+  `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`, SHA256
+  `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`.
+  It was regenerated from the postwatch batch report with
+  `--batch ... --require-ready`. The underlying batch used
+  `--allow-failed-inputs`, so one bad sibling archive did not block the selected
+  privacy-clean OpenClaw handoff.
 
 ## Boundary
 

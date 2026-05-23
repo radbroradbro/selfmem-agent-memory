@@ -50,7 +50,7 @@ Live status:
   path-bearing provenance. Memory text and local path provenance are redacted
   before hashing, stdout, and report output, unsafe ids are hash-replaced, and
   source-mismatched exports remain blocked from public benchmark claims.
-- Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
+- Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest postwatch batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean OpenClaw candidate, confirmed no returned production canary packet was present, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
 - Hardens the canary batch-audit and next-agent packet paths so empty,
   handoff-only, or no-candidate folders fail closed as metrics-only JSON,
   remove requested output zip paths on blocked packet creation, avoid stack
@@ -403,10 +403,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- canary:batch-audit`: passed on the fixture batch, failed closed with `--require-real-pass`, supported explicit mixed-folder `--allow-failed-inputs` triage, and triaged the available redacted real diagnostics without exposing raw content.
 - `reviews/overnight-20260522/real-next-agent-openclaw-canary-plan.md`: added a paste-ready OpenClaw fresh-window canary handoff selected from redacted metrics-only evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:next-agent`: passed on the fixture planner and converted the real redacted batch into a one-agent OpenClaw fresh-window plan focused on adapter-contract and store-latency evidence.
-- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready`: passed on the mixed redacted diagnostics folder, preserving one failed sibling input while selecting the privacy-clean OpenClaw candidate.
+- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready`: passed from the postwatch batch report, preserving the selected privacy-clean OpenClaw candidate and keeping failed sibling diagnostics from counting as rollout evidence.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260523-allow-failed.zip`, SHA256
-  `f34a47d2c9fd27bb00c74049e96cc158255a27a17390673dc1e8cdd50bca8f79`.
+  `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`, SHA256
+  `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 - Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.
 - `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.
