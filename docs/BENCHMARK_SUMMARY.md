@@ -37,6 +37,13 @@ across 100 hosted documents, with no raw labels or memory text in the report.
 This proves safe hosted metadata access only. It is not a hosted baseline or a
 comparison result.
 
+To generate the hosted baseline operator packet with this discovery state
+attached, run:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --discovery reviews/overnight-20260522/hosted-baseline-live-discovery.json --format markdown
+```
+
 `baseline:queryset` inspects the source-locked query set before either side
 collects results. It emits hashes and counts only, marks whether every query is
 labeled, and fails under `--strict` if any query lacks an expected result id or

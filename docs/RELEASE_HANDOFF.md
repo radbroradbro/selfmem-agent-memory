@@ -145,6 +145,14 @@ privacy-clean, and source-locked to the same query set and scoring code.
 Use `baseline:operator-packet` when an agent needs a paste-ready, public-safe
 handoff for hosted baseline collection. The packet itself is a contract and
 validation guide only. It does not call hosted Supermemory or close the blocker.
+After live hosted discovery has been collected, pass the public-safe discovery
+report back into the packet so the operator sees the current hashed candidate
+state without raw labels:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --discovery reviews/overnight-20260522/hosted-baseline-live-discovery.json --format markdown
+```
+
 Use `baseline:next-run` when an agent has partial hosted or RecallWeave
 evidence and needs the next exact command sequence. It is state-aware, calls no
 hosted provider, keeps fixture evidence from closing the blocker, and never

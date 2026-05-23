@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import { basename, isAbsolute, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
+const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const format = String(args.format || "json").trim().toLowerCase();
+const discoverySummary = args.discovery ? loadDiscoverySummary(args.discovery) : null;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
@@ -39,6 +44,7 @@ const packet = {
     querySetReportPath,
     evidencePacketPath,
   },
+  liveDiscovery: discoverySummary,
   commands: [
     {
       id: "discover-hosted-containers",
@@ -216,6 +222,7 @@ function buildMarkdown() {
     "",
     "Goal: collect one read-only hosted Supermemory baseline with aggregate metrics only. Do not send raw memory logs.",
     "",
+    ...discoveryMarkdownLines(),
     "## Run",
     "",
     "First print the result template:",
@@ -353,6 +360,26 @@ function buildMarkdown() {
   ].join("\n");
 }
 
+function discoveryMarkdownLines() {
+  if (!discoverySummary) return [];
+  return [
+    "## Current Live Discovery",
+    "",
+    `- Report: ${discoverySummary.reportLabel}`,
+    `- Hosted provider called: ${discoverySummary.callsHostedProvider ? "yes" : "no"}`,
+    `- Fixture: ${discoverySummary.fixtureOnly ? "yes" : "no"}`,
+    `- Documents seen: ${discoverySummary.documentsSeen}`,
+    `- Hashed container candidates: ${discoverySummary.containerCandidateCount}`,
+    `- Recommended hashed candidate: ${discoverySummary.recommendedCandidateId ?? "none"}`,
+    "- Raw labels included: no",
+    "- Raw memory included: no",
+    "- Privacy leaks: 0",
+    "",
+    "Use the optional private-map command only on the local operator machine to translate a hashed candidate into the raw hosted label. Do not attach that private map.",
+    "",
+  ];
+}
+
 function packetAcceptanceLines() {
   return [
     "- not a fixture",
@@ -388,6 +415,59 @@ function parseArgs(argv) {
 
 function toCamel(value) {
   return value.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+function loadDiscoverySummary(inputPath) {
+  const resolved = isAbsolute(inputPath) ? inputPath : resolve(root, inputPath);
+  assert.ok(existsSync(resolved), `discovery report missing: ${displayPath(resolved)}`);
+  const raw = readFileSync(resolved, "utf8");
+  assertSafeText(raw, "discovery report");
+  const json = JSON.parse(raw);
+  assert.equal(json.mode, "hosted-baseline-discovery", "discovery report mode mismatch");
+  assert.equal(json.publicSafe, true, "discovery report must be public-safe");
+  assert.equal(json.metricsOnly, true, "discovery report must be metrics-only");
+  assert.equal(json.rawLabelsIncluded, false, "discovery report must not include raw labels");
+  assert.equal(json.rawMemoryIncluded, false, "discovery report must not include raw memory");
+  assert.equal(json.rawTranscriptIncluded, false, "discovery report must not include raw transcripts");
+  assert.equal(json.rawPromptIncluded, false, "discovery report must not include raw prompts");
+  assert.equal(json.rawAnswerIncluded, false, "discovery report must not include raw answers");
+  assert.equal(Number(json.privacyLeakCount ?? 0), 0, "discovery report privacy leaks must be zero");
+  assert.equal(Number(json.redactionFailureCount ?? 0), 0, "discovery report redaction failures must be zero");
+  assert.ok(Number(json.sourceStats?.documentsSeen ?? 0) > 0, "discovery report must include documents seen");
+  assert.ok(Number(json.containerCandidateCount ?? 0) > 0, "discovery report must include hashed container candidates");
+  const candidateIds = (json.containerCandidates ?? []).map((candidate) => String(candidate.candidateId ?? ""));
+  for (const candidateId of candidateIds) {
+    assert.match(candidateId, /^c_[a-f0-9]{16}$/, "candidate id must be hashed");
+  }
+  const recommendedCandidateId = json.recommendedCandidateId ?? null;
+  if (recommendedCandidateId) {
+    assert.match(String(recommendedCandidateId), /^c_[a-f0-9]{16}$/, "recommended candidate id must be hashed");
+    assert.equal(candidateIds.includes(String(recommendedCandidateId)), true, "recommended candidate id must exist in candidate list");
+  }
+  return {
+    reportLabel: displayPath(resolved),
+    fixtureOnly: Boolean(json.fixtureOnly),
+    callsHostedProvider: json.callsHostedProvider === true,
+    documentsSeen: Number(json.sourceStats?.documentsSeen ?? 0),
+    containerCandidateCount: Number(json.containerCandidateCount ?? 0),
+    recommendedCandidateId,
+    candidateIds,
+    rawLabelsIncluded: false,
+    rawMemoryIncluded: false,
+    privacyLeakCount: 0,
+    redactionFailureCount: 0,
+  };
+}
+
+function displayPath(value) {
+  const rel = relative(root, value).replaceAll("\\", "/");
+  if (!rel.startsWith("../") && rel !== "..") return rel;
+  return `external:${basename(value)}`;
+}
+
+function assertSafeText(text, label) {
+  assert.doesNotMatch(text, secretPattern(), `${label} contains a key-shaped secret`);
+  assert.doesNotMatch(text, privatePathPattern(), `${label} contains a raw private path`);
 }
 
 function secretPattern() {

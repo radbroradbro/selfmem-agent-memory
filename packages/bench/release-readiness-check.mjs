@@ -2091,6 +2091,11 @@ check("fresh hosted baseline preflight passes", () => {
     recallWeaveResultPath,
   ]);
   const operatorResult = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs"]);
+  const operatorDiscoveryResult = run("node", [
+    "packages/bench/hosted-baseline-operator-packet.mjs",
+    "--discovery",
+    "reviews/overnight-20260522/hosted-baseline-live-discovery.json",
+  ]);
   const operatorMarkdown = run("node", ["packages/bench/hosted-baseline-operator-packet.mjs", "--format", "markdown"]);
   const nextRunResult = run("node", ["packages/bench/hosted-baseline-next-run.mjs"]);
   const nextRunMarkdown = run("node", ["packages/bench/hosted-baseline-next-run.mjs", "--format", "markdown"]);
@@ -2154,6 +2159,7 @@ check("fresh hosted baseline preflight passes", () => {
   const comparisonReport = JSON.parse(comparisonResult.stdout);
   const matchedCollectorComparisonReport = JSON.parse(matchedCollectorComparison.stdout);
   const operatorPacket = JSON.parse(operatorResult.stdout);
+  const operatorDiscoveryPacket = JSON.parse(operatorDiscoveryResult.stdout);
   const nextRunPlan = JSON.parse(nextRunResult.stdout);
   const baselinePacket = JSON.parse(baselinePacketResult.stdout);
   const baselinePacketReview = JSON.parse(baselinePacketReviewResult.stdout);
@@ -2412,6 +2418,17 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(operatorPacket.writesRealFiles, false);
   assert.equal(operatorPacket.callsHostedProvider, false);
   assert.equal(operatorPacket.publicSafe, true);
+  assert.equal(operatorDiscoveryPacket.mode, "hosted-baseline-operator-packet");
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.fixtureOnly, false);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.callsHostedProvider, true);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.documentsSeen, 100);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.containerCandidateCount, 4);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.rawLabelsIncluded, false);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.rawMemoryIncluded, false);
+  assert.equal(operatorDiscoveryPacket.liveDiscovery?.privacyLeakCount, 0);
+  assert.match(operatorDiscoveryPacket.liveDiscovery?.recommendedCandidateId ?? "", /^c_[a-f0-9]{16}$/);
+  assert.ok(operatorDiscoveryPacket.liveDiscovery?.candidateIds?.includes(operatorDiscoveryPacket.liveDiscovery?.recommendedCandidateId));
+  assert.ok(operatorDiscoveryPacket.liveDiscovery?.candidateIds?.every((id) => /^c_[a-f0-9]{16}$/.test(id)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "discover-hosted-containers" && /baseline:discover/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "write-private-container-map" && /RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "print-template" && /baseline:preflight/.test(item.command)));

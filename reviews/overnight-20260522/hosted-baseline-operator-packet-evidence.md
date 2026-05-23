@@ -23,6 +23,10 @@ Scope:
 - The packet now points operators to `baseline:packet --strict-real` so the
   hosted result, RecallWeave result, comparison, and preflight become one
   metrics-only reviewer zip.
+- The packet can now accept `--discovery
+  reviews/overnight-20260522/hosted-baseline-live-discovery.json` and include
+  the already-proven live hosted metadata state: 100 documents seen, 4 hashed
+  candidate containers, no raw labels, no raw memory, and zero privacy leaks.
 - Gemini focused review returned `CLEAN`.
 
 Commands:
@@ -30,6 +34,7 @@ Commands:
 ```bash
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
+npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --discovery reviews/overnight-20260522/hosted-baseline-live-discovery.json --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:discover
 npm exec --yes pnpm@10.23.0 -- baseline:queryset
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
@@ -42,6 +47,11 @@ Expected behavior:
 
 - JSON mode reports `mode: hosted-baseline-operator-packet`.
 - Markdown mode prints a paste-ready operator packet.
+- Discovery mode summarizes live hosted metadata discovery without raw hosted
+  labels or memory text.
+- Discovery mode reports `fixtureOnly: false`, `callsHostedProvider: true`,
+  `documentsSeen: 100`, `containerCandidateCount: 4`, hashed candidate ids,
+  and zero privacy leaks.
 - `writesRealFiles` is false.
 - `callsHostedProvider` is false.
 - It tells operators to print the template, validate fixture parsing, then

@@ -24,6 +24,17 @@ Findings:
 - Release-readiness gate: covered. The gate verifies the script, package
   command, no-hosted-call flag, forbidden artifact list, public-safe output,
   and secret-free evidence.
+- Follow-up extension: `baseline:operator-packet -- --discovery
+  reviews/overnight-20260522/hosted-baseline-live-discovery.json` now folds the
+  live hashed-candidate discovery summary into the operator packet. The release
+  gate verifies the state is non-fixture metadata, called the hosted provider,
+  saw 100 documents and 4 hashed candidate containers, includes no raw labels or
+  raw memory, and keeps privacy leaks at zero.
+- Follow-up review initially flagged that `recommendedCandidateId` needed the
+  same hashed-id validation as `containerCandidates`. The packet now validates
+  the recommended id format and requires it to appear in the hashed candidate
+  list; the release gate asserts both conditions.
+- Second focused review after the fix returned `CLEAN`.
 
 Notes:
 
