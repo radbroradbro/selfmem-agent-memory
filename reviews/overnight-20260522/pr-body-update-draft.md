@@ -32,7 +32,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `e9a483af3a416c5d5db17ae511d25c40f52d4c12`.
+- Latest code/product baseline: `94be156c52904e9379372023037cb7cccff8c7ad`.
+- GitHub Actions run `26329113469`: passed CI after adding the hosted-baseline
+  container selector, wiring it into operator, next-run, release doctor,
+  release readiness, clean consumer smoke, and docs, and proving fixture plus
+  live metadata-only selector smokes.
+- Previous verified code baseline before the hosted-baseline selector:
+  `e9a483af3a416c5d5db17ae511d25c40f52d4c12`.
 - GitHub Actions run `26328719263`: passed CI after hardening the hosted
   baseline next-run planner with `--require-ready`, owner-review readiness,
   fail-closed fixture rejection, strict-real evidence fields, updated release

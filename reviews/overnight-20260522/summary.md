@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `00836ec`, run `26325592308`, success.
+  `94be156`, run `26329113469`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -80,6 +80,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26324810035` on `7fdac2f`: success.
 - GitHub Actions CI run `26325210942` on `aedb81a`: success.
 - GitHub Actions CI run `26325592308` on `00836ec`: success.
+- GitHub Actions CI run `26329113469` on `94be156`: success.
 
 ## Shipped Overnight Slices
 

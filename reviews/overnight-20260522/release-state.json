@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T09:01:38Z",
+  "generatedAt": "2026-05-23T09:22:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "e9a483af3a416c5d5db17ae511d25c40f52d4c12",
-    "ciRunId": 26328719263,
+    "headSha": "94be156c52904e9379372023037cb7cccff8c7ad",
+    "ciRunId": 26329113469,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after hardening the hosted-baseline next-run planner with --require-ready, owner-review readiness, fail-closed fixture rejection, strict-real evidence fields, updated release doctor guidance, and public-safe evidence refresh. GitHub Actions run 26328719263 passed CI on e9a483a. Local release:check, release:doctor, full smoke, goal:audit, Gemini review, diff check, synthetic ready-shape check, and staged secret/private-path scans passed."
+    "note": "This is the latest inspected code/product baseline after adding the hosted-baseline container selector, wiring it into operator, next-run, release doctor, release readiness, clean consumer smoke, and docs, and proving fixture plus live metadata-only selector smokes. GitHub Actions run 26329113469 passed CI on 94be156. Local release:check, release:doctor, release:github-sync, full smoke, live metadata-only selector smoke, diff check, and secret/private-path scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
