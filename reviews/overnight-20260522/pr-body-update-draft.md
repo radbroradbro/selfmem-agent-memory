@@ -62,6 +62,14 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `59ebb53824ce0e90cf9b54fbd9621d5e2e381c54`.
+- GitHub Actions run `26337456058`: passed CI after hardening empty,
+  handoff-only, and no-candidate canary batch and next-agent packet behavior,
+  preserving strict-real and public-launch blockers, removing blocked output
+  zips, refreshing the release guard allowlist, and keeping the PR/issue sync
+  checks green.
+- Previous verified code/product baseline before the empty/handoff/no-candidate
+  fail-closed hardening:
   `afcc0f44f28c00ea155cf542a22c7c7ac8530e32`.
 - GitHub Actions run `26336780942`: passed CI after adding direct
   mixed-folder next-agent handoff packet support, wiring
