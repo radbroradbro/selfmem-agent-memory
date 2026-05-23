@@ -344,6 +344,7 @@ const requirements = [
     files.hostedBaselineLiveMirrorRunReport,
     files.hostedBaselineLiveMirrorPacketReport,
     files.hostedBaselineNextRunEvidence,
+    "packages/bench/baseline-reviewer-approval-intake.mjs",
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [

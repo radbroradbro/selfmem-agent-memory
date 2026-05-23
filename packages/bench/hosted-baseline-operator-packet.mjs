@@ -30,6 +30,7 @@ const sourceMatchPath = "/tmp/recallweave-baseline-source-match.json";
 const sourceAlignmentPath = "/tmp/recallweave-baseline-source-alignment.json";
 const sourceGapPath = "/tmp/recallweave-baseline-source-gap.json";
 const evidencePacketPath = "/tmp/recallweave-baseline-evidence-packet.zip";
+const reviewerApprovalReportPath = "/tmp/recallweave-reviewer-approval-report.json";
 const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
 
 const packet = {
@@ -59,6 +60,7 @@ const packet = {
     sourceAlignmentPath,
     sourceGapPath,
     evidencePacketPath,
+    reviewerApprovalReportPath,
     baselineRunReportPath,
   },
   liveDiscovery: discoverySummary,
@@ -247,11 +249,8 @@ const packet = {
     },
     {
       id: "compare-matched-results",
-      description: "Compare the aggregate hosted and RecallWeave result files. This still cannot authorize public claims without reviewer approvals.",
-      command: [
-        `RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed>`,
-        `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
-      ].join(" "),
+      description: "Compare the aggregate hosted and RecallWeave result files before review. This still cannot authorize public claims.",
+      command: `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
     },
     {
       id: "package-baseline-evidence",
@@ -264,6 +263,30 @@ const packet = {
         `--preflight ${preflightPath}`,
         "--strict-real",
         `--output ${evidencePacketPath}`,
+      ].join(" "),
+    },
+    {
+      id: "collect-reviewer-approvals",
+      description: "Validate two independent reviewer approval artifacts against the exact metrics-only packet. Reviewers can be Claude, Codex, Gemini, DeepSeek, or another provider, but the gate accepts only sanitized JSON approval files.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake --",
+        `--packet ${evidencePacketPath}`,
+        `--comparison ${comparisonPath}`,
+        "--strict-target",
+        "--review <reviewer-a-approval.json>",
+        "--review <reviewer-b-approval.json>",
+        `--output ${reviewerApprovalReportPath}`,
+      ].join(" "),
+    },
+    {
+      id: "rerun-reviewed-comparison",
+      description: "Rerun the aggregate comparison with the reviewer approval report bound to the packet before any public comparison language moves to owner review.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:compare --",
+        `--hosted ${resultPath}`,
+        `--recallweave ${recallWeaveResultPath}`,
+        `--reviewer-approval-report ${reviewerApprovalReportPath}`,
+        `--output ${comparisonPath}`,
       ].join(" "),
     },
   ],
@@ -300,7 +323,7 @@ const packet = {
     "matchedRecallWeaveRunPresent is true before comparison claims",
     "RecallWeave result provider is recallweave",
     "RecallWeave result shares dataset, query-set hash, scoring-code hash, judge model, and answer model",
-    "reviewerApprovalCount is at least 2 before comparison claims",
+    "baseline:reviewer-intake records at least two independent reviewer approvals before comparison claims",
     "recallWeaveWin is true before public comparison claims",
   ],
   attachOnly: [
@@ -316,6 +339,7 @@ const packet = {
     sourceAlignmentPath,
     sourceGapPath,
     evidencePacketPath,
+    reviewerApprovalReportPath,
     baselineRunReportPath,
   ],
   forbidden: [
@@ -544,7 +568,6 @@ function buildMarkdown() {
     "Then compare the matched aggregate files:",
     "",
     "```bash",
-    "RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed> \\",
     `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
     "```",
     "",
@@ -558,6 +581,28 @@ function buildMarkdown() {
     `  --preflight ${preflightPath} \\`,
     "  --strict-real \\",
     `  --output ${evidencePacketPath}`,
+    "```",
+    "",
+    "Then validate two independent reviewer approval files against that exact packet. DeepSeek, Claude, Gemini, Codex, or another reviewer may produce the JSON, but this gate only accepts metrics-only approval artifacts.",
+    "",
+    "```bash",
+    "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- \\",
+    `  --packet ${evidencePacketPath} \\`,
+    `  --comparison ${comparisonPath} \\`,
+    "  --strict-target \\",
+    "  --review <reviewer-a-approval.json> \\",
+    "  --review <reviewer-b-approval.json> \\",
+    `  --output ${reviewerApprovalReportPath}`,
+    "```",
+    "",
+    "Then rerun the aggregate comparison with the approval report bound to the packet:",
+    "",
+    "```bash",
+    "npm exec --yes pnpm@10.23.0 -- baseline:compare -- \\",
+    `  --hosted ${resultPath} \\`,
+    `  --recallweave ${recallWeaveResultPath} \\`,
+    `  --reviewer-approval-report ${reviewerApprovalReportPath} \\`,
+    `  --output ${comparisonPath}`,
     "```",
     "",
     "## Attach Only",
@@ -574,6 +619,7 @@ function buildMarkdown() {
     `- ${sourceAlignmentPath}`,
     `- ${sourceGapPath}`,
     `- ${evidencePacketPath}`,
+    `- ${reviewerApprovalReportPath}`,
     `- ${baselineRunReportPath}`,
     "",
     "## Pass Criteria",

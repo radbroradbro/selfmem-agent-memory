@@ -117,6 +117,7 @@ const output = {
     "/tmp/recallweave-baseline-source-alignment.json",
     "/tmp/recallweave-baseline-source-gap.json",
     "/tmp/recallweave-baseline-evidence-packet.zip",
+    "/tmp/recallweave-reviewer-approval-report.json",
     "/tmp/recallweave-baseline-run.json",
   ],
   forbidden: [
@@ -310,6 +311,7 @@ function commandsFor(status) {
   const sourceAlignmentPath = "/tmp/recallweave-baseline-source-alignment.json";
   const sourceGapPath = "/tmp/recallweave-baseline-source-gap.json";
   const packetPath = "/tmp/recallweave-baseline-evidence-packet.zip";
+  const reviewerApprovalReportPath = "/tmp/recallweave-reviewer-approval-report.json";
   const baselineRunReportPath = "/tmp/recallweave-baseline-run.json";
   const commands = [
     {
@@ -484,8 +486,8 @@ function commandsFor(status) {
   commands.push(
     {
       id: "compare-matched-results",
-      description: "Compare hosted and RecallWeave aggregate result files. This still cannot publish a claim by itself.",
-      command: `RECALLWEAVE_REVIEWER_APPROVAL_COUNT=<0-until-reviewed> npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
+      description: "Compare hosted and RecallWeave aggregate result files before review. This still cannot publish a claim by itself.",
+      command: `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} --output ${comparisonPath}`,
     },
     {
       id: "package-review-evidence",
@@ -498,6 +500,30 @@ function commandsFor(status) {
         `--preflight ${preflightPath}`,
         "--strict-real",
         `--output ${packetPath}`,
+      ].join(" "),
+    },
+    {
+      id: "collect-reviewer-approvals",
+      description: "Validate two independent reviewer approval artifacts against the exact metrics-only packet. This accepts Claude, Codex, Gemini, DeepSeek, or another reviewer only through sanitized JSON approval files.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake --",
+        `--packet ${packetPath}`,
+        `--comparison ${comparisonPath}`,
+        "--strict-target",
+        "--review <reviewer-a-approval.json>",
+        "--review <reviewer-b-approval.json>",
+        `--output ${reviewerApprovalReportPath}`,
+      ].join(" "),
+    },
+    {
+      id: "rerun-reviewed-comparison",
+      description: "Rerun the aggregate comparison with the reviewer approval report bound to the packet before any public comparison language moves to owner review.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:compare --",
+        `--hosted ${resultPath}`,
+        `--recallweave ${recallWeaveResultPath}`,
+        `--reviewer-approval-report ${reviewerApprovalReportPath}`,
+        `--output ${comparisonPath}`,
       ].join(" "),
     },
   );
@@ -534,7 +560,7 @@ function acceptanceCriteria() {
     "any auto-authored private query set was locally reviewed before collection",
     "latency, cost, P@1, recall@5, recall@10, NDCG@10, quality, and context-token fields present",
     "RecallWeave beats hosted baseline without any quality metric regressing more than the comparison gate allows",
-    "two independent reviewers approve the setup and result before any public comparison language",
+    "two independent reviewers approve the setup and result through baseline:reviewer-intake before any public comparison language",
     "owner approval remains required for public launch or visibility changes",
   ];
 }
@@ -563,7 +589,7 @@ function buildMarkdown(plan) {
   for (const item of plan.commandPlan) lines.push(`### ${item.id}`, "", item.description, "", "```bash", item.command, "```", "");
   lines.push("## Pass Criteria", "");
   for (const item of plan.acceptanceCriteria) lines.push(`- ${item}`);
-  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, hosted mirror report, source-match, source-alignment, and source-gap reports, the comparison, preflight, and baseline packet zip. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
+  lines.push("", "Attach only aggregate result files, discovery output, the query-set author report, the query-set inspection report, hosted mirror report, source-match, source-alignment, and source-gap reports, the comparison, preflight, baseline packet zip, and reviewer approval report. Do not attach raw memories, transcripts, prompts, answers, credentials, private paths, private container maps, private env files, private query sets, cookies, or unredacted diagnostics.");
   return lines.join("\n");
 }
 

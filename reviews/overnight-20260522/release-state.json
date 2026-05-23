@@ -289,6 +289,14 @@
       "evidence": "reviews/overnight-20260522/gemini-hosted-baseline-live-codex-local-review.md",
       "completedAt": "2026-05-23T12:03:00Z",
       "countsAsPublicLaunchApproval": false
+    },
+    "baselineReviewerApprovalIntake": {
+      "status": "local_clean",
+      "verdict": "MECHANISM_READY_NO_APPROVALS",
+      "route": "node packages/bench/baseline-reviewer-approval-intake.mjs",
+      "evidence": "reviews/overnight-20260522/baseline-reviewer-approval-intake-evidence.md",
+      "completedAt": "2026-05-23T18:45:00Z",
+      "countsAsPublicLaunchApproval": false
     }
   },
   "remainingBlockers": [

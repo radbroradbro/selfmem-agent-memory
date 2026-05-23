@@ -101,6 +101,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --fixture --require-ready
 npm exec --yes pnpm@10.23.0 -- baseline:packet
 npm exec --yes pnpm@10.23.0 -- baseline:packet:review
 npm exec --yes pnpm@10.23.0 -- baseline:returned-packet
+npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake
 ```
 
 The preflight is offline by default. It should report `callsHostedProvider:
@@ -266,6 +267,11 @@ without unpacking raw evidence by hand. Use `baseline:returned-packet -- --packe
 That command fails closed unless the packet is non-fixture, metrics-only,
 privacy-clean, and contains hosted, RecallWeave, comparison, and preflight
 evidence. Public benchmark language still requires reviewer and owner approval.
+Use `baseline:reviewer-intake` only with sanitized approval JSON files that
+bind to the packet SHA or run hash. It can accept approvals produced after
+Claude, Codex, Gemini, DeepSeek, or another reviewer inspects the metrics-only
+packet, but it does not accept raw memories, keys, private paths, or a loose
+reviewer count.
 
 ## Goal Completion Audit
 

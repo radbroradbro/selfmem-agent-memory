@@ -47,6 +47,8 @@ const extraCurrentFiles = [
   "packages/bench/baseline-evidence-packet.mjs",
   "packages/bench/baseline-evidence-packet-review.mjs",
   "packages/bench/baseline-returned-packet-intake.mjs",
+  "packages/bench/baseline-reviewer-approval-intake.mjs",
+  "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
   "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json",
   "packages/bench/fixtures/recallweave-local-container.fixture/local-memories.fixture.jsonl",
@@ -98,6 +100,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["baseline:packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:packet:review"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:returned-packet"], "string");
+  assert.equal(typeof packageJson.scripts?.["baseline:reviewer-intake"], "string");
   assert.equal(typeof packageJson.scripts?.["release:github-sync"], "string");
   assert.ok(existsSync(join(checkout, "README.md")), "README.md missing from consumer checkout");
   assert.ok(existsSync(join(checkout, "docs/USER_MANUAL.md")), "user manual missing from consumer checkout");
@@ -145,6 +148,7 @@ try {
   checks.push(run("node", ["packages/bench/baseline-evidence-packet.mjs"], "hosted baseline evidence packet"));
   checks.push(run("node", ["packages/bench/baseline-evidence-packet-review.mjs"], "hosted baseline evidence packet review"));
   checks.push(run("node", ["packages/bench/baseline-returned-packet-intake.mjs"], "returned hosted baseline packet intake"));
+  checks.push(run("node", ["packages/bench/baseline-reviewer-approval-intake.mjs"], "hosted baseline reviewer approval intake"));
 
   const pack = run("npm", ["pack", "--dry-run", "--json", "--cache", npmCache], "npm package dry run");
   const packJson = JSON.parse(pack.stdout);
@@ -194,6 +198,8 @@ try {
     "packages/bench/baseline-evidence-packet.mjs",
     "packages/bench/baseline-evidence-packet-review.mjs",
     "packages/bench/baseline-returned-packet-intake.mjs",
+    "packages/bench/baseline-reviewer-approval-intake.mjs",
+    "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
     "packages/bench/fixtures/recallweave-baseline-result.fixture.json",
     "packages/bench/fixtures/recallweave-baseline-search-responses.fixture.json",
     "packages/bench/fixtures/recallweave-local-container.fixture/local-memories.fixture.jsonl",

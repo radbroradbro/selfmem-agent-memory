@@ -23,12 +23,14 @@ npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
 npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake
 ```
 
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are
-present. Reports may contain aggregate metrics and hashes only.
+present through `baseline:reviewer-intake`. Reports may contain aggregate
+metrics and hashes only.
 
 `baseline:discover -- --live` is the read-only hosted metadata discovery step.
 It lists candidate containers as hashed ids, counts, timestamps, and status/type
@@ -211,7 +213,8 @@ A stronger claim requires:
 - the same settings,
 - a source-match preflight showing the local RecallWeave source can score the
   reviewed labels,
-- two independent reviewer approvals,
+- two independent reviewer approvals bound to the exact metrics-only packet
+  through `baseline:reviewer-intake`,
 - no memory text in shared reports,
 - zero redaction failures,
 - cost and latency accounting,
@@ -237,5 +240,6 @@ and beats the no-expansion run without exact-identifier, privacy, or latency
 regressions.
 
 Public GitHub benchmark scores are allowed only after a real matched canary win
-with two independent reviewer approvals. A canary win may justify a full
-benchmark; it does not prove general SOTA superiority.
+with two independent reviewer approvals recorded by `baseline:reviewer-intake`.
+A canary win may justify a full benchmark; it does not prove general SOTA
+superiority.

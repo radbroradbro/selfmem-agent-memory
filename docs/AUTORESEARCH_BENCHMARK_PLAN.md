@@ -31,7 +31,8 @@ A publishable canary must use:
 - the same privacy rules,
 - cost and latency accounting,
 - zero redaction failures,
-- two independent reviewer approvals.
+- two independent reviewer approvals recorded by `baseline:reviewer-intake`
+  and bound to the exact metrics-only packet or run.
 
 If RecallWeave does not win, write a private gap report and keep iterating. Do
 not market the score.
@@ -53,6 +54,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:source-gap
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:next-run
 ```
@@ -221,7 +223,9 @@ quality result.
 5. Pick the largest quality gap. If quality is tied, pick the largest latency
    or cost gap.
 6. Propose exactly one methodology change.
-7. Require two independent reviewers to approve the setup before coding.
+7. Require two independent reviewers to approve the setup before coding. Store
+   their metrics-only approvals through `baseline:reviewer-intake` before any
+   public comparison language moves to owner review.
 8. Implement only the approved change.
 9. Rerun the affected canary first.
 10. Keep the change only if quality improves without a serious regression, or
@@ -250,6 +254,13 @@ Preferred reviewer route:
 
 If a reviewer route is unavailable, write a blocked-review file. Do not count
 that route as approval.
+
+For non-UI benchmark packet review, an OpenAI-compatible route such as DeepSeek
+may serve as a reviewer when the operator keeps the API key in the local
+environment and converts the model decision into the
+`baseline:reviewer-intake -- --template` JSON shape. The committed repository
+must contain only the sanitized approval artifact or blocked-review note, not
+the key, raw prompt, raw memory text, or private paths.
 
 ## Query Expansion Gate
 

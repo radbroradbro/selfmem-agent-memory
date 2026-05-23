@@ -41,7 +41,8 @@ reserve "canary" for a limited one-agent rollout test.
 Do not treat this release as a proven Supermemory replacement. The included
 benchmark notes are metrics-only engineering evidence. A public score requires
 a matched, source-locked canary win with the same judge, answer model, queries,
-scoring code, privacy rules, and reviewer sign-off.
+scoring code, privacy rules, and two reviewer approvals recorded through the
+metrics-only `baseline:reviewer-intake` gate.
 
 ## Features
 

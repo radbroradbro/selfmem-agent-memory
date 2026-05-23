@@ -22,12 +22,17 @@ const recallWeavePath = resolveInputPath(
     process.env.RECALLWEAVE_RESULT_JSON ??
     (fixtureRequested ? "packages/bench/fixtures/recallweave-baseline-result.fixture.json" : null),
 );
-const reviewerApprovalCount = Number(process.env.RECALLWEAVE_REVIEWER_APPROVAL_COUNT ?? args.reviewerApprovalCount ?? 0);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\)/;
+const reviewerApprovalReportPath = resolveInputPath(
+  args.reviewerApprovalReport ?? process.env.RECALLWEAVE_REVIEWER_APPROVAL_REPORT_JSON ?? null,
+);
+const reviewerApprovalReport = reviewerApprovalReportPath ? loadReviewerApprovalReport(reviewerApprovalReportPath) : null;
+const legacyReviewerApprovalCount = Number(process.env.RECALLWEAVE_REVIEWER_APPROVAL_COUNT ?? args.reviewerApprovalCount ?? 0);
+const reviewerApprovalCount = reviewerApprovalReport ? reviewerApprovalReport.reviewerApprovalCount : 0;
 
 assert.ok(hostedPath, "hosted baseline result is required. Pass --hosted or RECALLWEAVE_HOSTED_BASELINE_RESULT_JSON");
 assert.ok(recallWeavePath, "RecallWeave result is required. Pass --recallweave or RECALLWEAVE_RESULT_JSON");
@@ -87,6 +92,8 @@ const result = {
   countsAsComparisonEvidence,
   recallWeaveWin,
   reviewerApprovalCount,
+  legacyReviewerApprovalCount,
+  reviewerApprovalReport,
   publicBenchmarkClaimsAllowed,
   failedChecks,
   safety: {
@@ -149,6 +156,35 @@ function loadResult(inputPath, expectedProvider) {
     cost: {
       ingestUsd: requiredNumber(result.cost?.ingestUsd ?? result.ingestCostUsd, "cost.ingestUsd", inputPath),
       queryUsd: requiredNumber(result.cost?.queryUsd ?? result.queryCostUsd, "cost.queryUsd", inputPath),
+    },
+  };
+}
+
+function loadReviewerApprovalReport(inputPath) {
+  assert.ok(existsSync(inputPath), `reviewer approval report missing: ${displayPath(inputPath)}`);
+  assert.ok(statSync(inputPath).size > 0, `reviewer approval report empty: ${displayPath(inputPath)}`);
+  const raw = readFileSync(inputPath, "utf8");
+  assert.doesNotMatch(raw, secretPattern, `${displayPath(inputPath)} contains a key-shaped secret`);
+  assert.doesNotMatch(raw, privatePathPattern, `${displayPath(inputPath)} contains a private path`);
+  const report = JSON.parse(raw);
+  assert.equal(report.mode, "baseline-reviewer-approval-intake", "reviewer approval report must be baseline-reviewer-approval-intake");
+  assert.equal(report.metricsOnly, true, "reviewer approval report must be metrics-only");
+  assert.equal(report.publicLaunchAllowed, false, "reviewer approval report must not authorize public launch");
+  return {
+    mode: report.mode,
+    metricsOnly: true,
+    publicLaunchAllowed: false,
+    publicBenchmarkApprovalReady: Boolean(report.publicBenchmarkApprovalReady),
+    reviewerApprovalCount: Number(report.reviewerApprovalCount ?? 0),
+    independentReviewerCount: Number(report.independentReviewerCount ?? 0),
+    reviewsSubmitted: Number(report.reviewsSubmitted ?? 0),
+    failedChecks: Array.isArray(report.failedChecks) ? report.failedChecks : [],
+    target: {
+      packetSha256: report.target?.packetSha256 ?? null,
+      runHash: report.target?.runHash ?? null,
+      comparisonHash: report.target?.comparisonHash ?? null,
+      querySetHash: report.target?.querySetHash ?? null,
+      scoringCodeHash: report.target?.scoringCodeHash ?? null,
     },
   };
 }

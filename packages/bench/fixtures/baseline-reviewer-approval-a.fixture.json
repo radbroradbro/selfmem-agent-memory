@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "mode": "baseline-reviewer-approval",
+  "fixtureOnly": true,
+  "reviewer": {
+    "id": "fixture-reviewer-a",
+    "provider": "fixture",
+    "model": "fixture-review-model-a"
+  },
+  "verdict": "APPROVE_SOURCE_MATCHED_BASELINE",
+  "countsAsBenchmarkApproval": true,
+  "claimScope": "source-matched-canary",
+  "target": {
+    "packetSha256": "fixture-packet-sha",
+    "querySetHash": "sha256:fixturequeryset000000000000000000000000000000000000000000000000",
+    "scoringCodeHash": "sha256:fixturescoring000000000000000000000000000000000000000000000000"
+  },
+  "attestations": {
+    "metricsOnlyEvidenceReviewed": true,
+    "noRawMemoryText": true,
+    "noRawTranscriptText": true,
+    "noRawPromptText": true,
+    "noRawAnswerText": true,
+    "noCredentials": true,
+    "privacyLeakCountZero": true,
+    "sameHarnessReviewed": true,
+    "sourceMatchedReviewed": true,
+    "contextTokenCaveatReviewed": true,
+    "publicLaunchStillBlocked": true,
+    "ownerApprovalStillRequired": true
+  },
+  "blockingConcerns": [],
+  "nonBlockingConcerns": [
+    "Fixture approval demonstrates shape only."
+  ]
+}

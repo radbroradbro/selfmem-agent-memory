@@ -536,5 +536,26 @@ npm exec --yes pnpm@10.23.0 -- baseline:compare \
   --recallweave /tmp/recallweave-result.json
 ```
 
+After packaging the aggregate evidence, validate reviewer approvals as their
+own metrics-only artifacts. DeepSeek, Claude, Gemini, Codex, or another model
+can review, but the gate trusts only the JSON approval file and never a loose
+counter:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake \
+  -- --packet /tmp/recallweave-baseline-evidence-packet.zip \
+  --comparison /tmp/recallweave-baseline-comparison.json \
+  --strict-target \
+  --review /tmp/reviewer-a-approval.json \
+  --review /tmp/reviewer-b-approval.json \
+  --output /tmp/recallweave-reviewer-approval-report.json
+
+npm exec --yes pnpm@10.23.0 -- baseline:compare \
+  -- --hosted /tmp/recallweave-hosted-baseline-result.json \
+  --recallweave /tmp/recallweave-result.json \
+  --reviewer-approval-report /tmp/recallweave-reviewer-approval-report.json \
+  --output /tmp/recallweave-baseline-comparison.json
+```
+
 Hosted credentials stay in local environment variables and must never appear in
 PRs, docs, diagnostics, screenshots, or attachments.

@@ -74,6 +74,8 @@ const requiredFiles = [
   "packages/bench/baseline-evidence-packet.mjs",
   "packages/bench/baseline-evidence-packet-review.mjs",
   "packages/bench/baseline-returned-packet-intake.mjs",
+  "packages/bench/baseline-reviewer-approval-intake.mjs",
+  "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -238,6 +240,7 @@ const requiredFiles = [
   `${reviewDir}/gemini-baseline-evidence-packet-review.md`,
   `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
   `${reviewDir}/gemini-baseline-returned-packet-intake-review.md`,
+  `${reviewDir}/baseline-reviewer-approval-intake-evidence.md`,
   `${reviewDir}/github-handoff-packet-evidence.md`,
   `${reviewDir}/gemini-github-handoff-packet-review.md`,
   `${reviewDir}/github-live-sync-evidence.md`,
@@ -368,6 +371,7 @@ const requiredScripts = [
   "baseline:packet",
   "baseline:packet:review",
   "baseline:returned-packet",
+  "baseline:reviewer-intake",
   "goal:audit",
   "release:doctor",
   "release:handoff",
@@ -2284,6 +2288,7 @@ check("fresh hosted baseline preflight passes", () => {
   const missingSourceAlignmentReportPath = join(collectorTmp, "missing-source-alignment.json");
   const missingSourceGapReportPath = join(collectorTmp, "missing-source-gap.json");
   const baselinePacketPath = join(collectorTmp, "baseline-evidence-packet.zip");
+  const baselineReviewerApprovalReportPath = join(collectorTmp, "baseline-reviewer-approval-template.json");
   const strictFixtureBaselinePacketPath = join(collectorTmp, "strict-fixture-baseline-evidence-packet.zip");
   const returnedBaselineIntakePath = join(collectorTmp, "returned-baseline-packet-intake.json");
   const result = run("node", ["packages/bench/hosted-baseline-preflight.mjs"]);
@@ -2671,6 +2676,9 @@ check("fresh hosted baseline preflight passes", () => {
   );
   const collectorPreflightResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--result", collectorResultPath]);
   const comparisonResult = run("node", ["packages/bench/baseline-comparison.mjs", "--fixture"]);
+  const looseReviewerComparisonResult = run("node", ["packages/bench/baseline-comparison.mjs", "--fixture"], {
+    env: { ...process.env, RECALLWEAVE_REVIEWER_APPROVAL_COUNT: "2" },
+  });
   const matchedCollectorComparison = run("node", [
     "packages/bench/baseline-comparison.mjs",
     "--hosted",
@@ -2758,6 +2766,15 @@ check("fresh hosted baseline preflight passes", () => {
   const baselinePacketResult = run("node", ["packages/bench/baseline-evidence-packet.mjs", "--output", baselinePacketPath]);
   const baselinePacketReviewResult = run("node", ["packages/bench/baseline-evidence-packet-review.mjs"]);
   const returnedBaselinePacketResult = run("node", ["packages/bench/baseline-returned-packet-intake.mjs"]);
+  const baselineReviewerIntakeResult = run("node", ["packages/bench/baseline-reviewer-approval-intake.mjs"]);
+  const baselineReviewerTemplateResult = run("node", [
+    "packages/bench/baseline-reviewer-approval-intake.mjs",
+    "--template",
+    "--packet",
+    baselinePacketPath,
+    "--output",
+    baselineReviewerApprovalReportPath,
+  ]);
   const returnedBaselinePacketPathResult = run("node", [
     "packages/bench/baseline-returned-packet-intake.mjs",
     "--packet",
@@ -2825,6 +2842,7 @@ check("fresh hosted baseline preflight passes", () => {
   const recallWeaveLiveReport = JSON.parse(recallWeaveLiveResult.stdout);
   const collectorPreflightReport = JSON.parse(collectorPreflightResult.stdout);
   const comparisonReport = JSON.parse(comparisonResult.stdout);
+  const looseReviewerComparisonReport = JSON.parse(looseReviewerComparisonResult.stdout);
   const matchedCollectorComparisonReport = JSON.parse(matchedCollectorComparison.stdout);
   const operatorPacket = JSON.parse(operatorResult.stdout);
   const operatorDiscoveryPacket = JSON.parse(operatorDiscoveryResult.stdout);
@@ -2835,6 +2853,8 @@ check("fresh hosted baseline preflight passes", () => {
   const nextRunRequireReadyFixtureReport = JSON.parse(nextRunRequireReadyFixture.stdout);
   const baselinePacket = JSON.parse(baselinePacketResult.stdout);
   const baselinePacketReview = JSON.parse(baselinePacketReviewResult.stdout);
+  const baselineReviewerIntake = JSON.parse(baselineReviewerIntakeResult.stdout);
+  const baselineReviewerTemplate = JSON.parse(baselineReviewerTemplateResult.stdout);
   const returnedBaselinePacket = JSON.parse(returnedBaselinePacketResult.stdout);
   const returnedBaselinePacketFromPath = JSON.parse(returnedBaselinePacketPathResult.stdout);
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-hosted-baseline-preflight-review.md"), "utf8");
@@ -2881,6 +2901,7 @@ check("fresh hosted baseline preflight passes", () => {
   const baselinePacketGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-evidence-packet-review.md"), "utf8");
   const baselineReturnedPacketEvidence = readFileSync(join(root, reviewDir, "baseline-returned-packet-intake-evidence.md"), "utf8");
   const baselineReturnedPacketGeminiReview = readFileSync(join(root, reviewDir, "gemini-baseline-returned-packet-intake-review.md"), "utf8");
+  const baselineReviewerApprovalIntakeEvidence = readFileSync(join(root, reviewDir, "baseline-reviewer-approval-intake-evidence.md"), "utf8");
   assert.equal(report.ok, true);
   assert.equal(report.mode, "hosted-baseline-preflight");
   assert.equal(report.writesRealFiles, false);
@@ -3237,6 +3258,10 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(comparisonReport.publicBenchmarkClaimsAllowed, false);
   assert.ok(comparisonReport.failedChecks?.includes("hosted-not-fixture"));
   assert.ok(comparisonReport.failedChecks?.includes("recallweave-not-fixture"));
+  assert.equal(looseReviewerComparisonReport.legacyReviewerApprovalCount, 2);
+  assert.equal(looseReviewerComparisonReport.reviewerApprovalCount, 0);
+  assert.equal(looseReviewerComparisonReport.publicBenchmarkClaimsAllowed, false);
+  assert.ok(looseReviewerComparisonReport.failedChecks?.includes("two-reviewer-approvals"));
   assert.ok(Number(comparisonReport.deltas?.quality) > 0);
   assert.equal(matchedCollectorComparisonReport.mode, "baseline-comparison");
   assert.equal(matchedCollectorComparisonReport.comparability?.sameDataset, true);
@@ -3341,6 +3366,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.commands.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "collect-live-result" && /baseline:collect/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "package-baseline-evidence" && /baseline:packet/.test(item.command) && /--strict-real/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "collect-reviewer-approvals" && /baseline:reviewer-intake/.test(item.command) && /--strict-target/.test(item.command)));
+  assert.ok(operatorPacket.commands.some((item) => item.id === "rerun-reviewed-comparison" && /--reviewer-approval-report/.test(item.command)));
   assert.ok(operatorPacket.commands.some((item) => item.id === "validate-live-result" && /RECALLWEAVE_BASELINE_NO_RAW_TEXT=1/.test(item.command)));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
@@ -3348,13 +3375,14 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-match.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-alignment.json"));
   assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-baseline-source-gap.json"));
+  assert.ok(operatorPacket.attachOnly?.includes("/tmp/recallweave-reviewer-approval-report.json"));
   for (const command of operatorPacket.commands.map((item) => item.command).filter((command) => /baseline:(preflight|compare|source-match|source-align|source-gap)/.test(command))) {
     if (/--fixture/.test(command)) continue;
     const toolSegment = command.slice(command.indexOf("baseline:"));
     assert.match(toolSegment, /--output\s+\/tmp\/recallweave-/);
     assert.doesNotMatch(toolSegment, /\s>\s/, "hosted baseline JSON evidence commands must use --output instead of shell redirection");
   }
-  assert.ok(operatorPacket.acceptanceCriteria.includes("reviewerApprovalCount is at least 2 before comparison claims"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("baseline:reviewer-intake records at least two independent reviewer approvals before comparison claims"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("querySetEvidence.publicBenchmarkReady is true"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("every query has at least one expectedResultId or expectedResultHash"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source"));
@@ -3380,6 +3408,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(operatorMarkdown.stdout, /baseline:run/);
   assert.match(operatorMarkdown.stdout, /baseline:export:recallweave/);
   assert.match(operatorMarkdown.stdout, /baseline:packet/);
+  assert.match(operatorMarkdown.stdout, /baseline:reviewer-intake/);
   assert.match(operatorMarkdown.stdout, /Attach Only/);
   assert.match(operatorSourceGapMarkdown.stdout, /Current Source-Gap Repair Queue/);
   assert.match(operatorSourceGapMarkdown.stdout, /BLOCKED_CONTENT_DIVERGENT/);
@@ -3427,12 +3456,15 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "export-recallweave-responses" && /baseline:export:recallweave/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "compare-matched-results" && /baseline:compare/.test(item.command)));
   assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "package-review-evidence" && /baseline:packet/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "collect-reviewer-approvals" && /baseline:reviewer-intake/.test(item.command) && /--strict-target/.test(item.command)));
+  assert.ok(nextRunPlan.commandPlan?.some((item) => item.id === "rerun-reviewed-comparison" && /--reviewer-approval-report/.test(item.command)));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-author-report.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-baseline-queryset-report.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-hosted-local-mirror.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-match.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-alignment.json"));
   assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-baseline-source-gap.json"));
+  assert.ok(nextRunPlan.attachOnly?.includes("/tmp/recallweave-reviewer-approval-report.json"));
   for (const command of nextRunPlan.commandPlan.map((item) => item.command).filter((command) => /baseline:(preflight|compare|source-match|source-align|source-gap)/.test(command))) {
     if (/--fixture/.test(command)) continue;
     const toolSegment = command.slice(command.indexOf("baseline:"));
@@ -3451,6 +3483,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(nextRunMarkdown.stdout, /baseline:source-align/);
   assert.match(nextRunMarkdown.stdout, /baseline:source-gap/);
   assert.match(nextRunMarkdown.stdout, /baseline:run/);
+  assert.match(nextRunMarkdown.stdout, /baseline:reviewer-intake/);
   assert.match(nextRunMarkdown.stdout, /private container maps/i);
   assert.equal(baselineRunPlan.ok, true);
   assert.equal(baselineRunPlan.mode, "hosted-baseline-run");
@@ -3522,6 +3555,17 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(baselinePacketReview.fixtureOnly, true);
   assert.equal(baselinePacketReview.countsAsProductionBaselineEvidence, false);
   assert.equal(baselinePacketReview.countsAsPublicBenchmarkEvidence, false);
+  assert.equal(baselineReviewerIntake.mode, "baseline-reviewer-approval-intake");
+  assert.equal(baselineReviewerIntake.metricsOnly, true);
+  assert.equal(baselineReviewerIntake.publicLaunchAllowed, false);
+  assert.equal(baselineReviewerIntake.reviewerApprovalCount, 0);
+  assert.equal(baselineReviewerIntake.publicBenchmarkApprovalReady, false);
+  assert.ok(baselineReviewerIntake.failedChecks?.includes("two-independent-approvals"));
+  assert.equal(baselineReviewerTemplate.mode, "baseline-reviewer-approval-template");
+  assert.equal(baselineReviewerTemplate.metricsOnly, true);
+  assert.equal(baselineReviewerTemplate.publicLaunchAllowed, false);
+  assert.equal(baselineReviewerTemplate.target?.packetSha256, baselinePacket.packet?.sha256);
+  assert.equal(baselineReviewerTemplate.template?.attestations?.contextTokenCaveatReviewed, true);
   assert.equal(returnedBaselinePacket.mode, "baseline-returned-packet-intake");
   assert.equal(returnedBaselinePacket.status, "NOT_BASELINE_EVIDENCE");
   assert.equal(returnedBaselinePacket.countsAsProductionBaselineEvidence, false);
@@ -3618,6 +3662,8 @@ check("fresh hosted baseline preflight passes", () => {
   assert.match(baselineReturnedPacketEvidence, /returned baseline evidence packet|returned hosted baseline packet/i);
   assert.match(baselineReturnedPacketEvidence, /baseline:returned-packet/i);
   assert.match(baselineReturnedPacketGeminiReview, /Verdict:\s*CLEAN|Verdict: `CLEAN`|^CLEAN/m);
+  assert.match(baselineReviewerApprovalIntakeEvidence, /reviewer approval intake/i);
+  assert.match(baselineReviewerApprovalIntakeEvidence, /baseline-reviewer-approval-intake|baseline:reviewer-intake/i);
   assert.match(querySetEvidence, /baseline:queryset/i);
   assert.match(querySetEvidence, /publicBenchmarkReady/i);
   assert.match(querySetGeminiReview, /Verdict:\s*CLEAN|Verdict:\s*`?PASS`?|^CLEAN/m);
@@ -3698,6 +3744,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(recallWeaveCollectorEvidence, secretPattern);
   assert.doesNotMatch(recallWeaveCollectorGeminiReview, secretPattern);
   assert.doesNotMatch(comparisonResult.stdout, secretPattern);
+  assert.doesNotMatch(looseReviewerComparisonResult.stdout, secretPattern);
   assert.doesNotMatch(matchedCollectorComparison.stdout, secretPattern);
   assert.doesNotMatch(comparisonEvidence, secretPattern);
   assert.doesNotMatch(comparisonGeminiReview, secretPattern);
@@ -3724,12 +3771,15 @@ check("fresh hosted baseline preflight passes", () => {
   assert.doesNotMatch(nextRunMarkdown.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   assert.doesNotMatch(baselinePacketResult.stdout, secretPattern);
   assert.doesNotMatch(baselinePacketReviewResult.stdout, secretPattern);
+  assert.doesNotMatch(baselineReviewerIntakeResult.stdout, secretPattern);
+  assert.doesNotMatch(baselineReviewerTemplateResult.stdout, secretPattern);
   assert.doesNotMatch(returnedBaselinePacketResult.stdout, secretPattern);
   assert.doesNotMatch(returnedBaselinePacketPathResult.stdout, secretPattern);
   assert.doesNotMatch(baselinePacketEvidence, secretPattern);
   assert.doesNotMatch(baselinePacketGeminiReview, secretPattern);
   assert.doesNotMatch(baselineReturnedPacketEvidence, secretPattern);
   assert.doesNotMatch(baselineReturnedPacketGeminiReview, secretPattern);
+  assert.doesNotMatch(baselineReviewerApprovalIntakeEvidence, secretPattern);
   rmSync(collectorTmp, { recursive: true, force: true });
 });
 
