@@ -104,9 +104,9 @@ issues.
 Latest verified head before this draft refresh:
 
 - PR: `https://github.com/radbroradbro/selfmem-agent-memory/pull/5`
-- Latest verified code baseline: `3b1870e`
-- GitHub Actions: CI run `26320054524` passed for the RecallWeave baseline
-  collector gate after rerun attempt 2
+- Latest verified code baseline: `7fc3be2`
+- GitHub Actions: CI run `26320492619` passed for the RecallWeave response
+  export gate
 - Generated GitHub handoff packet: `release:handoff` prints the paste-ready PR
   body, status comment, blocker issue, labels, and manual GitHub steps with
   no file writes and no secret-pattern hits
@@ -174,6 +174,8 @@ Latest verified head before this draft refresh:
   baseline operator packet gate.
 - GitHub Actions CI run `26318710488` passed on `adfd435`, the hosted
   baseline operator packet evidence refresh.
+- GitHub Actions CI run `26320492619` passed on `7fc3be2`, the RecallWeave
+  response export gate.
 - GitHub Actions CI run `26320054524` passed on `3b1870e`, the RecallWeave
   baseline collector gate after rerun attempt 2.
 - GitHub Actions CI run `26319551404` passed on `8520140`, the baseline
