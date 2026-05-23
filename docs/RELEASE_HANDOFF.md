@@ -90,6 +90,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:compare -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:operator-packet
+npm exec --yes pnpm@10.23.0 -- baseline:packet
 ```
 
 The preflight is offline by default. It should report `callsHostedProvider:
@@ -120,6 +121,9 @@ privacy-clean, and source-locked to the same query set and scoring code.
 Use `baseline:operator-packet` when an agent needs a paste-ready, public-safe
 handoff for hosted baseline collection. The packet itself is a contract and
 validation guide only. It does not call hosted Supermemory or close the blocker.
+Use `baseline:packet` after hosted and RecallWeave aggregate files are collected
+and compared. It creates one metrics-only zip for reviewer intake and rejects
+fixture packets under `--strict-real`.
 
 ## Goal Completion Audit
 

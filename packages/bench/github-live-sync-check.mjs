@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -94,14 +95,27 @@ assert.doesNotMatch(serialized, privatePathPattern);
 console.log(serialized);
 
 async function githubJson(apiPath) {
+  const authHeader = gitCredentialAuthHeader();
   const response = await fetch(`https://api.github.com${apiPath}`, {
     headers: {
       accept: "application/vnd.github+json",
       "user-agent": "recallweave-live-sync-check",
+      ...(authHeader ? { authorization: authHeader } : {}),
     },
   });
   assert.equal(response.ok, true, `GitHub API request failed for ${apiPath}: ${response.status}`);
   return response.json();
+}
+
+function gitCredentialAuthHeader() {
+  const result = spawnSync("git", ["credential", "fill"], {
+    input: "protocol=https\nhost=github.com\n\n",
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "ignore"],
+  });
+  if (result.status !== 0) return null;
+  const token = result.stdout.match(/^password=(.+)$/m)?.[1];
+  return token ? `Bearer ${token}` : null;
 }
 
 function extractFencedMarkdown(text) {

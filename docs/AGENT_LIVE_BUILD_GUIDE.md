@@ -45,6 +45,8 @@ Share:
 - smoke command output,
 - sanitized stack trace.
 - metrics-only `canary:diagnose` output when strict canary intake fails.
+- metrics-only `baseline:packet` output when sending hosted-baseline comparison
+  evidence.
 
 Do not share:
 

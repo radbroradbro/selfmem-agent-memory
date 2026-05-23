@@ -147,6 +147,11 @@ Scope:
   writes one metrics-only zip from report, intake, and optional diagnosis files,
   rejects raw-content keys, secrets, and private paths, and keeps fixture or
   failing packets from authorizing rollout.
+- Added baseline evidence packet coverage to the release gate. The packet
+  command writes one metrics-only zip from hosted result, RecallWeave result,
+  comparison, and preflight files, rejects raw-content keys, secrets, and
+  private paths, and keeps fixture packets from authorizing public benchmark
+  claims.
 - Added GitHub live sync coverage to the release gate. The checker calls the
   GitHub API in read-only mode, verifies PR #5 and issue #6 match the
   checked-in drafts, and prints hashes and booleans instead of body text,

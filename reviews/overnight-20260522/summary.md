@@ -85,6 +85,7 @@ evidence are still required before any public live update.
 | RecallWeave baseline collector | `packages/bench/recallweave-baseline-collector.mjs`, `baseline:collect:recallweave`, `reviews/overnight-20260522/recallweave-baseline-collector-evidence.md`, `reviews/overnight-20260522/gemini-recallweave-baseline-collector-review.md` |
 | Baseline comparison gate | `packages/bench/baseline-comparison.mjs`, `baseline:compare`, `reviews/overnight-20260522/baseline-comparison-evidence.md`, `reviews/overnight-20260522/gemini-baseline-comparison-review.md` |
 | Hosted baseline operator packet | `packages/bench/hosted-baseline-operator-packet.mjs`, `reviews/overnight-20260522/hosted-baseline-operator-packet-evidence.md` |
+| Baseline evidence packet | `packages/bench/baseline-evidence-packet.mjs`, `baseline:packet`, `reviews/overnight-20260522/baseline-evidence-packet-evidence.md`, `reviews/overnight-20260522/gemini-baseline-evidence-packet-review.md` |
 | Canary evidence intake | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-canary-evidence-intake-review.md` |
 | Strict-real fail-closed intake output | `packages/bench/canary-evidence-intake.mjs`, `reviews/overnight-20260522/canary-evidence-intake-evidence.md`, `reviews/overnight-20260522/gemini-strict-real-fail-closed-intake-review.md` |
 | Adapter strict canary contract | `packages/adapters/hermes/selfmem_canary/__init__.py`, `packages/adapters/openclaw/selfmem_canary/index.mjs`, `packages/bench/canary-evidence-intake.mjs`, `plugins/selfmem-fallback/scripts/selfmem_update.py`, `reviews/overnight-20260522/adapter-strict-canary-contract-evidence.md`, `reviews/overnight-20260522/gemini-adapter-strict-canary-contract-review.md` |
@@ -183,6 +184,10 @@ Latest local verification before this summary:
   full smoke, `release:check`, `release:doctor`, `goal:audit`, Gemini review,
   PR/issue live sync, and GitHub Actions CI run `26321472056` passed on
   `e2388f0`.
+- Baseline evidence packet verification: local packet smoke and strict fixture
+  rejection passed. Gemini review returned `CLEAN`. The packet keeps public
+  benchmark claims disabled unless a strict-real hosted baseline, RecallWeave
+  result, comparison, and preflight all pass.
 - GitHub Actions CI: success on guarded selected vault sync apply commit
   `103e7c6`, run `26290534116`.
 - GitHub Actions CI: success on guarded selected local-container browse commit

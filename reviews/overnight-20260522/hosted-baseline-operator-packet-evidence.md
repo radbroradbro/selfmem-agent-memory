@@ -13,6 +13,9 @@ Scope:
   `baseline:export:recallweave -- --live`,
   `baseline:collect:recallweave -- --live`, and `baseline:compare` instead of
   ad hoc external collectors.
+- The packet now points operators to `baseline:packet --strict-real` so the
+  hosted result, RecallWeave result, comparison, and preflight become one
+  metrics-only reviewer zip.
 - Gemini focused review returned `CLEAN`.
 
 Commands:
@@ -23,6 +26,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:operator-packet -- --format markdown
 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture
+npm exec --yes pnpm@10.23.0 -- baseline:packet
 ```
 
 Expected behavior:
@@ -42,6 +46,8 @@ Expected behavior:
 - It tells operators to run `baseline:compare` only after hosted and
   RecallWeave outputs share the same dataset, query-set hash, scoring-code
   hash, judge model, and answer model.
+- It tells operators to run `baseline:packet --strict-real` after comparison so
+  reviewers receive one metrics-only zip instead of loose ad hoc JSON.
 - It tells operators to keep `SUPERMEMORY_API_KEY` in the local environment and
   never paste it into the command or any attachment.
 - It requires env-only hosted credentials and never prints provider-key values.
@@ -50,6 +56,7 @@ Expected behavior:
   - `/tmp/recallweave-hosted-baseline-preflight.json`
   - `/tmp/recallweave-result.json`
   - `/tmp/recallweave-baseline-comparison.json`
+  - `/tmp/recallweave-baseline-evidence-packet.zip`
 - It forbids provider keys, raw hosted memories, raw RecallWeave response
   exports containing memory text, raw local memories, transcripts, prompts,
   answers, cookies, bearer tokens, private local paths, and unredacted

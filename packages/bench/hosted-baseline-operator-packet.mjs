@@ -13,6 +13,7 @@ const comparisonPath = "/tmp/recallweave-baseline-comparison.json";
 const preflightPath = "/tmp/recallweave-hosted-baseline-preflight.json";
 const templatePath = "/tmp/recallweave-hosted-baseline-template.json";
 const querySetPath = "/tmp/recallweave-hosted-baseline-queryset.json";
+const evidencePacketPath = "/tmp/recallweave-baseline-evidence-packet.zip";
 
 const packet = {
   ok: true,
@@ -30,6 +31,7 @@ const packet = {
     preflightPath,
     templatePath,
     querySetPath,
+    evidencePacketPath,
   },
   commands: [
     {
@@ -105,6 +107,19 @@ const packet = {
         `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} > ${comparisonPath}`,
       ].join(" "),
     },
+    {
+      id: "package-baseline-evidence",
+      description: "Package hosted result, RecallWeave result, comparison, and preflight into one metrics-only zip for reviewer intake.",
+      command: [
+        "npm exec --yes pnpm@10.23.0 -- baseline:packet --",
+        `--hosted ${resultPath}`,
+        `--recallweave ${recallWeaveResultPath}`,
+        `--comparison ${comparisonPath}`,
+        `--preflight ${preflightPath}`,
+        "--strict-real",
+        `--output ${evidencePacketPath}`,
+      ].join(" "),
+    },
   ],
   acceptanceCriteria: [
     "resultInspection.fixtureOnly is false",
@@ -134,6 +149,7 @@ const packet = {
     recallWeaveResultPath,
     comparisonPath,
     preflightPath,
+    evidencePacketPath,
   ],
   forbidden: [
     "provider keys",
@@ -251,12 +267,25 @@ function buildMarkdown() {
     `npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted ${resultPath} --recallweave ${recallWeaveResultPath} > ${comparisonPath}`,
     "```",
     "",
+    "Then package the aggregate evidence into one reviewer zip:",
+    "",
+    "```bash",
+    "npm exec --yes pnpm@10.23.0 -- baseline:packet -- \\",
+    `  --hosted ${resultPath} \\`,
+    `  --recallweave ${recallWeaveResultPath} \\`,
+    `  --comparison ${comparisonPath} \\`,
+    `  --preflight ${preflightPath} \\`,
+    "  --strict-real \\",
+    `  --output ${evidencePacketPath}`,
+    "```",
+    "",
     "## Attach Only",
     "",
     `- ${resultPath}`,
     `- ${recallWeaveResultPath}`,
     `- ${comparisonPath}`,
     `- ${preflightPath}`,
+    `- ${evidencePacketPath}`,
     "",
     "## Pass Criteria",
     "",

@@ -38,6 +38,8 @@ The current PR adds:
 - a matched baseline comparison gate that blocks public claims unless hosted
   and RecallWeave result files are non-fixture, source-matched, privacy-clean,
   and reviewer-approved;
+- a baseline evidence packet builder that creates one metrics-only zip from
+  hosted result, RecallWeave result, comparison, and preflight files;
 - a canary evidence intake for sanitized one-agent runtime reports, blocked
   from fleet rollout and public launch when the report is only a fixture;
 - a canary report generator that converts Hermes/OpenClaw traces into the
@@ -138,6 +140,8 @@ Latest verified head before this draft refresh:
 - Hosted baseline operator packet: `baseline:operator-packet` prints a
   public-safe handoff for aggregate-only hosted Supermemory baseline collection
   and calls no hosted provider
+- Baseline evidence packet: `baseline:packet` creates a metrics-only hosted
+  baseline reviewer zip and fails closed for fixture strict-real evidence
 - Canary evidence intake: `canary:intake` passes on the public fixture with
   lifecycle coverage, hybrid search coverage, local writes, read-through mode,
   p50/p95 latency, rollback readiness, zero privacy leaks, and

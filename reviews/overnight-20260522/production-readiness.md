@@ -78,6 +78,9 @@ Evidence in PR #5 and `reviews/overnight-20260522/` shows proposed work for:
 - Hosted baseline operator packet that gives agents a public-safe,
   aggregate-only hosted Supermemory baseline handoff without calling a hosted
   provider.
+- Baseline evidence packet that turns hosted result, RecallWeave result,
+  matched comparison, and preflight output into one metrics-only reviewer zip
+  and fails closed for fixtures under `--strict-real`.
 - GitHub live sync check that compares live PR #5 and blocker issue #6 against
   checked-in release drafts without printing body text or credentials.
 - Canary evidence intake that accepts sanitized one-agent runtime reports with
