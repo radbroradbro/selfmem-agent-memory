@@ -39,12 +39,20 @@ Live status:
   collection. Live runs now require the local container map and private hosted
   map through CLI flags or environment variables, while only public-safe
   source-match, source-alignment, and source-gap reports may be attached.
+- Hardens `baseline:source-match` for real local selfmem exports that contain
+  path-bearing provenance. Memory text and local path provenance are redacted
+  before hashing, stdout, and report output, unsafe ids are hash-replaced, and
+  source-mismatched exports remain blocked from public benchmark claims.
 - Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
 - Hardens the canary batch-audit and next-agent packet paths so empty,
   handoff-only, or no-candidate folders fail closed as metrics-only JSON,
   remove requested output zip paths on blocked packet creation, avoid stack
   traces, and preserve public/fleet launch blockers.
 - Adds current OpenClaw hosted/local source-alignment evidence. The selected local container map and hosted candidate label hash aligned, but the local source had 0 of 3 source-matched queries and 0 of 3 collectable queries, so the full hosted/local benchmark remains blocked until content alignment passes.
+- Adds a real local Codex selfmem source-match smoke with metrics only: 1081
+  parsed memories, 709 private path redactions, zero unsafe id redactions, zero
+  privacy leaks, and a correctly blocked source-mismatch verdict against the
+  fixture hosted query set.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Adds fresh canary window isolation so strict-real reports can ignore pre-patch trace history, stale errors, and old missing-latency events after a patched adapter is applied.
 - Adds a deterministic strict-real canary drill so the selected one-agent
@@ -344,6 +352,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   the local RecallWeave source is mirrored from the selected hosted source or a
   reviewed local-source query set is rebuilt and checked against hosted
   read-through.
+- Local Codex selfmem source-match smoke: the preflight parsed 1081 memories,
+  redacted 709 private path fragments before hashing or reporting, emitted zero
+  unsafe id redactions, and reported zero privacy leaks. It still failed
+  sourceMatchReady against the fixture hosted query set, so the output is
+  source-match research evidence only and does not support public comparison
+  claims.
 - `npm exec --yes pnpm@10.23.0 -- baseline:next-run`: passed, producing a state-aware hosted-baseline next-run plan that keeps fixture evidence as `FIXTURE_PLAN_ONLY`, requires source-match, source-alignment, and source-gap before the matched run chain, and does not authorize public claims.
 - `npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture`: passed with
   12 steps, including `preflight-local-source-match`,

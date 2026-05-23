@@ -44,6 +44,10 @@ requirements are resolved.
   reports into the hosted baseline operator packet, so agents can hand off
   exact hashed repair targets without raw query text, expected refs, memory
   text, private paths, or keys.
+- Current source-match follow-up lets operators smoke real local selfmem
+  exports with path-bearing provenance: local paths are redacted before hashing
+  or reporting, unsafe ids are hash-replaced, and source-mismatched exports
+  still block public benchmark claims.
 - Current canary follow-up hardens empty, handoff-only, and no-candidate
   folders: batch audit and next-agent packet commands fail closed as
   metrics-only JSON, remove requested output zip paths on blocked packet
@@ -234,6 +238,11 @@ requirements are resolved.
   label from matching benchmark content. The current OpenClaw attempt found
   label alignment, but content alignment failed safely with 0 of 3
   source-matched queries, 0 of 3 collectable queries, and no privacy leaks.
+- Baseline source-match now also has a metrics-only real local Codex selfmem
+  smoke: 1081 parsed memories, 709 private path redactions, zero unsafe id
+  redactions, zero privacy leaks, and a correctly blocked source-mismatch
+  verdict against the fixture hosted query set. No raw memory text, private
+  paths, expected refs, or key-shaped secrets were added to public evidence.
 - The hosted baseline operator packet, next-run planner, and `baseline:run`
   orchestrator now repeat the source-match and source-alignment gates and write
   a source-gap ready-or-repair plan before hosted collection. Live runs require

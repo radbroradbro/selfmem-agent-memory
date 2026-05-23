@@ -37,6 +37,8 @@ const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*)/i;
+const privatePathRedactionPattern =
+  /(?:\/Users\/[^\s"'`<>)}\]]+|\/Volumes\/[^\s"'`<>)}\]]+|\/private\/[^\s"'`<>)}\]]+|\/var\/folders\/[^\s"'`<>)}\]]+|[A-Za-z]:\\Users\\[^\s"'`<>)}\]]+|\.hermes\/profiles[^\s"'`<>)}\]]*|\.openclaw[^\s"'`<>)}\]]*)/gi;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 assert.ok(querySetPath, "query set is required. Pass --queryset or RECALLWEAVE_BASELINE_QUERYSET");
@@ -55,8 +57,8 @@ if (!fixtureRequested) {
 }
 
 const querySetRaw = readFileSync(querySetPath, "utf8");
-assert.doesNotMatch(querySetRaw, secretPattern, `${displayPath(querySetPath)} contains a key-shaped secret`);
-assert.doesNotMatch(querySetRaw, privatePathPattern, `${displayPath(querySetPath)} contains a private path`);
+assertNoPattern(querySetRaw, secretPattern, `${displayPath(querySetPath)} contains a key-shaped secret`);
+assertNoPattern(querySetRaw, privatePathPattern, `${displayPath(querySetPath)} contains a private path`);
 const querySet = JSON.parse(querySetRaw);
 const queries = Array.isArray(querySet.queries) ? querySet.queries : [];
 assert.ok(queries.length > 0, "query set must contain at least one query");
@@ -112,6 +114,8 @@ const report = {
     skippedFullyPrivate: loaded.skippedFullyPrivate,
     redactionCount: loaded.redactionCount,
     keyRedactionCount: loaded.keyRedactionCount,
+    privatePathRedactionCount: loaded.privatePathRedactionCount,
+    unsafeIdRedactionCount: loaded.unsafeIdRedactionCount,
     uniqueExportIdCount: loaded.outputIds.size,
     uniqueSourceIdCount: loaded.sourceIds.size,
     uniqueContentHashCount: loaded.contentHashes.size,
@@ -217,8 +221,7 @@ function queryExpectedRefCount(query) {
 
 function loadMemories(inputPath, options) {
   const raw = readFileSync(inputPath, "utf8");
-  assert.doesNotMatch(raw, secretPattern, `${displayPath(inputPath)} contains a key-shaped secret`);
-  assert.doesNotMatch(raw, privatePathPattern, `${displayPath(inputPath)} contains a private path`);
+  assertNoPattern(raw, secretPattern, `${displayPath(inputPath)} contains a key-shaped secret`);
   const lines = raw.split(/\r?\n/).filter((line) => line.trim());
   const candidates = [];
   let parsed = 0;
@@ -226,6 +229,8 @@ function loadMemories(inputPath, options) {
   let skippedFullyPrivate = 0;
   let redactionCount = 0;
   let keyRedactionCount = 0;
+  let privatePathRedactionCount = 0;
+  let unsafeIdRedactionCount = 0;
 
   lines.forEach((line, index) => {
     try {
@@ -239,11 +244,15 @@ function loadMemories(inputPath, options) {
       const redacted = redactForExport(text);
       redactionCount += redacted.privateRedactionCount;
       keyRedactionCount += redacted.keyRedactionCount;
+      privatePathRedactionCount += redacted.privatePathRedactionCount;
       if (!redacted.text.trim()) {
         skippedFullyPrivate += 1;
         return;
       }
-      const sourceId = safeScalar(item.id ?? item.memory_id ?? item.memoryId ?? item.sourceId ?? `line-${index + 1}`);
+      const rawSourceId = item.id ?? item.memory_id ?? item.memoryId ?? item.sourceId ?? `line-${index + 1}`;
+      const safeId = safeMemoryId(rawSourceId, `line-${index + 1}`);
+      if (safeId.redacted) unsafeIdRedactionCount += 1;
+      const sourceId = safeId.value;
       const contentHash = `sha256:${stableHash(normalizeText(redacted.text))}`;
       candidates.push({
         sourceId,
@@ -263,6 +272,8 @@ function loadMemories(inputPath, options) {
     skippedFullyPrivate,
     redactionCount,
     keyRedactionCount,
+    privatePathRedactionCount,
+    unsafeIdRedactionCount,
     sourceIds: new Set(candidates.map((candidate) => candidate.sourceId)),
     outputIds: new Set(candidates.map((candidate) => candidate.outputId)),
     contentHashes: new Set(candidates.map((candidate) => candidate.contentHash)),
@@ -287,10 +298,13 @@ function redactForExport(text) {
   let redacted = text.replace(privateTagPattern, " ");
   const keyMatches = redacted.match(secretPattern) ?? [];
   redacted = redacted.replace(secretPattern, " ");
+  const privatePathMatches = redacted.match(privatePathRedactionPattern) ?? [];
+  redacted = redacted.replace(privatePathRedactionPattern, " ");
   return {
     text: redacted.replace(/\s+/g, " ").trim(),
     privateRedactionCount: privateMatches.length,
     keyRedactionCount: keyMatches.length,
+    privatePathRedactionCount: privatePathMatches.length,
   };
 }
 
@@ -306,11 +320,12 @@ function normalizeHashRef(value) {
   return /^[a-f0-9]{64}$/i.test(text) ? `sha256:${text.toLowerCase()}` : text;
 }
 
-function safeScalar(value) {
+function safeMemoryId(value, fallback) {
   const text = String(value ?? "").trim() || "unknown";
-  assert.doesNotMatch(text, secretPattern, "memory id contains a key-shaped secret");
-  assert.doesNotMatch(text, privatePathPattern, "memory id contains a private path");
-  return text.slice(0, 160);
+  if (secretPattern.test(text) || privatePathPattern.test(text)) {
+    return { value: `memory:${shortHash(`${fallback}:${text}`)}`, redacted: true };
+  }
+  return { value: text.slice(0, 160), redacted: false };
 }
 
 function arrayOfStrings(value) {
@@ -318,10 +333,18 @@ function arrayOfStrings(value) {
 }
 
 function assertSafePublicText(text, label) {
-  assert.doesNotMatch(text, secretPattern, `${label} contains a key-shaped secret`);
-  assert.doesNotMatch(text, privatePathPattern, `${label} contains a private path`);
-  assert.doesNotMatch(text, privateTagPattern, `${label} contains private tags`);
-  assert.doesNotMatch(text, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/i, `${label} contains raw query or memory fields`);
+  assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
+  assertNoPattern(text, privatePathPattern, `${label} contains a private path`);
+  assertNoPattern(text, privateTagPattern, `${label} contains private tags`);
+  assertNoPattern(text, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/i, `${label} contains raw query or memory fields`);
+}
+
+function assertNoPattern(text, pattern, message) {
+  if (pattern.test(String(text))) {
+    pattern.lastIndex = 0;
+    throw new Error(message);
+  }
+  pattern.lastIndex = 0;
 }
 
 function resolveInputPath(value) {

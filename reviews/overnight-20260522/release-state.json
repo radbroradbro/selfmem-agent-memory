@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, and empty or handoff-only canary batch fail-closed behavior reviewed CLEAN",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, and empty or handoff-only canary batch fail-closed behavior reviewed CLEAN",
     "allowedPostBaselineCodePaths": [
       "package.json",
       "packages/bench/canary-drill.mjs",
@@ -39,6 +39,7 @@
       "packages/bench/canary-operator-packet.mjs",
       "packages/bench/baseline-source-alignment.mjs",
       "packages/bench/baseline-source-gap-plan.mjs",
+      "packages/bench/baseline-source-match-preflight.mjs",
       "packages/bench/consumer-install-smoke.mjs",
       "packages/bench/goal-completion-audit.mjs",
       "packages/bench/hosted-baseline-next-run.mjs",

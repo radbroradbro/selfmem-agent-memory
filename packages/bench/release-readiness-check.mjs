@@ -2265,6 +2265,9 @@ check("fresh hosted baseline preflight passes", () => {
   const missingMetricPath = join(collectorTmp, "missing-metric.json");
   const missingQuerySetEvidencePath = join(collectorTmp, "missing-query-set-evidence.json");
   const unlabeledQuerySetPath = join(collectorTmp, "unlabeled-queryset.json");
+  const privatePathSourceMatchQuerySetPath = join(collectorTmp, "private-path-source-match-queryset.json");
+  const privatePathSourceMatchMemoriesPath = join(collectorTmp, "private-path-source-match-memories.jsonl");
+  const privatePathSourceMatchReportPath = join(collectorTmp, "private-path-source-match.json");
   const missingSourceMatchQuerySetPath = join(collectorTmp, "missing-source-match-queryset.json");
   const missingSourceAlignmentReportPath = join(collectorTmp, "missing-source-alignment.json");
   const missingSourceGapReportPath = join(collectorTmp, "missing-source-gap.json");
@@ -2286,6 +2289,55 @@ check("fresh hosted baseline preflight passes", () => {
     "--output",
     sourceMatchReportPath,
   ]);
+  writeFileSync(
+    privatePathSourceMatchQuerySetPath,
+    JSON.stringify(
+      {
+        schemaVersion: 1,
+        fixtureOnly: true,
+        datasetSlice: "private-path-source-match-fixture-slice",
+        judgeModel: "fixture-judge",
+        answerModel: "fixture-answer",
+        queries: [
+          {
+            id: "private-path-source-match",
+            q: "Which memory proves private path redaction in source matching?",
+            expectedResultIds: ["privacy-path-memory"],
+          },
+        ],
+      },
+      null,
+      2,
+    ),
+  );
+  writeFileSync(
+    privatePathSourceMatchMemoriesPath,
+    `${JSON.stringify({
+      id: "privacy-path-memory",
+      text: "The source-match preflight should redact local paths such as /Users/example/.codex/selfmem-bridge/store/transcripts/session.jsonl before hashing or reporting.",
+      sourceId: "/Users/example/.codex/selfmem-bridge/store/transcripts/session.jsonl",
+    })}\n`,
+  );
+  const privatePathSourceMatchResult = run(
+    "node",
+    [
+      "packages/bench/baseline-source-match-preflight.mjs",
+      "--queryset",
+      privatePathSourceMatchQuerySetPath,
+      "--memories",
+      privatePathSourceMatchMemoriesPath,
+      "--preserve-ids",
+      "--output",
+      privatePathSourceMatchReportPath,
+    ],
+    {
+      env: {
+        ...process.env,
+        RECALLWEAVE_BASELINE_LIVE: "1",
+        RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+      },
+    },
+  );
   const sourceAlignmentResult = run("node", [
     "packages/bench/baseline-source-alignment.mjs",
     "--source-match",
@@ -2807,6 +2859,14 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(sourceMatchReport.failedChecks?.length, 0);
   assert.doesNotMatch(sourceMatchResult.stdout, /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
   assert.doesNotMatch(readFileSync(sourceMatchReportPath, "utf8"), /expectedResultIds|expectedResultHashes|"\s*q"\s*:|"\s*id"\s*:|"\s*(?:content|memory|text|raw|rawText|document)"\s*:/);
+  const privatePathSourceMatchReport = JSON.parse(privatePathSourceMatchResult.stdout);
+  assert.equal(privatePathSourceMatchReport.mode, "baseline-source-match-preflight");
+  assert.equal(privatePathSourceMatchReport.sourceMatchReady, true);
+  assert.equal(privatePathSourceMatchReport.localSourceEvidence?.privatePathRedactionCount >= 1, true);
+  assert.equal(privatePathSourceMatchReport.localSourceEvidence?.unsafeIdRedactionCount, 0);
+  assert.equal(privatePathSourceMatchReport.privateLeakCount, 0);
+  assert.doesNotMatch(privatePathSourceMatchResult.stdout, /\/Users\/example|transcripts\/session\.jsonl/);
+  assert.doesNotMatch(readFileSync(privatePathSourceMatchReportPath, "utf8"), /\/Users\/example|transcripts\/session\.jsonl/);
   assert.equal(sourceAlignmentReport.mode, "baseline-source-alignment");
   assert.equal(sourceAlignmentReport.metricsOnly, true);
   assert.equal(sourceAlignmentReport.publicSafe, true);
