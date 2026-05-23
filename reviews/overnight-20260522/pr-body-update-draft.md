@@ -21,6 +21,7 @@ Live status:
 - Adds output-file-safe baseline and canary evidence commands so package-manager banners cannot corrupt JSON artifacts or leak local checkout paths into preflight, comparison, intake, diagnosis, batch-audit, or next-agent plan files.
 - Adds a post-baseline public evidence guard. Once enabled in release-state, the release gate diffs the latest verified code baseline against `HEAD` and fails if any later change is outside public docs or review evidence.
 - Adds a release-readiness guard that verifies the current returned-diagnostics canary handoff packet label and SHA256 stay consistent across packet evidence, next-agent plan evidence, real diagnostic evidence, the PR body draft, and the blocker issue draft.
+- Adds `baseline:source-match` so a reviewed hosted-source query set must prove that the selected local RecallWeave source can collect matching expected references before hosted calls are spent on another matched run.
 - Adds real diagnostic canary evaluation evidence from redacted external Hermes/OpenClaw bundles. The latest batch audit parsed 8 of 9 returned diagnostics, found zero strict-real passes, ranked the closest privacy-clean candidate, and generated a public-safe OpenClaw next-agent handoff plus a single sendable handoff packet; it still failed adapter-contract and store-latency checks, so it does not count as production rollout evidence.
 - Bounds Hermes and OpenClaw hosted Supermemory read-through so canaries can prove local-first recall, explicit old-memory lookup, skip reasons, and total/local/remote latency without making every prompt wait on hosted search.
 - Adds fresh canary window isolation so strict-real reports can ignore pre-patch trace history, stale errors, and old missing-latency events after a patched adapter is applied.
@@ -34,7 +35,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `15e66574e1ae9b54cdfaa93cf67dc4e5fc8f53c7`.
+- Latest code/product baseline: `667ed57052eab4bf05f2bbed738f4b4b9c8155a4`.
+- GitHub Actions run `26332952176`: passed CI after adding
+  `baseline:source-match`, wiring it into the next-run planner, release
+  doctor, release readiness, clean consumer smoke, docs, and Gemini review, and
+  preserving public benchmark claim blockers.
+- Previous verified baseline before the baseline source-match preflight:
+  `15e66574e1ae9b54cdfaa93cf67dc4e5fc8f53c7`.
 - GitHub Actions run `26332365170`: passed CI after the live hosted-vs-local
   Codex baseline follow-up, export-style private env parsing, preflight path
   sanitization, release doctor, goal audit, and release guard updates.

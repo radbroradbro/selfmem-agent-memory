@@ -17,11 +17,10 @@ Verdict: resolved for PR body and blocker issue writes.
 - PR #5 body updated:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
-  - Updated at: 2026-05-23T12:17:34Z
-  - Body length: 24729
-  - Latest local refresh records `15e66574e1ae9b54cdfaa93cf67dc4e5fc8f53c7`
-    and CI run `26332365170` as the latest verified code/product baseline for
-    the live hosted-vs-local Codex follow-up. It does not close the
+  - Updated at: 2026-05-23T12:43:49Z
+  - Latest local refresh records `667ed57052eab4bf05f2bbed738f4b4b9c8155a4`
+    and CI run `26332952176` as the latest verified code/product baseline for
+    the baseline source-match preflight follow-up. It does not close the
     human-approval, source-matched hosted-baseline, or real-canary blockers.
   - The PR body was refreshed again after live hosted prep evidence added
     duplicate-query fail-closed behavior and an 8-query public-safe prep
@@ -31,6 +30,9 @@ Verdict: resolved for PR body and blocker issue writes.
     reviewed labels. This proves the live chain and local latency advantage, but
     it blocks public comparison claims until a source-matched, non-zero baseline
     is reviewed.
+  - The PR body was refreshed again after adding `baseline:source-match`, which
+    blocks another hosted/local run unless the selected local RecallWeave source
+    can collect the reviewed expected references.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
