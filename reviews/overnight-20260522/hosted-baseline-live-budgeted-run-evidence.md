@@ -72,7 +72,9 @@ baseline:packet:review -- --packet <strict-real-packet> --strict-real
 - Budgeted queries: 8 of 8.
 - Skipped-by-budget candidate count: 41.
 - Strict-real packet review: passed.
-- Remaining comparison blocker: two independent reviewer approvals.
+- Reviewer intake: two independent approvals collected after this run.
+- Remaining comparison blocker: rerun the matched comparison and packet with
+  the reviewer approval report attached.
 
 ## Artifact Hashes
 
@@ -88,8 +90,9 @@ hosted Supermemory on the source-matched canary quality metrics, and the local
 arm now runs within the configured 1600-token context budget. This is useful
 engineering evidence, not a public superiority claim.
 
-The comparison still requires two independent reviewer approvals before any
-public benchmark language.
+The reviewer approval intake now passes for this source-matched canary target.
+Public benchmark language still requires the matched comparison and packet to
+be rerun with that reviewer approval report attached.
 
 ## Boundary
 

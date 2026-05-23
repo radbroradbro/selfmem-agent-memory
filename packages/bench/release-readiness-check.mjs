@@ -2232,10 +2232,9 @@ check("fresh release blocker doctor passes", () => {
   const hostedBlocker = report.blockers.find((item) => item.id === "hosted-supermemory-baseline-not-current");
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
   assert.match(hostedBlocker.nextAction, /1600-token local context budget/);
-  assert.match(hostedBlocker.nextAction, /reviewerApprovalCount is 0/);
-  assert.match(hostedBlocker.nextAction, /baseline:reviewer:openai-compatible/);
-  assert.match(hostedBlocker.nextAction, /baseline:reviewer-intake/);
-  assert.match(hostedBlocker.nextAction, /baseline:compare -- --reviewer-approval-report/);
+  assert.match(hostedBlocker.nextAction, /Two independent reviewer approvals are now collected/);
+  assert.match(hostedBlocker.nextAction, /--reviewer-approval-report/);
+  assert.match(hostedBlocker.nextAction, /metrics-only packet is rebuilt/);
   assert.match(hostedBlocker.nextAction, /baseline:next-run -- --hosted[\s\S]*--require-ready/);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.status, "READY_FOR_BASELINE_REVIEW");
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.callsHostedProvider, true);
@@ -2245,6 +2244,10 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.contextBudget.applied, true);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.contextBudget.tokenBudget, 1600);
   assert.ok(report.checks.hostedBaselineLiveBudgetedRun.failedChecks.includes("two-reviewer-approvals"));
+  assert.equal(report.checks.budgetedBaselineReviewerIntake.publicBenchmarkApprovalReady, true);
+  assert.equal(report.checks.budgetedBaselineReviewerIntake.reviewerApprovalCount, 2);
+  assert.equal(report.checks.budgetedBaselineReviewerIntake.independentReviewerCount, 2);
+  assert.deepEqual(report.checks.budgetedBaselineReviewerIntake.failedChecks, []);
   assert.ok(report.manualCommands.some((item) => /baseline:select-container/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:author-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:mirror-hosted/.test(item) && /--output-dir/.test(item)));

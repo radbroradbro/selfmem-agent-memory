@@ -238,6 +238,7 @@ function summarizeComparison(json) {
 }
 
 function summarizeArm(arm = {}) {
+  const metrics = arm.metrics ?? {};
   return {
     provider: arm.provider ?? null,
     sourceCommit: arm.sourceCommit ?? null,
@@ -246,11 +247,20 @@ function summarizeArm(arm = {}) {
     scoringCodeHash: arm.scoringCodeHash ?? null,
     judgeModel: arm.judgeModel ?? null,
     answerModel: arm.answerModel ?? null,
-    quality: arm.quality ?? arm.metrics?.quality ?? null,
-    latencyP50Ms: arm.latencyP50Ms ?? arm.metrics?.latencyP50Ms ?? null,
-    latencyP95Ms: arm.latencyP95Ms ?? arm.metrics?.latencyP95Ms ?? null,
-    averageContextTokens: arm.averageContextTokens ?? arm.metrics?.averageContextTokens ?? null,
-    queryCount: arm.queryCount ?? arm.metrics?.queryCount ?? null,
+    quality: arm.quality ?? metrics.quality ?? null,
+    pAt1: arm.pAt1 ?? metrics.pAt1 ?? null,
+    recallAt5: arm.recallAt5 ?? metrics.recallAt5 ?? null,
+    recallAt10: arm.recallAt10 ?? metrics.recallAt10 ?? null,
+    ndcgAt10: arm.ndcgAt10 ?? metrics.ndcgAt10 ?? null,
+    latencyP50Ms: arm.latencyP50Ms ?? metrics.latencyP50Ms ?? null,
+    latencyP95Ms: arm.latencyP95Ms ?? metrics.latencyP95Ms ?? null,
+    averageContextTokens:
+      arm.averageContextTokens
+        ?? arm.contextTokensAvg
+        ?? metrics.averageContextTokens
+        ?? metrics.contextTokensAvg
+        ?? null,
+    queryCount: arm.queryCount ?? metrics.queryCount ?? null,
   };
 }
 
@@ -266,7 +276,23 @@ function summarizeRun(json) {
     publicLaunchAllowed: Boolean(json.publicLaunchAllowed),
     failedChecks: json.failedChecks ?? [],
     evidence: {
+      sourceMatch: {
+        sourceMatchReady: Boolean(json.evidence?.sourceMatch?.sourceMatchReady),
+        collectableQueryCount: Number(json.evidence?.sourceMatch?.collectableQueryCount ?? 0),
+      },
+      sourceAlignment: {
+        status: json.evidence?.sourceAlignment?.status ?? null,
+        matchedBaselineRunAllowed: Boolean(json.evidence?.sourceAlignment?.matchedBaselineRunAllowed),
+      },
+      sourceGap: {
+        status: json.evidence?.sourceGap?.status ?? null,
+        matchedBaselineRunAllowed: Boolean(json.evidence?.sourceGap?.matchedBaselineRunAllowed),
+      },
       hosted: summarizeArm(json.evidence?.hosted),
+      recallWeaveResponses: {
+        contextBudget: json.evidence?.recallWeaveResponses?.contextBudget ?? null,
+        privacyLeakCount: Number(json.evidence?.recallWeaveResponses?.privacyLeakCount ?? 0),
+      },
       recallWeave: summarizeArm(json.evidence?.recallWeave),
       comparison: {
         recallWeaveWin: Boolean(json.evidence?.comparison?.recallWeaveWin),

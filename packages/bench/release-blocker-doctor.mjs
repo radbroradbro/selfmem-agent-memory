@@ -51,6 +51,12 @@ const requiredFiles = {
   hostedBaselineLiveBudgetedRun: "hosted-baseline-live-budgeted-run-evidence.md",
   hostedBaselineLiveBudgetedRunReport: "hosted-baseline-live-budgeted-run.json",
   hostedBaselineLiveBudgetedPacketReport: "hosted-baseline-live-budgeted-packet.json",
+  budgetedBaselineReviewerFindings: "reviewer-work/reviewer-findings.md",
+  budgetedBaselineReviewerIntakeEvidence: "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md",
+  budgetedBaselineReviewerIntakeReport: "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json",
+  budgetedBaselineCodexApproval: "reviewer-work/codex-5-5-budgeted-baseline-approval.json",
+  budgetedBaselineGeminiApproval: "reviewer-work/gemini-3-1-pro-budgeted-baseline-approval.json",
+  budgetedBaselineClaudeBlocked: "reviewer-work/claude-opus-blocked-by-hooks.md",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
@@ -109,6 +115,10 @@ const hostedBaselineLiveMirrorGateReviewText = readFileSync(join(root, reviewDir
 const hostedBaselineLiveBudgetedRunText = readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-run-evidence.md"), "utf8");
 const hostedBaselineLiveBudgetedRunReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-run.json"), "utf8"));
 const hostedBaselineLiveBudgetedPacketReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-packet.json"), "utf8"));
+const budgetedBaselineReviewerFindingsText = readFileSync(join(root, reviewDir, "reviewer-work/reviewer-findings.md"), "utf8");
+const budgetedBaselineReviewerIntakeText = readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md"), "utf8");
+const budgetedBaselineReviewerIntakeReport = JSON.parse(readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json"), "utf8"));
+const budgetedBaselineClaudeBlockedText = readFileSync(join(root, reviewDir, "reviewer-work/claude-opus-blocked-by-hooks.md"), "utf8");
 const realCanaryDiagnosticText = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
 const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnostic-batch-audit-evidence.md"), "utf8");
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
@@ -199,6 +209,17 @@ assert.equal(hostedBaselineLiveBudgetedPacketReport.strictReal, true);
 assert.equal(hostedBaselineLiveBudgetedPacketReport.strictRealPassed, true);
 assert.equal(hostedBaselineLiveBudgetedPacketReport.packagePassesStrictReal, true);
 assert.equal(hostedBaselineLiveBudgetedPacketReport.publicBenchmarkClaimsAllowed, false);
+assert.match(budgetedBaselineReviewerFindingsText, /Codex GPT-5\.5[\s\S]*approved/i);
+assert.match(budgetedBaselineReviewerFindingsText, /Gemini[\s\S]*approved/i);
+assert.match(budgetedBaselineReviewerIntakeText, /reviewerApprovalCount:\s*2/i);
+assert.match(budgetedBaselineClaudeBlockedText, /blocked/i);
+assert.equal(budgetedBaselineReviewerIntakeReport.mode, "baseline-reviewer-approval-intake");
+assert.equal(budgetedBaselineReviewerIntakeReport.metricsOnly, true);
+assert.equal(budgetedBaselineReviewerIntakeReport.publicLaunchAllowed, false);
+assert.equal(budgetedBaselineReviewerIntakeReport.publicBenchmarkApprovalReady, true);
+assert.equal(budgetedBaselineReviewerIntakeReport.reviewerApprovalCount, 2);
+assert.equal(budgetedBaselineReviewerIntakeReport.independentReviewerCount, 2);
+assert.deepEqual(budgetedBaselineReviewerIntakeReport.failedChecks, []);
 assert.match(realCanaryDiagnosticText, /does not complete the real-container rollout requirement/i);
 assert.match(canaryBatchAuditText, /Strict-real pass count:\s*0/i);
 assert.match(canaryNextAgentText, /Selected host:\s*OpenClaw/i);
@@ -282,8 +303,8 @@ const blockerReport = [
   {
     id: "hosted-supermemory-baseline-not-current",
     status: "blocked",
-    evidence: "hosted-baseline-live-budgeted-run-evidence.md",
-    nextAction: "A source-matched live hosted mirror baseline completed with zero privacy leaks, RecallWeave non-zero quality, a strict-real packet, and a 1600-token local context budget. Public benchmark claims remain blocked because reviewerApprovalCount is 0. Next: collect two independent reviewer approvals through `baseline:reviewer:openai-compatible` and `baseline:reviewer-intake` against the metrics-only packet, rerun `baseline:compare -- --reviewer-approval-report <report>`, and rerun `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` with the reviewer approval report before any public claim.",
+    evidence: "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json",
+    nextAction: "A source-matched live hosted mirror baseline completed with zero privacy leaks, RecallWeave non-zero quality, a strict-real packet, and a 1600-token local context budget. Two independent reviewer approvals are now collected in reviewer-work, but public benchmark claims remain blocked until the matched comparison is rerun with `--reviewer-approval-report`, the metrics-only packet is rebuilt, and `baseline:next-run -- --hosted <hosted-result> --recallweave <recallweave-result> --preflight <preflight> --comparison <comparison> --require-ready` passes with the reviewer approval report attached.",
   },
   {
     id: "fresh-real-container-canary-not-current",
@@ -395,6 +416,13 @@ console.log(
           privacyLeakCount: Number(hostedBaselineLiveBudgetedRunReport.evidence?.hosted?.privacyLeakCount ?? 0)
             + Number(hostedBaselineLiveBudgetedRunReport.evidence?.recallWeave?.privacyLeakCount ?? 0),
           strictRealPacket: hostedBaselineLiveBudgetedPacketReport.packagePassesStrictReal,
+        },
+        budgetedBaselineReviewerIntake: {
+          ok: budgetedBaselineReviewerIntakeReport.ok,
+          publicBenchmarkApprovalReady: budgetedBaselineReviewerIntakeReport.publicBenchmarkApprovalReady,
+          reviewerApprovalCount: budgetedBaselineReviewerIntakeReport.reviewerApprovalCount,
+          independentReviewerCount: budgetedBaselineReviewerIntakeReport.independentReviewerCount,
+          failedChecks: budgetedBaselineReviewerIntakeReport.failedChecks,
         },
         hostedBaselineCollector: {
           provider: hostedBaselineCollector.provider,

@@ -67,6 +67,12 @@ const files = {
   hostedBaselineLiveBudgetedRunEvidence: `${reviewDir}/hosted-baseline-live-budgeted-run-evidence.md`,
   hostedBaselineLiveBudgetedRunReport: `${reviewDir}/hosted-baseline-live-budgeted-run.json`,
   hostedBaselineLiveBudgetedPacketReport: `${reviewDir}/hosted-baseline-live-budgeted-packet.json`,
+  budgetedBaselineReviewerFindings: `${reviewDir}/reviewer-work/reviewer-findings.md`,
+  budgetedBaselineReviewerIntakeEvidence: `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-evidence.md`,
+  budgetedBaselineReviewerIntakeReport: `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json`,
+  budgetedBaselineCodexApproval: `${reviewDir}/reviewer-work/codex-5-5-budgeted-baseline-approval.json`,
+  budgetedBaselineGeminiApproval: `${reviewDir}/reviewer-work/gemini-3-1-pro-budgeted-baseline-approval.json`,
+  budgetedBaselineClaudeBlocked: `${reviewDir}/reviewer-work/claude-opus-blocked-by-hooks.md`,
   hostedBaselineNextRunEvidence: `${reviewDir}/hosted-baseline-next-run-evidence.md`,
   hostedBaselineNextRunReview: `${reviewDir}/gemini-hosted-baseline-next-run-review.md`,
   baselineReturnedPacketIntakeEvidence: `${reviewDir}/baseline-returned-packet-intake-evidence.md`,
@@ -92,6 +98,7 @@ const hostedBaselineLiveMirrorRun = JSON.parse(readFileSync(join(root, files.hos
 const hostedBaselineLiveMirrorPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveMirrorPacketReport), "utf8"));
 const hostedBaselineLiveBudgetedRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedRunReport), "utf8"));
 const hostedBaselineLiveBudgetedPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedPacketReport), "utf8"));
+const budgetedBaselineReviewerIntake = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewerIntakeReport), "utf8"));
 const releaseReadinessEvidence = JSON.parse(readFileSync(join(root, files.releaseReadinessEvidence), "utf8"));
 const currentHeadLiveEvidence = JSON.parse(readFileSync(join(root, files.browserEvidence), "utf8"));
 const texts = Object.fromEntries(
@@ -183,6 +190,17 @@ assert.equal(hostedBaselineLiveBudgetedPacket.strictReal, true);
 assert.equal(hostedBaselineLiveBudgetedPacket.strictRealPassed, true);
 assert.equal(hostedBaselineLiveBudgetedPacket.packagePassesStrictReal, true);
 assert.equal(hostedBaselineLiveBudgetedPacket.publicBenchmarkClaimsAllowed, false);
+assert.match(texts.budgetedBaselineReviewerFindings, /Codex GPT-5\.5[\s\S]*approved/i);
+assert.match(texts.budgetedBaselineReviewerFindings, /Gemini[\s\S]*approved/i);
+assert.match(texts.budgetedBaselineReviewerIntakeEvidence, /reviewerApprovalCount:\s*2/i);
+assert.match(texts.budgetedBaselineClaudeBlocked, /blocked/i);
+assert.equal(budgetedBaselineReviewerIntake.mode, "baseline-reviewer-approval-intake");
+assert.equal(budgetedBaselineReviewerIntake.metricsOnly, true);
+assert.equal(budgetedBaselineReviewerIntake.publicLaunchAllowed, false);
+assert.equal(budgetedBaselineReviewerIntake.publicBenchmarkApprovalReady, true);
+assert.equal(budgetedBaselineReviewerIntake.reviewerApprovalCount, 2);
+assert.equal(budgetedBaselineReviewerIntake.independentReviewerCount, 2);
+assert.deepEqual(budgetedBaselineReviewerIntake.failedChecks, []);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -311,6 +329,16 @@ const requirements = [
     files.hostedBaselineLiveBudgetedRunReport,
     files.hostedBaselineLiveBudgetedPacketReport,
   ]),
+  proven("hosted-baseline-reviewer-approval-intake", "Two independent reviewers approved the source-matched budgeted hosted baseline canary target", [
+    "packages/bench/baseline-openai-compatible-reviewer.mjs",
+    "packages/bench/baseline-reviewer-approval-intake.mjs",
+    files.budgetedBaselineReviewerFindings,
+    files.budgetedBaselineReviewerIntakeEvidence,
+    files.budgetedBaselineReviewerIntakeReport,
+    files.budgetedBaselineCodexApproval,
+    files.budgetedBaselineGeminiApproval,
+    files.budgetedBaselineClaudeBlocked,
+  ]),
   proven("hosted-baseline-next-run", "Hosted baseline comparison has a state-aware next-run planner that keeps public claims blocked while producing the exact next metrics-only run packet", [
     "packages/bench/hosted-baseline-next-run.mjs",
     files.hostedBaselineNextRunEvidence,
@@ -380,13 +408,15 @@ const requirements = [
     files.releaseState,
     "docs/PUBLIC_RELEASE_CHECKLIST.md",
   ]),
-  blocked("hosted-baseline-review-approval", "Hosted benchmark claims require two independent reviewer approvals after the source-matched budgeted-context run", [
+  blocked("hosted-baseline-reviewed-comparison", "Hosted benchmark claims require the matched comparison and metrics-only packet to be rerun with the reviewer approval report attached", [
     files.hostedBaselineLiveBudgetedRunEvidence,
     files.hostedBaselineLiveBudgetedRunReport,
     files.hostedBaselineLiveBudgetedPacketReport,
+    files.budgetedBaselineReviewerIntakeReport,
     files.hostedBaselineNextRunEvidence,
     "packages/bench/baseline-openai-compatible-reviewer.mjs",
     "packages/bench/baseline-reviewer-approval-intake.mjs",
+    "packages/bench/baseline-comparison.mjs",
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [
@@ -418,7 +448,7 @@ const report = {
   latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
   goalComplete: false,
   mayCallUpdateGoalComplete: false,
-  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, including a fresh budgeted-context rerun, but human approval, two-reviewer benchmark approval, and real rollout requirements remain unresolved.",
+  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, including a fresh budgeted-context rerun and two independent reviewer approvals, but human approval, reviewed comparison packet refresh, and real rollout requirements remain unresolved.",
   counts: {
     total: requirements.length,
     proven: requirements.filter((item) => item.status === "proven").length,
