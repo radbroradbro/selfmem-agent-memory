@@ -97,10 +97,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `90b6bc953b6ebc125311838238e8f80d8603665f`.
+- GitHub Actions run `26345383489`: passed CI after adding the public benchmark
+  target validator for source-locked memory benchmarks, same judge model, and
+  same answer model comparability.
+- Previous verified code/product baseline before public benchmark target
+  gating:
   `67993f1d9eab7742ae70841d38ad9cd14021982c`.
-- GitHub Actions run `26344382488`: passed CI after hardening the current
-  OpenClaw one-agent handoff so deterministic drill execution and the
-  native-memory/read-through contract are explicit in the main next-agent plan.
 - Previous verified code/product baseline before current canary-drill handoff
   hardening:
   `4310e0ec7565abcf7eb4378fd165ecd5bab799f4`.
@@ -455,6 +458,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - GitHub Actions run `26344382488`: passed CI after hardening the current
   OpenClaw one-agent handoff so deterministic drill execution and the
   native-memory/read-through contract are explicit in the main next-agent plan.
+- GitHub Actions run `26345383489`: passed CI after adding the public benchmark
+  target validator for source-locked memory benchmarks, same judge model, and
+  same answer model comparability.
 - Previous verified code baseline before returned downloads supervision:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:

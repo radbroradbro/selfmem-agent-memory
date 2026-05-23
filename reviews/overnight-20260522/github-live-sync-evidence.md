@@ -64,15 +64,18 @@ Date: 2026-05-23
   for public benchmark canaries.
 - PR #5 and issue #6 were refreshed again after enforcing same judge model and
   same answer model in `benchmark:public-target`.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26345383489` passed on `90b6bc9` and the release-state baseline was
+  promoted.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T22:31:55Z
+- PR body refreshed at: 2026-05-23T22:40:18Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T22:31:55Z
-- PR body hash: 4b0e0c27e08526988d31454dc52cd6b9db4565533ef049d9dcf97aeb47dcab4f
+- Issue updated at: 2026-05-23T22:40:16Z
+- PR body hash: 2ba7303b3b476b2bc6d1cce00f7d736aa79d51cb4bcaa6aa348ed24d5818c31e
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 9acddbfde66046b6d52c29f05a7115c446d5049a5218fa1351ca82bbe76484b8
-- PR body length: 38088
-- Issue body length: 23414
+- Issue body hash: 336545c02bc5d028c8186b54586b90d7d7033c7b0c5406a993f07442469d804d
+- PR body length: 38406
+- Issue body length: 23663
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
