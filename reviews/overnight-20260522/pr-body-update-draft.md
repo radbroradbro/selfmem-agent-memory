@@ -34,7 +34,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 ## Latest Verified Baseline
 
-- Latest code/product baseline: `aeaa5aadfc8b92e764f910704b34eea3e6e22b50`.
+- Latest code/product baseline: `15e66574e1ae9b54cdfaa93cf67dc4e5fc8f53c7`.
+- GitHub Actions run `26332365170`: passed CI after the live hosted-vs-local
+  Codex baseline follow-up, export-style private env parsing, preflight path
+  sanitization, release doctor, goal audit, and release guard updates.
+- Previous verified baseline before the live hosted-vs-local Codex baseline
+  follow-up: `aeaa5aadfc8b92e764f910704b34eea3e6e22b50`.
 - GitHub Actions run `26331865543`: passed CI after hardening hosted baseline
   live-prep query-set uniqueness, collector evidence, release doctor, and the
   release guard.

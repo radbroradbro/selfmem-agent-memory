@@ -125,6 +125,8 @@ audit so future agents cannot treat green CI as native-goal completion.
 - Hosted baseline run orchestrator: `e7ce4f1`, CI run `26331102535` passed
 - Hosted baseline live-prep hardening: `aeaa5aa`, CI run `26331865543`
   passed
+- Live hosted-vs-local Codex baseline follow-up: `15e6657`, CI run
+  `26332365170` passed
 - Worktree at audit start: clean
 - Native Codex goal state: active
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-23T12:00:00Z",
+  "generatedAt": "2026-05-23T12:15:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,29 +14,21 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "aeaa5aadfc8b92e764f910704b34eea3e6e22b50",
-    "ciRunId": 26331865543,
+    "headSha": "15e66574e1ae9b54cdfaa93cf67dc4e5fc8f53c7",
+    "ciRunId": 26332365170,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "passed",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after hardening hosted baseline live-prep. Query-set authoring now requires distinct queries, collectors carry unique/duplicate query evidence, release:doctor and goal:audit report the live-prep gate, and the release guard records the reviewed benchmark-harness exception without weakening public-launch blockers. GitHub Actions run 26331865543 passed CI on aeaa5aa. Local release:check, test, release:doctor, goal:audit, release:github-sync, diff check, and staged secret scans passed."
+    "note": "This is the latest inspected code/product baseline after the live hosted-vs-local Codex baseline follow-up. It parses export-style private env files, keeps preflight output free of temp machine paths, records the live metrics-only 0-0 hosted/local result, and keeps public benchmark claims blocked. GitHub Actions run 26332365170 passed CI on 15e6657. Local release:check, test, smoke, release:doctor, goal:audit, release:github-sync, diff check, and staged secret scans passed."
   },
   "releaseStateGuard": {
     "enabled": true,
     "checkedBy": "pnpm release:check",
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
-    "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "Hosted baseline live Codex-local follow-up only: parse generated export-style private env files, keep preflight outputs free of temp machine paths, surface the live Codex-local run in release doctor and goal audit, and keep public benchmark claims blocked.",
-    "allowedPostBaselineCodePaths": [
-      "packages/bench/goal-completion-audit.mjs",
-      "packages/bench/hosted-baseline-preflight.mjs",
-      "packages/bench/hosted-baseline-run.mjs",
-      "packages/bench/release-blocker-doctor.mjs",
-      "packages/bench/release-readiness-check.mjs"
-    ]
+    "enforcePostBaselinePublicEvidenceOnly": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",

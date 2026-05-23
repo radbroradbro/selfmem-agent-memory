@@ -18,7 +18,7 @@ evidence are still required before any public live update.
 - Branch: `feat/nucleus-wiki-native-contract`
 - Base: `main`
 - Latest CI-inspected code/product baseline:
-  `aeaa5aa`, run `26331865543`, success.
+  `15e6657`, run `26332365170`, success.
 - Latest release-state guard CI:
   `dd17f44`, run `26289073223`, success.
 - PR API state when checked: open, not draft, mergeable, clean.
@@ -87,6 +87,7 @@ evidence are still required before any public live update.
 - GitHub Actions CI run `26330433491` on `54f59ee`: success.
 - GitHub Actions CI run `26330646504` on `14030dd`: success.
 - GitHub Actions CI run `26331102535` on `e7ce4f1`: success.
+- GitHub Actions CI run `26332365170` on `15e6657`: success.
 - GitHub Actions CI run `26331865543` on `aeaa5aa`: success.
 
 ## Shipped Overnight Slices
@@ -175,6 +176,7 @@ evidence are still required before any public live update.
 | One-command canary evidence packaging | `plugins/selfmem-fallback/scripts/selfmem_update.py`, `packages/bench/update-flow-smoke.py`, `reviews/overnight-20260522/update-flow-evidence.md`, CI run `26330646504` |
 | Hosted baseline run orchestrator | `packages/bench/hosted-baseline-run.mjs`, `baseline:run`, `reviews/overnight-20260522/hosted-baseline-run-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-run-review.md`, CI run `26331102535` |
 | Hosted baseline live-prep hardening | `packages/bench/hosted-baseline-queryset-author.mjs`, `packages/bench/baseline-queryset-inspect.mjs`, `reviews/overnight-20260522/hosted-baseline-live-prep-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-live-prep-review.md`, CI run `26331865543` |
+| Live hosted-vs-local Codex baseline follow-up | `packages/bench/hosted-baseline-run.mjs`, `packages/bench/hosted-baseline-preflight.mjs`, `reviews/overnight-20260522/hosted-baseline-live-codex-local-run-evidence.md`, `reviews/overnight-20260522/gemini-hosted-baseline-live-codex-local-review.md`, CI run `26332365170` |
 | Clean consumer smoke | `packages/bench/consumer-install-smoke.mjs`, `reviews/overnight-20260522/consumer-install-smoke-evidence.md`, `reviews/overnight-20260522/gemini-consumer-install-smoke-review.md` |
 | Session compaction benchmark | `packages/bench/session-compaction-benchmark.mjs`, `reviews/overnight-20260522/session-compaction-benchmark-evidence.md` |
 | Local-session compaction audit | `packages/bench/session-compaction-local-audit.mjs`, `reviews/overnight-20260522/session-compaction-local-audit-evidence.md` |
