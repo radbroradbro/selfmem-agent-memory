@@ -45,5 +45,6 @@
   "cost": {
     "ingestUsd": 0.008,
     "queryUsd": 0.014
-  }
+  },
+  "matchedHostedRunPresent": true
 }

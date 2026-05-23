@@ -38,3 +38,18 @@ Residual risk:
 
 - This is a harness and release-gate review. It does not validate a live hosted
   Supermemory baseline or a real RecallWeave run.
+
+Follow-up review on 2026-05-23:
+
+- Route: Gemini CLI focused review after one transient capacity retry.
+- Verdict: `CLEAN`.
+- Scope: matched-counterpart-run hardening for
+  `packages/bench/baseline-comparison.mjs`,
+  `packages/bench/release-readiness-check.mjs`, and the RecallWeave fixture
+  result.
+- Finding: the comparison gate now requires independent counterpart proof from
+  both result files. Hosted results must prove the matching RecallWeave run, and
+  RecallWeave results must prove the matching hosted run.
+- Finding: strict boolean checks prevent truthy values from bypassing the gate.
+- Finding: the release check covers the negative case where reviewer approvals
+  exist but the hosted result lacks matched RecallWeave proof.

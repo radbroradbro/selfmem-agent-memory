@@ -1981,6 +1981,7 @@ check("fresh hosted baseline preflight passes", () => {
   const recallWeaveLiveResultPath = join(collectorTmp, "recallweave-live-result.json");
   const forcedHostedPath = join(collectorTmp, "forced-hosted-live.json");
   const forcedRecallWeavePath = join(collectorTmp, "forced-recallweave-live.json");
+  const missingCounterpartRunPath = join(collectorTmp, "missing-counterpart-run.json");
   const missingMetricPath = join(collectorTmp, "missing-metric.json");
   const missingQuerySetEvidencePath = join(collectorTmp, "missing-query-set-evidence.json");
   const unlabeledQuerySetPath = join(collectorTmp, "unlabeled-queryset.json");
@@ -2541,6 +2542,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(comparisonReport.comparability?.sameScoringCode, true);
   assert.equal(comparisonReport.comparability?.sameJudge, true);
   assert.equal(comparisonReport.comparability?.sameAnswerModel, true);
+  assert.equal(comparisonReport.comparability?.matchedCounterpartRuns, true);
   assert.equal(comparisonReport.hosted?.querySetEvidence?.publicBenchmarkReady, true);
   assert.equal(comparisonReport.recallWeave?.querySetEvidence?.publicBenchmarkReady, true);
   assert.equal(comparisonReport.privacy?.privacyLeakCount, 0);
@@ -2575,6 +2577,20 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(forcedFixtureComparison.fixtureOnly, true);
   assert.equal(forcedFixtureComparison.countsAsComparisonEvidence, false);
   assert.equal(forcedFixtureComparison.publicBenchmarkClaimsAllowed, false);
+  const missingCounterpartRun = structuredClone(forcedHosted);
+  missingCounterpartRun.matchedRecallWeaveRunPresent = false;
+  writeFileSync(missingCounterpartRunPath, JSON.stringify(missingCounterpartRun, null, 2));
+  const missingCounterpartRunComparison = JSON.parse(
+    run(
+      "node",
+      ["packages/bench/baseline-comparison.mjs", "--hosted", missingCounterpartRunPath, "--recallweave", forcedRecallWeavePath],
+      { env: { ...process.env, RECALLWEAVE_REVIEWER_APPROVAL_COUNT: "2" } },
+    ).stdout,
+  );
+  assert.equal(missingCounterpartRunComparison.comparability?.matchedCounterpartRuns, false);
+  assert.equal(missingCounterpartRunComparison.countsAsComparisonEvidence, false);
+  assert.equal(missingCounterpartRunComparison.publicBenchmarkClaimsAllowed, false);
+  assert.ok(missingCounterpartRunComparison.failedChecks?.includes("matched-counterpart-runs"));
   const missingMetric = structuredClone(forcedRecallWeave);
   delete missingMetric.metrics.quality;
   writeFileSync(missingMetricPath, JSON.stringify(missingMetric, null, 2));

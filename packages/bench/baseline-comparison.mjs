@@ -59,6 +59,7 @@ const failedChecks = [
   check("same-judge", comparability.sameJudge),
   check("same-answer-model", comparability.sameAnswerModel),
   check("same-harness-flags", comparability.sameHarnessFlags),
+  check("matched-counterpart-runs", comparability.matchedCounterpartRuns),
   check("labeled-query-sets", labeledQuerySets),
   check("metrics-only", hosted.metricsOnly && recallWeave.metricsOnly),
   check("privacy-clean", privacyClean(privacy)),
@@ -133,6 +134,10 @@ function loadResult(inputPath, expectedProvider) {
     sameDataset: result.sameDataset === true || result.comparability?.sameDataset === true,
     sameJudge: result.sameJudge === true || result.comparability?.sameJudge === true,
     sameAnswerModel: result.sameAnswerModel === true || result.comparability?.sameAnswerModel === true,
+    matchedCounterpartRunPresent:
+      expectedProvider === "hosted-supermemory"
+        ? result.matchedRecallWeaveRunPresent === true || result.matchedRecallWeaveRun?.present === true
+        : result.matchedHostedRunPresent === true || result.matchedHostedRun?.present === true,
     querySetEvidence: normalizeQuerySetEvidence(result.querySetEvidence, inputPath),
     privacyLeakCount: requiredNumber(result.privacyLeakCount ?? result.privacy?.leakCount, "privacyLeakCount", inputPath),
     redactionFailureCount: requiredNumber(result.redactionFailureCount ?? result.redactionFailures, "redactionFailureCount", inputPath),
@@ -197,6 +202,7 @@ function compareHarness(hosted, recallWeave) {
       recallWeave.sameJudge &&
       hosted.sameAnswerModel &&
       recallWeave.sameAnswerModel,
+    matchedCounterpartRuns: hosted.matchedCounterpartRunPresent && recallWeave.matchedCounterpartRunPresent,
   };
 }
 
@@ -242,6 +248,7 @@ function resultSummary(result) {
     scoringCodeHash: result.scoringCodeHash,
     judgeModel: result.judgeModel,
     answerModel: result.answerModel,
+    matchedCounterpartRunPresent: result.matchedCounterpartRunPresent,
     querySetEvidence: result.querySetEvidence,
     metrics: result.metrics,
     cost: result.cost,
