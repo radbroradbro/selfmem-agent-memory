@@ -8,8 +8,9 @@ Added `canary:next-agent`, a metrics-only planner that turns a canary batch
 audit into a single next-agent update plan. The command is meant for the
 controller after multiple agents return redacted diagnostics. It chooses the
 closest privacy-clean candidate, names the failed strict checks, and prints a
-paste-ready one-agent command sequence for dry-run, adapter apply, fresh-window
-collection, strict intake, diagnosis, and metrics-only packet packaging. The
+paste-ready one-agent command sequence for dry-run, adapter apply,
+deterministic drill generation, fresh-window collection, strict intake,
+diagnosis, and metrics-only packet packaging. The
 fresh-window collection step now uses `selfmem_update` to write the report,
 intake, optional diagnosis, and evidence packet in one run, which reduces the
 chance that an agent returns only partial canary evidence.
@@ -40,7 +41,7 @@ node packages/bench/canary-next-agent-plan.mjs --input-root <redacted-diagnostic
 - Selected candidate privacy leak count: 0.
 - Selected candidate store latency samples: positive.
 - The generated Markdown includes the fresh-window timestamp step and the
-  strict-real intake and packet-output paths.
+  deterministic drill, strict-real intake, and packet-output paths.
 
 ## Real Redacted Batch Result
 
@@ -48,8 +49,8 @@ The command was also run against the available redacted diagnostic return set.
 No raw diagnostic, memory, transcript, prompt, answer, credential, or local path
 content was written to the repo.
 
-- Input count: 5.
-- Parsed input count: 4.
+- Input count: 9.
+- Parsed input count: 8.
 - Failed input count: 1.
 - Strict-real pass count: 0.
 - Selected host: OpenClaw.
@@ -72,7 +73,7 @@ content was written to the repo.
 
 The current next-agent handoff packet is
 `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`, SHA256
-`2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`.
+`f7317807abe297e9c45fe2a6124d17bc10b1c1537a2b667c5100483bc3ced7e0`.
 
 The packet was regenerated from the postwatch batch report with
 `--batch ... --require-ready`. The underlying batch was collected with
@@ -93,11 +94,11 @@ The packet scan found zero key-shaped text and zero private local paths.
 ## Interpretation
 
 The next real canary should be one OpenClaw runtime with the current adapter
-installed through `selfmem_update`, followed by a fresh post-update runtime
-window. The previous diagnostics show good privacy, lifecycle, hybrid search,
-local writes, and recall latency, but they cannot pass strict intake until the
-adapter contract and store latency instrumentation are present in the fresh
-window.
+installed through `selfmem_update`, followed by the deterministic drill and a
+fresh post-update runtime window. The previous diagnostics show good privacy,
+lifecycle, hybrid search, local writes, and recall latency, but they cannot
+pass strict intake until the adapter contract and store latency instrumentation
+are present in the fresh window.
 
 ## Guardrails
 
@@ -108,6 +109,9 @@ window.
 - Public launch and fleet rollout stay false in every output.
 - The generated command plan includes rollback-tested strict intake and a
   diagnosis path for failed evidence.
+- The generated command plan now requires the deterministic drill and states
+  that RecallWeave/selfmem is the native memory lane while hosted Supermemory is
+  read-through only.
 - The generated fresh-window command includes `--canary-intake-output`,
   `--canary-diagnosis-output`, and `--canary-packet-output` so the selected
   agent can return one metrics-only evidence packet without hand-running

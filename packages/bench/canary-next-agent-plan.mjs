@@ -263,12 +263,12 @@ function commandsFor(host) {
     },
     {
       id: "run-deterministic-drill",
-      description: "Generate the public-safe drill prompts and use them during the fresh window so required lifecycle, recall, write, read-through, and rollback coverage is not accidental.",
+      description: "Generate and follow the public-safe drill during the fresh window so local write, local recall, hosted read-through, lifecycle/LCM coverage, rollback, and strict intake are deliberate rather than accidental.",
       command: `npm exec --yes pnpm@10.23.0 -- canary:drill -- --host ${host} --format markdown --output /tmp/recallweave-canary-drill.md`,
     },
     {
       id: "collect-live-window",
-      description: "After at least 15 minutes of real use, collect strict-real metrics and package the returned evidence from the mapped live container.",
+      description: "After at least 15 minutes of real use following the deterministic drill, collect strict-real metrics and package the returned evidence from the mapped live container.",
       command: [
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip`,
       ].join(" && "),
@@ -302,6 +302,8 @@ function acceptanceCriteria() {
   return [
     "one agent only until a maintainer reviews the evidence",
     "fresh post-update window is at least 15 minutes",
+    "RecallWeave/selfmem is the native memory lane for this one agent while hosted Supermemory remains read-through only",
+    "deterministic drill was generated and followed during the fresh window",
     "strict-real intake passes from non-fixture evidence",
     "adapter strict canary contract is v1",
     "search and store latency instrumentation are present",

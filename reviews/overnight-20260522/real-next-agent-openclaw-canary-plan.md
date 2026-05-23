@@ -1,48 +1,24 @@
-# Real Next-Agent OpenClaw Canary Plan
+# RecallWeave Next Agent Canary Plan
 
-Date: 2026-05-23
+Status: READY_FOR_ONE_AGENT_FRESH_CANARY
+Scope: one-agent-fresh-canary
+Host: openclaw
 
-## Scope
+## Selected Candidate
 
-This is the paste-ready, metrics-only next-agent plan produced from the latest
-redacted diagnostics batch. It selects one OpenClaw agent for a fresh
-post-update canary window. It does not expose raw memories, transcripts,
-prompts, answers, credentials, filenames, private local paths, or container
-names.
+- Label: `bundle_8e90781bb060a889`
+- Failed checks: `adapter-contract`, `store-latency-instrumented`, `store-p95`
+- Recall p95: 1567.346 ms
+- Store p95: 0 ms
+- Store latency samples: 0
+- Privacy leak count: 0
 
-This does not complete the real rollout blocker. It tells the next operator
-exactly how to collect the evidence that could close that blocker later.
+## Focus
 
-## Controller Result
+- installed-version: Install the current adapter with `bin/selfmem_update --apply` before collecting evidence.
+- store-instrumentation: Collect a fresh post-update window with store `elapsed_ms` samples; old bundles with zero store samples cannot pass.
 
-- Status: `READY_FOR_ONE_AGENT_FRESH_CANARY`.
-- Scope: `one-agent-fresh-canary`.
-- Host: `openclaw`.
-- Candidate label: `bundle_8e90781bb060a889`.
-- Failed checks:
-  - `adapter-contract`
-  - `store-latency-instrumented`
-  - `store-p95`
-- Recall p95: 1567.346 ms.
-- Store p95: 0 ms.
-- Store latency samples: 0.
-- Privacy leak count: 0.
-- Batch parsed inputs: 8.
-- Batch failed inputs: 1.
-- Strict-real pass count: 0.
-
-## Markdown Workspace
-
-Use `reviews/overnight-20260522/next-agent-workspace/` for the next operator's
-markdown findings. The folder keeps the native CLI outputs, operator notes, and
-returned-packet intake summary separate from broader release notes.
-
-The workspace is public-safe by design. It must contain aggregate metrics,
-hashes, pass/fail flags, timestamps, and command ids only. Do not place raw
-memories, transcripts, prompts, answers, private paths, keys, cookies, or
-unredacted diagnostics there.
-
-## Paste-Ready Plan
+## Commands
 
 ### dry-run
 
@@ -60,10 +36,17 @@ Apply the current adapter and record the fresh evidence window timestamp.
 FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ") && bin/selfmem_update --host openclaw --repo <openclaw-checkout> --apply && printf "fresh canary window starts at %s\n" "$FRESH_WINDOW_START"
 ```
 
+### run-deterministic-drill
+
+Generate and follow the public-safe drill during the fresh window so local write, local recall, hosted read-through, lifecycle/LCM coverage, rollback, and strict intake are deliberate rather than accidental.
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown --output /tmp/recallweave-canary-drill.md
+```
+
 ### collect-live-window
 
-After at least 15 minutes of real use, collect strict-real metrics and package
-the returned evidence from the mapped live container.
+After at least 15 minutes of real use following the deterministic drill, collect strict-real metrics and package the returned evidence from the mapped live container.
 
 ```bash
 bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
@@ -71,8 +54,7 @@ bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rol
 
 ### collect-from-redacted-export
 
-Use only if the agent cannot collect from its live container but can provide a
-redacted diagnostic export.
+Use only if the agent cannot collect from its live container but can provide a redacted diagnostic export.
 
 ```bash
 bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
@@ -96,8 +78,7 @@ npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary
 
 ### package-failing-diagnostic
 
-Package diagnosis when strict intake fails. This does not count as rollout
-evidence.
+Package diagnosis when strict intake fails. This does not count as rollout evidence.
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --diagnosis /tmp/recallweave-canary-diagnosis.json --output /tmp/recallweave-canary-evidence-packet.zip
@@ -105,17 +86,16 @@ npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary
 
 ## Pass Criteria
 
-- One agent only until a maintainer reviews the evidence.
-- Fresh post-update window is at least 15 minutes.
-- Strict-real intake passes from non-fixture evidence.
-- Adapter strict canary contract is v1.
-- Search and store latency instrumentation are present.
-- Store latency sample count is greater than zero.
-- Recall p95 and store p95 are each at or below 2500 ms.
-- Lifecycle, hybrid search, local writes, hosted read-through, and rollback are
-  covered.
-- Privacy leak count and secret-pattern hits are zero.
+- one agent only until a maintainer reviews the evidence
+- fresh post-update window is at least 15 minutes
+- RecallWeave/selfmem is the native memory lane for this one agent while hosted Supermemory remains read-through only
+- deterministic drill was generated and followed during the fresh window
+- strict-real intake passes from non-fixture evidence
+- adapter strict canary contract is v1
+- search and store latency instrumentation are present
+- store latency sample count is greater than zero
+- recall p95 and store p95 are each at or below 2500 ms
+- lifecycle, hybrid search, local writes, hosted read-through, and rollback are covered
+- privacy leak count and secret-pattern hits are zero
 
-Attach only metrics-only report, intake, diagnosis if needed, and packet zip.
-Do not attach raw logs, memories, prompts, answers, keys, cookies, private local
-paths, or unredacted diagnostics.
+Attach only metrics-only report, intake, diagnosis if needed, and packet zip. Do not attach raw logs, memories, prompts, answers, keys, cookies, private local paths, or unredacted diagnostics.

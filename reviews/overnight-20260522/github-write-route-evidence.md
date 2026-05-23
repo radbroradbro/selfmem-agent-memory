@@ -63,6 +63,9 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after GitHub Actions run `26343998064`
     passed on `4310e0e` and the release-state baseline was promoted. Updated
     at: 2026-05-23T21:31:52Z.
+  - The PR body was refreshed again after regenerating the current OpenClaw
+    next-agent handoff packet with the deterministic drill step in the main
+    plan. Updated at: 2026-05-23T21:44:12Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -80,9 +83,10 @@ Verdict: resolved for PR body and blocker issue writes.
     handoff packet identity refresh, five-packet returned-diagnostics packet
     identity refresh, postwatch OpenClaw one-agent packet refresh, returned
     canary workspace refresh, latest verified baseline refresh, and returned
-    downloads findings baseline refresh
-  - Updated at: 2026-05-23T21:31:53Z
-  - Body length: 21787
+    downloads findings baseline refresh, and current deterministic-drill
+    packet refresh
+  - Updated at: 2026-05-23T21:44:12Z
+  - Body length: 21800
 
 ## Safety
 

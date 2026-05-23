@@ -46,15 +46,18 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
   `26343998064` passed on `4310e0e` and the release-state baseline was
   promoted.
+- PR #5 and issue #6 were refreshed again after the current OpenClaw
+  one-agent handoff packet was regenerated with the deterministic drill step in
+  the main next-agent plan.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T21:31:52Z
+- PR body refreshed at: 2026-05-23T21:44:12Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T21:31:53Z
-- PR body hash: 598866599c3aa7c3a216fa2880d8602a20a1207c03debb189e3902e2cd598431
+- Issue updated at: 2026-05-23T21:44:12Z
+- PR body hash: 33908faee6b1449fea6b970511a37a94436cc9d0a304256ca67f30903f1ae0e9
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 1583b9424c486bb9ffbee6982bf3238eed65ff6dd3fc1f96e905a8e18f297375
-- PR body length: 36525
-- Issue body length: 21787
+- Issue body hash: 2c1f65e78ddc5185a53833171879d8ab5fda7b239f0fa7e44192afc91aedb61a
+- PR body length: 36531
+- Issue body length: 21800
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

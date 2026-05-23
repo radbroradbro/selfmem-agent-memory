@@ -92,7 +92,7 @@ The current handoff packet remains:
 
 - `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`
 - SHA-256:
-  `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`
+  `f7317807abe297e9c45fe2a6124d17bc10b1c1537a2b667c5100483bc3ced7e0`
 
 The returned packet must pass `canary:returned-packet` with
 `--require-production-canary` before the real rollout blocker can close.

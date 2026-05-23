@@ -50,6 +50,7 @@ npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacte
   - `manifest.json`
   - `next-agent-plan.json`
   - `next-agent-plan.md`
+  - `strict-real-canary-drill.md`
   - `strict-real-operator-packet.md`
 
 ## Earlier Real Redacted Batch Packet Result
@@ -92,10 +93,12 @@ worktree on 2026-05-23, scanned the local incoming folders, wrote a postwatch
 batch report, and generated a fresh sendable packet through the
 `--batch ... --require-ready` path.
 This is the current packet to hand to the selected OpenClaw operator.
+It was regenerated after the next-agent plan made deterministic drill execution
+explicit in the main handoff path.
 
 - Packet label: `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`.
 - Packet SHA256:
-  `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`.
+  `f7317807abe297e9c45fe2a6124d17bc10b1c1537a2b667c5100483bc3ced7e0`.
 - Mode: `canary-next-agent-handoff-packet`.
 - Public safe: true.
 - Metrics only: true.

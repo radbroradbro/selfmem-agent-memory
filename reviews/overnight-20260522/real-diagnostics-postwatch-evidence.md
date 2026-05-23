@@ -50,7 +50,7 @@ and lacked store latency instrumentation.
 ## Fresh Canary Packet
 
 - Packet label: `recallweave-openclaw-next-agent-canary-20260523-postwatch.zip`
-- SHA-256: `2f2cec8a515eed467861204b3bf2bca249bee13ef6470c79ffc44b37321c7208`
+- SHA-256: `f7317807abe297e9c45fe2a6124d17bc10b1c1537a2b667c5100483bc3ced7e0`
 - Entries:
   - `README.md`
   - `manifest.json`
@@ -62,6 +62,9 @@ and lacked store latency instrumentation.
 ## Release Meaning
 
 The next action is a one-agent fresh OpenClaw canary using the current adapter.
+The current packet requires the deterministic drill before evidence collection,
+so the fresh window should deliberately exercise local write, local recall,
+hosted read-through, lifecycle or LCM coverage, and rollback.
 This evidence does not permit public launch, fleet rollout, or goal completion.
 It narrows the real-container blocker to one fresh post-update runtime window
 with strict returned-packet verification.

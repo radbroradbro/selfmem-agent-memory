@@ -2242,9 +2242,12 @@ check("fresh canary next-agent plan passes", () => {
   assert.equal(report.decision.recommendedScope, "one-agent-fresh-canary");
   assert.ok(report.decision.blockReasons.some((item) => item.reason.includes("fixture-only")));
   assert.ok(report.commandPlan.some((item) => item.id === "apply-current-adapter"));
+  assert.ok(report.commandPlan.some((item) => item.id === "run-deterministic-drill" && /canary:drill/.test(item.command)));
   assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window" && /--canary-packet-output/.test(item.command)));
   assert.ok(report.commandPlan.some((item) => item.id === "diagnose-if-failed"));
   assert.ok(report.commandPlan.some((item) => item.id === "package-passing-evidence"));
+  assert.ok(report.acceptanceCriteria.some((item) => /native memory lane/i.test(item)));
+  assert.ok(report.acceptanceCriteria.some((item) => /deterministic drill/i.test(item)));
   for (const command of report.commandPlan.map((item) => item.command).filter((command) => /canary:(intake|diagnose)/.test(command))) {
     const toolSegment = command.slice(command.indexOf("canary:"));
     assert.match(toolSegment, /--output\s+\/tmp\/recallweave-canary-/);
@@ -2260,6 +2263,8 @@ check("fresh canary next-agent plan passes", () => {
   assert.match(realPlanEvidence, /store-latency-instrumented/);
   assert.match(realPlanEvidence, /Recall p95:\s*1567\.346 ms/i);
   assert.match(realPlanEvidence, /FRESH_WINDOW_START/);
+  assert.match(realPlanEvidence, /run-deterministic-drill/);
+  assert.match(realPlanEvidence, /canary:drill/);
   assert.match(realPlanEvidence, /--strict-real/);
   assert.match(realPlanEvidence, /--canary-intake-output\s+\/tmp\/recallweave-canary-intake\.json/);
   assert.match(realPlanEvidence, /--canary-packet-output\s+\/tmp\/recallweave-canary-evidence-packet\.zip/);
