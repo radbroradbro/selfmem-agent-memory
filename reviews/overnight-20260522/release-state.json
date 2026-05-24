@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T01:07:00Z",
+  "generatedAt": "2026-05-24T01:33:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "5a2e0a70d4b4835217fc7f65e09c05b7bd3dd521",
-    "ciRunId": 26348138478,
+    "headSha": "9a95d08e86c0b212620ea8b3d2182b454e0b90af",
+    "ciRunId": 26348625868,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_strategy_compare_and_autoresearch_loop",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding the public LongMemEval-S materialize-run lane, retrieval-proxy blind baseline, same-data retrieval strategy comparison, and 24-arm local-only autoresearch loop. The materializer writes private query/haystack inputs outside the repository, publishes only hashes/counts, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result, strategy comparison, and autoresearch loop to that hash while requiring retrievalProxyOnly, memoryBenchAnswerQuality=false, and publicBenchmarkClaimsAllowed=false. Local release:check, benchmark:public-autoresearch fixture/live checks, targeted public artifact scans, diff check, release:github-sync, and GitHub Actions run 26348138478 passed."
+    "note": "Latest inspected code/product baseline after promoting the public LongMemEval-S retrieval-proxy baseline to the 24-arm autoresearch winner, bm25-lite-b800-k5. The materializer writes private query/haystack inputs outside the repository, publishes only hashes/counts, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result, strategy comparison, and autoresearch loop to that hash while requiring retrievalProxyOnly, memoryBenchAnswerQuality=false, and publicBenchmarkClaimsAllowed=false. Local release:check, benchmark:public-materialize, baseline:export:recallweave, baseline:collect:recallweave, benchmark:public-autoresearch fixture/live checks, targeted public artifact scans, diff check, release:github-sync, and GitHub Actions run 26348625868 passed."
   },
   "releaseStateGuard": {
     "enabled": true,

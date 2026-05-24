@@ -203,9 +203,9 @@ Scope:
 - GitHub Actions run `26347754208` passed on commit
   `d91b27bcc869656197c1cc67804530b75757bbe2` after the strategy-comparison
   lane was added.
-- GitHub Actions run `26348138478` passed on commit
-  `5a2e0a70d4b4835217fc7f65e09c05b7bd3dd521` after the local-only
-  autoresearch loop was added.
+- GitHub Actions run `26348625868` passed on commit
+  `9a95d08e86c0b212620ea8b3d2182b454e0b90af` after the canonical
+  LongMemEval-S retrieval-proxy run was promoted to `bm25-lite-b800-k5`.
 - Kept the gate public-safe and evidence-based.
 
 What `release:check` verifies:

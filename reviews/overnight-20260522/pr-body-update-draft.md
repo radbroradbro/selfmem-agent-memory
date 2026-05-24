@@ -83,11 +83,10 @@ Live status:
   candidate limit; `bm25-lite-b800-k5` preserves quality 0.4541 while cutting
   average context tokens to 800. The canonical checked-in run now uses this
   setting.
-- Promotes GitHub Actions run `26348138478` on `5a2e0a7` as the latest
-  verified code/product baseline after the LongMemEval-S materialize-run lane,
-  retrieval-proxy blind baseline, same-data strategy comparison,
-  local-only autoresearch loop,
-  release-gate hash binding, and sync evidence refresh.
+- Promotes GitHub Actions run `26348625868` on `9a95d08` as the latest
+  verified code/product baseline after promoting the canonical LongMemEval-S
+  retrieval-proxy run to `bm25-lite-b800-k5`, binding it to the materialized
+  query-set hash, and keeping retrieval-proxy/no-public-claims guards active.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
@@ -137,11 +136,8 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
-  `5a2e0a70d4b4835217fc7f65e09c05b7bd3dd521`.
-- GitHub Actions run `26348138478`: passed CI after adding the public
-  LongMemEval-S materialize-run lane, same-data strategy comparison,
-  local-only autoresearch loop, binding the RecallWeave result to the
-  materialized query-set hash, and marking the result as retrieval-proxy only.
+  `9a95d08e86c0b212620ea8b3d2182b454e0b90af`.
+- GitHub Actions run `26348625868`: passed CI after promoting the canonical LongMemEval-S retrieval-proxy run to the autoresearch winner, `bm25-lite-b800-k5`, binding it to the materialized query-set hash, and marking the result as retrieval-proxy only.
 - Previous verified code/product baseline before the materialize-run lane:
   `8eb69e848d442b08ebf4f5204d6ed17224161683`.
 - GitHub Actions run `26346613433`: passed CI after adding the public

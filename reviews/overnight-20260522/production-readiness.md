@@ -17,11 +17,11 @@ does not have enough current proof to authorize a production launch.
   draft, mergeable.
 - PR base: `main` at `f4981733a39cf9f09f3f87cac04e9b76a896e38b`.
 - Current inspected branch: `automation/recallweave-post12h-launch-review-20260524-tmp`.
-- Current inspected HEAD: `5a2e0a70d4b4835217fc7f65e09c05b7bd3dd521`.
+- Current inspected HEAD: `9a95d08e86c0b212620ea8b3d2182b454e0b90af`.
 - Blocker issue verified through the GitHub connector on 2026-05-24:
   <https://github.com/radbroradbro/selfmem-agent-memory/issues/6>, open.
-- CI run for `5a2e0a70d4b4835217fc7f65e09c05b7bd3dd521`:
-  `26348138478`, passed on the PR branch.
+- CI run for `9a95d08e86c0b212620ea8b3d2182b454e0b90af`:
+  `26348625868`, passed on the PR branch.
 
 ## What Actually Shipped Or Was Proposed
 
