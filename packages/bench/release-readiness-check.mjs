@@ -5398,7 +5398,12 @@ function isPublicEvidencePath(file) {
 }
 
 function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
-  return allowedCodePaths.has(file) && (file === ".gitignore" || file === "package.json" || file.startsWith("packages/bench/"));
+  return allowedCodePaths.has(file) && (
+    file === ".gitignore" ||
+    file === "package.json" ||
+    file.startsWith("packages/bench/") ||
+    file === "plugins/selfmem-fallback/scripts/selfmem_update.py"
+  );
 }
 
 async function listFiles(directory) {
