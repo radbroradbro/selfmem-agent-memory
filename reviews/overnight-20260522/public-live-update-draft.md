@@ -241,13 +241,15 @@ Latest verified head before this draft refresh:
 - Local release gate: `node packages/bench/release-readiness-check.mjs` passed
   in the controller run
 - Model/autoresearch matrix gate: Apple Silicon local default is Qwen3 0.6B
-  through Hugging Face/llama.cpp/Metal, Voyage/Gemini/NVIDIA are benchmark
-  challengers, query expansion is off by default, and public benchmark claims
-  require a matched source-locked canary win with reviewer sign-off
+  embeddings through Hugging Face/llama.cpp/Metal plus RecallWeave's
+  deterministic rerank proxy. Voyage/Gemini/NVIDIA are benchmark challengers,
+  query expansion is off by default, and public benchmark claims require a
+  matched source-locked canary win with reviewer sign-off
 - Brain UI Model Matrix evidence: 6 fixture provider arms, 4 cloud arms, 2
-  local arms, Apple Silicon Qwen3 0.6B local default, Voyage/Gemini/NVIDIA
-  cloud arms, query expansion off, env-only credentials, 5 gates, 3 blockers,
-  zero console errors, and no private/key-shaped visible text
+  local arms, Apple Silicon Qwen3 0.6B embedding default with deterministic
+  rerank proxy, Voyage/Gemini/NVIDIA cloud arms, query expansion off, env-only
+  credentials, 5 gates, 3 blockers, zero console errors, and no
+  private/key-shaped visible text
 - Clean consumer smoke evidence: a temporary public-style checkout ran updater
   help, update smoke, Brain UI smoke, Brain UI interaction smoke, local audit,
   compaction audit, and npm package dry-run, then verified required
@@ -305,7 +307,9 @@ Latest verified head before this draft refresh:
 - Direct local memory materialization is guarded by an environment flag, exact
   phrase, backup, and content-free audit log; selected local memory edits still
   start as append-only overlays before they are materialized.
-- The benchmark evidence is fixture-focused. Hosted Supermemory comparison
-  claims require a fresh, valid, metrics-only baseline accepted by the hosted
-  baseline preflight and reviewed against a matched RecallWeave run.
+- The benchmark evidence is still conservative. Voyage has a positive
+  retrieval-proxy canary on the 30-query public LongMemEval-S target, but
+  MemoryBench/SOTA claims remain blocked. The local Apple model lane is
+  preflight-only until a local embedding endpoint is configured and benchmarked
+  against BM25 and full-hybrid controls.
 - The public release should stay conservative until the owner approves it.

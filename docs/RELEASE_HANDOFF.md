@@ -334,6 +334,16 @@ keys, keeps the output directory and provider key file outside the repo, and
 requires `bm25-lite`, `full-hybrid-rerank`, and `cloud-voyage4-voyage` in the
 same run.
 
+The checked-in local Apple packet is
+`reviews/overnight-20260522/public-longmemeval-expanded-local-apple-operator-packet.md`.
+It is also public-safe and metrics-only. Its paired preflight,
+`reviews/overnight-20260522/public-longmemeval-expanded-local-apple-live-preflight.json`,
+currently reports `BLOCKED_PROVIDER_ENV` because no local embedding endpoint is
+configured through `SELFMEM_LOCAL_EMBED_BASE_URL`. The local Apple arm is
+scaffolded and fixture-covered, but it is not live-tested yet. The implemented
+local path is Qwen3 local embeddings plus RecallWeave's deterministic rerank
+proxy; a live Qwen3 reranker sidecar remains a future challenger.
+
 The first live Voyage provider canaries have now run:
 
 - 6-query target:

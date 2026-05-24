@@ -132,6 +132,16 @@ Live status:
   Gemini/Voyage/NVIDIA/local-Apple readiness without calling provider APIs or
   sending benchmark text. The current controller evidence reports
   `BLOCKED_PROVIDER_ENV`, so no live provider benchmark claim is made.
+- Adds an explicit local Apple preflight and operator packet for the
+  30-question LongMemEval-S target:
+  `public-longmemeval-expanded-local-apple-live-preflight.json`,
+  `public-longmemeval-expanded-local-apple-live-preflight-evidence.md`, and
+  `public-longmemeval-expanded-local-apple-operator-packet.md`. It confirms
+  the local model lane is scaffolded and fixture-covered but not live-tested:
+  no local embedding endpoint is configured through
+  `SELFMEM_LOCAL_EMBED_BASE_URL`, and the current implemented local arm uses
+  Qwen3 local embeddings plus RecallWeave's deterministic rerank proxy rather
+  than a live Qwen3 reranker sidecar.
 - Adds private provider key-file env support for live benchmark preflights and
   provider fixture runs. Operators can set `VOYAGE_API_KEYS_FILE`,
   `NVIDIA_API_KEYS_FILE`, or `GEMINI_API_KEYS_FILE` to a private file outside
@@ -212,6 +222,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 
 - Latest verified PR branch head:
   `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`.
+- Commit `dbac92e7428904a044754de30b7e11189aedeb9c` added public-safe local
+  Apple benchmark preflight evidence and corrected the local-model wording so
+  the repo does not imply a live local reranker has already been tested. Local
+  `release:check`, `release:github-sync`, and `goal:audit` passed after that
+  update. It does not change the approved runtime canary adapter/report commit.
 - GitHub Actions run `26367018906`: passed CI after adding the same-data Voyage
   latency comparison gate. This does not change the approved runtime canary
   adapter/report commit.

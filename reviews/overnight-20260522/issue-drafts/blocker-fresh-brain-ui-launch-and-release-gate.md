@@ -14,6 +14,12 @@ requirements are resolved.
 - GitHub Actions run `26367018906` passed CI after adding the same-data Voyage
   latency comparison gate.
   This did not change the approved runtime canary adapter/report commit.
+- Commit `dbac92e7428904a044754de30b7e11189aedeb9c` adds metrics-only local
+  Apple benchmark preflight evidence and corrects the local-model status so the
+  branch does not imply a live local reranker has already been tested. Local
+  `release:check`, `release:github-sync`, and `goal:audit` passed after that
+  update. This still does not authorize launch or change the approved runtime
+  canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
@@ -217,6 +223,13 @@ requirements are resolved.
   0.3040 versus BM25 0.2506, P@1 0.5667 versus 0.4667, NDCG@10 0.2658 versus
   0.2193, and p50 latency 1988 ms. It is the next cloud canary default, not a
   public MemoryBench/SOTA claim.
+- Current local Apple evidence is preflight-only:
+  `public-longmemeval-expanded-local-apple-live-preflight.json` reports
+  `BLOCKED_PROVIDER_ENV` because no local embedding endpoint is configured via
+  `SELFMEM_LOCAL_EMBED_BASE_URL`. The local arm is scaffolded and
+  fixture-covered, but not live-tested. The implemented local path is Qwen3
+  local embeddings plus RecallWeave's deterministic rerank proxy; a live Qwen3
+  reranker sidecar remains a future challenger.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
   `benchmark:public-target`, a metrics-only source-lock, slice-manifest,
