@@ -206,9 +206,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   hybrid runs cannot omit the `bm25-lite` control. This does not change the
   approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
-  `3d61677bc3d316e040ac5a634467d0204c272493`.
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-  `3d61677bc3d316e040ac5a634467d0204c272493`.
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - GitHub Actions run `26353888297`: passed CI after adding single-provider
   live preflight gates for Voyage and NVIDIA on the expanded LongMemEval target.
   The checked-in evidence keeps BM25 and full-hybrid controls in the same
@@ -582,7 +582,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- canary:batch-audit`: passed on the fixture batch, failed closed with `--require-real-pass`, supported explicit mixed-folder `--allow-failed-inputs` triage, and triaged the available redacted real diagnostics without exposing raw content.
 - `reviews/overnight-20260522/real-next-agent-openclaw-canary-plan.md`: added a paste-ready OpenClaw fresh-window canary handoff selected from redacted metrics-only evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:next-agent`: passed on the fixture planner and converted the real redacted batch into a one-agent OpenClaw fresh-window plan focused on adapter-contract and store-latency evidence.
-- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 3d61677bc3d316e040ac5a634467d0204c272493`: passed from the postwatch batch report, preserving the selected privacy-clean OpenClaw candidate and keeping failed sibling diagnostics from counting as rollout evidence.
+- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2`: passed from the postwatch batch report, preserving the selected privacy-clean OpenClaw candidate and keeping failed sibling diagnostics from counting as rollout evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:returned-workspace`: passed in
   fixture mode, wrote metrics-only markdown and JSON into a temp workspace, and
   failed closed with `--require-production-canary` for fixture evidence.
@@ -611,13 +611,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Previous verified code baseline before returned downloads supervision:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`, SHA256
-  `994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174`.
+  `recallweave-openclaw-next-agent-canary-20260524-18d606a.zip`, SHA256
+  `6e2dd7fb2c4530e5e688a5110f9d77913d52eda79b17da92fe0df4b0da66b6b3`.
   Packet generated from controller commit
-  `72a21eee898ee1681892254608593bbda5fc02aa`; approved adapter commit
-  `3d61677bc3d316e040ac5a634467d0204c272493`.
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`; approved adapter commit
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
   Returned canary reports must name commit
-  `3d61677bc3d316e040ac5a634467d0204c272493`.
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
   If a newer adapter commit should count, regenerate the packet first.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 - Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.

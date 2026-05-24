@@ -96,16 +96,16 @@ Date: 2026-05-23
   packet commands to the approved adapter commit and regenerating the handoff
   packet with concrete collection commands.
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
-  `26353888297` passed on `3d61677`, the release-state baseline was promoted,
+  `26353888297` passed on `18d606a`, the release-state baseline was promoted,
   the provider-backed benchmark gate added single-provider Voyage and NVIDIA
   live preflight reports, and the OpenClaw one-agent handoff packet was
   regenerated for that expected adapter commit.
 - PR #5 and issue #6 were refreshed again after clarifying the next-agent
   packet commit contract: the packet is generated from controller commit
-  `67c0944`, while the approved adapter/report commit remains `3d61677`.
+  `67c0944`, while the approved adapter/report commit remains `18d606a`.
 - PR #5 and issue #6 were refreshed again after splitting the release state
   into latest verified PR branch head `106b78c` and approved runtime canary
-  adapter/report commit `3d61677`.
+  adapter/report commit `18d606a`.
 - PR #5 was refreshed again after the standard inbox scan was rerun and still
   found 0 production evidence packets, now with 12 handoff packets present.
 - PR #5 was refreshed again after adding hash-only triage summaries for
@@ -113,17 +113,17 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
   `26354982486` passed on `cb40732`, making the latest verified PR branch head
   the returned canary triage and unreadable-zip sanitization commit while
-  preserving `3d61677` as the approved runtime canary adapter/report commit.
+  preserving `18d606a` as the approved runtime canary adapter/report commit.
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
   `26355118094` passed on `8b6f9bd`, promoting the returned canary triage
-  evidence head while preserving `3d61677` as the approved runtime canary
+  evidence head while preserving `18d606a` as the approved runtime canary
   adapter/report commit.
 - PR #5 and issue #6 were refreshed again after adding benchmark gate contract
   enforcement so provider gates reject solo provider-arm runs and hybrid gates
   reject runs without the `bm25-lite` control.
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
   `26355558402` passed on `c2b72f2`, promoting the benchmark gate contract
-  commit as the latest verified PR branch head while preserving `3d61677` as
+  commit as the latest verified PR branch head while preserving `18d606a` as
   the approved runtime canary adapter/report commit.
 - PR #5 and issue #6 were refreshed again after adding private provider
   key-file env support for same-data provider benchmark runs. The refresh kept

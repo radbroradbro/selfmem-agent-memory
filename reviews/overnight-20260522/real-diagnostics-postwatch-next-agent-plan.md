@@ -13,6 +13,20 @@ Host: openclaw
 - Store latency samples: 0
 - Privacy leak count: 0
 
+## Native/Default Memory Lane
+
+For this one selected agent, RecallWeave/selfmem must be the native/default memory provider or OpenClaw memory slot during the fresh canary window.
+Do not leave it installed as a shadow-only or optional sidecar memory.
+`selfmem_canary` is the current compatibility adapter id; it does not mean the runtime should keep RecallWeave in test-only mode.
+Hosted Supermemory stays history/read-through only. New writes during this canary must land locally in RecallWeave/selfmem.
+
+Required proof:
+
+- OpenClaw plugins.slots.memory is selfmem_canary
+- before-prompt recall comes from the native RecallWeave/selfmem lifecycle
+- new memory writes land in the local RecallWeave/selfmem container
+- hosted Supermemory, when configured, is used only as read-through history
+
 ## Focus
 
 - installed-version: Install the current adapter with `bin/selfmem_update --apply` before collecting evidence.
@@ -22,7 +36,7 @@ Host: openclaw
 
 ### dry-run
 
-Show exactly what will change without copying files.
+Show exactly what will change without copying files. Confirm the target agent will use RecallWeave/selfmem as its native/default memory provider or OpenClaw memory slot during this one-agent canary.
 
 ```bash
 bin/selfmem_update --host openclaw --repo <openclaw-checkout>
@@ -30,7 +44,7 @@ bin/selfmem_update --host openclaw --repo <openclaw-checkout>
 
 ### apply-current-adapter
 
-Apply the current adapter and record the fresh evidence window timestamp.
+Apply the current adapter, make RecallWeave/selfmem the native/default memory lane for this one selected agent, and record the fresh evidence window timestamp.
 
 ```bash
 FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ") && bin/selfmem_update --host openclaw --repo <openclaw-checkout> --apply && printf "fresh canary window starts at %s\n" "$FRESH_WINDOW_START"
@@ -49,7 +63,7 @@ npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown
 After at least 15 minutes of real use following the deterministic drill, collect strict-real metrics and package the returned evidence from the mapped live container.
 
 ```bash
-bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 3d61677bc3d316e040ac5a634467d0204c272493 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ### collect-from-redacted-export
@@ -57,7 +71,7 @@ bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rol
 Use only if the agent cannot collect from its live container but can provide a redacted diagnostic export.
 
 ```bash
-bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 3d61677bc3d316e040ac5a634467d0204c272493 --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ### diagnose-if-failed
@@ -73,7 +87,7 @@ npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report /tmp/recallweave-cana
 Package a passing strict-real canary. This remains one-agent evidence only.
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --strict-real --expected-commit 3d61677bc3d316e040ac5a634467d0204c272493 --output /tmp/recallweave-canary-evidence-packet.zip
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --strict-real --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ### package-failing-diagnostic
@@ -81,14 +95,17 @@ npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary
 Package diagnosis when strict intake fails. This does not count as rollout evidence.
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --diagnosis /tmp/recallweave-canary-diagnosis.json --expected-commit 3d61677bc3d316e040ac5a634467d0204c272493 --output /tmp/recallweave-canary-evidence-packet.zip
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --diagnosis /tmp/recallweave-canary-diagnosis.json --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ## Pass Criteria
 
 - one agent only until a maintainer reviews the evidence
 - fresh post-update window is at least 15 minutes
-- RecallWeave/selfmem is the native memory lane for this one agent while hosted Supermemory remains read-through only
+- RecallWeave/selfmem is the native/default memory lane for this one agent while hosted Supermemory remains read-through only
+- RecallWeave/selfmem is not left installed as a shadow-only or optional sidecar memory during the fresh canary window
+- native/default memory slot or provider status is proven in the returned metrics-only evidence
+- hosted Supermemory write-back is disabled; hosted memory is history/read-through only
 - deterministic drill was generated and followed during the fresh window
 - strict-real intake passes from non-fixture evidence
 - adapter strict canary contract is v1

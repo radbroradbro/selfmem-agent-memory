@@ -72,13 +72,13 @@ content was written to the repo.
 ## Current Handoff Packet
 
 The current next-agent handoff packet is
-`recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`, SHA256
-`994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174`.
+`recallweave-openclaw-next-agent-canary-20260524-18d606a.zip`, SHA256
+`6e2dd7fb2c4530e5e688a5110f9d77913d52eda79b17da92fe0df4b0da66b6b3`.
 It was generated from controller commit
-`72a21eee898ee1681892254608593bbda5fc02aa` and approves adapter commit
-`3d61677bc3d316e040ac5a634467d0204c272493`.
+`18d606aff589986b4d8b416a686bedb7ff1506d2` and approves adapter commit
+`18d606aff589986b4d8b416a686bedb7ff1506d2`.
 It expects returned canary reports to name commit
-`3d61677bc3d316e040ac5a634467d0204c272493`.
+`18d606aff589986b4d8b416a686bedb7ff1506d2`.
 If a newer adapter commit should count, regenerate the packet first.
 
 The packet was regenerated from the postwatch batch report with

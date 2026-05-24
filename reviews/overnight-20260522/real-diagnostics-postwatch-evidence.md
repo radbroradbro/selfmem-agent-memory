@@ -17,7 +17,7 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <downloads-
 npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <telegram-download-folder> --allow-failed-inputs --output reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 3d61677bc3d316e040ac5a634467d0204c272493 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260524-3d61677.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260524-18d606a.zip
 ```
 
 ## Returned Watch Result
@@ -50,12 +50,12 @@ and lacked store latency instrumentation.
 
 ## Fresh Canary Packet
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`
-- SHA-256: `994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174`
+- Packet label: `recallweave-openclaw-next-agent-canary-20260524-18d606a.zip`
+- SHA-256: `6e2dd7fb2c4530e5e688a5110f9d77913d52eda79b17da92fe0df4b0da66b6b3`
 - Packet generated from controller commit:
-  `72a21eee898ee1681892254608593bbda5fc02aa`
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`
 - Approved adapter commit:
-  `3d61677bc3d316e040ac5a634467d0204c272493`
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`
 - Entries:
   - `README.md`
   - `manifest.json`

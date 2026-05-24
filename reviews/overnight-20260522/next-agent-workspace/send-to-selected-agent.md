@@ -17,15 +17,15 @@ Purpose:
 - Return only metrics-only evidence.
 
 Use the current handoff packet:
-- recallweave-openclaw-next-agent-canary-20260524-3d61677.zip
-- SHA-256: 994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174
-- Packet generated from controller commit: 72a21eee898ee1681892254608593bbda5fc02aa
-- Approved adapter commit: 3d61677bc3d316e040ac5a634467d0204c272493
-- Expected report commit: 3d61677bc3d316e040ac5a634467d0204c272493
+- recallweave-openclaw-next-agent-canary-20260524-18d606a.zip
+- SHA-256: 6e2dd7fb2c4530e5e688a5110f9d77913d52eda79b17da92fe0df4b0da66b6b3
+- Packet generated from controller commit: 18d606aff589986b4d8b416a686bedb7ff1506d2
+- Approved adapter commit: 18d606aff589986b4d8b416a686bedb7ff1506d2
+- Expected report commit: 18d606aff589986b4d8b416a686bedb7ff1506d2
 
 Commit note:
-- The packet was generated from controller commit 72a21eee898ee1681892254608593bbda5fc02aa.
-- The approved adapter/report commit for this canary is 3d61677bc3d316e040ac5a634467d0204c272493.
+- The packet was generated from controller commit 18d606aff589986b4d8b416a686bedb7ff1506d2.
+- The approved adapter/report commit for this canary is 18d606aff589986b4d8b416a686bedb7ff1506d2.
 - If a newer adapter commit should count, regenerate the packet first.
 
 Important naming note:
@@ -50,7 +50,7 @@ Run flow:
 
 5. Collect strict-real evidence from the fresh window.
 
-   bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 3d61677bc3d316e040ac5a634467d0204c272493 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+   bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 
 6. Return only:
 

@@ -117,17 +117,17 @@ Verdict: resolved for PR body and blocker issue writes.
     current OpenClaw one-agent handoff packet was regenerated with an expected
     adapter commit. Updated at: 2026-05-24T04:51:05Z.
   - The PR body was refreshed again after GitHub Actions run `26353888297`
-    passed on `3d61677`, the release-state baseline was promoted, the provider
+    passed on `18d606a`, the release-state baseline was promoted, the provider
     gate gained single-provider Voyage and NVIDIA live preflight reports, and
     the current OpenClaw one-agent handoff packet was regenerated for the new
     expected adapter commit. Updated at: 2026-05-24T06:27:08Z.
   - The PR body was refreshed again after clarifying that the next-agent packet
     was generated from controller commit `67c0944`, while the approved
-    adapter/report commit remains `3d61677`. Updated at:
+    adapter/report commit remains `18d606a`. Updated at:
     2026-05-24T06:39:52Z.
   - The PR body was refreshed again after the release state split latest
     verified PR branch head `106b78c` from approved runtime canary
-    adapter/report commit `3d61677`. Updated at: 2026-05-24T06:51:08Z.
+    adapter/report commit `18d606a`. Updated at: 2026-05-24T06:51:08Z.
   - The PR body was refreshed again after rerunning the standard inbox scan:
     0 production evidence packets, 12 handoff packets, 8 diagnostics, 19
     unknown packets, and 5 unreadable packets. Updated at:
@@ -136,11 +136,11 @@ Verdict: resolved for PR body and blocker issue writes.
     unknown and unreadable returned zips. Updated at: 2026-05-24T07:11:09Z.
   - PR #5 and issue #6 were refreshed again after GitHub Actions run
     `26354982486` passed on `cb40732`, promoting that commit as the latest
-    verified PR branch head while preserving `3d61677` as the approved runtime
+    verified PR branch head while preserving `18d606a` as the approved runtime
     canary adapter/report commit. Updated at: 2026-05-24T07:23:33Z.
   - PR #5 and issue #6 were refreshed again after GitHub Actions run
     `26355118094` passed on `8b6f9bd`, promoting the returned canary triage
-    evidence head while preserving `3d61677` as the approved runtime canary
+    evidence head while preserving `18d606a` as the approved runtime canary
     adapter/report commit. Updated at: 2026-05-24T07:31:48Z.
   - PR #5 and issue #6 were refreshed again after adding benchmark gate
     contract enforcement so provider gates reject solo provider-arm runs and
@@ -148,7 +148,7 @@ Verdict: resolved for PR body and blocker issue writes.
     2026-05-24T07:44:34Z.
   - PR #5 and issue #6 were refreshed again after GitHub Actions run
     `26355558402` passed on `c2b72f2`, promoting the benchmark gate contract
-    commit as the latest verified PR branch head while preserving `3d61677` as
+    commit as the latest verified PR branch head while preserving `18d606a` as
     the approved runtime canary adapter/report commit. Updated at:
     2026-05-24T07:52:21Z.
   - PR #5 and issue #6 were refreshed again after adding private provider

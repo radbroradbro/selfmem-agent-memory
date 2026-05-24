@@ -16,9 +16,9 @@ requirements are resolved.
   hybrid runs cannot omit the `bm25-lite` control.
   This did not change the approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
-- `3d61677bc3d316e040ac5a634467d0204c272493`.
+- `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `3d61677bc3d316e040ac5a634467d0204c272493`.
+- `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - GitHub Actions run `26353888297` passed CI after adding single-provider live
   preflight gates for Voyage and NVIDIA on the expanded LongMemEval target. The
   checked-in evidence keeps BM25 and full-hybrid controls in the same
@@ -472,13 +472,13 @@ requirements are resolved.
   latency evidence. The next canary must use a fresh patched runtime window,
   follow `canary:drill`, and pass strict intake.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`, SHA256
-  `994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174`.
+  `recallweave-openclaw-next-agent-canary-20260524-18d606a.zip`, SHA256
+  `6e2dd7fb2c4530e5e688a5110f9d77913d52eda79b17da92fe0df4b0da66b6b3`.
   Packet generated from controller commit
-  `72a21eee898ee1681892254608593bbda5fc02aa`; approved adapter commit
-  `3d61677bc3d316e040ac5a634467d0204c272493`.
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`; approved adapter commit
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
   Returned canary reports must name commit
-  `3d61677bc3d316e040ac5a634467d0204c272493`.
+  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
   If a newer adapter commit should count, regenerate the packet first.
   It was regenerated from the postwatch batch report with
   `--batch ... --require-ready`. The underlying batch used
