@@ -215,6 +215,12 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   same comparison, blocks live provider calls until public-data/provider-call
   consent plus env-only readiness are present, and requires returned one-agent
   canary packets to report the approved runtime adapter commit.
+- Current live Voyage provider evidence now includes both a 6-query and
+  30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
+  `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on
+  retrieval-proxy quality on both slices, with zero privacy failures, but p50
+  latency was much higher. This is provider-backed canary evidence, not
+  MemoryBench answer-quality evidence or public SOTA proof.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.

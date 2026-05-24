@@ -131,6 +131,29 @@ providers or a local model server. This is the next route for testing whether
 the actual provider-backed hybrid stack beats BM25-lite on the same
 source-locked data.
 
+The first live Voyage provider canaries are now checked in as metrics-only
+evidence:
+
+- `reviews/overnight-20260522/public-longmemeval-voyage-live-provider-6q.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-voyage-live-provider.json`
+- `reviews/overnight-20260522/public-longmemeval-voyage-live-provider-evidence.md`
+
+Both runs compared `bm25-lite`, `full-hybrid-rerank`, and
+`cloud-voyage4-voyage` on the same source-locked public LongMemEval-S data. On
+the 6-query slice, live Voyage reached quality 0.5630 versus BM25 0.4541, with
+P@1 1.0000 versus 0.8333 and p50 latency 1874 ms versus 16 ms. On the 30-query
+expanded slice, live Voyage reached quality 0.2822 versus BM25 0.2506, with
+P@1 0.5333 versus 0.4667 and p50 latency 1641 ms versus 82 ms. Both runs had
+zero privacy and redaction failures.
+
+This is the first provider-backed canary trend in the right direction, but it
+is still retrieval-proxy evidence, not MemoryBench answer-quality evidence.
+Public benchmark claims remain blocked. The next optimization step is to test
+latency-sensitive provider arms, especially Voyage `rerank-2.5-lite`, smaller
+dense/rerank candidate pools, Gemini embeddings plus Voyage rerank, NVIDIA
+Nemotron retrieval/rerank, and the Apple Silicon local arm against the same
+30-query target.
+
 Provider keys can stay in normal environment variables, or in private key files
 referenced by env vars such as `VOYAGE_API_KEYS_FILE`,
 `NVIDIA_API_KEYS_FILE`, and `GEMINI_API_KEYS_FILE`. Key files must live outside

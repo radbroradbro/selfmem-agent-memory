@@ -324,6 +324,14 @@ function hybridPromotionDecision(items) {
 }
 
 function renderMarkdown(value) {
+  const promotionLabel = value.gate === "provider" ? "Provider arm beats control" : "Hybrid promotion";
+  const decisionLabel = value.gate === "provider" ? "Provider arm decision" : "Hybrid decision";
+  const decisionReason =
+    value.gate === "provider"
+      ? String(value.hybridPromotion.reason)
+          .replace("Best hybrid-family arm", "Best provider-backed arm")
+          .replace("hybrid-family arm", "provider-backed arm")
+      : value.hybridPromotion.reason;
   return [
     "# Public Benchmark Strategy Compare",
     "",
@@ -340,8 +348,8 @@ function renderMarkdown(value) {
     `- Query count: ${value.input.queryCount}`,
     `- Expected result refs: ${value.input.expectedResultRefCount}`,
     `- Winner: ${value.winner?.strategy ?? "none"}`,
-    `- Hybrid promotion: ${value.hybridPromotion.promoteHybrid}`,
-    `- Hybrid decision: ${value.hybridPromotion.reason}`,
+    `- ${promotionLabel}: ${value.hybridPromotion.promoteHybrid}`,
+    `- ${decisionLabel}: ${decisionReason}`,
     "",
     "## Strategies",
     "",

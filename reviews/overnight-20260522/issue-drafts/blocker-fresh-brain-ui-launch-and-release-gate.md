@@ -202,6 +202,12 @@ requirements are resolved.
   `GEMINI_API_KEYS_FILE`. Operators can run the same-data provider gate without
   putting keys in commands or public artifacts. Reports still include only
   credential presence and key counts.
+- Current live Voyage provider evidence now includes both a 6-query and
+  30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
+  `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on
+  retrieval-proxy quality on both slices, with zero privacy failures, but p50
+  latency was much higher. This is provider-backed canary evidence, not
+  MemoryBench answer-quality evidence or public SOTA proof.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
   `benchmark:public-target`, a metrics-only source-lock, slice-manifest,

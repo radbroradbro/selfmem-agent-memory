@@ -326,6 +326,23 @@ keys, keeps the output directory and provider key file outside the repo, and
 requires `bm25-lite`, `full-hybrid-rerank`, and `cloud-voyage4-voyage` in the
 same run.
 
+The first live Voyage provider canaries have now run:
+
+- 6-query target:
+  `reviews/overnight-20260522/public-longmemeval-voyage-live-provider-6q.json`
+- 30-query expanded target:
+  `reviews/overnight-20260522/public-longmemeval-expanded-voyage-live-provider.json`
+- Summary:
+  `reviews/overnight-20260522/public-longmemeval-voyage-live-provider-evidence.md`
+
+Both used the same-data provider gate with `bm25-lite`,
+`full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on
+retrieval-proxy quality on both slices, but p50 latency was much higher:
+1874 ms versus 16 ms on the 6-query slice and 1641 ms versus 82 ms on the
+30-query slice. Treat this as a provider-backed canary trend, not a public
+SOTA claim. The reports keep `memoryBenchAnswerQuality: false` and
+`publicBenchmarkClaimsAllowed: false`.
+
 Do not use the provider gate on private agent memories unless the operator has
 separately approved sending that text to the provider.
 

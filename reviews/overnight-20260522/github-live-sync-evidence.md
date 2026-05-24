@@ -134,15 +134,17 @@ Date: 2026-05-23
   evidence hardening and refreshed one-agent handoff packet as the latest
   verified PR branch head while preserving `18d606a` as the approved runtime
   canary adapter/report commit.
+- PR #5 and issue #6 were refreshed again after adding the live Voyage
+  provider canaries for the 6-query and 30-query public LongMemEval-S targets.
+  The refresh kept the body text public-safe and preserved the rule that this
+  is retrieval-proxy canary evidence, not MemoryBench answer-quality proof.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T16:01:43Z
+- PR body refreshed at: 2026-05-24T16:18:31Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T16:01:44Z
-- PR body hash: 9975aca6fbb42961a815c0af058bcdbcf2f96e9f88fc41c651dd6207f4f6cc22
+- Issue updated at: 2026-05-24T16:18:31Z
+- PR body hash: b97e4f673f75d7f8c90d273ab7abb14858e062d7ca1c116ba0e1da124b856530
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: fdd47c795539a37247d664c14a6f496c5f07e8530b068d08c86d54af58173869
-- PR body length: 50343
-- Issue body length: 30532
+- Issue body hash: 08f4d030b9640b5b084ab0f890cb9ebad0eca9119d631046961de088f0663fe0
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

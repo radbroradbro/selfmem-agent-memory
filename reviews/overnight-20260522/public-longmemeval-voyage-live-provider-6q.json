@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": true,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-24T16:08:56.412Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-canary-6-first-per-type-2026-05-23",
+    "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+    "collectorCompatibleQuerySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+    "materializerHash": "sha256:67847460b1192edbe4684688bfa864ace6b97d4b39beb0dcc3b11e87ca007348",
+    "queryCount": 6,
+    "expectedResultRefCount": 18,
+    "haystackSessionCount": 287
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+      "responsesHash": "sha256:f11def5368dff419a843f9b46fecb06661767e089ff7fb20697c40bdf761fe00",
+      "resultHash": "sha256:af4fd24ea22795c196e5fc00ebedb25485ab57e800cbc5ef0a48134a85e08879",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 16,
+        "latencyP95Ms": 19,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 24,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "40e34ede1aa4b126",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "ae337effdb3908fd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "06758812bd0bf031",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "ae337effdb3908fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+      "responsesHash": "sha256:42b7c105f748e228a56db8a11f6bdecabb773a5f0dab98b181c4c485223c642e",
+      "resultHash": "sha256:24ee06027818fb8108630c25370e2ecdc0616f51fcee333acbae410f762e315f",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 34,
+        "latencyP95Ms": 48,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 24,
+        "fullCandidateTokensAvg": 16982,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "40e34ede1aa4b126",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "4499c1e96be4db6a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage4-voyage",
+      "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+      "responsesHash": "sha256:329d228c4fbdf10f505e46d518bcaa11be098241fca0dbaf380f7cfa9adc3b14",
+      "resultHash": "sha256:2905f63a17179740daaf79d18ecd8984e9d5a895dd7dd2a88ce3361543b79e30",
+      "rankingStrategy": "cloud-voyage4-voyage",
+      "provider": {
+        "strategy": "cloud-voyage4-voyage",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 18,
+        "providerMockCalls": 0,
+        "embeddingCalls": 12,
+        "rerankCalls": 6,
+        "documentCountSent": 270,
+        "queryCountSent": 6,
+        "modelArm": "cloud-voyage4-voyage",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": "voyage-4-large",
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5",
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {
+          "voyage": 1
+        },
+        "keyCountAvailable": 1
+      },
+      "metrics": {
+        "quality": 0.563,
+        "pAt1": 1,
+        "recallAt5": 0.375,
+        "recallAt10": 0.375,
+        "ndcgAt10": 0.5018,
+        "latencyP50Ms": 1874,
+        "latencyP95Ms": 2357,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 24,
+        "fullCandidateTokensAvg": 17578,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "40e34ede1aa4b126",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "1aa8adaec50f772c",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "cloud-voyage4-voyage",
+    "quality": 0.563,
+    "pAt1": 1,
+    "recallAt5": 0.375,
+    "recallAt10": 0.375,
+    "ndcgAt10": 0.5018,
+    "latencyP50Ms": 1874
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 0.4541,
+    "pAt1": 0.8333,
+    "recallAt5": 0.2917,
+    "recallAt10": 0.2917,
+    "ndcgAt10": 0.3996,
+    "latencyP50Ms": 16
+  },
+  "hybridPromotion": {
+    "bestHybridStrategy": "cloud-voyage4-voyage",
+    "promoteHybrid": true,
+    "reason": "Best hybrid-family arm beats bm25-lite on retrieval-proxy quality.",
+    "qualityDeltaVsBm25": 0.1089,
+    "latencyDeltaVsBm25": 1858
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare Voyage, Gemini, NVIDIA, and local Apple Silicon provider arms against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

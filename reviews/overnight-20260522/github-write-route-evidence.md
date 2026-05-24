@@ -159,6 +159,9 @@ Verdict: resolved for PR body and blocker issue writes.
     evidence hardening and the refreshed one-agent handoff packet while
     preserving `18d606a` as the approved runtime canary adapter/report commit.
     Updated at: 2026-05-24T15:55:06Z.
+  - PR #5 and issue #6 were refreshed again after adding the live Voyage
+    provider canaries for the 6-query and 30-query public LongMemEval-S
+    targets. Updated at: 2026-05-24T16:18:31Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -188,8 +191,7 @@ Verdict: resolved for PR body and blocker issue writes.
     LongMemEval-S slice CI baseline refresh, public LongMemEval-S run-only
     target refresh, latest public LongMemEval-S run-target CI baseline refresh,
     and commit-bound OpenClaw handoff refresh
-  - Updated at: 2026-05-24T04:39:04Z
-  - Body length: 28866
+  - Updated at: 2026-05-24T16:18:31Z
 
 ## Safety
 
