@@ -73,10 +73,13 @@ The intended local mode for 24GB-class Apple Silicon machines is:
 
 ```text
 Qwen3 Embedding 0.6B through llama.cpp/Metal
-Qwen3 Reranker 0.6B through a local rerank sidecar
+deterministic RecallWeave rerank proxy
 local writes only
 lexical recall as no-credential fallback
 ```
+
+The Qwen3 Reranker 0.6B local sidecar is planned as a challenger arm. It is not
+the current tested local default.
 
 Gemini Embedding 2 and NVIDIA hosted retrieval models are benchmark arms, not
 silent fallbacks. Enable them only through local environment variables and only

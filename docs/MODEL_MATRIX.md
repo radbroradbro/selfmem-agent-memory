@@ -14,7 +14,7 @@ same public data, dataset revision, and scoring setup as the target row.
 | Lane | Default | Why |
 |---|---|---|
 | Cloud quality | Voyage `voyage-4-large` plus `rerank-2.5` | Strong text and code memory path with same-provider embedding and rerank. Voyage documents `rerank-2.5` as the highest-accuracy reranker and `rerank-2.5-lite` as the latency option. |
-| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus Qwen3 Reranker 0.6B | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. |
+| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus deterministic rerank proxy | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. The live local reranker is a planned challenger, not tested in-stack yet. |
 | Multimodal challenger | Gemini Embedding 2 or current Gemini embedding model | Useful for PDFs, images, audio, video, and storage-sensitive dimension tests. Do not make it the default until a matched canary wins. |
 | NVIDIA NIM challenger | NVIDIA NeMo Retriever embedding plus rerank pairs | Useful for hosted latency and retrieval comparisons. Keep this as a benchmark arm until measured on RecallWeave canaries. |
 | Query expansion | Off by default | Enable only when a canary proves better quality without unacceptable latency or exact-identifier damage. |
@@ -29,6 +29,12 @@ llama-server -hf Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0 --embedding --port 8080
 ```
 
 Use `SELFMEM_LOCAL_EMBED_BASE_URL=http://127.0.0.1:8080/v1`.
+
+Current benchmark support for this lane is local embeddings plus the
+deterministic RecallWeave rerank proxy. The provider gate fixture includes the
+local Apple arm, and the live preflight currently blocks until
+`SELFMEM_LOCAL_EMBED_BASE_URL` points at a running local embedding server. A
+live Apple Silicon model result has not been recorded yet.
 
 The reranker lane should first test Qwen3 Reranker 0.6B through a local
 OpenAI-compatible rerank endpoint or a small sidecar process. Qwen3 Reranker

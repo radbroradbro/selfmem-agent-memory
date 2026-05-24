@@ -122,12 +122,13 @@ arms:
     quantizationPolicy: default-q8-or-source-card-recommended-only
     embedModel: Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0
     dimensions: 1024
-    reranker: qwen3
-    rerankModel: Qwen/Qwen3-Reranker-0.6B
-    rerankRuntime: sentence-transformers-or-llama.cpp-gguf
+    reranker: deterministic-proxy
+    rerankModel: recallweave-deterministic-rerank-proxy
+    plannedReranker: Qwen/Qwen3-Reranker-0.6B
+    plannedRerankRuntime: sentence-transformers-or-llama.cpp-gguf
     baseUrlEnv: SELFMEM_LOCAL_EMBED_BASE_URL
     rerankBaseUrlEnv: SELFMEM_LOCAL_RERANK_BASE_URL
-    purpose: default zero-spend Apple Silicon arm for 24GB-class Macs
+    purpose: default zero-spend Apple Silicon embedding arm for 24GB-class Macs; local reranker remains a challenger until live-tested
 
   local-apple-qwen3-4b:
     embedder: qwen3

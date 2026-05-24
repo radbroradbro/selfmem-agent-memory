@@ -38,11 +38,12 @@ providers:
     rerankBaseUrlEnv: SELFMEM_LOCAL_RERANK_BASE_URL
     embedModel: Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0
     embedDimensions: 1024
-    rerankModel: Qwen/Qwen3-Reranker-0.6B
+    rerankModel: recallweave-deterministic-rerank-proxy
+    plannedRerankModel: Qwen/Qwen3-Reranker-0.6B
     qualityArms:
       - local-apple-qwen3-4b
       - local-qwen3-8b-qwen3rerank
-    rule: "Use small Apple Silicon arms first on 24GB Macs; benchmark 4B/8B arms before recommending them."
+    rule: "Use the small Apple Silicon embedding arm first on 24GB Macs; benchmark the local reranker and 4B/8B arms before recommending them."
 privacy:
   redactPrivateTags: true
   redactKeyShapes: true

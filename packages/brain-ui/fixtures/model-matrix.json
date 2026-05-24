@@ -14,7 +14,7 @@
     "label": "Apple Silicon local",
     "targetHardware": "Apple Silicon 24GB unified memory",
     "embedder": "Qwen3-Embedding-0.6B-GGUF",
-    "reranker": "Qwen3-Reranker-0.6B",
+    "reranker": "RecallWeave deterministic rerank proxy",
     "runtime": "llama.cpp with Metal",
     "sourcePolicy": "Hugging Face or official model-card artifacts only",
     "staleProcessPolicy": "Stop only RecallWeave-owned model processes; block when ownership is unclear.",
@@ -57,9 +57,9 @@
       "id": "local-apple-qwen3-0_6b",
       "lane": "local",
       "embedder": "Qwen3-Embedding-0.6B-GGUF",
-      "reranker": "Qwen3-Reranker-0.6B",
+      "reranker": "RecallWeave deterministic rerank proxy",
       "status": "default-local-canary",
-      "purpose": "Fast Apple Silicon local proof for 24GB-class Macs."
+      "purpose": "Fast Apple Silicon local embedding proof for 24GB-class Macs; local reranker is a challenger."
     },
     {
       "id": "local-apple-qwen3-4b",
