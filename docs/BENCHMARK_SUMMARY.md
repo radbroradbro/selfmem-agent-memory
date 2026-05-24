@@ -151,6 +151,13 @@ provider's env variable, so a Voyage test is not blocked by missing NVIDIA,
 Gemini, or local Apple readiness, and an NVIDIA test is not blocked by missing
 Voyage, Gemini, or local Apple readiness.
 
+The provider benchmark runner now enforces that comparison shape at the command
+level. A provider gate cannot run a provider arm by itself; it must include
+`bm25-lite`, `full-hybrid-rerank`, and at least one provider-backed arm. A
+hybrid gate must include `bm25-lite` plus at least one hybrid-family candidate.
+That keeps solo runs in the smoke-test lane and makes the control comparison
+part of the benchmark contract, not just prose.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are

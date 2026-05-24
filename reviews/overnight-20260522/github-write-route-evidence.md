@@ -142,6 +142,10 @@ Verdict: resolved for PR body and blocker issue writes.
     `26355118094` passed on `8b6f9bd`, promoting the returned canary triage
     evidence head while preserving `3d61677` as the approved runtime canary
     adapter/report commit. Updated at: 2026-05-24T07:31:48Z.
+  - PR #5 and issue #6 were refreshed again after adding benchmark gate
+    contract enforcement so provider gates reject solo provider-arm runs and
+    hybrid gates reject runs without the `bm25-lite` control. Updated at:
+    2026-05-24T07:44:34Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

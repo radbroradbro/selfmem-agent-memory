@@ -111,6 +111,12 @@ Live status:
   zero hosted calls; live provider runs require explicit provider-call and
   public-data environment guards plus env-only readiness for the selected
   provider arm.
+- Enforces the benchmark comparison shape in the runner itself. A provider
+  gate now rejects a solo provider-arm run unless `bm25-lite`,
+  `full-hybrid-rerank`, and at least one provider-backed arm are present. A
+  hybrid gate rejects runs that omit the `bm25-lite` lexical control. This
+  keeps solo RecallWeave tests in the smoke lane and makes same-data controls a
+  command-level contract.
 - Adds `benchmark:public-provider:preflight`, a fail-closed live provider
   benchmark preflight. It checks the source-locked public LongMemEval target,
   provider-call consent flags, public-data consent flags, and env-only

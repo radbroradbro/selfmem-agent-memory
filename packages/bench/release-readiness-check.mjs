@@ -1755,6 +1755,26 @@ check("fresh public benchmark target check passes", () => {
   assert.match(providerGateFixtureEvidence, /cloud-gemini-voyage-rerank/);
   assert.match(providerGateFixtureEvidence, /cloud-nvidia-nemotron-1b/);
   assert.match(providerGateFixtureEvidence, /local-apple-qwen3-0_6b/);
+  const providerGateWithoutControls = spawnSync(
+    "node",
+    ["packages/bench/public-benchmark-strategy-compare.mjs", "--gate", "provider", "--fixture", "--strategies", "cloud-voyage4-voyage"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  assert.notEqual(providerGateWithoutControls.status, 0, "provider gate must reject solo provider-arm runs");
+  const hybridGateWithoutControl = spawnSync(
+    "node",
+    ["packages/bench/public-benchmark-strategy-compare.mjs", "--gate", "hybrid", "--fixture", "--strategies", "full-hybrid-rerank"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  assert.notEqual(hybridGateWithoutControl.status, 0, "hybrid gate must reject runs without bm25-lite control");
   assert.equal(providerLivePreflightReport.ok, true);
   assert.equal(providerLivePreflightReport.mode, "provider-benchmark-live-preflight");
   assert.equal(providerLivePreflightReport.metricsOnly, true);
@@ -4139,8 +4159,7 @@ check("fresh hosted baseline preflight passes", () => {
   ]);
   const nextRunResult = run("node", ["packages/bench/hosted-baseline-next-run.mjs"]);
   const nextRunMarkdown = run("node", ["packages/bench/hosted-baseline-next-run.mjs", "--format", "markdown"]);
-  const baselineRunDir = "/tmp/recallweave-release-baseline-run";
-  rmSync(baselineRunDir, { recursive: true, force: true });
+  const baselineRunDir = mkdtempSync(join(tmpdir(), "recallweave-release-baseline-run-"));
   const baselineRunResult = run("node", [
     "packages/bench/hosted-baseline-run.mjs",
     "--fixture",

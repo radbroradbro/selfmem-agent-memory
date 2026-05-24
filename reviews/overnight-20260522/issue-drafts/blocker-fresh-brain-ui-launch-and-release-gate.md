@@ -192,6 +192,10 @@ requirements are resolved.
   calls no provider APIs, sends no benchmark text, and remains blocked until
   provider-call consent, public-data consent, and env-only Voyage/Gemini
   credentials are present.
+- Current benchmark runner enforcement rejects provider-only runs and hybrid
+  runs without the `bm25-lite` control. Provider gates must include
+  `bm25-lite`, `full-hybrid-rerank`, and at least one provider-backed arm, so
+  same-data comparison is enforced by command behavior rather than prose alone.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
   `benchmark:public-target`, a metrics-only source-lock, slice-manifest,

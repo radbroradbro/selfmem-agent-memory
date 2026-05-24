@@ -48,6 +48,7 @@ const privatePathOutputPattern =
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
+assertGateContract(gate, strategies);
 
 const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-strategy-compare-"));
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
@@ -383,6 +384,40 @@ function defaultStrategies(value) {
     ].join(",");
   }
   return "jaccard,bm25-lite,hybrid-v1";
+}
+
+function assertGateContract(value, strategyNames) {
+  const strategySet = new Set(strategyNames);
+  if (value === "hybrid") {
+    assert.ok(strategySet.has("bm25-lite"), "hybrid gate must include bm25-lite as the same-data lexical control");
+    assert.ok(
+      strategyNames.some((strategy) => isHybridFamilyStrategy(strategy)),
+      "hybrid gate must include at least one hybrid-family candidate",
+    );
+  }
+  if (value === "provider") {
+    assert.ok(strategySet.has("bm25-lite"), "provider gate must include bm25-lite as the same-data lexical control");
+    assert.ok(strategySet.has("full-hybrid-rerank"), "provider gate must include full-hybrid-rerank as the same-data hybrid control");
+    assert.ok(
+      strategyNames.some((strategy) => isProviderBackedStrategy(strategy)),
+      "provider gate must include at least one provider-backed arm",
+    );
+  }
+}
+
+function isHybridFamilyStrategy(strategy) {
+  return [
+    "dense-proxy",
+    "sparse-dense-rrf",
+    "sparse-dense-temporal",
+    "sparse-dense-graph-temporal",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+  ].includes(strategy);
+}
+
+function isProviderBackedStrategy(strategy) {
+  return strategy.startsWith("cloud-") || strategy.startsWith("local-apple-");
 }
 
 function normalizeGate(value) {
