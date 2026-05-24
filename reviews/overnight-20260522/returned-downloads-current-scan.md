@@ -3,7 +3,7 @@
 Status: AWAITING_RETURNED_PRODUCTION_CANARY
 Production evidence packets: 0
 Returned evidence packets: 0
-Handoff packets: 8
+Handoff packets: 10
 Diagnostic bundles: 8
 Unknown packets: 19
 Unreadable packets: 5
@@ -21,7 +21,7 @@ This note is metrics-only. It records the standard inbox scan without raw memori
 
 | Inbox | Status | Candidates | Scanned zips | Production evidence | Handoff packets | Diagnostics | Unknown | Unreadable |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| Downloads | HANDOFF_PACKETS_ONLY | 26 | 26 | 0 | 8 | 4 | 9 | 5 |
+| Downloads | HANDOFF_PACKETS_ONLY | 28 | 28 | 0 | 10 | 4 | 9 | 5 |
 | Telegram Desktop | NO_RETURNED_CANARY_EVIDENCE | 14 | 14 | 0 | 0 | 4 | 10 | 0 |
 
 ## Next Actions

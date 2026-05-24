@@ -93,14 +93,14 @@ Date: 2026-05-23
   and the current OpenClaw one-agent handoff packet was regenerated with an
   expected adapter commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T04:39:03Z
+- PR body refreshed at: 2026-05-24T04:51:05Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
 - Issue updated at: 2026-05-24T04:39:04Z
-- PR body hash: 82c370277d154ebd8d206dc4b400542936d040ab9b5c7ce10c4520103e8ce6d3
+- PR body hash: 9a72584e4dbd30b25742a67151d76216e3c77ebd19dbd5463fbabe7fa6260dbb
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 15f569bfaa268d7afcd366879d5cc3f2e6a4afd51ac15c7c90684787bc3d3a9e
-- PR body length: 48176
+- PR body length: 48177
 - Issue body length: 28866
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

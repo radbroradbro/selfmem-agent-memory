@@ -99,10 +99,14 @@ The current handoff packet remains:
 The returned packet must pass `canary:returned-packet` with
 `--require-production-canary` and the expected adapter commit before the real
 rollout blocker can close. A packet from an older adapter is diagnostic only.
+The expected report commit is the latest verified adapter/product baseline, not
+necessarily the latest docs-only PR head. The handoff command passes this
+approved commit into the report generator so a later evidence-only commit does
+not invalidate the runtime canary.
 
 The current standard-inbox scan is
 `reviews/overnight-20260522/returned-downloads-current-scan.md`. It found 0
-production evidence packets, 8 handoff packets, 8 diagnostic bundles, 19
+production evidence packets, 10 handoff packets, 8 diagnostic bundles, 19
 unknown packets, and 5 unreadable packets. That proves the current inbox has
 handoffs and diagnostics only. It does not close the real-container rollout
 blocker.
