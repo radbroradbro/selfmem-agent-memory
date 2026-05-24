@@ -234,6 +234,12 @@ passes `--allow-solo-smoke`, which labels the run as wiring-only evidence.
 That keeps solo runs in the smoke-test lane and makes the control comparison
 part of the benchmark contract, not just prose.
 
+Provider gates now make a separate provider-promotion decision. The report may
+still include the legacy `hybridPromotion` field for compatibility, but the
+decision is keyed as `kind: provider` and selects only provider-backed arms for
+`bestProviderStrategy`. The local `full-hybrid-rerank` arm is a required
+control, not a provider winner.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are

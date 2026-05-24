@@ -14,7 +14,7 @@
 - Expected result refs: 3
 - Winner: bm25-lite
 - Provider arm beats control: false
-- Provider arm decision: Keep bm25-lite as control/fallback; provider-backed arm has not earned promotion on this slice.
+- Provider arm decision: Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.
 
 ## Strategies
 

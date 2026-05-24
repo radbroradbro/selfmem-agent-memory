@@ -125,6 +125,7 @@ if (input.collectorCompatibleQuerySetHash) {
   assert.equal(results[0].querySetHash, input.collectorCompatibleQuerySetHash, "strategy run must bind to materialized query set");
 }
 
+const promotion = promotionDecision(gate, results);
 const report = {
   schemaVersion: 1,
   ok: true,
@@ -158,7 +159,8 @@ const report = {
   strategies: results,
   winner: bestStrategy(results),
   control: summarizeNamedStrategy(results, "bm25-lite"),
-  hybridPromotion: hybridPromotionDecision(results),
+  promotion,
+  hybridPromotion: promotion,
   safety: {
     publicSafe: true,
     metricsOnly: true,
@@ -297,10 +299,11 @@ function summarizeNamedStrategy(items, strategy) {
 
 function hybridPromotionDecision(items) {
   const control = items.find((item) => item.strategy === "bm25-lite") ?? null;
-  const hybridItems = items.filter((item) => !["jaccard", "bm25-lite"].includes(item.strategy));
+  const hybridItems = items.filter((item) => isHybridFamilyStrategy(item.strategy));
   const bestHybrid = bestStrategy(hybridItems);
   if (!control || !bestHybrid) {
     return {
+      kind: "hybrid",
       promoteHybrid: false,
       reason: "Missing bm25-lite control or hybrid-family candidate.",
     };
@@ -313,6 +316,7 @@ function hybridPromotionDecision(items) {
   const qualityTies = hybridQuality === controlQuality;
   const latencyImproves = hybridLatency <= controlLatency * 0.85;
   return {
+    kind: "hybrid",
     bestHybridStrategy: bestHybrid.strategy,
     promoteHybrid: qualityBeats || (qualityTies && latencyImproves),
     reason: qualityBeats
@@ -325,15 +329,59 @@ function hybridPromotionDecision(items) {
   };
 }
 
+function providerPromotionDecision(items) {
+  const control = items.find((item) => item.strategy === "bm25-lite") ?? null;
+  const fullHybridControl = items.find((item) => item.strategy === "full-hybrid-rerank") ?? null;
+  const providerItems = items.filter((item) => isProviderBackedStrategy(item.strategy));
+  const bestProvider = bestStrategy(providerItems);
+  if (!control || !fullHybridControl || !bestProvider) {
+    return {
+      kind: "provider",
+      promoteProvider: false,
+      promoteHybrid: false,
+      reason: "Missing bm25-lite control, full-hybrid-rerank control, or provider-backed arm.",
+    };
+  }
+  const controlQuality = Number(control.metrics?.quality ?? 0);
+  const fullHybridQuality = Number(fullHybridControl.metrics?.quality ?? 0);
+  const providerQuality = Number(bestProvider.quality ?? 0);
+  const controlLatency = Number(control.metrics?.latencyP50Ms ?? Infinity);
+  const fullHybridLatency = Number(fullHybridControl.metrics?.latencyP50Ms ?? Infinity);
+  const providerLatency = Number(bestProvider.latencyP50Ms ?? Infinity);
+  const qualityFloor = Math.max(controlQuality, fullHybridQuality);
+  const latencyFloor = Math.min(controlLatency, fullHybridLatency);
+  const qualityBeatsBothControls = providerQuality > qualityFloor;
+  const qualityTiesBothControls = providerQuality === qualityFloor;
+  const latencyImproves = providerLatency <= latencyFloor * 0.85;
+  const promoteProvider = qualityBeatsBothControls || (qualityTiesBothControls && latencyImproves);
+  return {
+    kind: "provider",
+    bestProviderStrategy: bestProvider.strategy,
+    bestHybridStrategy: bestProvider.strategy,
+    promoteProvider,
+    promoteHybrid: promoteProvider,
+    reason: qualityBeatsBothControls
+      ? "Best provider-backed arm beats both bm25-lite and full-hybrid-rerank on retrieval-proxy quality."
+      : qualityTiesBothControls && latencyImproves
+        ? "Best provider-backed arm ties the strongest control and improves p50 latency by at least 15%."
+        : "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    qualityDeltaVsBm25: round(providerQuality - controlQuality),
+    qualityDeltaVsFullHybrid: round(providerQuality - fullHybridQuality),
+    latencyDeltaVsBm25: round(providerLatency - controlLatency),
+    latencyDeltaVsFullHybrid: round(providerLatency - fullHybridLatency),
+  };
+}
+
+function promotionDecision(value, items) {
+  if (value === "provider") return providerPromotionDecision(items);
+  return hybridPromotionDecision(items);
+}
+
 function renderMarkdown(value) {
   const promotionLabel = value.gate === "provider" ? "Provider arm beats control" : "Hybrid promotion";
   const decisionLabel = value.gate === "provider" ? "Provider arm decision" : "Hybrid decision";
-  const decisionReason =
-    value.gate === "provider"
-      ? String(value.hybridPromotion.reason)
-          .replace("Best hybrid-family arm", "Best provider-backed arm")
-          .replace("hybrid-family arm", "provider-backed arm")
-      : value.hybridPromotion.reason;
+  const decision = value.promotion ?? value.hybridPromotion;
+  const decisionReason = decision.reason;
   return [
     "# Public Benchmark Strategy Compare",
     "",
@@ -350,7 +398,7 @@ function renderMarkdown(value) {
     `- Query count: ${value.input.queryCount}`,
     `- Expected result refs: ${value.input.expectedResultRefCount}`,
     `- Winner: ${value.winner?.strategy ?? "none"}`,
-    `- ${promotionLabel}: ${value.hybridPromotion.promoteHybrid}`,
+    `- ${promotionLabel}: ${value.gate === "provider" ? Boolean(decision.promoteProvider) : Boolean(decision.promoteHybrid)}`,
     `- ${decisionLabel}: ${decisionReason}`,
     "",
     "## Strategies",

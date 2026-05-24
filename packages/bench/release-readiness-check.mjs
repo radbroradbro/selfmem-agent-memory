@@ -1562,6 +1562,11 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(providerFixture.comparisonContract?.bm25ControlPresent, true);
   assert.equal(providerFixture.comparisonContract?.fullHybridControlPresent, true);
   assert.equal(providerFixture.comparisonContract?.providerArmPresent, true);
+  assert.equal(providerFixture.promotion?.kind, "provider");
+  assert.ok(providerFixture.promotion?.bestProviderStrategy, "provider gate must report a provider-backed best arm");
+  assert.ok(String(providerFixture.promotion?.bestProviderStrategy).startsWith("cloud-") || String(providerFixture.promotion?.bestProviderStrategy).startsWith("local-apple-"));
+  assert.notEqual(providerFixture.promotion?.bestProviderStrategy, "full-hybrid-rerank");
+  assert.match(providerFixture.promotion?.reason ?? "", /provider-backed arm/i);
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
@@ -5838,6 +5843,7 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === ".env.example" ||
     file === "package.json" ||
     file.startsWith("packages/bench/") ||
+    file.startsWith("tests/bench/") ||
     file === "plugins/selfmem-fallback/scripts/selfmem_update.py"
   );
 }

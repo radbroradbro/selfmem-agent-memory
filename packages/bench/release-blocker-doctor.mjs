@@ -331,6 +331,9 @@ assert.equal(publicLongmemEvalExpandedHybridGate.publicBenchmarkClaimsAllowed, f
 assert.equal(publicLongmemEvalProviderGateFixture.mode, "public-benchmark-provider-gate");
 assert.equal(publicLongmemEvalProviderGateFixture.fixtureOnly, true);
 assert.equal(publicLongmemEvalProviderGateFixture.publicBenchmarkClaimsAllowed, false);
+assert.equal(publicLongmemEvalProviderGateFixture.promotion?.kind, "provider");
+assert.ok(publicLongmemEvalProviderGateFixture.promotion?.bestProviderStrategy);
+assert.notEqual(publicLongmemEvalProviderGateFixture.promotion?.bestProviderStrategy, "full-hybrid-rerank");
 for (const strategy of [
   "bm25-lite",
   "full-hybrid-rerank",
