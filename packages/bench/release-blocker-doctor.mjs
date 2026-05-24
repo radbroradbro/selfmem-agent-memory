@@ -83,6 +83,7 @@ const requiredFiles = {
   publicLongmemEvalExpandedProviderLivePreflightVoyage: "public-longmemeval-expanded-provider-live-preflight-voyage.json",
   publicLongmemEvalExpandedProviderLivePreflightNvidia: "public-longmemeval-expanded-provider-live-preflight-nvidia.json",
   publicLongmemEvalAutoresearchLoop: "public-longmemeval-autoresearch-loop.json",
+  publicLongmemEvalExpandedAutoresearchLoop: "public-longmemeval-expanded-autoresearch-loop.json",
 };
 
 const evidence = Object.fromEntries(
@@ -167,6 +168,9 @@ const publicLongmemEvalExpandedProviderLivePreflightNvidia = JSON.parse(
   readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-nvidia.json"), "utf8"),
 );
 const publicLongmemEvalAutoresearchLoop = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
+const publicLongmemEvalExpandedAutoresearchLoop = JSON.parse(
+  readFileSync(join(root, reviewDir, "public-longmemeval-expanded-autoresearch-loop.json"), "utf8"),
+);
 
 assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
@@ -363,6 +367,12 @@ assert.equal(publicLongmemEvalAutoresearchLoop.mode, "public-benchmark-autoresea
 assert.equal(publicLongmemEvalAutoresearchLoop.publicBenchmarkClaimsAllowed, false);
 assert.equal(publicLongmemEvalAutoresearchLoop.memoryBenchAnswerQuality, false);
 assert.ok(Number(publicLongmemEvalAutoresearchLoop.loop?.armCount ?? 0) >= 12);
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.mode, "public-benchmark-autoresearch-loop");
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.input?.queryCount, 30);
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.input?.expectedResultRefCount, 92);
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.winner?.strategy, "bm25-lite");
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.publicBenchmarkClaimsAllowed, false);
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.memoryBenchAnswerQuality, false);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
 const branch = run("git", ["branch", "--show-current"]).stdout.trim();
@@ -658,6 +668,13 @@ console.log(
             armCount: publicLongmemEvalAutoresearchLoop.loop?.armCount,
             winner: publicLongmemEvalAutoresearchLoop.winner?.armId,
             publicBenchmarkClaimsAllowed: publicLongmemEvalAutoresearchLoop.publicBenchmarkClaimsAllowed,
+          },
+          expandedAutoresearchLoop: {
+            queryCount: publicLongmemEvalExpandedAutoresearchLoop.input?.queryCount,
+            expectedResultRefCount: publicLongmemEvalExpandedAutoresearchLoop.input?.expectedResultRefCount,
+            armCount: publicLongmemEvalExpandedAutoresearchLoop.loop?.armCount,
+            winner: publicLongmemEvalExpandedAutoresearchLoop.winner?.armId,
+            publicBenchmarkClaimsAllowed: publicLongmemEvalExpandedAutoresearchLoop.publicBenchmarkClaimsAllowed,
           },
         },
         githubLiveSync: {

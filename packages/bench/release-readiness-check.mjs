@@ -128,6 +128,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia.json`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia-evidence.md`,
+  `${reviewDir}/public-longmemeval-expanded-autoresearch-loop.json`,
+  `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
   `${reviewDir}/returned-downloads-current-scan.json`,
   `${reviewDir}/returned-downloads-current-scan.md`,
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
@@ -1082,6 +1084,7 @@ check("release state is conservative", () => {
     "public-longmemeval-provider-live-preflight",
     "public-longmemeval-expanded-hybrid-gate",
     "public-longmemeval-expanded-provider-live-preflight",
+    "public-longmemeval-expanded-autoresearch-loop",
     "public-longmemeval-autoresearch-loop",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
@@ -1401,6 +1404,8 @@ check("fresh public benchmark target check passes", () => {
   const expandedMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-materialize-run-evidence.md"), "utf8");
   const expandedHybridReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-hybrid-gate.json"), "utf8"));
   const expandedHybridEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-hybrid-gate-evidence.md"), "utf8");
+  const expandedAutoresearchReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-autoresearch-loop.json"), "utf8"));
+  const expandedAutoresearchEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-autoresearch-loop-evidence.md"), "utf8");
   const expandedProviderLivePreflightReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight.json"), "utf8"));
   const expandedProviderLivePreflightEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-evidence.md"), "utf8");
   const expandedProviderLivePreflightVoyageReport = JSON.parse(
@@ -1728,6 +1733,30 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(item.redactionFailureCount, 0);
     assert.equal(item.querySetHash, expandedMaterializeReport.selection?.collectorCompatibleQuerySetHash);
   }
+  assert.equal(expandedAutoresearchReport.ok, true);
+  assert.equal(expandedAutoresearchReport.fixtureOnly, false);
+  assert.equal(expandedAutoresearchReport.benchmark, "longmemeval");
+  assert.equal(expandedAutoresearchReport.metricsOnly, true);
+  assert.equal(expandedAutoresearchReport.retrievalProxyOnly, true);
+  assert.equal(expandedAutoresearchReport.memoryBenchAnswerQuality, false);
+  assert.equal(expandedAutoresearchReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(expandedAutoresearchReport.rawQuestionIdsIncluded, false);
+  assert.equal(expandedAutoresearchReport.rawQuestionsIncluded, false);
+  assert.equal(expandedAutoresearchReport.rawAnswersIncluded, false);
+  assert.equal(expandedAutoresearchReport.rawMemoryIncluded, false);
+  assert.equal(expandedAutoresearchReport.input?.querySetHash, expandedMaterializeReport.selection?.collectorCompatibleQuerySetHash);
+  assert.equal(expandedAutoresearchReport.input?.queryCount, 30);
+  assert.equal(expandedAutoresearchReport.input?.expectedResultRefCount, 92);
+  assert.equal(expandedAutoresearchReport.input?.haystackSessionCount, 1420);
+  assert.equal(expandedAutoresearchReport.loop?.variables?.maxMemoryBytes, 80000000);
+  assert.equal(expandedAutoresearchReport.winner?.strategy, "bm25-lite");
+  assert.equal(expandedAutoresearchReport.winner?.contextTokenBudget, 800);
+  assert.equal(expandedAutoresearchReport.winner?.metrics?.quality, expandedHybridReport.winner?.quality);
+  assert.equal(expandedAutoresearchReport.winner?.privacyLeakCount, 0);
+  assert.equal(expandedAutoresearchReport.winner?.redactionFailureCount, 0);
+  assert.match(expandedAutoresearchEvidence, /Public Benchmark Autoresearch Loop/);
+  assert.match(expandedAutoresearchEvidence, /Query set hash: sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7/);
+  assert.match(expandedAutoresearchEvidence, /Winner: bm25-lite-b800-k10/);
   assert.equal(providerGateFixtureReport.ok, true);
   assert.equal(providerGateFixtureReport.mode, "public-benchmark-provider-gate");
   assert.equal(providerGateFixtureReport.gate, "provider");
@@ -2227,6 +2256,7 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(providerGateFixtureReport), secretPattern);
   assert.doesNotMatch(providerGateFixtureEvidence, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), secretPattern);
+  assert.doesNotMatch(JSON.stringify(expandedAutoresearchReport), secretPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, secretPattern);
   assert.doesNotMatch(liveAutoresearchReview, secretPattern);
   assert.doesNotMatch(result.stdout, privatePathPattern);
@@ -2260,6 +2290,7 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(providerGateFixtureReport), privatePathPattern);
   assert.doesNotMatch(providerGateFixtureEvidence, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(expandedAutoresearchReport), privatePathPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, privatePathPattern);
   assert.doesNotMatch(liveAutoresearchReview, privatePathPattern);
 });

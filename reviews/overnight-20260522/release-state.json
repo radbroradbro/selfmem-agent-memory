@@ -180,7 +180,8 @@
     "public-longmemeval-provider-gate",
     "public-longmemeval-provider-live-preflight",
     "public-longmemeval-expanded-hybrid-gate",
-    "public-longmemeval-expanded-provider-live-preflight"
+    "public-longmemeval-expanded-provider-live-preflight",
+    "public-longmemeval-expanded-autoresearch-loop"
   ],
   "reviewerEvidence": {
     "freshCanaryWindow": {

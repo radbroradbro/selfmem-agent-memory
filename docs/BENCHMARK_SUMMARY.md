@@ -105,6 +105,17 @@ hybrid, `full-hybrid-rerank`, reached quality 0.2289 and P@1 0.4333 but had
 p50 latency 417 ms. This weakens the BM25-overfit worry, but it also proves the
 current proxy hybrid should not become the default yet.
 
+The expanded autoresearch sweep now uses the same 30-query target:
+`reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json`.
+It ran 48 local-only arms across `bm25-lite`, sparse+dense, temporal, graph,
+full-hybrid rerank, and query-expanded full-hybrid rerank, with 800, 1200,
+1600, and 2400 token budgets and limits of 5 and 10. `bm25-lite-b800-k10`
+won: quality 0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50
+latency 75 ms, and zero privacy failures. The best full-hybrid arm reached
+quality 0.2351. So the current recommendation is clear: keep BM25 as the
+local default/fallback, and use the provider benchmark lane to test whether
+real embeddings and rerankers beat it.
+
 The provider-backed benchmark lane now has an opt-in harness. The fixture gate
 is `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`,

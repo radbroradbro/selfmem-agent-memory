@@ -229,6 +229,14 @@ harness we will use.
   best local proxy hybrid, but it trails at quality 0.2289 and p50 latency
   417 ms. This is stronger evidence that the deterministic proxy hybrid should
   not be promoted before live embedding/reranker arms are tested.
+- Current expanded LongMemEval-S autoresearch sweep:
+  `reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json`.
+  It tests 48 local-only arms on the same 30-question target while varying
+  context budget and candidate limit. `bm25-lite-b800-k10` wins with quality
+  0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50 latency 75 ms,
+  and zero privacy failures. The result keeps BM25 as the local default/fallback
+  and sends the next real quality question to the provider-backed benchmark
+  lane.
 - Current provider-backed gate scaffold:
   `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
   It adds `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,

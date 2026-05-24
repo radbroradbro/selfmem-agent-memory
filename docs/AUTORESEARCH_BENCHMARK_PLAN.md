@@ -170,6 +170,14 @@ quality 0.2289 and p50 latency 417 ms. The next research iteration should
 therefore test real provider-backed embedding and reranking arms instead of
 promoting the deterministic proxy hybrid.
 
+The expanded autoresearch sweep now repeats that comparison over the same
+30-query target while varying context budget and candidate limit:
+`reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json`.
+It tested 48 local-only arms. `bm25-lite-b800-k10` won with quality 0.2506,
+P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50 latency 75 ms, and zero
+privacy failures. The result keeps BM25 as the local default/fallback and
+makes provider-backed embedding/reranking the next hypothesis to test.
+
 ## Provider-Backed Benchmark Gate
 
 The provider-backed gate now exists as an opt-in harness:

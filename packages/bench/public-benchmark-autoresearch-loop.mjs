@@ -30,6 +30,7 @@ const budgets = splitList(args.contextTokenBudgets ?? process.env.RECALLWEAVE_PU
 const limits = splitList(args.limits ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_LIMITS ?? "5,10").map((value) =>
   positiveInt(value, "limit"),
 );
+const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
 
 const retrievalStrategies = [
   "jaccard",
@@ -79,6 +80,8 @@ for (const arm of arms) {
       String(arm.contextTokenBudget),
       "--limit",
       String(arm.limit),
+      "--max-memory-bytes",
+      String(maxMemoryBytes),
       "--output",
       responsePath,
     ],
@@ -173,6 +176,7 @@ const report = {
       strategies,
       contextTokenBudgets: budgets,
       limits,
+      maxMemoryBytes,
     },
     keepDecision: winner ? `Use ${winner.strategy} with budget ${winner.contextTokenBudget} and limit ${winner.limit} for the next canary arm.` : "No winning arm.",
     rollbackPlan: "Fall back to the previous checked-in retrieval-proxy result and keep publicBenchmarkClaimsAllowed=false.",
