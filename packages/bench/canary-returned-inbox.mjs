@@ -17,7 +17,7 @@ const expectedCommit = normalizedCommit(args.expectedCommit || process.env.RECAL
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
-const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\)/;
+const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/|[A-Za-z]:\\Users\\)/;
 const likelyReturnedNamePattern = /(?:canary|recallweave|selfmem|memory|openclaw|hermes)/i;
 const handoffEntries = new Set([
   "next-agent-plan.json",
@@ -164,6 +164,7 @@ function inspectCandidate(candidate) {
   try {
     entries = listZip(candidate.path);
   } catch (error) {
+    const safeReason = publicZipFailureReason(error instanceof Error ? error.message : String(error));
     return {
       ...candidate,
       ok: !candidate.explicit,
@@ -175,7 +176,7 @@ function inspectCandidate(candidate) {
       review: {
         ok: false,
         failedChecks: ["unreadable-zip"],
-        strictFailureReason: sanitizeForOutput(error instanceof Error ? error.message : String(error)),
+        strictFailureReason: safeReason,
       },
     };
   }
@@ -338,6 +339,14 @@ function countBy(values) {
 function normalizeReason(value) {
   const sanitized = sanitizeForOutput(value);
   if (/zip entries contains a raw local path/i.test(sanitized)) return "zip entry failed public-safety path scan";
+  if (/zip listing failed|end-of-central-directory|zipfile|zipinfo|cannot find zipfile/i.test(sanitized)) return "zip listing failed";
+  return sanitized;
+}
+
+function publicZipFailureReason(value) {
+  const sanitized = sanitizeForOutput(value);
+  if (/contains a raw local path/i.test(sanitized)) return "zip entry failed public-safety path scan";
+  if (/zip listing failed|end-of-central-directory|zipfile|zipinfo|cannot find zipfile/i.test(sanitized)) return "zip listing failed";
   return sanitized;
 }
 
@@ -394,6 +403,6 @@ function assertSafeText(text, label) {
 
 function sanitizeForOutput(text) {
   return String(text)
-    .replace(/(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/)[^\s"']+/g, "<local-path>")
+    .replace(/(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/)[^\s"']+/g, "<local-path>")
     .replace(/[A-Za-z]:\\Users\\[^\s"']+/g, "<local-path>");
 }

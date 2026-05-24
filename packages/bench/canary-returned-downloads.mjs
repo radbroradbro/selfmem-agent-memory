@@ -15,7 +15,7 @@ const inputRoots = normalizeInputRoots(args);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
-const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\)/;
+const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/|[A-Za-z]:\\Users\\)/;
 
 let watchReport = null;
 let watchStdout = "";
@@ -303,6 +303,6 @@ function assertSafeText(text, label) {
 
 function sanitizeForOutput(text) {
   return String(text)
-    .replace(/(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/)[^\s"']+/g, "<local-path>")
+    .replace(/(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/)[^\s"']+/g, "<local-path>")
     .replace(/[A-Za-z]:\\Users\\[^\s"']+/g, "<local-path>");
 }
