@@ -82,9 +82,10 @@ Live status:
   local-only retrieval-proxy arms across strategy, context budget, and
   candidate limit; `bm25-lite-b800-k5` preserves quality 0.4541 while cutting
   average context tokens to 800.
-- Promotes GitHub Actions run `26347754208` on `d91b27b` as the latest
+- Promotes GitHub Actions run `26348138478` on `5a2e0a7` as the latest
   verified code/product baseline after the LongMemEval-S materialize-run lane,
   retrieval-proxy blind baseline, same-data strategy comparison,
+  local-only autoresearch loop,
   release-gate hash binding, and sync evidence refresh.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
@@ -135,11 +136,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
-  `d91b27bcc869656197c1cc67804530b75757bbe2`.
-- GitHub Actions run `26347754208`: passed CI after adding the public
-  LongMemEval-S materialize-run lane, same-data strategy comparison, binding
-  the RecallWeave result to the materialized query-set hash, and marking the
-  result as retrieval-proxy only.
+  `5a2e0a70d4b4835217fc7f65e09c05b7bd3dd521`.
+- GitHub Actions run `26348138478`: passed CI after adding the public
+  LongMemEval-S materialize-run lane, same-data strategy comparison,
+  local-only autoresearch loop, binding the RecallWeave result to the
+  materialized query-set hash, and marking the result as retrieval-proxy only.
 - Previous verified code/product baseline before the materialize-run lane:
   `8eb69e848d442b08ebf4f5204d6ed17224161683`.
 - GitHub Actions run `26346613433`: passed CI after adding the public

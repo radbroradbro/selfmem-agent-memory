@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T01:00:00Z",
+  "generatedAt": "2026-05-24T01:07:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "d91b27bcc869656197c1cc67804530b75757bbe2",
-    "ciRunId": 26347754208,
+    "headSha": "5a2e0a70d4b4835217fc7f65e09c05b7bd3dd521",
+    "ciRunId": 26348138478,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_and_strategy_compare",
+    "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_strategy_compare_and_autoresearch_loop",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding the public LongMemEval-S materialize-run lane, retrieval-proxy blind baseline, and same-data retrieval strategy comparison. The materializer writes private query/haystack inputs outside the repository, publishes only hashes/counts, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result and strategy comparison to that hash while requiring retrievalProxyOnly, memoryBenchAnswerQuality=false, and publicBenchmarkClaimsAllowed=false. Local release:check, benchmark:public-strategy fixture/live checks, targeted public artifact scans, diff check, release:github-sync, and GitHub Actions run 26347754208 passed."
+    "note": "Latest inspected code/product baseline after adding the public LongMemEval-S materialize-run lane, retrieval-proxy blind baseline, same-data retrieval strategy comparison, and 24-arm local-only autoresearch loop. The materializer writes private query/haystack inputs outside the repository, publishes only hashes/counts, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result, strategy comparison, and autoresearch loop to that hash while requiring retrievalProxyOnly, memoryBenchAnswerQuality=false, and publicBenchmarkClaimsAllowed=false. Local release:check, benchmark:public-autoresearch fixture/live checks, targeted public artifact scans, diff check, release:github-sync, and GitHub Actions run 26348138478 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
