@@ -11,6 +11,7 @@ const packetInput = args.packet || process.env.RECALLWEAVE_RETURNED_CANARY_PACKE
 const requireProductionCanary = Boolean(args.requireProductionCanary);
 const reviewStrictReal = Boolean(args.strictReal || requireProductionCanary || packetInput);
 const outputPath = args.output ? resolvePath(args.output) : null;
+const expectedCommit = normalizedCommit(args.expectedCommit || process.env.RECALLWEAVE_CANARY_EXPECTED_COMMIT || "");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -24,6 +25,7 @@ if (packetInput) {
 const reviewArgs = [];
 if (packetInput) reviewArgs.push("--packet", resolvePath(packetInput));
 if (reviewStrictReal) reviewArgs.push("--strict-real");
+if (expectedCommit) reviewArgs.push("--expected-commit", expectedCommit);
 
 const reviewRun = spawnSync("node", ["packages/bench/canary-evidence-packet-review.mjs", ...reviewArgs], {
   cwd: root,
@@ -56,6 +58,11 @@ const output = {
   requireProductionCanary,
   status,
   countsAsProductionCanaryEvidence,
+  sourceControl: review?.sourceControl ?? {
+    reportCommit: null,
+    expectedCommit: expectedCommit || null,
+    commitMatchesExpected: expectedCommit ? false : null,
+  },
   publicLaunchAllowed: false,
   fleetRolloutAllowed: false,
   packet: {
@@ -74,6 +81,7 @@ const output = {
         packagePassesStrictReal: Boolean(review.packagePassesStrictReal),
         failedChecks: review.failedChecks ?? [],
         strictFailureReason: review.strictFailureReason ?? null,
+        sourceControl: review.sourceControl ?? null,
       }
     : {
         ok: false,
@@ -132,6 +140,13 @@ function resolvePath(value) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function normalizedCommit(value) {
+  const commit = String(value ?? "").trim();
+  if (!commit) return "";
+  assert.match(commit, /^[a-f0-9]{7,40}$/i, "expected commit must be a git SHA prefix or full SHA");
+  return commit;
 }
 
 function assertSafeText(text, label) {

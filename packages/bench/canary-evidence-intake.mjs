@@ -9,6 +9,7 @@ const fixturePath = join(root, "packages/bench/fixtures/canary-runtime-report.fi
 const reportPath = readArgValue("--report") ?? process.env.RECALLWEAVE_CANARY_REPORT_JSON ?? fixturePath;
 const strictReal = process.argv.includes("--strict-real") || process.env.RECALLWEAVE_CANARY_STRICT_REAL === "1";
 const outputPath = readArgValue("--output") ?? process.env.RECALLWEAVE_CANARY_INTAKE_OUTPUT_JSON ?? null;
+const expectedCommit = normalizedCommit(readArgValue("--expected-commit") ?? process.env.RECALLWEAVE_CANARY_EXPECTED_COMMIT ?? "");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -38,6 +39,8 @@ const agent = report.agent ?? {};
 const provider = report.provider ?? {};
 const window = report.window ?? {};
 const adapter = report.adapter ?? {};
+const reportCommit = String(report.commit ?? "");
+const commitMatchesExpected = expectedCommit ? reportCommit === expectedCommit || reportCommit.startsWith(expectedCommit) : null;
 
 const checks = [
   check("schema-version", report.schemaVersion === 1),
@@ -81,6 +84,7 @@ const checks = [
   check("no-raw-prompt", privacy.rawPromptIncluded === false),
   check("no-raw-answer", privacy.rawAnswerIncluded === false),
   check("rollback-ready", report.rollback?.available === true && report.rollback?.tested === true),
+  check("expected-commit", expectedCommit ? commitMatchesExpected === true : true),
 ];
 
 const failedChecks = checks.filter((item) => !item.ok).map((item) => item.name);
@@ -108,7 +112,14 @@ const output = {
     path: fixtureOnly ? "fixture-canary-report" : "external-canary-report",
     sha256: createHash("sha256").update(raw).digest("hex"),
     generatedAt: report.generatedAt ?? null,
-    commit: report.commit ?? null,
+    commit: reportCommit || null,
+    expectedCommit: expectedCommit || null,
+    commitMatchesExpected,
+  },
+  sourceControl: {
+    reportCommit: reportCommit || null,
+    expectedCommit: expectedCommit || null,
+    commitMatchesExpected,
   },
   target: {
     host: agent.host,
@@ -200,6 +211,13 @@ function readArgValue(name) {
   const index = process.argv.indexOf(name);
   if (index === -1) return null;
   return process.argv[index + 1] ?? null;
+}
+
+function normalizedCommit(value) {
+  const commit = String(value ?? "").trim();
+  if (!commit) return "";
+  assert.match(commit, /^[a-f0-9]{7,40}$/i, "expected commit must be a git SHA prefix or full SHA");
+  return commit;
 }
 
 function resolveOutputPath(value) {

@@ -95,7 +95,8 @@ The current handoff packet remains:
   `d2130e5da937dc47fcf2296e3e9c28a7cab7e66a936fadf43a3950827f269e55`
 
 The returned packet must pass `canary:returned-packet` with
-`--require-production-canary` before the real rollout blocker can close.
+`--require-production-canary` and the expected adapter commit before the real
+rollout blocker can close. A packet from an older adapter is diagnostic only.
 
 The current standard-inbox scan is
 `reviews/overnight-20260522/returned-downloads-current-scan.md`. It found 0
@@ -594,7 +595,7 @@ The one-command updater path can write the report, intake, optional diagnosis,
 and packet in one run:
 
 ```bash
-bin/selfmem_update --host hermes --repo <runtime-checkout> --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+bin/selfmem_update --host hermes --repo <runtime-checkout> --run-canary --rollback-tested --strict-real --expected-commit <approved-commit> --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 Before collecting, use the deterministic drill to make the fresh window
@@ -614,7 +615,7 @@ If the updater was not used for packaging, use `canary:packet` to create one
 metrics-only zip for reviewers:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --output /tmp/recallweave-canary-evidence-packet.zip
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --expected-commit <approved-commit> --output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 If strict intake failed, include the diagnosis file with `--diagnosis`. The
@@ -701,7 +702,7 @@ When a returned evidence packet arrives, intake it before interpreting the
 result:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --output /tmp/recallweave-returned-canary-intake.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
 ```
 
 For a mixed folder of agent replies, scan the inbox first. The scanner separates
@@ -734,16 +735,16 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --output /tmp/recall
 For a release-blocking check, require production-grade evidence:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --require-found --output /tmp/recallweave-returned-canary-watch.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-inbox.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --require-found --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-watch.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json
 ```
 
 The command fails closed unless the returned packet is non-fixture,
 metrics-only, privacy-clean, strict-real, and eligible to count as one-agent
-production canary evidence. Even then, public launch and fleet rollout remain
-blocked until maintainer approval.
+production canary evidence for the expected adapter commit. Even then, public
+launch and fleet rollout remain blocked until maintainer approval.
 
 Current Hermes and OpenClaw adapters use local-first bounded hosted
 read-through. They search hosted Supermemory when local results are thin or the

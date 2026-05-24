@@ -17,6 +17,7 @@ const canaryReport = "/tmp/recallweave-canary-report.json";
 const intakeReport = "/tmp/recallweave-canary-intake.json";
 const diagnosisReport = "/tmp/recallweave-canary-diagnosis.json";
 const evidencePacket = "/tmp/recallweave-canary-evidence-packet.zip";
+const expectedCommit = "<approved-commit>";
 
 const drill = {
   ok: true,
@@ -35,6 +36,7 @@ const drill = {
   drillContract: {
     oneAgentOnly: true,
     requiresPatchedAdapter: true,
+    requiresExpectedAdapterCommit: true,
     requiresNativeMemorySlot: true,
     requiresLocalWrite: true,
     requiresHostedReadThrough: true,
@@ -100,11 +102,12 @@ const drill = {
       id: "collect-strict-real-evidence",
       channel: "terminal",
       expectedTrace: ["report", "intake", "packet"],
-      command: `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "${freshWindowStart}" --canary-output ${canaryReport} --canary-intake-output ${intakeReport} --canary-diagnosis-output ${diagnosisReport} --canary-packet-output ${evidencePacket}`,
+      command: `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since "${freshWindowStart}" --canary-output ${canaryReport} --canary-intake-output ${intakeReport} --canary-diagnosis-output ${diagnosisReport} --canary-packet-output ${evidencePacket}`,
     },
   ],
   acceptanceCriteria: [
     "fresh window is at least 15 minutes after adapter apply",
+    "report commit matches the approved adapter commit",
     "native memory provider is RecallWeave/selfmem for this one agent",
     "local write creates at least one store event with elapsed_ms",
     "before_prompt_build or prefetch injects non-empty context",

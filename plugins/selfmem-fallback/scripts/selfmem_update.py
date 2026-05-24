@@ -72,6 +72,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--canary-diagnostic-zip", default="", help="Optional redacted diagnostic zip to convert into canary evidence.")
     parser.add_argument("--canary-since", default="", help="Only count canary trace events at or after this ISO timestamp.")
     parser.add_argument("--canary-last-minutes", default="", help="Only count canary trace events from the last N minutes.")
+    parser.add_argument("--expected-commit", default="", help="Expected RecallWeave adapter commit for strict canary evidence.")
     parser.add_argument("--strict-real", action="store_true", help="Require strict real canary intake to pass.")
     parser.add_argument("--rollback-tested", action="store_true", help="Mark the canary report rollback drill as tested.")
     parser.add_argument("--apply", action="store_true", help="Actually copy files. Without this, the updater is a dry run.")
@@ -281,11 +282,14 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
     packet_output_path = Path(args.canary_packet_output).expanduser().resolve() if args.canary_packet_output else None
     if packet_output_path is not None:
         packet_output_path.parent.mkdir(parents=True, exist_ok=True)
+    expected_commit = normalized_expected_commit(args.expected_commit) or current_repo_commit(REPO_ROOT)
 
     report_command = [
         "node",
         str(REPO_ROOT / "packages" / "bench" / "canary-report-from-trace.mjs"),
         *source_args,
+        "--commit",
+        expected_commit,
         "--output",
         str(output_path),
     ]
@@ -312,6 +316,10 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
         return runtime
 
     runtime["report"] = summarize_canary_report(parse_json(report.stdout))
+    runtime["sourceControl"] = {
+        "expectedCommit": expected_commit,
+        "reportCommit": runtime["report"].get("commit") if isinstance(runtime["report"], dict) else None,
+    }
     intake_command = [
         "node",
         str(REPO_ROOT / "packages" / "bench" / "canary-evidence-intake.mjs"),
@@ -320,6 +328,8 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
         "--output",
         str(intake_output_path),
     ]
+    if expected_commit != "unknown":
+        intake_command.extend(["--expected-commit", expected_commit])
     if args.strict_real:
         intake_command.append("--strict-real")
     intake = subprocess.run(intake_command, cwd=REPO_ROOT, capture_output=True, text=True, check=False, timeout=30)
@@ -357,6 +367,8 @@ def run_runtime_canary(host: str, home: Path, args: argparse.Namespace) -> dict[
             "--output",
             str(packet_output_path),
         ]
+        if expected_commit != "unknown":
+            packet_command.extend(["--expected-commit", expected_commit])
         if diagnosis_ran and diagnosis_output_path is not None:
             packet_command.extend(["--diagnosis", str(diagnosis_output_path)])
         if args.strict_real and intake.returncode == 0:
@@ -384,6 +396,26 @@ def runtime_canary_source_args(host: str, home: Path, args: argparse.Namespace) 
     if not container:
         return []
     return ["--host", host, "--container", str(container)]
+
+
+def current_repo_commit(repo: Path) -> str:
+    try:
+        result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True, check=False, timeout=5)
+    except Exception:
+        return "unknown"
+    value = result.stdout.strip()
+    if result.returncode == 0 and len(value) == 40 and all(char in "0123456789abcdefABCDEF" for char in value):
+        return value
+    return "unknown"
+
+
+def normalized_expected_commit(value: str) -> str:
+    commit = (value or "").strip()
+    if not commit:
+        return ""
+    if 7 <= len(commit) <= 40 and all(char in "0123456789abcdefABCDEF" for char in commit):
+        return commit
+    raise SystemExit("--expected-commit must be a git SHA prefix or full SHA")
 
 
 def runtime_canary_source_label(source_args: list[str]) -> str:
@@ -416,6 +448,7 @@ def summarize_canary_report(value: Any) -> Any:
         return value
     return {
         "mode": value.get("mode"),
+        "commit": value.get("commit"),
         "fixtureOnly": value.get("fixtureOnly"),
         "evidenceType": value.get("evidenceType"),
         "evidenceSource": value.get("evidenceSource"),
@@ -438,6 +471,7 @@ def summarize_canary_intake(value: Any) -> Any:
         "countsAsRealRolloutEvidence": value.get("countsAsRealRolloutEvidence"),
         "canaryPass": value.get("canaryPass"),
         "failedChecks": value.get("failedChecks"),
+        "sourceControl": value.get("sourceControl"),
         "lifecycle": value.get("lifecycle"),
         "latencyMs": value.get("latencyMs"),
         "instrumentation": value.get("instrumentation"),
@@ -471,6 +505,7 @@ def summarize_canary_packet(value: Any) -> Any:
         "canaryPass": value.get("canaryPass"),
         "countsAsRealRolloutEvidence": value.get("countsAsRealRolloutEvidence"),
         "packagePassesStrictReal": value.get("packagePassesStrictReal"),
+        "sourceControl": value.get("sourceControl"),
         "publicLaunchAllowed": value.get("publicLaunchAllowed"),
         "fleetRolloutAllowed": value.get("fleetRolloutAllowed"),
         "packet": value.get("packet"),

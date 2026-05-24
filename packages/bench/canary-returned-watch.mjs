@@ -11,6 +11,7 @@ const inputRoots = normalizeInputRoots(args);
 const iterations = Math.max(1, Number(args.iterations ?? 1));
 const intervalMs = Math.max(0, Number(args.intervalMs ?? 0));
 const requireFound = Boolean(args.requireFound);
+const expectedCommit = normalizedExpectedCommit(args.expectedCommit ?? process.env.RECALLWEAVE_CANARY_EXPECTED_COMMIT ?? "");
 const outputPath = args.output ? resolvePath(args.output) : null;
 
 const secretPattern =
@@ -46,6 +47,9 @@ const output = {
   publicLaunchAllowed: false,
   fleetRolloutAllowed: false,
   requireFound,
+  sourceControl: {
+    expectedCommit: expectedCommit || null,
+  },
   iterationsRequested: iterations,
   iterationsCompleted: scans.length ? Math.max(...scans.map((scan) => scan.iteration)) : 0,
   intervalMs,
@@ -89,6 +93,7 @@ function runInboxScan(inputRoot, iteration) {
   const scanArgs = ["packages/bench/canary-returned-inbox.mjs", "--require-production-canary"];
   if (inputRoot) scanArgs.push("--input-root", inputRoot);
   if (args.includeAllZips) scanArgs.push("--include-all-zips");
+  if (expectedCommit) scanArgs.push("--expected-commit", expectedCommit);
 
   const run = spawnSync("node", scanArgs, {
     cwd: root,
@@ -184,6 +189,13 @@ function sha256(value) {
 
 function numberValue(value) {
   return Number.isFinite(Number(value)) ? Number(value) : 0;
+}
+
+function normalizedExpectedCommit(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  assert.match(text, /^[a-f0-9]{7,40}$/i, "--expected-commit must be a git SHA prefix or full SHA");
+  return text.toLowerCase();
 }
 
 function sleep(ms) {

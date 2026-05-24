@@ -237,7 +237,7 @@ If you did not use `--canary-packet-output`, package the report and intake
 files with:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --output /tmp/recallweave-canary-evidence-packet.zip
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --expected-commit <approved-commit> --output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 If strict intake failed and you generated a diagnosis file, add
@@ -248,8 +248,8 @@ keys, cookies, or private paths.
 The controller should validate any received packet before it counts:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip
-npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip --strict-real
+npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip --expected-commit <approved-commit>
+npm exec --yes pnpm@10.23.0 -- canary:packet:review -- --packet /tmp/recallweave-canary-evidence-packet.zip --strict-real --expected-commit <approved-commit>
 ```
 
 If several agents send redacted diagnostic bundles at once, audit them as a
@@ -304,7 +304,7 @@ handoffs.
 When the selected agent returns a canary evidence packet, run:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --output /tmp/recallweave-returned-canary-intake.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
 ```
 
 If the agent sent a folder of zips, scan the inbox first. This classifies real
@@ -313,7 +313,7 @@ zips. Folder scans redact candidate file names by default and use hash labels;
 add `--expose-labels` only for a local operator-only review:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --output /tmp/recallweave-returned-canary-inbox.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-inbox.json
 ```
 
 To poll one or more returned-zip folders without exposing candidate filenames,
@@ -334,9 +334,9 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --output /tmp/recall
 For release evidence, require a strict production canary:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --output /tmp/recallweave-returned-canary-intake.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --require-production-canary --output /tmp/recallweave-returned-canary-inbox.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --require-found --output /tmp/recallweave-returned-canary-watch.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-inbox.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --require-found --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-watch.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json
 ```
 

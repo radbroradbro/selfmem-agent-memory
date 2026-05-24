@@ -16,6 +16,7 @@ const diagnosisReport = "/tmp/recallweave-canary-diagnosis.json";
 const evidencePacket = "/tmp/recallweave-canary-evidence-packet.zip";
 const drillGuide = "/tmp/recallweave-canary-drill.md";
 const freshWindowStart = "<fresh-window-start-iso>";
+const expectedCommit = "<approved-commit>";
 
 const packet = {
   ok: true,
@@ -29,6 +30,7 @@ const packet = {
   freshWindow: {
     minimumMinutes: 15,
     startPlaceholder: freshWindowStart,
+    expectedAdapterCommit: expectedCommit,
     reason: "Only post-update events count. Older trace history can contain pre-patch missing latency samples or stale errors.",
   },
   canaryOutput: canaryReport,
@@ -54,32 +56,32 @@ const packet = {
       id: "collect-live-container-after-window",
       description: "After at least 15 minutes of real traffic on the patched agent, collect strict-real evidence from the fresh window.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since ${freshWindowStart} --canary-output ${canaryReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --expected-commit ${expectedCommit} --output ${intakeReport}`,
       ].join(" && "),
     },
     {
       id: "apply-and-collect-live-container",
       description: "Shortcut only when the agent has already run for at least 15 minutes after the patch. Use a real timestamp, not the placeholder.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --apply --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --apply --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since ${freshWindowStart} --canary-output ${canaryReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --expected-commit ${expectedCommit} --output ${intakeReport}`,
       ].join(" && "),
     },
     {
       id: "collect-from-redacted-diagnostic-dir",
       description: "Use this instead when the agent exports a redacted diagnostic directory that includes old trace history.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-diagnostic-dir <redacted-diagnostic-dir> --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since ${freshWindowStart} --canary-diagnostic-dir <redacted-diagnostic-dir> --canary-output ${canaryReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --expected-commit ${expectedCommit} --output ${intakeReport}`,
       ].join(" && "),
     },
     {
       id: "collect-from-redacted-diagnostic-zip",
       description: "Use this instead when the agent exports a redacted diagnostic zip that includes old trace history.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since ${freshWindowStart} --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output ${canaryReport}`,
-        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since ${freshWindowStart} --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output ${canaryReport}`,
+        `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --expected-commit ${expectedCommit} --output ${intakeReport}`,
       ].join(" && "),
     },
     {
@@ -90,12 +92,12 @@ const packet = {
     {
       id: "package-passing-evidence",
       description: "Create one sanitized evidence zip from a passing strict-real canary. This never includes raw logs or memories.",
-      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --strict-real --output ${evidencePacket}`,
+      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --strict-real --expected-commit ${expectedCommit} --output ${evidencePacket}`,
     },
     {
       id: "package-diagnostic-evidence",
       description: "Create one sanitized diagnostic zip when strict intake fails. This does not count as rollout evidence.",
-      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --diagnosis ${diagnosisReport} --output ${evidencePacket}`,
+      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --diagnosis ${diagnosisReport} --expected-commit ${expectedCommit} --output ${evidencePacket}`,
     },
   ],
   acceptanceCriteria: [
@@ -103,6 +105,7 @@ const packet = {
     "fixtureOnly is false",
     "countsAsRealRolloutEvidence is true",
     "evidenceSource.windowFilter.since is the timestamp recorded when the patched adapter was applied",
+    "sourceControl.commitMatchesExpected is true for the approved adapter commit",
     "adapter.strictCanaryContract is v1",
     "adapter.searchLatencyInstrumentation and adapter.storeLatencyInstrumentation are true",
     "window.durationMinutes is at least 15",
@@ -178,15 +181,15 @@ function buildMarkdown() {
     "Then collect from the fresh live window:",
     "",
     "```bash",
-    `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output ${canaryReport}`,
-    `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --output ${intakeReport}`,
+    `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since "$FRESH_WINDOW_START" --canary-output ${canaryReport}`,
+    `npm exec --yes pnpm@10.23.0 -- canary:intake -- --report ${canaryReport} --strict-real --expected-commit ${expectedCommit} --output ${intakeReport}`,
     "```",
     "",
     "If you only have a redacted diagnostic export, use one of these instead:",
     "",
     "```bash",
-    `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-dir <redacted-diagnostic-dir> --canary-output ${canaryReport}`,
-    `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output ${canaryReport}`,
+    `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-dir <redacted-diagnostic-dir> --canary-output ${canaryReport}`,
+    `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output ${canaryReport}`,
     "```",
     "",
     "If strict intake fails, diagnose the metrics only:",
@@ -198,13 +201,13 @@ function buildMarkdown() {
     "Package a passing strict-real canary into one sanitized zip:",
     "",
     "```bash",
-    `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --strict-real --output ${evidencePacket}`,
+    `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --strict-real --expected-commit ${expectedCommit} --output ${evidencePacket}`,
     "```",
     "",
     "If strict intake failed, package the diagnostic metrics instead:",
     "",
     "```bash",
-    `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --diagnosis ${diagnosisReport} --output ${evidencePacket}`,
+    `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report ${canaryReport} --intake ${intakeReport} --diagnosis ${diagnosisReport} --expected-commit ${expectedCommit} --output ${evidencePacket}`,
     "```",
     "",
     "## Attach Only",
@@ -228,6 +231,7 @@ function packetAcceptanceLines() {
     "- `fixtureOnly: false`",
     "- `countsAsRealRolloutEvidence: true`",
     "- `evidenceSource.windowFilter.since` matches the post-update timestamp",
+    "- `sourceControl.commitMatchesExpected: true`",
     "- `adapter.strictCanaryContract: v1` and search/store latency instrumentation markers are present",
     "- fresh window duration is at least 15 minutes",
     "- zero privacy leaks and zero secret-pattern hits",

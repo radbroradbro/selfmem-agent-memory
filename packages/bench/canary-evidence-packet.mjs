@@ -14,6 +14,7 @@ const reportInput = args.report || process.env.RECALLWEAVE_CANARY_REPORT_JSON ||
 const intakeInput = args.intake || "";
 const diagnosisInput = args.diagnosis || "";
 const outputPath = args.output ? resolvePath(args.output) : join(tmpdir(), "recallweave-canary-evidence-packet.zip");
+const expectedCommit = normalizedCommit(args.expectedCommit || process.env.RECALLWEAVE_CANARY_EXPECTED_COMMIT || "");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -35,10 +36,14 @@ const countsAsRealRolloutEvidence = Boolean(intake?.countsAsRealRolloutEvidence)
 const strictRealPassed = Boolean(intake?.strictRealPassed);
 const canaryPass = Boolean(intake?.canaryPass ?? report.canaryPass);
 const packagePassesStrictReal = !fixtureOnly && canaryPass && countsAsRealRolloutEvidence && strictRealPassed;
+const reportCommit = String(report.commit ?? intake?.report?.commit ?? "");
+const expectedReportCommit = expectedCommit || String(intake?.report?.expectedCommit ?? intake?.sourceControl?.expectedCommit ?? "");
+const commitMatchesExpected = expectedReportCommit ? reportCommit === expectedReportCommit || reportCommit.startsWith(expectedReportCommit) : null;
 
 if (strictReal) {
   assert.ok(intake, "--strict-real requires --intake from canary:intake --strict-real");
   assert.equal(packagePassesStrictReal, true, "strict-real packet requires passing live canary intake evidence");
+  if (expectedReportCommit) assert.equal(commitMatchesExpected, true, "strict-real packet report commit does not match expected commit");
 }
 
 const tmpRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-packet-"));
@@ -57,6 +62,11 @@ try {
     packagePassesStrictReal: strictReal ? true : packagePassesStrictReal,
     publicLaunchAllowed: false,
     fleetRolloutAllowed: false,
+    sourceControl: {
+      reportCommit: reportCommit || null,
+      expectedCommit: expectedReportCommit || null,
+      commitMatchesExpected,
+    },
     files: inputs.map((input) => ({
       name: input.name,
       sha256: input.sha256,
@@ -120,6 +130,7 @@ try {
     },
     publicLaunchAllowed: false,
     fleetRolloutAllowed: false,
+    sourceControl: manifest.sourceControl,
   };
   const serialized = `${JSON.stringify(output, null, 2)}\n`;
   assertSafeText(serialized, "packet output");
@@ -211,6 +222,13 @@ function resolvePath(value) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function normalizedCommit(value) {
+  const commit = String(value ?? "").trim();
+  if (!commit) return "";
+  assert.match(commit, /^[a-f0-9]{7,40}$/i, "expected commit must be a git SHA prefix or full SHA");
+  return commit;
 }
 
 function findForbiddenKeys(value, prefix = "") {

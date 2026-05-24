@@ -246,6 +246,7 @@ function remediationFocus(failedChecks) {
 function commandsFor(host) {
   const repoPlaceholder = host === "hermes" ? "<hermes-checkout>" : "<openclaw-checkout>";
   const diagnosticFlag = "--canary-diagnostic-zip <redacted-diagnostic.zip>";
+  const expectedCommit = "<approved-commit>";
   return [
     {
       id: "dry-run",
@@ -270,14 +271,14 @@ function commandsFor(host) {
       id: "collect-live-window",
       description: "After at least 15 minutes of real use following the deterministic drill, collect strict-real metrics and package the returned evidence from the mapped live container.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip`,
       ].join(" && "),
     },
     {
       id: "collect-from-redacted-export",
       description: "Use only if the agent cannot collect from its live container but can provide a redacted diagnostic export.",
       command: [
-        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" ${diagnosticFlag} --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip`,
+        `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --run-canary --rollback-tested --strict-real --expected-commit ${expectedCommit} --canary-since "$FRESH_WINDOW_START" ${diagnosticFlag} --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip`,
       ].join(" && "),
     },
     {
@@ -288,12 +289,12 @@ function commandsFor(host) {
     {
       id: "package-passing-evidence",
       description: "Package a passing strict-real canary. This remains one-agent evidence only.",
-      command: "npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --strict-real --output /tmp/recallweave-canary-evidence-packet.zip",
+      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --strict-real --expected-commit ${expectedCommit} --output /tmp/recallweave-canary-evidence-packet.zip`,
     },
     {
       id: "package-failing-diagnostic",
       description: "Package diagnosis when strict intake fails. This does not count as rollout evidence.",
-      command: "npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --diagnosis /tmp/recallweave-canary-diagnosis.json --output /tmp/recallweave-canary-evidence-packet.zip",
+      command: `npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --diagnosis /tmp/recallweave-canary-diagnosis.json --expected-commit ${expectedCommit} --output /tmp/recallweave-canary-evidence-packet.zip`,
     },
   ];
 }

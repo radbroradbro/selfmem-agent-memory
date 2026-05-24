@@ -38,6 +38,7 @@ if (blockedPlan) {
 }
 const operatorMarkdown = runNode("packages/bench/canary-operator-packet.mjs", ["--host", host, "--format", "markdown"]).stdout;
 const drillMarkdown = runNode("packages/bench/canary-drill.mjs", ["--host", host, "--format", "markdown"]).stdout;
+const sourceControl = readSourceControl();
 
 const files = [
   {
@@ -73,6 +74,7 @@ const manifest = {
   metricsOnly: true,
   publicLaunchAllowed: false,
   fleetRolloutAllowed: false,
+  sourceControl,
   oneAgentCanaryAllowed: Boolean(planJson.oneAgentCanaryAllowed),
   readyForLiveHandoff: Boolean(planJson.oneAgentCanaryAllowed && planJson.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"),
   requireReadyPassed: !requireReady || Boolean(planJson.oneAgentCanaryAllowed && planJson.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"),
@@ -108,11 +110,15 @@ const manifest = {
     requiresRollbackTested: true,
     windowStartVariable: "FRESH_WINDOW_START",
     collectCommandId: "collect-live-window",
+    expectedReportCommit: sourceControl.headSha,
     returnedPacketIntakeCommand:
-      "npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --output /tmp/recallweave-returned-canary-intake.json",
+      `npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary${sourceControl.headSha === "unknown" ? "" : ` --expected-commit ${sourceControl.headSha}`} --output /tmp/recallweave-returned-canary-intake.json`,
   },
   returnChecklist: [
     "apply the current adapter after recording FRESH_WINDOW_START",
+    sourceControl.headSha === "unknown"
+      ? "record the adapter commit shown by the runtime checkout before collection"
+      : `collect the returned report with commit ${sourceControl.headSha}`,
     "follow strict-real-canary-drill.md during the fresh window",
     "run one mapped live agent for at least 15 minutes after the update",
     "collect strict-real evidence with --canary-since \"$FRESH_WINDOW_START\"",
@@ -213,6 +219,7 @@ function buildReadme(packetManifest) {
     `Host: ${packetManifest.host}.`,
     `Status: ${packetManifest.status}.`,
     `Scope: ${packetManifest.recommendedScope}.`,
+    `Expected canary report commit: ${packetManifest.sourceControl.headSha}.`,
     "",
     "Read in this order:",
     "",
@@ -227,6 +234,7 @@ function buildReadme(packetManifest) {
     "",
     `- Minimum runtime after update: ${packetManifest.freshWindowContract.minimumMinutes} minutes.`,
     "- Evidence must be post-update, strict-real, non-fixture, rollback-tested, and metrics-only.",
+    `- The returned packet must report commit \`${packetManifest.sourceControl.headSha}\` unless the runtime proves a newer reviewed adapter commit.`,
     `- Record the update timestamp in \`${packetManifest.freshWindowContract.windowStartVariable}\` before applying the adapter.`,
     `- Collect evidence with the \`${packetManifest.freshWindowContract.collectCommandId}\` command in \`next-agent-plan.md\`.`,
     "",
@@ -354,6 +362,29 @@ function runNode(script, scriptArgs, options = {}) {
   if (!options.allowFailure) assert.equal(result.status, 0, `${script} failed: ${result.stderr || result.stdout}`);
   assertSafeText(result.stdout, `${script} stdout`);
   return result;
+}
+
+function readSourceControl() {
+  const head = runGit(["rev-parse", "HEAD"]) || "unknown";
+  const branch = runGit(["branch", "--show-current"]) || "unknown";
+  return {
+    headSha: head,
+    branch,
+    expectedReportCommit: head,
+    commitRequiredForProductionCanary: head !== "unknown",
+  };
+}
+
+function runGit(gitArgs) {
+  const result = spawnSync("git", gitArgs, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  if (result.status !== 0) return "";
+  const value = result.stdout.trim();
+  if (/^[a-f0-9]{40}$/i.test(value) || /^[A-Za-z0-9._/-]+$/.test(value)) return value;
+  return "";
 }
 
 function parseJsonStdout(result, label) {

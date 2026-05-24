@@ -13,6 +13,7 @@ const outputPath = args.output ? resolvePath(args.output) : null;
 const requireProductionCanary = Boolean(args.requireProductionCanary);
 const maxBytes = Number(args.maxBytes ?? 25 * 1024 * 1024);
 const exposeLabels = Boolean(args.exposeLabels);
+const expectedCommit = normalizedCommit(args.expectedCommit || process.env.RECALLWEAVE_CANARY_EXPECTED_COMMIT || "");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -56,6 +57,9 @@ try {
     status,
     publicLaunchAllowed: false,
     fleetRolloutAllowed: false,
+    sourceControl: {
+      expectedCommit: expectedCommit || null,
+    },
     input: {
       generatedFixture: candidates.some((candidate) => candidate.generatedFixture),
       inputRootLabel: args.inputRoot || args.folder ? basename(resolvePath(args.inputRoot || args.folder)) : null,
@@ -227,6 +231,7 @@ function inspectCandidate(candidate) {
 function inspectReturnedEvidenceCandidate(candidate, entries, safeEntries) {
   const reviewArgs = ["packages/bench/canary-returned-packet-intake.mjs", "--packet", candidate.path];
   if (requireProductionCanary) reviewArgs.push("--require-production-canary");
+  if (expectedCommit) reviewArgs.push("--expected-commit", expectedCommit);
   const run = spawnSync("node", reviewArgs, {
     cwd: root,
     encoding: "utf8",
@@ -262,6 +267,7 @@ function inspectReturnedEvidenceCandidate(candidate, entries, safeEntries) {
           packagePassesStrictReal: Boolean(intake.review.packagePassesStrictReal),
           failedChecks: intake.review.failedChecks ?? [],
           strictFailureReason: intake.review.strictFailureReason ?? null,
+          sourceControl: intake.review.sourceControl ?? intake.sourceControl ?? null,
         }
       : {
           ok: false,
@@ -331,6 +337,13 @@ function resolvePath(value) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function normalizedCommit(value) {
+  const commit = String(value ?? "").trim();
+  if (!commit) return "";
+  assert.match(commit, /^[a-f0-9]{7,40}$/i, "expected commit must be a git SHA prefix or full SHA");
+  return commit;
 }
 
 function assertSafeText(text, label) {

@@ -523,6 +523,7 @@ check("selfmem_update command is mapped", () => {
   assert.match(help, /--canary-packet-output/);
   assert.match(help, /--canary-since/);
   assert.match(help, /--canary-last-minutes/);
+  assert.match(help, /--expected-commit/);
   assert.match(help, /--strict-real/);
   assert.match(help, /--rollback-tested/);
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-bin-check-"));
@@ -2197,6 +2198,20 @@ check("fresh canary report generator passes", () => {
     assert.equal(intakeReport.fixtureOnly, true);
     assert.equal(intakeReport.countsAsRealRolloutEvidence, false);
     assert.equal(intakeReport.canaryPass, true);
+    const expectedCommit = "65ef223f9def19312e679dc7b13ae3a2fb961daa";
+    const commitReportPath = join(tempRoot, "commit-report.json");
+    run("node", ["packages/bench/canary-report-from-trace.mjs", "--fixture", "--commit", expectedCommit, "--output", commitReportPath]);
+    const commitMatchedIntake = JSON.parse(
+      run("node", ["packages/bench/canary-evidence-intake.mjs", "--report", commitReportPath, "--expected-commit", expectedCommit.slice(0, 12)]).stdout,
+    );
+    const commitMismatchIntake = JSON.parse(
+      run("node", ["packages/bench/canary-evidence-intake.mjs", "--report", commitReportPath, "--expected-commit", "deadbeef"]).stdout,
+    );
+    assert.equal(commitMatchedIntake.sourceControl.commitMatchesExpected, true);
+    assert.equal(commitMatchedIntake.canaryPass, true);
+    assert.equal(commitMismatchIntake.sourceControl.commitMatchesExpected, false);
+    assert.equal(commitMismatchIntake.canaryPass, false);
+    assert.ok(commitMismatchIntake.failedChecks.includes("expected-commit"));
     const diagnosticReportPath = join(tempRoot, "diagnostic-report.json");
     const diagnostic = run("node", [
       "packages/bench/canary-report-from-trace.mjs",
@@ -2549,6 +2564,7 @@ check("fresh canary drill passes", () => {
   assert.equal(report.minimumFreshWindowMinutes, 15);
   assert.equal(report.drillContract.oneAgentOnly, true);
   assert.equal(report.drillContract.requiresLocalWrite, true);
+  assert.equal(report.drillContract.requiresExpectedAdapterCommit, true);
   assert.equal(report.drillContract.requiresHostedReadThrough, true);
   assert.equal(report.drillContract.requiresLcmOrCompressionCoverage, true);
   assert.equal(report.drillContract.requiresMetricsOnlyReturn, true);
@@ -2559,7 +2575,8 @@ check("fresh canary drill passes", () => {
   assert.ok(report.operatorSteps.some((item) => item.id === "exercise-hosted-read-through" && /result count/i.test(item.prompt)));
   assert.ok(report.operatorSteps.some((item) => item.id === "exercise-lifecycle-compression" && /compression/i.test(item.prompt)));
   assert.ok(report.operatorSteps.some((item) => item.id === "rollback-drill" && /--rollback --dry-run/.test(item.command)));
-  assert.ok(report.operatorSteps.some((item) => item.id === "collect-strict-real-evidence" && /--strict-real/.test(item.command) && /--canary-since/.test(item.command)));
+  assert.ok(report.operatorSteps.some((item) => item.id === "collect-strict-real-evidence" && /--strict-real/.test(item.command) && /--canary-since/.test(item.command) && /--expected-commit <approved-commit>/.test(item.command)));
+  assert.ok(report.acceptanceCriteria.some((item) => /report commit matches/i.test(item)));
   assert.ok(report.acceptanceCriteria.some((item) => /hosted read-through is attempted/i.test(item)));
   assert.ok(report.acceptanceCriteria.some((item) => /strict-real intake passes/i.test(item)));
   assert.equal(report.expectedStrictIntakeFields["quality.hybridSearchCovered"], true);
@@ -2592,13 +2609,15 @@ check("fresh canary operator packet passes", () => {
   assert.equal(report.host, "hermes");
   assert.match(report.requiredSource, /live mapped container/i);
   assert.equal(report.freshWindow?.minimumMinutes, 15);
+  assert.equal(report.freshWindow?.expectedAdapterCommit, "<approved-commit>");
   assert.ok(report.commands.some((item) => item.id === "apply-live-container" && /FRESH_WINDOW_START/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "generate-drill" && /canary:drill/.test(item.command)));
-  assert.ok(report.commands.some((item) => item.id === "collect-live-container-after-window" && /--canary-since <fresh-window-start-iso>/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "collect-live-container-after-window" && /--canary-since <fresh-window-start-iso>/.test(item.command) && /--expected-commit <approved-commit>/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "apply-and-collect-live-container" && /--strict-real/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-dir" && /--canary-diagnostic-dir/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "collect-from-redacted-diagnostic-zip" && /--canary-diagnostic-zip/.test(item.command) && /--canary-since/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "package-passing-evidence" && /canary:packet/.test(item.command) && /--strict-real/.test(item.command)));
+  assert.ok(report.commands.some((item) => item.id === "package-passing-evidence" && /--expected-commit <approved-commit>/.test(item.command)));
   assert.ok(report.commands.some((item) => item.id === "package-diagnostic-evidence" && /canary:packet/.test(item.command) && /--diagnosis/.test(item.command)));
   for (const command of report.commands.map((item) => item.command).filter((command) => /canary:(intake|diagnose)/.test(command))) {
     const toolSegment = command.slice(command.indexOf("canary:"));
@@ -2606,6 +2625,7 @@ check("fresh canary operator packet passes", () => {
     assert.doesNotMatch(toolSegment, /\s>\s/, "canary JSON evidence commands must use --output instead of shell redirection");
   }
   assert.ok(report.acceptanceCriteria.includes("countsAsRealRolloutEvidence is true"));
+  assert.ok(report.acceptanceCriteria.includes("sourceControl.commitMatchesExpected is true for the approved adapter commit"));
   assert.ok(report.acceptanceCriteria.includes("fixtureOnly is false"));
   assert.ok(report.acceptanceCriteria.includes("adapter.strictCanaryContract is v1"));
   assert.ok(report.acceptanceCriteria.includes("window.durationMinutes is at least 15"));
@@ -2708,6 +2728,13 @@ check("fresh canary evidence packet review passes", () => {
       "--packet",
       packetPath,
     ]);
+    const mismatchReviewRun = run("node", [
+      "packages/bench/canary-evidence-packet-review.mjs",
+      "--packet",
+      packetPath,
+      "--expected-commit",
+      "deadbeef",
+    ]);
     const strictReview = spawnSync("node", [
       "packages/bench/canary-evidence-packet-review.mjs",
       "--packet",
@@ -2721,6 +2748,7 @@ check("fresh canary evidence packet review passes", () => {
     const generatedFixtureReview = run("node", ["packages/bench/canary-evidence-packet-review.mjs"]);
     const packet = JSON.parse(packetRun.stdout);
     const review = JSON.parse(reviewRun.stdout);
+    const mismatchReview = JSON.parse(mismatchReviewRun.stdout);
     const fixtureReview = JSON.parse(generatedFixtureReview.stdout);
     const strictOutput = JSON.parse(strictReview.stdout);
     const evidence = readFileSync(join(root, reviewDir, "canary-evidence-packet-review-evidence.md"), "utf8");
@@ -2733,6 +2761,10 @@ check("fresh canary evidence packet review passes", () => {
     assert.equal(review.fixtureOnly, true);
     assert.equal(review.countsAsRealRolloutEvidence, false);
     assert.equal(review.countsAsProductionCanaryEvidence, false);
+    assert.equal(mismatchReview.ok, false);
+    assert.equal(mismatchReview.sourceControl.expectedCommit, "deadbeef");
+    assert.equal(mismatchReview.sourceControl.commitMatchesExpected, false);
+    assert.ok(mismatchReview.failedChecks.includes("expected-commit"));
     assert.equal(review.publicLaunchAllowed, false);
     assert.equal(review.fleetRolloutAllowed, false);
     assert.deepEqual(review.packet.entries, ["README.md", "canary-report.json", "manifest.json"]);
@@ -2965,6 +2997,8 @@ check("fresh returned canary inbox watcher passes", () => {
       "--input-root",
       tempRoot,
       "--include-all-zips",
+      "--expected-commit",
+      "65ef223",
       "--iterations",
       "1",
       "--output",
@@ -2989,6 +3023,7 @@ check("fresh returned canary inbox watcher passes", () => {
     assert.equal(defaultReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
     assert.equal(watchReport.mode, "canary-returned-watch");
     assert.equal(watchReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+    assert.equal(watchReport.sourceControl?.expectedCommit, "65ef223");
     assert.equal(watchReport.counts.handoffPackets, 1);
     assert.equal(watchReport.counts.productionEvidencePackets, 0);
     assert.equal(outputReport.mode, "canary-returned-watch");
@@ -3215,9 +3250,9 @@ check("fresh canary next-agent plan passes", () => {
   assert.ok(report.decision.blockReasons.some((item) => item.reason.includes("fixture-only")));
   assert.ok(report.commandPlan.some((item) => item.id === "apply-current-adapter"));
   assert.ok(report.commandPlan.some((item) => item.id === "run-deterministic-drill" && /canary:drill/.test(item.command)));
-  assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window" && /--canary-packet-output/.test(item.command)));
+  assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window" && /--canary-packet-output/.test(item.command) && /--expected-commit <approved-commit>/.test(item.command)));
   assert.ok(report.commandPlan.some((item) => item.id === "diagnose-if-failed"));
-  assert.ok(report.commandPlan.some((item) => item.id === "package-passing-evidence"));
+  assert.ok(report.commandPlan.some((item) => item.id === "package-passing-evidence" && /--expected-commit <approved-commit>/.test(item.command)));
   assert.ok(report.acceptanceCriteria.some((item) => /native memory lane/i.test(item)));
   assert.ok(report.acceptanceCriteria.some((item) => /deterministic drill/i.test(item)));
   for (const command of report.commandPlan.map((item) => item.command).filter((command) => /canary:(intake|diagnose)/.test(command))) {
@@ -3305,6 +3340,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   const markdown = run("unzip", ["-p", packetPath, "next-agent-plan.md"]).stdout;
   const operator = run("unzip", ["-p", packetPath, "strict-real-operator-packet.md"]).stdout;
   const drill = run("unzip", ["-p", packetPath, "strict-real-canary-drill.md"]).stdout;
+  const currentHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
   const evidence = readFileSync(join(root, reviewDir, "canary-next-agent-packet-evidence.md"), "utf8");
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-next-agent-packet-review.md"), "utf8");
   assert.equal(report.ok, true);
@@ -3352,6 +3388,9 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(manifest.metricsOnly, true);
   assert.equal(manifest.publicLaunchAllowed, false);
   assert.equal(manifest.fleetRolloutAllowed, false);
+  assert.equal(manifest.sourceControl.headSha, currentHead);
+  assert.equal(manifest.sourceControl.expectedReportCommit, currentHead);
+  assert.equal(manifest.sourceControl.commitRequiredForProductionCanary, true);
   assert.equal(manifest.readyForLiveHandoff, false);
   assert.equal(manifest.requireReadyPassed, true);
   assert.equal(manifest.blockerPreserved, true);
@@ -3362,13 +3401,16 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(manifest.freshWindowContract.requiresNonFixtureEvidence, true);
   assert.equal(manifest.freshWindowContract.requiresRollbackTested, true);
   assert.match(manifest.freshWindowContract.returnedPacketIntakeCommand, /--require-production-canary/);
+  assert.match(manifest.freshWindowContract.returnedPacketIntakeCommand, new RegExp(`--expected-commit ${currentHead}`));
   assert.ok(manifest.returnChecklist.some((item) => /FRESH_WINDOW_START/.test(item)));
+  assert.ok(manifest.returnChecklist.some((item) => item.includes(currentHead)));
   assert.ok(manifest.returnChecklist.some((item) => /strict-real-canary-drill\.md/.test(item)));
   assert.ok(manifest.returnChecklist.some((item) => /metrics-only/.test(item)));
   assert.match(readme, /one selected agent operator/i);
   assert.match(readme, /Canary means a bounded validation window/i);
   assert.match(readme, /deterministic drill/i);
   assert.match(readme, /Fresh-window contract/i);
+  assert.match(readme, new RegExp(`Expected canary report commit: ${currentHead}`));
   assert.match(readme, /Ready for live handoff: no/i);
   assert.match(readme, /Do not attach raw memories/i);
   assert.match(markdown, /RecallWeave Next Agent Canary Plan/);
@@ -3456,7 +3498,7 @@ check("fresh release blocker doctor passes", () => {
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
   assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent handoff packet/);
   assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
-  assert.match(canaryBlocker.nextAction, /canary:returned-(?:inbox|packet).*--require-production-canary/);
+  assert.match(canaryBlocker.nextAction, /canary:returned-(?:inbox|packet).*--require-production-canary.*--expected-commit <approved-commit>/);
   assert.equal(report.checks.realDiagnosticsPostwatch.returnedWatchStatus, "AWAITING_RETURNED_PRODUCTION_CANARY");
   assert.equal(report.checks.realDiagnosticsPostwatch.productionEvidencePackets, 0);
   assert.equal(report.checks.realDiagnosticsPostwatch.diagnosticInputCount, 9);
@@ -3473,6 +3515,8 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.realDiagnosticsPostwatch.publicLaunchAllowed, false);
   assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--allow-failed-inputs/.test(item) && /--require-ready/.test(item)));
   assert.ok(report.manualCommands.some((item) => /canary:drill/.test(item) && /--format markdown/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /canary:returned-inbox/.test(item) && /--require-production-canary/.test(item) && /--expected-commit <approved-commit>/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /canary:returned-packet/.test(item) && /--require-production-canary/.test(item) && /--expected-commit <approved-commit>/.test(item)));
 });
 
 check("fresh hosted baseline preflight passes", () => {

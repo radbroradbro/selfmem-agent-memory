@@ -10,6 +10,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const strictReal = Boolean(args.strictReal);
 const packetInput = args.packet || process.env.RECALLWEAVE_CANARY_PACKET_ZIP || "";
+const expectedCommit = normalizedCommit(args.expectedCommit || process.env.RECALLWEAVE_CANARY_EXPECTED_COMMIT || "");
 const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-packet-review-"));
 
 const secretPattern =
@@ -72,6 +73,12 @@ try {
     rawPromptIncluded: Boolean(report.privacy?.rawPromptIncluded || intake?.privacy?.rawPromptIncluded),
     rawAnswerIncluded: Boolean(report.privacy?.rawAnswerIncluded || intake?.privacy?.rawAnswerIncluded),
   };
+  const reportCommit = String(report.commit ?? manifest.sourceControl?.reportCommit ?? "");
+  const manifestExpectedCommit = String(manifest.sourceControl?.expectedCommit ?? "");
+  const effectiveExpectedCommit = expectedCommit || manifestExpectedCommit;
+  const commitMatchesExpected = effectiveExpectedCommit
+    ? reportCommit === effectiveExpectedCommit || reportCommit.startsWith(effectiveExpectedCommit)
+    : null;
 
   const checks = [
     check("expected-entries", entries.includes("README.md") && entries.includes("manifest.json") && entries.includes("canary-report.json")),
@@ -91,11 +98,15 @@ try {
     check("no-raw-answer", privacy.rawAnswerIncluded === false),
     check("fixture-does-not-count", fixtureOnly ? countsAsRealRolloutEvidence === false : true),
     check("strict-real-passed", strictReal ? strictRealPassed : true),
+    check("expected-commit", effectiveExpectedCommit ? commitMatchesExpected === true : true),
   ];
   const failedChecks = checks.filter((item) => !item.ok).map((item) => item.name);
+  const productionCanaryEvidence = strictRealPassed && failedChecks.length === 0;
   const strictFailureReason = strictReal && !strictRealPassed
     ? "strict-real review requires a non-fixture packet with passing strict-real intake evidence"
-    : null;
+    : strictReal && failedChecks.length > 0
+      ? `strict-real review failed checks: ${failedChecks.join(", ")}`
+      : null;
 
   const output = {
     ok: !strictFailureReason && failedChecks.length === 0,
@@ -110,7 +121,7 @@ try {
     canaryPass,
     countsAsRealRolloutEvidence,
     packagePassesStrictReal,
-    countsAsProductionCanaryEvidence: strictRealPassed,
+    countsAsProductionCanaryEvidence: productionCanaryEvidence,
     publicLaunchAllowed: false,
     fleetRolloutAllowed: false,
     packet: {
@@ -124,6 +135,11 @@ try {
       localContainerHash: report.agent?.localContainerHash ?? intake?.target?.localContainerHash ?? null,
       sourceContainerHash: report.agent?.sourceContainerHash ?? intake?.target?.sourceContainerHash ?? null,
       providerMode: report.provider?.mode ?? intake?.target?.providerMode ?? null,
+    },
+    sourceControl: {
+      reportCommit: reportCommit || null,
+      expectedCommit: effectiveExpectedCommit || null,
+      commitMatchesExpected,
     },
     adapter: {
       strictCanaryContract: report.adapter?.strictCanaryContract ?? intake?.adapter?.strictCanaryContract ?? null,
@@ -221,6 +237,13 @@ function resolvePath(value) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function normalizedCommit(value) {
+  const commit = String(value ?? "").trim();
+  if (!commit) return "";
+  assert.match(commit, /^[a-f0-9]{7,40}$/i, "expected commit must be a git SHA prefix or full SHA");
+  return commit;
 }
 
 function findForbiddenKeys(value, prefix = "") {
