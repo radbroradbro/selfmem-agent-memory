@@ -3000,6 +3000,7 @@ check("fresh returned canary inbox scanner passes", () => {
   try {
     const fixturePacketPath = join(tempRoot, "fixture-canary-evidence-packet.zip");
     const handoffPacketPath = join(tempRoot, "recallweave-openclaw-handoff-packet.zip");
+    const unknownPacketPath = join(tempRoot, "random-memory-export.zip");
     const badPacketPath = join(tempRoot, "selfmem-bad-return.zip");
     const outputPath = join(tempRoot, "returned-inbox.json");
     writeFileSync(badPacketPath, "not a zip");
@@ -3013,6 +3014,7 @@ check("fresh returned canary inbox scanner passes", () => {
       "--output",
       handoffPacketPath,
     ]);
+    writeUnknownZip(tempRoot, unknownPacketPath);
     const defaultRun = run("node", ["packages/bench/canary-returned-inbox.mjs"]);
     const inboxRun = run("node", [
       "packages/bench/canary-returned-inbox.mjs",
@@ -3049,7 +3051,14 @@ check("fresh returned canary inbox scanner passes", () => {
     assert.equal(inboxReport.counts.returnedEvidencePackets, 1);
     assert.equal(inboxReport.counts.handoffPackets, 1);
     assert.equal(inboxReport.counts.unreadablePackets, 1);
+    assert.equal(inboxReport.counts.unknownPackets, 1);
     assert.equal(inboxReport.counts.productionEvidencePackets, 0);
+    assert.equal(inboxReport.triage?.metricsOnly, true);
+    assert.equal(inboxReport.triage?.labelMode, "hash-redacted");
+    assert.equal(inboxReport.triage?.unknown?.count, 1);
+    assert.equal(inboxReport.triage?.unreadable?.count, 1);
+    assert.match(inboxReport.triage?.unknown?.sampleIds?.[0] ?? "", /^zip-[a-f0-9]{12}$/);
+    assert.match(inboxReport.triage?.unreadable?.sampleIds?.[0] ?? "", /^zip-[a-f0-9]{12}$/);
     assert.equal(outputReport.mode, "canary-returned-inbox");
     assert.notEqual(requiredRun.status, 0, "required production canary inbox must fail closed for fixture packets");
     assert.equal(requiredReport.ok, false);
@@ -3062,6 +3071,7 @@ check("fresh returned canary inbox scanner passes", () => {
     for (const text of [defaultRun.stdout, inboxRun.stdout, requiredRun.stdout, evidence]) {
       assert.doesNotMatch(text, secretPattern);
       assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+      assert.doesNotMatch(text, /random-memory-export|selfmem-bad-return|recallweave-openclaw-handoff-packet/);
     }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
@@ -3072,12 +3082,16 @@ check("fresh returned canary inbox watcher passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-canary-watch-check-"));
   try {
     const handoffPacketPath = join(tempRoot, "recallweave-openclaw-handoff-packet.zip");
+    const unknownPacketPath = join(tempRoot, "random-memory-export.zip");
+    const badPacketPath = join(tempRoot, "selfmem-bad-return.zip");
     const outputPath = join(tempRoot, "returned-watch.json");
+    writeFileSync(badPacketPath, "not a zip");
     run("node", [
       "packages/bench/canary-next-agent-packet.mjs",
       "--output",
       handoffPacketPath,
     ]);
+    writeUnknownZip(tempRoot, unknownPacketPath);
     const defaultRun = run("node", ["packages/bench/canary-returned-watch.mjs"]);
     const watchRun = run("node", [
       "packages/bench/canary-returned-watch.mjs",
@@ -3112,7 +3126,12 @@ check("fresh returned canary inbox watcher passes", () => {
     assert.equal(watchReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
     assert.equal(watchReport.sourceControl?.expectedCommit, "65ef223");
     assert.equal(watchReport.counts.handoffPackets, 1);
+    assert.equal(watchReport.counts.unknownPackets, 1);
+    assert.equal(watchReport.counts.unreadablePackets, 1);
     assert.equal(watchReport.counts.productionEvidencePackets, 0);
+    assert.equal(watchReport.latestScans?.[0]?.triage?.unknown?.count, 1);
+    assert.equal(watchReport.latestScans?.[0]?.triage?.unreadable?.count, 1);
+    assert.match(watchReport.latestScans?.[0]?.triage?.unknown?.sampleIds?.[0] ?? "", /^zip-[a-f0-9]{12}$/);
     assert.equal(outputReport.mode, "canary-returned-watch");
     assert.notEqual(requiredRun.status, 0, "watcher must fail closed with --require-found when no production canary exists");
     assert.equal(requiredReport.ok, false);
@@ -3120,7 +3139,7 @@ check("fresh returned canary inbox watcher passes", () => {
     for (const text of [defaultRun.stdout, watchRun.stdout, requiredRun.stdout]) {
       assert.doesNotMatch(text, secretPattern);
       assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
-      assert.doesNotMatch(text, /recallweave-openclaw-handoff-packet\.zip/);
+      assert.doesNotMatch(text, /random-memory-export|selfmem-bad-return|recallweave-openclaw-handoff-packet/);
     }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
@@ -3131,13 +3150,17 @@ check("fresh returned downloads scanner passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-returned-downloads-check-"));
   try {
     const handoffPacketPath = join(tempRoot, "recallweave-openclaw-handoff-packet.zip");
+    const unknownPacketPath = join(tempRoot, "random-memory-export.zip");
+    const badPacketPath = join(tempRoot, "selfmem-bad-return.zip");
     const outputPath = join(tempRoot, "returned-downloads.json");
     const findingsPath = join(tempRoot, "returned-downloads-findings.md");
+    writeFileSync(badPacketPath, "not a zip");
     run("node", [
       "packages/bench/canary-next-agent-packet.mjs",
       "--output",
       handoffPacketPath,
     ]);
+    writeUnknownZip(tempRoot, unknownPacketPath);
     const noDefaultsRun = run("node", [
       "packages/bench/canary-returned-downloads.mjs",
       "--skip-defaults",
@@ -3183,12 +3206,19 @@ check("fresh returned downloads scanner passes", () => {
     assert.equal(downloadsReport.defaultInboxScan, false);
     assert.equal(downloadsReport.metricsOnly, true);
     assert.equal(downloadsReport.counts.handoffPackets, 1);
+    assert.equal(downloadsReport.counts.unknownPackets, 1);
+    assert.equal(downloadsReport.counts.unreadablePackets, 1);
     assert.equal(downloadsReport.counts.productionEvidencePackets, 0);
+    assert.equal(downloadsReport.returnedWatch?.latestScans?.[0]?.triage?.unknown?.count, 1);
+    assert.equal(downloadsReport.returnedWatch?.latestScans?.[0]?.triage?.unreadable?.count, 1);
+    assert.match(downloadsReport.returnedWatch?.latestScans?.[0]?.triage?.unknown?.sampleIds?.[0] ?? "", /^zip-[a-f0-9]{12}$/);
     assert.equal(downloadsReport.publicLaunchAllowed, false);
     assert.equal(downloadsReport.fleetRolloutAllowed, false);
     assert.equal(outputReport.mode, "canary-returned-downloads");
     assert.match(findings, /Returned Downloads Findings/);
     assert.match(findings, /Production evidence packets: 0/);
+    assert.match(findings, /Safe Triage/);
+    assert.match(findings, /zip-[a-f0-9]{12}/);
     assert.notEqual(requiredRun.status, 0, "downloads scanner must fail closed with --require-found when no production canary exists");
     assert.equal(requiredReport.ok, false);
     assert.equal(requiredReport.requireFound, true);
@@ -3209,7 +3239,7 @@ check("fresh returned downloads scanner passes", () => {
     for (const text of [noDefaultsRun.stdout, downloadsRun.stdout, requiredRun.stdout, findings, evidence, JSON.stringify(currentScan), currentScanFindings]) {
       assert.doesNotMatch(text, secretPattern);
       assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
-      assert.doesNotMatch(text, /recallweave-openclaw-handoff-packet\.zip/);
+      assert.doesNotMatch(text, /random-memory-export|selfmem-bad-return|recallweave-openclaw-handoff-packet/);
     }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
@@ -5488,6 +5518,19 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
   return result;
+}
+
+function writeUnknownZip(tempRoot, outputPath) {
+  writeFileSync(join(tempRoot, "plain-export.txt"), "plain diagnostic export, not a returned canary packet\n", {
+    encoding: "utf8",
+    mode: 0o600,
+  });
+  const result = spawnSync("zip", ["-q", "-X", outputPath, "plain-export.txt"], {
+    cwd: tempRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `zip failed\n${result.stderr}\n${result.stdout}`);
 }
 
 function currentCanaryPacketIdentity(text) {

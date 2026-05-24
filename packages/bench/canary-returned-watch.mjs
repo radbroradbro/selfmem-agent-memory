@@ -119,6 +119,7 @@ function runInboxScan(inputRoot, iteration) {
       unreadablePackets: numberValue(report.counts?.unreadablePackets),
       unknownPackets: numberValue(report.counts?.unknownPackets),
       labelMode: report.input?.broadFolderLabelsRedacted === false ? "exposed" : "hash-redacted",
+      triage: normalizeTriage(report.triage),
     };
   } catch (error) {
     return {
@@ -136,6 +137,7 @@ function runInboxScan(inputRoot, iteration) {
       unreadablePackets: 0,
       unknownPackets: 0,
       labelMode: "hash-redacted",
+      triage: normalizeTriage(null),
       error: sanitizeForOutput(error instanceof Error ? error.message : String(error)),
     };
   }
@@ -189,6 +191,36 @@ function sha256(value) {
 
 function numberValue(value) {
   return Number.isFinite(Number(value)) ? Number(value) : 0;
+}
+
+function normalizeTriage(triage) {
+  return {
+    labelMode: triage?.labelMode === "exposed" ? "exposed" : "hash-redacted",
+    metricsOnly: true,
+    unknown: normalizeTriageGroup(triage?.unknown),
+    unreadable: normalizeTriageGroup(triage?.unreadable),
+  };
+}
+
+function normalizeTriageGroup(group) {
+  return {
+    count: numberValue(group?.count),
+    statusCounts: sanitizeCountMap(group?.statusCounts),
+    failedCheckCounts: sanitizeCountMap(group?.failedCheckCounts),
+    reasonCounts: sanitizeCountMap(group?.reasonCounts),
+    sampleIds: Array.isArray(group?.sampleIds)
+      ? group.sampleIds.slice(0, 5).map((item) => sanitizeForOutput(String(item)))
+      : [],
+  };
+}
+
+function sanitizeCountMap(value) {
+  const output = {};
+  if (!value || typeof value !== "object") return output;
+  for (const [key, count] of Object.entries(value)) {
+    output[sanitizeForOutput(key)] = numberValue(count);
+  }
+  return output;
 }
 
 function normalizedExpectedCommit(value) {

@@ -132,6 +132,8 @@ Verdict: resolved for PR body and blocker issue writes.
     0 production evidence packets, 12 handoff packets, 8 diagnostics, 19
     unknown packets, and 5 unreadable packets. Updated at:
     2026-05-24T07:00:10Z.
+  - The PR body was refreshed again after adding hash-only triage summaries for
+    unknown and unreadable returned zips. Updated at: 2026-05-24T07:11:09Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

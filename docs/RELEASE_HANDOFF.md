@@ -115,7 +115,9 @@ The current standard-inbox scan is
 production evidence packets, 12 handoff packets, 8 diagnostic bundles, 19
 unknown packets, and 5 unreadable packets. That proves the current inbox has
 handoffs and diagnostics only. It does not close the real-container rollout
-blocker.
+blocker. The findings note now includes hash-only safe triage for unknown and
+unreadable zips, so maintainers can see whether the misses are malformed,
+diagnostic, or non-canary packets before exposing local filenames.
 
 To convert a returned packet into public-safe workspace notes, run:
 
@@ -733,15 +735,16 @@ For a mixed folder of agent replies, scan the inbox first. The scanner separates
 returned evidence packets from handoff packets, diagnostic bundles, unreadable
 zips, and unrelated files without exposing raw paths or memory text. Candidate
 file names are redacted by default for folder scans; use `--expose-labels` only
-for local operator-only review:
+for local operator-only review. Unknown and unreadable packets also get
+hash-only reason triage so reviewers can act without seeing private filenames:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --output /tmp/recallweave-returned-canary-inbox.json
 ```
 
 For repeated supervision, use the watcher. It keeps candidate filenames
-hash-redacted and exits successfully while waiting unless `--require-found` is
-set:
+hash-redacted, carries the same safe triage forward, and exits successfully
+while waiting unless `--require-found` is set:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --iterations 1 --output /tmp/recallweave-returned-canary-watch.json

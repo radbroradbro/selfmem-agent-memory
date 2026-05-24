@@ -43,11 +43,17 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <mixed-temp
   `HANDOFF_PACKET_NOT_RETURNED_EVIDENCE`.
 - Bad zips were classified as `UNREADABLE_ZIP`, but raw local paths were
   redacted from the failure reason.
+- Unknown and unreadable zips now include metrics-only triage:
+  - reason-count summaries
+  - failed-check summaries
+  - hash-only sample ids such as `zip-<sha12>`
+  - no raw filenames or local paths
 - Output preserved `publicLaunchAllowed: false` and `fleetRolloutAllowed:
   false`.
 - `canary:returned-watch` wraps the inbox scanner for repeated supervision. It
-  reports aggregate counts per watched folder, keeps labels hash-redacted, and
-  fails closed with `--require-found` when no production canary packet exists.
+  reports aggregate counts and safe triage per watched folder, keeps labels
+  hash-redacted, and fails closed with `--require-found` when no production
+  canary packet exists.
 - Controller follow-up on the current local incoming folders found no returned
   production canary packet. One broad folder contained handoff packets only;
   the Telegram download folder contained no returned canary evidence. Candidate

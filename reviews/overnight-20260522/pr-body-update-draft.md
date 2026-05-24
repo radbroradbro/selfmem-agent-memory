@@ -160,6 +160,7 @@ Live status:
   note into the next-agent workspace.
 - Refreshes the current standard-inbox scan: 0 production evidence packets, 12
   handoff packets, 8 diagnostics, 19 unknown packets, and 5 unreadable packets.
+  The findings now include hash-only triage for unknown and unreadable zips.
   Public launch and real-container rollout remain blocked.
 - Hardens the canary batch-audit and next-agent packet paths so empty,
   handoff-only, or no-candidate folders fail closed as metrics-only JSON,

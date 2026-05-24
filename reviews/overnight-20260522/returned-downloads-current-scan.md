@@ -24,6 +24,13 @@ This note is metrics-only. It records the standard inbox scan without raw memori
 | Downloads | HANDOFF_PACKETS_ONLY | 30 | 30 | 0 | 12 | 4 | 9 | 5 |
 | Telegram Desktop | NO_RETURNED_CANARY_EVIDENCE | 14 | 14 | 0 | 0 | 4 | 10 | 0 |
 
+## Safe Triage
+
+| Inbox | Unknown reasons | Unreadable reasons | Sample hash labels |
+|---|---|---|---|
+| Downloads | zip does not contain the returned canary evidence packet contract: 9 | zip entry failed public-safety path scan: 5 | zip-1869e3224be4, zip-4d6b788b5ccf, zip-ae02256bbba1, zip-3616fe224f2b, zip-0d89d11c6128, zip-21bdd26b49f9 |
+| Telegram Desktop | zip does not contain the returned canary evidence packet contract: 10 | none | zip-a4d3fa80d0e4, zip-d120c87d7c2c, zip-fa7497ed4263, zip-f0e9fcbb747f, zip-ffc8b5d8b8c4 |
+
 ## Next Actions
 
 - Keep waiting for a returned metrics-only production canary evidence packet.

@@ -108,15 +108,17 @@ Date: 2026-05-23
   adapter/report commit `3d61677`.
 - PR #5 was refreshed again after the standard inbox scan was rerun and still
   found 0 production evidence packets, now with 12 handoff packets present.
+- PR #5 was refreshed again after adding hash-only triage summaries for
+  unknown and unreadable returned zips.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T07:00:10Z
+- PR body refreshed at: 2026-05-24T07:11:09Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
 - Issue updated at: 2026-05-24T06:51:08Z
-- PR body hash: 86d7aa5c8279087dfb7ae20ce98ee7de4865b6be2b4f775d481cf0d79f1625ca
+- PR body hash: 71eb6a5f649e01ec17494875ce0be7213d3b03c336eb701791fbe67b8d810282
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 306ab225ccd48e51996245d4440bdcc744d7a3dc9c26b0e0b47ef0b8aef294a8
-- PR body length: 49295
+- PR body length: 49372
 - Issue body length: 29750
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

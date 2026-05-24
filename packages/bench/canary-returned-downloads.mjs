@@ -105,6 +105,7 @@ const output = {
           unreadablePackets: scan.unreadablePackets,
           unknownPackets: scan.unknownPackets,
           labelMode: scan.labelMode,
+          triage: scan.triage,
         })),
       }
     : null,
@@ -245,6 +246,20 @@ function toMarkdown(report) {
       ? "| none | NO_DEFAULT_INBOXES | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
       : null,
     "",
+    "## Safe Triage",
+    "",
+    "| Inbox | Unknown reasons | Unreadable reasons | Sample hash labels |",
+    "|---|---|---|---|",
+    ...latestScans.map((scan) =>
+      [
+        `| ${scan.rootLabel}`,
+        formatReasonCounts(scan.triage?.unknown?.reasonCounts),
+        formatReasonCounts(scan.triage?.unreadable?.reasonCounts),
+        `${formatSampleIds(scan.triage)} |`,
+      ].join(" | "),
+    ),
+    latestScans.length === 0 ? "| none | none | none | none |" : null,
+    "",
     "## Next Actions",
     "",
     ...nextActions.map((item) => `- ${item}`),
@@ -258,6 +273,23 @@ function toMarkdown(report) {
     "",
   ];
   return `${lines.filter((line) => line !== null).join("\n")}\n`;
+}
+
+function formatReasonCounts(counts) {
+  const entries = Object.entries(counts ?? {});
+  if (entries.length === 0) return "none";
+  return entries
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([label, count]) => `${label}: ${count}`)
+    .join("; ");
+}
+
+function formatSampleIds(triage) {
+  const ids = [
+    ...(triage?.unknown?.sampleIds ?? []),
+    ...(triage?.unreadable?.sampleIds ?? []),
+  ];
+  return ids.length > 0 ? ids.slice(0, 6).join(", ") : "none";
 }
 
 function sha256(value) {

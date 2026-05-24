@@ -35,7 +35,13 @@ try {
   const handoffPackets = results.filter((candidate) => candidate.kind === "handoff-packet");
   const diagnosticBundles = results.filter((candidate) => candidate.kind === "diagnostic-bundle");
   const unreadablePackets = results.filter((candidate) => candidate.kind === "unreadable-zip");
+  const unknownPackets = results.filter((candidate) => candidate.kind === "unknown-zip");
   const fatalExplicitFailures = results.filter((candidate) => candidate.explicit && !candidate.ok);
+  const triage = buildTriage({
+    unknownPackets,
+    unreadablePackets,
+    labelMode: exposeLabels ? "exposed" : "hash-redacted",
+  });
   const ok = fatalExplicitFailures.length === 0 && (!requireProductionCanary || productionEvidencePackets.length > 0);
   const status = productionEvidencePackets.length > 0
     ? "PRODUCTION_CANARY_EVIDENCE_FOUND"
@@ -74,9 +80,10 @@ try {
       handoffPackets: handoffPackets.length,
       diagnosticBundles: diagnosticBundles.length,
       unreadablePackets: unreadablePackets.length,
-      unknownPackets: results.filter((candidate) => candidate.kind === "unknown-zip").length,
+      unknownPackets: unknownPackets.length,
       fatalExplicitFailures: fatalExplicitFailures.length,
     },
+    triage,
     candidates: results.map(publicCandidate),
     productionEvidencePackets: productionEvidencePackets.map((candidate) => ({
       pathLabel: candidate.pathLabel,
@@ -298,6 +305,40 @@ function publicCandidate(candidate) {
     safeEntries: candidate.safeEntries,
     review: candidate.review,
   };
+}
+
+function buildTriage({ unknownPackets, unreadablePackets, labelMode }) {
+  return {
+    labelMode,
+    metricsOnly: true,
+    unknown: summarizeTriageGroup(unknownPackets),
+    unreadable: summarizeTriageGroup(unreadablePackets),
+  };
+}
+
+function summarizeTriageGroup(items) {
+  return {
+    count: items.length,
+    statusCounts: countBy(items.map((item) => item.status)),
+    failedCheckCounts: countBy(items.flatMap((item) => item.review?.failedChecks ?? [])),
+    reasonCounts: countBy(items.map((item) => item.review?.strictFailureReason ?? item.status)),
+    sampleIds: [...new Set(items.map((item) => `zip-${item.sha256.slice(0, 12)}`))].slice(0, 5),
+  };
+}
+
+function countBy(values) {
+  const counts = {};
+  for (const value of values) {
+    const key = normalizeReason(String(value || "unknown"));
+    counts[key] = (counts[key] ?? 0) + 1;
+  }
+  return counts;
+}
+
+function normalizeReason(value) {
+  const sanitized = sanitizeForOutput(value);
+  if (/zip entries contains a raw local path/i.test(sanitized)) return "zip entry failed public-safety path scan";
+  return sanitized;
 }
 
 function listZip(zipPath) {

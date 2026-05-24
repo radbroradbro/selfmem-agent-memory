@@ -56,7 +56,48 @@
         "diagnosticBundles": 4,
         "unreadablePackets": 5,
         "unknownPackets": 9,
-        "labelMode": "hash-redacted"
+        "labelMode": "hash-redacted",
+        "triage": {
+          "labelMode": "hash-redacted",
+          "metricsOnly": true,
+          "unknown": {
+            "count": 9,
+            "statusCounts": {
+              "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 9
+            },
+            "failedCheckCounts": {
+              "not-canary-evidence-packet": 9
+            },
+            "reasonCounts": {
+              "zip does not contain the returned canary evidence packet contract": 9
+            },
+            "sampleIds": [
+              "zip-1869e3224be4",
+              "zip-4d6b788b5ccf",
+              "zip-ae02256bbba1",
+              "zip-3616fe224f2b",
+              "zip-0d89d11c6128"
+            ]
+          },
+          "unreadable": {
+            "count": 5,
+            "statusCounts": {
+              "UNREADABLE_ZIP": 5
+            },
+            "failedCheckCounts": {
+              "unreadable-zip": 5
+            },
+            "reasonCounts": {
+              "zip entry failed public-safety path scan": 5
+            },
+            "sampleIds": [
+              "zip-21bdd26b49f9",
+              "zip-35dadada12ac",
+              "zip-06baf2421f10",
+              "zip-16352c5c2ef9"
+            ]
+          }
+        }
       },
       {
         "rootLabel": "Telegram Desktop",
@@ -69,7 +110,37 @@
         "diagnosticBundles": 4,
         "unreadablePackets": 0,
         "unknownPackets": 10,
-        "labelMode": "hash-redacted"
+        "labelMode": "hash-redacted",
+        "triage": {
+          "labelMode": "hash-redacted",
+          "metricsOnly": true,
+          "unknown": {
+            "count": 10,
+            "statusCounts": {
+              "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 10
+            },
+            "failedCheckCounts": {
+              "not-canary-evidence-packet": 10
+            },
+            "reasonCounts": {
+              "zip does not contain the returned canary evidence packet contract": 10
+            },
+            "sampleIds": [
+              "zip-a4d3fa80d0e4",
+              "zip-d120c87d7c2c",
+              "zip-fa7497ed4263",
+              "zip-f0e9fcbb747f",
+              "zip-ffc8b5d8b8c4"
+            ]
+          },
+          "unreadable": {
+            "count": 0,
+            "statusCounts": {},
+            "failedCheckCounts": {},
+            "reasonCounts": {},
+            "sampleIds": []
+          }
+        }
       }
     ]
   },
