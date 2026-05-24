@@ -89,17 +89,17 @@ Date: 2026-05-23
 - GitHub Actions run `26346952139` passed on `9a11452` after the
   LongMemEval-S run-only target and sync evidence refresh.
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
-  `26351686870` passed on `e3a49a9`, the release-state baseline was promoted,
+  `26351957568` passed on `8aa9826`, the release-state baseline was promoted,
   and the current OpenClaw one-agent handoff packet was regenerated with an
   expected adapter commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T04:26:45Z
+- PR body refreshed at: 2026-05-24T04:39:03Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T04:26:44Z
-- PR body hash: fe223c045a42eb58deb071f8980d4784a296ee64474998958efa66132a65a07c
+- Issue updated at: 2026-05-24T04:39:04Z
+- PR body hash: 82c370277d154ebd8d206dc4b400542936d040ab9b5c7ce10c4520103e8ce6d3
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: a0751d87cdcde9dddf7ea2a2ee1c34925ef91b5ed824ef327d49913d9061777e
+- Issue body hash: 15f569bfaa268d7afcd366879d5cc3f2e6a4afd51ac15c7c90684787bc3d3a9e
 - PR body length: 48176
 - Issue body length: 28866
 

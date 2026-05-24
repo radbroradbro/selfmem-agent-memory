@@ -10,8 +10,8 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
-- `e3a49a940ddc313232c21e267cb680ec50206738`.
-- GitHub Actions run `26351686870` passed CI after requiring a same-data
+- `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
+- GitHub Actions run `26351957568` passed CI after requiring a same-data
   benchmark comparator matrix and binding returned canary evidence to the
   approved adapter commit. The checked-in evidence keeps solo RecallWeave runs
   as smoke only, keeps BM25 as a control rather than the target product system,
@@ -450,10 +450,10 @@ requirements are resolved.
   latency evidence. The next canary must use a fresh patched runtime window,
   follow `canary:drill`, and pass strict intake.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260524-e3a49a9.zip`, SHA256
-  `18eef266c90e5346183082a8bd3794d88081f8b1e7fa03e40ae756031f89baa0`.
+  `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`, SHA256
+  `4932b02b6acfc7742f0b0dfa854837f0de2eceeb1499abae348048e93acfdb8c`.
   Returned canary reports must name commit
-  `e3a49a940ddc313232c21e267cb680ec50206738`.
+  `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
   It was regenerated from the postwatch batch report with
   `--batch ... --require-ready`. The underlying batch used
   `--allow-failed-inputs`, so one bad sibling archive does not block the

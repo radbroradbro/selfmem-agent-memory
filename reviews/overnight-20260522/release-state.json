@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T04:24:00Z",
+  "generatedAt": "2026-05-24T04:36:30Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "e3a49a940ddc313232c21e267cb680ec50206738",
-    "ciRunId": 26351686870,
+    "headSha": "8aa98265e84db5a1e2dda2b66d16065c7be30902",
+    "ciRunId": 26351957568,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_commit_bound_canary_evidence_public_benchmark_guards_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after requiring benchmark comparator matrices and binding one-agent canary evidence to the approved adapter commit. Current evidence keeps bm25-lite as a control rather than the target product system, blocks public benchmark claims until same-data public benchmark/provider-backed comparisons pass, requires returned canary packets to match the expected adapter commit, reports zero privacy failures, and keeps public launch blocked until owner approval and one real strict production canary. Local release:check, CI-mode release:check, release:github-sync, diff check, goal:audit, and GitHub Actions run 26351686870 passed."
+    "note": "Latest inspected code/product baseline after requiring benchmark comparator matrices and binding one-agent canary evidence to the approved adapter commit. Current evidence keeps bm25-lite as a control rather than the target product system, blocks public benchmark claims until same-data public benchmark/provider-backed comparisons pass, requires returned canary packets to match the expected adapter commit, reports zero privacy failures, and keeps public launch blocked until owner approval and one real strict production canary. Local release:check, CI-mode release:check, release:github-sync, diff check, goal:audit, and GitHub Actions run 26351957568 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
