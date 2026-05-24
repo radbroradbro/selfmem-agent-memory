@@ -1,0 +1,83 @@
+{
+  "ok": true,
+  "mode": "canary-returned-downloads",
+  "defaultInboxScan": true,
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicLaunchAllowed": false,
+  "fleetRolloutAllowed": false,
+  "requireFound": false,
+  "includeAllZips": true,
+  "discoveredRootCount": 2,
+  "rootLabels": [
+    "Downloads",
+    "Telegram Desktop"
+  ],
+  "rootLabelsHash": "ac42f650efe3265a41787e37ffbc0041327361fbcd401e445b8c4ed18b589bc7",
+  "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
+  "counts": {
+    "scanCount": 2,
+    "rootsWithProductionEvidence": 0,
+    "productionEvidencePackets": 0,
+    "returnedEvidencePackets": 0,
+    "handoffPackets": 8,
+    "diagnosticBundles": 8,
+    "unknownPackets": 19,
+    "unreadablePackets": 5
+  },
+  "returnedWatch": {
+    "ok": true,
+    "mode": "canary-returned-watch",
+    "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
+    "writesRealFiles": false,
+    "metricsOnly": true,
+    "publicLaunchAllowed": false,
+    "fleetRolloutAllowed": false,
+    "iterationsCompleted": 1,
+    "counts": {
+      "scanCount": 2,
+      "rootsWithProductionEvidence": 0,
+      "productionEvidencePackets": 0,
+      "returnedEvidencePackets": 0,
+      "handoffPackets": 8,
+      "diagnosticBundles": 8,
+      "unknownPackets": 19,
+      "unreadablePackets": 5
+    },
+    "latestScans": [
+      {
+        "rootLabel": "Downloads",
+        "status": "HANDOFF_PACKETS_ONLY",
+        "candidateCount": 26,
+        "scannedZipCount": 26,
+        "returnedEvidencePackets": 0,
+        "productionEvidencePackets": 0,
+        "handoffPackets": 8,
+        "diagnosticBundles": 4,
+        "unreadablePackets": 5,
+        "unknownPackets": 9,
+        "labelMode": "hash-redacted"
+      },
+      {
+        "rootLabel": "Telegram Desktop",
+        "status": "NO_RETURNED_CANARY_EVIDENCE",
+        "candidateCount": 14,
+        "scannedZipCount": 14,
+        "returnedEvidencePackets": 0,
+        "productionEvidencePackets": 0,
+        "handoffPackets": 0,
+        "diagnosticBundles": 4,
+        "unreadablePackets": 0,
+        "unknownPackets": 10,
+        "labelMode": "hash-redacted"
+      }
+    ]
+  },
+  "childExitStatus": 0,
+  "parseError": null,
+  "nextActions": [
+    "Keep waiting for a returned metrics-only production canary evidence packet.",
+    "Do not count handoff packets, diagnostic bundles, or unknown zips as production canary evidence.",
+    "Run canary:returned-inbox with --expose-labels only for local operator-only file location."
+  ]
+}

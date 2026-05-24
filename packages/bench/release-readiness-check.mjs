@@ -109,6 +109,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-hybrid-gate.json`,
   `${reviewDir}/public-longmemeval-hybrid-gate-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-hybrid-gate-review.md`,
+  `${reviewDir}/returned-downloads-current-scan.json`,
+  `${reviewDir}/returned-downloads-current-scan.md`,
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-autoresearch-loop-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-autoresearch-loop-review.md`,
@@ -2836,6 +2838,8 @@ check("fresh returned downloads scanner passes", () => {
     const requiredReport = JSON.parse(requiredRun.stdout);
     const findings = readFileSync(findingsPath, "utf8");
     const evidence = readFileSync(join(root, reviewDir, "canary-returned-downloads-evidence.md"), "utf8");
+    const currentScan = JSON.parse(readFileSync(join(root, reviewDir, "returned-downloads-current-scan.json"), "utf8"));
+    const currentScanFindings = readFileSync(join(root, reviewDir, "returned-downloads-current-scan.md"), "utf8");
 
     assert.equal(noDefaultsReport.mode, "canary-returned-downloads");
     assert.equal(noDefaultsReport.status, "NO_DEFAULT_INBOXES");
@@ -2858,7 +2862,18 @@ check("fresh returned downloads scanner passes", () => {
     assert.match(evidence, /canary:returned-downloads/i);
     assert.match(evidence, /Downloads/);
     assert.match(evidence, /markdown findings/i);
-    for (const text of [noDefaultsRun.stdout, downloadsRun.stdout, requiredRun.stdout, findings, evidence]) {
+    assert.equal(currentScan.mode, "canary-returned-downloads");
+    assert.equal(currentScan.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+    assert.equal(currentScan.metricsOnly, true);
+    assert.equal(currentScan.publicLaunchAllowed, false);
+    assert.equal(currentScan.fleetRolloutAllowed, false);
+    assert.equal(currentScan.counts?.productionEvidencePackets, 0);
+    assert.ok(Number(currentScan.counts?.handoffPackets ?? 0) >= 1);
+    assert.ok(Number(currentScan.counts?.diagnosticBundles ?? 0) >= 1);
+    assert.match(currentScanFindings, /Returned Downloads Findings/);
+    assert.match(currentScanFindings, /Production evidence packets: 0/);
+    assert.match(currentScanFindings, /No production canary evidence was found/);
+    for (const text of [noDefaultsRun.stdout, downloadsRun.stdout, requiredRun.stdout, findings, evidence, JSON.stringify(currentScan), currentScanFindings]) {
       assert.doesNotMatch(text, secretPattern);
       assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
       assert.doesNotMatch(text, /recallweave-openclaw-handoff-packet\.zip/);

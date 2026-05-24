@@ -450,6 +450,7 @@ const requirements = [
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [
     `${reviewDir}/brain-ui-canary-rollout-evidence.md`,
     files.realCanaryDiagnosticEvidence,
+    `${reviewDir}/returned-downloads-current-scan.md`,
     "docs/RELEASE_HANDOFF.md",
   ]),
 ];

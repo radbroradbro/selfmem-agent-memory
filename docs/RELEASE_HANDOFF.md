@@ -97,6 +97,13 @@ The current handoff packet remains:
 The returned packet must pass `canary:returned-packet` with
 `--require-production-canary` before the real rollout blocker can close.
 
+The current standard-inbox scan is
+`reviews/overnight-20260522/returned-downloads-current-scan.md`. It found 0
+production evidence packets, 8 handoff packets, 8 diagnostic bundles, 19
+unknown packets, and 5 unreadable packets. That proves the current inbox has
+handoffs and diagnostics only. It does not close the real-container rollout
+blocker.
+
 To convert a returned packet into public-safe workspace notes, run:
 
 ```bash
