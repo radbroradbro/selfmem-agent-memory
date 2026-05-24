@@ -92,7 +92,7 @@ The current handoff packet remains:
 
 - `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`
 - SHA-256:
-  `4932b02b6acfc7742f0b0dfa854837f0de2eceeb1499abae348048e93acfdb8c`
+  `b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5`
 - Expected returned report commit:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`
 
@@ -685,14 +685,14 @@ When sending the handoff to another agent, prefer one packet over loose pasted
 commands:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --output /tmp/recallweave-next-agent-handoff.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --expected-commit <approved-commit> --output /tmp/recallweave-next-agent-handoff.zip
 ```
 
 For a live handoff, require the planner to prove the packet is not fixture/demo
 evidence:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --output /tmp/recallweave-next-agent-handoff.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --expected-commit <approved-commit> --output /tmp/recallweave-next-agent-handoff.zip
 ```
 
 The packet contains only README, manifest, next-agent plan JSON/Markdown,

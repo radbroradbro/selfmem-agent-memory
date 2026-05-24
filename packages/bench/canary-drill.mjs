@@ -17,7 +17,7 @@ const canaryReport = "/tmp/recallweave-canary-report.json";
 const intakeReport = "/tmp/recallweave-canary-intake.json";
 const diagnosisReport = "/tmp/recallweave-canary-diagnosis.json";
 const evidencePacket = "/tmp/recallweave-canary-evidence-packet.zip";
-const expectedCommit = "<approved-commit>";
+const expectedCommit = normalizedExpectedCommit(args.expectedCommit) || "<approved-commit>";
 
 const drill = {
   ok: true,
@@ -209,6 +209,13 @@ function parseArgs(argv) {
 
 function toCamel(value) {
   return value.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+function normalizedExpectedCommit(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  assert.match(text, /^[a-f0-9]{7,40}$/i, "--expected-commit must be a git SHA prefix or full SHA");
+  return text;
 }
 
 function resolvePath(value) {

@@ -293,7 +293,7 @@ To send the work to one live operator, build a packet and require live-ready
 evidence:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to/redacted-diagnostics --allow-failed-inputs --require-ready --output /tmp/recallweave-next-agent-handoff.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root /path/to/redacted-diagnostics --allow-failed-inputs --require-ready --expected-commit <approved-commit> --output /tmp/recallweave-next-agent-handoff.zip
 ```
 
 The packet stays metrics-only. It includes a fresh-window contract, return

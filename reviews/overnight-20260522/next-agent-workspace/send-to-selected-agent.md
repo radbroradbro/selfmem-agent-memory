@@ -18,7 +18,7 @@ Purpose:
 
 Use the current handoff packet:
 - recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip
-- SHA-256: 4932b02b6acfc7742f0b0dfa854837f0de2eceeb1499abae348048e93acfdb8c
+- SHA-256: b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5
 - Expected report commit: 8aa98265e84db5a1e2dda2b66d16065c7be30902
 
 Important naming note:
@@ -43,7 +43,7 @@ Run flow:
 
 5. Collect strict-real evidence from the fresh window.
 
-   bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+   bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 8aa98265e84db5a1e2dda2b66d16065c7be30902 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 
 6. Return only:
 

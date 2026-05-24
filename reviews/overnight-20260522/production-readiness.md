@@ -4,62 +4,57 @@ Date: 2026-05-24
 
 Verdict: FAIL
 
-RecallWeave is not ready for a public live update. The current PR branch has
-strong alpha evidence for the LLM-wiki/Nucleus/Brain UI direction, and the new
-LongMemEval-S autoresearch lane is useful methodology work, but this gate still
-does not have enough current proof to authorize a production launch.
+RecallWeave is not ready for a public live update. The current PR candidate has
+strong public-alpha evidence for the LLM-wiki, Nucleus Index, Brain UI,
+canary, hosted-baseline, and public-benchmark directions, but this gate still
+lacks current proof for launch-critical checks.
 
 ## Current Trail
 
 - Public repo: <https://github.com/radbroradbro/selfmem-agent-memory>
-- PR: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
-- PR state verified through the GitHub connector on 2026-05-24: open, not
-  draft, mergeable.
-- PR base: `main` at `f4981733a39cf9f09f3f87cac04e9b76a896e38b`.
-- Current inspected branch: `automation/recallweave-post12h-launch-review-20260524-tmp`.
-- Current inspected HEAD: `e7fa56a13bb761c916e15388af50351ba380323e`.
-- Blocker issue verified through the GitHub connector on 2026-05-24:
-  <https://github.com/radbroradbro/selfmem-agent-memory/issues/6>, open.
-- CI run for `e7fa56a13bb761c916e15388af50351ba380323e`:
-  `26349083689`, passed on the PR branch.
+- Active PR trail: <https://github.com/radbroradbro/selfmem-agent-memory/pull/5>
+- Active blocker issue trail:
+  <https://github.com/radbroradbro/selfmem-agent-memory/issues/6>
+- Current inspected branch:
+  `automation/recallweave-post12h-launch-review-20260524-ce38`
+- Current inspected HEAD: `2bd4bc986289cdade812c6264b7dd82950682849`
+- Current gate time: `2026-05-24T05:00:47Z`
+
+Shell GitHub verification could not refresh PR or issue state in this sandbox
+because `api.github.com` DNS resolution failed. Existing checked-in GitHub
+sync evidence remains historical evidence, not a fresh live confirmation for
+this gate.
 
 ## What Actually Shipped Or Was Proposed
 
-The current PR branch proposes the RecallWeave alpha surface, not a completed
-production launch:
+The current PR candidate proposes a fixture-first RecallWeave alpha surface,
+not a completed production rollout:
 
 - Nucleus Index contracts for sanitized memory, lifecycle, retrieval trace,
-  wiki, research lineage, decision, and evidence nodes.
-- LLM-wiki compile and sync flows with frontmatter, wikilinks, provenance,
-  linting, conflict handling, and content-free audit logs.
-- Fixture-first self-hosted Brain UI for search, graph/index navigation,
+  wiki, research lineage, decision, source, and evidence nodes.
+- LLM-wiki compile and sync flows with frontmatter, wikilinks, central index
+  and log pages, provenance, conflict handling, and content-free audit logs.
+- Fixture-first Brain UI coverage for search, graph/index navigation,
   provenance, lifecycle/retrieval trace inspection, derived-doc editing,
   selected vault sync dry-run, selected vault sync apply, selected
-  local-container browse, lifecycle policy, selected lifecycle policy apply,
-  memory review queue, selected review queue apply, selected local memory edit,
-  local edit overlays, release readiness, benchmark dashboard, and context
-  preview.
+  local-container browse, selected local memory edit and materialize,
+  lifecycle policy, selected lifecycle policy apply, memory review queue,
+  selected review queue apply, release readiness, benchmark dashboard, and
+  context preview.
 - Hosted-baseline and canary evidence gates that keep hosted Supermemory
   write-back off and keep private hosted/local inputs out of git.
-- Metrics-only hosted baseline, reviewer-intake, returned-packet, canary drill,
-  canary packet, returned-inbox/downloads/watch, and next-agent packet tooling.
-- Public benchmark scaffolding for source-locked LongMemEval-S and a
-  retrieval-proxy autoresearch lane.
+- Public benchmark scaffolding for source-locked LongMemEval-S and
+  retrieval-proxy autoresearch work. This remains methodology evidence only;
+  public benchmark claims are still blocked without owner-reviewed same-data
+  evidence and reviewer sign-off.
 
-The current preview surface names are: selected vault sync dry-run, selected vault sync apply, selected local-container browse, lifecycle policy, selected lifecycle policy apply, memory review queue, selected review queue apply, selected local memory edit, edit overlay browse, materialization, dynamic graph layout, graph navigation, compaction audit, benchmark dashboard, canary rollout, canary report generator, canary evidence intake, canary diagnose, operator packet, canary evidence packet, research source lock, model matrix, and context preview.
-
-The current operational evidence names are: release readiness, current-head live browser evidence, clean consumer smoke, release blocker doctor, hosted baseline preflight, hosted baseline collector, baseline compare, hosted baseline operator packet, baseline evidence packet, GitHub handoff packet, GitHub live sync, and goal completion audit.
-
-The latest inspected benchmark evidence promotes the LongMemEval-S autoresearch
-winner into the checked-in retrieval-proxy run. It reports
-`retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`,
-`publicBenchmarkClaimsAllowed: false`, 24 arms, and `bm25-lite-b800-k5` as the
-current canary setting. This is methodology evidence only, not public
-superiority language.
+Current preview surface names include: selected vault sync dry-run, selected vault sync apply, selected local-container browse, lifecycle policy, selected lifecycle policy apply, memory review queue, and selected review queue apply.
+Full preview/check surface inventory includes: selected vault sync dry-run, selected vault sync apply, selected local-container browse, lifecycle policy, selected lifecycle policy apply, memory review queue, selected review queue apply, selected local memory edit, edit overlay browse, local memory materialize, dynamic graph layout, graph navigation, compaction audit, benchmark dashboard, canary rollout, canary report generator, canary evidence intake, canary diagnose, operator packet, canary evidence packet, research source lock, model matrix, context preview, release readiness, and current-head live browser evidence.
+Operational evidence surfaces include: clean consumer smoke, release blocker doctor, hosted baseline preflight, hosted baseline collector, baseline compare, hosted baseline operator packet, baseline evidence packet, GitHub handoff packet, GitHub live sync, and goal completion audit.
 
 ## Checks Run In This Gate
 
-Passed locally:
+Passed in this sandbox:
 
 - `npm run build`
 - `npm run test`: 6 test files, 22 tests
@@ -67,87 +62,94 @@ Passed locally:
 - `npm run privacy:test`: 5 tests
 - `npm run smoke:openclaw`: `privacyLeakCount: 0`
 - `npm run smoke:hermes`: `privacyLeakCount: 0`
-- `node packages/brain-ui/static-evidence.mjs`: 9 nodes, 9 edges,
-  `privacyLeakCount: 0`, release verdict `FAIL`
-- `node packages/bench/hosted-baseline-preflight.mjs`: no hosted provider call,
-  hosted write-back disabled, claims blocked
-- `node packages/bench/goal-completion-audit.mjs`: `goalComplete: false`;
-  human approval and real-container rollout remain unresolved
-- `npm exec --yes pnpm@10.23.0 -- release:check`: passed, including fresh
-  Brain UI smoke, fresh Brain UI interaction smoke, clean consumer smoke,
-  release blocker doctor, GitHub live sync, goal completion audit, secret scan,
-  and public-doc private-path scan
-- `npm exec --yes pnpm@10.23.0 -- release:github-sync`: passed; live PR and
-  issue text match the checked-in public-safe drafts by hash
+- `npm run brain:evidence:static`: fixture graph has 9 nodes, 9 edges,
+  expected Nucleus/wiki/provenance/lifecycle/retrieval/edit controls,
+  `hostedWriteBackEnabled: false`, `privacyLeakCount: 0`, and
+  `productionReady: false`
+- `npm run goal:audit`: `goalComplete: false`,
+  `mayCallUpdateGoalComplete: false`, 36 proven requirements, 1 blocked
+  requirement, and 1 incomplete requirement
+- `npm pack --dry-run` from `packages/core`: passed and produced
+  `recallweave-core-0.1.0-alpha.0.tgz`
 - `git diff --check`
-- Secret-pattern scan across the worktree, excluding dependencies/generated
-  artifacts: zero hits
-- `npm pack --dry-run` from `packages/core`: passed with a writable temporary
-  npm cache
+- The passing portions of `npm run release:check`: required files/scripts,
+  release docs, conservative release state, public benchmark source locks,
+  local session audit, batch audit, static Brain UI evidence, local container
+  audit smoke, adapter store-latency instrumentation, canary report/intake/
+  drill/packet/returned-packet gates, hosted-baseline preflight, GitHub handoff
+  packet, goal audit, remote-token check, core dry-run pack, forbidden runtime
+  file scan, secret scan, and public docs/evidence private-path scan.
 
-Blocked or unresolved locally:
+Blocked or failed in this sandbox:
 
-- Claude reviewer: blocked, `Not logged in`.
-- Gemini reviewer: blocked, requested browser authentication and timed out
-  without producing a review.
-- No strict-real production canary packet was accepted.
-- No owner approval was recorded for merge, visibility change, release note, or
-  public live update.
+- `npm_config_cache=/tmp/npm-cache npm exec --yes pnpm@10.23.0 -- install
+  --frozen-lockfile --offline`: failed because `registry.npmjs.org` DNS
+  resolution failed before pnpm could be fetched.
+- `npm run brain:smoke:built`: failed with `listen EPERM` on `127.0.0.1`.
+- `npm run brain:interaction:built`: failed with `listen EPERM` on
+  `127.0.0.1`.
+- `npm run release:check`: failed because fresh Brain UI smoke, fresh Brain UI
+  interaction smoke, clean consumer smoke, release blocker doctor, and GitHub
+  live sync could not pass in this environment.
+- `npm run release:github-sync`: failed because `api.github.com` DNS
+  resolution failed.
+- Browser file navigation to the Brain UI was rejected by Browser Use URL
+  policy, so this run captured no fresh browser screenshot or recording.
+- Claude reviewer route: blocked, `Not logged in`.
+- Gemini reviewer route: blocked at browser authentication prompt and produced
+  no review.
 
 ## Browser And UI Evidence
 
-Fresh UI evidence is clean and useful, but it is not enough for a public live
-update:
+Current UI evidence is useful but not launch-grade:
 
-- Static evidence proves the fixture Nucleus graph, graph/timeline/provenance
-  sections, lifecycle trail, benchmark dashboard, canary rollout, context
-  preview, release readiness, wiki vault, local edit, local materialize, and
-  selected audit renderers are present.
-- The static evidence reports no privacy leaks and keeps hosted write-back off.
-- Fresh Brain UI smoke and interaction smoke passed through the release gate.
-- Existing screenshot evidence under
-  `reviews/overnight-20260522/ui-evidence/` remains sanitized fixture evidence,
-  not proof of a current live production surface.
+- Static Brain UI evidence passed and remained fixture-only.
+- Existing screenshot evidence under the checked-in UI evidence packet remains
+  sanitized fixture evidence from prior runs.
+- This run could not produce fresh localhost/browser evidence because the
+  sandbox could not bind `127.0.0.1` and Browser Use rejected direct file
+  navigation.
 
 ## Readiness Grades
 
-- Security/privacy: PASS WITH CONCERNS. Local scans found zero secret-pattern
-  hits, public docs have zero private-path hits, and fixture evidence reports
-  zero privacy leaks.
-- Install/update ergonomics: PASS WITH CONCERNS. Local build/test/package dry
-  run and clean consumer smoke passed.
+- Security/privacy: PASS WITH CONCERNS. Current scans and fixture evidence
+  report zero secret/private hits, but launch still needs fresh live sync and
+  real-canary proof.
+- Install/update ergonomics: FAIL FOR THIS GATE. Local build/package checks
+  pass, but dependency refresh and consumer smoke were not proven here.
 - Local-first memory correctness: PASS WITH CONCERNS. Fixture and metrics-only
-  gates are strong; a real-container rollout is still incomplete.
-- LLM-wiki integrity: PASS WITH CONCERNS. Nucleus/wiki contracts and smoke
-  evidence exist, but production rollout still needs a strict real-container
-  canary.
-- UI usefulness: PASS WITH CONCERNS. Static evidence plus fresh Brain UI smoke
-  and interaction smoke passed, but evidence remains fixture/sanitized rather
-  than production canary proof.
-- Docs clarity: PASS WITH CONCERNS. Public docs keep benchmark and launch
-  claims conservative.
-- Test coverage: PASS WITH CONCERNS. Unit, privacy, adapter, UI, consumer, and
-  release checks pass; strict-real canary coverage is still missing.
+  gates are strong; real-container rollout remains incomplete.
+- LLM-wiki integrity: PASS WITH CONCERNS. Contracts and fixture smoke evidence
+  exist; production rollout still needs strict real-container canary evidence.
+- UI usefulness: FAIL FOR THIS GATE. Static fixture evidence is good, but fresh
+  live localhost/browser evidence failed or was blocked.
+- Docs clarity: PASS WITH CONCERNS. Public docs keep claims conservative.
+- Test coverage: PASS WITH CONCERNS. Unit, privacy, adapter, fixture, canary,
+  baseline, and benchmark guard coverage is broad; live UI, live GitHub, and
+  strict-real canary coverage are still unresolved in this run.
 - Rollback safety: PASS WITH CONCERNS. Canary drill, packet, returned evidence,
-  and next-agent workflows exist, but the real-container production canary has
-  not passed.
+  and next-agent workflows exist; real-container production canary has not
+  passed.
 
 ## Residual Risks And Blockers
 
-- Human owner approval is still required before merge, visibility changes, or
-  public release language.
-- A real-container production canary remains incomplete.
-- External reviewer routes were blocked in this environment, so no fresh
-  Claude/Gemini approval was collected.
-- The LongMemEval-S autoresearch result is retrieval-proxy methodology
-  evidence only and must not be marketed as MemoryBench answer quality or broad
-  memory-system superiority.
+- Human owner approval is still required before merge, visibility change,
+  release note, or public live update.
+- A strict-real, non-fixture one-agent production canary packet is still
+  missing.
+- Fresh live Brain UI localhost smoke, interaction smoke, and browser evidence
+  did not pass in this environment.
+- Fresh live GitHub sync did not pass in this environment.
+- Fresh Claude/Gemini reviewer approval was not collected.
+- Public benchmark language must remain limited to retrieval-proxy,
+  fixture-safe, or owner-reviewed metrics-only evidence.
 
 ## Next Trail Item
 
-Keep PR #5 and issue #6 as the active public trail. The next unblocker is one
-strict real-container canary packet that passes returned-packet intake, plus
-owner approval for any merge, visibility change, release note, or public live
-update.
+Keep PR #5 and issue #6 as the active public trail. The next unblocker is a
+strict real-container canary packet that passes returned-packet intake, plus an
+environment that can run localhost Brain UI smoke and GitHub live sync, followed
+by owner approval for any merge, visibility change, release note, or public
+live update.
 
 This gate does not authorize public launch.

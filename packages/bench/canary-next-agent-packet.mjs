@@ -10,6 +10,7 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const outputPath = args.output ? resolvePath(args.output) : join(tmpdir(), "recallweave-next-agent-handoff-packet.zip");
 const requireReady = Boolean(args.requireReady);
+const sourceControl = readSourceControl(args.expectedCommit);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -36,9 +37,8 @@ if (blockedPlan) {
   process.stdout.write(serialized);
   process.exit(1);
 }
-const operatorMarkdown = runNode("packages/bench/canary-operator-packet.mjs", ["--host", host, "--format", "markdown"]).stdout;
-const drillMarkdown = runNode("packages/bench/canary-drill.mjs", ["--host", host, "--format", "markdown"]).stdout;
-const sourceControl = readSourceControl();
+const operatorMarkdown = runNode("packages/bench/canary-operator-packet.mjs", ["--host", host, "--format", "markdown", ...expectedCommitArgs()]).stdout;
+const drillMarkdown = runNode("packages/bench/canary-drill.mjs", ["--host", host, "--format", "markdown", ...expectedCommitArgs()]).stdout;
 
 const files = [
   {
@@ -110,15 +110,15 @@ const manifest = {
     requiresRollbackTested: true,
     windowStartVariable: "FRESH_WINDOW_START",
     collectCommandId: "collect-live-window",
-    expectedReportCommit: sourceControl.headSha,
+    expectedReportCommit: sourceControl.expectedReportCommit,
     returnedPacketIntakeCommand:
-      `npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary${sourceControl.headSha === "unknown" ? "" : ` --expected-commit ${sourceControl.headSha}`} --output /tmp/recallweave-returned-canary-intake.json`,
+      `npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary${sourceControl.expectedReportCommit === "unknown" ? "" : ` --expected-commit ${sourceControl.expectedReportCommit}`} --output /tmp/recallweave-returned-canary-intake.json`,
   },
   returnChecklist: [
     "apply the current adapter after recording FRESH_WINDOW_START",
-    sourceControl.headSha === "unknown"
+    sourceControl.expectedReportCommit === "unknown"
       ? "record the adapter commit shown by the runtime checkout before collection"
-      : `collect the returned report with commit ${sourceControl.headSha}`,
+      : `collect the returned report with commit ${sourceControl.expectedReportCommit}`,
     "follow strict-real-canary-drill.md during the fresh window",
     "run one mapped live agent for at least 15 minutes after the update",
     "collect strict-real evidence with --canary-since \"$FRESH_WINDOW_START\"",
@@ -209,6 +209,7 @@ try {
 }
 
 function buildReadme(packetManifest) {
+  const expectedReportCommit = packetManifest.sourceControl.expectedReportCommit;
   return [
     "# RecallWeave Next-Agent Handoff Packet",
     "",
@@ -219,7 +220,7 @@ function buildReadme(packetManifest) {
     `Host: ${packetManifest.host}.`,
     `Status: ${packetManifest.status}.`,
     `Scope: ${packetManifest.recommendedScope}.`,
-    `Expected canary report commit: ${packetManifest.sourceControl.headSha}.`,
+    `Expected canary report commit: ${expectedReportCommit}.`,
     "",
     "Read in this order:",
     "",
@@ -234,7 +235,7 @@ function buildReadme(packetManifest) {
     "",
     `- Minimum runtime after update: ${packetManifest.freshWindowContract.minimumMinutes} minutes.`,
     "- Evidence must be post-update, strict-real, non-fixture, rollback-tested, and metrics-only.",
-    `- The returned packet must report commit \`${packetManifest.sourceControl.headSha}\` unless the runtime proves a newer reviewed adapter commit.`,
+    `- The returned packet must report commit \`${expectedReportCommit}\` unless the runtime proves a newer reviewed adapter commit.`,
     `- Record the update timestamp in \`${packetManifest.freshWindowContract.windowStartVariable}\` before applying the adapter.`,
     `- Collect evidence with the \`${packetManifest.freshWindowContract.collectCommandId}\` command in \`next-agent-plan.md\`.`,
     "",
@@ -349,7 +350,14 @@ function plannerArgs() {
   if (args.allowFailedInputs) result.push("--allow-failed-inputs");
   if (args.candidateLabel) result.push("--candidate-label", args.candidateLabel);
   if (args.host) result.push("--host", args.host);
+  if (sourceControl.expectedReportCommit !== "unknown") result.push("--expected-commit", sourceControl.expectedReportCommit);
   return result;
+}
+
+function expectedCommitArgs() {
+  return sourceControl.expectedReportCommit === "unknown"
+    ? []
+    : ["--expected-commit", sourceControl.expectedReportCommit];
 }
 
 function runNode(script, scriptArgs, options = {}) {
@@ -364,14 +372,16 @@ function runNode(script, scriptArgs, options = {}) {
   return result;
 }
 
-function readSourceControl() {
+function readSourceControl(expectedCommitInput) {
   const head = runGit(["rev-parse", "HEAD"]) || "unknown";
   const branch = runGit(["branch", "--show-current"]) || "unknown";
+  const expectedReportCommit = normalizedExpectedCommit(expectedCommitInput) || head;
+  const headSha = normalizedExpectedCommit(expectedCommitInput) ? expectedReportCommit : head;
   return {
-    headSha: head,
+    headSha,
     branch,
-    expectedReportCommit: head,
-    commitRequiredForProductionCanary: head !== "unknown",
+    expectedReportCommit,
+    commitRequiredForProductionCanary: expectedReportCommit !== "unknown",
   };
 }
 
@@ -450,6 +460,13 @@ function resolvePath(value) {
 function normalizeHost(value) {
   const host = String(value ?? "").trim().toLowerCase();
   return ["hermes", "openclaw"].includes(host) ? host : "unknown";
+}
+
+function normalizedExpectedCommit(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  assert.match(text, /^[a-f0-9]{7,40}$/i, "--expected-commit must be a git SHA prefix or full SHA");
+  return text;
 }
 
 function numberValue(value) {

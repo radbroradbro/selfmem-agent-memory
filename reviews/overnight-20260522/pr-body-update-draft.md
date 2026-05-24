@@ -551,7 +551,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- canary:batch-audit`: passed on the fixture batch, failed closed with `--require-real-pass`, supported explicit mixed-folder `--allow-failed-inputs` triage, and triaged the available redacted real diagnostics without exposing raw content.
 - `reviews/overnight-20260522/real-next-agent-openclaw-canary-plan.md`: added a paste-ready OpenClaw fresh-window canary handoff selected from redacted metrics-only evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:next-agent`: passed on the fixture planner and converted the real redacted batch into a one-agent OpenClaw fresh-window plan focused on adapter-contract and store-latency evidence.
-- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready`: passed from the postwatch batch report, preserving the selected privacy-clean OpenClaw candidate and keeping failed sibling diagnostics from counting as rollout evidence.
+- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 8aa98265e84db5a1e2dda2b66d16065c7be30902`: passed from the postwatch batch report, preserving the selected privacy-clean OpenClaw candidate and keeping failed sibling diagnostics from counting as rollout evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:returned-workspace`: passed in
   fixture mode, wrote metrics-only markdown and JSON into a temp workspace, and
   failed closed with `--require-production-canary` for fixture evidence.
@@ -581,7 +581,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
   `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`, SHA256
-  `4932b02b6acfc7742f0b0dfa854837f0de2eceeb1499abae348048e93acfdb8c`.
+  `b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5`.
   Returned canary reports must name commit
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.

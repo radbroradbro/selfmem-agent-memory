@@ -24,7 +24,7 @@ const alreadyPassed = Boolean(selected?.countsAsRealRolloutEvidence);
 const needsFreshWindow = selected ? Boolean(selected.fixtureOnly || selected.remediation?.needsFreshWindow || failedChecks.length > 0) : true;
 const canPlanOneAgent = Boolean(selected && privacyClean && host !== "unknown" && !alreadyPassed);
 const blockReasons = blockReasonsFor(selected, host, privacyClean, alreadyPassed);
-const commandPlan = canPlanOneAgent ? commandsFor(host) : [];
+const commandPlan = canPlanOneAgent ? commandsFor(host, normalizedExpectedCommit(args.expectedCommit) || "<approved-commit>") : [];
 
 const output = {
   ok: Boolean(selected),
@@ -243,10 +243,9 @@ function remediationFocus(failedChecks) {
   return focus;
 }
 
-function commandsFor(host) {
+function commandsFor(host, expectedCommit) {
   const repoPlaceholder = host === "hermes" ? "<hermes-checkout>" : "<openclaw-checkout>";
   const diagnosticFlag = "--canary-diagnostic-zip <redacted-diagnostic.zip>";
-  const expectedCommit = "<approved-commit>";
   return [
     {
       id: "dry-run",
@@ -409,4 +408,11 @@ function sha256(value) {
 function assertSafeText(text, label) {
   assert.doesNotMatch(text, secretPattern, `${label} contains a key-shaped secret`);
   assert.doesNotMatch(text, privatePathPattern, `${label} contains a raw local path`);
+}
+
+function normalizedExpectedCommit(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  assert.match(text, /^[a-f0-9]{7,40}$/i, "--expected-commit must be a git SHA prefix or full SHA");
+  return text;
 }

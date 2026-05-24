@@ -95,10 +95,13 @@ batch report, and generated a fresh sendable packet through the
 This is the current packet to hand to the selected OpenClaw operator.
 It was regenerated after the next-agent plan made deterministic drill execution
 explicit in the main handoff path.
+It now binds the approved adapter commit into `next-agent-plan`,
+`strict-real-operator-packet`, and `strict-real-canary-drill`, so operators do
+not have to replace an `<approved-commit>` placeholder before collection.
 
 - Packet label: `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`.
 - Packet SHA256:
-  `4932b02b6acfc7742f0b0dfa854837f0de2eceeb1499abae348048e93acfdb8c`.
+  `b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5`.
 - Expected returned report commit:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - Mode: `canary-next-agent-handoff-packet`.
