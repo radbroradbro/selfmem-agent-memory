@@ -25,7 +25,11 @@ container mapping. The mapping should identify:
 - whether hosted Supermemory should be used as read-only history.
 
 Keep provider credentials on the agent machine. Do not commit `keys.env`,
-`.env`, auth files, raw memory files, or diagnostics bundles.
+`.env`, auth files, raw memory files, or diagnostics bundles. For benchmark
+runs, prefer shell environment variables. If pasting keys into commands would
+be messy, put newline-separated keys in a private file outside the repository
+and set an env var such as `VOYAGE_API_KEYS_FILE`, `NVIDIA_API_KEYS_FILE`, or
+`GEMINI_API_KEYS_FILE`.
 
 ## Default Memory Mode
 

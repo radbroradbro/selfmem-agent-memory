@@ -133,15 +133,39 @@ function providerKeyCount(provider) {
 }
 
 function providerKeys(provider) {
-  return providerEnvNames(provider).flatMap((name) => splitList(process.env[name] ?? ""));
+  return [
+    ...providerValueEnvNames(provider).flatMap((name) => splitList(process.env[name] ?? "")),
+    ...providerKeyFileEnvNames(provider).flatMap(keysFromPrivateFileEnv),
+  ];
 }
 
 function providerEnvNames(provider) {
+  return [...providerValueEnvNames(provider), ...providerKeyFileEnvNames(provider)];
+}
+
+function providerValueEnvNames(provider) {
   if (provider === "gemini") return ["GEMINI_API_KEY", "GEMINI_API_KEYS", "GOOGLE_API_KEY", "GOOGLE_API_KEYS", "AI_STUDIO_API_KEY", "AI_STUDIO_API_KEYS"];
   if (provider === "voyage") return ["VOYAGE_API_KEY", "VOYAGE_API_KEYS"];
   if (provider === "nvidia") return ["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVAPI_KEY", "NVAPI_KEYS"];
   if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL"];
   return [];
+}
+
+function providerKeyFileEnvNames(provider) {
+  if (provider === "gemini") return ["GEMINI_API_KEY_FILE", "GEMINI_API_KEYS_FILE", "GOOGLE_API_KEY_FILE", "GOOGLE_API_KEYS_FILE", "AI_STUDIO_API_KEY_FILE", "AI_STUDIO_API_KEYS_FILE"];
+  if (provider === "voyage") return ["VOYAGE_API_KEY_FILE", "VOYAGE_API_KEYS_FILE"];
+  if (provider === "nvidia") return ["NVIDIA_API_KEY_FILE", "NVIDIA_API_KEYS_FILE", "NVAPI_KEY_FILE", "NVAPI_KEYS_FILE"];
+  return [];
+}
+
+function keysFromPrivateFileEnv(envName) {
+  const value = process.env[envName];
+  if (!value) return [];
+  const resolved = resolveInputPath(value);
+  assert.ok(existsSync(resolved), `${envName} points to a missing provider key file`);
+  assert.ok(statSync(resolved).isFile(), `${envName} must point to a provider key file`);
+  assertOutsideRepo(resolved, `${envName} provider key file`);
+  return splitList(readFileSync(resolved, "utf8"));
 }
 
 function liveCommandTemplate({ requiredProviders, strategies, targetPath }) {
@@ -158,9 +182,9 @@ function liveCommandTemplate({ requiredProviders, strategies, targetPath }) {
 }
 
 function providerEnvTemplateLines(provider) {
-  if (provider === "gemini") return ["GEMINI_API_KEY=<env-only-gemini-key>"];
-  if (provider === "voyage") return ["VOYAGE_API_KEY=<env-only-voyage-key>"];
-  if (provider === "nvidia") return ["NVIDIA_API_KEY=<env-only-nvidia-key>"];
+  if (provider === "gemini") return ["GEMINI_API_KEY=<env-only-gemini-key>", "GEMINI_API_KEYS_FILE=<optional-private-gemini-key-file>"];
+  if (provider === "voyage") return ["VOYAGE_API_KEY=<env-only-voyage-key>", "VOYAGE_API_KEYS_FILE=<optional-private-voyage-key-file>"];
+  if (provider === "nvidia") return ["NVIDIA_API_KEY=<env-only-nvidia-key>", "NVIDIA_API_KEYS_FILE=<optional-private-nvidia-key-file>"];
   if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-local-apple-server-url>"];
   return [];
 }
@@ -219,6 +243,11 @@ function displayPath(path) {
 
 function resolveInputPath(value) {
   return isAbsolute(String(value ?? "")) ? String(value) : resolve(root, String(value ?? ""));
+}
+
+function assertOutsideRepo(path, label) {
+  const rel = relative(root, path);
+  assert.ok(rel.startsWith("..") || isAbsolute(rel), `${label} must live outside the repository`);
 }
 
 function splitList(value) {

@@ -17,7 +17,7 @@ Benchmark: longmemeval
 
 - Provider calls enabled: false
 - Public data confirmed: false
-- nvidia: missing (NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, NVAPI_KEYS)
+- nvidia: missing (NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, NVAPI_KEYS, NVIDIA_API_KEY_FILE, NVIDIA_API_KEYS_FILE, NVAPI_KEY_FILE, NVAPI_KEYS_FILE)
 
 ## Blockers
 
@@ -37,5 +37,6 @@ Benchmark: longmemeval
 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1
 NVIDIA_API_KEY=<env-only-nvidia-key>
+NVIDIA_API_KEYS_FILE=<optional-private-nvidia-key-file>
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-nvidia-nemotron-1b
 ```

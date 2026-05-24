@@ -1855,6 +1855,42 @@ check("fresh public benchmark target check passes", () => {
   assert.match(expandedProviderLivePreflightVoyageEvidence, /Provider Benchmark Live Preflight/);
   assert.match(expandedProviderLivePreflightVoyageEvidence, /cloud-voyage4-voyage/);
   assert.match(expandedProviderLivePreflightVoyageEvidence, /VOYAGE_API_KEY=<env-only-voyage-key>/);
+  assert.match(expandedProviderLivePreflightVoyageEvidence, /VOYAGE_API_KEYS_FILE=<optional-private-voyage-key-file>/);
+  {
+    const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
+    const keyFile = join(tempRoot, "voyage.keys");
+    writeFileSync(keyFile, "fixture-voyage-key\n", { mode: 0o600 });
+    const keyFilePreflight = spawnSync(
+      "node",
+      [
+        "packages/bench/provider-benchmark-live-preflight.mjs",
+        "--target",
+        join(reviewDir, "public-longmemeval-expanded-run-target.json"),
+        "--strategies",
+        "bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage",
+      ],
+      {
+        cwd: root,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          RECALLWEAVE_PROVIDER_BENCHMARK_CALLS: "1",
+          RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA: "1",
+          VOYAGE_API_KEYS_FILE: keyFile,
+        },
+      },
+    );
+    assert.equal(keyFilePreflight.status, 0, keyFilePreflight.stderr || keyFilePreflight.stdout);
+    assert.doesNotMatch(keyFilePreflight.stdout, /fixture-voyage-key/);
+    assert.doesNotMatch(keyFilePreflight.stdout, /recallweave-provider-key-file-check/);
+    const keyFilePreflightReport = JSON.parse(keyFilePreflight.stdout);
+    assert.equal(keyFilePreflightReport.status, "READY_FOR_LIVE_PROVIDER_BENCHMARK");
+    assert.equal(keyFilePreflightReport.liveRunAllowed, true);
+    assert.equal(keyFilePreflightReport.credentialPresence?.voyage?.keyCount, 1);
+    assert.deepEqual(keyFilePreflightReport.missingCredentialProviders, []);
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
   assert.equal(expandedProviderLivePreflightNvidiaReport.ok, true);
   assert.equal(expandedProviderLivePreflightNvidiaReport.mode, "provider-benchmark-live-preflight");
   assert.equal(expandedProviderLivePreflightNvidiaReport.status, "BLOCKED_PROVIDER_ENV");

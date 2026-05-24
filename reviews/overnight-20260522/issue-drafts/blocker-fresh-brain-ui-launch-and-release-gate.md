@@ -197,6 +197,11 @@ requirements are resolved.
   runs without the `bm25-lite` control. Provider gates must include
   `bm25-lite`, `full-hybrid-rerank`, and at least one provider-backed arm, so
   same-data comparison is enforced by command behavior rather than prose alone.
+- Current provider benchmark preflight supports private key-file env vars such
+  as `VOYAGE_API_KEYS_FILE`, `NVIDIA_API_KEYS_FILE`, and
+  `GEMINI_API_KEYS_FILE`. Operators can run the same-data provider gate without
+  putting keys in commands or public artifacts. Reports still include only
+  credential presence and key counts.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
   `benchmark:public-target`, a metrics-only source-lock, slice-manifest,

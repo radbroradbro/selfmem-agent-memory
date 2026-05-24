@@ -120,6 +120,12 @@ providers or a local model server. This is the next route for testing whether
 the actual provider-backed hybrid stack beats BM25-lite on the same
 source-locked data.
 
+Provider keys can stay in normal environment variables, or in private key files
+referenced by env vars such as `VOYAGE_API_KEYS_FILE`,
+`NVIDIA_API_KEYS_FILE`, and `GEMINI_API_KEYS_FILE`. Key files must live outside
+the repository and may contain newline- or comma-separated keys. Public reports
+still print only presence and key counts.
+
 The live-provider preflight is
 `reviews/overnight-20260522/public-longmemeval-provider-live-preflight.json`.
 It calls no provider APIs and sends no benchmark text. In the current clean

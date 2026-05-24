@@ -214,8 +214,11 @@ For a cheap first live test, run one provider family at a time with explicit
 
 Those single-arm preflights still block without public-data consent,
 provider-call consent, and the matching env-only credential, but their live
-command templates name only the provider being tested. They are the preferred
-path for rate-limit-safe iteration before the full multi-provider matrix.
+command templates name only the provider being tested. A provider credential
+can also come from a private key-file env var such as `VOYAGE_API_KEYS_FILE` or
+`NVIDIA_API_KEYS_FILE`; the file must live outside the repository and is never
+printed. They are the preferred path for rate-limit-safe iteration before the
+full multi-provider matrix.
 For the stronger 30-question slice, use
 `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`; its
 checked-in provider preflight is

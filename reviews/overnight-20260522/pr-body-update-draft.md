@@ -123,6 +123,12 @@ Live status:
   Gemini/Voyage/NVIDIA/local-Apple readiness without calling provider APIs or
   sending benchmark text. The current controller evidence reports
   `BLOCKED_PROVIDER_ENV`, so no live provider benchmark claim is made.
+- Adds private provider key-file env support for live benchmark preflights and
+  provider fixture runs. Operators can set `VOYAGE_API_KEYS_FILE`,
+  `NVIDIA_API_KEYS_FILE`, or `GEMINI_API_KEYS_FILE` to a private file outside
+  the repository so keys do not appear in commands, checked-in docs, packets,
+  or reports. The release gate now verifies this path with a temporary key file
+  and checks that only key counts are printed.
 - Adds an expanded provider preflight for the 30-question target:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
   It calls no provider APIs, sends no benchmark text, and binds the future live

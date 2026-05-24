@@ -809,9 +809,9 @@ function rerankModelForStrategy(strategy) {
 }
 
 function providerEnvHint(provider) {
-  if (provider === "gemini") return "GEMINI_API_KEY, GEMINI_API_KEYS, GOOGLE_API_KEY, GOOGLE_API_KEYS, AI_STUDIO_API_KEY, or AI_STUDIO_API_KEYS";
-  if (provider === "voyage") return "VOYAGE_API_KEY or VOYAGE_API_KEYS";
-  if (provider === "nvidia") return "NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, or NVAPI_KEYS";
+  if (provider === "gemini") return "GEMINI_API_KEY, GEMINI_API_KEYS, GOOGLE_API_KEY, GOOGLE_API_KEYS, AI_STUDIO_API_KEY, AI_STUDIO_API_KEYS, or matching *_FILE vars";
+  if (provider === "voyage") return "VOYAGE_API_KEY, VOYAGE_API_KEYS, VOYAGE_API_KEY_FILE, or VOYAGE_API_KEYS_FILE";
+  if (provider === "nvidia") return "NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, NVAPI_KEYS, or matching *_FILE vars";
   if (provider === "local-apple") return "SELFMEM_LOCAL_EMBED_BASE_URL";
   return `${provider.toUpperCase()} provider credentials`;
 }
@@ -825,6 +825,7 @@ function providerKeys(provider) {
     return [
       ...splitProviderKeys(process.env.VOYAGE_API_KEYS),
       ...splitProviderKeys(process.env.VOYAGE_API_KEY),
+      ...providerKeysFromFiles("VOYAGE_API_KEYS_FILE", "VOYAGE_API_KEY_FILE"),
     ];
   }
   if (provider === "gemini") {
@@ -835,6 +836,14 @@ function providerKeys(provider) {
       ...splitProviderKeys(process.env.GOOGLE_API_KEY),
       ...splitProviderKeys(process.env.AI_STUDIO_API_KEYS),
       ...splitProviderKeys(process.env.AI_STUDIO_API_KEY),
+      ...providerKeysFromFiles(
+        "GEMINI_API_KEYS_FILE",
+        "GEMINI_API_KEY_FILE",
+        "GOOGLE_API_KEYS_FILE",
+        "GOOGLE_API_KEY_FILE",
+        "AI_STUDIO_API_KEYS_FILE",
+        "AI_STUDIO_API_KEY_FILE",
+      ),
     ];
   }
   if (provider === "nvidia") {
@@ -843,6 +852,7 @@ function providerKeys(provider) {
       ...splitProviderKeys(process.env.NVIDIA_API_KEY),
       ...splitProviderKeys(process.env.NVAPI_KEYS),
       ...splitProviderKeys(process.env.NVAPI_KEY),
+      ...providerKeysFromFiles("NVIDIA_API_KEYS_FILE", "NVIDIA_API_KEY_FILE", "NVAPI_KEYS_FILE", "NVAPI_KEY_FILE"),
     ];
   }
   if (provider === "local-apple") {
@@ -856,6 +866,18 @@ function splitProviderKeys(value) {
     .split(/[,\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function providerKeysFromFiles(...envNames) {
+  return envNames.flatMap((name) => {
+    const path = process.env[name];
+    if (!path) return [];
+    const resolved = resolve(String(path));
+    assert.ok(existsSync(resolved), `${name} points to a missing provider key file`);
+    assert.ok(statSync(resolved).isFile(), `${name} must point to a provider key file`);
+    assertOutsideRepo(resolved, `${name} provider key file`);
+    return splitProviderKeys(readFileSync(resolved, "utf8"));
+  });
 }
 
 function chooseProviderKey(provider, seed) {
@@ -1456,6 +1478,11 @@ function resolveInputPath(value) {
 function displayPath(value) {
   const rel = relative(root, value).replaceAll("\\", "/");
   return rel.startsWith("..") ? basename(value) : rel;
+}
+
+function assertOutsideRepo(path, label) {
+  const rel = relative(root, path);
+  assert.ok(rel.startsWith("..") || isAbsolute(rel), `${label} must live outside the repository`);
 }
 
 function fileHash(path) {
