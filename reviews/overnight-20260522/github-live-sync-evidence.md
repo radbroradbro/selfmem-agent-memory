@@ -114,15 +114,19 @@ Date: 2026-05-23
   `26354982486` passed on `cb40732`, making the latest verified PR branch head
   the returned canary triage and unreadable-zip sanitization commit while
   preserving `3d61677` as the approved runtime canary adapter/report commit.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26355118094` passed on `8b6f9bd`, promoting the returned canary triage
+  evidence head while preserving `3d61677` as the approved runtime canary
+  adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T07:23:32Z
+- PR body refreshed at: 2026-05-24T07:31:47Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T07:23:33Z
-- PR body hash: f187e1f8535c1ca0ea8c59ffa6cd26436e741027358bf4d9e5e5f8bf56c987d3
+- Issue updated at: 2026-05-24T07:31:48Z
+- PR body hash: 2d65d39f58826f5fc6a01c494abf63bab7722e934d380c9313d62ac5c265419e
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 03ae835241dc9fd76c31911067c828e8b9822021b0ddb6a49a3d46fd997ec893
-- PR body length: 49452
-- Issue body length: 29833
+- Issue body hash: 1f55eba5235d4f23dde566280430c371f9c419b5b61d09edae334a06ed8b7f0a
+- PR body length: 49440
+- Issue body length: 29821
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

@@ -10,9 +10,9 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `cb4073285c727cbc6795850f65ac6067a3bfe5df`.
-- GitHub Actions run `26354982486` passed CI after adding hash-only returned
-  canary zip triage and sanitizing unreadable zip errors in Linux CI output.
+- `8b6f9bd8aa4a5e8764fce63021edc059af903c5c`.
+- GitHub Actions run `26355118094` passed CI after promoting returned canary
+  triage evidence on top of the unreadable-zip sanitization fix.
   This did not change the approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
 - `3d61677bc3d316e040ac5a634467d0204c272493`.

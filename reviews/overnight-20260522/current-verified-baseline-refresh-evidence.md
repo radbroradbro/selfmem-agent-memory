@@ -13,9 +13,9 @@ triage and Linux CI sanitization; it does not promote a new runtime adapter.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `cb4073285c727cbc6795850f65ac6067a3bfe5df`
-- Commit title: `fix: sanitize unreadable canary zip errors`
-- GitHub Actions run: `26354982486`
+- Commit: `8b6f9bd8aa4a5e8764fce63021edc059af903c5c`
+- Commit title: `docs: promote returned canary triage head`
+- GitHub Actions run: `26355118094`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -38,7 +38,7 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
 - `npm exec --yes pnpm@10.23.0 -- release:doctor`
-- GitHub Actions run `26354982486`
+- GitHub Actions run `26355118094`
 
 ## Canary Handoff Artifact
 

@@ -188,10 +188,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-  `cb4073285c727cbc6795850f65ac6067a3bfe5df`.
-- GitHub Actions run `26354982486`: passed CI after adding hash-only returned
-  canary zip triage and sanitizing unreadable zip errors in Linux CI output.
-  This does not change the approved runtime canary adapter/report commit.
+  `8b6f9bd8aa4a5e8764fce63021edc059af903c5c`.
+- GitHub Actions run `26355118094`: passed CI after promoting returned canary
+  triage evidence on top of the unreadable-zip sanitization fix. This does not
+  change the approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
   `3d61677bc3d316e040ac5a634467d0204c272493`.
 - Latest verified code/product baseline:

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T07:24:00Z",
+  "generatedAt": "2026-05-24T07:30:30Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -388,14 +388,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "cb4073285c727cbc6795850f65ac6067a3bfe5df",
-    "ciRunId": 26354982486,
+    "headSha": "8b6f9bd8aa4a5e8764fce63021edc059af903c5c",
+    "ciRunId": 26355118094,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_returned_canary_zip_triage_public_benchmark_guards_github_sync_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest verified PR branch head after adding hash-only returned canary inbox triage and sanitizing unreadable zip errors across local and Linux CI output. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest verified PR branch head after promoting returned canary triage evidence on top of the unreadable-zip sanitization fix. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "3d61677bc3d316e040ac5a634467d0204c272493",
