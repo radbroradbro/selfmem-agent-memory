@@ -103,6 +103,12 @@ Live status:
   mocks and zero hosted calls; live provider runs require explicit provider-call
   and public-data environment guards plus env-only credentials for the selected
   provider arm.
+- Adds `benchmark:public-provider:preflight`, a fail-closed live provider
+  benchmark preflight. It checks the source-locked public LongMemEval target,
+  provider-call consent flags, public-data consent flags, and env-only
+  Gemini/Voyage credential presence without calling provider APIs or sending
+  benchmark text. The current controller evidence reports
+  `BLOCKED_PROVIDER_ENV`, so no live provider benchmark claim is made.
 - Promotes GitHub Actions run `26349930959` on `a67c411` as the latest
   verified code/product baseline after extending the provider gate with Gemini
   embedding arms, binding every arm to the same source-locked fixture path, and

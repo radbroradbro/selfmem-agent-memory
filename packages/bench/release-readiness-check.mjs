@@ -86,6 +86,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-target-author.mjs",
   "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/public-benchmark-strategy-compare.mjs",
+  "packages/bench/provider-benchmark-live-preflight.mjs",
   "packages/bench/public-benchmark-autoresearch-loop.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -111,6 +112,8 @@ const requiredFiles = [
   `${reviewDir}/codex-public-longmemeval-hybrid-gate-review.md`,
   `${reviewDir}/public-longmemeval-provider-gate-fixture.json`,
   `${reviewDir}/public-longmemeval-provider-gate-fixture-evidence.md`,
+  `${reviewDir}/public-longmemeval-provider-live-preflight.json`,
+  `${reviewDir}/public-longmemeval-provider-live-preflight-evidence.md`,
   `${reviewDir}/returned-downloads-current-scan.json`,
   `${reviewDir}/returned-downloads-current-scan.md`,
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
@@ -437,6 +440,8 @@ const requiredScripts = [
   "benchmark:public-target:author",
   "benchmark:public-materialize",
   "benchmark:public-strategy",
+  "benchmark:public-provider:preflight",
+  "benchmark:public-provider",
   "benchmark:public-autoresearch",
   "goal:audit",
   "release:doctor",
@@ -1351,6 +1356,9 @@ check("fresh public benchmark target check passes", () => {
   const liveHybridReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-hybrid-gate-review.md"), "utf8");
   const providerGateFixtureReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-provider-gate-fixture.json"), "utf8"));
   const providerGateFixtureEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-provider-gate-fixture-evidence.md"), "utf8");
+  const providerLivePreflightReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-provider-live-preflight.json"), "utf8"));
+  const providerLivePreflightEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-provider-live-preflight-evidence.md"), "utf8");
+  const providerLivePreflightFresh = JSON.parse(run("node", ["packages/bench/provider-benchmark-live-preflight.mjs"]).stdout);
   const liveAutoresearchReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
   const liveAutoresearchEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop-evidence.md"), "utf8");
   const liveAutoresearchReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-autoresearch-loop-review.md"), "utf8");
@@ -1628,6 +1636,31 @@ check("fresh public benchmark target check passes", () => {
   assert.match(providerGateFixtureEvidence, /Gate: provider/);
   assert.match(providerGateFixtureEvidence, /cloud-voyage4-voyage/);
   assert.match(providerGateFixtureEvidence, /cloud-gemini-voyage-rerank/);
+  assert.equal(providerLivePreflightReport.ok, true);
+  assert.equal(providerLivePreflightReport.mode, "provider-benchmark-live-preflight");
+  assert.equal(providerLivePreflightReport.metricsOnly, true);
+  assert.equal(providerLivePreflightReport.callsProviderApis, false);
+  assert.equal(providerLivePreflightReport.sendsBenchmarkTextToProvider, false);
+  assert.equal(providerLivePreflightReport.publicSafe, true);
+  assert.equal(providerLivePreflightReport.liveRunAllowed, false);
+  assert.equal(providerLivePreflightReport.status, "BLOCKED_PROVIDER_ENV");
+  assert.equal(providerLivePreflightFresh.status, "BLOCKED_PROVIDER_ENV");
+  assert.equal(providerLivePreflightFresh.liveRunAllowed, false);
+  assert.ok(providerLivePreflightReport.blockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled"));
+  assert.ok(providerLivePreflightReport.blockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"));
+  assert.ok(providerLivePreflightReport.missingCredentialProviders?.includes("gemini"));
+  assert.ok(providerLivePreflightReport.missingCredentialProviders?.includes("voyage"));
+  assert.deepEqual(providerLivePreflightReport.strategies, [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "cloud-voyage-rerank-only",
+    "cloud-voyage4-voyage",
+    "cloud-gemini-embed-rerank-proxy",
+    "cloud-gemini-voyage-rerank",
+  ]);
+  assert.match(providerLivePreflightEvidence, /Provider Benchmark Live Preflight/);
+  assert.match(providerLivePreflightEvidence, /Live run allowed: false/);
+  assert.match(providerLivePreflightEvidence, /cloud-gemini-voyage-rerank/);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");

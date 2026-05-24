@@ -160,6 +160,7 @@ The provider-backed gate now exists as an opt-in harness:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --fixture
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight
 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
@@ -176,6 +177,11 @@ fails closed unless provider calls, public-data transfer, and the selected
 provider credentials are explicitly enabled. Treat a live provider result as
 retrieval-proxy evidence until it is converted into MemoryBench answer-quality
 or another end-to-end memory score.
+
+Run the preflight before any live provider spend. It checks the source-locked
+LongMemEval target, selected strategy list, consent flags, and env-only
+credential presence without calling Voyage, Gemini, or any other provider. A
+`BLOCKED_PROVIDER_ENV` preflight means no live provider benchmark has been run.
 
 Allowed wording after a small-slice win:
 

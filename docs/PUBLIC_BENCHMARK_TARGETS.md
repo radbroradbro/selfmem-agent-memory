@@ -212,6 +212,12 @@ harness we will use.
   runs require `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`,
   `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, and env-only credentials for
   the selected provider arm.
+- Current live provider preflight:
+  `reviews/overnight-20260522/public-longmemeval-provider-live-preflight.json`.
+  It calls no provider APIs, sends no benchmark text, and currently reports
+  `BLOCKED_PROVIDER_ENV` because the clean controller environment has no
+  provider-call consent flags or env-only Gemini/Voyage credentials. Treat this
+  as the required gate before spending calls on provider-backed arms.
 - Current LongMemEval-S autoresearch loop:
   `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
   runs 24 retrieval-proxy arms over strategy, context budget, and candidate

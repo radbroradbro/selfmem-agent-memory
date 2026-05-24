@@ -233,6 +233,7 @@ mode uses deterministic mocks and makes zero hosted calls. A real provider run
 is opt-in only:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight
 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
@@ -240,6 +241,14 @@ GEMINI_API_KEY=<env-only-if-running-gemini-arm> \
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```
+
+The preflight evidence lives at
+`reviews/overnight-20260522/public-longmemeval-provider-live-preflight.json`.
+It calls no provider APIs and sends no benchmark text. In the current controller
+environment it is blocked because the env-only provider keys and explicit
+public-data/provider-call flags are absent. Do not describe provider-backed
+results as live until this preflight reports
+`READY_FOR_LIVE_PROVIDER_BENCHMARK`.
 
 Do not use the provider gate on private agent memories unless the operator has
 separately approved sending that text to the provider.

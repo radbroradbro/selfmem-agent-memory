@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark source-lock validation, public LongMemEval slice materialization, public LongMemEval run-only target generation, public benchmark target validation, public benchmark target authoring, public LongMemEval retrieval strategy comparison, and public LongMemEval autoresearch loop; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark source-lock validation, public LongMemEval slice materialization, public LongMemEval run-only target generation, public benchmark target validation, public benchmark target authoring, public LongMemEval retrieval strategy comparison, public LongMemEval provider preflight, and public LongMemEval autoresearch loop; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
     "allowedPostBaselineCodePaths": [
       ".gitignore",
       "package.json",
@@ -66,6 +66,7 @@
       "packages/bench/public-benchmark-target-check.mjs",
       "packages/bench/public-benchmark-materialize-run.mjs",
       "packages/bench/public-benchmark-strategy-compare.mjs",
+      "packages/bench/provider-benchmark-live-preflight.mjs",
       "packages/bench/public-benchmark-autoresearch-loop.mjs",
       "packages/bench/fixtures/public-benchmark-target.fixture.json",
       "packages/bench/recallweave-baseline-collector.mjs",
@@ -168,7 +169,8 @@
     "public-longmemeval-recallweave-run-result",
     "public-longmemeval-strategy-compare",
     "public-longmemeval-autoresearch-loop",
-    "public-longmemeval-provider-gate"
+    "public-longmemeval-provider-gate",
+    "public-longmemeval-provider-live-preflight"
   ],
   "reviewerEvidence": {
     "freshCanaryWindow": {

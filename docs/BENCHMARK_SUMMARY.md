@@ -97,6 +97,14 @@ the selected provider arm, before public benchmark passages can be sent to
 Voyage or Gemini. This is the next route for testing whether the actual cloud
 hybrid stack beats BM25-lite on the same source-locked data.
 
+The live-provider preflight is
+`reviews/overnight-20260522/public-longmemeval-provider-live-preflight.json`.
+It calls no provider APIs and sends no benchmark text. In the current clean
+controller environment it reports `BLOCKED_PROVIDER_ENV`: provider-call and
+public-data flags are unset, and env-only Gemini/Voyage credentials are absent.
+That is intentional. A live provider benchmark should run only after this
+preflight reports `READY_FOR_LIVE_PROVIDER_BENCHMARK`.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are
@@ -356,6 +364,7 @@ The public target itself must pass before a canary starts:
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --fixture
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight
 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
