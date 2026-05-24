@@ -71,9 +71,12 @@ Live status:
   RecallWeave can run on the same public benchmark data now. It still blocks
   public comparison claims until a source-locked reported target row passes
   the stricter comparison gate.
-- Promotes GitHub Actions run `26346952139` on `9a11452` as the latest
-  verified code/product baseline after the LongMemEval-S run-only target and
-  sync evidence refresh.
+
+- Adds the public LongMemEval-S materialize-run lane and first blind retrieval-proxy baseline. The materializer writes raw benchmark query and haystack inputs only to an operator-private directory, commits only hashes/counts/command templates, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result to that hash. The initial retrieval-proxy baseline scored 0.1089 quality on the 6-row source-locked slice with zero privacy failures; it is explicitly not MemoryBench answer-quality evidence and not public superiority language.
+- Promotes GitHub Actions run `26347410269` on `e88064a` as the latest
+  verified code/product baseline after the LongMemEval-S materialize-run lane,
+  retrieval-proxy blind baseline, release-gate hash binding, and sync evidence
+  refresh.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
@@ -123,6 +126,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `e88064ac92158addf472536c9e2e1167ae595566`.
+- GitHub Actions run `26347410269`: passed CI after adding the public
+  LongMemEval-S materialize-run lane, binding the RecallWeave result to the
+  materialized query-set hash, and marking the result as retrieval-proxy only.
+- Previous verified code/product baseline before the materialize-run lane:
   `8eb69e848d442b08ebf4f5204d6ed17224161683`.
 - GitHub Actions run `26346613433`: passed CI after adding the public
   LongMemEval-S slice manifest, deterministic question-id policy,

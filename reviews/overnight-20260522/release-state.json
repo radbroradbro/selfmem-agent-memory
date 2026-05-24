@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T00:02:20Z",
+  "generatedAt": "2026-05-24T00:27:14Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "9a11452d081d0fa9127d5cc55a2ee030c83a142b",
-    "ciRunId": 26346952139,
+    "headSha": "e88064ac92158addf472536c9e2e1167ae595566",
+    "ciRunId": 26347410269,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "passed",
+    "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "This is the latest inspected code/product baseline after adding the public LongMemEval-S run-only target, strict-run validation, same-data target authoring from the slice manifest, and focused Codex review for the public benchmark run lane. It preserves strict-real and public-launch blockers, and GitHub Actions run 26346952139 passed CI on 9a11452. Local release:check, release:doctor, goal:audit, release:github-sync, diff check, and targeted secret/private-path scans passed."
+    "note": "Latest inspected code/product baseline after adding the public LongMemEval-S materialize-run lane and retrieval-proxy blind baseline. The materializer writes private query/haystack inputs outside the repository, publishes only hashes/counts, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result to that hash while requiring retrievalProxyOnly, memoryBenchAnswerQuality=false, and publicBenchmarkClaimsAllowed=false. Local release:check, benchmark:public-materialize fixture, targeted public artifact scans, diff check, release:github-sync, and GitHub Actions run 26347410269 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
