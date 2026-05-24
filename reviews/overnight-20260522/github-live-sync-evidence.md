@@ -129,15 +129,20 @@ Date: 2026-05-23
   key-file env support for same-data provider benchmark runs. The refresh kept
   the body text public-safe and recorded only hashes, booleans, lengths, and
   timestamps.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26365847461` passed on `6ac6dd8`, promoting the native/default memory
+  evidence hardening and refreshed one-agent handoff packet as the latest
+  verified PR branch head while preserving `18d606a` as the approved runtime
+  canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T08:10:34Z
+- PR body refreshed at: 2026-05-24T16:01:43Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T08:10:35Z
-- PR body hash: b89153cee0dd96b08f7a72247a165a931d4c40c899d3c9468284e9a7bd18d813
+- Issue updated at: 2026-05-24T16:01:44Z
+- PR body hash: 9975aca6fbb42961a815c0af058bcdbcf2f96e9f88fc41c651dd6207f4f6cc22
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: df4824d274ef507f65a637cd280e373e5c1bd9d0b561188757be11c2ec9cf9e6
-- PR body length: 50318
-- Issue body length: 30507
+- Issue body hash: fdd47c795539a37247d664c14a6f496c5f07e8530b068d08c86d54af58173869
+- PR body length: 50343
+- Issue body length: 30532
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

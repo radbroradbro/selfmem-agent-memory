@@ -8,22 +8,23 @@ This refresh updates the checked-in release state and canary handoff evidence so
 the latest verified PR branch head is tracked separately from the approved
 runtime canary adapter/report commit. That split lets benchmark and tooling
 guards move forward without silently changing what the one-agent runtime canary
-must prove. The latest branch-head refresh only hardens returned-packet intake
-triage and Linux CI sanitization; it does not promote a new runtime adapter.
+must prove. The latest branch-head refresh requires explicit native/default
+memory proof in canary reports and packet review; it does not change the
+approved runtime adapter commit that returned agents must report.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `c2b72f2789b7fa817aa62e1f398b8bd9b46e049d`
-- Commit title: `test: enforce benchmark comparison gates`
-- GitHub Actions run: `26355558402`
+- Commit: `6ac6dd830db5ed1ad67840fc457a13b27729c07b`
+- Commit title: `docs: refresh native memory canary packet`
+- GitHub Actions run: `26365847461`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
 ## Approved Runtime Canary Baseline
 
 - Commit: `18d606aff589986b4d8b416a686bedb7ff1506d2`
-- Commit title: `test: add single-provider live preflight gates`
-- GitHub Actions run: `26353888297`
+- Commit title: `fix: require native memory evidence`
+- GitHub Actions run: `26365847461`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -38,7 +39,7 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
 - `npm exec --yes pnpm@10.23.0 -- release:doctor`
-- GitHub Actions run `26355558402`
+- GitHub Actions run `26365847461`
 
 ## Canary Handoff Artifact
 

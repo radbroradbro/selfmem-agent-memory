@@ -10,21 +10,21 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `c2b72f2789b7fa817aa62e1f398b8bd9b46e049d`.
-- GitHub Actions run `26355558402` passed CI after enforcing benchmark
-  comparison gates so provider runs cannot be solo provider-arm tests and
-  hybrid runs cannot omit the `bm25-lite` control.
+- `6ac6dd830db5ed1ad67840fc457a13b27729c07b`.
+- GitHub Actions run `26365847461` passed CI after requiring explicit
+  native/default memory evidence in canary reports, intake, remediation, and
+  packet review, then refreshing the sendable one-agent handoff.
   This did not change the approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `18d606aff589986b4d8b416a686bedb7ff1506d2`.
-- GitHub Actions run `26353888297` passed CI after adding single-provider live
-  preflight gates for Voyage and NVIDIA on the expanded LongMemEval target. The
-  checked-in evidence keeps BM25 and full-hybrid controls in the same
-  comparison, blocks live provider calls until public-data/provider-call consent
-  plus env-only readiness are present, and requires returned one-agent canary
-  packets to report the expected adapter commit.
+- `6ac6dd830db5ed1ad67840fc457a13b27729c07b`.
+- GitHub Actions run `26365847461` passed CI with release checks, release
+  doctor, live GitHub sync, goal audit, secret scan, and private-path scan
+  green. The checked-in evidence keeps BM25 and full-hybrid controls in the
+  same comparison, blocks live provider calls until public-data/provider-call
+  consent plus env-only readiness are present, and requires returned one-agent
+  canary packets to report the approved runtime adapter commit.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568` passed CI after requiring a same-data

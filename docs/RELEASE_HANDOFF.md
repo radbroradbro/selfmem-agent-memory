@@ -103,9 +103,9 @@ The current handoff packet remains:
 The returned packet must pass `canary:returned-packet` with
 `--require-production-canary` and the expected adapter commit before the real
 rollout blocker can close. A packet from an older adapter is diagnostic only.
-The expected report commit is the latest verified adapter/product baseline, not
-necessarily the latest docs-only PR head. The handoff command passes this
-approved commit into the report generator so a later evidence-only commit does
+The expected report commit is the approved runtime adapter baseline, not
+necessarily the latest verified PR head. The handoff command passes this
+approved commit into the report generator so later evidence or docs commits do
 not invalidate the runtime canary.
 If a newer adapter commit should count, regenerate the handoff packet with that
 commit first.

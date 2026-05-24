@@ -154,6 +154,11 @@ Verdict: resolved for PR body and blocker issue writes.
   - PR #5 and issue #6 were refreshed again after adding private provider
     key-file env support for same-data provider benchmark runs. Updated at:
     2026-05-24T08:10:35Z.
+  - PR #5 and issue #6 were refreshed again after GitHub Actions run
+    `26365847461` passed on `6ac6dd8`, promoting native/default memory
+    evidence hardening and the refreshed one-agent handoff packet while
+    preserving `18d606a` as the approved runtime canary adapter/report commit.
+    Updated at: 2026-05-24T15:55:06Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
