@@ -146,13 +146,17 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after promoting CI-passed commit
   `2bb8b6b3` as the latest verified branch head while preserving `18d606a` as
   the approved runtime canary adapter/report commit.
+- PR #5 and issue #6 were refreshed again after renaming the current
+  OpenClaw one-agent handoff packet to the clearly marked
+  `SEND-THIS-ONE` packet while preserving `18d606a` as the approved runtime
+  canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T16:52:41Z
+- PR body refreshed at: 2026-05-24T17:04:57Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T16:52:41Z
-- PR body hash: db6a28aa238c65645ef8ff7a0e96b530e6f27bc3086d6bd109c18a7140bef316
+- Issue updated at: 2026-05-24T17:04:58Z
+- PR body hash: 1e72a729a370150a7fda6754db6b3c5a1d9e14fb89c7dae513b86ddefc8aa767
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: c2c38268e32f3433c0e4a47ec9416b8973c1c8d371c8f9c6df8a274c75c512f4
+- Issue body hash: dd228b25551a84107d9053e3c7789716aae834964981d7e0bea8b3671a1930fa
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

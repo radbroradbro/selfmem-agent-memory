@@ -99,9 +99,9 @@ It now binds the approved adapter commit into `next-agent-plan`,
 `strict-real-operator-packet`, and `strict-real-canary-drill`, so operators do
 not have to replace an `<approved-commit>` placeholder before collection.
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260524-18d606a.zip`.
+- Packet label: `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`.
 - Packet SHA256:
-  `6e2dd7fb2c4530e5e688a5110f9d77913d52eda79b17da92fe0df4b0da66b6b3`.
+  `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`.
 - Packet generated from controller commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Approved adapter commit:
