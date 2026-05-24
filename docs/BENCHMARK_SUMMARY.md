@@ -109,19 +109,23 @@ The provider-backed benchmark lane now has an opt-in harness. The fixture gate
 is `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`,
 `cloud-voyage4-voyage`, `cloud-gemini-embed-rerank-proxy`, and
-`cloud-gemini-voyage-rerank` through the same public-safe metrics path. Fixture
-mode uses deterministic provider mocks and makes zero hosted calls. A real run
-must set both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1` and
-`RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, plus env-only credentials for
-the selected provider arm, before public benchmark passages can be sent to
-Voyage or Gemini. This is the next route for testing whether the actual cloud
-hybrid stack beats BM25-lite on the same source-locked data.
+`cloud-gemini-voyage-rerank`, plus NVIDIA and local Apple Silicon arms:
+`cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
+`cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b`. Fixture mode uses
+deterministic provider mocks and makes zero hosted calls. A real run must set
+both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1` and
+`RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, plus env-only readiness for the
+selected provider arm, before public benchmark passages can be sent to hosted
+providers or a local model server. This is the next route for testing whether
+the actual provider-backed hybrid stack beats BM25-lite on the same
+source-locked data.
 
 The live-provider preflight is
 `reviews/overnight-20260522/public-longmemeval-provider-live-preflight.json`.
 It calls no provider APIs and sends no benchmark text. In the current clean
 controller environment it reports `BLOCKED_PROVIDER_ENV`: provider-call and
-public-data flags are unset, and env-only Gemini/Voyage credentials are absent.
+public-data flags are unset, and env-only Gemini/Voyage/NVIDIA/local-Apple
+readiness is absent.
 That is intentional. A live provider benchmark should run only after this
 preflight reports `READY_FOR_LIVE_PROVIDER_BENCHMARK`.
 

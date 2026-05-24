@@ -181,22 +181,27 @@ RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
 GEMINI_API_KEY=<env-only-if-running-gemini-arm> \
+NVIDIA_API_KEY=<env-only-if-running-nvidia-arm> \
+SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-if-running-local-apple-arm> \
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```
 
 The gate compares `bm25-lite`, `full-hybrid-rerank`,
 `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
-`cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank`. Fixture
-mode uses deterministic provider mocks and makes zero hosted calls. Live mode
-fails closed unless provider calls, public-data transfer, and the selected
-provider credentials are explicitly enabled. Treat a live provider result as
+`cloud-gemini-embed-rerank-proxy`, `cloud-gemini-voyage-rerank`,
+`cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
+`cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b`. Fixture mode uses
+deterministic provider mocks and makes zero hosted calls. Live mode fails
+closed unless provider calls, public-data transfer, and the selected provider
+readiness are explicitly enabled. Treat a live provider result as
 retrieval-proxy evidence until it is converted into MemoryBench answer-quality
 or another end-to-end memory score.
 
 Run the preflight before any live provider spend. It checks the source-locked
 LongMemEval target, selected strategy list, consent flags, and env-only
-credential presence without calling Voyage, Gemini, or any other provider. A
+readiness without calling Voyage, Gemini, NVIDIA, the local Apple server, or
+any other provider. A
 `BLOCKED_PROVIDER_ENV` preflight means no live provider benchmark has been run.
 For the stronger 30-question slice, use
 `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`; its

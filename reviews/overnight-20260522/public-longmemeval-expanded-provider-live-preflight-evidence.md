@@ -15,12 +15,18 @@ Benchmark: longmemeval
 - cloud-voyage4-voyage
 - cloud-gemini-embed-rerank-proxy
 - cloud-gemini-voyage-rerank
+- cloud-nvidia-retriever-500m
+- cloud-nvidia-nemotron-1b
+- cloud-nvidia-e5-mistral
+- local-apple-qwen3-0_6b
 
 ## Provider Readiness
 
 - Provider calls enabled: false
 - Public data confirmed: false
 - gemini: missing (GEMINI_API_KEY, GEMINI_API_KEYS, GOOGLE_API_KEY, GOOGLE_API_KEYS, AI_STUDIO_API_KEY, AI_STUDIO_API_KEYS)
+- local-apple: missing (SELFMEM_LOCAL_EMBED_BASE_URL)
+- nvidia: missing (NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, NVAPI_KEYS)
 - voyage: missing (VOYAGE_API_KEY, VOYAGE_API_KEYS)
 
 ## Blockers
@@ -28,6 +34,8 @@ Benchmark: longmemeval
 - RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled
 - RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed
 - gemini-credentials-missing
+- local-apple-credentials-missing
+- nvidia-credentials-missing
 - voyage-credentials-missing
 
 ## Next Actions

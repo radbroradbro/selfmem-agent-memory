@@ -13,7 +13,7 @@ const requireReady = Boolean(args.requireReady);
 const strategies = splitList(
   args.strategies ??
     process.env.RECALLWEAVE_PUBLIC_PROVIDER_PREFLIGHT_STRATEGIES ??
-    "bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank",
+    "bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-nvidia-retriever-500m,cloud-nvidia-nemotron-1b,cloud-nvidia-e5-mistral,local-apple-qwen3-0_6b",
 );
 
 const knownStrategies = new Set([
@@ -23,6 +23,12 @@ const knownStrategies = new Set([
   "cloud-voyage4-voyage",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
+  "cloud-nvidia-retriever-500m",
+  "cloud-nvidia-nemotron-1b",
+  "cloud-nvidia-nemotron-vl-1b",
+  "cloud-nvidia-e5-mistral",
+  "cloud-nvidia-code",
+  "local-apple-qwen3-0_6b",
 ]);
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -107,6 +113,8 @@ const report = {
     "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
     "VOYAGE_API_KEY=<env-only-if-running-voyage-arm>",
     "GEMINI_API_KEY=<env-only-if-running-gemini-arm>",
+    "NVIDIA_API_KEY=<env-only-if-running-nvidia-arm>",
+    "SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-if-running-local-apple-arm>",
     `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target ${displayPath(targetPath)}`,
   ],
 };
@@ -122,6 +130,8 @@ function requiredProvidersForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy") return ["gemini"];
   if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
   if (strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return ["voyage"];
+  if (strategy.startsWith("cloud-nvidia-")) return ["nvidia"];
+  if (strategy === "local-apple-qwen3-0_6b") return ["local-apple"];
   return [];
 }
 
@@ -136,6 +146,8 @@ function providerKeys(provider) {
 function providerEnvNames(provider) {
   if (provider === "gemini") return ["GEMINI_API_KEY", "GEMINI_API_KEYS", "GOOGLE_API_KEY", "GOOGLE_API_KEYS", "AI_STUDIO_API_KEY", "AI_STUDIO_API_KEYS"];
   if (provider === "voyage") return ["VOYAGE_API_KEY", "VOYAGE_API_KEYS"];
+  if (provider === "nvidia") return ["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVAPI_KEY", "NVAPI_KEYS"];
+  if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL"];
   return [];
 }
 

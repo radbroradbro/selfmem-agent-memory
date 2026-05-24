@@ -24,6 +24,10 @@
 | cloud-voyage4-voyage | cloud-voyage4-voyage | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-gemini-embed-rerank-proxy | cloud-gemini-embed-rerank-proxy | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-gemini-voyage-rerank | cloud-gemini-voyage-rerank | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-nvidia-retriever-500m | cloud-nvidia-retriever-500m | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-nvidia-nemotron-1b | cloud-nvidia-nemotron-1b | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-nvidia-e5-mistral | cloud-nvidia-e5-mistral | 1 | 1 | 1 | 1 | 1 | 1 |
+| local-apple-qwen3-0_6b | local-apple-qwen3-0_6b | 1 | 1 | 1 | 1 | 1 | 1 |
 
 ## Safety
 

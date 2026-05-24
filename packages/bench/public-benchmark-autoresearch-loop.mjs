@@ -45,6 +45,12 @@ const retrievalStrategies = [
   "cloud-voyage4-voyage",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
+  "cloud-nvidia-retriever-500m",
+  "cloud-nvidia-nemotron-1b",
+  "cloud-nvidia-nemotron-vl-1b",
+  "cloud-nvidia-e5-mistral",
+  "cloud-nvidia-code",
+  "local-apple-qwen3-0_6b",
 ];
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;

@@ -317,7 +317,14 @@ assert.equal(publicLongmemEvalExpandedHybridGate.publicBenchmarkClaimsAllowed, f
 assert.equal(publicLongmemEvalProviderGateFixture.mode, "public-benchmark-provider-gate");
 assert.equal(publicLongmemEvalProviderGateFixture.fixtureOnly, true);
 assert.equal(publicLongmemEvalProviderGateFixture.publicBenchmarkClaimsAllowed, false);
-for (const strategy of ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage", "cloud-gemini-voyage-rerank"]) {
+for (const strategy of [
+  "bm25-lite",
+  "full-hybrid-rerank",
+  "cloud-voyage4-voyage",
+  "cloud-gemini-voyage-rerank",
+  "cloud-nvidia-nemotron-1b",
+  "local-apple-qwen3-0_6b",
+]) {
   assert.ok(
     publicLongmemEvalProviderGateFixture.strategies?.some((item) => item.strategy === strategy),
     `missing provider gate strategy ${strategy}`,

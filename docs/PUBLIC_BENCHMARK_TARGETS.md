@@ -232,17 +232,20 @@ harness we will use.
 - Current provider-backed gate scaffold:
   `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
   It adds `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
-  `cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank` to the
-  same public-safe comparison path. Fixture mode makes no hosted calls; live
-  runs require `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`,
-  `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, and env-only credentials for
+  `cloud-gemini-embed-rerank-proxy`, `cloud-gemini-voyage-rerank`,
+  `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
+  `cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b` to the same
+  public-safe comparison path. Fixture mode makes no hosted calls; live runs
+  require `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`,
+  `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, and env-only readiness for
   the selected provider arm.
 - Current live provider preflight:
   `reviews/overnight-20260522/public-longmemeval-provider-live-preflight.json`.
   It calls no provider APIs, sends no benchmark text, and currently reports
   `BLOCKED_PROVIDER_ENV` because the clean controller environment has no
-  provider-call consent flags or env-only Gemini/Voyage credentials. Treat this
-  as the required gate before spending calls on provider-backed arms.
+  provider-call consent flags or env-only Gemini/Voyage/NVIDIA/local-Apple
+  readiness. Treat this as the required gate before spending calls on
+  provider-backed arms.
 - Expanded live provider preflight:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
   It checks the same provider arms against the 30-question expanded target and

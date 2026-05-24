@@ -104,16 +104,18 @@ Live status:
 - Adds the provider-backed gate scaffold. The new `benchmark:public-provider`
   command compares `bm25-lite`, `full-hybrid-rerank`,
   `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
-  `cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank` through
-  the same public-safe metrics path. Fixture mode uses deterministic provider
-  mocks and zero hosted calls; live provider runs require explicit provider-call
-  and public-data environment guards plus env-only credentials for the selected
+  `cloud-gemini-embed-rerank-proxy`, `cloud-gemini-voyage-rerank`,
+  `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
+  `cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b` through the same
+  public-safe metrics path. Fixture mode uses deterministic provider mocks and
+  zero hosted calls; live provider runs require explicit provider-call and
+  public-data environment guards plus env-only readiness for the selected
   provider arm.
 - Adds `benchmark:public-provider:preflight`, a fail-closed live provider
   benchmark preflight. It checks the source-locked public LongMemEval target,
   provider-call consent flags, public-data consent flags, and env-only
-  Gemini/Voyage credential presence without calling provider APIs or sending
-  benchmark text. The current controller evidence reports
+  Gemini/Voyage/NVIDIA/local-Apple readiness without calling provider APIs or
+  sending benchmark text. The current controller evidence reports
   `BLOCKED_PROVIDER_ENV`, so no live provider benchmark claim is made.
 - Adds an expanded provider preflight for the 30-question target:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
@@ -125,7 +127,7 @@ Live status:
   expanded 30-query LongMemEval-S target. The checked-in evidence keeps BM25 as
   the current control winner, blocks deterministic hybrid promotion, and blocks
   live provider calls until explicit public-data/provider-call consent plus
-  env-only Gemini/Voyage credentials are present.
+  env-only provider readiness is present.
 - Previous verified code/product baseline before the expanded provider
   preflight:
   `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.

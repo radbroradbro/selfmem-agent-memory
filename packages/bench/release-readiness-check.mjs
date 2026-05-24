@@ -1501,9 +1501,13 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-nvidia-nemotron-1b" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b" && item.provider?.fixtureProviderMock === true));
   assert.match(providerMarkdown, /Gate: provider/);
   assert.match(providerMarkdown, /cloud-voyage4-voyage/);
   assert.match(providerMarkdown, /cloud-gemini-voyage-rerank/);
+  assert.match(providerMarkdown, /cloud-nvidia-nemotron-1b/);
+  assert.match(providerMarkdown, /local-apple-qwen3-0_6b/);
   assert.equal(autoresearchFixture.ok, true);
   assert.equal(autoresearchFixture.mode, "public-benchmark-autoresearch-loop");
   assert.equal(autoresearchFixture.fixtureOnly, true);
@@ -1707,6 +1711,10 @@ check("fresh public benchmark target check passes", () => {
     "cloud-voyage4-voyage",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
+    "cloud-nvidia-retriever-500m",
+    "cloud-nvidia-nemotron-1b",
+    "cloud-nvidia-e5-mistral",
+    "local-apple-qwen3-0_6b",
   ]) {
     assert.ok(providerGateNames.has(strategyName), `missing provider gate strategy ${strategyName}`);
   }
@@ -1714,9 +1722,13 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-nvidia-nemotron-1b" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b" && item.provider?.fixtureProviderMock === true));
   assert.match(providerGateFixtureEvidence, /Gate: provider/);
   assert.match(providerGateFixtureEvidence, /cloud-voyage4-voyage/);
   assert.match(providerGateFixtureEvidence, /cloud-gemini-voyage-rerank/);
+  assert.match(providerGateFixtureEvidence, /cloud-nvidia-nemotron-1b/);
+  assert.match(providerGateFixtureEvidence, /local-apple-qwen3-0_6b/);
   assert.equal(providerLivePreflightReport.ok, true);
   assert.equal(providerLivePreflightReport.mode, "provider-benchmark-live-preflight");
   assert.equal(providerLivePreflightReport.metricsOnly, true);
@@ -1731,6 +1743,8 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(providerLivePreflightReport.blockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"));
   assert.ok(providerLivePreflightReport.missingCredentialProviders?.includes("gemini"));
   assert.ok(providerLivePreflightReport.missingCredentialProviders?.includes("voyage"));
+  assert.ok(providerLivePreflightReport.missingCredentialProviders?.includes("nvidia"));
+  assert.ok(providerLivePreflightReport.missingCredentialProviders?.includes("local-apple"));
   assert.deepEqual(providerLivePreflightReport.strategies, [
     "bm25-lite",
     "full-hybrid-rerank",
@@ -1738,10 +1752,16 @@ check("fresh public benchmark target check passes", () => {
     "cloud-voyage4-voyage",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
+    "cloud-nvidia-retriever-500m",
+    "cloud-nvidia-nemotron-1b",
+    "cloud-nvidia-e5-mistral",
+    "local-apple-qwen3-0_6b",
   ]);
   assert.match(providerLivePreflightEvidence, /Provider Benchmark Live Preflight/);
   assert.match(providerLivePreflightEvidence, /Live run allowed: false/);
   assert.match(providerLivePreflightEvidence, /cloud-gemini-voyage-rerank/);
+  assert.match(providerLivePreflightEvidence, /cloud-nvidia-nemotron-1b/);
+  assert.match(providerLivePreflightEvidence, /local-apple-qwen3-0_6b/);
   assert.equal(expandedProviderLivePreflightReport.ok, true);
   assert.equal(expandedProviderLivePreflightReport.mode, "provider-benchmark-live-preflight");
   assert.equal(expandedProviderLivePreflightReport.status, "BLOCKED_PROVIDER_ENV");
@@ -1758,6 +1778,8 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(expandedProviderLivePreflightReport.blockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"));
   assert.ok(expandedProviderLivePreflightReport.missingCredentialProviders?.includes("gemini"));
   assert.ok(expandedProviderLivePreflightReport.missingCredentialProviders?.includes("voyage"));
+  assert.ok(expandedProviderLivePreflightReport.missingCredentialProviders?.includes("nvidia"));
+  assert.ok(expandedProviderLivePreflightReport.missingCredentialProviders?.includes("local-apple"));
   assert.ok(
     expandedProviderLivePreflightReport.liveCommandTemplate?.some((line) =>
       String(line).includes("reviews/overnight-20260522/public-longmemeval-expanded-run-target.json"),
@@ -1766,6 +1788,8 @@ check("fresh public benchmark target check passes", () => {
   assert.match(expandedProviderLivePreflightEvidence, /Provider Benchmark Live Preflight/);
   assert.match(expandedProviderLivePreflightEvidence, /Live run allowed: false/);
   assert.match(expandedProviderLivePreflightEvidence, /cloud-voyage4-voyage/);
+  assert.match(expandedProviderLivePreflightEvidence, /cloud-nvidia-nemotron-1b/);
+  assert.match(expandedProviderLivePreflightEvidence, /local-apple-qwen3-0_6b/);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");

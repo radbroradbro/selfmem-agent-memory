@@ -82,7 +82,8 @@ OPENROUTER_API_KEY
 Never commit key files, `.env`, private memory stores, trace logs, raw
 diagnostics, screenshots from real agent memory, or exported user data.
 
-The current public-safe provider harness exposes Voyage and Gemini arms:
+The current public-safe provider harness exposes Voyage, Gemini, NVIDIA, and
+local Apple Silicon arms:
 
 - `cloud-voyage-rerank-only`: BM25 preselect, then Voyage `rerank-2.5`.
 - `cloud-voyage4-voyage`: budgeted BM25 preselect, Voyage `voyage-4-large`
@@ -94,6 +95,15 @@ The current public-safe provider harness exposes Voyage and Gemini arms:
 - `cloud-gemini-voyage-rerank`: budgeted BM25 preselect, Gemini
   `gemini-embedding-001` query/document embeddings, sparse+dense+graph+temporal
   fusion, then Voyage `rerank-2.5`.
+- `cloud-nvidia-retriever-500m`: budgeted BM25 preselect, NVIDIA embedding,
+  sparse+dense+graph+temporal fusion, then NVIDIA's smaller reranker challenger.
+- `cloud-nvidia-nemotron-1b`: budgeted BM25 preselect, NVIDIA Nemotron
+  embedding, sparse+dense+graph+temporal fusion, then the 1B Nemotron reranker.
+- `cloud-nvidia-e5-mistral`: budgeted BM25 preselect, NVIDIA E5-style QA
+  embedding, sparse+dense+graph+temporal fusion, then the Mistral reranker arm.
+- `local-apple-qwen3-0_6b`: budgeted BM25 preselect, an OpenAI-compatible
+  local Apple Silicon embedding server, sparse+dense+graph+temporal fusion,
+  then the deterministic local rerank proxy until a local reranker passes.
 
 Live provider benchmark calls require both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`
 and `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`. The second flag is

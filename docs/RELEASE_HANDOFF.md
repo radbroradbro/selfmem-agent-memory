@@ -244,9 +244,11 @@ The provider-backed gate starts as a fixture-only CI path:
 `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It checks the exact public-safe comparison shape for `bm25-lite`,
 `full-hybrid-rerank`, `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
-`cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank`. Fixture
-mode uses deterministic mocks and makes zero hosted calls. A real provider run
-is opt-in only:
+`cloud-gemini-embed-rerank-proxy`, `cloud-gemini-voyage-rerank`,
+`cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
+`cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b`. Fixture mode uses
+deterministic mocks and makes zero hosted calls. A real provider run is opt-in
+only:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight
@@ -254,6 +256,8 @@ RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
 GEMINI_API_KEY=<env-only-if-running-gemini-arm> \
+NVIDIA_API_KEY=<env-only-if-running-nvidia-arm> \
+SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-if-running-local-apple-arm> \
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```

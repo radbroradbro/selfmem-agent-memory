@@ -39,6 +39,12 @@ const retrievalStrategies = [
   "cloud-voyage4-voyage",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
+  "cloud-nvidia-retriever-500m",
+  "cloud-nvidia-nemotron-1b",
+  "cloud-nvidia-nemotron-vl-1b",
+  "cloud-nvidia-e5-mistral",
+  "cloud-nvidia-code",
+  "local-apple-qwen3-0_6b",
 ];
 const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
 const contextTokenBudget = optionalPositiveInt(
@@ -260,6 +266,8 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "cloud-voyage4-voyage") return rankCloudVoyage4Voyage(query, candidates, options);
   if (options.strategy === "cloud-gemini-embed-rerank-proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
   if (options.strategy === "cloud-gemini-voyage-rerank") return rankCloudGeminiVoyageRerank(query, candidates, options);
+  if (nvidiaStrategyConfig(options.strategy)) return rankCloudNvidiaHybrid(query, candidates, options);
+  if (options.strategy === "local-apple-qwen3-0_6b") return rankLocalAppleQwen(query, candidates, options);
   return rankJaccard(queryText, candidates);
 }
 
@@ -488,6 +496,84 @@ async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
   return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
 }
 
+async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
+  const queryText = queryTextValue(query);
+  const config = nvidiaStrategyConfig(options.strategy);
+  assert.ok(config, `unknown NVIDIA strategy: ${options.strategy}`);
+  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  if (options.fixtureRequested) {
+    options.providerStats?.recordMockCall("nvidia-embedding");
+    options.providerStats?.recordMockCall("nvidia-rerank");
+    const dense = rankDenseProxy(queryText, densePool);
+    const fused = fuseRankedChannels(
+      densePool,
+      [
+        { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+        { name: "nvidia-dense-mock", weight: 1, ranked: dense },
+        { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+        { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+      ],
+      { scoreScale: 8 },
+    ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
+    return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  }
+  assertProviderBenchmarkAllowed(options.strategy);
+  const queryVector = (await nvidiaEmbed([queryText], "query", config, { providerStats: options.providerStats }))[0];
+  const documentVectors = await nvidiaEmbed(densePool.map((candidate) => candidate.text), "passage", config, { providerStats: options.providerStats });
+  const denseRanked = densePool
+    .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
+    .sort(byScoreThenId);
+  const fused = fuseRankedChannels(
+    densePool,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+      { name: "nvidia-dense", weight: 1, ranked: denseRanked },
+      { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+      { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+    ],
+    { scoreScale: 8 },
+  ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
+  const reranked = await nvidiaRerank(queryText, fused, config, { providerStats: options.providerStats });
+  return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+}
+
+async function rankLocalAppleQwen(query, candidates, options = {}) {
+  const queryText = queryTextValue(query);
+  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  if (options.fixtureRequested) {
+    options.providerStats?.recordMockCall("local-apple-embedding");
+    const dense = rankDenseProxy(queryText, densePool);
+    const fused = fuseRankedChannels(
+      densePool,
+      [
+        { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+        { name: "local-apple-dense-mock", weight: 1, ranked: dense },
+        { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+        { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+      ],
+      { scoreScale: 8 },
+    );
+    return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  }
+  assertProviderBenchmarkAllowed("local-apple-qwen3-0_6b");
+  const queryVector = (await localAppleEmbed([queryText], { providerStats: options.providerStats }))[0];
+  const documentVectors = await localAppleEmbed(densePool.map((candidate) => candidate.text), { providerStats: options.providerStats });
+  const denseRanked = densePool
+    .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
+    .sort(byScoreThenId);
+  const fused = fuseRankedChannels(
+    densePool,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+      { name: "local-apple-dense", weight: 1, ranked: denseRanked },
+      { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+      { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+    ],
+    { scoreScale: 8 },
+  );
+  return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+}
+
 function fuseRankedChannels(candidates, channels, options = {}) {
   const scores = new Map(candidates.map((candidate) => [candidate.outputId, 0]));
   for (const channel of channels) {
@@ -672,6 +758,12 @@ function isProviderStrategy(strategy) {
     "cloud-voyage4-voyage",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
+    "cloud-nvidia-retriever-500m",
+    "cloud-nvidia-nemotron-1b",
+    "cloud-nvidia-nemotron-vl-1b",
+    "cloud-nvidia-e5-mistral",
+    "cloud-nvidia-code",
+    "local-apple-qwen3-0_6b",
   ].includes(strategy);
 }
 
@@ -687,30 +779,40 @@ function requiredProvidersForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy") return ["gemini"];
   if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
   if (strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return ["voyage"];
+  if (nvidiaStrategyConfig(strategy)) return ["nvidia"];
+  if (strategy === "local-apple-qwen3-0_6b") return ["local-apple"];
   return [];
 }
 
 function embedModelForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiEmbedModel();
   if (strategy === "cloud-voyage4-voyage") return voyageEmbedModel();
+  if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).embedModel;
+  if (strategy === "local-apple-qwen3-0_6b") return localAppleEmbedModel();
   return null;
 }
 
 function embedDimensionsForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiOutputDimensionality();
   if (strategy === "cloud-voyage4-voyage") return optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
+  if (nvidiaStrategyConfig(strategy)) return optionalPositiveInt(process.env.NVIDIA_EMBED_DIMENSIONS ?? null, "NVIDIA output dimension");
+  if (strategy === "local-apple-qwen3-0_6b") return optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_DIMENSIONS ?? "1024", "local Apple output dimension");
   return null;
 }
 
 function rerankModelForStrategy(strategy) {
   if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return voyageRerankModel();
   if (strategy === "cloud-gemini-embed-rerank-proxy") return "local-deterministic-rerank-proxy";
+  if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).rerankModel;
+  if (strategy === "local-apple-qwen3-0_6b") return process.env.SELFMEM_LOCAL_RERANK_MODEL ?? "local-deterministic-rerank-proxy";
   return null;
 }
 
 function providerEnvHint(provider) {
   if (provider === "gemini") return "GEMINI_API_KEY, GEMINI_API_KEYS, GOOGLE_API_KEY, GOOGLE_API_KEYS, AI_STUDIO_API_KEY, or AI_STUDIO_API_KEYS";
   if (provider === "voyage") return "VOYAGE_API_KEY or VOYAGE_API_KEYS";
+  if (provider === "nvidia") return "NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, or NVAPI_KEYS";
+  if (provider === "local-apple") return "SELFMEM_LOCAL_EMBED_BASE_URL";
   return `${provider.toUpperCase()} provider credentials`;
 }
 
@@ -734,6 +836,17 @@ function providerKeys(provider) {
       ...splitProviderKeys(process.env.AI_STUDIO_API_KEYS),
       ...splitProviderKeys(process.env.AI_STUDIO_API_KEY),
     ];
+  }
+  if (provider === "nvidia") {
+    return [
+      ...splitProviderKeys(process.env.NVIDIA_API_KEYS),
+      ...splitProviderKeys(process.env.NVIDIA_API_KEY),
+      ...splitProviderKeys(process.env.NVAPI_KEYS),
+      ...splitProviderKeys(process.env.NVAPI_KEY),
+    ];
+  }
+  if (provider === "local-apple") {
+    return splitProviderKeys(process.env.SELFMEM_LOCAL_EMBED_BASE_URL);
   }
   return [];
 }
@@ -818,6 +931,60 @@ async function geminiEmbed(texts, inputType, options = {}) {
   return embeddings;
 }
 
+async function nvidiaEmbed(texts, inputType, config, options = {}) {
+  const input = texts.map((text) => String(text ?? ""));
+  const isQuery = inputType === "query";
+  options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : input.length);
+  const body = {
+    input,
+    model: nvidiaEmbedModel(config),
+    input_type: isQuery ? "query" : "passage",
+    encoding_format: "float",
+    truncate: process.env.NVIDIA_EMBED_TRUNCATE ?? "END",
+  };
+  const response = await nvidiaPost(nvidiaEmbeddingEndpoint(), body, { seed: `${inputType}:${input.length}:${input[0] ?? ""}` });
+  const embeddings = embeddingsFromOpenAiCompatibleResponse(response);
+  assert.equal(embeddings.length, input.length, "NVIDIA embeddings response length mismatch");
+  return embeddings;
+}
+
+async function nvidiaRerank(query, candidates, config, options = {}) {
+  const documents = candidates.map((candidate) => candidate.text);
+  options.providerStats?.recordProviderCall("rerank", documents.length);
+  const response = await nvidiaPost(
+    nvidiaRerankEndpoint(config),
+    {
+      model: nvidiaRerankModel(config),
+      query: { text: query },
+      passages: documents.map((text) => ({ text })),
+      truncate: process.env.NVIDIA_RERANK_TRUNCATE ?? "END",
+    },
+    { seed: `rerank:${query}:${documents.length}` },
+  );
+  const scores = rerankScoresFromNvidiaResponse(response);
+  assert.ok(scores.length > 0, "NVIDIA rerank returned no results");
+  return scores
+    .map((item, rank) => {
+      const candidate = candidates[item.index];
+      assert.ok(candidate, "NVIDIA rerank returned an invalid document index");
+      return { ...candidate, score: round(Number(item.score ?? 0) + reciprocalRankBoost(rank + 1)) };
+    })
+    .sort(byScoreThenId);
+}
+
+async function localAppleEmbed(texts, options = {}) {
+  const input = texts.map((text) => String(text ?? ""));
+  options.providerStats?.recordProviderCall("embedding", input.length);
+  const response = await localApplePost("/embeddings", {
+    input,
+    model: localAppleEmbedModel(),
+    encoding_format: "float",
+  });
+  const embeddings = embeddingsFromOpenAiCompatibleResponse(response);
+  assert.equal(embeddings.length, input.length, "local Apple embeddings response length mismatch");
+  return embeddings;
+}
+
 async function geminiPost(path, body, options = {}) {
   const key = chooseProviderKey("gemini", options.seed ?? path);
   const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
@@ -866,6 +1033,53 @@ async function voyagePost(path, body, options = {}) {
   }
 }
 
+async function nvidiaPost(url, body, options = {}) {
+  const key = chooseProviderKey("nvidia", options.seed ?? url);
+  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`NVIDIA provider request failed with status ${response.status}`);
+    }
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function localApplePost(path, body) {
+  const baseUrl = String(process.env.SELFMEM_LOCAL_EMBED_BASE_URL ?? "").replace(/\/+$/, "");
+  assert.ok(baseUrl, "SELFMEM_LOCAL_EMBED_BASE_URL is required for local Apple embeddings");
+  const url = baseUrl.endsWith("/v1") ? `${baseUrl}${path}` : `${baseUrl}/v1${path}`;
+  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`local Apple embedding request failed with status ${response.status}`);
+    }
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function embeddingsFromVoyageResponse(response) {
   if (Array.isArray(response?.data)) {
     return [...response.data]
@@ -891,12 +1105,40 @@ function embeddingsFromGeminiResponse(response) {
   return [];
 }
 
+function embeddingsFromOpenAiCompatibleResponse(response) {
+  if (Array.isArray(response?.data)) {
+    return [...response.data]
+      .sort((left, right) => Number(left.index ?? 0) - Number(right.index ?? 0))
+      .map((item) => item?.embedding?.values ?? item?.embedding ?? item?.values)
+      .filter(Array.isArray);
+  }
+  if (Array.isArray(response?.embeddings)) return response.embeddings.filter(Array.isArray);
+  return [];
+}
+
 function rerankScoresFromVoyageResponse(response) {
   const items = Array.isArray(response?.data) ? response.data : Array.isArray(response?.results) ? response.results : [];
   return items
     .map((item) => ({
       index: Number(item.index),
       score: finiteNumberOrDefault(item.relevance_score ?? item.score, 0),
+    }))
+    .filter((item) => Number.isInteger(item.index) && item.index >= 0)
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+}
+
+function rerankScoresFromNvidiaResponse(response) {
+  const items = Array.isArray(response?.rankings)
+    ? response.rankings
+    : Array.isArray(response?.data)
+    ? response.data
+    : Array.isArray(response?.results)
+    ? response.results
+    : [];
+  return items
+    .map((item) => ({
+      index: Number(item.index),
+      score: finiteNumberOrDefault(item.logit ?? item.relevance_score ?? item.score, 0),
     }))
     .filter((item) => Number.isInteger(item.index) && item.index >= 0)
     .sort((left, right) => right.score - left.score || left.index - right.index);
@@ -920,6 +1162,53 @@ function geminiModelResource(model) {
 
 function geminiOutputDimensionality() {
   return optionalPositiveInt(process.env.GEMINI_EMBED_DIMENSIONS ?? process.env.GEMINI_OUTPUT_DIMENSION ?? "1536", "Gemini output dimension");
+}
+
+function nvidiaStrategyConfig(strategy) {
+  const configs = {
+    "cloud-nvidia-retriever-500m": {
+      embedModel: "nvidia/llama-nemotron-embed-1b-v2",
+      rerankModel: "nvidia/llama-3.2-nemoretriever-500m-rerank-v2",
+    },
+    "cloud-nvidia-nemotron-1b": {
+      embedModel: "nvidia/llama-nemotron-embed-1b-v2",
+      rerankModel: "nvidia/llama-nemotron-rerank-1b-v2",
+    },
+    "cloud-nvidia-nemotron-vl-1b": {
+      embedModel: "nvidia/llama-nemotron-embed-vl-1b-v2",
+      rerankModel: "nvidia/llama-nemotron-rerank-vl-1b-v2",
+    },
+    "cloud-nvidia-e5-mistral": {
+      embedModel: "nvidia/nv-embedqa-e5-v5",
+      rerankModel: "nvidia/nv-rerankqa-mistral-4b-v3",
+    },
+    "cloud-nvidia-code": {
+      embedModel: "nvidia/nv-embedcode-7b-v1",
+      rerankModel: "nvidia/llama-nemotron-rerank-1b-v2",
+    },
+  };
+  return configs[strategy] ?? null;
+}
+
+function nvidiaEmbedModel(config) {
+  return String(process.env.NVIDIA_EMBED_MODEL ?? config.embedModel);
+}
+
+function nvidiaRerankModel(config) {
+  return String(process.env.NVIDIA_RERANK_MODEL ?? config.rerankModel);
+}
+
+function nvidiaEmbeddingEndpoint() {
+  return String(process.env.NVIDIA_EMBEDDING_ENDPOINT ?? "https://integrate.api.nvidia.com/v1/embeddings");
+}
+
+function nvidiaRerankEndpoint(config) {
+  if (process.env.NVIDIA_RERANK_ENDPOINT) return String(process.env.NVIDIA_RERANK_ENDPOINT);
+  return `https://ai.api.nvidia.com/v1/retrieval/${nvidiaRerankModel(config)}/reranking`;
+}
+
+function localAppleEmbedModel() {
+  return String(process.env.SELFMEM_LOCAL_EMBED_MODEL ?? "Qwen/Qwen3-Embedding-0.6B-GGUF");
 }
 
 function providerCandidateLimit(envName, fallback) {

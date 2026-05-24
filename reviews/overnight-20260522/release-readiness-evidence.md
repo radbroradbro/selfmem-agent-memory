@@ -211,6 +211,10 @@ Scope:
   `e7fa56a13bb761c916e15388af50351ba380323e` after the public hybrid gate
   compared BM25 against local-only dense, sparse+dense, temporal, graph,
   rerank, and query-expansion proxy arms.
+- Extended the provider-backed benchmark gate so the next same-data run can
+  compare BM25 and full local hybrid against Voyage, Gemini, NVIDIA, and local
+  Apple Silicon arms. The gate still blocks live provider calls until public
+  data consent, provider-call consent, and env-only readiness are present.
 - Kept the gate public-safe and evidence-based.
 
 What `release:check` verifies:
