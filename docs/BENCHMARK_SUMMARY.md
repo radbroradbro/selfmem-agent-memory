@@ -6,6 +6,14 @@ This repository includes metrics-only benchmark notes. It does not include agent
 
 RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. A 2026-05-23 source-matched, budgeted live canary beat the selected hosted baseline on this small private slice, and two independent reviewers approved the metrics-only packet for owner review. That supports a narrow canary comparison only. Broad superiority language still needs a fuller benchmark and owner approval.
 
+Solo RecallWeave runs are smoke tests only. They can prove the harness runs,
+privacy holds, latency is measurable, and the adapter does not fall over. They
+do not prove memory quality. Quality evidence must compare RecallWeave against
+same-data controls: a lexical floor such as BM25-lite, the current hybrid arm,
+provider-backed hybrid arms when explicit env-only provider consent is present,
+and source-locked public target rows or hosted Supermemory parity runs where
+those are available.
+
 The current branch includes a hosted baseline preflight:
 
 ```bash

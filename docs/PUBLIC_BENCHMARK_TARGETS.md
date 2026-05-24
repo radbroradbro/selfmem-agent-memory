@@ -10,6 +10,22 @@ iterate through autoresearch until the canary trend beats those targets.
 
 Use public benchmark data first.
 
+Do not test RecallWeave alone for quality. A solo run is a smoke test, not a
+comparison. Every quality report must name the same-data comparators and the
+claim tier it supports.
+
+Minimum same-data matrix:
+
+- lexical control: BM25-lite or another transparent sparse floor,
+- current local hybrid arm: sparse plus dense proxy, graph/topic, temporal, and
+  rerank/query-expansion proxies where available,
+- provider-backed hybrid arm: Voyage, Gemini, NVIDIA, or local Apple Silicon
+  embeddings/rerankers only after the provider preflight allows the run,
+- public target row: source-locked reported score or leaderboard row with the
+  same benchmark variant and metric definition,
+- hosted Supermemory parity: read-only product-parity baseline when quota and
+  source alignment allow it.
+
 Hosted Supermemory is useful for product parity and read-through behavior, but
 it is not the only baseline. When hosted quota is locked, do not block the
 benchmark loop on hosted writes. Run RecallWeave against a source-locked slice

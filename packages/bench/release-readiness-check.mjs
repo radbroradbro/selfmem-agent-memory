@@ -1197,8 +1197,13 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(autoresearchPlan, /Do not publish/i);
   assert.match(autoresearchPlan, /same dataset slice/i);
   assert.match(autoresearchPlan, /same public data, repository or dataset revision/i);
+  assert.match(autoresearchPlan, /must not optimize a solo RecallWeave run in isolation/i);
+  assert.match(autoresearchPlan, /BM25-lite as the lexical floor/i);
   assert.match(publicTargets, /Component Benchmarks/i);
   assert.match(publicTargets, /MTEB, MMTEB, BEIR, MIRACL, MS MARCO/i);
+  assert.match(publicTargets, /Do not test RecallWeave alone for quality/i);
+  assert.match(publicTargets, /Minimum same-data matrix/i);
+  assert.match(publicTargets, /provider-backed hybrid arm/i);
   assert.match(publicTargets, /118209a746d97d0d85e5a7234267f0b6962857e9/);
   assert.match(autoresearchPlan, /benchmark:source-lock -- --strict/);
   assert.match(publicTargets, /same public benchmark source, repository or dataset revision/i);

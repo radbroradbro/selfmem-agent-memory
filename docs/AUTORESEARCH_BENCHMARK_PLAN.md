@@ -20,6 +20,14 @@ definitions, and iterate through autoresearch until the canary trend points
 toward a win. Hosted Supermemory remains a read-through compatibility and
 product-parity lane, not a required scoring dependency.
 
+The autoresearch loop must not optimize a solo RecallWeave run in isolation.
+Each iteration needs a comparator table on the same source-locked data:
+BM25-lite as the lexical floor, the current hybrid arm, any approved
+provider-backed arm, and a public target row or hosted parity run when
+available. If BM25 wins, BM25 remains the fallback while the research loop
+targets the largest hybrid or provider gap. If a hybrid or provider arm wins,
+that arm still needs reviewer approval before it becomes an agent default.
+
 ## Rule For Public Scores
 
 Use a matched source-locked canary before any public score.
