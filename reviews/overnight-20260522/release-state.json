@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9",
-    "ciRunId": 26350184513,
+    "headSha": "67d0c9fc8cc3faef2150efa8368d619a1b4c9f11",
+    "ciRunId": 26350709133,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_strategy_compare_autoresearch_loop_and_provider_gate",
+    "localSmoke": "release_check_covers_fixture_public_materialize_strategy_compare_autoresearch_provider_gate_and_expanded_hybrid_gate",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding the fail-closed live provider benchmark preflight. The preflight checks the source-locked LongMemEval-S target, selected BM25, hybrid, Voyage, and Gemini strategy list, provider-call consent flags, public-data consent flags, and env-only Gemini/Voyage credential presence without calling provider APIs or sending benchmark text. Current clean-controller evidence reports BLOCKED_PROVIDER_ENV, preserving retrievalProxyOnly, memoryBenchAnswerQuality=false, publicBenchmarkClaimsAllowed=false, zero privacy failures, and public-safe evidence only. Local release:check, benchmark:public-provider:preflight, release:github-sync, diff check, goal:audit, and GitHub Actions run 26350184513 passed."
+    "note": "Latest inspected code/product baseline after adding the source-locked 30-query LongMemEval-S expanded hybrid stress gate and preserving the fail-closed live provider benchmark preflight. Current evidence keeps bm25-lite as the control winner, blocks deterministic hybrid promotion, keeps retrievalProxyOnly and publicBenchmarkClaimsAllowed=false, reports zero privacy failures, and requires provider-backed embedding/reranker arms before any public benchmark-performance claim. Local release:check, release:github-sync, diff check, goal:audit, goal-loop-review code verification, and GitHub Actions run 26350709133 passed."
   },
   "releaseStateGuard": {
     "enabled": true,

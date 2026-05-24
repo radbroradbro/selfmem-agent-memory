@@ -115,12 +115,12 @@ Live status:
   Gemini/Voyage credential presence without calling provider APIs or sending
   benchmark text. The current controller evidence reports
   `BLOCKED_PROVIDER_ENV`, so no live provider benchmark claim is made.
-- Promotes GitHub Actions run `26350184513` on `95768a6` as the latest
-  verified code/product baseline after adding the live provider benchmark
-  preflight. The preflight confirms the provider-backed benchmark lane compares
-  BM25, full hybrid, Voyage, and Gemini arms on the same source-locked
-  LongMemEval-S target, while blocking live calls until env-only credentials
-  and explicit public-data consent flags are present.
+- Promotes GitHub Actions run `26350709133` on `67d0c9f` as the latest
+  verified code/product baseline after adding the expanded 30-query
+  LongMemEval-S hybrid stress gate. The new gate compares BM25 and local
+  hybrid-family arms on the same source-locked target and keeps deterministic
+  hybrid promotion blocked until provider-backed embedding and reranker arms
+  beat the control.
 - Promotes GitHub Actions run `26349930959` on `a67c411` as the previous
   verified code/product baseline after extending the provider gate with Gemini
   embedding arms, binding every arm to the same source-locked fixture path, and
@@ -177,6 +177,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.
+- GitHub Actions run `26350709133`: passed CI after adding the expanded 30-query LongMemEval-S hybrid stress gate. The gate compares BM25 and local hybrid-family arms on the same source-locked target, keeps BM25 as the current control winner, blocks deterministic hybrid promotion, and preserves the fail-closed provider-backed benchmark path for the next live Voyage/Gemini-style arm.
+- Previous verified code/product baseline before the expanded hybrid stress gate:
   `95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9`.
 - GitHub Actions run `26350184513`: passed CI after adding the fail-closed live provider benchmark preflight. The preflight checks the public LongMemEval-S target, BM25/full-hybrid/Voyage/Gemini strategy list, consent flags, and env-only provider readiness without provider API calls or benchmark-text transmission.
 - Previous verified code/product baseline before the live provider preflight:

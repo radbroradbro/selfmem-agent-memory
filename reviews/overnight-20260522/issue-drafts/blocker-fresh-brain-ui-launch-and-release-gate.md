@@ -10,7 +10,15 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
-- `95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9`.
+- `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.
+- GitHub Actions run `26350709133` passed CI after adding the expanded
+  30-query LongMemEval-S hybrid stress gate. The gate compares BM25 and local
+  hybrid-family arms on the same source-locked target, keeps BM25 as the
+  current control winner, blocks deterministic hybrid promotion, and preserves
+  the fail-closed provider-backed benchmark path for the next live
+  Voyage/Gemini-style arm.
+- Previous verified code/product baseline before the expanded hybrid stress
+  gate: `95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9`.
 - GitHub Actions run `26350184513` passed CI after adding the fail-closed live
   provider benchmark preflight for the same source-locked LongMemEval-S target,
   BM25/full-hybrid/Voyage/Gemini strategy list, provider-call consent flags,
