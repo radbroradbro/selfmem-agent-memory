@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -99,6 +100,7 @@ const loaded = loadMemories(effectiveMemoriesPath, { preserveIds });
 assert.ok(loaded.candidates.length > 0, "memories input produced no searchable candidates");
 const providerStats = createProviderStats({ strategy: rankingStrategy, fixtureRequested });
 const localAppleDocumentEmbeddingCache = new Map();
+let localApplePersistentCacheState = null;
 
 const responses = {};
 const contextBudgetStats = [];
@@ -582,25 +584,30 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
 }
 
 async function localAppleEmbedCandidates(candidates, options = {}) {
+  ensureLocalApplePersistentCacheLoaded(options);
   const vectors = new Array(candidates.length);
   const missing = [];
   const missingIndexes = [];
   candidates.forEach((candidate, index) => {
-    const key = candidate.contentHash ?? stableHash(candidate.text);
+    const descriptor = localAppleEmbeddingCacheDescriptor(candidate);
+    const key = descriptor.cacheKey;
     const cached = localAppleDocumentEmbeddingCache.get(key);
     if (cached) {
+      options.providerStats?.recordLocalEmbeddingCacheHit();
       vectors[index] = cached;
       return;
     }
-    missing.push(candidate.text);
-    missingIndexes.push({ index, key });
+    options.providerStats?.recordLocalEmbeddingCacheMiss();
+    missing.push(descriptor.embeddingView);
+    missingIndexes.push({ descriptor, index, key });
   });
   if (missing.length) {
     const embedded = await localAppleEmbed(missing, options);
     assert.equal(embedded.length, missing.length, "local Apple candidate embedding cache fill mismatch");
     embedded.forEach((vector, offset) => {
-      const { index, key } = missingIndexes[offset];
+      const { descriptor, index, key } = missingIndexes[offset];
       localAppleDocumentEmbeddingCache.set(key, vector);
+      persistLocalAppleEmbeddingCacheEntry(descriptor, vector, options);
       vectors[index] = vector;
     });
   }
@@ -750,6 +757,13 @@ function createProviderStats(options = {}) {
     rerankCalls: 0,
     documentCountSent: 0,
     queryCountSent: 0,
+    localEmbeddingCacheEnabled: false,
+    localEmbeddingCacheEntriesLoaded: 0,
+    localEmbeddingCacheHits: 0,
+    localEmbeddingCacheMisses: 0,
+    localEmbeddingCacheWrites: 0,
+    localEmbeddingCacheReadErrors: 0,
+    localEmbeddingCacheWriteErrors: 0,
     modelArm: providerStrategy ? options.strategy : null,
     providers: providerNames,
     embedModel: providerStrategy ? embedModelForStrategy(options.strategy) : null,
@@ -773,6 +787,23 @@ function createProviderStats(options = {}) {
         stats.embeddingCalls += 1;
         stats.queryCountSent += 1;
       }
+    },
+    recordLocalEmbeddingCacheLoad({ enabled, entriesLoaded = 0, readErrors = 0 } = {}) {
+      stats.localEmbeddingCacheEnabled = Boolean(enabled);
+      stats.localEmbeddingCacheEntriesLoaded += Math.max(0, Number(entriesLoaded ?? 0));
+      stats.localEmbeddingCacheReadErrors += Math.max(0, Number(readErrors ?? 0));
+    },
+    recordLocalEmbeddingCacheHit(count = 1) {
+      stats.localEmbeddingCacheHits += Math.max(0, Number(count ?? 0));
+    },
+    recordLocalEmbeddingCacheMiss(count = 1) {
+      stats.localEmbeddingCacheMisses += Math.max(0, Number(count ?? 0));
+    },
+    recordLocalEmbeddingCacheWrite(count = 1) {
+      stats.localEmbeddingCacheWrites += Math.max(0, Number(count ?? 0));
+    },
+    recordLocalEmbeddingCacheWriteError(count = 1) {
+      stats.localEmbeddingCacheWriteErrors += Math.max(0, Number(count ?? 0));
     },
     summary() {
       const providerKeyCounts = Object.fromEntries(providerNames.map((provider) => [provider, providerKeyCount(provider)]));
@@ -831,7 +862,7 @@ function embedDimensionsForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiOutputDimensionality();
   if (voyageStrategyConfig(strategy)?.embedModel) return optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
   if (nvidiaStrategyConfig(strategy)) return optionalPositiveInt(process.env.NVIDIA_EMBED_DIMENSIONS ?? null, "NVIDIA output dimension");
-  if (strategy === "local-apple-qwen3-0_6b") return optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_DIMENSIONS ?? "1024", "local Apple output dimension");
+  if (strategy === "local-apple-qwen3-0_6b") return localAppleEmbedDimensions();
   return null;
 }
 
@@ -1323,9 +1354,146 @@ function localAppleEmbedModel() {
   return String(process.env.SELFMEM_LOCAL_EMBED_MODEL ?? "Qwen/Qwen3-Embedding-0.6B-GGUF");
 }
 
+function localAppleEmbedDimensions() {
+  return optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_DIMENSIONS ?? "1024", "local Apple output dimension");
+}
+
+function localAppleEmbedMaxEstimatedTokens() {
+  return optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_MAX_TOKENS ?? "3000", "local Apple embedding max tokens");
+}
+
+function localAppleEmbeddingCacheDescriptor(candidate) {
+  const text = String(candidate?.text ?? "");
+  const embeddingView = prepareLocalAppleEmbeddingInput(text);
+  const settings = localAppleEmbeddingCacheSettings();
+  const contentHash = candidate?.contentHash ?? stableHash(text);
+  const embeddingViewHash = stableHash(embeddingView);
+  const cacheKey = stableHash({
+    ...settings,
+    contentHash,
+    embeddingViewHash,
+  });
+  return {
+    ...settings,
+    cacheKey,
+    contentHash,
+    embeddingViewHash,
+    embeddingView,
+  };
+}
+
+function localAppleEmbeddingCacheSettings() {
+  return {
+    schemaVersion: 1,
+    provider: "local-apple",
+    inputPolicy: "head-tail-v1",
+    model: localAppleEmbedModel(),
+    configuredDimensions: localAppleEmbedDimensions(),
+    maxEstimatedTokens: localAppleEmbedMaxEstimatedTokens(),
+  };
+}
+
+function ensureLocalApplePersistentCacheLoaded(options = {}) {
+  if (localApplePersistentCacheState) return localApplePersistentCacheState;
+  const enabled = !envFlagDisabled(process.env.SELFMEM_LOCAL_EMBED_CACHE ?? process.env.SELFMEM_LOCAL_EMBED_CACHE_ENABLED ?? "1");
+  const settings = localAppleEmbeddingCacheSettings();
+  localApplePersistentCacheState = {
+    enabled,
+    settings,
+    path: null,
+  };
+  if (!enabled) {
+    options.providerStats?.recordLocalEmbeddingCacheLoad({ enabled: false });
+    return localApplePersistentCacheState;
+  }
+  let entriesLoaded = 0;
+  let readErrors = 0;
+  try {
+    const cachePath = localAppleEmbeddingCachePath(settings);
+    localApplePersistentCacheState.path = cachePath;
+    mkdirSync(dirname(cachePath), { recursive: true, mode: 0o700 });
+    try {
+      chmodSync(dirname(cachePath), 0o700);
+    } catch {
+      // Best-effort privacy hardening. Existing filesystem ACLs may be stricter.
+    }
+    if (existsSync(cachePath)) {
+      const lines = readFileSync(cachePath, "utf8").split(/\r?\n/).filter(Boolean);
+      for (const line of lines) {
+        try {
+          const entry = JSON.parse(line);
+          if (!isCurrentLocalAppleEmbeddingCacheEntry(entry, settings)) continue;
+          localAppleDocumentEmbeddingCache.set(entry.cacheKey, entry.vector);
+          entriesLoaded += 1;
+        } catch {
+          readErrors += 1;
+        }
+      }
+      try {
+        chmodSync(cachePath, 0o600);
+      } catch {
+        // Best effort only.
+      }
+    }
+  } catch {
+    readErrors += 1;
+    localApplePersistentCacheState.enabled = false;
+  }
+  options.providerStats?.recordLocalEmbeddingCacheLoad({
+    enabled: localApplePersistentCacheState.enabled,
+    entriesLoaded,
+    readErrors,
+  });
+  return localApplePersistentCacheState;
+}
+
+function persistLocalAppleEmbeddingCacheEntry(descriptor, vector, options = {}) {
+  const state = ensureLocalApplePersistentCacheLoaded(options);
+  if (!state.enabled || !state.path) return;
+  try {
+    const entry = {
+      schemaVersion: 1,
+      provider: "local-apple",
+      inputPolicy: descriptor.inputPolicy,
+      model: descriptor.model,
+      configuredDimensions: descriptor.configuredDimensions,
+      dimensions: Array.isArray(vector) ? vector.length : 0,
+      maxEstimatedTokens: descriptor.maxEstimatedTokens,
+      cacheKey: descriptor.cacheKey,
+      contentHash: descriptor.contentHash,
+      embeddingViewHash: descriptor.embeddingViewHash,
+      vector,
+      createdAt: generatedAt,
+    };
+    appendFileSync(state.path, `${JSON.stringify(entry)}\n`, { mode: 0o600 });
+    options.providerStats?.recordLocalEmbeddingCacheWrite();
+  } catch {
+    options.providerStats?.recordLocalEmbeddingCacheWriteError();
+  }
+}
+
+function localAppleEmbeddingCachePath(settings) {
+  if (process.env.SELFMEM_LOCAL_EMBED_CACHE_PATH) return resolve(String(process.env.SELFMEM_LOCAL_EMBED_CACHE_PATH));
+  const settingsHash = stableHash(settings).slice(0, 16);
+  return join(homedir(), ".cache", "recallweave", `local-apple-embeddings-${settingsHash}.jsonl`);
+}
+
+function isCurrentLocalAppleEmbeddingCacheEntry(entry, settings) {
+  if (!entry || typeof entry !== "object") return false;
+  if (entry.schemaVersion !== 1 || entry.provider !== "local-apple") return false;
+  if (entry.inputPolicy !== settings.inputPolicy) return false;
+  if (entry.model !== settings.model) return false;
+  if (entry.configuredDimensions !== settings.configuredDimensions) return false;
+  if (entry.maxEstimatedTokens !== settings.maxEstimatedTokens) return false;
+  if (typeof entry.cacheKey !== "string" || typeof entry.contentHash !== "string" || typeof entry.embeddingViewHash !== "string") return false;
+  if (!Array.isArray(entry.vector) || !entry.vector.length) return false;
+  if (Number.isFinite(entry.dimensions) && entry.vector.length !== entry.dimensions) return false;
+  return entry.vector.every((value) => Number.isFinite(value));
+}
+
 function prepareLocalAppleEmbeddingInput(text) {
   const source = String(text ?? "");
-  const maxEstimatedTokens = optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_MAX_TOKENS ?? "3000", "local Apple embedding max tokens");
+  const maxEstimatedTokens = localAppleEmbedMaxEstimatedTokens();
   if (estimateTokens(source) <= maxEstimatedTokens) return source;
   const maxChars = Math.max(64, maxEstimatedTokens * 4);
   const marker = "\n\n[RecallWeave local embedding view: middle elided]\n\n";
@@ -1638,6 +1806,10 @@ function positiveInt(value, label) {
 function optionalPositiveInt(value, label) {
   if (value == null || value === "" || value === false) return null;
   return positiveInt(value, label);
+}
+
+function envFlagDisabled(value) {
+  return ["0", "false", "off", "no", "disabled"].includes(String(value ?? "").trim().toLowerCase());
 }
 
 function normalizeStrategy(value) {

@@ -207,6 +207,26 @@ expanded 30-query local pass also exposed the right production requirement:
 local embeddings must be persisted in a reusable vector index before large
 local benchmarks or agent defaults are meaningful.
 
+The benchmark harness now has a privacy-safe persistent document-embedding
+cache for the local Apple lane. It stores only cache hashes, model/settings
+metadata, vector dimensions, and vectors outside the repository; it does not
+store raw memory text, local paths, credentials, or transcripts. The cache smoke
+in `reviews/overnight-20260522/local-apple-persistent-cache-smoke.md` used a
+fake OpenAI-compatible local embedding server: the first run wrote 5 document
+cache entries, and the second run loaded all 5 with zero document misses. That
+does not improve model quality by itself, but it makes larger local benchmarks
+and slightly larger Apple Silicon embedding models realistic instead of
+re-embedding the same public documents every run.
+
+The default Apple Silicon lane remains Qwen3 Embedding 0.6B for consumer
+hardware. Operators may test a larger local model by serving it through the
+same OpenAI-compatible embedding endpoint and setting
+`SELFMEM_LOCAL_EMBED_MODEL`, `SELFMEM_LOCAL_EMBED_DIMENSIONS`,
+`SELFMEM_LOCAL_EMBED_BASE_URL`, and optionally
+`SELFMEM_LOCAL_EMBED_CACHE_PATH`. Public score claims still require a matched
+canary report and reviewer approval; model-size experiments are evidence, not
+marketing claims.
+
 Provider keys can stay in normal environment variables, or in private key files
 referenced by env vars such as `VOYAGE_API_KEYS_FILE`,
 `NVIDIA_API_KEYS_FILE`, and `GEMINI_API_KEYS_FILE`. Key files must live outside
@@ -522,6 +542,9 @@ The next public-safe benchmark gate will test separated provider arms:
   `cloud-nvidia-nemotron-vl-1b`, and `cloud-nvidia-e5-mistral` for hosted
   NVIDIA retrieval comparisons.
 - `local-apple-qwen3-0_6b` for the default Apple Silicon lane.
+- `local-apple-qwen3-0_6b` with `SELFMEM_LOCAL_EMBED_MODEL` overridden for a
+  measured larger local Apple Silicon arm after the persistent cache gate is
+  green.
 
 Query expansion stays off unless it enters as one isolated methodology change
 and beats the no-expansion run without exact-identifier, privacy, or latency
