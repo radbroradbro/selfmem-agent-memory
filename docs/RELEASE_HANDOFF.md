@@ -227,14 +227,16 @@ promotion until real embedding/reranker arms beat it on a larger slice.
 The provider-backed gate starts as a fixture-only CI path:
 `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It checks the exact public-safe comparison shape for `bm25-lite`,
-`full-hybrid-rerank`, `cloud-voyage-rerank-only`, and `cloud-voyage4-voyage`.
-Fixture mode uses deterministic mocks and makes zero hosted calls. A real
-provider run is opt-in only:
+`full-hybrid-rerank`, `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
+`cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank`. Fixture
+mode uses deterministic mocks and makes zero hosted calls. A real provider run
+is opt-in only:
 
 ```bash
 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
+GEMINI_API_KEY=<env-only-if-running-gemini-arm> \
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```

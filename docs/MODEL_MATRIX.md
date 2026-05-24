@@ -55,7 +55,8 @@ OpenAI-compatible interface and let the canary decide.
 | Arm | Embedder | Reranker | Status |
 |---|---|---|---|
 | `cloud-voyage4-voyage` | `voyage-4-large` | `rerank-2.5` | Default cloud canary arm. |
-| `cloud-gemini2-cohere4pro` | Gemini Embedding 2 or current Gemini embedding model | Cohere Rerank 4 Pro | Challenger for multimodal and document-heavy memory. |
+| `cloud-gemini-embed-rerank-proxy` | `gemini-embedding-001`, default 1536 dims | Local deterministic rerank proxy | Gemini embedding challenger without a hosted reranker. |
+| `cloud-gemini-voyage-rerank` | `gemini-embedding-001`, default 1536 dims | `rerank-2.5` | Gemini embedding challenger with Voyage rerank held constant. |
 | `cloud-nvidia-retriever-500m` | `nvidia/llama-nemotron-embed-1b-v2` | `nvidia/llama-3.2-nemoretriever-500m-rerank-v2` | Latency challenger. |
 | `cloud-nvidia-nemotron-1b` | `nvidia/llama-nemotron-embed-1b-v2` | `nvidia/llama-nemotron-rerank-1b-v2` | Current text retrieval challenger. |
 | `cloud-nvidia-nemotron-vl-1b` | `nvidia/llama-nemotron-embed-vl-1b-v2` | `nvidia/llama-nemotron-rerank-vl-1b-v2` | Multimodal retrieval challenger. |
@@ -69,6 +70,10 @@ VOYAGE_API_KEY
 VOYAGE_API_KEYS
 GEMINI_API_KEY
 GEMINI_API_KEYS
+GOOGLE_API_KEY
+GOOGLE_API_KEYS
+AI_STUDIO_API_KEY
+AI_STUDIO_API_KEYS
 NVIDIA_API_KEY
 NVIDIA_API_KEYS
 OPENROUTER_API_KEY
@@ -77,12 +82,18 @@ OPENROUTER_API_KEY
 Never commit key files, `.env`, private memory stores, trace logs, raw
 diagnostics, screenshots from real agent memory, or exported user data.
 
-The current public-safe provider harness exposes two Voyage arms:
+The current public-safe provider harness exposes Voyage and Gemini arms:
 
 - `cloud-voyage-rerank-only`: BM25 preselect, then Voyage `rerank-2.5`.
 - `cloud-voyage4-voyage`: budgeted BM25 preselect, Voyage `voyage-4-large`
   query/document embeddings, sparse+dense+graph+temporal fusion, then Voyage
   `rerank-2.5`.
+- `cloud-gemini-embed-rerank-proxy`: budgeted BM25 preselect, Gemini
+  `gemini-embedding-001` query/document embeddings, sparse+dense+graph+temporal
+  fusion, then the local deterministic rerank proxy.
+- `cloud-gemini-voyage-rerank`: budgeted BM25 preselect, Gemini
+  `gemini-embedding-001` query/document embeddings, sparse+dense+graph+temporal
+  fusion, then Voyage `rerank-2.5`.
 
 Live provider benchmark calls require both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`
 and `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`. The second flag is

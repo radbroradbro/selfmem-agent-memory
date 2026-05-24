@@ -16,7 +16,7 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-24T02:19:07.929Z",
+  "generatedAt": "2026-05-24T02:39:12.179Z",
   "input": {
     "source": "fixture",
     "datasetSlice": "fixture-memory-canary-slice",
@@ -31,8 +31,8 @@
     {
       "strategy": "bm25-lite",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:74515ac923288278b85e109d195b5f618efddaeeae1d0165d7540eb712aceaa1",
-      "resultHash": "sha256:c66b3a0d18c60ef1b97637aa6fbb9797fa3ff82b6114326ca0727c28fb980b01",
+      "responsesHash": "sha256:43cc19c32734bb9e491176b29a418b081c3ca533fc949f15df5e9ed895a15c3c",
+      "resultHash": "sha256:a2b5cbae0120ef6d238d435439044bf083e2283803b334e9d365b36eda1d4a4a",
       "rankingStrategy": "bm25-lite",
       "provider": {
         "strategy": "bm25-lite",
@@ -46,9 +46,12 @@
         "documentCountSent": 0,
         "queryCountSent": 0,
         "modelArm": null,
+        "providers": [],
         "embedModel": null,
+        "embedDimensions": null,
         "rerankModel": null,
         "fixtureProviderMock": false,
+        "providerKeyCounts": {},
         "keyCountAvailable": 0
       },
       "metrics": {
@@ -58,7 +61,7 @@
         "recallAt10": 1,
         "ndcgAt10": 1,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 7,
+        "latencyP95Ms": 5,
         "contextTokensAvg": 119
       },
       "contextBudget": {
@@ -104,8 +107,8 @@
     {
       "strategy": "full-hybrid-rerank",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:681afbdae9281b1750247c5c75fad896125a933b72022a8776771d130a879aae",
-      "resultHash": "sha256:891892572d5c001ae3ef3bed91336c6ea5bc175491c6330a73e27f956049e992",
+      "responsesHash": "sha256:7a33233035cf2170d7f5c3a24a18cb2683ea317c54fa8d3a9c561872524ae87f",
+      "resultHash": "sha256:f7c94e56a1843a96e33a0ca2cf2c2d99ecc48b8f58f8fa349e258c1a8557898b",
       "rankingStrategy": "full-hybrid-rerank",
       "provider": {
         "strategy": "full-hybrid-rerank",
@@ -119,82 +122,12 @@
         "documentCountSent": 0,
         "queryCountSent": 0,
         "modelArm": null,
+        "providers": [],
         "embedModel": null,
+        "embedDimensions": null,
         "rerankModel": null,
         "fixtureProviderMock": false,
-        "keyCountAvailable": 0
-      },
-      "metrics": {
-        "quality": 1,
-        "pAt1": 1,
-        "recallAt5": 1,
-        "recallAt10": 1,
-        "ndcgAt10": 1,
-        "latencyP50Ms": 1,
-        "latencyP95Ms": 9,
-        "contextTokensAvg": 119
-      },
-      "contextBudget": {
-        "applied": true,
-        "tokenBudget": 800,
-        "strategy": "ranked-prefix-with-last-result-clipping",
-        "queryCount": 3,
-        "queriesClipped": 0,
-        "clippedResultCount": 0,
-        "skippedByBudgetCount": 0,
-        "fullCandidateTokensAvg": 119,
-        "exportedContextTokensAvg": 119
-      },
-      "privacyLeakCount": 0,
-      "redactionFailureCount": 0,
-      "resultFingerprints": [
-        {
-          "queryIdHash": "88e0ebf4bd261e0c",
-          "topResultIdHash": "30db9417d7f5ef82",
-          "pAt1": 1,
-          "recallAt5": 1,
-          "recallAt10": 1,
-          "ndcgAt10": 1
-        },
-        {
-          "queryIdHash": "e5c08511b104dde0",
-          "topResultIdHash": "be860b09b9428b93",
-          "pAt1": 1,
-          "recallAt5": 1,
-          "recallAt10": 1,
-          "ndcgAt10": 1
-        },
-        {
-          "queryIdHash": "7317cde9f031a0db",
-          "topResultIdHash": "54fbee446492c839",
-          "pAt1": 1,
-          "recallAt5": 1,
-          "recallAt10": 1,
-          "ndcgAt10": 1
-        }
-      ]
-    },
-    {
-      "strategy": "cloud-voyage-rerank-only",
-      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:24dfc11a759b177ba979e681f23e39c2ca17b63786c443e0f4dfd6c4407becd4",
-      "resultHash": "sha256:5500bbccb2153b412d492cd56a4a5e6aa81d93c2500bd4472e651d4d4dc8a7ff",
-      "rankingStrategy": "cloud-voyage-rerank-only",
-      "provider": {
-        "strategy": "cloud-voyage-rerank-only",
-        "providerStrategy": true,
-        "providerCallsAllowed": false,
-        "providerPublicDataConfirmed": false,
-        "providerCallsMade": 0,
-        "providerMockCalls": 3,
-        "embeddingCalls": 0,
-        "rerankCalls": 3,
-        "documentCountSent": 0,
-        "queryCountSent": 0,
-        "modelArm": "cloud-voyage-rerank-only",
-        "embedModel": "voyage-4-large",
-        "rerankModel": "rerank-2.5",
-        "fixtureProviderMock": true,
+        "providerKeyCounts": {},
         "keyCountAvailable": 0
       },
       "metrics": {
@@ -248,10 +181,90 @@
       ]
     },
     {
+      "strategy": "cloud-voyage-rerank-only",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:8fc2ca5cf5bb7ef1249a6152d0bf9e78ab29338d704a76858f1eccc648917bfc",
+      "resultHash": "sha256:680195e921d469b54514686990fc28ce1a6998e56c1068b9c44d03e206b518bd",
+      "rankingStrategy": "cloud-voyage-rerank-only",
+      "provider": {
+        "strategy": "cloud-voyage-rerank-only",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 3,
+        "embeddingCalls": 0,
+        "rerankCalls": 3,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-voyage-rerank-only",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5",
+        "fixtureProviderMock": true,
+        "providerKeyCounts": {
+          "voyage": 0
+        },
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 5,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
       "strategy": "cloud-voyage4-voyage",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:229777808a6e28cd77b60334f96d344c3d882afa1cc2ef23743881d087913611",
-      "resultHash": "sha256:c24c9eb7c6abe2737460dcfdca49cbe84a8690e63448d35253a362848c16967c",
+      "responsesHash": "sha256:8b32c29c8f345b347dea4e8fc9ec7b84b7e2877365c145318a0eeadd15cfc534",
+      "resultHash": "sha256:be03fc1ca06154106279f5f5bb65ce2dd0315ab67916368c0bbee4402a49c157",
       "rankingStrategy": "cloud-voyage4-voyage",
       "provider": {
         "strategy": "cloud-voyage4-voyage",
@@ -265,9 +278,16 @@
         "documentCountSent": 0,
         "queryCountSent": 0,
         "modelArm": "cloud-voyage4-voyage",
+        "providers": [
+          "voyage"
+        ],
         "embedModel": "voyage-4-large",
+        "embedDimensions": null,
         "rerankModel": "rerank-2.5",
         "fixtureProviderMock": true,
+        "providerKeyCounts": {
+          "voyage": 0
+        },
         "keyCountAvailable": 0
       },
       "metrics": {
@@ -277,7 +297,169 @@
         "recallAt10": 1,
         "ndcgAt10": 1,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 8,
+        "latencyP95Ms": 6,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-gemini-embed-rerank-proxy",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:b95541554cef6801d34eb0cf4da7bed3318dbea7394f542d1239cf7316e09770",
+      "resultHash": "sha256:deb4e4c8f46a13d37dd8f9a4c17829af61f26e7143a036f0ca5e84370ab12411",
+      "rankingStrategy": "cloud-gemini-embed-rerank-proxy",
+      "provider": {
+        "strategy": "cloud-gemini-embed-rerank-proxy",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 3,
+        "embeddingCalls": 3,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-gemini-embed-rerank-proxy",
+        "providers": [
+          "gemini"
+        ],
+        "embedModel": "gemini-embedding-001",
+        "embedDimensions": 1536,
+        "rerankModel": "local-deterministic-rerank-proxy",
+        "fixtureProviderMock": true,
+        "providerKeyCounts": {
+          "gemini": 0
+        },
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 6,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-gemini-voyage-rerank",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:cb094cf17bdc298f80594af3dff9c39512dd2ad6dbc11e17cf6c5ca39882a6e3",
+      "resultHash": "sha256:0ad99065cc15ab504aa2faf15bd4566544217e9238f655016b541ac1010ba017",
+      "rankingStrategy": "cloud-gemini-voyage-rerank",
+      "provider": {
+        "strategy": "cloud-gemini-voyage-rerank",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 6,
+        "embeddingCalls": 3,
+        "rerankCalls": 3,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-gemini-voyage-rerank",
+        "providers": [
+          "gemini",
+          "voyage"
+        ],
+        "embedModel": "gemini-embedding-001",
+        "embedDimensions": 1536,
+        "rerankModel": "rerank-2.5",
+        "fixtureProviderMock": true,
+        "providerKeyCounts": {
+          "gemini": 0,
+          "voyage": 0
+        },
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 6,
         "contextTokensAvg": 119
       },
       "contextBudget": {
@@ -354,7 +536,7 @@
   },
   "nextActions": [
     "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
-    "Compare cloud-voyage4-voyage against bm25-lite on the same source-locked data before any default promotion.",
+    "Compare Voyage and Gemini provider arms against bm25-lite on the same source-locked data before any default promotion.",
     "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
   ]
 }

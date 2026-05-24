@@ -37,6 +37,8 @@ const retrievalStrategies = [
   "query-expanded-full-hybrid-rerank",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
+  "cloud-gemini-embed-rerank-proxy",
+  "cloud-gemini-voyage-rerank",
 ];
 const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
 const contextTokenBudget = optionalPositiveInt(
@@ -249,6 +251,8 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates);
   if (options.strategy === "cloud-voyage-rerank-only") return rankCloudVoyageRerankOnly(query, candidates, options);
   if (options.strategy === "cloud-voyage4-voyage") return rankCloudVoyage4Voyage(query, candidates, options);
+  if (options.strategy === "cloud-gemini-embed-rerank-proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
+  if (options.strategy === "cloud-gemini-voyage-rerank") return rankCloudGeminiVoyageRerank(query, candidates, options);
   return rankJaccard(queryText, candidates);
 }
 
@@ -401,6 +405,82 @@ async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
   return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
 }
 
+async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) {
+  const queryText = queryTextValue(query);
+  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  if (options.fixtureRequested) {
+    options.providerStats?.recordMockCall("gemini-embedding");
+    const dense = rankDenseProxy(queryText, densePool);
+    const fused = fuseRankedChannels(
+      densePool,
+      [
+        { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+        { name: "gemini-dense-mock", weight: 1, ranked: dense },
+        { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+        { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+      ],
+      { scoreScale: 8 },
+    );
+    return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  }
+  assertProviderBenchmarkAllowed("cloud-gemini-embed-rerank-proxy");
+  const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats }))[0];
+  const documentVectors = await geminiEmbed(densePool.map((candidate) => candidate.text), "document", { providerStats: options.providerStats });
+  const denseRanked = densePool
+    .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
+    .sort(byScoreThenId);
+  const fused = fuseRankedChannels(
+    densePool,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+      { name: "gemini-dense", weight: 1, ranked: denseRanked },
+      { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+      { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+    ],
+    { scoreScale: 8 },
+  );
+  return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+}
+
+async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
+  const queryText = queryTextValue(query);
+  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  if (options.fixtureRequested) {
+    options.providerStats?.recordMockCall("gemini-embedding");
+    options.providerStats?.recordMockCall("voyage-rerank");
+    const dense = rankDenseProxy(queryText, densePool);
+    const fused = fuseRankedChannels(
+      densePool,
+      [
+        { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+        { name: "gemini-dense-mock", weight: 1, ranked: dense },
+        { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+        { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+      ],
+      { scoreScale: 8 },
+    ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
+    return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  }
+  assertProviderBenchmarkAllowed("cloud-gemini-voyage-rerank");
+  const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats }))[0];
+  const documentVectors = await geminiEmbed(densePool.map((candidate) => candidate.text), "document", { providerStats: options.providerStats });
+  const denseRanked = densePool
+    .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
+    .sort(byScoreThenId);
+  const fused = fuseRankedChannels(
+    densePool,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+      { name: "gemini-dense", weight: 1, ranked: denseRanked },
+      { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+      { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+    ],
+    { scoreScale: 8 },
+  ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
+  const reranked = await voyageRerank(queryText, fused, { providerStats: options.providerStats });
+  return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+}
+
 function fuseRankedChannels(candidates, channels, options = {}) {
   const scores = new Map(candidates.map((candidate) => [candidate.outputId, 0]));
   for (const channel of channels) {
@@ -532,6 +612,7 @@ function cosine(left, right) {
 
 function createProviderStats(options = {}) {
   const providerStrategy = isProviderStrategy(options.strategy);
+  const providerNames = providerStrategy ? requiredProvidersForStrategy(options.strategy) : [];
   const stats = {
     strategy: options.strategy,
     providerStrategy,
@@ -544,8 +625,10 @@ function createProviderStats(options = {}) {
     documentCountSent: 0,
     queryCountSent: 0,
     modelArm: providerStrategy ? options.strategy : null,
-    embedModel: providerStrategy ? voyageEmbedModel() : null,
-    rerankModel: providerStrategy ? voyageRerankModel() : null,
+    providers: providerNames,
+    embedModel: providerStrategy ? embedModelForStrategy(options.strategy) : null,
+    embedDimensions: providerStrategy ? embedDimensionsForStrategy(options.strategy) : null,
+    rerankModel: providerStrategy ? rerankModelForStrategy(options.strategy) : null,
     fixtureProviderMock: providerStrategy && options.fixtureRequested,
   };
   return {
@@ -566,19 +649,62 @@ function createProviderStats(options = {}) {
       }
     },
     summary() {
-      return { ...stats, keyCountAvailable: providerStrategy ? providerKeyCount("voyage") : 0 };
+      const providerKeyCounts = Object.fromEntries(providerNames.map((provider) => [provider, providerKeyCount(provider)]));
+      return {
+        ...stats,
+        providerKeyCounts,
+        keyCountAvailable: providerNames.length ? Math.min(...providerNames.map((provider) => providerKeyCount(provider))) : 0,
+      };
     },
   };
 }
 
 function isProviderStrategy(strategy) {
-  return ["cloud-voyage-rerank-only", "cloud-voyage4-voyage"].includes(strategy);
+  return [
+    "cloud-voyage-rerank-only",
+    "cloud-voyage4-voyage",
+    "cloud-gemini-embed-rerank-proxy",
+    "cloud-gemini-voyage-rerank",
+  ].includes(strategy);
 }
 
 function assertProviderBenchmarkAllowed(strategy) {
   assert.equal(providerBenchmarkCallsAllowed, true, `${strategy} requires RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`);
   assert.equal(providerBenchmarkPublicData, true, `${strategy} requires RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`);
-  assert.ok(providerKeyCount("voyage") > 0, `${strategy} requires VOYAGE_API_KEY or VOYAGE_API_KEYS`);
+  for (const provider of requiredProvidersForStrategy(strategy)) {
+    assert.ok(providerKeyCount(provider) > 0, `${strategy} requires ${providerEnvHint(provider)}`);
+  }
+}
+
+function requiredProvidersForStrategy(strategy) {
+  if (strategy === "cloud-gemini-embed-rerank-proxy") return ["gemini"];
+  if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
+  if (strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return ["voyage"];
+  return [];
+}
+
+function embedModelForStrategy(strategy) {
+  if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiEmbedModel();
+  if (strategy === "cloud-voyage4-voyage") return voyageEmbedModel();
+  return null;
+}
+
+function embedDimensionsForStrategy(strategy) {
+  if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiOutputDimensionality();
+  if (strategy === "cloud-voyage4-voyage") return optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
+  return null;
+}
+
+function rerankModelForStrategy(strategy) {
+  if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return voyageRerankModel();
+  if (strategy === "cloud-gemini-embed-rerank-proxy") return "local-deterministic-rerank-proxy";
+  return null;
+}
+
+function providerEnvHint(provider) {
+  if (provider === "gemini") return "GEMINI_API_KEY, GEMINI_API_KEYS, GOOGLE_API_KEY, GOOGLE_API_KEYS, AI_STUDIO_API_KEY, or AI_STUDIO_API_KEYS";
+  if (provider === "voyage") return "VOYAGE_API_KEY or VOYAGE_API_KEYS";
+  return `${provider.toUpperCase()} provider credentials`;
 }
 
 function providerKeyCount(provider) {
@@ -586,11 +712,23 @@ function providerKeyCount(provider) {
 }
 
 function providerKeys(provider) {
-  if (provider !== "voyage") return [];
-  return [
-    ...splitProviderKeys(process.env.VOYAGE_API_KEYS),
-    ...splitProviderKeys(process.env.VOYAGE_API_KEY),
-  ];
+  if (provider === "voyage") {
+    return [
+      ...splitProviderKeys(process.env.VOYAGE_API_KEYS),
+      ...splitProviderKeys(process.env.VOYAGE_API_KEY),
+    ];
+  }
+  if (provider === "gemini") {
+    return [
+      ...splitProviderKeys(process.env.GEMINI_API_KEYS),
+      ...splitProviderKeys(process.env.GEMINI_API_KEY),
+      ...splitProviderKeys(process.env.GOOGLE_API_KEYS),
+      ...splitProviderKeys(process.env.GOOGLE_API_KEY),
+      ...splitProviderKeys(process.env.AI_STUDIO_API_KEYS),
+      ...splitProviderKeys(process.env.AI_STUDIO_API_KEY),
+    ];
+  }
+  return [];
 }
 
 function splitProviderKeys(value) {
@@ -651,6 +789,52 @@ async function voyageRerank(query, candidates, options = {}) {
     .sort(byScoreThenId);
 }
 
+async function geminiEmbed(texts, inputType, options = {}) {
+  const input = texts.map((text) => String(text ?? ""));
+  const isQuery = inputType === "query";
+  options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : input.length);
+  const model = geminiEmbedModel();
+  const modelResource = geminiModelResource(model);
+  const outputDimensionality = geminiOutputDimensionality();
+  const taskType = isQuery ? "RETRIEVAL_QUERY" : "RETRIEVAL_DOCUMENT";
+  const body = {
+    requests: input.map((text) => ({
+      model: modelResource,
+      content: { parts: [{ text }] },
+      taskType,
+      ...(outputDimensionality ? { outputDimensionality } : {}),
+    })),
+  };
+  const response = await geminiPost(`${modelResource}:batchEmbedContents`, body, { seed: `${inputType}:${input.length}:${input[0] ?? ""}` });
+  const embeddings = embeddingsFromGeminiResponse(response);
+  assert.equal(embeddings.length, input.length, "Gemini embeddings response length mismatch");
+  return embeddings;
+}
+
+async function geminiPost(path, body, options = {}) {
+  const key = chooseProviderKey("gemini", options.seed ?? path);
+  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${path}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-goog-api-key": key,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Gemini provider request failed with status ${response.status}`);
+    }
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function voyagePost(path, body, options = {}) {
   const key = chooseProviderKey("voyage", options.seed ?? path);
   const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
@@ -686,6 +870,20 @@ function embeddingsFromVoyageResponse(response) {
   return [];
 }
 
+function embeddingsFromGeminiResponse(response) {
+  if (Array.isArray(response?.embeddings)) {
+    return response.embeddings
+      .map((item) => item?.values ?? item?.embedding?.values)
+      .filter(Array.isArray);
+  }
+  if (Array.isArray(response?.data)) {
+    return response.data
+      .map((item) => item?.embedding?.values ?? item?.values)
+      .filter(Array.isArray);
+  }
+  return [];
+}
+
 function rerankScoresFromVoyageResponse(response) {
   const items = Array.isArray(response?.data) ? response.data : Array.isArray(response?.results) ? response.results : [];
   return items
@@ -703,6 +901,18 @@ function voyageEmbedModel() {
 
 function voyageRerankModel() {
   return String(process.env.VOYAGE_RERANK_MODEL ?? "rerank-2.5");
+}
+
+function geminiEmbedModel() {
+  return String(process.env.GEMINI_EMBED_MODEL ?? "gemini-embedding-001").replace(/^models\//, "");
+}
+
+function geminiModelResource(model) {
+  return `models/${String(model ?? "").replace(/^models\//, "")}`;
+}
+
+function geminiOutputDimensionality() {
+  return optionalPositiveInt(process.env.GEMINI_EMBED_DIMENSIONS ?? process.env.GEMINI_OUTPUT_DIMENSION ?? "1536", "Gemini output dimension");
 }
 
 function providerCandidateLimit(envName, fallback) {

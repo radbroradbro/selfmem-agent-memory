@@ -22,6 +22,8 @@
 | full-hybrid-rerank | none | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-voyage-rerank-only | cloud-voyage-rerank-only | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-voyage4-voyage | cloud-voyage4-voyage | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-gemini-embed-rerank-proxy | cloud-gemini-embed-rerank-proxy | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-gemini-voyage-rerank | cloud-gemini-voyage-rerank | 1 | 1 | 1 | 1 | 1 | 1 |
 
 ## Safety
 

@@ -1453,8 +1453,11 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(providerFixture.rawMemoryIncluded, false);
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
   assert.match(providerMarkdown, /Gate: provider/);
   assert.match(providerMarkdown, /cloud-voyage4-voyage/);
+  assert.match(providerMarkdown, /cloud-gemini-voyage-rerank/);
   assert.equal(autoresearchFixture.ok, true);
   assert.equal(autoresearchFixture.mode, "public-benchmark-autoresearch-loop");
   assert.equal(autoresearchFixture.fixtureOnly, true);
@@ -1608,13 +1611,23 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(providerGateFixtureReport.rawAnswersIncluded, false);
   assert.equal(providerGateFixtureReport.rawMemoryIncluded, false);
   const providerGateNames = new Set((providerGateFixtureReport.strategies ?? []).map((item) => item.strategy));
-  for (const strategyName of ["bm25-lite", "full-hybrid-rerank", "cloud-voyage-rerank-only", "cloud-voyage4-voyage"]) {
+  for (const strategyName of [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "cloud-voyage-rerank-only",
+    "cloud-voyage4-voyage",
+    "cloud-gemini-embed-rerank-proxy",
+    "cloud-gemini-voyage-rerank",
+  ]) {
     assert.ok(providerGateNames.has(strategyName), `missing provider gate strategy ${strategyName}`);
   }
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
   assert.match(providerGateFixtureEvidence, /Gate: provider/);
   assert.match(providerGateFixtureEvidence, /cloud-voyage4-voyage/);
+  assert.match(providerGateFixtureEvidence, /cloud-gemini-voyage-rerank/);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");

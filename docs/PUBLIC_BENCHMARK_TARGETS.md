@@ -206,11 +206,12 @@ harness we will use.
   default.
 - Current provider-backed gate scaffold:
   `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
-  It adds `cloud-voyage-rerank-only` and `cloud-voyage4-voyage` to the same
-  public-safe comparison path. Fixture mode makes no hosted calls; live runs
-  require `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`,
-  `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, and env-only Voyage
-  credentials.
+  It adds `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
+  `cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank` to the
+  same public-safe comparison path. Fixture mode makes no hosted calls; live
+  runs require `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`,
+  `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, and env-only credentials for
+  the selected provider arm.
 - Current LongMemEval-S autoresearch loop:
   `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
   runs 24 retrieval-proxy arms over strategy, context budget, and candidate

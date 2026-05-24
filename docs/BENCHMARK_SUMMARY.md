@@ -87,14 +87,15 @@ the gate correctly refused hybrid promotion.
 
 The provider-backed benchmark lane now has an opt-in harness. The fixture gate
 is `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
-It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`, and
-`cloud-voyage4-voyage` through the same public-safe metrics path. Fixture mode
-uses deterministic provider mocks and makes zero hosted calls. A real run must
-set both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1` and
-`RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, plus `VOYAGE_API_KEY` or
-`VOYAGE_API_KEYS`, before raw public benchmark passages can be sent to Voyage.
-This is the next route for testing whether the actual cloud hybrid stack beats
-BM25-lite on the same source-locked data.
+It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`,
+`cloud-voyage4-voyage`, `cloud-gemini-embed-rerank-proxy`, and
+`cloud-gemini-voyage-rerank` through the same public-safe metrics path. Fixture
+mode uses deterministic provider mocks and makes zero hosted calls. A real run
+must set both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1` and
+`RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, plus env-only credentials for
+the selected provider arm, before public benchmark passages can be sent to
+Voyage or Gemini. This is the next route for testing whether the actual cloud
+hybrid stack beats BM25-lite on the same source-locked data.
 
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
@@ -333,7 +334,9 @@ Until then, RecallWeave should be described as a local-first fallback and experi
 The next public-safe benchmark gate will test separated provider arms:
 
 - `cloud-voyage4-voyage` for the first cloud quality proof.
-- `cloud-gemini2-cohere4pro` for multimodal and dimension tests.
+- `cloud-gemini-embed-rerank-proxy` for Gemini embedding quality without a
+  hosted reranker.
+- `cloud-gemini-voyage-rerank` for Gemini embedding quality with Voyage rerank.
 - `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
   `cloud-nvidia-nemotron-vl-1b`, and `cloud-nvidia-e5-mistral` for hosted
   NVIDIA retrieval comparisons.

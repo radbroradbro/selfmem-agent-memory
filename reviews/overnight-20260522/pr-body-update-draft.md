@@ -97,10 +97,12 @@ Live status:
   claims blocked.
 - Adds the provider-backed gate scaffold. The new `benchmark:public-provider`
   command compares `bm25-lite`, `full-hybrid-rerank`,
-  `cloud-voyage-rerank-only`, and `cloud-voyage4-voyage` through the same
-  public-safe metrics path. Fixture mode uses deterministic provider mocks and
-  zero hosted calls; live provider runs require explicit provider-call and
-  public-data environment guards plus env-only Voyage credentials.
+  `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
+  `cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank` through
+  the same public-safe metrics path. Fixture mode uses deterministic provider
+  mocks and zero hosted calls; live provider runs require explicit provider-call
+  and public-data environment guards plus env-only credentials for the selected
+  provider arm.
 - Promotes GitHub Actions run `26349083689` on `e7fa56a` as the latest
   verified code/product baseline after adding the public hybrid benchmark gate,
   binding every arm to the materialized query-set hash, and keeping

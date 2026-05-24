@@ -163,16 +163,19 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --fixture
 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
+GEMINI_API_KEY=<env-only-if-running-gemini-arm> \
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```
 
 The gate compares `bm25-lite`, `full-hybrid-rerank`,
-`cloud-voyage-rerank-only`, and `cloud-voyage4-voyage`. Fixture mode uses
-deterministic provider mocks and makes zero hosted calls. Live mode fails
-closed unless provider calls and public-data transfer are both explicitly
-enabled. Treat a live provider result as retrieval-proxy evidence until it is
-converted into MemoryBench answer-quality or another end-to-end memory score.
+`cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
+`cloud-gemini-embed-rerank-proxy`, and `cloud-gemini-voyage-rerank`. Fixture
+mode uses deterministic provider mocks and makes zero hosted calls. Live mode
+fails closed unless provider calls, public-data transfer, and the selected
+provider credentials are explicitly enabled. Treat a live provider result as
+retrieval-proxy evidence until it is converted into MemoryBench answer-quality
+or another end-to-end memory score.
 
 Allowed wording after a small-slice win:
 
@@ -349,7 +352,8 @@ same frozen harness.
 | Arm | Purpose |
 |---|---|
 | `cloud-voyage4-voyage` | First cloud quality proof. |
-| `cloud-gemini2-cohere4pro` | Multimodal and dimension challenger. |
+| `cloud-gemini-embed-rerank-proxy` | Gemini embedding challenger without hosted reranker effects. |
+| `cloud-gemini-voyage-rerank` | Gemini embedding challenger with Voyage rerank held constant. |
 | `cloud-nvidia-retriever-500m` | Hosted latency challenger. |
 | `cloud-nvidia-nemotron-1b` | Current NVIDIA text retrieval challenger. |
 | `cloud-nvidia-nemotron-vl-1b` | Multimodal NVIDIA retrieval challenger. |
