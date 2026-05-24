@@ -13,6 +13,20 @@ Host: openclaw
 - Store latency samples: 0
 - Privacy leak count: 0
 
+## Native/Default Memory Lane
+
+For this one selected agent, RecallWeave/selfmem must be the native/default memory provider or OpenClaw memory slot during the fresh canary window.
+Do not leave it installed as a shadow-only or optional sidecar memory.
+`selfmem_canary` is the current compatibility adapter id; it does not mean the runtime should keep RecallWeave in test-only mode.
+Hosted Supermemory stays history/read-through only. New writes during this canary must land locally in RecallWeave/selfmem.
+
+Required proof:
+
+- OpenClaw plugins.slots.memory is selfmem_canary
+- before-prompt recall comes from the native RecallWeave/selfmem lifecycle
+- new memory writes land in the local RecallWeave/selfmem container
+- hosted Supermemory, when configured, is used only as read-through history
+
 ## Focus
 
 - installed-version: Install the current adapter with `bin/selfmem_update --apply` before collecting evidence.
@@ -22,7 +36,7 @@ Host: openclaw
 
 ### dry-run
 
-Show exactly what will change without copying files.
+Show exactly what will change without copying files. Confirm the target agent will use RecallWeave/selfmem as its native/default memory provider or OpenClaw memory slot during this one-agent canary.
 
 ```bash
 bin/selfmem_update --host openclaw --repo <openclaw-checkout>
@@ -30,7 +44,7 @@ bin/selfmem_update --host openclaw --repo <openclaw-checkout>
 
 ### apply-current-adapter
 
-Apply the current adapter and record the fresh evidence window timestamp.
+Apply the current adapter, make RecallWeave/selfmem the native/default memory lane for this one selected agent, and record the fresh evidence window timestamp.
 
 ```bash
 FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ") && bin/selfmem_update --host openclaw --repo <openclaw-checkout> --apply && printf "fresh canary window starts at %s\n" "$FRESH_WINDOW_START"
@@ -88,7 +102,10 @@ npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary
 
 - one agent only until a maintainer reviews the evidence
 - fresh post-update window is at least 15 minutes
-- RecallWeave/selfmem is the native memory lane for this one agent while hosted Supermemory remains read-through only
+- RecallWeave/selfmem is the native/default memory lane for this one agent while hosted Supermemory remains read-through only
+- RecallWeave/selfmem is not left installed as a shadow-only or optional sidecar memory during the fresh canary window
+- native/default memory slot or provider status is proven in the returned metrics-only evidence
+- hosted Supermemory write-back is disabled; hosted memory is history/read-through only
 - deterministic drill was generated and followed during the fresh window
 - strict-real intake passes from non-fixture evidence
 - adapter strict canary contract is v1

@@ -3535,7 +3535,12 @@ check("fresh canary next-agent plan passes", () => {
   assert.ok(report.commandPlan.some((item) => item.id === "collect-live-window" && /--canary-packet-output/.test(item.command) && /--expected-commit <approved-commit>/.test(item.command)));
   assert.ok(report.commandPlan.some((item) => item.id === "diagnose-if-failed"));
   assert.ok(report.commandPlan.some((item) => item.id === "package-passing-evidence" && /--expected-commit <approved-commit>/.test(item.command)));
-  assert.ok(report.acceptanceCriteria.some((item) => /native memory lane/i.test(item)));
+  assert.equal(report.nativeDefaultContract.required, true);
+  assert.equal(report.nativeDefaultContract.shadowOnlyAllowed, false);
+  assert.equal(report.nativeDefaultContract.hostedWriteBackAllowed, false);
+  assert.ok(report.acceptanceCriteria.some((item) => /native\/default memory lane/i.test(item)));
+  assert.ok(report.acceptanceCriteria.some((item) => /shadow-only/i.test(item)));
+  assert.ok(report.acceptanceCriteria.some((item) => /write-back is disabled/i.test(item)));
   assert.ok(report.acceptanceCriteria.some((item) => /deterministic drill/i.test(item)));
   for (const command of report.commandPlan.map((item) => item.command).filter((command) => /canary:(intake|diagnose)/.test(command))) {
     const toolSegment = command.slice(command.indexOf("canary:"));
@@ -3543,6 +3548,8 @@ check("fresh canary next-agent plan passes", () => {
     assert.doesNotMatch(toolSegment, /\s>\s/, "next-agent JSON evidence commands must use --output instead of shell redirection");
   }
   assert.match(markdownRun.stdout, /RecallWeave Next Agent Canary Plan/);
+  assert.match(markdownRun.stdout, /Native\/Default Memory Lane/);
+  assert.match(markdownRun.stdout, /shadow-only or optional sidecar/i);
   assert.match(markdownRun.stdout, /FRESH_WINDOW_START/);
   assert.match(evidence, /canary:next-agent/i);
   assert.match(evidence, /one-agent/i);
@@ -3557,6 +3564,8 @@ check("fresh canary next-agent plan passes", () => {
   assert.match(realPlanEvidence, /--strict-real/);
   assert.match(realPlanEvidence, /--canary-intake-output\s+\/tmp\/recallweave-canary-intake\.json/);
   assert.match(realPlanEvidence, /--canary-packet-output\s+\/tmp\/recallweave-canary-evidence-packet\.zip/);
+  assert.match(realPlanEvidence, /native\/default memory provider or OpenClaw memory slot/i);
+  assert.match(realPlanEvidence, /OpenClaw plugins\.slots\.memory is selfmem_canary/i);
   assert.match(realPlanEvidence, /Do not attach raw logs/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
   assert.doesNotMatch(planRun.stdout, secretPattern);
@@ -3686,6 +3695,10 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(manifest.sourceControl.expectedReportCommit, currentHead);
   assert.equal(manifest.sourceControl.expectedCommitProvided, false);
   assert.equal(manifest.sourceControl.commitRequiredForProductionCanary, true);
+  assert.equal(manifest.nativeDefaultContract.required, true);
+  assert.equal(manifest.nativeDefaultContract.shadowOnlyAllowed, false);
+  assert.equal(manifest.nativeDefaultContract.hostedWriteBackAllowed, false);
+  assert.match(manifest.nativeDefaultContract.runtimeIdMeaning, /native memory provider or memory slot/i);
   assert.equal(expectedCommitManifest.sourceControl.headSha, currentHead);
   assert.equal(expectedCommitManifest.sourceControl.approvedAdapterCommit, expectedCommit);
   assert.equal(expectedCommitManifest.sourceControl.expectedReportCommit, expectedCommit);
@@ -3708,8 +3721,15 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.ok(manifest.returnChecklist.some((item) => item.includes(currentHead)));
   assert.ok(manifest.returnChecklist.some((item) => /strict-real-canary-drill\.md/.test(item)));
   assert.ok(manifest.returnChecklist.some((item) => /metrics-only/.test(item)));
+  assert.ok(manifest.returnChecklist.some((item) => /native\/default memory provider or memory slot/.test(item)));
+  assert.ok(manifest.returnChecklist.some((item) => /shadow-only/.test(item)));
+  assert.ok(manifest.returnChecklist.some((item) => /hosted Supermemory read-through\/history only/.test(item)));
   assert.match(readme, /one selected agent operator/i);
   assert.match(readme, /Canary means a bounded validation window/i);
+  assert.match(readme, /native\/default memory provider or memory slot/i);
+  assert.match(readme, /not permission to keep RecallWeave shadow-only/i);
+  assert.match(readme, /Hosted Supermemory is read-through\/history only/i);
+  assert.match(readme, /Native\/default memory contract/i);
   assert.match(readme, /deterministic drill/i);
   assert.match(readme, /Fresh-window contract/i);
   assert.match(readme, new RegExp(`Packet generated from controller commit: ${currentHead}`));
@@ -3722,6 +3742,9 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(readme, /Ready for live handoff: no/i);
   assert.match(readme, /Do not attach raw memories/i);
   assert.match(markdown, /RecallWeave Next Agent Canary Plan/);
+  assert.match(markdown, /Native\/Default Memory Lane/);
+  assert.match(markdown, /OpenClaw plugins\.slots\.memory is selfmem_canary|Hermes active memory\.provider is selfmem_canary/);
+  assert.match(markdown, /New writes during this canary must land locally in RecallWeave\/selfmem/i);
   assert.match(markdown, /FRESH_WINDOW_START/);
   assert.match(operator, /RecallWeave Strict-Real Canary Packet/);
   assert.match(operator, /canary:intake/);

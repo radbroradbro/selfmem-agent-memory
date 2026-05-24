@@ -59,6 +59,7 @@ const output = {
         : "blocked-before-agent-update",
   },
   remediationFocus: remediationFocus(failedChecks),
+  nativeDefaultContract: nativeDefaultContract(host),
   commandPlan,
   acceptanceCriteria: acceptanceCriteria(),
   attachOnly: [
@@ -249,12 +250,12 @@ function commandsFor(host, expectedCommit) {
   return [
     {
       id: "dry-run",
-      description: "Show exactly what will change without copying files.",
+      description: "Show exactly what will change without copying files. Confirm the target agent will use RecallWeave/selfmem as its native/default memory provider or OpenClaw memory slot during this one-agent canary.",
       command: `bin/selfmem_update --host ${host} --repo ${repoPlaceholder}`,
     },
     {
       id: "apply-current-adapter",
-      description: "Apply the current adapter and record the fresh evidence window timestamp.",
+      description: "Apply the current adapter, make RecallWeave/selfmem the native/default memory lane for this one selected agent, and record the fresh evidence window timestamp.",
       command: [
         `FRESH_WINDOW_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")`,
         `bin/selfmem_update --host ${host} --repo ${repoPlaceholder} --apply`,
@@ -302,7 +303,10 @@ function acceptanceCriteria() {
   return [
     "one agent only until a maintainer reviews the evidence",
     "fresh post-update window is at least 15 minutes",
-    "RecallWeave/selfmem is the native memory lane for this one agent while hosted Supermemory remains read-through only",
+    "RecallWeave/selfmem is the native/default memory lane for this one agent while hosted Supermemory remains read-through only",
+    "RecallWeave/selfmem is not left installed as a shadow-only or optional sidecar memory during the fresh canary window",
+    "native/default memory slot or provider status is proven in the returned metrics-only evidence",
+    "hosted Supermemory write-back is disabled; hosted memory is history/read-through only",
     "deterministic drill was generated and followed during the fresh window",
     "strict-real intake passes from non-fixture evidence",
     "adapter strict canary contract is v1",
@@ -312,6 +316,25 @@ function acceptanceCriteria() {
     "lifecycle, hybrid search, local writes, hosted read-through, and rollback are covered",
     "privacy leak count and secret-pattern hits are zero",
   ];
+}
+
+function nativeDefaultContract(host) {
+  return {
+    required: true,
+    scope: "one selected agent during the fresh canary window",
+    runtimeId: "selfmem_canary",
+    runtimeIdMeaning: "compatibility adapter id only; it must occupy the native memory provider or memory slot for the selected canary agent",
+    shadowOnlyAllowed: false,
+    newWrites: "local RecallWeave/selfmem only",
+    hostedSupermemoryMode: "read-through/history only",
+    hostedWriteBackAllowed: false,
+    proofRequired: [
+      host === "hermes" ? "Hermes active memory.provider is selfmem_canary" : "OpenClaw plugins.slots.memory is selfmem_canary",
+      "before-prompt recall comes from the native RecallWeave/selfmem lifecycle",
+      "new memory writes land in the local RecallWeave/selfmem container",
+      "hosted Supermemory, when configured, is used only as read-through history",
+    ],
+  };
 }
 
 function buildMarkdown(plan) {
@@ -338,6 +361,20 @@ function buildMarkdown(plan) {
       "",
     );
   }
+
+  lines.push(
+    "## Native/Default Memory Lane",
+    "",
+    "For this one selected agent, RecallWeave/selfmem must be the native/default memory provider or OpenClaw memory slot during the fresh canary window.",
+    "Do not leave it installed as a shadow-only or optional sidecar memory.",
+    "`selfmem_canary` is the current compatibility adapter id; it does not mean the runtime should keep RecallWeave in test-only mode.",
+    "Hosted Supermemory stays history/read-through only. New writes during this canary must land locally in RecallWeave/selfmem.",
+    "",
+    "Required proof:",
+    "",
+  );
+  for (const item of plan.nativeDefaultContract.proofRequired) lines.push(`- ${item}`);
+  lines.push("");
 
   if (plan.decision.blockReasons.length) {
     lines.push("## Blocks", "");

@@ -114,7 +114,11 @@ const manifest = {
     returnedPacketIntakeCommand:
       `npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary${sourceControl.expectedReportCommit === "unknown" ? "" : ` --expected-commit ${sourceControl.expectedReportCommit}`} --output /tmp/recallweave-returned-canary-intake.json`,
   },
+  nativeDefaultContract: planJson.nativeDefaultContract ?? null,
   returnChecklist: [
+    "make RecallWeave/selfmem the native/default memory provider or memory slot for this one selected agent during the fresh canary window",
+    "do not leave RecallWeave/selfmem installed as shadow-only or optional sidecar memory during the fresh canary window",
+    "keep hosted Supermemory read-through/history only; do not enable hosted write-back",
     "apply the current adapter after recording FRESH_WINDOW_START",
     sourceControl.expectedReportCommit === "unknown"
       ? "record the adapter commit shown by the runtime checkout before collection"
@@ -219,6 +223,9 @@ function buildReadme(packetManifest) {
     "This packet gives one selected agent operator the exact fresh-canary steps.",
     "It is public-safe and metrics-only. It does not authorize fleet rollout or public launch.",
     "Canary means a bounded validation window, not the memory provider name.",
+    "For this one selected agent, RecallWeave/selfmem must be the native/default memory provider or memory slot during the canary window.",
+    "The compatibility id `selfmem_canary` may appear in configs. That is the adapter label, not permission to keep RecallWeave shadow-only.",
+    "Hosted Supermemory is read-through/history only. New memory writes must land locally in RecallWeave/selfmem.",
     "",
     `Host: ${packetManifest.host}.`,
     `Status: ${packetManifest.status}.`,
@@ -243,6 +250,13 @@ function buildReadme(packetManifest) {
     `- The returned packet must report commit \`${expectedReportCommit}\`. If a newer adapter commit should count, regenerate this handoff packet with that commit first.`,
     `- Record the update timestamp in \`${packetManifest.freshWindowContract.windowStartVariable}\` before applying the adapter.`,
     `- Collect evidence with the \`${packetManifest.freshWindowContract.collectCommandId}\` command in \`next-agent-plan.md\`.`,
+    "",
+    "Native/default memory contract:",
+    "",
+    "- RecallWeave/selfmem must occupy the active memory provider or OpenClaw memory slot for this one selected canary agent.",
+    "- It must not be left as a shadow-only plugin, optional helper, or manual-only search path during the fresh window.",
+    "- Hosted Supermemory may be queried as history/read-through only. Hosted write-back remains disabled.",
+    "- The returned metrics-only evidence must prove active memory slot/provider status, local writes, lifecycle recall, and hosted read-through mode.",
     "",
     "Return checklist:",
     "",
