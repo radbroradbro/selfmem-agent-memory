@@ -95,10 +95,10 @@ Live status:
   quality 0.4541 and p50 16 ms; the full hybrid proxy arms tie quality but are
   slower at p50 33 ms, so the gate refuses hybrid promotion and keeps broader
   claims blocked.
-- Promotes GitHub Actions run `26348625868` on `9a95d08` as the latest
-  verified code/product baseline after promoting the canonical LongMemEval-S
-  retrieval-proxy run to `bm25-lite-b800-k5`, binding it to the materialized
-  query-set hash, and keeping retrieval-proxy/no-public-claims guards active.
+- Promotes GitHub Actions run `26349083689` on `e7fa56a` as the latest
+  verified code/product baseline after adding the public hybrid benchmark gate,
+  binding every arm to the materialized query-set hash, and keeping
+  retrieval-proxy/no-public-claims guards active.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
@@ -148,6 +148,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `e7fa56a13bb761c916e15388af50351ba380323e`.
+- GitHub Actions run `26349083689`: passed CI after adding the public LongMemEval-S hybrid gate, comparing BM25 against local-only hybrid proxy arms, and keeping the result retrieval-proxy only.
+- Previous verified code/product baseline before the hybrid gate:
   `9a95d08e86c0b212620ea8b3d2182b454e0b90af`.
 - GitHub Actions run `26348625868`: passed CI after promoting the canonical LongMemEval-S retrieval-proxy run to the autoresearch winner, `bm25-lite-b800-k5`, binding it to the materialized query-set hash, and marking the result as retrieval-proxy only.
 - Previous verified code/product baseline before the materialize-run lane:

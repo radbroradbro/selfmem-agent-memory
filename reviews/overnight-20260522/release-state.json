@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T01:33:00Z",
+  "generatedAt": "2026-05-24T01:59:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "9a95d08e86c0b212620ea8b3d2182b454e0b90af",
-    "ciRunId": 26348625868,
+    "headSha": "e7fa56a13bb761c916e15388af50351ba380323e",
+    "ciRunId": 26349083689,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_strategy_compare_and_autoresearch_loop",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after promoting the public LongMemEval-S retrieval-proxy baseline to the 24-arm autoresearch winner, bm25-lite-b800-k5. The materializer writes private query/haystack inputs outside the repository, publishes only hashes/counts, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result, strategy comparison, and autoresearch loop to that hash while requiring retrievalProxyOnly, memoryBenchAnswerQuality=false, and publicBenchmarkClaimsAllowed=false. Local release:check, benchmark:public-materialize, baseline:export:recallweave, baseline:collect:recallweave, benchmark:public-autoresearch fixture/live checks, targeted public artifact scans, diff check, release:github-sync, and GitHub Actions run 26348625868 passed."
+    "note": "Latest inspected code/product baseline after adding the public LongMemEval-S hybrid benchmark gate. The gate compares bm25-lite against local-only dense, sparse+dense, temporal, graph, rerank, and query-expansion proxy arms on the same source-locked slice, keeps bm25-lite as the control/fallback because the full hybrid proxy ties quality but is slower, and preserves retrievalProxyOnly, memoryBenchAnswerQuality=false, publicBenchmarkClaimsAllowed=false, zero privacy failures, and public-safe evidence only. Local release:check, benchmark:public-hybrid fixture/live checks, release:github-sync, diff check, and GitHub Actions run 26349083689 passed."
   },
   "releaseStateGuard": {
     "enabled": true,

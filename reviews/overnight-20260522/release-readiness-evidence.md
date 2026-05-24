@@ -206,6 +206,10 @@ Scope:
 - GitHub Actions run `26348625868` passed on commit
   `9a95d08e86c0b212620ea8b3d2182b454e0b90af` after the canonical
   LongMemEval-S retrieval-proxy run was promoted to `bm25-lite-b800-k5`.
+- GitHub Actions run `26349083689` passed on commit
+  `e7fa56a13bb761c916e15388af50351ba380323e` after the public hybrid gate
+  compared BM25 against local-only dense, sparse+dense, temporal, graph,
+  rerank, and query-expansion proxy arms.
 - Kept the gate public-safe and evidence-based.
 
 What `release:check` verifies:
