@@ -10,7 +10,13 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
-- `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.
+- `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d`.
+- GitHub Actions run `26351014379` passed CI after binding the provider
+  preflight to the expanded 30-query LongMemEval-S target. The checked-in
+  evidence calls no provider APIs, sends no benchmark text, and keeps the next
+  live cloud-provider run tied to the stronger expanded target.
+- Previous verified code/product baseline before the expanded provider
+  preflight: `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.
 - GitHub Actions run `26350709133` passed CI after adding the expanded
   30-query LongMemEval-S hybrid stress gate. The gate compares BM25 and local
   hybrid-family arms on the same source-locked target, keeps BM25 as the

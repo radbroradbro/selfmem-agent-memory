@@ -120,12 +120,15 @@ Live status:
   It calls no provider APIs, sends no benchmark text, and binds the future live
   command to `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`
   so the next cloud-provider test does not fall back to the smaller slice.
-- Promotes GitHub Actions run `26350709133` on `67d0c9f` as the latest
-  verified code/product baseline after adding the expanded 30-query
-  LongMemEval-S hybrid stress gate. The new gate compares BM25 and local
-  hybrid-family arms on the same source-locked target and keeps deterministic
-  hybrid promotion blocked until provider-backed embedding and reranker arms
-  beat the control.
+- Promotes GitHub Actions run `26351014379` on `c59aed9` as the latest
+  verified code/product baseline after binding the provider preflight to the
+  expanded 30-query LongMemEval-S target. The checked-in evidence keeps BM25 as
+  the current control winner, blocks deterministic hybrid promotion, and blocks
+  live provider calls until explicit public-data/provider-call consent plus
+  env-only Gemini/Voyage credentials are present.
+- Previous verified code/product baseline before the expanded provider
+  preflight:
+  `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.
 - Promotes GitHub Actions run `26349930959` on `a67c411` as the previous
   verified code/product baseline after extending the provider gate with Gemini
   embedding arms, binding every arm to the same source-locked fixture path, and
@@ -182,6 +185,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d`.
+- GitHub Actions run `26351014379`: passed CI after binding the provider preflight to the expanded 30-query LongMemEval-S target. The checked-in evidence calls no provider APIs, sends no benchmark text, and keeps the next live cloud-provider run tied to the stronger expanded target.
+- Previous verified code/product baseline before the expanded provider preflight:
   `67d0c9fc8cc3faef2150efa8368d619a1b4c9f11`.
 - GitHub Actions run `26350709133`: passed CI after adding the expanded 30-query LongMemEval-S hybrid stress gate. The gate compares BM25 and local hybrid-family arms on the same source-locked target, keeps BM25 as the current control winner, blocks deterministic hybrid promotion, and preserves the fail-closed provider-backed benchmark path for the next live Voyage/Gemini-style arm.
 - Previous verified code/product baseline before the expanded hybrid stress gate:
