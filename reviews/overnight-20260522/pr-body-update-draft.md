@@ -158,7 +158,7 @@ Live status:
   Downloads and Telegram Desktop inboxes without typing private folder paths
   into package-manager commands, and write a metrics-only markdown findings
   note into the next-agent workspace.
-- Refreshes the current standard-inbox scan: 0 production evidence packets, 10
+- Refreshes the current standard-inbox scan: 0 production evidence packets, 12
   handoff packets, 8 diagnostics, 19 unknown packets, and 5 unreadable packets.
   Public launch and real-container rollout remain blocked.
 - Hardens the canary batch-audit and next-agent packet paths so empty,

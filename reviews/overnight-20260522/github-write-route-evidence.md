@@ -128,6 +128,10 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after the release state split latest
     verified PR branch head `106b78c` from approved runtime canary
     adapter/report commit `3d61677`. Updated at: 2026-05-24T06:51:08Z.
+  - The PR body was refreshed again after rerunning the standard inbox scan:
+    0 production evidence packets, 12 handoff packets, 8 diagnostics, 19
+    unknown packets, and 5 unreadable packets. Updated at:
+    2026-05-24T07:00:10Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
