@@ -36,13 +36,13 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output <met
 - Status: `AWAITING_RETURNED_PRODUCTION_CANARY`.
 - Production evidence packets: 0.
 - Returned evidence packets: 0.
-- Handoff packets: 8.
+- Handoff packets: 1.
 - Diagnostic bundles: 8.
 - Unknown packets: 19.
 - Unreadable packets: 5.
 - Downloads scan:
-  - candidates: 26.
-  - handoff packets: 8.
+  - candidates: 19.
+  - handoff packets: 1.
   - diagnostics: 4.
   - unknown: 9.
   - unreadable: 5.
