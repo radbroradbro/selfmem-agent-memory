@@ -106,6 +106,9 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-strategy-compare.json`,
   `${reviewDir}/public-longmemeval-strategy-compare-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-strategy-compare-review.md`,
+  `${reviewDir}/public-longmemeval-hybrid-gate.json`,
+  `${reviewDir}/public-longmemeval-hybrid-gate-evidence.md`,
+  `${reviewDir}/codex-public-longmemeval-hybrid-gate-review.md`,
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-autoresearch-loop-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-autoresearch-loop-review.md`,
@@ -1292,6 +1295,20 @@ check("fresh public benchmark target check passes", () => {
   const materializeMarkdown = run("node", ["packages/bench/public-benchmark-materialize-run.mjs", "--format", "markdown"]).stdout;
   const strategyFixture = JSON.parse(run("node", ["packages/bench/public-benchmark-strategy-compare.mjs"]).stdout);
   const strategyMarkdown = run("node", ["packages/bench/public-benchmark-strategy-compare.mjs", "--format", "markdown"]).stdout;
+  const hybridFixture = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-strategy-compare.mjs", "--gate", "hybrid", "--context-token-budget", "800", "--limit", "5"]).stdout,
+  );
+  const hybridMarkdown = run("node", [
+    "packages/bench/public-benchmark-strategy-compare.mjs",
+    "--gate",
+    "hybrid",
+    "--context-token-budget",
+    "800",
+    "--limit",
+    "5",
+    "--format",
+    "markdown",
+  ]).stdout;
   const autoresearchFixture = JSON.parse(
     run("node", ["packages/bench/public-benchmark-autoresearch-loop.mjs", "--context-token-budgets", "800,1600", "--limits", "5,10"]).stdout,
   );
@@ -1311,6 +1328,9 @@ check("fresh public benchmark target check passes", () => {
   const liveStrategyReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-strategy-compare.json"), "utf8"));
   const liveStrategyEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-strategy-compare-evidence.md"), "utf8");
   const liveStrategyReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-strategy-compare-review.md"), "utf8");
+  const liveHybridReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-hybrid-gate.json"), "utf8"));
+  const liveHybridEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-hybrid-gate-evidence.md"), "utf8");
+  const liveHybridReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-hybrid-gate-review.md"), "utf8");
   const liveAutoresearchReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
   const liveAutoresearchEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop-evidence.md"), "utf8");
   const liveAutoresearchReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-autoresearch-loop-review.md"), "utf8");
@@ -1383,6 +1403,22 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(strategyFixture.strategies?.length, 3);
   assert.ok(strategyFixture.winner?.strategy);
   assert.match(strategyMarkdown, /Public Benchmark Strategy Compare/);
+  assert.equal(hybridFixture.ok, true);
+  assert.equal(hybridFixture.mode, "public-benchmark-hybrid-gate");
+  assert.equal(hybridFixture.gate, "hybrid");
+  assert.equal(hybridFixture.fixtureOnly, true);
+  assert.equal(hybridFixture.metricsOnly, true);
+  assert.equal(hybridFixture.retrievalProxyOnly, true);
+  assert.equal(hybridFixture.memoryBenchAnswerQuality, false);
+  assert.equal(hybridFixture.publicBenchmarkClaimsAllowed, false);
+  assert.equal(hybridFixture.publicSafe, true);
+  assert.equal(hybridFixture.rawQuestionsIncluded, false);
+  assert.equal(hybridFixture.rawAnswersIncluded, false);
+  assert.equal(hybridFixture.rawMemoryIncluded, false);
+  assert.equal(hybridFixture.strategies?.length, 7);
+  assert.equal(hybridFixture.control?.strategy, "bm25-lite");
+  assert.equal(hybridFixture.hybridPromotion?.promoteHybrid, false);
+  assert.match(hybridMarkdown, /Gate: hybrid/);
   assert.equal(autoresearchFixture.ok, true);
   assert.equal(autoresearchFixture.mode, "public-benchmark-autoresearch-loop");
   assert.equal(autoresearchFixture.fixtureOnly, true);
@@ -1481,6 +1517,49 @@ check("fresh public benchmark target check passes", () => {
   assert.match(liveStrategyReview, /PASS WITH CONCERNS/);
   assert.match(liveStrategyReview, /same-data/i);
   assert.match(liveStrategyReview, /not a MemoryBench answer-quality/i);
+  assert.equal(liveHybridReport.ok, true);
+  assert.equal(liveHybridReport.mode, "public-benchmark-hybrid-gate");
+  assert.equal(liveHybridReport.gate, "hybrid");
+  assert.equal(liveHybridReport.fixtureOnly, false);
+  assert.equal(liveHybridReport.benchmark, "longmemeval");
+  assert.equal(liveHybridReport.metricsOnly, true);
+  assert.equal(liveHybridReport.retrievalProxyOnly, true);
+  assert.equal(liveHybridReport.memoryBenchAnswerQuality, false);
+  assert.equal(liveHybridReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(liveHybridReport.rawQuestionIdsIncluded, false);
+  assert.equal(liveHybridReport.rawQuestionsIncluded, false);
+  assert.equal(liveHybridReport.rawAnswersIncluded, false);
+  assert.equal(liveHybridReport.rawMemoryIncluded, false);
+  assert.equal(liveHybridReport.input?.querySetHash, liveMaterializeReport.selection?.collectorCompatibleQuerySetHash);
+  assert.equal(liveHybridReport.input?.queryCount, 6);
+  assert.equal(liveHybridReport.input?.expectedResultRefCount, 18);
+  assert.equal(liveHybridReport.input?.haystackSessionCount, 287);
+  const hybridNames = new Set((liveHybridReport.strategies ?? []).map((item) => item.strategy));
+  for (const strategyName of [
+    "bm25-lite",
+    "dense-proxy",
+    "sparse-dense-rrf",
+    "sparse-dense-temporal",
+    "sparse-dense-graph-temporal",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+  ]) {
+    assert.ok(hybridNames.has(strategyName), `missing hybrid gate strategy ${strategyName}`);
+  }
+  assert.equal(liveHybridReport.control?.strategy, "bm25-lite");
+  assert.equal(liveHybridReport.winner?.strategy, "bm25-lite");
+  assert.equal(liveHybridReport.hybridPromotion?.promoteHybrid, false);
+  assert.equal(liveHybridReport.control?.quality, liveRecallWeaveRun.metrics?.quality);
+  for (const item of liveHybridReport.strategies ?? []) {
+    assert.equal(item.privacyLeakCount, 0);
+    assert.equal(item.redactionFailureCount, 0);
+    assert.equal(item.querySetHash, liveMaterializeReport.selection?.collectorCompatibleQuerySetHash);
+  }
+  assert.match(liveHybridEvidence, /Gate: hybrid/);
+  assert.match(liveHybridEvidence, /Hybrid promotion: false/);
+  assert.match(liveHybridReview, /PASS WITH CONCERNS/);
+  assert.match(liveHybridReview, /bm25-lite/i);
+  assert.match(liveHybridReview, /not MemoryBench answer-quality/i);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");
@@ -1747,6 +1826,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(materializeMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(strategyFixture), secretPattern);
   assert.doesNotMatch(strategyMarkdown, secretPattern);
+  assert.doesNotMatch(JSON.stringify(hybridFixture), secretPattern);
+  assert.doesNotMatch(hybridMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(autoresearchFixture), secretPattern);
   assert.doesNotMatch(autoresearchMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveMaterializeReport), secretPattern);
@@ -1756,6 +1837,9 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveStrategyReport), secretPattern);
   assert.doesNotMatch(liveStrategyEvidence, secretPattern);
   assert.doesNotMatch(liveStrategyReview, secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveHybridReport), secretPattern);
+  assert.doesNotMatch(liveHybridEvidence, secretPattern);
+  assert.doesNotMatch(liveHybridReview, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), secretPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, secretPattern);
   assert.doesNotMatch(liveAutoresearchReview, secretPattern);
@@ -1771,6 +1855,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(materializeMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(strategyFixture), privatePathPattern);
   assert.doesNotMatch(strategyMarkdown, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(hybridFixture), privatePathPattern);
+  assert.doesNotMatch(hybridMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(autoresearchFixture), privatePathPattern);
   assert.doesNotMatch(autoresearchMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveMaterializeReport), privatePathPattern);
@@ -1780,6 +1866,9 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveStrategyReport), privatePathPattern);
   assert.doesNotMatch(liveStrategyEvidence, privatePathPattern);
   assert.doesNotMatch(liveStrategyReview, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(liveHybridReport), privatePathPattern);
+  assert.doesNotMatch(liveHybridEvidence, privatePathPattern);
+  assert.doesNotMatch(liveHybridReview, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), privatePathPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, privatePathPattern);
   assert.doesNotMatch(liveAutoresearchReview, privatePathPattern);

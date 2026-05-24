@@ -118,25 +118,41 @@ too expensive for the next run.
 ## Next Hybrid Benchmark Gate
 
 Do not promote BM25-lite as the final memory strategy. Keep it as the cheap
-control and fallback. The next benchmark gate must compare it against real
-hybrid arms on the same source-locked data:
+control and fallback. The current local-only hybrid gate compares it against
+hybrid-family proxy arms on the same source-locked data:
 
 - `bm25-lite-b800-k5`: lexical control and emergency fallback.
-- `dense-only`: embedding retrieval only, with provider/model/dimensions
-  recorded.
-- `sparse-dense-rrf`: BM25 plus dense retrieval with reciprocal-rank fusion.
+- `dense-proxy`: local hashed-vector dense proxy. This proves benchmark wiring
+  only; it is not a hosted or learned embedding result.
+- `sparse-dense-rrf`: BM25 plus dense proxy with reciprocal-rank fusion.
 - `sparse-dense-temporal`: sparse/dense fusion with recency, update, and
-  supersession signals.
-- `sparse-dense-graph-temporal`: topic/wiki graph expansion plus temporal
-  signals.
-- `full-hybrid-rerank`: sparse, dense, graph, temporal, and reranker.
-- Optional `query-expansion-on`: only if the expanded query text is logged by
-  hash and the original query remains the evaluation key.
+  supersession-style signals.
+- `sparse-dense-graph-temporal`: topic/wiki graph proxy expansion plus
+  temporal signals.
+- `full-hybrid-rerank`: sparse, dense proxy, graph proxy, temporal, and
+  deterministic rerank proxy.
+- `query-expanded-full-hybrid-rerank`: the full proxy arm with deterministic
+  query expansion. The original query remains the evaluation key.
 
 The full hybrid arm only becomes the agent default if it beats BM25-lite on
 quality, or ties quality while improving a meaningful operational metric on a
 larger and more varied slice. Otherwise BM25-lite remains the fallback, and the
 hybrid method needs more work.
+
+Latest result:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-hybrid -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json
+```
+
+The 2026-05-24 source-locked 6-query LongMemEval-S hybrid gate kept
+`bm25-lite` as the control/fallback. `full-hybrid-rerank` and
+`query-expanded-full-hybrid-rerank` tied BM25 quality but doubled p50 latency
+from 16 ms to 33 ms. `dense-proxy` alone was faster but much lower quality.
+That means the benchmark wiring is now present, but the local proxy hybrid has
+not earned default status. The next research iteration should test real
+embedding and reranking arms, then rerun the same gate on a larger slice.
 
 Allowed wording after a small-slice win:
 

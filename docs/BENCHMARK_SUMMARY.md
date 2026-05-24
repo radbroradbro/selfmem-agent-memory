@@ -34,6 +34,8 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
+npm exec --yes pnpm@10.23.0 -- benchmark:public-hybrid -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json
 npm exec --yes pnpm@10.23.0 -- benchmark:public-autoresearch -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```
@@ -70,6 +72,18 @@ graph/topic routing, temporal supersession, hosted read-through fusion, query
 expansion, and reranking. The next benchmark gate must compare BM25-lite
 against those real hybrid arms on the same source-locked data before any agent
 default changes.
+
+The follow-up hybrid gate now exists and is intentionally conservative. It
+compares `bm25-lite` against local-only hybrid-family proxy arms on the same
+LongMemEval-S canary slice: `dense-proxy`, `sparse-dense-rrf`,
+`sparse-dense-temporal`, `sparse-dense-graph-temporal`,
+`full-hybrid-rerank`, and `query-expanded-full-hybrid-rerank`. These proxy
+arms prove benchmark wiring and ranking behavior without hosted provider
+calls. They do not replace later Voyage, Gemini, NVIDIA, or Apple Silicon local
+model arms. On the current 6-query slice, `bm25-lite` remains the winner:
+quality 0.4541, P@1 0.8333, recall@5 0.2917, NDCG@10 0.3996, p50 latency
+16 ms. The best full-hybrid proxy tied quality but was slower at 33 ms p50, so
+the gate correctly refused hybrid promotion.
 
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched

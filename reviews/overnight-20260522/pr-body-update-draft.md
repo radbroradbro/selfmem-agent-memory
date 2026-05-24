@@ -88,6 +88,13 @@ Live status:
   hybrid only; the next benchmark gate must compare BM25-lite against dense,
   graph, temporal, query-expansion, and reranked hybrid arms on the same
   source-locked data.
+- Adds that next same-data hybrid gate. The new `benchmark:public-hybrid`
+  command compares `bm25-lite` against local-only dense, sparse+dense,
+  temporal, graph, rerank, and query-expansion proxy arms on the source-locked
+  LongMemEval-S slice. `bm25-lite` remains the control/fallback winner at
+  quality 0.4541 and p50 16 ms; the full hybrid proxy arms tie quality but are
+  slower at p50 33 ms, so the gate refuses hybrid promotion and keeps broader
+  claims blocked.
 - Promotes GitHub Actions run `26348625868` on `9a95d08` as the latest
   verified code/product baseline after promoting the canonical LongMemEval-S
   retrieval-proxy run to `bm25-lite-b800-k5`, binding it to the materialized

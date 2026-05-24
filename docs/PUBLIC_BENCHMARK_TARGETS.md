@@ -47,6 +47,10 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json \
   --output reviews/overnight-20260522/public-longmemeval-strategy-compare.json \
   --markdown-output reviews/overnight-20260522/public-longmemeval-strategy-compare-evidence.md
+npm exec --yes pnpm@10.23.0 -- benchmark:public-hybrid -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --output reviews/overnight-20260522/public-longmemeval-hybrid-gate.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-hybrid-gate-evidence.md
 npm exec --yes pnpm@10.23.0 -- benchmark:public-autoresearch -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json \
   --output reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json \
@@ -192,6 +196,14 @@ harness we will use.
   84 ms, p95 latency 92 ms, and zero privacy or redaction failures.
   `hybrid-v1` tied quality but was slower. This is a methodology signal for
   autoresearch, not MemoryBench answer-quality proof.
+- Current LongMemEval-S hybrid gate:
+  `reviews/overnight-20260522/public-longmemeval-hybrid-gate.json`. It runs
+  `bm25-lite` against local-only dense, sparse+dense, temporal, graph, rerank,
+  and query-expansion proxy arms on the same materialized query set.
+  `full-hybrid-rerank` and `query-expanded-full-hybrid-rerank` tied BM25
+  quality, but p50 latency was 33 ms versus BM25 at 16 ms. The gate therefore
+  keeps BM25 as the fallback/control and does not promote hybrid as the agent
+  default.
 - Current LongMemEval-S autoresearch loop:
   `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
   runs 24 retrieval-proxy arms over strategy, context budget, and candidate

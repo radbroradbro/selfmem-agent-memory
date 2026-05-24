@@ -25,6 +25,17 @@ const containerDir = resolveInputPath(args.containerDir ?? process.env.RECALLWEA
 const outputPath = args.output ?? process.env.RECALLWEAVE_BASELINE_RESPONSES_JSON ?? null;
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 const preserveIds = fixtureRequested || args.preserveIds === true || process.env.RECALLWEAVE_BASELINE_PRESERVE_IDS === "1";
+const retrievalStrategies = [
+  "jaccard",
+  "bm25-lite",
+  "hybrid-v1",
+  "dense-proxy",
+  "sparse-dense-rrf",
+  "sparse-dense-temporal",
+  "sparse-dense-graph-temporal",
+  "full-hybrid-rerank",
+  "query-expanded-full-hybrid-rerank",
+];
 const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
 const contextTokenBudget = optionalPositiveInt(
   args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? null,
@@ -71,7 +82,7 @@ const responses = {};
 const contextBudgetStats = [];
 for (const query of queries) {
   const startedAt = performance.now();
-  const ranked = rankCandidates(query.q, loaded.candidates, { strategy: rankingStrategy }).slice(0, limit);
+  const ranked = rankCandidates(query, loaded.candidates, { strategy: rankingStrategy }).slice(0, limit);
   const budgeted = applyContextBudget(ranked, { contextTokenBudget });
   contextBudgetStats.push({ queryIdHash: shortHash(query.id), ...budgeted.stats });
   responses[query.id] = {
@@ -172,6 +183,8 @@ function loadMemories(inputPath, options) {
         return;
       }
       const sourceId = safeScalar(item.id ?? item.memory_id ?? item.memoryId ?? item.sourceId ?? `line-${index + 1}`);
+      const metadata = sanitizeMetadata(item.metadata);
+      const tokens = tokenize(redacted.text);
       const contentHash = `sha256:${stableHash(normalizeText(redacted.text))}`;
       candidates.push({
         sourceId,
@@ -179,6 +192,14 @@ function loadMemories(inputPath, options) {
         text: redacted.text,
         contentHash,
         estimatedTokens: estimateTokens(redacted.text),
+        metadata,
+        dateMs: extractDateMs(item, redacted.text),
+        tokens,
+        tokenSet: new Set(tokens),
+        bigramSet: new Set(ngrams(tokens, 2)),
+        semanticVector: hashedSemanticVector(redacted.text),
+        topicTermSet: topicTerms(`${redacted.text} ${metadata.kind ?? ""} ${metadata.questionType ?? ""}`),
+        roleCoverage: roleCoverageScore(redacted.text),
         baseScore: finiteNumberOrDefault(item.score ?? item.similarity ?? item.confidence, 0),
       });
     } catch {
@@ -211,16 +232,23 @@ function extractMemoryText(item) {
 }
 
 function rankCandidates(query, candidates, options = {}) {
-  if (options.strategy === "bm25-lite") return rankBm25Lite(query, candidates);
-  if (options.strategy === "hybrid-v1") return rankHybridV1(query, candidates);
-  return rankJaccard(query, candidates);
+  const queryText = queryTextValue(query);
+  if (options.strategy === "bm25-lite") return rankBm25Lite(queryText, candidates);
+  if (options.strategy === "hybrid-v1") return rankHybridV1(queryText, candidates);
+  if (options.strategy === "dense-proxy") return rankDenseProxy(queryText, candidates);
+  if (options.strategy === "sparse-dense-rrf") return rankSparseDenseRrf(queryText, candidates);
+  if (options.strategy === "sparse-dense-temporal") return rankSparseDenseTemporal(query, candidates);
+  if (options.strategy === "sparse-dense-graph-temporal") return rankSparseDenseGraphTemporal(query, candidates);
+  if (options.strategy === "full-hybrid-rerank") return rankFullHybridRerank(query, candidates);
+  if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates);
+  return rankJaccard(queryText, candidates);
 }
 
 function rankJaccard(query, candidates) {
   const queryTokens = new Set(tokenize(query));
   return candidates
     .map((candidate) => {
-      const docTokens = new Set(tokenize(candidate.text));
+      const docTokens = candidate.tokenSet ?? new Set(tokenize(candidate.text));
       let overlap = 0;
       for (const token of queryTokens) {
         if (docTokens.has(token)) overlap += 1;
@@ -239,8 +267,7 @@ function rankHybridV1(query, candidates) {
   const queryBigrams = new Set(ngrams(tokenize(query), 2));
   return candidates
     .map((candidate) => {
-      const candidateTokens = tokenize(candidate.text);
-      const candidateBigramSet = new Set(ngrams(candidateTokens, 2));
+      const candidateBigramSet = candidate.bigramSet ?? new Set(ngrams(tokenize(candidate.text), 2));
       let bigramHits = 0;
       for (const bigram of queryBigrams) {
         if (candidateBigramSet.has(bigram)) bigramHits += 1;
@@ -255,11 +282,133 @@ function rankHybridV1(query, candidates) {
     .sort((left, right) => right.score - left.score || left.outputId.localeCompare(right.outputId));
 }
 
+function rankDenseProxy(query, candidates) {
+  const expandedQuery = expandQuery(query);
+  const queryVector = hashedSemanticVector(expandedQuery);
+  return candidates
+    .map((candidate) => {
+      const score = cosine(queryVector, candidate.semanticVector ?? hashedSemanticVector(candidate.text)) + candidate.baseScore * 0.02;
+      return { ...candidate, score: round(score) };
+    })
+    .sort(byScoreThenId);
+}
+
+function rankSparseDenseRrf(query, candidates) {
+  return fuseRankedChannels(
+    candidates,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(query, candidates) },
+      { name: "dense", weight: 0.85, ranked: rankDenseProxy(query, candidates) },
+    ],
+    { scoreScale: 8 },
+  );
+}
+
+function rankSparseDenseTemporal(query, candidates) {
+  const queryText = queryTextValue(query);
+  return fuseRankedChannels(
+    candidates,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, candidates) },
+      { name: "dense", weight: 0.85, ranked: rankDenseProxy(queryText, candidates) },
+      { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, candidates) },
+    ],
+    { scoreScale: 8 },
+  );
+}
+
+function rankSparseDenseGraphTemporal(query, candidates) {
+  const queryText = queryTextValue(query);
+  return fuseRankedChannels(
+    candidates,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, candidates) },
+      { name: "dense", weight: 0.85, ranked: rankDenseProxy(queryText, candidates) },
+      { name: "graph", weight: 0.65, ranked: rankGraphProxy(query, candidates) },
+      { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, candidates) },
+    ],
+    { scoreScale: 8 },
+  );
+}
+
+function rankFullHybridRerank(query, candidates) {
+  const firstStage = rankSparseDenseGraphTemporal(query, candidates);
+  return rerankProxy(query, firstStage);
+}
+
+function rankQueryExpandedFullHybridRerank(query, candidates) {
+  const expanded = { ...query, q: expandQuery(queryTextValue(query)) };
+  const firstStage = rankSparseDenseGraphTemporal(expanded, candidates);
+  return rerankProxy(expanded, firstStage);
+}
+
+function fuseRankedChannels(candidates, channels, options = {}) {
+  const scores = new Map(candidates.map((candidate) => [candidate.outputId, 0]));
+  for (const channel of channels) {
+    channel.ranked.forEach((candidate, index) => {
+      const rank = index + 1;
+      const previous = scores.get(candidate.outputId) ?? 0;
+      scores.set(candidate.outputId, previous + Number(channel.weight ?? 1) / (60 + rank));
+    });
+  }
+  const scale = Number(options.scoreScale ?? 1);
+  return candidates
+    .map((candidate) => ({ ...candidate, score: round((scores.get(candidate.outputId) ?? 0) * scale + candidate.baseScore * 0.01) }))
+    .sort(byScoreThenId);
+}
+
+function rankTemporal(query, candidates) {
+  const queryText = normalizeText(queryTextValue(query));
+  const wantsTemporal = /\b(new|newer|latest|recent|recently|last|current|now|after|before|when|date|time|changed|updated|previous|earlier|first)\b/.test(queryText);
+  const dates = candidates.map((candidate) => candidate.dateMs).filter((value) => Number.isFinite(value));
+  const min = dates.length ? Math.min(...dates) : Date.now();
+  const max = dates.length ? Math.max(...dates) : Date.now();
+  const span = Math.max(1, max - min);
+  return candidates
+    .map((candidate) => {
+      const recency = Number.isFinite(candidate.dateMs) ? (candidate.dateMs - min) / span : 0;
+      const queryType = String(query?.metadata?.questionType ?? "").toLowerCase();
+      const candidateType = String(candidate.metadata?.questionType ?? "").toLowerCase();
+      const typeMatch = queryType && candidateType && queryType === candidateType ? 0.18 : 0;
+      const temporalCue = wantsTemporal ? 0.2 : 0;
+      return { ...candidate, score: round(recency * 0.62 + typeMatch + temporalCue + candidate.baseScore * 0.01) };
+    })
+    .sort(byScoreThenId);
+}
+
+function rankGraphProxy(query, candidates) {
+  const queryTopics = topicTerms(`${queryTextValue(query)} ${query?.metadata?.questionType ?? ""}`);
+  return candidates
+    .map((candidate) => {
+      const overlap = overlapRatio(queryTopics, candidate.topicTermSet ?? topicTerms(candidate.text));
+      const roleCoverage = candidate.roleCoverage ?? roleCoverageScore(candidate.text);
+      return { ...candidate, score: round(overlap * 0.78 + roleCoverage * 0.18 + candidate.baseScore * 0.01) };
+    })
+    .sort(byScoreThenId);
+}
+
+function rerankProxy(query, candidates) {
+  const queryText = queryTextValue(query);
+  const queryTokens = new Set(tokenize(queryText));
+  const queryBigrams = new Set(ngrams([...queryTokens], 2));
+  return candidates
+    .map((candidate, index) => {
+      const candidateTokens = candidate.tokenSet ?? new Set(tokenize(candidate.text));
+      const lexical = overlapRatio(queryTokens, candidateTokens);
+      const bigrams = overlapRatio(queryBigrams, candidate.bigramSet ?? new Set(ngrams([...candidateTokens], 2)));
+      const exact = candidate.text.toLowerCase().includes(queryText.toLowerCase()) ? 0.18 : 0;
+      const roleCoverage = roleCoverageScore(candidate.text) * 0.08;
+      const prior = reciprocalRankBoost(index + 1) * 3;
+      return { ...candidate, score: round(candidate.score * 0.58 + lexical * 0.18 + bigrams * 0.08 + exact + roleCoverage + prior) };
+    })
+    .sort(byScoreThenId);
+}
+
 function rankBm25Lite(query, candidates) {
   const queryTokens = tokenize(query);
   const uniqueQueryTokens = [...new Set(queryTokens)];
   const docs = candidates.map((candidate) => {
-    const tokens = tokenize(candidate.text);
+    const tokens = candidate.tokens ?? tokenize(candidate.text);
     return {
       candidate,
       tokens,
@@ -291,6 +440,94 @@ function rankBm25Lite(query, candidates) {
     .sort((left, right) => right.score - left.score || left.outputId.localeCompare(right.outputId));
 }
 
+function hashedSemanticVector(text, dimensions = 192) {
+  const vector = Array(dimensions).fill(0);
+  const normalized = normalizeText(text);
+  const features = [
+    ...tokenize(normalized),
+    ...ngrams(tokenize(normalized), 2),
+    ...charNgrams(normalized, 3),
+  ];
+  for (const feature of features) {
+    const hash = stableHash(feature);
+    const bucket = Number.parseInt(hash.slice(0, 8), 16) % dimensions;
+    const sign = Number.parseInt(hash.slice(8, 10), 16) % 2 === 0 ? 1 : -1;
+    vector[bucket] += sign;
+  }
+  return vector;
+}
+
+function cosine(left, right) {
+  let dot = 0;
+  let leftNorm = 0;
+  let rightNorm = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    dot += left[index] * right[index];
+    leftNorm += left[index] * left[index];
+    rightNorm += right[index] * right[index];
+  }
+  if (!leftNorm || !rightNorm) return 0;
+  return Math.max(0, dot / (Math.sqrt(leftNorm) * Math.sqrt(rightNorm)));
+}
+
+function charNgrams(text, size) {
+  const compact = String(text).replace(/\s+/g, " ").trim();
+  if (compact.length < size) return compact ? [compact] : [];
+  return Array.from({ length: compact.length - size + 1 }, (_, index) => compact.slice(index, index + size));
+}
+
+function expandQuery(query) {
+  const tokens = tokenize(query);
+  const expanded = new Set(tokens);
+  const expansionMap = {
+    remember: ["memory", "store", "write", "recall"],
+    memory: ["remember", "recall", "stored", "context"],
+    policy: ["rule", "decision", "setting"],
+    ui: ["interface", "dashboard", "brain", "preview"],
+    proof: ["evidence", "verified", "smoke", "review"],
+    latest: ["recent", "updated", "current", "new"],
+    recent: ["latest", "updated", "current", "new"],
+    when: ["date", "time", "after", "before"],
+    changed: ["updated", "superseded", "replaced"],
+    canary: ["benchmark", "smoke", "gate", "test"],
+  };
+  for (const token of tokens) {
+    if (token.endsWith("s") && token.length > 3) expanded.add(token.slice(0, -1));
+    if (token.endsWith("ed") && token.length > 4) expanded.add(token.slice(0, -2));
+    for (const synonym of expansionMap[token] ?? []) expanded.add(synonym);
+  }
+  return [...expanded].join(" ");
+}
+
+function topicTerms(text) {
+  const stop = new Set(["what", "when", "where", "which", "with", "that", "this", "from", "into", "have", "does", "must", "should", "would", "could", "about", "before", "after", "session", "assistant", "user"]);
+  return new Set(tokenize(text).filter((token) => token.length > 2 && !stop.has(token)));
+}
+
+function overlapRatio(left, right) {
+  if (!left.size || !right.size) return 0;
+  let hits = 0;
+  for (const item of left) {
+    if (right.has(item)) hits += 1;
+  }
+  return hits / Math.max(1, left.size);
+}
+
+function roleCoverageScore(text) {
+  const normalized = normalizeText(text);
+  let score = 0;
+  if (normalized.includes("user:")) score += 0.35;
+  if (normalized.includes("assistant:")) score += 0.35;
+  if (normalized.includes("date:")) score += 0.15;
+  if (normalized.includes("session:")) score += 0.15;
+  return Math.min(1, score);
+}
+
+function temporalWeight(query) {
+  const text = normalizeText(`${queryTextValue(query)} ${query?.metadata?.questionType ?? ""}`);
+  return /\btemporal|knowledge-update|latest|recent|recently|last|current|now|after|before|when|changed|updated\b/.test(text) ? 0.7 : 0.25;
+}
+
 function ngrams(tokens, size) {
   if (tokens.length < size) return [];
   return Array.from({ length: tokens.length - size + 1 }, (_, index) => tokens.slice(index, index + size).join(" "));
@@ -304,6 +541,14 @@ function tokenFrequencies(tokens) {
 
 function reciprocalRankBoost(rank) {
   return Number.isFinite(rank) && rank > 0 ? 1 / (60 + rank) : 0;
+}
+
+function byScoreThenId(left, right) {
+  return right.score - left.score || left.outputId.localeCompare(right.outputId);
+}
+
+function queryTextValue(query) {
+  return typeof query === "string" ? query : String(query?.q ?? "");
 }
 
 function applyContextBudget(candidates, options) {
@@ -414,6 +659,33 @@ function safeScalar(value) {
   return text.slice(0, 160);
 }
 
+function sanitizeMetadata(metadata) {
+  if (!metadata || typeof metadata !== "object") return {};
+  const safe = {};
+  for (const key of ["kind", "type", "category", "questionType", "date", "createdAt", "updatedAt", "source"]) {
+    if (metadata[key] == null) continue;
+    const value = String(metadata[key]).slice(0, 160);
+    assert.doesNotMatch(value, secretPattern, `metadata.${key} contains a key-shaped secret`);
+    assert.doesNotMatch(value, privatePathPattern, `metadata.${key} contains a private path`);
+    safe[key] = value;
+  }
+  return safe;
+}
+
+function extractDateMs(item, text) {
+  const metadata = item?.metadata && typeof item.metadata === "object" ? item.metadata : {};
+  for (const value of [metadata.date, metadata.createdAt, metadata.updatedAt, item?.createdAt, item?.updatedAt]) {
+    const parsed = Date.parse(String(value ?? ""));
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  const match = String(text ?? "").match(/\b(20\d{2}-\d{2}-\d{2})\b/);
+  if (match) {
+    const parsed = Date.parse(match[1]);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
 function resolveInputPath(value) {
   if (!value) return null;
   return isAbsolute(value) ? value : resolve(root, value);
@@ -459,7 +731,7 @@ function optionalPositiveInt(value, label) {
 
 function normalizeStrategy(value) {
   const strategy = String(value ?? "").trim().toLowerCase() || "jaccard";
-  assert.ok(["jaccard", "bm25-lite", "hybrid-v1"].includes(strategy), `unknown retrieval strategy: ${strategy}`);
+  assert.ok(retrievalStrategies.includes(strategy), `unknown retrieval strategy: ${strategy}`);
   return strategy;
 }
 

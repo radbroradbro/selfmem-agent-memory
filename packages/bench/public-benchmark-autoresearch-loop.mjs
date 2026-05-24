@@ -20,13 +20,24 @@ const limits = splitList(args.limits ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK
   positiveInt(value, "limit"),
 );
 
+const retrievalStrategies = [
+  "jaccard",
+  "bm25-lite",
+  "hybrid-v1",
+  "dense-proxy",
+  "sparse-dense-rrf",
+  "sparse-dense-temporal",
+  "sparse-dense-graph-temporal",
+  "full-hybrid-rerank",
+  "query-expanded-full-hybrid-rerank",
+];
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
-for (const strategy of strategies) assert.ok(["jaccard", "bm25-lite", "hybrid-v1"].includes(strategy), `unknown strategy: ${strategy}`);
+for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
 
 const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-autoresearch-loop-"));
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);

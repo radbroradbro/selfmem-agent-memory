@@ -12,17 +12,29 @@ const fixtureRequested = Boolean(args.fixture) || !args.live;
 const format = String(args.format ?? "json").toLowerCase();
 const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGY_REPORT ?? null;
 const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGY_MARKDOWN ?? null;
-const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGIES ?? "jaccard,bm25-lite,hybrid-v1");
+const gate = normalizeGate(args.gate ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_GATE ?? "strategy");
+const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGIES ?? defaultStrategies(gate));
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 1600, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 
+const retrievalStrategies = [
+  "jaccard",
+  "bm25-lite",
+  "hybrid-v1",
+  "dense-proxy",
+  "sparse-dense-rrf",
+  "sparse-dense-temporal",
+  "sparse-dense-graph-temporal",
+  "full-hybrid-rerank",
+  "query-expanded-full-hybrid-rerank",
+];
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
-for (const strategy of strategies) assert.ok(["jaccard", "bm25-lite", "hybrid-v1"].includes(strategy), `unknown strategy: ${strategy}`);
+for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
 
 const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-strategy-compare-"));
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
@@ -98,7 +110,8 @@ if (input.collectorCompatibleQuerySetHash) {
 const report = {
   schemaVersion: 1,
   ok: true,
-  mode: "public-benchmark-strategy-compare",
+  mode: gate === "hybrid" ? "public-benchmark-hybrid-gate" : "public-benchmark-strategy-compare",
+  gate,
   fixtureOnly: fixtureRequested,
   benchmark: input.benchmark,
   metricsOnly: true,
@@ -125,17 +138,26 @@ const report = {
   },
   strategies: results,
   winner: bestStrategy(results),
+  control: summarizeNamedStrategy(results, "bm25-lite"),
+  hybridPromotion: hybridPromotionDecision(results),
   safety: {
     publicSafe: true,
     metricsOnly: true,
     privateInputsStoredOutsideRepository: true,
     printsCredentials: false,
   },
-  nextActions: [
-    "Keep the winning retrieval-proxy strategy only if reviewer approves it as a methodology change.",
-    "Use this report to choose the next embedding, reranker, temporal, or query-expansion autoresearch arm.",
-    "Do not turn retrieval-proxy metrics into MemoryBench answer-quality claims.",
-  ],
+  nextActions:
+    gate === "hybrid"
+      ? [
+          "Keep bm25-lite as the lexical control unless a hybrid arm beats it on quality or ties quality with a meaningful operational gain.",
+          "Use the winning hybrid-family arm only as retrieval-proxy methodology evidence until MemoryBench answer-quality is run.",
+          "Run a larger source-locked LongMemEval or MemoryBench slice before any public SOTA or leaderboard language.",
+        ]
+      : [
+          "Keep the winning retrieval-proxy strategy only if reviewer approves it as a methodology change.",
+          "Use this report to choose the next embedding, reranker, temporal, or query-expansion autoresearch arm.",
+          "Do not turn retrieval-proxy metrics into MemoryBench answer-quality claims.",
+        ],
 };
 
 const serialized = format === "markdown" ? `${renderMarkdown(report)}\n` : `${JSON.stringify(report, null, 2)}\n`;
@@ -233,11 +255,57 @@ function bestStrategy(items) {
     : null;
 }
 
+function summarizeNamedStrategy(items, strategy) {
+  const found = items.find((item) => item.strategy === strategy) ?? null;
+  return found
+    ? {
+        strategy: found.strategy,
+        quality: found.metrics.quality,
+        pAt1: found.metrics.pAt1,
+        recallAt5: found.metrics.recallAt5,
+        recallAt10: found.metrics.recallAt10,
+        ndcgAt10: found.metrics.ndcgAt10,
+        latencyP50Ms: found.metrics.latencyP50Ms,
+      }
+    : null;
+}
+
+function hybridPromotionDecision(items) {
+  const control = items.find((item) => item.strategy === "bm25-lite") ?? null;
+  const hybridItems = items.filter((item) => !["jaccard", "bm25-lite", "hybrid-v1"].includes(item.strategy));
+  const bestHybrid = bestStrategy(hybridItems);
+  if (!control || !bestHybrid) {
+    return {
+      promoteHybrid: false,
+      reason: "Missing bm25-lite control or hybrid-family candidate.",
+    };
+  }
+  const controlQuality = Number(control.metrics?.quality ?? 0);
+  const hybridQuality = Number(bestHybrid.quality ?? 0);
+  const controlLatency = Number(control.metrics?.latencyP50Ms ?? Infinity);
+  const hybridLatency = Number(bestHybrid.latencyP50Ms ?? Infinity);
+  const qualityBeats = hybridQuality > controlQuality;
+  const qualityTies = hybridQuality === controlQuality;
+  const latencyImproves = hybridLatency <= controlLatency * 0.85;
+  return {
+    bestHybridStrategy: bestHybrid.strategy,
+    promoteHybrid: qualityBeats || (qualityTies && latencyImproves),
+    reason: qualityBeats
+      ? "Best hybrid-family arm beats bm25-lite on retrieval-proxy quality."
+      : qualityTies && latencyImproves
+        ? "Best hybrid-family arm ties quality and improves p50 latency by at least 15%."
+        : "Keep bm25-lite as control/fallback; hybrid-family arm has not earned promotion on this slice.",
+    qualityDeltaVsBm25: round(hybridQuality - controlQuality),
+    latencyDeltaVsBm25: round(hybridLatency - controlLatency),
+  };
+}
+
 function renderMarkdown(value) {
   return [
     "# Public Benchmark Strategy Compare",
     "",
     `- OK: ${value.ok}`,
+    `- Gate: ${value.gate}`,
     `- Fixture only: ${value.fixtureOnly}`,
     `- Benchmark: ${value.benchmark}`,
     `- Retrieval proxy only: ${value.retrievalProxyOnly}`,
@@ -247,6 +315,8 @@ function renderMarkdown(value) {
     `- Query count: ${value.input.queryCount}`,
     `- Expected result refs: ${value.input.expectedResultRefCount}`,
     `- Winner: ${value.winner?.strategy ?? "none"}`,
+    `- Hybrid promotion: ${value.hybridPromotion.promoteHybrid}`,
+    `- Hybrid decision: ${value.hybridPromotion.reason}`,
     "",
     "## Strategies",
     "",
@@ -264,6 +334,31 @@ function renderMarkdown(value) {
     `- Raw transcript included: ${value.rawTranscriptIncluded}`,
     `- Private output path included: ${value.rawPrivateOutputPathIncluded}`,
   ].join("\n");
+}
+
+function defaultStrategies(value) {
+  if (value === "hybrid") {
+    return [
+      "bm25-lite",
+      "dense-proxy",
+      "sparse-dense-rrf",
+      "sparse-dense-temporal",
+      "sparse-dense-graph-temporal",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+    ].join(",");
+  }
+  return "jaccard,bm25-lite,hybrid-v1";
+}
+
+function normalizeGate(value) {
+  const gate = String(value ?? "strategy").trim().toLowerCase();
+  assert.ok(["strategy", "hybrid"].includes(gate), `unknown benchmark gate: ${gate}`);
+  return gate;
+}
+
+function round(value) {
+  return Number(Number(value).toFixed(4));
 }
 
 function runNode(argv, options = {}) {

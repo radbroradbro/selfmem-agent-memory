@@ -148,6 +148,11 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
   --output reviews/overnight-20260522/public-longmemeval-strategy-compare.json \
   --markdown-output reviews/overnight-20260522/public-longmemeval-strategy-compare-evidence.md
 
+npm exec --yes pnpm@10.23.0 -- benchmark:public-hybrid -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --output reviews/overnight-20260522/public-longmemeval-hybrid-gate.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-hybrid-gate-evidence.md
+
 npm exec --yes pnpm@10.23.0 -- benchmark:public-autoresearch -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json \
   --output reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json \
@@ -203,6 +208,14 @@ The first same-data autoresearch loop is
 quality 0.4541 while reducing average context tokens to 800. The checked-in
 retrieval-proxy run now uses that setting. Treat it as a local methodology
 improvement, not MemoryBench answer-quality proof.
+
+The follow-up hybrid gate is
+`reviews/overnight-20260522/public-longmemeval-hybrid-gate.json`. It compares
+`bm25-lite` against local-only dense, sparse+dense, temporal, graph, rerank, and
+query-expansion proxy arms on the same source-locked slice. `full-hybrid-rerank`
+and `query-expanded-full-hybrid-rerank` tied BM25 quality but were slower, so
+the gate keeps `bm25-lite` as the control/fallback and blocks hybrid default
+promotion until real embedding/reranker arms beat it on a larger slice.
 
 Run this before any hosted Supermemory comparison claim:
 
