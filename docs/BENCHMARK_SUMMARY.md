@@ -109,9 +109,9 @@ The expanded autoresearch sweep now uses the same 30-query target:
 `reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json`.
 It ran 48 local-only arms across `bm25-lite`, sparse+dense, temporal, graph,
 full-hybrid rerank, and query-expanded full-hybrid rerank, with 800, 1200,
-1600, and 2400 token budgets and limits of 5 and 10. `bm25-lite-b800-k10`
+1600, and 2400 token budgets and limits of 5 and 10. `bm25-lite-b800-k5`
 won: quality 0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50
-latency 75 ms, and zero privacy failures. The best full-hybrid arm reached
+latency 74 ms, and zero privacy failures. The best full-hybrid arm reached
 quality 0.2351. So the current recommendation is clear: keep BM25 as the
 local default/fallback, and use the provider benchmark lane to test whether
 real embeddings and rerankers beat it.
@@ -187,6 +187,8 @@ The provider benchmark runner now enforces that comparison shape at the command
 level. A provider gate cannot run a provider arm by itself; it must include
 `bm25-lite`, `full-hybrid-rerank`, and at least one provider-backed arm. A
 hybrid gate must include `bm25-lite` plus at least one hybrid-family candidate.
+The autoresearch runner also rejects single-arm reports unless the operator
+passes `--allow-solo-smoke`, which labels the run as wiring-only evidence.
 That keeps solo runs in the smoke-test lane and makes the control comparison
 part of the benchmark contract, not just prose.
 

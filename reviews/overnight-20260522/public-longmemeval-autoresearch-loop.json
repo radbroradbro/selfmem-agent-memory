@@ -8,6 +8,20 @@
   "retrievalProxyOnly": true,
   "memoryBenchAnswerQuality": false,
   "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": false,
+    "fullHybridControlPresent": true,
+    "providerArmPresent": false,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
   "publicSafe": true,
   "rawQuestionIdsIncluded": false,
   "rawQuestionsIncluded": false,
@@ -15,13 +29,13 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-24T05:45:26.681Z",
+  "generatedAt": "2026-05-24T09:10:01.222Z",
   "input": {
     "source": "materialized-source-locked-longmemeval",
     "datasetSlice": "longmemeval-s-cleaned-canary-6-first-per-type-2026-05-23",
     "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
     "collectorCompatibleQuerySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
-    "materializerHash": "sha256:4bf446852f55f99b9bba30bd641c6e36f1f427083437acfc960d6095a98eecb3",
+    "materializerHash": "sha256:e70e0ccb3b5453a84714323d79415a542cad337f88bf5331f41b7a83a5cf1bfd",
     "queryCount": 6,
     "expectedResultRefCount": 18,
     "haystackSessionCount": 287
@@ -50,7 +64,8 @@
       "limits": [
         5,
         10
-      ]
+      ],
+      "maxMemoryBytes": 5000000
     },
     "keepDecision": "Use bm25-lite with budget 800 and limit 5 for the next canary arm.",
     "rollbackPlan": "Fall back to the previous checked-in retrieval-proxy result and keep publicBenchmarkClaimsAllowed=false."
@@ -97,8 +112,8 @@
       "recallAt5": 0.2917,
       "recallAt10": 0.2917,
       "ndcgAt10": 0.3996,
-      "latencyP50Ms": 16,
-      "latencyP95Ms": 23,
+      "latencyP50Ms": 15,
+      "latencyP95Ms": 19,
       "contextTokensAvg": 800
     },
     "contextBudget": {
@@ -129,7 +144,7 @@
         "recallAt10": 0.0833,
         "ndcgAt10": 0.1022,
         "latencyP50Ms": 6,
-        "latencyP95Ms": 18,
+        "latencyP95Ms": 19,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -158,8 +173,8 @@
         "recallAt5": 0.0833,
         "recallAt10": 0.0833,
         "ndcgAt10": 0.1022,
-        "latencyP50Ms": 6,
-        "latencyP95Ms": 18,
+        "latencyP50Ms": 5,
+        "latencyP95Ms": 20,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -189,7 +204,7 @@
         "recallAt10": 0.0833,
         "ndcgAt10": 0.1022,
         "latencyP50Ms": 6,
-        "latencyP95Ms": 12,
+        "latencyP95Ms": 19,
         "contextTokensAvg": 1186
       },
       "contextBudget": {
@@ -219,7 +234,7 @@
         "recallAt10": 0.0833,
         "ndcgAt10": 0.1022,
         "latencyP50Ms": 6,
-        "latencyP95Ms": 18,
+        "latencyP95Ms": 19,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -309,7 +324,7 @@
         "recallAt10": 0.0833,
         "ndcgAt10": 0.1022,
         "latencyP50Ms": 6,
-        "latencyP95Ms": 19,
+        "latencyP95Ms": 20,
         "contextTokensAvg": 1830
       },
       "contextBudget": {
@@ -339,7 +354,7 @@
         "recallAt10": 0.0833,
         "ndcgAt10": 0.1022,
         "latencyP50Ms": 6,
-        "latencyP95Ms": 18,
+        "latencyP95Ms": 19,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -368,8 +383,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 16,
-        "latencyP95Ms": 23,
+        "latencyP50Ms": 15,
+        "latencyP95Ms": 19,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -399,7 +414,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 16,
-        "latencyP95Ms": 23,
+        "latencyP95Ms": 22,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -429,7 +444,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 16,
-        "latencyP95Ms": 23,
+        "latencyP95Ms": 22,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -459,7 +474,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 19,
+        "latencyP95Ms": 22,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -549,7 +564,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 16,
-        "latencyP95Ms": 23,
+        "latencyP95Ms": 22,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -638,8 +653,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 21,
-        "latencyP95Ms": 34,
+        "latencyP50Ms": 23,
+        "latencyP95Ms": 30,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -699,7 +714,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 21,
-        "latencyP95Ms": 34,
+        "latencyP95Ms": 27,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -728,7 +743,7 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 22,
+        "latencyP50Ms": 21,
         "latencyP95Ms": 35,
         "contextTokensAvg": 1600
       },
@@ -759,7 +774,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 21,
-        "latencyP95Ms": 35,
+        "latencyP95Ms": 34,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -788,8 +803,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 20,
-        "latencyP95Ms": 34,
+        "latencyP50Ms": 21,
+        "latencyP95Ms": 36,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -818,8 +833,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 21,
-        "latencyP95Ms": 34,
+        "latencyP50Ms": 20,
+        "latencyP95Ms": 35,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -999,7 +1014,7 @@
         "recallAt10": 0.125,
         "ndcgAt10": 0.1673,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 6,
+        "latencyP95Ms": 5,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1029,7 +1044,7 @@
         "recallAt10": 0.125,
         "ndcgAt10": 0.1673,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 6,
+        "latencyP95Ms": 5,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1059,7 +1074,7 @@
         "recallAt10": 0.125,
         "ndcgAt10": 0.1673,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 6,
+        "latencyP95Ms": 5,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1089,7 +1104,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 28,
+        "latencyP95Ms": 29,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -1148,8 +1163,8 @@
         "recallAt5": 0.1667,
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
-        "latencyP50Ms": 15,
-        "latencyP95Ms": 28,
+        "latencyP50Ms": 16,
+        "latencyP95Ms": 22,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1179,7 +1194,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 28,
+        "latencyP95Ms": 29,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1209,7 +1224,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 21,
+        "latencyP95Ms": 28,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1239,7 +1254,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 28,
+        "latencyP95Ms": 30,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1268,8 +1283,8 @@
         "recallAt5": 0.1667,
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
-        "latencyP50Ms": 15,
-        "latencyP95Ms": 21,
+        "latencyP50Ms": 14,
+        "latencyP95Ms": 27,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1329,7 +1344,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 28,
+        "latencyP95Ms": 21,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -1359,7 +1374,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 29,
+        "latencyP95Ms": 31,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -1389,7 +1404,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 30,
+        "latencyP95Ms": 28,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1419,7 +1434,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 28,
+        "latencyP95Ms": 29,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1508,7 +1523,7 @@
         "recallAt5": 0.1667,
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
-        "latencyP50Ms": 14,
+        "latencyP50Ms": 15,
         "latencyP95Ms": 28,
         "contextTokensAvg": 2400
       },
@@ -1568,7 +1583,7 @@
         "recallAt5": 0.1667,
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
-        "latencyP50Ms": 16,
+        "latencyP50Ms": 15,
         "latencyP95Ms": 29,
         "contextTokensAvg": 800
       },
@@ -1629,7 +1644,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 29,
+        "latencyP95Ms": 31,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1689,7 +1704,7 @@
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
         "latencyP50Ms": 15,
-        "latencyP95Ms": 30,
+        "latencyP95Ms": 29,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1748,8 +1763,8 @@
         "recallAt5": 0.1667,
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
-        "latencyP50Ms": 16,
-        "latencyP95Ms": 30,
+        "latencyP50Ms": 15,
+        "latencyP95Ms": 29,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1778,8 +1793,8 @@
         "recallAt5": 0.1667,
         "recallAt10": 0.1667,
         "ndcgAt10": 0.2323,
-        "latencyP50Ms": 16,
-        "latencyP95Ms": 30,
+        "latencyP50Ms": 15,
+        "latencyP95Ms": 29,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1839,7 +1854,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 45,
+        "latencyP95Ms": 49,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -1869,7 +1884,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 46,
+        "latencyP95Ms": 47,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1899,7 +1914,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 44,
+        "latencyP95Ms": 46,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1928,8 +1943,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 31,
-        "latencyP95Ms": 41,
+        "latencyP50Ms": 32,
+        "latencyP95Ms": 45,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1959,7 +1974,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 45,
+        "latencyP95Ms": 47,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1989,7 +2004,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 46,
+        "latencyP95Ms": 45,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -2018,8 +2033,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 31,
-        "latencyP95Ms": 39,
+        "latencyP50Ms": 32,
+        "latencyP95Ms": 45,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -2049,7 +2064,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 46,
+        "latencyP95Ms": 45,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -2078,8 +2093,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 31,
-        "latencyP95Ms": 41,
+        "latencyP50Ms": 32,
+        "latencyP95Ms": 44,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -2139,7 +2154,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 45,
+        "latencyP95Ms": 44,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -2199,7 +2214,7 @@
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
         "latencyP50Ms": 32,
-        "latencyP95Ms": 45,
+        "latencyP95Ms": 47,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -2228,8 +2243,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 33,
-        "latencyP95Ms": 47,
+        "latencyP50Ms": 32,
+        "latencyP95Ms": 45,
         "contextTokensAvg": 2400
       },
       "contextBudget": {

@@ -28,6 +28,12 @@ available. If BM25 wins, BM25 remains the fallback while the research loop
 targets the largest hybrid or provider gap. If a hybrid or provider arm wins,
 that arm still needs reviewer approval before it becomes an agent default.
 
+Solo runs are allowed only as wiring smoke tests. The benchmark runners reject a
+single-arm report by default; an operator must pass `--allow-solo-smoke` to
+label that run as smoke-only. A smoke-only run cannot support method promotion,
+public score language, or any comparison to Supermemory, MemoryBench,
+LongMemEval, LoCoMo, ConvoMem, BEAM, or reported leaderboard rows.
+
 ## Rule For Public Scores
 
 Use a matched source-locked canary before any public score.
@@ -173,8 +179,8 @@ promoting the deterministic proxy hybrid.
 The expanded autoresearch sweep now repeats that comparison over the same
 30-query target while varying context budget and candidate limit:
 `reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json`.
-It tested 48 local-only arms. `bm25-lite-b800-k10` won with quality 0.2506,
-P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50 latency 75 ms, and zero
+It tested 48 local-only arms. `bm25-lite-b800-k5` won with quality 0.2506,
+P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50 latency 74 ms, and zero
 privacy failures. The result keeps BM25 as the local default/fallback and
 makes provider-backed embedding/reranking the next hypothesis to test.
 

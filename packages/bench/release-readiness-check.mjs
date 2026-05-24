@@ -1508,6 +1508,9 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(strategyFixture.rawAnswersIncluded, false);
   assert.equal(strategyFixture.rawMemoryIncluded, false);
   assert.equal(strategyFixture.strategies?.length, 3);
+  assert.equal(strategyFixture.comparisonContract?.soloRunsAreSmokeOnly, true);
+  assert.equal(strategyFixture.comparisonContract?.sameDataControlsRequired, true);
+  assert.equal(strategyFixture.comparisonContract?.bm25ControlPresent, true);
   assert.ok(strategyFixture.winner?.strategy);
   assert.match(strategyMarkdown, /Public Benchmark Strategy Compare/);
   assert.equal(hybridFixture.ok, true);
@@ -1524,6 +1527,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(hybridFixture.rawMemoryIncluded, false);
   assert.equal(hybridFixture.strategies?.length, 7);
   assert.equal(hybridFixture.control?.strategy, "bm25-lite");
+  assert.equal(hybridFixture.comparisonContract?.bm25ControlPresent, true);
+  assert.equal(hybridFixture.comparisonContract?.hybridFamilyPresent, true);
   assert.equal(hybridFixture.hybridPromotion?.promoteHybrid, false);
   assert.match(hybridMarkdown, /Gate: hybrid/);
   assert.equal(providerFixture.ok, true);
@@ -1538,6 +1543,9 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(providerFixture.rawQuestionsIncluded, false);
   assert.equal(providerFixture.rawAnswersIncluded, false);
   assert.equal(providerFixture.rawMemoryIncluded, false);
+  assert.equal(providerFixture.comparisonContract?.bm25ControlPresent, true);
+  assert.equal(providerFixture.comparisonContract?.fullHybridControlPresent, true);
+  assert.equal(providerFixture.comparisonContract?.providerArmPresent, true);
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
@@ -1560,6 +1568,10 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(autoresearchFixture.rawQuestionsIncluded, false);
   assert.equal(autoresearchFixture.rawAnswersIncluded, false);
   assert.equal(autoresearchFixture.rawMemoryIncluded, false);
+  assert.equal(autoresearchFixture.comparisonContract?.soloRunsAreSmokeOnly, true);
+  assert.equal(autoresearchFixture.comparisonContract?.sameDataControlsRequired, true);
+  assert.equal(autoresearchFixture.comparisonContract?.bm25ControlPresent, true);
+  assert.equal(autoresearchFixture.comparisonContract?.hybridFamilyPresent, true);
   assert.ok(Number(autoresearchFixture.loop?.armCount ?? 0) >= 12);
   assert.ok(autoresearchFixture.winner?.armId);
   assert.match(autoresearchMarkdown, /Public Benchmark Autoresearch Loop/);
@@ -1756,7 +1768,7 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(expandedAutoresearchReport.winner?.redactionFailureCount, 0);
   assert.match(expandedAutoresearchEvidence, /Public Benchmark Autoresearch Loop/);
   assert.match(expandedAutoresearchEvidence, /Query set hash: sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7/);
-  assert.match(expandedAutoresearchEvidence, /Winner: bm25-lite-b800-k10/);
+  assert.match(expandedAutoresearchEvidence, /Winner: bm25-lite-b800-k5/);
   assert.equal(providerGateFixtureReport.ok, true);
   assert.equal(providerGateFixtureReport.mode, "public-benchmark-provider-gate");
   assert.equal(providerGateFixtureReport.gate, "provider");
@@ -1814,6 +1826,21 @@ check("fresh public benchmark target check passes", () => {
     },
   );
   assert.notEqual(hybridGateWithoutControl.status, 0, "hybrid gate must reject runs without bm25-lite control");
+  const strategyGateWithoutControl = spawnSync(
+    "node",
+    ["packages/bench/public-benchmark-strategy-compare.mjs", "--fixture", "--strategies", "hybrid-v1"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  assert.notEqual(strategyGateWithoutControl.status, 0, "strategy gate must reject solo benchmark runs without explicit smoke labeling");
+  const strategyGateSoloSmoke = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-strategy-compare.mjs", "--fixture", "--strategies", "bm25-lite", "--allow-solo-smoke"]).stdout,
+  );
+  assert.equal(strategyGateSoloSmoke.comparisonContract?.allowSoloSmoke, true);
+  assert.equal(strategyGateSoloSmoke.comparisonContract?.sameDataControlsRequired, false);
   assert.equal(providerLivePreflightReport.ok, true);
   assert.equal(providerLivePreflightReport.mode, "provider-benchmark-live-preflight");
   assert.equal(providerLivePreflightReport.metricsOnly, true);
@@ -1982,6 +2009,9 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(liveAutoresearchReport.rawQuestionsIncluded, false);
   assert.equal(liveAutoresearchReport.rawAnswersIncluded, false);
   assert.equal(liveAutoresearchReport.rawMemoryIncluded, false);
+  assert.equal(liveAutoresearchReport.comparisonContract?.bm25ControlPresent, true);
+  assert.equal(liveAutoresearchReport.comparisonContract?.hybridFamilyPresent, true);
+  assert.equal(liveAutoresearchReport.comparisonContract?.sameDataControlsRequired, true);
   assert.equal(liveAutoresearchReport.input?.querySetHash, liveMaterializeReport.selection?.collectorCompatibleQuerySetHash);
   assert.equal(liveAutoresearchReport.input?.queryCount, 6);
   assert.equal(liveAutoresearchReport.input?.expectedResultRefCount, 18);
@@ -1999,6 +2029,21 @@ check("fresh public benchmark target check passes", () => {
   assert.match(liveAutoresearchReview, /PASS WITH CONCERNS/);
   assert.match(liveAutoresearchReview, /same-data/i);
   assert.match(liveAutoresearchReview, /not MemoryBench answer-quality/i);
+  const autoresearchSolo = spawnSync(
+    "node",
+    ["packages/bench/public-benchmark-autoresearch-loop.mjs", "--fixture", "--strategies", "bm25-lite"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  assert.notEqual(autoresearchSolo.status, 0, "autoresearch benchmark must reject solo runs without explicit smoke labeling");
+  const autoresearchSoloSmoke = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-autoresearch-loop.mjs", "--fixture", "--strategies", "bm25-lite", "--allow-solo-smoke"]).stdout,
+  );
+  assert.equal(autoresearchSoloSmoke.comparisonContract?.allowSoloSmoke, true);
+  assert.equal(autoresearchSoloSmoke.comparisonContract?.sameDataControlsRequired, false);
   const liveRunTargetStrict = JSON.parse(
     run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", liveRunTargetPath, "--strict-run"]).stdout,
   );

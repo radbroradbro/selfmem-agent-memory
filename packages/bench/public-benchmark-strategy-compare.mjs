@@ -14,6 +14,7 @@ const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRAT
 const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGY_MARKDOWN ?? null;
 const gate = normalizeGate(args.gate ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_GATE ?? "strategy");
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGIES ?? defaultStrategies(gate));
+const allowSoloSmoke = Boolean(args.allowSoloSmoke) || process.env.RECALLWEAVE_ALLOW_SOLO_BENCHMARK_SMOKE === "1";
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 1600, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
@@ -48,7 +49,7 @@ const privatePathOutputPattern =
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
-assertGateContract(gate, strategies);
+assertGateContract(gate, strategies, { allowSoloSmoke });
 
 const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-strategy-compare-"));
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
@@ -133,6 +134,7 @@ const report = {
   retrievalProxyOnly: true,
   memoryBenchAnswerQuality: false,
   publicBenchmarkClaimsAllowed: false,
+  comparisonContract: comparisonContract(gate, strategies, { allowSoloSmoke }),
   publicSafe: true,
   rawQuestionIdsIncluded: false,
   rawQuestionsIncluded: false,
@@ -293,7 +295,7 @@ function summarizeNamedStrategy(items, strategy) {
 
 function hybridPromotionDecision(items) {
   const control = items.find((item) => item.strategy === "bm25-lite") ?? null;
-  const hybridItems = items.filter((item) => !["jaccard", "bm25-lite", "hybrid-v1"].includes(item.strategy));
+  const hybridItems = items.filter((item) => !["jaccard", "bm25-lite"].includes(item.strategy));
   const bestHybrid = bestStrategy(hybridItems);
   if (!control || !bestHybrid) {
     return {
@@ -332,6 +334,8 @@ function renderMarkdown(value) {
     `- Retrieval proxy only: ${value.retrievalProxyOnly}`,
     `- MemoryBench answer quality: ${value.memoryBenchAnswerQuality}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
+    `- Solo smoke only: ${value.comparisonContract.soloRunsAreSmokeOnly}`,
+    `- Same-data controls required: ${value.comparisonContract.sameDataControlsRequired}`,
     `- Query set hash: ${value.input.querySetHash}`,
     `- Query count: ${value.input.queryCount}`,
     `- Expected result refs: ${value.input.expectedResultRefCount}`,
@@ -386,17 +390,18 @@ function defaultStrategies(value) {
   return "jaccard,bm25-lite,hybrid-v1";
 }
 
-function assertGateContract(value, strategyNames) {
+function assertGateContract(value, strategyNames, options = {}) {
   const strategySet = new Set(strategyNames);
+  if (options.allowSoloSmoke) return;
+  assert.ok(strategyNames.length >= 2, "benchmark comparison must include at least two arms; use --allow-solo-smoke only for wiring tests");
+  assert.ok(strategySet.has("bm25-lite"), "benchmark comparison must include bm25-lite as the same-data lexical control");
   if (value === "hybrid") {
-    assert.ok(strategySet.has("bm25-lite"), "hybrid gate must include bm25-lite as the same-data lexical control");
     assert.ok(
       strategyNames.some((strategy) => isHybridFamilyStrategy(strategy)),
       "hybrid gate must include at least one hybrid-family candidate",
     );
   }
   if (value === "provider") {
-    assert.ok(strategySet.has("bm25-lite"), "provider gate must include bm25-lite as the same-data lexical control");
     assert.ok(strategySet.has("full-hybrid-rerank"), "provider gate must include full-hybrid-rerank as the same-data hybrid control");
     assert.ok(
       strategyNames.some((strategy) => isProviderBackedStrategy(strategy)),
@@ -405,8 +410,30 @@ function assertGateContract(value, strategyNames) {
   }
 }
 
+function comparisonContract(value, strategyNames, options = {}) {
+  const strategySet = new Set(strategyNames);
+  const includesHybridFamily = strategyNames.some((strategy) => isHybridFamilyStrategy(strategy));
+  const includesProviderBacked = strategyNames.some((strategy) => isProviderBackedStrategy(strategy));
+  return {
+    soloRunsAreSmokeOnly: true,
+    allowSoloSmoke: Boolean(options.allowSoloSmoke),
+    sameDataControlsRequired: !options.allowSoloSmoke,
+    bm25ControlRequired: !options.allowSoloSmoke,
+    bm25ControlPresent: strategySet.has("bm25-lite"),
+    hybridFamilyRequired: value === "hybrid" || includesHybridFamily,
+    hybridFamilyPresent: includesHybridFamily,
+    fullHybridControlRequired: value === "provider" || includesProviderBacked,
+    fullHybridControlPresent: strategySet.has("full-hybrid-rerank"),
+    providerArmRequired: value === "provider",
+    providerArmPresent: includesProviderBacked,
+    actualBenchmarkTargetRequiredForClaims: true,
+    publicClaimsAllowedByThisReport: false,
+  };
+}
+
 function isHybridFamilyStrategy(strategy) {
   return [
+    "hybrid-v1",
     "dense-proxy",
     "sparse-dense-rrf",
     "sparse-dense-temporal",

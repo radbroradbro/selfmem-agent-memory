@@ -309,9 +309,11 @@ assert.equal(realDiagnosticsPostwatchNextAgentPlan.decision?.status, "READY_FOR_
 assert.equal(realDiagnosticsPostwatchNextAgentPlan.publicLaunchAllowed, false);
 assert.equal(realDiagnosticsPostwatchNextAgentPlan.fleetRolloutAllowed, false);
 assert.match(benchmarkSummaryText, /Solo RecallWeave runs are smoke tests only/i);
+assert.match(benchmarkSummaryText, /--allow-solo-smoke/i);
 assert.match(publicBenchmarkTargetsText, /Do not test RecallWeave alone for quality/i);
 assert.match(publicBenchmarkTargetsText, /Minimum same-data matrix/i);
 assert.match(autoresearchBenchmarkPlanText, /must not optimize a solo RecallWeave run in isolation/i);
+assert.match(autoresearchBenchmarkPlanText, /--allow-solo-smoke/i);
 assert.equal(publicLongmemEvalHybridGate.mode, "public-benchmark-hybrid-gate");
 assert.equal(publicLongmemEvalHybridGate.input?.queryCount, 6);
 assert.equal(publicLongmemEvalHybridGate.control?.strategy, "bm25-lite");
@@ -366,6 +368,9 @@ assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.sendsBenchmark
 assert.equal(publicLongmemEvalAutoresearchLoop.mode, "public-benchmark-autoresearch-loop");
 assert.equal(publicLongmemEvalAutoresearchLoop.publicBenchmarkClaimsAllowed, false);
 assert.equal(publicLongmemEvalAutoresearchLoop.memoryBenchAnswerQuality, false);
+assert.equal(publicLongmemEvalAutoresearchLoop.comparisonContract?.bm25ControlPresent, true);
+assert.equal(publicLongmemEvalAutoresearchLoop.comparisonContract?.hybridFamilyPresent, true);
+assert.equal(publicLongmemEvalAutoresearchLoop.comparisonContract?.sameDataControlsRequired, true);
 assert.ok(Number(publicLongmemEvalAutoresearchLoop.loop?.armCount ?? 0) >= 12);
 assert.equal(publicLongmemEvalExpandedAutoresearchLoop.mode, "public-benchmark-autoresearch-loop");
 assert.equal(publicLongmemEvalExpandedAutoresearchLoop.input?.queryCount, 30);
@@ -373,6 +378,9 @@ assert.equal(publicLongmemEvalExpandedAutoresearchLoop.input?.expectedResultRefC
 assert.equal(publicLongmemEvalExpandedAutoresearchLoop.winner?.strategy, "bm25-lite");
 assert.equal(publicLongmemEvalExpandedAutoresearchLoop.publicBenchmarkClaimsAllowed, false);
 assert.equal(publicLongmemEvalExpandedAutoresearchLoop.memoryBenchAnswerQuality, false);
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.comparisonContract?.bm25ControlPresent, true);
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.comparisonContract?.hybridFamilyPresent, true);
+assert.equal(publicLongmemEvalExpandedAutoresearchLoop.comparisonContract?.sameDataControlsRequired, true);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
 const branch = run("git", ["branch", "--show-current"]).stdout.trim();

@@ -9,6 +9,21 @@
   "retrievalProxyOnly": true,
   "memoryBenchAnswerQuality": false,
   "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": true,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
   "publicSafe": true,
   "rawQuestionIdsIncluded": false,
   "rawQuestionsIncluded": false,
@@ -16,7 +31,7 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-24T05:58:20.164Z",
+  "generatedAt": "2026-05-24T09:24:31.727Z",
   "input": {
     "source": "fixture",
     "datasetSlice": "fixture-memory-canary-slice",
@@ -31,8 +46,8 @@
     {
       "strategy": "bm25-lite",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:2258c699af54084f056b5eaac50507147edbb42bb60d4126df6c9a8cfcbb901d",
-      "resultHash": "sha256:298f4ec55e1de411c14428029e117001138fa582cd13f24b4ef78819ace457b2",
+      "responsesHash": "sha256:f9969dee412cff1783d808ad4b119f749957762bb4c12f3b2ce78e739a58d7b2",
+      "resultHash": "sha256:bbdb5ea3ed18dd6a8f9f572cd2adfeb5ef590295bd04c76b2bd2a695c7900561",
       "rankingStrategy": "bm25-lite",
       "provider": {
         "strategy": "bm25-lite",
@@ -107,8 +122,8 @@
     {
       "strategy": "full-hybrid-rerank",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:5f17a7a23f3c6fb22ac6429e22cb38f7cd1f57d11e0aed78c7032d95475ece79",
-      "resultHash": "sha256:0a09ef0b812b146dfad1528a0b3505df17415caa3c6cd491e3a22c21e01ff920",
+      "responsesHash": "sha256:3fb1882c800b150a3d879438e10fb747e959855d2403846ed67c55d3511a6d87",
+      "resultHash": "sha256:f76df3b55243fb07bc67eda735f70d97de0cf9f464c4b84585376b9aafd91020",
       "rankingStrategy": "full-hybrid-rerank",
       "provider": {
         "strategy": "full-hybrid-rerank",
@@ -183,8 +198,8 @@
     {
       "strategy": "cloud-voyage-rerank-only",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:5109532c099c61ba4097e011d2a846310e5e9cff677a25be55972a92abb3efe2",
-      "resultHash": "sha256:df6139809f2aa23d44994618ca7a74bd3964ff2f4b3b4fb28bb87cb08aa523a9",
+      "responsesHash": "sha256:3023bbfae555062e88164cc503ab9c4ca50ddb3a093693c9a297c41ea2278fdc",
+      "resultHash": "sha256:68dfecba4b3e991990efcebd61c8ce98ecc1dfaf22a4d7e08ac227b027f3b172",
       "rankingStrategy": "cloud-voyage-rerank-only",
       "provider": {
         "strategy": "cloud-voyage-rerank-only",
@@ -263,8 +278,8 @@
     {
       "strategy": "cloud-voyage4-voyage",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:1fa44c90701402deb30b6c204b134995aab38e0be8815b1e7b305f5044e35651",
-      "resultHash": "sha256:b43e05ca7e1cb480d8ec4f0b54a892f0ff78738525225c883a1728c0995cfe1b",
+      "responsesHash": "sha256:e4a8ba1a2fa30e58bda98bb6ac524bb90e3242c96a48ad47d26269d14617ebc8",
+      "resultHash": "sha256:d19bb86bea4516545aa3cdc0b515a120141f42cd63950d8b81aa60c743662e88",
       "rankingStrategy": "cloud-voyage4-voyage",
       "provider": {
         "strategy": "cloud-voyage4-voyage",
@@ -343,8 +358,8 @@
     {
       "strategy": "cloud-gemini-embed-rerank-proxy",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:52a067a8b2c7433c1cb817510614c65f0c7be4f30f0528699be7a823bb484e52",
-      "resultHash": "sha256:cffec3dc13531e85fd9027b53d44e95a65783c12717c50ffc7ec40ee4fdfe064",
+      "responsesHash": "sha256:b7fad3425ea8f4cf01a20883259c8a3dbf8ae603ec51cc2f9d018761e54c776a",
+      "resultHash": "sha256:25e5027cbfa242b00f8dec0d10aff039d02f4bf19062304bc876817fd03ae28e",
       "rankingStrategy": "cloud-gemini-embed-rerank-proxy",
       "provider": {
         "strategy": "cloud-gemini-embed-rerank-proxy",
@@ -377,7 +392,7 @@
         "recallAt10": 1,
         "ndcgAt10": 1,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 6,
+        "latencyP95Ms": 5,
         "contextTokensAvg": 119
       },
       "contextBudget": {
@@ -423,8 +438,8 @@
     {
       "strategy": "cloud-gemini-voyage-rerank",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:e598b6b970d6d00c584f4c5ab9c7d148bc96c4e79733a79bbc7bdaaa8c774a68",
-      "resultHash": "sha256:59789932506102b16336e9554d5c385b3b7d303fd8a1acda581427c3b56dc893",
+      "responsesHash": "sha256:992b23e93c50c89f83631f6297decb4e9da55bfd8e9c8b2a48bfa7fc06e1e120",
+      "resultHash": "sha256:2e09649becdc07d9b69bd40b4e7ee3f0b09d433784fa4af8a5e6e2369b29e2c8",
       "rankingStrategy": "cloud-gemini-voyage-rerank",
       "provider": {
         "strategy": "cloud-gemini-voyage-rerank",
@@ -505,8 +520,8 @@
     {
       "strategy": "cloud-nvidia-retriever-500m",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:dc4fc3608c09037a493dea11b63f498ad2662adf683376bf04928d4b25b6d146",
-      "resultHash": "sha256:fc1538f75f7de08bb0ce16149133b2204f1b3874c973f1e1fbc6d99a571a5e5f",
+      "responsesHash": "sha256:cba44cb457bfefeb750c2a1cc418df3704d8a748d8d429ea7d3666adf031f2c9",
+      "resultHash": "sha256:47589bf6ed5b7f8061c0825016e0b1296d3b042b16d662c654d0c66f4b23d530",
       "rankingStrategy": "cloud-nvidia-retriever-500m",
       "provider": {
         "strategy": "cloud-nvidia-retriever-500m",
@@ -526,86 +541,6 @@
         "embedModel": "nvidia/llama-nemotron-embed-1b-v2",
         "embedDimensions": null,
         "rerankModel": "nvidia/llama-3.2-nemoretriever-500m-rerank-v2",
-        "fixtureProviderMock": true,
-        "providerKeyCounts": {
-          "nvidia": 0
-        },
-        "keyCountAvailable": 0
-      },
-      "metrics": {
-        "quality": 1,
-        "pAt1": 1,
-        "recallAt5": 1,
-        "recallAt10": 1,
-        "ndcgAt10": 1,
-        "latencyP50Ms": 1,
-        "latencyP95Ms": 5,
-        "contextTokensAvg": 119
-      },
-      "contextBudget": {
-        "applied": true,
-        "tokenBudget": 800,
-        "strategy": "ranked-prefix-with-last-result-clipping",
-        "queryCount": 3,
-        "queriesClipped": 0,
-        "clippedResultCount": 0,
-        "skippedByBudgetCount": 0,
-        "fullCandidateTokensAvg": 119,
-        "exportedContextTokensAvg": 119
-      },
-      "privacyLeakCount": 0,
-      "redactionFailureCount": 0,
-      "resultFingerprints": [
-        {
-          "queryIdHash": "88e0ebf4bd261e0c",
-          "topResultIdHash": "30db9417d7f5ef82",
-          "pAt1": 1,
-          "recallAt5": 1,
-          "recallAt10": 1,
-          "ndcgAt10": 1
-        },
-        {
-          "queryIdHash": "e5c08511b104dde0",
-          "topResultIdHash": "be860b09b9428b93",
-          "pAt1": 1,
-          "recallAt5": 1,
-          "recallAt10": 1,
-          "ndcgAt10": 1
-        },
-        {
-          "queryIdHash": "7317cde9f031a0db",
-          "topResultIdHash": "54fbee446492c839",
-          "pAt1": 1,
-          "recallAt5": 1,
-          "recallAt10": 1,
-          "ndcgAt10": 1
-        }
-      ]
-    },
-    {
-      "strategy": "cloud-nvidia-nemotron-1b",
-      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:325ba263e681c70165f2dbaf4e501b1f5aef890611061e3c29facbaf9060f47e",
-      "resultHash": "sha256:e8a87884af68264d0223cdfa89718501cbc756ee6558c1b161122c1c05d7dbc0",
-      "rankingStrategy": "cloud-nvidia-nemotron-1b",
-      "provider": {
-        "strategy": "cloud-nvidia-nemotron-1b",
-        "providerStrategy": true,
-        "providerCallsAllowed": false,
-        "providerPublicDataConfirmed": false,
-        "providerCallsMade": 0,
-        "providerMockCalls": 6,
-        "embeddingCalls": 3,
-        "rerankCalls": 3,
-        "documentCountSent": 0,
-        "queryCountSent": 0,
-        "modelArm": "cloud-nvidia-nemotron-1b",
-        "providers": [
-          "nvidia"
-        ],
-        "embedModel": "nvidia/llama-nemotron-embed-1b-v2",
-        "embedDimensions": null,
-        "rerankModel": "nvidia/llama-nemotron-rerank-1b-v2",
         "fixtureProviderMock": true,
         "providerKeyCounts": {
           "nvidia": 0
@@ -663,10 +598,90 @@
       ]
     },
     {
+      "strategy": "cloud-nvidia-nemotron-1b",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:2064f25f05875927533e7178bb8e49df6e29fef62e919574a717087fb002e186",
+      "resultHash": "sha256:2436942f972aacfe4ad85bf2f82facaf385c088980d50e97f8a26f2c49318948",
+      "rankingStrategy": "cloud-nvidia-nemotron-1b",
+      "provider": {
+        "strategy": "cloud-nvidia-nemotron-1b",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 6,
+        "embeddingCalls": 3,
+        "rerankCalls": 3,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-nvidia-nemotron-1b",
+        "providers": [
+          "nvidia"
+        ],
+        "embedModel": "nvidia/llama-nemotron-embed-1b-v2",
+        "embedDimensions": null,
+        "rerankModel": "nvidia/llama-nemotron-rerank-1b-v2",
+        "fixtureProviderMock": true,
+        "providerKeyCounts": {
+          "nvidia": 0
+        },
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 5,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
       "strategy": "cloud-nvidia-e5-mistral",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:ec71834004378c22933b209898dd02c6c3e87baaf8f31cd9edbaff0f694922be",
-      "resultHash": "sha256:ec4a7fb3191ef3c8a06b3bf005dba5f2ec3f6b1f9545419f75213862bae2f8ce",
+      "responsesHash": "sha256:2e3b7a70b9c41604e5ed7172bb4b674b2658f08eece5b48d03be3b20d05a94cc",
+      "resultHash": "sha256:b6689cb4eb3c9eebf248902e597a6502dfb982a95919591d9ba7e338aedbdbbd",
       "rankingStrategy": "cloud-nvidia-e5-mistral",
       "provider": {
         "strategy": "cloud-nvidia-e5-mistral",
@@ -745,8 +760,8 @@
     {
       "strategy": "local-apple-qwen3-0_6b",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:e2182c2dad74c6aab113f5e64b5270fb6c40bfeb50597b5ada3507ef1cdf1f85",
-      "resultHash": "sha256:8fb5fb957aeccff1406573cff936b63394c372116888b855664fd5900351afa2",
+      "responsesHash": "sha256:3da218197579806fe31df593b9640e9c2e266a5613904125b3d895966b6228d9",
+      "resultHash": "sha256:581652a8ca8c25b593ea50699a5c5a22206656e223b99747fb65ea980637fafc",
       "rankingStrategy": "local-apple-qwen3-0_6b",
       "provider": {
         "strategy": "local-apple-qwen3-0_6b",

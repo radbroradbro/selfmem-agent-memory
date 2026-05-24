@@ -8,6 +8,20 @@
   "retrievalProxyOnly": true,
   "memoryBenchAnswerQuality": false,
   "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": false,
+    "fullHybridControlPresent": true,
+    "providerArmPresent": false,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
   "publicSafe": true,
   "rawQuestionIdsIncluded": false,
   "rawQuestionsIncluded": false,
@@ -15,13 +29,13 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-24T08:47:50.139Z",
+  "generatedAt": "2026-05-24T09:21:10.205Z",
   "input": {
     "source": "materialized-source-locked-longmemeval",
     "datasetSlice": "longmemeval-s-cleaned-canary-30-first-per-type-2026-05-24",
     "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
     "collectorCompatibleQuerySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
-    "materializerHash": "sha256:2141142f3b940adf0c16bf587f1f91cfd556fe005e590bbee6386f0386e06855",
+    "materializerHash": "sha256:b2657f06f97d71811cb0779f05295ba5bc4d770927d9d1e201046bded9d09a81",
     "queryCount": 30,
     "expectedResultRefCount": 92,
     "haystackSessionCount": 1420
@@ -50,15 +64,15 @@
       ],
       "maxMemoryBytes": 80000000
     },
-    "keepDecision": "Use bm25-lite with budget 800 and limit 10 for the next canary arm.",
+    "keepDecision": "Use bm25-lite with budget 800 and limit 5 for the next canary arm.",
     "rollbackPlan": "Fall back to the previous checked-in retrieval-proxy result and keep publicBenchmarkClaimsAllowed=false."
   },
   "baseline": null,
   "winner": {
-    "armId": "bm25-lite-b800-k10",
+    "armId": "bm25-lite-b800-k5",
     "strategy": "bm25-lite",
     "contextTokenBudget": 800,
-    "limit": 10,
+    "limit": 5,
     "rankingStrategy": "bm25-lite",
     "metrics": {
       "quality": 0.2506,
@@ -66,8 +80,8 @@
       "recallAt5": 0.1583,
       "recallAt10": 0.1583,
       "ndcgAt10": 0.2193,
-      "latencyP50Ms": 75,
-      "latencyP95Ms": 84,
+      "latencyP50Ms": 74,
+      "latencyP95Ms": 83,
       "contextTokensAvg": 800
     },
     "contextBudget": {
@@ -77,8 +91,8 @@
       "queryCount": 30,
       "queriesClipped": 30,
       "clippedResultCount": 30,
-      "skippedByBudgetCount": 270,
-      "fullCandidateTokensAvg": 32152,
+      "skippedByBudgetCount": 120,
+      "fullCandidateTokensAvg": 16763,
       "exportedContextTokensAvg": 800
     },
     "privacyLeakCount": 0,
@@ -97,8 +111,8 @@
         "recallAt5": 0.1583,
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 82,
+        "latencyP50Ms": 74,
+        "latencyP95Ms": 83,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -127,8 +141,8 @@
         "recallAt5": 0.1583,
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
-        "latencyP50Ms": 75,
-        "latencyP95Ms": 84,
+        "latencyP50Ms": 74,
+        "latencyP95Ms": 83,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -158,7 +172,7 @@
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
         "latencyP50Ms": 75,
-        "latencyP95Ms": 84,
+        "latencyP95Ms": 82,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -187,8 +201,8 @@
         "recallAt5": 0.1583,
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
-        "latencyP50Ms": 73,
-        "latencyP95Ms": 84,
+        "latencyP50Ms": 75,
+        "latencyP95Ms": 85,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -217,8 +231,8 @@
         "recallAt5": 0.1583,
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
-        "latencyP50Ms": 74,
-        "latencyP95Ms": 82,
+        "latencyP50Ms": 76,
+        "latencyP95Ms": 85,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -247,8 +261,8 @@
         "recallAt5": 0.1583,
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 84,
+        "latencyP50Ms": 74,
+        "latencyP95Ms": 81,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -277,8 +291,8 @@
         "recallAt5": 0.1583,
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 83,
+        "latencyP50Ms": 75,
+        "latencyP95Ms": 81,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -307,8 +321,8 @@
         "recallAt5": 0.1583,
         "recallAt10": 0.1583,
         "ndcgAt10": 0.2193,
-        "latencyP50Ms": 74,
-        "latencyP95Ms": 81,
+        "latencyP50Ms": 78,
+        "latencyP95Ms": 87,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -337,8 +351,8 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 75,
-        "latencyP95Ms": 82,
+        "latencyP50Ms": 77,
+        "latencyP95Ms": 86,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -367,8 +381,8 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 88,
+        "latencyP50Ms": 75,
+        "latencyP95Ms": 85,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -397,8 +411,8 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 83,
+        "latencyP50Ms": 78,
+        "latencyP95Ms": 85,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -427,8 +441,8 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 78,
-        "latencyP95Ms": 86,
+        "latencyP50Ms": 76,
+        "latencyP95Ms": 84,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -457,8 +471,8 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 86,
+        "latencyP50Ms": 78,
+        "latencyP95Ms": 85,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -487,7 +501,7 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 75,
+        "latencyP50Ms": 77,
         "latencyP95Ms": 85,
         "contextTokensAvg": 1600
       },
@@ -517,8 +531,8 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 86,
+        "latencyP50Ms": 77,
+        "latencyP95Ms": 87,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -547,7 +561,7 @@
         "recallAt5": 0.075,
         "recallAt10": 0.075,
         "ndcgAt10": 0.0928,
-        "latencyP50Ms": 75,
+        "latencyP50Ms": 77,
         "latencyP95Ms": 83,
         "contextTokensAvg": 2400
       },
@@ -577,7 +591,7 @@
         "recallAt5": 0.0917,
         "recallAt10": 0.0917,
         "ndcgAt10": 0.1188,
-        "latencyP50Ms": 77,
+        "latencyP50Ms": 78,
         "latencyP95Ms": 84,
         "contextTokensAvg": 800
       },
@@ -608,7 +622,7 @@
         "recallAt10": 0.0917,
         "ndcgAt10": 0.1188,
         "latencyP50Ms": 77,
-        "latencyP95Ms": 85,
+        "latencyP95Ms": 84,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -637,8 +651,8 @@
         "recallAt5": 0.0917,
         "recallAt10": 0.0917,
         "ndcgAt10": 0.1188,
-        "latencyP50Ms": 75,
-        "latencyP95Ms": 86,
+        "latencyP50Ms": 78,
+        "latencyP95Ms": 90,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -667,8 +681,8 @@
         "recallAt5": 0.0917,
         "recallAt10": 0.0917,
         "ndcgAt10": 0.1188,
-        "latencyP50Ms": 77,
-        "latencyP95Ms": 85,
+        "latencyP50Ms": 76,
+        "latencyP95Ms": 86,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -698,7 +712,7 @@
         "recallAt10": 0.1,
         "ndcgAt10": 0.127,
         "latencyP50Ms": 77,
-        "latencyP95Ms": 87,
+        "latencyP95Ms": 86,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -757,8 +771,8 @@
         "recallAt5": 0.1,
         "recallAt10": 0.1,
         "ndcgAt10": 0.127,
-        "latencyP50Ms": 79,
-        "latencyP95Ms": 87,
+        "latencyP50Ms": 78,
+        "latencyP95Ms": 88,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -788,7 +802,7 @@
         "recallAt10": 0.1,
         "ndcgAt10": 0.127,
         "latencyP50Ms": 76,
-        "latencyP95Ms": 84,
+        "latencyP95Ms": 88,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -817,7 +831,7 @@
         "recallAt5": 0.1083,
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
-        "latencyP50Ms": 79,
+        "latencyP50Ms": 80,
         "latencyP95Ms": 88,
         "contextTokensAvg": 800
       },
@@ -848,7 +862,7 @@
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
         "latencyP50Ms": 78,
-        "latencyP95Ms": 92,
+        "latencyP95Ms": 89,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -877,8 +891,8 @@
         "recallAt5": 0.1083,
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
-        "latencyP50Ms": 78,
-        "latencyP95Ms": 88,
+        "latencyP50Ms": 77,
+        "latencyP95Ms": 86,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -908,7 +922,7 @@
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
         "latencyP50Ms": 79,
-        "latencyP95Ms": 90,
+        "latencyP95Ms": 89,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -937,8 +951,8 @@
         "recallAt5": 0.1167,
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
-        "latencyP50Ms": 79,
-        "latencyP95Ms": 88,
+        "latencyP50Ms": 84,
+        "latencyP95Ms": 93,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -968,7 +982,7 @@
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
         "latencyP50Ms": 78,
-        "latencyP95Ms": 86,
+        "latencyP95Ms": 89,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -997,8 +1011,8 @@
         "recallAt5": 0.1167,
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
-        "latencyP50Ms": 79,
-        "latencyP95Ms": 91,
+        "latencyP50Ms": 77,
+        "latencyP95Ms": 86,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1027,8 +1041,8 @@
         "recallAt5": 0.1167,
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
-        "latencyP50Ms": 79,
-        "latencyP95Ms": 88,
+        "latencyP50Ms": 80,
+        "latencyP95Ms": 87,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1057,8 +1071,8 @@
         "recallAt5": 0.1417,
         "recallAt10": 0.1417,
         "ndcgAt10": 0.1989,
-        "latencyP50Ms": 160,
-        "latencyP95Ms": 173,
+        "latencyP50Ms": 157,
+        "latencyP95Ms": 168,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -1087,7 +1101,7 @@
         "recallAt5": 0.1417,
         "recallAt10": 0.1417,
         "ndcgAt10": 0.1989,
-        "latencyP50Ms": 160,
+        "latencyP50Ms": 161,
         "latencyP95Ms": 174,
         "contextTokensAvg": 800
       },
@@ -1117,8 +1131,8 @@
         "recallAt5": 0.1417,
         "recallAt10": 0.1417,
         "ndcgAt10": 0.1989,
-        "latencyP50Ms": 159,
-        "latencyP95Ms": 172,
+        "latencyP50Ms": 158,
+        "latencyP95Ms": 173,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1147,8 +1161,8 @@
         "recallAt5": 0.1417,
         "recallAt10": 0.1417,
         "ndcgAt10": 0.1989,
-        "latencyP50Ms": 158,
-        "latencyP95Ms": 175,
+        "latencyP50Ms": 159,
+        "latencyP95Ms": 172,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1177,8 +1191,8 @@
         "recallAt5": 0.15,
         "recallAt10": 0.15,
         "ndcgAt10": 0.2071,
-        "latencyP50Ms": 159,
-        "latencyP95Ms": 174,
+        "latencyP50Ms": 155,
+        "latencyP95Ms": 171,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1207,8 +1221,8 @@
         "recallAt5": 0.15,
         "recallAt10": 0.15,
         "ndcgAt10": 0.2071,
-        "latencyP50Ms": 157,
-        "latencyP95Ms": 170,
+        "latencyP50Ms": 156,
+        "latencyP95Ms": 171,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1237,8 +1251,8 @@
         "recallAt5": 0.15,
         "recallAt10": 0.15,
         "ndcgAt10": 0.2071,
-        "latencyP50Ms": 159,
-        "latencyP95Ms": 172,
+        "latencyP50Ms": 158,
+        "latencyP95Ms": 173,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1267,8 +1281,8 @@
         "recallAt5": 0.15,
         "recallAt10": 0.15,
         "ndcgAt10": 0.2071,
-        "latencyP50Ms": 158,
-        "latencyP95Ms": 174,
+        "latencyP50Ms": 161,
+        "latencyP95Ms": 172,
         "contextTokensAvg": 2400
       },
       "contextBudget": {
@@ -1297,8 +1311,8 @@
         "recallAt5": 0.1083,
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
-        "latencyP50Ms": 160,
-        "latencyP95Ms": 172,
+        "latencyP50Ms": 159,
+        "latencyP95Ms": 171,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -1327,8 +1341,8 @@
         "recallAt5": 0.1083,
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
-        "latencyP50Ms": 156,
-        "latencyP95Ms": 177,
+        "latencyP50Ms": 158,
+        "latencyP95Ms": 173,
         "contextTokensAvg": 800
       },
       "contextBudget": {
@@ -1357,8 +1371,8 @@
         "recallAt5": 0.1083,
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
-        "latencyP50Ms": 158,
-        "latencyP95Ms": 169,
+        "latencyP50Ms": 159,
+        "latencyP95Ms": 172,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1387,8 +1401,8 @@
         "recallAt5": 0.1083,
         "recallAt10": 0.1083,
         "ndcgAt10": 0.1524,
-        "latencyP50Ms": 159,
-        "latencyP95Ms": 171,
+        "latencyP50Ms": 157,
+        "latencyP95Ms": 176,
         "contextTokensAvg": 1200
       },
       "contextBudget": {
@@ -1417,8 +1431,8 @@
         "recallAt5": 0.1167,
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
-        "latencyP50Ms": 156,
-        "latencyP95Ms": 170,
+        "latencyP50Ms": 159,
+        "latencyP95Ms": 172,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1447,8 +1461,8 @@
         "recallAt5": 0.1167,
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
-        "latencyP50Ms": 158,
-        "latencyP95Ms": 172,
+        "latencyP50Ms": 157,
+        "latencyP95Ms": 171,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -1477,7 +1491,7 @@
         "recallAt5": 0.1167,
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
-        "latencyP50Ms": 159,
+        "latencyP50Ms": 161,
         "latencyP95Ms": 172,
         "contextTokensAvg": 2400
       },
@@ -1507,8 +1521,8 @@
         "recallAt5": 0.1167,
         "recallAt10": 0.1167,
         "ndcgAt10": 0.1606,
-        "latencyP50Ms": 159,
-        "latencyP95Ms": 173,
+        "latencyP50Ms": 162,
+        "latencyP95Ms": 174,
         "contextTokensAvg": 2400
       },
       "contextBudget": {

@@ -398,7 +398,7 @@
     "localSmoke": "release_check_covers_expanded_autoresearch_public_benchmark_guards_github_sync_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest verified PR branch head after adding the expanded 30-question LongMemEval-S autoresearch sweep. The same-data evidence keeps bm25-lite-b800-k10 as the local default/fallback, keeps deterministic hybrid unpromoted, and keeps provider-backed comparisons gated by env-only readiness. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest verified PR branch head after adding the expanded 30-question LongMemEval-S autoresearch sweep. The same-data evidence keeps bm25-lite-b800-k5 as the local default/fallback, keeps deterministic hybrid unpromoted, and keeps provider-backed comparisons gated by env-only readiness. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "3d61677bc3d316e040ac5a634467d0204c272493",

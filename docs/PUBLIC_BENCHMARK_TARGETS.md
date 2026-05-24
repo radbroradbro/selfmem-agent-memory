@@ -232,8 +232,8 @@ harness we will use.
 - Current expanded LongMemEval-S autoresearch sweep:
   `reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json`.
   It tests 48 local-only arms on the same 30-question target while varying
-  context budget and candidate limit. `bm25-lite-b800-k10` wins with quality
-  0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50 latency 75 ms,
+  context budget and candidate limit. `bm25-lite-b800-k5` wins with quality
+  0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193, p50 latency 74 ms,
   and zero privacy failures. The result keeps BM25 as the local default/fallback
   and sends the next real quality question to the provider-backed benchmark
   lane.

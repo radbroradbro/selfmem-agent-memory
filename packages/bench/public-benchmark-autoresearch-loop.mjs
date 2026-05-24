@@ -12,6 +12,7 @@ const fixtureRequested = Boolean(args.fixture) || !args.live;
 const format = String(args.format ?? "json").toLowerCase();
 const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_REPORT ?? null;
 const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_MARKDOWN ?? null;
+const allowSoloSmoke = Boolean(args.allowSoloSmoke) || process.env.RECALLWEAVE_ALLOW_SOLO_BENCHMARK_SMOKE === "1";
 const defaultAutoresearchStrategies = [
   "jaccard",
   "bm25-lite",
@@ -60,6 +61,7 @@ const privatePathPattern =
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
+assertAutoresearchContract(strategies, { allowSoloSmoke });
 
 const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-autoresearch-loop-"));
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
@@ -150,6 +152,7 @@ const report = {
   retrievalProxyOnly: true,
   memoryBenchAnswerQuality: false,
   publicBenchmarkClaimsAllowed: false,
+  comparisonContract: comparisonContract(strategies, { allowSoloSmoke }),
   publicSafe: true,
   rawQuestionIdsIncluded: false,
   rawQuestionsIncluded: false,
@@ -213,6 +216,56 @@ function buildArms(input) {
   return arms;
 }
 
+function assertAutoresearchContract(strategyNames, options = {}) {
+  if (options.allowSoloSmoke) return;
+  const strategySet = new Set(strategyNames);
+  assert.ok(strategyNames.length >= 2, "autoresearch benchmark must compare multiple arms; use --allow-solo-smoke only for wiring tests");
+  assert.ok(strategySet.has("bm25-lite"), "autoresearch benchmark must include bm25-lite as the same-data lexical control");
+  assert.ok(
+    strategyNames.some((strategy) => isHybridFamilyStrategy(strategy)),
+    "autoresearch benchmark must include at least one hybrid-family candidate",
+  );
+  if (strategyNames.some((strategy) => isProviderBackedStrategy(strategy))) {
+    assert.ok(strategySet.has("full-hybrid-rerank"), "provider-backed autoresearch must include full-hybrid-rerank as the same-data hybrid control");
+  }
+}
+
+function comparisonContract(strategyNames, options = {}) {
+  const strategySet = new Set(strategyNames);
+  const includesHybridFamily = strategyNames.some((strategy) => isHybridFamilyStrategy(strategy));
+  const includesProviderBacked = strategyNames.some((strategy) => isProviderBackedStrategy(strategy));
+  return {
+    soloRunsAreSmokeOnly: true,
+    allowSoloSmoke: Boolean(options.allowSoloSmoke),
+    sameDataControlsRequired: !options.allowSoloSmoke,
+    bm25ControlRequired: !options.allowSoloSmoke,
+    bm25ControlPresent: strategySet.has("bm25-lite"),
+    hybridFamilyRequired: !options.allowSoloSmoke,
+    hybridFamilyPresent: includesHybridFamily,
+    fullHybridControlRequired: includesProviderBacked,
+    fullHybridControlPresent: strategySet.has("full-hybrid-rerank"),
+    providerArmPresent: includesProviderBacked,
+    actualBenchmarkTargetRequiredForClaims: true,
+    publicClaimsAllowedByThisReport: false,
+  };
+}
+
+function isHybridFamilyStrategy(strategy) {
+  return [
+    "hybrid-v1",
+    "dense-proxy",
+    "sparse-dense-rrf",
+    "sparse-dense-temporal",
+    "sparse-dense-graph-temporal",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+  ].includes(strategy);
+}
+
+function isProviderBackedStrategy(strategy) {
+  return strategy.startsWith("cloud-") || strategy.startsWith("local-apple-");
+}
+
 function compareArms(left, right) {
   const qualityDelta = Number(right.metrics?.quality ?? 0) - Number(left.metrics?.quality ?? 0);
   if (qualityDelta !== 0) return qualityDelta;
@@ -248,6 +301,8 @@ function renderMarkdown(value) {
     `- Retrieval proxy only: ${value.retrievalProxyOnly}`,
     `- MemoryBench answer quality: ${value.memoryBenchAnswerQuality}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
+    `- Solo smoke only: ${value.comparisonContract.soloRunsAreSmokeOnly}`,
+    `- Same-data controls required: ${value.comparisonContract.sameDataControlsRequired}`,
     `- Query set hash: ${value.input.querySetHash}`,
     `- Arm count: ${value.loop.armCount}`,
     `- Winner: ${value.winner?.armId ?? "none"}`,

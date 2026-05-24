@@ -251,8 +251,8 @@ provider-backed embedding and reranking, gated by the provider preflight below.
 The matching expanded autoresearch sweep is
 `reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json`.
 It compares 48 local-only arms on that same 30-question target. The winner is
-`bm25-lite-b800-k10`: quality 0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10
-0.2193, p50 latency 75 ms, and zero privacy failures. That keeps BM25 as the
+`bm25-lite-b800-k5`: quality 0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10
+0.2193, p50 latency 74 ms, and zero privacy failures. That keeps BM25 as the
 local default/fallback for now. It does not prove BM25 is the final product
 method; it proves the current deterministic proxy hybrid has not earned
 promotion.

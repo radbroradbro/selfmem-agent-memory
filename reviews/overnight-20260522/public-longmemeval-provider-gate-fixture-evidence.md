@@ -7,6 +7,8 @@
 - Retrieval proxy only: true
 - MemoryBench answer quality: false
 - Public benchmark claims allowed: false
+- Solo smoke only: true
+- Same-data controls required: true
 - Query set hash: sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb
 - Query count: 3
 - Expected result refs: 3
