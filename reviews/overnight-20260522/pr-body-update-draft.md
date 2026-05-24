@@ -103,10 +103,10 @@ Live status:
   mocks and zero hosted calls; live provider runs require explicit provider-call
   and public-data environment guards plus env-only credentials for the selected
   provider arm.
-- Promotes GitHub Actions run `26349083689` on `e7fa56a` as the latest
-  verified code/product baseline after adding the public hybrid benchmark gate,
-  binding every arm to the materialized query-set hash, and keeping
-  retrieval-proxy/no-public-claims guards active.
+- Promotes GitHub Actions run `26349930959` on `a67c411` as the latest
+  verified code/product baseline after extending the provider gate with Gemini
+  embedding arms, binding every arm to the same source-locked fixture path, and
+  keeping retrieval-proxy/no-public-claims guards active.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
@@ -159,8 +159,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `a67c4115dc00450f5a51c09089879ec4687c596d`.
+- GitHub Actions run `26349930959`: passed CI after extending the opt-in provider-backed benchmark gate to compare BM25, full local hybrid, Voyage rerank-only, Voyage embed+rerank, Gemini embed+local rerank proxy, and Gemini embed+Voyage rerank arms in fixture mode with zero hosted calls, and keeping the result retrieval-proxy only.
+- Previous verified code/product baseline before the Gemini provider arms:
   `1e71c434725be7c95350d10ec61f8763a9558e63`.
-- GitHub Actions run `26349617343`: passed CI after adding the opt-in provider-backed benchmark gate, comparing BM25, full local hybrid, Voyage rerank-only, and Voyage embed+rerank arms in fixture mode with zero hosted calls, and keeping the result retrieval-proxy only.
 - Previous verified code/product baseline before the provider gate:
   `1d91c2c7afd4a3074528abeb8472b8c445dca505`.
 - Previous verified code/product baseline before the hybrid gate:

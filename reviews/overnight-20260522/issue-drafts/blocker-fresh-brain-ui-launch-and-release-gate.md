@@ -10,11 +10,13 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
-- `1e71c434725be7c95350d10ec61f8763a9558e63`.
-- GitHub Actions run `26349617343` passed CI after adding the opt-in
+- `a67c4115dc00450f5a51c09089879ec4687c596d`.
+- GitHub Actions run `26349930959` passed CI after extending the opt-in
   provider-backed benchmark gate for BM25, full local hybrid, Voyage
-  rerank-only, and Voyage embed+rerank arms in fixture mode with zero hosted
-  calls.
+  rerank-only, Voyage embed+rerank, Gemini embed+local rerank proxy, and Gemini
+  embed+Voyage rerank arms in fixture mode with zero hosted calls.
+- Previous verified code/product baseline before the Gemini provider arms:
+  `1e71c434725be7c95350d10ec61f8763a9558e63`.
 - Previous verified code/product baseline before the provider gate:
   `1d91c2c7afd4a3074528abeb8472b8c445dca505`.
 - Previous verified code/product baseline before the public benchmark target
