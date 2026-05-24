@@ -17,14 +17,24 @@ claim tier it supports.
 Minimum same-data matrix:
 
 - lexical control: BM25-lite or another transparent sparse floor,
-- current local hybrid arm: sparse plus dense proxy, graph/topic, temporal, and
-  rerank/query-expansion proxies where available,
+- current RecallWeave hybrid arm: sparse, dense, graph/topic, temporal, and
+  rerank/query-expansion channels where available. In local-only mode these may
+  be deterministic proxies; in provider mode they must be real embedding and
+  reranking calls,
 - provider-backed hybrid arm: Voyage, Gemini, NVIDIA, or local Apple Silicon
   embeddings/rerankers only after the provider preflight allows the run,
 - public target row: source-locked reported score or leaderboard row with the
   same benchmark variant and metric definition,
 - hosted Supermemory parity: read-only product-parity baseline when quota and
   source alignment allow it.
+
+The acceptance ladder is one-way. Beating BM25 only proves that the retrieval
+stack clears the lexical floor. It does not prove RecallWeave beats other
+memory systems. To support that stronger claim, a run must also beat or match a
+source-locked external target row under comparable metric definitions, or beat a
+same-data hosted parity run that passed source alignment and reviewer intake.
+If BM25 beats the hybrid arm, treat that as a failed methodology iteration and
+optimize the hybrid stack rather than promoting BM25 as the product goal.
 
 Hosted Supermemory is useful for product parity and read-through behavior, but
 it is not the only baseline. When hosted quota is locked, do not block the
@@ -109,6 +119,7 @@ question text, memory text, transcripts, private paths, or credentials.
 | --- | --- | --- |
 | Fixture | Parser or UI fixture only. | "The harness shape works." |
 | Run only | A real source-locked benchmark slice is ready to run, but no reported comparison row is attached yet. | "RecallWeave can now run on the same public benchmark slice." |
+| Lexical floor | RecallWeave beats BM25-lite on the same source-locked slice, with zero privacy failures. | "The retrieval stack clears the lexical floor on this canary." |
 | Canary trend | RecallWeave beats a reported target on a small source-locked slice with matching metric definitions. | "The canary is trending toward a win against reported leaders." |
 | Public benchmark | Full or officially comparable benchmark run with source lock, metric parity, reviewer approval, and privacy scan. | "RecallWeave beat the reported target on this benchmark setup." |
 | Broad SOTA | Multiple full comparable benchmarks, same metric definitions, reviewer approval, and reproducible artifacts. | "RecallWeave is stronger across the tested benchmark suite." |

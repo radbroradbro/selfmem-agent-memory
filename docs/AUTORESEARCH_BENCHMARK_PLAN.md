@@ -28,6 +28,13 @@ available. If BM25 wins, BM25 remains the fallback while the research loop
 targets the largest hybrid or provider gap. If a hybrid or provider arm wins,
 that arm still needs reviewer approval before it becomes an agent default.
 
+Do not confuse the floor with the finish line. The goal is to beat other memory
+systems or source-locked reported targets, not merely to beat BM25. BM25 exists
+because a cheap transparent baseline catches false sophistication. A real
+RecallWeave win needs two steps: first clear the lexical floor, then beat a
+same-data external target or source-aligned hosted parity run under the same
+metric definitions.
+
 Solo runs are allowed only as wiring smoke tests. The benchmark runners reject a
 single-arm report by default; an operator must pass `--allow-solo-smoke` to
 label that run as smoke-only. A smoke-only run cannot support method promotion,
@@ -150,8 +157,9 @@ hybrid-family proxy arms on the same source-locked data:
 
 The full hybrid arm only becomes the agent default if it beats BM25-lite on
 quality, or ties quality while improving a meaningful operational metric on a
-larger and more varied slice. Otherwise BM25-lite remains the fallback, and the
-hybrid method needs more work.
+larger and more varied slice. That promotion is still an internal default
+decision, not an external-memory-system win. Otherwise BM25-lite remains the
+fallback, and the hybrid method needs more work.
 
 Latest result:
 

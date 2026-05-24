@@ -9,10 +9,13 @@ RecallWeave is promising and operationally useful as a quota-safe local write la
 Solo RecallWeave runs are smoke tests only. They can prove the harness runs,
 privacy holds, latency is measurable, and the adapter does not fall over. They
 do not prove memory quality. Quality evidence must compare RecallWeave against
-same-data controls: a lexical floor such as BM25-lite, the current hybrid arm,
-provider-backed hybrid arms when explicit env-only provider consent is present,
-and source-locked public target rows or hosted Supermemory parity runs where
-those are available.
+same-data controls and external targets: a lexical floor such as BM25-lite, the
+current full RecallWeave hybrid arm, provider-backed hybrid arms when explicit
+env-only provider consent is present, and source-locked public target rows or
+hosted Supermemory parity runs where those are available. BM25-lite is not the
+system RecallWeave is trying to be. It is the floor. If BM25-lite wins, the
+benchmark found a gap in hybrid weighting, embeddings, reranking, chunking,
+query expansion, graph use, or temporal handling.
 
 The current branch includes a hosted baseline preflight:
 
@@ -75,12 +78,14 @@ cutting average context tokens in half. The checked-in retrieval-proxy run has
 now been regenerated with this setting. This is still not MemoryBench
 answer-quality evidence.
 
-BM25-lite is the control floor, not the final agent-memory design. The
-autoresearch loop now includes the local hybrid-family proxy arms, but those
-arms still use deterministic dense/rerank/query-expansion proxies rather than
-learned embeddings or hosted rerankers. The next benchmark gate must compare
-BM25-lite against provider-backed Voyage, Gemini, NVIDIA, and Apple Silicon
-arms on the same source-locked data before any agent default changes.
+BM25-lite is the control floor, not the final agent-memory design. A BM25 win is
+a useful negative result: the richer retrieval stack has not earned promotion
+on that slice. The autoresearch loop now includes the local hybrid-family proxy
+arms, but those arms still use deterministic dense/rerank/query-expansion
+proxies rather than learned embeddings or hosted rerankers. The next benchmark
+gate must compare BM25-lite against the actual RecallWeave hybrid stack,
+provider-backed Voyage, Gemini, NVIDIA, and Apple Silicon arms on the same
+source-locked data before any agent default changes or external-system claims.
 
 The follow-up hybrid gate now exists and is intentionally conservative. It
 compares `bm25-lite` against local-only hybrid-family proxy arms on the same
