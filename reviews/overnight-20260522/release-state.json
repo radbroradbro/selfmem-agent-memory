@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T04:36:30Z",
+  "generatedAt": "2026-05-24T06:05:20Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "8aa98265e84db5a1e2dda2b66d16065c7be30902",
-    "ciRunId": 26351957568,
+    "headSha": "6c3cb1e97978999bc3606eed67f19ba7f208d9e7",
+    "ciRunId": 26353508492,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_commit_bound_canary_evidence_public_benchmark_guards_and_goal_audit",
+    "localSmoke": "release_check_covers_provider_arms_public_benchmark_guards_github_sync_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after requiring benchmark comparator matrices and binding one-agent canary evidence to the approved adapter commit. Current evidence keeps bm25-lite as a control rather than the target product system, blocks public benchmark claims until same-data public benchmark/provider-backed comparisons pass, requires returned canary packets to match the expected adapter commit, reports zero privacy failures, and keeps public launch blocked until owner approval and one real strict production canary. Local release:check, CI-mode release:check, release:github-sync, diff check, goal:audit, and GitHub Actions run 26351957568 passed."
+    "note": "Latest inspected code/product baseline after exposing NVIDIA and local Apple Silicon provider benchmark arms alongside BM25, full local hybrid, Voyage, and Gemini controls. Current evidence keeps bm25-lite as a control rather than the target product system, blocks live provider calls until public-data/provider-call consent plus env-only readiness are present, blocks public benchmark claims until same-data provider-backed comparisons pass, requires returned one-agent canary packets to report the expected adapter commit, reports zero privacy failures, and keeps public launch blocked until owner approval and one real strict production canary. Local release:check, release:doctor, release:github-sync, diff check, goal:audit, and GitHub Actions run 26353508492 passed."
   },
   "releaseStateGuard": {
     "enabled": true,

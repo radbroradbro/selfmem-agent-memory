@@ -95,14 +95,19 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after binding the one-agent canary
   packet commands to the approved adapter commit and regenerating the handoff
   packet with concrete collection commands.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26353508492` passed on `6c3cb1e`, the release-state baseline was promoted,
+  the provider-backed benchmark gate added NVIDIA and local Apple Silicon arms,
+  and the OpenClaw one-agent handoff packet was regenerated for that expected
+  adapter commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T05:11:30Z
+- PR body refreshed at: 2026-05-24T06:07:33Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T05:11:29Z
-- PR body hash: d811817890f1a5a4729c2d26a6613f3ad662d07127456969bb71b9e1d86d7d09
+- Issue updated at: 2026-05-24T06:07:34Z
+- PR body hash: b20bb6dd6500493b5efce43edba71da364d7dc6c7a39eb9e6c0441bf525468df
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 6e429b89f1d32823c704dd96861caa4f87137e8f88d07d9dbc65fea063384d16
+- Issue body hash: 675882e40c5a3b1ec13c7f47c34dd7d9af4095ea4e48e74c1d6e52a5b4f9aea9
 - PR body length: 48236
 - Issue body length: 28866
 

@@ -10,13 +10,20 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
-- `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
+- `6c3cb1e97978999bc3606eed67f19ba7f208d9e7`.
+- GitHub Actions run `26353508492` passed CI after exposing NVIDIA and local
+  Apple Silicon provider benchmark arms beside BM25, full local hybrid,
+  Voyage, and Gemini controls. The checked-in evidence keeps BM25 as a control
+  rather than the target product system, blocks live provider calls until
+  public-data/provider-call consent plus env-only readiness are present, and
+  requires returned one-agent canary packets to report the expected adapter
+  commit.
+- Previous verified code/product baseline before NVIDIA/local Apple provider
+  benchmark arms:
+  `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568` passed CI after requiring a same-data
   benchmark comparator matrix and binding returned canary evidence to the
-  approved adapter commit. The checked-in evidence keeps solo RecallWeave runs
-  as smoke only, keeps BM25 as a control rather than the target product system,
-  and requires returned one-agent canary packets to report the expected adapter
-  commit.
+  approved adapter commit.
 - Previous verified code/product baseline before the commit-bound canary
   evidence gate: `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d`.
 - GitHub Actions run `26351014379` passed CI after binding the provider
@@ -450,10 +457,10 @@ requirements are resolved.
   latency evidence. The next canary must use a fresh patched runtime window,
   follow `canary:drill`, and pass strict intake.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`, SHA256
-  `b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5`.
+  `recallweave-openclaw-next-agent-canary-20260524-6c3cb1e.zip`, SHA256
+  `d11607f6175f2c2c35757c90918f0bddd578c478c0660c80b25e9cf85278b2ef`.
   Returned canary reports must name commit
-  `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
+  `6c3cb1e97978999bc3606eed67f19ba7f208d9e7`.
   It was regenerated from the postwatch batch report with
   `--batch ... --require-ready`. The underlying batch used
   `--allow-failed-inputs`, so one bad sibling archive does not block the

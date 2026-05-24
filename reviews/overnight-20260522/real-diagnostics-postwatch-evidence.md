@@ -17,7 +17,7 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <downloads-
 npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <telegram-download-folder> --allow-failed-inputs --output reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 8aa98265e84db5a1e2dda2b66d16065c7be30902 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 6c3cb1e97978999bc3606eed67f19ba7f208d9e7 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260524-6c3cb1e.zip
 ```
 
 ## Returned Watch Result
@@ -50,8 +50,8 @@ and lacked store latency instrumentation.
 
 ## Fresh Canary Packet
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`
-- SHA-256: `b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5`
+- Packet label: `recallweave-openclaw-next-agent-canary-20260524-6c3cb1e.zip`
+- SHA-256: `d11607f6175f2c2c35757c90918f0bddd578c478c0660c80b25e9cf85278b2ef`
 - Entries:
   - `README.md`
   - `manifest.json`

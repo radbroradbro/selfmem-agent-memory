@@ -187,8 +187,18 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `6c3cb1e97978999bc3606eed67f19ba7f208d9e7`.
+- GitHub Actions run `26353508492`: passed CI after exposing NVIDIA and local
+  Apple Silicon provider benchmark arms beside BM25, full local hybrid,
+  Voyage, and Gemini controls. The checked-in evidence keeps BM25 as a control
+  rather than the target product system, blocks live provider calls until
+  public-data/provider-call consent plus env-only readiness are present, and
+  requires returned one-agent canary packets to report the expected adapter
+  commit.
+- Previous verified code/product baseline before NVIDIA/local Apple provider
+  benchmark arms:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
-- GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit. The checked-in evidence keeps solo RecallWeave runs as smoke only, keeps BM25 as a control rather than the target product system, and requires returned one-agent canary packets to report the expected adapter commit.
+- GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.
 - Previous verified code/product baseline before the commit-bound canary evidence gate:
   `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d`.
 - GitHub Actions run `26351014379`: passed CI after binding the provider preflight to the expanded 30-query LongMemEval-S target. The checked-in evidence calls no provider APIs, sends no benchmark text, and keeps the next live cloud-provider run tied to the stronger expanded target.
@@ -553,7 +563,7 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - `npm exec --yes pnpm@10.23.0 -- canary:batch-audit`: passed on the fixture batch, failed closed with `--require-real-pass`, supported explicit mixed-folder `--allow-failed-inputs` triage, and triaged the available redacted real diagnostics without exposing raw content.
 - `reviews/overnight-20260522/real-next-agent-openclaw-canary-plan.md`: added a paste-ready OpenClaw fresh-window canary handoff selected from redacted metrics-only evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:next-agent`: passed on the fixture planner and converted the real redacted batch into a one-agent OpenClaw fresh-window plan focused on adapter-contract and store-latency evidence.
-- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 8aa98265e84db5a1e2dda2b66d16065c7be30902`: passed from the postwatch batch report, preserving the selected privacy-clean OpenClaw candidate and keeping failed sibling diagnostics from counting as rollout evidence.
+- `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 6c3cb1e97978999bc3606eed67f19ba7f208d9e7`: passed from the postwatch batch report, preserving the selected privacy-clean OpenClaw candidate and keeping failed sibling diagnostics from counting as rollout evidence.
 - `npm exec --yes pnpm@10.23.0 -- canary:returned-workspace`: passed in
   fixture mode, wrote metrics-only markdown and JSON into a temp workspace, and
   failed closed with `--require-production-canary` for fixture evidence.
@@ -582,10 +592,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Previous verified code baseline before returned downloads supervision:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`, SHA256
-  `b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5`.
+  `recallweave-openclaw-next-agent-canary-20260524-6c3cb1e.zip`, SHA256
+  `d11607f6175f2c2c35757c90918f0bddd578c478c0660c80b25e9cf85278b2ef`.
   Returned canary reports must name commit
-  `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
+  `6c3cb1e97978999bc3606eed67f19ba7f208d9e7`.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 - Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.
 - `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.

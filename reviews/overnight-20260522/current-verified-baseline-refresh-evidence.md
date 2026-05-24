@@ -6,13 +6,13 @@ Date: 2026-05-24
 
 This refresh updates the checked-in release state and canary handoff evidence so
 the latest verified code/product baseline matches the current PR head after the
-benchmark comparator guard and commit-bound canary evidence gate.
+provider-backed benchmark gate added NVIDIA and local Apple Silicon arms.
 
 ## Verified Head
 
-- Commit: `8aa98265e84db5a1e2dda2b66d16065c7be30902`
-- Commit title: `docs: refresh current OpenClaw canary handoff`
-- GitHub Actions run: `26351957568`
+- Commit: `6c3cb1e97978999bc3606eed67f19ba7f208d9e7`
+- Commit title: `test: expose nvidia and apple provider benchmark arms`
+- GitHub Actions run: `26353508492`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -26,16 +26,17 @@ refresh:
 - `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
-- GitHub Actions run `26351957568`
+- `npm exec --yes pnpm@10.23.0 -- release:doctor`
+- GitHub Actions run `26353508492`
 
 ## Canary Handoff Artifact
 
 The current sendable OpenClaw one-agent canary handoff packet is:
 
-- Packet: `recallweave-openclaw-next-agent-canary-20260524-8aa9826.zip`
-- SHA256: `b9b3fbe1c3c29ff6c6754291603a745a087cf40abe496a259abafc191dedabc5`
+- Packet: `recallweave-openclaw-next-agent-canary-20260524-6c3cb1e.zip`
+- SHA256: `d11607f6175f2c2c35757c90918f0bddd578c478c0660c80b25e9cf85278b2ef`
 - Expected returned report commit:
-  `8aa98265e84db5a1e2dda2b66d16065c7be30902`
+  `6c3cb1e97978999bc3606eed67f19ba7f208d9e7`
 - Zip integrity: passed.
 - Manifest confirms `READY_FOR_ONE_AGENT_FRESH_CANARY`,
   `oneAgentCanaryAllowed: true`, `publicLaunchAllowed: false`, and
@@ -55,6 +56,10 @@ The benchmark lane remains conservative:
 - Public benchmark claims require same-data comparison against BM25, hybrid
   arms, provider-backed hybrid arms when explicitly consented, and public
   benchmark or leaderboard targets where possible.
+- The current provider-backed fixture gate includes BM25, full local hybrid,
+  Voyage, Gemini, NVIDIA, and local Apple Silicon arms, but live provider runs
+  remain opt-in and blocked by preflight until consent flags and env-only
+  provider readiness are present.
 - Hosted Supermemory comparisons remain product-parity sanity checks, not the
   main public scoreboard.
 
