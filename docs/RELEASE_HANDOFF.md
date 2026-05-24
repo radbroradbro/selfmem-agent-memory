@@ -304,6 +304,19 @@ Each report includes a live command template that names only the selected
 provider credential and keeps the BM25 and full-hybrid controls in the same
 comparison.
 
+For a paste-ready operator handoff, generate the provider packet:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:packet -- --provider voyage --format markdown
+```
+
+The checked-in Voyage packet is
+`reviews/overnight-20260522/public-longmemeval-expanded-provider-operator-packet.md`.
+It is public-safe and metrics-only. It does not call a provider, does not print
+keys, keeps the output directory and provider key file outside the repo, and
+requires `bm25-lite`, `full-hybrid-rerank`, and `cloud-voyage4-voyage` in the
+same run.
+
 Do not use the provider gate on private agent memories unless the operator has
 separately approved sending that text to the provider.
 

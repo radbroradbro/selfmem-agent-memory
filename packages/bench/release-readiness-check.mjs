@@ -455,6 +455,7 @@ const requiredScripts = [
   "benchmark:public-materialize",
   "benchmark:public-strategy",
   "benchmark:public-provider:preflight",
+  "benchmark:public-provider:packet",
   "benchmark:public-provider",
   "benchmark:public-autoresearch",
   "goal:audit",
@@ -1416,6 +1417,15 @@ check("fresh public benchmark target check passes", () => {
     join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-nvidia-evidence.md"),
     "utf8",
   );
+  const providerOperatorPacket = JSON.parse(run("node", ["packages/bench/provider-benchmark-operator-packet.mjs", "--provider", "voyage"]).stdout);
+  const providerOperatorPacketMarkdown = run("node", [
+    "packages/bench/provider-benchmark-operator-packet.mjs",
+    "--provider",
+    "voyage",
+    "--format",
+    "markdown",
+  ]).stdout;
+  const providerOperatorPacketEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-operator-packet.md"), "utf8");
   const expandedProviderLivePreflightFresh = JSON.parse(
     run("node", [
       "packages/bench/provider-benchmark-live-preflight.mjs",
@@ -1909,6 +1919,29 @@ check("fresh public benchmark target check passes", () => {
   assert.match(expandedProviderLivePreflightNvidiaEvidence, /Provider Benchmark Live Preflight/);
   assert.match(expandedProviderLivePreflightNvidiaEvidence, /cloud-nvidia-nemotron-1b/);
   assert.match(expandedProviderLivePreflightNvidiaEvidence, /NVIDIA_API_KEY=<env-only-nvidia-key>/);
+  assert.equal(providerOperatorPacket.ok, true);
+  assert.equal(providerOperatorPacket.mode, "provider-benchmark-operator-packet");
+  assert.equal(providerOperatorPacket.provider, "voyage");
+  assert.equal(providerOperatorPacket.callsProviderApis, false);
+  assert.equal(providerOperatorPacket.sendsBenchmarkTextToProvider, false);
+  assert.equal(providerOperatorPacket.publicBenchmarkClaimsAllowed, false);
+  assert.equal(providerOperatorPacket.preflight?.status, "BLOCKED_PROVIDER_ENV");
+  assert.equal(providerOperatorPacket.preflight?.liveRunAllowedNow, false);
+  assert.deepEqual(providerOperatorPacket.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage"]);
+  assert.equal(providerOperatorPacket.sameDataContract?.bm25ControlRequired, true);
+  assert.equal(providerOperatorPacket.sameDataContract?.fullHybridControlRequired, true);
+  assert.equal(providerOperatorPacket.sameDataContract?.providerArmRequired, true);
+  assert.equal(providerOperatorPacket.sameDataContract?.soloProviderRunsAreSmokeOnly, true);
+  assert.ok(providerOperatorPacket.passCriteria?.some((item) => /READY_FOR_LIVE_PROVIDER_BENCHMARK/.test(item)));
+  assert.match(providerOperatorPacketMarkdown, /Provider lane: voyage/);
+  assert.match(providerOperatorPacketMarkdown, /bm25-lite/);
+  assert.match(providerOperatorPacketMarkdown, /full-hybrid-rerank/);
+  assert.match(providerOperatorPacketMarkdown, /cloud-voyage4-voyage/);
+  assert.match(providerOperatorPacketMarkdown, /publicBenchmarkClaimsAllowed remains false/i);
+  assert.match(providerOperatorPacketEvidence, /RecallWeave Provider Benchmark Operator Packet/);
+  assert.match(providerOperatorPacketEvidence, /Provider lane: voyage/);
+  assert.match(providerOperatorPacketEvidence, /preflight reports READY_FOR_LIVE_PROVIDER_BENCHMARK/i);
+  assert.match(providerOperatorPacketEvidence, /result includes bm25-lite, full-hybrid-rerank, and the selected provider arm/i);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");

@@ -157,6 +157,21 @@ provider's env variable, so a Voyage test is not blocked by missing NVIDIA,
 Gemini, or local Apple readiness, and an NVIDIA test is not blocked by missing
 Voyage, Gemini, or local Apple readiness.
 
+The same path also has a public-safe operator packet:
+`reviews/overnight-20260522/public-longmemeval-expanded-provider-operator-packet.md`.
+Generate it with:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:packet -- --provider voyage --format markdown
+```
+
+The packet is deliberately conservative. It tells the operator to rerun
+`benchmark:public-provider:preflight --require-ready`, then run the same-data
+provider comparison only after the provider key file and public-data/provider
+call consent flags are present. It also lists exactly what may come back:
+metrics-only preflight and result files, not keys, raw benchmark text, raw
+memories, transcripts, private paths, or diagnostics.
+
 The provider benchmark runner now enforces that comparison shape at the command
 level. A provider gate cannot run a provider arm by itself; it must include
 `bm25-lite`, `full-hybrid-rerank`, and at least one provider-backed arm. A

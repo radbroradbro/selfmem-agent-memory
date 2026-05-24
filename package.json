@@ -89,6 +89,7 @@
     "benchmark:public-strategy": "node packages/bench/public-benchmark-strategy-compare.mjs",
     "benchmark:public-hybrid": "node packages/bench/public-benchmark-strategy-compare.mjs --gate hybrid --context-token-budget 800 --limit 5",
     "benchmark:public-provider:preflight": "node packages/bench/provider-benchmark-live-preflight.mjs",
+    "benchmark:public-provider:packet": "node packages/bench/provider-benchmark-operator-packet.mjs",
     "benchmark:public-provider": "node packages/bench/public-benchmark-strategy-compare.mjs --gate provider --context-token-budget 800 --limit 5",
     "benchmark:public-autoresearch": "node packages/bench/public-benchmark-autoresearch-loop.mjs",
     "goal:audit": "node packages/bench/goal-completion-audit.mjs",
