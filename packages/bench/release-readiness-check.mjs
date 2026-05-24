@@ -3368,12 +3368,21 @@ check("fresh canary next-agent plan passes", () => {
 check("fresh canary next-agent handoff packet passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-next-agent-packet-check-"));
   const packetPath = join(tempRoot, "next-agent-handoff.zip");
+  const expectedCommitPacketPath = join(tempRoot, "next-agent-handoff-expected-commit.zip");
   const allowFailedPacketPath = join(tempRoot, "next-agent-handoff-allow-failed.zip");
   const noCandidateRoot = join(tempRoot, "empty-diagnostics");
   const noCandidatePacketPath = join(tempRoot, "no-candidate.zip");
   const requireReadyPacketPath = join(tempRoot, "fixture-should-not-pass.zip");
   mkdirSync(noCandidateRoot, { recursive: true });
   const packetRun = run("node", ["packages/bench/canary-next-agent-packet.mjs", "--output", packetPath]);
+  const expectedCommit = "0123456789abcdef0123456789abcdef01234567";
+  const expectedCommitPacketRun = run("node", [
+    "packages/bench/canary-next-agent-packet.mjs",
+    "--expected-commit",
+    expectedCommit,
+    "--output",
+    expectedCommitPacketPath,
+  ]);
   const allowFailedPacketRun = run("node", [
     "packages/bench/canary-next-agent-packet.mjs",
     "--input-root",
@@ -3413,6 +3422,8 @@ check("fresh canary next-agent handoff packet passes", () => {
   const noCandidateReport = JSON.parse(noCandidateRun.stdout);
   const entries = run("unzip", ["-Z1", packetPath]).stdout.split(/\r?\n/).filter(Boolean).sort();
   const manifest = JSON.parse(run("unzip", ["-p", packetPath, "manifest.json"]).stdout);
+  const expectedCommitManifest = JSON.parse(run("unzip", ["-p", expectedCommitPacketPath, "manifest.json"]).stdout);
+  const expectedCommitReadme = run("unzip", ["-p", expectedCommitPacketPath, "README.md"]).stdout;
   const allowFailedManifest = JSON.parse(run("unzip", ["-p", allowFailedPacketPath, "manifest.json"]).stdout);
   const allowFailedPlan = JSON.parse(run("unzip", ["-p", allowFailedPacketPath, "next-agent-plan.json"]).stdout);
   const readme = run("unzip", ["-p", packetPath, "README.md"]).stdout;
@@ -3468,8 +3479,17 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(manifest.publicLaunchAllowed, false);
   assert.equal(manifest.fleetRolloutAllowed, false);
   assert.equal(manifest.sourceControl.headSha, currentHead);
+  assert.equal(manifest.sourceControl.approvedAdapterCommit, currentHead);
   assert.equal(manifest.sourceControl.expectedReportCommit, currentHead);
+  assert.equal(manifest.sourceControl.expectedCommitProvided, false);
   assert.equal(manifest.sourceControl.commitRequiredForProductionCanary, true);
+  assert.equal(expectedCommitManifest.sourceControl.headSha, currentHead);
+  assert.equal(expectedCommitManifest.sourceControl.approvedAdapterCommit, expectedCommit);
+  assert.equal(expectedCommitManifest.sourceControl.expectedReportCommit, expectedCommit);
+  assert.equal(expectedCommitManifest.sourceControl.expectedCommitProvided, true);
+  assert.equal(expectedCommitManifest.sourceControl.commitRequiredForProductionCanary, true);
+  assert.match(expectedCommitManifest.freshWindowContract.returnedPacketIntakeCommand, new RegExp(`--expected-commit ${expectedCommit}`));
+  assert.match(expectedCommitPacketRun.stdout, new RegExp(`"expectedReportCommit": "${expectedCommit}"`));
   assert.equal(manifest.readyForLiveHandoff, false);
   assert.equal(manifest.requireReadyPassed, true);
   assert.equal(manifest.blockerPreserved, true);
@@ -3489,7 +3509,13 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(readme, /Canary means a bounded validation window/i);
   assert.match(readme, /deterministic drill/i);
   assert.match(readme, /Fresh-window contract/i);
+  assert.match(readme, new RegExp(`Packet generated from controller commit: ${currentHead}`));
+  assert.match(readme, new RegExp(`Approved adapter commit: ${currentHead}`));
   assert.match(readme, new RegExp(`Expected canary report commit: ${currentHead}`));
+  assert.match(expectedCommitReadme, new RegExp(`Packet generated from controller commit: ${currentHead}`));
+  assert.match(expectedCommitReadme, new RegExp(`Approved adapter commit: ${expectedCommit}`));
+  assert.match(expectedCommitReadme, new RegExp(`Expected canary report commit: ${expectedCommit}`));
+  assert.match(expectedCommitReadme, /regenerate this handoff packet with that commit first/i);
   assert.match(readme, /Ready for live handoff: no/i);
   assert.match(readme, /Do not attach raw memories/i);
   assert.match(markdown, /RecallWeave Next Agent Canary Plan/);
@@ -3503,7 +3529,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(evidence, /single public-safe zip/i);
   assert.match(evidence, /--allow-failed-inputs/i);
   assert.match(geminiReview, /Verdict:\s*CLEAN/i);
-  for (const text of [packetRun.stdout, allowFailedPacketRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, noCandidateRun.stdout, noCandidateRun.stderr, readme, markdown, operator, drill, evidence]) {
+  for (const text of [packetRun.stdout, expectedCommitPacketRun.stdout, allowFailedPacketRun.stdout, requireReadyFixtureRun.stdout, requireReadyFixtureRun.stderr, noCandidateRun.stdout, noCandidateRun.stderr, readme, expectedCommitReadme, markdown, operator, drill, evidence]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   }

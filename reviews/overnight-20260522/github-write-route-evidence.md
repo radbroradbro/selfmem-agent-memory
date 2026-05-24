@@ -121,6 +121,10 @@ Verdict: resolved for PR body and blocker issue writes.
     gate gained single-provider Voyage and NVIDIA live preflight reports, and
     the current OpenClaw one-agent handoff packet was regenerated for the new
     expected adapter commit. Updated at: 2026-05-24T06:27:08Z.
+  - The PR body was refreshed again after clarifying that the next-agent packet
+    was generated from controller commit `67c0944`, while the approved
+    adapter/report commit remains `3d61677`. Updated at:
+    2026-05-24T06:39:52Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

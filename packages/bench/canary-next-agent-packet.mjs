@@ -192,6 +192,7 @@ try {
     oneAgentCanaryAllowed: manifest.oneAgentCanaryAllowed,
     readyForLiveHandoff: manifest.readyForLiveHandoff,
     requireReadyPassed: manifest.requireReadyPassed,
+    sourceControl: manifest.sourceControl,
     host,
     status: manifest.status,
     selectedCandidate: manifest.selectedCandidate,
@@ -210,6 +211,8 @@ try {
 
 function buildReadme(packetManifest) {
   const expectedReportCommit = packetManifest.sourceControl.expectedReportCommit;
+  const generatedFromCommit = packetManifest.sourceControl.headSha;
+  const approvedAdapterCommit = packetManifest.sourceControl.approvedAdapterCommit;
   return [
     "# RecallWeave Next-Agent Handoff Packet",
     "",
@@ -220,6 +223,8 @@ function buildReadme(packetManifest) {
     `Host: ${packetManifest.host}.`,
     `Status: ${packetManifest.status}.`,
     `Scope: ${packetManifest.recommendedScope}.`,
+    `Packet generated from controller commit: ${generatedFromCommit}.`,
+    `Approved adapter commit: ${approvedAdapterCommit}.`,
     `Expected canary report commit: ${expectedReportCommit}.`,
     "",
     "Read in this order:",
@@ -235,7 +240,7 @@ function buildReadme(packetManifest) {
     "",
     `- Minimum runtime after update: ${packetManifest.freshWindowContract.minimumMinutes} minutes.`,
     "- Evidence must be post-update, strict-real, non-fixture, rollback-tested, and metrics-only.",
-    `- The returned packet must report commit \`${expectedReportCommit}\` unless the runtime proves a newer reviewed adapter commit.`,
+    `- The returned packet must report commit \`${expectedReportCommit}\`. If a newer adapter commit should count, regenerate this handoff packet with that commit first.`,
     `- Record the update timestamp in \`${packetManifest.freshWindowContract.windowStartVariable}\` before applying the adapter.`,
     `- Collect evidence with the \`${packetManifest.freshWindowContract.collectCommandId}\` command in \`next-agent-plan.md\`.`,
     "",
@@ -375,12 +380,14 @@ function runNode(script, scriptArgs, options = {}) {
 function readSourceControl(expectedCommitInput) {
   const head = runGit(["rev-parse", "HEAD"]) || "unknown";
   const branch = runGit(["branch", "--show-current"]) || "unknown";
-  const expectedReportCommit = normalizedExpectedCommit(expectedCommitInput) || head;
-  const headSha = normalizedExpectedCommit(expectedCommitInput) ? expectedReportCommit : head;
+  const expectedCommit = normalizedExpectedCommit(expectedCommitInput);
+  const expectedReportCommit = expectedCommit || head;
   return {
-    headSha,
+    headSha: head,
     branch,
+    approvedAdapterCommit: expectedReportCommit,
     expectedReportCommit,
+    expectedCommitProvided: Boolean(expectedCommit),
     commitRequiredForProductionCanary: expectedReportCommit !== "unknown",
   };
 }

@@ -591,9 +591,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
   `recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`, SHA256
-  `15cd332af510b104bd9040ac78e8fff4c1b7ffb3d7628b62bfb897730514f2fe`.
+  `12172f1a526f2a877d5098b234a6eff0b8aa5976730bdd4f67de8e87b647be39`.
+  Packet generated from controller commit
+  `67c09445a1c5e2205d8c2ea82709b1e0459236f3`; approved adapter commit
+  `3d61677bc3d316e040ac5a634467d0204c272493`.
   Returned canary reports must name commit
   `3d61677bc3d316e040ac5a634467d0204c272493`.
+  If a newer adapter commit should count, regenerate the packet first.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 - Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.
 - `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.

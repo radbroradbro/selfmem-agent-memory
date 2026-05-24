@@ -5,7 +5,9 @@ Use this with exactly one OpenClaw agent. Attach the zip named below in the same
 Packet:
 
 - `recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`
-- SHA256: `15cd332af510b104bd9040ac78e8fff4c1b7ffb3d7628b62bfb897730514f2fe`
+- SHA256: `12172f1a526f2a877d5098b234a6eff0b8aa5976730bdd4f67de8e87b647be39`
+- Packet generated from controller commit: `67c09445a1c5e2205d8c2ea82709b1e0459236f3`
+- Approved adapter commit: `3d61677bc3d316e040ac5a634467d0204c272493`
 - Expected report commit: `3d61677bc3d316e040ac5a634467d0204c272493`
 
 Paste:
@@ -14,6 +16,7 @@ Paste:
 Please use the attached RecallWeave OpenClaw canary handoff packet.
 
 Important: this packet is for one fresh canary window only. Do not roll it out to other agents yet.
+Commit note: this packet was generated from controller commit 67c09445a1c5e2205d8c2ea82709b1e0459236f3, but the approved adapter/report commit for this canary is 3d61677bc3d316e040ac5a634467d0204c272493. If a newer adapter commit should count, regenerate the packet first.
 The returned canary evidence must report commit 3d61677bc3d316e040ac5a634467d0204c272493 or it will count as diagnostic only.
 
 Do this in order:
