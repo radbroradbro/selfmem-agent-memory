@@ -116,6 +116,15 @@ public-data flags are unset, and env-only Gemini/Voyage credentials are absent.
 That is intentional. A live provider benchmark should run only after this
 preflight reports `READY_FOR_LIVE_PROVIDER_BENCHMARK`.
 
+The larger 30-question target also has its own live-provider preflight:
+`reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
+It binds the future live command to
+`reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`, calls
+no provider APIs, sends no benchmark text, and currently reports the same
+`BLOCKED_PROVIDER_ENV` status. This should be the preferred next provider run
+because it tests the cloud arms against the stronger slice where deterministic
+hybrid still failed to beat BM25.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are

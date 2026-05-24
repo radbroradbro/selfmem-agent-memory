@@ -107,7 +107,7 @@ const report = {
     "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
     "VOYAGE_API_KEY=<env-only-if-running-voyage-arm>",
     "GEMINI_API_KEY=<env-only-if-running-gemini-arm>",
-    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-run-target.json",
+    `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target ${displayPath(targetPath)}`,
   ],
 };
 

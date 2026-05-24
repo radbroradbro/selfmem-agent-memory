@@ -258,6 +258,25 @@ public-data/provider-call flags are absent. Do not describe provider-backed
 results as live until this preflight reports
 `READY_FOR_LIVE_PROVIDER_BENCHMARK`.
 
+For the stronger 30-question LongMemEval-S slice, use the expanded target:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight -- \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json
+RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
+RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
+VOYAGE_API_KEY=<env-only> \
+GEMINI_API_KEY=<env-only-if-running-gemini-arm> \
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
+  --max-memory-bytes 80000000
+```
+
+The checked-in expanded preflight is
+`reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
+It is blocked in the clean controller environment for the same reason: no
+provider-call consent, no public-data consent, and no env-only provider keys.
+
 Do not use the provider gate on private agent memories unless the operator has
 separately approved sending that text to the provider.
 

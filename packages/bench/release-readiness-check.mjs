@@ -122,6 +122,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-materialize-run-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-hybrid-gate.json`,
   `${reviewDir}/public-longmemeval-expanded-hybrid-gate-evidence.md`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight.json`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-evidence.md`,
   `${reviewDir}/returned-downloads-current-scan.json`,
   `${reviewDir}/returned-downloads-current-scan.md`,
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
@@ -1065,6 +1067,7 @@ check("release state is conservative", () => {
     "public-longmemeval-provider-gate",
     "public-longmemeval-provider-live-preflight",
     "public-longmemeval-expanded-hybrid-gate",
+    "public-longmemeval-expanded-provider-live-preflight",
     "public-longmemeval-autoresearch-loop",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
@@ -1379,6 +1382,15 @@ check("fresh public benchmark target check passes", () => {
   const expandedMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-materialize-run-evidence.md"), "utf8");
   const expandedHybridReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-hybrid-gate.json"), "utf8"));
   const expandedHybridEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-hybrid-gate-evidence.md"), "utf8");
+  const expandedProviderLivePreflightReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight.json"), "utf8"));
+  const expandedProviderLivePreflightEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-evidence.md"), "utf8");
+  const expandedProviderLivePreflightFresh = JSON.parse(
+    run("node", [
+      "packages/bench/provider-benchmark-live-preflight.mjs",
+      "--target",
+      "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    ]).stdout,
+  );
   const liveAutoresearchReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
   const liveAutoresearchEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop-evidence.md"), "utf8");
   const liveAutoresearchReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-autoresearch-loop-review.md"), "utf8");
@@ -1724,6 +1736,30 @@ check("fresh public benchmark target check passes", () => {
   assert.match(providerLivePreflightEvidence, /Provider Benchmark Live Preflight/);
   assert.match(providerLivePreflightEvidence, /Live run allowed: false/);
   assert.match(providerLivePreflightEvidence, /cloud-gemini-voyage-rerank/);
+  assert.equal(expandedProviderLivePreflightReport.ok, true);
+  assert.equal(expandedProviderLivePreflightReport.mode, "provider-benchmark-live-preflight");
+  assert.equal(expandedProviderLivePreflightReport.status, "BLOCKED_PROVIDER_ENV");
+  assert.equal(expandedProviderLivePreflightReport.liveRunAllowed, false);
+  assert.equal(expandedProviderLivePreflightReport.callsProviderApis, false);
+  assert.equal(expandedProviderLivePreflightReport.sendsBenchmarkTextToProvider, false);
+  assert.equal(expandedProviderLivePreflightReport.target?.path, "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
+  assert.equal(expandedProviderLivePreflightReport.target?.hash, "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c");
+  assert.equal(expandedProviderLivePreflightFresh.target?.hash, expandedProviderLivePreflightReport.target?.hash);
+  assert.equal(expandedProviderLivePreflightFresh.status, "BLOCKED_PROVIDER_ENV");
+  assert.equal(expandedProviderLivePreflightFresh.liveRunAllowed, false);
+  assert.deepEqual(expandedProviderLivePreflightReport.strategies, providerLivePreflightReport.strategies);
+  assert.ok(expandedProviderLivePreflightReport.blockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled"));
+  assert.ok(expandedProviderLivePreflightReport.blockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"));
+  assert.ok(expandedProviderLivePreflightReport.missingCredentialProviders?.includes("gemini"));
+  assert.ok(expandedProviderLivePreflightReport.missingCredentialProviders?.includes("voyage"));
+  assert.ok(
+    expandedProviderLivePreflightReport.liveCommandTemplate?.some((line) =>
+      String(line).includes("reviews/overnight-20260522/public-longmemeval-expanded-run-target.json"),
+    ),
+  );
+  assert.match(expandedProviderLivePreflightEvidence, /Provider Benchmark Live Preflight/);
+  assert.match(expandedProviderLivePreflightEvidence, /Live run allowed: false/);
+  assert.match(expandedProviderLivePreflightEvidence, /cloud-voyage4-voyage/);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");

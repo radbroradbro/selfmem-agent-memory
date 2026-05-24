@@ -161,6 +161,11 @@ requirements are resolved.
   questions, 92 expected references, and 1,420 haystack sessions. BM25 remains
   the control winner, so the deterministic proxy hybrid is still blocked from
   default promotion pending live embedding/reranker runs.
+- Current expanded provider preflight evidence binds the next live cloud run to
+  `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`,
+  calls no provider APIs, sends no benchmark text, and remains blocked until
+  provider-call consent, public-data consent, and env-only Voyage/Gemini
+  credentials are present.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
   `benchmark:public-target`, a metrics-only source-lock, slice-manifest,

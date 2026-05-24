@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "provider-benchmark-live-preflight",
+  "status": "BLOCKED_PROVIDER_ENV",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "publicSafe": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "printsCredentials": false,
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "querySelectionPolicyHash": "sha256:b24524da13771152c315c7890859c678fd1310b4d997abc000fb090e003c6b9b",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "strategies": [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "cloud-voyage-rerank-only",
+    "cloud-voyage4-voyage",
+    "cloud-gemini-embed-rerank-proxy",
+    "cloud-gemini-voyage-rerank"
+  ],
+  "requiredProviders": [
+    "gemini",
+    "voyage"
+  ],
+  "providerCallsEnabled": false,
+  "publicDataConfirmed": false,
+  "credentialPresence": {
+    "gemini": {
+      "present": false,
+      "keyCount": 0,
+      "envNames": [
+        "GEMINI_API_KEY",
+        "GEMINI_API_KEYS",
+        "GOOGLE_API_KEY",
+        "GOOGLE_API_KEYS",
+        "AI_STUDIO_API_KEY",
+        "AI_STUDIO_API_KEYS"
+      ]
+    },
+    "voyage": {
+      "present": false,
+      "keyCount": 0,
+      "envNames": [
+        "VOYAGE_API_KEY",
+        "VOYAGE_API_KEYS"
+      ]
+    }
+  },
+  "missingCredentialProviders": [
+    "gemini",
+    "voyage"
+  ],
+  "liveRunAllowed": false,
+  "blockers": [
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+    "gemini-credentials-missing",
+    "voyage-credentials-missing"
+  ],
+  "nextActions": [
+    "Set provider credentials only in the shell environment, never in committed files.",
+    "Set RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 and RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 only for public benchmark slices.",
+    "Re-run this preflight before spending provider calls."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+    "VOYAGE_API_KEY=<env-only-if-running-voyage-arm>",
+    "GEMINI_API_KEY=<env-only-if-running-gemini-arm>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json"
+  ]
+}

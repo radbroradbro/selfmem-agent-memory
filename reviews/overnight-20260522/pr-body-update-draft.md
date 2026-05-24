@@ -115,6 +115,11 @@ Live status:
   Gemini/Voyage credential presence without calling provider APIs or sending
   benchmark text. The current controller evidence reports
   `BLOCKED_PROVIDER_ENV`, so no live provider benchmark claim is made.
+- Adds an expanded provider preflight for the 30-question target:
+  `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
+  It calls no provider APIs, sends no benchmark text, and binds the future live
+  command to `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`
+  so the next cloud-provider test does not fall back to the smaller slice.
 - Promotes GitHub Actions run `26350709133` on `67d0c9f` as the latest
   verified code/product baseline after adding the expanded 30-query
   LongMemEval-S hybrid stress gate. The new gate compares BM25 and local

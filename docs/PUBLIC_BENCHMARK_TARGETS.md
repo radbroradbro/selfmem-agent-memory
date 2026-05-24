@@ -227,6 +227,13 @@ harness we will use.
   `BLOCKED_PROVIDER_ENV` because the clean controller environment has no
   provider-call consent flags or env-only Gemini/Voyage credentials. Treat this
   as the required gate before spending calls on provider-backed arms.
+- Expanded live provider preflight:
+  `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
+  It checks the same provider arms against the 30-question expanded target and
+  binds the live command template to
+  `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`.
+  This is the preferred next cloud-provider run because it compares against the
+  stronger slice where deterministic hybrid still failed to beat BM25.
 - Current LongMemEval-S autoresearch loop:
   `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
   runs 24 retrieval-proxy arms over strategy, context budget, and candidate

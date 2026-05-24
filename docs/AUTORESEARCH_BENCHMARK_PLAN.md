@@ -190,6 +190,12 @@ Run the preflight before any live provider spend. It checks the source-locked
 LongMemEval target, selected strategy list, consent flags, and env-only
 credential presence without calling Voyage, Gemini, or any other provider. A
 `BLOCKED_PROVIDER_ENV` preflight means no live provider benchmark has been run.
+For the stronger 30-question slice, use
+`reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`; its
+checked-in provider preflight is
+`reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`
+and currently blocks for missing consent flags and env-only provider
+credentials.
 
 Allowed wording after a small-slice win:
 
