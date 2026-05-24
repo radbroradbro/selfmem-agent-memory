@@ -337,7 +337,7 @@ For release evidence, require a strict production canary:
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-inbox.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --require-found --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-watch.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json
 ```
 
 This intake command does not read raw memories. It accepts only the metrics-only

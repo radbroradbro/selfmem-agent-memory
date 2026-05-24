@@ -87,5 +87,5 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-workspace -- --packet <returned-c
 If the packet lands in the standard local inboxes, run:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json
 ```

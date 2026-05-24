@@ -57,6 +57,7 @@
     "canary:returned-inbox": "node packages/bench/canary-returned-inbox.mjs",
     "canary:returned-watch": "node packages/bench/canary-returned-watch.mjs",
     "canary:returned-downloads": "node packages/bench/canary-returned-downloads.mjs",
+    "canary:returned-downloads:strict": "node packages/bench/canary-returned-downloads.mjs --require-found",
     "canary:batch-audit": "node packages/bench/canary-diagnostic-batch-audit.mjs",
     "canary:next-agent": "node packages/bench/canary-next-agent-plan.mjs",
     "canary:next-agent-packet": "node packages/bench/canary-next-agent-packet.mjs",

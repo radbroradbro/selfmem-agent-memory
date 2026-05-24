@@ -138,6 +138,9 @@ requirements are resolved.
   without typing private folder paths into package-manager commands. The
   current scan found 0 production canary evidence packets and wrote a
   metrics-only markdown findings note for the next-agent workspace.
+- The named `canary:returned-downloads:strict` alias now runs the same standard
+  inbox scan with `--require-found`, so it must fail until a returned
+  production canary packet exists.
 - GitHub Actions run `26343015277` passed CI after adding returned downloads
   supervision and the markdown findings note.
 - GitHub Actions run `26343998064` passed CI after expanding the returned

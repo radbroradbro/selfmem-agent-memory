@@ -824,7 +824,7 @@ For a release-blocking check, require production-grade evidence:
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-inbox.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --require-found --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-watch.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --require-found --output /tmp/recallweave-returned-downloads.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json
 ```
 
 The command fails closed unless the returned packet is non-fixture,

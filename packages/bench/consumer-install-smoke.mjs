@@ -87,6 +87,7 @@ try {
   assert.equal(typeof packageJson.scripts?.["canary:returned-inbox"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:returned-watch"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:returned-downloads"], "string");
+  assert.match(packageJson.scripts?.["canary:returned-downloads:strict"] ?? "", /--require-found/);
   assert.equal(typeof packageJson.scripts?.["canary:batch-audit"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:next-agent"], "string");
   assert.equal(typeof packageJson.scripts?.["canary:next-agent-packet"], "string");

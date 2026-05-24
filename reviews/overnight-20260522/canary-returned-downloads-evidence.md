@@ -7,6 +7,10 @@ Date: 2026-05-23
 Added `canary:returned-downloads`, a metrics-only controller helper for the
 standard local inboxes where returned agent packets usually arrive.
 
+Added `canary:returned-downloads:strict` as the named release-blocking version
+of the same standard-inbox scan. It always sets `--require-found`, so it must
+fail until a returned production canary packet exists.
+
 By default it scans:
 
 - Downloads

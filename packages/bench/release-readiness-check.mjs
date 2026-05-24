@@ -431,6 +431,7 @@ const requiredScripts = [
   "canary:returned-inbox",
   "canary:returned-watch",
   "canary:returned-downloads",
+  "canary:returned-downloads:strict",
   "canary:batch-audit",
   "canary:next-agent",
   "canary:next-agent-packet",
@@ -3433,6 +3434,7 @@ check("fresh returned downloads scanner passes", () => {
     const evidence = readFileSync(join(root, reviewDir, "canary-returned-downloads-evidence.md"), "utf8");
     const currentScan = JSON.parse(readFileSync(join(root, reviewDir, "returned-downloads-current-scan.json"), "utf8"));
     const currentScanFindings = readFileSync(join(root, reviewDir, "returned-downloads-current-scan.md"), "utf8");
+    const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 
     assert.equal(noDefaultsReport.mode, "canary-returned-downloads");
     assert.equal(noDefaultsReport.status, "NO_DEFAULT_INBOXES");
@@ -3459,6 +3461,7 @@ check("fresh returned downloads scanner passes", () => {
     assert.notEqual(requiredRun.status, 0, "downloads scanner must fail closed with --require-found when no production canary exists");
     assert.equal(requiredReport.ok, false);
     assert.equal(requiredReport.requireFound, true);
+    assert.match(packageJson.scripts?.["canary:returned-downloads:strict"] ?? "", /--require-found/);
     assert.match(evidence, /canary:returned-downloads/i);
     assert.match(evidence, /Downloads/);
     assert.match(evidence, /markdown findings/i);
