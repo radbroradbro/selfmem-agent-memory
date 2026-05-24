@@ -187,9 +187,9 @@ Scope:
   repository, and commits only counts, hashes, command templates, and the
   collector-compatible query-set hash used to bind the scored run.
 - Added the first public LongMemEval RecallWeave retrieval-proxy result to the
-  gate. The canonical checked-in result now uses `bm25-lite`, requires zero
-  privacy failures, requires explicit retrieval-proxy/no-public-claims flags,
-  and explicitly blocks MemoryBench quality-win language.
+  gate. The canonical checked-in result now uses `bm25-lite-b800-k5`, requires
+  zero privacy failures, requires explicit retrieval-proxy/no-public-claims
+  flags, and explicitly blocks MemoryBench quality-win language.
 - Added public LongMemEval retrieval strategy comparison to the release gate.
   The same materialized slice now compares `jaccard`, `bm25-lite`, and
   `hybrid-v1`; `bm25-lite` wins the retrieval-proxy canary and the gate keeps
@@ -198,7 +198,8 @@ Scope:
 - Added public LongMemEval autoresearch-loop coverage to the release gate. The
   loop runs 24 same-data retrieval-proxy arms over strategy, context budget,
   and candidate limit; the current winner is `bm25-lite-b800-k5`, which keeps
-  quality 0.4541 while cutting average context tokens to 800.
+  quality 0.4541 while cutting average context tokens to 800. The checked-in
+  retrieval-proxy run now uses that setting.
 - GitHub Actions run `26347754208` passed on commit
   `d91b27bcc869656197c1cc67804530b75757bbe2` after the strategy-comparison
   lane was added.

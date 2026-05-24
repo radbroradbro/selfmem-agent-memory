@@ -169,16 +169,16 @@ harness we will use.
   slice has 6 queries, 287 haystack sessions, and 18 expected references. It
   also emits the collector-compatible query-set hash so the release gate can
   prove the checked-in RecallWeave result came from the materialized same-data
-  query set. Its command template now names `bm25-lite` as the current
-  canary retrieval strategy.
+  query set. Its command template now names `bm25-lite`, an 800-token context
+  budget, and top-5 retrieval as the current canary setting.
 - Current RecallWeave retrieval-proxy run:
   `reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
   It uses the source-locked LongMemEval-S canary data with the local
   RecallWeave response exporter and the repository's retrieval metrics. It
-  uses `bm25-lite` and reports quality 0.4541, P@1 0.8333, recall@5 0.2917,
-  recall@10 0.2917, NDCG@10 0.3996, p50 latency 82 ms, p95 latency 100 ms,
-  average context tokens
-  1600, zero cost, and zero redaction failures. This is a retrieval-proxy
+  uses `bm25-lite-b800-k5` and reports quality 0.4541, P@1 0.8333, recall@5
+  0.2917, recall@10 0.2917, NDCG@10 0.3996, p50 latency 73 ms, p95 latency
+  78 ms, average context tokens 800, zero cost, and zero redaction failures.
+  This is a retrieval-proxy
   baseline, not a MemoryBench answer-quality win and not a public benchmark
   claim. The result JSON carries explicit `retrievalProxyOnly: true`,
   `memoryBenchAnswerQuality: false`, and `publicBenchmarkClaimsAllowed: false`

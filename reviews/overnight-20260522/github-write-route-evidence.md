@@ -109,6 +109,9 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after promoting GitHub Actions run
     `26346952139` on `9a11452` as the latest verified code/product baseline.
     Updated at: 2026-05-24T00:02:45Z.
+  - The PR body was refreshed again after promoting the public LongMemEval-S
+    retrieval-proxy run to the autoresearch winner, `bm25-lite-b800-k5`.
+    Updated at: 2026-05-24T01:29:11Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

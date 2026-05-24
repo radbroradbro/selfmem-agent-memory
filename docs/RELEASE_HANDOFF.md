@@ -185,23 +185,24 @@ The current materialized LongMemEval-S run writes private query and haystack
 files outside the repository and commits only metrics-safe evidence. The
 checked-in retrieval-proxy result is
 `reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
-It now uses `bm25-lite`, the winning retrieval strategy from the same-data
-comparison. It is useful as a blind autoresearch baseline, but it is not a
-MemoryBench answer-quality result and not a public comparison claim.
+It now uses `bm25-lite-b800-k5`, the winning same-data autoresearch setting.
+It is useful as a blind autoresearch baseline, but it is not a MemoryBench
+answer-quality result and not a public comparison claim.
 
 The current same-data retrieval strategy comparison is
 `reviews/overnight-20260522/public-longmemeval-strategy-compare.json`.
 `bm25-lite` beat the initial `jaccard` baseline on this six-row retrieval-proxy
 slice, moving quality from 0.1089 to 0.4541 and P@1 from 0.1667 to 0.8333 with
 zero privacy failures. The canonical checked-in RecallWeave run has been
-regenerated with `bm25-lite`. Treat it as the next autoresearch method choice,
-not a public benchmark claim.
+regenerated with `bm25-lite-b800-k5`. Treat it as the next autoresearch method
+choice, not a public benchmark claim.
 
 The first same-data autoresearch loop is
 `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It ran
 24 local-only retrieval-proxy arms and selected `bm25-lite-b800-k5`, preserving
-quality 0.4541 while reducing average context tokens to 800. Treat it as a
-local methodology improvement, not MemoryBench answer-quality proof.
+quality 0.4541 while reducing average context tokens to 800. The checked-in
+retrieval-proxy run now uses that setting. Treat it as a local methodology
+improvement, not MemoryBench answer-quality proof.
 
 Run this before any hosted Supermemory comparison claim:
 

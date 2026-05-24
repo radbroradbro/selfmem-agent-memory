@@ -1408,6 +1408,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(liveMaterializeReport.selection?.answerLabelsHash, "sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e");
   assert.ok(liveMaterializeReport.selection?.collectorCompatibleQuerySetHash?.startsWith("sha256:"));
   assert.equal(liveMaterializeReport.target?.retrievalStrategy, "bm25-lite");
+  assert.equal(liveMaterializeReport.target?.contextTokenBudget, 800);
+  assert.equal(liveMaterializeReport.target?.limit, 5);
   assert.equal(liveMaterializeReport.privateOutputs?.directoryInsideRepository, false);
   assert.equal(liveMaterializeReport.rawPrivateOutputPathIncluded, false);
   assert.match(liveMaterializeEvidence, /Public Benchmark Materialize Run/);
@@ -1432,7 +1434,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(liveRecallWeaveRun.rawAnswerIncluded, false);
   assert.equal(liveRecallWeaveRun.retrievalConfig?.retrievalMode, "strategy:bm25-lite");
   assert.equal(liveRecallWeaveRun.retrievalConfig?.rankingStrategy, "bm25-lite");
-  assert.equal(liveRecallWeaveRun.retrievalConfig?.contextBudget?.tokenBudget, 1600);
+  assert.equal(liveRecallWeaveRun.retrievalConfig?.limit, 5);
+  assert.equal(liveRecallWeaveRun.retrievalConfig?.contextBudget?.tokenBudget, 800);
   assert.equal(liveRecallWeaveRun.matchedHostedRunPresent, false);
   assert.equal(liveRecallWeaveRun.reviewerApprovalCount, 0);
   assert.ok(Number(liveRecallWeaveRun.metrics?.quality) > 0);

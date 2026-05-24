@@ -32,8 +32,8 @@ const sourceLockPath = resolveInputPath(
 const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_MATERIALIZE_REPORT ?? null;
 const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_MATERIALIZE_MARKDOWN ?? null;
 const privateOutputDir = resolvePrivateOutputDir(args.privateOutputDir ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_PRIVATE_OUTPUT_DIR);
-const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 1600, "context token budget");
-const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
+const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 800, "context token budget");
+const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 5, "limit");
 const retrievalStrategy = normalizeRetrievalStrategy(
   args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "bm25-lite",
 );
@@ -466,7 +466,7 @@ function runCommandTemplates(privateOutputs) {
     exportResponses:
       `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset ${querySet} --memories ${memories} --preserve-ids --strategy ${retrievalStrategy} --context-token-budget ${contextTokenBudget} --limit ${limit} --output <private-output-dir>/longmemeval-recallweave-responses.private.json`,
     collectMetrics:
-      `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset ${querySet} --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --retrieval-mode strategy:${retrievalStrategy} --output <public-metrics-output.json>`,
+      `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset ${querySet} --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --retrieval-mode strategy:${retrievalStrategy} --limit ${limit} --output <public-metrics-output.json>`,
   };
 }
 
@@ -486,6 +486,8 @@ function renderMarkdown(value) {
     `- Collector-compatible query set hash: ${value.selection.collectorCompatibleQuerySetHash}`,
     `- Memories file hash: ${value.selection.memoriesFileHash}`,
     `- Retrieval strategy: ${value.target.retrievalStrategy}`,
+    `- Context token budget: ${value.target.contextTokenBudget}`,
+    `- Result limit: ${value.target.limit}`,
     "",
     "## Safety",
     "",

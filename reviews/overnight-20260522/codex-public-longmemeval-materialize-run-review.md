@@ -18,6 +18,8 @@ Follow-up review after Goodall blocker:
 - The materializer command template now names `bm25-lite`, the winning
   same-data retrieval strategy, so the canonical run is no longer stuck on the
   initial `jaccard` baseline.
+- Follow-up promotion: the command template and checked-in result now use the
+  autoresearch winner, `bm25-lite-b800-k5`.
 - The RecallWeave result JSON now carries `retrievalProxyOnly: true`,
   `memoryBenchAnswerQuality: false`, and
   `publicBenchmarkClaimsAllowed: false`.
@@ -28,7 +30,7 @@ Concerns:
 - The checked-in result is a retrieval proxy from the local RecallWeave response
   exporter and repository scoring contract. It is not official MemoryBench
   answer evaluation and is not a MemoryBench quality win.
-- The blind baseline is still incomplete: the canonical `bm25-lite`
+- The blind baseline is still incomplete: the canonical `bm25-lite-b800-k5`
   retrieval-proxy quality is 0.4541 on six source-locked rows, which is much
   better than the initial `jaccard` baseline but still not official MemoryBench
   answer evaluation. It argues for embedding, reranking, temporal, and

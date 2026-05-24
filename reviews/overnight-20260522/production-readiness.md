@@ -50,11 +50,12 @@ The current preview surface names are: selected vault sync dry-run, selected vau
 
 The current operational evidence names are: release readiness, current-head live browser evidence, clean consumer smoke, release blocker doctor, hosted baseline preflight, hosted baseline collector, baseline compare, hosted baseline operator packet, baseline evidence packet, GitHub handoff packet, GitHub live sync, and goal completion audit.
 
-The latest inspected commit adds a LongMemEval-S autoresearch loop. Its checked
-evidence reports `retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`,
+The latest inspected benchmark evidence promotes the LongMemEval-S autoresearch
+winner into the checked-in retrieval-proxy run. It reports
+`retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`,
 `publicBenchmarkClaimsAllowed: false`, 24 arms, and `bm25-lite-b800-k5` as the
-next canary arm. This is methodology evidence only, not public superiority
-language.
+current canary setting. This is methodology evidence only, not public
+superiority language.
 
 ## Checks Run In This Gate
 
