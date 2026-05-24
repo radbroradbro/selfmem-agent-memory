@@ -66,6 +66,7 @@
       "packages/bench/hosted-baseline-preflight.mjs",
       "packages/bench/hosted-baseline-queryset-author.mjs",
       "packages/bench/hosted-baseline-run.mjs",
+      "packages/bench/provider-benchmark-operator-packet.mjs",
       "packages/bench/provider-benchmark-live-preflight.mjs",
       "packages/bench/public-benchmark-autoresearch-loop.mjs",
       "packages/bench/public-benchmark-materialize-run.mjs",
