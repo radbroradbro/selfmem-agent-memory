@@ -72,6 +72,15 @@ const requiredFiles = {
   realDiagnosticsPostwatchNextAgentPlan: "real-diagnostics-postwatch-next-agent-plan.json",
   realDiagnosticsPostwatchNextAgentPlanMarkdown: "real-diagnostics-postwatch-next-agent-plan.md",
   releaseHandoff: "../../docs/RELEASE_HANDOFF.md",
+  benchmarkSummary: "../../docs/BENCHMARK_SUMMARY.md",
+  publicBenchmarkTargets: "../../docs/PUBLIC_BENCHMARK_TARGETS.md",
+  autoresearchBenchmarkPlan: "../../docs/AUTORESEARCH_BENCHMARK_PLAN.md",
+  publicLongmemEvalHybridGate: "public-longmemeval-hybrid-gate.json",
+  publicLongmemEvalExpandedHybridGate: "public-longmemeval-expanded-hybrid-gate.json",
+  publicLongmemEvalProviderGateFixture: "public-longmemeval-provider-gate-fixture.json",
+  publicLongmemEvalProviderLivePreflight: "public-longmemeval-provider-live-preflight.json",
+  publicLongmemEvalExpandedProviderLivePreflight: "public-longmemeval-expanded-provider-live-preflight.json",
+  publicLongmemEvalAutoresearchLoop: "public-longmemeval-autoresearch-loop.json",
 };
 
 const evidence = Object.fromEntries(
@@ -139,6 +148,17 @@ const realDiagnosticsPostwatchEvidenceText = readFileSync(join(root, reviewDir, 
 const realDiagnosticsPostwatchReturnedWatch = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-returned-watch.json"), "utf8"));
 const realDiagnosticsPostwatchBatchAudit = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-batch-audit.json"), "utf8"));
 const realDiagnosticsPostwatchNextAgentPlan = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-next-agent-plan.json"), "utf8"));
+const benchmarkSummaryText = readFileSync(join(root, "docs/BENCHMARK_SUMMARY.md"), "utf8");
+const publicBenchmarkTargetsText = readFileSync(join(root, "docs/PUBLIC_BENCHMARK_TARGETS.md"), "utf8");
+const autoresearchBenchmarkPlanText = readFileSync(join(root, "docs/AUTORESEARCH_BENCHMARK_PLAN.md"), "utf8");
+const publicLongmemEvalHybridGate = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-hybrid-gate.json"), "utf8"));
+const publicLongmemEvalExpandedHybridGate = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-hybrid-gate.json"), "utf8"));
+const publicLongmemEvalProviderGateFixture = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-provider-gate-fixture.json"), "utf8"));
+const publicLongmemEvalProviderLivePreflight = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-provider-live-preflight.json"), "utf8"));
+const publicLongmemEvalExpandedProviderLivePreflight = JSON.parse(
+  readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight.json"), "utf8"),
+);
+const publicLongmemEvalAutoresearchLoop = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
 
 assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
@@ -276,6 +296,46 @@ assert.equal(realDiagnosticsPostwatchNextAgentPlan.oneAgentCanaryAllowed, true);
 assert.equal(realDiagnosticsPostwatchNextAgentPlan.decision?.status, "READY_FOR_ONE_AGENT_FRESH_CANARY");
 assert.equal(realDiagnosticsPostwatchNextAgentPlan.publicLaunchAllowed, false);
 assert.equal(realDiagnosticsPostwatchNextAgentPlan.fleetRolloutAllowed, false);
+assert.match(benchmarkSummaryText, /Solo RecallWeave runs are smoke tests only/i);
+assert.match(publicBenchmarkTargetsText, /Do not test RecallWeave alone for quality/i);
+assert.match(publicBenchmarkTargetsText, /Minimum same-data matrix/i);
+assert.match(autoresearchBenchmarkPlanText, /must not optimize a solo RecallWeave run in isolation/i);
+assert.equal(publicLongmemEvalHybridGate.mode, "public-benchmark-hybrid-gate");
+assert.equal(publicLongmemEvalHybridGate.input?.queryCount, 6);
+assert.equal(publicLongmemEvalHybridGate.control?.strategy, "bm25-lite");
+assert.equal(publicLongmemEvalHybridGate.winner?.strategy, "bm25-lite");
+assert.equal(publicLongmemEvalHybridGate.hybridPromotion?.promoteHybrid, false);
+assert.equal(publicLongmemEvalHybridGate.publicBenchmarkClaimsAllowed, false);
+assert.equal(publicLongmemEvalHybridGate.memoryBenchAnswerQuality, false);
+assert.equal(publicLongmemEvalExpandedHybridGate.mode, "public-benchmark-hybrid-gate");
+assert.equal(publicLongmemEvalExpandedHybridGate.input?.queryCount, 30);
+assert.equal(publicLongmemEvalExpandedHybridGate.control?.strategy, "bm25-lite");
+assert.equal(publicLongmemEvalExpandedHybridGate.winner?.strategy, "bm25-lite");
+assert.equal(publicLongmemEvalExpandedHybridGate.hybridPromotion?.bestHybridStrategy, "full-hybrid-rerank");
+assert.equal(publicLongmemEvalExpandedHybridGate.hybridPromotion?.promoteHybrid, false);
+assert.equal(publicLongmemEvalExpandedHybridGate.publicBenchmarkClaimsAllowed, false);
+assert.equal(publicLongmemEvalProviderGateFixture.mode, "public-benchmark-provider-gate");
+assert.equal(publicLongmemEvalProviderGateFixture.fixtureOnly, true);
+assert.equal(publicLongmemEvalProviderGateFixture.publicBenchmarkClaimsAllowed, false);
+for (const strategy of ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage", "cloud-gemini-voyage-rerank"]) {
+  assert.ok(
+    publicLongmemEvalProviderGateFixture.strategies?.some((item) => item.strategy === strategy),
+    `missing provider gate strategy ${strategy}`,
+  );
+}
+assert.equal(publicLongmemEvalProviderLivePreflight.mode, "provider-benchmark-live-preflight");
+assert.equal(publicLongmemEvalProviderLivePreflight.liveRunAllowed, false);
+assert.equal(publicLongmemEvalProviderLivePreflight.callsProviderApis, false);
+assert.equal(publicLongmemEvalProviderLivePreflight.sendsBenchmarkTextToProvider, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflight.mode, "provider-benchmark-live-preflight");
+assert.equal(publicLongmemEvalExpandedProviderLivePreflight.liveRunAllowed, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflight.callsProviderApis, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflight.sendsBenchmarkTextToProvider, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflight.target?.path, "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
+assert.equal(publicLongmemEvalAutoresearchLoop.mode, "public-benchmark-autoresearch-loop");
+assert.equal(publicLongmemEvalAutoresearchLoop.publicBenchmarkClaimsAllowed, false);
+assert.equal(publicLongmemEvalAutoresearchLoop.memoryBenchAnswerQuality, false);
+assert.ok(Number(publicLongmemEvalAutoresearchLoop.loop?.armCount ?? 0) >= 12);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
 const branch = run("git", ["branch", "--show-current"]).stdout.trim();
@@ -526,6 +586,40 @@ console.log(
           oneAgentCanaryAllowed: realDiagnosticsPostwatchNextAgentPlan.oneAgentCanaryAllowed,
           status: realDiagnosticsPostwatchNextAgentPlan.decision?.status,
           publicLaunchAllowed: realDiagnosticsPostwatchNextAgentPlan.publicLaunchAllowed,
+        },
+        publicBenchmarkLane: {
+          soloRunsAreSmokeOnly: true,
+          sameDataComparatorsRequired: true,
+          publicClaimsAllowedFromRetrievalProxy: false,
+          sixQueryHybridGate: {
+            queryCount: publicLongmemEvalHybridGate.input?.queryCount,
+            control: publicLongmemEvalHybridGate.control?.strategy,
+            winner: publicLongmemEvalHybridGate.winner?.strategy,
+            hybridPromotion: publicLongmemEvalHybridGate.hybridPromotion?.promoteHybrid,
+            publicBenchmarkClaimsAllowed: publicLongmemEvalHybridGate.publicBenchmarkClaimsAllowed,
+          },
+          expandedHybridGate: {
+            queryCount: publicLongmemEvalExpandedHybridGate.input?.queryCount,
+            expectedResultRefCount: publicLongmemEvalExpandedHybridGate.input?.expectedResultRefCount,
+            control: publicLongmemEvalExpandedHybridGate.control?.strategy,
+            winner: publicLongmemEvalExpandedHybridGate.winner?.strategy,
+            bestHybridStrategy: publicLongmemEvalExpandedHybridGate.hybridPromotion?.bestHybridStrategy,
+            hybridPromotion: publicLongmemEvalExpandedHybridGate.hybridPromotion?.promoteHybrid,
+            publicBenchmarkClaimsAllowed: publicLongmemEvalExpandedHybridGate.publicBenchmarkClaimsAllowed,
+          },
+          providerGate: {
+            fixtureOnly: publicLongmemEvalProviderGateFixture.fixtureOnly,
+            strategies: publicLongmemEvalProviderGateFixture.strategies?.map((item) => item.strategy),
+            liveRunAllowed: publicLongmemEvalProviderLivePreflight.liveRunAllowed,
+            expandedLiveRunAllowed: publicLongmemEvalExpandedProviderLivePreflight.liveRunAllowed,
+            providerPreflightStatus: publicLongmemEvalProviderLivePreflight.status,
+            expandedProviderPreflightStatus: publicLongmemEvalExpandedProviderLivePreflight.status,
+          },
+          autoresearchLoop: {
+            armCount: publicLongmemEvalAutoresearchLoop.loop?.armCount,
+            winner: publicLongmemEvalAutoresearchLoop.winner?.armId,
+            publicBenchmarkClaimsAllowed: publicLongmemEvalAutoresearchLoop.publicBenchmarkClaimsAllowed,
+          },
         },
         githubLiveSync: {
           ok: githubLiveSync.ok,
