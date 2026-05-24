@@ -5,11 +5,20 @@ Date: 2026-05-24
 ## Scope
 
 This refresh updates the checked-in release state and canary handoff evidence so
-the latest verified code/product baseline matches the current PR head after the
-provider-backed benchmark gate added single-provider live preflights for Voyage
-and NVIDIA.
+the latest verified PR branch head is tracked separately from the approved
+runtime canary adapter/report commit. That split lets benchmark and tooling
+guards move forward without silently changing what the one-agent runtime canary
+must prove.
 
-## Verified Head
+## Latest Verified PR Branch Head
+
+- Commit: `106b78c0ecbe7f3d14a7f10a45016c8a20f97210`
+- Commit title: `test: clarify canary packet commit contract`
+- GitHub Actions run: `26354290765`
+- CI conclusion: `success`
+- PR branch: `feat/nucleus-wiki-native-contract`
+
+## Approved Runtime Canary Baseline
 
 - Commit: `3d61677bc3d316e040ac5a634467d0204c272493`
 - Commit title: `test: add single-provider live preflight gates`
@@ -19,8 +28,8 @@ and NVIDIA.
 
 ## Local Verification
 
-The following checks passed on or against the same head before this baseline
-refresh:
+The following checks passed on or against the latest verified PR branch head
+before this baseline refresh:
 
 - `npm exec --yes pnpm@10.23.0 -- release:check`
 - `GITHUB_ACTIONS=true CI=true npm exec --yes pnpm@10.23.0 -- release:check`

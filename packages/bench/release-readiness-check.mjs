@@ -986,6 +986,14 @@ check("release state is conservative", () => {
   assert.match(releaseState.latestVerifiedCodeBaseline?.headSha ?? "", /^[a-f0-9]{40}$/);
   assert.equal(releaseState.latestVerifiedCodeBaseline?.localReleaseCheck, "passed");
   assert.equal(releaseState.latestVerifiedCodeBaseline?.secretScan, "zero_hits");
+  assert.match(releaseState.latestVerifiedRepositoryHead?.headSha ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(releaseState.latestVerifiedRepositoryHead?.ciConclusion, "success");
+  assert.equal(releaseState.latestVerifiedRepositoryHead?.localReleaseCheck, "passed");
+  assert.equal(releaseState.latestVerifiedRepositoryHead?.secretScan, "zero_hits");
+  assert.match(releaseState.approvedRuntimeCanaryBaseline?.headSha ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(releaseState.approvedRuntimeCanaryBaseline?.role, "approved-runtime-canary-adapter");
+  assert.equal(releaseState.approvedRuntimeCanaryBaseline?.expectedReportCommit, releaseState.approvedRuntimeCanaryBaseline?.headSha);
+  assert.notEqual(releaseState.latestVerifiedRepositoryHead?.headSha, releaseState.approvedRuntimeCanaryBaseline?.headSha);
   assert.equal(releaseState.releaseStateGuard?.enabled, true);
   assert.equal(releaseState.releaseStateGuard?.checkedBy, "pnpm release:check");
   assert.equal(releaseState.releaseStateGuard?.requiresConservativeVerdict, true);
@@ -3601,8 +3609,11 @@ check("fresh release blocker doctor passes", () => {
   assert.ok(report.manualCommands.some((item) => /baseline:source-gap/.test(item) && /--output/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /--reviewed-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
-  const approvedAdapterCommit = report.latestVerifiedCodeBaseline?.headSha ?? "";
+  const approvedAdapterCommit =
+    report.approvedRuntimeCanaryBaseline?.expectedReportCommit ?? report.approvedRuntimeCanaryBaseline?.headSha ?? "";
   assert.match(approvedAdapterCommit, /^[a-f0-9]{40}$/);
+  assert.match(report.latestVerifiedRepositoryHead?.headSha ?? "", /^[a-f0-9]{40}$/);
+  assert.notEqual(report.latestVerifiedRepositoryHead?.headSha, approvedAdapterCommit);
   assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent handoff packet/);
   assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
   assert.match(canaryBlocker.nextAction, new RegExp(`canary:returned-(?:inbox|packet).*--require-production-canary.*--expected-commit ${approvedAdapterCommit}`));

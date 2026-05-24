@@ -433,7 +433,10 @@ const reviewerReport = [
   },
 ];
 
-const approvedAdapterCommit = releaseState.latestVerifiedCodeBaseline?.headSha ?? "";
+const approvedRuntimeCanaryBaseline =
+  releaseState.approvedRuntimeCanaryBaseline ?? releaseState.latestVerifiedCodeBaseline;
+const approvedAdapterCommit =
+  approvedRuntimeCanaryBaseline?.expectedReportCommit ?? approvedRuntimeCanaryBaseline?.headSha ?? "";
 assert.match(approvedAdapterCommit, /^[a-f0-9]{40}$/);
 
 const realCanaryNextAction = realDiagnosticsPostwatchNextAgentPlan.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"
@@ -484,6 +487,8 @@ console.log(
       branch,
       head: gitHead,
       latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
+      latestVerifiedRepositoryHead: releaseState.latestVerifiedRepositoryHead ?? null,
+      approvedRuntimeCanaryBaseline,
       reviewers: reviewerReport,
       blockers: blockerReport,
       checks: {

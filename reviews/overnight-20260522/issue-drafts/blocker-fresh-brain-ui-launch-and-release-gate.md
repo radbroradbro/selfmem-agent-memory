@@ -9,6 +9,12 @@ requirements are resolved.
 
 ## Current Evidence
 
+- Latest verified PR branch head:
+- `106b78c0ecbe7f3d14a7f10a45016c8a20f97210`.
+- GitHub Actions run `26354290765` passed CI after splitting branch-head
+  verification from the approved runtime canary adapter/report commit.
+- Approved one-agent canary adapter/report commit:
+- `3d61677bc3d316e040ac5a634467d0204c272493`.
 - Latest verified code/product baseline:
 - `3d61677bc3d316e040ac5a634467d0204c272493`.
 - GitHub Actions run `26353888297` passed CI after adding single-provider live

@@ -125,6 +125,9 @@ Verdict: resolved for PR body and blocker issue writes.
     was generated from controller commit `67c0944`, while the approved
     adapter/report commit remains `3d61677`. Updated at:
     2026-05-24T06:39:52Z.
+  - The PR body was refreshed again after the release state split latest
+    verified PR branch head `106b78c` from approved runtime canary
+    adapter/report commit `3d61677`. Updated at: 2026-05-24T06:51:08Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

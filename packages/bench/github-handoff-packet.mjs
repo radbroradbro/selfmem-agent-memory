@@ -49,8 +49,14 @@ const currentHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
 const branch = run("git", ["branch", "--show-current"]).stdout.trim();
 const remoteUrl = run("git", ["remote", "get-url", "origin"]).stdout.trim();
 const latestBaseline = releaseState.latestVerifiedCodeBaseline;
+const latestRepositoryHead = releaseState.latestVerifiedRepositoryHead ?? latestBaseline;
+const approvedRuntimeCanaryBaseline = releaseState.approvedRuntimeCanaryBaseline ?? latestBaseline;
 const latestCiRunId = latestBaseline?.ciRunId;
 const latestHeadShort = String(latestBaseline?.headSha ?? "").slice(0, 7);
+const latestRepositoryHeadShort = String(latestRepositoryHead?.headSha ?? "").slice(0, 7);
+const approvedCanaryHeadShort = String(
+  approvedRuntimeCanaryBaseline?.expectedReportCommit ?? approvedRuntimeCanaryBaseline?.headSha ?? "",
+).slice(0, 7);
 
 assert.equal(releaseState.goalStatus, "active");
 assert.equal(releaseState.repository, repository);
@@ -65,6 +71,10 @@ assert.equal(releaseState.safetyBoundary?.enablesHostedWriteBack, false);
 assert.equal(typeof latestCiRunId, "number");
 assert.match(String(latestBaseline?.headSha ?? ""), /^[a-f0-9]{40}$/);
 assert.equal(latestBaseline?.ciConclusion, "success");
+assert.match(String(latestRepositoryHead?.headSha ?? ""), /^[a-f0-9]{40}$/);
+assert.equal(latestRepositoryHead?.ciConclusion, "success");
+assert.match(String(approvedRuntimeCanaryBaseline?.expectedReportCommit ?? approvedRuntimeCanaryBaseline?.headSha ?? ""), /^[a-f0-9]{40}$/);
+assert.equal(approvedRuntimeCanaryBaseline?.ciConclusion, "success");
 for (const blocker of requiredBlockers) {
   assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
 }
@@ -93,7 +103,9 @@ const statusComment = [
   "",
   "- Current public launch verdict: FAIL.",
   "- Current production readiness: false.",
-  `- Latest verified code baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
+  `- Latest verified PR branch head: ${latestRepositoryHeadShort}, GitHub Actions run ${latestRepositoryHead?.ciRunId} passed.`,
+  `- Approved one-agent canary adapter/report commit remains ${approvedCanaryHeadShort}.`,
+  `- Prior verified code/product baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
   "- PR #5 has been updated and release blocker issue #6 has been created. The generated handoff packet remains useful for auditing or refreshing those public-safe fields later.",
   "- Claude Opus review completed with CONCERNS. Remaining blockers: human public-launch approval required and one real-container canary still incomplete. The source-matched budgeted hosted canary is ready for owner review, but it does not authorize public launch or broad benchmark language.",
   "",
@@ -112,6 +124,8 @@ const packet = {
   publicLaunchAllowed: false,
   productionReady: false,
   latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
+  latestVerifiedRepositoryHead: releaseState.latestVerifiedRepositoryHead ?? null,
+  approvedRuntimeCanaryBaseline,
   requiredBlockers,
   labels: [
     "code-checks-pass",
