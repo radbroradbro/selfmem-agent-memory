@@ -64,22 +64,23 @@ quality but was slower. This supports the next autoresearch step, but it is
 still not MemoryBench answer-quality evidence or a public benchmark superiority
 claim.
 
-The first local-only autoresearch loop ran 24 same-data retrieval-proxy arms
-across strategy, context budget, and candidate limit. The winner was
+The current local-only autoresearch loop runs 72 same-data retrieval-proxy arms
+across lexical, dense-proxy, temporal, graph-proxy, rerank-proxy, and
+query-expansion-proxy strategies, context budget, and candidate limit. The
+winner remains
 `bm25-lite-b800-k5`: quality 0.4541, P@1 0.8333, recall@5 0.2917, NDCG@10
-0.3996, average context tokens 800, p50 latency 75 ms, and zero privacy
+0.3996, average context tokens 800, p50 latency 16 ms, and zero privacy
 failures. It keeps the same quality as the 1600-token `bm25-lite` run while
 cutting average context tokens in half. The checked-in retrieval-proxy run has
 now been regenerated with this setting. This is still not MemoryBench
 answer-quality evidence.
 
-BM25-lite is the control floor, not the final agent-memory design. The tested
-`hybrid-v1` arm is only a lightweight lexical hybrid over BM25, Jaccard,
-bigrams, and rank boost. It is not the full RecallWeave stack with embeddings,
-graph/topic routing, temporal supersession, hosted read-through fusion, query
-expansion, and reranking. The next benchmark gate must compare BM25-lite
-against those real hybrid arms on the same source-locked data before any agent
-default changes.
+BM25-lite is the control floor, not the final agent-memory design. The
+autoresearch loop now includes the local hybrid-family proxy arms, but those
+arms still use deterministic dense/rerank/query-expansion proxies rather than
+learned embeddings or hosted rerankers. The next benchmark gate must compare
+BM25-lite against provider-backed Voyage, Gemini, NVIDIA, and Apple Silicon
+arms on the same source-locked data before any agent default changes.
 
 The follow-up hybrid gate now exists and is intentionally conservative. It
 compares `bm25-lite` against local-only hybrid-family proxy arms on the same

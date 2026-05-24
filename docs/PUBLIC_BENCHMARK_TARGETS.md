@@ -252,8 +252,9 @@ harness we will use.
   stronger slice where deterministic hybrid still failed to beat BM25.
 - Current LongMemEval-S autoresearch loop:
   `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
-  runs 24 retrieval-proxy arms over strategy, context budget, and candidate
-  limit on the same materialized query set. The winning arm is
+  runs 72 retrieval-proxy arms across lexical, dense-proxy, temporal,
+  graph-proxy, rerank-proxy, and query-expansion-proxy strategies on the same
+  materialized query set. The winning arm is
   `bm25-lite-b800-k5`, which keeps quality 0.4541 and P@1 0.8333 while cutting
   average context tokens to 800. This is a local-only methodology result, not
   official MemoryBench answer-quality proof.

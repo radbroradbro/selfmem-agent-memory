@@ -78,11 +78,11 @@ Live status:
   quality from 0.1089 to 0.4541 and P@1 from 0.1667 to 0.8333 with zero
   privacy failures. This is an autoresearch methodology signal, not a
   MemoryBench answer-quality win.
-- Adds the first same-data LongMemEval-S autoresearch loop. It runs 24
-  local-only retrieval-proxy arms across strategy, context budget, and
-  candidate limit; `bm25-lite-b800-k5` preserves quality 0.4541 while cutting
-  average context tokens to 800. The canonical checked-in run now uses this
-  setting.
+- Adds the same-data LongMemEval-S autoresearch loop. It now runs 72 local-only
+  retrieval-proxy arms across lexical, dense-proxy, temporal, graph-proxy,
+  rerank-proxy, and query-expansion-proxy strategies; `bm25-lite-b800-k5`
+  preserves quality 0.4541 while cutting average context tokens to 800. The
+  canonical checked-in run now uses this setting.
 - Clarifies that BM25-lite is the control floor and fallback, not the final
   agent-memory default. The tested `hybrid-v1` arm is a lightweight lexical
   hybrid only; the next benchmark gate must compare BM25-lite against dense,

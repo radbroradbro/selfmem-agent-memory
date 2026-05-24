@@ -216,12 +216,13 @@ zero privacy failures. The canonical checked-in RecallWeave run has been
 regenerated with `bm25-lite-b800-k5`. Treat it as the next autoresearch method
 choice, not a public benchmark claim.
 
-The first same-data autoresearch loop is
+The current same-data autoresearch loop is
 `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It ran
-24 local-only retrieval-proxy arms and selected `bm25-lite-b800-k5`, preserving
-quality 0.4541 while reducing average context tokens to 800. The checked-in
-retrieval-proxy run now uses that setting. Treat it as a local methodology
-improvement, not MemoryBench answer-quality proof.
+72 local-only retrieval-proxy arms across lexical, dense-proxy, temporal,
+graph-proxy, rerank-proxy, and query-expansion-proxy strategies. It selected
+`bm25-lite-b800-k5`, preserving quality 0.4541 while reducing average context
+tokens to 800. The checked-in retrieval-proxy run now uses that setting. Treat
+it as a local methodology improvement, not MemoryBench answer-quality proof.
 
 The follow-up hybrid gate is
 `reviews/overnight-20260522/public-longmemeval-hybrid-gate.json`. It compares

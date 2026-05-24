@@ -12,7 +12,18 @@ const fixtureRequested = Boolean(args.fixture) || !args.live;
 const format = String(args.format ?? "json").toLowerCase();
 const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_REPORT ?? null;
 const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_MARKDOWN ?? null;
-const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_STRATEGIES ?? "jaccard,bm25-lite,hybrid-v1");
+const defaultAutoresearchStrategies = [
+  "jaccard",
+  "bm25-lite",
+  "hybrid-v1",
+  "dense-proxy",
+  "sparse-dense-rrf",
+  "sparse-dense-temporal",
+  "sparse-dense-graph-temporal",
+  "full-hybrid-rerank",
+  "query-expanded-full-hybrid-rerank",
+].join(",");
+const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_STRATEGIES ?? defaultAutoresearchStrategies);
 const budgets = splitList(args.contextTokenBudgets ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_BUDGETS ?? "800,1200,1600,2400").map((value) =>
   positiveInt(value, "context token budget"),
 );
@@ -149,7 +160,8 @@ const report = {
     haystackSessionCount: input.haystackSessionCount,
   },
   loop: {
-    hypothesis: "A sparse BM25-style first-stage ranker should outperform token-set Jaccard on source-locked LongMemEval recall while preserving local-only zero-cost execution.",
+    hypothesis:
+      "A local hybrid recall family must beat or materially improve on the BM25 lexical control on source-locked LongMemEval recall before any default promotion; provider-backed arms remain a separate opt-in gate.",
     armCount: results.length,
     variables: {
       strategies,
@@ -170,7 +182,7 @@ const report = {
   },
   nextActions: [
     "Promote the winning arm only as retrieval-proxy methodology evidence.",
-    "Run the next loop with embedding, reranking, temporal, or query-expansion arms against the same source-locked slice.",
+    "Run the provider-backed loop with Voyage, Gemini, NVIDIA, or Apple Silicon arms only after the env-only public-data preflight passes.",
     "Do not turn this loop into MemoryBench answer-quality or SOTA language.",
   ],
 };

@@ -196,10 +196,11 @@ Scope:
   the canonical result and comparison bound to retrieval-proxy,
   no-public-claims wording.
 - Added public LongMemEval autoresearch-loop coverage to the release gate. The
-  loop runs 24 same-data retrieval-proxy arms over strategy, context budget,
-  and candidate limit; the current winner is `bm25-lite-b800-k5`, which keeps
-  quality 0.4541 while cutting average context tokens to 800. The checked-in
-  retrieval-proxy run now uses that setting.
+  loop now runs 72 same-data retrieval-proxy arms across lexical, dense-proxy,
+  temporal, graph-proxy, rerank-proxy, and query-expansion-proxy strategies;
+  the current winner is `bm25-lite-b800-k5`, which keeps quality 0.4541 while
+  cutting average context tokens to 800. The checked-in retrieval-proxy run now
+  uses that setting.
 - GitHub Actions run `26347754208` passed on commit
   `d91b27bcc869656197c1cc67804530b75757bbe2` after the strategy-comparison
   lane was added.

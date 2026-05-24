@@ -107,15 +107,15 @@ too expensive for the next run.
    win. The result must carry
    `retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`, and
    `publicBenchmarkClaimsAllowed: false`.
-   The first local-only loop then tested 24 arms across strategy, context
-   budget, and candidate limit. It selected `bm25-lite-b800-k5`, which kept
-   quality at 0.4541 while cutting average context tokens to 800. This becomes
-   the current checked-in retrieval-proxy canary setting.
-   This is a control floor, not the intended agent-memory default. The tested
-   `hybrid-v1` arm is a lightweight lexical hybrid over BM25, Jaccard, bigrams,
-   and rank boost. It does not yet include dense embeddings, graph traversal,
-   temporal supersession, hosted read-through fusion, query expansion, or a
-   learned reranker.
+   The current local-only loop tests 72 arms across lexical, dense-proxy,
+   temporal, graph-proxy, rerank-proxy, and query-expansion-proxy strategies,
+   context budget, and candidate limit. It selected `bm25-lite-b800-k5`, which
+   kept quality at 0.4541 while cutting average context tokens to 800. This
+   becomes the current checked-in retrieval-proxy canary setting.
+   This is a control floor, not the intended agent-memory default. The
+   hybrid-family arms are deterministic proxies that prove ranking wiring. They
+   do not yet prove learned embedding, hosted reranker, or Apple Silicon local
+   model quality.
 4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
    latency, context tokens, and cost against the reported target.
 5. If the canary beats the reported target under matching metric definitions,
