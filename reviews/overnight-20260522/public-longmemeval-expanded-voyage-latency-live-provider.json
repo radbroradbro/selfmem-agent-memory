@@ -1,0 +1,1555 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": false,
+    "sameDataControlsRequired": true,
+    "bm25ControlRequired": true,
+    "bm25ControlPresent": true,
+    "hybridFamilyRequired": true,
+    "hybridFamilyPresent": true,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": true,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-24T16:36:57.198Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-canary-30-first-per-type-2026-05-24",
+    "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "collectorCompatibleQuerySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "materializerHash": "sha256:c0b70c79cff70fe969c68a000d3addacb11bb4e9961e9351f5a0a318a7ca58be",
+    "queryCount": 30,
+    "expectedResultRefCount": 92,
+    "haystackSessionCount": 1420
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:4dbef12e2ddeb38920765ccf7d2a49623dbd07c013c2c5abbbd53fca65396bdc",
+      "resultHash": "sha256:b3afccccf458b6dd1e48205458aa509a97148e1ca00f0adfec0fc5c2f4a91b49",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.2506,
+        "pAt1": 0.4667,
+        "recallAt5": 0.1583,
+        "recallAt10": 0.1583,
+        "ndcgAt10": 0.2193,
+        "latencyP50Ms": 75,
+        "latencyP95Ms": 82,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 120,
+        "fullCandidateTokensAvg": 16763,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "35ecb6b2d5f7096f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "13ba88d1a961039f",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "09e1d6fa1b3afa09",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "82d0a454db861d8a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "d5b8ffcebba67fe3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "b79a42662777d71c",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "591d1f9e88f3edb1",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "0da5f98cd9e50bcc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "a67131f574dc7cb1",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "111d6599e903d5e6",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "302895094f7d45a3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "f3078f45f8951b90",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "74408dae012df1cf",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "06758812bd0bf031",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "388334e1ee924ae4",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "8cd3157cee5f4bbb",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "dbc42502ba119053",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "ae337effdb3908fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "a86259d4bdc873ce",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "461f0addf481ae01",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:e96f5812f75f21b7218f954bf28be52fee6ce4df48ad32bd13240532cb00fca8",
+      "resultHash": "sha256:0c5371508e3ba7683a2b69441f831464482a5fc702dd249810e184bfd97fe0ce",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.2289,
+        "pAt1": 0.4333,
+        "recallAt5": 0.1417,
+        "recallAt10": 0.1417,
+        "ndcgAt10": 0.1989,
+        "latencyP50Ms": 156,
+        "latencyP95Ms": 169,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 120,
+        "fullCandidateTokensAvg": 17365,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "c6e4c900e5e1562b",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "13ba88d1a961039f",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "1d531c01116f27ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "0c5508a057e81ce8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "35f58eeec4f4be13",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "253413e419dacc2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "09e1d6fa1b3afa09",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "30dff0ed57b06248",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "4499c1e96be4db6a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "95dd60f3690f8d2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "3718c838d12a16f7",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "cd5a734d367c4cbd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "4225a09dcab96bf3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "9fddc1645cfa896e",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "388334e1ee924ae4",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "68d3109781971bbe",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "db15078dff75756a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "4d4501cc8199c941",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage4-voyage",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:b313b2d07b8d86bbbada9741289e766f592036dd40ae62c37f8ff17d62c65852",
+      "resultHash": "sha256:3a2bd7215b1f0c64b27493d090046c0c03d5843be9d5dad6a1cf97f64d6b238b",
+      "rankingStrategy": "cloud-voyage4-voyage",
+      "provider": {
+        "strategy": "cloud-voyage4-voyage",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 308,
+        "providerMockCalls": 0,
+        "embeddingCalls": 278,
+        "rerankCalls": 30,
+        "documentCountSent": 5400,
+        "queryCountSent": 30,
+        "modelArm": "cloud-voyage4-voyage",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": "voyage-4-large",
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5",
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {
+          "voyage": 1
+        },
+        "keyCountAvailable": 1
+      },
+      "metrics": {
+        "quality": 0.304,
+        "pAt1": 0.5667,
+        "recallAt5": 0.1917,
+        "recallAt10": 0.1917,
+        "ndcgAt10": 0.2658,
+        "latencyP50Ms": 6659,
+        "latencyP95Ms": 8867,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 119,
+        "fullCandidateTokensAvg": 16333,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "6c2796cbc9d00905",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "54182c385e7bb054",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "9d18292863e24867",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "d67ba64cf989e31c",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "35f58eeec4f4be13",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "b79a42662777d71c",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "02d8aa9c6e4cb50d",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "a3ebaf062d3ea5d5",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "1aa8adaec50f772c",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "3a887eb293009068",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "45b92a23c1820fa0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "f3078f45f8951b90",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "6279689fafe4e99d",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b4d12b3d4cafedc6",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "74b40853759b7e6b",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "74b40853759b7e6b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "dbc42502ba119053",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "388334e1ee924ae4",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "81610fa029fc56cc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "68d3109781971bbe",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "dbc42502ba119053",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "77aa0bbe141635c6",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "ed10a8b6df4838ac",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "4d4501cc8199c941",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:eae5dc87cceaeba98e47c26ed929b753e343585e5f9ffb5d55e313b191158fe4",
+      "resultHash": "sha256:7f5d69da98c08858c7b6094e0c58f93565d3ce1a7fa01a7613758f10496e1ed2",
+      "rankingStrategy": "cloud-voyage4-voyage-lite-rerank",
+      "provider": {
+        "strategy": "cloud-voyage4-voyage-lite-rerank",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 133,
+        "providerMockCalls": 0,
+        "embeddingCalls": 103,
+        "rerankCalls": 30,
+        "documentCountSent": 1350,
+        "queryCountSent": 30,
+        "modelArm": "cloud-voyage4-voyage-lite-rerank",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": "voyage-4-large",
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5-lite",
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {
+          "voyage": 1
+        },
+        "keyCountAvailable": 1
+      },
+      "metrics": {
+        "quality": 0.304,
+        "pAt1": 0.5667,
+        "recallAt5": 0.1917,
+        "recallAt10": 0.1917,
+        "ndcgAt10": 0.2658,
+        "latencyP50Ms": 2251,
+        "latencyP95Ms": 3557,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 119,
+        "fullCandidateTokensAvg": 16617,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "40e34ede1aa4b126",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "8758d4701719cf90",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "ea573d6bf6f96081",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "0c5508a057e81ce8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "35f58eeec4f4be13",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "b79a42662777d71c",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "02d8aa9c6e4cb50d",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "a3ebaf062d3ea5d5",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "3718c838d12a16f7",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "c6cd7525dda26216",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "45b92a23c1820fa0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "f3078f45f8951b90",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "2f2c46a8354fa7b1",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "6279689fafe4e99d",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b4d12b3d4cafedc6",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "06758812bd0bf031",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "388334e1ee924ae4",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "81610fa029fc56cc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "8cd3157cee5f4bbb",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "ab23666debb53eb6",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "ed10a8b6df4838ac",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "4d4501cc8199c941",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage4-lite-voyage-lite",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:ceb7b6353f0ba17298a4313a77f9de4b815c01b2ab5c00302c0876734a8223ec",
+      "resultHash": "sha256:86cd9b562847f51b1917c8dd1734740c7d80f63d75c8e2de7fbe1c521610f980",
+      "rankingStrategy": "cloud-voyage4-lite-voyage-lite",
+      "provider": {
+        "strategy": "cloud-voyage4-lite-voyage-lite",
+        "providerStrategy": true,
+        "providerCallsAllowed": true,
+        "providerPublicDataConfirmed": true,
+        "providerCallsMade": 133,
+        "providerMockCalls": 0,
+        "embeddingCalls": 103,
+        "rerankCalls": 30,
+        "documentCountSent": 1350,
+        "queryCountSent": 30,
+        "modelArm": "cloud-voyage4-lite-voyage-lite",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": "voyage-4-lite",
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5-lite",
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {
+          "voyage": 1
+        },
+        "keyCountAvailable": 1
+      },
+      "metrics": {
+        "quality": 0.304,
+        "pAt1": 0.5667,
+        "recallAt5": 0.1917,
+        "recallAt10": 0.1917,
+        "ndcgAt10": 0.2658,
+        "latencyP50Ms": 1988,
+        "latencyP95Ms": 2637,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 119,
+        "fullCandidateTokensAvg": 16456,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "40e34ede1aa4b126",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "8758d4701719cf90",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "ea573d6bf6f96081",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "0c5508a057e81ce8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "35f58eeec4f4be13",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "b79a42662777d71c",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "02d8aa9c6e4cb50d",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "a3ebaf062d3ea5d5",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "3718c838d12a16f7",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "c6cd7525dda26216",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "45b92a23c1820fa0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "f3078f45f8951b90",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "2f2c46a8354fa7b1",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "6279689fafe4e99d",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b4d12b3d4cafedc6",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "06758812bd0bf031",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "388334e1ee924ae4",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "81610fa029fc56cc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "8cd3157cee5f4bbb",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "ab23666debb53eb6",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "ed10a8b6df4838ac",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "4d4501cc8199c941",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "cloud-voyage4-lite-voyage-lite",
+    "quality": 0.304,
+    "pAt1": 0.5667,
+    "recallAt5": 0.1917,
+    "recallAt10": 0.1917,
+    "ndcgAt10": 0.2658,
+    "latencyP50Ms": 1988
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 0.2506,
+    "pAt1": 0.4667,
+    "recallAt5": 0.1583,
+    "recallAt10": 0.1583,
+    "ndcgAt10": 0.2193,
+    "latencyP50Ms": 75
+  },
+  "hybridPromotion": {
+    "bestHybridStrategy": "cloud-voyage4-lite-voyage-lite",
+    "promoteHybrid": true,
+    "reason": "Best hybrid-family arm beats bm25-lite on retrieval-proxy quality.",
+    "qualityDeltaVsBm25": 0.0534,
+    "latencyDeltaVsBm25": 1913
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare Voyage, Gemini, NVIDIA, and local Apple Silicon provider arms against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

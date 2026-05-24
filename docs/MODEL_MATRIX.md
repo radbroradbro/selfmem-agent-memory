@@ -54,7 +54,9 @@ OpenAI-compatible interface and let the canary decide.
 
 | Arm | Embedder | Reranker | Status |
 |---|---|---|---|
-| `cloud-voyage4-voyage` | `voyage-4-large` | `rerank-2.5` | Default cloud canary arm. |
+| `cloud-voyage4-lite-voyage-lite` | `voyage-4-lite` | `rerank-2.5-lite` | Current latency-sensitive cloud canary winner on the 30-query retrieval-proxy slice. |
+| `cloud-voyage4-voyage-lite-rerank` | `voyage-4-large` | `rerank-2.5-lite` | Isolates lite rerank latency while keeping the larger embedder. |
+| `cloud-voyage4-voyage` | `voyage-4-large` | `rerank-2.5` | Larger quality reference arm. |
 | `cloud-gemini-embed-rerank-proxy` | `gemini-embedding-001`, default 1536 dims | Local deterministic rerank proxy | Gemini embedding challenger without a hosted reranker. |
 | `cloud-gemini-voyage-rerank` | `gemini-embedding-001`, default 1536 dims | `rerank-2.5` | Gemini embedding challenger with Voyage rerank held constant. |
 | `cloud-nvidia-retriever-500m` | `nvidia/llama-nemotron-embed-1b-v2` | `nvidia/llama-3.2-nemoretriever-500m-rerank-v2` | Latency challenger. |
@@ -89,6 +91,12 @@ local Apple Silicon arms:
 - `cloud-voyage4-voyage`: budgeted BM25 preselect, Voyage `voyage-4-large`
   query/document embeddings, sparse+dense+graph+temporal fusion, then Voyage
   `rerank-2.5`.
+- `cloud-voyage4-voyage-lite-rerank`: smaller budgeted BM25 preselect,
+  Voyage `voyage-4-large` query/document embeddings, sparse+dense+graph+
+  temporal fusion, then Voyage `rerank-2.5-lite`.
+- `cloud-voyage4-lite-voyage-lite`: smaller budgeted BM25 preselect, Voyage
+  `voyage-4-lite` query/document embeddings, sparse+dense+graph+temporal
+  fusion, then Voyage `rerank-2.5-lite`.
 - `cloud-gemini-embed-rerank-proxy`: budgeted BM25 preselect, Gemini
   `gemini-embedding-001` query/document embeddings, sparse+dense+graph+temporal
   fusion, then the local deterministic rerank proxy.

@@ -104,6 +104,7 @@ Live status:
 - Adds the provider-backed gate scaffold. The new `benchmark:public-provider`
   command compares `bm25-lite`, `full-hybrid-rerank`,
   `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
+  `cloud-voyage4-voyage-lite-rerank`, `cloud-voyage4-lite-voyage-lite`,
   `cloud-gemini-embed-rerank-proxy`, `cloud-gemini-voyage-rerank`,
   `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
   `cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b` through the same
@@ -111,6 +112,14 @@ Live status:
   zero hosted calls; live provider runs require explicit provider-call and
   public-data environment guards plus env-only readiness for the selected
   provider arm.
+- Adds a latency-sensitive 30-query Voyage canary on the same public
+  LongMemEval-S target. The run compares `bm25-lite`, `full-hybrid-rerank`,
+  `cloud-voyage4-voyage`, `cloud-voyage4-voyage-lite-rerank`, and
+  `cloud-voyage4-lite-voyage-lite`. The best provider arm,
+  `cloud-voyage4-lite-voyage-lite`, reached quality 0.3040 versus BM25 0.2506,
+  P@1 0.5667 versus 0.4667, and p50 1988 ms versus 6659 ms for the larger
+  `cloud-voyage4-voyage` arm, with zero privacy failures. The report still
+  blocks MemoryBench/SOTA claims.
 - Enforces the benchmark comparison shape in the runner itself. A provider
   gate now rejects a solo provider-arm run unless `bm25-lite`,
   `full-hybrid-rerank`, and at least one provider-backed arm are present. A
@@ -221,6 +230,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   retrieval-proxy quality on both slices, with zero privacy failures, but p50
   latency was much higher. This is provider-backed canary evidence, not
   MemoryBench answer-quality evidence or public SOTA proof.
+- Current live Voyage latency evidence adds `cloud-voyage4-voyage-lite-rerank`
+  and `cloud-voyage4-lite-voyage-lite` to the same 30-query target. The
+  `voyage-4-lite` plus `rerank-2.5-lite` arm matched the larger Voyage arm's
+  retrieval-proxy quality at 0.3040 while reducing p50 latency to 1988 ms.
+  Public claims remain blocked because this is not MemoryBench answer quality.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.

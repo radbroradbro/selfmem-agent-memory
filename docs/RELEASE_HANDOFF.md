@@ -261,6 +261,7 @@ The provider-backed gate starts as a fixture-only CI path:
 `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It checks the exact public-safe comparison shape for `bm25-lite`,
 `full-hybrid-rerank`, `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,
+`cloud-voyage4-voyage-lite-rerank`, `cloud-voyage4-lite-voyage-lite`,
 `cloud-gemini-embed-rerank-proxy`, `cloud-gemini-voyage-rerank`,
 `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
 `cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b`. Fixture mode uses
@@ -332,8 +333,12 @@ The first live Voyage provider canaries have now run:
   `reviews/overnight-20260522/public-longmemeval-voyage-live-provider-6q.json`
 - 30-query expanded target:
   `reviews/overnight-20260522/public-longmemeval-expanded-voyage-live-provider.json`
+- 30-query latency-sensitive target:
+  `reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json`
 - Summary:
   `reviews/overnight-20260522/public-longmemeval-voyage-live-provider-evidence.md`
+  and
+  `reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider-evidence.md`
 
 Both used the same-data provider gate with `bm25-lite`,
 `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on
@@ -342,6 +347,14 @@ retrieval-proxy quality on both slices, but p50 latency was much higher:
 30-query slice. Treat this as a provider-backed canary trend, not a public
 SOTA claim. The reports keep `memoryBenchAnswerQuality: false` and
 `publicBenchmarkClaimsAllowed: false`.
+
+The latency-sensitive 30-query run added `cloud-voyage4-voyage-lite-rerank`
+and `cloud-voyage4-lite-voyage-lite` to the same BM25 and full-hybrid controls.
+`cloud-voyage4-lite-voyage-lite` reached quality 0.3040, P@1 0.5667,
+recall@5 0.1917, NDCG@10 0.2658, p50 latency 1988 ms, and zero privacy
+failures. It preserved the same measured quality as `cloud-voyage4-voyage`
+while cutting p50 latency from 6659 ms to 1988 ms. Use it as the next cloud
+canary default, not as a final MemoryBench or SOTA claim.
 
 Do not use the provider gate on private agent memories unless the operator has
 separately approved sending that text to the provider.

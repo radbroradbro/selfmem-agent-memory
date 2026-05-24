@@ -13,8 +13,8 @@
 - Query count: 3
 - Expected result refs: 3
 - Winner: bm25-lite
-- Hybrid promotion: false
-- Hybrid decision: Keep bm25-lite as control/fallback; hybrid-family arm has not earned promotion on this slice.
+- Provider arm beats control: false
+- Provider arm decision: Keep bm25-lite as control/fallback; provider-backed arm has not earned promotion on this slice.
 
 ## Strategies
 
@@ -24,6 +24,8 @@
 | full-hybrid-rerank | none | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-voyage-rerank-only | cloud-voyage-rerank-only | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-voyage4-voyage | cloud-voyage4-voyage | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-voyage4-voyage-lite-rerank | cloud-voyage4-voyage-lite-rerank | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-voyage4-lite-voyage-lite | cloud-voyage4-lite-voyage-lite | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-gemini-embed-rerank-proxy | cloud-gemini-embed-rerank-proxy | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-gemini-voyage-rerank | cloud-gemini-voyage-rerank | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-nvidia-retriever-500m | cloud-nvidia-retriever-500m | 1 | 1 | 1 | 1 | 1 | 1 |

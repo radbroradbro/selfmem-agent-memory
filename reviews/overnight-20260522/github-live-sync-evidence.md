@@ -138,13 +138,18 @@ Date: 2026-05-23
   provider canaries for the 6-query and 30-query public LongMemEval-S targets.
   The refresh kept the body text public-safe and preserved the rule that this
   is retrieval-proxy canary evidence, not MemoryBench answer-quality proof.
+- PR #5 and issue #6 were refreshed again after adding the latency-sensitive
+  Voyage provider canary for the 30-query public LongMemEval-S target,
+  including the `cloud-voyage4-lite-voyage-lite` arm. The refresh kept the
+  body text public-safe and preserved the rule that this is retrieval-proxy
+  canary evidence, not MemoryBench answer-quality proof.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T16:18:31Z
+- PR body refreshed at: 2026-05-24T16:43:32Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T16:18:31Z
-- PR body hash: b97e4f673f75d7f8c90d273ab7abb14858e062d7ca1c116ba0e1da124b856530
+- Issue updated at: 2026-05-24T16:43:32Z
+- PR body hash: 0c038c0943dbaee5ea3c24d6fae4d6cccd0767e75704c058ec184ddae1658605
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 08f4d030b9640b5b084ab0f890cb9ebad0eca9119d631046961de088f0663fe0
+- Issue body hash: 0e58a2ec92e19cd6dc25fd1670c44d1c5d5a53c01cb5b7774403a669d4cae490
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

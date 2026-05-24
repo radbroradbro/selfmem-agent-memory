@@ -37,6 +37,8 @@ const retrievalStrategies = [
   "query-expanded-full-hybrid-rerank",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
+  "cloud-voyage4-voyage-lite-rerank",
+  "cloud-voyage4-lite-voyage-lite",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
   "cloud-nvidia-retriever-500m",
@@ -263,7 +265,7 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "full-hybrid-rerank") return rankFullHybridRerank(query, candidates);
   if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates);
   if (options.strategy === "cloud-voyage-rerank-only") return rankCloudVoyageRerankOnly(query, candidates, options);
-  if (options.strategy === "cloud-voyage4-voyage") return rankCloudVoyage4Voyage(query, candidates, options);
+  if (voyageStrategyConfig(options.strategy)?.mode === "embed-rerank") return rankCloudVoyage4Voyage(query, candidates, options);
   if (options.strategy === "cloud-gemini-embed-rerank-proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
   if (options.strategy === "cloud-gemini-voyage-rerank") return rankCloudGeminiVoyageRerank(query, candidates, options);
   if (nvidiaStrategyConfig(options.strategy)) return rankCloudNvidiaHybrid(query, candidates, options);
@@ -371,19 +373,23 @@ function rankQueryExpandedFullHybridRerank(query, candidates) {
 
 async function rankCloudVoyageRerankOnly(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
-  const firstStage = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
+  const config = voyageStrategyConfig(options.strategy);
+  assert.ok(config?.mode === "rerank-only", `invalid Voyage rerank-only strategy: ${options.strategy}`);
+  const firstStage = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", config.rerankCandidateLimit));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("voyage-rerank");
     return providerMockRerank(query, firstStage);
   }
-  assertProviderBenchmarkAllowed("cloud-voyage-rerank-only");
-  const ranked = await voyageRerank(queryText, firstStage, { providerStats: options.providerStats });
+  assertProviderBenchmarkAllowed(options.strategy);
+  const ranked = await voyageRerank(queryText, firstStage, { providerStats: options.providerStats, model: config.rerankModel });
   return [...ranked, ...candidatesNotIn(firstStage, candidates)].sort(byScoreThenId);
 }
 
 async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
-  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  const config = voyageStrategyConfig(options.strategy);
+  assert.ok(config?.mode === "embed-rerank", `invalid Voyage embed/rerank strategy: ${options.strategy}`);
+  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", config.denseCandidateLimit));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("voyage-embedding");
     options.providerStats?.recordMockCall("voyage-rerank");
@@ -400,9 +406,9 @@ async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
     );
     return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
   }
-  assertProviderBenchmarkAllowed("cloud-voyage4-voyage");
-  const queryVector = (await voyageEmbed([queryText], "query", { providerStats: options.providerStats }))[0];
-  const documentVectors = await voyageEmbed(densePool.map((candidate) => candidate.text), "document", { providerStats: options.providerStats });
+  assertProviderBenchmarkAllowed(options.strategy);
+  const queryVector = (await voyageEmbed([queryText], "query", { providerStats: options.providerStats, model: config.embedModel }))[0];
+  const documentVectors = await voyageEmbed(densePool.map((candidate) => candidate.text), "document", { providerStats: options.providerStats, model: config.embedModel });
   const denseRanked = densePool
     .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
     .sort(byScoreThenId);
@@ -415,8 +421,8 @@ async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
       { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
     ],
     { scoreScale: 8 },
-  ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
-  const reranked = await voyageRerank(queryText, fused, { providerStats: options.providerStats });
+  ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", config.rerankCandidateLimit));
+  const reranked = await voyageRerank(queryText, fused, { providerStats: options.providerStats, model: config.rerankModel });
   return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
 }
 
@@ -756,6 +762,8 @@ function isProviderStrategy(strategy) {
   return [
     "cloud-voyage-rerank-only",
     "cloud-voyage4-voyage",
+    "cloud-voyage4-voyage-lite-rerank",
+    "cloud-voyage4-lite-voyage-lite",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
     "cloud-nvidia-retriever-500m",
@@ -778,7 +786,7 @@ function assertProviderBenchmarkAllowed(strategy) {
 function requiredProvidersForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy") return ["gemini"];
   if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
-  if (strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return ["voyage"];
+  if (voyageStrategyConfig(strategy)) return ["voyage"];
   if (nvidiaStrategyConfig(strategy)) return ["nvidia"];
   if (strategy === "local-apple-qwen3-0_6b") return ["local-apple"];
   return [];
@@ -786,7 +794,7 @@ function requiredProvidersForStrategy(strategy) {
 
 function embedModelForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiEmbedModel();
-  if (strategy === "cloud-voyage4-voyage") return voyageEmbedModel();
+  if (voyageStrategyConfig(strategy)?.embedModel) return voyageStrategyConfig(strategy).embedModel;
   if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).embedModel;
   if (strategy === "local-apple-qwen3-0_6b") return localAppleEmbedModel();
   return null;
@@ -794,14 +802,15 @@ function embedModelForStrategy(strategy) {
 
 function embedDimensionsForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiOutputDimensionality();
-  if (strategy === "cloud-voyage4-voyage") return optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
+  if (voyageStrategyConfig(strategy)?.embedModel) return optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
   if (nvidiaStrategyConfig(strategy)) return optionalPositiveInt(process.env.NVIDIA_EMBED_DIMENSIONS ?? null, "NVIDIA output dimension");
   if (strategy === "local-apple-qwen3-0_6b") return optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_DIMENSIONS ?? "1024", "local Apple output dimension");
   return null;
 }
 
 function rerankModelForStrategy(strategy) {
-  if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return voyageRerankModel();
+  if (strategy === "cloud-gemini-voyage-rerank") return voyageRerankModel();
+  if (voyageStrategyConfig(strategy)?.rerankModel) return voyageStrategyConfig(strategy).rerankModel;
   if (strategy === "cloud-gemini-embed-rerank-proxy") return "local-deterministic-rerank-proxy";
   if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).rerankModel;
   if (strategy === "local-apple-qwen3-0_6b") return process.env.SELFMEM_LOCAL_RERANK_MODEL ?? "local-deterministic-rerank-proxy";
@@ -890,17 +899,24 @@ function chooseProviderKey(provider, seed) {
 async function voyageEmbed(texts, inputType, options = {}) {
   const input = texts.map((text) => String(text ?? ""));
   const isQuery = inputType === "query";
-  options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : input.length);
-  const body = {
-    input,
-    model: voyageEmbedModel(),
-    input_type: inputType,
-    truncation: true,
-  };
-  const outputDimension = optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
-  if (outputDimension) body.output_dimension = outputDimension;
-  const response = await voyagePost("/v1/embeddings", body, { seed: `${inputType}:${input.length}:${input[0] ?? ""}` });
-  const embeddings = embeddingsFromVoyageResponse(response);
+  const batches = batchProviderInputs(input, {
+    maxCount: optionalPositiveInt(process.env.VOYAGE_EMBED_BATCH_SIZE ?? null, "Voyage embed batch size") ?? 32,
+    maxEstimatedTokens: optionalPositiveInt(process.env.VOYAGE_EMBED_BATCH_TOKENS ?? null, "Voyage embed batch tokens") ?? 60_000,
+  });
+  const embeddings = [];
+  for (const [batchIndex, batch] of batches.entries()) {
+    options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : batch.length);
+    const body = {
+      input: batch,
+      model: options.model ?? voyageEmbedModel(),
+      input_type: inputType,
+      truncation: true,
+    };
+    const outputDimension = optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
+    if (outputDimension) body.output_dimension = outputDimension;
+    const response = await voyagePost("/v1/embeddings", body, { seed: `${inputType}:${batchIndex}:${batch.length}:${batch[0] ?? ""}` });
+    embeddings.push(...embeddingsFromVoyageResponse(response));
+  }
   assert.equal(embeddings.length, input.length, "Voyage embeddings response length mismatch");
   return embeddings;
 }
@@ -913,7 +929,7 @@ async function voyageRerank(query, candidates, options = {}) {
     {
       query,
       documents,
-      model: voyageRerankModel(),
+      model: options.model ?? voyageRerankModel(),
       top_k: documents.length,
       return_documents: false,
       truncation: true,
@@ -1174,6 +1190,40 @@ function voyageRerankModel() {
   return String(process.env.VOYAGE_RERANK_MODEL ?? "rerank-2.5");
 }
 
+function voyageStrategyConfig(strategy) {
+  const configs = {
+    "cloud-voyage-rerank-only": {
+      mode: "rerank-only",
+      embedModel: null,
+      rerankModel: voyageRerankModel(),
+      denseCandidateLimit: 0,
+      rerankCandidateLimit: 60,
+    },
+    "cloud-voyage4-voyage": {
+      mode: "embed-rerank",
+      embedModel: voyageEmbedModel(),
+      rerankModel: voyageRerankModel(),
+      denseCandidateLimit: 120,
+      rerankCandidateLimit: 60,
+    },
+    "cloud-voyage4-voyage-lite-rerank": {
+      mode: "embed-rerank",
+      embedModel: "voyage-4-large",
+      rerankModel: "rerank-2.5-lite",
+      denseCandidateLimit: 30,
+      rerankCandidateLimit: 15,
+    },
+    "cloud-voyage4-lite-voyage-lite": {
+      mode: "embed-rerank",
+      embedModel: "voyage-4-lite",
+      rerankModel: "rerank-2.5-lite",
+      denseCandidateLimit: 30,
+      rerankCandidateLimit: 15,
+    },
+  };
+  return configs[strategy] ?? null;
+}
+
 function geminiEmbedModel() {
   return String(process.env.GEMINI_EMBED_MODEL ?? "gemini-embedding-001").replace(/^models\//, "");
 }
@@ -1235,6 +1285,26 @@ function localAppleEmbedModel() {
 
 function providerCandidateLimit(envName, fallback) {
   return optionalPositiveInt(process.env[envName] ?? null, envName) ?? fallback;
+}
+
+function batchProviderInputs(items, options = {}) {
+  const maxCount = Math.max(1, Number(options.maxCount ?? 32));
+  const maxEstimatedTokens = Math.max(1, Number(options.maxEstimatedTokens ?? 60_000));
+  const batches = [];
+  let current = [];
+  let currentTokens = 0;
+  for (const item of items) {
+    const estimated = estimateTokens(item);
+    if (current.length && (current.length >= maxCount || currentTokens + estimated > maxEstimatedTokens)) {
+      batches.push(current);
+      current = [];
+      currentTokens = 0;
+    }
+    current.push(item);
+    currentTokens += estimated;
+  }
+  if (current.length) batches.push(current);
+  return batches;
 }
 
 function providerMockRerank(query, candidates) {

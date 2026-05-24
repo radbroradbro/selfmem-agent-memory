@@ -119,7 +119,8 @@ real embeddings and rerankers beat it.
 The provider-backed benchmark lane now has an opt-in harness. The fixture gate
 is `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`,
-`cloud-voyage4-voyage`, `cloud-gemini-embed-rerank-proxy`, and
+`cloud-voyage4-voyage`, `cloud-voyage4-voyage-lite-rerank`,
+`cloud-voyage4-lite-voyage-lite`, `cloud-gemini-embed-rerank-proxy`, and
 `cloud-gemini-voyage-rerank`, plus NVIDIA and local Apple Silicon arms:
 `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
 `cloud-nvidia-e5-mistral`, and `local-apple-qwen3-0_6b`. Fixture mode uses
@@ -146,12 +147,30 @@ expanded slice, live Voyage reached quality 0.2822 versus BM25 0.2506, with
 P@1 0.5333 versus 0.4667 and p50 latency 1641 ms versus 82 ms. Both runs had
 zero privacy and redaction failures.
 
+The latency-sensitive live Voyage canary is now also checked in:
+
+- `reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider-preflight.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider-evidence.md`
+
+This run compared five same-data arms on the 30-query public LongMemEval-S
+target: `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage4-voyage`,
+`cloud-voyage4-voyage-lite-rerank`, and `cloud-voyage4-lite-voyage-lite`.
+The best provider-backed arm was `cloud-voyage4-lite-voyage-lite`: quality
+0.3040, P@1 0.5667, recall@5 0.1917, NDCG@10 0.2658, p50 latency 1988 ms,
+and zero privacy failures. It beat BM25 by 0.0534 quality points and preserved
+the same measured quality as the larger `voyage-4-large` plus `rerank-2.5`
+arm while cutting p50 latency from 6659 ms to 1988 ms.
+
+The harness now batches Voyage document embeddings by count and estimated
+tokens. That prevents oversized provider requests and makes latency an honest
+part of the comparison instead of a hidden failure mode.
+
 This is the first provider-backed canary trend in the right direction, but it
 is still retrieval-proxy evidence, not MemoryBench answer-quality evidence.
 Public benchmark claims remain blocked. The next optimization step is to test
-latency-sensitive provider arms, especially Voyage `rerank-2.5-lite`, smaller
-dense/rerank candidate pools, Gemini embeddings plus Voyage rerank, NVIDIA
-Nemotron retrieval/rerank, and the Apple Silicon local arm against the same
+Gemini embeddings plus Voyage rerank, NVIDIA Nemotron retrieval/rerank, the
+Apple Silicon local arm, and query-expansion variants against the same
 30-query target.
 
 Provider keys can stay in normal environment variables, or in private key files
@@ -451,7 +470,11 @@ Until then, RecallWeave should be described as a local-first fallback and experi
 
 The next public-safe benchmark gate will test separated provider arms:
 
-- `cloud-voyage4-voyage` for the first cloud quality proof.
+- `cloud-voyage4-lite-voyage-lite` as the current latency-sensitive cloud
+  canary winner.
+- `cloud-voyage4-voyage` as the larger quality reference arm.
+- `cloud-voyage4-voyage-lite-rerank` to isolate the effect of
+  `rerank-2.5-lite` while keeping `voyage-4-large`.
 - `cloud-gemini-embed-rerank-proxy` for Gemini embedding quality without a
   hosted reranker.
 - `cloud-gemini-voyage-rerank` for Gemini embedding quality with Voyage rerank.

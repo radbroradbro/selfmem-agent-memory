@@ -21,6 +21,8 @@ const knownStrategies = new Set([
   "full-hybrid-rerank",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
+  "cloud-voyage4-voyage-lite-rerank",
+  "cloud-voyage4-lite-voyage-lite",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
   "cloud-nvidia-retriever-500m",
@@ -122,7 +124,12 @@ if (!report.ok) process.exitCode = 1;
 function requiredProvidersForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy") return ["gemini"];
   if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
-  if (strategy === "cloud-voyage-rerank-only" || strategy === "cloud-voyage4-voyage") return ["voyage"];
+  if (
+    strategy === "cloud-voyage-rerank-only" ||
+    strategy === "cloud-voyage4-voyage" ||
+    strategy === "cloud-voyage4-voyage-lite-rerank" ||
+    strategy === "cloud-voyage4-lite-voyage-lite"
+  ) return ["voyage"];
   if (strategy.startsWith("cloud-nvidia-")) return ["nvidia"];
   if (strategy === "local-apple-qwen3-0_6b") return ["local-apple"];
   return [];

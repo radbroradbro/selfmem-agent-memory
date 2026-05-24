@@ -31,7 +31,7 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-24T09:24:31.727Z",
+  "generatedAt": "2026-05-24T16:40:25.927Z",
   "input": {
     "source": "fixture",
     "datasetSlice": "fixture-memory-canary-slice",
@@ -46,8 +46,8 @@
     {
       "strategy": "bm25-lite",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:f9969dee412cff1783d808ad4b119f749957762bb4c12f3b2ce78e739a58d7b2",
-      "resultHash": "sha256:bbdb5ea3ed18dd6a8f9f572cd2adfeb5ef590295bd04c76b2bd2a695c7900561",
+      "responsesHash": "sha256:3fec6e836c40362ef61b8008f27d576659420bed284a5f1ab501d751c56f77a8",
+      "resultHash": "sha256:8583ded879e70087dfb2379a1e2e33da202352ad20d1ee652ce676a96b7a1037",
       "rankingStrategy": "bm25-lite",
       "provider": {
         "strategy": "bm25-lite",
@@ -122,8 +122,8 @@
     {
       "strategy": "full-hybrid-rerank",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:3fb1882c800b150a3d879438e10fb747e959855d2403846ed67c55d3511a6d87",
-      "resultHash": "sha256:f76df3b55243fb07bc67eda735f70d97de0cf9f464c4b84585376b9aafd91020",
+      "responsesHash": "sha256:8db1c0687791ea0b7276dc3315a6b890c6af5fa02aa378f6bfcd57ee65e3c9e7",
+      "resultHash": "sha256:50c180560ba36e9a447321ac75621ba55c3df0076f67c09c814440902b5391c3",
       "rankingStrategy": "full-hybrid-rerank",
       "provider": {
         "strategy": "full-hybrid-rerank",
@@ -198,8 +198,8 @@
     {
       "strategy": "cloud-voyage-rerank-only",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:3023bbfae555062e88164cc503ab9c4ca50ddb3a093693c9a297c41ea2278fdc",
-      "resultHash": "sha256:68dfecba4b3e991990efcebd61c8ce98ecc1dfaf22a4d7e08ac227b027f3b172",
+      "responsesHash": "sha256:98a2e968e017d402d0c097010979d9843d5e8f786aeeb27df3e3973815ea8186",
+      "resultHash": "sha256:dd8927dda9ba87e1900528e5df75e250b979d82e22968d094ef5aaa00094b6a9",
       "rankingStrategy": "cloud-voyage-rerank-only",
       "provider": {
         "strategy": "cloud-voyage-rerank-only",
@@ -232,7 +232,7 @@
         "recallAt10": 1,
         "ndcgAt10": 1,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 5,
+        "latencyP95Ms": 4,
         "contextTokensAvg": 119
       },
       "contextBudget": {
@@ -278,8 +278,8 @@
     {
       "strategy": "cloud-voyage4-voyage",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:e4a8ba1a2fa30e58bda98bb6ac524bb90e3242c96a48ad47d26269d14617ebc8",
-      "resultHash": "sha256:d19bb86bea4516545aa3cdc0b515a120141f42cd63950d8b81aa60c743662e88",
+      "responsesHash": "sha256:31a70b1a2080856959803f85a90803787e6c55eacdd347ba46f9c152ce868cb5",
+      "resultHash": "sha256:11b5ed137d9efc46660da5a8c8d160d3dbba550d48f431c25fcaa132643b3e30",
       "rankingStrategy": "cloud-voyage4-voyage",
       "provider": {
         "strategy": "cloud-voyage4-voyage",
@@ -356,10 +356,170 @@
       ]
     },
     {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:6bbc509e592e837c1bee353461d85ba6473c3d6904234b7b8b5a0de412db2220",
+      "resultHash": "sha256:a8f8ebf6cea37896baa3f1ff4b4f32b0223c3587a2c49db7a81756dba2318f7b",
+      "rankingStrategy": "cloud-voyage4-voyage-lite-rerank",
+      "provider": {
+        "strategy": "cloud-voyage4-voyage-lite-rerank",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 6,
+        "embeddingCalls": 3,
+        "rerankCalls": 3,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-voyage4-voyage-lite-rerank",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": "voyage-4-large",
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5-lite",
+        "fixtureProviderMock": true,
+        "providerKeyCounts": {
+          "voyage": 0
+        },
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 5,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage4-lite-voyage-lite",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:c486fc9ea43d68baea16498575dd67a3cd952da6ecb1e20f9fbbd80502a77a79",
+      "resultHash": "sha256:28edb19d0b1963936c3c89355db0043cf0a10ae2760381bd1096354e4326c8ed",
+      "rankingStrategy": "cloud-voyage4-lite-voyage-lite",
+      "provider": {
+        "strategy": "cloud-voyage4-lite-voyage-lite",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 6,
+        "embeddingCalls": 3,
+        "rerankCalls": 3,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-voyage4-lite-voyage-lite",
+        "providers": [
+          "voyage"
+        ],
+        "embedModel": "voyage-4-lite",
+        "embedDimensions": null,
+        "rerankModel": "rerank-2.5-lite",
+        "fixtureProviderMock": true,
+        "providerKeyCounts": {
+          "voyage": 0
+        },
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 5,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
       "strategy": "cloud-gemini-embed-rerank-proxy",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:b7fad3425ea8f4cf01a20883259c8a3dbf8ae603ec51cc2f9d018761e54c776a",
-      "resultHash": "sha256:25e5027cbfa242b00f8dec0d10aff039d02f4bf19062304bc876817fd03ae28e",
+      "responsesHash": "sha256:9e3c21732804636cd6db4525382006e88214dcd768c9f3c19260a9532a0ac203",
+      "resultHash": "sha256:9c88ed6dade191f5a57d2e54c2825bc202458c22c9992a9966b4371655dad629",
       "rankingStrategy": "cloud-gemini-embed-rerank-proxy",
       "provider": {
         "strategy": "cloud-gemini-embed-rerank-proxy",
@@ -438,8 +598,8 @@
     {
       "strategy": "cloud-gemini-voyage-rerank",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:992b23e93c50c89f83631f6297decb4e9da55bfd8e9c8b2a48bfa7fc06e1e120",
-      "resultHash": "sha256:2e09649becdc07d9b69bd40b4e7ee3f0b09d433784fa4af8a5e6e2369b29e2c8",
+      "responsesHash": "sha256:4e85bdd950d657932ec711c6450ec1ce0454fa03a76b33216a2ec85bb3ec14c1",
+      "resultHash": "sha256:05e0579d38e1ecdfda62acf19c80d81e5fe62c70ed6b5a8c5a7275560e8f5598",
       "rankingStrategy": "cloud-gemini-voyage-rerank",
       "provider": {
         "strategy": "cloud-gemini-voyage-rerank",
@@ -474,7 +634,7 @@
         "recallAt10": 1,
         "ndcgAt10": 1,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 6,
+        "latencyP95Ms": 5,
         "contextTokensAvg": 119
       },
       "contextBudget": {
@@ -520,8 +680,8 @@
     {
       "strategy": "cloud-nvidia-retriever-500m",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:cba44cb457bfefeb750c2a1cc418df3704d8a748d8d429ea7d3666adf031f2c9",
-      "resultHash": "sha256:47589bf6ed5b7f8061c0825016e0b1296d3b042b16d662c654d0c66f4b23d530",
+      "responsesHash": "sha256:9de41b21832051b6d8779a01af502fe97d3168aac9a91ad93c4c91d1cf04fe9c",
+      "resultHash": "sha256:fbb85c459f1d4f42ef056f627a6562ae63cf12c7b8664e4d4682b740309053b7",
       "rankingStrategy": "cloud-nvidia-retriever-500m",
       "provider": {
         "strategy": "cloud-nvidia-retriever-500m",
@@ -600,8 +760,8 @@
     {
       "strategy": "cloud-nvidia-nemotron-1b",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:2064f25f05875927533e7178bb8e49df6e29fef62e919574a717087fb002e186",
-      "resultHash": "sha256:2436942f972aacfe4ad85bf2f82facaf385c088980d50e97f8a26f2c49318948",
+      "responsesHash": "sha256:7b2b86dc4e319cbf5b3a940894c085146d7e6a4ed16ad1e9a81c291075ffb511",
+      "resultHash": "sha256:ba81637b8e21c2c83deb0a9f438de3ccdf358c84514ae1f0708ec79ea8000b24",
       "rankingStrategy": "cloud-nvidia-nemotron-1b",
       "provider": {
         "strategy": "cloud-nvidia-nemotron-1b",
@@ -634,7 +794,7 @@
         "recallAt10": 1,
         "ndcgAt10": 1,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 5,
+        "latencyP95Ms": 6,
         "contextTokensAvg": 119
       },
       "contextBudget": {
@@ -680,8 +840,8 @@
     {
       "strategy": "cloud-nvidia-e5-mistral",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:2e3b7a70b9c41604e5ed7172bb4b674b2658f08eece5b48d03be3b20d05a94cc",
-      "resultHash": "sha256:b6689cb4eb3c9eebf248902e597a6502dfb982a95919591d9ba7e338aedbdbbd",
+      "responsesHash": "sha256:a2b07c88657c6cdbd6b51e8c6bb4662a8dbe2ef932c8d89e5576d3df9de5fc17",
+      "resultHash": "sha256:407f69f71bb294ea7cfc9ae37eb7b06b7776f246898e30e583e4bead47440b78",
       "rankingStrategy": "cloud-nvidia-e5-mistral",
       "provider": {
         "strategy": "cloud-nvidia-e5-mistral",
@@ -714,7 +874,7 @@
         "recallAt10": 1,
         "ndcgAt10": 1,
         "latencyP50Ms": 1,
-        "latencyP95Ms": 5,
+        "latencyP95Ms": 6,
         "contextTokensAvg": 119
       },
       "contextBudget": {
@@ -760,8 +920,8 @@
     {
       "strategy": "local-apple-qwen3-0_6b",
       "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-      "responsesHash": "sha256:3da218197579806fe31df593b9640e9c2e266a5613904125b3d895966b6228d9",
-      "resultHash": "sha256:581652a8ca8c25b593ea50699a5c5a22206656e223b99747fb65ea980637fafc",
+      "responsesHash": "sha256:126a1f7c646b4b22f4f382fbd3378a6f7ea7cfbeb6489aeab04f45afd8d30d82",
+      "resultHash": "sha256:1c1e408aab977a980f6569cff71bb0b2e51ee1f616d61b7fe6c230eed6184347",
       "rankingStrategy": "local-apple-qwen3-0_6b",
       "provider": {
         "strategy": "local-apple-qwen3-0_6b",

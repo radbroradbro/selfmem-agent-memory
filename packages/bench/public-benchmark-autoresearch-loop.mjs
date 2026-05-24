@@ -45,6 +45,8 @@ const retrievalStrategies = [
   "query-expanded-full-hybrid-rerank",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
+  "cloud-voyage4-voyage-lite-rerank",
+  "cloud-voyage4-lite-voyage-lite",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
   "cloud-nvidia-retriever-500m",

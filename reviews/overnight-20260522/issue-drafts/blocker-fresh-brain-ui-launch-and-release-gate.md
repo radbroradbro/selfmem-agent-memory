@@ -208,6 +208,12 @@ requirements are resolved.
   retrieval-proxy quality on both slices, with zero privacy failures, but p50
   latency was much higher. This is provider-backed canary evidence, not
   MemoryBench answer-quality evidence or public SOTA proof.
+- Current live Voyage latency evidence adds `cloud-voyage4-voyage-lite-rerank`
+  and `cloud-voyage4-lite-voyage-lite` to the same 30-query public
+  LongMemEval-S target. `cloud-voyage4-lite-voyage-lite` reached quality
+  0.3040 versus BM25 0.2506, P@1 0.5667 versus 0.4667, NDCG@10 0.2658 versus
+  0.2193, and p50 latency 1988 ms. It is the next cloud canary default, not a
+  public MemoryBench/SOTA claim.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
   `benchmark:public-target`, a metrics-only source-lock, slice-manifest,

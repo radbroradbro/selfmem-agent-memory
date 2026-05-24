@@ -128,6 +128,11 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia.json`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia-evidence.md`,
+  `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-preflight.json`,
+  `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-preflight.md`,
+  `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider.json`,
+  `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider.md`,
+  `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
   `${reviewDir}/returned-downloads-current-scan.json`,
@@ -1422,6 +1427,16 @@ check("fresh public benchmark target check passes", () => {
     join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-nvidia-evidence.md"),
     "utf8",
   );
+  const expandedVoyageLatencyPreflightReport = JSON.parse(
+    readFileSync(join(root, reviewDir, "public-longmemeval-expanded-voyage-latency-live-provider-preflight.json"), "utf8"),
+  );
+  const expandedVoyageLatencyReport = JSON.parse(
+    readFileSync(join(root, reviewDir, "public-longmemeval-expanded-voyage-latency-live-provider.json"), "utf8"),
+  );
+  const expandedVoyageLatencyEvidence = readFileSync(
+    join(root, reviewDir, "public-longmemeval-expanded-voyage-latency-live-provider-evidence.md"),
+    "utf8",
+  );
   const providerOperatorPacket = JSON.parse(run("node", ["packages/bench/provider-benchmark-operator-packet.mjs", "--provider", "voyage"]).stdout);
   const providerOperatorPacketMarkdown = run("node", [
     "packages/bench/provider-benchmark-operator-packet.mjs",
@@ -1786,6 +1801,8 @@ check("fresh public benchmark target check passes", () => {
     "full-hybrid-rerank",
     "cloud-voyage-rerank-only",
     "cloud-voyage4-voyage",
+    "cloud-voyage4-voyage-lite-rerank",
+    "cloud-voyage4-lite-voyage-lite",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
     "cloud-nvidia-retriever-500m",
@@ -1796,6 +1813,8 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(providerGateNames.has(strategyName), `missing provider gate strategy ${strategyName}`);
   }
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage-lite-rerank" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage4-lite-voyage-lite" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
@@ -1803,6 +1822,7 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b" && item.provider?.fixtureProviderMock === true));
   assert.match(providerGateFixtureEvidence, /Gate: provider/);
   assert.match(providerGateFixtureEvidence, /cloud-voyage4-voyage/);
+  assert.match(providerGateFixtureEvidence, /cloud-voyage4-lite-voyage-lite/);
   assert.match(providerGateFixtureEvidence, /cloud-gemini-voyage-rerank/);
   assert.match(providerGateFixtureEvidence, /cloud-nvidia-nemotron-1b/);
   assert.match(providerGateFixtureEvidence, /local-apple-qwen3-0_6b/);
@@ -1922,6 +1942,42 @@ check("fresh public benchmark target check passes", () => {
   assert.match(expandedProviderLivePreflightVoyageEvidence, /cloud-voyage4-voyage/);
   assert.match(expandedProviderLivePreflightVoyageEvidence, /VOYAGE_API_KEY=<env-only-voyage-key>/);
   assert.match(expandedProviderLivePreflightVoyageEvidence, /VOYAGE_API_KEYS_FILE=<optional-private-voyage-key-file>/);
+  assert.equal(expandedVoyageLatencyPreflightReport.ok, true);
+  assert.equal(expandedVoyageLatencyPreflightReport.mode, "provider-benchmark-live-preflight");
+  assert.equal(expandedVoyageLatencyPreflightReport.liveRunAllowed, true);
+  assert.deepEqual(expandedVoyageLatencyPreflightReport.requiredProviders, ["voyage"]);
+  assert.deepEqual(expandedVoyageLatencyPreflightReport.strategies, [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "cloud-voyage4-voyage",
+    "cloud-voyage4-voyage-lite-rerank",
+    "cloud-voyage4-lite-voyage-lite",
+  ]);
+  assert.equal(expandedVoyageLatencyReport.ok, true);
+  assert.equal(expandedVoyageLatencyReport.fixtureOnly, false);
+  assert.equal(expandedVoyageLatencyReport.retrievalProxyOnly, true);
+  assert.equal(expandedVoyageLatencyReport.memoryBenchAnswerQuality, false);
+  assert.equal(expandedVoyageLatencyReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(expandedVoyageLatencyReport.input?.queryCount, 30);
+  assert.equal(expandedVoyageLatencyReport.input?.expectedResultRefCount, 92);
+  assert.equal(expandedVoyageLatencyReport.winner?.strategy, "cloud-voyage4-lite-voyage-lite");
+  assert.equal(expandedVoyageLatencyReport.winner?.quality, 0.304);
+  assert.equal(expandedVoyageLatencyReport.control?.strategy, "bm25-lite");
+  assert.equal(expandedVoyageLatencyReport.control?.quality, 0.2506);
+  assert.equal(expandedVoyageLatencyReport.hybridPromotion?.promoteHybrid, true);
+  assert.equal(expandedVoyageLatencyReport.privacyLeakCount ?? 0, 0);
+  assert.ok(
+    expandedVoyageLatencyReport.strategies?.some(
+      (item) =>
+        item.strategy === "cloud-voyage4-lite-voyage-lite" &&
+        item.provider?.embedModel === "voyage-4-lite" &&
+        item.provider?.rerankModel === "rerank-2.5-lite" &&
+        item.privacyLeakCount === 0 &&
+        item.redactionFailureCount === 0,
+    ),
+  );
+  assert.match(expandedVoyageLatencyEvidence, /cloud-voyage4-lite-voyage-lite/);
+  assert.match(expandedVoyageLatencyEvidence, /Public LongMemEval-S Voyage Latency Provider Evidence/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
     const keyFile = join(tempRoot, "voyage.keys");
