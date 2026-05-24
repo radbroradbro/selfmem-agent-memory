@@ -5841,7 +5841,10 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
   return allowedCodePaths.has(file) && (
     file === ".gitignore" ||
     file === ".env.example" ||
+    file === "configs/default.local.yaml" ||
+    file === "configs/provider-matrix.yaml" ||
     file === "package.json" ||
+    file === "packages/brain-ui/fixtures/model-matrix.json" ||
     file.startsWith("packages/bench/") ||
     file.startsWith("tests/bench/") ||
     file === "plugins/selfmem-fallback/scripts/selfmem_update.py"

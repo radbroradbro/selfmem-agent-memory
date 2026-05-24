@@ -178,6 +178,18 @@ Gemini embeddings plus Voyage rerank, NVIDIA Nemotron retrieval/rerank, the
 Apple Silicon local arm, and query-expansion variants against the same
 30-query target.
 
+The Apple Silicon local arm now has an explicit metrics-only preflight:
+
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-live-preflight.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-live-preflight-evidence.md`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-operator-packet.md`
+
+That preflight is blocked because no local embedding endpoint is configured via
+`SELFMEM_LOCAL_EMBED_BASE_URL`. This means the local arm is scaffolded and
+fixture-covered, but not live-tested. The current implemented local arm is
+Qwen3 local embeddings plus RecallWeave's deterministic rerank proxy; a live
+Qwen3 reranker sidecar remains a future challenger.
+
 Provider keys can stay in normal environment variables, or in private key files
 referenced by env vars such as `VOYAGE_API_KEYS_FILE`,
 `NVIDIA_API_KEYS_FILE`, and `GEMINI_API_KEYS_FILE`. Key files must live outside
