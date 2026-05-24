@@ -13,9 +13,9 @@ triage and Linux CI sanitization; it does not promote a new runtime adapter.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `8b6f9bd8aa4a5e8764fce63021edc059af903c5c`
-- Commit title: `docs: promote returned canary triage head`
-- GitHub Actions run: `26355118094`
+- Commit: `c2b72f2789b7fa817aa62e1f398b8bd9b46e049d`
+- Commit title: `test: enforce benchmark comparison gates`
+- GitHub Actions run: `26355558402`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -38,7 +38,7 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
 - `npm exec --yes pnpm@10.23.0 -- release:doctor`
-- GitHub Actions run `26355118094`
+- GitHub Actions run `26355558402`
 
 ## Canary Handoff Artifact
 
@@ -77,6 +77,10 @@ The benchmark lane remains conservative:
   test one provider family without requiring every provider's credentials.
   Live provider runs remain opt-in and blocked by preflight until consent flags
   and env-only provider readiness are present.
+- The benchmark runner now enforces the comparison contract directly: provider
+  gates require `bm25-lite`, `full-hybrid-rerank`, and at least one
+  provider-backed arm, while hybrid gates require `bm25-lite` and at least one
+  hybrid-family candidate.
 - Hosted Supermemory comparisons remain product-parity sanity checks, not the
   main public scoreboard.
 

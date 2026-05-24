@@ -121,15 +121,19 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after adding benchmark gate contract
   enforcement so provider gates reject solo provider-arm runs and hybrid gates
   reject runs without the `bm25-lite` control.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26355558402` passed on `c2b72f2`, promoting the benchmark gate contract
+  commit as the latest verified PR branch head while preserving `3d61677` as
+  the approved runtime canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T07:44:33Z
+- PR body refreshed at: 2026-05-24T07:52:20Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T07:44:34Z
-- PR body hash: 6221a2744e380883e5fe1866684c0331c322a8f977b7566745247ae179eb668a
+- Issue updated at: 2026-05-24T07:52:21Z
+- PR body hash: 3a1cb4f3b502993851feb046c416f3d0399ba645f4b4ea4b20377e20b389da3b
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 6bb75ecf449b7cef8f711b3141e2c27960bace68ce21e5cb62bbda1f22e7c974
-- PR body length: 49835
-- Issue body length: 30124
+- Issue body hash: b25d785e0a0afca2daa30afab67835de2788ac8d7a650211704e1fc90b5372b8
+- PR body length: 49889
+- Issue body length: 30178
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

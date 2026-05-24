@@ -146,6 +146,11 @@ Verdict: resolved for PR body and blocker issue writes.
     contract enforcement so provider gates reject solo provider-arm runs and
     hybrid gates reject runs without the `bm25-lite` control. Updated at:
     2026-05-24T07:44:34Z.
+  - PR #5 and issue #6 were refreshed again after GitHub Actions run
+    `26355558402` passed on `c2b72f2`, promoting the benchmark gate contract
+    commit as the latest verified PR branch head while preserving `3d61677` as
+    the approved runtime canary adapter/report commit. Updated at:
+    2026-05-24T07:52:21Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

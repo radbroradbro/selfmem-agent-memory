@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T07:30:30Z",
+  "generatedAt": "2026-05-24T07:51:40Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -388,14 +388,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "8b6f9bd8aa4a5e8764fce63021edc059af903c5c",
-    "ciRunId": 26355118094,
+    "headSha": "c2b72f2789b7fa817aa62e1f398b8bd9b46e049d",
+    "ciRunId": 26355558402,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_returned_canary_zip_triage_public_benchmark_guards_github_sync_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest verified PR branch head after promoting returned canary triage evidence on top of the unreadable-zip sanitization fix. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest verified PR branch head after enforcing benchmark comparison gates so provider runs cannot be solo provider-arm tests and hybrid runs cannot omit the bm25-lite control. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "3d61677bc3d316e040ac5a634467d0204c272493",

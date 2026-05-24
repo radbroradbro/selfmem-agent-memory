@@ -10,9 +10,10 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `8b6f9bd8aa4a5e8764fce63021edc059af903c5c`.
-- GitHub Actions run `26355118094` passed CI after promoting returned canary
-  triage evidence on top of the unreadable-zip sanitization fix.
+- `c2b72f2789b7fa817aa62e1f398b8bd9b46e049d`.
+- GitHub Actions run `26355558402` passed CI after enforcing benchmark
+  comparison gates so provider runs cannot be solo provider-arm tests and
+  hybrid runs cannot omit the `bm25-lite` control.
   This did not change the approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
 - `3d61677bc3d316e040ac5a634467d0204c272493`.
