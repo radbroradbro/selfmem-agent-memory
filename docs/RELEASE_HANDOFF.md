@@ -143,6 +143,11 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
   --output reviews/overnight-20260522/public-longmemeval-materialize-run.json \
   --markdown-output reviews/overnight-20260522/public-longmemeval-materialize-run-evidence.md
 
+npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --output reviews/overnight-20260522/public-longmemeval-strategy-compare.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-strategy-compare-evidence.md
+
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
   --benchmark longmemeval \
   --source-url https://github.com/supermemoryai/memorybench \
@@ -177,6 +182,13 @@ checked-in retrieval-proxy result is
 `reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
 It is useful as a blind autoresearch baseline, but it is not a MemoryBench
 answer-quality result and not a public comparison claim.
+
+The current same-data retrieval strategy comparison is
+`reviews/overnight-20260522/public-longmemeval-strategy-compare.json`.
+`bm25-lite` beat the initial `jaccard` baseline on this six-row retrieval-proxy
+slice, moving quality from 0.1089 to 0.4541 and P@1 from 0.1667 to 0.8333 with
+zero privacy failures. Treat it as the next autoresearch method choice, not a
+public benchmark claim.
 
 Run this before any hosted Supermemory comparison claim:
 

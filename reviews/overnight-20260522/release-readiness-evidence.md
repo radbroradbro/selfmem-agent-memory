@@ -190,6 +190,10 @@ Scope:
   gate. The gate treats it as a blind autoresearch baseline, requires zero
   privacy failures, requires explicit retrieval-proxy/no-public-claims flags,
   and explicitly blocks MemoryBench quality-win language.
+- Added public LongMemEval retrieval strategy comparison to the release gate.
+  The same materialized slice now compares `jaccard`, `bm25-lite`, and
+  `hybrid-v1`; `bm25-lite` wins the retrieval-proxy canary and the gate keeps
+  the result bound to retrieval-proxy, no-public-claims wording.
 - Kept the gate public-safe and evidence-based.
 
 What `release:check` verifies:

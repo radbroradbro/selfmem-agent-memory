@@ -25,6 +25,7 @@ const containerDir = resolveInputPath(args.containerDir ?? process.env.RECALLWEA
 const outputPath = args.output ?? process.env.RECALLWEAVE_BASELINE_RESPONSES_JSON ?? null;
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 const preserveIds = fixtureRequested || args.preserveIds === true || process.env.RECALLWEAVE_BASELINE_PRESERVE_IDS === "1";
+const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
 const contextTokenBudget = optionalPositiveInt(
   args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? null,
   "context token budget",
@@ -70,7 +71,7 @@ const responses = {};
 const contextBudgetStats = [];
 for (const query of queries) {
   const startedAt = performance.now();
-  const ranked = rankCandidates(query.q, loaded.candidates).slice(0, limit);
+  const ranked = rankCandidates(query.q, loaded.candidates, { strategy: rankingStrategy }).slice(0, limit);
   const budgeted = applyContextBudget(ranked, { contextTokenBudget });
   contextBudgetStats.push({ queryIdHash: shortHash(query.id), ...budgeted.stats });
   responses[query.id] = {
@@ -110,6 +111,7 @@ const result = {
     memoriesFileHash: `sha256:${fileHash(effectiveMemoriesPath)}`,
     memoriesFileName: basename(effectiveMemoriesPath),
     preserveIds,
+    rankingStrategy,
   },
   privacyLeakCount: 0,
   redactionFailureCount: 0,
@@ -208,7 +210,13 @@ function extractMemoryText(item) {
   return "";
 }
 
-function rankCandidates(query, candidates) {
+function rankCandidates(query, candidates, options = {}) {
+  if (options.strategy === "bm25-lite") return rankBm25Lite(query, candidates);
+  if (options.strategy === "hybrid-v1") return rankHybridV1(query, candidates);
+  return rankJaccard(query, candidates);
+}
+
+function rankJaccard(query, candidates) {
   const queryTokens = new Set(tokenize(query));
   return candidates
     .map((candidate) => {
@@ -223,6 +231,79 @@ function rankCandidates(query, candidates) {
       return { ...candidate, score: round(Math.min(1, candidate.baseScore + lexical + exactBoost)) };
     })
     .sort((left, right) => right.score - left.score || left.outputId.localeCompare(right.outputId));
+}
+
+function rankHybridV1(query, candidates) {
+  const bm25 = new Map(rankBm25Lite(query, candidates).map((candidate, index) => [candidate.outputId, { score: candidate.score, rank: index + 1 }]));
+  const jaccard = new Map(rankJaccard(query, candidates).map((candidate, index) => [candidate.outputId, { score: candidate.score, rank: index + 1 }]));
+  const queryBigrams = new Set(ngrams(tokenize(query), 2));
+  return candidates
+    .map((candidate) => {
+      const candidateTokens = tokenize(candidate.text);
+      const candidateBigramSet = new Set(ngrams(candidateTokens, 2));
+      let bigramHits = 0;
+      for (const bigram of queryBigrams) {
+        if (candidateBigramSet.has(bigram)) bigramHits += 1;
+      }
+      const bigramScore = queryBigrams.size ? bigramHits / queryBigrams.size : 0;
+      const bm25Score = bm25.get(candidate.outputId)?.score ?? 0;
+      const jaccardScore = jaccard.get(candidate.outputId)?.score ?? 0;
+      const rankBoost = reciprocalRankBoost(bm25.get(candidate.outputId)?.rank) + reciprocalRankBoost(jaccard.get(candidate.outputId)?.rank);
+      const score = bm25Score * 0.72 + jaccardScore * 0.18 + bigramScore * 0.08 + rankBoost * 0.02;
+      return { ...candidate, score: round(score) };
+    })
+    .sort((left, right) => right.score - left.score || left.outputId.localeCompare(right.outputId));
+}
+
+function rankBm25Lite(query, candidates) {
+  const queryTokens = tokenize(query);
+  const uniqueQueryTokens = [...new Set(queryTokens)];
+  const docs = candidates.map((candidate) => {
+    const tokens = tokenize(candidate.text);
+    return {
+      candidate,
+      tokens,
+      frequencies: tokenFrequencies(tokens),
+      length: Math.max(1, tokens.length),
+    };
+  });
+  const averageLength = Math.max(1, average(docs.map((doc) => doc.length)));
+  const documentCount = Math.max(1, docs.length);
+  const documentFrequency = new Map();
+  for (const token of uniqueQueryTokens) {
+    documentFrequency.set(token, docs.filter((doc) => doc.frequencies.has(token)).length);
+  }
+  const k1 = 1.2;
+  const b = 0.75;
+  return docs
+    .map((doc) => {
+      let score = 0;
+      for (const token of uniqueQueryTokens) {
+        const tf = doc.frequencies.get(token) ?? 0;
+        if (!tf) continue;
+        const df = documentFrequency.get(token) ?? 0;
+        const idf = Math.log(1 + (documentCount - df + 0.5) / (df + 0.5));
+        score += idf * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + b * (doc.length / averageLength))));
+      }
+      const exactBoost = doc.candidate.text.toLowerCase().includes(query.toLowerCase()) ? 0.1 : 0;
+      return { ...doc.candidate, score: round(score + exactBoost + doc.candidate.baseScore) };
+    })
+    .sort((left, right) => right.score - left.score || left.outputId.localeCompare(right.outputId));
+}
+
+function ngrams(tokens, size) {
+  if (tokens.length < size) return [];
+  return Array.from({ length: tokens.length - size + 1 }, (_, index) => tokens.slice(index, index + size).join(" "));
+}
+
+function tokenFrequencies(tokens) {
+  const counts = new Map();
+  for (const token of tokens) counts.set(token, (counts.get(token) ?? 0) + 1);
+  return counts;
+}
+
+function reciprocalRankBoost(rank) {
+  return Number.isFinite(rank) && rank > 0 ? 1 / (60 + rank) : 0;
 }
 
 function applyContextBudget(candidates, options) {
@@ -374,6 +455,12 @@ function positiveInt(value, label) {
 function optionalPositiveInt(value, label) {
   if (value == null || value === "" || value === false) return null;
   return positiveInt(value, label);
+}
+
+function normalizeStrategy(value) {
+  const strategy = String(value ?? "").trim().toLowerCase() || "jaccard";
+  assert.ok(["jaccard", "bm25-lite", "hybrid-v1"].includes(strategy), `unknown retrieval strategy: ${strategy}`);
+  return strategy;
 }
 
 function parseArgs(argv) {

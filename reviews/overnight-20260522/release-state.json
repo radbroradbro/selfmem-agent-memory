@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T00:27:14Z",
+  "generatedAt": "2026-05-24T00:42:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -29,7 +29,7 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark source-lock validation, public LongMemEval slice materialization, public LongMemEval run-only target generation, public benchmark target validation, and public benchmark target authoring; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark source-lock validation, public LongMemEval slice materialization, public LongMemEval run-only target generation, public benchmark target validation, public benchmark target authoring, and public LongMemEval retrieval strategy comparison; env-only OpenAI-compatible reviewer wiring is locally gate-covered",
     "allowedPostBaselineCodePaths": [
       ".gitignore",
       "package.json",
@@ -65,6 +65,7 @@
       "packages/bench/public-benchmark-target-author.mjs",
       "packages/bench/public-benchmark-target-check.mjs",
       "packages/bench/public-benchmark-materialize-run.mjs",
+      "packages/bench/public-benchmark-strategy-compare.mjs",
       "packages/bench/fixtures/public-benchmark-target.fixture.json",
       "packages/bench/recallweave-baseline-collector.mjs",
       "packages/bench/recallweave-response-export.mjs",
@@ -163,7 +164,8 @@
     "public-benchmark-target-author",
     "public-benchmark-target-check",
     "public-longmemeval-materialize-run",
-    "public-longmemeval-recallweave-run-result"
+    "public-longmemeval-recallweave-run-result",
+    "public-longmemeval-strategy-compare"
   ],
   "reviewerEvidence": {
     "freshCanaryWindow": {
@@ -342,6 +344,14 @@
       "route": "node packages/bench/hosted-baseline-run.mjs --live --context-token-budget 1600",
       "evidence": "reviews/overnight-20260522/reviewer-work/budgeted-baseline-reviewed-next-run.json",
       "completedAt": "2026-05-23T20:20:00Z",
+      "countsAsPublicLaunchApproval": false
+    },
+    "publicLongMemEvalStrategyCompare": {
+      "status": "codex_pass_with_concerns",
+      "verdict": "PASS_WITH_CONCERNS_RETRIEVAL_PROXY_ONLY",
+      "route": "node packages/bench/public-benchmark-strategy-compare.mjs --live",
+      "evidence": "reviews/overnight-20260522/codex-public-longmemeval-strategy-compare-review.md",
+      "completedAt": "2026-05-24T00:42:00Z",
       "countsAsPublicLaunchApproval": false
     }
   },

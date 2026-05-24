@@ -43,6 +43,10 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json \
   --output reviews/overnight-20260522/public-longmemeval-materialize-run.json \
   --markdown-output reviews/overnight-20260522/public-longmemeval-materialize-run-evidence.md
+npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --output reviews/overnight-20260522/public-longmemeval-strategy-compare.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-strategy-compare-evidence.md
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
 
@@ -173,6 +177,14 @@ harness we will use.
   claim. The result JSON carries explicit `retrievalProxyOnly: true`,
   `memoryBenchAnswerQuality: false`, and `publicBenchmarkClaimsAllowed: false`
   flags so it cannot be separated from that caveat.
+- Current LongMemEval-S retrieval strategy comparison:
+  `reviews/overnight-20260522/public-longmemeval-strategy-compare.json`. It
+  runs `jaccard`, `bm25-lite`, and `hybrid-v1` on the same materialized query
+  set. `bm25-lite` won the retrieval-proxy canary with quality 0.4541, P@1
+  0.8333, recall@5 0.2917, recall@10 0.2917, NDCG@10 0.3996, p50 latency
+  90 ms, p95 latency 102 ms, and zero privacy or redaction failures.
+  `hybrid-v1` tied quality but was slower. This is a methodology signal for
+  autoresearch, not MemoryBench answer-quality proof.
 - LongMemEval is a strong target because it uses 500 human-curated questions and
   tests information extraction, multi-session reasoning, knowledge update,
   temporal reasoning, and abstention.

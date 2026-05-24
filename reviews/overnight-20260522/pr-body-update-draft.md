@@ -73,6 +73,11 @@ Live status:
   the stricter comparison gate.
 
 - Adds the public LongMemEval-S materialize-run lane and first blind retrieval-proxy baseline. The materializer writes raw benchmark query and haystack inputs only to an operator-private directory, commits only hashes/counts/command templates, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result to that hash. The initial retrieval-proxy baseline scored 0.1089 quality on the 6-row source-locked slice with zero privacy failures; it is explicitly not MemoryBench answer-quality evidence and not public superiority language.
+- Adds a same-data LongMemEval-S retrieval strategy comparison. `bm25-lite`
+  wins the retrieval-proxy canary over the initial `jaccard` baseline, moving
+  quality from 0.1089 to 0.4541 and P@1 from 0.1667 to 0.8333 with zero
+  privacy failures. This is an autoresearch methodology signal, not a
+  MemoryBench answer-quality win.
 - Promotes GitHub Actions run `26347410269` on `e88064a` as the latest
   verified code/product baseline after the LongMemEval-S materialize-run lane,
   retrieval-proxy blind baseline, release-gate hash binding, and sync evidence

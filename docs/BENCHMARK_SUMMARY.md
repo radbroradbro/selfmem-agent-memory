@@ -32,6 +32,8 @@ materialization path:
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
+npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```
 
 That command uses the same public LongMemEval-S dataset hash as the checked-in
@@ -41,6 +43,14 @@ retrieval-proxy RecallWeave run on that slice scored 0.1089 quality, P@1
 0.1667, recall@5 0.0833, recall@10 0.0833, NDCG@10 0.1022, p50 latency 62 ms,
 p95 latency 71 ms, average context tokens 1600, zero cost, and zero redaction
 failures. This is a blind autoresearch baseline, not a MemoryBench quality win.
+
+The same source-locked slice now has a public-safe retrieval strategy
+comparison. `bm25-lite` won the retrieval-proxy canary with quality 0.4541,
+P@1 0.8333, recall@5 0.2917, recall@10 0.2917, NDCG@10 0.3996, p50 latency
+90 ms, p95 latency 102 ms, average context tokens 1600, zero cost, and zero
+redaction failures. `hybrid-v1` tied quality but was slower. This supports the
+next autoresearch step, but it is still not MemoryBench answer-quality evidence
+or a public benchmark superiority claim.
 
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched

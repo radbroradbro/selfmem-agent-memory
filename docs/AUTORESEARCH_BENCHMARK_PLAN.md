@@ -94,6 +94,10 @@ too expensive for the next run.
    Treat that as the blind baseline for autoresearch, not as a win. The result
    must carry `retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`,
    and `publicBenchmarkClaimsAllowed: false`.
+   The first same-data strategy comparison on that slice found that
+   `bm25-lite` improved the retrieval-proxy quality to 0.4541 and P@1 to
+   0.8333, while keeping privacy failures at zero. Keep this as a methodology
+   signal for the next run. Do not call it MemoryBench answer quality.
 4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
    latency, context tokens, and cost against the reported target.
 5. If the canary beats the reported target under matching metric definitions,
