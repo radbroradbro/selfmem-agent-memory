@@ -18,13 +18,13 @@ Purpose:
 
 Use the current handoff packet:
 - recallweave-openclaw-next-agent-canary-20260524-3d61677.zip
-- SHA-256: 12172f1a526f2a877d5098b234a6eff0b8aa5976730bdd4f67de8e87b647be39
-- Packet generated from controller commit: 67c09445a1c5e2205d8c2ea82709b1e0459236f3
+- SHA-256: 994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174
+- Packet generated from controller commit: 72a21eee898ee1681892254608593bbda5fc02aa
 - Approved adapter commit: 3d61677bc3d316e040ac5a634467d0204c272493
 - Expected report commit: 3d61677bc3d316e040ac5a634467d0204c272493
 
 Commit note:
-- The packet was generated from controller commit 67c09445a1c5e2205d8c2ea82709b1e0459236f3.
+- The packet was generated from controller commit 72a21eee898ee1681892254608593bbda5fc02aa.
 - The approved adapter/report commit for this canary is 3d61677bc3d316e040ac5a634467d0204c272493.
 - If a newer adapter commit should count, regenerate the packet first.
 

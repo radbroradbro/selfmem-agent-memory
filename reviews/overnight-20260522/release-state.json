@@ -407,7 +407,7 @@
     "role": "approved-runtime-canary-adapter",
     "expectedReportCommit": "3d61677bc3d316e040ac5a634467d0204c272493",
     "packetLabel": "recallweave-openclaw-next-agent-canary-20260524-3d61677.zip",
-    "packetSha256": "12172f1a526f2a877d5098b234a6eff0b8aa5976730bdd4f67de8e87b647be39",
+    "packetSha256": "994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174",
     "note": "Returned one-agent runtime canary reports must name this approved adapter/report commit. Later docs, evidence, benchmark-gate, or packet-tooling commits do not change the canary expected commit unless the handoff packet is regenerated with that newer adapter commit."
   }
 }

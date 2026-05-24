@@ -5,8 +5,8 @@ Use this with exactly one OpenClaw agent. Attach the zip named below in the same
 Packet:
 
 - `recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`
-- SHA256: `12172f1a526f2a877d5098b234a6eff0b8aa5976730bdd4f67de8e87b647be39`
-- Packet generated from controller commit: `67c09445a1c5e2205d8c2ea82709b1e0459236f3`
+- SHA256: `994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174`
+- Packet generated from controller commit: `72a21eee898ee1681892254608593bbda5fc02aa`
 - Approved adapter commit: `3d61677bc3d316e040ac5a634467d0204c272493`
 - Expected report commit: `3d61677bc3d316e040ac5a634467d0204c272493`
 
@@ -16,7 +16,10 @@ Paste:
 Please use the attached RecallWeave OpenClaw canary handoff packet.
 
 Important: this packet is for one fresh canary window only. Do not roll it out to other agents yet.
-Commit note: this packet was generated from controller commit 67c09445a1c5e2205d8c2ea82709b1e0459236f3, but the approved adapter/report commit for this canary is 3d61677bc3d316e040ac5a634467d0204c272493. If a newer adapter commit should count, regenerate the packet first.
+For this one selected OpenClaw agent, RecallWeave/selfmem should become the native/default memory slot during the canary window. Do not leave it installed as shadow-only or manual-only.
+The `selfmem_canary` label is a compatibility/plugin id, not a request to keep it non-default.
+Hosted Supermemory remains read-through/history only. New memory writes during this canary should land locally in RecallWeave/selfmem.
+Commit note: this packet was generated from controller commit 72a21eee898ee1681892254608593bbda5fc02aa, but the approved adapter/report commit for this canary is 3d61677bc3d316e040ac5a634467d0204c272493. If a newer adapter commit should count, regenerate the packet first.
 The returned canary evidence must report commit 3d61677bc3d316e040ac5a634467d0204c272493 or it will count as diagnostic only.
 
 Do this in order:
@@ -33,6 +36,8 @@ Do not return raw memories, raw transcripts, prompts, answers, keys, cookies, pr
 
 The run only counts if strict-real intake passes from a non-fixture post-update window. It must prove:
 
+- native/default memory slot status for RecallWeave/selfmem
+- hosted Supermemory write-back disabled and read-through/history mode only
 - adapter strict canary contract v1
 - search and store latency instrumentation
 - store latency sample count greater than zero

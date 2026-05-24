@@ -101,9 +101,9 @@ not have to replace an `<approved-commit>` placeholder before collection.
 
 - Packet label: `recallweave-openclaw-next-agent-canary-20260524-3d61677.zip`.
 - Packet SHA256:
-  `12172f1a526f2a877d5098b234a6eff0b8aa5976730bdd4f67de8e87b647be39`.
+  `994d941bf69e83b8149f2ec23e24eb9fdb1e68240450cb7bcf64ffd012f17174`.
 - Packet generated from controller commit:
-  `67c09445a1c5e2205d8c2ea82709b1e0459236f3`.
+  `72a21eee898ee1681892254608593bbda5fc02aa`.
 - Approved adapter commit:
   `3d61677bc3d316e040ac5a634467d0204c272493`.
 - Expected returned report commit:
