@@ -1,10 +1,16 @@
 # Paste-Ready OpenClaw Canary Handoff
 
-Use this with exactly one OpenClaw agent. Attach the zip named below in the same message. This is a fresh canary window, not a fleet rollout.
+Use this with exactly one OpenClaw agent. Attach the zip named below in the same message, plus the send instructions and checksum note. This is a fresh canary window, not a fleet rollout.
+
+Send files:
+
+- `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
+- `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
+- `recallweave-SEND-THIS-ONE-checksum.txt`
 
 Packet:
 
-- `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
+- Zip: `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
 - SHA256: `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`
 - Packet generated from controller commit: `18d606aff589986b4d8b416a686bedb7ff1506d2`
 - Approved adapter commit: `18d606aff589986b4d8b416a686bedb7ff1506d2`

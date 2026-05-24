@@ -88,9 +88,16 @@ Do not put raw memories, transcripts, prompts, answers, provider keys, cookies,
 private local paths, private container names, or unredacted diagnostics in that
 workspace.
 
-The current handoff packet remains the clearly named sendable packet:
+The current selected-agent send set is:
 
 - `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
+- `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
+- `recallweave-SEND-THIS-ONE-checksum.txt`
+
+The current handoff packet remains the clearly named sendable packet:
+
+- Zip:
+  `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
 - SHA-256:
   `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`
 - Packet generated from controller commit:

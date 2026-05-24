@@ -16,8 +16,13 @@ Purpose:
   compression coverage, rollback availability, and latency instrumentation.
 - Return only metrics-only evidence.
 
-Use the current handoff packet:
+Send these three current handoff files together:
 - recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip
+- recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md
+- recallweave-SEND-THIS-ONE-checksum.txt
+
+Use the current handoff packet:
+- Zip: recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip
 - SHA-256: f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda
 - Packet generated from controller commit: 18d606aff589986b4d8b416a686bedb7ff1506d2
 - Approved adapter commit: 18d606aff589986b4d8b416a686bedb7ff1506d2

@@ -633,6 +633,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Current one-agent handoff packet:
   `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`, SHA256
   `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`.
+  Send it with `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
+  and `recallweave-SEND-THIS-ONE-checksum.txt` so the selected agent can
+  verify the exact packet before running it.
   Packet generated from controller commit
   `18d606aff589986b4d8b416a686bedb7ff1506d2`; approved adapter commit
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
