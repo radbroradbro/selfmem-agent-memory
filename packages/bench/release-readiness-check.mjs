@@ -109,6 +109,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-hybrid-gate.json`,
   `${reviewDir}/public-longmemeval-hybrid-gate-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-hybrid-gate-review.md`,
+  `${reviewDir}/public-longmemeval-provider-gate-fixture.json`,
+  `${reviewDir}/public-longmemeval-provider-gate-fixture-evidence.md`,
   `${reviewDir}/returned-downloads-current-scan.json`,
   `${reviewDir}/returned-downloads-current-scan.md`,
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
@@ -1311,6 +1313,20 @@ check("fresh public benchmark target check passes", () => {
     "--format",
     "markdown",
   ]).stdout;
+  const providerFixture = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-strategy-compare.mjs", "--gate", "provider", "--context-token-budget", "800", "--limit", "5"]).stdout,
+  );
+  const providerMarkdown = run("node", [
+    "packages/bench/public-benchmark-strategy-compare.mjs",
+    "--gate",
+    "provider",
+    "--context-token-budget",
+    "800",
+    "--limit",
+    "5",
+    "--format",
+    "markdown",
+  ]).stdout;
   const autoresearchFixture = JSON.parse(
     run("node", ["packages/bench/public-benchmark-autoresearch-loop.mjs", "--context-token-budgets", "800,1600", "--limits", "5,10"]).stdout,
   );
@@ -1333,6 +1349,8 @@ check("fresh public benchmark target check passes", () => {
   const liveHybridReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-hybrid-gate.json"), "utf8"));
   const liveHybridEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-hybrid-gate-evidence.md"), "utf8");
   const liveHybridReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-hybrid-gate-review.md"), "utf8");
+  const providerGateFixtureReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-provider-gate-fixture.json"), "utf8"));
+  const providerGateFixtureEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-provider-gate-fixture-evidence.md"), "utf8");
   const liveAutoresearchReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
   const liveAutoresearchEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop-evidence.md"), "utf8");
   const liveAutoresearchReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-autoresearch-loop-review.md"), "utf8");
@@ -1421,6 +1439,22 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(hybridFixture.control?.strategy, "bm25-lite");
   assert.equal(hybridFixture.hybridPromotion?.promoteHybrid, false);
   assert.match(hybridMarkdown, /Gate: hybrid/);
+  assert.equal(providerFixture.ok, true);
+  assert.equal(providerFixture.mode, "public-benchmark-provider-gate");
+  assert.equal(providerFixture.gate, "provider");
+  assert.equal(providerFixture.fixtureOnly, true);
+  assert.equal(providerFixture.metricsOnly, true);
+  assert.equal(providerFixture.retrievalProxyOnly, true);
+  assert.equal(providerFixture.memoryBenchAnswerQuality, false);
+  assert.equal(providerFixture.publicBenchmarkClaimsAllowed, false);
+  assert.equal(providerFixture.publicSafe, true);
+  assert.equal(providerFixture.rawQuestionsIncluded, false);
+  assert.equal(providerFixture.rawAnswersIncluded, false);
+  assert.equal(providerFixture.rawMemoryIncluded, false);
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
+  assert.match(providerMarkdown, /Gate: provider/);
+  assert.match(providerMarkdown, /cloud-voyage4-voyage/);
   assert.equal(autoresearchFixture.ok, true);
   assert.equal(autoresearchFixture.mode, "public-benchmark-autoresearch-loop");
   assert.equal(autoresearchFixture.fixtureOnly, true);
@@ -1562,6 +1596,25 @@ check("fresh public benchmark target check passes", () => {
   assert.match(liveHybridReview, /PASS WITH CONCERNS/);
   assert.match(liveHybridReview, /bm25-lite/i);
   assert.match(liveHybridReview, /not MemoryBench answer-quality/i);
+  assert.equal(providerGateFixtureReport.ok, true);
+  assert.equal(providerGateFixtureReport.mode, "public-benchmark-provider-gate");
+  assert.equal(providerGateFixtureReport.gate, "provider");
+  assert.equal(providerGateFixtureReport.fixtureOnly, true);
+  assert.equal(providerGateFixtureReport.metricsOnly, true);
+  assert.equal(providerGateFixtureReport.retrievalProxyOnly, true);
+  assert.equal(providerGateFixtureReport.memoryBenchAnswerQuality, false);
+  assert.equal(providerGateFixtureReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(providerGateFixtureReport.rawQuestionsIncluded, false);
+  assert.equal(providerGateFixtureReport.rawAnswersIncluded, false);
+  assert.equal(providerGateFixtureReport.rawMemoryIncluded, false);
+  const providerGateNames = new Set((providerGateFixtureReport.strategies ?? []).map((item) => item.strategy));
+  for (const strategyName of ["bm25-lite", "full-hybrid-rerank", "cloud-voyage-rerank-only", "cloud-voyage4-voyage"]) {
+    assert.ok(providerGateNames.has(strategyName), `missing provider gate strategy ${strategyName}`);
+  }
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage4-voyage" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
+  assert.match(providerGateFixtureEvidence, /Gate: provider/);
+  assert.match(providerGateFixtureEvidence, /cloud-voyage4-voyage/);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");
@@ -1830,6 +1883,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(strategyMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(hybridFixture), secretPattern);
   assert.doesNotMatch(hybridMarkdown, secretPattern);
+  assert.doesNotMatch(JSON.stringify(providerFixture), secretPattern);
+  assert.doesNotMatch(providerMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(autoresearchFixture), secretPattern);
   assert.doesNotMatch(autoresearchMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveMaterializeReport), secretPattern);
@@ -1842,6 +1897,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveHybridReport), secretPattern);
   assert.doesNotMatch(liveHybridEvidence, secretPattern);
   assert.doesNotMatch(liveHybridReview, secretPattern);
+  assert.doesNotMatch(JSON.stringify(providerGateFixtureReport), secretPattern);
+  assert.doesNotMatch(providerGateFixtureEvidence, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), secretPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, secretPattern);
   assert.doesNotMatch(liveAutoresearchReview, secretPattern);
@@ -1859,6 +1916,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(strategyMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(hybridFixture), privatePathPattern);
   assert.doesNotMatch(hybridMarkdown, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(providerFixture), privatePathPattern);
+  assert.doesNotMatch(providerMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(autoresearchFixture), privatePathPattern);
   assert.doesNotMatch(autoresearchMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveMaterializeReport), privatePathPattern);
@@ -1871,6 +1930,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveHybridReport), privatePathPattern);
   assert.doesNotMatch(liveHybridEvidence, privatePathPattern);
   assert.doesNotMatch(liveHybridReview, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(providerGateFixtureReport), privatePathPattern);
+  assert.doesNotMatch(providerGateFixtureEvidence, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), privatePathPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, privatePathPattern);
   assert.doesNotMatch(liveAutoresearchReview, privatePathPattern);

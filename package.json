@@ -88,6 +88,7 @@
     "benchmark:public-materialize": "node packages/bench/public-benchmark-materialize-run.mjs",
     "benchmark:public-strategy": "node packages/bench/public-benchmark-strategy-compare.mjs",
     "benchmark:public-hybrid": "node packages/bench/public-benchmark-strategy-compare.mjs --gate hybrid --context-token-budget 800 --limit 5",
+    "benchmark:public-provider": "node packages/bench/public-benchmark-strategy-compare.mjs --gate provider --context-token-budget 800 --limit 5",
     "benchmark:public-autoresearch": "node packages/bench/public-benchmark-autoresearch-loop.mjs",
     "goal:audit": "node packages/bench/goal-completion-audit.mjs",
     "release:doctor": "node packages/bench/release-blocker-doctor.mjs",

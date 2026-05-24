@@ -27,6 +27,8 @@ const retrievalStrategies = [
   "sparse-dense-graph-temporal",
   "full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
+  "cloud-voyage-rerank-only",
+  "cloud-voyage4-voyage",
 ];
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -86,6 +88,7 @@ for (const strategy of strategies) {
     responsesHash: `sha256:${fileHash(responsePath)}`,
     resultHash: `sha256:${fileHash(resultPath)}`,
     rankingStrategy: response.source?.rankingStrategy ?? null,
+    provider: response.source?.provider ?? null,
     metrics: result.metrics,
     contextBudget: result.retrievalConfig?.contextBudget ?? null,
     privacyLeakCount: result.privacyLeakCount,
@@ -110,7 +113,7 @@ if (input.collectorCompatibleQuerySetHash) {
 const report = {
   schemaVersion: 1,
   ok: true,
-  mode: gate === "hybrid" ? "public-benchmark-hybrid-gate" : "public-benchmark-strategy-compare",
+  mode: gate === "provider" ? "public-benchmark-provider-gate" : gate === "hybrid" ? "public-benchmark-hybrid-gate" : "public-benchmark-strategy-compare",
   gate,
   fixtureOnly: fixtureRequested,
   benchmark: input.benchmark,
@@ -147,7 +150,13 @@ const report = {
     printsCredentials: false,
   },
   nextActions:
-    gate === "hybrid"
+    gate === "provider"
+      ? [
+          "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+          "Compare cloud-voyage4-voyage against bm25-lite on the same source-locked data before any default promotion.",
+          "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims.",
+        ]
+      : gate === "hybrid"
       ? [
           "Keep bm25-lite as the lexical control unless a hybrid arm beats it on quality or ties quality with a meaningful operational gain.",
           "Use the winning hybrid-family arm only as retrieval-proxy methodology evidence until MemoryBench answer-quality is run.",
@@ -320,10 +329,10 @@ function renderMarkdown(value) {
     "",
     "## Strategies",
     "",
-    "| Strategy | Quality | P@1 | Recall@5 | Recall@10 | NDCG@10 | p50 ms |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+    "| Strategy | Provider arm | Quality | P@1 | Recall@5 | Recall@10 | NDCG@10 | p50 ms |",
+    "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ...value.strategies.map((item) =>
-      `| ${item.strategy} | ${item.metrics.quality} | ${item.metrics.pAt1} | ${item.metrics.recallAt5} | ${item.metrics.recallAt10} | ${item.metrics.ndcgAt10} | ${item.metrics.latencyP50Ms} |`,
+      `| ${item.strategy} | ${item.provider?.modelArm ?? "none"} | ${item.metrics.quality} | ${item.metrics.pAt1} | ${item.metrics.recallAt5} | ${item.metrics.recallAt10} | ${item.metrics.ndcgAt10} | ${item.metrics.latencyP50Ms} |`,
     ),
     "",
     "## Safety",
@@ -337,6 +346,14 @@ function renderMarkdown(value) {
 }
 
 function defaultStrategies(value) {
+  if (value === "provider") {
+    return [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "cloud-voyage-rerank-only",
+      "cloud-voyage4-voyage",
+    ].join(",");
+  }
   if (value === "hybrid") {
     return [
       "bm25-lite",
@@ -353,7 +370,7 @@ function defaultStrategies(value) {
 
 function normalizeGate(value) {
   const gate = String(value ?? "strategy").trim().toLowerCase();
-  assert.ok(["strategy", "hybrid"].includes(gate), `unknown benchmark gate: ${gate}`);
+  assert.ok(["strategy", "hybrid", "provider"].includes(gate), `unknown benchmark gate: ${gate}`);
   return gate;
 }
 

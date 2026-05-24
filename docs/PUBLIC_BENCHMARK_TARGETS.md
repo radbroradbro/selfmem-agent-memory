@@ -204,6 +204,13 @@ harness we will use.
   quality, but p50 latency was 33 ms versus BM25 at 16 ms. The gate therefore
   keeps BM25 as the fallback/control and does not promote hybrid as the agent
   default.
+- Current provider-backed gate scaffold:
+  `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
+  It adds `cloud-voyage-rerank-only` and `cloud-voyage4-voyage` to the same
+  public-safe comparison path. Fixture mode makes no hosted calls; live runs
+  require `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`,
+  `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, and env-only Voyage
+  credentials.
 - Current LongMemEval-S autoresearch loop:
   `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
   runs 24 retrieval-proxy arms over strategy, context budget, and candidate

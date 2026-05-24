@@ -154,6 +154,26 @@ That means the benchmark wiring is now present, but the local proxy hybrid has
 not earned default status. The next research iteration should test real
 embedding and reranking arms, then rerun the same gate on a larger slice.
 
+## Provider-Backed Benchmark Gate
+
+The provider-backed gate now exists as an opt-in harness:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --fixture
+RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
+RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
+VOYAGE_API_KEY=<env-only> \
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json
+```
+
+The gate compares `bm25-lite`, `full-hybrid-rerank`,
+`cloud-voyage-rerank-only`, and `cloud-voyage4-voyage`. Fixture mode uses
+deterministic provider mocks and makes zero hosted calls. Live mode fails
+closed unless provider calls and public-data transfer are both explicitly
+enabled. Treat a live provider result as retrieval-proxy evidence until it is
+converted into MemoryBench answer-quality or another end-to-end memory score.
+
 Allowed wording after a small-slice win:
 
 > RecallWeave beat the source-locked reported target on this canary slice. This

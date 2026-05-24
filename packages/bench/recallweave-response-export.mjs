@@ -35,6 +35,8 @@ const retrievalStrategies = [
   "sparse-dense-graph-temporal",
   "full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
+  "cloud-voyage-rerank-only",
+  "cloud-voyage4-voyage",
 ];
 const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
 const contextTokenBudget = optionalPositiveInt(
@@ -42,6 +44,8 @@ const contextTokenBudget = optionalPositiveInt(
   "context token budget",
 );
 const generatedAt = new Date().toISOString();
+const providerBenchmarkCallsAllowed = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_CALLS === "1";
+const providerBenchmarkPublicData = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1";
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -77,12 +81,13 @@ for (const query of queries) {
 
 const loaded = loadMemories(effectiveMemoriesPath, { preserveIds });
 assert.ok(loaded.candidates.length > 0, "memories input produced no searchable candidates");
+const providerStats = createProviderStats({ strategy: rankingStrategy, fixtureRequested });
 
 const responses = {};
 const contextBudgetStats = [];
 for (const query of queries) {
   const startedAt = performance.now();
-  const ranked = rankCandidates(query, loaded.candidates, { strategy: rankingStrategy }).slice(0, limit);
+  const ranked = (await rankCandidates(query, loaded.candidates, { strategy: rankingStrategy, fixtureRequested, providerStats })).slice(0, limit);
   const budgeted = applyContextBudget(ranked, { contextTokenBudget });
   contextBudgetStats.push({ queryIdHash: shortHash(query.id), ...budgeted.stats });
   responses[query.id] = {
@@ -123,6 +128,7 @@ const result = {
     memoriesFileName: basename(effectiveMemoriesPath),
     preserveIds,
     rankingStrategy,
+    provider: providerStats.summary(),
   },
   privacyLeakCount: 0,
   redactionFailureCount: 0,
@@ -231,7 +237,7 @@ function extractMemoryText(item) {
   return "";
 }
 
-function rankCandidates(query, candidates, options = {}) {
+async function rankCandidates(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
   if (options.strategy === "bm25-lite") return rankBm25Lite(queryText, candidates);
   if (options.strategy === "hybrid-v1") return rankHybridV1(queryText, candidates);
@@ -241,6 +247,8 @@ function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "sparse-dense-graph-temporal") return rankSparseDenseGraphTemporal(query, candidates);
   if (options.strategy === "full-hybrid-rerank") return rankFullHybridRerank(query, candidates);
   if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates);
+  if (options.strategy === "cloud-voyage-rerank-only") return rankCloudVoyageRerankOnly(query, candidates, options);
+  if (options.strategy === "cloud-voyage4-voyage") return rankCloudVoyage4Voyage(query, candidates, options);
   return rankJaccard(queryText, candidates);
 }
 
@@ -340,6 +348,57 @@ function rankQueryExpandedFullHybridRerank(query, candidates) {
   const expanded = { ...query, q: expandQuery(queryTextValue(query)) };
   const firstStage = rankSparseDenseGraphTemporal(expanded, candidates);
   return rerankProxy(expanded, firstStage);
+}
+
+async function rankCloudVoyageRerankOnly(query, candidates, options = {}) {
+  const queryText = queryTextValue(query);
+  const firstStage = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
+  if (options.fixtureRequested) {
+    options.providerStats?.recordMockCall("voyage-rerank");
+    return providerMockRerank(query, firstStage);
+  }
+  assertProviderBenchmarkAllowed("cloud-voyage-rerank-only");
+  const ranked = await voyageRerank(queryText, firstStage, { providerStats: options.providerStats });
+  return [...ranked, ...candidatesNotIn(firstStage, candidates)].sort(byScoreThenId);
+}
+
+async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
+  const queryText = queryTextValue(query);
+  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  if (options.fixtureRequested) {
+    options.providerStats?.recordMockCall("voyage-embedding");
+    options.providerStats?.recordMockCall("voyage-rerank");
+    const dense = rankDenseProxy(queryText, densePool);
+    const fused = fuseRankedChannels(
+      densePool,
+      [
+        { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+        { name: "voyage-dense-mock", weight: 1, ranked: dense },
+        { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+        { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+      ],
+      { scoreScale: 8 },
+    );
+    return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  }
+  assertProviderBenchmarkAllowed("cloud-voyage4-voyage");
+  const queryVector = (await voyageEmbed([queryText], "query", { providerStats: options.providerStats }))[0];
+  const documentVectors = await voyageEmbed(densePool.map((candidate) => candidate.text), "document", { providerStats: options.providerStats });
+  const denseRanked = densePool
+    .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
+    .sort(byScoreThenId);
+  const fused = fuseRankedChannels(
+    densePool,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryText, densePool) },
+      { name: "voyage-dense", weight: 1, ranked: denseRanked },
+      { name: "graph", weight: 0.45, ranked: rankGraphProxy(query, densePool) },
+      { name: "temporal", weight: temporalWeight(query), ranked: rankTemporal(query, densePool) },
+    ],
+    { scoreScale: 8 },
+  ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
+  const reranked = await voyageRerank(queryText, fused, { providerStats: options.providerStats });
+  return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
 }
 
 function fuseRankedChannels(candidates, channels, options = {}) {
@@ -461,13 +520,210 @@ function cosine(left, right) {
   let dot = 0;
   let leftNorm = 0;
   let rightNorm = 0;
-  for (let index = 0; index < left.length; index += 1) {
+  const length = Math.min(left.length, right.length);
+  for (let index = 0; index < length; index += 1) {
     dot += left[index] * right[index];
     leftNorm += left[index] * left[index];
     rightNorm += right[index] * right[index];
   }
   if (!leftNorm || !rightNorm) return 0;
   return Math.max(0, dot / (Math.sqrt(leftNorm) * Math.sqrt(rightNorm)));
+}
+
+function createProviderStats(options = {}) {
+  const providerStrategy = isProviderStrategy(options.strategy);
+  const stats = {
+    strategy: options.strategy,
+    providerStrategy,
+    providerCallsAllowed: providerBenchmarkCallsAllowed,
+    providerPublicDataConfirmed: providerBenchmarkPublicData,
+    providerCallsMade: 0,
+    providerMockCalls: 0,
+    embeddingCalls: 0,
+    rerankCalls: 0,
+    documentCountSent: 0,
+    queryCountSent: 0,
+    modelArm: providerStrategy ? options.strategy : null,
+    embedModel: providerStrategy ? voyageEmbedModel() : null,
+    rerankModel: providerStrategy ? voyageRerankModel() : null,
+    fixtureProviderMock: providerStrategy && options.fixtureRequested,
+  };
+  return {
+    recordMockCall(kind) {
+      stats.providerMockCalls += 1;
+      if (kind.includes("embedding")) stats.embeddingCalls += 1;
+      if (kind.includes("rerank")) stats.rerankCalls += 1;
+    },
+    recordProviderCall(kind, count) {
+      stats.providerCallsMade += 1;
+      if (kind === "embedding") stats.embeddingCalls += 1;
+      if (kind === "rerank") stats.rerankCalls += 1;
+      if (kind === "embedding") stats.documentCountSent += Math.max(0, Number(count ?? 0));
+      if (kind === "rerank") stats.documentCountSent += Math.max(0, Number(count ?? 0));
+      if (kind === "query-embedding") {
+        stats.embeddingCalls += 1;
+        stats.queryCountSent += 1;
+      }
+    },
+    summary() {
+      return { ...stats, keyCountAvailable: providerStrategy ? providerKeyCount("voyage") : 0 };
+    },
+  };
+}
+
+function isProviderStrategy(strategy) {
+  return ["cloud-voyage-rerank-only", "cloud-voyage4-voyage"].includes(strategy);
+}
+
+function assertProviderBenchmarkAllowed(strategy) {
+  assert.equal(providerBenchmarkCallsAllowed, true, `${strategy} requires RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`);
+  assert.equal(providerBenchmarkPublicData, true, `${strategy} requires RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`);
+  assert.ok(providerKeyCount("voyage") > 0, `${strategy} requires VOYAGE_API_KEY or VOYAGE_API_KEYS`);
+}
+
+function providerKeyCount(provider) {
+  return providerKeys(provider).length;
+}
+
+function providerKeys(provider) {
+  if (provider !== "voyage") return [];
+  return [
+    ...splitProviderKeys(process.env.VOYAGE_API_KEYS),
+    ...splitProviderKeys(process.env.VOYAGE_API_KEY),
+  ];
+}
+
+function splitProviderKeys(value) {
+  return String(value ?? "")
+    .split(/[,\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function chooseProviderKey(provider, seed) {
+  const keys = providerKeys(provider);
+  assert.ok(keys.length > 0, `${provider} provider key missing`);
+  const index = Number.parseInt(stableHash(seed).slice(0, 8), 16) % keys.length;
+  return keys[index];
+}
+
+async function voyageEmbed(texts, inputType, options = {}) {
+  const input = texts.map((text) => String(text ?? ""));
+  const isQuery = inputType === "query";
+  options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : input.length);
+  const body = {
+    input,
+    model: voyageEmbedModel(),
+    input_type: inputType,
+    truncation: true,
+  };
+  const outputDimension = optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
+  if (outputDimension) body.output_dimension = outputDimension;
+  const response = await voyagePost("/v1/embeddings", body, { seed: `${inputType}:${input.length}:${input[0] ?? ""}` });
+  const embeddings = embeddingsFromVoyageResponse(response);
+  assert.equal(embeddings.length, input.length, "Voyage embeddings response length mismatch");
+  return embeddings;
+}
+
+async function voyageRerank(query, candidates, options = {}) {
+  const documents = candidates.map((candidate) => candidate.text);
+  options.providerStats?.recordProviderCall("rerank", documents.length);
+  const response = await voyagePost(
+    "/v1/rerank",
+    {
+      query,
+      documents,
+      model: voyageRerankModel(),
+      top_k: documents.length,
+      return_documents: false,
+      truncation: true,
+    },
+    { seed: `rerank:${query}:${documents.length}` },
+  );
+  const scores = rerankScoresFromVoyageResponse(response);
+  assert.ok(scores.length > 0, "Voyage rerank returned no results");
+  return scores
+    .map((item, rank) => {
+      const candidate = candidates[item.index];
+      assert.ok(candidate, "Voyage rerank returned an invalid document index");
+      return { ...candidate, score: round(Number(item.score ?? 0) + reciprocalRankBoost(rank + 1)) };
+    })
+    .sort(byScoreThenId);
+}
+
+async function voyagePost(path, body, options = {}) {
+  const key = chooseProviderKey("voyage", options.seed ?? path);
+  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(`https://api.voyageai.com${path}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Voyage provider request failed with status ${response.status}`);
+    }
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function embeddingsFromVoyageResponse(response) {
+  if (Array.isArray(response?.data)) {
+    return [...response.data]
+      .sort((left, right) => Number(left.index ?? 0) - Number(right.index ?? 0))
+      .map((item) => item.embedding)
+      .filter(Array.isArray);
+  }
+  if (Array.isArray(response?.embeddings)) return response.embeddings.filter(Array.isArray);
+  return [];
+}
+
+function rerankScoresFromVoyageResponse(response) {
+  const items = Array.isArray(response?.data) ? response.data : Array.isArray(response?.results) ? response.results : [];
+  return items
+    .map((item) => ({
+      index: Number(item.index),
+      score: finiteNumberOrDefault(item.relevance_score ?? item.score, 0),
+    }))
+    .filter((item) => Number.isInteger(item.index) && item.index >= 0)
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+}
+
+function voyageEmbedModel() {
+  return String(process.env.VOYAGE_EMBED_MODEL ?? "voyage-4-large");
+}
+
+function voyageRerankModel() {
+  return String(process.env.VOYAGE_RERANK_MODEL ?? "rerank-2.5");
+}
+
+function providerCandidateLimit(envName, fallback) {
+  return optionalPositiveInt(process.env[envName] ?? null, envName) ?? fallback;
+}
+
+function providerMockRerank(query, candidates) {
+  const reranked = rerankProxy(query, candidates);
+  return reranked.map((candidate, index) => ({
+    ...candidate,
+    score: round(candidate.score + reciprocalRankBoost(index + 1) + deterministicNoise(`${queryTextValue(query)}:${candidate.outputId}`) * 0.01),
+  })).sort(byScoreThenId);
+}
+
+function deterministicNoise(value) {
+  return Number.parseInt(stableHash(value).slice(0, 8), 16) / 0xffffffff;
+}
+
+function candidatesNotIn(selected, allCandidates) {
+  const ids = new Set(selected.map((candidate) => candidate.outputId));
+  return allCandidates.filter((candidate) => !ids.has(candidate.outputId)).map((candidate) => ({ ...candidate, score: 0 }));
 }
 
 function charNgrams(text, size) {

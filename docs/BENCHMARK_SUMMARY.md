@@ -85,6 +85,17 @@ quality 0.4541, P@1 0.8333, recall@5 0.2917, NDCG@10 0.3996, p50 latency
 16 ms. The best full-hybrid proxy tied quality but was slower at 33 ms p50, so
 the gate correctly refused hybrid promotion.
 
+The provider-backed benchmark lane now has an opt-in harness. The fixture gate
+is `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
+It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`, and
+`cloud-voyage4-voyage` through the same public-safe metrics path. Fixture mode
+uses deterministic provider mocks and makes zero hosted calls. A real run must
+set both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1` and
+`RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`, plus `VOYAGE_API_KEY` or
+`VOYAGE_API_KEYS`, before raw public benchmark passages can be sent to Voyage.
+This is the next route for testing whether the actual cloud hybrid stack beats
+BM25-lite on the same source-locked data.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are
@@ -341,6 +352,12 @@ The public target itself must pass before a canary starts:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --fixture
+RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
+RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
+VOYAGE_API_KEY=<env-only> \
+npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```
 
 This gate separates component evidence from memory-system evidence. MTEB,

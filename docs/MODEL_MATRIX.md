@@ -77,6 +77,19 @@ OPENROUTER_API_KEY
 Never commit key files, `.env`, private memory stores, trace logs, raw
 diagnostics, screenshots from real agent memory, or exported user data.
 
+The current public-safe provider harness exposes two Voyage arms:
+
+- `cloud-voyage-rerank-only`: BM25 preselect, then Voyage `rerank-2.5`.
+- `cloud-voyage4-voyage`: budgeted BM25 preselect, Voyage `voyage-4-large`
+  query/document embeddings, sparse+dense+graph+temporal fusion, then Voyage
+  `rerank-2.5`.
+
+Live provider benchmark calls require both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`
+and `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`. The second flag is
+intentional: the harness may send benchmark passages to the provider, so it
+must only be used on public benchmark slices unless the operator separately
+approves private data transfer.
+
 ## Query Expansion
 
 Query expansion is off by default.

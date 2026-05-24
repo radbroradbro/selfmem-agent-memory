@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": true,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-24T02:19:07.929Z",
+  "input": {
+    "source": "fixture",
+    "datasetSlice": "fixture-memory-canary-slice",
+    "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+    "collectorCompatibleQuerySetHash": null,
+    "materializerHash": null,
+    "queryCount": 3,
+    "expectedResultRefCount": 3,
+    "haystackSessionCount": 6
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:74515ac923288278b85e109d195b5f618efddaeeae1d0165d7540eb712aceaa1",
+      "resultHash": "sha256:c66b3a0d18c60ef1b97637aa6fbb9797fa3ff82b6114326ca0727c28fb980b01",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "embedModel": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 7,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:681afbdae9281b1750247c5c75fad896125a933b72022a8776771d130a879aae",
+      "resultHash": "sha256:891892572d5c001ae3ef3bed91336c6ea5bc175491c6330a73e27f956049e992",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "embedModel": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 9,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage-rerank-only",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:24dfc11a759b177ba979e681f23e39c2ca17b63786c443e0f4dfd6c4407becd4",
+      "resultHash": "sha256:5500bbccb2153b412d492cd56a4a5e6aa81d93c2500bd4472e651d4d4dc8a7ff",
+      "rankingStrategy": "cloud-voyage-rerank-only",
+      "provider": {
+        "strategy": "cloud-voyage-rerank-only",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 3,
+        "embeddingCalls": 0,
+        "rerankCalls": 3,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-voyage-rerank-only",
+        "embedModel": "voyage-4-large",
+        "rerankModel": "rerank-2.5",
+        "fixtureProviderMock": true,
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 7,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-voyage4-voyage",
+      "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
+      "responsesHash": "sha256:229777808a6e28cd77b60334f96d344c3d882afa1cc2ef23743881d087913611",
+      "resultHash": "sha256:c24c9eb7c6abe2737460dcfdca49cbe84a8690e63448d35253a362848c16967c",
+      "rankingStrategy": "cloud-voyage4-voyage",
+      "provider": {
+        "strategy": "cloud-voyage4-voyage",
+        "providerStrategy": true,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 6,
+        "embeddingCalls": 3,
+        "rerankCalls": 3,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": "cloud-voyage4-voyage",
+        "embedModel": "voyage-4-large",
+        "rerankModel": "rerank-2.5",
+        "fixtureProviderMock": true,
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 1,
+        "pAt1": 1,
+        "recallAt5": 1,
+        "recallAt10": 1,
+        "ndcgAt10": 1,
+        "latencyP50Ms": 1,
+        "latencyP95Ms": 8,
+        "contextTokensAvg": 119
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 3,
+        "queriesClipped": 0,
+        "clippedResultCount": 0,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 119,
+        "exportedContextTokensAvg": 119
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "88e0ebf4bd261e0c",
+          "topResultIdHash": "30db9417d7f5ef82",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "e5c08511b104dde0",
+          "topResultIdHash": "be860b09b9428b93",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        },
+        {
+          "queryIdHash": "7317cde9f031a0db",
+          "topResultIdHash": "54fbee446492c839",
+          "pAt1": 1,
+          "recallAt5": 1,
+          "recallAt10": 1,
+          "ndcgAt10": 1
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "quality": 1,
+    "pAt1": 1,
+    "recallAt5": 1,
+    "recallAt10": 1,
+    "ndcgAt10": 1,
+    "latencyP50Ms": 1
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 1,
+    "pAt1": 1,
+    "recallAt5": 1,
+    "recallAt10": 1,
+    "ndcgAt10": 1,
+    "latencyP50Ms": 1
+  },
+  "hybridPromotion": {
+    "bestHybridStrategy": "full-hybrid-rerank",
+    "promoteHybrid": false,
+    "reason": "Keep bm25-lite as control/fallback; hybrid-family arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": 0,
+    "latencyDeltaVsBm25": 0
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare cloud-voyage4-voyage against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

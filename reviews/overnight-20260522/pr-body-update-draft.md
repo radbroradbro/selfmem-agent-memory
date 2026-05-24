@@ -95,6 +95,12 @@ Live status:
   quality 0.4541 and p50 16 ms; the full hybrid proxy arms tie quality but are
   slower at p50 33 ms, so the gate refuses hybrid promotion and keeps broader
   claims blocked.
+- Adds the provider-backed gate scaffold. The new `benchmark:public-provider`
+  command compares `bm25-lite`, `full-hybrid-rerank`,
+  `cloud-voyage-rerank-only`, and `cloud-voyage4-voyage` through the same
+  public-safe metrics path. Fixture mode uses deterministic provider mocks and
+  zero hosted calls; live provider runs require explicit provider-call and
+  public-data environment guards plus env-only Voyage credentials.
 - Promotes GitHub Actions run `26349083689` on `e7fa56a` as the latest
   verified code/product baseline after adding the public hybrid benchmark gate,
   binding every arm to the materialized query-set hash, and keeping
