@@ -90,9 +90,11 @@ workspace.
 
 The current handoff packet remains:
 
-- `recallweave-openclaw-next-agent-canary-20260523-latest.zip`
+- `recallweave-openclaw-next-agent-canary-20260524-e3a49a9.zip`
 - SHA-256:
-  `d2130e5da937dc47fcf2296e3e9c28a7cab7e66a936fadf43a3950827f269e55`
+  `18eef266c90e5346183082a8bd3794d88081f8b1e7fa03e40ae756031f89baa0`
+- Expected returned report commit:
+  `e3a49a940ddc313232c21e267cb680ec50206738`
 
 The returned packet must pass `canary:returned-packet` with
 `--require-production-canary` and the expected adapter commit before the real

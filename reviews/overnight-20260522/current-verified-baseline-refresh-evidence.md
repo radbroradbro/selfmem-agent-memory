@@ -4,16 +4,15 @@ Date: 2026-05-24
 
 ## Scope
 
-This refresh updates the checked-in release state, PR body draft, and blocker
-issue draft so the latest verified code/product baseline matches the current PR
-head after the expanded 30-query LongMemEval-S hybrid stress gate and the
-expanded fail-closed live provider benchmark preflight.
+This refresh updates the checked-in release state and canary handoff evidence so
+the latest verified code/product baseline matches the current PR head after the
+benchmark comparator guard and commit-bound canary evidence gate.
 
 ## Verified Head
 
-- Commit: `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d`
-- Commit title: `feat: bind provider preflight to expanded benchmark target`
-- GitHub Actions run: `26351014379`
+- Commit: `e3a49a940ddc313232c21e267cb680ec50206738`
+- Commit title: `fix: allow commit-bound canary gate in CI`
+- GitHub Actions run: `26351686870`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -22,47 +21,42 @@ expanded fail-closed live provider benchmark preflight.
 The following checks passed on or against the same head before this
 evidence-only refresh:
 
-- `npm exec --yes pnpm@10.23.0 -- benchmark:public-hybrid -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --max-memory-bytes 80000000 --output reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate.json --markdown-output reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate-evidence.md`
-- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight -- --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json --markdown-output reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-evidence.md`
-- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight`
-- `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - `npm exec --yes pnpm@10.23.0 -- release:check`
+- `GITHUB_ACTIONS=true CI=true npm exec --yes pnpm@10.23.0 -- release:check`
+- `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
-- Changed-file secret and private-path scans
+- GitHub Actions run `26351686870`
 
-## Reviewer
+## Canary Handoff Artifact
 
-Gemini previously ran a focused cold review for the source-match
-private-path-redaction baseline refresh. A focused Codex reviewer also checked
-the MemoryBench source-lock hardening and the public LongMemEval-S slice
-manifest and found no blockers. This 2026-05-24T03:42Z refresh was validated
-by local release gates, goal-loop-review code verification, and CI, but the
-external Gemini reviewer route was not rerun.
+The current sendable OpenClaw one-agent canary handoff packet is:
 
-- Route: `gemini --skip-trust --approval-mode plan`.
-- Verdict: previous `CLEAN`; focused Codex reviewer found no blocker on the
-  source-lock checkout verifier or public LongMemEval-S slice manifest.
-- Evidence:
-  `reviews/overnight-20260522/gemini-current-verified-baseline-refresh-review.md`.
-- Current findings: the release-state, PR draft, blocker issue draft, and
-  refresh evidence accurately name commit
-  `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d` and GitHub Actions run
-  `26351014379`, preserve `productionReady: false` and public launch verdict
-  `FAIL`, keep the human and real-canary blockers, and do not include raw
-  memories, transcripts, prompts, answers, credentials, private local paths, or
-  key-shaped secrets.
+- Packet: `recallweave-openclaw-next-agent-canary-20260524-e3a49a9.zip`
+- SHA256: `18eef266c90e5346183082a8bd3794d88081f8b1e7fa03e40ae756031f89baa0`
+- Expected returned report commit:
+  `e3a49a940ddc313232c21e267cb680ec50206738`
+- Zip integrity: passed.
+- Manifest confirms `READY_FOR_ONE_AGENT_FRESH_CANARY`,
+  `oneAgentCanaryAllowed: true`, `publicLaunchAllowed: false`, and
+  `fleetRolloutAllowed: false`.
 
-The expanded hybrid gate uses source-locked public LongMemEval-S data and
-metrics-only outputs. It keeps BM25 as the current control winner, blocks
-deterministic hybrid promotion, and points the next benchmark step at real
-provider-backed embedding and reranker arms. The expanded live provider
-preflight itself made no provider API calls, sent no benchmark text, and binds
-the future live command to
-`reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`. It
-reports `BLOCKED_PROVIDER_ENV` in the clean controller environment because
-provider-call consent flags, public-data consent flags, and env-only
-Gemini/Voyage credentials are absent.
+The returned packet must be metrics-only, strict-real, non-fixture, privacy
+clean, rollback-tested, at least 15 minutes after the update, and tied to the
+expected report commit above. Any older or mismatched adapter commit is
+diagnostic only.
+
+## Benchmark Boundary
+
+The benchmark lane remains conservative:
+
+- Solo RecallWeave runs are smoke tests only.
+- `bm25-lite` is a control/fallback, not the target product system.
+- Public benchmark claims require same-data comparison against BM25, hybrid
+  arms, provider-backed hybrid arms when explicitly consented, and public
+  benchmark or leaderboard targets where possible.
+- Hosted Supermemory comparisons remain product-parity sanity checks, not the
+  main public scoreboard.
 
 ## Boundary
 

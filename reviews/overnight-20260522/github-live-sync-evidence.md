@@ -88,15 +88,19 @@ Date: 2026-05-23
   review evidence.
 - GitHub Actions run `26346952139` passed on `9a11452` after the
   LongMemEval-S run-only target and sync evidence refresh.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26351686870` passed on `e3a49a9`, the release-state baseline was promoted,
+  and the current OpenClaw one-agent handoff packet was regenerated with an
+  expected adapter commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T00:02:45Z
+- PR body refreshed at: 2026-05-24T04:26:45Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T00:02:46Z
-- PR body hash: ab269b726143cb9495bde80cc16646f73ce1fa71af2e78bb6df27b2f10b26d84
+- Issue updated at: 2026-05-24T04:26:44Z
+- PR body hash: fe223c045a42eb58deb071f8980d4784a296ee64474998958efa66132a65a07c
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: dfe79eb7d6609f140d3204329face42e63860a067310602fe1b6a35c7ecf2f03
-- PR body length: 40378
-- Issue body length: 25546
+- Issue body hash: a0751d87cdcde9dddf7ea2a2ee1c34925ef91b5ed824ef327d49913d9061777e
+- PR body length: 48176
+- Issue body length: 28866
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

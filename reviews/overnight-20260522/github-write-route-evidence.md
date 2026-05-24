@@ -112,6 +112,10 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after promoting the public LongMemEval-S
     retrieval-proxy run to the autoresearch winner, `bm25-lite-b800-k5`.
     Updated at: 2026-05-24T01:29:11Z.
+  - The PR body was refreshed again after GitHub Actions run `26351686870`
+    passed on `e3a49a9`, the release-state baseline was promoted, and the
+    current OpenClaw one-agent handoff packet was regenerated with an expected
+    adapter commit. Updated at: 2026-05-24T04:26:45Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -138,11 +142,11 @@ Verdict: resolved for PR body and blocker issue writes.
     author/source-lock attestation refresh, and MemoryBench source-lock
     checkout verification refresh, latest MemoryBench source-lock CI baseline
     refresh, public LongMemEval-S slice-manifest refresh, latest public
-    LongMemEval-S slice CI baseline refresh, and public LongMemEval-S
-    run-only target refresh, latest public LongMemEval-S run-target CI
-    baseline refresh
-  - Updated at: 2026-05-24T00:02:46Z
-  - Body length: 25546
+    LongMemEval-S slice CI baseline refresh, public LongMemEval-S run-only
+    target refresh, latest public LongMemEval-S run-target CI baseline refresh,
+    and commit-bound OpenClaw handoff refresh
+  - Updated at: 2026-05-24T04:26:44Z
+  - Body length: 28866
 
 ## Safety
 

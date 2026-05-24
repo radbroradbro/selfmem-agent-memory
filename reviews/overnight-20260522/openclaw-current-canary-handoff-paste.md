@@ -4,8 +4,9 @@ Use this with exactly one OpenClaw agent. Attach the zip named below in the same
 
 Packet:
 
-- `recallweave-openclaw-next-agent-canary-20260523-latest.zip`
-- SHA256: `d2130e5da937dc47fcf2296e3e9c28a7cab7e66a936fadf43a3950827f269e55`
+- `recallweave-openclaw-next-agent-canary-20260524-e3a49a9.zip`
+- SHA256: `18eef266c90e5346183082a8bd3794d88081f8b1e7fa03e40ae756031f89baa0`
+- Expected report commit: `e3a49a940ddc313232c21e267cb680ec50206738`
 
 Paste:
 
@@ -13,6 +14,7 @@ Paste:
 Please use the attached RecallWeave OpenClaw canary handoff packet.
 
 Important: this packet is for one fresh canary window only. Do not roll it out to other agents yet.
+The returned canary evidence must report commit e3a49a940ddc313232c21e267cb680ec50206738 or it will count as diagnostic only.
 
 Do this in order:
 

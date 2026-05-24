@@ -185,6 +185,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `e3a49a940ddc313232c21e267cb680ec50206738`.
+- GitHub Actions run `26351686870`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit. The checked-in evidence keeps solo RecallWeave runs as smoke only, keeps BM25 as a control rather than the target product system, and requires returned one-agent canary packets to report the expected adapter commit.
+- Previous verified code/product baseline before the commit-bound canary evidence gate:
   `c59aed9939d3cc148c17a98e2f0adfa4ed6c3e1d`.
 - GitHub Actions run `26351014379`: passed CI after binding the provider preflight to the expanded 30-query LongMemEval-S target. The checked-in evidence calls no provider APIs, sends no benchmark text, and keeps the next live cloud-provider run tied to the stronger expanded target.
 - Previous verified code/product baseline before the expanded provider preflight:
@@ -577,8 +580,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Previous verified code baseline before returned downloads supervision:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260523-latest.zip`, SHA256
-  `d2130e5da937dc47fcf2296e3e9c28a7cab7e66a936fadf43a3950827f269e55`.
+  `recallweave-openclaw-next-agent-canary-20260524-e3a49a9.zip`, SHA256
+  `18eef266c90e5346183082a8bd3794d88081f8b1e7fa03e40ae756031f89baa0`.
+  Returned canary reports must name commit
+  `e3a49a940ddc313232c21e267cb680ec50206738`.
   It is ready only for one fresh OpenClaw canary window, not fleet rollout.
 - Fresh canary window synthetic diagnostic: passed, proving old pre-patch errors and store events outside `--since` do not poison strict-real intake.
 - `npm exec --yes pnpm@10.23.0 -- smoke:openclaw`: passed with bounded read-through policy and local/remote/total recall timing assertions.
