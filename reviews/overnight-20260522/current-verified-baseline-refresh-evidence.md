@@ -1,19 +1,18 @@
 # Current Verified Baseline Refresh Evidence
 
-Date: 2026-05-23
+Date: 2026-05-24
 
 ## Scope
 
 This refresh updates the checked-in release state, PR body draft, and blocker
 issue draft so the latest verified code/product baseline matches the current PR
-head after the public LongMemEval-S slice manifest, deterministic question-id
-policy, answer-label hash, scoring-code hash, and focused Codex review.
+head after the opt-in provider-backed benchmark gate.
 
 ## Verified Head
 
-- Commit: `8eb69e848d442b08ebf4f5204d6ed17224161683`
-- Commit title: `docs: refresh longmemeval slice sync evidence`
-- GitHub Actions run: `26346613433`
+- Commit: `1e71c434725be7c95350d10ec61f8763a9558e63`
+- Commit title: `feat: add opt-in provider benchmark gate`
+- GitHub Actions run: `26349617343`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -45,8 +44,8 @@ rerun.
   `reviews/overnight-20260522/gemini-current-verified-baseline-refresh-review.md`.
 - Current findings: the release-state, PR draft, blocker issue draft, and
   refresh evidence accurately name commit
-  `8eb69e848d442b08ebf4f5204d6ed17224161683` and GitHub Actions run
-  `26346613433`, preserve `productionReady: false` and public launch verdict
+  `1e71c434725be7c95350d10ec61f8763a9558e63` and GitHub Actions run
+  `26349617343`, preserve `productionReady: false` and public launch verdict
   `FAIL`, keep the human and real-canary blockers, and do not include raw
   memories, transcripts, prompts, answers, credentials, private local paths, or
   key-shaped secrets.

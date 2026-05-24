@@ -157,8 +157,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
-  `e7fa56a13bb761c916e15388af50351ba380323e`.
-- GitHub Actions run `26349083689`: passed CI after adding the public LongMemEval-S hybrid gate, comparing BM25 against local-only hybrid proxy arms, and keeping the result retrieval-proxy only.
+  `1e71c434725be7c95350d10ec61f8763a9558e63`.
+- GitHub Actions run `26349617343`: passed CI after adding the opt-in provider-backed benchmark gate, comparing BM25, full local hybrid, Voyage rerank-only, and Voyage embed+rerank arms in fixture mode with zero hosted calls, and keeping the result retrieval-proxy only.
+- Previous verified code/product baseline before the provider gate:
+  `1d91c2c7afd4a3074528abeb8472b8c445dca505`.
 - Previous verified code/product baseline before the hybrid gate:
   `9a95d08e86c0b212620ea8b3d2182b454e0b90af`.
 - GitHub Actions run `26348625868`: passed CI after promoting the canonical LongMemEval-S retrieval-proxy run to the autoresearch winner, `bm25-lite-b800-k5`, binding it to the materialized query-set hash, and marking the result as retrieval-proxy only.

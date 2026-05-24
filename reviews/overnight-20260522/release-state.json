@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T01:59:00Z",
+  "generatedAt": "2026-05-24T02:26:30Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "e7fa56a13bb761c916e15388af50351ba380323e",
-    "ciRunId": 26349083689,
+    "headSha": "1e71c434725be7c95350d10ec61f8763a9558e63",
+    "ciRunId": 26349617343,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_strategy_compare_and_autoresearch_loop",
+    "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_strategy_compare_autoresearch_loop_and_provider_gate",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding the public LongMemEval-S hybrid benchmark gate. The gate compares bm25-lite against local-only dense, sparse+dense, temporal, graph, rerank, and query-expansion proxy arms on the same source-locked slice, keeps bm25-lite as the control/fallback because the full hybrid proxy ties quality but is slower, and preserves retrievalProxyOnly, memoryBenchAnswerQuality=false, publicBenchmarkClaimsAllowed=false, zero privacy failures, and public-safe evidence only. Local release:check, benchmark:public-hybrid fixture/live checks, release:github-sync, diff check, and GitHub Actions run 26349083689 passed."
+    "note": "Latest inspected code/product baseline after adding the opt-in provider-backed public benchmark gate. The gate adds cloud-voyage-rerank-only and cloud-voyage4-voyage arms to the same public-safe LongMemEval-S metrics path, keeps fixture mode provider-mocked with zero hosted calls, requires explicit provider-call and public-data environment guards for live Voyage runs, and preserves retrievalProxyOnly, memoryBenchAnswerQuality=false, publicBenchmarkClaimsAllowed=false, zero privacy failures, and public-safe evidence only. Local release:check, benchmark:public-provider fixture check, release:github-sync, diff check, and GitHub Actions run 26349617343 passed."
   },
   "releaseStateGuard": {
     "enabled": true,

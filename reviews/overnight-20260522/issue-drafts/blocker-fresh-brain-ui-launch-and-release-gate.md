@@ -10,6 +10,15 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
+- `1e71c434725be7c95350d10ec61f8763a9558e63`.
+- GitHub Actions run `26349617343` passed CI after adding the opt-in
+  provider-backed benchmark gate for BM25, full local hybrid, Voyage
+  rerank-only, and Voyage embed+rerank arms in fixture mode with zero hosted
+  calls.
+- Previous verified code/product baseline before the provider gate:
+  `1d91c2c7afd4a3074528abeb8472b8c445dca505`.
+- Previous verified code/product baseline before the public benchmark target
+  follow-up:
   `8eb69e848d442b08ebf4f5204d6ed17224161683`.
 - GitHub Actions run `26346613433` passed CI after adding the public
   LongMemEval-S slice manifest, deterministic question-id policy,
