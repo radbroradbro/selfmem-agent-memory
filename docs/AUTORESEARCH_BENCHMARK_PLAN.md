@@ -151,8 +151,16 @@ The 2026-05-24 source-locked 6-query LongMemEval-S hybrid gate kept
 `query-expanded-full-hybrid-rerank` tied BM25 quality but doubled p50 latency
 from 16 ms to 33 ms. `dense-proxy` alone was faster but much lower quality.
 That means the benchmark wiring is now present, but the local proxy hybrid has
-not earned default status. The next research iteration should test real
-embedding and reranking arms, then rerun the same gate on a larger slice.
+not earned default status.
+
+A larger 2026-05-24 source-locked 30-query LongMemEval-S stress gate then ran
+the same local-only hybrid-family arms over 1,420 haystack sessions and 92
+expected references. `bm25-lite` again won the retrieval-proxy gate: quality
+0.2506, P@1 0.4667, recall@5 0.1583, recall@10 0.1583, NDCG@10 0.2193, and
+p50 latency 180 ms. The best local proxy hybrid was `full-hybrid-rerank` at
+quality 0.2289 and p50 latency 417 ms. The next research iteration should
+therefore test real provider-backed embedding and reranking arms instead of
+promoting the deterministic proxy hybrid.
 
 ## Provider-Backed Benchmark Gate
 

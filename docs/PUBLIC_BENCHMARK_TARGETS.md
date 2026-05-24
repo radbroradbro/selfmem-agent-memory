@@ -204,6 +204,15 @@ harness we will use.
   quality, but p50 latency was 33 ms versus BM25 at 16 ms. The gate therefore
   keeps BM25 as the fallback/control and does not promote hybrid as the agent
   default.
+- Current expanded LongMemEval-S hybrid stress gate:
+  `reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate.json`.
+  It uses the same source-locked dataset hash with a deterministic 30-question
+  slice, 92 expected references, and 1,420 haystack sessions. BM25 remains the
+  control winner at quality 0.2506, P@1 0.4667, recall@5 0.1583, recall@10
+  0.1583, NDCG@10 0.2193, and p50 latency 180 ms. `full-hybrid-rerank` is the
+  best local proxy hybrid, but it trails at quality 0.2289 and p50 latency
+  417 ms. This is stronger evidence that the deterministic proxy hybrid should
+  not be promoted before live embedding/reranker arms are tested.
 - Current provider-backed gate scaffold:
   `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
   It adds `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,

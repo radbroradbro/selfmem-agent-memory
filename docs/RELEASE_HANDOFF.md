@@ -224,6 +224,14 @@ and `query-expanded-full-hybrid-rerank` tied BM25 quality but were slower, so
 the gate keeps `bm25-lite` as the control/fallback and blocks hybrid default
 promotion until real embedding/reranker arms beat it on a larger slice.
 
+The expanded hybrid stress gate is
+`reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate.json`. It
+uses 30 public LongMemEval-S questions, 92 expected references, and 1,420
+haystack sessions. BM25 remains the control winner, while
+`full-hybrid-rerank` is slightly worse and slower. Treat that as a blocker on
+promoting the deterministic proxy hybrid. The next benchmark move is live
+provider-backed embedding and reranking, gated by the provider preflight below.
+
 The provider-backed gate starts as a fixture-only CI path:
 `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It checks the exact public-safe comparison shape for `bm25-lite`,

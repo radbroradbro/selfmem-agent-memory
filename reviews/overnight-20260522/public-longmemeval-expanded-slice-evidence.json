@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "mode": "public-benchmark-slice-manifest",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "sourceName": "MemoryBench LongMemEval-S cleaned dataset",
+  "sourceUrl": "https://github.com/supermemoryai/memorybench",
+  "sourceCommit": "118209a746d97d0d85e5a7234267f0b6962857e9",
+  "checkedAt": "2026-05-24",
+  "dataset": {
+    "urlHost": "huggingface.co",
+    "urlHash": "sha256:0f3681557c33a32488352d403d88015e86902893622310839f59a35d7d1dd94a",
+    "hash": "sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "byteSize": 277383467,
+    "itemCount": 500,
+    "selectedCount": 30,
+    "questionTypeCount": 6,
+    "selectedQuestionIdsHash": "sha256:94a21a5744089b9716874f8a4b5eb587a62c8e5671086021d38b5668ec0ce856",
+    "questionIdPolicy": "datasetHash=sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442; types=single-session-user,single-session-assistant,single-session-preference,multi-session,temporal-reasoning,knowledge-update; perType=5; limit=30; sort=question_id-ascending; selection=first-per-type-round-robin",
+    "selectedTypeCounts": {
+      "knowledge-update": 5,
+      "multi-session": 5,
+      "single-session-assistant": 5,
+      "single-session-preference": 5,
+      "single-session-user": 5,
+      "temporal-reasoning": 5
+    }
+  },
+  "labels": {
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "answerLabelCount": 30,
+    "answerLabelFields": [
+      "question_id",
+      "question_type",
+      "answer"
+    ]
+  },
+  "scoring": {
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "scoringInputsHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "scoringScriptRef": "MemoryBench LongMemEval adapter and benchmark contracts at the source-locked commit"
+  },
+  "publicSafety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "rawQuestionIdsIncluded": false,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "printsCredentials": false,
+    "includesPrivatePaths": false
+  },
+  "nextActions": [
+    "Use this manifest to author a real benchmark target with benchmark:public-target:author.",
+    "Run RecallWeave on the same dataset hash and deterministic question-id policy.",
+    "Attach metrics-only results before using canary-trend wording."
+  ]
+}

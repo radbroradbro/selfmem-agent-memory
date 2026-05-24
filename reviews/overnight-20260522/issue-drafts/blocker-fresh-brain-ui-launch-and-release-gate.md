@@ -149,6 +149,10 @@ requirements are resolved.
   leaderboards can choose model arms, but public RecallWeave claims still need
   the same public benchmark data, revision, split, labels, judge model, answer
   model, judge rule, and scoring setup as the target row.
+- Current expanded LongMemEval-S hybrid stress evidence uses 30 public
+  questions, 92 expected references, and 1,420 haystack sessions. BM25 remains
+  the control winner, so the deterministic proxy hybrid is still blocked from
+  default promotion pending live embedding/reranker runs.
 - Current benchmark tooling adds `benchmark:source-lock`,
   `benchmark:public-slice`, `benchmark:public-target:author`, and
   `benchmark:public-target`, a metrics-only source-lock, slice-manifest,

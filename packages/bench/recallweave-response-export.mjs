@@ -45,6 +45,9 @@ const contextTokenBudget = optionalPositiveInt(
   args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? null,
   "context token budget",
 );
+const maxMemoryBytes =
+  optionalPositiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? null, "max memory bytes") ??
+  5_000_000;
 const generatedAt = new Date().toISOString();
 const providerBenchmarkCallsAllowed = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_CALLS === "1";
 const providerBenchmarkPublicData = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1";
@@ -63,7 +66,10 @@ const effectiveMemoriesPath = memoriesPath ?? (containerDir ? join(containerDir,
 assert.ok(effectiveMemoriesPath, "memories input is required. Pass --memories, --container-dir, or RECALLWEAVE_BASELINE_MEMORIES_JSONL");
 assert.ok(existsSync(effectiveMemoriesPath), `memories file missing: ${displayPath(effectiveMemoriesPath)}`);
 assert.ok(statSync(effectiveMemoriesPath).size > 0, `memories file empty: ${displayPath(effectiveMemoriesPath)}`);
-assert.ok(statSync(effectiveMemoriesPath).size <= 5_000_000, `memories file too large for metrics export: ${displayPath(effectiveMemoriesPath)}`);
+assert.ok(
+  statSync(effectiveMemoriesPath).size <= maxMemoryBytes,
+  `memories file too large for metrics export: ${displayPath(effectiveMemoriesPath)}; size=${statSync(effectiveMemoriesPath).size}; max=${maxMemoryBytes}`,
+);
 
 if (!fixtureRequested) {
   assert.equal(liveRequested, true, "live RecallWeave response export requires --live or RECALLWEAVE_BASELINE_LIVE=1");
@@ -139,6 +145,7 @@ const result = {
   rawPromptIncluded: false,
   rawAnswerIncluded: false,
   inputStats: {
+    maxMemoryBytes,
     linesRead: loaded.linesRead,
     parsed: loaded.parsed,
     candidates: loaded.candidates.length,

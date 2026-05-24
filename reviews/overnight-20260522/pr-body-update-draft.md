@@ -95,6 +95,12 @@ Live status:
   quality 0.4541 and p50 16 ms; the full hybrid proxy arms tie quality but are
   slower at p50 33 ms, so the gate refuses hybrid promotion and keeps broader
   claims blocked.
+- Adds an expanded 30-question LongMemEval-S hybrid stress gate. The expanded
+  public-safe run uses the same source-locked dataset hash with 92 expected
+  references and 1,420 haystack sessions. `bm25-lite` remains the winner at
+  quality 0.2506 and P@1 0.4667; `full-hybrid-rerank` is the best local proxy
+  hybrid but trails at quality 0.2289 and p50 417 ms, so deterministic hybrid
+  promotion remains blocked until live embedding/reranker arms beat the control.
 - Adds the provider-backed gate scaffold. The new `benchmark:public-provider`
   command compares `bm25-lite`, `full-hybrid-rerank`,
   `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,

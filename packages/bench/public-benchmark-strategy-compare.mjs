@@ -16,6 +16,7 @@ const gate = normalizeGate(args.gate ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGIES ?? defaultStrategies(gate));
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 1600, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
+const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
 
 const retrievalStrategies = [
   "jaccard",
@@ -36,6 +37,8 @@ const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
+const privatePathOutputPattern =
+  /(\/Users\/[^\s"'`]+|\/Volumes\/[^\s"'`]+|\/private\/[^\s"'`]+|\/var\/folders\/[^\s"'`]+|\/tmp\/[^\s"'`]+|\/home\/[^\s"'`]+|[A-Za-z]:\\Users\\[^\s"'`]+|\.hermes\/profiles[^\s"'`]*|\.openclaw[^\s"'`]*)/gi;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
@@ -388,17 +391,27 @@ function runNode(argv, options = {}) {
     encoding: "utf8",
     env: {
       ...process.env,
-      ...(options.live ? { RECALLWEAVE_BASELINE_LIVE: "1", RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1" } : {}),
+      ...(options.live
+        ? {
+            RECALLWEAVE_BASELINE_LIVE: "1",
+            RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+            RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES: String(maxMemoryBytes),
+          }
+        : {}),
       ...(options.env ?? {}),
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
   if (result.status !== 0) {
-    throw new Error(`node ${argv.join(" ")} failed\n${result.stdout}\n${result.stderr}`);
+    throw new Error(sanitizeFailureText(`node ${argv.join(" ")} failed\n${result.stdout}\n${result.stderr}`));
   }
   assertSafePublicText(result.stdout, "child stdout");
   assertSafePublicText(result.stderr, "child stderr");
   return result;
+}
+
+function sanitizeFailureText(text) {
+  return String(text).replace(privatePathOutputPattern, "<private-path>");
 }
 
 function assertSafePublicText(text, label) {

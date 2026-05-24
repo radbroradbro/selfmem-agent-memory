@@ -85,6 +85,17 @@ quality 0.4541, P@1 0.8333, recall@5 0.2917, NDCG@10 0.3996, p50 latency
 16 ms. The best full-hybrid proxy tied quality but was slower at 33 ms p50, so
 the gate correctly refused hybrid promotion.
 
+The same local-only hybrid gate now also has a larger 30-query LongMemEval-S
+stress slice:
+`reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate.json`.
+That slice covers 30 source-locked public questions, 92 expected references,
+and 1,420 haystack sessions. `bm25-lite` again remains the control winner:
+quality 0.2506, P@1 0.4667, recall@5 0.1583, recall@10 0.1583, NDCG@10
+0.2193, p50 latency 180 ms, and zero privacy failures. The best local proxy
+hybrid, `full-hybrid-rerank`, reached quality 0.2289 and P@1 0.4333 but had
+p50 latency 417 ms. This weakens the BM25-overfit worry, but it also proves the
+current proxy hybrid should not become the default yet.
+
 The provider-backed benchmark lane now has an opt-in harness. The fixture gate
 is `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`,

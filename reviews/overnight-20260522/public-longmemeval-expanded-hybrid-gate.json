@@ -1,0 +1,2112 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-hybrid-gate",
+  "gate": "hybrid",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-24T03:13:59.235Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-canary-30-first-per-type-2026-05-24",
+    "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "collectorCompatibleQuerySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "materializerHash": "sha256:8b9e5688e299f7823392336cb97f6a6438a6181c4ee44848811fa2e712e24925",
+    "queryCount": 30,
+    "expectedResultRefCount": 92,
+    "haystackSessionCount": 1420
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:5a1f351bf1c67dd80db478a27a3f334d085df890d954005624d2543d877a6a31",
+      "resultHash": "sha256:ebcf079e7ef54919f0e53e600b9da9430d11fb341803ff1a01f46ee505f0d555",
+      "rankingStrategy": "bm25-lite",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.2506,
+        "pAt1": 0.4667,
+        "recallAt5": 0.1583,
+        "recallAt10": 0.1583,
+        "ndcgAt10": 0.2193,
+        "latencyP50Ms": 180,
+        "latencyP95Ms": 206,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 120,
+        "fullCandidateTokensAvg": 16763,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "35ecb6b2d5f7096f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "13ba88d1a961039f",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "09e1d6fa1b3afa09",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "82d0a454db861d8a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "d5b8ffcebba67fe3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "b79a42662777d71c",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "591d1f9e88f3edb1",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "0da5f98cd9e50bcc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "a67131f574dc7cb1",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "111d6599e903d5e6",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "302895094f7d45a3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "f3078f45f8951b90",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "74408dae012df1cf",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "262e49ee643494a0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "06758812bd0bf031",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "388334e1ee924ae4",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "8cd3157cee5f4bbb",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "dbc42502ba119053",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "ae337effdb3908fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "a86259d4bdc873ce",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "461f0addf481ae01",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    },
+    {
+      "strategy": "dense-proxy",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:220dabe1822f0200f0221683b86162b0a0b4b9c462179d0c3e7d74ffa8766139",
+      "resultHash": "sha256:6098ba32e3bbbf82d4643cb21c6e30708abbd11b245c2571ea7dc23ea31592c1",
+      "rankingStrategy": "dense-proxy",
+      "provider": {
+        "strategy": "dense-proxy",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.0533,
+        "pAt1": 0.1,
+        "recallAt5": 0.0333,
+        "recallAt10": 0.0333,
+        "ndcgAt10": 0.0465,
+        "latencyP50Ms": 2,
+        "latencyP95Ms": 4,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 118,
+        "fullCandidateTokensAvg": 12337,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "acbb50ea12b7b8dd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "05f481829a319f10",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "77c85cfa0d005b11",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "da89b71cc88b8840",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "d5b8ffcebba67fe3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "0304621aa1128941",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "c6e4c900e5e1562b",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "9458664ec439b14a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "30dff0ed57b06248",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "30dff0ed57b06248",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "6beaba29b4214b03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "38496097e37b8ef4",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "033a25be786b3960",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "4225a09dcab96bf3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "62d897d8a4a96a42",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "8ecf41dc25f2e0e6",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "67233b2982aa0418",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "67233b2982aa0418",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "bf90fce1165b0cdb",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "2b9000b117b03730",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "38cf329b408faed0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "be2159ef07e27d6a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "bf90fce1165b0cdb",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "0431180923757a42",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "aa002cf75a68fd76",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "aa002cf75a68fd76",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "354ad7ed61d72fdc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    },
+    {
+      "strategy": "sparse-dense-rrf",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:9386b40705f572dcbc9bf5d2227d4a5fe5cd3efd4cde268cc5a097e64a99f685",
+      "resultHash": "sha256:3b2ad69c3e2e8ecb513b9f8f8484196412766012cff63e14a806a5f06d82446a",
+      "rankingStrategy": "sparse-dense-rrf",
+      "provider": {
+        "strategy": "sparse-dense-rrf",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.1024,
+        "pAt1": 0.1667,
+        "recallAt5": 0.075,
+        "recallAt10": 0.075,
+        "ndcgAt10": 0.0928,
+        "latencyP50Ms": 202,
+        "latencyP95Ms": 251,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 119,
+        "fullCandidateTokensAvg": 15371,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "6c2796cbc9d00905",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "317e5683bcf39db3",
+          "pAt1": 0,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.3869
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "1d531c01116f27ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "da89b71cc88b8840",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "d5b8ffcebba67fe3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "da63e22d306faea1",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "5622e28938f39d05",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "335e219873ed5f2a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "45b92a23c1820fa0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "95dd60f3690f8d2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "45b92a23c1820fa0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "033a25be786b3960",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "4225a09dcab96bf3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "5e9c9bdfc3d7a44c",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "9fddc1645cfa896e",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "ce65a32ce1d59205",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "ca9077b549e43797",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "c1bc09c76a684adc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "05f481829a319f10",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "ae337effdb3908fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "3b70783e41bbff9a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "db15078dff75756a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "31e2880a39655091",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        }
+      ]
+    },
+    {
+      "strategy": "sparse-dense-temporal",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:97d6a96954df66f15ff3d6fe20b6f6149f4b315d6bbbe7638b46695749d58407",
+      "resultHash": "sha256:9ce1954baac723c923ab0dafa1bfa156505dc606ced22eb66f8bafd0552be543",
+      "rankingStrategy": "sparse-dense-temporal",
+      "provider": {
+        "strategy": "sparse-dense-temporal",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.1339,
+        "pAt1": 0.2333,
+        "recallAt5": 0.0917,
+        "recallAt10": 0.0917,
+        "ndcgAt10": 0.1188,
+        "latencyP50Ms": 198,
+        "latencyP95Ms": 301,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 119,
+        "fullCandidateTokensAvg": 15516,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "6c2796cbc9d00905",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "317e5683bcf39db3",
+          "pAt1": 0,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.3869
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "1d531c01116f27ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "da89b71cc88b8840",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "d5b8ffcebba67fe3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "5587d7c36a0b81d2",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "5622e28938f39d05",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "335e219873ed5f2a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "4499c1e96be4db6a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "95dd60f3690f8d2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "45b92a23c1820fa0",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "033a25be786b3960",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "c62a697be135c687",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "9fddc1645cfa896e",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "67233b2982aa0418",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "67233b2982aa0418",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "ce65a32ce1d59205",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "ca9077b549e43797",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "c1bc09c76a684adc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "f3006db012a924fc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "1c9e871fb444e336",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "1c9e871fb444e336",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "db15078dff75756a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "edd919f524cf9ee8",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "sparse-dense-graph-temporal",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:1076af85a1324df466ef4e6950b9a0143d04c9a3cce5b3d8c21701186741c24e",
+      "resultHash": "sha256:845b0c7acbe90e1ff72d8ea74d8bb59e21ecc6e3dee071c7f60cab4f4dd7b767",
+      "rankingStrategy": "sparse-dense-graph-temporal",
+      "provider": {
+        "strategy": "sparse-dense-graph-temporal",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.1756,
+        "pAt1": 0.3333,
+        "recallAt5": 0.1083,
+        "recallAt10": 0.1083,
+        "ndcgAt10": 0.1524,
+        "latencyP50Ms": 222,
+        "latencyP95Ms": 295,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 120,
+        "fullCandidateTokensAvg": 16763,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "6c2796cbc9d00905",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "13ba88d1a961039f",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "7d1c39643639c8d1",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "da89b71cc88b8840",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "d5b8ffcebba67fe3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "da63e22d306faea1",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "5622e28938f39d05",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "30dff0ed57b06248",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "4499c1e96be4db6a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "95dd60f3690f8d2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "3718c838d12a16f7",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "cd5a734d367c4cbd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "4225a09dcab96bf3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "9fddc1645cfa896e",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "dbc42502ba119053",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "9897d1f103d6ccc2",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "c1bc09c76a684adc",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "ab23666debb53eb6",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "db15078dff75756a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "edd919f524cf9ee8",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:8a4e09d3185ce4b37a598fc5ae3544e5af727a7c868b46589ce1172e9c6dc7ec",
+      "resultHash": "sha256:1bf7bf01bf96a8e7c0e00de931139cc3aeb088fbfaca169c0423d5944a0ce2cb",
+      "rankingStrategy": "full-hybrid-rerank",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.2289,
+        "pAt1": 0.4333,
+        "recallAt5": 0.1417,
+        "recallAt10": 0.1417,
+        "ndcgAt10": 0.1989,
+        "latencyP50Ms": 417,
+        "latencyP95Ms": 560,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 120,
+        "fullCandidateTokensAvg": 17365,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "c6e4c900e5e1562b",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "13ba88d1a961039f",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "1d531c01116f27ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "0c5508a057e81ce8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "35f58eeec4f4be13",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "253413e419dacc2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "09e1d6fa1b3afa09",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "30dff0ed57b06248",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "4499c1e96be4db6a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "95dd60f3690f8d2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "3718c838d12a16f7",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "cd5a734d367c4cbd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "4225a09dcab96bf3",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "9fddc1645cfa896e",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "388334e1ee924ae4",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "68d3109781971bbe",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "db15078dff75756a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "4d4501cc8199c941",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responsesHash": "sha256:2fb7d7d0797aef5edeb7382a96d2cedd96b07632828cf863c283078a6a9d574d",
+      "resultHash": "sha256:ae9fe7ecd464b79ec1986a8ab6221ab0c136264805482bb5fe8dd44fcef57b35",
+      "rankingStrategy": "query-expanded-full-hybrid-rerank",
+      "provider": {
+        "strategy": "query-expanded-full-hybrid-rerank",
+        "providerStrategy": false,
+        "providerCallsAllowed": false,
+        "providerPublicDataConfirmed": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "modelArm": null,
+        "providers": [],
+        "embedModel": null,
+        "embedDimensions": null,
+        "rerankModel": null,
+        "fixtureProviderMock": false,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0
+      },
+      "metrics": {
+        "quality": 0.1756,
+        "pAt1": 0.3333,
+        "recallAt5": 0.1083,
+        "recallAt10": 0.1083,
+        "ndcgAt10": 0.1524,
+        "latencyP50Ms": 383,
+        "latencyP95Ms": 450,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 30,
+        "queriesClipped": 30,
+        "clippedResultCount": 30,
+        "skippedByBudgetCount": 120,
+        "fullCandidateTokensAvg": 17305,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "topResultIdHash": "c6e4c900e5e1562b",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "topResultIdHash": "13ba88d1a961039f",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "topResultIdHash": "1d531c01116f27ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "topResultIdHash": "0c5508a057e81ce8",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "topResultIdHash": "b33ad09b3ddd07aa",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "topResultIdHash": "1c170521836d4e63",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "topResultIdHash": "253413e419dacc2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "topResultIdHash": "1df043faf5cb6ed8",
+          "pAt1": 1,
+          "recallAt5": 0.5,
+          "recallAt10": 0.5,
+          "ndcgAt10": 0.6131
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "topResultIdHash": "5622e28938f39d05",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "topResultIdHash": "30dff0ed57b06248",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "topResultIdHash": "4499c1e96be4db6a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "topResultIdHash": "95dd60f3690f8d2f",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "topResultIdHash": "3718c838d12a16f7",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "topResultIdHash": "cd5a734d367c4cbd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "topResultIdHash": "cd5a734d367c4cbd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "topResultIdHash": "846e49132af0e6f2",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "topResultIdHash": "9fddc1645cfa896e",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "topResultIdHash": "b5f1f7b0d660537b",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "topResultIdHash": "60bea2f9bccdd9fd",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "topResultIdHash": "9897d1f103d6ccc2",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "topResultIdHash": "267660bfd156a6ea",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "topResultIdHash": "082406d91e73ab0d",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "topResultIdHash": "b3b77eb7948b5b4a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "topResultIdHash": "6df5009c240368cf",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "topResultIdHash": "31a939dd1f1cfa03",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "topResultIdHash": "db15078dff75756a",
+          "pAt1": 0,
+          "recallAt5": 0,
+          "recallAt10": 0,
+          "ndcgAt10": 0
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "topResultIdHash": "4d4501cc8199c941",
+          "pAt1": 1,
+          "recallAt5": 0.25,
+          "recallAt10": 0.25,
+          "ndcgAt10": 0.3904
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "quality": 0.2506,
+    "pAt1": 0.4667,
+    "recallAt5": 0.1583,
+    "recallAt10": 0.1583,
+    "ndcgAt10": 0.2193,
+    "latencyP50Ms": 180
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "quality": 0.2506,
+    "pAt1": 0.4667,
+    "recallAt5": 0.1583,
+    "recallAt10": 0.1583,
+    "ndcgAt10": 0.2193,
+    "latencyP50Ms": 180
+  },
+  "hybridPromotion": {
+    "bestHybridStrategy": "full-hybrid-rerank",
+    "promoteHybrid": false,
+    "reason": "Keep bm25-lite as control/fallback; hybrid-family arm has not earned promotion on this slice.",
+    "qualityDeltaVsBm25": -0.0217,
+    "latencyDeltaVsBm25": 237
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep bm25-lite as the lexical control unless a hybrid arm beats it on quality or ties quality with a meaningful operational gain.",
+    "Use the winning hybrid-family arm only as retrieval-proxy methodology evidence until MemoryBench answer-quality is run.",
+    "Run a larger source-locked LongMemEval or MemoryBench slice before any public SOTA or leaderboard language."
+  ]
+}
