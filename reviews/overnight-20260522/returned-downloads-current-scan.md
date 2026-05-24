@@ -33,10 +33,10 @@ This note is metrics-only. It records the standard inbox scan without raw memori
 
 ## Current Handoff Surface
 
-- Top-level Downloads now contains exactly one RecallWeave handoff zip.
-- The visible handoff is `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`.
-- Older RecallWeave handoff zips were moved to a superseded folder outside the repo so operators are less likely to send stale packets.
-- The scanner still treats this handoff as a handoff only, not production evidence.
+- Top-level Downloads contains exactly one RecallWeave handoff zip.
+- The send set is `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`, `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`, and `recallweave-SEND-THIS-ONE-checksum.txt`.
+- Older RecallWeave handoff zips remain outside the top-level send surface so operators are less likely to send stale packets.
+- The scanner still treats the visible handoff zip as a handoff only, not production evidence.
 
 ## Next Actions
 
