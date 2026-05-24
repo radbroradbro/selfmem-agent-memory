@@ -110,15 +110,19 @@ Date: 2026-05-23
   found 0 production evidence packets, now with 12 handoff packets present.
 - PR #5 was refreshed again after adding hash-only triage summaries for
   unknown and unreadable returned zips.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26354982486` passed on `cb40732`, making the latest verified PR branch head
+  the returned canary triage and unreadable-zip sanitization commit while
+  preserving `3d61677` as the approved runtime canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T07:11:09Z
+- PR body refreshed at: 2026-05-24T07:23:32Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T06:51:08Z
-- PR body hash: 71eb6a5f649e01ec17494875ce0be7213d3b03c336eb701791fbe67b8d810282
+- Issue updated at: 2026-05-24T07:23:33Z
+- PR body hash: f187e1f8535c1ca0ea8c59ffa6cd26436e741027358bf4d9e5e5f8bf56c987d3
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 306ab225ccd48e51996245d4440bdcc744d7a3dc9c26b0e0b47ef0b8aef294a8
-- PR body length: 49372
-- Issue body length: 29750
+- Issue body hash: 03ae835241dc9fd76c31911067c828e8b9822021b0ddb6a49a3d46fd997ec893
+- PR body length: 49452
+- Issue body length: 29833
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

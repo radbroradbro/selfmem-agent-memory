@@ -8,13 +8,14 @@ This refresh updates the checked-in release state and canary handoff evidence so
 the latest verified PR branch head is tracked separately from the approved
 runtime canary adapter/report commit. That split lets benchmark and tooling
 guards move forward without silently changing what the one-agent runtime canary
-must prove.
+must prove. The latest branch-head refresh only hardens returned-packet intake
+triage and Linux CI sanitization; it does not promote a new runtime adapter.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `106b78c0ecbe7f3d14a7f10a45016c8a20f97210`
-- Commit title: `test: clarify canary packet commit contract`
-- GitHub Actions run: `26354290765`
+- Commit: `cb4073285c727cbc6795850f65ac6067a3bfe5df`
+- Commit title: `fix: sanitize unreadable canary zip errors`
+- GitHub Actions run: `26354982486`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -37,7 +38,7 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
 - `npm exec --yes pnpm@10.23.0 -- release:doctor`
-- GitHub Actions run `26353888297`
+- GitHub Actions run `26354982486`
 
 ## Canary Handoff Artifact
 
