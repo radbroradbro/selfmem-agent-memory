@@ -28,6 +28,7 @@ node packages/bench/canary-returned-downloads.mjs --skip-defaults
 node packages/bench/canary-returned-downloads.mjs --skip-defaults --input-root <mixed-temp-folder> --iterations 1
 node packages/bench/canary-returned-downloads.mjs --skip-defaults --input-root <mixed-temp-folder> --require-found
 node packages/bench/canary-returned-downloads.mjs --output <metrics-json> --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output <metrics-json>
 ```
 
 ## Current Local Inbox Scan
