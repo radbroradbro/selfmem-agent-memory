@@ -20,7 +20,7 @@
     "rootsWithProductionEvidence": 0,
     "productionEvidencePackets": 0,
     "returnedEvidencePackets": 0,
-    "handoffPackets": 8,
+    "handoffPackets": 10,
     "diagnosticBundles": 8,
     "unknownPackets": 19,
     "unreadablePackets": 5
@@ -39,7 +39,7 @@
       "rootsWithProductionEvidence": 0,
       "productionEvidencePackets": 0,
       "returnedEvidencePackets": 0,
-      "handoffPackets": 8,
+      "handoffPackets": 10,
       "diagnosticBundles": 8,
       "unknownPackets": 19,
       "unreadablePackets": 5
@@ -48,11 +48,11 @@
       {
         "rootLabel": "Downloads",
         "status": "HANDOFF_PACKETS_ONLY",
-        "candidateCount": 26,
-        "scannedZipCount": 26,
+        "candidateCount": 28,
+        "scannedZipCount": 28,
         "returnedEvidencePackets": 0,
         "productionEvidencePackets": 0,
-        "handoffPackets": 8,
+        "handoffPackets": 10,
         "diagnosticBundles": 4,
         "unreadablePackets": 5,
         "unknownPackets": 9,
