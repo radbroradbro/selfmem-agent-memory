@@ -107,7 +107,8 @@ Date: 2026-05-23
   into latest verified PR branch head `106b78c` and approved runtime canary
   adapter/report commit `18d606a`.
 - PR #5 was refreshed again after the standard inbox scan was rerun and still
-  found 0 production evidence packets, now with 12 handoff packets present.
+  found 0 production evidence packets, then the top-level Downloads handoff
+  surface was reduced to the single current `SEND-THIS-ONE` packet.
 - PR #5 was refreshed again after adding hash-only triage summaries for
   unknown and unreadable returned zips.
 - PR #5 and issue #6 were refreshed again after GitHub Actions run
@@ -150,12 +151,16 @@ Date: 2026-05-23
   OpenClaw one-agent handoff packet to the clearly marked
   `SEND-THIS-ONE` packet while preserving `18d606a` as the approved runtime
   canary adapter/report commit.
+- PR #5 was refreshed again after the standard inbox scan evidence was updated
+  to match the cleaned top-level Downloads surface: 0 production evidence
+  packets, 1 current handoff packet, 8 diagnostics, 19 unknown packets, and 5
+  unreadable packets.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T17:04:57Z
+- PR body refreshed at: 2026-05-24T17:13:35Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
 - Issue updated at: 2026-05-24T17:04:58Z
-- PR body hash: 1e72a729a370150a7fda6754db6b3c5a1d9e14fb89c7dae513b86ddefc8aa767
+- PR body hash: 81ed7a001ae6ea8b70062618af503b73e8d1fdab0e4f6884397dba0dc292e6ea
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: dd228b25551a84107d9053e3c7789716aae834964981d7e0bea8b3671a1930fa
 

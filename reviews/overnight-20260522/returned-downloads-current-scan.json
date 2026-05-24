@@ -1,12 +1,12 @@
 {
-  "ok": true,
+  "ok": false,
   "mode": "canary-returned-downloads",
   "defaultInboxScan": true,
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicLaunchAllowed": false,
   "fleetRolloutAllowed": false,
-  "requireFound": false,
+  "requireFound": true,
   "includeAllZips": true,
   "discoveredRootCount": 2,
   "rootLabels": [
@@ -20,13 +20,13 @@
     "rootsWithProductionEvidence": 0,
     "productionEvidencePackets": 0,
     "returnedEvidencePackets": 0,
-    "handoffPackets": 12,
+    "handoffPackets": 1,
     "diagnosticBundles": 8,
     "unknownPackets": 19,
     "unreadablePackets": 5
   },
   "returnedWatch": {
-    "ok": true,
+    "ok": false,
     "mode": "canary-returned-watch",
     "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
     "writesRealFiles": false,
@@ -39,7 +39,7 @@
       "rootsWithProductionEvidence": 0,
       "productionEvidencePackets": 0,
       "returnedEvidencePackets": 0,
-      "handoffPackets": 12,
+      "handoffPackets": 1,
       "diagnosticBundles": 8,
       "unknownPackets": 19,
       "unreadablePackets": 5
@@ -48,11 +48,11 @@
       {
         "rootLabel": "Downloads",
         "status": "HANDOFF_PACKETS_ONLY",
-        "candidateCount": 30,
-        "scannedZipCount": 30,
+        "candidateCount": 19,
+        "scannedZipCount": 19,
         "returnedEvidencePackets": 0,
         "productionEvidencePackets": 0,
-        "handoffPackets": 12,
+        "handoffPackets": 1,
         "diagnosticBundles": 4,
         "unreadablePackets": 5,
         "unknownPackets": 9,
@@ -144,7 +144,7 @@
       }
     ]
   },
-  "childExitStatus": 0,
+  "childExitStatus": 1,
   "parseError": null,
   "nextActions": [
     "Keep waiting for a returned metrics-only production canary evidence packet.",

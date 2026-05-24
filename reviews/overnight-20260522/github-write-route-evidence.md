@@ -129,7 +129,7 @@ Verdict: resolved for PR body and blocker issue writes.
     verified PR branch head `106b78c` from approved runtime canary
     adapter/report commit `18d606a`. Updated at: 2026-05-24T06:51:08Z.
   - The PR body was refreshed again after rerunning the standard inbox scan:
-    0 production evidence packets, 12 handoff packets, 8 diagnostics, 19
+    0 production evidence packets, 1 handoff packet, 8 diagnostics, 19
     unknown packets, and 5 unreadable packets. Updated at:
     2026-05-24T07:00:10Z.
   - The PR body was refreshed again after adding hash-only triage summaries for
