@@ -124,6 +124,10 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-hybrid-gate-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight.json`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-evidence.md`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage.json`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage-evidence.md`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia.json`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia-evidence.md`,
   `${reviewDir}/returned-downloads-current-scan.json`,
   `${reviewDir}/returned-downloads-current-scan.md`,
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
@@ -1390,6 +1394,20 @@ check("fresh public benchmark target check passes", () => {
   const expandedHybridEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-hybrid-gate-evidence.md"), "utf8");
   const expandedProviderLivePreflightReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight.json"), "utf8"));
   const expandedProviderLivePreflightEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-evidence.md"), "utf8");
+  const expandedProviderLivePreflightVoyageReport = JSON.parse(
+    readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-voyage.json"), "utf8"),
+  );
+  const expandedProviderLivePreflightVoyageEvidence = readFileSync(
+    join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-voyage-evidence.md"),
+    "utf8",
+  );
+  const expandedProviderLivePreflightNvidiaReport = JSON.parse(
+    readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-nvidia.json"), "utf8"),
+  );
+  const expandedProviderLivePreflightNvidiaEvidence = readFileSync(
+    join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-nvidia-evidence.md"),
+    "utf8",
+  );
   const expandedProviderLivePreflightFresh = JSON.parse(
     run("node", [
       "packages/bench/provider-benchmark-live-preflight.mjs",
@@ -1785,11 +1803,48 @@ check("fresh public benchmark target check passes", () => {
       String(line).includes("reviews/overnight-20260522/public-longmemeval-expanded-run-target.json"),
     ),
   );
+  assert.ok(expandedProviderLivePreflightReport.liveCommandTemplate?.some((line) => String(line).includes("--strategies bm25-lite,full-hybrid-rerank")));
   assert.match(expandedProviderLivePreflightEvidence, /Provider Benchmark Live Preflight/);
   assert.match(expandedProviderLivePreflightEvidence, /Live run allowed: false/);
   assert.match(expandedProviderLivePreflightEvidence, /cloud-voyage4-voyage/);
   assert.match(expandedProviderLivePreflightEvidence, /cloud-nvidia-nemotron-1b/);
   assert.match(expandedProviderLivePreflightEvidence, /local-apple-qwen3-0_6b/);
+  assert.equal(expandedProviderLivePreflightVoyageReport.ok, true);
+  assert.equal(expandedProviderLivePreflightVoyageReport.mode, "provider-benchmark-live-preflight");
+  assert.equal(expandedProviderLivePreflightVoyageReport.status, "BLOCKED_PROVIDER_ENV");
+  assert.equal(expandedProviderLivePreflightVoyageReport.liveRunAllowed, false);
+  assert.equal(expandedProviderLivePreflightVoyageReport.callsProviderApis, false);
+  assert.equal(expandedProviderLivePreflightVoyageReport.sendsBenchmarkTextToProvider, false);
+  assert.equal(expandedProviderLivePreflightVoyageReport.target?.path, "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
+  assert.deepEqual(expandedProviderLivePreflightVoyageReport.requiredProviders, ["voyage"]);
+  assert.deepEqual(expandedProviderLivePreflightVoyageReport.missingCredentialProviders, ["voyage"]);
+  assert.equal(expandedProviderLivePreflightVoyageReport.singleProviderArmReady, true);
+  assert.deepEqual(expandedProviderLivePreflightVoyageReport.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage"]);
+  assert.ok(expandedProviderLivePreflightVoyageReport.blockers?.includes("voyage-credentials-missing"));
+  assert.ok(expandedProviderLivePreflightVoyageReport.liveCommandTemplate?.some((line) => String(line).includes("VOYAGE_API_KEY=<env-only-voyage-key>")));
+  assert.ok(!expandedProviderLivePreflightVoyageReport.liveCommandTemplate?.some((line) => String(line).includes("NVIDIA_API_KEY=<env-only-nvidia-key>")));
+  assert.ok(!expandedProviderLivePreflightVoyageReport.liveCommandTemplate?.some((line) => String(line).includes("GEMINI_API_KEY=<env-only-gemini-key>")));
+  assert.match(expandedProviderLivePreflightVoyageEvidence, /Provider Benchmark Live Preflight/);
+  assert.match(expandedProviderLivePreflightVoyageEvidence, /cloud-voyage4-voyage/);
+  assert.match(expandedProviderLivePreflightVoyageEvidence, /VOYAGE_API_KEY=<env-only-voyage-key>/);
+  assert.equal(expandedProviderLivePreflightNvidiaReport.ok, true);
+  assert.equal(expandedProviderLivePreflightNvidiaReport.mode, "provider-benchmark-live-preflight");
+  assert.equal(expandedProviderLivePreflightNvidiaReport.status, "BLOCKED_PROVIDER_ENV");
+  assert.equal(expandedProviderLivePreflightNvidiaReport.liveRunAllowed, false);
+  assert.equal(expandedProviderLivePreflightNvidiaReport.callsProviderApis, false);
+  assert.equal(expandedProviderLivePreflightNvidiaReport.sendsBenchmarkTextToProvider, false);
+  assert.equal(expandedProviderLivePreflightNvidiaReport.target?.path, "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
+  assert.deepEqual(expandedProviderLivePreflightNvidiaReport.requiredProviders, ["nvidia"]);
+  assert.deepEqual(expandedProviderLivePreflightNvidiaReport.missingCredentialProviders, ["nvidia"]);
+  assert.equal(expandedProviderLivePreflightNvidiaReport.singleProviderArmReady, true);
+  assert.deepEqual(expandedProviderLivePreflightNvidiaReport.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-nvidia-nemotron-1b"]);
+  assert.ok(expandedProviderLivePreflightNvidiaReport.blockers?.includes("nvidia-credentials-missing"));
+  assert.ok(expandedProviderLivePreflightNvidiaReport.liveCommandTemplate?.some((line) => String(line).includes("NVIDIA_API_KEY=<env-only-nvidia-key>")));
+  assert.ok(!expandedProviderLivePreflightNvidiaReport.liveCommandTemplate?.some((line) => String(line).includes("VOYAGE_API_KEY=<env-only-voyage-key>")));
+  assert.ok(!expandedProviderLivePreflightNvidiaReport.liveCommandTemplate?.some((line) => String(line).includes("GEMINI_API_KEY=<env-only-gemini-key>")));
+  assert.match(expandedProviderLivePreflightNvidiaEvidence, /Provider Benchmark Live Preflight/);
+  assert.match(expandedProviderLivePreflightNvidiaEvidence, /cloud-nvidia-nemotron-1b/);
+  assert.match(expandedProviderLivePreflightNvidiaEvidence, /NVIDIA_API_KEY=<env-only-nvidia-key>/);
   assert.equal(liveAutoresearchReport.ok, true);
   assert.equal(liveAutoresearchReport.fixtureOnly, false);
   assert.equal(liveAutoresearchReport.benchmark, "longmemeval");

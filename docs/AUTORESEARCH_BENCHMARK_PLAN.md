@@ -203,6 +203,19 @@ LongMemEval target, selected strategy list, consent flags, and env-only
 readiness without calling Voyage, Gemini, NVIDIA, the local Apple server, or
 any other provider. A
 `BLOCKED_PROVIDER_ENV` preflight means no live provider benchmark has been run.
+For a cheap first live test, run one provider family at a time with explicit
+`--strategies`. The checked-in single-provider expanded preflights are:
+
+- `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
+  for `bm25-lite`, `full-hybrid-rerank`, and `cloud-voyage4-voyage`.
+- `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-nvidia.json`
+  for `bm25-lite`, `full-hybrid-rerank`, and
+  `cloud-nvidia-nemotron-1b`.
+
+Those single-arm preflights still block without public-data consent,
+provider-call consent, and the matching env-only credential, but their live
+command templates name only the provider being tested. They are the preferred
+path for rate-limit-safe iteration before the full multi-provider matrix.
 For the stronger 30-question slice, use
 `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`; its
 checked-in provider preflight is

@@ -278,9 +278,9 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight -- \
 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
 VOYAGE_API_KEY=<env-only> \
-GEMINI_API_KEY=<env-only-if-running-gemini-arm> \
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live \
   --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
+  --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage \
   --max-memory-bytes 80000000
 ```
 
@@ -288,6 +288,13 @@ The checked-in expanded preflight is
 `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight.json`.
 It is blocked in the clean controller environment for the same reason: no
 provider-call consent, no public-data consent, and no env-only provider keys.
+For one-provider runs, prefer the checked-in single-arm preflights:
+`reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
+or
+`reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-nvidia.json`.
+Each report includes a live command template that names only the selected
+provider credential and keeps the BM25 and full-hybrid controls in the same
+comparison.
 
 Do not use the provider gate on private agent memories unless the operator has
 separately approved sending that text to the provider.

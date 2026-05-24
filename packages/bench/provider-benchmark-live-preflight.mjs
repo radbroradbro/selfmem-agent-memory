@@ -96,6 +96,7 @@ const report = {
   publicDataConfirmed,
   credentialPresence,
   missingCredentialProviders,
+  singleProviderArmReady: requiredProviders.length === 1,
   liveRunAllowed: ready,
   blockers,
   nextActions: ready
@@ -108,15 +109,7 @@ const report = {
         "Set RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 and RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 only for public benchmark slices.",
         "Re-run this preflight before spending provider calls.",
       ],
-  liveCommandTemplate: [
-    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
-    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
-    "VOYAGE_API_KEY=<env-only-if-running-voyage-arm>",
-    "GEMINI_API_KEY=<env-only-if-running-gemini-arm>",
-    "NVIDIA_API_KEY=<env-only-if-running-nvidia-arm>",
-    "SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-if-running-local-apple-arm>",
-    `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target ${displayPath(targetPath)}`,
-  ],
+  liveCommandTemplate: liveCommandTemplate({ requiredProviders, strategies, targetPath }),
 };
 
 const serialized = `${JSON.stringify(report, null, 2)}\n`;
@@ -151,6 +144,27 @@ function providerEnvNames(provider) {
   return [];
 }
 
+function liveCommandTemplate({ requiredProviders, strategies, targetPath }) {
+  return [
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+    ...requiredProviders.flatMap(providerEnvTemplateLines),
+    [
+      "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live",
+      `--target ${displayPath(targetPath)}`,
+      `--strategies ${strategies.join(",")}`,
+    ].join(" "),
+  ];
+}
+
+function providerEnvTemplateLines(provider) {
+  if (provider === "gemini") return ["GEMINI_API_KEY=<env-only-gemini-key>"];
+  if (provider === "voyage") return ["VOYAGE_API_KEY=<env-only-voyage-key>"];
+  if (provider === "nvidia") return ["NVIDIA_API_KEY=<env-only-nvidia-key>"];
+  if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-local-apple-server-url>"];
+  return [];
+}
+
 function toMarkdown(value) {
   return [
     "# Provider Benchmark Live Preflight",
@@ -179,6 +193,12 @@ function toMarkdown(value) {
     "## Next Actions",
     "",
     ...value.nextActions.map((item) => `- ${item}`),
+    "",
+    "## Live Command Template",
+    "",
+    "```bash",
+    ...value.liveCommandTemplate,
+    "```",
   ].join("\n");
 }
 

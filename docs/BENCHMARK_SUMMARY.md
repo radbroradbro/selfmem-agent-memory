@@ -138,6 +138,19 @@ no provider APIs, sends no benchmark text, and currently reports the same
 because it tests the cloud arms against the stronger slice where deterministic
 hybrid still failed to beat BM25.
 
+Two single-provider expanded preflights now make that next run less all-or-none:
+
+- Voyage arm:
+  `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`.
+- NVIDIA arm:
+  `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-nvidia.json`.
+
+Both compare the provider arm against `bm25-lite` and `full-hybrid-rerank` on
+the same 30-question target. Their command templates list only the selected
+provider's env variable, so a Voyage test is not blocked by missing NVIDIA,
+Gemini, or local Apple readiness, and an NVIDIA test is not blocked by missing
+Voyage, Gemini, or local Apple readiness.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are

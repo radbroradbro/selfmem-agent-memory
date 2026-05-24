@@ -253,6 +253,14 @@ harness we will use.
   `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`.
   This is the preferred next cloud-provider run because it compares against the
   stronger slice where deterministic hybrid still failed to beat BM25.
+- Single-provider expanded preflights:
+  `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
+  and
+  `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-nvidia.json`.
+  These are the first live-run candidates when the operator wants to spend only
+  one provider family. They keep `bm25-lite` and `full-hybrid-rerank` in the
+  same comparison table, but they require only the selected provider's env-only
+  credential.
 - Current LongMemEval-S autoresearch loop:
   `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
   runs 72 retrieval-proxy arms across lexical, dense-proxy, temporal,

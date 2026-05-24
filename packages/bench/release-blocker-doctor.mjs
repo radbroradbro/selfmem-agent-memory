@@ -80,6 +80,8 @@ const requiredFiles = {
   publicLongmemEvalProviderGateFixture: "public-longmemeval-provider-gate-fixture.json",
   publicLongmemEvalProviderLivePreflight: "public-longmemeval-provider-live-preflight.json",
   publicLongmemEvalExpandedProviderLivePreflight: "public-longmemeval-expanded-provider-live-preflight.json",
+  publicLongmemEvalExpandedProviderLivePreflightVoyage: "public-longmemeval-expanded-provider-live-preflight-voyage.json",
+  publicLongmemEvalExpandedProviderLivePreflightNvidia: "public-longmemeval-expanded-provider-live-preflight-nvidia.json",
   publicLongmemEvalAutoresearchLoop: "public-longmemeval-autoresearch-loop.json",
 };
 
@@ -157,6 +159,12 @@ const publicLongmemEvalProviderGateFixture = JSON.parse(readFileSync(join(root, 
 const publicLongmemEvalProviderLivePreflight = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-provider-live-preflight.json"), "utf8"));
 const publicLongmemEvalExpandedProviderLivePreflight = JSON.parse(
   readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight.json"), "utf8"),
+);
+const publicLongmemEvalExpandedProviderLivePreflightVoyage = JSON.parse(
+  readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-voyage.json"), "utf8"),
+);
+const publicLongmemEvalExpandedProviderLivePreflightNvidia = JSON.parse(
+  readFileSync(join(root, reviewDir, "public-longmemeval-expanded-provider-live-preflight-nvidia.json"), "utf8"),
 );
 const publicLongmemEvalAutoresearchLoop = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
 
@@ -339,6 +347,18 @@ assert.equal(publicLongmemEvalExpandedProviderLivePreflight.liveRunAllowed, fals
 assert.equal(publicLongmemEvalExpandedProviderLivePreflight.callsProviderApis, false);
 assert.equal(publicLongmemEvalExpandedProviderLivePreflight.sendsBenchmarkTextToProvider, false);
 assert.equal(publicLongmemEvalExpandedProviderLivePreflight.target?.path, "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
+assert.deepEqual(publicLongmemEvalExpandedProviderLivePreflightVoyage.requiredProviders, ["voyage"]);
+assert.deepEqual(publicLongmemEvalExpandedProviderLivePreflightVoyage.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage"]);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightVoyage.singleProviderArmReady, true);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightVoyage.liveRunAllowed, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightVoyage.callsProviderApis, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightVoyage.sendsBenchmarkTextToProvider, false);
+assert.deepEqual(publicLongmemEvalExpandedProviderLivePreflightNvidia.requiredProviders, ["nvidia"]);
+assert.deepEqual(publicLongmemEvalExpandedProviderLivePreflightNvidia.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-nvidia-nemotron-1b"]);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.singleProviderArmReady, true);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.liveRunAllowed, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.callsProviderApis, false);
+assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.sendsBenchmarkTextToProvider, false);
 assert.equal(publicLongmemEvalAutoresearchLoop.mode, "public-benchmark-autoresearch-loop");
 assert.equal(publicLongmemEvalAutoresearchLoop.publicBenchmarkClaimsAllowed, false);
 assert.equal(publicLongmemEvalAutoresearchLoop.memoryBenchAnswerQuality, false);
@@ -622,8 +642,12 @@ console.log(
             strategies: publicLongmemEvalProviderGateFixture.strategies?.map((item) => item.strategy),
             liveRunAllowed: publicLongmemEvalProviderLivePreflight.liveRunAllowed,
             expandedLiveRunAllowed: publicLongmemEvalExpandedProviderLivePreflight.liveRunAllowed,
+            voyageSingleArmLiveRunAllowed: publicLongmemEvalExpandedProviderLivePreflightVoyage.liveRunAllowed,
+            nvidiaSingleArmLiveRunAllowed: publicLongmemEvalExpandedProviderLivePreflightNvidia.liveRunAllowed,
             providerPreflightStatus: publicLongmemEvalProviderLivePreflight.status,
             expandedProviderPreflightStatus: publicLongmemEvalExpandedProviderLivePreflight.status,
+            voyageSingleArmPreflightStatus: publicLongmemEvalExpandedProviderLivePreflightVoyage.status,
+            nvidiaSingleArmPreflightStatus: publicLongmemEvalExpandedProviderLivePreflightNvidia.status,
           },
           autoresearchLoop: {
             armCount: publicLongmemEvalAutoresearchLoop.loop?.armCount,

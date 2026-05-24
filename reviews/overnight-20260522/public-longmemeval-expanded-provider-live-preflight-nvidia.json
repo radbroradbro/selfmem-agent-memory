@@ -26,43 +26,14 @@
   "strategies": [
     "bm25-lite",
     "full-hybrid-rerank",
-    "cloud-voyage-rerank-only",
-    "cloud-voyage4-voyage",
-    "cloud-gemini-embed-rerank-proxy",
-    "cloud-gemini-voyage-rerank",
-    "cloud-nvidia-retriever-500m",
-    "cloud-nvidia-nemotron-1b",
-    "cloud-nvidia-e5-mistral",
-    "local-apple-qwen3-0_6b"
+    "cloud-nvidia-nemotron-1b"
   ],
   "requiredProviders": [
-    "gemini",
-    "local-apple",
-    "nvidia",
-    "voyage"
+    "nvidia"
   ],
   "providerCallsEnabled": false,
   "publicDataConfirmed": false,
   "credentialPresence": {
-    "gemini": {
-      "present": false,
-      "keyCount": 0,
-      "envNames": [
-        "GEMINI_API_KEY",
-        "GEMINI_API_KEYS",
-        "GOOGLE_API_KEY",
-        "GOOGLE_API_KEYS",
-        "AI_STUDIO_API_KEY",
-        "AI_STUDIO_API_KEYS"
-      ]
-    },
-    "local-apple": {
-      "present": false,
-      "keyCount": 0,
-      "envNames": [
-        "SELFMEM_LOCAL_EMBED_BASE_URL"
-      ]
-    },
     "nvidia": {
       "present": false,
       "keyCount": 0,
@@ -72,31 +43,17 @@
         "NVAPI_KEY",
         "NVAPI_KEYS"
       ]
-    },
-    "voyage": {
-      "present": false,
-      "keyCount": 0,
-      "envNames": [
-        "VOYAGE_API_KEY",
-        "VOYAGE_API_KEYS"
-      ]
     }
   },
   "missingCredentialProviders": [
-    "gemini",
-    "local-apple",
-    "nvidia",
-    "voyage"
+    "nvidia"
   ],
-  "singleProviderArmReady": false,
+  "singleProviderArmReady": true,
   "liveRunAllowed": false,
   "blockers": [
     "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
     "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-    "gemini-credentials-missing",
-    "local-apple-credentials-missing",
-    "nvidia-credentials-missing",
-    "voyage-credentials-missing"
+    "nvidia-credentials-missing"
   ],
   "nextActions": [
     "Set provider credentials only in the shell environment, never in committed files.",
@@ -106,10 +63,7 @@
   "liveCommandTemplate": [
     "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
     "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
-    "GEMINI_API_KEY=<env-only-gemini-key>",
-    "SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-local-apple-server-url>",
     "NVIDIA_API_KEY=<env-only-nvidia-key>",
-    "VOYAGE_API_KEY=<env-only-voyage-key>",
-    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-nvidia-retriever-500m,cloud-nvidia-nemotron-1b,cloud-nvidia-e5-mistral,local-apple-qwen3-0_6b"
+    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-nvidia-nemotron-1b"
   ]
 }
