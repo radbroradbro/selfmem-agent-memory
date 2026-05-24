@@ -78,10 +78,10 @@ Live status:
   quality from 0.1089 to 0.4541 and P@1 from 0.1667 to 0.8333 with zero
   privacy failures. This is an autoresearch methodology signal, not a
   MemoryBench answer-quality win.
-- Promotes GitHub Actions run `26347410269` on `e88064a` as the latest
+- Promotes GitHub Actions run `26347754208` on `d91b27b` as the latest
   verified code/product baseline after the LongMemEval-S materialize-run lane,
-  retrieval-proxy blind baseline, release-gate hash binding, and sync evidence
-  refresh.
+  retrieval-proxy blind baseline, same-data strategy comparison,
+  release-gate hash binding, and sync evidence refresh.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark
@@ -131,10 +131,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
-  `e88064ac92158addf472536c9e2e1167ae595566`.
-- GitHub Actions run `26347410269`: passed CI after adding the public
-  LongMemEval-S materialize-run lane, binding the RecallWeave result to the
-  materialized query-set hash, and marking the result as retrieval-proxy only.
+  `d91b27bcc869656197c1cc67804530b75757bbe2`.
+- GitHub Actions run `26347754208`: passed CI after adding the public
+  LongMemEval-S materialize-run lane, same-data strategy comparison, binding
+  the RecallWeave result to the materialized query-set hash, and marking the
+  result as retrieval-proxy only.
 - Previous verified code/product baseline before the materialize-run lane:
   `8eb69e848d442b08ebf4f5204d6ed17224161683`.
 - GitHub Actions run `26346613433`: passed CI after adding the public

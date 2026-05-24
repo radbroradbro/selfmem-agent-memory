@@ -194,6 +194,9 @@ Scope:
   The same materialized slice now compares `jaccard`, `bm25-lite`, and
   `hybrid-v1`; `bm25-lite` wins the retrieval-proxy canary and the gate keeps
   the result bound to retrieval-proxy, no-public-claims wording.
+- GitHub Actions run `26347754208` passed on commit
+  `d91b27bcc869656197c1cc67804530b75757bbe2` after the strategy-comparison
+  lane was added.
 - Kept the gate public-safe and evidence-based.
 
 What `release:check` verifies:
