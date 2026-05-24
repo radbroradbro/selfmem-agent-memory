@@ -98,6 +98,7 @@ for (const query of queries) {
 const loaded = loadMemories(effectiveMemoriesPath, { preserveIds });
 assert.ok(loaded.candidates.length > 0, "memories input produced no searchable candidates");
 const providerStats = createProviderStats({ strategy: rankingStrategy, fixtureRequested });
+const localAppleDocumentEmbeddingCache = new Map();
 
 const responses = {};
 const contextBudgetStats = [];
@@ -563,7 +564,7 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
   }
   assertProviderBenchmarkAllowed("local-apple-qwen3-0_6b");
   const queryVector = (await localAppleEmbed([queryText], { providerStats: options.providerStats }))[0];
-  const documentVectors = await localAppleEmbed(densePool.map((candidate) => candidate.text), { providerStats: options.providerStats });
+  const documentVectors = await localAppleEmbedCandidates(densePool, { providerStats: options.providerStats });
   const denseRanked = densePool
     .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
     .sort(byScoreThenId);
@@ -578,6 +579,32 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
     { scoreScale: 8 },
   );
   return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+}
+
+async function localAppleEmbedCandidates(candidates, options = {}) {
+  const vectors = new Array(candidates.length);
+  const missing = [];
+  const missingIndexes = [];
+  candidates.forEach((candidate, index) => {
+    const key = candidate.contentHash ?? stableHash(candidate.text);
+    const cached = localAppleDocumentEmbeddingCache.get(key);
+    if (cached) {
+      vectors[index] = cached;
+      return;
+    }
+    missing.push(candidate.text);
+    missingIndexes.push({ index, key });
+  });
+  if (missing.length) {
+    const embedded = await localAppleEmbed(missing, options);
+    assert.equal(embedded.length, missing.length, "local Apple candidate embedding cache fill mismatch");
+    embedded.forEach((vector, offset) => {
+      const { index, key } = missingIndexes[offset];
+      localAppleDocumentEmbeddingCache.set(key, vector);
+      vectors[index] = vector;
+    });
+  }
+  return vectors;
 }
 
 function fuseRankedChannels(candidates, channels, options = {}) {
@@ -1011,15 +1038,23 @@ async function nvidiaRerank(query, candidates, config, options = {}) {
 }
 
 async function localAppleEmbed(texts, options = {}) {
-  const input = texts.map((text) => String(text ?? ""));
-  options.providerStats?.recordProviderCall("embedding", input.length);
-  const response = await localApplePost("/embeddings", {
-    input,
-    model: localAppleEmbedModel(),
-    encoding_format: "float",
+  const input = texts.map((text) => prepareLocalAppleEmbeddingInput(text));
+  const embeddings = [];
+  const batches = batchProviderInputs(input, {
+    maxCount: optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_BATCH_MAX_COUNT ?? "8", "local Apple embedding batch max count"),
+    maxEstimatedTokens: optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS ?? "12000", "local Apple embedding batch max tokens"),
   });
-  const embeddings = embeddingsFromOpenAiCompatibleResponse(response);
-  assert.equal(embeddings.length, input.length, "local Apple embeddings response length mismatch");
+  for (const batch of batches) {
+    options.providerStats?.recordProviderCall("embedding", batch.length);
+    const response = await localApplePost("/embeddings", {
+      input: batch,
+      model: localAppleEmbedModel(),
+      encoding_format: "float",
+    });
+    const batchEmbeddings = embeddingsFromOpenAiCompatibleResponse(response);
+    assert.equal(batchEmbeddings.length, batch.length, "local Apple embeddings response length mismatch");
+    embeddings.push(...batchEmbeddings);
+  }
   return embeddings;
 }
 
@@ -1147,7 +1182,12 @@ function embeddingsFromOpenAiCompatibleResponse(response) {
   if (Array.isArray(response?.data)) {
     return [...response.data]
       .sort((left, right) => Number(left.index ?? 0) - Number(right.index ?? 0))
-      .map((item) => item?.embedding?.values ?? item?.embedding ?? item?.values)
+      .map((item) => {
+        if (Array.isArray(item?.embedding)) return item.embedding;
+        if (Array.isArray(item?.embedding?.values)) return item.embedding.values;
+        if (Array.isArray(item?.values)) return item.values;
+        return null;
+      })
       .filter(Array.isArray);
   }
   if (Array.isArray(response?.embeddings)) return response.embeddings.filter(Array.isArray);
@@ -1281,6 +1321,18 @@ function nvidiaRerankEndpoint(config) {
 
 function localAppleEmbedModel() {
   return String(process.env.SELFMEM_LOCAL_EMBED_MODEL ?? "Qwen/Qwen3-Embedding-0.6B-GGUF");
+}
+
+function prepareLocalAppleEmbeddingInput(text) {
+  const source = String(text ?? "");
+  const maxEstimatedTokens = optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_MAX_TOKENS ?? "3000", "local Apple embedding max tokens");
+  if (estimateTokens(source) <= maxEstimatedTokens) return source;
+  const maxChars = Math.max(64, maxEstimatedTokens * 4);
+  const marker = "\n\n[RecallWeave local embedding view: middle elided]\n\n";
+  const available = Math.max(64, maxChars - marker.length);
+  const headChars = Math.max(32, Math.floor(available * 0.6));
+  const tailChars = Math.max(32, available - headChars);
+  return `${source.slice(0, headChars)}${marker}${source.slice(-tailChars)}`;
 }
 
 function providerCandidateLimit(envName, fallback) {

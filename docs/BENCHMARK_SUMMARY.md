@@ -190,6 +190,23 @@ fixture-covered, but not live-tested. The current implemented local arm is
 Qwen3 local embeddings plus RecallWeave's deterministic rerank proxy; a live
 Qwen3 reranker sidecar remains a future challenger.
 
+A first live Apple Silicon run is now recorded on the smaller 6-query
+LongMemEval-S slice:
+
+- `reviews/overnight-20260522/public-longmemeval-local-apple-live-provider-6q.json`
+- `reviews/overnight-20260522/public-longmemeval-local-apple-live-provider-6q.md`
+
+It used llama.cpp on Apple Metal with Qwen3 Embedding 0.6B GGUF, a 30-candidate
+local dense preselect, bounded head/tail embedding views for long sessions, and
+content-hash document embedding reuse inside the run. The local arm tied
+`bm25-lite` and `full-hybrid-rerank` on retrieval-proxy quality: quality
+0.4541, P@1 0.8333, recall@5 0.2917, and NDCG@10 0.3996, with zero privacy or
+redaction failures. It did not earn promotion because p50 latency was 17,026 ms
+versus 16 ms for BM25 and 32 ms for the deterministic full-hybrid control. The
+expanded 30-query local pass also exposed the right production requirement:
+local embeddings must be persisted in a reusable vector index before large
+local benchmarks or agent defaults are meaningful.
+
 Provider keys can stay in normal environment variables, or in private key files
 referenced by env vars such as `VOYAGE_API_KEYS_FILE`,
 `NVIDIA_API_KEYS_FILE`, and `GEMINI_API_KEYS_FILE`. Key files must live outside
