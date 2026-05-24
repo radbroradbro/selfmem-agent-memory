@@ -84,6 +84,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-slice-author.mjs",
   "packages/bench/public-benchmark-target-check.mjs",
   "packages/bench/public-benchmark-target-author.mjs",
+  "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
   `${reviewDir}/public-memorybench-source-lock.json`,
@@ -96,6 +97,10 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-run-target-check.json`,
   `${reviewDir}/public-longmemeval-run-target-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-run-target-review.md`,
+  `${reviewDir}/public-longmemeval-materialize-run.json`,
+  `${reviewDir}/public-longmemeval-materialize-run-evidence.md`,
+  `${reviewDir}/public-longmemeval-recallweave-run-result.json`,
+  `${reviewDir}/codex-public-longmemeval-materialize-run-review.md`,
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -1022,6 +1027,8 @@ check("release state is conservative", () => {
     "public-longmemeval-run-target",
     "public-benchmark-target-author",
     "public-benchmark-target-check",
+    "public-longmemeval-materialize-run",
+    "public-longmemeval-recallweave-run-result",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
   }
@@ -1268,6 +1275,12 @@ check("fresh public benchmark target check passes", () => {
   const liveRunTargetEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-run-target-evidence.md"), "utf8");
   const liveRunTargetReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-run-target-check.json"), "utf8"));
   const liveRunTargetReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-run-target-review.md"), "utf8");
+  const materializeFixture = JSON.parse(run("node", ["packages/bench/public-benchmark-materialize-run.mjs"]).stdout);
+  const materializeMarkdown = run("node", ["packages/bench/public-benchmark-materialize-run.mjs", "--format", "markdown"]).stdout;
+  const liveMaterializeReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run.json"), "utf8"));
+  const liveMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run-evidence.md"), "utf8");
+  const liveRecallWeaveRun = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-recallweave-run-result.json"), "utf8"));
+  const liveMaterializeReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-materialize-run-review.md"), "utf8");
   const authoredTarget = JSON.parse(authored.stdout);
   const report = JSON.parse(result.stdout);
   assert.equal(authoredTarget.fixtureOnly, true);
@@ -1312,6 +1325,57 @@ check("fresh public benchmark target check passes", () => {
   assert.match(liveRunTargetReview, /PASS WITH CONCERNS/);
   assert.match(liveRunTargetReview, /fails `--strict`/);
   assert.match(liveRunTargetReview, /Do not claim release readiness/i);
+  assert.equal(materializeFixture.ok, true);
+  assert.equal(materializeFixture.mode, "public-benchmark-materialize-run");
+  assert.equal(materializeFixture.fixtureOnly, true);
+  assert.equal(materializeFixture.metricsOnly, true);
+  assert.equal(materializeFixture.publicSafe, true);
+  assert.equal(materializeFixture.rawQuestionIdsIncluded, false);
+  assert.equal(materializeFixture.rawQuestionsIncluded, false);
+  assert.equal(materializeFixture.rawAnswersIncluded, false);
+  assert.equal(materializeFixture.rawMemoryIncluded, false);
+  assert.equal(materializeFixture.privateOutputs?.directoryInsideRepository, false);
+  assert.match(materializeMarkdown, /Public Benchmark Materialize Run/);
+  assert.equal(liveMaterializeReport.ok, true);
+  assert.equal(liveMaterializeReport.fixtureOnly, false);
+  assert.equal(liveMaterializeReport.claimTier, "run-only");
+  assert.equal(liveMaterializeReport.source?.datasetHash, "sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442");
+  assert.equal(liveMaterializeReport.selection?.queryCount, 6);
+  assert.equal(liveMaterializeReport.selection?.haystackSessionCount, 287);
+  assert.equal(liveMaterializeReport.selection?.expectedResultRefCount, 18);
+  assert.equal(liveMaterializeReport.selection?.selectedQuestionIdsHash, "sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23");
+  assert.equal(liveMaterializeReport.selection?.answerLabelsHash, "sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e");
+  assert.ok(liveMaterializeReport.selection?.collectorCompatibleQuerySetHash?.startsWith("sha256:"));
+  assert.equal(liveMaterializeReport.privateOutputs?.directoryInsideRepository, false);
+  assert.equal(liveMaterializeReport.rawPrivateOutputPathIncluded, false);
+  assert.match(liveMaterializeEvidence, /Public Benchmark Materialize Run/);
+  assert.match(liveMaterializeEvidence, /Query count: 6/);
+  assert.equal(liveRecallWeaveRun.evidenceType, "live-recallweave-baseline-collector-result");
+  assert.equal(liveRecallWeaveRun.provider, "recallweave");
+  assert.equal(liveRecallWeaveRun.fixtureOnly, false);
+  assert.equal(liveRecallWeaveRun.metricsOnly, true);
+  assert.equal(liveRecallWeaveRun.retrievalProxyOnly, true);
+  assert.equal(liveRecallWeaveRun.memoryBenchAnswerQuality, false);
+  assert.equal(liveRecallWeaveRun.publicBenchmarkClaimsAllowed, false);
+  assert.equal(liveRecallWeaveRun.datasetSlice, "longmemeval-s-cleaned-canary-6-first-per-type-2026-05-23");
+  assert.equal(liveRecallWeaveRun.querySetHash, liveMaterializeReport.selection?.collectorCompatibleQuerySetHash);
+  assert.equal(liveRecallWeaveRun.queryCount, 6);
+  assert.equal(liveRecallWeaveRun.querySetEvidence?.publicBenchmarkReady, true);
+  assert.equal(liveRecallWeaveRun.querySetEvidence?.expectedResultRefCount, 18);
+  assert.equal(liveRecallWeaveRun.privacyLeakCount, 0);
+  assert.equal(liveRecallWeaveRun.redactionFailureCount, 0);
+  assert.equal(liveRecallWeaveRun.rawMemoryIncluded, false);
+  assert.equal(liveRecallWeaveRun.rawTranscriptIncluded, false);
+  assert.equal(liveRecallWeaveRun.rawPromptIncluded, false);
+  assert.equal(liveRecallWeaveRun.rawAnswerIncluded, false);
+  assert.equal(liveRecallWeaveRun.retrievalConfig?.contextBudget?.tokenBudget, 1600);
+  assert.equal(liveRecallWeaveRun.matchedHostedRunPresent, false);
+  assert.equal(liveRecallWeaveRun.reviewerApprovalCount, 0);
+  assert.ok(Number(liveRecallWeaveRun.metrics?.quality) > 0);
+  assert.ok(Number(liveRecallWeaveRun.metrics?.quality) < 1);
+  assert.match(liveMaterializeReview, /PASS WITH CONCERNS/);
+  assert.match(liveMaterializeReview, /retrieval proxy/i);
+  assert.match(liveMaterializeReview, /not a MemoryBench quality win/i);
   const liveRunTargetStrict = JSON.parse(
     run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", liveRunTargetPath, "--strict-run"]).stdout,
   );
@@ -1546,6 +1610,12 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveRunTargetReport), secretPattern);
   assert.doesNotMatch(liveRunTargetEvidence, secretPattern);
   assert.doesNotMatch(liveRunTargetReview, secretPattern);
+  assert.doesNotMatch(JSON.stringify(materializeFixture), secretPattern);
+  assert.doesNotMatch(materializeMarkdown, secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveMaterializeReport), secretPattern);
+  assert.doesNotMatch(liveMaterializeEvidence, secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveRecallWeaveRun), secretPattern);
+  assert.doesNotMatch(liveMaterializeReview, secretPattern);
   assert.doesNotMatch(result.stdout, privatePathPattern);
   assert.doesNotMatch(authored.stdout, privatePathPattern);
   assert.doesNotMatch(markdown, privatePathPattern);
@@ -1554,6 +1624,12 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveRunTargetReport), privatePathPattern);
   assert.doesNotMatch(liveRunTargetEvidence, privatePathPattern);
   assert.doesNotMatch(liveRunTargetReview, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(materializeFixture), privatePathPattern);
+  assert.doesNotMatch(materializeMarkdown, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(liveMaterializeReport), privatePathPattern);
+  assert.doesNotMatch(liveMaterializeEvidence, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(liveRecallWeaveRun), privatePathPattern);
+  assert.doesNotMatch(liveMaterializeReview, privatePathPattern);
 });
 
 check("fresh local session compaction audit passes", () => {

@@ -64,6 +64,7 @@
       "packages/bench/public-benchmark-slice-author.mjs",
       "packages/bench/public-benchmark-target-author.mjs",
       "packages/bench/public-benchmark-target-check.mjs",
+      "packages/bench/public-benchmark-materialize-run.mjs",
       "packages/bench/fixtures/public-benchmark-target.fixture.json",
       "packages/bench/recallweave-baseline-collector.mjs",
       "packages/bench/recallweave-response-export.mjs",
@@ -160,7 +161,9 @@
     "public-benchmark-slice",
     "public-longmemeval-run-target",
     "public-benchmark-target-author",
-    "public-benchmark-target-check"
+    "public-benchmark-target-check",
+    "public-longmemeval-materialize-run",
+    "public-longmemeval-recallweave-run-result"
   ],
   "reviewerEvidence": {
     "freshCanaryWindow": {

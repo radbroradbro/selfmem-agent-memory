@@ -73,7 +73,12 @@ too expensive for the next run.
    row is attached yet. Then run
    `benchmark:public-target -- --target <target.json> --strict` only after a
    reported comparison row is attached, so the target cannot be confused with
-   component-only evidence or a private fixture.
+   component-only evidence or a private fixture. Once the run-only target
+   passes, run `benchmark:public-materialize -- --live --target <target.json>`.
+   That command writes raw query and haystack inputs only to an
+   operator-private directory and commits only hashes, counts, and command
+   templates. Its collector-compatible query-set hash must match the
+   RecallWeave result hash before the run counts as same-data evidence.
 2. Freeze a small but real canary slice from MemoryBench, LongMemEval, LoCoMo,
    ConvoMem, BEAM, or another documented memory benchmark.
    Use the same public data, repository or dataset revision, split, labels,
@@ -83,6 +88,12 @@ too expensive for the next run.
    question type, selected by deterministic first-per-type round-robin after
    sorting by `question_id`.
 3. Run RecallWeave on that slice with a fixed provider arm.
+   The first LongMemEval-S run is a retrieval-proxy baseline from the local
+   RecallWeave response exporter, not official MemoryBench answer judging. It
+   scored 0.1089 quality on six source-locked rows with zero privacy failures.
+   Treat that as the blind baseline for autoresearch, not as a win. The result
+   must carry `retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`,
+   and `publicBenchmarkClaimsAllowed: false`.
 4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
    latency, context tokens, and cost against the reported target.
 5. If the canary beats the reported target under matching metric definitions,

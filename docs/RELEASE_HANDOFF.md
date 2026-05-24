@@ -138,6 +138,11 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json \
   --strict-run
 
+npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --output reviews/overnight-20260522/public-longmemeval-materialize-run.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-materialize-run-evidence.md
+
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
   --benchmark longmemeval \
   --source-url https://github.com/supermemoryai/memorybench \
@@ -165,6 +170,13 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json>
 Use `--strict-run` for a real same-data run target without comparison claims.
 Use `--strict` only when a reported leaderboard or provider row is attached and
 the result will be compared.
+
+The current materialized LongMemEval-S run writes private query and haystack
+files outside the repository and commits only metrics-safe evidence. The
+checked-in retrieval-proxy result is
+`reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
+It is useful as a blind autoresearch baseline, but it is not a MemoryBench
+answer-quality result and not a public comparison claim.
 
 Run this before any hosted Supermemory comparison claim:
 

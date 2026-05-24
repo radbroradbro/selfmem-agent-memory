@@ -26,6 +26,22 @@ npm exec --yes pnpm@10.23.0 -- baseline:run -- --fixture
 npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake
 ```
 
+The public benchmark lane now also includes a source-locked LongMemEval-S
+materialization path:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json
+```
+
+That command uses the same public LongMemEval-S dataset hash as the checked-in
+run-only target, writes the raw query set and haystack sessions only to a
+private local directory, and emits public-safe hashes and counts. The first
+retrieval-proxy RecallWeave run on that slice scored 0.1089 quality, P@1
+0.1667, recall@5 0.0833, recall@10 0.0833, NDCG@10 0.1022, p50 latency 62 ms,
+p95 latency 71 ms, average context tokens 1600, zero cost, and zero redaction
+failures. This is a blind autoresearch baseline, not a MemoryBench quality win.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are

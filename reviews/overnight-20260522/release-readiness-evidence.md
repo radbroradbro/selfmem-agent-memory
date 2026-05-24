@@ -181,6 +181,15 @@ Scope:
   credentials, private paths, memories, transcripts, or diagnostics.
 - Reduced aggregate smoke churn by using one build before built-artifact smoke
   commands.
+- Added public LongMemEval materialize-run coverage to the release gate. The
+  materializer consumes the run-only target, confirms the public dataset and
+  selected-id hashes, writes raw query and haystack inputs only outside the
+  repository, and commits only counts, hashes, command templates, and the
+  collector-compatible query-set hash used to bind the scored run.
+- Added the first public LongMemEval RecallWeave retrieval-proxy result to the
+  gate. The gate treats it as a blind autoresearch baseline, requires zero
+  privacy failures, requires explicit retrieval-proxy/no-public-claims flags,
+  and explicitly blocks MemoryBench quality-win language.
 - Kept the gate public-safe and evidence-based.
 
 What `release:check` verifies:

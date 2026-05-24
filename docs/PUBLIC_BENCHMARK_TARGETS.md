@@ -39,6 +39,10 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author -- \
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json \
   --strict-run
+npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --output reviews/overnight-20260522/public-longmemeval-materialize-run.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-materialize-run-evidence.md
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
 
@@ -149,6 +153,26 @@ harness we will use.
   generated from the slice manifest with `claimTier: run-only`; it passes
   `benchmark:public-target -- --strict-run` and keeps comparison claims blocked
   until a source-locked reported target row passes `--strict`.
+- Current LongMemEval-S private materialization:
+  `reviews/overnight-20260522/public-longmemeval-materialize-run.json`. It
+  confirms the same dataset hash and deterministic selected-id hash, writes the
+  raw query set and haystack sessions only to an operator-private directory,
+  and commits only counts, hashes, and command templates. The materialized
+  slice has 6 queries, 287 haystack sessions, and 18 expected references. It
+  also emits the collector-compatible query-set hash so the release gate can
+  prove the checked-in RecallWeave result came from the materialized same-data
+  query set.
+- Current RecallWeave retrieval-proxy run:
+  `reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
+  It uses the source-locked LongMemEval-S canary data with the local
+  RecallWeave response exporter and the repository's retrieval metrics. It
+  reports quality 0.1089, P@1 0.1667, recall@5 0.0833, recall@10 0.0833,
+  NDCG@10 0.1022, p50 latency 62 ms, p95 latency 71 ms, average context tokens
+  1600, zero cost, and zero redaction failures. This is a retrieval-proxy
+  baseline, not a MemoryBench answer-quality win and not a public benchmark
+  claim. The result JSON carries explicit `retrievalProxyOnly: true`,
+  `memoryBenchAnswerQuality: false`, and `publicBenchmarkClaimsAllowed: false`
+  flags so it cannot be separated from that caveat.
 - LongMemEval is a strong target because it uses 500 human-curated questions and
   tests information extraction, multi-session reasoning, knowledge update,
   temporal reasoning, and abstention.

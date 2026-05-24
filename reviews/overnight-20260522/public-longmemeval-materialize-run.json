@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-materialize-run",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "claimTier": "run-only",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesPrivateFiles": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-24T00:23:38.248Z",
+  "source": {
+    "memoryBenchCommit": "118209a746d97d0d85e5a7234267f0b6962857e9",
+    "datasetHost": "huggingface.co",
+    "datasetHash": "sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "datasetByteSize": 277383467,
+    "datasetItemCount": 500
+  },
+  "target": {
+    "targetIdHash": "db35dc9732c3f215",
+    "targetFileHash": "sha256:25292b75a9a11119a39103d26f368ec05491e188b97caf6df2575a11aa8331f7",
+    "sourceLockHash": "sha256:dae7e055cfa65b82e9ee1d03a8cab874839c740789a4a19d2b1501ae454824e4",
+    "splitHash": "6f0745e496075d65",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o",
+    "contextTokenBudget": 1600,
+    "limit": 10
+  },
+  "selection": {
+    "selectedCount": 6,
+    "questionTypeCount": 6,
+    "selectedQuestionIdsHash": "sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23",
+    "answerLabelsHash": "sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e",
+    "queryCount": 6,
+    "haystackSessionCount": 287,
+    "expectedResultRefCount": 18,
+    "querySetHash": "sha256:cbe842779aead8c27f308100838a8022b6af4437c8328de6c8242b8616408111",
+    "collectorCompatibleQuerySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+    "memoriesFileHash": "sha256:f8f6949f8106c1ea331b999ad66ee626cbda824f9814c0f193cba92f437705ab"
+  },
+  "privateOutputs": {
+    "directoryLabel": "operator-private-output-dir",
+    "directoryInsideRepository": false,
+    "fileMode": "0600",
+    "directoryMode": "0700",
+    "files": [
+      {
+        "role": "queryset",
+        "name": "longmemeval-queryset.private.json",
+        "hash": "sha256:7b8a5f034c186abcfcd5171812b4630bff6239d71c09f4c3c48f1e7672ad6e73",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "memories",
+        "name": "longmemeval-memories.private.jsonl",
+        "hash": "sha256:ab0d6a74b3cdf0c2659a0d3ff477fccb69641246cbbef204402f2a750fde54f6",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "readme",
+        "name": "README.private.txt",
+        "hash": "sha256:c10118c9a418153dd2783a98042b216f212b492ff7a5a508abcd87f483a37d7b",
+        "rawTextPrivate": false
+      }
+    ]
+  },
+  "runCommands": {
+    "exportResponses": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --preserve-ids --context-token-budget 1600 --limit 10 --output <private-output-dir>/longmemeval-recallweave-responses.private.json",
+    "collectMetrics": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --output <public-metrics-output.json>"
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "rawQuestionIdsIncluded": false,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "rawPrivateOutputPathIncluded": false,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Run the RecallWeave response exporter against the private query set and memories file.",
+    "Run the RecallWeave baseline collector against the private query set and exported responses.",
+    "Attach only the metrics-only result file before moving this target beyond run-only."
+  ]
+}
