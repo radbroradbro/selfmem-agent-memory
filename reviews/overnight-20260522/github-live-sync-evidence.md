@@ -143,13 +143,16 @@ Date: 2026-05-23
   including the `cloud-voyage4-lite-voyage-lite` arm. The refresh kept the
   body text public-safe and preserved the rule that this is retrieval-proxy
   canary evidence, not MemoryBench answer-quality proof.
+- PR #5 and issue #6 were refreshed again after promoting CI-passed commit
+  `2bb8b6b3` as the latest verified branch head while preserving `18d606a` as
+  the approved runtime canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T16:43:32Z
+- PR body refreshed at: 2026-05-24T16:52:41Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T16:43:32Z
-- PR body hash: 0c038c0943dbaee5ea3c24d6fae4d6cccd0767e75704c058ec184ddae1658605
+- Issue updated at: 2026-05-24T16:52:41Z
+- PR body hash: db6a28aa238c65645ef8ff7a0e96b530e6f27bc3086d6bd109c18a7140bef316
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 0e58a2ec92e19cd6dc25fd1670c44d1c5d5a53c01cb5b7774403a669d4cae490
+- Issue body hash: c2c38268e32f3433c0e4a47ec9416b8973c1c8d371c8f9c6df8a274c75c512f4
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

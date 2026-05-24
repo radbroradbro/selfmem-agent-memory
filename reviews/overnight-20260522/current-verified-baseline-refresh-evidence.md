@@ -11,12 +11,14 @@ guards move forward without silently changing what the one-agent runtime canary
 must prove. The latest branch-head refresh requires explicit native/default
 memory proof in canary reports and packet review; it does not change the
 approved runtime adapter commit that returned agents must report.
+The current branch-head refresh adds the same-data Voyage latency comparison
+gate and keeps it as retrieval-proxy evidence, not a MemoryBench/SOTA claim.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `6ac6dd830db5ed1ad67840fc457a13b27729c07b`
-- Commit title: `docs: refresh native memory canary packet`
-- GitHub Actions run: `26365847461`
+- Commit: `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`
+- Commit title: `bench: add Voyage latency comparison gate`
+- GitHub Actions run: `26367018906`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -24,7 +26,7 @@ approved runtime adapter commit that returned agents must report.
 
 - Commit: `18d606aff589986b4d8b416a686bedb7ff1506d2`
 - Commit title: `fix: require native memory evidence`
-- GitHub Actions run: `26365847461`
+- GitHub Actions run: `26353888297`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -39,7 +41,9 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
 - `npm exec --yes pnpm@10.23.0 -- release:doctor`
-- GitHub Actions run `26365847461`
+- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the 30-query
+  LongMemEval-S target with BM25, full-hybrid, and Voyage provider arms
+- GitHub Actions run `26367018906`
 
 ## Canary Handoff Artifact
 

@@ -209,21 +209,21 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-  `6ac6dd830db5ed1ad67840fc457a13b27729c07b`.
-- GitHub Actions run `26365847461`: passed CI after requiring explicit
-  native/default memory evidence in canary reports, intake, remediation, and
-  packet review, then refreshing the sendable one-agent handoff. This does not
-  change the approved runtime canary adapter/report commit.
+  `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`.
+- GitHub Actions run `26367018906`: passed CI after adding the same-data Voyage
+  latency comparison gate. This does not change the approved runtime canary
+  adapter/report commit.
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-  `6ac6dd830db5ed1ad67840fc457a13b27729c07b`.
-- GitHub Actions run `26365847461`: passed CI with release checks, release
+  `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`.
+- GitHub Actions run `26367018906`: passed CI with release checks, release
   doctor, live GitHub sync, goal audit, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
-  same comparison, blocks live provider calls until public-data/provider-call
-  consent plus env-only readiness are present, and requires returned one-agent
-  canary packets to report the approved runtime adapter commit.
+  same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
+  beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice, and
+  requires returned one-agent canary packets to report the approved runtime
+  adapter commit.
 - Current live Voyage provider evidence now includes both a 6-query and
   30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
   `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on

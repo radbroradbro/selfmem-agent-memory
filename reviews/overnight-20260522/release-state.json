@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "6ac6dd830db5ed1ad67840fc457a13b27729c07b",
-    "ciRunId": 26365847461,
+    "headSha": "2bb8b6b3f024ed3f691196fd739065d8c00dd27a",
+    "ciRunId": 26367018906,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after requiring explicit native/default memory evidence in canary reports and refreshing the one-agent handoff packet. Current evidence keeps bm25-lite as a control rather than the target product system, blocks live provider calls until public-data/provider-call consent plus env-only readiness are present, blocks public benchmark claims until same-data provider-backed comparisons pass, requires returned one-agent canary packets to report the approved runtime adapter commit, reports zero privacy failures, and keeps public launch blocked until owner approval and one real strict production canary. Local release:check, release:doctor, release:github-sync, diff check, goal:audit, secret scan, and GitHub Actions run 26365847461 passed."
+    "note": "Latest inspected code/product baseline after adding the same-data Voyage latency comparison gate. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice with zero privacy failures, keeps MemoryBench/SOTA claims blocked, requires returned one-agent canary packets to report the approved runtime adapter commit, and keeps public launch blocked until owner approval and one real strict production canary. Local release:check, release:doctor, release:github-sync, diff check, goal:audit, secret scan, and GitHub Actions run 26367018906 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -391,14 +391,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "6ac6dd830db5ed1ad67840fc457a13b27729c07b",
-    "ciRunId": 26365847461,
+    "headSha": "2bb8b6b3f024ed3f691196fd739065d8c00dd27a",
+    "ciRunId": 26367018906,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest verified PR branch head after adding explicit native/default memory proof to canary reports, intake, remediation, and packet review, then refreshing the sendable one-agent handoff. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest verified PR branch head after adding the same-data Voyage latency comparison gate and public-safe evidence. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",

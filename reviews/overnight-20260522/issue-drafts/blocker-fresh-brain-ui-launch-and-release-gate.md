@@ -10,21 +10,21 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `6ac6dd830db5ed1ad67840fc457a13b27729c07b`.
-- GitHub Actions run `26365847461` passed CI after requiring explicit
-  native/default memory evidence in canary reports, intake, remediation, and
-  packet review, then refreshing the sendable one-agent handoff.
+- `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`.
+- GitHub Actions run `26367018906` passed CI after adding the same-data Voyage
+  latency comparison gate.
   This did not change the approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `6ac6dd830db5ed1ad67840fc457a13b27729c07b`.
-- GitHub Actions run `26365847461` passed CI with release checks, release
+- `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`.
+- GitHub Actions run `26367018906` passed CI with release checks, release
   doctor, live GitHub sync, goal audit, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
-  same comparison, blocks live provider calls until public-data/provider-call
-  consent plus env-only readiness are present, and requires returned one-agent
-  canary packets to report the approved runtime adapter commit.
+  same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
+  beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice, and
+  requires returned one-agent canary packets to report the approved runtime
+  adapter commit.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568` passed CI after requiring a same-data
