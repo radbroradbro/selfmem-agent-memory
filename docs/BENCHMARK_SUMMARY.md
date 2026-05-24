@@ -63,6 +63,14 @@ cutting average context tokens in half. The checked-in retrieval-proxy run has
 now been regenerated with this setting. This is still not MemoryBench
 answer-quality evidence.
 
+BM25-lite is the control floor, not the final agent-memory design. The tested
+`hybrid-v1` arm is only a lightweight lexical hybrid over BM25, Jaccard,
+bigrams, and rank boost. It is not the full RecallWeave stack with embeddings,
+graph/topic routing, temporal supersession, hosted read-through fusion, query
+expansion, and reranking. The next benchmark gate must compare BM25-lite
+against those real hybrid arms on the same source-locked data before any agent
+default changes.
+
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched
 RecallWeave run, a RecallWeave win, and two independent reviewer approvals are

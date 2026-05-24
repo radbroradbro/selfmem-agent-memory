@@ -83,6 +83,11 @@ Live status:
   candidate limit; `bm25-lite-b800-k5` preserves quality 0.4541 while cutting
   average context tokens to 800. The canonical checked-in run now uses this
   setting.
+- Clarifies that BM25-lite is the control floor and fallback, not the final
+  agent-memory default. The tested `hybrid-v1` arm is a lightweight lexical
+  hybrid only; the next benchmark gate must compare BM25-lite against dense,
+  graph, temporal, query-expansion, and reranked hybrid arms on the same
+  source-locked data.
 - Promotes GitHub Actions run `26348625868` on `9a95d08` as the latest
   verified code/product baseline after promoting the canonical LongMemEval-S
   retrieval-proxy run to `bm25-lite-b800-k5`, binding it to the materialized

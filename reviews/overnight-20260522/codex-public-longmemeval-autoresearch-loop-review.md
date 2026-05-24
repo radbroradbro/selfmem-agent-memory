@@ -28,6 +28,10 @@ Concerns:
 
 - This is still retrieval-proxy evidence, not MemoryBench answer-quality
   evaluation.
+- The tested `hybrid-v1` arm is only a lightweight lexical hybrid. It does not
+  exercise the intended RecallWeave product hybrid of dense embeddings, graph
+  routing, temporal supersession, hosted read-through fusion, query expansion,
+  and reranking.
 - The loop searched sparse retrieval, context budget, and candidate limit only.
   It did not yet test embedding, reranking, temporal retrieval, graph expansion,
   or query expansion.
@@ -35,6 +39,7 @@ Concerns:
 
 Approval:
 
-Keep `bm25-lite-b800-k5` as the next local-only canary setting. Expand the
-autoresearch loop next with embedding, reranking, temporal, or query-expansion
-arms against the same source-locked slice before making broader claims.
+Keep `bm25-lite-b800-k5` as the control floor and fallback canary setting.
+Expand the autoresearch loop next with embedding, reranking, temporal, graph,
+and query-expansion arms against the same source-locked slice before making
+broader claims or changing the agent default.

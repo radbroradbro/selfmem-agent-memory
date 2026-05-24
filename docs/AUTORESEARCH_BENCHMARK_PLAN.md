@@ -103,12 +103,40 @@ too expensive for the next run.
    budget, and candidate limit. It selected `bm25-lite-b800-k5`, which kept
    quality at 0.4541 while cutting average context tokens to 800. This becomes
    the current checked-in retrieval-proxy canary setting.
+   This is a control floor, not the intended agent-memory default. The tested
+   `hybrid-v1` arm is a lightweight lexical hybrid over BM25, Jaccard, bigrams,
+   and rank boost. It does not yet include dense embeddings, graph traversal,
+   temporal supersession, hosted read-through fusion, query expansion, or a
+   learned reranker.
 4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
    latency, context tokens, and cost against the reported target.
 5. If the canary beats the reported target under matching metric definitions,
    label it `canary-trending-win`, not full SOTA.
 6. If it loses, run the autoresearch loop against the largest gap until a
    canary trend beats the target or the stopping rule fires.
+
+## Next Hybrid Benchmark Gate
+
+Do not promote BM25-lite as the final memory strategy. Keep it as the cheap
+control and fallback. The next benchmark gate must compare it against real
+hybrid arms on the same source-locked data:
+
+- `bm25-lite-b800-k5`: lexical control and emergency fallback.
+- `dense-only`: embedding retrieval only, with provider/model/dimensions
+  recorded.
+- `sparse-dense-rrf`: BM25 plus dense retrieval with reciprocal-rank fusion.
+- `sparse-dense-temporal`: sparse/dense fusion with recency, update, and
+  supersession signals.
+- `sparse-dense-graph-temporal`: topic/wiki graph expansion plus temporal
+  signals.
+- `full-hybrid-rerank`: sparse, dense, graph, temporal, and reranker.
+- Optional `query-expansion-on`: only if the expanded query text is logged by
+  hash and the original query remains the evaluation key.
+
+The full hybrid arm only becomes the agent default if it beats BM25-lite on
+quality, or ties quality while improving a meaningful operational metric on a
+larger and more varied slice. Otherwise BM25-lite remains the fallback, and the
+hybrid method needs more work.
 
 Allowed wording after a small-slice win:
 
