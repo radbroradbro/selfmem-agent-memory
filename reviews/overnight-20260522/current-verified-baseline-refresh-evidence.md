@@ -13,6 +13,21 @@ memory proof in canary reports and packet review; it does not change the
 approved runtime adapter commit that returned agents must report.
 The current branch-head refresh adds the same-data Voyage latency comparison
 gate and keeps it as retrieval-proxy evidence, not a MemoryBench/SOTA claim.
+The latest observed PR-head refresh also adds public benchmark caveat updates
+and a local Apple preflight packet. It keeps the local Apple lane explicit:
+scaffolded and fixture-covered, but not live-tested until a local embedding
+endpoint is configured.
+
+## Latest Observed PR Branch Head
+
+- Commit: `ede755d9f77812cc384cc10a625232a379d18098`
+- Commit title: `docs: refresh public benchmark caveats`
+- GitHub Actions run: `26374762450`
+- CI conclusion: `success`
+- PR branch: `feat/nucleus-wiki-native-contract`
+
+This does not change the approved runtime canary adapter/report commit. It only
+updates the public-facing benchmark caveat and local Apple preflight evidence.
 
 ## Latest Verified PR Branch Head
 

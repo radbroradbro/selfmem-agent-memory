@@ -395,14 +395,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "2bb8b6b3f024ed3f691196fd739065d8c00dd27a",
-    "ciRunId": 26367018906,
+    "headSha": "ede755d9f77812cc384cc10a625232a379d18098",
+    "ciRunId": 26374762450,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_and_goal_audit",
+    "localSmoke": "release_check_covers_public_caveats_local_apple_preflight_github_sync_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest verified PR branch head after adding the same-data Voyage latency comparison gate and public-safe evidence. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest observed PR branch head after refreshing public benchmark caveats and local Apple preflight evidence. GitHub Actions run 26374762450 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
