@@ -109,7 +109,13 @@ Live status:
   Gemini/Voyage credential presence without calling provider APIs or sending
   benchmark text. The current controller evidence reports
   `BLOCKED_PROVIDER_ENV`, so no live provider benchmark claim is made.
-- Promotes GitHub Actions run `26349930959` on `a67c411` as the latest
+- Promotes GitHub Actions run `26350184513` on `95768a6` as the latest
+  verified code/product baseline after adding the live provider benchmark
+  preflight. The preflight confirms the provider-backed benchmark lane compares
+  BM25, full hybrid, Voyage, and Gemini arms on the same source-locked
+  LongMemEval-S target, while blocking live calls until env-only credentials
+  and explicit public-data consent flags are present.
+- Promotes GitHub Actions run `26349930959` on `a67c411` as the previous
   verified code/product baseline after extending the provider gate with Gemini
   embedding arms, binding every arm to the same source-locked fixture path, and
   keeping retrieval-proxy/no-public-claims guards active.
@@ -165,6 +171,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified code/product baseline:
+  `95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9`.
+- GitHub Actions run `26350184513`: passed CI after adding the fail-closed live provider benchmark preflight. The preflight checks the public LongMemEval-S target, BM25/full-hybrid/Voyage/Gemini strategy list, consent flags, and env-only provider readiness without provider API calls or benchmark-text transmission.
+- Previous verified code/product baseline before the live provider preflight:
   `a67c4115dc00450f5a51c09089879ec4687c596d`.
 - GitHub Actions run `26349930959`: passed CI after extending the opt-in provider-backed benchmark gate to compare BM25, full local hybrid, Voyage rerank-only, Voyage embed+rerank, Gemini embed+local rerank proxy, and Gemini embed+Voyage rerank arms in fixture mode with zero hosted calls, and keeping the result retrieval-proxy only.
 - Previous verified code/product baseline before the Gemini provider arms:

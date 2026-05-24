@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-24T02:43:11Z",
+  "generatedAt": "2026-05-24T02:57:42Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "a67c4115dc00450f5a51c09089879ec4687c596d",
-    "ciRunId": 26349930959,
+    "headSha": "95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9",
+    "ciRunId": 26350184513,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "not_rerun_full_smoke_release_check_covers_fixture_public_materialize_strategy_compare_autoresearch_loop_and_provider_gate",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after extending the opt-in provider-backed public benchmark gate. The gate compares bm25-lite, full-hybrid-rerank, cloud-voyage-rerank-only, cloud-voyage4-voyage, cloud-gemini-embed-rerank-proxy, and cloud-gemini-voyage-rerank on the same public-safe LongMemEval-S metrics path, keeps fixture mode provider-mocked with zero hosted calls, requires explicit provider-call and public-data environment guards for live provider runs, and preserves retrievalProxyOnly, memoryBenchAnswerQuality=false, publicBenchmarkClaimsAllowed=false, zero privacy failures, and public-safe evidence only. Local release:check, benchmark:public-provider fixture check, release:github-sync, diff check, goal:audit, and GitHub Actions run 26349930959 passed."
+    "note": "Latest inspected code/product baseline after adding the fail-closed live provider benchmark preflight. The preflight checks the source-locked LongMemEval-S target, selected BM25, hybrid, Voyage, and Gemini strategy list, provider-call consent flags, public-data consent flags, and env-only Gemini/Voyage credential presence without calling provider APIs or sending benchmark text. Current clean-controller evidence reports BLOCKED_PROVIDER_ENV, preserving retrievalProxyOnly, memoryBenchAnswerQuality=false, publicBenchmarkClaimsAllowed=false, zero privacy failures, and public-safe evidence only. Local release:check, benchmark:public-provider:preflight, release:github-sync, diff check, goal:audit, and GitHub Actions run 26350184513 passed."
   },
   "releaseStateGuard": {
     "enabled": true,

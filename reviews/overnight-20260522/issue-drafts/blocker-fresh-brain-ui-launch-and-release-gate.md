@@ -10,7 +10,14 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified code/product baseline:
-- `a67c4115dc00450f5a51c09089879ec4687c596d`.
+- `95768a6ebc97c13d53eb0e6a63ad4c3c3b1141e9`.
+- GitHub Actions run `26350184513` passed CI after adding the fail-closed live
+  provider benchmark preflight for the same source-locked LongMemEval-S target,
+  BM25/full-hybrid/Voyage/Gemini strategy list, provider-call consent flags,
+  public-data consent flags, and env-only provider readiness without provider
+  API calls or benchmark-text transmission.
+- Previous verified code/product baseline before the live provider preflight:
+  `a67c4115dc00450f5a51c09089879ec4687c596d`.
 - GitHub Actions run `26349930959` passed CI after extending the opt-in
   provider-backed benchmark gate for BM25, full local hybrid, Voyage
   rerank-only, Voyage embed+rerank, Gemini embed+local rerank proxy, and Gemini
