@@ -3496,9 +3496,11 @@ check("fresh release blocker doctor passes", () => {
   assert.ok(report.manualCommands.some((item) => /baseline:source-gap/.test(item) && /--output/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:run/.test(item) && /--reviewed-queryset/.test(item)));
   assert.ok(report.manualCommands.some((item) => /baseline:next-run/.test(item) && /--require-ready/.test(item)));
+  const approvedAdapterCommit = report.latestVerifiedCodeBaseline?.headSha ?? "";
+  assert.match(approvedAdapterCommit, /^[a-f0-9]{40}$/);
   assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent handoff packet/);
   assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
-  assert.match(canaryBlocker.nextAction, /canary:returned-(?:inbox|packet).*--require-production-canary.*--expected-commit <approved-commit>/);
+  assert.match(canaryBlocker.nextAction, new RegExp(`canary:returned-(?:inbox|packet).*--require-production-canary.*--expected-commit ${approvedAdapterCommit}`));
   assert.equal(report.checks.realDiagnosticsPostwatch.returnedWatchStatus, "AWAITING_RETURNED_PRODUCTION_CANARY");
   assert.equal(report.checks.realDiagnosticsPostwatch.productionEvidencePackets, 0);
   assert.equal(report.checks.realDiagnosticsPostwatch.diagnosticInputCount, 9);
@@ -3513,10 +3515,10 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.realDiagnosticsPostwatch.oneAgentCanaryAllowed, true);
   assert.equal(report.checks.realDiagnosticsPostwatch.status, "READY_FOR_ONE_AGENT_FRESH_CANARY");
   assert.equal(report.checks.realDiagnosticsPostwatch.publicLaunchAllowed, false);
-  assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--allow-failed-inputs/.test(item) && /--require-ready/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /canary:next-agent-packet/.test(item) && /--allow-failed-inputs/.test(item) && /--require-ready/.test(item) && item.includes(approvedAdapterCommit)));
   assert.ok(report.manualCommands.some((item) => /canary:drill/.test(item) && /--format markdown/.test(item)));
-  assert.ok(report.manualCommands.some((item) => /canary:returned-inbox/.test(item) && /--require-production-canary/.test(item) && /--expected-commit <approved-commit>/.test(item)));
-  assert.ok(report.manualCommands.some((item) => /canary:returned-packet/.test(item) && /--require-production-canary/.test(item) && /--expected-commit <approved-commit>/.test(item)));
+  assert.ok(report.manualCommands.some((item) => /canary:returned-inbox/.test(item) && /--require-production-canary/.test(item) && item.includes(approvedAdapterCommit)));
+  assert.ok(report.manualCommands.some((item) => /canary:returned-packet/.test(item) && /--require-production-canary/.test(item) && item.includes(approvedAdapterCommit)));
 });
 
 check("fresh hosted baseline preflight passes", () => {
