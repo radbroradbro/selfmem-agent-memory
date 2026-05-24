@@ -14,5 +14,10 @@
   "adapter_contract_version": "2026.05.23.store-latency-v1",
   "strict_canary_contract": "v1",
   "mode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+  "native_memory": {
+    "provider_id": "selfmem_canary",
+    "slot": "memory.provider",
+    "default_active": true
+  },
   "read_only": false
 }

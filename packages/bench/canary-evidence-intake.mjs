@@ -37,6 +37,7 @@ const quality = report.quality ?? {};
 const privacy = report.privacy ?? {};
 const agent = report.agent ?? {};
 const provider = report.provider ?? {};
+const nativeMemory = report.nativeMemory ?? {};
 const window = report.window ?? {};
 const adapter = report.adapter ?? {};
 const reportCommit = String(report.commit ?? "");
@@ -59,6 +60,18 @@ const checks = [
   check("window-duration", Number(window.durationMinutes) >= 15),
   check("local-write-mode", provider.localWriteMode === "enabled"),
   check("hosted-read-only", provider.hostedSupermemoryMode === "read-through-only"),
+  check(
+    "native-default-memory",
+    nativeMemory.providerId === "selfmem_canary"
+      && nativeMemory.defaultActive === true
+      && nativeMemory.shadowOnly === false
+      && nativeMemory.newWrites === "local"
+      && nativeMemory.hostedWriteBack === false
+      && Array.isArray(nativeMemory.proof)
+      && nativeMemory.proof.includes("explicit-native-default-config")
+      && nativeMemory.proof.includes("before-prompt-lifecycle-fired")
+      && nativeMemory.proof.includes("local-store-events-observed"),
+  ),
   check("session-start", Number(counts.sessionStart) > 0),
   check("before-prompt-build", Number(counts.beforePromptBuild) > 0),
   check("agent-end", Number(counts.agentEnd) > 0),
@@ -128,6 +141,16 @@ const output = {
     sourceContainerHash: agent.sourceContainerHash,
     providerMode: provider.mode,
     hostedSupermemoryMode: provider.hostedSupermemoryMode,
+  },
+  nativeMemory: {
+    providerId: nativeMemory.providerId ?? null,
+    slot: nativeMemory.slot ?? null,
+    defaultActive: nativeMemory.defaultActive === true,
+    shadowOnly: nativeMemory.shadowOnly === true,
+    newWrites: nativeMemory.newWrites ?? null,
+    hostedReadThrough: nativeMemory.hostedReadThrough === true,
+    hostedWriteBack: nativeMemory.hostedWriteBack === true,
+    proof: Array.isArray(nativeMemory.proof) ? nativeMemory.proof : [],
   },
   adapter: {
     name: adapter.name ?? null,

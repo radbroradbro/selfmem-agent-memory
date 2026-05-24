@@ -28,7 +28,25 @@
     "localWriteMode": "enabled",
     "hostedSupermemoryMode": "read-through-only",
     "embedder": "voyage-4-large",
-    "reranker": "rerank-2.5"
+    "reranker": "rerank-2.5",
+    "hostedWriteBack": false
+  },
+  "nativeMemory": {
+    "providerId": "selfmem_canary",
+    "slot": "memory.provider",
+    "defaultActive": true,
+    "shadowOnly": false,
+    "newWrites": "local",
+    "hostedReadThrough": true,
+    "hostedWriteBack": false,
+    "proof": [
+      "provider-id-selfmem-canary",
+      "before-prompt-lifecycle-fired",
+      "local-store-events-observed",
+      "local-write-mode-enabled",
+      "hermes-native-adapter-loaded",
+      "explicit-native-default-config"
+    ]
   },
   "counts": {
     "sessionStart": 2,

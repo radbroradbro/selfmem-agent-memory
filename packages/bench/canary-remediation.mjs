@@ -66,6 +66,19 @@ const output = {
     providerMode: report.provider?.mode ?? input.target?.providerMode ?? null,
     hostedSupermemoryMode: report.provider?.hostedSupermemoryMode ?? input.target?.hostedSupermemoryMode ?? null,
   },
+  nativeMemory: {
+    providerId: report.nativeMemory?.providerId ?? input.nativeMemory?.providerId ?? null,
+    slot: report.nativeMemory?.slot ?? input.nativeMemory?.slot ?? null,
+    defaultActive: Boolean(report.nativeMemory?.defaultActive ?? input.nativeMemory?.defaultActive),
+    shadowOnly: Boolean(report.nativeMemory?.shadowOnly ?? input.nativeMemory?.shadowOnly),
+    newWrites: report.nativeMemory?.newWrites ?? input.nativeMemory?.newWrites ?? null,
+    hostedWriteBack: Boolean(report.nativeMemory?.hostedWriteBack ?? input.nativeMemory?.hostedWriteBack),
+    proof: Array.isArray(report.nativeMemory?.proof)
+      ? report.nativeMemory.proof
+      : Array.isArray(input.nativeMemory?.proof)
+        ? input.nativeMemory.proof
+        : [],
+  },
   adapter: {
     name: report.adapter?.name ?? input.adapter?.name ?? null,
     contractVersion: report.adapter?.contractVersion ?? input.adapter?.contractVersion ?? null,
@@ -135,6 +148,7 @@ function normalizeReport(value) {
         localWriteMode: "enabled",
         hostedSupermemoryMode: value.target?.hostedSupermemoryMode,
       },
+      nativeMemory: value.nativeMemory,
       adapter: value.adapter,
       counts: {
         sessionStart: value.lifecycle?.sessionStart,
@@ -165,6 +179,7 @@ function evaluateChecks(report) {
   const privacy = report.privacy ?? {};
   const agent = report.agent ?? {};
   const provider = report.provider ?? {};
+  const nativeMemory = report.nativeMemory ?? {};
   const adapter = report.adapter ?? {};
   const window = report.window ?? {};
   return [
@@ -184,6 +199,18 @@ function evaluateChecks(report) {
     check("window-duration", numberValue(window.durationMinutes) >= 15),
     check("local-write-mode", provider.localWriteMode === "enabled"),
     check("hosted-read-only", provider.hostedSupermemoryMode === "read-through-only"),
+    check(
+      "native-default-memory",
+      nativeMemory.providerId === "selfmem_canary"
+        && nativeMemory.defaultActive === true
+        && nativeMemory.shadowOnly === false
+        && nativeMemory.newWrites === "local"
+        && nativeMemory.hostedWriteBack === false
+        && Array.isArray(nativeMemory.proof)
+        && nativeMemory.proof.includes("explicit-native-default-config")
+        && nativeMemory.proof.includes("before-prompt-lifecycle-fired")
+        && nativeMemory.proof.includes("local-store-events-observed"),
+    ),
     check("session-start", numberValue(counts.sessionStart) > 0),
     check("before-prompt-build", numberValue(counts.beforePromptBuild) > 0),
     check("agent-end", numberValue(counts.agentEnd) > 0),
@@ -231,6 +258,7 @@ function actionFor(name, report) {
     "window-duration": [{ ...base, category: "evidence-window", recommendation: "Collect at least 15 minutes of active runtime after applying the patch." }],
     "local-write-mode": [{ ...base, category: "write-lane", recommendation: "Make RecallWeave the local write lane for this agent before claiming native memory coverage." }],
     "hosted-read-only": [{ ...base, category: "supermemory-bridge", recommendation: "Keep hosted Supermemory in read-through-only mode. Do not enable hosted write-back for canary evidence." }],
+    "native-default-memory": [{ ...base, category: "native-memory", recommendation: "Make RecallWeave/selfmem the active default memory provider or OpenClaw memory slot for this one canary agent, not a shadow-only helper. The returned report must prove lifecycle recall and local writes through the native lane." }],
     "session-start": [{ ...base, category: "lifecycle", recommendation: "Check plugin registration. The session-start hook did not appear in the report." }],
     "before-prompt-build": [{ ...base, category: "lifecycle", recommendation: "Check prompt-build or prefetch hook registration. Recall may not be entering production prompts." }],
     "agent-end": [{ ...base, category: "lifecycle", recommendation: "Check end-of-turn hook registration. The agent may not be writing distilled memories." }],

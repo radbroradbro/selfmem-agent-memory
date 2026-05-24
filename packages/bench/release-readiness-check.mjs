@@ -2426,6 +2426,7 @@ check("fresh canary report generator passes", () => {
     assert.equal(generatedReport.adapter.searchLatencyInstrumentation, true);
     assert.equal(generatedReport.adapter.storeLatencyInstrumentation, true);
     assert.equal(generatedReport.provider.hostedSupermemoryMode, "read-through-only");
+    assertNativeMemory(generatedReport.nativeMemory);
     assert.equal(generatedReport.counts.sessionStart > 0, true);
     assert.equal(generatedReport.counts.beforePromptBuild > 0, true);
     assert.equal(generatedReport.counts.preCompress > 0, true);
@@ -2450,6 +2451,7 @@ check("fresh canary report generator passes", () => {
     assert.equal(intakeReport.fixtureOnly, true);
     assert.equal(intakeReport.countsAsRealRolloutEvidence, false);
     assert.equal(intakeReport.canaryPass, true);
+    assertNativeMemory(intakeReport.nativeMemory);
     const expectedCommit = "65ef223f9def19312e679dc7b13ae3a2fb961daa";
     const commitReportPath = join(tempRoot, "commit-report.json");
     run("node", ["packages/bench/canary-report-from-trace.mjs", "--fixture", "--commit", expectedCommit, "--output", commitReportPath]);
@@ -2479,6 +2481,7 @@ check("fresh canary report generator passes", () => {
     assert.equal(diagnosticReport.evidenceSource.traceKind, "trace_metadata_only.jsonl");
     assert.equal(diagnosticReport.evidenceSource.metadataOnly, true);
     assert.equal(diagnosticReport.provider.hostedSupermemoryMode, "read-through-only");
+    assertNativeMemory(diagnosticReport.nativeMemory);
     assert.equal(diagnosticReport.counts.sessionStart, 1);
     assert.equal(diagnosticReport.counts.beforePromptBuild, 1);
     assert.equal(diagnosticReport.counts.preCompress, 1);
@@ -2500,6 +2503,7 @@ check("fresh canary report generator passes", () => {
     assert.equal(diagnosticIntakeReport.fixtureOnly, true);
     assert.equal(diagnosticIntakeReport.countsAsRealRolloutEvidence, false);
     assert.equal(diagnosticIntakeReport.canaryPass, true);
+    assertNativeMemory(diagnosticIntakeReport.nativeMemory);
     const diagnosticZip = join(tempRoot, "diagnostic-fixture.zip");
     const zipCreate = spawnSync("python3", [
       "-m",
@@ -2527,6 +2531,7 @@ check("fresh canary report generator passes", () => {
     assert.equal(diagnosticZipReport.evidenceSource.traceKind, "trace_metadata_only.jsonl");
     assert.equal(diagnosticZipReport.latencyMs.storeP95, 145);
     assert.equal(diagnosticZipReport.instrumentation.storeLatencySampleCount, 1);
+    assertNativeMemory(diagnosticZipReport.nativeMemory);
     assert.doesNotMatch(diagnosticZipRun.stdout, secretPattern);
     assert.doesNotMatch(diagnosticZipRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
     const diagnosticZipStrict = spawnSync("node", [
@@ -2563,6 +2568,11 @@ check("fresh canary report generator passes", () => {
           storeLatencyInstrumentation: true,
         },
         provider_mode: "voyage-4-large+rerank-2.5+supermemory-read-through",
+        native_memory: {
+          provider_id: "selfmem_canary",
+          slot: "memory.provider",
+          default_active: true,
+        },
       }),
     );
     writeFileSync(
@@ -2649,10 +2659,12 @@ check("fresh canary report generator passes", () => {
     assert.equal(windowedReport.quality.hybridSearchCovered, true);
     assert.equal(windowedReport.quality.hostedReadThroughObserved, true);
     assert.equal(windowedReport.window.durationMinutes >= 15, true);
+    assertNativeMemory(windowedReport.nativeMemory);
     const windowedIntake = run("node", ["packages/bench/canary-evidence-intake.mjs", "--report", windowedReportPath, "--strict-real"]);
     const windowedIntakeReport = JSON.parse(windowedIntake.stdout);
     assert.equal(windowedIntakeReport.canaryPass, true);
     assert.equal(windowedIntakeReport.countsAsRealRolloutEvidence, true);
+    assertNativeMemory(windowedIntakeReport.nativeMemory);
     assert.doesNotMatch(windowedRun.stdout, secretPattern);
     assert.doesNotMatch(windowedRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
 
@@ -2754,10 +2766,11 @@ check("fresh canary evidence intake passes", () => {
   assert.equal(report.lifecycle?.store > 0, true);
   assert.equal(report.instrumentation?.searchLatencySampleCount > 0, true);
   assert.equal(report.instrumentation?.storeLatencySampleCount > 0, true);
-  assert.equal(report.instrumentation?.missingStoreLatencyCount, 0);
-  assert.equal(report.quality?.lifecycleCovered, true);
-  assert.equal(report.quality?.hybridSearchCovered, true);
-  assert.deepEqual(report.failedChecks, []);
+    assert.equal(report.instrumentation?.missingStoreLatencyCount, 0);
+    assert.equal(report.quality?.lifecycleCovered, true);
+    assert.equal(report.quality?.hybridSearchCovered, true);
+    assertNativeMemory(report.nativeMemory);
+    assert.deepEqual(report.failedChecks, []);
   assert.match(geminiReview, /Verdict: `CLEAN`|^CLEAN/m);
   assert.doesNotMatch(geminiReview, /pending external review/i);
 });
@@ -2786,12 +2799,14 @@ check("fresh canary remediation passes", () => {
   assert.equal(failingReport.measurements.storeP95Ms, 0);
   assert.equal(failingReport.measurements.storeLatencySampleCount, 0);
   assert.equal(failingReport.measurements.missingStoreLatencyCount, 12);
+  assertNativeMemory(failingReport.nativeMemory);
   assert.ok(failingReport.actions.some((item) => item.check === "store-latency-instrumented" && item.category === "instrumentation"));
   assert.ok(failingReport.actions.some((item) => item.check === "recall-p95" && item.category === "latency"));
   assert.ok(failingReport.actions.some((item) => item.check === "store-p95" && item.category === "instrumentation"));
   assert.equal(failingReport.recollectWindow.needsFreshWindow, true);
   assert.equal(passingReport.canaryPass, true);
   assert.equal(passingReport.fixtureOnly, true);
+  assertNativeMemory(passingReport.nativeMemory);
   assert.deepEqual(passingReport.failedChecks, []);
   assert.doesNotMatch(failingResult.stdout, secretPattern);
   assert.doesNotMatch(failingResult.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
@@ -3013,6 +3028,7 @@ check("fresh canary evidence packet review passes", () => {
     assert.equal(review.fixtureOnly, true);
     assert.equal(review.countsAsRealRolloutEvidence, false);
     assert.equal(review.countsAsProductionCanaryEvidence, false);
+    assertNativeMemory(review.nativeMemory);
     assert.equal(mismatchReview.ok, false);
     assert.equal(mismatchReview.sourceControl.expectedCommit, "deadbeef");
     assert.equal(mismatchReview.sourceControl.commitMatchesExpected, false);
@@ -5705,6 +5721,18 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
   return result;
+}
+
+function assertNativeMemory(value) {
+  assert.equal(value?.providerId, "selfmem_canary");
+  assert.equal(value?.defaultActive, true);
+  assert.equal(value?.shadowOnly, false);
+  assert.equal(value?.newWrites, "local");
+  assert.equal(value?.hostedWriteBack, false);
+  assert.ok(Array.isArray(value?.proof), "native memory proof must be present");
+  assert.ok(value.proof.includes("explicit-native-default-config"));
+  assert.ok(value.proof.includes("before-prompt-lifecycle-fired"));
+  assert.ok(value.proof.includes("local-store-events-observed"));
 }
 
 function writeUnknownZip(tempRoot, outputPath) {

@@ -5,5 +5,10 @@
   "local_container": "selfmem_fixture_summary_agent",
   "source_supermemory_container": "fixture_source",
   "mode": "voyage-4-large+rerank-2.5+supermemory-read-through",
+  "native_memory": {
+    "provider_id": "selfmem_canary",
+    "slot": "memory.provider",
+    "default_active": true
+  },
   "read_only": false
 }

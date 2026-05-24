@@ -145,6 +145,18 @@ const zeroResultRate = numericValue(
   searchCount ? zeroResultSearches / searchCount : 1,
 );
 const generatedAt = new Date().toISOString();
+const inferredHost = host || inferHost(containerMap, tracePath, reliability, monitor);
+const nativeMemory = nativeMemoryStatus({
+  host: inferredHost,
+  containerMap,
+  reliability,
+  monitorContainer,
+  providerMode,
+  readOnly,
+  beforePromptCount,
+  storeCount,
+  hostedReadThroughObserved,
+});
 
 const report = {
   schemaVersion: 1,
@@ -160,7 +172,7 @@ const report = {
     windowFilter: describeWindowFilter(windowFilter),
   },
   agent: {
-    host: host || inferHost(containerMap, tracePath, reliability, monitor),
+    host: inferredHost,
     agentIdentityHash: hashLabel("agent", agentIdentity),
     localContainerHash: hashLabel("container", localContainer),
     sourceContainerHash: hashLabel("source", sourceContainer),
@@ -211,7 +223,9 @@ const report = {
     hostedSupermemoryMode: hostedReadThroughObserved ? "read-through-only" : "disabled",
     embedder: inferEmbedder(providerMode),
     reranker: inferReranker(providerMode),
+    hostedWriteBack: false,
   },
+  nativeMemory,
   counts: {
     sessionStart: sessionStartCount,
     beforePromptBuild: beforePromptCount,
@@ -627,6 +641,13 @@ function firstBoolean(...values) {
   return false;
 }
 
+function firstOptionalBoolean(...values) {
+  for (const value of values) {
+    if (value === true || value === false) return value;
+  }
+  return undefined;
+}
+
 function percentile(values, p) {
   if (!values.length) return 0;
   const sorted = [...values].sort((a, b) => a - b);
@@ -682,6 +703,63 @@ function inferEmbedder(providerMode) {
 function inferReranker(providerMode) {
   if (providerMode.includes("rerank-2.5")) return "rerank-2.5";
   return "none";
+}
+
+function nativeMemoryStatus(input) {
+  const nativeConfig = objectValue(input.containerMap.native_memory)
+    || objectValue(input.containerMap.nativeMemory)
+    || objectValue(input.reliability.native_memory)
+    || objectValue(input.reliability.nativeMemory)
+    || {};
+  const providerId = firstString(
+    nativeConfig.provider_id,
+    nativeConfig.providerId,
+    nativeConfig.active_provider,
+    nativeConfig.activeProvider,
+    input.containerMap.active_memory_provider,
+    input.containerMap.activeMemoryProvider,
+    input.containerMap.memory_provider,
+    input.containerMap.memoryProvider,
+    input.containerMap.provider,
+  );
+  const slot = firstString(
+    nativeConfig.slot,
+    nativeConfig.memory_slot,
+    nativeConfig.memorySlot,
+    input.containerMap.active_memory_slot,
+    input.containerMap.activeMemorySlot,
+    input.containerMap.memory_slot,
+    input.containerMap.memorySlot,
+    input.host === "openclaw" ? "plugins.slots.memory" : "memory.provider",
+  );
+  const explicitDefault = firstOptionalBoolean(
+    nativeConfig.default_active,
+    nativeConfig.defaultActive,
+    nativeConfig.native_default,
+    nativeConfig.nativeDefault,
+    input.containerMap.native_memory_default,
+    input.containerMap.nativeMemoryDefault,
+    input.reliability.checks?.native_memory_default_active,
+    input.monitorContainer.nativeMemoryDefaultActive,
+  );
+  const proof = [];
+  if (providerId === "selfmem_canary") proof.push("provider-id-selfmem-canary");
+  if (input.beforePromptCount > 0) proof.push("before-prompt-lifecycle-fired");
+  if (input.storeCount > 0) proof.push("local-store-events-observed");
+  if (input.readOnly === false) proof.push("local-write-mode-enabled");
+  if (input.host === "openclaw" || input.host === "hermes") proof.push(`${input.host}-native-adapter-loaded`);
+  if (explicitDefault === true) proof.push("explicit-native-default-config");
+  const defaultActive = explicitDefault === true;
+  return {
+    providerId,
+    slot,
+    defaultActive,
+    shadowOnly: defaultActive ? false : null,
+    newWrites: input.readOnly ? "disabled" : "local",
+    hostedReadThrough: Boolean(input.hostedReadThroughObserved),
+    hostedWriteBack: false,
+    proof,
+  };
 }
 
 function isErrorEvent(event) {

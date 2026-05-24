@@ -79,6 +79,7 @@ try {
   const commitMatchesExpected = effectiveExpectedCommit
     ? reportCommit === effectiveExpectedCommit || reportCommit.startsWith(effectiveExpectedCommit)
     : null;
+  const nativeMemory = report.nativeMemory ?? intake?.nativeMemory ?? {};
 
   const checks = [
     check("expected-entries", entries.includes("README.md") && entries.includes("manifest.json") && entries.includes("canary-report.json")),
@@ -90,6 +91,18 @@ try {
     check("strict-contract", (report.adapter?.strictCanaryContract ?? intake?.adapter?.strictCanaryContract) === "v1"),
     check("search-latency-marker", Boolean(report.adapter?.searchLatencyInstrumentation ?? intake?.adapter?.searchLatencyInstrumentation)),
     check("store-latency-marker", Boolean(report.adapter?.storeLatencyInstrumentation ?? intake?.adapter?.storeLatencyInstrumentation)),
+    check(
+      "native-default-memory",
+      nativeMemory.providerId === "selfmem_canary"
+        && nativeMemory.defaultActive === true
+        && nativeMemory.shadowOnly === false
+        && nativeMemory.newWrites === "local"
+        && nativeMemory.hostedWriteBack === false
+        && Array.isArray(nativeMemory.proof)
+        && nativeMemory.proof.includes("explicit-native-default-config")
+        && nativeMemory.proof.includes("before-prompt-lifecycle-fired")
+        && nativeMemory.proof.includes("local-store-events-observed"),
+    ),
     check("zero-privacy-leaks", privacy.reportPrivacyLeakCount === 0 && privacy.intakePrivacyLeakCount === 0),
     check("zero-secret-hits", privacy.reportSecretPatternHits === 0 && privacy.intakeSecretPatternHits === 0),
     check("no-raw-memory", privacy.rawMemoryIncluded === false),
@@ -145,6 +158,16 @@ try {
       strictCanaryContract: report.adapter?.strictCanaryContract ?? intake?.adapter?.strictCanaryContract ?? null,
       searchLatencyInstrumentation: Boolean(report.adapter?.searchLatencyInstrumentation ?? intake?.adapter?.searchLatencyInstrumentation),
       storeLatencyInstrumentation: Boolean(report.adapter?.storeLatencyInstrumentation ?? intake?.adapter?.storeLatencyInstrumentation),
+    },
+    nativeMemory: {
+      providerId: nativeMemory.providerId ?? null,
+      slot: nativeMemory.slot ?? null,
+      defaultActive: nativeMemory.defaultActive === true,
+      shadowOnly: nativeMemory.shadowOnly === true,
+      newWrites: nativeMemory.newWrites ?? null,
+      hostedReadThrough: nativeMemory.hostedReadThrough === true,
+      hostedWriteBack: nativeMemory.hostedWriteBack === true,
+      proof: Array.isArray(nativeMemory.proof) ? nativeMemory.proof : [],
     },
     checks,
     failedChecks,

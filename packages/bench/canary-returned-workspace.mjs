@@ -144,6 +144,7 @@ function buildOperatorFindings(input) {
   const target = review.target ?? {};
   const privacy = report.privacy ?? reportIntake.privacy ?? {};
   const quality = report.quality ?? reportIntake.quality ?? {};
+  const nativeMemory = report.nativeMemory ?? reportIntake.nativeMemory ?? {};
   const instrumentation = report.instrumentation ?? reportIntake.instrumentation ?? {};
   const latency = report.latencyMs ?? reportIntake.latencyMs ?? {};
   const window = report.window ?? reportIntake.window ?? {};
@@ -189,6 +190,11 @@ function buildOperatorFindings(input) {
     `- hybrid search covered: ${yesNo(quality.hybridSearchCovered)}.`,
     `- local writes observed: ${yesNo(quality.localWritesObserved)}.`,
     `- hosted read-through observed: ${yesNo(quality.hostedReadThroughObserved)}.`,
+    `- native/default memory active: ${yesNo(nativeMemory.defaultActive)}.`,
+    `- native/default provider id: ${safeValue(nativeMemory.providerId)}.`,
+    `- native/default slot: ${safeValue(nativeMemory.slot)}.`,
+    `- shadow-only mode: ${yesNo(nativeMemory.shadowOnly)}.`,
+    `- hosted write-back enabled: ${yesNo(nativeMemory.hostedWriteBack)}.`,
     `- rollback available: ${yesNo(rollback.available)}.`,
     `- rollback tested: ${yesNo(rollback.tested)}.`,
     "",
