@@ -34,23 +34,33 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
 npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json
+npm exec --yes pnpm@10.23.0 -- benchmark:public-autoresearch -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json
 ```
 
 That command uses the same public LongMemEval-S dataset hash as the checked-in
 run-only target, writes the raw query set and haystack sessions only to a
-private local directory, and emits public-safe hashes and counts. The first
-retrieval-proxy RecallWeave run on that slice scored 0.1089 quality, P@1
-0.1667, recall@5 0.0833, recall@10 0.0833, NDCG@10 0.1022, p50 latency 62 ms,
-p95 latency 71 ms, average context tokens 1600, zero cost, and zero redaction
-failures. This is a blind autoresearch baseline, not a MemoryBench quality win.
+private local directory, and emits public-safe hashes and counts. The canonical
+retrieval-proxy RecallWeave run now uses the strategy-comparison winner,
+`bm25-lite`, and scored 0.4541 quality, P@1 0.8333, recall@5 0.2917,
+recall@10 0.2917, NDCG@10 0.3996, p50 latency 82 ms, p95 latency 100 ms,
+average context tokens 1600, zero cost, and zero redaction failures. This is a
+blind autoresearch baseline, not a MemoryBench quality win.
 
-The same source-locked slice now has a public-safe retrieval strategy
-comparison. `bm25-lite` won the retrieval-proxy canary with quality 0.4541,
-P@1 0.8333, recall@5 0.2917, recall@10 0.2917, NDCG@10 0.3996, p50 latency
-90 ms, p95 latency 102 ms, average context tokens 1600, zero cost, and zero
-redaction failures. `hybrid-v1` tied quality but was slower. This supports the
-next autoresearch step, but it is still not MemoryBench answer-quality evidence
-or a public benchmark superiority claim.
+The same source-locked slice also has a public-safe retrieval strategy
+comparison. The initial `jaccard` baseline scored 0.1089 quality and P@1
+0.1667. `bm25-lite` won with quality 0.4541 and P@1 0.8333. `hybrid-v1` tied
+quality but was slower. This supports the next autoresearch step, but it is
+still not MemoryBench answer-quality evidence or a public benchmark superiority
+claim.
+
+The first local-only autoresearch loop ran 24 same-data retrieval-proxy arms
+across strategy, context budget, and candidate limit. The winner was
+`bm25-lite-b800-k5`: quality 0.4541, P@1 0.8333, recall@5 0.2917, NDCG@10
+0.3996, average context tokens 800, p50 latency 75 ms, and zero privacy
+failures. It keeps the same quality as the 1600-token `bm25-lite` run while
+cutting average context tokens in half. This is still not MemoryBench
+answer-quality evidence.
 
 That command does not call hosted Supermemory by default. It keeps public
 benchmark claims blocked unless a fresh metrics-only hosted baseline, a matched

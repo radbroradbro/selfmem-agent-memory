@@ -47,6 +47,10 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live \
   --target reviews/overnight-20260522/public-longmemeval-run-target.json \
   --output reviews/overnight-20260522/public-longmemeval-strategy-compare.json \
   --markdown-output reviews/overnight-20260522/public-longmemeval-strategy-compare-evidence.md
+npm exec --yes pnpm@10.23.0 -- benchmark:public-autoresearch -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-run-target.json \
+  --output reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json \
+  --markdown-output reviews/overnight-20260522/public-longmemeval-autoresearch-loop-evidence.md
 npm exec --yes pnpm@10.23.0 -- benchmark:public-target -- --target <target.json> --strict
 ```
 
@@ -165,13 +169,15 @@ harness we will use.
   slice has 6 queries, 287 haystack sessions, and 18 expected references. It
   also emits the collector-compatible query-set hash so the release gate can
   prove the checked-in RecallWeave result came from the materialized same-data
-  query set.
+  query set. Its command template now names `bm25-lite` as the current
+  canary retrieval strategy.
 - Current RecallWeave retrieval-proxy run:
   `reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
   It uses the source-locked LongMemEval-S canary data with the local
   RecallWeave response exporter and the repository's retrieval metrics. It
-  reports quality 0.1089, P@1 0.1667, recall@5 0.0833, recall@10 0.0833,
-  NDCG@10 0.1022, p50 latency 62 ms, p95 latency 71 ms, average context tokens
+  uses `bm25-lite` and reports quality 0.4541, P@1 0.8333, recall@5 0.2917,
+  recall@10 0.2917, NDCG@10 0.3996, p50 latency 82 ms, p95 latency 100 ms,
+  average context tokens
   1600, zero cost, and zero redaction failures. This is a retrieval-proxy
   baseline, not a MemoryBench answer-quality win and not a public benchmark
   claim. The result JSON carries explicit `retrievalProxyOnly: true`,
@@ -180,11 +186,19 @@ harness we will use.
 - Current LongMemEval-S retrieval strategy comparison:
   `reviews/overnight-20260522/public-longmemeval-strategy-compare.json`. It
   runs `jaccard`, `bm25-lite`, and `hybrid-v1` on the same materialized query
-  set. `bm25-lite` won the retrieval-proxy canary with quality 0.4541, P@1
+  set. The initial `jaccard` baseline scored quality 0.1089 and P@1 0.1667.
+  `bm25-lite` won the retrieval-proxy canary with quality 0.4541, P@1
   0.8333, recall@5 0.2917, recall@10 0.2917, NDCG@10 0.3996, p50 latency
-  90 ms, p95 latency 102 ms, and zero privacy or redaction failures.
+  84 ms, p95 latency 92 ms, and zero privacy or redaction failures.
   `hybrid-v1` tied quality but was slower. This is a methodology signal for
   autoresearch, not MemoryBench answer-quality proof.
+- Current LongMemEval-S autoresearch loop:
+  `reviews/overnight-20260522/public-longmemeval-autoresearch-loop.json`. It
+  runs 24 retrieval-proxy arms over strategy, context budget, and candidate
+  limit on the same materialized query set. The winning arm is
+  `bm25-lite-b800-k5`, which keeps quality 0.4541 and P@1 0.8333 while cutting
+  average context tokens to 800. This is a local-only methodology result, not
+  official MemoryBench answer-quality proof.
 - LongMemEval is a strong target because it uses 500 human-curated questions and
   tests information extraction, multi-session reasoning, knowledge update,
   temporal reasoning, and abstention.

@@ -11,6 +11,7 @@
 - Query set hash: sha256:cbe842779aead8c27f308100838a8022b6af4437c8328de6c8242b8616408111
 - Collector-compatible query set hash: sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c
 - Memories file hash: sha256:f8f6949f8106c1ea331b999ad66ee626cbda824f9814c0f193cba92f437705ab
+- Retrieval strategy: bm25-lite
 
 ## Safety
 

@@ -1,0 +1,845 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-autoresearch-loop",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-24T00:59:04.092Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-canary-6-first-per-type-2026-05-23",
+    "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+    "collectorCompatibleQuerySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
+    "materializerHash": "sha256:06fa13edc128eb8f238b035e7006ea739663fff4875d5ffa3e2a5e215d131595",
+    "queryCount": 6,
+    "expectedResultRefCount": 18,
+    "haystackSessionCount": 287
+  },
+  "loop": {
+    "hypothesis": "A sparse BM25-style first-stage ranker should outperform token-set Jaccard on source-locked LongMemEval recall while preserving local-only zero-cost execution.",
+    "armCount": 24,
+    "variables": {
+      "strategies": [
+        "jaccard",
+        "bm25-lite",
+        "hybrid-v1"
+      ],
+      "contextTokenBudgets": [
+        800,
+        1200,
+        1600,
+        2400
+      ],
+      "limits": [
+        5,
+        10
+      ]
+    },
+    "keepDecision": "Use bm25-lite with budget 800 and limit 5 for the next canary arm.",
+    "rollbackPlan": "Fall back to the previous checked-in retrieval-proxy result and keep publicBenchmarkClaimsAllowed=false."
+  },
+  "baseline": {
+    "armId": "jaccard-b1600-k10",
+    "strategy": "jaccard",
+    "contextTokenBudget": 1600,
+    "limit": 10,
+    "rankingStrategy": "jaccard",
+    "metrics": {
+      "quality": 0.1089,
+      "pAt1": 0.1667,
+      "recallAt5": 0.0833,
+      "recallAt10": 0.0833,
+      "ndcgAt10": 0.1022,
+      "latencyP50Ms": 64,
+      "latencyP95Ms": 73,
+      "contextTokensAvg": 1600
+    },
+    "contextBudget": {
+      "applied": true,
+      "tokenBudget": 1600,
+      "strategy": "ranked-prefix-with-last-result-clipping",
+      "queryCount": 6,
+      "queriesClipped": 6,
+      "clippedResultCount": 6,
+      "skippedByBudgetCount": 26,
+      "fullCandidateTokensAvg": 5520,
+      "exportedContextTokensAvg": 1600
+    },
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0
+  },
+  "winner": {
+    "armId": "bm25-lite-b800-k5",
+    "strategy": "bm25-lite",
+    "contextTokenBudget": 800,
+    "limit": 5,
+    "rankingStrategy": "bm25-lite",
+    "metrics": {
+      "quality": 0.4541,
+      "pAt1": 0.8333,
+      "recallAt5": 0.2917,
+      "recallAt10": 0.2917,
+      "ndcgAt10": 0.3996,
+      "latencyP50Ms": 75,
+      "latencyP95Ms": 85,
+      "contextTokensAvg": 800
+    },
+    "contextBudget": {
+      "applied": true,
+      "tokenBudget": 800,
+      "strategy": "ranked-prefix-with-last-result-clipping",
+      "queryCount": 6,
+      "queriesClipped": 6,
+      "clippedResultCount": 6,
+      "skippedByBudgetCount": 24,
+      "fullCandidateTokensAvg": 16974,
+      "exportedContextTokensAvg": 800
+    },
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0
+  },
+  "arms": [
+    {
+      "armId": "jaccard-b800-k5",
+      "strategy": "jaccard",
+      "contextTokenBudget": 800,
+      "limit": 5,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 64,
+        "latencyP95Ms": 76,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 9,
+        "fullCandidateTokensAvg": 1974,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "jaccard-b800-k10",
+      "strategy": "jaccard",
+      "contextTokenBudget": 800,
+      "limit": 10,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 64,
+        "latencyP95Ms": 73,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 39,
+        "fullCandidateTokensAvg": 5520,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "jaccard-b1200-k5",
+      "strategy": "jaccard",
+      "contextTokenBudget": 1200,
+      "limit": 5,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 64,
+        "latencyP95Ms": 73,
+        "contextTokensAvg": 1186
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1200,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 5,
+        "clippedResultCount": 5,
+        "skippedByBudgetCount": 3,
+        "fullCandidateTokensAvg": 1974,
+        "exportedContextTokensAvg": 1186
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "jaccard-b1200-k10",
+      "strategy": "jaccard",
+      "contextTokenBudget": 1200,
+      "limit": 10,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 64,
+        "latencyP95Ms": 72,
+        "contextTokensAvg": 1200
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1200,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 32,
+        "fullCandidateTokensAvg": 5520,
+        "exportedContextTokensAvg": 1200
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "jaccard-b1600-k5",
+      "strategy": "jaccard",
+      "contextTokenBudget": 1600,
+      "limit": 5,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 64,
+        "latencyP95Ms": 74,
+        "contextTokensAvg": 1465
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 3,
+        "clippedResultCount": 3,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 1974,
+        "exportedContextTokensAvg": 1465
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "jaccard-b1600-k10",
+      "strategy": "jaccard",
+      "contextTokenBudget": 1600,
+      "limit": 10,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 64,
+        "latencyP95Ms": 73,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 26,
+        "fullCandidateTokensAvg": 5520,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "jaccard-b2400-k5",
+      "strategy": "jaccard",
+      "contextTokenBudget": 2400,
+      "limit": 5,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 65,
+        "latencyP95Ms": 74,
+        "contextTokensAvg": 1830
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 2400,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 2,
+        "clippedResultCount": 2,
+        "skippedByBudgetCount": 0,
+        "fullCandidateTokensAvg": 1974,
+        "exportedContextTokensAvg": 1830
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "jaccard-b2400-k10",
+      "strategy": "jaccard",
+      "contextTokenBudget": 2400,
+      "limit": 10,
+      "rankingStrategy": "jaccard",
+      "metrics": {
+        "quality": 0.1089,
+        "pAt1": 0.1667,
+        "recallAt5": 0.0833,
+        "recallAt10": 0.0833,
+        "ndcgAt10": 0.1022,
+        "latencyP50Ms": 64,
+        "latencyP95Ms": 72,
+        "contextTokensAvg": 2400
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 2400,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 22,
+        "fullCandidateTokensAvg": 5520,
+        "exportedContextTokensAvg": 2400
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b800-k5",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 800,
+      "limit": 5,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 75,
+        "latencyP95Ms": 85,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 24,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b800-k10",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 800,
+      "limit": 10,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 76,
+        "latencyP95Ms": 83,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 54,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b1200-k5",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 1200,
+      "limit": 5,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 74,
+        "latencyP95Ms": 84,
+        "contextTokensAvg": 1200
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1200,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 23,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 1200
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b1200-k10",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 1200,
+      "limit": 10,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 75,
+        "latencyP95Ms": 83,
+        "contextTokensAvg": 1200
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1200,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 53,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 1200
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b1600-k5",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 1600,
+      "limit": 5,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 77,
+        "latencyP95Ms": 90,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 23,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b1600-k10",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 1600,
+      "limit": 10,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 77,
+        "latencyP95Ms": 83,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 53,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b2400-k5",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 2400,
+      "limit": 5,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 77,
+        "latencyP95Ms": 84,
+        "contextTokensAvg": 2400
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 2400,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 23,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 2400
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "bm25-lite-b2400-k10",
+      "strategy": "bm25-lite",
+      "contextTokenBudget": 2400,
+      "limit": 10,
+      "rankingStrategy": "bm25-lite",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 74,
+        "latencyP95Ms": 83,
+        "contextTokensAvg": 2400
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 2400,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 53,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 2400
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b800-k5",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 800,
+      "limit": 5,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 235,
+        "latencyP95Ms": 251,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 24,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b800-k10",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 800,
+      "limit": 10,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 235,
+        "latencyP95Ms": 253,
+        "contextTokensAvg": 800
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 800,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 54,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 800
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b1200-k5",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 1200,
+      "limit": 5,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 231,
+        "latencyP95Ms": 250,
+        "contextTokensAvg": 1200
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1200,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 23,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 1200
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b1200-k10",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 1200,
+      "limit": 10,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 234,
+        "latencyP95Ms": 249,
+        "contextTokensAvg": 1200
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1200,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 53,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 1200
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b1600-k5",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 1600,
+      "limit": 5,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 232,
+        "latencyP95Ms": 269,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 23,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b1600-k10",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 1600,
+      "limit": 10,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 232,
+        "latencyP95Ms": 253,
+        "contextTokensAvg": 1600
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 53,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b2400-k5",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 2400,
+      "limit": 5,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 232,
+        "latencyP95Ms": 250,
+        "contextTokensAvg": 2400
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 2400,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 23,
+        "fullCandidateTokensAvg": 16974,
+        "exportedContextTokensAvg": 2400
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "armId": "hybrid-v1-b2400-k10",
+      "strategy": "hybrid-v1",
+      "contextTokenBudget": 2400,
+      "limit": 10,
+      "rankingStrategy": "hybrid-v1",
+      "metrics": {
+        "quality": 0.4541,
+        "pAt1": 0.8333,
+        "recallAt5": 0.2917,
+        "recallAt10": 0.2917,
+        "ndcgAt10": 0.3996,
+        "latencyP50Ms": 241,
+        "latencyP95Ms": 254,
+        "contextTokensAvg": 2400
+      },
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 2400,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 6,
+        "queriesClipped": 6,
+        "clippedResultCount": 6,
+        "skippedByBudgetCount": 53,
+        "fullCandidateTokensAvg": 32471,
+        "exportedContextTokensAvg": 2400
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    }
+  ],
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Promote the winning arm only as retrieval-proxy methodology evidence.",
+    "Run the next loop with embedding, reranking, temporal, or query-expansion arms against the same source-locked slice.",
+    "Do not turn this loop into MemoryBench answer-quality or SOTA language."
+  ]
+}

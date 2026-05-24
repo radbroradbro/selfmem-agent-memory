@@ -14,7 +14,7 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-24T00:23:38.248Z",
+  "generatedAt": "2026-05-24T00:53:37.666Z",
   "source": {
     "memoryBenchCommit": "118209a746d97d0d85e5a7234267f0b6962857e9",
     "datasetHost": "huggingface.co",
@@ -30,7 +30,8 @@
     "judgeModel": "gpt-4o",
     "answerModel": "gpt-4o",
     "contextTokenBudget": 1600,
-    "limit": 10
+    "limit": 10,
+    "retrievalStrategy": "bm25-lite"
   },
   "selection": {
     "selectedCount": 6,
@@ -71,8 +72,8 @@
     ]
   },
   "runCommands": {
-    "exportResponses": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --preserve-ids --context-token-budget 1600 --limit 10 --output <private-output-dir>/longmemeval-recallweave-responses.private.json",
-    "collectMetrics": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --output <public-metrics-output.json>"
+    "exportResponses": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --preserve-ids --strategy bm25-lite --context-token-budget 1600 --limit 10 --output <private-output-dir>/longmemeval-recallweave-responses.private.json",
+    "collectMetrics": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset <private-output-dir>/longmemeval-queryset.private.json --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --retrieval-mode strategy:bm25-lite --output <public-metrics-output.json>"
   },
   "safety": {
     "publicSafe": true,

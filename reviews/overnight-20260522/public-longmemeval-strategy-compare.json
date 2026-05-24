@@ -15,13 +15,13 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-24T00:36:20.578Z",
+  "generatedAt": "2026-05-24T00:54:01.303Z",
   "input": {
     "source": "materialized-source-locked-longmemeval",
     "datasetSlice": "longmemeval-s-cleaned-canary-6-first-per-type-2026-05-23",
     "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
     "collectorCompatibleQuerySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
-    "materializerHash": "sha256:20b7756c698e1bedd9ec38c1c75ccb14673f4d6d7be801846dd46fbaa452c34f",
+    "materializerHash": "sha256:9f4269be54ea29ed28d34a81c5eec48137f24aa17b64df383b14f29878a87538",
     "queryCount": 6,
     "expectedResultRefCount": 18,
     "haystackSessionCount": 287
@@ -30,8 +30,8 @@
     {
       "strategy": "jaccard",
       "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
-      "responsesHash": "sha256:01f3819693a3c7bb0ad86d1094555e0ede489890f48cce5e3e56f3785cbd5da8",
-      "resultHash": "sha256:72d8d2d62977c7c8f45503b0a224010d614feaafb0ea6ca97c72c22f16119fb8",
+      "responsesHash": "sha256:658aaba01f57b0c279c81be850243fe02c0bb6bd9cf9585cbf6e1f66a484e769",
+      "resultHash": "sha256:b0ed7a5fab69946b99f24843dd38dca60538287624793487b1a65ef208ea4468",
       "rankingStrategy": "jaccard",
       "metrics": {
         "quality": 0.1089,
@@ -39,8 +39,8 @@
         "recallAt5": 0.0833,
         "recallAt10": 0.0833,
         "ndcgAt10": 0.1022,
-        "latencyP50Ms": 76,
-        "latencyP95Ms": 83,
+        "latencyP50Ms": 75,
+        "latencyP95Ms": 87,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -110,8 +110,8 @@
     {
       "strategy": "bm25-lite",
       "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
-      "responsesHash": "sha256:ecc43bb22df11ceaeedacad4078fe59b5451274aad486fb49e8d903b998efedf",
-      "resultHash": "sha256:55979e5ffa0e83e3910b2bbe22c013115ed2dcf6b08420b6150491e2e59382b4",
+      "responsesHash": "sha256:61a1e84513699f230b6627078e2ba9f4f25a52de93c763f37abf92922fbaad82",
+      "resultHash": "sha256:48767c85769b8d794523a6843b9c1681b9d33582e5427ab72948ed0bf27b6de1",
       "rankingStrategy": "bm25-lite",
       "metrics": {
         "quality": 0.4541,
@@ -119,8 +119,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 90,
-        "latencyP95Ms": 102,
+        "latencyP50Ms": 84,
+        "latencyP95Ms": 92,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -190,8 +190,8 @@
     {
       "strategy": "hybrid-v1",
       "querySetHash": "sha256:6a7b0da2db62f83beabb6e9cfc27910c47f122289bd7ece9a0d3c8ddfdcde24c",
-      "responsesHash": "sha256:6113cc6b7756819797b24557670d462b6a8fcc58308e5dd2822d62ba10e42b18",
-      "resultHash": "sha256:d153669eca16ad98c639bbbddcac7ec64836f252281e7769aad17c0075684ba7",
+      "responsesHash": "sha256:96f7c49e28e2c78e6feb19851182fbd4664b16c3f4b0b0be9ccfecb4c13fd7ea",
+      "resultHash": "sha256:f890aee8e665a17dd773d01dcff1108ef8bf2adcd94d28116634f68d6d7ebac4",
       "rankingStrategy": "hybrid-v1",
       "metrics": {
         "quality": 0.4541,
@@ -199,8 +199,8 @@
         "recallAt5": 0.2917,
         "recallAt10": 0.2917,
         "ndcgAt10": 0.3996,
-        "latencyP50Ms": 266,
-        "latencyP95Ms": 291,
+        "latencyP50Ms": 267,
+        "latencyP95Ms": 281,
         "contextTokensAvg": 1600
       },
       "contextBudget": {
@@ -275,7 +275,7 @@
     "recallAt5": 0.2917,
     "recallAt10": 0.2917,
     "ndcgAt10": 0.3996,
-    "latencyP50Ms": 90
+    "latencyP50Ms": 84
   },
   "safety": {
     "publicSafe": true,

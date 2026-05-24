@@ -86,6 +86,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-target-author.mjs",
   "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/public-benchmark-strategy-compare.mjs",
+  "packages/bench/public-benchmark-autoresearch-loop.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
   `${reviewDir}/public-memorybench-source-lock.json`,
@@ -105,6 +106,9 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-strategy-compare.json`,
   `${reviewDir}/public-longmemeval-strategy-compare-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-strategy-compare-review.md`,
+  `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
+  `${reviewDir}/public-longmemeval-autoresearch-loop-evidence.md`,
+  `${reviewDir}/codex-public-longmemeval-autoresearch-loop-review.md`,
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -426,6 +430,7 @@ const requiredScripts = [
   "benchmark:public-target:author",
   "benchmark:public-materialize",
   "benchmark:public-strategy",
+  "benchmark:public-autoresearch",
   "goal:audit",
   "release:doctor",
   "release:handoff",
@@ -1036,6 +1041,7 @@ check("release state is conservative", () => {
     "public-longmemeval-materialize-run",
     "public-longmemeval-recallweave-run-result",
     "public-longmemeval-strategy-compare",
+    "public-longmemeval-autoresearch-loop",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
   }
@@ -1286,6 +1292,18 @@ check("fresh public benchmark target check passes", () => {
   const materializeMarkdown = run("node", ["packages/bench/public-benchmark-materialize-run.mjs", "--format", "markdown"]).stdout;
   const strategyFixture = JSON.parse(run("node", ["packages/bench/public-benchmark-strategy-compare.mjs"]).stdout);
   const strategyMarkdown = run("node", ["packages/bench/public-benchmark-strategy-compare.mjs", "--format", "markdown"]).stdout;
+  const autoresearchFixture = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-autoresearch-loop.mjs", "--context-token-budgets", "800,1600", "--limits", "5,10"]).stdout,
+  );
+  const autoresearchMarkdown = run("node", [
+    "packages/bench/public-benchmark-autoresearch-loop.mjs",
+    "--context-token-budgets",
+    "800,1600",
+    "--limits",
+    "5,10",
+    "--format",
+    "markdown",
+  ]).stdout;
   const liveMaterializeReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run.json"), "utf8"));
   const liveMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run-evidence.md"), "utf8");
   const liveRecallWeaveRun = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-recallweave-run-result.json"), "utf8"));
@@ -1293,6 +1311,9 @@ check("fresh public benchmark target check passes", () => {
   const liveStrategyReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-strategy-compare.json"), "utf8"));
   const liveStrategyEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-strategy-compare-evidence.md"), "utf8");
   const liveStrategyReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-strategy-compare-review.md"), "utf8");
+  const liveAutoresearchReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop.json"), "utf8"));
+  const liveAutoresearchEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-autoresearch-loop-evidence.md"), "utf8");
+  const liveAutoresearchReview = readFileSync(join(root, reviewDir, "codex-public-longmemeval-autoresearch-loop-review.md"), "utf8");
   const authoredTarget = JSON.parse(authored.stdout);
   const report = JSON.parse(result.stdout);
   assert.equal(authoredTarget.fixtureOnly, true);
@@ -1362,6 +1383,20 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(strategyFixture.strategies?.length, 3);
   assert.ok(strategyFixture.winner?.strategy);
   assert.match(strategyMarkdown, /Public Benchmark Strategy Compare/);
+  assert.equal(autoresearchFixture.ok, true);
+  assert.equal(autoresearchFixture.mode, "public-benchmark-autoresearch-loop");
+  assert.equal(autoresearchFixture.fixtureOnly, true);
+  assert.equal(autoresearchFixture.metricsOnly, true);
+  assert.equal(autoresearchFixture.retrievalProxyOnly, true);
+  assert.equal(autoresearchFixture.memoryBenchAnswerQuality, false);
+  assert.equal(autoresearchFixture.publicBenchmarkClaimsAllowed, false);
+  assert.equal(autoresearchFixture.publicSafe, true);
+  assert.equal(autoresearchFixture.rawQuestionsIncluded, false);
+  assert.equal(autoresearchFixture.rawAnswersIncluded, false);
+  assert.equal(autoresearchFixture.rawMemoryIncluded, false);
+  assert.ok(Number(autoresearchFixture.loop?.armCount ?? 0) >= 12);
+  assert.ok(autoresearchFixture.winner?.armId);
+  assert.match(autoresearchMarkdown, /Public Benchmark Autoresearch Loop/);
   assert.equal(liveMaterializeReport.ok, true);
   assert.equal(liveMaterializeReport.fixtureOnly, false);
   assert.equal(liveMaterializeReport.claimTier, "run-only");
@@ -1372,6 +1407,7 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(liveMaterializeReport.selection?.selectedQuestionIdsHash, "sha256:686da163b61d343549768cdccd890a46ce775b653414932bdd07aec2ccdd3a23");
   assert.equal(liveMaterializeReport.selection?.answerLabelsHash, "sha256:423098446f2953b45fe049fbd9da0b8d806050d4aed6cdec2a349f167ce1fa3e");
   assert.ok(liveMaterializeReport.selection?.collectorCompatibleQuerySetHash?.startsWith("sha256:"));
+  assert.equal(liveMaterializeReport.target?.retrievalStrategy, "bm25-lite");
   assert.equal(liveMaterializeReport.privateOutputs?.directoryInsideRepository, false);
   assert.equal(liveMaterializeReport.rawPrivateOutputPathIncluded, false);
   assert.match(liveMaterializeEvidence, /Public Benchmark Materialize Run/);
@@ -1394,6 +1430,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(liveRecallWeaveRun.rawTranscriptIncluded, false);
   assert.equal(liveRecallWeaveRun.rawPromptIncluded, false);
   assert.equal(liveRecallWeaveRun.rawAnswerIncluded, false);
+  assert.equal(liveRecallWeaveRun.retrievalConfig?.retrievalMode, "strategy:bm25-lite");
+  assert.equal(liveRecallWeaveRun.retrievalConfig?.rankingStrategy, "bm25-lite");
   assert.equal(liveRecallWeaveRun.retrievalConfig?.contextBudget?.tokenBudget, 1600);
   assert.equal(liveRecallWeaveRun.matchedHostedRunPresent, false);
   assert.equal(liveRecallWeaveRun.reviewerApprovalCount, 0);
@@ -1425,6 +1463,11 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(Number(bm25Lite?.metrics?.quality ?? 0) > Number(jaccard?.metrics?.quality ?? 0));
   assert.ok(Number(bm25Lite?.metrics?.pAt1 ?? 0) > Number(jaccard?.metrics?.pAt1 ?? 0));
   assert.equal(liveStrategyReport.winner?.strategy, "bm25-lite");
+  assert.equal(liveRecallWeaveRun.metrics?.quality, liveStrategyReport.winner?.quality);
+  assert.equal(liveRecallWeaveRun.metrics?.pAt1, liveStrategyReport.winner?.pAt1);
+  assert.equal(liveRecallWeaveRun.metrics?.recallAt5, liveStrategyReport.winner?.recallAt5);
+  assert.equal(liveRecallWeaveRun.metrics?.recallAt10, liveStrategyReport.winner?.recallAt10);
+  assert.equal(liveRecallWeaveRun.metrics?.ndcgAt10, liveStrategyReport.winner?.ndcgAt10);
   for (const item of liveStrategyReport.strategies ?? []) {
     assert.equal(item.privacyLeakCount, 0);
     assert.equal(item.redactionFailureCount, 0);
@@ -1435,6 +1478,34 @@ check("fresh public benchmark target check passes", () => {
   assert.match(liveStrategyReview, /PASS WITH CONCERNS/);
   assert.match(liveStrategyReview, /same-data/i);
   assert.match(liveStrategyReview, /not a MemoryBench answer-quality/i);
+  assert.equal(liveAutoresearchReport.ok, true);
+  assert.equal(liveAutoresearchReport.fixtureOnly, false);
+  assert.equal(liveAutoresearchReport.benchmark, "longmemeval");
+  assert.equal(liveAutoresearchReport.metricsOnly, true);
+  assert.equal(liveAutoresearchReport.retrievalProxyOnly, true);
+  assert.equal(liveAutoresearchReport.memoryBenchAnswerQuality, false);
+  assert.equal(liveAutoresearchReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(liveAutoresearchReport.rawQuestionIdsIncluded, false);
+  assert.equal(liveAutoresearchReport.rawQuestionsIncluded, false);
+  assert.equal(liveAutoresearchReport.rawAnswersIncluded, false);
+  assert.equal(liveAutoresearchReport.rawMemoryIncluded, false);
+  assert.equal(liveAutoresearchReport.input?.querySetHash, liveMaterializeReport.selection?.collectorCompatibleQuerySetHash);
+  assert.equal(liveAutoresearchReport.input?.queryCount, 6);
+  assert.equal(liveAutoresearchReport.input?.expectedResultRefCount, 18);
+  assert.equal(liveAutoresearchReport.input?.haystackSessionCount, 287);
+  assert.ok(Number(liveAutoresearchReport.loop?.armCount ?? 0) >= 24);
+  assert.equal(liveAutoresearchReport.winner?.strategy, "bm25-lite");
+  assert.equal(liveAutoresearchReport.winner?.contextTokenBudget, 800);
+  assert.equal(liveAutoresearchReport.winner?.limit, 5);
+  assert.equal(liveAutoresearchReport.winner?.metrics?.quality, liveRecallWeaveRun.metrics?.quality);
+  assert.equal(liveAutoresearchReport.winner?.metrics?.pAt1, liveRecallWeaveRun.metrics?.pAt1);
+  assert.equal(liveAutoresearchReport.winner?.privacyLeakCount, 0);
+  assert.equal(liveAutoresearchReport.winner?.redactionFailureCount, 0);
+  assert.match(liveAutoresearchEvidence, /Public Benchmark Autoresearch Loop/);
+  assert.match(liveAutoresearchEvidence, /Winner: bm25-lite-b800-k5/);
+  assert.match(liveAutoresearchReview, /PASS WITH CONCERNS/);
+  assert.match(liveAutoresearchReview, /same-data/i);
+  assert.match(liveAutoresearchReview, /not MemoryBench answer-quality/i);
   const liveRunTargetStrict = JSON.parse(
     run("node", ["packages/bench/public-benchmark-target-check.mjs", "--target", liveRunTargetPath, "--strict-run"]).stdout,
   );
@@ -1673,6 +1744,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(materializeMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(strategyFixture), secretPattern);
   assert.doesNotMatch(strategyMarkdown, secretPattern);
+  assert.doesNotMatch(JSON.stringify(autoresearchFixture), secretPattern);
+  assert.doesNotMatch(autoresearchMarkdown, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveMaterializeReport), secretPattern);
   assert.doesNotMatch(liveMaterializeEvidence, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveRecallWeaveRun), secretPattern);
@@ -1680,6 +1753,9 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveStrategyReport), secretPattern);
   assert.doesNotMatch(liveStrategyEvidence, secretPattern);
   assert.doesNotMatch(liveStrategyReview, secretPattern);
+  assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), secretPattern);
+  assert.doesNotMatch(liveAutoresearchEvidence, secretPattern);
+  assert.doesNotMatch(liveAutoresearchReview, secretPattern);
   assert.doesNotMatch(result.stdout, privatePathPattern);
   assert.doesNotMatch(authored.stdout, privatePathPattern);
   assert.doesNotMatch(markdown, privatePathPattern);
@@ -1692,6 +1768,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(materializeMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(strategyFixture), privatePathPattern);
   assert.doesNotMatch(strategyMarkdown, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(autoresearchFixture), privatePathPattern);
+  assert.doesNotMatch(autoresearchMarkdown, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveMaterializeReport), privatePathPattern);
   assert.doesNotMatch(liveMaterializeEvidence, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveRecallWeaveRun), privatePathPattern);
@@ -1699,6 +1777,9 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(JSON.stringify(liveStrategyReport), privatePathPattern);
   assert.doesNotMatch(liveStrategyEvidence, privatePathPattern);
   assert.doesNotMatch(liveStrategyReview, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), privatePathPattern);
+  assert.doesNotMatch(liveAutoresearchEvidence, privatePathPattern);
+  assert.doesNotMatch(liveAutoresearchReview, privatePathPattern);
 });
 
 check("fresh local session compaction audit passes", () => {

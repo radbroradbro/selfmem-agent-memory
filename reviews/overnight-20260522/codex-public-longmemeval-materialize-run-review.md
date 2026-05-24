@@ -15,6 +15,9 @@ Follow-up review after Goodall blocker:
   `public-longmemeval-recallweave-run-result.json.querySetHash` equals that
   materializer hash, so the scored result is bound to the materialized same-data
   query set.
+- The materializer command template now names `bm25-lite`, the winning
+  same-data retrieval strategy, so the canonical run is no longer stuck on the
+  initial `jaccard` baseline.
 - The RecallWeave result JSON now carries `retrievalProxyOnly: true`,
   `memoryBenchAnswerQuality: false`, and
   `publicBenchmarkClaimsAllowed: false`.
@@ -25,10 +28,11 @@ Concerns:
 - The checked-in result is a retrieval proxy from the local RecallWeave response
   exporter and repository scoring contract. It is not official MemoryBench
   answer evaluation and is not a MemoryBench quality win.
-- The blind baseline is weak: quality 0.1089 on six source-locked rows. That is
-  acceptable as an autoresearch starting point, but it argues for embedding,
-  reranking, temporal, and query-expansion work before any public benchmark
-  language.
+- The blind baseline is still incomplete: the canonical `bm25-lite`
+  retrieval-proxy quality is 0.4541 on six source-locked rows, which is much
+  better than the initial `jaccard` baseline but still not official MemoryBench
+  answer evaluation. It argues for embedding, reranking, temporal, and
+  query-expansion work before any public benchmark language.
 - The target remains `run-only`. A reported comparison row and reviewer
   approvals are still required before canary-trend wording.
 

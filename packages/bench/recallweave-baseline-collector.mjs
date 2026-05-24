@@ -119,6 +119,7 @@ const result = {
   retrievalConfig: {
     source: fixtureRequested ? "fixture" : "recallweave-response-export",
     retrievalMode,
+    rankingStrategy: responsesEnvelope.source?.rankingStrategy ?? null,
     limit,
     localContainerHash: localContainer ? shortHash(localContainer) : null,
     responsesHash: `sha256:${fileHash(responsesPath)}`,

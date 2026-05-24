@@ -89,15 +89,19 @@ too expensive for the next run.
    sorting by `question_id`.
 3. Run RecallWeave on that slice with a fixed provider arm.
    The first LongMemEval-S run is a retrieval-proxy baseline from the local
-   RecallWeave response exporter, not official MemoryBench answer judging. It
-   scored 0.1089 quality on six source-locked rows with zero privacy failures.
-   Treat that as the blind baseline for autoresearch, not as a win. The result
-   must carry `retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`,
-   and `publicBenchmarkClaimsAllowed: false`.
-   The first same-data strategy comparison on that slice found that
-   `bm25-lite` improved the retrieval-proxy quality to 0.4541 and P@1 to
-   0.8333, while keeping privacy failures at zero. Keep this as a methodology
-   signal for the next run. Do not call it MemoryBench answer quality.
+   RecallWeave response exporter, not official MemoryBench answer judging. The
+   initial `jaccard` run scored 0.1089 quality on six source-locked rows with
+   zero privacy failures. The first same-data strategy comparison found that
+   `bm25-lite` improved retrieval-proxy quality to 0.4541 and P@1 to 0.8333,
+   while keeping privacy failures at zero, so the canonical checked-in run now
+   uses `bm25-lite`. Treat that as the blind baseline for the next
+   autoresearch arm, not as a win. The result must carry
+   `retrievalProxyOnly: true`, `memoryBenchAnswerQuality: false`, and
+   `publicBenchmarkClaimsAllowed: false`.
+   The first local-only loop then tested 24 arms across strategy, context
+   budget, and candidate limit. It selected `bm25-lite-b800-k5`, which kept
+   quality at 0.4541 while cutting average context tokens to 800. This becomes
+   the next retrieval-proxy canary setting.
 4. Compare quality, P@1, recall@5, recall@10, NDCG@10 where available,
    latency, context tokens, and cost against the reported target.
 5. If the canary beats the reported target under matching metric definitions,

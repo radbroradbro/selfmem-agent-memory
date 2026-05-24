@@ -34,6 +34,9 @@ const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC
 const privateOutputDir = resolvePrivateOutputDir(args.privateOutputDir ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_PRIVATE_OUTPUT_DIR);
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 1600, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
+const retrievalStrategy = normalizeRetrievalStrategy(
+  args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "bm25-lite",
+);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -140,6 +143,7 @@ async function liveMaterialize() {
       answerModel: target.benchmark.answerModel,
       contextTokenBudget,
       limit,
+      retrievalStrategy,
     },
     selection: materialized.selection,
     privateOutputs: materialized.privateOutputs,
@@ -250,6 +254,7 @@ function fixtureMaterialize() {
       answerModel: target.benchmark.answerModel,
       contextTokenBudget,
       limit,
+      retrievalStrategy,
     },
     selection: materialized.selection,
     privateOutputs: materialized.privateOutputs,
@@ -459,9 +464,9 @@ function runCommandTemplates(privateOutputs) {
   const memories = `<private-output-dir>/${privateOutputs.files.find((item) => item.role === "memories")?.name ?? "longmemeval-memories.private.jsonl"}`;
   return {
     exportResponses:
-      `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset ${querySet} --memories ${memories} --preserve-ids --context-token-budget ${contextTokenBudget} --limit ${limit} --output <private-output-dir>/longmemeval-recallweave-responses.private.json`,
+      `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset ${querySet} --memories ${memories} --preserve-ids --strategy ${retrievalStrategy} --context-token-budget ${contextTokenBudget} --limit ${limit} --output <private-output-dir>/longmemeval-recallweave-responses.private.json`,
     collectMetrics:
-      `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset ${querySet} --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --output <public-metrics-output.json>`,
+      `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset ${querySet} --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --retrieval-mode strategy:${retrievalStrategy} --output <public-metrics-output.json>`,
   };
 }
 
@@ -480,6 +485,7 @@ function renderMarkdown(value) {
     `- Query set hash: ${value.selection.querySetHash}`,
     `- Collector-compatible query set hash: ${value.selection.collectorCompatibleQuerySetHash}`,
     `- Memories file hash: ${value.selection.memoriesFileHash}`,
+    `- Retrieval strategy: ${value.target.retrievalStrategy}`,
     "",
     "## Safety",
     "",
@@ -622,6 +628,12 @@ function positiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
   return number;
+}
+
+function normalizeRetrievalStrategy(value) {
+  const strategy = String(value ?? "").trim().toLowerCase();
+  assert.ok(["jaccard", "bm25-lite", "hybrid-v1"].includes(strategy), `unknown retrieval strategy: ${strategy}`);
+  return strategy;
 }
 
 function resolveInputPath(value) {
