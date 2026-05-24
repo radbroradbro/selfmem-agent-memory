@@ -71,6 +71,9 @@ Live status:
   RecallWeave can run on the same public benchmark data now. It still blocks
   public comparison claims until a source-locked reported target row passes
   the stricter comparison gate.
+- Promotes GitHub Actions run `26346952139` on `9a11452` as the latest
+  verified code/product baseline after the LongMemEval-S run-only target and
+  sync evidence refresh.
 - Clarifies that MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker leaderboards are
   component evidence for choosing Gemini, Voyage, NVIDIA, Qwen, Jina, BGE, GTE,
   and Apple Silicon arms. Public memory claims still require the same benchmark

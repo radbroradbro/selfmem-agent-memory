@@ -124,6 +124,8 @@ requirements are resolved.
   for a RecallWeave run on the same public benchmark data, but it does not
   permit public comparison claims until a source-locked reported target row
   passes `--strict`.
+- GitHub Actions run `26346952139` passed on `9a11452` after the LongMemEval-S
+  run-only target and sync evidence refresh.
 - Current benchmark plan also separates component model evidence from
   memory-system evidence. MTEB/MMTEB/BEIR/MIRACL/MS MARCO and reranker
   leaderboards can choose model arms, but public RecallWeave claims still need

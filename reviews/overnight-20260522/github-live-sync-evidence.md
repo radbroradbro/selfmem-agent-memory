@@ -86,15 +86,17 @@ Date: 2026-05-23
 - PR #5 and issue #6 were refreshed again after adding the real
   LongMemEval-S run-only target, `--strict-run` validation, and focused Codex
   review evidence.
+- GitHub Actions run `26346952139` passed on `9a11452` after the
+  LongMemEval-S run-only target and sync evidence refresh.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-23T23:58:53Z
+- PR body refreshed at: 2026-05-24T00:02:45Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-23T23:58:52Z
-- PR body hash: fabfb3fd3c155edc3cca3a7977fa99f69f6dcf4c23241b0a7d8b6c9420e3f34f
+- Issue updated at: 2026-05-24T00:02:46Z
+- PR body hash: ab269b726143cb9495bde80cc16646f73ce1fa71af2e78bb6df27b2f10b26d84
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 2b3fe66f84dc06b5722f69c57d518af4a9d19bee5b3b2be50e8908d305caff15
-- PR body length: 40205
-- Issue body length: 25422
+- Issue body hash: dfe79eb7d6609f140d3204329face42e63860a067310602fe1b6a35c7ecf2f03
+- PR body length: 40378
+- Issue body length: 25546
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

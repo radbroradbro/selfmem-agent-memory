@@ -104,6 +104,11 @@ Verdict: resolved for PR body and blocker issue writes.
   - The PR body was refreshed again after adding the real LongMemEval-S
     run-only target, `--strict-run` validation, and focused Codex review
     evidence. Updated at: 2026-05-23T23:58:53Z.
+  - GitHub Actions run `26346952139` passed on `9a11452` after the
+    LongMemEval-S run-only target and sync evidence refresh.
+  - The PR body was refreshed again after promoting GitHub Actions run
+    `26346952139` on `9a11452` as the latest verified code/product baseline.
+    Updated at: 2026-05-24T00:02:45Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -131,9 +136,10 @@ Verdict: resolved for PR body and blocker issue writes.
     checkout verification refresh, latest MemoryBench source-lock CI baseline
     refresh, public LongMemEval-S slice-manifest refresh, latest public
     LongMemEval-S slice CI baseline refresh, and public LongMemEval-S
-    run-only target refresh
-  - Updated at: 2026-05-23T23:58:52Z
-  - Body length: 25422
+    run-only target refresh, latest public LongMemEval-S run-target CI
+    baseline refresh
+  - Updated at: 2026-05-24T00:02:46Z
+  - Body length: 25546
 
 ## Safety
 
