@@ -119,6 +119,21 @@ Follow-up implementation evidence on 2026-05-25:
   exported metrics only, and observed no stored-memory payload marker.
 - This is wiring proof only. It is not a same-data quality result and does not
   satisfy the missing live LLM query-expansion benchmark row.
+- `benchmark:answer-quality` now exists as the explicit conversion step from
+  retrieval-proxy evidence to end-to-end answer-quality evidence. Fixture smoke
+  evidence is checked in at
+  `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json` and
+  proves metrics-only output, strategy scoring shape, no provider calls, and
+  fail-closed public-claim flags.
+- The answer-quality harness is not complete benchmark proof until it is run
+  with `--live` against private materialized LongMemEval inputs, private answer
+  labels, and per-strategy response exports, then passed through
+  `benchmark:memory-score:result-gate --require-ready`.
+- The live answer-quality output may contain strategy names, hashes, aggregate
+  answer-quality metrics, judge-correct rate, latency, context-token counts,
+  provider endpoint labels, cost, and privacy counters. It must not contain raw
+  questions, gold answers, candidate answers, memory text, prompts, transcripts,
+  private paths, or keys.
 
 ## Claim Boundary
 

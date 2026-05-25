@@ -12,6 +12,10 @@ Use this checklist before making the repository public.
 - [ ] Benchmark notes are metrics-only and say public scores require a matched
   source-locked canary win, same judge/settings, zero privacy failures, and
   reviewer sign-off.
+- [ ] Benchmark notes distinguish retrieval-proxy evidence from end-to-end
+  answer-quality evidence and name `benchmark:answer-quality` plus
+  `benchmark:memory-score:result-gate --require-ready` as the required
+  conversion path before SOTA or MemoryBench-style language.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.
 
 ## Scans

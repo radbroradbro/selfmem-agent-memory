@@ -178,6 +178,26 @@ Gemini embeddings plus Voyage rerank, NVIDIA Nemotron retrieval/rerank, the
 Apple Silicon local arm, and query-expansion variants against the same
 30-query target.
 
+The answer-quality harness is now present as the conversion step from
+retrieval-proxy evidence to end-to-end memory evidence:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --fixture
+```
+
+The checked-in fixture smoke is
+`reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`. It
+proves public-safe metrics output, strategy scoring shape, and fail-closed
+claim flags with zero provider calls. It does not prove a MemoryBench or
+LongMemEval answer-quality win. A live run must use the private materialized
+query set, memories, answer labels, and per-strategy response exports for the
+same source-locked target, then pass:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
+  --result <public-answer-quality-output.json>
+```
+
 The Apple Silicon local arm now has an explicit metrics-only preflight:
 
 - `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-live-preflight.json`
@@ -567,6 +587,8 @@ A stronger claim requires:
 - the same judge and answer model,
 - the same scoring code,
 - the same settings,
+- a metrics-only end-to-end answer-quality result from `benchmark:answer-quality`
+  that passed `benchmark:memory-score:result-gate --require-ready`,
 - a source-match preflight showing the local RecallWeave source can score the
   reviewed labels,
 - context-token parity between hosted and local arms, or an explicit local

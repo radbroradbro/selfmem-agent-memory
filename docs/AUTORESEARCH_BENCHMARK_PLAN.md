@@ -268,6 +268,75 @@ Silicon arm enters the matrix. They do not replace MemoryBench, LongMemEval,
 LoCoMo, ConvoMem, BEAM, or another end-to-end memory/retrieval benchmark for
 RecallWeave quality claims.
 
+## End-To-End Answer-Quality Gate
+
+Retrieval-proxy wins are useful for method selection, but they do not close the
+full memory benchmark gate. A strategy becomes end-to-end memory evidence only
+after the same private materialized benchmark inputs are answered and judged by
+the answer-quality harness.
+
+First prove parser and safety wiring without model calls:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --fixture
+```
+
+For a live run, materialize the source-locked target into an operator-private
+directory outside the repository, export one RecallWeave response file per arm,
+then score all arms with the same query set, memory set, answer labels, answer
+model, judge model, and target hash:
+
+```bash
+RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>
+
+npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
+  --private-output-dir "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized" \
+  --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialize-report.json"
+
+RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live \
+  --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json" \
+  --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl" \
+  --preserve-ids \
+  --strategy <strategy> \
+  --context-token-budget 800 \
+  --limit 5 \
+  --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/<strategy>-responses.private.json"
+
+RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 \
+RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 \
+RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 \
+RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> \
+RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> \
+RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model> \
+RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model> \
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
+  --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json" \
+  --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl" \
+  --answer-labels "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json" \
+  --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/bm25-lite-responses.private.json" \
+  --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/full-hybrid-rerank-responses.private.json" \
+  --arm <provider-or-local-arm>="$RECALLWEAVE_SOTA_OUTPUT_DIR/<provider-or-local-arm>-responses.private.json" \
+  --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json" \
+  --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.md"
+
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
+  --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json"
+```
+
+The answer-quality report is still metrics-only. It may contain strategy names,
+hashes, aggregate answer quality, judge-correct rate, latency, context-token
+counts, provider endpoint labels, and privacy counters. It must not contain raw
+questions, gold answers, candidate answers, memory text, transcripts, prompts,
+private local paths, or keys.
+
+The gate is allowed to use one clearly labeled cloud substep, such as cloud
+query expansion or cloud answer judging, when local hardware is the bottleneck.
+That arm must be named as mixed or cloud-assisted, costed separately, and never
+described as pure local evidence.
+
 ## Hosted Supermemory Parity Lane
 
 Run the hosted baseline preflight before any live comparison:
@@ -465,15 +534,17 @@ present.
 4. Record accuracy, P@1, recall@5, recall@10, NDCG@10 where available, p50 and
    p95 latency, context tokens, context-budget settings, ingest cost, query
    cost, and failures.
-5. Pick the largest quality gap. If quality is tied, pick the largest latency
+5. Convert retrieval-proxy results into an end-to-end answer-quality result
+   before any public benchmark claim or SOTA wording.
+6. Pick the largest quality gap. If quality is tied, pick the largest latency
    or cost gap.
-6. Propose exactly one methodology change.
-7. Require two independent reviewers to approve the setup before coding. Store
+7. Propose exactly one methodology change.
+8. Require two independent reviewers to approve the setup before coding. Store
    their metrics-only approvals through `baseline:reviewer-intake` before any
    public comparison language moves to owner review.
-8. Implement only the approved change.
-9. Rerun the affected canary first.
-10. Keep the change only if quality improves without a serious regression, or
+9. Implement only the approved change.
+10. Rerun the affected canary first.
+11. Keep the change only if quality improves without a serious regression, or
     quality holds while latency or cost improves materially.
 
 Reviewer packets must include commands, dataset slice, run id, source commit,

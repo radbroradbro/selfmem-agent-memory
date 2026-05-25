@@ -223,6 +223,22 @@ It now uses `bm25-lite-b800-k5`, the winning same-data autoresearch setting.
 It is useful as a blind autoresearch baseline, but it is not a MemoryBench
 answer-quality result and not a public comparison claim.
 
+The current answer-quality harness smoke is
+`reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`. It
+proves the metrics-only `benchmark:answer-quality` output shape in fixture
+mode with zero provider calls. It is not live benchmark evidence. To turn a
+retrieval or provider canary into end-to-end memory evidence, run the harness
+against private materialized LongMemEval inputs and per-strategy response
+exports, then require:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
+  --result <public-answer-quality-output.json>
+```
+
+Do not use MemoryBench, LongMemEval, or SOTA wording until that result gate,
+reviewer audit, UI evidence, docs, and owner approval all pass.
+
 The current same-data retrieval strategy comparison is
 `reviews/overnight-20260522/public-longmemeval-strategy-compare.json`.
 `bm25-lite` beat the initial `jaccard` baseline on this six-row retrieval-proxy

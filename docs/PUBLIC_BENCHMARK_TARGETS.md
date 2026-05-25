@@ -200,8 +200,11 @@ harness we will use.
   slice has 6 queries, 287 haystack sessions, and 18 expected references. It
   also emits the collector-compatible query-set hash so the release gate can
   prove the checked-in RecallWeave result came from the materialized same-data
-  query set. Its command template now names `bm25-lite`, an 800-token context
-  budget, and top-5 retrieval as the current canary setting.
+  query set. The materializer also writes `longmemeval-answer-labels.private.json`
+  outside the repository for the answer-quality harness. Its command template
+  now names `bm25-lite`, an 800-token context budget, top-5 retrieval, and the
+  metrics-only `benchmark:answer-quality` follow-up as the current canary
+  setting.
 - Current RecallWeave retrieval-proxy run:
   `reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
   It uses the source-locked LongMemEval-S canary data with the local
@@ -272,6 +275,15 @@ harness we will use.
   `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`.
   This is the preferred next cloud-provider run because it compares against the
   stronger slice where deterministic hybrid still failed to beat BM25.
+- Current answer-quality harness smoke:
+  `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`. It
+  proves the parser, safety flags, strategy table, and metrics-only output for
+  `benchmark:answer-quality` in fixture mode. It makes zero provider calls and
+  reports `readyForEndToEndMemoryScoreGate: false`, so it does not count as a
+  MemoryBench or LongMemEval answer-quality result. A live result must use the
+  private materialized query set, memories, answer labels, and per-strategy
+  response exports, then pass `benchmark:memory-score:result-gate --require-ready`
+  before it can enter any SOTA evidence packet.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and
