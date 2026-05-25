@@ -98,6 +98,7 @@
     "benchmark:query-expansion:result-gate": "node packages/bench/query-expansion-result-gate.mjs",
     "benchmark:local-rerank:result-gate": "node packages/bench/local-rerank-result-gate.mjs",
     "benchmark:provider-challenger:result-gate": "node packages/bench/provider-challenger-result-gate.mjs",
+    "benchmark:memory-score:result-gate": "node packages/bench/end-to-end-memory-score-gate.mjs",
     "benchmark:sota-ladder": "node packages/bench/public-benchmark-sota-ladder.mjs",
     "benchmark:sota-ladder:packet": "node packages/bench/public-benchmark-sota-operator-packet.mjs",
     "goal:audit": "node packages/bench/goal-completion-audit.mjs",

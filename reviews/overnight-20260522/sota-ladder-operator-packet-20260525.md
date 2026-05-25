@@ -25,6 +25,7 @@
 - Query expansion preflight: BLOCKED_QUERY_EXPANSION_ENV
 - Provider preflight: BLOCKED_PROVIDER_ENV
 - Provider challenger result gate: BLOCKED_PROVIDER_CHALLENGER_RESULT
+- End-to-end memory score gate: BLOCKED_END_TO_END_MEMORY_SCORE
 - Local rerank evidence: true
 - Local rerank result gate: BLOCKED_LOCAL_RERANK_RESULT
 - Query expansion local smoke: true
@@ -120,6 +121,8 @@ Do not ship public benchmark or production-replacement claims until answer quali
 RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>
 npm exec --yes pnpm@10.23.0 -- benchmark:sota-ladder
 npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,dense-proxy,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-ladder-same-data-result.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-ladder-same-data-result.md"
+<run MemoryBench/LongMemEval answer-quality harness into "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json">
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.md"
 npm exec --yes pnpm@10.23.0 -- baseline:packet -- --hosted <metrics-only-hosted-result.json> --recallweave <metrics-only-recallweave-result.json> --comparison <metrics-only-comparison.json> --preflight <metrics-only-preflight.json> --strict-real --output <metrics-only-reviewer-packet.zip>
 npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet <metrics-only-reviewer-packet.zip> --comparison <metrics-only-comparison.json> --strict-target --review <reviewer-a-approval.json> --review <reviewer-b-approval.json> --output reviews/overnight-20260522/reviewer-approval-report.json
 ```

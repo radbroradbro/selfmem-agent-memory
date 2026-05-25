@@ -102,6 +102,8 @@ const files = {
   localRerankResultGateMarkdown: `${reviewDir}/local-rerank-result-gate-20260525.md`,
   providerChallengerResultGateReport: `${reviewDir}/provider-challenger-result-gate-20260525.json`,
   providerChallengerResultGateMarkdown: `${reviewDir}/provider-challenger-result-gate-20260525.md`,
+  endToEndMemoryScoreGateReport: `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
+  endToEndMemoryScoreGateMarkdown: `${reviewDir}/end-to-end-memory-score-gate-20260525.md`,
 };
 
 for (const [name, file] of Object.entries(files)) {
@@ -132,6 +134,7 @@ const queryExpansionLiveLocalSmoke = JSON.parse(readFileSync(join(root, files.qu
 const queryExpansionResultGate = JSON.parse(readFileSync(join(root, files.queryExpansionResultGateReport), "utf8"));
 const localRerankResultGate = JSON.parse(readFileSync(join(root, files.localRerankResultGateReport), "utf8"));
 const providerChallengerResultGate = JSON.parse(readFileSync(join(root, files.providerChallengerResultGateReport), "utf8"));
+const endToEndMemoryScoreGate = JSON.parse(readFileSync(join(root, files.endToEndMemoryScoreGateReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
     .filter(([, file]) => file.endsWith(".md"))
@@ -260,6 +263,8 @@ assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionImplemen
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionImplementation?.liveLlmExpansionProven, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLocalSmoke?.evidenceExists, true);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLocalSmoke?.publicBenchmarkClaimsAllowed, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.status, "BLOCKED_END_TO_END_MEMORY_SCORE");
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.countsAsEndToEndMemoryBenchmark, false);
 assert.equal(queryExpansionPreflight.mode, "public-benchmark-query-expansion-preflight");
 assert.equal(queryExpansionPreflight.status, "BLOCKED_QUERY_EXPANSION_ENV");
 assert.equal(queryExpansionPreflight.readiness?.liveLlmExpansionWiringPresent, true);
@@ -292,6 +297,14 @@ assert.equal(providerChallengerResultGate.countsAsFullMemorySotaEvidence, false)
 assert.equal(providerChallengerResultGate.publicBenchmarkClaimsAllowed, false);
 assert.ok(providerChallengerResultGate.blockers.includes("provider-live-calls-missing"));
 assert.ok(providerChallengerResultGate.blockers.includes("provider-used-mock-calls"));
+assert.equal(endToEndMemoryScoreGate.mode, "end-to-end-memory-score-gate");
+assert.equal(endToEndMemoryScoreGate.status, "BLOCKED_END_TO_END_MEMORY_SCORE");
+assert.equal(endToEndMemoryScoreGate.countsAsEndToEndMemoryBenchmark, false);
+assert.equal(endToEndMemoryScoreGate.countsAsFullMemorySotaEvidence, false);
+assert.equal(endToEndMemoryScoreGate.publicBenchmarkClaimsAllowed, false);
+assert.ok(endToEndMemoryScoreGate.blockers.includes("retrieval-proxy-result-cannot-count-as-answer-quality"));
+assert.ok(endToEndMemoryScoreGate.blockers.includes("memorybench-answer-quality-not-proven"));
+assert.ok(endToEndMemoryScoreGate.blockers.includes("missing-answer-quality-score"));
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -531,12 +544,15 @@ const requirements = [
     files.localRerankResultGateMarkdown,
     files.providerChallengerResultGateReport,
     files.providerChallengerResultGateMarkdown,
+    files.endToEndMemoryScoreGateReport,
+    files.endToEndMemoryScoreGateMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
     "packages/bench/public-benchmark-sota-operator-packet.mjs",
     "packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "packages/bench/query-expansion-result-gate.mjs",
     "packages/bench/local-rerank-result-gate.mjs",
     "packages/bench/provider-challenger-result-gate.mjs",
+    "packages/bench/end-to-end-memory-score-gate.mjs",
     "packages/bench/recallweave-response-export.mjs",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [

@@ -39,6 +39,7 @@ const localRerankResultGateEvidence = loadEvidence(`${reviewDir}/local-rerank-re
 const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-live-local-smoke-20260525.json`);
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
+const endToEndMemoryScoreGateEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-gate-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
 
 const blockers = [
@@ -47,6 +48,7 @@ const blockers = [
   ...arrayOf(providerPreflight.blockers).map((item) => `provider:${item}`),
   !currentQueryExpansionImpl.liveLlmExpansionWiringPresent ? "query-expansion-live-llm-wiring-not-proven" : null,
   !localRerankEvidence.exists ? "local-rerank-sidecar-evidence-missing" : null,
+  !endToEndMemoryScoreGateEvidence.exists ? "end-to-end-memory-score-gate-missing" : null,
 ].filter(Boolean);
 
 const packet = {
@@ -105,6 +107,15 @@ const packet = {
       status: providerChallengerResultGateEvidence.json?.status ?? null,
       countsAsLiveProviderChallengerBenchmark: Boolean(providerChallengerResultGateEvidence.json?.countsAsLiveProviderChallengerBenchmark),
       blockers: providerChallengerResultGateEvidence.json?.blockers ?? [],
+    },
+    endToEndMemoryScoreGate: {
+      evidencePath: endToEndMemoryScoreGateEvidence.path,
+      evidenceExists: endToEndMemoryScoreGateEvidence.exists,
+      evidenceHash: endToEndMemoryScoreGateEvidence.hash,
+      status: endToEndMemoryScoreGateEvidence.json?.status ?? null,
+      countsAsEndToEndMemoryBenchmark: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsEndToEndMemoryBenchmark),
+      countsAsFullMemorySotaEvidence: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsFullMemorySotaEvidence),
+      blockers: endToEndMemoryScoreGateEvidence.json?.blockers ?? [],
     },
     localRerankSidecar: {
       strategy: "local-apple-qwen3-0_6b-local-rerank",
@@ -188,6 +199,7 @@ const packet = {
       "provider-challenger-result-gate.json",
       "local-rerank-result-gate.json",
       "end-to-end-memory-score.json",
+      "end-to-end-memory-score-gate.json",
       "reviewer-approval-report.json",
       "ui-evidence-index.md",
       "release-notes-diff.md",
@@ -389,6 +401,14 @@ function buildOperatorFlow() {
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-ladder-same-data-result.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-ladder-same-data-result.md\"",
         ].join(" "),
+        "<run MemoryBench/LongMemEval answer-quality harness into \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\">",
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\"",
+          `--target ${target}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.md\"",
+        ].join(" "),
         "npm exec --yes pnpm@10.23.0 -- baseline:packet -- --hosted <metrics-only-hosted-result.json> --recallweave <metrics-only-recallweave-result.json> --comparison <metrics-only-comparison.json> --preflight <metrics-only-preflight.json> --strict-real --output <metrics-only-reviewer-packet.zip>",
         "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet <metrics-only-reviewer-packet.zip> --comparison <metrics-only-comparison.json> --strict-target --review <reviewer-a-approval.json> --review <reviewer-b-approval.json> --output reviews/overnight-20260522/reviewer-approval-report.json",
       ],
@@ -464,6 +484,7 @@ function renderMarkdown(value) {
     `- Query expansion preflight: ${value.currentEvidence.queryExpansionPreflight.status}`,
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
+    `- End-to-end memory score gate: ${value.currentEvidence.endToEndMemoryScoreGate.status ?? "missing"}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
     `- Local rerank result gate: ${value.currentEvidence.localRerankResultGate.status ?? "missing"}`,
     `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,

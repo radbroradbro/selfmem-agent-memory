@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T18:14:45.443Z",
+  "generatedAt": "2026-05-25T18:29:55.686Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -77,6 +77,16 @@
       "retrievalProxyOnly": null,
       "memoryBenchAnswerQuality": null,
       "publicBenchmarkClaimsAllowed": null
+    },
+    "endToEndMemoryScoreGate": {
+      "path": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
+      "exists": true,
+      "hash": "sha256:51f5a2d07b5b229b9645613b528ffa42cf9e7d35a2d1b4b760b146d558ab558a",
+      "mode": "end-to-end-memory-score-gate",
+      "fixtureOnly": null,
+      "retrievalProxyOnly": null,
+      "memoryBenchAnswerQuality": null,
+      "publicBenchmarkClaimsAllowed": false
     },
     "readinessNote": {
       "path": "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
@@ -384,6 +394,8 @@
     "queryExpansionPreflightPresent": true,
     "queryExpansionPreflightSafe": true,
     "queryExpansionCanBeBenchmarked": false,
+    "endToEndMemoryScoreGatePresent": true,
+    "endToEndMemoryScoreGateReady": false,
     "endToEndMemoryScorePresent": false,
     "publicClaimsAllowedByInputs": false,
     "reportedMemoryTargetsPresent": true,

@@ -17,6 +17,7 @@ const evidenceFiles = {
   voyageLatencyCanary: "reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json",
   localApple4bWarm: "reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-warm.json",
   queryExpansionPreflight: "reviews/overnight-20260522/query-expansion-preflight-20260525.json",
+  endToEndMemoryScoreGate: "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
   readinessNote: "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
 };
 
@@ -173,7 +174,11 @@ const checks = {
     loaded.queryExpansionPreflight.json?.callsProviderApis === false &&
     loaded.queryExpansionPreflight.json?.sendsBenchmarkTextToProvider === false,
   queryExpansionCanBeBenchmarked: loaded.queryExpansionPreflight.json?.readiness?.queryExpansionCanBeBenchmarked === true,
-  endToEndMemoryScorePresent: rows.some((row) => row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false),
+  endToEndMemoryScoreGatePresent: loaded.endToEndMemoryScoreGate.exists,
+  endToEndMemoryScoreGateReady: loaded.endToEndMemoryScoreGate.json?.countsAsEndToEndMemoryBenchmark === true,
+  endToEndMemoryScorePresent:
+    rows.some((row) => row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false) ||
+    loaded.endToEndMemoryScoreGate.json?.countsAsEndToEndMemoryBenchmark === true,
   publicClaimsAllowedByInputs: rows.some((row) => row.publicBenchmarkClaimsAllowed === true),
   reportedMemoryTargetsPresent: reportedMemoryTargets.length >= 2,
   readinessNotePresent: loaded.readinessNote.exists,
