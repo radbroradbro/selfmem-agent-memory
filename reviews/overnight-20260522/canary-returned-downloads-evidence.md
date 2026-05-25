@@ -63,6 +63,9 @@ safe entry labels, hashes, counts, and status codes.
 The scan wrote
 `reviews/overnight-20260522/returned-downloads-current-scan.md` as the native
 markdown findings note. It contains counts and safe inbox labels only.
+The release gate now requires that checked-in current scan to show exactly one
+handoff packet, which keeps superseded `SEND-THIS-ONE` packets out of the
+operator-facing handoff surface.
 
 ## Fixture Result
 

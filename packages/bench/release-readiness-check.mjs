@@ -3788,10 +3788,11 @@ check("fresh returned downloads scanner passes", () => {
     assert.equal(currentScan.publicLaunchAllowed, false);
     assert.equal(currentScan.fleetRolloutAllowed, false);
     assert.equal(currentScan.counts?.productionEvidencePackets, 0);
-    assert.ok(Number(currentScan.counts?.handoffPackets ?? 0) >= 1);
+    assert.equal(Number(currentScan.counts?.handoffPackets ?? 0), 1);
     assert.ok(Number(currentScan.counts?.diagnosticBundles ?? 0) >= 1);
     assert.match(currentScanFindings, /Returned Downloads Findings/);
     assert.match(currentScanFindings, /Production evidence packets: 0/);
+    assert.match(currentScanFindings, /Handoff packets: 1/);
     assert.match(currentScanFindings, /No production canary evidence was found/);
     for (const text of [noDefaultsRun.stdout, downloadsRun.stdout, requiredRun.stdout, findings, evidence, JSON.stringify(currentScan), currentScanFindings]) {
       assert.doesNotMatch(text, secretPattern);
