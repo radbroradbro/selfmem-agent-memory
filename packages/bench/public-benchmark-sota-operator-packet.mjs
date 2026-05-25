@@ -40,6 +40,7 @@ const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-l
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
 const endToEndMemoryScoreGateEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-gate-20260525.json`);
+const answerQualityHarnessSmokeEvidence = loadEvidence(`${reviewDir}/answer-quality-harness-smoke-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
 
 const blockers = [
@@ -116,6 +117,15 @@ const packet = {
       countsAsEndToEndMemoryBenchmark: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsEndToEndMemoryBenchmark),
       countsAsFullMemorySotaEvidence: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsFullMemorySotaEvidence),
       blockers: endToEndMemoryScoreGateEvidence.json?.blockers ?? [],
+    },
+    answerQualityHarnessSmoke: {
+      evidencePath: answerQualityHarnessSmokeEvidence.path,
+      evidenceExists: answerQualityHarnessSmokeEvidence.exists,
+      evidenceHash: answerQualityHarnessSmokeEvidence.hash,
+      mode: answerQualityHarnessSmokeEvidence.json?.mode ?? null,
+      fixtureOnly: Boolean(answerQualityHarnessSmokeEvidence.json?.fixtureOnly),
+      memoryBenchAnswerQuality: Boolean(answerQualityHarnessSmokeEvidence.json?.memoryBenchAnswerQuality),
+      readyForEndToEndMemoryScoreGate: Boolean(answerQualityHarnessSmokeEvidence.json?.readyForEndToEndMemoryScoreGate),
     },
     localRerankSidecar: {
       strategy: "local-apple-qwen3-0_6b-local-rerank",
@@ -199,6 +209,7 @@ const packet = {
       "provider-challenger-result-gate.json",
       "local-rerank-result-gate.json",
       "end-to-end-memory-score.json",
+      "answer-quality-harness-smoke.json",
       "end-to-end-memory-score-gate.json",
       "reviewer-approval-report.json",
       "ui-evidence-index.md",
@@ -243,6 +254,10 @@ function buildOperatorFlow() {
   const target = displayPath(targetPath);
   const providerStrategies = providerPreflightStrategies.join(",");
   const fullLadderStrategies = sameDataStrategies.join(",");
+  const fullLadderStrategyList = sameDataStrategies.join(" ");
+  const answerQualityArms = sameDataStrategies
+    .map((strategy) => `--arm ${strategy}="$RECALLWEAVE_SOTA_OUTPUT_DIR/${strategy}-responses.private.json"`)
+    .join(" ");
   return [
     {
       id: "refresh-current-safe-gates",
@@ -393,6 +408,12 @@ function buildOperatorFlow() {
         "RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-ladder",
         [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
+          `--target ${target}`,
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialize-report.json\"",
+        ].join(" "),
+        [
           "npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live",
           `--target ${target}`,
           `--strategies ${fullLadderStrategies}`,
@@ -401,7 +422,32 @@ function buildOperatorFlow() {
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-ladder-same-data-result.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-ladder-same-data-result.md\"",
         ].join(" "),
-        "<run MemoryBench/LongMemEval answer-quality harness into \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\">",
+        [
+          `for strategy in ${fullLadderStrategyList}; do`,
+          "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+          "npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live",
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl\"",
+          "--preserve-ids",
+          "--strategy \"$strategy\"",
+          "--context-token-budget 800",
+          "--limit 5",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/${strategy}-responses.private.json\";",
+          "done",
+        ].join(" "),
+        [
+          "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+          "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+          "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
+          `--target ${target}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl\"",
+          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json\"",
+          answerQualityArms,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.md\"",
+        ].join(" "),
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready",
           "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\"",
@@ -485,6 +531,7 @@ function renderMarkdown(value) {
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
     `- End-to-end memory score gate: ${value.currentEvidence.endToEndMemoryScoreGate.status ?? "missing"}`,
+    `- Answer-quality harness smoke: ${value.currentEvidence.answerQualityHarnessSmoke.mode ?? "missing"}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
     `- Local rerank result gate: ${value.currentEvidence.localRerankResultGate.status ?? "missing"}`,
     `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,

@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality",
+  "fixtureOnly": true,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "readyForEndToEndMemoryScoreGate": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "generatedAt": "2026-05-25T18:37:08.763Z",
+  "target": {
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o"
+  },
+  "input": {
+    "source": "fixture-answer-quality-smoke",
+    "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "querySetHash": "sha256:d24290ad168215070aabf6f6ed68019e41b0bcbba5f40febb7a47aee75f0c4ca",
+    "materializerHash": null,
+    "memoriesHash": "sha256:c472e3be829df545c0c72702f651df571c8e208f63721f73f9f72372af9e4cc8",
+    "answerLabelsHash": "sha256:ae94858febc7847535f476e767ebf4a3452d1f8354a5b0112149c50c1699e2bf",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "datasetSlice": "fixture-answer-quality",
+    "queryCount": 2,
+    "scoredQueryCount": 2
+  },
+  "provider": {
+    "answerModel": "fixture-answer-model",
+    "judgeModel": "fixture-judge-model",
+    "answerQualityCallsAllowed": false,
+    "publicDataConfirmed": false,
+    "callsMade": 0,
+    "endpointLabel": null
+  },
+  "metrics": {
+    "answerQuality": 100,
+    "memoryScore": 100,
+    "longmemevalScore": 100,
+    "quality": 1,
+    "judgeCorrectRate": 1,
+    "answerLatencyP50Ms": 3,
+    "answerLatencyP95Ms": 3,
+    "contextTokensAvg": 22
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "metrics": {
+        "answerQuality": 100,
+        "memoryScore": 100,
+        "longmemevalScore": 100,
+        "quality": 1,
+        "judgeCorrectRate": 1,
+        "answerLatencyP50Ms": 3,
+        "answerLatencyP95Ms": 3,
+        "contextTokensAvg": 22
+      },
+      "provider": {
+        "answerCalls": 0,
+        "judgeCalls": 0,
+        "fixtureJudge": true
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 2,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "56c99d3dbd472995",
+          "queryHash": "befc8a0e51bcb7e7",
+          "candidateAnswerHash": "sha256:bf2af2e2e38aa573a2ae16670d685012cb2b43a86f45d952551880700a5a006a",
+          "judgeDecisionHash": "sha256:e0a1e1387026a82b8df0c39dd9f78d33371da516b734b38b9e04d336d2184708",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "ecd94636cd716609",
+          "queryHash": "0fdbc2966242c2b2",
+          "candidateAnswerHash": "sha256:ae1bb44bef03a0cdf0436f08fa9e3f7ffe88222ea759153c8cf14c2f48a5fcda",
+          "judgeDecisionHash": "sha256:fe6d6b609786dde439de283a97a782ab2584efe12123522fd9c475c782c3c3f2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 100,
+        "memoryScore": 100,
+        "longmemevalScore": 100,
+        "quality": 1,
+        "judgeCorrectRate": 1,
+        "answerLatencyP50Ms": 3,
+        "answerLatencyP95Ms": 3,
+        "contextTokensAvg": 22
+      },
+      "provider": {
+        "answerCalls": 0,
+        "judgeCalls": 0,
+        "fixtureJudge": true
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 2,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "56c99d3dbd472995",
+          "queryHash": "befc8a0e51bcb7e7",
+          "candidateAnswerHash": "sha256:bf2af2e2e38aa573a2ae16670d685012cb2b43a86f45d952551880700a5a006a",
+          "judgeDecisionHash": "sha256:e0a1e1387026a82b8df0c39dd9f78d33371da516b734b38b9e04d336d2184708",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "ecd94636cd716609",
+          "queryHash": "0fdbc2966242c2b2",
+          "candidateAnswerHash": "sha256:ae1bb44bef03a0cdf0436f08fa9e3f7ffe88222ea759153c8cf14c2f48a5fcda",
+          "judgeDecisionHash": "sha256:fe6d6b609786dde439de283a97a782ab2584efe12123522fd9c475c782c3c3f2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 100,
+        "memoryScore": 100,
+        "longmemevalScore": 100,
+        "quality": 1,
+        "judgeCorrectRate": 1,
+        "answerLatencyP50Ms": 3,
+        "answerLatencyP95Ms": 3,
+        "contextTokensAvg": 22
+      },
+      "provider": {
+        "answerCalls": 0,
+        "judgeCalls": 0,
+        "fixtureJudge": true
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 2,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "56c99d3dbd472995",
+          "queryHash": "befc8a0e51bcb7e7",
+          "candidateAnswerHash": "sha256:bf2af2e2e38aa573a2ae16670d685012cb2b43a86f45d952551880700a5a006a",
+          "judgeDecisionHash": "sha256:e0a1e1387026a82b8df0c39dd9f78d33371da516b734b38b9e04d336d2184708",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "ecd94636cd716609",
+          "queryHash": "0fdbc2966242c2b2",
+          "candidateAnswerHash": "sha256:ae1bb44bef03a0cdf0436f08fa9e3f7ffe88222ea759153c8cf14c2f48a5fcda",
+          "judgeDecisionHash": "sha256:fe6d6b609786dde439de283a97a782ab2584efe12123522fd9c475c782c3c3f2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "answerQuality": 100,
+    "judgeCorrectRate": 1,
+    "answerLatencyP50Ms": 3
+  },
+  "reviewerApprovalCount": 0,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "safety": {
+    "metricsOnly": true,
+    "publicSafe": true,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "privateInputsStoredOutsideRepository": true
+  },
+  "nextActions": [
+    "Run this harness with --live against private materialized LongMemEval inputs and explicit model-call consent.",
+    "Attach the metrics-only answer-quality result to benchmark:memory-score:result-gate."
+  ]
+}

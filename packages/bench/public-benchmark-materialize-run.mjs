@@ -270,6 +270,7 @@ function fixtureMaterialize() {
 function writePrivateBenchmarkInputs(options) {
   const sessionMap = new Map();
   const answerContentHashesByQuery = new Map();
+  const materializerHash = `sha256:${stableHash("public-benchmark-materialize-run:v1")}`;
   for (const row of options.selected) {
     const sessionIds = asArray(row.haystack_session_ids).map((item) => String(item));
     const sessions = asArray(row.haystack_sessions);
@@ -302,7 +303,7 @@ function writePrivateBenchmarkInputs(options) {
   const queries = options.selected.map((row) => {
     const answerSessionIds = asArray(row.answer_session_ids).map((item) => String(item)).filter(Boolean);
     return {
-      id: `longmemeval-${shortHash(`${row.question_type}:${row.question_id}`)}`,
+      id: queryIdFor(row),
       q: String(row.question),
       expectedResultIds: answerSessionIds,
       expectedResultHashes: answerContentHashesByQuery.get(String(row.question_id)) ?? [],
@@ -328,20 +329,39 @@ function writePrivateBenchmarkInputs(options) {
       selectedQuestionIdsHash: options.selectedQuestionIdsHash,
       answerLabelsHash: options.answerLabelsHash,
       scoringCodeHash: options.scoringCodeHash,
+      materializerHash,
     },
     queries,
+  };
+  const answerLabels = {
+    schemaVersion: 1,
+    fixtureOnly: options.fixtureOnly,
+    benchmark: "longmemeval",
+    datasetSlice: options.datasetSlice,
+    answerLabelsHash: options.answerLabelsHash,
+    scoringCodeHash: options.scoringCodeHash,
+    labels: options.selected.map((row) => ({
+      queryId: queryIdFor(row),
+      questionId: String(row.question_id),
+      questionType: String(row.question_type),
+      answer: String(row.answer ?? ""),
+    })),
   };
   const collectorQuerySetPayload = collectorQuerySetHashPayload(querySet);
   const memories = [...sessionMap.values()].sort((left, right) => left.id.localeCompare(right.id));
   const querySetPath = resolve(privateOutputDir, "longmemeval-queryset.private.json");
   const memoriesPath = resolve(privateOutputDir, "longmemeval-memories.private.jsonl");
+  const answerLabelsPath = resolve(privateOutputDir, "longmemeval-answer-labels.private.json");
   const readmePath = resolve(privateOutputDir, "README.private.txt");
   assertOutsideRepo(querySetPath, "private query set");
   assertOutsideRepo(memoriesPath, "private memories file");
+  assertOutsideRepo(answerLabelsPath, "private answer labels file");
   assertNoUnsafePrivateText(JSON.stringify(querySet), "private query set");
   assertNoUnsafePrivateText(memories.map((item) => JSON.stringify(item)).join("\n"), "private memories");
+  assertNoUnsafePrivateText(JSON.stringify(answerLabels), "private answer labels");
   writePrivateFile(querySetPath, `${JSON.stringify(querySet, null, 2)}\n`);
   writePrivateFile(memoriesPath, `${memories.map((item) => JSON.stringify(item)).join("\n")}\n`);
+  writePrivateFile(answerLabelsPath, `${JSON.stringify(answerLabels, null, 2)}\n`);
   writePrivateFile(
     readmePath,
     [
@@ -360,12 +380,14 @@ function writePrivateBenchmarkInputs(options) {
       questionTypeCount: new Set(options.selected.map((item) => String(item.question_type))).size,
       selectedQuestionIdsHash: options.selectedQuestionIdsHash,
       answerLabelsHash: options.answerLabelsHash,
+      materializerHash,
       queryCount: queries.length,
       haystackSessionCount: memories.length,
       expectedResultRefCount: expectedRefs,
       querySetHash: `sha256:${stableHash(canonicalJson(querySet))}`,
       collectorCompatibleQuerySetHash: `sha256:${stableHash(collectorQuerySetPayload)}`,
       memoriesFileHash: `sha256:${stableHash(memories.map((item) => JSON.stringify(item)).join("\n"))}`,
+      answerLabelsFileHash: `sha256:${fileHash(answerLabelsPath)}`,
     },
     privateOutputs: {
       directoryLabel: "operator-private-output-dir",
@@ -375,6 +397,7 @@ function writePrivateBenchmarkInputs(options) {
       files: [
         { role: "queryset", name: basename(querySetPath), hash: `sha256:${fileHash(querySetPath)}`, rawTextPrivate: true },
         { role: "memories", name: basename(memoriesPath), hash: `sha256:${fileHash(memoriesPath)}`, rawTextPrivate: true },
+        { role: "answer-labels", name: basename(answerLabelsPath), hash: `sha256:${fileHash(answerLabelsPath)}`, rawTextPrivate: true },
         { role: "readme", name: basename(readmePath), hash: `sha256:${fileHash(readmePath)}`, rawTextPrivate: false },
       ],
     },
@@ -462,12 +485,19 @@ function formatSessionContent(input) {
 function runCommandTemplates(privateOutputs) {
   const querySet = `<private-output-dir>/${privateOutputs.files.find((item) => item.role === "queryset")?.name ?? "longmemeval-queryset.private.json"}`;
   const memories = `<private-output-dir>/${privateOutputs.files.find((item) => item.role === "memories")?.name ?? "longmemeval-memories.private.jsonl"}`;
+  const answerLabels = `<private-output-dir>/${privateOutputs.files.find((item) => item.role === "answer-labels")?.name ?? "longmemeval-answer-labels.private.json"}`;
   return {
     exportResponses:
       `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 pnpm baseline:export:recallweave -- --live --queryset ${querySet} --memories ${memories} --preserve-ids --strategy ${retrievalStrategy} --context-token-budget ${contextTokenBudget} --limit ${limit} --output <private-output-dir>/longmemeval-recallweave-responses.private.json`,
     collectMetrics:
       `RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_JUDGE_MODEL=<judge-model> RECALLWEAVE_BASELINE_ANSWER_MODEL=<answer-model> pnpm baseline:collect:recallweave -- --live --queryset ${querySet} --responses <private-output-dir>/longmemeval-recallweave-responses.private.json --retrieval-mode strategy:${retrievalStrategy} --limit ${limit} --output <public-metrics-output.json>`,
+    scoreAnswerQuality:
+      `RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 pnpm benchmark:answer-quality -- --live --target <target.json> --queryset ${querySet} --memories ${memories} --answer-labels ${answerLabels} --arm ${retrievalStrategy}=<private-output-dir>/longmemeval-recallweave-responses.private.json --output <public-answer-quality-output.json>`,
   };
+}
+
+function queryIdFor(row) {
+  return `longmemeval-${shortHash(`${row.question_type}:${row.question_id}`)}`;
 }
 
 function renderMarkdown(value) {

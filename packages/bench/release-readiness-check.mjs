@@ -493,6 +493,7 @@ const requiredScripts = [
   "benchmark:public-provider:packet",
   "benchmark:public-provider",
   "benchmark:public-autoresearch",
+  "benchmark:answer-quality",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
   "benchmark:local-rerank:result-gate",
@@ -1429,6 +1430,8 @@ check("fresh public benchmark target check passes", () => {
     "--format",
     "markdown",
   ]).stdout;
+  const answerQualityFixture = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture"]).stdout);
+  const answerQualityMarkdown = run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture", "--format", "markdown"]).stdout;
   const liveMaterializeReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run.json"), "utf8"));
   const liveMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run-evidence.md"), "utf8");
   const liveRecallWeaveRun = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-recallweave-run-result.json"), "utf8"));
@@ -1638,6 +1641,20 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(Number(autoresearchFixture.loop?.armCount ?? 0) >= 12);
   assert.ok(autoresearchFixture.winner?.armId);
   assert.match(autoresearchMarkdown, /Public Benchmark Autoresearch Loop/);
+  assert.equal(answerQualityFixture.ok, true);
+  assert.equal(answerQualityFixture.mode, "public-benchmark-answer-quality");
+  assert.equal(answerQualityFixture.fixtureOnly, true);
+  assert.equal(answerQualityFixture.metricsOnly, true);
+  assert.equal(answerQualityFixture.retrievalProxyOnly, false);
+  assert.equal(answerQualityFixture.memoryBenchAnswerQuality, true);
+  assert.equal(answerQualityFixture.readyForEndToEndMemoryScoreGate, false);
+  assert.equal(answerQualityFixture.publicBenchmarkClaimsAllowed, false);
+  assert.equal(answerQualityFixture.rawQuestionsIncluded, false);
+  assert.equal(answerQualityFixture.rawAnswersIncluded, false);
+  assert.equal(answerQualityFixture.rawMemoryIncluded, false);
+  assert.equal(answerQualityFixture.rawTranscriptIncluded, false);
+  assert.ok(answerQualityFixture.strategies?.some((item) => item.strategy === "bm25-lite"));
+  assert.match(answerQualityMarkdown, /Public Benchmark Answer Quality/);
   assert.equal(liveMaterializeReport.ok, true);
   assert.equal(liveMaterializeReport.fixtureOnly, false);
   assert.equal(liveMaterializeReport.claimTier, "run-only");
