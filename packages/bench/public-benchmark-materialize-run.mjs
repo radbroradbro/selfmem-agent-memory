@@ -40,6 +40,7 @@ const retrievalStrategy = normalizeRetrievalStrategy(
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
+const secretPatternGlobal = new RegExp(secretPattern.source, "g");
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
@@ -85,7 +86,7 @@ async function liveMaterialize() {
   assert.match(String(target.benchmark.datasetRevision ?? ""), new RegExp(escapeRegExp(datasetHash)), "target datasetRevision must include dataset hash");
   const dataset = JSON.parse(rawText);
   assert.ok(Array.isArray(dataset), "LongMemEval dataset must be a JSON array");
-  const selected = selectSlice(dataset, policy.types, { perType: policy.perType, limit: policy.limit });
+  const selected = selectSlice(dataset, policy.types, { perType: policy.perType, limit: policy.limit, selection: policy.selection });
   const selectedIds = selected.map((item) => String(item.question_id));
   const selectedQuestionIdsHash = `sha256:${stableHash(selectedIds.join("\n"))}`;
   const labelPayload = selected.map((item) => ({
@@ -271,6 +272,10 @@ function writePrivateBenchmarkInputs(options) {
   const sessionMap = new Map();
   const answerContentHashesByQuery = new Map();
   const materializerHash = `sha256:${stableHash("public-benchmark-materialize-run:v1")}`;
+  const redactionStats = {
+    keyShapedTokenRedactionCount: 0,
+    privateTagRedactionCount: 0,
+  };
   for (const row of options.selected) {
     const sessionIds = asArray(row.haystack_session_ids).map((item) => String(item));
     const sessions = asArray(row.haystack_sessions);
@@ -281,6 +286,7 @@ function writePrivateBenchmarkInputs(options) {
         sessionId,
         date: dates[index],
         messages: sessions[index],
+        redactionStats,
       });
       sessionMap.set(sessionId, {
         id: sessionId,
@@ -296,7 +302,7 @@ function writePrivateBenchmarkInputs(options) {
     const hashes = asArray(row.answer_session_ids)
       .map((sessionId) => sessionMap.get(String(sessionId))?.content)
       .filter(Boolean)
-      .map((content) => `sha256:${stableHash(normalizeText(redactForPrivateTags(content)))}`);
+      .map((content) => `sha256:${stableHash(normalizeText(content))}`);
     answerContentHashesByQuery.set(String(row.question_id), [...new Set(hashes)]);
   }
 
@@ -384,6 +390,7 @@ function writePrivateBenchmarkInputs(options) {
       queryCount: queries.length,
       haystackSessionCount: memories.length,
       expectedResultRefCount: expectedRefs,
+      redactionStats,
       querySetHash: `sha256:${stableHash(canonicalJson(querySet))}`,
       collectorCompatibleQuerySetHash: `sha256:${stableHash(collectorQuerySetPayload)}`,
       memoriesFileHash: `sha256:${stableHash(memories.map((item) => JSON.stringify(item)).join("\n"))}`,
@@ -431,11 +438,19 @@ async function readDatasetBuffer(datasetUrl) {
 }
 
 function selectSlice(dataset, questionTypes, options) {
+  if (options.selection === "full-dataset") {
+    const wantedTypes = new Set(questionTypes.map((type) => String(type)));
+    const selected = dataset
+      .filter((item) => wantedTypes.has(String(item.question_type)) && requiredString(item.question_id) && answerPresent(item.answer))
+      .sort((left, right) => String(left.question_id).localeCompare(String(right.question_id)));
+    assert.equal(selected.length, options.limit, "full dataset selection did not match the target policy limit");
+    return selected;
+  }
   const selected = [];
   for (const type of questionTypes) {
     if (selected.length >= options.limit) break;
     const candidates = dataset
-      .filter((item) => String(item.question_type) === type && requiredString(item.question_id) && requiredString(item.answer))
+      .filter((item) => String(item.question_type) === type && requiredString(item.question_id) && answerPresent(item.answer))
       .sort((left, right) => String(left.question_id).localeCompare(String(right.question_id)));
     selected.push(...candidates.slice(0, Math.min(options.perType, options.limit - selected.length)));
   }
@@ -461,11 +476,12 @@ function parseQuestionIdPolicy(value) {
     .map((item) => item.trim())
     .filter(Boolean);
   assert.ok(types.length > 0, "questionIdPolicy needs types");
-  const perType = positiveInt(fields.perType, "questionIdPolicy perType");
   const limit = positiveInt(fields.limit, "questionIdPolicy limit");
   assert.equal(fields.sort, "question_id-ascending", "questionIdPolicy sort must be question_id-ascending");
-  assert.equal(fields.selection, "first-per-type-round-robin", "questionIdPolicy selection must be first-per-type-round-robin");
-  return { datasetHash, types, perType, limit };
+  const selection = String(fields.selection ?? "");
+  assert.ok(["first-per-type-round-robin", "full-dataset"].includes(selection), "questionIdPolicy selection must be first-per-type-round-robin or full-dataset");
+  const perType = selection === "full-dataset" ? null : positiveInt(fields.perType, "questionIdPolicy perType");
+  return { datasetHash, types, perType, limit, selection };
 }
 
 function formatSessionContent(input) {
@@ -476,7 +492,7 @@ function formatSessionContent(input) {
   for (const message of messages) {
     if (!message || typeof message !== "object") continue;
     const role = String(message.role ?? "message").trim() || "message";
-    const content = String(message.content ?? "").replace(privateTagPattern, " ").replace(/\s+/g, " ").trim();
+    const content = redactPrivateBenchmarkText(message.content, input.redactionStats);
     if (content) lines.push(`${titleCase(role)}: ${content}`);
   }
   return lines.join("\n");
@@ -556,14 +572,19 @@ function publicSafety() {
 }
 
 function assertSafePublicText(text, label) {
-  assert.doesNotMatch(String(text), secretPattern, `${label} contains a key-shaped secret`);
-  assert.doesNotMatch(String(text), privatePathPattern, `${label} contains a private path or raw memory filename`);
-  assert.doesNotMatch(String(text), privateTagPattern, `${label} contains private tags`);
+  assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
+  assertNoPattern(text, privatePathPattern, `${label} contains a private path or raw memory filename`);
+  assertNoPattern(text, privateTagPattern, `${label} contains private tags`);
 }
 
 function assertNoUnsafePrivateText(text, label) {
-  assert.doesNotMatch(String(text), secretPattern, `${label} contains a key-shaped secret`);
-  assert.doesNotMatch(String(text), privateTagPattern, `${label} contains private tags`);
+  assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
+  assertNoPattern(text, privateTagPattern, `${label} contains private tags`);
+}
+
+function assertNoPattern(text, pattern, message) {
+  pattern.lastIndex = 0;
+  if (pattern.test(String(text))) throw new Error(message);
 }
 
 function writePrivateFile(path, text) {
@@ -589,8 +610,19 @@ function assertOutsideRepo(path, label) {
   assert.ok(rel.startsWith("..") || isAbsolute(rel), `${label} must stay outside the repository`);
 }
 
-function redactForPrivateTags(text) {
-  return String(text).replace(privateTagPattern, " ").replace(/\s+/g, " ").trim();
+function redactPrivateBenchmarkText(text, stats) {
+  const input = String(text ?? "");
+  const privateTagMatches = input.match(privateTagPattern) ?? [];
+  const secretMatches = input.match(secretPatternGlobal) ?? [];
+  if (stats) {
+    stats.privateTagRedactionCount += privateTagMatches.length;
+    stats.keyShapedTokenRedactionCount += secretMatches.length;
+  }
+  return input
+    .replace(privateTagPattern, " ")
+    .replace(secretPatternGlobal, "[redacted-key-shaped-token]")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function normalizeText(text) {
@@ -599,6 +631,10 @@ function normalizeText(text) {
 
 function requiredString(value) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function answerPresent(value) {
+  return value != null && String(value).trim().length > 0;
 }
 
 function requiredHttpsUrl(value) {

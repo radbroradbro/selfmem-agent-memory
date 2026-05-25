@@ -175,7 +175,7 @@ function inspectPrivateJson(path, role, inspector) {
   if (!path) return { role, present: false, rawTextPrivate: true };
   assertPrivateFile(path, role);
   const raw = readFileSync(path, "utf8");
-  assert.doesNotMatch(raw, secretPattern, `${role} contains a key-shaped secret`);
+  assertNoPattern(raw, secretPattern, `${role} contains a key-shaped secret`);
   const parsed = JSON.parse(raw);
   return {
     role,
@@ -192,7 +192,7 @@ function inspectPrivateJsonl(path, role) {
   if (!path) return { role, present: false, rawTextPrivate: true };
   assertPrivateFile(path, role);
   const raw = readFileSync(path, "utf8");
-  assert.doesNotMatch(raw, secretPattern, `${role} contains a key-shaped secret`);
+  assertNoPattern(raw, secretPattern, `${role} contains a key-shaped secret`);
   const lineCount = raw.split(/\r?\n/).filter((line) => line.trim()).length;
   return {
     role,
@@ -236,7 +236,7 @@ function inspectArms() {
     assertSafeStrategy(arm.strategy);
     assertPrivateFile(arm.path, `${arm.strategy} response arm`);
     const raw = readFileSync(arm.path, "utf8");
-    assert.doesNotMatch(raw, secretPattern, `${arm.strategy} response arm contains a key-shaped secret`);
+    assertNoPattern(raw, secretPattern, `${arm.strategy} response arm contains a key-shaped secret`);
     const parsed = JSON.parse(raw);
     const querySetHash = parsed.querySetHash ?? null;
     return {
@@ -415,10 +415,15 @@ function writeOutput(path, text) {
 }
 
 function assertSafePublicText(text, label) {
-  assert.doesNotMatch(String(text), secretPattern, `${label} contains a key-shaped secret`);
-  assert.doesNotMatch(String(text), privatePathPattern, `${label} contains a private local path`);
-  assert.doesNotMatch(String(text), privateTagPattern, `${label} contains private tags`);
-  assert.doesNotMatch(String(text), /\b(q|answer|content|memory|text|raw|prompt)"\s*:/, `${label} contains raw text-like fields`);
+  assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
+  assertNoPattern(text, privatePathPattern, `${label} contains a private local path`);
+  assertNoPattern(text, privateTagPattern, `${label} contains private tags`);
+  assertNoPattern(text, /\b(q|answer|content|memory|text|raw|prompt)"\s*:/, `${label} contains raw text-like fields`);
+}
+
+function assertNoPattern(text, pattern, message) {
+  pattern.lastIndex = 0;
+  if (pattern.test(String(text))) throw new Error(message);
 }
 
 function sha256(value) {

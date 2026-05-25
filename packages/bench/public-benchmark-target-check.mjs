@@ -22,7 +22,16 @@ const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
-const claimTiers = new Set(["fixture", "run-only", "canary-trend", "canary-trending-win", "public-benchmark", "broad-sota"]);
+const claimTiers = new Set([
+  "fixture",
+  "run-only",
+  "canary-trend",
+  "canary-trending-win",
+  "public-benchmark",
+  "full-benchmark",
+  "officially-comparable",
+  "broad-sota",
+]);
 const memoryBenchmarks = new Set(["memorybench", "longmemeval", "longmemeval-v2", "locomo", "convomem", "beam"]);
 const componentBenchmarks = new Set(["mteb", "mmteb", "beir", "miracl", "ms marco", "ms-marco", "reranker"]);
 const sha256Pattern = /^sha256:[a-f0-9]{64}$/i;

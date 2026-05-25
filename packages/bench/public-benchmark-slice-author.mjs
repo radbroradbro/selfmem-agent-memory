@@ -17,10 +17,15 @@ const sourceLockPath = resolveInputPath(
     "reviews/overnight-20260522/public-memorybench-source-lock.json",
 );
 const benchmark = normalizeBenchmarkName(args.benchmark ?? "longmemeval");
-const perType = Number(args.perType ?? 1);
-const limit = Number(args.limit ?? 6);
-assert.ok(Number.isInteger(perType) && perType > 0, "--per-type must be a positive integer");
-assert.ok(Number.isInteger(limit) && limit > 0, "--limit must be a positive integer");
+const selection = normalizeSelection(args.selection ?? (args.full ? "full-dataset" : "first-per-type-round-robin"));
+const perType = selection === "full-dataset" ? null : Number(args.perType ?? 1);
+const limit = args.limit == null && selection === "full-dataset" ? null : Number(args.limit ?? 6);
+if (selection === "first-per-type-round-robin") {
+  assert.ok(Number.isInteger(perType) && perType > 0, "--per-type must be a positive integer");
+  assert.ok(Number.isInteger(limit) && limit > 0, "--limit must be a positive integer");
+} else {
+  assert.ok(limit == null || (Number.isInteger(limit) && limit > 0), "--limit must be a positive integer when provided");
+}
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -56,7 +61,7 @@ async function liveManifest() {
     "temporal-reasoning",
     "knowledge-update",
   ];
-  const selected = selectSlice(dataset, questionTypes, { perType, limit });
+  const selected = selectSlice(dataset, questionTypes, { perType, limit, selection });
   const labelPayload = selected.map((item) => ({
     questionId: String(item.question_id),
     questionType: String(item.question_type),
@@ -73,14 +78,23 @@ async function liveManifest() {
     benchmarkTypesHash: sourceLock.keyFileHashes?.["src/types/benchmark.ts"],
     unifiedTypesHash: sourceLock.keyFileHashes?.["src/types/unified.ts"],
   };
-  const questionIdPolicy = [
-    `datasetHash=${datasetHash}`,
-    `types=${questionTypes.join(",")}`,
-    `perType=${perType}`,
-    `limit=${limit}`,
-    "sort=question_id-ascending",
-    "selection=first-per-type-round-robin",
-  ].join("; ");
+  const questionIdPolicy =
+    selection === "full-dataset"
+      ? [
+          `datasetHash=${datasetHash}`,
+          `types=${questionTypes.join(",")}`,
+          `limit=${selected.length}`,
+          "sort=question_id-ascending",
+          "selection=full-dataset",
+        ].join("; ")
+      : [
+          `datasetHash=${datasetHash}`,
+          `types=${questionTypes.join(",")}`,
+          `perType=${perType}`,
+          `limit=${limit}`,
+          "sort=question_id-ascending",
+          "selection=first-per-type-round-robin",
+        ].join("; ");
 
   return {
     schemaVersion: 1,
@@ -135,11 +149,20 @@ async function readDatasetBuffer(datasetUrl) {
 }
 
 function selectSlice(dataset, questionTypes, options) {
+  if (options.selection === "full-dataset") {
+    const wantedTypes = new Set(questionTypes.map((type) => String(type)));
+    const selected = dataset
+      .filter((item) => wantedTypes.has(String(item.question_type)) && requiredString(item.question_id) && answerPresent(item.answer))
+      .sort((left, right) => String(left.question_id).localeCompare(String(right.question_id)));
+    assert.ok(selected.length > 0, "full dataset selection did not produce any rows");
+    if (options.limit != null) assert.equal(selected.length, options.limit, "full dataset selection did not match the expected limit");
+    return selected;
+  }
   const selected = [];
   for (const type of questionTypes) {
     if (selected.length >= options.limit) break;
     const candidates = dataset
-      .filter((item) => String(item.question_type) === type && requiredString(item.question_id) && requiredString(item.answer))
+      .filter((item) => String(item.question_type) === type && requiredString(item.question_id) && answerPresent(item.answer))
       .sort((left, right) => String(left.question_id).localeCompare(String(right.question_id)));
     selected.push(...candidates.slice(0, Math.min(options.perType, options.limit - selected.length)));
   }
@@ -265,8 +288,18 @@ function normalizeBenchmarkName(value) {
   return String(value ?? "").trim().toLowerCase().replace(/\s+/g, "-").replace(/^longmemeval-s$/, "longmemeval");
 }
 
+function normalizeSelection(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  assert.ok(["first-per-type-round-robin", "full-dataset"].includes(normalized), "--selection must be first-per-type-round-robin or full-dataset");
+  return normalized;
+}
+
 function requiredString(value) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function answerPresent(value) {
+  return value != null && String(value).trim().length > 0;
 }
 
 function requiredHttpsUrl(value) {

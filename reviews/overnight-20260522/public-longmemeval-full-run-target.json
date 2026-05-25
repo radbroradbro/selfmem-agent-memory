@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "fixtureOnly": false,
+  "targetId": "longmemeval-longmemeval-s-cleaned-full-500-2026-05-25-2026-05-25-5a5f4f93f812a235",
+  "benchmarkType": "memory",
+  "claimTier": "run-only",
+  "benchmark": {
+    "name": "LongMemEval",
+    "family": "longmemeval",
+    "sourceUrl": "https://github.com/supermemoryai/memorybench",
+    "checkedAt": "2026-05-25",
+    "datasetRevision": "memorybench:118209a746d97d0d85e5a7234267f0b6962857e9;dataset:sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "split": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o",
+    "questionIdPolicy": "datasetHash=sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442; types=single-session-user,single-session-assistant,single-session-preference,multi-session,temporal-reasoning,knowledge-update; limit=500; sort=question_id-ascending; selection=full-dataset",
+    "answerLabelsRef": "MemoryBench LongMemEval-S cleaned dataset selected answer labels hash",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "judgeRule": "MemoryBench LongMemEval-S full answer-quality target; no comparison claim until the full metrics-only result, reviewer intake, and SOTA ladder pass.",
+    "scoringScriptRef": "MemoryBench LongMemEval adapter and benchmark contracts at the source-locked commit",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "metrics": [
+      "quality",
+      "pAt1",
+      "recallAt5",
+      "recallAt10",
+      "ndcgAt10",
+      "latencyP50Ms",
+      "latencyP95Ms",
+      "contextTokensAvg",
+      "queryCostUsdAvg"
+    ]
+  },
+  "sourceLock": {
+    "authorTool": "benchmark:public-target:author",
+    "checkedAt": "2026-05-25",
+    "sameDataAttestation": "same public longmemeval data source is locked by MemoryBench LongMemEval-S cleaned dataset; MemoryBench commit 118209a746d97d0d85e5a7234267f0b6962857e9; dataset hash sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442; selected-id policy hash sha256:702287feda46afbb122e7d61f8fb1530e6b571b8172e248376c4f887d0527f42; answer-label hash sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388; scoring-code hash sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "reportedTarget": {
+    "pending": true,
+    "caveat": "Run-only target. Attach a source-locked reported target row before comparison claims."
+  },
+  "comparability": {
+    "metricDefinitionsMatch": true,
+    "sameDatasetSource": true,
+    "sameDatasetRevision": true,
+    "sameSplit": true,
+    "sameLabels": true,
+    "sameJudgeRule": true,
+    "sameScoringCode": true
+  },
+  "componentEvidence": [],
+  "fullComparableBenchmarkCount": 0
+}

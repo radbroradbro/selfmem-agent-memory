@@ -170,6 +170,16 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
+  `${reviewDir}/public-longmemeval-full-slice-evidence.json`,
+  `${reviewDir}/public-longmemeval-full-slice-evidence.md`,
+  `${reviewDir}/public-longmemeval-full-run-target.json`,
+  `${reviewDir}/public-longmemeval-full-run-target-check.json`,
+  `${reviewDir}/public-longmemeval-full-materialize-run.json`,
+  `${reviewDir}/public-longmemeval-full-materialize-run-evidence.md`,
+  `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
+  `${reviewDir}/sota-ladder-full-target-report-20260525.md`,
+  `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.json`,
+  `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.md`,
   `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
   `${reviewDir}/memory-score-reviewer-intake-20260525.md`,
   `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
@@ -1311,9 +1321,13 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(autoresearchPlan, /must not optimize a solo RecallWeave run in isolation/i);
   assert.match(autoresearchPlan, /Full Benchmark Rule/i);
   assert.match(autoresearchPlan, /full 500-row public set/i);
+  assert.match(autoresearchPlan, /public-longmemeval-full-run-target\.json/i);
+  assert.match(autoresearchPlan, /500 queries, 19,195 haystack sessions/i);
   assert.match(autoresearchPlan, /BM25-lite as the lexical floor/i);
   assert.match(publicTargets, /Component Benchmarks/i);
   assert.match(publicTargets, /Full Benchmark Gate/i);
+  assert.match(publicTargets, /public-longmemeval-full-run-target\.json/i);
+  assert.match(publicTargets, /19,195 haystack sessions/i);
   assert.match(publicTargets, /85\.2%/);
   assert.match(publicTargets, /Qwen3 Embedding 4B or 8B/i);
   assert.match(publicTargets, /EmbeddingGemma-class small\s+local embeddings/i);
@@ -1587,6 +1601,16 @@ check("fresh public benchmark target check passes", () => {
   const expandedVoyageLatencyEvidence = readFileSync(
     join(root, reviewDir, "public-longmemeval-expanded-voyage-latency-live-provider-evidence.md"),
     "utf8",
+  );
+  const fullSliceReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-full-slice-evidence.json"), "utf8"));
+  const fullSliceEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-full-slice-evidence.md"), "utf8");
+  const fullRunTarget = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-full-run-target.json"), "utf8"));
+  const fullRunTargetReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-full-run-target-check.json"), "utf8"));
+  const fullMaterializeReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-full-materialize-run.json"), "utf8"));
+  const fullMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-full-materialize-run-evidence.md"), "utf8");
+  const fullTargetSotaReport = JSON.parse(readFileSync(join(root, reviewDir, "sota-ladder-full-target-report-20260525.json"), "utf8"));
+  const fullTargetOperatorPacket = JSON.parse(
+    readFileSync(join(root, reviewDir, "sota-ladder-full-target-operator-packet-20260525.json"), "utf8"),
   );
   const providerOperatorPacket = JSON.parse(run("node", ["packages/bench/provider-benchmark-operator-packet.mjs", "--provider", "voyage"]).stdout);
   const providerOperatorPacketMarkdown = run("node", [
@@ -2372,6 +2396,48 @@ check("fresh public benchmark target check passes", () => {
   );
   assert.match(expandedVoyageLatencyEvidence, /cloud-voyage4-lite-voyage-lite/);
   assert.match(expandedVoyageLatencyEvidence, /Public LongMemEval-S Voyage Latency Provider Evidence/);
+  assert.equal(fullSliceReport.mode, "public-benchmark-slice-manifest");
+  assert.equal(fullSliceReport.fixtureOnly, false);
+  assert.equal(fullSliceReport.dataset?.hash, liveMaterializeReport.source?.datasetHash);
+  assert.equal(fullSliceReport.dataset?.itemCount, 500);
+  assert.equal(fullSliceReport.dataset?.selectedCount, 500);
+  assert.equal(fullSliceReport.dataset?.questionTypeCount, 6);
+  assert.equal(fullSliceReport.dataset?.selectedQuestionIdsHash, "sha256:702287feda46afbb122e7d61f8fb1530e6b571b8172e248376c4f887d0527f42");
+  assert.equal(fullSliceReport.labels?.answerLabelsHash, "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388");
+  assert.match(fullSliceReport.dataset?.questionIdPolicy ?? "", /selection=full-dataset/);
+  assert.match(fullSliceEvidence, /Selected count: 500/);
+  assert.equal(fullRunTarget.claimTier, "run-only");
+  assert.equal(fullRunTarget.benchmark?.split, "longmemeval-s-cleaned-full-500-2026-05-25");
+  assert.match(fullRunTarget.benchmark?.questionIdPolicy ?? "", /limit=500; sort=question_id-ascending; selection=full-dataset/);
+  assert.equal(fullRunTarget.benchmark?.answerLabelsHash, fullSliceReport.labels?.answerLabelsHash);
+  assert.equal(fullRunTargetReport.ok, true);
+  assert.equal(fullRunTargetReport.publicSliceRunReady, true);
+  assert.equal(fullRunTargetReport.targetSummary?.usesQuestionIdPolicy, true);
+  assert.equal(fullRunTargetReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(fullMaterializeReport.ok, true);
+  assert.equal(fullMaterializeReport.fixtureOnly, false);
+  assert.equal(fullMaterializeReport.selection?.selectedCount, 500);
+  assert.equal(fullMaterializeReport.selection?.queryCount, 500);
+  assert.equal(fullMaterializeReport.selection?.haystackSessionCount, 19195);
+  assert.equal(fullMaterializeReport.selection?.expectedResultRefCount, 1896);
+  assert.equal(fullMaterializeReport.selection?.answerLabelsHash, fullRunTarget.benchmark?.answerLabelsHash);
+  assert.equal(fullMaterializeReport.rawPrivateOutputPathIncluded, false);
+  assert.equal(fullMaterializeReport.rawQuestionsIncluded, false);
+  assert.equal(fullMaterializeReport.rawAnswersIncluded, false);
+  assert.equal(fullMaterializeReport.rawMemoryIncluded, false);
+  assert.equal(fullMaterializeReport.selection?.redactionStats?.keyShapedTokenRedactionCount, 4);
+  assert.match(fullMaterializeEvidence, /Query count: 500/);
+  assert.equal(fullTargetSotaReport.mode, "public-benchmark-sota-ladder");
+  assert.equal(fullTargetSotaReport.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+  assert.equal(fullTargetSotaReport.fullBenchmarkPolicy?.datasetSlice, "longmemeval-s-cleaned-full-500-2026-05-25");
+  assert.equal(fullTargetSotaReport.fullBenchmarkPolicy?.currentAnswerQualityQueryCount, 30);
+  assert.equal(fullTargetSotaReport.fullBenchmarkPolicy?.minimumFullQueryCount, 500);
+  assert.equal(fullTargetSotaReport.fullBenchmarkPolicy?.fullOrOfficiallyComparableRunPresent, false);
+  assert.ok(fullTargetSotaReport.blockers?.includes("missing-full-or-officially-comparable-memory-benchmark-run"));
+  assert.equal(fullTargetOperatorPacket.mode, "public-benchmark-sota-operator-packet");
+  assert.equal(fullTargetOperatorPacket.target?.path, "reviews/overnight-20260522/public-longmemeval-full-run-target.json");
+  assert.equal(fullTargetOperatorPacket.currentEvidence?.sotaLadder?.fullBenchmarkPolicy?.datasetSlice, "longmemeval-s-cleaned-full-500-2026-05-25");
+  assert.ok(fullTargetOperatorPacket.operatorFlow?.some((item) => item.id === "author-full-longmemeval-target"));
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
     const keyFile = join(tempRoot, "voyage.keys");

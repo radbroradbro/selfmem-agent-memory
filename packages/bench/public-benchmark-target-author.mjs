@@ -351,6 +351,9 @@ function splitFromManifest(manifest) {
   if (!manifest) return "";
   const count = manifest.dataset?.selectedCount;
   const checkedAt = manifest.checkedAt;
+  if (String(manifest.dataset?.questionIdPolicy ?? "").includes("selection=full-dataset")) {
+    return `longmemeval-s-cleaned-full-${count ?? "unknown"}-${checkedAt ?? "undated"}`;
+  }
   return `longmemeval-s-cleaned-canary-${count ?? "unknown"}-first-per-type-${checkedAt ?? "undated"}`;
 }
 

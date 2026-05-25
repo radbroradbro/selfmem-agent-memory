@@ -9,9 +9,14 @@ const args = parseArgs(process.argv.slice(2));
 const outputPath = args.output ?? process.env.RECALLWEAVE_SOTA_LADDER_REPORT ?? null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ?? process.env.RECALLWEAVE_SOTA_LADDER_MARKDOWN ?? null;
 const strict = Boolean(args.strict);
+const sourceLockedTargetPath =
+  args.target ??
+  args.targetFile ??
+  process.env.RECALLWEAVE_MEMORYBENCH_TARGET ??
+  "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json";
 
 const evidenceFiles = {
-  sourceLockedTarget: "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+  sourceLockedTarget: sourceLockedTargetPath,
   expandedHybridGate: "reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate.json",
   expandedAutoresearch: "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
   metadataAwareAutoresearch: "reviews/overnight-20260522/public-longmemeval-metadata-aware-autoresearch-20260525.json",

@@ -226,6 +226,13 @@ full-hybrid, query-expanded hybrid, local Qwen3 0.6B embedding, and local Qwen3
 0.6B embedding plus local rerank arms. The best local arm was
 `local-apple-qwen3-0_6b-local-rerank` at `36` answer-quality / `0.3667`
 correct rate with 300 local model calls and zero answer or judge failures.
+The full LongMemEval-S run-only target is also checked in at
+`reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
+materialization evidence in
+`reviews/overnight-20260522/public-longmemeval-full-materialize-run.json`.
+That full target covers 500 public rows, 19,195 haystack sessions, and 1,896
+expected references. It is the next required broad-SOTA target, but no
+500-query answer-quality score exists yet.
 The first live provider answer-quality run is checked in at
 `reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json`.
 On the same target/query/materializer/scoring hashes, `cloud-nvidia-nemotron-1b`

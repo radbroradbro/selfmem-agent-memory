@@ -26,7 +26,7 @@ assert.ok(statSync(targetPath).size > 0, `benchmark target empty: ${displayPath(
 const targetRaw = readFileSync(targetPath, "utf8");
 assertSafePublicText(targetRaw, "source-locked target");
 const target = JSON.parse(targetRaw);
-const sotaLadder = runJson(["packages/bench/public-benchmark-sota-ladder.mjs"]);
+const sotaLadder = runJson(["packages/bench/public-benchmark-sota-ladder.mjs", "--target", displayPath(targetPath)]);
 const queryExpansionLocalQwen36PreflightEvidence = loadEvidence(`${reviewDir}/query-expansion-local-qwen36-preflight-20260525.json`);
 const queryExpansionPreflight =
   queryExpansionLocalQwen36PreflightEvidence.json?.readiness?.queryExpansionCanBeBenchmarked === true
@@ -388,6 +388,54 @@ function buildOperatorFlow() {
           `--strategies ${providerStrategies}`,
           "--output reviews/overnight-20260522/provider-preflight-next.json",
         ].join(" "),
+      ],
+    },
+    {
+      id: "author-full-longmemeval-target",
+      description:
+        "Promote the benchmark target from the current 30-query canary shape to the full 500-row LongMemEval-S run-only target. This still does not spend model calls or authorize SOTA wording.",
+      commands: [
+        "RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>",
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:public-slice -- --live",
+          "--full",
+          "--output reviews/overnight-20260522/public-longmemeval-full-slice-evidence.json",
+          "--markdown-output reviews/overnight-20260522/public-longmemeval-full-slice-evidence.md",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:public-target:author --",
+          "--slice-manifest reviews/overnight-20260522/public-longmemeval-full-slice-evidence.json",
+          "--claim-tier run-only",
+          "--judge-model gpt-4o",
+          "--answer-model gpt-4o",
+          "--judge-rule \"MemoryBench LongMemEval-S full answer-quality target; no comparison claim until the full metrics-only result, reviewer intake, and SOTA ladder pass.\"",
+          "--output reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:public-target --",
+          "--target reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+          "--strict-run",
+          "--output reviews/overnight-20260522/public-longmemeval-full-run-target-check.json",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
+          "--target reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized\"",
+          "--output reviews/overnight-20260522/public-longmemeval-full-materialize-run.json",
+          "--markdown-output reviews/overnight-20260522/public-longmemeval-full-materialize-run-evidence.md",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:sota-ladder --",
+          "--target reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+          "--output reviews/overnight-20260522/sota-ladder-full-target-report-20260525.json",
+          "--markdown-output reviews/overnight-20260522/sota-ladder-full-target-report-20260525.md",
+        ].join(" "),
+      ],
+      expectedPublicEvidence: [
+        "full slice selectedCount is 500",
+        "target claimTier remains run-only until a reported comparison row is attached",
+        "materialize report queryCount is 500 and raw questions stay outside the repository",
+        "SOTA ladder remains blocked until full answer-quality results exist",
       ],
     },
     {

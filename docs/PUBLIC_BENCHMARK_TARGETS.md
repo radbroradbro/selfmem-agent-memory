@@ -173,6 +173,14 @@ means the full 500-row public set or a target artifact whose claim tier is
 `public-benchmark`, `full-benchmark`, `officially-comparable`, or
 `broad-sota`.
 
+The full LongMemEval-S run-only target is now authored at
+`reviews/overnight-20260522/public-longmemeval-full-run-target.json`. Its
+materialization report covers 500 public rows, 19,195 haystack sessions, and
+1,896 expected references while keeping raw questions, answers, and haystack
+text outside the repository. This is a ready target, not a completed score:
+the SOTA ladder still stays blocked until the 500-query answer-quality result,
+same-data provider/local arms, reviewer intake, and release gates pass.
+
 Canary trend language may say the method is improving on the frozen slice.
 Release language must wait until the full benchmark gate, same-data model
 comparability, reviewer intake, UI evidence, docs, release notes, owner
@@ -225,6 +233,19 @@ harness we will use.
   `sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518`.
   The manifest does not commit raw question ids, question text, answers,
   memories, or transcripts.
+- Current full LongMemEval-S target:
+  `reviews/overnight-20260522/public-longmemeval-full-run-target.json`.
+  It uses the same dataset hash with `selection=full-dataset`, 500 selected
+  rows, selected-id hash
+  `sha256:702287feda46afbb122e7d61f8fb1530e6b571b8172e248376c4f887d0527f42`,
+  answer-label hash
+  `sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388`,
+  and run-only claim tier. The materialization report
+  `reviews/overnight-20260522/public-longmemeval-full-materialize-run.json`
+  confirms 500 private queries, 19,195 haystack sessions, 1,896 expected
+  references, and four redacted key-shaped tokens from the public dataset.
+  This is the required next target for broad SOTA evaluation; it is not itself
+  answer-quality evidence.
 - Current LongMemEval-S run target:
   `reviews/overnight-20260522/public-longmemeval-run-target.json`. It is
   generated from the slice manifest with `claimTier: run-only`; it passes

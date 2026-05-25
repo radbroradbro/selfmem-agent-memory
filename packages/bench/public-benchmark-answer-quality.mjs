@@ -523,7 +523,7 @@ function memoryLookup(memories) {
 
 function loadMemories(path) {
   const text = readFileSync(path, "utf8");
-  assert.doesNotMatch(text, secretPattern, `${displayPath(path)} contains a key-shaped secret`);
+  assertNoPattern(text, secretPattern, `${displayPath(path)} contains a key-shaped secret`);
   return text
     .split(/\r?\n/)
     .filter((line) => line.trim())
@@ -627,7 +627,7 @@ function assertOutsideRepo(path, label) {
 
 function loadJson(path, label) {
   const text = readFileSync(path, "utf8");
-  assert.doesNotMatch(text, secretPattern, `${label} contains a key-shaped secret`);
+  assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
   return JSON.parse(text);
 }
 
@@ -641,15 +641,20 @@ function writeOutput(path, text) {
 }
 
 function assertSafePublicText(text, label) {
-  assert.doesNotMatch(String(text), secretPattern, `${label} contains a key-shaped secret`);
-  assert.doesNotMatch(String(text), privatePathPattern, `${label} contains a private local path`);
-  assert.doesNotMatch(String(text), privateTagPattern, `${label} contains private tags`);
-  assert.doesNotMatch(String(text), /\b(q|answer|content|memory|text|raw|prompt)"\s*:/, `${label} contains raw text-like fields`);
+  assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
+  assertNoPattern(text, privatePathPattern, `${label} contains a private local path`);
+  assertNoPattern(text, privateTagPattern, `${label} contains private tags`);
+  assertNoPattern(text, /\b(q|answer|content|memory|text|raw|prompt)"\s*:/, `${label} contains raw text-like fields`);
 }
 
 function assertNoUnsafePrompt(text, label) {
-  assert.doesNotMatch(String(text), secretPattern, `${label} contains a key-shaped secret`);
-  assert.doesNotMatch(String(text), privateTagPattern, `${label} contains private tags`);
+  assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
+  assertNoPattern(text, privateTagPattern, `${label} contains private tags`);
+}
+
+function assertNoPattern(text, pattern, message) {
+  pattern.lastIndex = 0;
+  if (pattern.test(String(text))) throw new Error(message);
 }
 
 function safeError(text) {

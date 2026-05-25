@@ -88,6 +88,14 @@ full 500-row public set, or a target artifact whose claim tier is
 is only the 30-query canary, even if the canary later beats the reported
 Supermemory target.
 
+The full run-only target now exists:
+`reviews/overnight-20260522/public-longmemeval-full-run-target.json`. Its
+public materialization report records 500 queries, 19,195 haystack sessions,
+1,896 expected references, and no raw benchmark text in the repository. The
+next autoresearch loop should run against that full target after the 30-query
+method is clean, then re-score answer quality and send the metrics-only packet
+to reviewers.
+
 ## Public Leaderboard Target Lane
 
 Use this lane when the hosted Supermemory key is unavailable, quota-locked, or
