@@ -4,6 +4,7 @@
 - Pure local ready: false
 - Mixed local-plus-cloud ready: false
 - Sends benchmark text to provider: false
+- Live LLM wiring present: true
 
 ## Blockers
 - no-query-expansion-arm-ready

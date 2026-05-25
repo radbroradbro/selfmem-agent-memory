@@ -108,6 +108,18 @@ reranking under limited compute; and current May 2026 local-model radar points
 to Qwen 3.6 and Gemma 4 family models as plausible query-expansion candidates
 that still need local measurement on this machine.
 
+Follow-up implementation evidence on 2026-05-25:
+
+- `query-expanded-full-hybrid-rerank` can now call a configured live
+  query-expansion endpoint instead of only the deterministic proxy.
+- The default remains fail-closed: with no local endpoint or explicit
+  mixed-cloud consent, query expansion falls back to the deterministic proxy
+  and the preflight reports `BLOCKED_QUERY_EXPANSION_ENV`.
+- A pure-local fixture server smoke produced three local-expander calls,
+  exported metrics only, and observed no stored-memory payload marker.
+- This is wiring proof only. It is not a same-data quality result and does not
+  satisfy the missing live LLM query-expansion benchmark row.
+
 ## Claim Boundary
 
 Do not claim RecallWeave is SOTA, production-ready as a Supermemory

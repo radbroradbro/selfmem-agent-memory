@@ -16,6 +16,7 @@ const configs = {
   defaultCloud: loadText("configs/default.cloud.yaml"),
   benchBudget: loadText("configs/bench-budget.yaml"),
 };
+const implementationText = readFileSync(resolve(root, "packages/bench/recallweave-response-export.mjs"), "utf8");
 
 const localEnv = {
   baseUrl: envPresence("SELFMEM_QUERY_EXPANSION_BASE_URL"),
@@ -51,6 +52,20 @@ const configContract = {
   defaultCloudHash: configs.defaultCloud.hash,
   benchBudgetHash: configs.benchBudget.hash,
 };
+const implementationContract = {
+  responseExporterHash: `sha256:${sha256(implementationText)}`,
+  liveRequestBuilderImported: /buildQueryExpansionRequest/.test(implementationText),
+  liveQueryExpansionPlanPresent: /function queryExpansionPlan\(/.test(implementationText),
+  openAiCompatibleQueryExpansionPresent: /function openAiCompatibleQueryExpansion\(/.test(implementationText),
+  geminiQueryExpansionPresent: /function geminiQueryExpansion\(/.test(implementationText),
+  deterministicFallbackPresent: /recordQueryExpansionFallback\("deterministic-proxy-not-configured"\)/.test(implementationText),
+  metricsOnlyStatsPresent: /queryExpansionOnlyCurrentQuerySent/.test(implementationText) && /queryExpansionStoredMemoriesSent/.test(implementationText),
+};
+implementationContract.liveLlmExpansionWiringPresent =
+  implementationContract.liveRequestBuilderImported &&
+  implementationContract.liveQueryExpansionPlanPresent &&
+  (implementationContract.openAiCompatibleQueryExpansionPresent || implementationContract.geminiQueryExpansionPresent) &&
+  implementationContract.metricsOnlyStatsPresent;
 
 const pureLocalReady = localEnv.baseUrl.present && localEnv.model.present && configContract.defaultLocalEnabledFalse;
 const anyCloudCredential = Object.values(cloudEnv).some((value) => value.present);
@@ -109,6 +124,8 @@ const blockers = [
   !configContract.rewriteQueryDefaultFalse ? "rewrite-query-not-default-false" : null,
   !configContract.onlySendUserQuery ? "query-expansion-payload-not-limited-to-user-query" : null,
   !configContract.fallbackDisabled ? "query-expansion-fallback-not-disabled" : null,
+  !implementationContract.liveLlmExpansionWiringPresent ? "query-expansion-live-wiring-missing" : null,
+  !implementationContract.deterministicFallbackPresent ? "query-expansion-deterministic-fallback-missing" : null,
   selectedMode === "BLOCKED_QUERY_EXPANSION_ENV" ? "no-query-expansion-arm-ready" : null,
   selectedMode === "MIXED_LOCAL_CLOUD_QUERY_EXPANSION_READY" && !consent.providerCalls ? "cloud-query-expansion-provider-calls-not-enabled" : null,
   selectedMode === "MIXED_LOCAL_CLOUD_QUERY_EXPANSION_READY" && !consent.publicData ? "cloud-query-expansion-public-data-not-confirmed" : null,
@@ -131,6 +148,7 @@ const report = {
   printsCredentials: false,
   generatedAt: new Date().toISOString(),
   configContract,
+  implementationContract,
   consent,
   localEnv,
   cloudEnv,
@@ -139,6 +157,7 @@ const report = {
     mixedCloudReady,
     selectedMode,
     queryExpansionCanBeBenchmarked: pureLocalReady || mixedCloudReady,
+    liveLlmExpansionWiringPresent: implementationContract.liveLlmExpansionWiringPresent,
     countsAsPureLocal: pureLocalReady,
     countsAsMixedLocalCloud: mixedCloudReady && !pureLocalReady,
   },
@@ -218,6 +237,7 @@ function renderMarkdown(value) {
     `- Pure local ready: ${value.readiness.pureLocalReady}`,
     `- Mixed local-plus-cloud ready: ${value.readiness.mixedCloudReady}`,
     `- Sends benchmark text to provider: ${value.sendsBenchmarkTextToProvider}`,
+    `- Live LLM wiring present: ${value.readiness.liveLlmExpansionWiringPresent}`,
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),

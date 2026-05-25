@@ -19,13 +19,13 @@
 - provider:local-rerank-credentials-missing
 - provider:nvidia-credentials-missing
 - provider:voyage-credentials-missing
-- query-expansion-live-llm-wiring-not-proven
 
 ## Current Evidence
 - SOTA ladder: BLOCKED_FULL_MEMORY_SOTA_EVIDENCE
 - Query expansion preflight: BLOCKED_QUERY_EXPANSION_ENV
 - Provider preflight: BLOCKED_PROVIDER_ENV
 - Local rerank evidence: true
+- Query expansion local smoke: true
 - Live LLM query expansion proven: false
 
 ## Operator Flow

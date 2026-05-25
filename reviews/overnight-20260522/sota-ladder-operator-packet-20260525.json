@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T18:06:09.107Z",
+  "generatedAt": "2026-05-25T18:13:15.294Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -165,13 +165,24 @@
         "SELFMEM_LOCAL_RERANK_BASE_URL"
       ]
     },
+    "queryExpansionLiveLocalSmoke": {
+      "evidencePath": "reviews/overnight-20260522/query-expansion-live-local-smoke-20260525.json",
+      "evidenceExists": true,
+      "evidenceHash": "sha256:adf883cf7f18b07ac534ae1a8880e1d1481fb1f6f636ebf72db1af2e54915cb9",
+      "claimUse": "wiring-smoke-only",
+      "publicBenchmarkClaimsAllowed": false
+    },
     "queryExpansionImplementation": {
       "strategy": "query-expanded-full-hybrid-rerank",
       "inspectedFile": "packages/bench/recallweave-response-export.mjs",
       "usesDeterministicProxy": true,
-      "importsLiveRequestBuilder": false,
+      "importsLiveRequestBuilder": true,
+      "hasLivePlan": true,
+      "hasOpenAiCompatibleExpansion": true,
+      "hasGeminiExpansion": true,
+      "liveLlmExpansionWiringPresent": true,
       "liveLlmExpansionProven": false,
-      "claimRule": "Do not count this as a live LLM query-expansion arm until the run report proves the configured expander was used."
+      "claimRule": "Wiring presence is not benchmark proof; do not count this as a live LLM query-expansion arm until the run report proves the configured expander was used."
     }
   },
   "sameDataContract": {
@@ -347,7 +358,6 @@
     "provider:local-apple-credentials-missing",
     "provider:local-rerank-credentials-missing",
     "provider:nvidia-credentials-missing",
-    "provider:voyage-credentials-missing",
-    "query-expansion-live-llm-wiring-not-proven"
+    "provider:voyage-credentials-missing"
   ]
 }

@@ -13,7 +13,7 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
-  "generatedAt": "2026-05-25T17:58:50.746Z",
+  "generatedAt": "2026-05-25T18:10:29.661Z",
   "configContract": {
     "providerMatrixDefaultEnabledFalse": true,
     "defaultLocalEnabledFalse": true,
@@ -25,6 +25,16 @@
     "defaultLocalHash": "sha256:166ae6f957b5bc5196fd5129e222edac880f2ec431a785ba9841a3c967fe94d8",
     "defaultCloudHash": "sha256:d460e2497b3939889effa8bdc598f91e4d632ab54752f024232ca108bb57e948",
     "benchBudgetHash": "sha256:3e505b93b6130b88339e14a614d5a0aa43b8a598a9e467c02acfaf155f241231"
+  },
+  "implementationContract": {
+    "responseExporterHash": "sha256:760f42c0f048638095ce718063134293ffa3027dcf42a3df1e4e3fb3319dfc46",
+    "liveRequestBuilderImported": true,
+    "liveQueryExpansionPlanPresent": true,
+    "openAiCompatibleQueryExpansionPresent": true,
+    "geminiQueryExpansionPresent": true,
+    "deterministicFallbackPresent": true,
+    "metricsOnlyStatsPresent": true,
+    "liveLlmExpansionWiringPresent": true
   },
   "consent": {
     "providerCalls": false,
@@ -98,6 +108,7 @@
     "mixedCloudReady": false,
     "selectedMode": "BLOCKED_QUERY_EXPANSION_ENV",
     "queryExpansionCanBeBenchmarked": false,
+    "liveLlmExpansionWiringPresent": true,
     "countsAsPureLocal": false,
     "countsAsMixedLocalCloud": false
   },

@@ -35,13 +35,14 @@ const providerPreflight = runJson([
   providerPreflightStrategies.join(","),
 ]);
 const localRerankEvidence = loadEvidence(`${reviewDir}/local-rerank-sidecar-baseline-refresh-evidence.md`);
+const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-live-local-smoke-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
 
 const blockers = [
   ...arrayOf(sotaLadder.blockers),
   ...arrayOf(queryExpansionPreflight.blockers).map((item) => `query-expansion:${item}`),
   ...arrayOf(providerPreflight.blockers).map((item) => `provider:${item}`),
-  currentQueryExpansionImpl.usesDeterministicProxy ? "query-expansion-live-llm-wiring-not-proven" : null,
+  !currentQueryExpansionImpl.liveLlmExpansionWiringPresent ? "query-expansion-live-llm-wiring-not-proven" : null,
   !localRerankEvidence.exists ? "local-rerank-sidecar-evidence-missing" : null,
 ].filter(Boolean);
 
@@ -100,6 +101,13 @@ const packet = {
       evidenceExists: localRerankEvidence.exists,
       evidenceHash: localRerankEvidence.hash,
       endpointEnv: ["SELFMEM_LOCAL_RERANK_ENDPOINT", "SELFMEM_LOCAL_RERANK_BASE_URL"],
+    },
+    queryExpansionLiveLocalSmoke: {
+      evidencePath: queryExpansionSmokeEvidence.path,
+      evidenceExists: queryExpansionSmokeEvidence.exists,
+      evidenceHash: queryExpansionSmokeEvidence.hash,
+      claimUse: queryExpansionSmokeEvidence.json?.claimUse ?? "wiring-smoke-only",
+      publicBenchmarkClaimsAllowed: Boolean(queryExpansionSmokeEvidence.json?.publicBenchmarkClaimsAllowed),
     },
     queryExpansionImplementation: currentQueryExpansionImpl,
   },
@@ -354,22 +362,31 @@ function inspectQueryExpansionImplementation() {
   const file = "packages/bench/recallweave-response-export.mjs";
   const text = readFileSync(resolve(root, file), "utf8");
   assertSafePublicText(text, file);
+  const importsLiveRequestBuilder = /buildQueryExpansionRequest/.test(text);
+  const hasLivePlan = /function queryExpansionPlan\(/.test(text);
+  const hasOpenAiCompatibleExpansion = /function openAiCompatibleQueryExpansion\(/.test(text);
+  const hasGeminiExpansion = /function geminiQueryExpansion\(/.test(text);
   return {
     strategy: "query-expanded-full-hybrid-rerank",
     inspectedFile: file,
     usesDeterministicProxy: /function expandQuery\(/.test(text),
-    importsLiveRequestBuilder: /buildQueryExpansionRequest/.test(text),
-    liveLlmExpansionProven: /buildQueryExpansionRequest/.test(text) && !/function expandQuery\(/.test(text),
-    claimRule: "Do not count this as a live LLM query-expansion arm until the run report proves the configured expander was used.",
+    importsLiveRequestBuilder,
+    hasLivePlan,
+    hasOpenAiCompatibleExpansion,
+    hasGeminiExpansion,
+    liveLlmExpansionWiringPresent: importsLiveRequestBuilder && hasLivePlan && (hasOpenAiCompatibleExpansion || hasGeminiExpansion),
+    liveLlmExpansionProven: false,
+    claimRule: "Wiring presence is not benchmark proof; do not count this as a live LLM query-expansion arm until the run report proves the configured expander was used.",
   };
 }
 
 function loadEvidence(file) {
   const abs = resolve(root, file);
-  if (!existsSync(abs)) return { path: file, exists: false, hash: null };
+  if (!existsSync(abs)) return { path: file, exists: false, hash: null, json: null };
   const text = readFileSync(abs, "utf8");
   assertSafePublicText(text, file);
-  return { path: file, exists: true, hash: `sha256:${sha256(text)}` };
+  const json = file.endsWith(".json") ? JSON.parse(text) : null;
+  return { path: file, exists: true, hash: `sha256:${sha256(text)}`, json };
 }
 
 function renderMarkdown(value) {
@@ -389,6 +406,7 @@ function renderMarkdown(value) {
     `- Query expansion preflight: ${value.currentEvidence.queryExpansionPreflight.status}`,
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
+    `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,
     `- Live LLM query expansion proven: ${value.currentEvidence.queryExpansionImplementation.liveLlmExpansionProven}`,
     "",
     "## Operator Flow",

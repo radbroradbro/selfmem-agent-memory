@@ -5,6 +5,7 @@ import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, statSyn
 import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildQueryExpansionRequest } from "../core/dist/query-expansion/request.js";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
@@ -268,7 +269,7 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "sparse-dense-temporal") return rankSparseDenseTemporal(query, candidates);
   if (options.strategy === "sparse-dense-graph-temporal") return rankSparseDenseGraphTemporal(query, candidates);
   if (options.strategy === "full-hybrid-rerank") return rankFullHybridRerank(query, candidates);
-  if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates);
+  if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates, options);
   if (options.strategy === "cloud-voyage-rerank-only") return rankCloudVoyageRerankOnly(query, candidates, options);
   if (voyageStrategyConfig(options.strategy)?.mode === "embed-rerank") return rankCloudVoyage4Voyage(query, candidates, options);
   if (options.strategy === "cloud-gemini-embed-rerank-proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
@@ -370,10 +371,58 @@ function rankFullHybridRerank(query, candidates) {
   return rerankProxy(query, firstStage);
 }
 
-function rankQueryExpandedFullHybridRerank(query, candidates) {
-  const expanded = { ...query, q: expandQuery(queryTextValue(query)) };
+async function rankQueryExpandedFullHybridRerank(query, candidates, options = {}) {
+  const expansion = await queryExpansionText(query, options);
+  const expanded = { ...query, q: expansion.expandedQuery };
   const firstStage = rankSparseDenseGraphTemporal(expanded, candidates);
   return rerankProxy(expanded, firstStage);
+}
+
+async function queryExpansionText(query, options = {}) {
+  const queryText = queryTextValue(query);
+  const plan = queryExpansionPlan(options);
+  if (!plan) {
+    options.providerStats?.recordQueryExpansionFallback("deterministic-proxy-not-configured");
+    return {
+      mode: "deterministic-proxy",
+      expandedQuery: expandQuery(queryText),
+      rewrites: [],
+    };
+  }
+
+  const started = performance.now();
+  const request = buildQueryExpansionRequest({
+    query: queryText,
+    maxRewrites: queryExpansionMaxRewrites(),
+    instruction: queryExpansionInstruction(),
+  });
+  let rewrites = [];
+  if (plan.provider === "local-openai-compatible") {
+    rewrites = await openAiCompatibleQueryExpansion(plan, request);
+  } else if (plan.provider === "nvidia-openai-compatible") {
+    rewrites = await openAiCompatibleQueryExpansion(plan, request);
+  } else if (plan.provider === "openrouter-openai-compatible") {
+    rewrites = await openAiCompatibleQueryExpansion(plan, request);
+  } else if (plan.provider === "gemini") {
+    rewrites = await geminiQueryExpansion(plan, request);
+  } else {
+    throw new Error(`unsupported query expansion provider: ${plan.provider}`);
+  }
+
+  const sanitized = sanitizeQueryExpansionRewrites(rewrites, { originalQuery: queryText, maxRewrites: request.maxRewrites });
+  assert.ok(sanitized.length > 0, "query expansion provider returned no usable rewrites");
+  options.providerStats?.recordQueryExpansionCall({
+    mode: plan.mode,
+    provider: plan.provider,
+    model: plan.model,
+    rewritesReturned: sanitized.length,
+    elapsedMs: Math.max(1, Math.round(performance.now() - started)),
+  });
+  return {
+    mode: plan.mode,
+    expandedQuery: clipQueryExpansion([queryText, ...sanitized].join(" ")),
+    rewrites: sanitized,
+  };
 }
 
 async function rankCloudVoyageRerankOnly(query, candidates, options = {}) {
@@ -767,6 +816,15 @@ function createProviderStats(options = {}) {
     rerankCalls: 0,
     documentCountSent: 0,
     queryCountSent: 0,
+    queryExpansionCalls: 0,
+    queryExpansionFallbacks: 0,
+    queryExpansionRewritesReturned: 0,
+    queryExpansionProvider: null,
+    queryExpansionMode: null,
+    queryExpansionModel: null,
+    queryExpansionElapsedMsTotal: 0,
+    queryExpansionOnlyCurrentQuerySent: true,
+    queryExpansionStoredMemoriesSent: false,
     localEmbeddingCacheEnabled: false,
     localEmbeddingCacheEntriesLoaded: 0,
     localEmbeddingCacheHits: 0,
@@ -798,6 +856,22 @@ function createProviderStats(options = {}) {
         stats.queryCountSent += 1;
       }
     },
+    recordQueryExpansionCall({ mode, provider, model, rewritesReturned = 0, elapsedMs = 0 } = {}) {
+      stats.providerCallsMade += 1;
+      stats.queryExpansionCalls += 1;
+      stats.queryCountSent += 1;
+      stats.queryExpansionProvider = String(provider ?? "unknown");
+      stats.queryExpansionMode = String(mode ?? "unknown");
+      stats.queryExpansionModel = String(model ?? "unknown");
+      stats.queryExpansionRewritesReturned += Math.max(0, Number(rewritesReturned ?? 0));
+      stats.queryExpansionElapsedMsTotal += Math.max(0, Number(elapsedMs ?? 0));
+    },
+    recordQueryExpansionFallback(reason) {
+      stats.queryExpansionFallbacks += 1;
+      stats.queryExpansionMode = "deterministic-proxy";
+      stats.queryExpansionProvider = "local-deterministic";
+      stats.queryExpansionModel = String(reason ?? "not-configured");
+    },
     recordLocalEmbeddingCacheLoad({ enabled, entriesLoaded = 0, readErrors = 0 } = {}) {
       stats.localEmbeddingCacheEnabled = Boolean(enabled);
       stats.localEmbeddingCacheEntriesLoaded += Math.max(0, Number(entriesLoaded ?? 0));
@@ -819,6 +893,8 @@ function createProviderStats(options = {}) {
       const providerKeyCounts = Object.fromEntries(providerNames.map((provider) => [provider, providerKeyCount(provider)]));
       return {
         ...stats,
+        queryExpansionElapsedMsAverage:
+          stats.queryExpansionCalls > 0 ? Math.max(1, Math.round(stats.queryExpansionElapsedMsTotal / stats.queryExpansionCalls)) : 0,
         providerKeyCounts,
         keyCountAvailable: providerNames.length ? Math.min(...providerNames.map((provider) => providerKeyCount(provider))) : 0,
       };
@@ -942,6 +1018,13 @@ function providerKeys(provider) {
   }
   if (provider === "local-rerank") {
     return splitProviderKeys(process.env.SELFMEM_LOCAL_RERANK_ENDPOINT ?? process.env.SELFMEM_LOCAL_RERANK_BASE_URL);
+  }
+  if (provider === "openrouter") {
+    return [
+      ...splitProviderKeys(process.env.OPENROUTER_API_KEYS),
+      ...splitProviderKeys(process.env.OPENROUTER_API_KEY),
+      ...providerKeysFromFiles("OPENROUTER_API_KEYS_FILE", "OPENROUTER_API_KEY_FILE"),
+    ];
   }
   return [];
 }
@@ -1246,6 +1329,74 @@ async function localAppleRerankPost(body) {
   }
 }
 
+async function openAiCompatibleQueryExpansion(plan, request) {
+  const response = await queryExpansionPost(plan, {
+    model: plan.model,
+    temperature: queryExpansionTemperature(),
+    max_tokens: queryExpansionMaxOutputTokens(),
+    messages: [
+      { role: "system", content: request.instruction },
+      {
+        role: "user",
+        content: [
+          "Rewrite this recall query. Return only a JSON array of strings.",
+          `Max rewrites: ${request.maxRewrites}`,
+          `Query: ${request.query}`,
+        ].join("\n"),
+      },
+    ],
+  });
+  return rewritesFromQueryExpansionText(chatCompletionText(response));
+}
+
+async function geminiQueryExpansion(plan, request) {
+  const response = await geminiPost(`${geminiModelResource(plan.model)}:generateContent`, {
+    generationConfig: {
+      temperature: queryExpansionTemperature(),
+      maxOutputTokens: queryExpansionMaxOutputTokens(),
+      responseMimeType: "application/json",
+    },
+    contents: [
+      {
+        role: "user",
+        parts: [
+          {
+            text: [
+              request.instruction,
+              "Return only a JSON array of strings.",
+              `Max rewrites: ${request.maxRewrites}`,
+              `Query: ${request.query}`,
+            ].join("\n"),
+          },
+        ],
+      },
+    ],
+  });
+  return rewritesFromQueryExpansionText(geminiText(response));
+}
+
+async function queryExpansionPost(plan, body) {
+  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_QUERY_EXPANSION_TIMEOUT_MS ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "query expansion timeout") ?? 60_000;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const headers = { "content-type": "application/json" };
+  if (plan.apiKey) headers.authorization = `Bearer ${plan.apiKey}`;
+  try {
+    const response = await fetch(plan.endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`query expansion request failed with status ${response.status}`);
+    }
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function embeddingsFromVoyageResponse(response) {
   if (Array.isArray(response?.data)) {
     return [...response.data]
@@ -1337,6 +1488,60 @@ function rerankScoresFromLocalResponse(response) {
     }))
     .filter((item) => Number.isInteger(item.index) && item.index >= 0)
     .sort((left, right) => right.score - left.score || left.index - right.index);
+}
+
+function chatCompletionText(response) {
+  const choice = Array.isArray(response?.choices) ? response.choices[0] : null;
+  const content = choice?.message?.content ?? choice?.text ?? response?.output_text ?? response?.text ?? "";
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => (typeof part === "string" ? part : part?.text ?? ""))
+      .join("\n")
+      .trim();
+  }
+  return String(content ?? "").trim();
+}
+
+function geminiText(response) {
+  const parts = response?.candidates?.[0]?.content?.parts;
+  if (Array.isArray(parts)) return parts.map((part) => part?.text ?? "").join("\n").trim();
+  return String(response?.text ?? "").trim();
+}
+
+function rewritesFromQueryExpansionText(text) {
+  const trimmed = String(text ?? "").trim();
+  if (!trimmed) return [];
+  const withoutFence = trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+  try {
+    const parsed = JSON.parse(withoutFence);
+    if (Array.isArray(parsed)) return parsed.map((item) => String(item ?? ""));
+    if (Array.isArray(parsed?.queries)) return parsed.queries.map((item) => String(item ?? ""));
+    if (Array.isArray(parsed?.rewrites)) return parsed.rewrites.map((item) => String(item ?? ""));
+  } catch {
+    // Providers sometimes return plain lines even after JSON instruction.
+  }
+  return withoutFence
+    .split(/\r?\n|;/)
+    .map((line) => line.replace(/^[-*\d.)\s"]+/, "").replace(/["\s]+$/g, ""))
+    .filter(Boolean);
+}
+
+function sanitizeQueryExpansionRewrites(rewrites, options = {}) {
+  const original = normalizeText(options.originalQuery ?? "");
+  const maxRewrites = Math.max(1, Number(options.maxRewrites ?? 3));
+  const seen = new Set([original]);
+  const sanitized = [];
+  for (const rewrite of rewrites) {
+    const redacted = redactForExport(String(rewrite ?? ""));
+    const clipped = clipQueryExpansion(redacted.text);
+    const normalized = normalizeText(clipped);
+    if (!normalized || seen.has(normalized)) continue;
+    if (redacted.privateRedactionCount > 0 && !clipped.trim()) continue;
+    seen.add(normalized);
+    sanitized.push(clipped);
+    if (sanitized.length >= maxRewrites) break;
+  }
+  return sanitized;
 }
 
 function voyageEmbedModel() {
@@ -1434,6 +1639,90 @@ function nvidiaEmbeddingEndpoint() {
 function nvidiaRerankEndpoint(config) {
   if (process.env.NVIDIA_RERANK_ENDPOINT) return String(process.env.NVIDIA_RERANK_ENDPOINT);
   return `https://ai.api.nvidia.com/v1/retrieval/${nvidiaRerankModel(config)}/reranking`;
+}
+
+function queryExpansionPlan(options = {}) {
+  if (options.fixtureRequested) return null;
+  const localBaseUrl = String(process.env.SELFMEM_QUERY_EXPANSION_BASE_URL ?? "").trim();
+  const localModel = String(process.env.SELFMEM_QUERY_EXPANSION_MODEL ?? "").trim();
+  if (localBaseUrl && localModel) {
+    return {
+      mode: "pure-local",
+      provider: "local-openai-compatible",
+      endpoint: openAiCompatibleChatEndpoint(localBaseUrl),
+      model: localModel,
+      apiKey: String(process.env.SELFMEM_QUERY_EXPANSION_API_KEY ?? "").trim() || null,
+    };
+  }
+
+  const cloudCallsAllowed = process.env.RECALLWEAVE_QUERY_EXPANSION_CALLS === "1" || providerBenchmarkCallsAllowed;
+  const publicDataConfirmed = process.env.RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA === "1" || providerBenchmarkPublicData;
+  if (!cloudCallsAllowed || !publicDataConfirmed) return null;
+  if (providerKeyCount("nvidia") > 0) {
+    return {
+      mode: "mixed-local-cloud",
+      provider: "nvidia-openai-compatible",
+      endpoint: openAiCompatibleChatEndpoint(process.env.NVIDIA_QUERY_EXPANSION_BASE_URL ?? "https://integrate.api.nvidia.com/v1"),
+      model: String(process.env.NVIDIA_QUERY_EXPANSION_MODEL ?? process.env.SELFMEM_QUERY_EXPANSION_MODEL ?? "nvidia/llama-3.1-nemotron-nano-8b-v1"),
+      apiKey: chooseProviderKey("nvidia", "query-expansion"),
+    };
+  }
+  if (providerKeyCount("gemini") > 0) {
+    return {
+      mode: "mixed-local-cloud",
+      provider: "gemini",
+      endpoint: null,
+      model: String(process.env.GEMINI_QUERY_EXPANSION_MODEL ?? "gemini-2.5-flash"),
+      apiKey: null,
+    };
+  }
+  if (providerKeyCount("openrouter") > 0) {
+    return {
+      mode: "mixed-local-cloud",
+      provider: "openrouter-openai-compatible",
+      endpoint: openAiCompatibleChatEndpoint(process.env.OPENROUTER_QUERY_EXPANSION_BASE_URL ?? "https://openrouter.ai/api/v1"),
+      model: String(process.env.OPENROUTER_QUERY_EXPANSION_MODEL ?? process.env.SELFMEM_QUERY_EXPANSION_MODEL ?? "qwen/qwen3-next-80b-a3b-instruct:free"),
+      apiKey: chooseProviderKey("openrouter", "query-expansion"),
+    };
+  }
+  return null;
+}
+
+function openAiCompatibleChatEndpoint(baseUrl) {
+  const normalized = String(baseUrl ?? "").replace(/\/+$/, "");
+  assert.ok(normalized, "query expansion base URL is required");
+  if (normalized.endsWith("/chat/completions")) return normalized;
+  return normalized.endsWith("/v1") ? `${normalized}/chat/completions` : `${normalized}/v1/chat/completions`;
+}
+
+function queryExpansionInstruction() {
+  return String(
+    process.env.SELFMEM_QUERY_EXPANSION_INSTRUCTION ??
+      "Rewrite the user query into short recall/search queries. Preserve exact identifiers, names, dates, citations, numbers, and negations. Do not add facts. Return only rewritten queries.",
+  );
+}
+
+function queryExpansionMaxRewrites() {
+  return optionalPositiveInt(process.env.SELFMEM_QUERY_EXPANSION_MAX_REWRITES ?? null, "query expansion max rewrites") ?? 3;
+}
+
+function queryExpansionMaxChars() {
+  return optionalPositiveInt(process.env.SELFMEM_QUERY_EXPANSION_MAX_CHARS ?? null, "query expansion max chars") ?? 1200;
+}
+
+function queryExpansionMaxOutputTokens() {
+  return optionalPositiveInt(process.env.SELFMEM_QUERY_EXPANSION_MAX_OUTPUT_TOKENS ?? null, "query expansion max output tokens") ?? 160;
+}
+
+function queryExpansionTemperature() {
+  return finiteNumberOrDefault(process.env.SELFMEM_QUERY_EXPANSION_TEMPERATURE, 0);
+}
+
+function clipQueryExpansion(value) {
+  return String(value ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, queryExpansionMaxChars());
 }
 
 function localAppleStrategyConfig(strategy = rankingStrategy) {
