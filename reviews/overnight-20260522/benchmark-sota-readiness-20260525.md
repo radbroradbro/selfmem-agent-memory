@@ -180,6 +180,11 @@ Follow-up provider evidence on 2026-05-25:
   query-expansion, and NVIDIA answer-quality reports before rerunning the
   provider-challenger, memory-score, and SOTA-ladder gates. Evidence:
   `reviews/overnight-20260522/sota-ladder-operator-packet-20260525.json`.
+- The release gate now also runs a negative combine test that mutates one
+  answer-quality input's query-set hash and confirms
+  `benchmark:answer-quality:combine` fails closed. This protects the future
+  Voyage retry from being accidentally combined with a different target or
+  materialization.
 - The non-Voyage provider lane did run end-to-end on the same 30-query
   source-locked target. `cloud-nvidia-nemotron-1b` scored `43.1667`
   answerQuality with `0.4333` judge-correct rate, beating the local

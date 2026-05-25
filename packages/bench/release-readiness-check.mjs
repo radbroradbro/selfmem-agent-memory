@@ -1856,6 +1856,26 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityCombinedEvidence.winner?.answerQuality, 43.1667);
   assert.ok(answerQualityCombinedEvidence.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b-local-rerank"));
   assert.ok(answerQualityCombinedEvidence.strategies?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank"));
+  const combineMismatchRoot = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-combine-mismatch-"));
+  try {
+    const mismatchedProvider = structuredClone(answerQualityLiveProviderEvidence);
+    mismatchedProvider.input.querySetHash = `sha256:${"0".repeat(64)}`;
+    const mismatchProviderPath = join(combineMismatchRoot, "provider-queryset-mismatch.json");
+    writeFileSync(mismatchProviderPath, `${JSON.stringify(mismatchedProvider, null, 2)}\n`);
+    const mismatchRun = spawnSync("node", [
+      "packages/bench/public-benchmark-answer-quality-combine.mjs",
+      "--input",
+      `reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json,${mismatchProviderPath}`,
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(mismatchRun.status, 0, "answer-quality combine must fail closed on query-set hash mismatch");
+    assert.match(`${mismatchRun.stdout}\n${mismatchRun.stderr}`, /query-set hash/i);
+  } finally {
+    rmSync(combineMismatchRoot, { recursive: true, force: true });
+  }
   assert.equal(voyageProviderRateLimitEvidence.mode, "provider-benchmark-blocker");
   assert.equal(voyageProviderRateLimitEvidence.status, "BLOCKED_VOYAGE_RATE_LIMIT");
   assert.equal(voyageProviderRateLimitEvidence.httpStatus, 429);
