@@ -5845,6 +5845,8 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "configs/provider-matrix.yaml" ||
     file === "package.json" ||
     file === "packages/brain-ui/fixtures/model-matrix.json" ||
+    file === "packages/brain-ui/interaction-smoke.mjs" ||
+    file === "packages/brain-ui/smoke.mjs" ||
     file.startsWith("packages/bench/") ||
     file.startsWith("tests/bench/") ||
     file === "plugins/selfmem-fallback/scripts/selfmem_update.py"
