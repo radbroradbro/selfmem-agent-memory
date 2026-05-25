@@ -5,10 +5,9 @@
 - Counts as full memory SOTA review: false
 - Reviewer approvals: 0
 - Independent reviewers: 0
-- Result hash: sha256:ff4ea6932ea9dc1b314cf977907928f5b7738b3b13f86eacef6cc2505cc59cf1
+- Result hash: sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472
 
 ## Blockers
-- fixture-result-cannot-be-reviewed-for-sota
 - two-independent-reviewer-approvals-missing
 
 ## Reviews

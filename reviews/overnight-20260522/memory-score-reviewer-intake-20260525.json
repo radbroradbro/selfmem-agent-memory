@@ -16,25 +16,24 @@
   "reviewsSubmitted": 0,
   "target": {
     "resultPresent": true,
-    "resultHash": "sha256:ff4ea6932ea9dc1b314cf977907928f5b7738b3b13f86eacef6cc2505cc59cf1",
+    "resultHash": "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",
     "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
-    "querySetHash": "sha256:d24290ad168215070aabf6f6ed68019e41b0bcbba5f40febb7a47aee75f0c4ca",
-    "materializerHash": null,
+    "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
     "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
-    "answerLabelsHash": "sha256:ae94858febc7847535f476e767ebf4a3452d1f8354a5b0112149c50c1699e2bf",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
     "benchmark": "longmemeval",
-    "fixtureOnly": true,
+    "fixtureOnly": false,
     "metricsOnly": true,
     "publicSafe": true,
     "retrievalProxyOnly": false,
     "memoryBenchAnswerQuality": true,
-    "strategyNamesHash": "sha256:66c804767e2e3b59d38c550f733d2575a32e71e15e1641be8e85032c76def7cb",
-    "scoredQueryCount": 2,
+    "strategyNamesHash": "sha256:eb06b53440e820624acda972e78a4294603e3df0187f310a6a7a13d7d70a7713",
+    "scoredQueryCount": 30,
     "hasAnyTarget": true
   },
   "reviews": [],
   "blockers": [
-    "fixture-result-cannot-be-reviewed-for-sota",
     "two-independent-reviewer-approvals-missing"
   ],
   "safety": {

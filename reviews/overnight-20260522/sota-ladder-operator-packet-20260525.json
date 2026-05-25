@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T19:07:09.736Z",
+  "generatedAt": "2026-05-25T20:26:01.738Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -29,11 +29,10 @@
       "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
       "publicBenchmarkClaimsAllowed": false,
       "blockers": [
-        "missing-end-to-end-memory-benchmark-score",
         "all-current-result-files-keep-public-claims-disabled",
+        "missing-voyage-answer-quality-same-data-result",
         "missing-nvidia-or-gemini-live-same-data-result",
-        "missing-local-apple-reranker-sidecar-result",
-        "missing-live-llm-query-expansion-result"
+        "missing-two-independent-memory-score-reviewer-approvals"
       ],
       "requiredFullMemoryArms": [
         {
@@ -54,7 +53,7 @@
         {
           "id": "provider-voyage4-rerank",
           "role": "cloud quality challenger",
-          "status": "present"
+          "status": "retrieval-proxy-present-answer-quality-missing"
         },
         {
           "id": "provider-nvidia-or-gemini",
@@ -69,12 +68,12 @@
         {
           "id": "local-apple-reranker-sidecar",
           "role": "local rerank method challenger",
-          "status": "missing-live-result"
+          "status": "present"
         },
         {
           "id": "llm-query-expansion",
           "role": "query expansion challenger",
-          "status": "deterministic-proxy-present-live-llm-missing"
+          "status": "present"
         }
       ],
       "reportedMemoryTargets": [
@@ -111,13 +110,12 @@
       ]
     },
     "queryExpansionPreflight": {
-      "status": "BLOCKED_QUERY_EXPANSION_ENV",
-      "queryExpansionCanBeBenchmarked": false,
-      "countsAsPureLocal": false,
+      "status": "PURE_LOCAL_QUERY_EXPANSION_READY",
+      "evidencePath": "reviews/overnight-20260522/query-expansion-local-qwen36-preflight-20260525.json",
+      "queryExpansionCanBeBenchmarked": true,
+      "countsAsPureLocal": true,
       "countsAsMixedLocalCloud": false,
-      "blockers": [
-        "no-query-expansion-arm-ready"
-      ]
+      "blockers": []
     },
     "providerPreflight": {
       "status": "BLOCKED_PROVIDER_ENV",
@@ -174,51 +172,51 @@
     "endToEndMemoryScoreGate": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:af7dd43419974d01b3ef3284b459b9dbc26c080523040d51d2b0082e7450f672",
+      "evidenceHash": "sha256:03207891bbff08eb4ed4f9dd05d8d6c9e7677fd514814071e015ab9c9d92611d",
       "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
       "countsAsEndToEndMemoryBenchmark": false,
       "countsAsFullMemorySotaEvidence": false,
       "blockers": [
-        "result-not-end-to-end-memory-score-report",
-        "fixture-result-cannot-count-as-end-to-end-memory-score",
-        "retrieval-proxy-result-cannot-count-as-answer-quality",
-        "memorybench-answer-quality-not-proven",
-        "result-not-bound-to-source-locked-target",
-        "target-hash-does-not-match-source-locked-target",
-        "missing-materializer-hash",
-        "scoring-code-hash-does-not-match-target",
-        "answer-labels-hash-does-not-match-target",
-        "missing-answer-quality-score",
-        "answer-quality-score-out-of-range",
         "missing-voyage-provider-arm",
         "missing-nvidia-or-gemini-provider-arm",
-        "missing-local-apple-arm",
-        "missing-local-rerank-arm",
-        "missing-memory-score-reviewer-approval-report",
+        "memory-score-reviewer-approval-report-not-ready",
         "missing-two-independent-reviewer-approvals"
       ]
+    },
+    "liveLocalAnswerQuality": {
+      "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "evidenceExists": true,
+      "evidenceHash": "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",
+      "mode": "public-benchmark-answer-quality",
+      "readyForEndToEndMemoryScoreGate": true,
+      "winner": {
+        "strategy": "local-apple-qwen3-0_6b-local-rerank",
+        "answerQuality": 36,
+        "judgeCorrectRate": 0.3667,
+        "answerLatencyP50Ms": 10260
+      },
+      "providerCalls": 300
     },
     "memoryScoreReviewerIntake": {
       "evidencePath": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:14ca1765c81f7351a8c454fa7f7df6a73e84b45399633f7fdba7873b34abcc7c",
+      "evidenceHash": "sha256:26b3d04087a0bd62793672563eec7cb4f24e54a45c3db7a721d86e75325e9a65",
       "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
       "publicBenchmarkApprovalReady": false,
       "countsAsFullMemorySotaReview": false,
       "reviewerApprovalCount": 0,
       "independentReviewerCount": 0,
       "blockers": [
-        "fixture-result-cannot-be-reviewed-for-sota",
         "two-independent-reviewer-approvals-missing"
       ]
     },
     "answerQualityArmExport": {
-      "evidencePath": "reviews/overnight-20260522/answer-quality-arm-export-20260525.json",
+      "evidencePath": "reviews/overnight-20260522/answer-quality-arm-export-live-local-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:b7c5936cb1ea81e39e30fdcf7a9bbd17068324943f22918650102bddd56e02fc",
-      "status": "BLOCKED_RESPONSE_ARM_EXPORT_ENV",
-      "readyForAnswerQualityPreflight": false,
-      "writesPrivateResponseFiles": false,
+      "evidenceHash": "sha256:058a10a04eb59cdf7f6be722efae36598302feab9fc62fc5c3ca4a7186c31e0b",
+      "status": "EXPORTED_RESPONSE_ARMS",
+      "readyForAnswerQualityPreflight": true,
+      "writesPrivateResponseFiles": true,
       "strategyCoverage": {
         "hasBm25Lite": true,
         "hasFullHybridRerank": true,
@@ -226,41 +224,18 @@
         "hasProviderChallenger": true,
         "hasLocalApple": true,
         "hasLocalRerank": true,
-        "strategyCount": 7
+        "strategyCount": 5
       },
-      "blockers": [
-        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
-        "private-queryset-missing",
-        "private-memories-missing",
-        "private-response-output-dir-missing",
-        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-        "query-expansion-endpoint-or-consent-missing"
-      ]
+      "blockers": []
     },
     "answerQualityPreflight": {
-      "evidencePath": "reviews/overnight-20260522/answer-quality-preflight-20260525.json",
+      "evidencePath": "reviews/overnight-20260522/answer-quality-preflight-live-local-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:e1714872655b989d9e8e45b461e24572792a4e7202a890b4b6bfa0ba9e58d449",
-      "status": "BLOCKED_ANSWER_QUALITY_ENV",
-      "liveAnswerQualityCanRun": false,
-      "readyForEndToEndMemoryScoreGate": false,
-      "blockers": [
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-        "answer-model-missing",
-        "judge-model-missing",
-        "openai-compatible-base-url-missing",
-        "private-queryset-missing",
-        "private-memories-missing",
-        "private-answer-labels-missing",
-        "response-arm-exports-missing",
-        "bm25-lite-arm-missing",
-        "full-hybrid-rerank-arm-missing",
-        "provider-or-local-challenger-arm-missing"
-      ]
+      "evidenceHash": "sha256:21ef3224390734c48772089590d72e0e3125a1d38163c5c1097474a8ea87bb75",
+      "status": "READY_FOR_LIVE_ANSWER_QUALITY",
+      "liveAnswerQualityCanRun": true,
+      "readyForEndToEndMemoryScoreGate": true,
+      "blockers": []
     },
     "answerQualityHarnessSmoke": {
       "evidencePath": "reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json",
@@ -332,7 +307,8 @@
       "liveLlmExpansionWiringPresent": true,
       "liveLlmExpansionProven": false,
       "claimRule": "Wiring presence is not benchmark proof; do not count this as a live LLM query-expansion arm until the run report proves the configured expander was used."
-    }
+    },
+    "liveLlmQueryExpansionProven": true
   },
   "sameDataContract": {
     "targetHashMustMatch": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
@@ -523,12 +499,10 @@
     "Brain UI evidence, docs, and release notes are updated after the benchmark result is known."
   ],
   "blockers": [
-    "missing-end-to-end-memory-benchmark-score",
     "all-current-result-files-keep-public-claims-disabled",
+    "missing-voyage-answer-quality-same-data-result",
     "missing-nvidia-or-gemini-live-same-data-result",
-    "missing-local-apple-reranker-sidecar-result",
-    "missing-live-llm-query-expansion-result",
-    "query-expansion:no-query-expansion-arm-ready",
+    "missing-two-independent-memory-score-reviewer-approvals",
     "provider:RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
     "provider:RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
     "provider:gemini-credentials-missing",
@@ -536,15 +510,6 @@
     "provider:local-rerank-credentials-missing",
     "provider:nvidia-credentials-missing",
     "provider:voyage-credentials-missing",
-    "answer-quality-arms:RECALLWEAVE_BASELINE_LIVE-not-enabled",
-    "answer-quality-arms:RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
-    "answer-quality-arms:private-queryset-missing",
-    "answer-quality-arms:private-memories-missing",
-    "answer-quality-arms:private-response-output-dir-missing",
-    "answer-quality-arms:RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-    "answer-quality-arms:RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-    "answer-quality-arms:query-expansion-endpoint-or-consent-missing",
-    "memory-score-reviewers:fixture-result-cannot-be-reviewed-for-sota",
     "memory-score-reviewers:two-independent-reviewer-approvals-missing"
   ]
 }

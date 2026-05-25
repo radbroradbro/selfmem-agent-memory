@@ -295,6 +295,15 @@ harness we will use.
   two reviewer approvals through `benchmark:memory-score:reviewer-intake`, then
   pass `benchmark:memory-score:result-gate --require-ready` before it can enter
   any SOTA evidence packet.
+- Current live-local answer-quality evidence:
+  `reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json`
+  and
+  `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json`.
+  The 30-query local run is real same-data answer-quality evidence; the best
+  local arm is `local-apple-qwen3-0_6b-local-rerank` at `36` answer-quality /
+  `0.3667` correct rate. It is not SOTA proof and does not authorize public
+  comparison language because provider challenger arms and two independent
+  reviewer approvals are still missing.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and

@@ -209,6 +209,17 @@ npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-r
   --reviewer-approval-report <memory-score-reviewer-intake.json>
 ```
 
+The first full local answer-quality run is checked in at
+`reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json`.
+It scored the 30-query source-locked LongMemEval target across BM25,
+full-hybrid, query-expanded hybrid, local Qwen3 0.6B embedding, and local Qwen3
+0.6B embedding plus local rerank arms. The best local arm was
+`local-apple-qwen3-0_6b-local-rerank` at `36` answer-quality / `0.3667`
+correct rate with 300 local model calls and zero answer or judge failures.
+`reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` keeps
+public and SOTA claims blocked because the same-data provider challengers and
+two independent reviewer approvals are still missing.
+
 The Apple Silicon local arm now has an explicit metrics-only preflight:
 
 - `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-live-preflight.json`

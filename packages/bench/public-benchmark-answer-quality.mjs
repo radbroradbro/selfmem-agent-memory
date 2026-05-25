@@ -22,6 +22,10 @@ const answerModel = String(args.answerModel ?? process.env.RECALLWEAVE_MEMORYBEN
 const judgeModel = String(args.judgeModel ?? process.env.RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL ?? process.env.RECALLWEAVE_BASELINE_JUDGE_MODEL ?? "").trim();
 const baseUrl = String(args.baseUrl ?? process.env.RECALLWEAVE_MEMORYBENCH_BASE_URL ?? "").trim();
 const apiKey = String(args.apiKey ?? process.env.RECALLWEAVE_MEMORYBENCH_API_KEY ?? "").trim();
+const maxOutputTokens = optionalPositiveInt(args.maxOutputTokens ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_OUTPUT_TOKENS ?? 512, "max output tokens");
+const callTimeoutMs = optionalPositiveInt(args.callTimeoutMs ?? process.env.RECALLWEAVE_MEMORYBENCH_CALL_TIMEOUT_MS ?? 120000, "call timeout ms");
+const continueOnCallError = truthy(args.continueOnCallError ?? process.env.RECALLWEAVE_MEMORYBENCH_CONTINUE_ON_CALL_ERROR ?? "");
+const progressEnabled = !fixtureRequested && !truthy(args.noProgress ?? process.env.RECALLWEAVE_MEMORYBENCH_NO_PROGRESS ?? "");
 const allowAnswerQualityCalls = process.env.RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS === "1";
 const publicDataConfirmed = process.env.RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA === "1";
 const noRawTextOutput = process.env.RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT === "1";
@@ -110,6 +114,7 @@ async function liveRun() {
   for (const arm of armSpecs) {
     const responsesEnvelope = loadJson(arm.responsesPath, `${arm.strategy} responses`);
     assert.equal(responsesEnvelope.querySetHash, `sha256:${stableHash(collectorQuerySetHashPayload(querySet))}`, `${arm.strategy} responses must match query-set hash`);
+    progressLog(`answer-quality arm ${arms.length + 1}/${armSpecs.length}: ${arm.strategy}`);
     const scoredArm = await scoreArmAsync({
       strategy: arm.strategy,
       responses: responsesEnvelope.responses ?? {},
@@ -136,6 +141,8 @@ async function liveRun() {
       answerQualityCallsAllowed: true,
       publicDataConfirmed: true,
       callsMade: providerCalls,
+      callTimeoutMs,
+      continueOnCallError,
       endpointLabel: endpointLabel(baseUrl),
     },
   });
@@ -183,19 +190,37 @@ async function scoreArmAsync({ strategy, responses, queries, memories, labelsByQ
   const scored = [];
   let answerCalls = 0;
   let judgeCalls = 0;
-  for (const query of selectedQueries) {
+  let answerFailures = 0;
+  let judgeFailures = 0;
+  for (let queryIndex = 0; queryIndex < selectedQueries.length; queryIndex += 1) {
+    const query = selectedQueries[queryIndex];
     const response = responses[query.id] ?? emptyResponse();
     const contextItems = contextFor(response, memoryIndex);
     const expected = labelsByQueryId.get(query.id);
     assert.ok(expected, `missing answer label for query ${query.id}`);
     const started = performance.now();
-    const candidateAnswer = await callAnswerModel({ query, contextItems });
-    answerCalls += 1;
-    const judge = await callJudgeModel({ query, expectedAnswer: expected.answer, candidateAnswer });
-    judgeCalls += 1;
+    let candidateAnswer = "unknown";
+    let judge = { score: 0, correct: false, rationaleHash: "not-run" };
+    let stage = "answer";
+    try {
+      progressLog(`answer-quality ${strategy} query ${queryIndex + 1}/${selectedQueries.length} ${shortHash(query.id)} answer`);
+      answerCalls += 1;
+      candidateAnswer = await callAnswerModel({ query, contextItems });
+      stage = "judge";
+      progressLog(`answer-quality ${strategy} query ${queryIndex + 1}/${selectedQueries.length} ${shortHash(query.id)} judge`);
+      judgeCalls += 1;
+      judge = await callJudgeModel({ query, expectedAnswer: expected.answer, candidateAnswer });
+    } catch (error) {
+      if (stage === "answer") answerFailures += 1;
+      else judgeFailures += 1;
+      const reason = safeFailureReason(error);
+      if (!continueOnCallError) throw new Error(`${strategy} ${shortHash(query.id)} ${stage} failed: ${reason}`);
+      judge = { score: 0, correct: false, rationaleHash: shortHash(reason), errorCode: reason };
+      progressLog(`answer-quality ${strategy} query ${queryIndex + 1}/${selectedQueries.length} ${shortHash(query.id)} ${stage} failed: ${reason}`);
+    }
     scored.push(scoreFingerprint({ query, response, contextItems, candidateAnswer, judge, elapsedMs: Math.round(performance.now() - started) }));
   }
-  return summarizeArm({ strategy, scored, provider: { answerCalls, judgeCalls, fixtureJudge: false } });
+  return summarizeArm({ strategy, scored, provider: { answerCalls, judgeCalls, answerFailures, judgeFailures, callTimeoutMs, continueOnCallError, fixtureJudge: false } });
 }
 
 function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memoriesHash, answerLabelsHash, materializerHash, arms, provider }) {
@@ -363,6 +388,8 @@ async function callOpenAiCompatible({ model, system, prompt, jsonMode = false })
       { role: "user", content: prompt },
     ],
     temperature: 0,
+    max_tokens: maxOutputTokens,
+    chat_template_kwargs: { enable_thinking: false, preserve_thinking: false },
     stream: false,
   };
   if (jsonMode) body.response_format = { type: "json_object" };
@@ -372,6 +399,7 @@ async function callOpenAiCompatible({ model, system, prompt, jsonMode = false })
     method: "POST",
     headers,
     body: JSON.stringify(body),
+    signal: timeoutSignal(callTimeoutMs),
   });
   const raw = await response.text();
   assertNoUnsafePrompt(raw, "model response");
@@ -628,6 +656,26 @@ function safeError(text) {
   return String(text).replace(secretPattern, "[redacted-key]").slice(0, 300);
 }
 
+function safeFailureReason(error) {
+  const name = String(error?.name ?? "Error").replace(/[^A-Za-z0-9_.-]/g, "_");
+  if (name === "AbortError" || name === "TimeoutError") return `model-call-timeout-${callTimeoutMs}ms`;
+  const message = String(error?.message ?? "").replace(secretPattern, "[redacted-key]");
+  const safeMessage = message.replace(privatePathPattern, "external-input").replace(privateTagPattern, "[private]").replace(/[^A-Za-z0-9_.: -]/g, " ");
+  return `${name}:${safeMessage}`.slice(0, 160);
+}
+
+function timeoutSignal(timeoutMs) {
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") return AbortSignal.timeout(timeoutMs);
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), timeoutMs).unref?.();
+  return controller.signal;
+}
+
+function progressLog(message) {
+  if (!progressEnabled) return;
+  process.stderr.write(`[progress] ${message}\n`);
+}
+
 function chatCompletionsUrl(value) {
   const clean = String(value).replace(/\/+$/, "");
   if (clean.endsWith("/chat/completions")) return clean;
@@ -747,4 +795,8 @@ function optionalPositiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
   return number;
+}
+
+function truthy(value) {
+  return /^(1|true|yes|on)$/i.test(String(value ?? ""));
 }

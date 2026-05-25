@@ -99,6 +99,7 @@
     "benchmark:answer-quality": "node packages/bench/public-benchmark-answer-quality.mjs",
     "benchmark:query-expansion:preflight": "node packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "benchmark:query-expansion:result-gate": "node packages/bench/query-expansion-result-gate.mjs",
+    "benchmark:local-rerank:sidecar": "node packages/bench/local-openai-rerank-sidecar.mjs",
     "benchmark:local-rerank:result-gate": "node packages/bench/local-rerank-result-gate.mjs",
     "benchmark:provider-challenger:result-gate": "node packages/bench/provider-challenger-result-gate.mjs",
     "benchmark:memory-score:result-gate": "node packages/bench/end-to-end-memory-score-gate.mjs",

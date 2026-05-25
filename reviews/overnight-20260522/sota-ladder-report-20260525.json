@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T18:29:55.686Z",
+  "generatedAt": "2026-05-25T20:24:30.358Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -78,10 +78,30 @@
       "memoryBenchAnswerQuality": null,
       "publicBenchmarkClaimsAllowed": null
     },
+    "queryExpansionLocalQwen36Preflight": {
+      "path": "reviews/overnight-20260522/query-expansion-local-qwen36-preflight-20260525.json",
+      "exists": true,
+      "hash": "sha256:806bba8e6df647e45ce5dc5050584798b30e3177af296d92474a3db0262315bf",
+      "mode": "public-benchmark-query-expansion-preflight",
+      "fixtureOnly": null,
+      "retrievalProxyOnly": null,
+      "memoryBenchAnswerQuality": null,
+      "publicBenchmarkClaimsAllowed": null
+    },
+    "liveLocalAnswerQuality": {
+      "path": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "exists": true,
+      "hash": "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",
+      "mode": "public-benchmark-answer-quality",
+      "fixtureOnly": false,
+      "retrievalProxyOnly": false,
+      "memoryBenchAnswerQuality": true,
+      "publicBenchmarkClaimsAllowed": false
+    },
     "endToEndMemoryScoreGate": {
       "path": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "exists": true,
-      "hash": "sha256:51f5a2d07b5b229b9645613b528ffa42cf9e7d35a2d1b4b760b146d558ab558a",
+      "hash": "sha256:03207891bbff08eb4ed4f9dd05d8d6c9e7677fd514814071e015ab9c9d92611d",
       "mode": "end-to-end-memory-score-gate",
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -91,7 +111,7 @@
     "readinessNote": {
       "path": "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
       "exists": true,
-      "hash": "sha256:3043cf922fee0d176fcaeafb5734a77a77415db8a29cdbcc550ad573da146a90",
+      "hash": "sha256:59a9a9c2c6c6b6bfca30f605013a806933d2b028629564311d2cbbbf7ff3a098",
       "mode": null,
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -211,7 +231,7 @@
     {
       "id": "provider-voyage4-rerank",
       "role": "cloud quality challenger",
-      "status": "present"
+      "status": "retrieval-proxy-present-answer-quality-missing"
     },
     {
       "id": "provider-nvidia-or-gemini",
@@ -226,12 +246,12 @@
     {
       "id": "local-apple-reranker-sidecar",
       "role": "local rerank method challenger",
-      "status": "missing-live-result"
+      "status": "present"
     },
     {
       "id": "llm-query-expansion",
       "role": "query expansion challenger",
-      "status": "deterministic-proxy-present-live-llm-missing"
+      "status": "present"
     }
   ],
   "observedStrategies": [
@@ -241,6 +261,8 @@
     "cloud-voyage4-voyage-lite-rerank",
     "dense-proxy",
     "full-hybrid-rerank",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank",
     "local-apple-qwen3-4b",
     "query-expanded-full-hybrid-rerank",
     "sparse-dense-graph-temporal",
@@ -249,9 +271,60 @@
   ],
   "bestObservedRows": [
     {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "sourcePath": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "quality": 36,
+      "answerQuality": 36,
+      "latencyP50Ms": 10260,
+      "retrievalProxyOnly": false,
+      "memoryBenchAnswerQuality": true,
+      "publicBenchmarkClaimsAllowed": false
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "sourcePath": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "quality": 26.6667,
+      "answerQuality": 26.6667,
+      "latencyP50Ms": 9823,
+      "retrievalProxyOnly": false,
+      "memoryBenchAnswerQuality": true,
+      "publicBenchmarkClaimsAllowed": false
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "sourcePath": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "quality": 26.6667,
+      "answerQuality": 26.6667,
+      "latencyP50Ms": 10072,
+      "retrievalProxyOnly": false,
+      "memoryBenchAnswerQuality": true,
+      "publicBenchmarkClaimsAllowed": false
+    },
+    {
+      "strategy": "bm25-lite",
+      "sourcePath": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "quality": 20,
+      "answerQuality": 20,
+      "latencyP50Ms": 9636,
+      "retrievalProxyOnly": false,
+      "memoryBenchAnswerQuality": true,
+      "publicBenchmarkClaimsAllowed": false
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "sourcePath": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "quality": 20,
+      "answerQuality": 20,
+      "latencyP50Ms": 10106,
+      "retrievalProxyOnly": false,
+      "memoryBenchAnswerQuality": true,
+      "publicBenchmarkClaimsAllowed": false
+    },
+    {
       "strategy": "cloud-voyage4-lite-voyage-lite",
       "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json",
       "quality": 0.304,
+      "answerQuality": null,
       "pAt1": 0.5667,
       "recallAt5": 0.1917,
       "ndcgAt10": 0.2658,
@@ -264,6 +337,7 @@
       "strategy": "cloud-voyage4-voyage-lite-rerank",
       "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json",
       "quality": 0.304,
+      "answerQuality": null,
       "pAt1": 0.5667,
       "recallAt5": 0.1917,
       "ndcgAt10": 0.2658,
@@ -276,6 +350,7 @@
       "strategy": "cloud-voyage4-voyage",
       "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json",
       "quality": 0.304,
+      "answerQuality": null,
       "pAt1": 0.5667,
       "recallAt5": 0.1917,
       "ndcgAt10": 0.2658,
@@ -285,21 +360,10 @@
       "publicBenchmarkClaimsAllowed": false
     },
     {
-      "strategy": "bm25-lite",
-      "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
-      "quality": 0.2506,
-      "pAt1": 0.4667,
-      "recallAt5": 0.1583,
-      "ndcgAt10": 0.2193,
-      "latencyP50Ms": 74,
-      "retrievalProxyOnly": true,
-      "memoryBenchAnswerQuality": false,
-      "publicBenchmarkClaimsAllowed": false
-    },
-    {
       "strategy": "local-apple-qwen3-4b",
       "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-warm.json",
       "quality": 0.2506,
+      "answerQuality": null,
       "pAt1": 0.4667,
       "recallAt5": 0.1583,
       "ndcgAt10": 0.2193,
@@ -309,21 +373,10 @@
       "publicBenchmarkClaimsAllowed": false
     },
     {
-      "strategy": "full-hybrid-rerank",
-      "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
-      "quality": 0.2351,
-      "pAt1": 0.4333,
-      "recallAt5": 0.15,
-      "ndcgAt10": 0.2071,
-      "latencyP50Ms": 155,
-      "retrievalProxyOnly": true,
-      "memoryBenchAnswerQuality": false,
-      "publicBenchmarkClaimsAllowed": false
-    },
-    {
       "strategy": "sparse-dense-graph-temporal",
       "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
       "quality": 0.1818,
+      "answerQuality": null,
       "pAt1": 0.3333,
       "recallAt5": 0.1167,
       "ndcgAt10": 0.1606,
@@ -333,21 +386,10 @@
       "publicBenchmarkClaimsAllowed": false
     },
     {
-      "strategy": "query-expanded-full-hybrid-rerank",
-      "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
-      "quality": 0.1818,
-      "pAt1": 0.3333,
-      "recallAt5": 0.1167,
-      "ndcgAt10": 0.1606,
-      "latencyP50Ms": 157,
-      "retrievalProxyOnly": true,
-      "memoryBenchAnswerQuality": false,
-      "publicBenchmarkClaimsAllowed": false
-    },
-    {
       "strategy": "sparse-dense-temporal",
       "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
       "quality": 0.1401,
+      "answerQuality": null,
       "pAt1": 0.2333,
       "recallAt5": 0.1,
       "ndcgAt10": 0.127,
@@ -360,22 +402,11 @@
       "strategy": "sparse-dense-rrf",
       "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
       "quality": 0.1024,
+      "answerQuality": null,
       "pAt1": 0.1667,
       "recallAt5": 0.075,
       "ndcgAt10": 0.0928,
       "latencyP50Ms": 75,
-      "retrievalProxyOnly": true,
-      "memoryBenchAnswerQuality": false,
-      "publicBenchmarkClaimsAllowed": false
-    },
-    {
-      "strategy": "dense-proxy",
-      "sourcePath": "reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate.json",
-      "quality": 0.0533,
-      "pAt1": 0.1,
-      "recallAt5": 0.0333,
-      "ndcgAt10": 0.0465,
-      "latencyP50Ms": 2,
       "retrievalProxyOnly": true,
       "memoryBenchAnswerQuality": false,
       "publicBenchmarkClaimsAllowed": false
@@ -385,34 +416,35 @@
     "sourceLockedTargetPresent": true,
     "componentEvidencePresent": true,
     "sameDataControlRowsPresent": true,
-    "voyageProviderCanaryPresent": true,
+    "voyageProviderCanaryPresent": false,
     "nvidiaOrGeminiLiveCanaryPresent": false,
     "localAppleEmbeddingCanaryPresent": true,
-    "localAppleRerankerCanaryPresent": false,
-    "llmQueryExpansionLiveCanaryPresent": false,
-    "queryExpansionProxyPresent": true,
+    "localAppleRerankerCanaryPresent": true,
+    "llmQueryExpansionLiveCanaryPresent": true,
+    "queryExpansionProxyPresent": false,
     "queryExpansionPreflightPresent": true,
     "queryExpansionPreflightSafe": true,
     "queryExpansionCanBeBenchmarked": false,
     "endToEndMemoryScoreGatePresent": true,
     "endToEndMemoryScoreGateReady": false,
-    "endToEndMemoryScorePresent": false,
+    "liveLocalAnswerQualityPresent": true,
+    "reviewerApprovalsPresent": false,
+    "endToEndMemoryScorePresent": true,
     "publicClaimsAllowedByInputs": false,
     "reportedMemoryTargetsPresent": true,
     "readinessNotePresent": true
   },
   "blockers": [
-    "missing-end-to-end-memory-benchmark-score",
     "all-current-result-files-keep-public-claims-disabled",
+    "missing-voyage-answer-quality-same-data-result",
     "missing-nvidia-or-gemini-live-same-data-result",
-    "missing-local-apple-reranker-sidecar-result",
-    "missing-live-llm-query-expansion-result"
+    "missing-two-independent-memory-score-reviewer-approvals"
   ],
   "nextActions": [
     "Use MTEB and model-card evidence only to choose embedding and reranker candidates.",
-    "Run the full same-data memory benchmark ladder before any SOTA or production replacement claim.",
-    "Add live NVIDIA or Gemini provider results, plus a local Apple reranker-sidecar result, on the same source-locked target.",
-    "Test LLM query expansion as its own arm: local small-model first where practical, or a clearly labeled cloud-only query-expansion substep if local hardware is the bottleneck.",
+    "Run the missing provider answer-quality challengers on the same source-locked target before any SOTA or production replacement claim.",
+    "Add Voyage and NVIDIA or Gemini answer-quality arms to the same end-to-end memory score packet.",
+    "Keep the local query-expansion and local-rerank arms, but label them as local-only evidence until provider challengers and reviewers pass.",
     "Promote no method until an end-to-end memory score beats the reported target under matching metric definitions.",
     "Send the exact metrics-only packet to Gemini/Claude or NVIDIA/DeepSeek-style reviewers before release wording changes."
   ]

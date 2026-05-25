@@ -231,12 +231,22 @@ the live-run preflights are
 proves the metrics-only `benchmark:answer-quality` output shape in fixture mode
 with zero provider calls. The arm-export preflight proves the same-data response
 arm plan is present for BM25, full-hybrid, query expansion, provider, local
-Apple, and local rerank arms. The scoring preflight proves the clean shell is
-still blocked until private materialized inputs, response arm exports,
-model-call consent, public-data consent, and no-raw-output consent are present.
-None of these is live benchmark evidence. To turn a retrieval or provider
-canary into end-to-end memory evidence, export the response arms, run the
-preflight and harness against private materialized LongMemEval inputs, then
+Apple, and local rerank arms. The clean-shell scoring preflight remains useful
+as a fail-closed check when private materialized inputs, response arm exports,
+model-call consent, public-data consent, or no-raw-output consent are absent.
+
+A full local same-data LongMemEval answer-quality run now exists:
+`reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json`.
+It scored 30 queries across BM25, full hybrid, query-expanded hybrid, local
+Qwen3 0.6B embedding, and local Qwen3 0.6B embedding plus local rerank arms.
+The best local arm was `local-apple-qwen3-0_6b-local-rerank` at `36`
+answer-quality / `0.3667` correct rate with 300 local model calls and zero
+answer or judge failures. This is real local evidence, not SOTA proof:
+`reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` remains
+blocked by missing Voyage/provider challenger arms and missing two independent
+reviewer approvals. To turn a retrieval, local, or provider canary into
+end-to-end memory evidence eligible for claims, export the response arms, run
+the preflight and harness against private materialized LongMemEval inputs, then
 require:
 
 ```bash

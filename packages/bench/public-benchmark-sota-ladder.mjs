@@ -17,6 +17,8 @@ const evidenceFiles = {
   voyageLatencyCanary: "reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json",
   localApple4bWarm: "reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-warm.json",
   queryExpansionPreflight: "reviews/overnight-20260522/query-expansion-preflight-20260525.json",
+  queryExpansionLocalQwen36Preflight: "reviews/overnight-20260522/query-expansion-local-qwen36-preflight-20260525.json",
+  liveLocalAnswerQuality: "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
   endToEndMemoryScoreGate: "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
   readinessNote: "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
 };
@@ -26,40 +28,54 @@ const rows = collectRows(loaded);
 const allStrategies = [...new Set(rows.map((row) => row.strategy).filter(Boolean))].sort();
 
 const requiredArms = [
-  { id: "bm25-lite", role: "lexical floor", status: hasStrategy(rows, "bm25-lite") ? "present" : "missing" },
+  { id: "bm25-lite", role: "lexical floor", status: hasMemoryStrategy(rows, "bm25-lite") ? "present" : retrievalStatus(rows, ["bm25-lite"]) },
   {
     id: "dense-or-vector-only",
     role: "semantic control",
-    status: hasAnyStrategy(rows, ["dense-proxy", "local-apple-qwen3-0_6b", "local-apple-qwen3-4b"]) ? "present" : "missing",
+    status: hasAnyMemoryStrategy(rows, ["dense-proxy", "local-apple-qwen3-0_6b", "local-apple-qwen3-4b"])
+      ? "present"
+      : retrievalStatus(rows, ["dense-proxy", "local-apple-qwen3-0_6b", "local-apple-qwen3-4b"]),
   },
-  { id: "full-hybrid-rerank", role: "intended local hybrid control", status: hasStrategy(rows, "full-hybrid-rerank") ? "present" : "missing" },
+  { id: "full-hybrid-rerank", role: "intended local hybrid control", status: hasMemoryStrategy(rows, "full-hybrid-rerank") ? "present" : retrievalStatus(rows, ["full-hybrid-rerank"]) },
   {
     id: "provider-voyage4-rerank",
     role: "cloud quality challenger",
-    status: hasAnyStrategy(rows, ["cloud-voyage4-voyage", "cloud-voyage4-voyage-lite-rerank", "cloud-voyage4-lite-voyage-lite"]) ? "present" : "missing",
+    status: hasAnyMemoryStrategy(rows, ["cloud-voyage4-voyage", "cloud-voyage4-voyage-lite-rerank", "cloud-voyage4-lite-voyage-lite"])
+      ? "present"
+      : retrievalStatus(rows, ["cloud-voyage4-voyage", "cloud-voyage4-voyage-lite-rerank", "cloud-voyage4-lite-voyage-lite"], "retrieval-proxy-present-answer-quality-missing"),
   },
   {
     id: "provider-nvidia-or-gemini",
     role: "non-Voyage provider challenger",
-    status: hasAnyStrategy(rows, ["cloud-nvidia-retriever-500m", "cloud-nvidia-nemotron-1b", "cloud-nvidia-e5-mistral", "cloud-gemini-embed-rerank-proxy", "cloud-gemini-voyage-rerank"])
+    status: hasAnyMemoryStrategy(rows, ["cloud-nvidia-retriever-500m", "cloud-nvidia-nemotron-1b", "cloud-nvidia-e5-mistral", "cloud-gemini-embed-rerank-proxy", "cloud-gemini-voyage-rerank"])
       ? "present"
-      : "missing-live-result",
+      : retrievalStatus(
+          rows,
+          ["cloud-nvidia-retriever-500m", "cloud-nvidia-nemotron-1b", "cloud-nvidia-e5-mistral", "cloud-gemini-embed-rerank-proxy", "cloud-gemini-voyage-rerank"],
+          "retrieval-proxy-present-answer-quality-missing",
+        ),
   },
   {
     id: "local-apple-embedding",
     role: "zero-spend local challenger",
-    status: hasAnyStrategy(rows, ["local-apple-qwen3-0_6b", "local-apple-qwen3-4b"]) ? "present" : "missing",
+    status: hasAnyMemoryStrategy(rows, ["local-apple-qwen3-0_6b", "local-apple-qwen3-4b"])
+      ? "present"
+      : retrievalStatus(rows, ["local-apple-qwen3-0_6b", "local-apple-qwen3-4b"]),
   },
   {
     id: "local-apple-reranker-sidecar",
     role: "local rerank method challenger",
-    status: hasAnyStrategy(rows, ["local-apple-qwen3-0_6b-local-rerank", "local-apple-qwen3-4b-local-rerank"]) ? "present" : "missing-live-result",
+    status: hasAnyMemoryStrategy(rows, ["local-apple-qwen3-0_6b-local-rerank", "local-apple-qwen3-4b-local-rerank"])
+      ? "present"
+      : retrievalStatus(rows, ["local-apple-qwen3-0_6b-local-rerank", "local-apple-qwen3-4b-local-rerank"]),
   },
   {
     id: "llm-query-expansion",
     role: "query expansion challenger",
-    status: hasAnyStrategy(rows, ["query-expanded-full-hybrid-rerank"])
-      ? "deterministic-proxy-present-live-llm-missing"
+    status: hasMemoryStrategy(rows, "query-expanded-full-hybrid-rerank")
+      ? "present"
+      : hasStrategy(rows, "query-expanded-full-hybrid-rerank")
+        ? "deterministic-proxy-present-live-llm-missing"
       : "missing-live-result",
   },
 ];
@@ -176,6 +192,8 @@ const checks = {
   queryExpansionCanBeBenchmarked: loaded.queryExpansionPreflight.json?.readiness?.queryExpansionCanBeBenchmarked === true,
   endToEndMemoryScoreGatePresent: loaded.endToEndMemoryScoreGate.exists,
   endToEndMemoryScoreGateReady: loaded.endToEndMemoryScoreGate.json?.countsAsEndToEndMemoryBenchmark === true,
+  liveLocalAnswerQualityPresent: loaded.liveLocalAnswerQuality.json?.memoryBenchAnswerQuality === true && loaded.liveLocalAnswerQuality.json?.fixtureOnly === false,
+  reviewerApprovalsPresent: Number(loaded.endToEndMemoryScoreGate.json?.reviewerApproval?.reviewerApprovalCount ?? 0) >= 2,
   endToEndMemoryScorePresent:
     rows.some((row) => row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false) ||
     loaded.endToEndMemoryScoreGate.json?.countsAsEndToEndMemoryBenchmark === true,
@@ -187,11 +205,11 @@ const checks = {
 const blockers = [
   !checks.endToEndMemoryScorePresent ? "missing-end-to-end-memory-benchmark-score" : null,
   !checks.publicClaimsAllowedByInputs ? "all-current-result-files-keep-public-claims-disabled" : null,
+  !checks.voyageProviderCanaryPresent ? "missing-voyage-answer-quality-same-data-result" : null,
   !checks.nvidiaOrGeminiLiveCanaryPresent ? "missing-nvidia-or-gemini-live-same-data-result" : null,
-  !checks.localAppleRerankerCanaryPresent ? "missing-local-apple-reranker-sidecar-result" : null,
+  !checks.reviewerApprovalsPresent ? "missing-two-independent-memory-score-reviewer-approvals" : null,
   !checks.queryExpansionPreflightPresent ? "missing-query-expansion-preflight" : null,
   !checks.queryExpansionPreflightSafe ? "query-expansion-preflight-not-safe" : null,
-  !checks.llmQueryExpansionLiveCanaryPresent ? "missing-live-llm-query-expansion-result" : null,
   !checks.sameDataControlRowsPresent ? "missing-same-data-control-row" : null,
   !checks.sourceLockedTargetPresent ? "missing-source-locked-target" : null,
 ].filter(Boolean);
@@ -273,33 +291,42 @@ function collectRows(loadedEvidence) {
 }
 
 function summarizeBestRows(rowsIn) {
-  const scored = rowsIn.filter((row) => Number.isFinite(Number(row.metrics?.quality)));
+  const scored = rowsIn.filter((row) => Number.isFinite(Number(row.metrics?.quality ?? row.metrics?.answerQuality)));
   const bestByStrategy = new Map();
   for (const row of scored) {
     const current = bestByStrategy.get(row.strategy);
-    const quality = Number(row.metrics.quality);
-    const latency = Number(row.metrics.latencyP50Ms ?? Number.POSITIVE_INFINITY);
-    const currentQuality = Number(current?.metrics?.quality ?? Number.NEGATIVE_INFINITY);
-    const currentLatency = Number(current?.metrics?.latencyP50Ms ?? Number.POSITIVE_INFINITY);
+    const quality = metricQuality(row);
+    const latency = metricLatency(row);
+    const currentQuality = current ? metricQuality(current) : Number.NEGATIVE_INFINITY;
+    const currentLatency = current ? metricLatency(current) : Number.POSITIVE_INFINITY;
     if (!current || quality > currentQuality || (quality === currentQuality && latency < currentLatency)) {
       bestByStrategy.set(row.strategy, row);
     }
   }
   return [...bestByStrategy.values()]
-    .sort((a, b) => Number(b.metrics.quality) - Number(a.metrics.quality) || Number(a.metrics.latencyP50Ms ?? 0) - Number(b.metrics.latencyP50Ms ?? 0))
+    .sort((a, b) => metricQuality(b) - metricQuality(a) || metricLatency(a) - metricLatency(b))
     .slice(0, 12)
     .map((row) => ({
       strategy: row.strategy,
       sourcePath: row.sourcePath,
-      quality: row.metrics.quality,
+      quality: metricQuality(row),
+      answerQuality: row.metrics.answerQuality ?? null,
       pAt1: row.metrics.pAt1,
       recallAt5: row.metrics.recallAt5,
       ndcgAt10: row.metrics.ndcgAt10,
-      latencyP50Ms: row.metrics.latencyP50Ms,
+      latencyP50Ms: metricLatency(row),
       retrievalProxyOnly: row.retrievalProxyOnly,
       memoryBenchAnswerQuality: row.memoryBenchAnswerQuality,
       publicBenchmarkClaimsAllowed: row.publicBenchmarkClaimsAllowed,
     }));
+}
+
+function metricQuality(row) {
+  return Number(row.metrics?.answerQuality ?? row.metrics?.quality ?? 0);
+}
+
+function metricLatency(row) {
+  return Number(row.metrics?.answerLatencyP50Ms ?? row.metrics?.latencyP50Ms ?? Number.POSITIVE_INFINITY);
 }
 
 function nextActions(blockersIn) {
@@ -311,9 +338,9 @@ function nextActions(blockersIn) {
   }
   return [
     "Use MTEB and model-card evidence only to choose embedding and reranker candidates.",
-    "Run the full same-data memory benchmark ladder before any SOTA or production replacement claim.",
-    "Add live NVIDIA or Gemini provider results, plus a local Apple reranker-sidecar result, on the same source-locked target.",
-    "Test LLM query expansion as its own arm: local small-model first where practical, or a clearly labeled cloud-only query-expansion substep if local hardware is the bottleneck.",
+    "Run the missing provider answer-quality challengers on the same source-locked target before any SOTA or production replacement claim.",
+    "Add Voyage and NVIDIA or Gemini answer-quality arms to the same end-to-end memory score packet.",
+    "Keep the local query-expansion and local-rerank arms, but label them as local-only evidence until provider challengers and reviewers pass.",
     "Promote no method until an end-to-end memory score beats the reported target under matching metric definitions.",
     "Send the exact metrics-only packet to Gemini/Claude or NVIDIA/DeepSeek-style reviewers before release wording changes.",
   ];
@@ -336,7 +363,7 @@ function renderMarkdown(value) {
     "## Best Observed Rows",
     ...value.bestObservedRows.map(
       (row) =>
-        `- ${row.strategy}: quality ${row.quality}, P@1 ${row.pAt1}, nDCG@10 ${row.ndcgAt10}, p50 ${row.latencyP50Ms} ms, retrievalProxyOnly=${row.retrievalProxyOnly}`,
+        `- ${row.strategy}: quality ${row.quality}, answerQuality ${row.answerQuality ?? "n/a"}, P@1 ${row.pAt1 ?? "n/a"}, nDCG@10 ${row.ndcgAt10 ?? "n/a"}, p50 ${row.latencyP50Ms} ms, retrievalProxyOnly=${row.retrievalProxyOnly}, memoryBenchAnswerQuality=${row.memoryBenchAnswerQuality}`,
     ),
     "",
     "## Next Actions",
@@ -349,9 +376,22 @@ function hasStrategy(rowsIn, strategy) {
   return rowsIn.some((row) => row.strategy === strategy);
 }
 
+function hasMemoryStrategy(rowsIn, strategy) {
+  return rowsIn.some((row) => row.strategy === strategy && row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false);
+}
+
 function hasAnyStrategy(rowsIn, strategies) {
   const wanted = new Set(strategies);
   return rowsIn.some((row) => wanted.has(row.strategy));
+}
+
+function hasAnyMemoryStrategy(rowsIn, strategies) {
+  const wanted = new Set(strategies);
+  return rowsIn.some((row) => wanted.has(row.strategy) && row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false);
+}
+
+function retrievalStatus(rowsIn, strategies, presentStatus = "retrieval-proxy-present-answer-quality-missing") {
+  return hasAnyStrategy(rowsIn, strategies) ? presentStatus : "missing-live-result";
 }
 
 function loadEvidence(file) {

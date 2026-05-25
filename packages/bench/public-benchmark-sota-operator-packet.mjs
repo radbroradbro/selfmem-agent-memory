@@ -26,7 +26,11 @@ const targetRaw = readFileSync(targetPath, "utf8");
 assertSafePublicText(targetRaw, "source-locked target");
 const target = JSON.parse(targetRaw);
 const sotaLadder = runJson(["packages/bench/public-benchmark-sota-ladder.mjs"]);
-const queryExpansionPreflight = runJson(["packages/bench/public-benchmark-query-expansion-preflight.mjs"]);
+const queryExpansionLocalQwen36PreflightEvidence = loadEvidence(`${reviewDir}/query-expansion-local-qwen36-preflight-20260525.json`);
+const queryExpansionPreflight =
+  queryExpansionLocalQwen36PreflightEvidence.json?.readiness?.queryExpansionCanBeBenchmarked === true
+    ? queryExpansionLocalQwen36PreflightEvidence.json
+    : runJson(["packages/bench/public-benchmark-query-expansion-preflight.mjs"]);
 const providerPreflight = runJson([
   "packages/bench/provider-benchmark-live-preflight.mjs",
   "--target",
@@ -40,11 +44,21 @@ const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-l
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
 const endToEndMemoryScoreGateEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-gate-20260525.json`);
+const liveLocalAnswerQualityEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-live-local-20260525.json`);
 const memoryScoreReviewerIntakeEvidence = loadEvidence(`${reviewDir}/memory-score-reviewer-intake-20260525.json`);
-const answerQualityArmExportEvidence = loadEvidence(`${reviewDir}/answer-quality-arm-export-20260525.json`);
-const answerQualityPreflightEvidence = loadEvidence(`${reviewDir}/answer-quality-preflight-20260525.json`);
+const answerQualityArmExportLegacyEvidence = loadEvidence(`${reviewDir}/answer-quality-arm-export-20260525.json`);
+const answerQualityArmExportLiveLocalEvidence = loadEvidence(`${reviewDir}/answer-quality-arm-export-live-local-20260525.json`);
+const answerQualityArmExportEvidence =
+  answerQualityArmExportLiveLocalEvidence.json?.status === "EXPORTED_RESPONSE_ARMS" ? answerQualityArmExportLiveLocalEvidence : answerQualityArmExportLegacyEvidence;
+const answerQualityPreflightLegacyEvidence = loadEvidence(`${reviewDir}/answer-quality-preflight-20260525.json`);
+const answerQualityPreflightLiveLocalEvidence = loadEvidence(`${reviewDir}/answer-quality-preflight-live-local-20260525.json`);
+const answerQualityPreflightEvidence =
+  answerQualityPreflightLiveLocalEvidence.json?.status === "READY_FOR_LIVE_ANSWER_QUALITY" ? answerQualityPreflightLiveLocalEvidence : answerQualityPreflightLegacyEvidence;
 const answerQualityHarnessSmokeEvidence = loadEvidence(`${reviewDir}/answer-quality-harness-smoke-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
+const liveLlmQueryExpansionProven = Boolean(
+  answerQualityArmExportEvidence.json?.arms?.some((arm) => arm.strategy === "query-expanded-full-hybrid-rerank" && Number(arm.queryExpansionCalls ?? 0) > 0),
+);
 
 const blockers = [
   ...arrayOf(sotaLadder.blockers),
@@ -95,6 +109,7 @@ const packet = {
     },
     queryExpansionPreflight: {
       status: queryExpansionPreflight.status,
+      evidencePath: queryExpansionLocalQwen36PreflightEvidence.exists ? queryExpansionLocalQwen36PreflightEvidence.path : null,
       queryExpansionCanBeBenchmarked: Boolean(queryExpansionPreflight.readiness?.queryExpansionCanBeBenchmarked),
       countsAsPureLocal: Boolean(queryExpansionPreflight.readiness?.countsAsPureLocal),
       countsAsMixedLocalCloud: Boolean(queryExpansionPreflight.readiness?.countsAsMixedLocalCloud),
@@ -124,6 +139,15 @@ const packet = {
       countsAsEndToEndMemoryBenchmark: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsEndToEndMemoryBenchmark),
       countsAsFullMemorySotaEvidence: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsFullMemorySotaEvidence),
       blockers: endToEndMemoryScoreGateEvidence.json?.blockers ?? [],
+    },
+    liveLocalAnswerQuality: {
+      evidencePath: liveLocalAnswerQualityEvidence.path,
+      evidenceExists: liveLocalAnswerQualityEvidence.exists,
+      evidenceHash: liveLocalAnswerQualityEvidence.hash,
+      mode: liveLocalAnswerQualityEvidence.json?.mode ?? null,
+      readyForEndToEndMemoryScoreGate: Boolean(liveLocalAnswerQualityEvidence.json?.readyForEndToEndMemoryScoreGate),
+      winner: liveLocalAnswerQualityEvidence.json?.winner ?? null,
+      providerCalls: Number(liveLocalAnswerQualityEvidence.json?.provider?.callsMade ?? 0),
     },
     memoryScoreReviewerIntake: {
       evidencePath: memoryScoreReviewerIntakeEvidence.path,
@@ -195,6 +219,7 @@ const packet = {
       blockers: queryExpansionResultGateEvidence.json?.blockers ?? [],
     },
     queryExpansionImplementation: currentQueryExpansionImpl,
+    liveLlmQueryExpansionProven,
   },
   sameDataContract: {
     targetHashMustMatch: `sha256:${sha256(targetRaw)}`,
@@ -598,6 +623,8 @@ function renderMarkdown(value) {
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
     `- End-to-end memory score gate: ${value.currentEvidence.endToEndMemoryScoreGate.status ?? "missing"}`,
+    `- Live-local answer quality: ${value.currentEvidence.liveLocalAnswerQuality.readyForEndToEndMemoryScoreGate}`,
+    `- Live-local winner: ${value.currentEvidence.liveLocalAnswerQuality.winner?.strategy ?? "missing"} (${value.currentEvidence.liveLocalAnswerQuality.winner?.answerQuality ?? "missing"})`,
     `- Memory score reviewer intake: ${value.currentEvidence.memoryScoreReviewerIntake.status ?? "missing"}`,
     `- Answer-quality arm export: ${value.currentEvidence.answerQualityArmExport.status ?? "missing"}`,
     `- Answer-quality preflight: ${value.currentEvidence.answerQualityPreflight.status ?? "missing"}`,
@@ -606,7 +633,7 @@ function renderMarkdown(value) {
     `- Local rerank result gate: ${value.currentEvidence.localRerankResultGate.status ?? "missing"}`,
     `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,
     `- Query expansion result gate: ${value.currentEvidence.queryExpansionResultGate.status ?? "missing"}`,
-    `- Live LLM query expansion proven: ${value.currentEvidence.queryExpansionImplementation.liveLlmExpansionProven}`,
+    `- Live LLM query expansion proven: ${value.currentEvidence.liveLlmQueryExpansionProven}`,
     "",
     "## Operator Flow",
     ...value.operatorFlow.flatMap((step) => [

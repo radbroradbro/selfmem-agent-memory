@@ -7,35 +7,22 @@
 - Target: reviews/overnight-20260522/public-longmemeval-expanded-run-target.json
 
 ## Blockers
-- result-not-end-to-end-memory-score-report
-- fixture-result-cannot-count-as-end-to-end-memory-score
-- retrieval-proxy-result-cannot-count-as-answer-quality
-- memorybench-answer-quality-not-proven
-- result-not-bound-to-source-locked-target
-- target-hash-does-not-match-source-locked-target
-- missing-materializer-hash
-- scoring-code-hash-does-not-match-target
-- answer-labels-hash-does-not-match-target
-- missing-answer-quality-score
-- answer-quality-score-out-of-range
 - missing-voyage-provider-arm
 - missing-nvidia-or-gemini-provider-arm
-- missing-local-apple-arm
-- missing-local-rerank-arm
-- missing-memory-score-reviewer-approval-report
+- memory-score-reviewer-approval-report-not-ready
 - missing-two-independent-reviewer-approvals
 
 ## Result
-- Source: generated-fixture-retrieval-proxy-smoke
-- Fixture only: true
-- Answer quality metric: missing=missing
+- Source: result-file
+- Fixture only: false
+- Answer quality metric: result=36
 - Reviewer approvals: 0
-- Arms: bm25-lite, dense-proxy, full-hybrid-rerank, query-expanded-full-hybrid-rerank
+- Arms: bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
 
 ## Reviewer Approval
-- Report exists: false
-- Report status: missing
-- Target bound: false
+- Report exists: true
+- Report status: BLOCKED_MEMORY_SCORE_REVIEWERS
+- Target bound: true
 - Independent reviewers: 0
 
 ## Next Actions

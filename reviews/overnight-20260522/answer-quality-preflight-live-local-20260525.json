@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-preflight",
+  "status": "READY_FOR_LIVE_ANSWER_QUALITY",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-05-25T19:42:40.202Z",
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "consent": {
+    "answerQualityCallsEnabled": true,
+    "publicDataConfirmed": true,
+    "noRawTextOutputConfirmed": true
+  },
+  "endpoint": {
+    "baseUrlPresent": true,
+    "endpointIsLocal": true,
+    "apiKeyPresent": false,
+    "valuePrinted": false
+  },
+  "models": {
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "valuesPrinted": false
+  },
+  "privateInputs": {
+    "querySet": {
+      "role": "queryset",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-queryset.private.json",
+      "hash": "sha256:d3758e0719fae64d09caf612bee16ef3952f30df1ad99046858836015d019164",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "queryCount": 30,
+      "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "matchesTarget": true
+    },
+    "memories": {
+      "role": "memories",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-memories.private.jsonl",
+      "hash": "sha256:6dc310a098e00e424bea17babecd4bd5b23c5a03b8214557388d7a0f5bcadf25",
+      "lineCount": 1420
+    },
+    "answerLabels": {
+      "role": "answer-labels",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-answer-labels.private.json",
+      "hash": "sha256:0d9710ac102bd24cd6690d97312cdcb4867b3683576131521ab3b51a7fac3637",
+      "labelCount": 30,
+      "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "matchesTarget": true
+    }
+  },
+  "arms": [
+    {
+      "strategy": "bm25-lite",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "bm25-lite-responses.private.json",
+      "hash": "sha256:b511438c17b089284bb949a6c73938e91a316cca19e9668b64e7b7faac940f01",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "hash": "sha256:fc1f9125f5b6103343790d94b718fba7d19ebc680386aa3b1c63899d1c78f8fd",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "hash": "sha256:794a696961468d6d5d53ce4c43f3126e2ed032582f80bb56a84f863bc0fc52d0",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "local-apple-qwen3-0_6b-responses.private.json",
+      "hash": "sha256:40371784a1431a8cf3dc2b313e68a84402aa2f1e750cb7eb7461de2c56a5154d",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "local-apple-qwen3-0_6b-local-rerank-responses.private.json",
+      "hash": "sha256:5bc30a43825947ee40992fb898abf91d0f72d0061dfcab872e2a6bd4cefe767b",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    }
+  ],
+  "requiredStrategyCoverage": {
+    "hasBm25Lite": true,
+    "hasFullHybridRerank": true,
+    "hasChallenger": true
+  },
+  "readiness": {
+    "envReady": true,
+    "privateInputsReady": true,
+    "armsReady": true,
+    "sameDataReady": true,
+    "liveAnswerQualityCanRun": true,
+    "readyForEndToEndMemoryScoreGate": true,
+    "countsAsFullMemorySotaEvidence": false
+  },
+  "blockers": [],
+  "nextActions": [
+    "Run benchmark:answer-quality with --live against the private materialized inputs and response arm exports.",
+    "Attach the metrics-only result to benchmark:memory-score:result-gate --require-ready.",
+    "Send the metrics-only packet to independent reviewers before public benchmark wording changes."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+    "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
+    "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model>",
+    "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json --arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json --output <public-answer-quality-output.json>"
+  ]
+}

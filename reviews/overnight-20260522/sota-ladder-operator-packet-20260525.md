@@ -6,12 +6,10 @@
 - Target hash: sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c
 
 ## Current Blockers
-- missing-end-to-end-memory-benchmark-score
 - all-current-result-files-keep-public-claims-disabled
+- missing-voyage-answer-quality-same-data-result
 - missing-nvidia-or-gemini-live-same-data-result
-- missing-local-apple-reranker-sidecar-result
-- missing-live-llm-query-expansion-result
-- query-expansion:no-query-expansion-arm-ready
+- missing-two-independent-memory-score-reviewer-approvals
 - provider:RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled
 - provider:RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed
 - provider:gemini-credentials-missing
@@ -19,32 +17,25 @@
 - provider:local-rerank-credentials-missing
 - provider:nvidia-credentials-missing
 - provider:voyage-credentials-missing
-- answer-quality-arms:RECALLWEAVE_BASELINE_LIVE-not-enabled
-- answer-quality-arms:RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed
-- answer-quality-arms:private-queryset-missing
-- answer-quality-arms:private-memories-missing
-- answer-quality-arms:private-response-output-dir-missing
-- answer-quality-arms:RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled
-- answer-quality-arms:RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed
-- answer-quality-arms:query-expansion-endpoint-or-consent-missing
-- memory-score-reviewers:fixture-result-cannot-be-reviewed-for-sota
 - memory-score-reviewers:two-independent-reviewer-approvals-missing
 
 ## Current Evidence
 - SOTA ladder: BLOCKED_FULL_MEMORY_SOTA_EVIDENCE
-- Query expansion preflight: BLOCKED_QUERY_EXPANSION_ENV
+- Query expansion preflight: PURE_LOCAL_QUERY_EXPANSION_READY
 - Provider preflight: BLOCKED_PROVIDER_ENV
 - Provider challenger result gate: BLOCKED_PROVIDER_CHALLENGER_RESULT
 - End-to-end memory score gate: BLOCKED_END_TO_END_MEMORY_SCORE
+- Live-local answer quality: true
+- Live-local winner: local-apple-qwen3-0_6b-local-rerank (36)
 - Memory score reviewer intake: BLOCKED_MEMORY_SCORE_REVIEWERS
-- Answer-quality arm export: BLOCKED_RESPONSE_ARM_EXPORT_ENV
-- Answer-quality preflight: BLOCKED_ANSWER_QUALITY_ENV
+- Answer-quality arm export: EXPORTED_RESPONSE_ARMS
+- Answer-quality preflight: READY_FOR_LIVE_ANSWER_QUALITY
 - Answer-quality harness smoke: public-benchmark-answer-quality
 - Local rerank evidence: true
 - Local rerank result gate: BLOCKED_LOCAL_RERANK_RESULT
 - Query expansion local smoke: true
 - Query expansion result gate: BLOCKED_QUERY_EXPANSION_RESULT
-- Live LLM query expansion proven: false
+- Live LLM query expansion proven: true
 
 ## Operator Flow
 ### refresh-current-safe-gates

@@ -1334,6 +1334,7 @@ async function openAiCompatibleQueryExpansion(plan, request) {
     model: plan.model,
     temperature: queryExpansionTemperature(),
     max_tokens: queryExpansionMaxOutputTokens(),
+    chat_template_kwargs: { enable_thinking: false, preserve_thinking: false },
     messages: [
       { role: "system", content: request.instruction },
       {
@@ -1902,7 +1903,7 @@ function isCurrentLocalAppleEmbeddingCacheEntry(entry, settings) {
 }
 
 function prepareLocalAppleEmbeddingInput(text) {
-  const source = String(text ?? "");
+  const source = providerSafeText(text);
   const maxEstimatedTokens = localAppleEmbedMaxEstimatedTokens();
   if (estimateTokens(source) <= maxEstimatedTokens) return source;
   const maxChars = Math.max(64, maxEstimatedTokens * 4);
@@ -1911,6 +1912,12 @@ function prepareLocalAppleEmbeddingInput(text) {
   const headChars = Math.max(32, Math.floor(available * 0.6));
   const tailChars = Math.max(32, available - headChars);
   return `${source.slice(0, headChars)}${marker}${source.slice(-tailChars)}`;
+}
+
+function providerSafeText(value) {
+  const text = String(value ?? "");
+  if (typeof text.toWellFormed === "function") return text.toWellFormed();
+  return text.replace(/[\uD800-\uDFFF]/g, " ");
 }
 
 function providerCandidateLimit(envName, fallback) {

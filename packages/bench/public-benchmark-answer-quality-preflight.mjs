@@ -206,7 +206,7 @@ function inspectPrivateJsonl(path, role) {
 }
 
 function inspectQuerySet(value) {
-  const querySetHash = `sha256:${sha256(canonicalJson(collectorQuerySetHashPayload(value)))}`;
+  const querySetHash = `sha256:${stableHash(collectorQuerySetHashPayload(value))}`;
   const expectedAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
   const expectedScoringCodeHash = target.benchmark?.scoringCodeHash ?? null;
   return {
@@ -425,18 +425,6 @@ function sha256(value) {
   return createHash("sha256").update(String(value)).digest("hex");
 }
 
-function canonicalJson(value) {
-  return JSON.stringify(sortForHash(value));
-}
-
-function sortForHash(value) {
-  if (Array.isArray(value)) return value.map((item) => sortForHash(item));
-  if (value && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value)
-        .sort(([left], [right]) => left.localeCompare(right))
-        .map(([key, child]) => [key, sortForHash(child)]),
-    );
-  }
-  return value;
+function stableHash(value) {
+  return sha256(typeof value === "string" ? value : JSON.stringify(value));
 }
