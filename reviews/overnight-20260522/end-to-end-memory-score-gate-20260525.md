@@ -8,21 +8,19 @@
 
 ## Blockers
 - missing-voyage-provider-arm
-- memory-score-reviewer-approval-report-not-ready
-- missing-two-independent-reviewer-approvals
 
 ## Result
 - Source: result-file
 - Fixture only: false
 - Answer quality metric: result=43.1667
-- Reviewer approvals: 0
+- Reviewer approvals: 2
 - Arms: bm25-lite, cloud-nvidia-nemotron-1b, full-hybrid-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank, query-expanded-full-hybrid-rerank
 
 ## Reviewer Approval
 - Report exists: true
-- Report status: BLOCKED_MEMORY_SCORE_REVIEWERS
+- Report status: READY_MEMORY_SCORE_REVIEWERS
 - Target bound: true
-- Independent reviewers: 0
+- Independent reviewers: 2
 
 ## Next Actions
 - Run the same-data LongMemEval/MemoryBench answer-quality harness, not only the retrieval-proxy strategy comparison.

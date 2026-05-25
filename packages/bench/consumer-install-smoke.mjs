@@ -111,6 +111,8 @@ try {
   assert.equal(typeof packageJson.scripts?.["baseline:returned-packet"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:reviewer:openai-compatible"], "string");
   assert.equal(typeof packageJson.scripts?.["baseline:reviewer-intake"], "string");
+  assert.equal(typeof packageJson.scripts?.["benchmark:memory-score:reviewer-intake"], "string");
+  assert.equal(typeof packageJson.scripts?.["benchmark:memory-score:reviewer:openai-compatible"], "string");
   assert.equal(typeof packageJson.scripts?.["release:github-sync"], "string");
   assert.ok(existsSync(join(checkout, "README.md")), "README.md missing from consumer checkout");
   assert.ok(existsSync(join(checkout, "docs/USER_MANUAL.md")), "user manual missing from consumer checkout");

@@ -8,8 +8,6 @@
 ## Current Blockers
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
-- missing-two-independent-memory-score-reviewer-approvals
-- memory-score-reviewers:two-independent-reviewer-approvals-missing
 - voyage-provider-rate-limited
 
 ## Current Evidence
@@ -23,7 +21,7 @@
 - Live-local winner: local-apple-qwen3-0_6b-local-rerank (36)
 - Live-provider answer quality: true
 - Live-provider winner: cloud-nvidia-nemotron-1b (43.1667)
-- Memory score reviewer intake: BLOCKED_MEMORY_SCORE_REVIEWERS
+- Memory score reviewer intake: READY_MEMORY_SCORE_REVIEWERS
 - Answer-quality arm export: EXPORTED_RESPONSE_ARMS
 - Answer-quality preflight: READY_FOR_LIVE_ANSWER_QUALITY
 - Answer-quality harness smoke: public-benchmark-answer-quality

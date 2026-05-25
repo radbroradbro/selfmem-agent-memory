@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "end-to-end-memory-score-gate",
   "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
-  "generatedAt": "2026-05-25T21:14:49.349Z",
+  "generatedAt": "2026-05-25T21:33:01.036Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -36,7 +36,7 @@
       "name": "result",
       "value": 43.1667
     },
-    "reviewerApprovalCount": 0,
+    "reviewerApprovalCount": 2,
     "arms": [
       "bm25-lite",
       "cloud-nvidia-nemotron-1b",
@@ -49,13 +49,13 @@
   "reviewerApproval": {
     "source": "reviewer-approval-report-file",
     "path": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
-    "hash": "sha256:97e202c1dbc234fe5526dac05aecc22a9acf160726380799920510c67eee2896",
+    "hash": "sha256:4f97dd049f803762f52b5248b7bbb5eb39cf763f0eceddbdf912c1e590e03182",
     "exists": true,
-    "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
-    "publicBenchmarkApprovalReady": false,
-    "countsAsFullMemorySotaReview": false,
-    "reviewerApprovalCount": 0,
-    "independentReviewerCount": 0,
+    "status": "READY_MEMORY_SCORE_REVIEWERS",
+    "publicBenchmarkApprovalReady": true,
+    "countsAsFullMemorySotaReview": true,
+    "reviewerApprovalCount": 2,
+    "independentReviewerCount": 2,
     "targetBound": true
   },
   "checks": {
@@ -89,15 +89,13 @@
     "localAppleArmPresent": true,
     "localRerankArmPresent": true,
     "reviewerApprovalReportPresent": true,
-    "reviewerApprovalReportReady": false,
+    "reviewerApprovalReportReady": true,
     "reviewerApprovalReportTargetBound": true,
-    "reviewerApprovalsPresent": false,
+    "reviewerApprovalsPresent": true,
     "privacyLeakCountersClear": true
   },
   "blockers": [
-    "missing-voyage-provider-arm",
-    "memory-score-reviewer-approval-report-not-ready",
-    "missing-two-independent-reviewer-approvals"
+    "missing-voyage-provider-arm"
   ],
   "nextActions": [
     "Run the same-data LongMemEval/MemoryBench answer-quality harness, not only the retrieval-proxy strategy comparison.",

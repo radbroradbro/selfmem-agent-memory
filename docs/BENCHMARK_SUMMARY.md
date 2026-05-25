@@ -216,9 +216,30 @@ full-hybrid, query-expanded hybrid, local Qwen3 0.6B embedding, and local Qwen3
 0.6B embedding plus local rerank arms. The best local arm was
 `local-apple-qwen3-0_6b-local-rerank` at `36` answer-quality / `0.3667`
 correct rate with 300 local model calls and zero answer or judge failures.
+The first live provider answer-quality run is checked in at
+`reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json`.
+On the same target/query/materializer/scoring hashes, `cloud-nvidia-nemotron-1b`
+scored `43.1667` answer-quality / `0.4333` correct rate. The union report is
+`reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json`.
+Voyage full and lite answer-quality attempts hit HTTP `429`, recorded in
+`reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json`, so the
+provider/SOTA ladder still has a hard missing-Voyage blocker.
 `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` keeps
-public and SOTA claims blocked because the same-data provider challengers and
-two independent reviewer approvals are still missing.
+public and SOTA claims blocked because Voyage answer-quality and two
+independent reviewer approvals are still missing.
+
+OpenAI-compatible reviewers can now produce a memory-score approval JSON for
+the exact metrics-only packet. The command writes only the reviewer artifact;
+the gate decides whether it counts:
+
+```bash
+RECALLWEAVE_REVIEW_OPENAI_PROVIDER=deepseek-pro \
+RECALLWEAVE_REVIEW_OPENAI_MODEL=deepseek-v4-pro \
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer:openai-compatible -- \
+  --result reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json \
+  --reviewer-id deepseek-memory-score-a \
+  --output <reviewer-a-memory-score-approval.json>
+```
 
 The Apple Silicon local arm now has an explicit metrics-only preflight:
 

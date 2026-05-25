@@ -276,6 +276,22 @@ npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-r
 Do not use MemoryBench, LongMemEval, or SOTA wording until that result gate,
 reviewer audit, UI evidence, docs, and owner approval all pass.
 
+For DeepSeek, NVIDIA, OpenRouter, Z.ai, or another OpenAI-compatible reviewer,
+generate a memory-score approval artifact with the env-only reviewer route:
+
+```bash
+RECALLWEAVE_REVIEW_OPENAI_PROVIDER=deepseek-pro \
+RECALLWEAVE_REVIEW_OPENAI_MODEL=deepseek-v4-pro \
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer:openai-compatible -- \
+  --result reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json \
+  --reviewer-id deepseek-memory-score-a \
+  --output <reviewer-a-memory-score-approval.json>
+```
+
+The reviewer prompt contains only metrics, hashes, safety counters, gate
+blockers, and strategy names. It must not include provider keys, raw benchmark
+questions, raw answers, raw memories, transcripts, or private paths.
+
 The current same-data retrieval strategy comparison is
 `reviews/overnight-20260522/public-longmemeval-strategy-compare.json`.
 `bm25-lite` beat the initial `jaccard` baseline on this six-row retrieval-proxy

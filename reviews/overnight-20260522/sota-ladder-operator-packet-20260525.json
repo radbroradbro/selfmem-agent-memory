@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T21:17:04.226Z",
+  "generatedAt": "2026-05-25T21:33:02.244Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -30,8 +30,7 @@
       "publicBenchmarkClaimsAllowed": false,
       "blockers": [
         "all-current-result-files-keep-public-claims-disabled",
-        "missing-voyage-answer-quality-same-data-result",
-        "missing-two-independent-memory-score-reviewer-approvals"
+        "missing-voyage-answer-quality-same-data-result"
       ],
       "requiredFullMemoryArms": [
         {
@@ -161,14 +160,12 @@
     "endToEndMemoryScoreGate": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:f3a5f17fab3b9a23fa2e2401e6994104d0641a3872852e7cccc3a6bb2748f50b",
+      "evidenceHash": "sha256:db1299d6b11123f2cefeb89feda00cbd0ec3ef21211effe66950352b40c35640",
       "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
       "countsAsEndToEndMemoryBenchmark": false,
       "countsAsFullMemorySotaEvidence": false,
       "blockers": [
-        "missing-voyage-provider-arm",
-        "memory-score-reviewer-approval-report-not-ready",
-        "missing-two-independent-reviewer-approvals"
+        "missing-voyage-provider-arm"
       ]
     },
     "liveLocalAnswerQuality": {
@@ -207,15 +204,13 @@
     "memoryScoreReviewerIntake": {
       "evidencePath": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:97e202c1dbc234fe5526dac05aecc22a9acf160726380799920510c67eee2896",
-      "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
-      "publicBenchmarkApprovalReady": false,
-      "countsAsFullMemorySotaReview": false,
-      "reviewerApprovalCount": 0,
-      "independentReviewerCount": 0,
-      "blockers": [
-        "two-independent-reviewer-approvals-missing"
-      ]
+      "evidenceHash": "sha256:4f97dd049f803762f52b5248b7bbb5eb39cf763f0eceddbdf912c1e590e03182",
+      "status": "READY_MEMORY_SCORE_REVIEWERS",
+      "publicBenchmarkApprovalReady": true,
+      "countsAsFullMemorySotaReview": true,
+      "reviewerApprovalCount": 2,
+      "independentReviewerCount": 2,
+      "blockers": []
     },
     "answerQualityArmExport": {
       "evidencePath": "reviews/overnight-20260522/answer-quality-arm-export-live-local-20260525.json",
@@ -508,8 +503,6 @@
   "blockers": [
     "all-current-result-files-keep-public-claims-disabled",
     "missing-voyage-answer-quality-same-data-result",
-    "missing-two-independent-memory-score-reviewer-approvals",
-    "memory-score-reviewers:two-independent-reviewer-approvals-missing",
     "voyage-provider-rate-limited"
   ]
 }

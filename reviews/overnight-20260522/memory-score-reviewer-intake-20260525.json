@@ -2,18 +2,18 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "memory-score-reviewer-approval-intake",
-  "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
+  "status": "READY_MEMORY_SCORE_REVIEWERS",
   "writesRealFiles": true,
   "callsProviderApis": false,
   "sendsBenchmarkTextToProvider": false,
   "metricsOnly": true,
   "publicSafe": true,
   "publicLaunchAllowed": false,
-  "publicBenchmarkApprovalReady": false,
-  "countsAsFullMemorySotaReview": false,
-  "reviewerApprovalCount": 0,
-  "independentReviewerCount": 0,
-  "reviewsSubmitted": 0,
+  "publicBenchmarkApprovalReady": true,
+  "countsAsFullMemorySotaReview": true,
+  "reviewerApprovalCount": 2,
+  "independentReviewerCount": 2,
+  "reviewsSubmitted": 2,
   "target": {
     "resultPresent": true,
     "resultHash": "sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0",
@@ -32,10 +32,33 @@
     "scoredQueryCount": 30,
     "hasAnyTarget": true
   },
-  "reviews": [],
-  "blockers": [
-    "two-independent-reviewer-approvals-missing"
+  "reviews": [
+    {
+      "sourceLabel": "deepseek-v4-pro-memory-score-approval.json",
+      "reviewerKeyHash": "01b4476a97f374d7",
+      "provider": "deepseek-pro",
+      "model": "deepseek-v4-pro",
+      "verdict": "APPROVE_MEMORY_SCORE_EVIDENCE",
+      "claimScope": "source-locked-memory-score",
+      "targetBound": true,
+      "countable": true,
+      "duplicateReviewer": false,
+      "failedChecks": []
+    },
+    {
+      "sourceLabel": "zai-glm-5-1-memory-score-approval.json",
+      "reviewerKeyHash": "db3dad61ccd21199",
+      "provider": "zai",
+      "model": "glm-5.1",
+      "verdict": "APPROVE_MEMORY_SCORE_EVIDENCE",
+      "claimScope": "source-locked-memory-score",
+      "targetBound": true,
+      "countable": true,
+      "duplicateReviewer": false,
+      "failedChecks": []
+    }
   ],
+  "blockers": [],
   "safety": {
     "acceptsOnlyMetricsOnlyReviewArtifacts": true,
     "requiresResultBinding": true,
@@ -48,8 +71,8 @@
     "includesRawAnswerText": false
   },
   "nextActions": [
-    "Run the live answer-quality harness and pass its metrics-only result to this reviewer intake.",
-    "Collect two independent reviewer approval JSON files bound to the exact result hash.",
-    "Do not publish SOTA or MemoryBench-style claims until this intake and benchmark:memory-score:result-gate both pass."
+    "Run benchmark:memory-score:result-gate with --reviewer-approval-report pointing to this intake report.",
+    "Attach the reviewer-approved gate report to the SOTA ladder packet.",
+    "Public launch still remains blocked until owner approval, UI evidence, docs, and release notes are current."
   ]
 }

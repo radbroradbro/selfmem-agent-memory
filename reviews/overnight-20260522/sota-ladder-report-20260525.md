@@ -7,7 +7,6 @@
 ## Blockers
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
-- missing-two-independent-memory-score-reviewer-approvals
 
 ## Required Full Memory Arms
 - bm25-lite: present (lexical floor)

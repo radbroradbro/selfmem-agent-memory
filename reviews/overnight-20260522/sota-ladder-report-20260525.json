@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T21:16:56.964Z",
+  "generatedAt": "2026-05-25T21:33:01.601Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -131,7 +131,7 @@
     "endToEndMemoryScoreGate": {
       "path": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "exists": true,
-      "hash": "sha256:f3a5f17fab3b9a23fa2e2401e6994104d0641a3872852e7cccc3a6bb2748f50b",
+      "hash": "sha256:db1299d6b11123f2cefeb89feda00cbd0ec3ef21211effe66950352b40c35640",
       "mode": "end-to-end-memory-score-gate",
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -458,7 +458,7 @@
     "liveLocalAnswerQualityPresent": true,
     "liveProviderAnswerQualityPresent": true,
     "voyageProviderRateLimited": true,
-    "reviewerApprovalsPresent": false,
+    "reviewerApprovalsPresent": true,
     "endToEndMemoryScorePresent": true,
     "publicClaimsAllowedByInputs": false,
     "reportedMemoryTargetsPresent": true,
@@ -466,8 +466,7 @@
   },
   "blockers": [
     "all-current-result-files-keep-public-claims-disabled",
-    "missing-voyage-answer-quality-same-data-result",
-    "missing-two-independent-memory-score-reviewer-approvals"
+    "missing-voyage-answer-quality-same-data-result"
   ],
   "nextActions": [
     "Use MTEB and model-card evidence only to choose embedding and reranker candidates.",

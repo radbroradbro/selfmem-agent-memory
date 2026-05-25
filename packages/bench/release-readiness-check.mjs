@@ -115,6 +115,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
   "packages/bench/memory-score-reviewer-approval-intake.mjs",
+  "packages/bench/memory-score-openai-compatible-reviewer.mjs",
   "packages/bench/end-to-end-memory-score-gate.mjs",
   "packages/bench/public-benchmark-autoresearch-loop.mjs",
   "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
@@ -539,6 +540,7 @@ const requiredScripts = [
   "benchmark:provider-challenger:result-gate",
   "benchmark:memory-score:result-gate",
   "benchmark:memory-score:reviewer-intake",
+  "benchmark:memory-score:reviewer:openai-compatible",
   "benchmark:sota-ladder",
   "benchmark:sota-ladder:packet",
   "goal:audit",
@@ -1797,24 +1799,26 @@ check("fresh public benchmark target check passes", () => {
   }
   assert.equal(memoryScoreReviewerIntakeEvidence.ok, true);
   assert.equal(memoryScoreReviewerIntakeEvidence.mode, "memory-score-reviewer-approval-intake");
-  assert.equal(memoryScoreReviewerIntakeEvidence.status, "BLOCKED_MEMORY_SCORE_REVIEWERS");
+  assert.equal(memoryScoreReviewerIntakeEvidence.status, "READY_MEMORY_SCORE_REVIEWERS");
   assert.equal(memoryScoreReviewerIntakeEvidence.metricsOnly, true);
   assert.equal(memoryScoreReviewerIntakeEvidence.publicSafe, true);
   assert.equal(memoryScoreReviewerIntakeEvidence.callsProviderApis, false);
   assert.equal(memoryScoreReviewerIntakeEvidence.sendsBenchmarkTextToProvider, false);
-  assert.equal(memoryScoreReviewerIntakeEvidence.publicBenchmarkApprovalReady, false);
-  assert.equal(memoryScoreReviewerIntakeEvidence.countsAsFullMemorySotaReview, false);
-  assert.equal(memoryScoreReviewerIntakeEvidence.reviewerApprovalCount, 0);
-  assert.equal(memoryScoreReviewerIntakeEvidence.independentReviewerCount, 0);
+  assert.equal(memoryScoreReviewerIntakeEvidence.publicBenchmarkApprovalReady, true);
+  assert.equal(memoryScoreReviewerIntakeEvidence.countsAsFullMemorySotaReview, true);
+  assert.equal(memoryScoreReviewerIntakeEvidence.reviewerApprovalCount, 2);
+  assert.equal(memoryScoreReviewerIntakeEvidence.independentReviewerCount, 2);
   assert.equal(memoryScoreReviewerIntakeEvidence.target?.memoryBenchAnswerQuality, true);
   assert.equal(memoryScoreReviewerIntakeEvidence.target?.fixtureOnly, false);
   assert.equal(memoryScoreReviewerIntakeEvidence.target?.scoredQueryCount, 30);
   assert.match(String(memoryScoreReviewerIntakeEvidence.target?.resultHash), /^sha256:/);
-  assert.ok(memoryScoreReviewerIntakeEvidence.blockers.includes("two-independent-reviewer-approvals-missing"));
+  assert.deepEqual(memoryScoreReviewerIntakeEvidence.blockers, []);
+  assert.ok(memoryScoreReviewerIntakeEvidence.reviews?.some((review) => review.provider === "deepseek-pro" && review.countable === true));
+  assert.ok(memoryScoreReviewerIntakeEvidence.reviews?.some((review) => review.provider === "zai" && review.countable === true));
   assert.equal(memoryScoreReviewerIntakeEvidence.safety?.requiresResultBinding, true);
   assert.equal(memoryScoreReviewerIntakeEvidence.safety?.requiresTwoIndependentReviewersForClaims, true);
   assert.match(memoryScoreReviewerIntakeMarkdownFresh, /Memory Score Reviewer Approval Intake/);
-  assert.match(memoryScoreReviewerIntakeMarkdownEvidence, /BLOCKED_MEMORY_SCORE_REVIEWERS/);
+  assert.match(memoryScoreReviewerIntakeMarkdownEvidence, /READY_MEMORY_SCORE_REVIEWERS/);
   assert.equal(answerQualityArmExportLiveLocalEvidence.mode, "public-benchmark-answer-quality-arm-export");
   assert.equal(answerQualityArmExportLiveLocalEvidence.status, "EXPORTED_RESPONSE_ARMS");
   assert.equal(answerQualityArmExportLiveLocalEvidence.fixtureOnly, false);
@@ -1863,10 +1867,11 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(endToEndMemoryScoreGateEvidence.result?.arms?.includes("local-apple-qwen3-0_6b-local-rerank"));
   assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("missing-voyage-provider-arm"));
   assert.equal(endToEndMemoryScoreGateEvidence.blockers.includes("missing-nvidia-or-gemini-provider-arm"), false);
-  assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("memory-score-reviewer-approval-report-not-ready"));
-  assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("missing-two-independent-reviewer-approvals"));
+  assert.equal(endToEndMemoryScoreGateEvidence.blockers.includes("memory-score-reviewer-approval-report-not-ready"), false);
+  assert.equal(endToEndMemoryScoreGateEvidence.blockers.includes("missing-two-independent-reviewer-approvals"), false);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.exists, true);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.targetBound, true);
+  assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.reviewerApprovalCount, 2);
   for (const preflight of [answerQualityPreflightFresh, answerQualityPreflightEvidence]) {
     assert.equal(preflight.ok, true);
     assert.equal(preflight.mode, "public-benchmark-answer-quality-preflight");
