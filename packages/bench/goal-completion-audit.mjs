@@ -87,6 +87,15 @@ const files = {
   issueDraft: `${reviewDir}/issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md`,
   browserEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
   releaseReadinessEvidence: `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
+  benchmarkSotaReadiness: `${reviewDir}/benchmark-sota-readiness-20260525.md`,
+  benchmarkSotaLadderReport: `${reviewDir}/sota-ladder-report-20260525.json`,
+  benchmarkSotaLadderMarkdown: `${reviewDir}/sota-ladder-report-20260525.md`,
+  benchmarkSotaOperatorPacket: `${reviewDir}/sota-ladder-operator-packet-20260525.json`,
+  benchmarkSotaOperatorMarkdown: `${reviewDir}/sota-ladder-operator-packet-20260525.md`,
+  queryExpansionPreflightReport: `${reviewDir}/query-expansion-preflight-20260525.json`,
+  queryExpansionPreflightMarkdown: `${reviewDir}/query-expansion-preflight-20260525.md`,
+  queryExpansionLiveLocalSmokeReport: `${reviewDir}/query-expansion-live-local-smoke-20260525.json`,
+  queryExpansionLiveLocalSmokeMarkdown: `${reviewDir}/query-expansion-live-local-smoke-20260525.md`,
 };
 
 for (const [name, file] of Object.entries(files)) {
@@ -110,6 +119,10 @@ const budgetedBaselineReviewedReturnedPacketIntake = JSON.parse(readFileSync(joi
 const budgetedBaselineReviewedNextRun = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewedNextRun), "utf8"));
 const releaseReadinessEvidence = JSON.parse(readFileSync(join(root, files.releaseReadinessEvidence), "utf8"));
 const currentHeadLiveEvidence = JSON.parse(readFileSync(join(root, files.browserEvidence), "utf8"));
+const benchmarkSotaLadder = JSON.parse(readFileSync(join(root, files.benchmarkSotaLadderReport), "utf8"));
+const benchmarkSotaOperatorPacket = JSON.parse(readFileSync(join(root, files.benchmarkSotaOperatorPacket), "utf8"));
+const queryExpansionPreflight = JSON.parse(readFileSync(join(root, files.queryExpansionPreflightReport), "utf8"));
+const queryExpansionLiveLocalSmoke = JSON.parse(readFileSync(join(root, files.queryExpansionLiveLocalSmokeReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
     .filter(([, file]) => file.endsWith(".md"))
@@ -224,6 +237,31 @@ assert.equal(budgetedBaselineReviewedReturnedPacketIntake.publicLaunchAllowed, f
 assert.equal(budgetedBaselineReviewedNextRun.status, "READY_FOR_OWNER_REVIEW");
 assert.equal(budgetedBaselineReviewedNextRun.readyForOwnerReview, true);
 assert.equal(budgetedBaselineReviewedNextRun.publicLaunchAllowed, false);
+assert.equal(benchmarkSotaLadder.mode, "public-benchmark-sota-ladder");
+assert.equal(benchmarkSotaLadder.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+assert.equal(benchmarkSotaLadder.publicBenchmarkClaimsAllowed, false);
+assert.equal(benchmarkSotaLadder.componentBenchmarksAreModelSelectionOnly, true);
+assert.ok(benchmarkSotaLadder.blockers.includes("missing-end-to-end-memory-benchmark-score"));
+assert.ok(benchmarkSotaLadder.blockers.includes("missing-live-llm-query-expansion-result"));
+assert.ok(benchmarkSotaLadder.blockers.includes("missing-local-apple-reranker-sidecar-result"));
+assert.equal(benchmarkSotaOperatorPacket.mode, "public-benchmark-sota-operator-packet");
+assert.equal(benchmarkSotaOperatorPacket.status, "BLOCKED_SOTA_OPERATOR_INPUTS");
+assert.equal(benchmarkSotaOperatorPacket.publicBenchmarkClaimsAllowed, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionImplementation?.liveLlmExpansionWiringPresent, true);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionImplementation?.liveLlmExpansionProven, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLocalSmoke?.evidenceExists, true);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLocalSmoke?.publicBenchmarkClaimsAllowed, false);
+assert.equal(queryExpansionPreflight.mode, "public-benchmark-query-expansion-preflight");
+assert.equal(queryExpansionPreflight.status, "BLOCKED_QUERY_EXPANSION_ENV");
+assert.equal(queryExpansionPreflight.readiness?.liveLlmExpansionWiringPresent, true);
+assert.equal(queryExpansionPreflight.readiness?.queryExpansionCanBeBenchmarked, false);
+assert.ok(queryExpansionPreflight.blockers.includes("no-query-expansion-arm-ready"));
+assert.equal(queryExpansionLiveLocalSmoke.mode, "query-expansion-live-local-smoke");
+assert.equal(queryExpansionLiveLocalSmoke.ok, true);
+assert.equal(queryExpansionLiveLocalSmoke.claimUse, "wiring-smoke-only");
+assert.equal(queryExpansionLiveLocalSmoke.publicBenchmarkClaimsAllowed, false);
+assert.equal(queryExpansionLiveLocalSmoke.queryExpansionOnlyCurrentQuerySent, true);
+assert.equal(queryExpansionLiveLocalSmoke.queryExpansionStoredMemoriesSent, false);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -447,6 +485,21 @@ const requirements = [
     "packages/bench/baseline-evidence-packet-review.mjs",
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
+  incomplete("full-memory-sota-benchmark-gate", "Full same-data memory benchmark/SOTA gate remains incomplete until end-to-end answer quality, live query expansion, local reranker, provider challengers, reviewers, UI, docs, and owner approval all pass", [
+    files.benchmarkSotaReadiness,
+    files.benchmarkSotaLadderReport,
+    files.benchmarkSotaLadderMarkdown,
+    files.benchmarkSotaOperatorPacket,
+    files.benchmarkSotaOperatorMarkdown,
+    files.queryExpansionPreflightReport,
+    files.queryExpansionPreflightMarkdown,
+    files.queryExpansionLiveLocalSmokeReport,
+    files.queryExpansionLiveLocalSmokeMarkdown,
+    "packages/bench/public-benchmark-sota-ladder.mjs",
+    "packages/bench/public-benchmark-sota-operator-packet.mjs",
+    "packages/bench/public-benchmark-query-expansion-preflight.mjs",
+    "packages/bench/recallweave-response-export.mjs",
+  ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [
     `${reviewDir}/brain-ui-canary-rollout-evidence.md`,
     files.realCanaryDiagnosticEvidence,
@@ -477,7 +530,7 @@ const report = {
   latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
   goalComplete: false,
   mayCallUpdateGoalComplete: false,
-  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, including a fresh budgeted-context rerun, two independent reviewer approvals, and a reviewed comparison packet. Human approval and real rollout requirements remain unresolved.",
+  reason: "The core preview work and source-matched hosted mirror baseline are evidenced, including a fresh budgeted-context rerun, two independent reviewer approvals, and a reviewed comparison packet. Human approval, full-memory SOTA benchmark evidence, and real rollout requirements remain unresolved.",
   counts: {
     total: requirements.length,
     proven: requirements.filter((item) => item.status === "proven").length,
