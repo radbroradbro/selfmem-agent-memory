@@ -163,13 +163,18 @@ Date: 2026-05-23
   reranker sidecar gate, promoting `d1615df0` as the latest verified
   code/product baseline while preserving `18d606a` as the approved runtime
   canary adapter/report commit.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26378580702` passed on `f2feec90`, promoting the returned canary
+  zip-classification hardening as the latest verified code/product baseline
+  while preserving `18d606a` as the approved runtime canary adapter/report
+  commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-25T01:12:09Z
+- PR body refreshed at: 2026-05-25T01:34:28Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-25T01:12:10Z
-- PR body hash: 9d5626c74242c6c10e380c0c403163be5f7cc97139b90d4ce6f9f083907e9a4a
+- Issue updated at: 2026-05-25T01:34:30Z
+- PR body hash: 64e40e6db57414860d7a785706d603981b94ae29651b9979f74231c9a9f76572
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 0f78e289809245ce3c90d3ce6305a0650b9789d4b4231dd2a9a6c41c7275be0a
+- Issue body hash: ce43c384354832b30a4c3d94e6abc179d74e0a5abe2721b43f301683f2e6bcd1
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

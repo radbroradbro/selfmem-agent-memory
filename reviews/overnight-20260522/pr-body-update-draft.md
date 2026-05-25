@@ -2,7 +2,7 @@
 
 Live status:
 
-- PR #5 body was updated from this public-safe source on 2026-05-23.
+- PR #5 body was updated from this public-safe source on 2026-05-25.
 - The release blocker issue was created as GitHub issue #6.
 - The GitHub connector itself still returned `401 token_expired`, so the write
   used the local git credential helper without printing or committing the
@@ -192,8 +192,10 @@ Live status:
 - Adds `canary:returned-downloads:strict` as the named release-blocking command
   for the same standard inbox scan with `--require-found` always enabled.
 - Refreshes the current standard-inbox scan: 0 production evidence packets, 1
-  handoff packet, 8 diagnostics, 19 unknown packets, and 5 unreadable packets.
-  The findings now include hash-only triage for unknown and unreadable zips.
+  handoff packet, 10 diagnostics, 22 unknown packets, and 0 unreadable packets.
+  The scanner now classifies zip contents with sanitized basenames, emits only
+  safe labels, hashes, counts, and status codes, and still refuses to count
+  handoff packets, diagnostics, or unknown zips as production canary evidence.
   Public launch and real-container rollout remain blocked.
 - Hardens the canary batch-audit and next-agent packet paths so empty,
   handoff-only, or no-candidate folders fail closed as metrics-only JSON,
@@ -221,6 +223,17 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
+  `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
+- Commit `f2feec90880e87481fbd05ca70ff272cd6f2fb92` hardens returned canary
+  inbox/downloads classification so path-like zip entries no longer make a
+  packet unreadable before classification. Public output remains metrics only,
+  and the refreshed standard-inbox scan still reports 0 production evidence
+  packets.
+- GitHub Actions run `26378580702`: passed CI after the returned canary scanner
+  hardening. This does not change the approved runtime canary adapter/report
+  commit.
+- Previous verified code/product baseline before returned canary scanner
+  hardening:
   `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
 - Commit `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b` adds the env-only
   `local-apple-qwen3-0_6b-local-rerank` challenger gate. It keeps the measured
@@ -247,15 +260,16 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-  `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
-- GitHub Actions run `26378052431`: passed CI with release checks, live GitHub
+  `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
+- GitHub Actions run `26378580702`: passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
   beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
   records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
-  a blocked-until-endpoint challenger, and requires returned one-agent canary
-  packets to report the approved runtime adapter commit.
+  a blocked-until-endpoint challenger, hardens returned canary zip
+  classification, and requires returned one-agent canary packets to report the
+  approved runtime adapter commit.
 - Current live Voyage provider evidence now includes both a 6-query and
   30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
   `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on

@@ -166,6 +166,11 @@ Verdict: resolved for PR body and blocker issue writes.
     Qwen3 0.6B and 4B provider runs and promoting `6c72c194` as the latest
     verified code/product baseline while preserving `18d606a` as the approved
     runtime canary adapter/report commit. Updated at: 2026-05-25T00:37:15Z.
+  - PR #5 and issue #6 were refreshed again after GitHub Actions run
+    `26378580702` passed on `f2feec90`, promoting returned canary
+    zip-classification hardening as the latest verified code/product baseline
+    while preserving `18d606a` as the approved runtime canary adapter/report
+    commit. Updated at: 2026-05-25T01:34:30Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -194,8 +199,9 @@ Verdict: resolved for PR body and blocker issue writes.
     refresh, public LongMemEval-S slice-manifest refresh, latest public
     LongMemEval-S slice CI baseline refresh, public LongMemEval-S run-only
     target refresh, latest public LongMemEval-S run-target CI baseline refresh,
-    and commit-bound OpenClaw handoff refresh
-  - Updated at: 2026-05-24T16:18:31Z
+    commit-bound OpenClaw handoff refresh, and returned canary
+    zip-classification baseline refresh
+  - Updated at: 2026-05-25T01:34:30Z
 
 ## Safety
 
