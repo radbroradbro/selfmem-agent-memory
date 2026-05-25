@@ -10,10 +10,14 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`.
+- `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
 - GitHub Actions run `26377087807` passed CI after recording the local Apple
   provider runs.
   This did not change the approved runtime canary adapter/report commit.
+- GitHub Actions run `26378052431` passed CI after adding the env-only local
+  reranker sidecar gate. The sidecar arm is fixture-covered and fail-closed, has
+  no live quality result yet, and does not change the approved runtime canary
+  adapter/report commit.
 - Commit `dbac92e7428904a044754de30b7e11189aedeb9c` adds metrics-only local
   Apple benchmark preflight evidence and corrects the local-model status so the
   branch does not imply a live local reranker has already been tested. Local
@@ -27,14 +31,15 @@ requirements are resolved.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`.
-- GitHub Actions run `26377087807` passed CI with release checks, live GitHub
+- `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
+- GitHub Actions run `26378052431` passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
   beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
-  records Qwen3 0.6B and 4B local Apple runs, and requires returned one-agent
-  canary packets to report the approved runtime adapter commit.
+  records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
+  a blocked-until-endpoint challenger, and requires returned one-agent canary
+  packets to report the approved runtime adapter commit.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568` passed CI after requiring a same-data

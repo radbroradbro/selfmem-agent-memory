@@ -221,7 +221,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-  `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`.
+  `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
+- Commit `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b` adds the env-only
+  `local-apple-qwen3-0_6b-local-rerank` challenger gate. It keeps the measured
+  Qwen3 0.6B Apple Silicon embedding lane fixed and only swaps the final
+  reranker to a local sidecar when `SELFMEM_LOCAL_RERANK_ENDPOINT` or
+  `SELFMEM_LOCAL_RERANK_BASE_URL` exists. This is fixture-covered and
+  fail-closed. It has no live quality result and is not promoted.
 - Commit `dbac92e7428904a044754de30b7e11189aedeb9c` added public-safe local
   Apple benchmark preflight evidence and corrected the local-model wording so
   the repo does not imply a live local reranker has already been tested. Local
@@ -235,17 +241,21 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - GitHub Actions run `26377087807`: passed CI after recording the local Apple
   provider runs. This does not change the approved runtime canary adapter/report
   commit.
+- GitHub Actions run `26378052431`: passed CI after adding the local reranker
+  sidecar gate and the release guard allowlist for its Brain UI smoke checks.
+  This does not change the approved runtime canary adapter/report commit.
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-  `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`.
-- GitHub Actions run `26377087807`: passed CI with release checks, live GitHub
+  `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
+- GitHub Actions run `26378052431`: passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
   beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
-  records Qwen3 0.6B and 4B local Apple runs, and requires returned one-agent
-  canary packets to report the approved runtime adapter commit.
+  records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
+  a blocked-until-endpoint challenger, and requires returned one-agent canary
+  packets to report the approved runtime adapter commit.
 - Current live Voyage provider evidence now includes both a 6-query and
   30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
   `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on

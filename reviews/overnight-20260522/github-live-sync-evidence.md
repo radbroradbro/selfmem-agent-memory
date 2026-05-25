@@ -159,13 +159,17 @@ Date: 2026-05-23
   Qwen3 0.6B and 4B provider runs, promoting `6c72c194` as the latest verified
   code/product baseline while preserving `18d606a` as the approved runtime
   canary adapter/report commit.
+- PR #5 and issue #6 were refreshed again after adding the env-only local
+  reranker sidecar gate, promoting `d1615df0` as the latest verified
+  code/product baseline while preserving `18d606a` as the approved runtime
+  canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-25T00:37:13Z
+- PR body refreshed at: 2026-05-25T01:12:09Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-25T00:37:15Z
-- PR body hash: 3d2695e066e6a639b39ebcfde9bc1621902bef70c7b9a17687c405ceea1702d5
+- Issue updated at: 2026-05-25T01:12:10Z
+- PR body hash: 9d5626c74242c6c10e380c0c403163be5f7cc97139b90d4ce6f9f083907e9a4a
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: c27eb9b49893e458fc0fed7cf1e2b726bfdc7683a01aa7a7c7e0eee0cdcb04d7
+- Issue body hash: 0f78e289809245ce3c90d3ce6305a0650b9789d4b4231dd2a9a6c41c7275be0a
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
