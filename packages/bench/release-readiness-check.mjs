@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -9,6 +20,22 @@ import process from "node:process";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir());
+const originalTmpDir = tmpdir();
+const staleTempCleanupReport = cleanupStaleRecallWeaveTempRoots([originalTmpDir, "/private/tmp"], {
+  maxAgeMs: Number(process.env.RECALLWEAVE_RELEASE_TEMP_MAX_AGE_MS ?? 30 * 60 * 1000),
+});
+const releaseTempRoot = mkdtempSync(join(originalTmpDir, "recallweave-release-check-root-"));
+process.env.TMPDIR = releaseTempRoot;
+process.env.TMP = releaseTempRoot;
+process.env.TEMP = releaseTempRoot;
+
+process.on("exit", () => {
+  try {
+    rmSync(releaseTempRoot, { recursive: true, force: true });
+  } catch {
+    // Best effort only. The next release check removes stale RecallWeave temp roots.
+  }
+});
 
 const requiredFiles = [
   "README.md",
@@ -520,6 +547,14 @@ check("required scripts exist", () => {
   for (const script of requiredScripts) {
     assert.equal(typeof pkg.scripts?.[script], "string", `missing script ${script}`);
   }
+});
+
+check("stale RecallWeave temp cleanup guard passes", () => {
+  assert.equal(staleTempCleanupReport.ok, true);
+  assert.equal(staleTempCleanupReport.metricsOnly, true);
+  assert.equal(staleTempCleanupReport.printsPaths, false);
+  assert.equal(staleTempCleanupReport.onlyRecallWeavePrefix, true);
+  assert.ok(staleTempCleanupReport.maxAgeMs >= 0);
 });
 
 check("selfmem_update command is mapped", () => {
@@ -5785,6 +5820,53 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
   return result;
+}
+
+function cleanupStaleRecallWeaveTempRoots(roots, { maxAgeMs }) {
+  const now = Date.now();
+  const seen = new Set();
+  const report = {
+    ok: true,
+    mode: "release-temp-cleanup-guard",
+    metricsOnly: true,
+    printsPaths: false,
+    onlyRecallWeavePrefix: true,
+    maxAgeMs,
+    rootCount: 0,
+    candidates: 0,
+    removed: 0,
+    skippedYoung: 0,
+    skippedSymlink: 0,
+    skippedError: 0,
+  };
+
+  for (const rootPath of roots) {
+    if (!rootPath || seen.has(rootPath) || !existsSync(rootPath)) continue;
+    seen.add(rootPath);
+    report.rootCount += 1;
+    for (const entry of readdirSync(rootPath, { withFileTypes: true })) {
+      if (!entry.name.startsWith("recallweave-")) continue;
+      report.candidates += 1;
+      const candidate = join(rootPath, entry.name);
+      try {
+        const stat = lstatSync(candidate);
+        if (stat.isSymbolicLink()) {
+          report.skippedSymlink += 1;
+          continue;
+        }
+        if (now - stat.mtimeMs < maxAgeMs) {
+          report.skippedYoung += 1;
+          continue;
+        }
+        rmSync(candidate, { recursive: true, force: true });
+        report.removed += 1;
+      } catch {
+        report.skippedError += 1;
+      }
+    }
+  }
+
+  return report;
 }
 
 function assertNativeMemory(value) {
