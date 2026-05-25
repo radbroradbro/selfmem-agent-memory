@@ -168,13 +168,18 @@ Date: 2026-05-23
   zip-classification hardening as the latest verified code/product baseline
   while preserving `18d606a` as the approved runtime canary adapter/report
   commit.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26379062431` passed on `fba92059`, promoting the 12-hour returned canary
+  standard-inbox watcher alias as the latest verified code/product baseline
+  while preserving `18d606a` as the approved runtime canary adapter/report
+  commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-25T01:34:28Z
+- PR body refreshed at: 2026-05-25T01:52:27Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-25T01:34:30Z
-- PR body hash: 64e40e6db57414860d7a785706d603981b94ae29651b9979f74231c9a9f76572
+- Issue updated at: 2026-05-25T01:52:28Z
+- PR body hash: 6744b21d7a4b5b73cd516d0038d6c97a48d95e44521e2652ba4b2421491105d4
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: ce43c384354832b30a4c3d94e6abc179d74e0a5abe2721b43f301683f2e6bcd1
+- Issue body hash: 7154c8698adab7ac0463255a31e17c87f73611f2c491659ab5732979902c2947
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

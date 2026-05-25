@@ -191,6 +191,10 @@ Live status:
   note into the next-agent workspace.
 - Adds `canary:returned-downloads:strict` as the named release-blocking command
   for the same standard inbox scan with `--require-found` always enabled.
+- Adds `canary:returned-downloads:watch12h` for maintainer supervision. It
+  checks the standard Downloads and Telegram Desktop inboxes every 15 minutes
+  for 12 hours, requires production-grade evidence, and exits nonzero if no
+  returned production canary packet appears.
 - Refreshes the current standard-inbox scan: 0 production evidence packets, 1
   handoff packet, 10 diagnostics, 22 unknown packets, and 0 unreadable packets.
   The scanner now classifies zip contents with sanitized basenames, emits only
@@ -223,6 +227,16 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
+  `fba92059552c155436e84bb05d87b1fd6aef9add`.
+- Commit `fba92059552c155436e84bb05d87b1fd6aef9add` adds the
+  `canary:returned-downloads:watch12h` maintainer supervision alias and
+  documents the 12-hour watch flow. It does not change the approved runtime
+  canary adapter/report commit, and it keeps public launch blocked until a real
+  returned production packet passes intake.
+- GitHub Actions run `26379062431`: passed CI after adding the 12-hour returned
+  canary watch alias.
+- Previous verified code/product baseline before the 12-hour returned canary
+  watcher:
   `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
 - Commit `f2feec90880e87481fbd05ca70ff272cd6f2fb92` hardens returned canary
   inbox/downloads classification so path-like zip entries no longer make a
@@ -260,16 +274,17 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-  `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
-- GitHub Actions run `26378580702`: passed CI with release checks, live GitHub
+- `fba92059552c155436e84bb05d87b1fd6aef9add`.
+- GitHub Actions run `26379062431`: passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
   beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
   records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
   a blocked-until-endpoint challenger, hardens returned canary zip
-  classification, and requires returned one-agent canary packets to report the
-  approved runtime adapter commit.
+  classification, adds the 12-hour returned canary watcher, and requires
+  returned one-agent canary packets to report the approved runtime adapter
+  commit.
 - Current live Voyage provider evidence now includes both a 6-query and
   30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
   `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on

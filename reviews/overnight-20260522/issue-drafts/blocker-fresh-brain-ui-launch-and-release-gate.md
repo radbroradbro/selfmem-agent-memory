@@ -10,7 +10,12 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
+- `fba92059552c155436e84bb05d87b1fd6aef9add`.
+- GitHub Actions run `26379062431` passed CI after adding the 12-hour returned
+  canary standard-inbox watcher alias. The watcher checks Downloads and
+  Telegram Desktop every 15 minutes for 12 hours, requires production-grade
+  evidence, and exits nonzero if no returned production packet appears. This did
+  not change the approved runtime canary adapter/report commit.
 - GitHub Actions run `26378580702` passed CI after hardening returned canary
   inbox/downloads classification. Path-like zip entries no longer make a
   packet unreadable before classification, public output remains metrics only,
@@ -37,16 +42,20 @@ requirements are resolved.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
-- GitHub Actions run `26378580702` passed CI with release checks, live GitHub
+- `fba92059552c155436e84bb05d87b1fd6aef9add`.
+- GitHub Actions run `26379062431` passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
   beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
   records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
   a blocked-until-endpoint challenger, hardens returned canary zip
-  classification, and requires returned one-agent canary packets to report the
-  approved runtime adapter commit.
+  classification, adds the 12-hour returned canary watcher, and requires
+  returned one-agent canary packets to report the approved runtime adapter
+  commit.
+- Previous verified code/product baseline before the 12-hour returned canary
+  watcher:
+  `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
 - Previous verified code/product baseline before returned canary scanner
   hardening:
   `d1615df09ab7e13fc2f1b39c74dbe6de7128f07b`.
