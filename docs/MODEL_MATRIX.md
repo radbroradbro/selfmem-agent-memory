@@ -32,14 +32,52 @@ Use `SELFMEM_LOCAL_EMBED_BASE_URL=http://127.0.0.1:8080/v1`.
 
 Current benchmark support for this lane is local embeddings plus the
 deterministic RecallWeave rerank proxy. The provider gate fixture includes the
-local Apple arm, and the live preflight currently blocks until
-`SELFMEM_LOCAL_EMBED_BASE_URL` points at a running local embedding server. A
-live Apple Silicon model result has not been recorded yet.
+local Apple arm. A live 30-query public LongMemEval-S retrieval-proxy result is
+now recorded for this lane with a 900-token head/tail embedding view and a
+persistent document embedding cache. The warm-cache run tied BM25 on quality
+and reached 133 ms p50 latency, but it did not beat BM25 and should not be
+promoted as the default retrieval winner.
+
+For the stable local benchmark path, start llama.cpp in single-slot embedding
+mode and keep document embeddings cached:
+
+```bash
+llama-server -hf Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0 \
+  --embedding --host 127.0.0.1 --port 8080 \
+  -c 8192 -b 4096 -ub 4096 -np 1 -nocb --cache-ram 0
+```
+
+Then set:
+
+```bash
+SELFMEM_LOCAL_EMBED_BASE_URL=http://127.0.0.1:8080/v1
+SELFMEM_LOCAL_EMBED_MAX_TOKENS=900
+SELFMEM_LOCAL_EMBED_BATCH_MAX_COUNT=1
+```
+
+The default 3000-token embedding view remains useful for cloud arms and may
+work with other local runtimes, but it crashed this llama.cpp server on the
+30-query local Apple run. Treat that as a runtime configuration blocker until a
+new local server build or sidecar proves otherwise.
 
 The reranker lane should first test Qwen3 Reranker 0.6B through a local
 OpenAI-compatible rerank endpoint or a small sidecar process. Qwen3 Reranker
 4B and 8B stay optional quality arms. They are not the default for 24GB Macs
 until measured latency and memory pressure justify them.
+
+The scaled Apple Silicon challenger is `local-apple-qwen3-4b`. It uses
+Qwen3 Embedding 4B GGUF as a separate benchmark arm, not an env-only override
+of the 0.6B default. Qwen's model card lists 32K context, up to 2560 embedding
+dimensions, and GGUF quantizations including `Q4_K_M`, so the first local
+quality attempt should use `Q4_K_M` on 24GB-class Macs before trying heavier
+quantizations. It must run against the same BM25 and full-hybrid controls and
+must earn promotion with measured quality, not model-card scores.
+
+The first measured `local-apple-qwen3-4b` run completed on the 30-query
+LongMemEval-S retrieval-proxy target. It tied BM25 on quality, but warm-cache
+latency was 290 ms p50, compared with 133 ms p50 for the earlier 0.6B warm
+run and 97 ms p50 for BM25 in the matched 4B warm report. Do not promote the
+4B embedder as the Apple default from this evidence.
 
 Local packages should come from source-locked model cards or Hugging Face GGUF
 artifacts that are known to run on Apple Silicon. Do not use a random quant or
@@ -118,6 +156,8 @@ local Apple Silicon arms:
 - `local-apple-qwen3-0_6b`: budgeted BM25 preselect, an OpenAI-compatible
   local Apple Silicon embedding server, sparse+dense+graph+temporal fusion,
   then the deterministic local rerank proxy until a local reranker passes.
+- `local-apple-qwen3-4b`: same local Apple Silicon stack, but labeled for
+  Qwen3 Embedding 4B GGUF and 2560-dimensional embeddings.
 
 Live provider benchmark calls require both `RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1`
 and `RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1`. The second flag is

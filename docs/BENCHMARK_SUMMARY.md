@@ -227,6 +227,55 @@ same OpenAI-compatible embedding endpoint and setting
 canary report and reviewer approval; model-size experiments are evidence, not
 marketing claims.
 
+The scaled local benchmark lane is now explicit as `local-apple-qwen3-4b`.
+It is intended for the user's 24GB-class Apple Silicon hardware as the first
+larger local challenger after the 0.6B baseline. It should start with the
+Qwen3 Embedding 4B `Q4_K_M` GGUF quantization, 2560 configured dimensions,
+the same 900-token local embedding view that stabilized the 0.6B run, and the
+same BM25 plus full-hybrid controls. It should not be presented as a default
+or public quality win unless the measured run beats the strongest control.
+
+That scaled lane now has a live 30-query result:
+
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-preflight.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-cold.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-cold.md`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-warm.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-warm.md`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-evidence.md`
+
+The 4B arm tied BM25 quality on the warm-cache run: quality 0.2506, P@1
+0.4667, recall@5 0.1583, NDCG@10 0.2193. Warm latency was 290 ms p50 and
+363 ms p95, versus BM25 at 97 ms p50 and 106 ms p95, and versus the 0.6B warm
+local arm's earlier 133 ms p50 and 200 ms p95. Cold cache fill was much slower
+at 31.3 s p50 and 53.9 s p95. This means scaling from 0.6B to 4B did not
+improve this retrieval target; the next local gain should come from reranking,
+query expansion, candidate selection, or chunking rather than raw embedding
+model size.
+
+A source-locked 30-query local Apple run is now recorded:
+
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-cached-live-preflight.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-cached-live-provider-900tok-8192ctx.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-cached-live-provider-900tok-8192ctx.md`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-cached-live-provider-900tok-warm.json`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-cached-live-provider-900tok-warm.md`
+- `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-cached-live-evidence.md`
+
+The stable local setup used a 900-token head/tail embedding view, single-slot
+llama.cpp on Apple Metal, Qwen3 Embedding 0.6B Q8 GGUF, and a persistent
+document embedding cache. Attempts with the default 3000-token local embedding
+view crashed the local llama.cpp server during embedding, so they are recorded
+as local runtime blockers, not quality results.
+
+On the warm-cache run, `local-apple-qwen3-0_6b` tied BM25 on retrieval-proxy
+quality: quality 0.2506, P@1 0.4667, recall@5 0.1583, NDCG@10 0.2193. Latency
+was 133 ms p50 and 200 ms p95, versus BM25 at 90 ms p50 and 105 ms p95. The
+warm run loaded 573 document cache entries, had 900 document cache hits, zero
+document cache misses, and zero privacy or redaction failures. This makes the
+local lane viable as a warm-index fallback, but it does not earn promotion over
+BM25 or the current Voyage cloud canary.
+
 Provider keys can stay in normal environment variables, or in private key files
 referenced by env vars such as `VOYAGE_API_KEYS_FILE`,
 `NVIDIA_API_KEYS_FILE`, and `GEMINI_API_KEYS_FILE`. Key files must live outside

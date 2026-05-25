@@ -48,6 +48,7 @@ const retrievalStrategies = [
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
   "local-apple-qwen3-0_6b",
+  "local-apple-qwen3-4b",
 ];
 const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
 const contextTokenBudget = optionalPositiveInt(
@@ -272,7 +273,7 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "cloud-gemini-embed-rerank-proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
   if (options.strategy === "cloud-gemini-voyage-rerank") return rankCloudGeminiVoyageRerank(query, candidates, options);
   if (nvidiaStrategyConfig(options.strategy)) return rankCloudNvidiaHybrid(query, candidates, options);
-  if (options.strategy === "local-apple-qwen3-0_6b") return rankLocalAppleQwen(query, candidates, options);
+  if (localAppleStrategyConfig(options.strategy)) return rankLocalAppleQwen(query, candidates, options);
   return rankJaccard(queryText, candidates);
 }
 
@@ -564,7 +565,7 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
     );
     return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
   }
-  assertProviderBenchmarkAllowed("local-apple-qwen3-0_6b");
+  assertProviderBenchmarkAllowed(options.strategy);
   const queryVector = (await localAppleEmbed([queryText], { providerStats: options.providerStats }))[0];
   const documentVectors = await localAppleEmbedCandidates(densePool, { providerStats: options.providerStats });
   const denseRanked = densePool
@@ -830,6 +831,7 @@ function isProviderStrategy(strategy) {
     "cloud-nvidia-e5-mistral",
     "cloud-nvidia-code",
     "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-4b",
   ].includes(strategy);
 }
 
@@ -846,7 +848,7 @@ function requiredProvidersForStrategy(strategy) {
   if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
   if (voyageStrategyConfig(strategy)) return ["voyage"];
   if (nvidiaStrategyConfig(strategy)) return ["nvidia"];
-  if (strategy === "local-apple-qwen3-0_6b") return ["local-apple"];
+  if (localAppleStrategyConfig(strategy)) return ["local-apple"];
   return [];
 }
 
@@ -854,7 +856,7 @@ function embedModelForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiEmbedModel();
   if (voyageStrategyConfig(strategy)?.embedModel) return voyageStrategyConfig(strategy).embedModel;
   if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).embedModel;
-  if (strategy === "local-apple-qwen3-0_6b") return localAppleEmbedModel();
+  if (localAppleStrategyConfig(strategy)) return localAppleEmbedModel(strategy);
   return null;
 }
 
@@ -862,7 +864,7 @@ function embedDimensionsForStrategy(strategy) {
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiOutputDimensionality();
   if (voyageStrategyConfig(strategy)?.embedModel) return optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
   if (nvidiaStrategyConfig(strategy)) return optionalPositiveInt(process.env.NVIDIA_EMBED_DIMENSIONS ?? null, "NVIDIA output dimension");
-  if (strategy === "local-apple-qwen3-0_6b") return localAppleEmbedDimensions();
+  if (localAppleStrategyConfig(strategy)) return localAppleEmbedDimensions(strategy);
   return null;
 }
 
@@ -871,7 +873,7 @@ function rerankModelForStrategy(strategy) {
   if (voyageStrategyConfig(strategy)?.rerankModel) return voyageStrategyConfig(strategy).rerankModel;
   if (strategy === "cloud-gemini-embed-rerank-proxy") return "local-deterministic-rerank-proxy";
   if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).rerankModel;
-  if (strategy === "local-apple-qwen3-0_6b") return process.env.SELFMEM_LOCAL_RERANK_MODEL ?? "local-deterministic-rerank-proxy";
+  if (localAppleStrategyConfig(strategy)) return process.env.SELFMEM_LOCAL_RERANK_MODEL ?? "local-deterministic-rerank-proxy";
   return null;
 }
 
@@ -1350,12 +1352,29 @@ function nvidiaRerankEndpoint(config) {
   return `https://ai.api.nvidia.com/v1/retrieval/${nvidiaRerankModel(config)}/reranking`;
 }
 
-function localAppleEmbedModel() {
-  return String(process.env.SELFMEM_LOCAL_EMBED_MODEL ?? "Qwen/Qwen3-Embedding-0.6B-GGUF");
+function localAppleStrategyConfig(strategy = rankingStrategy) {
+  const configs = {
+    "local-apple-qwen3-0_6b": {
+      model: "Qwen/Qwen3-Embedding-0.6B-GGUF",
+      dimensions: 1024,
+    },
+    "local-apple-qwen3-4b": {
+      model: "Qwen/Qwen3-Embedding-4B-GGUF",
+      dimensions: 2560,
+    },
+  };
+  return configs[strategy] ?? null;
 }
 
-function localAppleEmbedDimensions() {
-  return optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_DIMENSIONS ?? "1024", "local Apple output dimension");
+function localAppleEmbedModel(strategy = rankingStrategy) {
+  return String(process.env.SELFMEM_LOCAL_EMBED_MODEL ?? localAppleStrategyConfig(strategy)?.model ?? "Qwen/Qwen3-Embedding-0.6B-GGUF");
+}
+
+function localAppleEmbedDimensions(strategy = rankingStrategy) {
+  return optionalPositiveInt(
+    process.env.SELFMEM_LOCAL_EMBED_DIMENSIONS ?? String(localAppleStrategyConfig(strategy)?.dimensions ?? 1024),
+    "local Apple output dimension",
+  );
 }
 
 function localAppleEmbedMaxEstimatedTokens() {

@@ -26,6 +26,23 @@ describe("public benchmark comparison contract", () => {
     expect(report.promotion.reason).not.toMatch(/hybrid-family arm/i);
   });
 
+  it("labels the scaled Apple Silicon arm separately from the 0.6B default", () => {
+    const report = runReport([
+      "--gate",
+      "provider",
+      "--fixture",
+      "--format",
+      "json",
+      "--strategies",
+      "bm25-lite,full-hybrid-rerank,local-apple-qwen3-4b",
+    ]);
+
+    const apple = report.strategies.find((item: { strategy: string }) => item.strategy === "local-apple-qwen3-4b");
+    expect(apple.provider.modelArm).toBe("local-apple-qwen3-4b");
+    expect(apple.provider.embedModel).toBe("Qwen/Qwen3-Embedding-4B-GGUF");
+    expect(apple.provider.embedDimensions).toBe(2560);
+  });
+
   it("blocks provider gates without both lexical and full-hybrid controls", () => {
     const result = runRaw([
       "--gate",
