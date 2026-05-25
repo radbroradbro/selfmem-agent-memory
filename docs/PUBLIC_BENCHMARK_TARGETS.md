@@ -147,6 +147,37 @@ An embedding arm can win MTEB and still lose RecallWeave memory quality if
 chunking, query expansion, temporal handling, graph traversal, or prompt budget
 is wrong. The autoresearch loop should let the full memory benchmark decide.
 
+For local model selection, prefer source-backed MTEB v2 or reranker evidence
+before spending Apple Silicon time. Current source-backed candidate ordering is:
+
+- quality-first local embedding challenger: Qwen3 Embedding 4B or 8B where
+  memory and latency allow,
+- consumer-hardware floor: Qwen3 Embedding 0.6B or EmbeddingGemma-class small
+  local embeddings,
+- local rerank challenger: Qwen3 Reranker 0.6B first, then 4B or 8B only when
+  latency and memory pressure are measured,
+- cloud quality challenger: Voyage 4 plus Voyage Rerank 2.5,
+- hosted retriever challenger: NVIDIA NeMo/Nemotron embedding and rerank arms.
+
+The local quality winner is whichever arm wins the same-data memory benchmark.
+MTEB v2 chooses the candidate list; it does not override a RecallWeave
+LongMemEval or MemoryBench loss.
+
+## Full Benchmark Gate
+
+The current 30-query LongMemEval-S run is a canary. It is enough to find method
+gaps and rate-limit issues, but it is not broad SOTA evidence. Broad SOTA or
+production-replacement wording requires a full benchmark run or an explicitly
+official comparable target. For the current LongMemEval-S source lock, that
+means the full 500-row public set or a target artifact whose claim tier is
+`public-benchmark`, `full-benchmark`, `officially-comparable`, or
+`broad-sota`.
+
+Canary trend language may say the method is improving on the frozen slice.
+Release language must wait until the full benchmark gate, same-data model
+comparability, reviewer intake, UI evidence, docs, release notes, owner
+approval, and real production canary are all current.
+
 ## Seed Targets
 
 These are targets for planning, not proof that the cited systems used the same
@@ -154,9 +185,16 @@ harness we will use.
 
 | Source | Benchmark | Reported metric | Target | Caveat |
 | --- | --- | --- | ---: | --- |
-| Supermemory README | LongMemEval | result | 81.6% | Reported as #1 by provider; match metric before using. |
-| Supermemory README | LoCoMo | rank | #1 | No numeric score in the checked README lines. |
-| Supermemory README | ConvoMem | rank | #1 | No numeric score in the checked README lines. |
+| Supermemory research | LongMemEval-S | overall, gpt-4o judge | 81.6% | Reported provider result; match dataset, scoring, judge, answer model, and session ingestion semantics before claiming a win. |
+| Supermemory research | LongMemEval-S | overall, gpt-5 judge | 84.6% | Reported provider result; use as a target row, not as live Supermemory usage. |
+| Supermemory research | LongMemEval-S | overall, gemini-3-pro judge | 85.2% | Current primary reported production/research target for the SOTA ladder. |
+| Supermemory ASMR blog | LongMemEval-S | experimental agentic flow | 98.6% | Ceiling reference only. The source labels it experimental and not the core production Supermemory engine. |
+| Qwen3 official repo | MTEB English v2 | embedding mean task | 75.22 | Qwen3 Embedding 8B component score; choose local challenger arms only. |
+| Qwen3 official repo | MTEB English v2 | embedding mean task | 74.60 | Qwen3 Embedding 4B component score; plausible quality-first Apple/local challenger. |
+| Qwen3 official repo | MTEB-R | reranker score | 69.76 | Qwen3 Reranker 4B component score; test only if local latency and memory fit. |
+| Google EmbeddingGemma docs | MTEB multilingual v2 | small local embedding class | n/a | Small on-device baseline; lower hardware cost does not imply full memory quality. |
+| Voyage model docs | Retrieval/rerank model card | model recommendation | n/a | Use Voyage 4 and rerank-2.5 as provider challengers; same-data answer-quality run still required. |
+| NVIDIA model docs | Rerank model card | model recommendation | n/a | Use Nemotron/NVIDIA NIM as hosted challenger; same-data answer-quality run still required. |
 | Mem0 state report | LoCoMo | score | 92.5 | Reported provider result with average tokens per query. |
 | Mem0 state report | LongMemEval | score | 94.4 | Reported provider result with average tokens per query. |
 | Mem0 state report | BEAM 1M | score | 64.1 | Use only when the BEAM slice and context depth match. |
@@ -351,10 +389,17 @@ harness we will use.
 - https://github.com/supermemoryai/memorybench
 - https://supermemory.ai/docs/memorybench/integrations
 - https://github.com/supermemoryai/supermemory/blob/main/README.md
+- https://supermemory.ai/research/
+- https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/
 - https://mem0.ai/blog/state-of-ai-agent-memory-2026
 - https://openreview.net/pdf?id=wIonk5yTDq
 - https://ai.google.dev/gemini-api/docs/models/gemini-embedding-2
+- https://ai.google.dev/gemma/docs/embeddinggemma
+- https://github.com/QwenLM/Qwen3-Embedding
 - https://huggingface.co/Qwen/Qwen3-Embedding-0.6B
+- https://www.mongodb.com/docs/voyageai/models/
+- https://docs.nvidia.com/nemo/retriever/
+- https://build.nvidia.com/nvidia/llama-nemotron-rerank-1b-v2/modelcard
 - https://huggingface.co/mteb
 - https://arxiv.org/abs/2210.07316
 - https://arxiv.org/abs/2605.12493

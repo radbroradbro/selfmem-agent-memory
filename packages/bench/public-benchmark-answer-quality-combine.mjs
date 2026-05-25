@@ -57,6 +57,8 @@ function loadAnswerQualityResult(pathLike) {
 
 function assertSameData(items) {
   const first = items[0].json;
+  assert.ok(first.provider?.answerModel, "first input must include answer model");
+  assert.ok(first.provider?.judgeModel, "first input must include judge model");
   for (const item of items.slice(1)) {
     assert.equal(item.json.target?.hash, first.target?.hash, "all inputs must share target hash");
     assert.equal(item.json.input?.targetHash, first.input?.targetHash, "all inputs must share input target hash");
@@ -65,6 +67,8 @@ function assertSameData(items) {
     assert.equal(item.json.input?.answerLabelsHash, first.input?.answerLabelsHash, "all inputs must share answer-label hash");
     assert.equal(item.json.input?.scoringCodeHash, first.input?.scoringCodeHash, "all inputs must share scoring-code hash");
     assert.equal(item.json.input?.scoredQueryCount, first.input?.scoredQueryCount, "all inputs must share scored-query count");
+    assert.equal(item.json.provider?.answerModel, first.provider.answerModel, "all inputs must share answer model");
+    assert.equal(item.json.provider?.judgeModel, first.provider.judgeModel, "all inputs must share judge model");
   }
 }
 
@@ -102,6 +106,8 @@ function buildCombinedReport(items) {
     },
     sourceLock: {
       sameDataAttestation: true,
+      sameAnswerModel: true,
+      sameJudgeModel: true,
       inputResultCount: items.length,
       inputResultHashes: items.map((item) => item.hash),
       inputResultPaths: items.map((item) => item.path),

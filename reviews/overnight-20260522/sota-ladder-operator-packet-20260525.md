@@ -9,6 +9,7 @@
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
 - best-end-to-end-score-below-reported-supermemory-target
+- missing-full-or-officially-comparable-memory-benchmark-run
 - voyage-provider-rate-limited
 
 ## Current Evidence
@@ -171,6 +172,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet <metrics-onl
 - The query-expansion arm states whether it is pure local or mixed local-plus-cloud, and mixed arms name the cloud substep.
 - The query-expansion arm proves live LLM expansion wiring before it is counted as an LLM query-expansion result.
 - The final claim uses an end-to-end memory answer-quality score, not retrieval-proxy or MTEB-only evidence.
+- Broad SOTA or production-replacement language waits for a full benchmark or officially comparable target, not only a 30-query canary.
 - Supermemory reported scores are comparison targets only unless the same harness/dataset/judge semantics are matched.
 - privacyLeakCount and redactionFailureCount are zero for every attached report.
 - Two independent reviewers approve the exact metrics-only packet before owner review or public release wording changes.

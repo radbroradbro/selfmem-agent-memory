@@ -1295,6 +1295,9 @@ check("model matrix and autoresearch gate stay conservative", () => {
   const budget = readFileSync(join(root, "configs/bench-budget.yaml"), "utf8");
 
   assert.match(modelMatrix, /Qwen3-Embedding-0\.6B-GGUF/);
+  assert.match(modelMatrix, /consumer-hardware floor/i);
+  assert.match(modelMatrix, /Qwen3 Embedding 4B or 8B/i);
+  assert.match(modelMatrix, /EmbeddingGemma-class small embeddings/i);
   assert.match(modelMatrix, /llama\.cpp/);
   assert.match(modelMatrix, /Apple Silicon/i);
   assert.match(modelMatrix, /NVIDIA NIM/i);
@@ -1306,8 +1309,14 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(autoresearchPlan, /same dataset slice/i);
   assert.match(autoresearchPlan, /same public data, repository or dataset revision/i);
   assert.match(autoresearchPlan, /must not optimize a solo RecallWeave run in isolation/i);
+  assert.match(autoresearchPlan, /Full Benchmark Rule/i);
+  assert.match(autoresearchPlan, /full 500-row public set/i);
   assert.match(autoresearchPlan, /BM25-lite as the lexical floor/i);
   assert.match(publicTargets, /Component Benchmarks/i);
+  assert.match(publicTargets, /Full Benchmark Gate/i);
+  assert.match(publicTargets, /85\.2%/);
+  assert.match(publicTargets, /Qwen3 Embedding 4B or 8B/i);
+  assert.match(publicTargets, /EmbeddingGemma-class small\s+local embeddings/i);
   assert.match(publicTargets, /MTEB, MMTEB, BEIR, MIRACL, MS MARCO/i);
   assert.match(publicTargets, /Do not test RecallWeave alone for quality/i);
   assert.match(publicTargets, /Minimum same-data matrix/i);
@@ -1503,6 +1512,9 @@ check("fresh public benchmark target check passes", () => {
     "--format",
     "markdown",
   ]).stdout;
+  const sotaLadderFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-sota-ladder.mjs"]).stdout);
+  const sotaLadderMarkdownFresh = run("node", ["packages/bench/public-benchmark-sota-ladder.mjs", "--format", "markdown"]).stdout;
+  const sotaOperatorPacketFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-sota-operator-packet.mjs"]).stdout);
   const answerQualityArmExportEvidence = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.json"), "utf8"));
   const answerQualityArmExportMarkdownEvidence = readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.md"), "utf8");
   const answerQualityArmExportLiveLocalEvidence = JSON.parse(
@@ -1854,6 +1866,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityCombinedEvidence.provider?.callsMade, 480);
   assert.equal(answerQualityCombinedEvidence.winner?.strategy, "cloud-nvidia-nemotron-1b");
   assert.equal(answerQualityCombinedEvidence.winner?.answerQuality, 43.1667);
+  assert.equal(answerQualityCombinedEvidence.sourceLock?.sameAnswerModel, true);
+  assert.equal(answerQualityCombinedEvidence.sourceLock?.sameJudgeModel, true);
   assert.ok(answerQualityCombinedEvidence.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b-local-rerank"));
   assert.ok(answerQualityCombinedEvidence.strategies?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank"));
   const combineMismatchRoot = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-combine-mismatch-"));
@@ -1873,6 +1887,36 @@ check("fresh public benchmark target check passes", () => {
     });
     assert.notEqual(mismatchRun.status, 0, "answer-quality combine must fail closed on query-set hash mismatch");
     assert.match(`${mismatchRun.stdout}\n${mismatchRun.stderr}`, /query-set hash/i);
+    const mismatchedJudge = structuredClone(answerQualityLiveProviderEvidence);
+    mismatchedJudge.provider.judgeModel = "different-judge-model";
+    const mismatchJudgePath = join(combineMismatchRoot, "provider-judge-mismatch.json");
+    writeFileSync(mismatchJudgePath, `${JSON.stringify(mismatchedJudge, null, 2)}\n`);
+    const mismatchJudgeRun = spawnSync("node", [
+      "packages/bench/public-benchmark-answer-quality-combine.mjs",
+      "--input",
+      `reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json,${mismatchJudgePath}`,
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(mismatchJudgeRun.status, 0, "answer-quality combine must fail closed on judge model mismatch");
+    assert.match(`${mismatchJudgeRun.stdout}\n${mismatchJudgeRun.stderr}`, /judge model/i);
+    const mismatchedAnswer = structuredClone(answerQualityLiveProviderEvidence);
+    mismatchedAnswer.provider.answerModel = "different-answer-model";
+    const mismatchAnswerPath = join(combineMismatchRoot, "provider-answer-mismatch.json");
+    writeFileSync(mismatchAnswerPath, `${JSON.stringify(mismatchedAnswer, null, 2)}\n`);
+    const mismatchAnswerRun = spawnSync("node", [
+      "packages/bench/public-benchmark-answer-quality-combine.mjs",
+      "--input",
+      `reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json,${mismatchAnswerPath}`,
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(mismatchAnswerRun.status, 0, "answer-quality combine must fail closed on answer model mismatch");
+    assert.match(`${mismatchAnswerRun.stdout}\n${mismatchAnswerRun.stderr}`, /answer model/i);
   } finally {
     rmSync(combineMismatchRoot, { recursive: true, force: true });
   }
@@ -1892,6 +1936,18 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.exists, true);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.targetBound, true);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.reviewerApprovalCount, 2);
+  assert.equal(sotaLadderFresh.mode, "public-benchmark-sota-ladder");
+  assert.equal(sotaLadderFresh.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+  assert.equal(sotaLadderFresh.fullBenchmarkPolicy?.currentAnswerQualityQueryCount, 30);
+  assert.equal(sotaLadderFresh.fullBenchmarkPolicy?.minimumFullQueryCount, 500);
+  assert.equal(sotaLadderFresh.fullBenchmarkPolicy?.fullOrOfficiallyComparableRunPresent, false);
+  assert.ok(sotaLadderFresh.blockers.includes("missing-full-or-officially-comparable-memory-benchmark-run"));
+  assert.ok(sotaLadderFresh.componentEvidence?.some((item) => item.id === "embeddinggemma"));
+  assert.match(sotaLadderMarkdownFresh, /Full Benchmark Policy/);
+  assert.equal(sotaOperatorPacketFresh.mode, "public-benchmark-sota-operator-packet");
+  assert.equal(sotaOperatorPacketFresh.sameDataContract?.fullOrOfficiallyComparableBenchmarkRequiredForBroadSota, true);
+  assert.equal(sotaOperatorPacketFresh.currentEvidence?.sotaLadder?.fullBenchmarkPolicy?.fullOrOfficiallyComparableRunPresent, false);
+  assert.ok(sotaOperatorPacketFresh.passCriteria?.some((item) => /full benchmark or officially comparable/i.test(item)));
   for (const preflight of [answerQualityPreflightFresh, answerQualityPreflightEvidence]) {
     assert.equal(preflight.ok, true);
     assert.equal(preflight.mode, "public-benchmark-answer-quality-preflight");

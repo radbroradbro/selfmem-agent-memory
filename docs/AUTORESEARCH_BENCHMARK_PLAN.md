@@ -74,6 +74,20 @@ A publishable canary must use:
 If RecallWeave does not win, write a private gap report and keep iterating. Do
 not market the score.
 
+## Full Benchmark Rule
+
+The current LongMemEval-S 30-question target is a canary target. Use it to find
+method gaps, rate limits, and local-vs-cloud tradeoffs. Do not let a canary
+win become broad SOTA or production-replacement language.
+
+Broad SOTA evidence requires a full benchmark run or an explicitly official
+comparable target. For the current LongMemEval-S source lock, that means the
+full 500-row public set, or a target artifact whose claim tier is
+`public-benchmark`, `full-benchmark`, `officially-comparable`, or
+`broad-sota`. The SOTA ladder must stay blocked while the answer-quality packet
+is only the 30-query canary, even if the canary later beats the reported
+Supermemory target.
+
 ## Public Leaderboard Target Lane
 
 Use this lane when the hosted Supermemory key is unavailable, quota-locked, or

@@ -19,7 +19,7 @@
   "rawMemoryIncluded": false,
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
-  "generatedAt": "2026-05-25T21:14:25.332Z",
+  "generatedAt": "2026-05-25T23:04:02.003Z",
   "target": {
     "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
     "benchmark": "longmemeval",
@@ -43,6 +43,8 @@
   },
   "sourceLock": {
     "sameDataAttestation": true,
+    "sameAnswerModel": true,
+    "sameJudgeModel": true,
     "inputResultCount": 2,
     "inputResultHashes": [
       "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",

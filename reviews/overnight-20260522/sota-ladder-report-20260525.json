@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T22:33:47.266Z",
+  "generatedAt": "2026-05-25T23:11:44.138Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -118,6 +118,16 @@
       "memoryBenchAnswerQuality": true,
       "publicBenchmarkClaimsAllowed": false
     },
+    "combinedAnswerQuality": {
+      "path": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
+      "exists": true,
+      "hash": "sha256:066d808e6d8216e829f677c61456642c0862e0de3aeee65d734704eeb0ca43d6",
+      "mode": "public-benchmark-answer-quality",
+      "fixtureOnly": false,
+      "retrievalProxyOnly": false,
+      "memoryBenchAnswerQuality": true,
+      "publicBenchmarkClaimsAllowed": false
+    },
     "providerPreflightVoyageNvidia": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.json",
       "exists": true,
@@ -151,7 +161,7 @@
     "readinessNote": {
       "path": "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
       "exists": true,
-      "hash": "sha256:909bfeb2062b117facbc202488e09bc8824ccf35393761fe13ebe22c6f41ed89",
+      "hash": "sha256:410ea848284a8f37678cdbf07faa7ccbe18ad5514080b54194406a52f475a642",
       "mode": null,
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -173,6 +183,13 @@
       "claimUse": "model-selection-only",
       "source": "https://github.com/QwenLM/Qwen3-Embedding",
       "finding": "Qwen3 4B/8B embedding and Qwen3 reranker reported scores justify local challenger arms where hardware allows."
+    },
+    {
+      "id": "embeddinggemma",
+      "role": "small local embedding candidate selector",
+      "claimUse": "model-selection-only",
+      "source": "https://ai.google.dev/gemma/docs/embeddinggemma",
+      "finding": "EmbeddingGemma is a 308M-parameter on-device multilingual embedding model useful as a small local baseline, not full memory proof."
     },
     {
       "id": "voyage-4-rerank-2_5",
@@ -220,6 +237,18 @@
     ],
     "publicClaimRule": "Query expansion can improve the method, but it does not count as local-only unless the expansion model runs locally; mixed arms must label the cloud substep."
   },
+  "fullBenchmarkPolicy": {
+    "requirement": "Broad SOTA or production-replacement wording requires a full benchmark run or an explicitly official comparable target, not only a 30-query canary.",
+    "benchmarkFamily": "longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-canary-30-first-per-type-2026-05-24",
+    "targetClaimTier": "run-only",
+    "currentAnswerQualityQueryCount": 30,
+    "minimumFullQueryCount": 500,
+    "fullQueryCountPresent": false,
+    "officiallyComparableClaimTier": false,
+    "fullOrOfficiallyComparableRunPresent": false,
+    "currentCanaryOnly": true
+  },
   "reportedMemoryTargets": [
     {
       "id": "supermemory-production-research-gpt4o",
@@ -259,7 +288,7 @@
       "judge": "multi-agent experimental flow",
       "source": "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
       "targetUse": "ceiling-reference-not-production-target",
-      "caveat": "The source labels this as experimental/non-production and a parody/social experiment."
+      "caveat": "The source labels this as experimental/non-production rather than the core production Supermemory engine."
     }
   ],
   "reportedTargetComparison": {
@@ -508,15 +537,18 @@
     "bestEndToEndScoreMeetsReportedTarget": false,
     "publicClaimsAllowedByInputs": false,
     "reportedMemoryTargetsPresent": true,
+    "fullOrOfficiallyComparableMemoryBenchmarkPresent": false,
     "readinessNotePresent": true
   },
   "blockers": [
     "all-current-result-files-keep-public-claims-disabled",
     "missing-voyage-answer-quality-same-data-result",
-    "best-end-to-end-score-below-reported-supermemory-target"
+    "best-end-to-end-score-below-reported-supermemory-target",
+    "missing-full-or-officially-comparable-memory-benchmark-run"
   ],
   "nextActions": [
     "Use MTEB and model-card evidence only to choose embedding and reranker candidates.",
+    "Run the full LongMemEval-S or officially comparable MemoryBench target before broad SOTA or production-replacement wording.",
     "Run the missing provider answer-quality challengers on the same source-locked target before any SOTA or production replacement claim.",
     "Add Voyage and NVIDIA or Gemini answer-quality arms to the same end-to-end memory score packet.",
     "Keep the local query-expansion and local-rerank arms, but label them as local-only evidence until provider challengers and reviewers pass.",

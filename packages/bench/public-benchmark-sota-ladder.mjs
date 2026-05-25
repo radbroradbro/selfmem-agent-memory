@@ -21,6 +21,7 @@ const evidenceFiles = {
   queryExpansionLocalQwen36Preflight: "reviews/overnight-20260522/query-expansion-local-qwen36-preflight-20260525.json",
   liveLocalAnswerQuality: "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
   liveProviderAnswerQuality: "reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json",
+  combinedAnswerQuality: "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
   providerPreflightVoyageNvidia: "reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.json",
   voyageProviderRateLimit: "reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json",
   endToEndMemoryScoreGate: "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
@@ -98,6 +99,13 @@ const componentEvidence = [
     claimUse: "model-selection-only",
     source: "https://github.com/QwenLM/Qwen3-Embedding",
     finding: "Qwen3 4B/8B embedding and Qwen3 reranker reported scores justify local challenger arms where hardware allows.",
+  },
+  {
+    id: "embeddinggemma",
+    role: "small local embedding candidate selector",
+    claimUse: "model-selection-only",
+    source: "https://ai.google.dev/gemma/docs/embeddinggemma",
+    finding: "EmbeddingGemma is a 308M-parameter on-device multilingual embedding model useful as a small local baseline, not full memory proof.",
   },
   {
     id: "voyage-4-rerank-2_5",
@@ -183,7 +191,7 @@ const reportedMemoryTargets = [
     judge: "multi-agent experimental flow",
     source: "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
     targetUse: "ceiling-reference-not-production-target",
-    caveat: "The source labels this as experimental/non-production and a parody/social experiment.",
+    caveat: "The source labels this as experimental/non-production rather than the core production Supermemory engine.",
   },
 ];
 const primaryReportedTarget =
@@ -192,6 +200,7 @@ const primaryReportedTarget =
     .sort((a, b) => Number(b.score) - Number(a.score))[0] ?? null;
 const bestEndToEndMemoryRow = bestEndToEndMemoryScoreRow(rows);
 const reportedTargetComparison = compareReportedTarget(bestEndToEndMemoryRow, primaryReportedTarget);
+const fullBenchmarkPolicy = buildFullBenchmarkPolicy(loaded);
 
 const checks = {
   sourceLockedTargetPresent: loaded.sourceLockedTarget.exists,
@@ -225,6 +234,7 @@ const checks = {
   bestEndToEndScoreMeetsReportedTarget: reportedTargetComparison.meetsPrimaryReportedTarget === true,
   publicClaimsAllowedByInputs: rows.some((row) => row.publicBenchmarkClaimsAllowed === true),
   reportedMemoryTargetsPresent: reportedMemoryTargets.length >= 2,
+  fullOrOfficiallyComparableMemoryBenchmarkPresent: fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent,
   readinessNotePresent: loaded.readinessNote.exists,
 };
 
@@ -240,6 +250,7 @@ const blockers = [
   !checks.queryExpansionPreflightPresent ? "missing-query-expansion-preflight" : null,
   !checks.queryExpansionPreflightSafe ? "query-expansion-preflight-not-safe" : null,
   !checks.sameDataControlRowsPresent ? "missing-same-data-control-row" : null,
+  !checks.fullOrOfficiallyComparableMemoryBenchmarkPresent ? "missing-full-or-officially-comparable-memory-benchmark-run" : null,
   !checks.sourceLockedTargetPresent ? "missing-source-locked-target" : null,
 ].filter(Boolean);
 
@@ -279,6 +290,7 @@ const report = {
   ),
   componentEvidence,
   queryExpansionPolicy,
+  fullBenchmarkPolicy,
   reportedMemoryTargets,
   reportedTargetComparison,
   requiredFullMemoryArms: requiredArms,
@@ -392,6 +404,39 @@ function compareReportedTarget(row, target) {
   };
 }
 
+function buildFullBenchmarkPolicy(loadedEvidence) {
+  const sourceTarget = loadedEvidence.sourceLockedTarget.json;
+  const targetClaimTier = sourceTarget?.claimTier ?? null;
+  const benchmarkFamily = sourceTarget?.benchmark?.family ?? sourceTarget?.benchmark?.name ?? null;
+  const datasetSlice = sourceTarget?.benchmark?.split ?? null;
+  const reports = [
+    loadedEvidence.combinedAnswerQuality.json,
+    loadedEvidence.liveLocalAnswerQuality.json,
+    loadedEvidence.liveProviderAnswerQuality.json,
+  ].filter(Boolean);
+  const currentAnswerQualityQueryCount = reports.reduce(
+    (max, reportItem) => Math.max(max, Number(reportItem.input?.scoredQueryCount ?? reportItem.input?.queryCount ?? 0)),
+    0,
+  );
+  const minimumFullQueryCount = String(benchmarkFamily ?? "").toLowerCase().includes("longmemeval") ? 500 : null;
+  const fullQueryCountPresent = minimumFullQueryCount == null ? false : currentAnswerQualityQueryCount >= minimumFullQueryCount;
+  const officiallyComparableClaimTier = ["public-benchmark", "full-benchmark", "officially-comparable", "broad-sota"].includes(
+    String(targetClaimTier ?? ""),
+  );
+  return {
+    requirement: "Broad SOTA or production-replacement wording requires a full benchmark run or an explicitly official comparable target, not only a 30-query canary.",
+    benchmarkFamily,
+    datasetSlice,
+    targetClaimTier,
+    currentAnswerQualityQueryCount,
+    minimumFullQueryCount,
+    fullQueryCountPresent,
+    officiallyComparableClaimTier,
+    fullOrOfficiallyComparableRunPresent: fullQueryCountPresent || officiallyComparableClaimTier,
+    currentCanaryOnly: !fullQueryCountPresent && !officiallyComparableClaimTier,
+  };
+}
+
 function metricQuality(row) {
   return Number(row.metrics?.answerQuality ?? row.metrics?.quality ?? 0);
 }
@@ -409,6 +454,7 @@ function nextActions(blockersIn) {
   }
   return [
     "Use MTEB and model-card evidence only to choose embedding and reranker candidates.",
+    "Run the full LongMemEval-S or officially comparable MemoryBench target before broad SOTA or production-replacement wording.",
     "Run the missing provider answer-quality challengers on the same source-locked target before any SOTA or production replacement claim.",
     "Add Voyage and NVIDIA or Gemini answer-quality arms to the same end-to-end memory score packet.",
     "Keep the local query-expansion and local-rerank arms, but label them as local-only evidence until provider challengers and reviewers pass.",
@@ -435,6 +481,12 @@ function renderMarkdown(value) {
     `- Primary reported target: ${value.reportedTargetComparison.primaryTarget?.id ?? "n/a"} (${value.reportedTargetComparison.primaryTarget?.score ?? "n/a"} ${value.reportedTargetComparison.primaryTarget?.scoreUnit ?? ""})`,
     `- Best end-to-end RecallWeave row: ${value.reportedTargetComparison.bestObserved?.strategy ?? "n/a"} (${value.reportedTargetComparison.bestObserved?.score ?? "n/a"})`,
     `- Meets reported target: ${value.reportedTargetComparison.meetsPrimaryReportedTarget}`,
+    "",
+    "## Full Benchmark Policy",
+    `- Current answer-quality query count: ${value.fullBenchmarkPolicy.currentAnswerQualityQueryCount}`,
+    `- Minimum full query count: ${value.fullBenchmarkPolicy.minimumFullQueryCount ?? "n/a"}`,
+    `- Officially comparable target tier: ${value.fullBenchmarkPolicy.officiallyComparableClaimTier}`,
+    `- Full or officially comparable run present: ${value.fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent}`,
     "",
     "## Best Observed Rows",
     ...value.bestObservedRows.map(

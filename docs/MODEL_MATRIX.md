@@ -14,7 +14,7 @@ same public data, dataset revision, and scoring setup as the target row.
 | Lane | Default | Why |
 |---|---|---|
 | Cloud quality | Voyage `voyage-4-large` plus `rerank-2.5` | Strong text and code memory path with same-provider embedding and rerank. Voyage documents `rerank-2.5` as the highest-accuracy reranker and `rerank-2.5-lite` as the latency option. |
-| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus deterministic rerank proxy | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. A local reranker sidecar is scaffolded as a challenger, not the default. |
+| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus deterministic rerank proxy | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. This is the consumer-hardware floor, not the assumed quality ceiling. |
 | Multimodal challenger | Gemini Embedding 2 or current Gemini embedding model | Useful for PDFs, images, audio, video, and storage-sensitive dimension tests. Do not make it the default until a matched canary wins. |
 | NVIDIA NIM challenger | NVIDIA NeMo Retriever embedding plus rerank pairs | Useful for hosted latency and retrieval comparisons. Keep this as a benchmark arm until measured on RecallWeave canaries. |
 | Query expansion | Off by default | Enable only when a canary proves better quality without unacceptable latency or exact-identifier damage. |
@@ -64,6 +64,16 @@ The reranker lane should first test Qwen3 Reranker 0.6B through a local
 OpenAI-compatible rerank endpoint or a small sidecar process. Qwen3 Reranker
 4B and 8B stay optional quality arms. They are not the default for 24GB Macs
 until measured latency and memory pressure justify them.
+
+The quality-first local search lane is Qwen3 Embedding 4B or 8B plus Qwen3
+Reranker 4B or 8B when the machine can run them without stale model-server
+pressure. MTEB English v2 and reranker scores justify putting those arms in
+the matrix, but the local winner is the arm that wins the same-data
+LongMemEval or MemoryBench answer-quality run.
+
+EmbeddingGemma-class small embeddings are useful as a low-footprint local
+baseline. They are not a replacement for the Qwen3 4B/8B quality challengers
+unless the full memory benchmark shows they win on this workload.
 
 The scaled Apple Silicon challenger is `local-apple-qwen3-4b`. It uses
 Qwen3 Embedding 4B GGUF as a separate benchmark arm, not an env-only override

@@ -113,6 +113,7 @@ const packet = {
       publicBenchmarkClaimsAllowed: Boolean(sotaLadder.publicBenchmarkClaimsAllowed),
       blockers: arrayOf(sotaLadder.blockers),
       requiredFullMemoryArms: sotaLadder.requiredFullMemoryArms ?? [],
+      fullBenchmarkPolicy: sotaLadder.fullBenchmarkPolicy ?? null,
       reportedMemoryTargets: sotaLadder.reportedMemoryTargets ?? [],
     },
     queryExpansionPreflight: {
@@ -261,6 +262,7 @@ const packet = {
     nvidiaOrGeminiProviderArmRequired: true,
     queryExpansionArmRequired: true,
     endToEndMemoryAnswerQualityRequired: true,
+    fullOrOfficiallyComparableBenchmarkRequiredForBroadSota: true,
     retrievalProxyOnlyIsNotEnoughForPublicClaims: true,
     componentBenchmarksOnlySelectCandidates: true,
   },
@@ -278,6 +280,7 @@ const packet = {
     ],
     stillNotEnoughAlone: [
       "Does not authorize public SOTA wording unless the combined full-memory answer-quality score meets or beats the reported target.",
+      "Does not authorize broad SOTA wording unless the run is full-benchmark or officially comparable, not only a 30-query canary.",
       "Does not replace owner approval or the fresh real-container production canary.",
     ],
   },
@@ -342,6 +345,7 @@ const packet = {
     "The query-expansion arm states whether it is pure local or mixed local-plus-cloud, and mixed arms name the cloud substep.",
     "The query-expansion arm proves live LLM expansion wiring before it is counted as an LLM query-expansion result.",
     "The final claim uses an end-to-end memory answer-quality score, not retrieval-proxy or MTEB-only evidence.",
+    "Broad SOTA or production-replacement language waits for a full benchmark or officially comparable target, not only a 30-query canary.",
     "Supermemory reported scores are comparison targets only unless the same harness/dataset/judge semantics are matched.",
     "privacyLeakCount and redactionFailureCount are zero for every attached report.",
     "Two independent reviewers approve the exact metrics-only packet before owner review or public release wording changes.",

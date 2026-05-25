@@ -8,6 +8,7 @@
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
 - best-end-to-end-score-below-reported-supermemory-target
+- missing-full-or-officially-comparable-memory-benchmark-run
 
 ## Required Full Memory Arms
 - bm25-lite: present (lexical floor)
@@ -23,6 +24,12 @@
 - Primary reported target: supermemory-production-research-gemini-3-pro (85.2 overall percent)
 - Best end-to-end RecallWeave row: cloud-nvidia-nemotron-1b (43.1667)
 - Meets reported target: false
+
+## Full Benchmark Policy
+- Current answer-quality query count: 30
+- Minimum full query count: 500
+- Officially comparable target tier: false
+- Full or officially comparable run present: false
 
 ## Best Observed Rows
 - cloud-nvidia-nemotron-1b: quality 43.1667, answerQuality 43.1667, P@1 n/a, nDCG@10 n/a, p50 9031 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
@@ -40,6 +47,7 @@
 
 ## Next Actions
 - Use MTEB and model-card evidence only to choose embedding and reranker candidates.
+- Run the full LongMemEval-S or officially comparable MemoryBench target before broad SOTA or production-replacement wording.
 - Run the missing provider answer-quality challengers on the same source-locked target before any SOTA or production replacement claim.
 - Add Voyage and NVIDIA or Gemini answer-quality arms to the same end-to-end memory score packet.
 - Keep the local query-expansion and local-rerank arms, but label them as local-only evidence until provider challengers and reviewers pass.

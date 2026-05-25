@@ -185,6 +185,15 @@ Follow-up provider evidence on 2026-05-25:
   `benchmark:answer-quality:combine` fails closed. This protects the future
   Voyage retry from being accidentally combined with a different target or
   materialization.
+- The answer-quality combiner now also requires every input report to use the
+  same answer model and judge model, and the release gate exercises both
+  mismatch paths. A future Voyage retry can change the retrieval arm, but not
+  silently change the answer-quality judge contract.
+- The SOTA ladder now also distinguishes a 30-query canary from a full or
+  officially comparable benchmark. The current LongMemEval-S answer-quality
+  packet has 30 scored queries, so even a future canary win must remain blocked
+  for broad SOTA or production-replacement wording until the full 500-row
+  LongMemEval-S set or another official comparable target passes.
 - The non-Voyage provider lane did run end-to-end on the same 30-query
   source-locked target. `cloud-nvidia-nemotron-1b` scored `43.1667`
   answerQuality with `0.4333` judge-correct rate, beating the local

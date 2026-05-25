@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T22:44:41.658Z",
+  "generatedAt": "2026-05-25T23:11:44.887Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -31,7 +31,8 @@
       "blockers": [
         "all-current-result-files-keep-public-claims-disabled",
         "missing-voyage-answer-quality-same-data-result",
-        "best-end-to-end-score-below-reported-supermemory-target"
+        "best-end-to-end-score-below-reported-supermemory-target",
+        "missing-full-or-officially-comparable-memory-benchmark-run"
       ],
       "requiredFullMemoryArms": [
         {
@@ -75,6 +76,18 @@
           "status": "present"
         }
       ],
+      "fullBenchmarkPolicy": {
+        "requirement": "Broad SOTA or production-replacement wording requires a full benchmark run or an explicitly official comparable target, not only a 30-query canary.",
+        "benchmarkFamily": "longmemeval",
+        "datasetSlice": "longmemeval-s-cleaned-canary-30-first-per-type-2026-05-24",
+        "targetClaimTier": "run-only",
+        "currentAnswerQualityQueryCount": 30,
+        "minimumFullQueryCount": 500,
+        "fullQueryCountPresent": false,
+        "officiallyComparableClaimTier": false,
+        "fullOrOfficiallyComparableRunPresent": false,
+        "currentCanaryOnly": true
+      },
       "reportedMemoryTargets": [
         {
           "id": "supermemory-production-research-gpt4o",
@@ -114,7 +127,7 @@
           "judge": "multi-agent experimental flow",
           "source": "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
           "targetUse": "ceiling-reference-not-production-target",
-          "caveat": "The source labels this as experimental/non-production and a parody/social experiment."
+          "caveat": "The source labels this as experimental/non-production rather than the core production Supermemory engine."
         }
       ]
     },
@@ -313,6 +326,7 @@
     "nvidiaOrGeminiProviderArmRequired": true,
     "queryExpansionArmRequired": true,
     "endToEndMemoryAnswerQualityRequired": true,
+    "fullOrOfficiallyComparableBenchmarkRequiredForBroadSota": true,
     "retrievalProxyOnlyIsNotEnoughForPublicClaims": true,
     "componentBenchmarksOnlySelectCandidates": true
   },
@@ -334,6 +348,7 @@
     ],
     "stillNotEnoughAlone": [
       "Does not authorize public SOTA wording unless the combined full-memory answer-quality score meets or beats the reported target.",
+      "Does not authorize broad SOTA wording unless the run is full-benchmark or officially comparable, not only a 30-query canary.",
       "Does not replace owner approval or the fresh real-container production canary."
     ]
   },
@@ -532,6 +547,7 @@
     "The query-expansion arm states whether it is pure local or mixed local-plus-cloud, and mixed arms name the cloud substep.",
     "The query-expansion arm proves live LLM expansion wiring before it is counted as an LLM query-expansion result.",
     "The final claim uses an end-to-end memory answer-quality score, not retrieval-proxy or MTEB-only evidence.",
+    "Broad SOTA or production-replacement language waits for a full benchmark or officially comparable target, not only a 30-query canary.",
     "Supermemory reported scores are comparison targets only unless the same harness/dataset/judge semantics are matched.",
     "privacyLeakCount and redactionFailureCount are zero for every attached report.",
     "Two independent reviewers approve the exact metrics-only packet before owner review or public release wording changes.",
@@ -541,6 +557,7 @@
     "all-current-result-files-keep-public-claims-disabled",
     "missing-voyage-answer-quality-same-data-result",
     "best-end-to-end-score-below-reported-supermemory-target",
+    "missing-full-or-officially-comparable-memory-benchmark-run",
     "voyage-provider-rate-limited"
   ]
 }
