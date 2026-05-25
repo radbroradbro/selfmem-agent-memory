@@ -173,6 +173,13 @@ Follow-up provider evidence on 2026-05-25:
   retry/backoff and provider pacing. Evidence:
   `reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json`.
   This remains a hard SOTA-ladder blocker.
+- The refreshed SOTA operator packet now includes a minimum Voyage
+  answer-quality retry flow. It reruns only `bm25-lite`,
+  `full-hybrid-rerank`, and `cloud-voyage4-lite-voyage-lite` after the rate
+  limit clears, then combines that metrics-only result with the existing local,
+  query-expansion, and NVIDIA answer-quality reports before rerunning the
+  provider-challenger, memory-score, and SOTA-ladder gates. Evidence:
+  `reviews/overnight-20260522/sota-ladder-operator-packet-20260525.json`.
 - The non-Voyage provider lane did run end-to-end on the same 30-query
   source-locked target. `cloud-nvidia-nemotron-1b` scored `43.1667`
   answerQuality with `0.4333` judge-correct rate, beating the local

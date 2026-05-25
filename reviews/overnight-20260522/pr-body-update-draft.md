@@ -317,6 +317,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   `voyage-4-lite` plus `rerank-2.5-lite` arm matched the larger Voyage arm's
   retrieval-proxy quality at 0.3040 while reducing p50 latency to 1988 ms.
   Public claims remain blocked because this is not MemoryBench answer quality.
+- Current SOTA operator packet now adds a minimum Voyage answer-quality retry
+  flow for the exact remaining provider blocker. After Voyage rate limits clear,
+  operators rerun only `bm25-lite`, `full-hybrid-rerank`, and
+  `cloud-voyage4-lite-voyage-lite`, combine that metrics-only result with the
+  existing local, query-expansion, local-rerank, and NVIDIA answer-quality
+  reports, then rerun the provider-challenger, memory-score, and SOTA-ladder
+  gates before any public wording changes.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.

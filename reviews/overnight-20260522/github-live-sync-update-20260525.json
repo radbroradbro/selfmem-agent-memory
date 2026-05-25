@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "pr": {
+    "status": 200,
+    "updated_at": "2026-05-25T22:46:03Z",
+    "html_url": "https://github.com/radbroradbro/selfmem-agent-memory/pull/5"
+  },
+  "issue": {
+    "status": 200,
+    "updated_at": "2026-05-25T22:46:03Z",
+    "html_url": "https://github.com/radbroradbro/selfmem-agent-memory/issues/6"
+  },
+  "prBodyHash": "db1cc8a78c1170a101156b6cbd8c0ad67bad994725d5690a603732ec3616ef1e",
+  "issueBodyHash": "2ec5708487b2e238b97935f9ce5dd1740c9005ab1d8fa1e93f80191b2ad6cba9",
+  "syncedAt": "2026-05-25T22:46:04.245Z"
+}

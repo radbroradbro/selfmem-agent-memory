@@ -267,6 +267,13 @@ requirements are resolved.
   0.3040 versus BM25 0.2506, P@1 0.5667 versus 0.4667, NDCG@10 0.2658 versus
   0.2193, and p50 latency 1988 ms. It is the next cloud canary default, not a
   public MemoryBench/SOTA claim.
+- Current SOTA operator packet adds a minimum Voyage answer-quality retry flow
+  for the remaining provider blocker. It reruns only the required BM25,
+  full-hybrid, and `cloud-voyage4-lite-voyage-lite` rows after Voyage rate
+  limits clear, combines that metrics-only result with existing local,
+  query-expansion, local-rerank, and NVIDIA answer-quality reports, and then
+  reruns the provider-challenger, memory-score, and SOTA-ladder gates before
+  any public wording changes.
 - Current local Apple evidence is preflight-only:
   `public-longmemeval-expanded-local-apple-live-preflight.json` reports
   `BLOCKED_PROVIDER_ENV` because no local embedding endpoint is configured via

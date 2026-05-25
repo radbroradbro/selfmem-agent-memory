@@ -17,6 +17,7 @@ const sameDataStrategies = splitList(
     "bm25-lite,dense-proxy,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank",
 );
 const providerPreflightStrategies = sameDataStrategies.filter((strategy) => providerPreflightStrategy(strategy));
+const minimumVoyageAnswerQualityStrategies = ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-lite-voyage-lite"];
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(existsSync(targetPath), `benchmark target missing: ${displayPath(targetPath)}`);
@@ -263,6 +264,23 @@ const packet = {
     retrievalProxyOnlyIsNotEnoughForPublicClaims: true,
     componentBenchmarksOnlySelectCandidates: true,
   },
+  minimumVoyageAnswerQualityRetry: {
+    purpose: "Close the current hard end-to-end gate blocker with the fewest extra provider calls after Voyage rate limits reset.",
+    requiredStrategies: minimumVoyageAnswerQualityStrategies,
+    mustCombineWithExistingInputs: [
+      `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
+      `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
+    ],
+    combinedOutputMustThenPass: [
+      "benchmark:provider-challenger:result-gate --require-ready",
+      "benchmark:memory-score:result-gate --require-ready",
+      "benchmark:sota-ladder",
+    ],
+    stillNotEnoughAlone: [
+      "Does not authorize public SOTA wording unless the combined full-memory answer-quality score meets or beats the reported target.",
+      "Does not replace owner approval or the fresh real-container production canary.",
+    ],
+  },
   operatorFlow: buildOperatorFlow(),
   reviewerPacket: {
     purpose: "Challenge the method, scoring contract, privacy contract, and release wording before any public or production claim.",
@@ -345,8 +363,12 @@ function buildOperatorFlow() {
   const target = displayPath(targetPath);
   const providerStrategies = providerPreflightStrategies.join(",");
   const fullLadderStrategies = sameDataStrategies.join(",");
+  const minimumVoyageStrategies = minimumVoyageAnswerQualityStrategies.join(",");
   const answerQualityArms = sameDataStrategies
     .map((strategy) => `--arm ${strategy}="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/${strategy}-responses.private.json"`)
+    .join(" ");
+  const minimumVoyageAnswerQualityArms = minimumVoyageAnswerQualityStrategies
+    .map((strategy) => `--arm ${strategy}="$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms/${strategy}-responses.private.json"`)
     .join(" ");
   return [
     {
@@ -489,6 +511,87 @@ function buildOperatorFlow() {
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.md\"",
         ].join(" "),
+      ],
+    },
+    {
+      id: "minimum-voyage-answer-quality-retry",
+      description:
+        "Run this after the Voyage 429 clears. It targets the current hard blocker with BM25 and full-hybrid controls plus one Voyage arm, then combines the metrics-only result with existing local/NVIDIA/query-expansion answer-quality rows.",
+      commands: [
+        "RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+        "VOYAGE_API_KEYS_FILE=<private-file-outside-repo>",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-answer-and-judge-url>",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model>",
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model>",
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
+          `--target ${target}`,
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialize-report.json\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute",
+          `--target ${target}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-memories.private.jsonl\"",
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms\"",
+          `--strategies ${minimumVoyageStrategies}`,
+          "--context-token-budget 800",
+          "--limit 5",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-arm-export.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-arm-export.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
+          `--target ${target}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-memories.private.jsonl\"",
+          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-answer-labels.private.json\"",
+          minimumVoyageAnswerQualityArms,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-preflight.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-preflight.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
+          `--target ${target}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-memories.private.jsonl\"",
+          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-answer-labels.private.json\"",
+          minimumVoyageAnswerQualityArms,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine --",
+          "--input reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json,reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json,\"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality.json\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:provider-challenger:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.json\"",
+          `--target ${target}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate-with-voyage.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate-with-voyage.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.json\"",
+          "--reviewer-approval-report reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
+          `--target ${target}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate-with-voyage.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate-with-voyage.md\"",
+        ].join(" "),
+      ],
+      beforeCountingAsFullMemoryGateProgress: [
+        "Confirm the combined report includes BM25, full-hybrid, query expansion, local Apple, local rerank, NVIDIA or Gemini, and Voyage rows.",
+        "Confirm the combined report remains metrics-only and publicBenchmarkClaimsAllowed=false until the SOTA ladder target comparison passes.",
+        "Send the combined metrics-only report to independent reviewers again if the winner, target score, or release wording changes.",
       ],
     },
     {

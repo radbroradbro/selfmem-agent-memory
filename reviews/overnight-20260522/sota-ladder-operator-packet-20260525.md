@@ -113,6 +113,30 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target revi
 npm exec --yes pnpm@10.23.0 -- benchmark:provider-challenger:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.md"
 ```
 
+### minimum-voyage-answer-quality-retry
+
+Run this after the Voyage 429 clears. It targets the current hard blocker with BM25 and full-hybrid controls plus one Voyage arm, then combines the metrics-only result with existing local/NVIDIA/query-expansion answer-quality rows.
+
+```bash
+RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>
+RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1
+RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1
+VOYAGE_API_KEYS_FILE=<private-file-outside-repo>
+RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1
+RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1
+RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1
+RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-answer-and-judge-url>
+RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model>
+RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model>
+npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --private-output-dir "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized" --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialize-report.json"
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-queryset.private.json" --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-memories.private.jsonl" --private-output-dir "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms" --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-lite-voyage-lite --context-token-budget 800 --limit 5 --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-arm-export.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-arm-export.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-queryset.private.json" --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-memories.private.jsonl" --answer-labels "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-answer-labels.private.json" --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms/bm25-lite-responses.private.json" --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms/full-hybrid-rerank-responses.private.json" --arm cloud-voyage4-lite-voyage-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms/cloud-voyage4-lite-voyage-lite-responses.private.json" --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-preflight.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality-preflight.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-queryset.private.json" --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-memories.private.jsonl" --answer-labels "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-materialized/longmemeval-answer-labels.private.json" --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms/bm25-lite-responses.private.json" --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms/full-hybrid-rerank-responses.private.json" --arm cloud-voyage4-lite-voyage-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-response-arms/cloud-voyage4-lite-voyage-lite-responses.private.json" --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json,reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json,"$RECALLWEAVE_SOTA_OUTPUT_DIR/voyage-answer-quality.json" --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:provider-challenger:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.json" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate-with-voyage.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate-with-voyage.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-with-voyage.json" --reviewer-approval-report reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate-with-voyage.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate-with-voyage.md"
+```
+
 ### end-to-end-memory-score-and-review
 
 Do not ship public benchmark or production-replacement claims until answer quality, reviewers, UI, docs, and owner approval are all present.

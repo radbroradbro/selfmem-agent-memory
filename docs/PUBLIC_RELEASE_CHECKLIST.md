@@ -22,6 +22,10 @@ Use this checklist before making the repository public.
   the same-data Voyage arm, exact-packet reviewer approvals, owner approval,
   and real rollout gates all pass. Current reviewer approvals do not replace a
   missing Voyage result.
+- [ ] If Voyage was previously rate-limited, rerun the minimum Voyage
+  answer-quality retry flow from the SOTA operator packet, combine it with the
+  existing same-data answer-quality reports, and rerun the provider-challenger,
+  memory-score, and SOTA-ladder gates before changing public wording.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.
 
 ## Scans

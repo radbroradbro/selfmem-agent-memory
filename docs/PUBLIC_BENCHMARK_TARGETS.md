@@ -311,6 +311,13 @@ harness we will use.
   Public comparison and SOTA wording remain blocked because
   `reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json` records
   a missing same-data Voyage answer-quality arm after HTTP 429.
+- Current SOTA operator packet:
+  `reviews/overnight-20260522/sota-ladder-operator-packet-20260525.json`.
+  Its minimum Voyage answer-quality retry flow reruns only the required BM25,
+  full-hybrid, and `cloud-voyage4-lite-voyage-lite` rows after the rate limit
+  clears, then combines the new metrics-only result with the existing local,
+  query-expansion, local-rerank, and NVIDIA answer-quality reports before
+  rerunning the provider-challenger, memory-score, and SOTA-ladder gates.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and
