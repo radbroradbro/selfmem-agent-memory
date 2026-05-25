@@ -496,6 +496,7 @@ const requiredScripts = [
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
   "benchmark:local-rerank:result-gate",
+  "benchmark:provider-challenger:result-gate",
   "benchmark:sota-ladder",
   "benchmark:sota-ladder:packet",
   "goal:audit",

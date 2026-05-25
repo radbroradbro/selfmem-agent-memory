@@ -24,6 +24,7 @@
 - SOTA ladder: BLOCKED_FULL_MEMORY_SOTA_EVIDENCE
 - Query expansion preflight: BLOCKED_QUERY_EXPANSION_ENV
 - Provider preflight: BLOCKED_PROVIDER_ENV
+- Provider challenger result gate: BLOCKED_PROVIDER_CHALLENGER_RESULT
 - Local rerank evidence: true
 - Local rerank result gate: BLOCKED_LOCAL_RERANK_RESULT
 - Query expansion local smoke: true
@@ -108,6 +109,7 @@ SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-server-url>
 RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight -- --require-ready --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-preflight-ready.json"
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --max-memory-bytes 80000000 --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:provider-challenger:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.md"
 ```
 
 ### end-to-end-memory-score-and-review

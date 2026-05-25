@@ -38,6 +38,7 @@ const localRerankEvidence = loadEvidence(`${reviewDir}/local-rerank-sidecar-base
 const localRerankResultGateEvidence = loadEvidence(`${reviewDir}/local-rerank-result-gate-20260525.json`);
 const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-live-local-smoke-20260525.json`);
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
+const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
 
 const blockers = [
@@ -96,6 +97,14 @@ const packet = {
       requiredProviders: providerPreflight.requiredProviders ?? [],
       missingCredentialProviders: providerPreflight.missingCredentialProviders ?? [],
       blockers: arrayOf(providerPreflight.blockers),
+    },
+    providerChallengerResultGate: {
+      evidencePath: providerChallengerResultGateEvidence.path,
+      evidenceExists: providerChallengerResultGateEvidence.exists,
+      evidenceHash: providerChallengerResultGateEvidence.hash,
+      status: providerChallengerResultGateEvidence.json?.status ?? null,
+      countsAsLiveProviderChallengerBenchmark: Boolean(providerChallengerResultGateEvidence.json?.countsAsLiveProviderChallengerBenchmark),
+      blockers: providerChallengerResultGateEvidence.json?.blockers ?? [],
     },
     localRerankSidecar: {
       strategy: "local-apple-qwen3-0_6b-local-rerank",
@@ -176,6 +185,7 @@ const packet = {
       "query-expansion-result-gate.json",
       "provider-preflight.json",
       "same-data-provider-result.json",
+      "provider-challenger-result-gate.json",
       "local-rerank-result-gate.json",
       "end-to-end-memory-score.json",
       "reviewer-approval-report.json",
@@ -355,6 +365,13 @@ function buildOperatorFlow() {
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.md\"",
         ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:provider-challenger:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json\"",
+          `--target ${target}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.md\"",
+        ].join(" "),
       ],
     },
     {
@@ -446,6 +463,7 @@ function renderMarkdown(value) {
     `- SOTA ladder: ${value.currentEvidence.sotaLadder.status}`,
     `- Query expansion preflight: ${value.currentEvidence.queryExpansionPreflight.status}`,
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
+    `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
     `- Local rerank result gate: ${value.currentEvidence.localRerankResultGate.status ?? "missing"}`,
     `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,

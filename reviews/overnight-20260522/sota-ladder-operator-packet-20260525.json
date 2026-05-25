@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T18:21:36.962Z",
+  "generatedAt": "2026-05-25T18:24:15.666Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -155,6 +155,22 @@
         "voyage-credentials-missing"
       ]
     },
+    "providerChallengerResultGate": {
+      "evidencePath": "reviews/overnight-20260522/provider-challenger-result-gate-20260525.json",
+      "evidenceExists": true,
+      "evidenceHash": "sha256:75621fba8e051ed927a8334c8b62e82120890a02d25703254d09693f0dba41e2",
+      "status": "BLOCKED_PROVIDER_CHALLENGER_RESULT",
+      "countsAsLiveProviderChallengerBenchmark": false,
+      "blockers": [
+        "fixture-result-cannot-count-as-live-provider-ladder",
+        "result-not-bound-to-source-locked-target",
+        "missing-materializer-hash",
+        "provider-live-consent-not-proven",
+        "provider-live-calls-missing",
+        "provider-used-mock-calls",
+        "provider-key-or-endpoint-counts-missing"
+      ]
+    },
     "localRerankSidecar": {
       "strategy": "local-apple-qwen3-0_6b-local-rerank",
       "evidencePath": "reviews/overnight-20260522/local-rerank-sidecar-baseline-refresh-evidence.md",
@@ -304,7 +320,8 @@
         "SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-server-url>",
         "RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>",
         "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight -- --require-ready --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-preflight-ready.json\"",
-        "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --max-memory-bytes 80000000 --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.md\""
+        "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --max-memory-bytes 80000000 --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.md\"",
+        "npm exec --yes pnpm@10.23.0 -- benchmark:provider-challenger:result-gate -- --require-ready --result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-same-data-result.json\" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/provider-challenger-gate.md\""
       ]
     },
     {
@@ -354,6 +371,7 @@
       "query-expansion-result-gate.json",
       "provider-preflight.json",
       "same-data-provider-result.json",
+      "provider-challenger-result-gate.json",
       "local-rerank-result-gate.json",
       "end-to-end-memory-score.json",
       "reviewer-approval-report.json",
