@@ -40,6 +40,7 @@ const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-l
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
 const endToEndMemoryScoreGateEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-gate-20260525.json`);
+const answerQualityArmExportEvidence = loadEvidence(`${reviewDir}/answer-quality-arm-export-20260525.json`);
 const answerQualityPreflightEvidence = loadEvidence(`${reviewDir}/answer-quality-preflight-20260525.json`);
 const answerQualityHarnessSmokeEvidence = loadEvidence(`${reviewDir}/answer-quality-harness-smoke-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
@@ -48,8 +49,10 @@ const blockers = [
   ...arrayOf(sotaLadder.blockers),
   ...arrayOf(queryExpansionPreflight.blockers).map((item) => `query-expansion:${item}`),
   ...arrayOf(providerPreflight.blockers).map((item) => `provider:${item}`),
+  ...arrayOf(answerQualityArmExportEvidence.json?.blockers).map((item) => `answer-quality-arms:${item}`),
   !currentQueryExpansionImpl.liveLlmExpansionWiringPresent ? "query-expansion-live-llm-wiring-not-proven" : null,
   !localRerankEvidence.exists ? "local-rerank-sidecar-evidence-missing" : null,
+  !answerQualityArmExportEvidence.exists ? "answer-quality-arm-export-evidence-missing" : null,
   !endToEndMemoryScoreGateEvidence.exists ? "end-to-end-memory-score-gate-missing" : null,
 ].filter(Boolean);
 
@@ -118,6 +121,16 @@ const packet = {
       countsAsEndToEndMemoryBenchmark: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsEndToEndMemoryBenchmark),
       countsAsFullMemorySotaEvidence: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsFullMemorySotaEvidence),
       blockers: endToEndMemoryScoreGateEvidence.json?.blockers ?? [],
+    },
+    answerQualityArmExport: {
+      evidencePath: answerQualityArmExportEvidence.path,
+      evidenceExists: answerQualityArmExportEvidence.exists,
+      evidenceHash: answerQualityArmExportEvidence.hash,
+      status: answerQualityArmExportEvidence.json?.status ?? null,
+      readyForAnswerQualityPreflight: Boolean(answerQualityArmExportEvidence.json?.readyForAnswerQualityPreflight),
+      writesPrivateResponseFiles: Boolean(answerQualityArmExportEvidence.json?.writesPrivateResponseFiles),
+      strategyCoverage: answerQualityArmExportEvidence.json?.strategyCoverage ?? null,
+      blockers: answerQualityArmExportEvidence.json?.blockers ?? [],
     },
     answerQualityPreflight: {
       evidencePath: answerQualityPreflightEvidence.path,
@@ -219,6 +232,7 @@ const packet = {
       "provider-challenger-result-gate.json",
       "local-rerank-result-gate.json",
       "end-to-end-memory-score.json",
+      "answer-quality-arm-export.json",
       "answer-quality-preflight.json",
       "answer-quality-harness-smoke.json",
       "end-to-end-memory-score-gate.json",
@@ -265,9 +279,8 @@ function buildOperatorFlow() {
   const target = displayPath(targetPath);
   const providerStrategies = providerPreflightStrategies.join(",");
   const fullLadderStrategies = sameDataStrategies.join(",");
-  const fullLadderStrategyList = sameDataStrategies.join(" ");
   const answerQualityArms = sameDataStrategies
-    .map((strategy) => `--arm ${strategy}="$RECALLWEAVE_SOTA_OUTPUT_DIR/${strategy}-responses.private.json"`)
+    .map((strategy) => `--arm ${strategy}="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/${strategy}-responses.private.json"`)
     .join(" ");
   return [
     {
@@ -417,6 +430,16 @@ function buildOperatorFlow() {
       description: "Do not ship public benchmark or production-replacement claims until answer quality, reviewers, UI, docs, and owner approval are all present.",
       commands: [
         "RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>",
+        "RECALLWEAVE_BASELINE_LIVE=1",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+        "SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-url-or-use-approved-cloud-env>",
+        "SELFMEM_QUERY_EXPANSION_MODEL=<local-query-expansion-model-or-use-approved-cloud-env>",
+        "VOYAGE_API_KEYS_FILE=<private-file-outside-repo>",
+        "NVIDIA_API_KEYS_FILE=<private-file-outside-repo>",
+        "SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-server-url>",
+        "SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-server-url>",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-ladder",
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
@@ -434,17 +457,16 @@ function buildOperatorFlow() {
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-ladder-same-data-result.md\"",
         ].join(" "),
         [
-          `for strategy in ${fullLadderStrategyList}; do`,
-          "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
-          "npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live",
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute",
+          `--target ${target}`,
           "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json\"",
           "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl\"",
-          "--preserve-ids",
-          "--strategy \"$strategy\"",
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms\"",
+          `--strategies ${fullLadderStrategies}`,
           "--context-token-budget 800",
           "--limit 5",
-          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/${strategy}-responses.private.json\";",
-          "done",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-arm-export.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-arm-export.md\"",
         ].join(" "),
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
@@ -552,6 +574,7 @@ function renderMarkdown(value) {
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
     `- End-to-end memory score gate: ${value.currentEvidence.endToEndMemoryScoreGate.status ?? "missing"}`,
+    `- Answer-quality arm export: ${value.currentEvidence.answerQualityArmExport.status ?? "missing"}`,
     `- Answer-quality preflight: ${value.currentEvidence.answerQualityPreflight.status ?? "missing"}`,
     `- Answer-quality harness smoke: ${value.currentEvidence.answerQualityHarnessSmoke.mode ?? "missing"}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,

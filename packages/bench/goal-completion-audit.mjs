@@ -104,6 +104,8 @@ const files = {
   providerChallengerResultGateMarkdown: `${reviewDir}/provider-challenger-result-gate-20260525.md`,
   endToEndMemoryScoreGateReport: `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
   endToEndMemoryScoreGateMarkdown: `${reviewDir}/end-to-end-memory-score-gate-20260525.md`,
+  answerQualityArmExportReport: `${reviewDir}/answer-quality-arm-export-20260525.json`,
+  answerQualityArmExportMarkdown: `${reviewDir}/answer-quality-arm-export-20260525.md`,
   answerQualityPreflightReport: `${reviewDir}/answer-quality-preflight-20260525.json`,
   answerQualityPreflightMarkdown: `${reviewDir}/answer-quality-preflight-20260525.md`,
   answerQualityHarnessSmokeReport: `${reviewDir}/answer-quality-harness-smoke-20260525.json`,
@@ -139,6 +141,7 @@ const queryExpansionResultGate = JSON.parse(readFileSync(join(root, files.queryE
 const localRerankResultGate = JSON.parse(readFileSync(join(root, files.localRerankResultGateReport), "utf8"));
 const providerChallengerResultGate = JSON.parse(readFileSync(join(root, files.providerChallengerResultGateReport), "utf8"));
 const endToEndMemoryScoreGate = JSON.parse(readFileSync(join(root, files.endToEndMemoryScoreGateReport), "utf8"));
+const answerQualityArmExport = JSON.parse(readFileSync(join(root, files.answerQualityArmExportReport), "utf8"));
 const answerQualityPreflight = JSON.parse(readFileSync(join(root, files.answerQualityPreflightReport), "utf8"));
 const answerQualityHarnessSmoke = JSON.parse(readFileSync(join(root, files.answerQualityHarnessSmokeReport), "utf8"));
 const texts = Object.fromEntries(
@@ -271,6 +274,9 @@ assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLoca
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLocalSmoke?.publicBenchmarkClaimsAllowed, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.status, "BLOCKED_END_TO_END_MEMORY_SCORE");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.countsAsEndToEndMemoryBenchmark, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.status, "BLOCKED_RESPONSE_ARM_EXPORT_ENV");
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.readyForAnswerQualityPreflight, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.writesPrivateResponseFiles, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.status, "BLOCKED_ANSWER_QUALITY_ENV");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.liveAnswerQualityCanRun, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityHarnessSmoke?.mode, "public-benchmark-answer-quality");
@@ -315,6 +321,21 @@ assert.equal(endToEndMemoryScoreGate.publicBenchmarkClaimsAllowed, false);
 assert.ok(endToEndMemoryScoreGate.blockers.includes("retrieval-proxy-result-cannot-count-as-answer-quality"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("memorybench-answer-quality-not-proven"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("missing-answer-quality-score"));
+assert.equal(answerQualityArmExport.mode, "public-benchmark-answer-quality-arm-export");
+assert.equal(answerQualityArmExport.status, "BLOCKED_RESPONSE_ARM_EXPORT_ENV");
+assert.equal(answerQualityArmExport.callsProviderApis, false);
+assert.equal(answerQualityArmExport.sendsBenchmarkTextToProvider, false);
+assert.equal(answerQualityArmExport.readyForAnswerQualityPreflight, false);
+assert.equal(answerQualityArmExport.readyForEndToEndMemoryScoreGate, false);
+assert.equal(answerQualityArmExport.countsAsFullMemorySotaEvidence, false);
+assert.equal(answerQualityArmExport.strategyCoverage?.hasBm25Lite, true);
+assert.equal(answerQualityArmExport.strategyCoverage?.hasFullHybridRerank, true);
+assert.equal(answerQualityArmExport.strategyCoverage?.hasQueryExpansion, true);
+assert.equal(answerQualityArmExport.strategyCoverage?.hasProviderChallenger, true);
+assert.equal(answerQualityArmExport.strategyCoverage?.hasLocalApple, true);
+assert.equal(answerQualityArmExport.strategyCoverage?.hasLocalRerank, true);
+assert.ok(answerQualityArmExport.blockers.includes("private-queryset-missing"));
+assert.ok(answerQualityArmExport.blockers.includes("private-response-output-dir-missing"));
 assert.equal(answerQualityPreflight.mode, "public-benchmark-answer-quality-preflight");
 assert.equal(answerQualityPreflight.status, "BLOCKED_ANSWER_QUALITY_ENV");
 assert.equal(answerQualityPreflight.callsProviderApis, false);
@@ -571,12 +592,15 @@ const requirements = [
     files.providerChallengerResultGateMarkdown,
     files.endToEndMemoryScoreGateReport,
     files.endToEndMemoryScoreGateMarkdown,
+    files.answerQualityArmExportReport,
+    files.answerQualityArmExportMarkdown,
     files.answerQualityPreflightReport,
     files.answerQualityPreflightMarkdown,
     files.answerQualityHarnessSmokeReport,
     files.answerQualityHarnessSmokeMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
     "packages/bench/public-benchmark-sota-operator-packet.mjs",
+    "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
     "packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "packages/bench/public-benchmark-answer-quality.mjs",
     "packages/bench/public-benchmark-query-expansion-preflight.mjs",

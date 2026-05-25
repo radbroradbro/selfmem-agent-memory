@@ -276,16 +276,20 @@ harness we will use.
   This is the preferred next cloud-provider run because it compares against the
   stronger slice where deterministic hybrid still failed to beat BM25.
 - Current answer-quality harness smoke:
-  `reviews/overnight-20260522/answer-quality-preflight-20260525.json` and
+  `reviews/overnight-20260522/answer-quality-arm-export-20260525.json`,
+  `reviews/overnight-20260522/answer-quality-preflight-20260525.json`, and
   `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`.
-  The preflight proves the clean controller shell is still blocked from live
-  answer-quality scoring until model-call consent, public-data consent,
-  no-raw-output consent, private materialized inputs, and response arm exports
-  are present. The fixture smoke proves the parser, safety flags, strategy
-  table, and metrics-only output for `benchmark:answer-quality` without
-  provider calls. Neither file counts as a MemoryBench or LongMemEval
-  answer-quality result. A live result must use the private materialized query
-  set, memories, answer labels, and per-strategy response exports, then pass
+  The arm-export preflight proves the clean controller shell has the required
+  BM25, full-hybrid, query-expansion, provider, local Apple, and local rerank
+  response-arm plan, but remains blocked until private materialized inputs and
+  live export consent exist. The scoring preflight remains blocked until
+  model-call consent, public-data consent, no-raw-output consent, private
+  materialized inputs, and response arm exports are present. The fixture smoke
+  proves the parser, safety flags, strategy table, and metrics-only output for
+  `benchmark:answer-quality` without provider calls. These files do not count
+  as a MemoryBench or LongMemEval answer-quality result. A live result must use
+  the private materialized query set, memories, answer labels, and per-strategy
+  response exports from `benchmark:answer-quality:arms -- --execute`, then pass
   `benchmark:memory-score:result-gate --require-ready` before it can enter any
   SOTA evidence packet.
 - Single-provider expanded preflights:

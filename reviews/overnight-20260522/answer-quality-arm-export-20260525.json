@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-arm-export",
+  "status": "BLOCKED_RESPONSE_ARM_EXPORT_ENV",
+  "fixtureOnly": false,
+  "executesExports": false,
+  "writesPrivateResponseFiles": false,
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "readyForAnswerQualityPreflight": false,
+  "readyForEndToEndMemoryScoreGate": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-05-25T18:56:44.586Z",
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "input": {
+    "querySet": {
+      "role": "queryset",
+      "present": false,
+      "rawTextPrivate": true
+    },
+    "memories": {
+      "role": "memories",
+      "present": false,
+      "rawTextPrivate": true
+    }
+  },
+  "privateOutput": {
+    "present": false,
+    "pathLabel": null,
+    "insideRepository": null,
+    "valuePrinted": false
+  },
+  "env": {
+    "liveExportEnabled": false,
+    "noRawTextConfirmed": false,
+    "providerCallsEnabled": false,
+    "providerPublicDataConfirmed": false,
+    "queryExpansionReady": false,
+    "localQueryExpansionEndpointPresent": false,
+    "valuePrinted": false
+  },
+  "strategyCoverage": {
+    "hasBm25Lite": true,
+    "hasFullHybridRerank": true,
+    "hasQueryExpansion": true,
+    "hasProviderChallenger": true,
+    "hasLocalApple": true,
+    "hasLocalRerank": true,
+    "strategyCount": 7
+  },
+  "arms": [
+    {
+      "strategy": "bm25-lite",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "bm25-lite-responses.private.json"
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "full-hybrid-rerank-responses.private.json"
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "query-expanded-full-hybrid-rerank-responses.private.json"
+    },
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "cloud-voyage4-voyage-lite-rerank-responses.private.json"
+    },
+    {
+      "strategy": "cloud-nvidia-nemotron-1b",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "cloud-nvidia-nemotron-1b-responses.private.json"
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "local-apple-qwen3-0_6b-responses.private.json"
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "local-apple-qwen3-0_6b-local-rerank-responses.private.json"
+    }
+  ],
+  "blockers": [
+    "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+    "private-queryset-missing",
+    "private-memories-missing",
+    "private-response-output-dir-missing",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+    "query-expansion-endpoint-or-consent-missing"
+  ],
+  "answerQualityArmArgs": [
+    "--arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json",
+    "--arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json",
+    "--arm query-expanded-full-hybrid-rerank=<private-output-dir>/query-expanded-full-hybrid-rerank-responses.private.json",
+    "--arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/cloud-voyage4-voyage-lite-rerank-responses.private.json",
+    "--arm cloud-nvidia-nemotron-1b=<private-output-dir>/cloud-nvidia-nemotron-1b-responses.private.json",
+    "--arm local-apple-qwen3-0_6b=<private-output-dir>/local-apple-qwen3-0_6b-responses.private.json",
+    "--arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/local-apple-qwen3-0_6b-local-rerank-responses.private.json"
+  ],
+  "nextActions": [
+    "Materialize the source-locked LongMemEval target into a private directory outside the repository.",
+    "Set RECALLWEAVE_BASELINE_LIVE=1 and RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 for live exports.",
+    "Enable provider or local endpoint consent only for the arms being tested.",
+    "Keep BM25, full-hybrid, query-expansion, provider, local Apple, and local rerank arms on the same data."
+  ]
+}

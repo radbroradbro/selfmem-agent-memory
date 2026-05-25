@@ -182,19 +182,23 @@ The answer-quality harness is now present as the conversion step from
 retrieval-proxy evidence to end-to-end memory evidence:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --fixture
 ```
 
-The checked-in preflight evidence is
+The checked-in response-arm export preflight is
+`reviews/overnight-20260522/answer-quality-arm-export-20260525.json`, the
+checked-in live scoring preflight is
 `reviews/overnight-20260522/answer-quality-preflight-20260525.json`, and the
 checked-in fixture smoke is
 `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`. It
 proves public-safe metrics output, strategy scoring shape, and fail-closed
 claim flags with zero provider calls. It does not prove a MemoryBench or
 LongMemEval answer-quality win. A live run must use the private materialized
-query set, memories, answer labels, and per-strategy response exports for the
-same source-locked target, then pass:
+query set, memories, answer labels, and per-strategy response exports generated
+by `benchmark:answer-quality:arms -- --execute` for the same source-locked
+target, then pass:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \

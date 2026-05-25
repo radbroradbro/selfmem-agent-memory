@@ -225,17 +225,26 @@ answer-quality result and not a public comparison claim.
 
 The current answer-quality harness smoke is
 `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`, and
-the live-run preflight is
+the live-run preflights are
+`reviews/overnight-20260522/answer-quality-arm-export-20260525.json` and
 `reviews/overnight-20260522/answer-quality-preflight-20260525.json`. The smoke
-proves the metrics-only `benchmark:answer-quality` output shape in fixture
-mode with zero provider calls. The preflight proves the clean shell is still
-blocked until private materialized inputs, response arm exports, model-call
-consent, public-data consent, and no-raw-output consent are present. Neither is
-live benchmark evidence. To turn a retrieval or provider canary into end-to-end
-memory evidence, run the preflight and harness against private materialized
-LongMemEval inputs and per-strategy response exports, then require:
+proves the metrics-only `benchmark:answer-quality` output shape in fixture mode
+with zero provider calls. The arm-export preflight proves the same-data response
+arm plan is present for BM25, full-hybrid, query expansion, provider, local
+Apple, and local rerank arms. The scoring preflight proves the clean shell is
+still blocked until private materialized inputs, response arm exports,
+model-call consent, public-data consent, and no-raw-output consent are present.
+None of these is live benchmark evidence. To turn a retrieval or provider
+canary into end-to-end memory evidence, export the response arms, run the
+preflight and harness against private materialized LongMemEval inputs, then
+require:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
+  --queryset <private-queryset.json> \
+  --memories <private-memories.jsonl> \
+  --private-output-dir <private-response-arm-dir>
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready \
   --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
   --queryset <private-queryset.json> \

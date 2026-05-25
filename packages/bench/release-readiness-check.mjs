@@ -115,6 +115,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
   "packages/bench/public-benchmark-autoresearch-loop.mjs",
+  "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
   "packages/bench/public-benchmark-answer-quality-preflight.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -163,6 +164,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
+  `${reviewDir}/answer-quality-arm-export-20260525.json`,
+  `${reviewDir}/answer-quality-arm-export-20260525.md`,
   `${reviewDir}/answer-quality-preflight-20260525.json`,
   `${reviewDir}/answer-quality-preflight-20260525.md`,
   `${reviewDir}/returned-downloads-current-scan.json`,
@@ -496,6 +499,7 @@ const requiredScripts = [
   "benchmark:public-provider:packet",
   "benchmark:public-provider",
   "benchmark:public-autoresearch",
+  "benchmark:answer-quality:arms",
   "benchmark:answer-quality:preflight",
   "benchmark:answer-quality",
   "benchmark:query-expansion:preflight",
@@ -1434,6 +1438,15 @@ check("fresh public benchmark target check passes", () => {
     "--format",
     "markdown",
   ]).stdout;
+  const answerQualityArmExportFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality-arm-export.mjs"]).stdout);
+  const answerQualityArmExportMarkdownFresh = run("node", [
+    "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
+    "--format",
+    "markdown",
+  ]).stdout;
+  const answerQualityArmExportFixture = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-answer-quality-arm-export.mjs", "--fixture", "--execute"]).stdout,
+  );
   const answerQualityPreflightFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality-preflight.mjs"]).stdout);
   const answerQualityPreflightMarkdownFresh = run("node", [
     "packages/bench/public-benchmark-answer-quality-preflight.mjs",
@@ -1442,6 +1455,8 @@ check("fresh public benchmark target check passes", () => {
   ]).stdout;
   const answerQualityFixture = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture"]).stdout);
   const answerQualityMarkdown = run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture", "--format", "markdown"]).stdout;
+  const answerQualityArmExportEvidence = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.json"), "utf8"));
+  const answerQualityArmExportMarkdownEvidence = readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.md"), "utf8");
   const answerQualityPreflightEvidence = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-preflight-20260525.json"), "utf8"));
   const answerQualityPreflightMarkdownEvidence = readFileSync(join(root, reviewDir, "answer-quality-preflight-20260525.md"), "utf8");
   const liveMaterializeReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run.json"), "utf8"));
@@ -1653,6 +1668,50 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(Number(autoresearchFixture.loop?.armCount ?? 0) >= 12);
   assert.ok(autoresearchFixture.winner?.armId);
   assert.match(autoresearchMarkdown, /Public Benchmark Autoresearch Loop/);
+  for (const armExport of [answerQualityArmExportFresh, answerQualityArmExportEvidence]) {
+    assert.equal(armExport.ok, true);
+    assert.equal(armExport.mode, "public-benchmark-answer-quality-arm-export");
+    assert.equal(armExport.status, "BLOCKED_RESPONSE_ARM_EXPORT_ENV");
+    assert.equal(armExport.metricsOnly, true);
+    assert.equal(armExport.publicSafe, true);
+    assert.equal(armExport.retrievalProxyOnly, true);
+    assert.equal(armExport.memoryBenchAnswerQuality, false);
+    assert.equal(armExport.readyForAnswerQualityPreflight, false);
+    assert.equal(armExport.readyForEndToEndMemoryScoreGate, false);
+    assert.equal(armExport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(armExport.callsProviderApis, false);
+    assert.equal(armExport.sendsBenchmarkTextToProvider, false);
+    assert.equal(armExport.rawQuestionsIncluded, false);
+    assert.equal(armExport.rawAnswersIncluded, false);
+    assert.equal(armExport.rawMemoryIncluded, false);
+    assert.equal(armExport.rawTranscriptIncluded, false);
+    assert.equal(armExport.rawPrivateOutputPathIncluded, false);
+    assert.equal(armExport.strategyCoverage?.hasBm25Lite, true);
+    assert.equal(armExport.strategyCoverage?.hasFullHybridRerank, true);
+    assert.equal(armExport.strategyCoverage?.hasQueryExpansion, true);
+    assert.equal(armExport.strategyCoverage?.hasProviderChallenger, true);
+    assert.equal(armExport.strategyCoverage?.hasLocalApple, true);
+    assert.equal(armExport.strategyCoverage?.hasLocalRerank, true);
+    assert.ok(armExport.blockers.includes("private-queryset-missing"));
+    assert.ok(armExport.blockers.includes("private-response-output-dir-missing"));
+    assert.ok(armExport.blockers.includes("RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed"));
+    assert.ok(armExport.blockers.includes("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled"));
+    assert.ok(armExport.blockers.includes("query-expansion-endpoint-or-consent-missing"));
+  }
+  assert.match(answerQualityArmExportMarkdownFresh, /Answer-Quality Response Arm Export/);
+  assert.match(answerQualityArmExportMarkdownEvidence, /BLOCKED_RESPONSE_ARM_EXPORT_ENV/);
+  assert.equal(answerQualityArmExportFixture.status, "EXPORTED_RESPONSE_ARMS");
+  assert.equal(answerQualityArmExportFixture.fixtureOnly, true);
+  assert.equal(answerQualityArmExportFixture.executesExports, true);
+  assert.equal(answerQualityArmExportFixture.writesPrivateResponseFiles, true);
+  assert.equal(answerQualityArmExportFixture.readyForAnswerQualityPreflight, false);
+  assert.equal(answerQualityArmExportFixture.countsAsFullMemorySotaEvidence, false);
+  assert.equal(answerQualityArmExportFixture.callsProviderApis, false);
+  assert.equal(answerQualityArmExportFixture.rawPrivateOutputPathIncluded, false);
+  assert.ok(answerQualityArmExportFixture.arms?.length >= 7);
+  assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank"));
+  assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "cloud-voyage4-voyage-lite-rerank" && item.providerMockCalls > 0));
+  assert.ok(answerQualityArmExportFixture.arms?.every((item) => item.privacyLeakCount === 0 && item.redactionFailureCount === 0));
   for (const preflight of [answerQualityPreflightFresh, answerQualityPreflightEvidence]) {
     assert.equal(preflight.ok, true);
     assert.equal(preflight.mode, "public-benchmark-answer-quality-preflight");

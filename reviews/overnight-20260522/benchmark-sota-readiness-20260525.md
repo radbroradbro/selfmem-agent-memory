@@ -125,6 +125,12 @@ Follow-up implementation evidence on 2026-05-25:
   currently blocks because the clean shell has no model-call consent,
   public-data consent, no-raw-output consent, private materialized inputs, or
   response arm exports.
+- `benchmark:answer-quality:arms` now exists as the fail-closed response-arm
+  export step before answer-quality scoring. Evidence is checked in at
+  `reviews/overnight-20260522/answer-quality-arm-export-20260525.json`; it
+  keeps the clean shell blocked, names the missing private input/export consent,
+  and verifies the required BM25, full-hybrid, query-expansion, provider,
+  local Apple, and local rerank arm plan.
 - `benchmark:answer-quality` exists as the explicit conversion step from
   retrieval-proxy evidence to end-to-end answer-quality evidence. Fixture smoke
   evidence is checked in at

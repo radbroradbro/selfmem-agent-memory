@@ -278,6 +278,7 @@ the answer-quality harness.
 First prove parser and safety wiring without model calls:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --fixture
 ```
@@ -295,15 +296,19 @@ npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live \
   --private-output-dir "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized" \
   --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialize-report.json"
 
-RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
-npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live \
+RECALLWEAVE_BASELINE_LIVE=1 \
+RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 \
+RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 \
+RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 \
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
   --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json" \
   --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl" \
-  --preserve-ids \
-  --strategy <strategy> \
+  --private-output-dir "$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms" \
+  --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,<provider-or-local-arm> \
   --context-token-budget 800 \
   --limit 5 \
-  --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/<strategy>-responses.private.json"
+  --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-arm-export.json"
 
 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 \
 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 \
@@ -317,9 +322,10 @@ npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-r
   --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json" \
   --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl" \
   --answer-labels "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json" \
-  --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/bm25-lite-responses.private.json" \
-  --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/full-hybrid-rerank-responses.private.json" \
-  --arm <provider-or-local-arm>="$RECALLWEAVE_SOTA_OUTPUT_DIR/<provider-or-local-arm>-responses.private.json" \
+  --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/bm25-lite-responses.private.json" \
+  --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/full-hybrid-rerank-responses.private.json" \
+  --arm query-expanded-full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/query-expanded-full-hybrid-rerank-responses.private.json" \
+  --arm <provider-or-local-arm>="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/<provider-or-local-arm>-responses.private.json" \
   --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-preflight.json"
 
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live \
@@ -327,9 +333,10 @@ npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live \
   --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json" \
   --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl" \
   --answer-labels "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json" \
-  --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/bm25-lite-responses.private.json" \
-  --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/full-hybrid-rerank-responses.private.json" \
-  --arm <provider-or-local-arm>="$RECALLWEAVE_SOTA_OUTPUT_DIR/<provider-or-local-arm>-responses.private.json" \
+  --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/bm25-lite-responses.private.json" \
+  --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/full-hybrid-rerank-responses.private.json" \
+  --arm query-expanded-full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/query-expanded-full-hybrid-rerank-responses.private.json" \
+  --arm <provider-or-local-arm>="$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/<provider-or-local-arm>-responses.private.json" \
   --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json" \
   --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.md"
 
