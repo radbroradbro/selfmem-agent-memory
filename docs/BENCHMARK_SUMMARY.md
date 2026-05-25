@@ -121,6 +121,16 @@ quality 0.2351. So the current recommendation is clear: keep BM25 as the
 local default/fallback, and use the provider benchmark lane to test whether
 real embeddings and rerankers beat it.
 
+A follow-up autoresearch hypothesis tested
+`metadata-aware-full-hybrid-rerank` on that same 30-query target:
+`reviews/overnight-20260522/public-longmemeval-metadata-aware-autoresearch-20260525.json`.
+It compared `bm25-lite`, `full-hybrid-rerank`, and the metadata-aware hybrid
+candidate across the same token budgets and limits. The hypothesis failed:
+`bm25-lite-b800-k5` stayed the winner at quality 0.2506, the best
+`full-hybrid-rerank` arm reached 0.2351, and the metadata-aware arm peaked at
+0.1121. The candidate remains available as an explicit experimental arm for
+reproduction, but it is not a default or promoted method.
+
 The provider-backed benchmark lane now has an opt-in harness. The fixture gate
 is `reviews/overnight-20260522/public-longmemeval-provider-gate-fixture.json`.
 It compares `bm25-lite`, `full-hybrid-rerank`, `cloud-voyage-rerank-only`,

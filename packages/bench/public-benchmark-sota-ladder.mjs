@@ -14,6 +14,7 @@ const evidenceFiles = {
   sourceLockedTarget: "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
   expandedHybridGate: "reviews/overnight-20260522/public-longmemeval-expanded-hybrid-gate.json",
   expandedAutoresearch: "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
+  metadataAwareAutoresearch: "reviews/overnight-20260522/public-longmemeval-metadata-aware-autoresearch-20260525.json",
   voyageLatencyCanary: "reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json",
   localApple4bWarm: "reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-warm.json",
   queryExpansionPreflight: "reviews/overnight-20260522/query-expansion-preflight-20260525.json",

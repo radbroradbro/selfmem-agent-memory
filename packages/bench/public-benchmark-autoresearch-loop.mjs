@@ -42,6 +42,7 @@ const retrievalStrategies = [
   "sparse-dense-temporal",
   "sparse-dense-graph-temporal",
   "full-hybrid-rerank",
+  "metadata-aware-full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
@@ -260,6 +261,7 @@ function isHybridFamilyStrategy(strategy) {
     "sparse-dense-temporal",
     "sparse-dense-graph-temporal",
     "full-hybrid-rerank",
+    "metadata-aware-full-hybrid-rerank",
     "query-expanded-full-hybrid-rerank",
   ].includes(strategy);
 }

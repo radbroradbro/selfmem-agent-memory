@@ -36,6 +36,7 @@ const retrievalStrategies = [
   "sparse-dense-temporal",
   "sparse-dense-graph-temporal",
   "full-hybrid-rerank",
+  "metadata-aware-full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
@@ -270,6 +271,7 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "sparse-dense-temporal") return rankSparseDenseTemporal(query, candidates);
   if (options.strategy === "sparse-dense-graph-temporal") return rankSparseDenseGraphTemporal(query, candidates);
   if (options.strategy === "full-hybrid-rerank") return rankFullHybridRerank(query, candidates);
+  if (options.strategy === "metadata-aware-full-hybrid-rerank") return rankMetadataAwareFullHybridRerank(query, candidates);
   if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates, options);
   if (options.strategy === "cloud-voyage-rerank-only") return rankCloudVoyageRerankOnly(query, candidates, options);
   if (voyageStrategyConfig(options.strategy)?.mode === "embed-rerank") return rankCloudVoyage4Voyage(query, candidates, options);
@@ -370,6 +372,18 @@ function rankSparseDenseGraphTemporal(query, candidates) {
 function rankFullHybridRerank(query, candidates) {
   const firstStage = rankSparseDenseGraphTemporal(query, candidates);
   return rerankProxy(query, firstStage);
+}
+
+function rankMetadataAwareFullHybridRerank(query, candidates) {
+  const firstStage = fuseRankedChannels(
+    candidates,
+    [
+      { name: "hybrid", weight: 1, ranked: rankSparseDenseGraphTemporal(query, candidates) },
+      { name: "metadata", weight: metadataWeight(query), ranked: rankMetadataAlignment(query, candidates) },
+    ],
+    { scoreScale: 10 },
+  );
+  return metadataAwareRerankProxy(query, firstStage);
 }
 
 async function rankQueryExpandedFullHybridRerank(query, candidates, options = {}) {
@@ -719,6 +733,23 @@ function rankGraphProxy(query, candidates) {
     .sort(byScoreThenId);
 }
 
+function rankMetadataAlignment(query, candidates) {
+  const queryMetadata = query?.metadata && typeof query.metadata === "object" ? query.metadata : {};
+  const queryType = normalizeText(queryMetadata.questionType ?? "");
+  const queryMetadataTokens = metadataTokens(queryMetadata);
+  return candidates
+    .map((candidate) => {
+      const candidateMetadata = candidate.metadata && typeof candidate.metadata === "object" ? candidate.metadata : {};
+      const candidateType = normalizeText(candidateMetadata.questionType ?? "");
+      const exactType = queryType && candidateType && queryType === candidateType ? 0.54 : 0;
+      const broadType = queryType && candidateType && broadQuestionType(queryType) === broadQuestionType(candidateType) ? 0.16 : 0;
+      const metadataOverlap = overlapRatio(queryMetadataTokens, metadataTokens(candidateMetadata)) * 0.22;
+      const temporalFit = temporalCompatibility(query, candidate) * 0.08;
+      return { ...candidate, score: round(exactType + broadType + metadataOverlap + temporalFit + candidate.baseScore * 0.01) };
+    })
+    .sort(byScoreThenId);
+}
+
 function rerankProxy(query, candidates) {
   const queryText = queryTextValue(query);
   const queryTokens = new Set(tokenize(queryText));
@@ -732,6 +763,16 @@ function rerankProxy(query, candidates) {
       const roleCoverage = roleCoverageScore(candidate.text) * 0.08;
       const prior = reciprocalRankBoost(index + 1) * 3;
       return { ...candidate, score: round(candidate.score * 0.58 + lexical * 0.18 + bigrams * 0.08 + exact + roleCoverage + prior) };
+    })
+    .sort(byScoreThenId);
+}
+
+function metadataAwareRerankProxy(query, candidates) {
+  const metadataRank = new Map(rankMetadataAlignment(query, candidates).map((candidate, index) => [candidate.outputId, index + 1]));
+  return rerankProxy(query, candidates)
+    .map((candidate) => {
+      const rank = metadataRank.get(candidate.outputId);
+      return { ...candidate, score: round(candidate.score + reciprocalRankBoost(rank) * 4) };
     })
     .sort(byScoreThenId);
 }
@@ -2057,6 +2098,37 @@ function roleCoverageScore(text) {
 function temporalWeight(query) {
   const text = normalizeText(`${queryTextValue(query)} ${query?.metadata?.questionType ?? ""}`);
   return /\btemporal|knowledge-update|latest|recent|recently|last|current|now|after|before|when|changed|updated\b/.test(text) ? 0.7 : 0.25;
+}
+
+function metadataWeight(query) {
+  const type = normalizeText(query?.metadata?.questionType ?? "");
+  if (!type) return 0.35;
+  if (/\b(temporal|knowledge-update|multi-session)\b/.test(type)) return 0.85;
+  return 0.65;
+}
+
+function metadataTokens(metadata) {
+  return new Set(
+    Object.entries(metadata ?? {})
+      .filter(([key]) => ["kind", "type", "category", "questionType", "source"].includes(key))
+      .flatMap(([key, value]) => tokenize(`${key} ${String(value ?? "")}`)),
+  );
+}
+
+function broadQuestionType(value) {
+  const text = normalizeText(value);
+  if (text.startsWith("single-session")) return "single-session";
+  if (text.startsWith("multi-session")) return "multi-session";
+  if (text.startsWith("knowledge-update")) return "knowledge-update";
+  if (text.startsWith("temporal")) return "temporal";
+  return text;
+}
+
+function temporalCompatibility(query, candidate) {
+  const text = normalizeText(`${queryTextValue(query)} ${query?.metadata?.questionType ?? ""}`);
+  const wantsTemporal = /\b(temporal|knowledge-update|latest|recent|recently|last|current|now|after|before|when|changed|updated)\b/.test(text);
+  if (!wantsTemporal) return 0;
+  return Number.isFinite(candidate.dateMs) ? 1 : 0;
 }
 
 function ngrams(tokens, size) {

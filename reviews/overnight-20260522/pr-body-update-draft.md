@@ -101,6 +101,11 @@ Live status:
   quality 0.2506 and P@1 0.4667; `full-hybrid-rerank` is the best local proxy
   hybrid but trails at quality 0.2289 and p50 417 ms, so deterministic hybrid
   promotion remains blocked until live embedding/reranker arms beat the control.
+- Adds a negative autoresearch follow-up for `metadata-aware-full-hybrid-rerank`
+  on the same 30-question LongMemEval-S target. The arm compared against
+  `bm25-lite` and `full-hybrid-rerank` across the same budget and top-k matrix,
+  but peaked at quality 0.1121 while BM25 stayed at 0.2506. The method remains
+  an explicit reproducibility arm only; it is not promoted.
 - Adds the provider-backed gate scaffold. The new `benchmark:public-provider`
   command compares `bm25-lite`, `full-hybrid-rerank`,
   `cloud-voyage-rerank-only`, `cloud-voyage4-voyage`,

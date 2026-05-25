@@ -237,6 +237,10 @@ requirements are resolved.
   questions, 92 expected references, and 1,420 haystack sessions. BM25 remains
   the control winner, so the deterministic proxy hybrid is still blocked from
   default promotion pending live embedding/reranker runs.
+- Current metadata-aware autoresearch evidence is negative: the explicit
+  `metadata-aware-full-hybrid-rerank` challenger peaked at quality 0.1121 on
+  the same 30-query target, below BM25 at 0.2506 and the best deterministic
+  full-hybrid arm at 0.2351. This remains reproducibility evidence only.
 - Current expanded provider preflight evidence binds the next live cloud run to
   `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`,
   calls no provider APIs, sends no benchmark text, and remains blocked until

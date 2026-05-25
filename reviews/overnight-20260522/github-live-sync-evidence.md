@@ -217,4 +217,16 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 2e4ed555be77ee6f6e4f83439e5b69fa8538d034d475c54c28e2667b06168f6c
 
+## 2026-05-25 Metadata-Aware Autoresearch Refresh
+
+- PR #5 and issue #6 were refreshed again after the same-data autoresearch loop
+  added negative evidence for `metadata-aware-full-hybrid-rerank` on the
+  30-query LongMemEval-S target.
+- The refreshed live sync check matched the checked-in public-safe drafts.
+- PR body refreshed at: 2026-05-25T22:35:09Z
+- Issue updated at: 2026-05-25T22:35:09Z
+- PR body hash: eaa445ecf85a2957976e7dc9ff4f145be7e9b5b5a965e9d5b03d929bb5acc72d
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: 364c8de90b7c53c24a23eff8d7eccaa62dd538abcb82a6c743af3da569eca066
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

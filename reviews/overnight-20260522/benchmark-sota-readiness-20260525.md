@@ -49,6 +49,12 @@ repository evidence.
   stress slice, Voyage-backed arms trend better but slower, Apple 0.6B and 4B
   local embedding arms did not beat BM25 on quality, and the next local method
   challenger is the local Apple embedding lane plus a local reranker sidecar.
+- A same-data autoresearch follow-up tested
+  `metadata-aware-full-hybrid-rerank` against `bm25-lite` and
+  `full-hybrid-rerank` across the 30-query target. It failed to improve the
+  retrieval-proxy score: BM25 stayed at 0.2506 quality, best full-hybrid stayed
+  at 0.2351, and the metadata-aware candidate peaked at 0.1121. It is retained
+  only as explicit negative-method evidence, not a promoted route.
 
 ## Component Benchmark Research Checked Live
 
