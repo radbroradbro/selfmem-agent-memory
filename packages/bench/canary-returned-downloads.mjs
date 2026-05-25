@@ -272,7 +272,7 @@ function toMarkdown(report) {
       : "No production canary evidence was found. Public launch and fleet rollout remain blocked.",
     "",
   ];
-  return `${lines.filter((line) => line !== null).join("\n")}\n`;
+  return `${lines.filter((line) => line !== null).join("\n").replace(/\n+$/, "")}\n`;
 }
 
 function formatReasonCounts(counts) {

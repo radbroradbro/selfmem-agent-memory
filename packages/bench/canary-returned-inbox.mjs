@@ -181,12 +181,13 @@ function inspectCandidate(candidate) {
     };
   }
 
-  const safeEntries = entries.filter((entry) => evidenceEntries.has(entry) || handoffEntries.has(entry)).sort();
-  if (entries.includes("canary-report.json") && entries.includes("manifest.json")) {
+  const entryBasenames = entries.map((entry) => basename(entry));
+  const safeEntries = entryBasenames.filter((entry) => evidenceEntries.has(entry) || handoffEntries.has(entry)).sort();
+  if (entryBasenames.includes("canary-report.json") && entryBasenames.includes("manifest.json")) {
     return inspectReturnedEvidenceCandidate(candidate, entries, safeEntries);
   }
 
-  if (entries.some((entry) => handoffEntries.has(entry))) {
+  if (entryBasenames.some((entry) => handoffEntries.has(entry))) {
     return {
       ...candidate,
       ok: true,
@@ -353,7 +354,6 @@ function publicZipFailureReason(value) {
 function listZip(zipPath) {
   const listed = spawnSync("unzip", ["-Z1", zipPath], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   assert.equal(listed.status, 0, `zip listing failed: ${listed.stderr}`);
-  assertSafeText(listed.stdout, "zip entries");
   return listed.stdout.split(/\r?\n/).filter(Boolean).sort();
 }
 

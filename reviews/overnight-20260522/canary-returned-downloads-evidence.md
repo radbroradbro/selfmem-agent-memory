@@ -37,24 +37,27 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output <met
 - Production evidence packets: 0.
 - Returned evidence packets: 0.
 - Handoff packets: 1.
-- Diagnostic bundles: 8.
-- Unknown packets: 19.
-- Unreadable packets: 5.
+- Diagnostic bundles: 10.
+- Unknown packets: 22.
+- Unreadable packets: 0.
 - Downloads scan:
   - candidates: 19.
   - handoff packets: 1.
-  - diagnostics: 4.
-  - unknown: 9.
-  - unreadable: 5.
+  - diagnostics: 6.
+  - unknown: 12.
+  - unreadable: 0.
 - Telegram Desktop scan:
   - candidates: 14.
   - diagnostics: 4.
   - unknown: 10.
 
+The refreshed scanner no longer treats zip entries with private-looking paths as
+unreadable. It uses sanitized basenames for classification and still emits only
+safe entry labels, hashes, counts, and status codes.
+
 The scan wrote
-`reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md`
-as the native markdown findings note. It contains counts and safe inbox labels
-only.
+`reviews/overnight-20260522/returned-downloads-current-scan.md` as the native
+markdown findings note. It contains counts and safe inbox labels only.
 
 ## Fixture Result
 

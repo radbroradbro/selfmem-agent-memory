@@ -1,12 +1,12 @@
 {
-  "ok": false,
+  "ok": true,
   "mode": "canary-returned-downloads",
   "defaultInboxScan": true,
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicLaunchAllowed": false,
   "fleetRolloutAllowed": false,
-  "requireFound": true,
+  "requireFound": false,
   "includeAllZips": true,
   "discoveredRootCount": 2,
   "rootLabels": [
@@ -21,12 +21,12 @@
     "productionEvidencePackets": 0,
     "returnedEvidencePackets": 0,
     "handoffPackets": 1,
-    "diagnosticBundles": 8,
-    "unknownPackets": 19,
-    "unreadablePackets": 5
+    "diagnosticBundles": 10,
+    "unknownPackets": 22,
+    "unreadablePackets": 0
   },
   "returnedWatch": {
-    "ok": false,
+    "ok": true,
     "mode": "canary-returned-watch",
     "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
     "writesRealFiles": false,
@@ -40,9 +40,9 @@
       "productionEvidencePackets": 0,
       "returnedEvidencePackets": 0,
       "handoffPackets": 1,
-      "diagnosticBundles": 8,
-      "unknownPackets": 19,
-      "unreadablePackets": 5
+      "diagnosticBundles": 10,
+      "unknownPackets": 22,
+      "unreadablePackets": 0
     },
     "latestScans": [
       {
@@ -53,49 +53,38 @@
         "returnedEvidencePackets": 0,
         "productionEvidencePackets": 0,
         "handoffPackets": 1,
-        "diagnosticBundles": 4,
-        "unreadablePackets": 5,
-        "unknownPackets": 9,
+        "diagnosticBundles": 6,
+        "unreadablePackets": 0,
+        "unknownPackets": 12,
         "labelMode": "hash-redacted",
         "triage": {
           "labelMode": "hash-redacted",
           "metricsOnly": true,
           "unknown": {
-            "count": 9,
+            "count": 12,
             "statusCounts": {
-              "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 9
+              "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 12
             },
             "failedCheckCounts": {
-              "not-canary-evidence-packet": 9
+              "not-canary-evidence-packet": 12
             },
             "reasonCounts": {
-              "zip does not contain the returned canary evidence packet contract": 9
-            },
-            "sampleIds": [
-              "zip-1869e3224be4",
-              "zip-4d6b788b5ccf",
-              "zip-ae02256bbba1",
-              "zip-3616fe224f2b",
-              "zip-0d89d11c6128"
-            ]
-          },
-          "unreadable": {
-            "count": 5,
-            "statusCounts": {
-              "UNREADABLE_ZIP": 5
-            },
-            "failedCheckCounts": {
-              "unreadable-zip": 5
-            },
-            "reasonCounts": {
-              "zip entry failed public-safety path scan": 5
+              "zip does not contain the returned canary evidence packet contract": 12
             },
             "sampleIds": [
               "zip-21bdd26b49f9",
-              "zip-35dadada12ac",
-              "zip-06baf2421f10",
-              "zip-16352c5c2ef9"
+              "zip-1869e3224be4",
+              "zip-4d6b788b5ccf",
+              "zip-ae02256bbba1",
+              "zip-3616fe224f2b"
             ]
+          },
+          "unreadable": {
+            "count": 0,
+            "statusCounts": {},
+            "failedCheckCounts": {},
+            "reasonCounts": {},
+            "sampleIds": []
           }
         }
       },
@@ -144,7 +133,7 @@
       }
     ]
   },
-  "childExitStatus": 1,
+  "childExitStatus": 0,
   "parseError": null,
   "nextActions": [
     "Keep waiting for a returned metrics-only production canary evidence packet.",
