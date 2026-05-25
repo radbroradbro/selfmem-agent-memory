@@ -26,6 +26,10 @@ Use this checklist before making the repository public.
   answer-quality retry flow from the SOTA operator packet, combine it with the
   existing same-data answer-quality reports, and rerun the provider-challenger,
   memory-score, and SOTA-ladder gates before changing public wording.
+- [ ] Broad SOTA or production-replacement wording uses the full 500-query
+  LongMemEval answer-quality target, either as one run or as complete
+  non-overlapping `--query-offset` / `--max-queries` shards merged with
+  `benchmark:answer-quality:combine -- --combine-mode shards`.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.
 
 ## Scans

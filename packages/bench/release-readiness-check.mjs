@@ -1941,6 +1941,93 @@ check("fresh public benchmark target check passes", () => {
     });
     assert.notEqual(mismatchAnswerRun.status, 0, "answer-quality combine must fail closed on answer model mismatch");
     assert.match(`${mismatchAnswerRun.stdout}\n${mismatchAnswerRun.stderr}`, /answer model/i);
+
+    const shardBase = structuredClone(answerQualityFixture);
+    shardBase.fixtureOnly = false;
+    shardBase.readyForEndToEndMemoryScoreGate = true;
+    shardBase.callsProviderApis = true;
+    shardBase.sendsBenchmarkTextToProvider = true;
+    shardBase.provider.answerQualityCallsAllowed = true;
+    shardBase.provider.publicDataConfirmed = true;
+    shardBase.provider.callsMade = 12;
+    const writeShard = (name, startIndex, endIndexExclusive, selectedIndexes, overrides = {}, totalQueryCount = 2) => {
+      const shard = structuredClone(shardBase);
+      shard.input.queryCount = totalQueryCount;
+      shard.input.totalQueryCount = totalQueryCount;
+      shard.input.scoredQueryCount = selectedIndexes.length;
+      shard.input.queryOffset = startIndex;
+      shard.input.queryLimit = endIndexExclusive - startIndex;
+      shard.input.scoredQueryStart = startIndex;
+      shard.input.scoredQueryEndExclusive = endIndexExclusive;
+      shard.input.queryShard = {
+        startIndex,
+        endIndexExclusive,
+        totalQueryCount,
+        scoredQueryCount: selectedIndexes.length,
+        requestedLimit: endIndexExclusive - startIndex,
+        completeDataset: false,
+        selectedQueryIdHash: `sha256:${name}${"a".repeat(Math.max(0, 64 - name.length))}`.slice(0, 71),
+      };
+      for (const arm of shard.strategies) {
+        arm.scoredQueryCount = selectedIndexes.length;
+        arm.resultFingerprints = selectedIndexes.map((index) => arm.resultFingerprints[index]);
+      }
+      Object.assign(shard, overrides);
+      const path = join(combineMismatchRoot, `${name}.json`);
+      writeFileSync(path, `${JSON.stringify(shard, null, 2)}\n`);
+      return path;
+    };
+
+    const shard0 = writeShard("shard0", 0, 1, [0]);
+    const shard1 = writeShard("shard1", 1, 2, [1]);
+    const shardCombineRun = spawnSync("node", [
+      "packages/bench/public-benchmark-answer-quality-combine.mjs",
+      "--combine-mode",
+      "shards",
+      "--input",
+      `${shard0},${shard1}`,
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.equal(shardCombineRun.status, 0, `answer-quality shard combine should pass\n${shardCombineRun.stderr}`);
+    const shardCombined = JSON.parse(shardCombineRun.stdout);
+    assert.equal(shardCombined.combineMode, "query-shard-answer-quality-union");
+    assert.equal(shardCombined.input?.scoredQueryCount, 2);
+    assert.equal(shardCombined.sourceLock?.queryShardCoverage?.complete, true);
+    assert.ok(shardCombined.strategies?.every((item) => item.scoredQueryCount === 2));
+
+    const overlapShard = writeShard("overlap", 0, 1, [0]);
+    const overlapRun = spawnSync("node", [
+      "packages/bench/public-benchmark-answer-quality-combine.mjs",
+      "--combine-mode",
+      "shards",
+      "--input",
+      `${shard0},${overlapShard}`,
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(overlapRun.status, 0, "answer-quality shard combine must fail closed on overlap");
+    assert.match(`${overlapRun.stdout}\n${overlapRun.stderr}`, /gap or overlap/i);
+
+    const gapStart = writeShard("gapstart", 0, 1, [0], {}, 3);
+    const gapShard = writeShard("gap", 2, 3, [1], {}, 3);
+    const gapRun = spawnSync("node", [
+      "packages/bench/public-benchmark-answer-quality-combine.mjs",
+      "--combine-mode",
+      "shards",
+      "--input",
+      `${gapStart},${gapShard}`,
+    ], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    assert.notEqual(gapRun.status, 0, "answer-quality shard combine must fail closed on coverage gaps");
+    assert.match(`${gapRun.stdout}\n${gapRun.stderr}`, /gap or overlap/i);
   } finally {
     rmSync(combineMismatchRoot, { recursive: true, force: true });
   }
@@ -2438,6 +2525,12 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(fullTargetOperatorPacket.target?.path, "reviews/overnight-20260522/public-longmemeval-full-run-target.json");
   assert.equal(fullTargetOperatorPacket.currentEvidence?.sotaLadder?.fullBenchmarkPolicy?.datasetSlice, "longmemeval-s-cleaned-full-500-2026-05-25");
   assert.ok(fullTargetOperatorPacket.operatorFlow?.some((item) => item.id === "author-full-longmemeval-target"));
+  const fullShardFlow = fullTargetOperatorPacket.operatorFlow?.find((item) => item.id === "full-longmemeval-answer-quality-shards");
+  assert.ok(fullShardFlow, "full target operator packet must include sharded answer-quality flow");
+  assert.equal(fullShardFlow.shardContract?.expectedFullQueryCount, 500);
+  assert.equal(fullShardFlow.shardContract?.combineMode, "query-shard-answer-quality-union");
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--query-offset")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--combine-mode shards")));
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
     const keyFile = join(tempRoot, "voyage.keys");

@@ -373,6 +373,17 @@ npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-r
   --reviewer-approval-report "$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.json"
 ```
 
+For the full 500-query LongMemEval-S target, use the same answer-quality
+contract but score deterministic shards with `--query-offset` and
+`--max-queries`, then merge them with
+`benchmark:answer-quality:combine -- --combine-mode shards`. The combiner must
+fail closed if shards use different target/query/materializer/answer-label
+hashes, different answer or judge models, overlapping ranges, missing ranges,
+or different strategy sets. A merged full packet should report
+`combineMode=query-shard-answer-quality-union`, `scoredQueryCount=500`, and
+`queryShard.completeDataset=true` before it enters reviewer intake or the SOTA
+ladder.
+
 The answer-quality report is still metrics-only. It may contain strategy names,
 hashes, aggregate answer quality, judge-correct rate, latency, context-token
 counts, provider endpoint labels, and privacy counters. It must not contain raw

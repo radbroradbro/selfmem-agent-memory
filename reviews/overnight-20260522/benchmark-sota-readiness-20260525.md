@@ -189,6 +189,12 @@ Follow-up provider evidence on 2026-05-25:
   same answer model and judge model, and the release gate exercises both
   mismatch paths. A future Voyage retry can change the retrieval arm, but not
   silently change the answer-quality judge contract.
+- The answer-quality runner now supports deterministic full-target query
+  shards with `--query-offset` and `--max-queries`. The combiner's
+  `--combine-mode shards` path rejects target/model mismatches, strategy-set
+  mismatches, shard overlaps, and shard gaps before it emits a
+  `query-shard-answer-quality-union` report. The SOTA operator packet includes
+  a ten-shard 500-query LongMemEval-S flow.
 - The SOTA ladder now also distinguishes a 30-query canary from a full or
   officially comparable benchmark. The current LongMemEval-S answer-quality
   packet has 30 scored queries, so even a future canary win must remain blocked

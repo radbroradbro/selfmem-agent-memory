@@ -17,6 +17,7 @@ const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolve(root, 
 const format = String(args.format ?? "json").toLowerCase();
 const requireLiveReady = Boolean(args.requireReady);
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_QUERIES ?? null, "max queries");
+const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_MEMORYBENCH_QUERY_OFFSET ?? 0, "query offset");
 const maxContextChars = optionalPositiveInt(args.maxContextChars ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_CONTEXT_CHARS ?? 12000, "max context chars");
 const answerModel = String(args.answerModel ?? process.env.RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL ?? process.env.RECALLWEAVE_BASELINE_ANSWER_MODEL ?? "").trim();
 const judgeModel = String(args.judgeModel ?? process.env.RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL ?? process.env.RECALLWEAVE_BASELINE_JUDGE_MODEL ?? "").trim();
@@ -36,6 +37,7 @@ const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+assert.ok(!fixtureRequested || queryOffset === 0, "--query-offset is only supported for live answer-quality runs");
 assert.ok(targetPath && existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `target empty: ${displayPath(targetPath)}`);
 
@@ -55,10 +57,12 @@ if (requireLiveReady && !run.readyForEndToEndMemoryScoreGate) process.exit(1);
 
 function fixtureRun() {
   const fixture = fixtureInputs();
+  const querySelection = selectQueries(fixture.queries);
   const arms = fixture.armSpecs.map((arm) =>
     scoreArm({
       strategy: arm.strategy,
       responses: arm.responses,
+      querySelection,
       queries: fixture.queries,
       memories: fixture.memories,
       labelsByQueryId: fixture.labelsByQueryId,
@@ -103,6 +107,7 @@ async function liveRun() {
   const memories = loadMemories(memoriesPath);
   const armSpecs = liveArmSpecs();
   const labelsByQueryId = labelsByQuery(answerLabels);
+  const querySelection = selectQueries(querySet.queries ?? []);
   const expectedAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
   assert.equal(answerLabels.answerLabelsHash, expectedAnswerLabelsHash, "private answer-label hash must match target");
   assert.equal(answerLabels.scoringCodeHash, target.benchmark?.scoringCodeHash, "private scoring-code hash must match target");
@@ -118,6 +123,7 @@ async function liveRun() {
     const scoredArm = await scoreArmAsync({
       strategy: arm.strategy,
       responses: responsesEnvelope.responses ?? {},
+      querySelection,
       queries: querySet.queries,
       memories,
       labelsByQueryId,
@@ -169,9 +175,9 @@ function liveArmSpecs() {
   );
 }
 
-function scoreArm({ strategy, responses, queries, memories, labelsByQueryId, fixture }) {
+function scoreArm({ strategy, responses, querySelection, queries, memories, labelsByQueryId, fixture }) {
   const memoryIndex = memoryLookup(memories);
-  const selectedQueries = maxQueries ? queries.slice(0, maxQueries) : queries;
+  const selectedQueries = querySelection?.queries ?? selectQueries(queries).queries;
   const scored = selectedQueries.map((query) => {
     const response = responses[query.id] ?? emptyResponse();
     const contextItems = contextFor(response, memoryIndex);
@@ -184,9 +190,9 @@ function scoreArm({ strategy, responses, queries, memories, labelsByQueryId, fix
   return summarizeArm({ strategy, scored, provider: { answerCalls: 0, judgeCalls: 0, fixtureJudge: true } });
 }
 
-async function scoreArmAsync({ strategy, responses, queries, memories, labelsByQueryId }) {
+async function scoreArmAsync({ strategy, responses, querySelection, queries, memories, labelsByQueryId }) {
   const memoryIndex = memoryLookup(memories);
-  const selectedQueries = maxQueries ? queries.slice(0, maxQueries) : queries;
+  const selectedQueries = querySelection?.queries ?? selectQueries(queries).queries;
   const scored = [];
   let answerCalls = 0;
   let judgeCalls = 0;
@@ -225,6 +231,7 @@ async function scoreArmAsync({ strategy, responses, queries, memories, labelsByQ
 
 function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memoriesHash, answerLabelsHash, materializerHash, arms, provider }) {
   const bestArm = bestByAnswerQuality(arms);
+  const querySelection = selectQueries(querySet.queries ?? []);
   const report = {
     schemaVersion: 1,
     ok: true,
@@ -264,8 +271,22 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
       answerLabelsHash,
       scoringCodeHash: target.benchmark?.scoringCodeHash ?? null,
       datasetSlice: querySet.datasetSlice ?? null,
-      queryCount: Number(querySet.queries?.length ?? 0),
+      queryCount: querySelection.totalQueryCount,
+      totalQueryCount: querySelection.totalQueryCount,
       scoredQueryCount: arms[0]?.scoredQueryCount ?? 0,
+      queryOffset: querySelection.startIndex,
+      queryLimit: maxQueries,
+      scoredQueryStart: querySelection.startIndex,
+      scoredQueryEndExclusive: querySelection.endIndexExclusive,
+      queryShard: {
+        startIndex: querySelection.startIndex,
+        endIndexExclusive: querySelection.endIndexExclusive,
+        totalQueryCount: querySelection.totalQueryCount,
+        scoredQueryCount: arms[0]?.scoredQueryCount ?? 0,
+        requestedLimit: maxQueries,
+        completeDataset: querySelection.startIndex === 0 && querySelection.endIndexExclusive === querySelection.totalQueryCount,
+        selectedQueryIdHash: querySelection.selectedQueryIdHash,
+      },
     },
     provider,
     metrics: bestArm?.metrics ?? null,
@@ -340,9 +361,27 @@ function scoreFingerprint({ query, response, contextItems, candidateAnswer, judg
       judgeDecisionHash: `sha256:${stableHash(canonicalJson(judge))}`,
       contextResultCount: contextItems.length,
       responseTotal: Number(response.total ?? contextItems.length),
+      elapsedMs,
+      contextTokens: estimateTokens(contextItems.map((item) => item.content).join("\n")),
       score: round(score),
       correct: Boolean(judge.correct ?? score >= 50),
     },
+  };
+}
+
+function selectQueries(queries) {
+  const list = Array.isArray(queries) ? queries : [];
+  const totalQueryCount = list.length;
+  assert.ok(queryOffset <= totalQueryCount, `query offset ${queryOffset} exceeds query count ${totalQueryCount}`);
+  const endIndexExclusive = maxQueries ? Math.min(totalQueryCount, queryOffset + maxQueries) : totalQueryCount;
+  const selected = list.slice(queryOffset, endIndexExclusive);
+  assert.ok(selected.length > 0, "selected query shard is empty");
+  return {
+    queries: selected,
+    totalQueryCount,
+    startIndex: queryOffset,
+    endIndexExclusive,
+    selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => shortHash(query.id)).join("\n"))}`,
   };
 }
 
@@ -572,6 +611,7 @@ function renderMarkdown(value) {
     `- Benchmark: ${value.benchmark}`,
     `- Query count: ${value.input.queryCount}`,
     `- Scored query count: ${value.input.scoredQueryCount}`,
+    `- Query shard: ${value.input.scoredQueryStart}-${value.input.scoredQueryEndExclusive} of ${value.input.totalQueryCount}`,
     `- Answer-label hash: ${value.input.answerLabelsHash}`,
     "",
     "## Arms",
@@ -799,6 +839,13 @@ function optionalPositiveInt(value, label) {
   if (value == null || value === "") return null;
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
+  return number;
+}
+
+function optionalNonNegativeInt(value, label) {
+  if (value == null || value === "") return 0;
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
   return number;
 }
 

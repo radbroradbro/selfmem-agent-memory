@@ -365,6 +365,9 @@ process.stdout.write(format === "markdown" ? markdownText : jsonText);
 
 function buildOperatorFlow() {
   const target = displayPath(targetPath);
+  const fullAnswerQualityTarget = target.includes("public-longmemeval-full-run-target.json")
+    ? target
+    : `${reviewDir}/public-longmemeval-full-run-target.json`;
   const providerStrategies = providerPreflightStrategies.join(",");
   const fullLadderStrategies = sameDataStrategies.join(",");
   const minimumVoyageStrategies = minimumVoyageAnswerQualityStrategies.join(",");
@@ -436,6 +439,103 @@ function buildOperatorFlow() {
         "target claimTier remains run-only until a reported comparison row is attached",
         "materialize report queryCount is 500 and raw questions stay outside the repository",
         "SOTA ladder remains blocked until full answer-quality results exist",
+      ],
+    },
+    {
+      id: "full-longmemeval-answer-quality-shards",
+      description:
+        "Run the 500-query LongMemEval-S answer-quality benchmark in deterministic query shards. This is the first full-target scoring lane; it stays metrics-only and cannot authorize SOTA wording until the merged shard packet, reviewer intake, and SOTA ladder pass.",
+      commands: [
+        "RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-answer-and-judge-url>",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model>",
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model>",
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
+          `--target ${fullAnswerQualityTarget}`,
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialize-report.json\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute",
+          `--target ${fullAnswerQualityTarget}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms\"",
+          `--strategies ${fullLadderStrategies}`,
+          "--context-token-budget 800",
+          "--limit 5",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arm-export.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arm-export.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
+          `--target ${fullAnswerQualityTarget}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
+          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-answer-labels.private.json\"",
+          answerQualityArms.replaceAll("$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms", "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms"),
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflight.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflight.md\"",
+        ].join(" "),
+        [
+          "for offset in 0 50 100 150 200 250 300 350 400 450; do",
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
+          `--target ${fullAnswerQualityTarget}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
+          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-answer-labels.private.json\"",
+          answerQualityArms.replaceAll("$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms", "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms"),
+          "--query-offset \"$offset\"",
+          "--max-queries 50",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-$offset.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-$offset.md\"",
+          "|| exit 1; done",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --combine-mode shards",
+          "--input \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-0.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-50.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-100.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-150.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-200.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-250.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-300.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-350.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-400.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-450.json\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --strict-target",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score.json\"",
+          "--review <reviewer-a-memory-score-approval.json>",
+          "--review <reviewer-b-memory-score-approval.json>",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-memory-score-reviewer-intake.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-memory-score-reviewer-intake.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score.json\"",
+          `--target ${fullAnswerQualityTarget}`,
+          "--reviewer-approval-report \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-memory-score-reviewer-intake.json\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score-gate.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score-gate.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:sota-ladder --",
+          `--target ${fullAnswerQualityTarget}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-sota-ladder-report.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-sota-ladder-report.md\"",
+        ].join(" "),
+      ],
+      shardContract: {
+        shardSize: 50,
+        expectedShardCount: 10,
+        expectedFullQueryCount: 500,
+        combineMode: "query-shard-answer-quality-union",
+        failClosedOn: ["target mismatch", "query-set mismatch", "answer-model mismatch", "judge-model mismatch", "query-shard gap", "query-shard overlap"],
+      },
+      expectedPublicEvidence: [
+        "each shard report includes scoredQueryStart, scoredQueryEndExclusive, totalQueryCount, and a selected-query hash",
+        "the combined report uses combineMode=query-shard-answer-quality-union",
+        "the combined report scoredQueryCount is 500 and queryShard.completeDataset is true",
+        "publicBenchmarkClaimsAllowed remains false until result gate, SOTA ladder, and reviewer intake all pass",
       ],
     },
     {

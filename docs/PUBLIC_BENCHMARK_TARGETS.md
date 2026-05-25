@@ -180,6 +180,15 @@ materialization report covers 500 public rows, 19,195 haystack sessions, and
 text outside the repository. This is a ready target, not a completed score:
 the SOTA ladder still stays blocked until the 500-query answer-quality result,
 same-data provider/local arms, reviewer intake, and release gates pass.
+The answer-quality runner now supports full-target scoring in deterministic
+query shards via `--query-offset` and `--max-queries`; the shard combiner must
+merge only complete, non-overlapping coverage with the same target, query set,
+materializer, answer-label, answer-model, judge-model, and strategy set.
+Keep raw benchmark and memory sources outside the repository but reachable to
+the operator through source manifests, hashes, and private materialized paths.
+The UI and default retrieval path may use compressed memories, but benchmark
+and audit review must retain a way to challenge the compression against the raw
+source.
 
 Canary trend language may say the method is improving on the frozen slice.
 Release language must wait until the full benchmark gate, same-data model
@@ -377,6 +386,11 @@ harness we will use.
   clears, then combines the new metrics-only result with the existing local,
   query-expansion, local-rerank, and NVIDIA answer-quality reports before
   rerunning the provider-challenger, memory-score, and SOTA-ladder gates.
+  It also includes a full LongMemEval-S answer-quality shard flow for ten
+  50-query chunks, merged with
+  `combineMode=query-shard-answer-quality-union`; that merged packet still needs
+  reviewer intake, result gate, SOTA ladder, UI evidence, docs, owner approval,
+  and real production canary before any broad claim.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and

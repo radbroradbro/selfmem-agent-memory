@@ -247,6 +247,11 @@ adds the NVIDIA `cloud-nvidia-nemotron-1b` provider arm at `43.1667`
 answer-quality / `0.4333` correct rate. Two independent reviewer approvals are
 recorded in
 `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`.
+The full 500-query LongMemEval target is ready as a run target, and the
+answer-quality harness now supports chunked scoring with `--query-offset` and
+`--max-queries`. Merge those chunks only with
+`benchmark:answer-quality:combine -- --combine-mode shards`, which rejects gaps,
+overlaps, target/model mismatches, and mixed strategy sets.
 This is real benchmark progress, not SOTA proof:
 `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` remains
 blocked by the missing same-data Voyage answer-quality arm recorded in

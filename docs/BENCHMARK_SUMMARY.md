@@ -232,7 +232,10 @@ materialization evidence in
 `reviews/overnight-20260522/public-longmemeval-full-materialize-run.json`.
 That full target covers 500 public rows, 19,195 haystack sessions, and 1,896
 expected references. It is the next required broad-SOTA target, but no
-500-query answer-quality score exists yet.
+500-query answer-quality score exists yet. The harness can now score that full
+target in query shards using `--query-offset` and `--max-queries`, then merge
+only complete non-overlapping shard coverage with
+`benchmark:answer-quality:combine -- --combine-mode shards`.
 The first live provider answer-quality run is checked in at
 `reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json`.
 On the same target/query/materializer/scoring hashes, `cloud-nvidia-nemotron-1b`

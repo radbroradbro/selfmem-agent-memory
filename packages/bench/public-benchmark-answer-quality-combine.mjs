@@ -15,13 +15,17 @@ const inputs = splitList(
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
+const requestedCombineMode = args.combineMode ? String(args.combineMode) : null;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+assert.ok(!requestedCombineMode || ["same-data", "shards"].includes(requestedCombineMode), "--combine-mode must be same-data or shards");
 assert.ok(inputs.length >= 2, "at least two answer-quality inputs are required");
 
 const loaded = inputs.map(loadAnswerQualityResult);
-assertSameData(loaded);
-const combined = buildCombinedReport(loaded);
+const combineMode = requestedCombineMode ?? autoCombineMode(loaded);
+if (combineMode === "same-data") assertSameData(loaded);
+else assertShardData(loaded);
+const combined = combineMode === "same-data" ? buildCombinedReport(loaded) : buildShardCombinedReport(loaded);
 const jsonText = `${JSON.stringify(combined, null, 2)}\n`;
 const markdownText = `${renderMarkdown(combined)}\n`;
 assertSafePublicText(jsonText, "combined answer-quality report");
@@ -55,6 +59,15 @@ function loadAnswerQualityResult(pathLike) {
   };
 }
 
+function autoCombineMode(items) {
+  const ranges = items.map((item) => shardRange(item.json));
+  const first = ranges[0];
+  const sameRange = ranges.every(
+    (range) => range.startIndex === first.startIndex && range.endIndexExclusive === first.endIndexExclusive && range.totalQueryCount === first.totalQueryCount,
+  );
+  return sameRange ? "same-data" : "shards";
+}
+
 function assertSameData(items) {
   const first = items[0].json;
   assert.ok(first.provider?.answerModel, "first input must include answer model");
@@ -67,6 +80,45 @@ function assertSameData(items) {
     assert.equal(item.json.input?.answerLabelsHash, first.input?.answerLabelsHash, "all inputs must share answer-label hash");
     assert.equal(item.json.input?.scoringCodeHash, first.input?.scoringCodeHash, "all inputs must share scoring-code hash");
     assert.equal(item.json.input?.scoredQueryCount, first.input?.scoredQueryCount, "all inputs must share scored-query count");
+    assert.equal(item.json.provider?.answerModel, first.provider.answerModel, "all inputs must share answer model");
+    assert.equal(item.json.provider?.judgeModel, first.provider.judgeModel, "all inputs must share judge model");
+  }
+}
+
+function assertShardData(items) {
+  assertSameTargetAndModels(items);
+  const first = items[0].json;
+  const firstStrategies = strategyNames(first);
+  assert.ok(firstStrategies.length > 0, "first shard must include strategies");
+  const ranges = items.map((item) => ({ ...shardRange(item.json), path: item.path }));
+  for (const item of items) {
+    const names = strategyNames(item.json);
+    assert.deepEqual(names, firstStrategies, "all query shards must include the same strategy set");
+    const range = shardRange(item.json);
+    assert.equal(range.scoredQueryCount, range.endIndexExclusive - range.startIndex, "shard scored-query count must match shard range");
+  }
+  const sorted = [...ranges].sort((left, right) => left.startIndex - right.startIndex || left.endIndexExclusive - right.endIndexExclusive);
+  let expectedStart = 0;
+  for (const range of sorted) {
+    assert.equal(range.startIndex, expectedStart, `query shard coverage gap or overlap before ${range.path}`);
+    expectedStart = range.endIndexExclusive;
+  }
+  assert.equal(expectedStart, sorted[0].totalQueryCount, "query shard coverage must reach total query count");
+  const shardHashes = new Set(ranges.map((range) => range.selectedQueryIdHash).filter(Boolean));
+  assert.equal(shardHashes.size, ranges.length, "query shards must have unique selected-query hashes");
+}
+
+function assertSameTargetAndModels(items) {
+  const first = items[0].json;
+  assert.ok(first.provider?.answerModel, "first input must include answer model");
+  assert.ok(first.provider?.judgeModel, "first input must include judge model");
+  for (const item of items.slice(1)) {
+    assert.equal(item.json.target?.hash, first.target?.hash, "all inputs must share target hash");
+    assert.equal(item.json.input?.targetHash, first.input?.targetHash, "all inputs must share input target hash");
+    assert.equal(item.json.input?.querySetHash, first.input?.querySetHash, "all inputs must share query-set hash");
+    assert.equal(item.json.input?.materializerHash, first.input?.materializerHash, "all inputs must share materializer hash");
+    assert.equal(item.json.input?.answerLabelsHash, first.input?.answerLabelsHash, "all inputs must share answer-label hash");
+    assert.equal(item.json.input?.scoringCodeHash, first.input?.scoringCodeHash, "all inputs must share scoring-code hash");
     assert.equal(item.json.provider?.answerModel, first.provider.answerModel, "all inputs must share answer model");
     assert.equal(item.json.provider?.judgeModel, first.provider.judgeModel, "all inputs must share judge model");
   }
@@ -151,6 +203,205 @@ function buildCombinedReport(items) {
   };
 }
 
+function buildShardCombinedReport(items) {
+  const first = items[0].json;
+  const ranges = items.map((item) => ({ ...shardRange(item.json), path: item.path, hash: item.hash }));
+  const sortedItems = [...items].sort((left, right) => shardRange(left.json).startIndex - shardRange(right.json).startIndex);
+  const strategies = strategyNames(first).map((strategy) => mergeShardStrategy(strategy, sortedItems));
+  const winner = bestByAnswerQuality(strategies);
+  const callsMade = items.reduce((sum, item) => sum + Number(item.json.provider?.callsMade ?? 0), 0);
+  const coverage = {
+    complete: true,
+    inputShardCount: items.length,
+    totalQueryCount: ranges[0].totalQueryCount,
+    scoredQueryCount: ranges.reduce((sum, range) => sum + range.scoredQueryCount, 0),
+    ranges: ranges
+      .sort((left, right) => left.startIndex - right.startIndex)
+      .map((range) => ({
+        startIndex: range.startIndex,
+        endIndexExclusive: range.endIndexExclusive,
+        scoredQueryCount: range.scoredQueryCount,
+        selectedQueryIdHash: range.selectedQueryIdHash,
+      })),
+  };
+  return {
+    schemaVersion: 1,
+    ok: true,
+    mode: "public-benchmark-answer-quality",
+    combineMode: "query-shard-answer-quality-union",
+    fixtureOnly: false,
+    benchmark: first.benchmark,
+    metricsOnly: true,
+    publicSafe: true,
+    retrievalProxyOnly: false,
+    memoryBenchAnswerQuality: true,
+    readyForEndToEndMemoryScoreGate: true,
+    publicBenchmarkClaimsAllowed: false,
+    callsProviderApis: true,
+    sendsBenchmarkTextToProvider: true,
+    rawQuestionIdsIncluded: false,
+    rawQuestionsIncluded: false,
+    rawAnswersIncluded: false,
+    rawMemoryIncluded: false,
+    rawTranscriptIncluded: false,
+    rawPromptIncluded: false,
+    generatedAt: new Date().toISOString(),
+    target: first.target,
+    input: {
+      ...first.input,
+      source: "materialized-source-locked-longmemeval",
+      queryCount: coverage.totalQueryCount,
+      totalQueryCount: coverage.totalQueryCount,
+      scoredQueryCount: coverage.scoredQueryCount,
+      queryOffset: 0,
+      queryLimit: coverage.totalQueryCount,
+      scoredQueryStart: 0,
+      scoredQueryEndExclusive: coverage.totalQueryCount,
+      queryShard: {
+        combined: true,
+        completeDataset: true,
+        ...coverage,
+      },
+    },
+    sourceLock: {
+      sameDataAttestation: true,
+      sameAnswerModel: true,
+      sameJudgeModel: true,
+      inputResultCount: items.length,
+      inputResultHashes: items.map((item) => item.hash),
+      inputResultPaths: items.map((item) => item.path),
+      queryShardCoverage: coverage,
+    },
+    provider: {
+      answerModel: first.provider?.answerModel ?? null,
+      judgeModel: first.provider?.judgeModel ?? null,
+      answerQualityCallsAllowed: true,
+      publicDataConfirmed: true,
+      callsMade,
+      endpointLabel: first.provider?.endpointLabel ?? null,
+    },
+    metrics: winner?.metrics ?? null,
+    strategies,
+    winner: winner
+      ? {
+          strategy: winner.strategy,
+          answerQuality: winner.metrics.answerQuality,
+          judgeCorrectRate: winner.metrics.judgeCorrectRate,
+          answerLatencyP50Ms: winner.metrics.answerLatencyP50Ms,
+        }
+      : null,
+    reviewerApprovalCount: 0,
+    privacyLeakCount: strategies.reduce((sum, strategy) => sum + Number(strategy.privacyLeakCount ?? 0), 0),
+    redactionFailureCount: strategies.reduce((sum, strategy) => sum + Number(strategy.redactionFailureCount ?? 0), 0),
+    safety: {
+      metricsOnly: true,
+      publicSafe: true,
+      rawQuestionsIncluded: false,
+      rawAnswersIncluded: false,
+      rawMemoryIncluded: false,
+      rawTranscriptIncluded: false,
+      privateInputsStoredOutsideRepository: true,
+      combinedFromMetricsOnlyReports: true,
+      combinedFromQueryShards: true,
+    },
+    nextActions: [
+      "Run benchmark:memory-score:result-gate with this full-coverage query-shard union.",
+      "Run benchmark:sota-ladder against the same target before public benchmark wording changes.",
+      "Send the exact metrics-only full-shard packet to independent reviewers before owner or production approval.",
+    ],
+  };
+}
+
+function mergeShardStrategy(strategy, sortedItems) {
+  const rows = sortedItems.map((item) => {
+    const row = (item.json.strategies ?? []).find((candidate) => candidate.strategy === strategy);
+    assert.ok(row, `missing strategy ${strategy} in ${item.path}`);
+    return row;
+  });
+  const fingerprints = rows.flatMap((row) => row.resultFingerprints ?? []);
+  assert.ok(fingerprints.length > 0, `${strategy} has no result fingerprints`);
+  const ids = new Set();
+  const scores = [];
+  const correct = [];
+  const latencies = [];
+  const contextTokens = [];
+  for (const fingerprint of fingerprints) {
+    assert.ok(fingerprint.queryIdHash, `${strategy} fingerprint missing query hash`);
+    assert.ok(!ids.has(fingerprint.queryIdHash), `${strategy} has duplicate query hash across shards`);
+    ids.add(fingerprint.queryIdHash);
+    assert.ok(Number.isFinite(Number(fingerprint.score)), `${strategy} fingerprint missing score`);
+    assert.ok(Number.isFinite(Number(fingerprint.elapsedMs)), `${strategy} fingerprint missing elapsedMs`);
+    assert.ok(Number.isFinite(Number(fingerprint.contextTokens)), `${strategy} fingerprint missing contextTokens`);
+    scores.push(Number(fingerprint.score));
+    correct.push(fingerprint.correct ? 1 : 0);
+    latencies.push(Number(fingerprint.elapsedMs));
+    contextTokens.push(Number(fingerprint.contextTokens));
+  }
+  const sortedLatencies = latencies.sort((left, right) => left - right);
+  return {
+    strategy,
+    metrics: {
+      answerQuality: round(average(scores)),
+      memoryScore: round(average(scores)),
+      longmemevalScore: round(average(scores)),
+      quality: round(average(scores) / 100),
+      judgeCorrectRate: round(average(correct)),
+      answerLatencyP50Ms: percentile(sortedLatencies, 0.5),
+      answerLatencyP95Ms: percentile(sortedLatencies, 0.95),
+      contextTokensAvg: Math.round(average(contextTokens)),
+    },
+    provider: mergeProviders(rows.map((row) => row.provider ?? {})),
+    privacyLeakCount: rows.reduce((sum, row) => sum + Number(row.privacyLeakCount ?? 0), 0),
+    redactionFailureCount: rows.reduce((sum, row) => sum + Number(row.redactionFailureCount ?? 0), 0),
+    scoredQueryCount: fingerprints.length,
+    resultFingerprints: fingerprints,
+  };
+}
+
+function mergeProviders(providers) {
+  return {
+    answerCalls: providers.reduce((sum, provider) => sum + Number(provider.answerCalls ?? 0), 0),
+    judgeCalls: providers.reduce((sum, provider) => sum + Number(provider.judgeCalls ?? 0), 0),
+    answerFailures: providers.reduce((sum, provider) => sum + Number(provider.answerFailures ?? 0), 0),
+    judgeFailures: providers.reduce((sum, provider) => sum + Number(provider.judgeFailures ?? 0), 0),
+    callTimeoutMs: providers.find((provider) => provider.callTimeoutMs != null)?.callTimeoutMs ?? null,
+    continueOnCallError: providers.some((provider) => provider.continueOnCallError === true),
+    fixtureJudge: false,
+  };
+}
+
+function shardRange(json) {
+  const input = json.input ?? {};
+  const shard = input.queryShard ?? {};
+  const totalQueryCount = requiredInt(input.totalQueryCount ?? shard.totalQueryCount ?? input.queryCount, "total query count");
+  const scoredQueryCount = requiredInt(input.scoredQueryCount ?? shard.scoredQueryCount, "scored query count");
+  const startIndex = requiredInt(input.scoredQueryStart ?? shard.startIndex ?? input.queryOffset ?? 0, "query shard start");
+  const endIndexExclusive = requiredInt(
+    input.scoredQueryEndExclusive ?? shard.endIndexExclusive ?? startIndex + scoredQueryCount,
+    "query shard end",
+  );
+  assert.ok(startIndex >= 0, "query shard start must be non-negative");
+  assert.ok(endIndexExclusive > startIndex, "query shard end must be greater than start");
+  assert.ok(endIndexExclusive <= totalQueryCount, "query shard end must not exceed total query count");
+  return {
+    startIndex,
+    endIndexExclusive,
+    totalQueryCount,
+    scoredQueryCount,
+    selectedQueryIdHash: shard.selectedQueryIdHash ?? null,
+  };
+}
+
+function strategyNames(json) {
+  return (json.strategies ?? []).map((row) => row.strategy).filter(Boolean).sort((left, right) => left.localeCompare(right));
+}
+
+function requiredInt(value, label) {
+  const number = Number(value);
+  assert.ok(Number.isInteger(number), `${label} must be an integer`);
+  return number;
+}
+
 function bestUniqueStrategies(rows) {
   const byStrategy = new Map();
   for (const row of rows) {
@@ -170,6 +421,21 @@ function answerQuality(row) {
   return Number(row?.metrics?.answerQuality ?? row?.metrics?.memoryScore ?? row?.metrics?.longmemevalScore ?? 0);
 }
 
+function average(values) {
+  const valid = values.map(Number).filter(Number.isFinite);
+  return valid.length ? valid.reduce((sum, value) => sum + value, 0) / valid.length : 0;
+}
+
+function percentile(values, percentileValue) {
+  if (!values.length) return 0;
+  const index = Math.min(values.length - 1, Math.ceil(values.length * percentileValue) - 1);
+  return Math.round(values[index]);
+}
+
+function round(value) {
+  return Number(Number(value).toFixed(4));
+}
+
 function renderMarkdown(value) {
   return [
     "# Combined Answer-Quality Memory Score",
@@ -178,7 +444,9 @@ function renderMarkdown(value) {
     `- Ready for end-to-end memory score gate: ${value.readyForEndToEndMemoryScoreGate}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
     `- Benchmark: ${value.benchmark}`,
+    `- Combine mode: ${value.combineMode}`,
     `- Scored query count: ${value.input.scoredQueryCount}`,
+    `- Query coverage: ${value.input.scoredQueryStart ?? 0}-${value.input.scoredQueryEndExclusive ?? value.input.scoredQueryCount} of ${value.input.totalQueryCount ?? value.input.queryCount}`,
     `- Target hash: ${value.target.hash}`,
     `- Query-set hash: ${value.input.querySetHash}`,
     "",
