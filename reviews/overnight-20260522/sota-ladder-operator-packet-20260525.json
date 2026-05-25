@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T21:33:02.244Z",
+  "generatedAt": "2026-05-25T21:45:11.277Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -133,7 +133,7 @@
     "voyageProviderRateLimit": {
       "evidencePath": "reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:a6e8b8743aedf946c77c54d54622dfe81247f8e1d1c4a8bc71be759f38f3bab4",
+      "evidenceHash": "sha256:ed9e1b8892b6f760d406dca9d9fd8e8d53f7283b412b154d1802a18577f75a0f",
       "status": "BLOCKED_VOYAGE_RATE_LIMIT",
       "attemptedStrategies": [
         "cloud-voyage4-voyage",
@@ -160,7 +160,7 @@
     "endToEndMemoryScoreGate": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:db1299d6b11123f2cefeb89feda00cbd0ec3ef21211effe66950352b40c35640",
+      "evidenceHash": "sha256:cdf199627998c12a69647d8398a1b7d840ed173e50ed003d18f62f9a61c27e95",
       "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
       "countsAsEndToEndMemoryBenchmark": false,
       "countsAsFullMemorySotaEvidence": false,

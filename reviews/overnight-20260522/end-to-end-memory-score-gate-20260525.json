@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "end-to-end-memory-score-gate",
   "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
-  "generatedAt": "2026-05-25T21:33:01.036Z",
+  "generatedAt": "2026-05-25T21:45:11.108Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,

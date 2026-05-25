@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T21:33:01.601Z",
+  "generatedAt": "2026-05-25T21:45:11.164Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -121,7 +121,7 @@
     "voyageProviderRateLimit": {
       "path": "reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json",
       "exists": true,
-      "hash": "sha256:a6e8b8743aedf946c77c54d54622dfe81247f8e1d1c4a8bc71be759f38f3bab4",
+      "hash": "sha256:ed9e1b8892b6f760d406dca9d9fd8e8d53f7283b412b154d1802a18577f75a0f",
       "mode": "provider-benchmark-blocker",
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -131,7 +131,7 @@
     "endToEndMemoryScoreGate": {
       "path": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "exists": true,
-      "hash": "sha256:db1299d6b11123f2cefeb89feda00cbd0ec3ef21211effe66950352b40c35640",
+      "hash": "sha256:cdf199627998c12a69647d8398a1b7d840ed173e50ed003d18f62f9a61c27e95",
       "mode": "end-to-end-memory-score-gate",
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
