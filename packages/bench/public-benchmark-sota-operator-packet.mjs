@@ -35,6 +35,7 @@ const providerPreflight = runJson([
   providerPreflightStrategies.join(","),
 ]);
 const localRerankEvidence = loadEvidence(`${reviewDir}/local-rerank-sidecar-baseline-refresh-evidence.md`);
+const localRerankResultGateEvidence = loadEvidence(`${reviewDir}/local-rerank-result-gate-20260525.json`);
 const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-live-local-smoke-20260525.json`);
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
@@ -103,6 +104,14 @@ const packet = {
       evidenceHash: localRerankEvidence.hash,
       endpointEnv: ["SELFMEM_LOCAL_RERANK_ENDPOINT", "SELFMEM_LOCAL_RERANK_BASE_URL"],
     },
+    localRerankResultGate: {
+      evidencePath: localRerankResultGateEvidence.path,
+      evidenceExists: localRerankResultGateEvidence.exists,
+      evidenceHash: localRerankResultGateEvidence.hash,
+      status: localRerankResultGateEvidence.json?.status ?? null,
+      countsAsLiveLocalRerankBenchmark: Boolean(localRerankResultGateEvidence.json?.countsAsLiveLocalRerankBenchmark),
+      blockers: localRerankResultGateEvidence.json?.blockers ?? [],
+    },
     queryExpansionLiveLocalSmoke: {
       evidencePath: queryExpansionSmokeEvidence.path,
       evidenceExists: queryExpansionSmokeEvidence.exists,
@@ -167,6 +176,7 @@ const packet = {
       "query-expansion-result-gate.json",
       "provider-preflight.json",
       "same-data-provider-result.json",
+      "local-rerank-result-gate.json",
       "end-to-end-memory-score.json",
       "reviewer-approval-report.json",
       "ui-evidence-index.md",
@@ -311,6 +321,13 @@ function buildOperatorFlow() {
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-result.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-result.md\"",
         ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:local-rerank:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-result.json\"",
+          `--target ${target}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-gate.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-gate.md\"",
+        ].join(" "),
       ],
     },
     {
@@ -430,6 +447,7 @@ function renderMarkdown(value) {
     `- Query expansion preflight: ${value.currentEvidence.queryExpansionPreflight.status}`,
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
+    `- Local rerank result gate: ${value.currentEvidence.localRerankResultGate.status ?? "missing"}`,
     `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,
     `- Query expansion result gate: ${value.currentEvidence.queryExpansionResultGate.status ?? "missing"}`,
     `- Live LLM query expansion proven: ${value.currentEvidence.queryExpansionImplementation.liveLlmExpansionProven}`,

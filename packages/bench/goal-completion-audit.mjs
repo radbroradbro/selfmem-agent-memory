@@ -98,6 +98,8 @@ const files = {
   queryExpansionLiveLocalSmokeMarkdown: `${reviewDir}/query-expansion-live-local-smoke-20260525.md`,
   queryExpansionResultGateReport: `${reviewDir}/query-expansion-result-gate-20260525.json`,
   queryExpansionResultGateMarkdown: `${reviewDir}/query-expansion-result-gate-20260525.md`,
+  localRerankResultGateReport: `${reviewDir}/local-rerank-result-gate-20260525.json`,
+  localRerankResultGateMarkdown: `${reviewDir}/local-rerank-result-gate-20260525.md`,
 };
 
 for (const [name, file] of Object.entries(files)) {
@@ -126,6 +128,7 @@ const benchmarkSotaOperatorPacket = JSON.parse(readFileSync(join(root, files.ben
 const queryExpansionPreflight = JSON.parse(readFileSync(join(root, files.queryExpansionPreflightReport), "utf8"));
 const queryExpansionLiveLocalSmoke = JSON.parse(readFileSync(join(root, files.queryExpansionLiveLocalSmokeReport), "utf8"));
 const queryExpansionResultGate = JSON.parse(readFileSync(join(root, files.queryExpansionResultGateReport), "utf8"));
+const localRerankResultGate = JSON.parse(readFileSync(join(root, files.localRerankResultGateReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
     .filter(([, file]) => file.endsWith(".md"))
@@ -272,6 +275,13 @@ assert.equal(queryExpansionResultGate.countsAsFullMemorySotaEvidence, false);
 assert.equal(queryExpansionResultGate.publicBenchmarkClaimsAllowed, false);
 assert.ok(queryExpansionResultGate.blockers.includes("query-expansion-live-calls-missing"));
 assert.ok(queryExpansionResultGate.blockers.includes("query-expansion-used-deterministic-fallback"));
+assert.equal(localRerankResultGate.mode, "local-rerank-result-gate");
+assert.equal(localRerankResultGate.status, "BLOCKED_LOCAL_RERANK_RESULT");
+assert.equal(localRerankResultGate.countsAsLiveLocalRerankBenchmark, false);
+assert.equal(localRerankResultGate.countsAsFullMemorySotaEvidence, false);
+assert.equal(localRerankResultGate.publicBenchmarkClaimsAllowed, false);
+assert.ok(localRerankResultGate.blockers.includes("local-rerank-live-calls-missing"));
+assert.ok(localRerankResultGate.blockers.includes("local-rerank-used-mock-calls"));
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -507,10 +517,13 @@ const requirements = [
     files.queryExpansionLiveLocalSmokeMarkdown,
     files.queryExpansionResultGateReport,
     files.queryExpansionResultGateMarkdown,
+    files.localRerankResultGateReport,
+    files.localRerankResultGateMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
     "packages/bench/public-benchmark-sota-operator-packet.mjs",
     "packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "packages/bench/query-expansion-result-gate.mjs",
+    "packages/bench/local-rerank-result-gate.mjs",
     "packages/bench/recallweave-response-export.mjs",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [

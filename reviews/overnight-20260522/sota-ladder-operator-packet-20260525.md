@@ -25,6 +25,7 @@
 - Query expansion preflight: BLOCKED_QUERY_EXPANSION_ENV
 - Provider preflight: BLOCKED_PROVIDER_ENV
 - Local rerank evidence: true
+- Local rerank result gate: BLOCKED_LOCAL_RERANK_RESULT
 - Query expansion local smoke: true
 - Query expansion result gate: BLOCKED_QUERY_EXPANSION_RESULT
 - Live LLM query expansion proven: false
@@ -90,6 +91,7 @@ RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1
 RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight -- --require-ready --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,local-apple-qwen3-0_6b-local-rerank --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-preflight.json"
 npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,full-hybrid-rerank,local-apple-qwen3-0_6b-local-rerank --max-memory-bytes 80000000 --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-result.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-result.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:local-rerank:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-result.json" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-gate.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/local-rerank-gate.md"
 ```
 
 ### provider-comparison-ladder
