@@ -178,13 +178,17 @@ Date: 2026-05-23
   release-state evidence refresh as the latest verified branch head while
   preserving `fba92059` as the latest verified code/product baseline and
   `18d606a` as the approved runtime canary adapter/report commit.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26380217502` passed on `badef23f`, promoting the release-check temp
+  containment guard as the latest verified code/product baseline while
+  preserving `18d606a` as the approved runtime canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-25T02:02:52Z
+- PR body refreshed at: 2026-05-25T02:39:19Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-25T02:02:53Z
-- PR body hash: 7e1042d30219fa17cad9c063466b3e70e24810563cb718c01afde29e794c4528
+- Issue updated at: 2026-05-25T02:39:20Z
+- PR body hash: e1f33a5494d6b4f37df731fbd8ef71fc03801f499315c0e3394d94f2991bc544
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 8277a091e4d30389b8e33e6685eb3223b1e9908fae72891a0adf75a4a063588f
+- Issue body hash: 4fdb777ba06dfe4a79c625883b73e946d95f6c4d3785327cd14b6676c5a164a9
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

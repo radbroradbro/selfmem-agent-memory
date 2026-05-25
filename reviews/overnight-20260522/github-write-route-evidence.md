@@ -182,6 +182,11 @@ Verdict: resolved for PR body and blocker issue writes.
     preserving `fba92059` as the latest verified code/product baseline and
     `18d606a` as the approved runtime canary adapter/report commit. Updated at:
     2026-05-25T02:02:53Z.
+  - PR #5 and issue #6 were refreshed again after GitHub Actions run
+    `26380217502` passed on `badef23f`, promoting the release-check temp
+    containment guard as the latest verified code/product baseline while
+    preserving `18d606a` as the approved runtime canary adapter/report commit.
+    Updated at: 2026-05-25T02:39:20Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
@@ -211,8 +216,9 @@ Verdict: resolved for PR body and blocker issue writes.
     LongMemEval-S slice CI baseline refresh, public LongMemEval-S run-only
     target refresh, latest public LongMemEval-S run-target CI baseline refresh,
     commit-bound OpenClaw handoff refresh, returned canary zip-classification
-    baseline refresh, and returned canary 12-hour watcher refresh
-  - Updated at: 2026-05-25T01:52:28Z
+    baseline refresh, returned canary 12-hour watcher refresh, and
+    release-check temp containment guard refresh
+  - Updated at: 2026-05-25T02:39:20Z
 
 ## Safety
 

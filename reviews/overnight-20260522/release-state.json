@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-25T02:00:00Z",
+  "generatedAt": "2026-05-25T02:38:16Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "fba92059552c155436e84bb05d87b1fd6aef9add",
-    "ciRunId": 26379062431,
+    "headSha": "badef23f65c9004cd78118df806413b1090a23f1",
+    "ciRunId": 26380217502,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_goal_audit_local_apple_provider_runs_and_local_reranker_sidecar_gate",
+    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_goal_audit_local_apple_provider_runs_local_reranker_sidecar_gate_and_release_temp_cleanup_guard",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding the 12-hour returned canary standard-inbox watcher alias. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice, records Qwen3 0.6B and 4B Apple Silicon local runs that tied BM25 but did not earn promotion, and keeps local-apple-qwen3-0_6b-local-rerank as a fixture-covered, fail-closed challenger with no live quality result yet. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, watch12h smoke, diff check, secret scan, private-path scan, and GitHub Actions run 26379062431 passed."
+    "note": "Latest inspected code/product baseline after containing release-check temp artifacts in a bounded run root and adding a stale RecallWeave temp cleanup guard. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice, records Qwen3 0.6B and 4B Apple Silicon local runs that tied BM25 but did not earn promotion, and keeps local-apple-qwen3-0_6b-local-rerank as a fixture-covered, fail-closed challenger with no live quality result yet. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, temp cleanup guard verification, diff check, secret scan, private-path scan, and GitHub Actions run 26380217502 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -397,14 +397,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "9af072834ae1ad809e07b145f21c14b647bee688",
-    "ciRunId": 26379203538,
+    "headSha": "badef23f65c9004cd78118df806413b1090a23f1",
+    "ciRunId": 26380217502,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_and_goal_audit",
+    "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_goal_audit_and_release_temp_cleanup_guard",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after refreshing public docs and release-state evidence for the 12-hour returned canary standard-inbox watcher alias. GitHub Actions run 26379203538 passed. The latest verified code/product baseline remains fba92059552c155436e84bb05d87b1fd6aef9add, and this branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest observed PR branch head after containing release-check temp artifacts in a bounded run root and adding a stale RecallWeave temp cleanup guard. GitHub Actions run 26380217502 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",

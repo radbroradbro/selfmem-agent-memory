@@ -10,11 +10,15 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `9af072834ae1ad809e07b145f21c14b647bee688`.
+- `badef23f65c9004cd78118df806413b1090a23f1`.
+- GitHub Actions run `26380217502` passed CI after containing release-check
+  temp artifacts in a bounded run root and adding a stale RecallWeave temp
+  cleanup guard. This does not change the approved runtime canary
+  adapter/report commit.
+- GitHub Actions run `26379689695` passed CI after refreshing the returned
+  inbox handoff counts in `docs/RELEASE_HANDOFF.md`.
 - GitHub Actions run `26379203538` passed CI after refreshing public docs and
-  release-state evidence for the returned canary watcher. This branch-head
-  verification does not change the latest verified code/product baseline or the
-  approved runtime canary adapter/report commit.
+  release-state evidence for the returned canary watcher.
 - GitHub Actions run `26379062431` passed CI after adding the 12-hour returned
   canary standard-inbox watcher alias. The watcher checks Downloads and
   Telegram Desktop every 15 minutes for 12 hours, requires production-grade
@@ -46,17 +50,21 @@ requirements are resolved.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `fba92059552c155436e84bb05d87b1fd6aef9add`.
-- GitHub Actions run `26379062431` passed CI with release checks, live GitHub
+- `badef23f65c9004cd78118df806413b1090a23f1`.
+- GitHub Actions run `26380217502` passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
   beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
   records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
   a blocked-until-endpoint challenger, hardens returned canary zip
-  classification, adds the 12-hour returned canary watcher, and requires
-  returned one-agent canary packets to report the approved runtime adapter
-  commit.
+  classification, adds the 12-hour returned canary watcher, requires returned
+  one-agent canary packets to report the approved runtime adapter commit, and
+  contains release-check temp artifacts so repeated goal-loop checks do not
+  exhaust local temp storage.
+- Previous verified code/product baseline before release-check temp
+  containment:
+  `fba92059552c155436e84bb05d87b1fd6aef9add`.
 - Previous verified code/product baseline before the 12-hour returned canary
   watcher:
   `f2feec90880e87481fbd05ca70ff272cd6f2fb92`.
