@@ -8,16 +8,15 @@
 
 ## Blockers
 - missing-voyage-provider-arm
-- missing-nvidia-or-gemini-provider-arm
 - memory-score-reviewer-approval-report-not-ready
 - missing-two-independent-reviewer-approvals
 
 ## Result
 - Source: result-file
 - Fixture only: false
-- Answer quality metric: result=36
+- Answer quality metric: result=43.1667
 - Reviewer approvals: 0
-- Arms: bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
+- Arms: bm25-lite, cloud-nvidia-nemotron-1b, full-hybrid-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank, query-expanded-full-hybrid-rerank
 
 ## Reviewer Approval
 - Report exists: true

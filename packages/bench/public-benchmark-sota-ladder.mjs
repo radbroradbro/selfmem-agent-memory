@@ -19,6 +19,9 @@ const evidenceFiles = {
   queryExpansionPreflight: "reviews/overnight-20260522/query-expansion-preflight-20260525.json",
   queryExpansionLocalQwen36Preflight: "reviews/overnight-20260522/query-expansion-local-qwen36-preflight-20260525.json",
   liveLocalAnswerQuality: "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+  liveProviderAnswerQuality: "reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json",
+  providerPreflightVoyageNvidia: "reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.json",
+  voyageProviderRateLimit: "reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json",
   endToEndMemoryScoreGate: "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
   readinessNote: "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
 };
@@ -193,6 +196,11 @@ const checks = {
   endToEndMemoryScoreGatePresent: loaded.endToEndMemoryScoreGate.exists,
   endToEndMemoryScoreGateReady: loaded.endToEndMemoryScoreGate.json?.countsAsEndToEndMemoryBenchmark === true,
   liveLocalAnswerQualityPresent: loaded.liveLocalAnswerQuality.json?.memoryBenchAnswerQuality === true && loaded.liveLocalAnswerQuality.json?.fixtureOnly === false,
+  liveProviderAnswerQualityPresent:
+    loaded.liveProviderAnswerQuality.json?.memoryBenchAnswerQuality === true && loaded.liveProviderAnswerQuality.json?.fixtureOnly === false,
+  voyageProviderRateLimited:
+    loaded.voyageProviderRateLimit.json?.mode === "provider-benchmark-blocker" &&
+    loaded.voyageProviderRateLimit.json?.status === "BLOCKED_VOYAGE_RATE_LIMIT",
   reviewerApprovalsPresent: Number(loaded.endToEndMemoryScoreGate.json?.reviewerApproval?.reviewerApprovalCount ?? 0) >= 2,
   endToEndMemoryScorePresent:
     rows.some((row) => row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false) ||

@@ -16,7 +16,7 @@
   "reviewsSubmitted": 0,
   "target": {
     "resultPresent": true,
-    "resultHash": "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",
+    "resultHash": "sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0",
     "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
     "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
     "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
@@ -28,7 +28,7 @@
     "publicSafe": true,
     "retrievalProxyOnly": false,
     "memoryBenchAnswerQuality": true,
-    "strategyNamesHash": "sha256:eb06b53440e820624acda972e78a4294603e3df0187f310a6a7a13d7d70a7713",
+    "strategyNamesHash": "sha256:1bd91cf633ac7a28810945f90609ee6582935180571de23add9e509a78b0b0c6",
     "scoredQueryCount": 30,
     "hasAnyTarget": true
   },

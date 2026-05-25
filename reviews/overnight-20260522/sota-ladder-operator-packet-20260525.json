@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T20:26:01.738Z",
+  "generatedAt": "2026-05-25T21:17:04.226Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -31,7 +31,6 @@
       "blockers": [
         "all-current-result-files-keep-public-claims-disabled",
         "missing-voyage-answer-quality-same-data-result",
-        "missing-nvidia-or-gemini-live-same-data-result",
         "missing-two-independent-memory-score-reviewer-approvals"
       ],
       "requiredFullMemoryArms": [
@@ -58,7 +57,7 @@
         {
           "id": "provider-nvidia-or-gemini",
           "role": "non-Voyage provider challenger",
-          "status": "missing-live-result"
+          "status": "present"
         },
         {
           "id": "local-apple-embedding",
@@ -118,40 +117,30 @@
       "blockers": []
     },
     "providerPreflight": {
-      "status": "BLOCKED_PROVIDER_ENV",
-      "liveRunAllowed": false,
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.json",
+      "status": "READY_FOR_LIVE_PROVIDER_BENCHMARK",
+      "liveRunAllowed": true,
       "strategies": [
-        "bm25-lite",
-        "full-hybrid-rerank",
         "cloud-voyage4-voyage",
-        "cloud-gemini-voyage-rerank",
-        "cloud-nvidia-nemotron-1b",
-        "local-apple-qwen3-0_6b",
-        "local-apple-qwen3-0_6b-local-rerank"
+        "cloud-nvidia-nemotron-1b"
       ],
       "requiredProviders": [
-        "gemini",
-        "local-apple",
-        "local-rerank",
         "nvidia",
         "voyage"
       ],
-      "missingCredentialProviders": [
-        "gemini",
-        "local-apple",
-        "local-rerank",
-        "nvidia",
-        "voyage"
+      "missingCredentialProviders": [],
+      "blockers": []
+    },
+    "voyageProviderRateLimit": {
+      "evidencePath": "reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json",
+      "evidenceExists": true,
+      "evidenceHash": "sha256:a6e8b8743aedf946c77c54d54622dfe81247f8e1d1c4a8bc71be759f38f3bab4",
+      "status": "BLOCKED_VOYAGE_RATE_LIMIT",
+      "attemptedStrategies": [
+        "cloud-voyage4-voyage",
+        "cloud-voyage4-lite-voyage-lite"
       ],
-      "blockers": [
-        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-        "gemini-credentials-missing",
-        "local-apple-credentials-missing",
-        "local-rerank-credentials-missing",
-        "nvidia-credentials-missing",
-        "voyage-credentials-missing"
-      ]
+      "httpStatus": 429
     },
     "providerChallengerResultGate": {
       "evidencePath": "reviews/overnight-20260522/provider-challenger-result-gate-20260525.json",
@@ -172,13 +161,12 @@
     "endToEndMemoryScoreGate": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:03207891bbff08eb4ed4f9dd05d8d6c9e7677fd514814071e015ab9c9d92611d",
+      "evidenceHash": "sha256:f3a5f17fab3b9a23fa2e2401e6994104d0641a3872852e7cccc3a6bb2748f50b",
       "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
       "countsAsEndToEndMemoryBenchmark": false,
       "countsAsFullMemorySotaEvidence": false,
       "blockers": [
         "missing-voyage-provider-arm",
-        "missing-nvidia-or-gemini-provider-arm",
         "memory-score-reviewer-approval-report-not-ready",
         "missing-two-independent-reviewer-approvals"
       ]
@@ -197,10 +185,29 @@
       },
       "providerCalls": 300
     },
+    "liveProviderAnswerQuality": {
+      "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json",
+      "evidenceExists": true,
+      "evidenceHash": "sha256:182681f12644f886d37e8edfa6a020bf902abefa88677d74c221a74e5f9413dc",
+      "mode": "public-benchmark-answer-quality",
+      "readyForEndToEndMemoryScoreGate": true,
+      "winner": {
+        "strategy": "cloud-nvidia-nemotron-1b",
+        "answerQuality": 43.1667,
+        "judgeCorrectRate": 0.4333,
+        "answerLatencyP50Ms": 9031
+      },
+      "providerCalls": 180,
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "cloud-nvidia-nemotron-1b"
+      ]
+    },
     "memoryScoreReviewerIntake": {
       "evidencePath": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:26b3d04087a0bd62793672563eec7cb4f24e54a45c3db7a721d86e75325e9a65",
+      "evidenceHash": "sha256:97e202c1dbc234fe5526dac05aecc22a9acf160726380799920510c67eee2896",
       "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
       "publicBenchmarkApprovalReady": false,
       "countsAsFullMemorySotaReview": false,
@@ -501,15 +508,8 @@
   "blockers": [
     "all-current-result-files-keep-public-claims-disabled",
     "missing-voyage-answer-quality-same-data-result",
-    "missing-nvidia-or-gemini-live-same-data-result",
     "missing-two-independent-memory-score-reviewer-approvals",
-    "provider:RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-    "provider:RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-    "provider:gemini-credentials-missing",
-    "provider:local-apple-credentials-missing",
-    "provider:local-rerank-credentials-missing",
-    "provider:nvidia-credentials-missing",
-    "provider:voyage-credentials-missing",
-    "memory-score-reviewers:two-independent-reviewer-approvals-missing"
+    "memory-score-reviewers:two-independent-reviewer-approvals-missing",
+    "voyage-provider-rate-limited"
   ]
 }

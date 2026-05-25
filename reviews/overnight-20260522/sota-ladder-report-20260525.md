@@ -7,7 +7,6 @@
 ## Blockers
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
-- missing-nvidia-or-gemini-live-same-data-result
 - missing-two-independent-memory-score-reviewer-approvals
 
 ## Required Full Memory Arms
@@ -15,16 +14,17 @@
 - dense-or-vector-only: present (semantic control)
 - full-hybrid-rerank: present (intended local hybrid control)
 - provider-voyage4-rerank: retrieval-proxy-present-answer-quality-missing (cloud quality challenger)
-- provider-nvidia-or-gemini: missing-live-result (non-Voyage provider challenger)
+- provider-nvidia-or-gemini: present (non-Voyage provider challenger)
 - local-apple-embedding: present (zero-spend local challenger)
 - local-apple-reranker-sidecar: present (local rerank method challenger)
 - llm-query-expansion: present (query expansion challenger)
 
 ## Best Observed Rows
+- cloud-nvidia-nemotron-1b: quality 43.1667, answerQuality 43.1667, P@1 n/a, nDCG@10 n/a, p50 9031 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
 - local-apple-qwen3-0_6b-local-rerank: quality 36, answerQuality 36, P@1 n/a, nDCG@10 n/a, p50 10260 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
+- full-hybrid-rerank: quality 26.6667, answerQuality 26.6667, P@1 n/a, nDCG@10 n/a, p50 8749 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
 - local-apple-qwen3-0_6b: quality 26.6667, answerQuality 26.6667, P@1 n/a, nDCG@10 n/a, p50 9823 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
-- full-hybrid-rerank: quality 26.6667, answerQuality 26.6667, P@1 n/a, nDCG@10 n/a, p50 10072 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
-- bm25-lite: quality 20, answerQuality 20, P@1 n/a, nDCG@10 n/a, p50 9636 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
+- bm25-lite: quality 20, answerQuality 20, P@1 n/a, nDCG@10 n/a, p50 7049 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
 - query-expanded-full-hybrid-rerank: quality 20, answerQuality 20, P@1 n/a, nDCG@10 n/a, p50 10106 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true
 - cloud-voyage4-lite-voyage-lite: quality 0.304, answerQuality n/a, P@1 0.5667, nDCG@10 0.2658, p50 1988 ms, retrievalProxyOnly=true, memoryBenchAnswerQuality=false
 - cloud-voyage4-voyage-lite-rerank: quality 0.304, answerQuality n/a, P@1 0.5667, nDCG@10 0.2658, p50 2251 ms, retrievalProxyOnly=true, memoryBenchAnswerQuality=false
@@ -32,7 +32,6 @@
 - local-apple-qwen3-4b: quality 0.2506, answerQuality n/a, P@1 0.4667, nDCG@10 0.2193, p50 290 ms, retrievalProxyOnly=true, memoryBenchAnswerQuality=false
 - sparse-dense-graph-temporal: quality 0.1818, answerQuality n/a, P@1 0.3333, nDCG@10 0.1606, p50 77 ms, retrievalProxyOnly=true, memoryBenchAnswerQuality=false
 - sparse-dense-temporal: quality 0.1401, answerQuality n/a, P@1 0.2333, nDCG@10 0.127, p50 76 ms, retrievalProxyOnly=true, memoryBenchAnswerQuality=false
-- sparse-dense-rrf: quality 0.1024, answerQuality n/a, P@1 0.1667, nDCG@10 0.0928, p50 75 ms, retrievalProxyOnly=true, memoryBenchAnswerQuality=false
 
 ## Next Actions
 - Use MTEB and model-card evidence only to choose embedding and reranker candidates.

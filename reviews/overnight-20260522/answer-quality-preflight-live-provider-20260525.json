@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-preflight",
+  "status": "READY_FOR_LIVE_ANSWER_QUALITY",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-05-25T20:59:14.911Z",
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "consent": {
+    "answerQualityCallsEnabled": true,
+    "publicDataConfirmed": true,
+    "noRawTextOutputConfirmed": true
+  },
+  "endpoint": {
+    "baseUrlPresent": true,
+    "endpointIsLocal": true,
+    "apiKeyPresent": false,
+    "valuePrinted": false
+  },
+  "models": {
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "valuesPrinted": false
+  },
+  "privateInputs": {
+    "querySet": {
+      "role": "queryset",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-queryset.private.json",
+      "hash": "sha256:d3758e0719fae64d09caf612bee16ef3952f30df1ad99046858836015d019164",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "queryCount": 30,
+      "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "matchesTarget": true
+    },
+    "memories": {
+      "role": "memories",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-memories.private.jsonl",
+      "hash": "sha256:6dc310a098e00e424bea17babecd4bd5b23c5a03b8214557388d7a0f5bcadf25",
+      "lineCount": 1420
+    },
+    "answerLabels": {
+      "role": "answer-labels",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-answer-labels.private.json",
+      "hash": "sha256:0d9710ac102bd24cd6690d97312cdcb4867b3683576131521ab3b51a7fac3637",
+      "labelCount": 30,
+      "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "matchesTarget": true
+    }
+  },
+  "arms": [
+    {
+      "strategy": "bm25-lite",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "bm25-lite-responses.private.json",
+      "hash": "sha256:02df28a195fc8a6c4a582d51a518daaac9106dd7eed307fe1afae63a92b00aaa",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "hash": "sha256:712b26be346b90e2d554bb48bcdad40f4adf2452d6018a06fbfa5ffb0f0a2ebd",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    },
+    {
+      "strategy": "cloud-nvidia-nemotron-1b",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "cloud-nvidia-nemotron-1b-responses.private.json",
+      "hash": "sha256:d0c63343785f64b08e8cd54e954978bf986cea3208bc16bd29822012a4784af9",
+      "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+      "responseCount": 30,
+      "querySetMatches": true
+    }
+  ],
+  "requiredStrategyCoverage": {
+    "hasBm25Lite": true,
+    "hasFullHybridRerank": true,
+    "hasChallenger": true
+  },
+  "readiness": {
+    "envReady": true,
+    "privateInputsReady": true,
+    "armsReady": true,
+    "sameDataReady": true,
+    "liveAnswerQualityCanRun": true,
+    "readyForEndToEndMemoryScoreGate": true,
+    "countsAsFullMemorySotaEvidence": false
+  },
+  "blockers": [],
+  "nextActions": [
+    "Run benchmark:answer-quality with --live against the private materialized inputs and response arm exports.",
+    "Attach the metrics-only result to benchmark:memory-score:result-gate --require-ready.",
+    "Send the metrics-only packet to independent reviewers before public benchmark wording changes."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+    "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
+    "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model>",
+    "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json --arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json --output <public-answer-quality-output.json>"
+  ]
+}

@@ -154,6 +154,28 @@ Follow-up implementation evidence on 2026-05-25:
   questions, gold answers, candidate answers, memory text, prompts, transcripts,
   private paths, or keys.
 
+Follow-up provider evidence on 2026-05-25:
+
+- A scrubbed provider preflight passed for `cloud-voyage4-voyage` and
+  `cloud-nvidia-nemotron-1b` on the source-locked LongMemEval target with
+  provider-call consent, public-data consent, and env-only credentials present.
+  Evidence:
+  `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.json`.
+- The full `cloud-voyage4-voyage` arm and the lower-call
+  `cloud-voyage4-lite-voyage-lite` fallback both hit Voyage HTTP 429 after
+  retry/backoff and provider pacing. Evidence:
+  `reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json`.
+  This remains a hard SOTA-ladder blocker.
+- The non-Voyage provider lane did run end-to-end on the same 30-query
+  source-locked target. `cloud-nvidia-nemotron-1b` scored `43.1667`
+  answerQuality with `0.4333` judge-correct rate, beating the local
+  `local-apple-qwen3-0_6b-local-rerank` result of `36` on the current local
+  answer-quality judge. Evidence:
+  `reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json`.
+- This is progress, not launch clearance. The current ladder still lacks a
+  same-data Voyage answer-quality row, two independent reviewers, UI/docs
+  refresh against the final result, and owner approval.
+
 ## Claim Boundary
 
 Do not claim RecallWeave is SOTA, production-ready as a Supermemory

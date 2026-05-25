@@ -1,0 +1,2062 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality",
+  "combineMode": "same-data-answer-quality-union",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "readyForEndToEndMemoryScoreGate": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "callsProviderApis": true,
+  "sendsBenchmarkTextToProvider": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "generatedAt": "2026-05-25T21:14:25.332Z",
+  "target": {
+    "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o"
+  },
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
+    "memoriesHash": "sha256:6dc310a098e00e424bea17babecd4bd5b23c5a03b8214557388d7a0f5bcadf25",
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "datasetSlice": "longmemeval-s-cleaned-canary-30-first-per-type-2026-05-24",
+    "queryCount": 30,
+    "scoredQueryCount": 30
+  },
+  "sourceLock": {
+    "sameDataAttestation": true,
+    "inputResultCount": 2,
+    "inputResultHashes": [
+      "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",
+      "sha256:182681f12644f886d37e8edfa6a020bf902abefa88677d74c221a74e5f9413dc"
+    ],
+    "inputResultPaths": [
+      "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json"
+    ]
+  },
+  "provider": {
+    "answerModel": "qwen36-a3b-main-q8kv-8192",
+    "judgeModel": "qwen36-a3b-main-q8kv-8192",
+    "answerQualityCallsAllowed": true,
+    "publicDataConfirmed": true,
+    "callsMade": 480,
+    "endpointLabel": "http://127.0.0.1:8080"
+  },
+  "metrics": {
+    "answerQuality": 43.1667,
+    "memoryScore": 43.1667,
+    "longmemevalScore": 43.1667,
+    "quality": 0.4317,
+    "judgeCorrectRate": 0.4333,
+    "answerLatencyP50Ms": 9031,
+    "answerLatencyP95Ms": 10133,
+    "contextTokensAvg": 3173
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "metrics": {
+        "answerQuality": 20,
+        "memoryScore": 20,
+        "longmemevalScore": 20,
+        "quality": 0.2,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 9636,
+        "answerLatencyP95Ms": 11405,
+        "contextTokensAvg": 3175
+      },
+      "provider": {
+        "answerCalls": 30,
+        "judgeCalls": 30,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 60000,
+        "continueOnCallError": true,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 30,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:478a4b6daf5ec28a809be567d137efe77c8a81f426eb8319d3a4add812446835",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "queryHash": "bfff570c17b666ad",
+          "candidateAnswerHash": "sha256:970ec274ca867815174ebe4eff19282000f9495a6c7254e94991d1fb4dc3df30",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "queryHash": "dcd19c76f1cffae7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:58f5ca2d0ba6927d70e4386361ac216c6e08095058ae7b5c61e2f40860711ad1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "queryHash": "092f4e554cd2fc97",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c58ff6d0e4f3ad04d14d9275062a5316cecb1c61bede3ffbc99b52171a4087fa",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "queryHash": "999eecaa8d8c7c47",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:47c4935618043dbdc2d4ecc053dfb4004a339160e90e3e76869e309e77ec25da",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "queryHash": "3c789297fa08e77f",
+          "candidateAnswerHash": "sha256:aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+          "judgeDecisionHash": "sha256:96f1f571684013ca6185648e04050e3ae496ce62c60aee70922ce1050d0014d2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "queryHash": "69f1c47596c1b1dd",
+          "candidateAnswerHash": "sha256:2f1bd56c71068dd1f35870c3a707969028ec6afd97e81599b53ec0c0b8757426",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "queryHash": "48b5d702cf4d7c63",
+          "candidateAnswerHash": "sha256:89661e92f6119a028a0bdce4a79f61109ec81e4bf6186ce71a280184b9a445bc",
+          "judgeDecisionHash": "sha256:2137767bed2384d8dc8ac7908129dd051ceec3463d37ed78ce6f55dd2bed70b6",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "queryHash": "1b967c709502e939",
+          "candidateAnswerHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "queryHash": "954dfb82cc0408f7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:74ed5fabfa6aa47722831c089b1c846fb1f137c76ffa30c9920db52b1dbd617c",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "queryHash": "1ecc048a82f8640c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:433ed12516ddde534695f8f76d9344908b4401884e00da24a6cb861d845c9e21",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "queryHash": "3e88319c30129bd2",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c1d0d3ad36228c5f8129aa262df478e9137dc5a78b920d1b8077355b61cfc195",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "queryHash": "c237614b617f17c1",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:555a7804a12a8031cc64fdb71ad1e8ef7219806731f0fdb3f45faea9f1b8e2f4",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "queryHash": "2a975437feccedb6",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:328afa2f7546bd21471b0d8c4b9e3dc5585da4ca9e459e1ca63ae00a6b138c62",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "queryHash": "eb7d539e7e98a15d",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:48783730482ecd6abc61c749d339addb721484291a46fbbd8daf4f494ed981a2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:787f348e2d23a17af2a2b608553aae60473ed75c9ff36294cdd388104a75e191",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "queryHash": "e14b9745ab9c44cf",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:92e846173adebc5eb14760cf8cbe33d7106548685d34680af8ce411596527a6f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "queryHash": "948194c5125b66ed",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:3ecaa2f1b871d4486cb808bce72c985db35cbdad21f4c0fee02636b47025c23a",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "queryHash": "431e5f10c52659b7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:039c06ed029af5ccffb81272ed5bf7c8535bede6268b335cdc8d427fca2a90d9",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "queryHash": "4b591d196d918131",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:04a66c9ee4036db23a8f4c43d02be91c3c9090f73205e8ce61b754ad1e330ebe",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "queryHash": "40a14628fb5f794e",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:64cb2e3c367aa7243021037de9db12e0f722c6c977abbc2daf72883f4a1b9eae",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "queryHash": "569830ef27cdb495",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c7675be99b4f835e4d7a228e3af3fb36191aa0d377bc1fc380c4e5f292caa789",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "queryHash": "cd486494423ed757",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:1b750b588eeaa1a61eec6a4871efd299b187b2f6c06f54ef76e3d851572b1898",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "queryHash": "504981be310226c5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:eb019954b8d10f60fc58f32cabb99b6758a8e8a0db86404087593e395725d7be",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "queryHash": "771e934df322e91f",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:de16accd0db8db07684ea3f11edd8f7b9d273f802fc8528bc88e3a0059f39026",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "queryHash": "a458c868378f1e4a",
+          "candidateAnswerHash": "sha256:4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+          "judgeDecisionHash": "sha256:26b7542bcd8b5c3cebef4f5d01c7766f6f92ceea83d1dc7179d494121a16be77",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "queryHash": "3407e27a755a5e10",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:2aa8dcdbabb89f46199fd1d4cd63ddd25bea49853b74652ea2722cd13fad4ef3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "queryHash": "4330eb4a4c45c624",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:6a960e5384533743b0c6c19aa52e7d9060caf0aa5dea312086a2afd64e6472f1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "queryHash": "529af960857b5d25",
+          "candidateAnswerHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "judgeDecisionHash": "sha256:5e0b8c0612893eb9582d491305b8287cd2d7f168ef31ae222c743e9b6a140d7f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "queryHash": "3c953b2bf0e28188",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:e08ec1ed64c58b7cfd69858d248f536cd9176a716a4250f66a768d6c46709792",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        }
+      ]
+    },
+    {
+      "strategy": "cloud-nvidia-nemotron-1b",
+      "metrics": {
+        "answerQuality": 43.1667,
+        "memoryScore": 43.1667,
+        "longmemevalScore": 43.1667,
+        "quality": 0.4317,
+        "judgeCorrectRate": 0.4333,
+        "answerLatencyP50Ms": 9031,
+        "answerLatencyP95Ms": 10133,
+        "contextTokensAvg": 3173
+      },
+      "provider": {
+        "answerCalls": 30,
+        "judgeCalls": 30,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 180000,
+        "continueOnCallError": true,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 30,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b22d27fa84aff706f7aae62cdc6dc58f996fa6941a9890c856ca99869c6088f2",
+          "judgeDecisionHash": "sha256:d4eec94936f06e776c9b43058ec2834eb1aa15ae333bb6738e99a84d344197fb",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 95,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "queryHash": "bfff570c17b666ad",
+          "candidateAnswerHash": "sha256:970ec274ca867815174ebe4eff19282000f9495a6c7254e94991d1fb4dc3df30",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "queryHash": "dcd19c76f1cffae7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:58f5ca2d0ba6927d70e4386361ac216c6e08095058ae7b5c61e2f40860711ad1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "queryHash": "092f4e554cd2fc97",
+          "candidateAnswerHash": "sha256:bc54807d7df55abaf214d21aef97ce35c150ce5c072cf6f287d6c790c72ab265",
+          "judgeDecisionHash": "sha256:e6a41260b1569fb1d05370eb15404a940b732a4cfa36013f2b89475a7116fbbd",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "queryHash": "999eecaa8d8c7c47",
+          "candidateAnswerHash": "sha256:62c3eaf615ffcfe42b7547cc04ec7364729293a0aba622e98db97755899dcbf5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "queryHash": "3c789297fa08e77f",
+          "candidateAnswerHash": "sha256:aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+          "judgeDecisionHash": "sha256:96f1f571684013ca6185648e04050e3ae496ce62c60aee70922ce1050d0014d2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "queryHash": "69f1c47596c1b1dd",
+          "candidateAnswerHash": "sha256:2f1bd56c71068dd1f35870c3a707969028ec6afd97e81599b53ec0c0b8757426",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "queryHash": "48b5d702cf4d7c63",
+          "candidateAnswerHash": "sha256:89661e92f6119a028a0bdce4a79f61109ec81e4bf6186ce71a280184b9a445bc",
+          "judgeDecisionHash": "sha256:2137767bed2384d8dc8ac7908129dd051ceec3463d37ed78ce6f55dd2bed70b6",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "queryHash": "1b967c709502e939",
+          "candidateAnswerHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "queryHash": "954dfb82cc0408f7",
+          "candidateAnswerHash": "sha256:b9dfc439c91eb589811fd259a379348679437dde1d747110728abb3800ec6362",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 2,
+          "responseTotal": 2,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "queryHash": "1ecc048a82f8640c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:433ed12516ddde534695f8f76d9344908b4401884e00da24a6cb861d845c9e21",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "queryHash": "3e88319c30129bd2",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c1d0d3ad36228c5f8129aa262df478e9137dc5a78b920d1b8077355b61cfc195",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "queryHash": "c237614b617f17c1",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:555a7804a12a8031cc64fdb71ad1e8ef7219806731f0fdb3f45faea9f1b8e2f4",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "queryHash": "2a975437feccedb6",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:328afa2f7546bd21471b0d8c4b9e3dc5585da4ca9e459e1ca63ae00a6b138c62",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "queryHash": "eb7d539e7e98a15d",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:48783730482ecd6abc61c749d339addb721484291a46fbbd8daf4f494ed981a2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:787f348e2d23a17af2a2b608553aae60473ed75c9ff36294cdd388104a75e191",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "queryHash": "e14b9745ab9c44cf",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:92e846173adebc5eb14760cf8cbe33d7106548685d34680af8ce411596527a6f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "queryHash": "948194c5125b66ed",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:3ecaa2f1b871d4486cb808bce72c985db35cbdad21f4c0fee02636b47025c23a",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "queryHash": "431e5f10c52659b7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:039c06ed029af5ccffb81272ed5bf7c8535bede6268b335cdc8d427fca2a90d9",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "queryHash": "4b591d196d918131",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:04a66c9ee4036db23a8f4c43d02be91c3c9090f73205e8ce61b754ad1e330ebe",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "queryHash": "40a14628fb5f794e",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:64cb2e3c367aa7243021037de9db12e0f722c6c977abbc2daf72883f4a1b9eae",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "queryHash": "569830ef27cdb495",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c7675be99b4f835e4d7a228e3af3fb36191aa0d377bc1fc380c4e5f292caa789",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "queryHash": "cd486494423ed757",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:1b750b588eeaa1a61eec6a4871efd299b187b2f6c06f54ef76e3d851572b1898",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "queryHash": "504981be310226c5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:eb019954b8d10f60fc58f32cabb99b6758a8e8a0db86404087593e395725d7be",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "queryHash": "771e934df322e91f",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:de16accd0db8db07684ea3f11edd8f7b9d273f802fc8528bc88e3a0059f39026",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "queryHash": "a458c868378f1e4a",
+          "candidateAnswerHash": "sha256:b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "queryHash": "3407e27a755a5e10",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:2aa8dcdbabb89f46199fd1d4cd63ddd25bea49853b74652ea2722cd13fad4ef3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "queryHash": "4330eb4a4c45c624",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:6a960e5384533743b0c6c19aa52e7d9060caf0aa5dea312086a2afd64e6472f1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "queryHash": "529af960857b5d25",
+          "candidateAnswerHash": "sha256:ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "queryHash": "3c953b2bf0e28188",
+          "candidateAnswerHash": "sha256:4bcf573e52dfc9289862eef57026bb603c53814d28c16c0f4d24d9303b9de0e5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 26.6667,
+        "memoryScore": 26.6667,
+        "longmemevalScore": 26.6667,
+        "quality": 0.2667,
+        "judgeCorrectRate": 0.2667,
+        "answerLatencyP50Ms": 10072,
+        "answerLatencyP95Ms": 11267,
+        "contextTokensAvg": 3398
+      },
+      "provider": {
+        "answerCalls": 30,
+        "judgeCalls": 30,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 60000,
+        "continueOnCallError": true,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 30,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:478a4b6daf5ec28a809be567d137efe77c8a81f426eb8319d3a4add812446835",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "queryHash": "bfff570c17b666ad",
+          "candidateAnswerHash": "sha256:970ec274ca867815174ebe4eff19282000f9495a6c7254e94991d1fb4dc3df30",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "queryHash": "dcd19c76f1cffae7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:58f5ca2d0ba6927d70e4386361ac216c6e08095058ae7b5c61e2f40860711ad1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "queryHash": "092f4e554cd2fc97",
+          "candidateAnswerHash": "sha256:bc54807d7df55abaf214d21aef97ce35c150ce5c072cf6f287d6c790c72ab265",
+          "judgeDecisionHash": "sha256:e6a41260b1569fb1d05370eb15404a940b732a4cfa36013f2b89475a7116fbbd",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "queryHash": "999eecaa8d8c7c47",
+          "candidateAnswerHash": "sha256:62c3eaf615ffcfe42b7547cc04ec7364729293a0aba622e98db97755899dcbf5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "queryHash": "3c789297fa08e77f",
+          "candidateAnswerHash": "sha256:aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+          "judgeDecisionHash": "sha256:96f1f571684013ca6185648e04050e3ae496ce62c60aee70922ce1050d0014d2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "queryHash": "69f1c47596c1b1dd",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:5f8c8064ecc3cf339034284d785d81cd9427f3179fd8d9c3e0b7ed52d68f4901",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "queryHash": "48b5d702cf4d7c63",
+          "candidateAnswerHash": "sha256:89661e92f6119a028a0bdce4a79f61109ec81e4bf6186ce71a280184b9a445bc",
+          "judgeDecisionHash": "sha256:2137767bed2384d8dc8ac7908129dd051ceec3463d37ed78ce6f55dd2bed70b6",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "queryHash": "1b967c709502e939",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:46f895edfa6f0970734f5d9ae9d0a4c21d9b820967127595c1a81cefbe8a6d2d",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "queryHash": "954dfb82cc0408f7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:74ed5fabfa6aa47722831c089b1c846fb1f137c76ffa30c9920db52b1dbd617c",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "queryHash": "1ecc048a82f8640c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:433ed12516ddde534695f8f76d9344908b4401884e00da24a6cb861d845c9e21",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "queryHash": "3e88319c30129bd2",
+          "candidateAnswerHash": "sha256:b0da7176e3415fac6cbdfa75af7d41d699c75b484ce4d17e4ce5cccb0dba78fb",
+          "judgeDecisionHash": "sha256:88965b613b384ee9a3c9f25e00548146e8078b82a4f2e5e18e7d4315d2effca7",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "queryHash": "c237614b617f17c1",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:555a7804a12a8031cc64fdb71ad1e8ef7219806731f0fdb3f45faea9f1b8e2f4",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "queryHash": "2a975437feccedb6",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:328afa2f7546bd21471b0d8c4b9e3dc5585da4ca9e459e1ca63ae00a6b138c62",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "queryHash": "eb7d539e7e98a15d",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:48783730482ecd6abc61c749d339addb721484291a46fbbd8daf4f494ed981a2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:787f348e2d23a17af2a2b608553aae60473ed75c9ff36294cdd388104a75e191",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "queryHash": "e14b9745ab9c44cf",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:92e846173adebc5eb14760cf8cbe33d7106548685d34680af8ce411596527a6f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "queryHash": "948194c5125b66ed",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:3ecaa2f1b871d4486cb808bce72c985db35cbdad21f4c0fee02636b47025c23a",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "queryHash": "431e5f10c52659b7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:039c06ed029af5ccffb81272ed5bf7c8535bede6268b335cdc8d427fca2a90d9",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "queryHash": "4b591d196d918131",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:04a66c9ee4036db23a8f4c43d02be91c3c9090f73205e8ce61b754ad1e330ebe",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "queryHash": "40a14628fb5f794e",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:64cb2e3c367aa7243021037de9db12e0f722c6c977abbc2daf72883f4a1b9eae",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "queryHash": "569830ef27cdb495",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c7675be99b4f835e4d7a228e3af3fb36191aa0d377bc1fc380c4e5f292caa789",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "queryHash": "cd486494423ed757",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:1b750b588eeaa1a61eec6a4871efd299b187b2f6c06f54ef76e3d851572b1898",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "queryHash": "504981be310226c5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:eb019954b8d10f60fc58f32cabb99b6758a8e8a0db86404087593e395725d7be",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "queryHash": "771e934df322e91f",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:de16accd0db8db07684ea3f11edd8f7b9d273f802fc8528bc88e3a0059f39026",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "queryHash": "a458c868378f1e4a",
+          "candidateAnswerHash": "sha256:b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "queryHash": "3407e27a755a5e10",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:2aa8dcdbabb89f46199fd1d4cd63ddd25bea49853b74652ea2722cd13fad4ef3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "queryHash": "4330eb4a4c45c624",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:6a960e5384533743b0c6c19aa52e7d9060caf0aa5dea312086a2afd64e6472f1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "queryHash": "529af960857b5d25",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:35ca8c6f7dfa37c345713401bbfc4342481b164d99854281da603c426c297ff3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "queryHash": "3c953b2bf0e28188",
+          "candidateAnswerHash": "sha256:4bcf573e52dfc9289862eef57026bb603c53814d28c16c0f4d24d9303b9de0e5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "metrics": {
+        "answerQuality": 26.6667,
+        "memoryScore": 26.6667,
+        "longmemevalScore": 26.6667,
+        "quality": 0.2667,
+        "judgeCorrectRate": 0.2667,
+        "answerLatencyP50Ms": 9823,
+        "answerLatencyP95Ms": 11282,
+        "contextTokensAvg": 3267
+      },
+      "provider": {
+        "answerCalls": 30,
+        "judgeCalls": 30,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 60000,
+        "continueOnCallError": true,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 30,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:478a4b6daf5ec28a809be567d137efe77c8a81f426eb8319d3a4add812446835",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "queryHash": "bfff570c17b666ad",
+          "candidateAnswerHash": "sha256:970ec274ca867815174ebe4eff19282000f9495a6c7254e94991d1fb4dc3df30",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "queryHash": "dcd19c76f1cffae7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:58f5ca2d0ba6927d70e4386361ac216c6e08095058ae7b5c61e2f40860711ad1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "queryHash": "092f4e554cd2fc97",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c58ff6d0e4f3ad04d14d9275062a5316cecb1c61bede3ffbc99b52171a4087fa",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "queryHash": "999eecaa8d8c7c47",
+          "candidateAnswerHash": "sha256:62c3eaf615ffcfe42b7547cc04ec7364729293a0aba622e98db97755899dcbf5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "queryHash": "3c789297fa08e77f",
+          "candidateAnswerHash": "sha256:aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+          "judgeDecisionHash": "sha256:96f1f571684013ca6185648e04050e3ae496ce62c60aee70922ce1050d0014d2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "queryHash": "69f1c47596c1b1dd",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:5f8c8064ecc3cf339034284d785d81cd9427f3179fd8d9c3e0b7ed52d68f4901",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "queryHash": "48b5d702cf4d7c63",
+          "candidateAnswerHash": "sha256:89661e92f6119a028a0bdce4a79f61109ec81e4bf6186ce71a280184b9a445bc",
+          "judgeDecisionHash": "sha256:2137767bed2384d8dc8ac7908129dd051ceec3463d37ed78ce6f55dd2bed70b6",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "queryHash": "1b967c709502e939",
+          "candidateAnswerHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "queryHash": "954dfb82cc0408f7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:74ed5fabfa6aa47722831c089b1c846fb1f137c76ffa30c9920db52b1dbd617c",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "queryHash": "1ecc048a82f8640c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:433ed12516ddde534695f8f76d9344908b4401884e00da24a6cb861d845c9e21",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "queryHash": "3e88319c30129bd2",
+          "candidateAnswerHash": "sha256:b0da7176e3415fac6cbdfa75af7d41d699c75b484ce4d17e4ce5cccb0dba78fb",
+          "judgeDecisionHash": "sha256:88965b613b384ee9a3c9f25e00548146e8078b82a4f2e5e18e7d4315d2effca7",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "queryHash": "c237614b617f17c1",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:555a7804a12a8031cc64fdb71ad1e8ef7219806731f0fdb3f45faea9f1b8e2f4",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "queryHash": "2a975437feccedb6",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:328afa2f7546bd21471b0d8c4b9e3dc5585da4ca9e459e1ca63ae00a6b138c62",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "queryHash": "eb7d539e7e98a15d",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:48783730482ecd6abc61c749d339addb721484291a46fbbd8daf4f494ed981a2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:787f348e2d23a17af2a2b608553aae60473ed75c9ff36294cdd388104a75e191",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "queryHash": "e14b9745ab9c44cf",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:92e846173adebc5eb14760cf8cbe33d7106548685d34680af8ce411596527a6f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "queryHash": "948194c5125b66ed",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:3ecaa2f1b871d4486cb808bce72c985db35cbdad21f4c0fee02636b47025c23a",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "queryHash": "431e5f10c52659b7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:039c06ed029af5ccffb81272ed5bf7c8535bede6268b335cdc8d427fca2a90d9",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "queryHash": "4b591d196d918131",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:04a66c9ee4036db23a8f4c43d02be91c3c9090f73205e8ce61b754ad1e330ebe",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "queryHash": "40a14628fb5f794e",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:64cb2e3c367aa7243021037de9db12e0f722c6c977abbc2daf72883f4a1b9eae",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "queryHash": "569830ef27cdb495",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c7675be99b4f835e4d7a228e3af3fb36191aa0d377bc1fc380c4e5f292caa789",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "queryHash": "cd486494423ed757",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:1b750b588eeaa1a61eec6a4871efd299b187b2f6c06f54ef76e3d851572b1898",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "queryHash": "504981be310226c5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:eb019954b8d10f60fc58f32cabb99b6758a8e8a0db86404087593e395725d7be",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "queryHash": "771e934df322e91f",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:de16accd0db8db07684ea3f11edd8f7b9d273f802fc8528bc88e3a0059f39026",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "queryHash": "a458c868378f1e4a",
+          "candidateAnswerHash": "sha256:b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "queryHash": "3407e27a755a5e10",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:2aa8dcdbabb89f46199fd1d4cd63ddd25bea49853b74652ea2722cd13fad4ef3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "queryHash": "4330eb4a4c45c624",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:6a960e5384533743b0c6c19aa52e7d9060caf0aa5dea312086a2afd64e6472f1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "queryHash": "529af960857b5d25",
+          "candidateAnswerHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "judgeDecisionHash": "sha256:5e0b8c0612893eb9582d491305b8287cd2d7f168ef31ae222c743e9b6a140d7f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "queryHash": "3c953b2bf0e28188",
+          "candidateAnswerHash": "sha256:4bcf573e52dfc9289862eef57026bb603c53814d28c16c0f4d24d9303b9de0e5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "metrics": {
+        "answerQuality": 36,
+        "memoryScore": 36,
+        "longmemevalScore": 36,
+        "quality": 0.36,
+        "judgeCorrectRate": 0.3667,
+        "answerLatencyP50Ms": 10260,
+        "answerLatencyP95Ms": 11794,
+        "contextTokensAvg": 3273
+      },
+      "provider": {
+        "answerCalls": 30,
+        "judgeCalls": 30,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 60000,
+        "continueOnCallError": true,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 30,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b22d27fa84aff706f7aae62cdc6dc58f996fa6941a9890c856ca99869c6088f2",
+          "judgeDecisionHash": "sha256:d4eec94936f06e776c9b43058ec2834eb1aa15ae333bb6738e99a84d344197fb",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 95,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "queryHash": "bfff570c17b666ad",
+          "candidateAnswerHash": "sha256:970ec274ca867815174ebe4eff19282000f9495a6c7254e94991d1fb4dc3df30",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "queryHash": "dcd19c76f1cffae7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:58f5ca2d0ba6927d70e4386361ac216c6e08095058ae7b5c61e2f40860711ad1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "queryHash": "092f4e554cd2fc97",
+          "candidateAnswerHash": "sha256:bc54807d7df55abaf214d21aef97ce35c150ce5c072cf6f287d6c790c72ab265",
+          "judgeDecisionHash": "sha256:e6a41260b1569fb1d05370eb15404a940b732a4cfa36013f2b89475a7116fbbd",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "queryHash": "999eecaa8d8c7c47",
+          "candidateAnswerHash": "sha256:62c3eaf615ffcfe42b7547cc04ec7364729293a0aba622e98db97755899dcbf5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "queryHash": "3c789297fa08e77f",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:ab20b028f136d085dced0d15a7104f6b8d5189717edb04be10b21dff30c356b7",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "queryHash": "69f1c47596c1b1dd",
+          "candidateAnswerHash": "sha256:2f1bd56c71068dd1f35870c3a707969028ec6afd97e81599b53ec0c0b8757426",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "queryHash": "48b5d702cf4d7c63",
+          "candidateAnswerHash": "sha256:89661e92f6119a028a0bdce4a79f61109ec81e4bf6186ce71a280184b9a445bc",
+          "judgeDecisionHash": "sha256:2137767bed2384d8dc8ac7908129dd051ceec3463d37ed78ce6f55dd2bed70b6",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "queryHash": "1b967c709502e939",
+          "candidateAnswerHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "queryHash": "954dfb82cc0408f7",
+          "candidateAnswerHash": "sha256:b9dfc439c91eb589811fd259a379348679437dde1d747110728abb3800ec6362",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 2,
+          "responseTotal": 2,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "queryHash": "1ecc048a82f8640c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:433ed12516ddde534695f8f76d9344908b4401884e00da24a6cb861d845c9e21",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "queryHash": "3e88319c30129bd2",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c1d0d3ad36228c5f8129aa262df478e9137dc5a78b920d1b8077355b61cfc195",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "queryHash": "c237614b617f17c1",
+          "candidateAnswerHash": "sha256:4f1fb93dcdd82497959bea47c283ef268d5b66b4845a5014df7b82dc8277c87b",
+          "judgeDecisionHash": "sha256:06f9614b488bd50ce18fdbf1a1e7c89ea2ccd725cd07e5d859c18f1b634b4d99",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 85,
+          "correct": true
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "queryHash": "2a975437feccedb6",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:328afa2f7546bd21471b0d8c4b9e3dc5585da4ca9e459e1ca63ae00a6b138c62",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "queryHash": "eb7d539e7e98a15d",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:48783730482ecd6abc61c749d339addb721484291a46fbbd8daf4f494ed981a2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:787f348e2d23a17af2a2b608553aae60473ed75c9ff36294cdd388104a75e191",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "queryHash": "e14b9745ab9c44cf",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:92e846173adebc5eb14760cf8cbe33d7106548685d34680af8ce411596527a6f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "queryHash": "948194c5125b66ed",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:3ecaa2f1b871d4486cb808bce72c985db35cbdad21f4c0fee02636b47025c23a",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "queryHash": "431e5f10c52659b7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:039c06ed029af5ccffb81272ed5bf7c8535bede6268b335cdc8d427fca2a90d9",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "queryHash": "4b591d196d918131",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:04a66c9ee4036db23a8f4c43d02be91c3c9090f73205e8ce61b754ad1e330ebe",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "queryHash": "40a14628fb5f794e",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:64cb2e3c367aa7243021037de9db12e0f722c6c977abbc2daf72883f4a1b9eae",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "queryHash": "569830ef27cdb495",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c7675be99b4f835e4d7a228e3af3fb36191aa0d377bc1fc380c4e5f292caa789",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "queryHash": "cd486494423ed757",
+          "candidateAnswerHash": "sha256:8a798890fe93817163b10b5f7bd2ca4d25d84c52739a645a889c173eee7d9d3d",
+          "judgeDecisionHash": "sha256:61173a32ba74b50e36b22a65fa548ef964f3a71ce004c81860c43a2ec70cdd2e",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "queryHash": "504981be310226c5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:eb019954b8d10f60fc58f32cabb99b6758a8e8a0db86404087593e395725d7be",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "queryHash": "771e934df322e91f",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:de16accd0db8db07684ea3f11edd8f7b9d273f802fc8528bc88e3a0059f39026",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "queryHash": "a458c868378f1e4a",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c4dfcf2024c5885a39096bc9025be48a3f8c18313d2dbdc2a643304cb9ef4d47",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "queryHash": "3407e27a755a5e10",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:2aa8dcdbabb89f46199fd1d4cd63ddd25bea49853b74652ea2722cd13fad4ef3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "queryHash": "4330eb4a4c45c624",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:6a960e5384533743b0c6c19aa52e7d9060caf0aa5dea312086a2afd64e6472f1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "queryHash": "529af960857b5d25",
+          "candidateAnswerHash": "sha256:ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "queryHash": "3c953b2bf0e28188",
+          "candidateAnswerHash": "sha256:bbb1a824138d13ca6d526933b3eb3f6b51d7eec509bad8dc5471b0ebfa545fca",
+          "judgeDecisionHash": "sha256:98a87d5a5264aaf102dd8a6b5cb8124b356c6f75d1cd110bf7af23f52b70e65e",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        }
+      ]
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 20,
+        "memoryScore": 20,
+        "longmemevalScore": 20,
+        "quality": 0.2,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 10106,
+        "answerLatencyP95Ms": 11604,
+        "contextTokensAvg": 3447
+      },
+      "provider": {
+        "answerCalls": 30,
+        "judgeCalls": 30,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 60000,
+        "continueOnCallError": true,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 30,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:478a4b6daf5ec28a809be567d137efe77c8a81f426eb8319d3a4add812446835",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1aa972033766bb45",
+          "queryHash": "bfff570c17b666ad",
+          "candidateAnswerHash": "sha256:970ec274ca867815174ebe4eff19282000f9495a6c7254e94991d1fb4dc3df30",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "b86e08dc6a275cb4",
+          "queryHash": "dcd19c76f1cffae7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:58f5ca2d0ba6927d70e4386361ac216c6e08095058ae7b5c61e2f40860711ad1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "6d4d82173b1e3b6e",
+          "queryHash": "092f4e554cd2fc97",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c58ff6d0e4f3ad04d14d9275062a5316cecb1c61bede3ffbc99b52171a4087fa",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "8e450e468431ded3",
+          "queryHash": "999eecaa8d8c7c47",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:47c4935618043dbdc2d4ecc053dfb4004a339160e90e3e76869e309e77ec25da",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "baaedf38f62d1095",
+          "queryHash": "3c789297fa08e77f",
+          "candidateAnswerHash": "sha256:aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+          "judgeDecisionHash": "sha256:96f1f571684013ca6185648e04050e3ae496ce62c60aee70922ce1050d0014d2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "bff5d180531e9d8b",
+          "queryHash": "69f1c47596c1b1dd",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:5f8c8064ecc3cf339034284d785d81cd9427f3179fd8d9c3e0b7ed52d68f4901",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "cbbc8e4975ce23dc",
+          "queryHash": "48b5d702cf4d7c63",
+          "candidateAnswerHash": "sha256:89661e92f6119a028a0bdce4a79f61109ec81e4bf6186ce71a280184b9a445bc",
+          "judgeDecisionHash": "sha256:2137767bed2384d8dc8ac7908129dd051ceec3463d37ed78ce6f55dd2bed70b6",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "66d8d6d36ade109c",
+          "queryHash": "1b967c709502e939",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:46f895edfa6f0970734f5d9ae9d0a4c21d9b820967127595c1a81cefbe8a6d2d",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1a691123d5ed7d58",
+          "queryHash": "954dfb82cc0408f7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:74ed5fabfa6aa47722831c089b1c846fb1f137c76ffa30c9920db52b1dbd617c",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "0335acd04644b660",
+          "queryHash": "1ecc048a82f8640c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:433ed12516ddde534695f8f76d9344908b4401884e00da24a6cb861d845c9e21",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ce3f1ad09cc5d083",
+          "queryHash": "3e88319c30129bd2",
+          "candidateAnswerHash": "sha256:b0da7176e3415fac6cbdfa75af7d41d699c75b484ce4d17e4ce5cccb0dba78fb",
+          "judgeDecisionHash": "sha256:88965b613b384ee9a3c9f25e00548146e8078b82a4f2e5e18e7d4315d2effca7",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "441ff11e4a25e26f",
+          "queryHash": "c237614b617f17c1",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:555a7804a12a8031cc64fdb71ad1e8ef7219806731f0fdb3f45faea9f1b8e2f4",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "c3cc3aea0e2c0799",
+          "queryHash": "2a975437feccedb6",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:328afa2f7546bd21471b0d8c4b9e3dc5585da4ca9e459e1ca63ae00a6b138c62",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "b3e3c1c73d47ac62",
+          "queryHash": "eb7d539e7e98a15d",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:48783730482ecd6abc61c749d339addb721484291a46fbbd8daf4f494ed981a2",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:787f348e2d23a17af2a2b608553aae60473ed75c9ff36294cdd388104a75e191",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "863fd637e8d6c9bf",
+          "queryHash": "e14b9745ab9c44cf",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:92e846173adebc5eb14760cf8cbe33d7106548685d34680af8ce411596527a6f",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "f16fe4a9ba59748e",
+          "queryHash": "948194c5125b66ed",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:3ecaa2f1b871d4486cb808bce72c985db35cbdad21f4c0fee02636b47025c23a",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "de57dbc64da3aef5",
+          "queryHash": "431e5f10c52659b7",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:039c06ed029af5ccffb81272ed5bf7c8535bede6268b335cdc8d427fca2a90d9",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "1088da1cac9c9fb7",
+          "queryHash": "4b591d196d918131",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:04a66c9ee4036db23a8f4c43d02be91c3c9090f73205e8ce61b754ad1e330ebe",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3e2ac305f18c7c7d",
+          "queryHash": "40a14628fb5f794e",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:64cb2e3c367aa7243021037de9db12e0f722c6c977abbc2daf72883f4a1b9eae",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7055966e2db58feb",
+          "queryHash": "569830ef27cdb495",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:c7675be99b4f835e4d7a228e3af3fb36191aa0d377bc1fc380c4e5f292caa789",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "ff2b2b596aaea093",
+          "queryHash": "cd486494423ed757",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:1b750b588eeaa1a61eec6a4871efd299b187b2f6c06f54ef76e3d851572b1898",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "e2a45d648f602f4f",
+          "queryHash": "504981be310226c5",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:eb019954b8d10f60fc58f32cabb99b6758a8e8a0db86404087593e395725d7be",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "7dd79b4061adabf3",
+          "queryHash": "771e934df322e91f",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:de16accd0db8db07684ea3f11edd8f7b9d273f802fc8528bc88e3a0059f39026",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "468809cb62f99ca4",
+          "queryHash": "a458c868378f1e4a",
+          "candidateAnswerHash": "sha256:b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "e74283329e456786",
+          "queryHash": "3407e27a755a5e10",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:2aa8dcdbabb89f46199fd1d4cd63ddd25bea49853b74652ea2722cd13fad4ef3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "564481764d976b4d",
+          "queryHash": "4330eb4a4c45c624",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:6a960e5384533743b0c6c19aa52e7d9060caf0aa5dea312086a2afd64e6472f1",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "7f2426b6f8e8102f",
+          "queryHash": "529af960857b5d25",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:35ca8c6f7dfa37c345713401bbfc4342481b164d99854281da603c426c297ff3",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "3ca9a42033895827",
+          "queryHash": "3c953b2bf0e28188",
+          "candidateAnswerHash": "sha256:4bcf573e52dfc9289862eef57026bb603c53814d28c16c0f4d24d9303b9de0e5",
+          "judgeDecisionHash": "sha256:a94338ab65dbf5e3b632cb469ac4415119649f4b7cfc55548112e86d3265aa41",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "cloud-nvidia-nemotron-1b",
+    "answerQuality": 43.1667,
+    "judgeCorrectRate": 0.4333,
+    "answerLatencyP50Ms": 9031
+  },
+  "reviewerApprovalCount": 0,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "safety": {
+    "metricsOnly": true,
+    "publicSafe": true,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "privateInputsStoredOutsideRepository": true,
+    "combinedFromMetricsOnlyReports": true
+  },
+  "nextActions": [
+    "Retry the missing Voyage same-data answer-quality arm after provider rate limits reset.",
+    "Run benchmark:memory-score:reviewer-intake against this exact combined metrics-only result after two independent reviews are collected.",
+    "Keep public benchmark and production-replacement claims disabled until the full gate passes."
+  ]
+}

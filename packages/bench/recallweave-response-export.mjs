@@ -63,6 +63,7 @@ const maxMemoryBytes =
 const generatedAt = new Date().toISOString();
 const providerBenchmarkCallsAllowed = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_CALLS === "1";
 const providerBenchmarkPublicData = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1";
+const providerLastRequestAt = new Map();
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -1212,74 +1213,135 @@ async function localAppleRerank(query, candidates, options = {}) {
 
 async function geminiPost(path, body, options = {}) {
   const key = chooseProviderKey("gemini", options.seed ?? path);
-  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${path}`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-goog-api-key": key,
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`Gemini provider request failed with status ${response.status}`);
-    }
-    return response.json();
-  } finally {
-    clearTimeout(timeout);
-  }
+  return providerPostJson({
+    provider: "gemini",
+    url: `https://generativelanguage.googleapis.com/v1beta/${path}`,
+    body,
+    headers: {
+      "content-type": "application/json",
+      "x-goog-api-key": key,
+    },
+  });
 }
 
 async function voyagePost(path, body, options = {}) {
   const key = chooseProviderKey("voyage", options.seed ?? path);
-  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(`https://api.voyageai.com${path}`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${key}`,
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`Voyage provider request failed with status ${response.status}`);
-    }
-    return response.json();
-  } finally {
-    clearTimeout(timeout);
-  }
+  return providerPostJson({
+    provider: "voyage",
+    url: `https://api.voyageai.com${path}`,
+    body,
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${key}`,
+    },
+  });
 }
 
 async function nvidiaPost(url, body, options = {}) {
   const key = chooseProviderKey("nvidia", options.seed ?? url);
+  return providerPostJson({
+    provider: "nvidia",
+    url,
+    body,
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${key}`,
+    },
+  });
+}
+
+async function providerPostJson({ provider, url, body, headers }) {
   const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, {
+  const attempts = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ?? 4;
+  let lastStatus = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    await waitProviderTurn(provider);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      const raw = await response.text();
+      lastStatus = response.status;
+      if (response.ok) return JSON.parse(raw);
+      if (!retryableProviderStatus(response.status) || attempt === attempts) {
+        throw new Error(`${providerDisplayName(provider)} provider request failed with status ${response.status}`);
+      }
+      await sleep(providerRetryDelayMs(response, attempt));
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+  throw new Error(`${providerDisplayName(provider)} provider request failed with status ${lastStatus ?? "unknown"}`);
+}
+
+async function queryExpansionPost(plan, body) {
+  const timeoutMs =
+    optionalPositiveInt(process.env.RECALLWEAVE_QUERY_EXPANSION_TIMEOUT_MS ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "query expansion timeout") ??
+    60_000;
+  const attempts = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ?? 4;
+  const headers = { "content-type": "application/json" };
+  if (plan.apiKey) headers.authorization = `Bearer ${plan.apiKey}`;
+  let lastStatus = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(plan.endpoint, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${key}`,
-      },
+      headers,
       body: JSON.stringify(body),
       signal: controller.signal,
     });
-    if (!response.ok) {
-      throw new Error(`NVIDIA provider request failed with status ${response.status}`);
+      const raw = await response.text();
+      lastStatus = response.status;
+      if (response.ok) return JSON.parse(raw);
+      if (!retryableProviderStatus(response.status) || attempt === attempts) {
+        throw new Error(`query expansion request failed with status ${response.status}`);
+      }
+      await sleep(providerRetryDelayMs(response, attempt));
+    } finally {
+      clearTimeout(timeout);
     }
-    return response.json();
-  } finally {
-    clearTimeout(timeout);
   }
+  throw new Error(`query expansion request failed with status ${lastStatus ?? "unknown"}`);
+}
+
+async function waitProviderTurn(provider) {
+  const providerSpecific = process.env[`${String(provider).toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`];
+  const intervalMs = optionalPositiveInt(providerSpecific ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0;
+  if (!intervalMs) return;
+  const now = Date.now();
+  const previous = providerLastRequestAt.get(provider) ?? 0;
+  const waitMs = Math.max(0, previous + intervalMs - now);
+  if (waitMs > 0) await sleep(waitMs);
+  providerLastRequestAt.set(provider, Date.now());
+}
+
+function retryableProviderStatus(status) {
+  return status === 408 || status === 409 || status === 425 || status === 429 || status >= 500;
+}
+
+function providerRetryDelayMs(response, attempt) {
+  const retryAfter = Number(response.headers?.get?.("retry-after") ?? 0);
+  if (Number.isFinite(retryAfter) && retryAfter > 0) return Math.min(120_000, Math.ceil(retryAfter * 1000));
+  const baseMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_RETRY_BASE_MS ?? null, "provider retry base ms") ?? 2_000;
+  return Math.min(120_000, baseMs * 2 ** Math.max(0, attempt - 1));
+}
+
+function providerDisplayName(provider) {
+  if (provider === "gemini") return "Gemini";
+  if (provider === "voyage") return "Voyage";
+  if (provider === "nvidia") return "NVIDIA";
+  return String(provider ?? "provider");
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function localApplePost(path, body) {
@@ -1374,28 +1436,6 @@ async function geminiQueryExpansion(plan, request) {
     ],
   });
   return rewritesFromQueryExpansionText(geminiText(response));
-}
-
-async function queryExpansionPost(plan, body) {
-  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_QUERY_EXPANSION_TIMEOUT_MS ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "query expansion timeout") ?? 60_000;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  const headers = { "content-type": "application/json" };
-  if (plan.apiKey) headers.authorization = `Bearer ${plan.apiKey}`;
-  try {
-    const response = await fetch(plan.endpoint, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`query expansion request failed with status ${response.status}`);
-    }
-    return response.json();
-  } finally {
-    clearTimeout(timeout);
-  }
 }
 
 function embeddingsFromVoyageResponse(response) {

@@ -8,25 +8,21 @@
 ## Current Blockers
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
-- missing-nvidia-or-gemini-live-same-data-result
 - missing-two-independent-memory-score-reviewer-approvals
-- provider:RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled
-- provider:RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed
-- provider:gemini-credentials-missing
-- provider:local-apple-credentials-missing
-- provider:local-rerank-credentials-missing
-- provider:nvidia-credentials-missing
-- provider:voyage-credentials-missing
 - memory-score-reviewers:two-independent-reviewer-approvals-missing
+- voyage-provider-rate-limited
 
 ## Current Evidence
 - SOTA ladder: BLOCKED_FULL_MEMORY_SOTA_EVIDENCE
 - Query expansion preflight: PURE_LOCAL_QUERY_EXPANSION_READY
-- Provider preflight: BLOCKED_PROVIDER_ENV
+- Provider preflight: READY_FOR_LIVE_PROVIDER_BENCHMARK
+- Voyage provider blocker: BLOCKED_VOYAGE_RATE_LIMIT
 - Provider challenger result gate: BLOCKED_PROVIDER_CHALLENGER_RESULT
 - End-to-end memory score gate: BLOCKED_END_TO_END_MEMORY_SCORE
 - Live-local answer quality: true
 - Live-local winner: local-apple-qwen3-0_6b-local-rerank (36)
+- Live-provider answer quality: true
+- Live-provider winner: cloud-nvidia-nemotron-1b (43.1667)
 - Memory score reviewer intake: BLOCKED_MEMORY_SCORE_REVIEWERS
 - Answer-quality arm export: EXPORTED_RESPONSE_ARMS
 - Answer-quality preflight: READY_FOR_LIVE_ANSWER_QUALITY

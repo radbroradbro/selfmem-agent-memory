@@ -31,13 +31,17 @@ const queryExpansionPreflight =
   queryExpansionLocalQwen36PreflightEvidence.json?.readiness?.queryExpansionCanBeBenchmarked === true
     ? queryExpansionLocalQwen36PreflightEvidence.json
     : runJson(["packages/bench/public-benchmark-query-expansion-preflight.mjs"]);
-const providerPreflight = runJson([
-  "packages/bench/provider-benchmark-live-preflight.mjs",
-  "--target",
-  displayPath(targetPath),
-  "--strategies",
-  providerPreflightStrategies.join(","),
-]);
+const providerPreflightEvidence = loadEvidence(`${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.json`);
+const providerPreflight =
+  providerPreflightEvidence.json?.status === "READY_FOR_LIVE_PROVIDER_BENCHMARK"
+    ? providerPreflightEvidence.json
+    : runJson([
+        "packages/bench/provider-benchmark-live-preflight.mjs",
+        "--target",
+        displayPath(targetPath),
+        "--strategies",
+        providerPreflightStrategies.join(","),
+      ]);
 const localRerankEvidence = loadEvidence(`${reviewDir}/local-rerank-sidecar-baseline-refresh-evidence.md`);
 const localRerankResultGateEvidence = loadEvidence(`${reviewDir}/local-rerank-result-gate-20260525.json`);
 const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-live-local-smoke-20260525.json`);
@@ -45,6 +49,8 @@ const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expans
 const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
 const endToEndMemoryScoreGateEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-gate-20260525.json`);
 const liveLocalAnswerQualityEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-live-local-20260525.json`);
+const liveProviderAnswerQualityEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`);
+const voyageProviderRateLimitEvidence = loadEvidence(`${reviewDir}/voyage-provider-rate-limit-20260525.json`);
 const memoryScoreReviewerIntakeEvidence = loadEvidence(`${reviewDir}/memory-score-reviewer-intake-20260525.json`);
 const answerQualityArmExportLegacyEvidence = loadEvidence(`${reviewDir}/answer-quality-arm-export-20260525.json`);
 const answerQualityArmExportLiveLocalEvidence = loadEvidence(`${reviewDir}/answer-quality-arm-export-live-local-20260525.json`);
@@ -71,6 +77,7 @@ const blockers = [
   !answerQualityArmExportEvidence.exists ? "answer-quality-arm-export-evidence-missing" : null,
   !memoryScoreReviewerIntakeEvidence.exists ? "memory-score-reviewer-intake-evidence-missing" : null,
   !endToEndMemoryScoreGateEvidence.exists ? "end-to-end-memory-score-gate-missing" : null,
+  voyageProviderRateLimitEvidence.json?.status === "BLOCKED_VOYAGE_RATE_LIMIT" ? "voyage-provider-rate-limited" : null,
 ].filter(Boolean);
 
 const packet = {
@@ -116,12 +123,21 @@ const packet = {
       blockers: arrayOf(queryExpansionPreflight.blockers),
     },
     providerPreflight: {
+      evidencePath: providerPreflightEvidence.exists ? providerPreflightEvidence.path : null,
       status: providerPreflight.status,
       liveRunAllowed: Boolean(providerPreflight.liveRunAllowed),
       strategies: providerPreflight.strategies ?? providerPreflightStrategies,
       requiredProviders: providerPreflight.requiredProviders ?? [],
       missingCredentialProviders: providerPreflight.missingCredentialProviders ?? [],
       blockers: arrayOf(providerPreflight.blockers),
+    },
+    voyageProviderRateLimit: {
+      evidencePath: voyageProviderRateLimitEvidence.path,
+      evidenceExists: voyageProviderRateLimitEvidence.exists,
+      evidenceHash: voyageProviderRateLimitEvidence.hash,
+      status: voyageProviderRateLimitEvidence.json?.status ?? null,
+      attemptedStrategies: voyageProviderRateLimitEvidence.json?.attemptedStrategies ?? [],
+      httpStatus: voyageProviderRateLimitEvidence.json?.httpStatus ?? null,
     },
     providerChallengerResultGate: {
       evidencePath: providerChallengerResultGateEvidence.path,
@@ -148,6 +164,16 @@ const packet = {
       readyForEndToEndMemoryScoreGate: Boolean(liveLocalAnswerQualityEvidence.json?.readyForEndToEndMemoryScoreGate),
       winner: liveLocalAnswerQualityEvidence.json?.winner ?? null,
       providerCalls: Number(liveLocalAnswerQualityEvidence.json?.provider?.callsMade ?? 0),
+    },
+    liveProviderAnswerQuality: {
+      evidencePath: liveProviderAnswerQualityEvidence.path,
+      evidenceExists: liveProviderAnswerQualityEvidence.exists,
+      evidenceHash: liveProviderAnswerQualityEvidence.hash,
+      mode: liveProviderAnswerQualityEvidence.json?.mode ?? null,
+      readyForEndToEndMemoryScoreGate: Boolean(liveProviderAnswerQualityEvidence.json?.readyForEndToEndMemoryScoreGate),
+      winner: liveProviderAnswerQualityEvidence.json?.winner ?? null,
+      providerCalls: Number(liveProviderAnswerQualityEvidence.json?.provider?.callsMade ?? 0),
+      strategies: (liveProviderAnswerQualityEvidence.json?.strategies ?? []).map((item) => item.strategy).filter(Boolean),
     },
     memoryScoreReviewerIntake: {
       evidencePath: memoryScoreReviewerIntakeEvidence.path,
@@ -621,10 +647,13 @@ function renderMarkdown(value) {
     `- SOTA ladder: ${value.currentEvidence.sotaLadder.status}`,
     `- Query expansion preflight: ${value.currentEvidence.queryExpansionPreflight.status}`,
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
+    `- Voyage provider blocker: ${value.currentEvidence.voyageProviderRateLimit.status ?? "missing"}`,
     `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
     `- End-to-end memory score gate: ${value.currentEvidence.endToEndMemoryScoreGate.status ?? "missing"}`,
     `- Live-local answer quality: ${value.currentEvidence.liveLocalAnswerQuality.readyForEndToEndMemoryScoreGate}`,
     `- Live-local winner: ${value.currentEvidence.liveLocalAnswerQuality.winner?.strategy ?? "missing"} (${value.currentEvidence.liveLocalAnswerQuality.winner?.answerQuality ?? "missing"})`,
+    `- Live-provider answer quality: ${value.currentEvidence.liveProviderAnswerQuality.readyForEndToEndMemoryScoreGate}`,
+    `- Live-provider winner: ${value.currentEvidence.liveProviderAnswerQuality.winner?.strategy ?? "missing"} (${value.currentEvidence.liveProviderAnswerQuality.winner?.answerQuality ?? "missing"})`,
     `- Memory score reviewer intake: ${value.currentEvidence.memoryScoreReviewerIntake.status ?? "missing"}`,
     `- Answer-quality arm export: ${value.currentEvidence.answerQualityArmExport.status ?? "missing"}`,
     `- Answer-quality preflight: ${value.currentEvidence.answerQualityPreflight.status ?? "missing"}`,

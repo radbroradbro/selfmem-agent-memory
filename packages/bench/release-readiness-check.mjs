@@ -120,6 +120,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
   "packages/bench/public-benchmark-answer-quality-preflight.mjs",
   "packages/bench/public-benchmark-answer-quality.mjs",
+  "packages/bench/public-benchmark-answer-quality-combine.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -174,12 +175,24 @@ const requiredFiles = [
   `${reviewDir}/end-to-end-memory-score-gate-20260525.md`,
   `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
   `${reviewDir}/end-to-end-memory-score-live-local-20260525.md`,
+  `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
+  `${reviewDir}/end-to-end-memory-score-live-provider-20260525.md`,
+  `${reviewDir}/end-to-end-memory-score-combined-20260525.json`,
+  `${reviewDir}/end-to-end-memory-score-combined-20260525.md`,
   `${reviewDir}/answer-quality-arm-export-live-local-20260525.json`,
   `${reviewDir}/answer-quality-arm-export-live-local-20260525.md`,
   `${reviewDir}/answer-quality-preflight-live-local-20260525.json`,
   `${reviewDir}/answer-quality-preflight-live-local-20260525.md`,
+  `${reviewDir}/answer-quality-preflight-live-provider-20260525.json`,
+  `${reviewDir}/answer-quality-preflight-live-provider-20260525.md`,
   `${reviewDir}/live-local-materialize-20260525.json`,
   `${reviewDir}/live-local-materialize-20260525.md`,
+  `${reviewDir}/live-provider-materialize-20260525.json`,
+  `${reviewDir}/live-provider-materialize-20260525.md`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.json`,
+  `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage-nvidia-20260525.md`,
+  `${reviewDir}/voyage-provider-rate-limit-20260525.json`,
+  `${reviewDir}/voyage-provider-rate-limit-20260525.md`,
   `${reviewDir}/query-expansion-local-qwen36-preflight-20260525.json`,
   `${reviewDir}/query-expansion-local-qwen36-preflight-20260525.md`,
   `${reviewDir}/answer-quality-arm-export-20260525.json`,
@@ -1497,6 +1510,14 @@ check("fresh public benchmark target check passes", () => {
     readFileSync(join(root, reviewDir, "answer-quality-preflight-live-local-20260525.json"), "utf8"),
   );
   const answerQualityLiveLocalEvidence = JSON.parse(readFileSync(join(root, reviewDir, "end-to-end-memory-score-live-local-20260525.json"), "utf8"));
+  const answerQualityPreflightLiveProviderEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "answer-quality-preflight-live-provider-20260525.json"), "utf8"),
+  );
+  const answerQualityLiveProviderEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "end-to-end-memory-score-live-provider-20260525.json"), "utf8"),
+  );
+  const answerQualityCombinedEvidence = JSON.parse(readFileSync(join(root, reviewDir, "end-to-end-memory-score-combined-20260525.json"), "utf8"));
+  const voyageProviderRateLimitEvidence = JSON.parse(readFileSync(join(root, reviewDir, "voyage-provider-rate-limit-20260525.json"), "utf8"));
   const endToEndMemoryScoreGateEvidence = JSON.parse(readFileSync(join(root, reviewDir, "end-to-end-memory-score-gate-20260525.json"), "utf8"));
   const memoryScoreReviewerIntakeEvidence = JSON.parse(readFileSync(join(root, reviewDir, "memory-score-reviewer-intake-20260525.json"), "utf8"));
   const memoryScoreReviewerIntakeMarkdownEvidence = readFileSync(join(root, reviewDir, "memory-score-reviewer-intake-20260525.md"), "utf8");
@@ -1811,11 +1832,38 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityLiveLocalEvidence.provider?.callsMade, 300);
   assert.equal(answerQualityLiveLocalEvidence.winner?.strategy, "local-apple-qwen3-0_6b-local-rerank");
   assert.equal(answerQualityLiveLocalEvidence.winner?.answerQuality, 36);
+  assert.equal(answerQualityPreflightLiveProviderEvidence.mode, "public-benchmark-answer-quality-preflight");
+  assert.equal(answerQualityPreflightLiveProviderEvidence.status, "READY_FOR_LIVE_ANSWER_QUALITY");
+  assert.equal(answerQualityPreflightLiveProviderEvidence.readiness?.sameDataReady, true);
+  assert.equal(answerQualityPreflightLiveProviderEvidence.readiness?.readyForEndToEndMemoryScoreGate, true);
+  assert.equal(answerQualityLiveProviderEvidence.mode, "public-benchmark-answer-quality");
+  assert.equal(answerQualityLiveProviderEvidence.fixtureOnly, false);
+  assert.equal(answerQualityLiveProviderEvidence.readyForEndToEndMemoryScoreGate, true);
+  assert.equal(answerQualityLiveProviderEvidence.provider?.callsMade, 180);
+  assert.equal(answerQualityLiveProviderEvidence.winner?.strategy, "cloud-nvidia-nemotron-1b");
+  assert.equal(answerQualityLiveProviderEvidence.winner?.answerQuality, 43.1667);
+  assert.ok(answerQualityLiveProviderEvidence.strategies?.some((item) => item.strategy === "cloud-nvidia-nemotron-1b"));
+  assert.equal(answerQualityCombinedEvidence.mode, "public-benchmark-answer-quality");
+  assert.equal(answerQualityCombinedEvidence.combineMode, "same-data-answer-quality-union");
+  assert.equal(answerQualityCombinedEvidence.fixtureOnly, false);
+  assert.equal(answerQualityCombinedEvidence.readyForEndToEndMemoryScoreGate, true);
+  assert.equal(answerQualityCombinedEvidence.provider?.callsMade, 480);
+  assert.equal(answerQualityCombinedEvidence.winner?.strategy, "cloud-nvidia-nemotron-1b");
+  assert.equal(answerQualityCombinedEvidence.winner?.answerQuality, 43.1667);
+  assert.ok(answerQualityCombinedEvidence.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b-local-rerank"));
+  assert.ok(answerQualityCombinedEvidence.strategies?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank"));
+  assert.equal(voyageProviderRateLimitEvidence.mode, "provider-benchmark-blocker");
+  assert.equal(voyageProviderRateLimitEvidence.status, "BLOCKED_VOYAGE_RATE_LIMIT");
+  assert.equal(voyageProviderRateLimitEvidence.httpStatus, 429);
+  assert.ok(voyageProviderRateLimitEvidence.attemptedStrategies?.includes("cloud-voyage4-voyage"));
   assert.equal(endToEndMemoryScoreGateEvidence.mode, "end-to-end-memory-score-gate");
   assert.equal(endToEndMemoryScoreGateEvidence.status, "BLOCKED_END_TO_END_MEMORY_SCORE");
-  assert.equal(endToEndMemoryScoreGateEvidence.result?.answerQualityMetric?.value, 36);
+  assert.equal(endToEndMemoryScoreGateEvidence.result?.answerQualityMetric?.value, 43.1667);
+  assert.ok(endToEndMemoryScoreGateEvidence.result?.arms?.includes("cloud-nvidia-nemotron-1b"));
+  assert.ok(endToEndMemoryScoreGateEvidence.result?.arms?.includes("local-apple-qwen3-0_6b-local-rerank"));
   assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("missing-voyage-provider-arm"));
-  assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("missing-nvidia-or-gemini-provider-arm"));
+  assert.equal(endToEndMemoryScoreGateEvidence.blockers.includes("missing-nvidia-or-gemini-provider-arm"), false);
+  assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("memory-score-reviewer-approval-report-not-ready"));
   assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("missing-two-independent-reviewer-approvals"));
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.exists, true);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.targetBound, true);

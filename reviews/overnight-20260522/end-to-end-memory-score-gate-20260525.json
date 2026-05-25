@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "end-to-end-memory-score-gate",
   "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
-  "generatedAt": "2026-05-25T20:20:04.974Z",
+  "generatedAt": "2026-05-25T21:14:49.349Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -22,8 +22,8 @@
   },
   "result": {
     "source": "result-file",
-    "path": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
-    "hash": "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",
+    "path": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
+    "hash": "sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0",
     "fixtureOnly": false,
     "mode": "public-benchmark-answer-quality",
     "benchmark": "longmemeval",
@@ -34,21 +34,22 @@
     "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
     "answerQualityMetric": {
       "name": "result",
-      "value": 36
+      "value": 43.1667
     },
     "reviewerApprovalCount": 0,
     "arms": [
       "bm25-lite",
+      "cloud-nvidia-nemotron-1b",
       "full-hybrid-rerank",
-      "query-expanded-full-hybrid-rerank",
       "local-apple-qwen3-0_6b",
-      "local-apple-qwen3-0_6b-local-rerank"
+      "local-apple-qwen3-0_6b-local-rerank",
+      "query-expanded-full-hybrid-rerank"
     ]
   },
   "reviewerApproval": {
     "source": "reviewer-approval-report-file",
     "path": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
-    "hash": "sha256:26b3d04087a0bd62793672563eec7cb4f24e54a45c3db7a721d86e75325e9a65",
+    "hash": "sha256:97e202c1dbc234fe5526dac05aecc22a9acf160726380799920510c67eee2896",
     "exists": true,
     "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
     "publicBenchmarkApprovalReady": false,
@@ -84,7 +85,7 @@
     "fullHybridControlPresent": true,
     "queryExpansionArmPresent": true,
     "voyageProviderArmPresent": false,
-    "nvidiaOrGeminiProviderArmPresent": false,
+    "nvidiaOrGeminiProviderArmPresent": true,
     "localAppleArmPresent": true,
     "localRerankArmPresent": true,
     "reviewerApprovalReportPresent": true,
@@ -95,7 +96,6 @@
   },
   "blockers": [
     "missing-voyage-provider-arm",
-    "missing-nvidia-or-gemini-provider-arm",
     "memory-score-reviewer-approval-report-not-ready",
     "missing-two-independent-reviewer-approvals"
   ],
