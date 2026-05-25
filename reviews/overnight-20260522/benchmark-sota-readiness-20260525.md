@@ -89,6 +89,25 @@ plus Voyage Rerank 2.5 and the NVIDIA/Gemini arms already represented in the
 provider matrix. The full score still has to come from RecallWeave running on a
 source-locked memory benchmark such as LongMemEval-S, not from MTEB alone.
 
+Query expansion is allowed as its own benchmark variable. The local benchmark
+does not have to pretend every substep is local if the useful experiment is a
+mixed arm. Preferred order:
+
+1. Test a small current local instruction model through an env-only local
+   OpenAI-compatible endpoint for bounded query rewrites.
+2. If local context, latency, or quality is the bottleneck, test a clearly
+   labeled cloud query-expansion arm, such as an NVIDIA-hosted model call, while
+   keeping embeddings/rerank/local stages separate in the report.
+3. Never label a mixed query-expansion run as pure local. It is still valid
+   method evidence if the cloud substep is explicit, costed, and reviewed.
+
+Live research checked on 2026-05-25 supports this ladder: NVIDIA NIM exposes
+current retrieval and rerank endpoints; a 2026 WSDM Cup retrieval pipeline used
+LLM-based query expansion before sparse retrieval, dense ranking, and Qwen3
+reranking under limited compute; and current May 2026 local-model radar points
+to Qwen 3.6 and Gemma 4 family models as plausible query-expansion candidates
+that still need local measurement on this machine.
+
 ## Claim Boundary
 
 Do not claim RecallWeave is SOTA, production-ready as a Supermemory
