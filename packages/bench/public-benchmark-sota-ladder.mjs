@@ -16,6 +16,7 @@ const evidenceFiles = {
   expandedAutoresearch: "reviews/overnight-20260522/public-longmemeval-expanded-autoresearch-loop.json",
   voyageLatencyCanary: "reviews/overnight-20260522/public-longmemeval-expanded-voyage-latency-live-provider.json",
   localApple4bWarm: "reviews/overnight-20260522/public-longmemeval-expanded-local-apple-4b-live-provider-900tok-warm.json",
+  queryExpansionPreflight: "reviews/overnight-20260522/query-expansion-preflight-20260525.json",
   readinessNote: "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
 };
 
@@ -165,6 +166,13 @@ const checks = {
   localAppleRerankerCanaryPresent: requiredArms.find((arm) => arm.id === "local-apple-reranker-sidecar")?.status === "present",
   llmQueryExpansionLiveCanaryPresent: requiredArms.find((arm) => arm.id === "llm-query-expansion")?.status === "present",
   queryExpansionProxyPresent: requiredArms.find((arm) => arm.id === "llm-query-expansion")?.status === "deterministic-proxy-present-live-llm-missing",
+  queryExpansionPreflightPresent: loaded.queryExpansionPreflight.exists,
+  queryExpansionPreflightSafe:
+    loaded.queryExpansionPreflight.json?.mode === "public-benchmark-query-expansion-preflight" &&
+    loaded.queryExpansionPreflight.json?.publicSafe === true &&
+    loaded.queryExpansionPreflight.json?.callsProviderApis === false &&
+    loaded.queryExpansionPreflight.json?.sendsBenchmarkTextToProvider === false,
+  queryExpansionCanBeBenchmarked: loaded.queryExpansionPreflight.json?.readiness?.queryExpansionCanBeBenchmarked === true,
   endToEndMemoryScorePresent: rows.some((row) => row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false),
   publicClaimsAllowedByInputs: rows.some((row) => row.publicBenchmarkClaimsAllowed === true),
   reportedMemoryTargetsPresent: reportedMemoryTargets.length >= 2,
@@ -176,6 +184,8 @@ const blockers = [
   !checks.publicClaimsAllowedByInputs ? "all-current-result-files-keep-public-claims-disabled" : null,
   !checks.nvidiaOrGeminiLiveCanaryPresent ? "missing-nvidia-or-gemini-live-same-data-result" : null,
   !checks.localAppleRerankerCanaryPresent ? "missing-local-apple-reranker-sidecar-result" : null,
+  !checks.queryExpansionPreflightPresent ? "missing-query-expansion-preflight" : null,
+  !checks.queryExpansionPreflightSafe ? "query-expansion-preflight-not-safe" : null,
   !checks.llmQueryExpansionLiveCanaryPresent ? "missing-live-llm-query-expansion-result" : null,
   !checks.sameDataControlRowsPresent ? "missing-same-data-control-row" : null,
   !checks.sourceLockedTargetPresent ? "missing-source-locked-target" : null,
