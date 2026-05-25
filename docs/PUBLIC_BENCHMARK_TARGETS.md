@@ -302,8 +302,15 @@ harness we will use.
   The 30-query local run is real same-data answer-quality evidence; the best
   local arm is `local-apple-qwen3-0_6b-local-rerank` at `36` answer-quality /
   `0.3667` correct rate. It is not SOTA proof and does not authorize public
-  comparison language because provider challenger arms and two independent
-  reviewer approvals are still missing.
+  comparison language by itself.
+- Current combined answer-quality evidence:
+  `reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json`.
+  This adds the NVIDIA `cloud-nvidia-nemotron-1b` same-data provider arm and
+  two independent memory-score reviewer approvals in
+  `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`.
+  Public comparison and SOTA wording remain blocked because
+  `reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json` records
+  a missing same-data Voyage answer-quality arm after HTTP 429.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and

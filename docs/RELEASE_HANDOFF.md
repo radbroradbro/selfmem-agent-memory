@@ -241,13 +241,19 @@ It scored 30 queries across BM25, full hybrid, query-expanded hybrid, local
 Qwen3 0.6B embedding, and local Qwen3 0.6B embedding plus local rerank arms.
 The best local arm was `local-apple-qwen3-0_6b-local-rerank` at `36`
 answer-quality / `0.3667` correct rate with 300 local model calls and zero
-answer or judge failures. This is real local evidence, not SOTA proof:
+answer or judge failures. The combined same-data answer-quality report,
+`reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json`,
+adds the NVIDIA `cloud-nvidia-nemotron-1b` provider arm at `43.1667`
+answer-quality / `0.4333` correct rate. Two independent reviewer approvals are
+recorded in
+`reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`.
+This is real benchmark progress, not SOTA proof:
 `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` remains
-blocked by missing Voyage/provider challenger arms and missing two independent
-reviewer approvals. To turn a retrieval, local, or provider canary into
-end-to-end memory evidence eligible for claims, export the response arms, run
-the preflight and harness against private materialized LongMemEval inputs, then
-require:
+blocked by the missing same-data Voyage answer-quality arm recorded in
+`reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json`. To turn
+a retrieval, local, or provider canary into end-to-end memory evidence eligible
+for claims, export the response arms, run the preflight and harness against
+private materialized LongMemEval inputs, then require:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute \

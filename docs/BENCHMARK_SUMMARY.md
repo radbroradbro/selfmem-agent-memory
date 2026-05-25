@@ -225,8 +225,12 @@ Voyage full and lite answer-quality attempts hit HTTP `429`, recorded in
 `reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json`, so the
 provider/SOTA ladder still has a hard missing-Voyage blocker.
 `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` keeps
-public and SOTA claims blocked because Voyage answer-quality and two
-independent reviewer approvals are still missing.
+public and SOTA claims blocked because the same-data Voyage answer-quality arm
+is still missing. Two independent memory-score reviewer approvals are now
+recorded in
+`reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`, bound
+to the current combined metrics-only packet. Those approvals do not override
+the missing Voyage arm, owner approval, or real rollout gates.
 
 OpenAI-compatible reviewers can now produce a memory-score approval JSON for
 the exact metrics-only packet. The command writes only the reviewer artifact;
@@ -637,7 +641,9 @@ A stronger claim requires:
 - context-token parity between hosted and local arms, or an explicit local
   context budget recorded in the RecallWeave export,
 - two independent reviewer approvals bound to the exact metrics-only packet
-  through `baseline:reviewer-intake`,
+  through `benchmark:memory-score:reviewer-intake` for public memory-score
+  evidence, or through `baseline:reviewer-intake` for the separate hosted
+  baseline canary lane,
 - no memory text in shared reports,
 - zero redaction failures,
 - cost and latency accounting,

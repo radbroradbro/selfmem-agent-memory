@@ -18,9 +18,10 @@ Use this checklist before making the repository public.
   `benchmark:memory-score:reviewer-intake`, and
   `benchmark:memory-score:result-gate --require-ready` as the required
   conversion path before SOTA or MemoryBench-style language.
-- [ ] Live-local answer-quality results are labeled as local evidence only,
-  with provider challenger arms and two independent reviewer approvals still
-  required before any SOTA or Supermemory-replacement wording.
+- [ ] Live answer-quality results are labeled as incomplete SOTA evidence until
+  the same-data Voyage arm, exact-packet reviewer approvals, owner approval,
+  and real rollout gates all pass. Current reviewer approvals do not replace a
+  missing Voyage result.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.
 
 ## Scans
