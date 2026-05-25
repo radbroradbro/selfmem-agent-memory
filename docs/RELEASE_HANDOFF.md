@@ -837,6 +837,15 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json
 ```
 
+For overnight supervision on the maintainer machine, use the 12-hour standard
+inbox watcher. It checks Downloads and Telegram Desktop every 15 minutes,
+requires production-grade evidence, and exits nonzero if no returned production
+packet appears:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --output /tmp/recallweave-returned-downloads-watch.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-watch-findings.md
+```
+
 The command fails closed unless the returned packet is non-fixture,
 metrics-only, privacy-clean, strict-real, and eligible to count as one-agent
 production canary evidence for the expected adapter commit. Even then, public

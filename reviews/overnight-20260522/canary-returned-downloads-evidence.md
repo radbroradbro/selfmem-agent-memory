@@ -11,6 +11,10 @@ Added `canary:returned-downloads:strict` as the named release-blocking version
 of the same standard-inbox scan. It always sets `--require-found`, so it must
 fail until a returned production canary packet exists.
 
+Added `canary:returned-downloads:watch12h` as the maintainer supervision
+command for the standard local inboxes. It checks every 15 minutes for 12 hours,
+requires a production canary packet, and exits nonzero if none appears.
+
 By default it scans:
 
 - Downloads
@@ -29,6 +33,7 @@ node packages/bench/canary-returned-downloads.mjs --skip-defaults --input-root <
 node packages/bench/canary-returned-downloads.mjs --skip-defaults --input-root <mixed-temp-folder> --require-found
 node packages/bench/canary-returned-downloads.mjs --output <metrics-json> --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output <metrics-json>
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --output <metrics-json> --findings-output <findings-md>
 ```
 
 ## Current Local Inbox Scan

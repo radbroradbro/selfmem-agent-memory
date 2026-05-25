@@ -340,6 +340,13 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json
 ```
 
+For overnight supervision on the maintainer machine, use the 12-hour standard
+inbox watcher:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --output /tmp/recallweave-returned-downloads-watch.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-watch-findings.md
+```
+
 This intake command does not read raw memories. It accepts only the metrics-only
 packet and fails closed unless the packet is non-fixture, privacy-clean, and
 strict-real.
