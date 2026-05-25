@@ -253,8 +253,14 @@ npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-r
   --arm bm25-lite=<private-bm25-responses.json> \
   --arm full-hybrid-rerank=<private-hybrid-responses.json> \
   --arm <provider-or-local-arm>=<private-challenger-responses.json>
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --strict-target \
+  --result <public-answer-quality-output.json> \
+  --review <reviewer-a-memory-score-approval.json> \
+  --review <reviewer-b-memory-score-approval.json> \
+  --output <memory-score-reviewer-intake.json>
 npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
-  --result <public-answer-quality-output.json>
+  --result <public-answer-quality-output.json> \
+  --reviewer-approval-report <memory-score-reviewer-intake.json>
 ```
 
 Do not use MemoryBench, LongMemEval, or SOTA wording until that result gate,

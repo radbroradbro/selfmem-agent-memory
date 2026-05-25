@@ -104,6 +104,8 @@ const files = {
   providerChallengerResultGateMarkdown: `${reviewDir}/provider-challenger-result-gate-20260525.md`,
   endToEndMemoryScoreGateReport: `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
   endToEndMemoryScoreGateMarkdown: `${reviewDir}/end-to-end-memory-score-gate-20260525.md`,
+  memoryScoreReviewerIntakeReport: `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
+  memoryScoreReviewerIntakeMarkdown: `${reviewDir}/memory-score-reviewer-intake-20260525.md`,
   answerQualityArmExportReport: `${reviewDir}/answer-quality-arm-export-20260525.json`,
   answerQualityArmExportMarkdown: `${reviewDir}/answer-quality-arm-export-20260525.md`,
   answerQualityPreflightReport: `${reviewDir}/answer-quality-preflight-20260525.json`,
@@ -141,6 +143,7 @@ const queryExpansionResultGate = JSON.parse(readFileSync(join(root, files.queryE
 const localRerankResultGate = JSON.parse(readFileSync(join(root, files.localRerankResultGateReport), "utf8"));
 const providerChallengerResultGate = JSON.parse(readFileSync(join(root, files.providerChallengerResultGateReport), "utf8"));
 const endToEndMemoryScoreGate = JSON.parse(readFileSync(join(root, files.endToEndMemoryScoreGateReport), "utf8"));
+const memoryScoreReviewerIntake = JSON.parse(readFileSync(join(root, files.memoryScoreReviewerIntakeReport), "utf8"));
 const answerQualityArmExport = JSON.parse(readFileSync(join(root, files.answerQualityArmExportReport), "utf8"));
 const answerQualityPreflight = JSON.parse(readFileSync(join(root, files.answerQualityPreflightReport), "utf8"));
 const answerQualityHarnessSmoke = JSON.parse(readFileSync(join(root, files.answerQualityHarnessSmokeReport), "utf8"));
@@ -274,6 +277,9 @@ assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLoca
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLocalSmoke?.publicBenchmarkClaimsAllowed, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.status, "BLOCKED_END_TO_END_MEMORY_SCORE");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.countsAsEndToEndMemoryBenchmark, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.memoryScoreReviewerIntake?.status, "BLOCKED_MEMORY_SCORE_REVIEWERS");
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.memoryScoreReviewerIntake?.publicBenchmarkApprovalReady, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.memoryScoreReviewerIntake?.reviewerApprovalCount, 0);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.status, "BLOCKED_RESPONSE_ARM_EXPORT_ENV");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.readyForAnswerQualityPreflight, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.writesPrivateResponseFiles, false);
@@ -321,6 +327,19 @@ assert.equal(endToEndMemoryScoreGate.publicBenchmarkClaimsAllowed, false);
 assert.ok(endToEndMemoryScoreGate.blockers.includes("retrieval-proxy-result-cannot-count-as-answer-quality"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("memorybench-answer-quality-not-proven"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("missing-answer-quality-score"));
+assert.ok(endToEndMemoryScoreGate.blockers.includes("missing-memory-score-reviewer-approval-report"));
+assert.equal(endToEndMemoryScoreGate.reviewerApproval?.exists, false);
+assert.equal(endToEndMemoryScoreGate.reviewerApproval?.targetBound, false);
+assert.equal(memoryScoreReviewerIntake.mode, "memory-score-reviewer-approval-intake");
+assert.equal(memoryScoreReviewerIntake.status, "BLOCKED_MEMORY_SCORE_REVIEWERS");
+assert.equal(memoryScoreReviewerIntake.publicBenchmarkApprovalReady, false);
+assert.equal(memoryScoreReviewerIntake.countsAsFullMemorySotaReview, false);
+assert.equal(memoryScoreReviewerIntake.reviewerApprovalCount, 0);
+assert.equal(memoryScoreReviewerIntake.independentReviewerCount, 0);
+assert.equal(memoryScoreReviewerIntake.target?.memoryBenchAnswerQuality, true);
+assert.equal(memoryScoreReviewerIntake.target?.fixtureOnly, true);
+assert.ok(memoryScoreReviewerIntake.blockers.includes("fixture-result-cannot-be-reviewed-for-sota"));
+assert.ok(memoryScoreReviewerIntake.blockers.includes("two-independent-reviewer-approvals-missing"));
 assert.equal(answerQualityArmExport.mode, "public-benchmark-answer-quality-arm-export");
 assert.equal(answerQualityArmExport.status, "BLOCKED_RESPONSE_ARM_EXPORT_ENV");
 assert.equal(answerQualityArmExport.callsProviderApis, false);
@@ -592,6 +611,8 @@ const requirements = [
     files.providerChallengerResultGateMarkdown,
     files.endToEndMemoryScoreGateReport,
     files.endToEndMemoryScoreGateMarkdown,
+    files.memoryScoreReviewerIntakeReport,
+    files.memoryScoreReviewerIntakeMarkdown,
     files.answerQualityArmExportReport,
     files.answerQualityArmExportMarkdown,
     files.answerQualityPreflightReport,
@@ -608,6 +629,7 @@ const requirements = [
     "packages/bench/local-rerank-result-gate.mjs",
     "packages/bench/provider-challenger-result-gate.mjs",
     "packages/bench/end-to-end-memory-score-gate.mjs",
+    "packages/bench/memory-score-reviewer-approval-intake.mjs",
     "packages/bench/recallweave-response-export.mjs",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [

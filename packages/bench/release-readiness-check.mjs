@@ -114,6 +114,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
+  "packages/bench/memory-score-reviewer-approval-intake.mjs",
   "packages/bench/public-benchmark-autoresearch-loop.mjs",
   "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
   "packages/bench/public-benchmark-answer-quality-preflight.mjs",
@@ -164,6 +165,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
+  `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
+  `${reviewDir}/memory-score-reviewer-intake-20260525.md`,
   `${reviewDir}/answer-quality-arm-export-20260525.json`,
   `${reviewDir}/answer-quality-arm-export-20260525.md`,
   `${reviewDir}/answer-quality-preflight-20260525.json`,
@@ -507,6 +510,7 @@ const requiredScripts = [
   "benchmark:local-rerank:result-gate",
   "benchmark:provider-challenger:result-gate",
   "benchmark:memory-score:result-gate",
+  "benchmark:memory-score:reviewer-intake",
   "benchmark:sota-ladder",
   "benchmark:sota-ladder:packet",
   "goal:audit",
@@ -1455,8 +1459,24 @@ check("fresh public benchmark target check passes", () => {
   ]).stdout;
   const answerQualityFixture = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture"]).stdout);
   const answerQualityMarkdown = run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture", "--format", "markdown"]).stdout;
+  const memoryScoreReviewerIntakeFresh = JSON.parse(
+    run("node", [
+      "packages/bench/memory-score-reviewer-approval-intake.mjs",
+      "--result",
+      "reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json",
+    ]).stdout,
+  );
+  const memoryScoreReviewerIntakeMarkdownFresh = run("node", [
+    "packages/bench/memory-score-reviewer-approval-intake.mjs",
+    "--result",
+    "reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json",
+    "--format",
+    "markdown",
+  ]).stdout;
   const answerQualityArmExportEvidence = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.json"), "utf8"));
   const answerQualityArmExportMarkdownEvidence = readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.md"), "utf8");
+  const memoryScoreReviewerIntakeEvidence = JSON.parse(readFileSync(join(root, reviewDir, "memory-score-reviewer-intake-20260525.json"), "utf8"));
+  const memoryScoreReviewerIntakeMarkdownEvidence = readFileSync(join(root, reviewDir, "memory-score-reviewer-intake-20260525.md"), "utf8");
   const answerQualityPreflightEvidence = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-preflight-20260525.json"), "utf8"));
   const answerQualityPreflightMarkdownEvidence = readFileSync(join(root, reviewDir, "answer-quality-preflight-20260525.md"), "utf8");
   const liveMaterializeReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-materialize-run.json"), "utf8"));
@@ -1712,6 +1732,27 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank"));
   assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "cloud-voyage4-voyage-lite-rerank" && item.providerMockCalls > 0));
   assert.ok(answerQualityArmExportFixture.arms?.every((item) => item.privacyLeakCount === 0 && item.redactionFailureCount === 0));
+  for (const reviewerIntake of [memoryScoreReviewerIntakeFresh, memoryScoreReviewerIntakeEvidence]) {
+    assert.equal(reviewerIntake.ok, true);
+    assert.equal(reviewerIntake.mode, "memory-score-reviewer-approval-intake");
+    assert.equal(reviewerIntake.status, "BLOCKED_MEMORY_SCORE_REVIEWERS");
+    assert.equal(reviewerIntake.metricsOnly, true);
+    assert.equal(reviewerIntake.publicSafe, true);
+    assert.equal(reviewerIntake.callsProviderApis, false);
+    assert.equal(reviewerIntake.sendsBenchmarkTextToProvider, false);
+    assert.equal(reviewerIntake.publicBenchmarkApprovalReady, false);
+    assert.equal(reviewerIntake.countsAsFullMemorySotaReview, false);
+    assert.equal(reviewerIntake.reviewerApprovalCount, 0);
+    assert.equal(reviewerIntake.independentReviewerCount, 0);
+    assert.equal(reviewerIntake.target?.memoryBenchAnswerQuality, true);
+    assert.equal(reviewerIntake.target?.fixtureOnly, true);
+    assert.ok(reviewerIntake.blockers.includes("fixture-result-cannot-be-reviewed-for-sota"));
+    assert.ok(reviewerIntake.blockers.includes("two-independent-reviewer-approvals-missing"));
+    assert.equal(reviewerIntake.safety?.requiresResultBinding, true);
+    assert.equal(reviewerIntake.safety?.requiresTwoIndependentReviewersForClaims, true);
+  }
+  assert.match(memoryScoreReviewerIntakeMarkdownFresh, /Memory Score Reviewer Approval Intake/);
+  assert.match(memoryScoreReviewerIntakeMarkdownEvidence, /BLOCKED_MEMORY_SCORE_REVIEWERS/);
   for (const preflight of [answerQualityPreflightFresh, answerQualityPreflightEvidence]) {
     assert.equal(preflight.ok, true);
     assert.equal(preflight.mode, "public-benchmark-answer-quality-preflight");

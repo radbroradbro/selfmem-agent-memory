@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T18:58:50.548Z",
+  "generatedAt": "2026-05-25T19:07:09.736Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -174,7 +174,7 @@
     "endToEndMemoryScoreGate": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:51f5a2d07b5b229b9645613b528ffa42cf9e7d35a2d1b4b760b146d558ab558a",
+      "evidenceHash": "sha256:af7dd43419974d01b3ef3284b459b9dbc26c080523040d51d2b0082e7450f672",
       "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
       "countsAsEndToEndMemoryBenchmark": false,
       "countsAsFullMemorySotaEvidence": false,
@@ -194,7 +194,22 @@
         "missing-nvidia-or-gemini-provider-arm",
         "missing-local-apple-arm",
         "missing-local-rerank-arm",
+        "missing-memory-score-reviewer-approval-report",
         "missing-two-independent-reviewer-approvals"
+      ]
+    },
+    "memoryScoreReviewerIntake": {
+      "evidencePath": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
+      "evidenceExists": true,
+      "evidenceHash": "sha256:14ca1765c81f7351a8c454fa7f7df6a73e84b45399633f7fdba7873b34abcc7c",
+      "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
+      "publicBenchmarkApprovalReady": false,
+      "countsAsFullMemorySotaReview": false,
+      "reviewerApprovalCount": 0,
+      "independentReviewerCount": 0,
+      "blockers": [
+        "fixture-result-cannot-be-reviewed-for-sota",
+        "two-independent-reviewer-approvals-missing"
       ]
     },
     "answerQualityArmExport": {
@@ -430,7 +445,8 @@
         "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json\" --memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl\" --private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms\" --strategies bm25-lite,dense-proxy,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-arm-export.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-arm-export.md\"",
         "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json\" --memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl\" --answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json\" --arm bm25-lite=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/bm25-lite-responses.private.json\" --arm dense-proxy=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/dense-proxy-responses.private.json\" --arm full-hybrid-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/full-hybrid-rerank-responses.private.json\" --arm query-expanded-full-hybrid-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/query-expanded-full-hybrid-rerank-responses.private.json\" --arm cloud-voyage4-voyage=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/cloud-voyage4-voyage-responses.private.json\" --arm cloud-gemini-voyage-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/cloud-gemini-voyage-rerank-responses.private.json\" --arm cloud-nvidia-nemotron-1b=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/cloud-nvidia-nemotron-1b-responses.private.json\" --arm local-apple-qwen3-0_6b=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/local-apple-qwen3-0_6b-responses.private.json\" --arm local-apple-qwen3-0_6b-local-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/local-apple-qwen3-0_6b-local-rerank-responses.private.json\" --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-preflight.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-preflight.md\"",
         "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json\" --memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl\" --answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json\" --arm bm25-lite=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/bm25-lite-responses.private.json\" --arm dense-proxy=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/dense-proxy-responses.private.json\" --arm full-hybrid-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/full-hybrid-rerank-responses.private.json\" --arm query-expanded-full-hybrid-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/query-expanded-full-hybrid-rerank-responses.private.json\" --arm cloud-voyage4-voyage=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/cloud-voyage4-voyage-responses.private.json\" --arm cloud-gemini-voyage-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/cloud-gemini-voyage-rerank-responses.private.json\" --arm cloud-nvidia-nemotron-1b=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/cloud-nvidia-nemotron-1b-responses.private.json\" --arm local-apple-qwen3-0_6b=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/local-apple-qwen3-0_6b-responses.private.json\" --arm local-apple-qwen3-0_6b-local-rerank=\"$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms/local-apple-qwen3-0_6b-local-rerank-responses.private.json\" --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.md\"",
-        "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready --result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.md\"",
+        "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --strict-target --result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\" --review <reviewer-a-memory-score-approval.json> --review <reviewer-b-memory-score-approval.json> --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.md\"",
+        "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready --result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\" --reviewer-approval-report \"$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.json\" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.json\" --markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.md\"",
         "npm exec --yes pnpm@10.23.0 -- baseline:packet -- --hosted <metrics-only-hosted-result.json> --recallweave <metrics-only-recallweave-result.json> --comparison <metrics-only-comparison.json> --preflight <metrics-only-preflight.json> --strict-real --output <metrics-only-reviewer-packet.zip>",
         "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet <metrics-only-reviewer-packet.zip> --comparison <metrics-only-comparison.json> --strict-target --review <reviewer-a-approval.json> --review <reviewer-b-approval.json> --output reviews/overnight-20260522/reviewer-approval-report.json"
       ]
@@ -477,6 +493,7 @@
       "answer-quality-arm-export.json",
       "answer-quality-preflight.json",
       "answer-quality-harness-smoke.json",
+      "memory-score-reviewer-intake.json",
       "end-to-end-memory-score-gate.json",
       "reviewer-approval-report.json",
       "ui-evidence-index.md",
@@ -526,6 +543,8 @@
     "answer-quality-arms:private-response-output-dir-missing",
     "answer-quality-arms:RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
     "answer-quality-arms:RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-    "answer-quality-arms:query-expansion-endpoint-or-consent-missing"
+    "answer-quality-arms:query-expansion-endpoint-or-consent-missing",
+    "memory-score-reviewers:fixture-result-cannot-be-reviewed-for-sota",
+    "memory-score-reviewers:two-independent-reviewer-approvals-missing"
   ]
 }

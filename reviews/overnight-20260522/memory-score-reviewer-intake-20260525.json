@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "memory-score-reviewer-approval-intake",
+  "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
+  "writesRealFiles": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "publicLaunchAllowed": false,
+  "publicBenchmarkApprovalReady": false,
+  "countsAsFullMemorySotaReview": false,
+  "reviewerApprovalCount": 0,
+  "independentReviewerCount": 0,
+  "reviewsSubmitted": 0,
+  "target": {
+    "resultPresent": true,
+    "resultHash": "sha256:ff4ea6932ea9dc1b314cf977907928f5b7738b3b13f86eacef6cc2505cc59cf1",
+    "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "querySetHash": "sha256:d24290ad168215070aabf6f6ed68019e41b0bcbba5f40febb7a47aee75f0c4ca",
+    "materializerHash": null,
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "answerLabelsHash": "sha256:ae94858febc7847535f476e767ebf4a3452d1f8354a5b0112149c50c1699e2bf",
+    "benchmark": "longmemeval",
+    "fixtureOnly": true,
+    "metricsOnly": true,
+    "publicSafe": true,
+    "retrievalProxyOnly": false,
+    "memoryBenchAnswerQuality": true,
+    "strategyNamesHash": "sha256:66c804767e2e3b59d38c550f733d2575a32e71e15e1641be8e85032c76def7cb",
+    "scoredQueryCount": 2,
+    "hasAnyTarget": true
+  },
+  "reviews": [],
+  "blockers": [
+    "fixture-result-cannot-be-reviewed-for-sota",
+    "two-independent-reviewer-approvals-missing"
+  ],
+  "safety": {
+    "acceptsOnlyMetricsOnlyReviewArtifacts": true,
+    "requiresResultBinding": true,
+    "requiresTwoIndependentReviewersForClaims": true,
+    "printsCredentialValues": false,
+    "includesRawQuestionText": false,
+    "includesRawMemoryText": false,
+    "includesRawTranscriptText": false,
+    "includesRawPromptText": false,
+    "includesRawAnswerText": false
+  },
+  "nextActions": [
+    "Run the live answer-quality harness and pass its metrics-only result to this reviewer intake.",
+    "Collect two independent reviewer approval JSON files bound to the exact result hash.",
+    "Do not publish SOTA or MemoryBench-style claims until this intake and benchmark:memory-score:result-gate both pass."
+  ]
+}

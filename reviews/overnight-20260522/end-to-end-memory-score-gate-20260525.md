@@ -22,6 +22,7 @@
 - missing-nvidia-or-gemini-provider-arm
 - missing-local-apple-arm
 - missing-local-rerank-arm
+- missing-memory-score-reviewer-approval-report
 - missing-two-independent-reviewer-approvals
 
 ## Result
@@ -30,6 +31,12 @@
 - Answer quality metric: missing=missing
 - Reviewer approvals: 0
 - Arms: bm25-lite, dense-proxy, full-hybrid-rerank, query-expanded-full-hybrid-rerank
+
+## Reviewer Approval
+- Report exists: false
+- Report status: missing
+- Target bound: false
+- Independent reviewers: 0
 
 ## Next Actions
 - Run the same-data LongMemEval/MemoryBench answer-quality harness, not only the retrieval-proxy strategy comparison.

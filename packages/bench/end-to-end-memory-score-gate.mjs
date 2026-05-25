@@ -11,6 +11,7 @@ const resultPath = args.result ? resolve(root, args.result) : null;
 const targetPath = resolve(root, args.target ?? "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
 const outputPath = args.output ? resolve(root, args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolve(root, args.markdownOutput ?? args.markdown) : null;
+const reviewerApprovalReportPath = args.reviewerApprovalReport ?? args.reviewerReport ?? process.env.RECALLWEAVE_MEMORY_SCORE_REVIEWER_APPROVAL_REPORT ?? null;
 const format = String(args.format ?? "json").toLowerCase();
 const requireReady = Boolean(args.requireReady);
 const fixtureProxySmoke = Boolean(args.fixtureProxySmoke);
@@ -23,7 +24,8 @@ const targetRaw = readFileSync(targetPath, "utf8");
 assertSafePublicText(targetRaw, "target");
 const target = JSON.parse(targetRaw);
 const loaded = loadResult();
-const report = buildGateReport({ loaded, target, targetRaw });
+const reviewerApproval = loadReviewerApprovalReport();
+const report = buildGateReport({ loaded, target, targetRaw, reviewerApproval });
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
 const markdownText = `${renderMarkdown(report)}\n`;
 assertSafePublicText(jsonText, "end-to-end memory score gate");
@@ -77,18 +79,37 @@ function loadResult() {
   };
 }
 
-function buildGateReport({ loaded, target, targetRaw }) {
+function loadReviewerApprovalReport() {
+  if (!reviewerApprovalReportPath || !existsSync(resolve(root, reviewerApprovalReportPath))) {
+    return {
+      source: "missing-reviewer-approval-report",
+      path: reviewerApprovalReportPath ? displayPath(resolve(root, reviewerApprovalReportPath)) : null,
+      exists: false,
+      json: null,
+      hash: null,
+    };
+  }
+  const path = resolve(root, reviewerApprovalReportPath);
+  assert.ok(statSync(path).size > 0, `reviewer approval report empty: ${displayPath(path)}`);
+  const text = readFileSync(path, "utf8");
+  assertSafePublicText(text, displayPath(path));
+  const json = JSON.parse(text);
+  assert.equal(json.mode, "memory-score-reviewer-approval-intake", "reviewer approval report must be memory-score-reviewer-approval-intake");
+  return {
+    source: "reviewer-approval-report-file",
+    path: displayPath(path),
+    exists: true,
+    json,
+    hash: `sha256:${sha256(text)}`,
+  };
+}
+
+function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
   const result = loaded.json;
   const rows = normalizeRows(result);
   const rowNames = rows.map((item) => item.strategy ?? item.armId).filter(Boolean);
   const answerMetric = bestAnswerMetric(rows, result);
-  const reviewerApprovalCount = Number(
-    result?.reviewerApprovalCount ??
-      result?.reviewers?.approvalCount ??
-      result?.review?.approvalCount ??
-      result?.evidence?.reviewerApprovalCount ??
-      0,
-  );
+  const reviewerApprovalCount = reviewerApproval.exists ? Number(reviewerApproval.json?.reviewerApprovalCount ?? 0) : 0;
   const targetBenchmark = target.benchmark?.family ?? target.benchmark?.name;
   const targetScoringHash = target.benchmark?.scoringCodeHash ?? null;
   const targetAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
@@ -96,6 +117,13 @@ function buildGateReport({ loaded, target, targetRaw }) {
   const resultTargetHash = result?.target?.hash ?? result?.input?.targetHash ?? result?.sourceLock?.targetHash ?? null;
   const resultScoringHash = result?.scoringCodeHash ?? result?.input?.scoringCodeHash ?? result?.target?.scoringCodeHash ?? null;
   const resultAnswerLabelsHash = result?.answerLabelsHash ?? result?.input?.answerLabelsHash ?? result?.target?.answerLabelsHash ?? null;
+  const reviewerTarget = reviewerApproval.json?.target ?? {};
+  const reviewerApprovalReportTargetBound =
+    reviewerApproval.exists &&
+    reviewerTarget.resultHash === loaded.hash &&
+    (!resultTargetHash || reviewerTarget.targetHash === resultTargetHash) &&
+    (!resultScoringHash || reviewerTarget.scoringCodeHash === resultScoringHash) &&
+    (!resultAnswerLabelsHash || reviewerTarget.answerLabelsHash === resultAnswerLabelsHash);
   const checks = {
     resultExists: loaded.exists,
     modeRecognized: [
@@ -137,6 +165,10 @@ function buildGateReport({ loaded, target, targetRaw }) {
     nvidiaOrGeminiProviderArmPresent: rowNames.some((name) => String(name).startsWith("cloud-nvidia-") || name === "cloud-gemini-voyage-rerank"),
     localAppleArmPresent: hasAny(rowNames, ["local-apple-qwen3-0_6b", "local-apple-qwen3-4b"]),
     localRerankArmPresent: hasAny(rowNames, ["local-apple-qwen3-0_6b-local-rerank", "local-apple-qwen3-4b-local-rerank"]),
+    reviewerApprovalReportPresent: reviewerApproval.exists,
+    reviewerApprovalReportReady:
+      reviewerApproval.json?.publicBenchmarkApprovalReady === true && reviewerApproval.json?.countsAsFullMemorySotaReview === true,
+    reviewerApprovalReportTargetBound,
     reviewerApprovalsPresent: reviewerApprovalCount >= 2,
     privacyLeakCountersClear: rows.every((item) => Number(item.privacyLeakCount ?? 0) === 0 && Number(item.redactionFailureCount ?? 0) === 0),
   };
@@ -171,6 +203,9 @@ function buildGateReport({ loaded, target, targetRaw }) {
     !checks.nvidiaOrGeminiProviderArmPresent ? "missing-nvidia-or-gemini-provider-arm" : null,
     !checks.localAppleArmPresent ? "missing-local-apple-arm" : null,
     !checks.localRerankArmPresent ? "missing-local-rerank-arm" : null,
+    !checks.reviewerApprovalReportPresent ? "missing-memory-score-reviewer-approval-report" : null,
+    checks.reviewerApprovalReportPresent && !checks.reviewerApprovalReportReady ? "memory-score-reviewer-approval-report-not-ready" : null,
+    checks.reviewerApprovalReportPresent && !checks.reviewerApprovalReportTargetBound ? "memory-score-reviewer-approval-report-not-bound-to-result" : null,
     !checks.reviewerApprovalsPresent ? "missing-two-independent-reviewer-approvals" : null,
     !checks.privacyLeakCountersClear ? "privacy-or-redaction-counter-nonzero" : null,
   ].filter(Boolean);
@@ -215,6 +250,18 @@ function buildGateReport({ loaded, target, targetRaw }) {
       answerQualityMetric: answerMetric,
       reviewerApprovalCount,
       arms: rowNames,
+    },
+    reviewerApproval: {
+      source: reviewerApproval.source,
+      path: reviewerApproval.path,
+      hash: reviewerApproval.hash,
+      exists: reviewerApproval.exists,
+      status: reviewerApproval.json?.status ?? null,
+      publicBenchmarkApprovalReady: Boolean(reviewerApproval.json?.publicBenchmarkApprovalReady),
+      countsAsFullMemorySotaReview: Boolean(reviewerApproval.json?.countsAsFullMemorySotaReview),
+      reviewerApprovalCount,
+      independentReviewerCount: Number(reviewerApproval.json?.independentReviewerCount ?? 0),
+      targetBound: reviewerApprovalReportTargetBound,
     },
     checks,
     blockers,
@@ -284,6 +331,12 @@ function renderMarkdown(value) {
     `- Answer quality metric: ${value.result.answerQualityMetric.name ?? "missing"}=${value.result.answerQualityMetric.value ?? "missing"}`,
     `- Reviewer approvals: ${value.result.reviewerApprovalCount}`,
     `- Arms: ${value.result.arms.join(", ") || "none"}`,
+    "",
+    "## Reviewer Approval",
+    `- Report exists: ${value.reviewerApproval.exists}`,
+    `- Report status: ${value.reviewerApproval.status ?? "missing"}`,
+    `- Target bound: ${value.reviewerApproval.targetBound}`,
+    `- Independent reviewers: ${value.reviewerApproval.independentReviewerCount}`,
     "",
     "## Next Actions",
     ...value.nextActions.map((item) => `- ${item}`),

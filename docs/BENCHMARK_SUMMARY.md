@@ -191,6 +191,8 @@ The checked-in response-arm export preflight is
 `reviews/overnight-20260522/answer-quality-arm-export-20260525.json`, the
 checked-in live scoring preflight is
 `reviews/overnight-20260522/answer-quality-preflight-20260525.json`, and the
+checked-in reviewer-intake preflight is
+`reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`. The
 checked-in fixture smoke is
 `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`. It
 proves public-safe metrics output, strategy scoring shape, and fail-closed
@@ -198,11 +200,13 @@ claim flags with zero provider calls. It does not prove a MemoryBench or
 LongMemEval answer-quality win. A live run must use the private materialized
 query set, memories, answer labels, and per-strategy response exports generated
 by `benchmark:answer-quality:arms -- --execute` for the same source-locked
-target, then pass:
+target, then collect two bound approvals through
+`benchmark:memory-score:reviewer-intake` and pass:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
-  --result <public-answer-quality-output.json>
+  --result <public-answer-quality-output.json> \
+  --reviewer-approval-report <memory-score-reviewer-intake.json>
 ```
 
 The Apple Silicon local arm now has an explicit metrics-only preflight:

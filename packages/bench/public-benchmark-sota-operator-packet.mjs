@@ -40,6 +40,7 @@ const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-l
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
 const endToEndMemoryScoreGateEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-gate-20260525.json`);
+const memoryScoreReviewerIntakeEvidence = loadEvidence(`${reviewDir}/memory-score-reviewer-intake-20260525.json`);
 const answerQualityArmExportEvidence = loadEvidence(`${reviewDir}/answer-quality-arm-export-20260525.json`);
 const answerQualityPreflightEvidence = loadEvidence(`${reviewDir}/answer-quality-preflight-20260525.json`);
 const answerQualityHarnessSmokeEvidence = loadEvidence(`${reviewDir}/answer-quality-harness-smoke-20260525.json`);
@@ -50,9 +51,11 @@ const blockers = [
   ...arrayOf(queryExpansionPreflight.blockers).map((item) => `query-expansion:${item}`),
   ...arrayOf(providerPreflight.blockers).map((item) => `provider:${item}`),
   ...arrayOf(answerQualityArmExportEvidence.json?.blockers).map((item) => `answer-quality-arms:${item}`),
+  ...arrayOf(memoryScoreReviewerIntakeEvidence.json?.blockers).map((item) => `memory-score-reviewers:${item}`),
   !currentQueryExpansionImpl.liveLlmExpansionWiringPresent ? "query-expansion-live-llm-wiring-not-proven" : null,
   !localRerankEvidence.exists ? "local-rerank-sidecar-evidence-missing" : null,
   !answerQualityArmExportEvidence.exists ? "answer-quality-arm-export-evidence-missing" : null,
+  !memoryScoreReviewerIntakeEvidence.exists ? "memory-score-reviewer-intake-evidence-missing" : null,
   !endToEndMemoryScoreGateEvidence.exists ? "end-to-end-memory-score-gate-missing" : null,
 ].filter(Boolean);
 
@@ -121,6 +124,17 @@ const packet = {
       countsAsEndToEndMemoryBenchmark: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsEndToEndMemoryBenchmark),
       countsAsFullMemorySotaEvidence: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsFullMemorySotaEvidence),
       blockers: endToEndMemoryScoreGateEvidence.json?.blockers ?? [],
+    },
+    memoryScoreReviewerIntake: {
+      evidencePath: memoryScoreReviewerIntakeEvidence.path,
+      evidenceExists: memoryScoreReviewerIntakeEvidence.exists,
+      evidenceHash: memoryScoreReviewerIntakeEvidence.hash,
+      status: memoryScoreReviewerIntakeEvidence.json?.status ?? null,
+      publicBenchmarkApprovalReady: Boolean(memoryScoreReviewerIntakeEvidence.json?.publicBenchmarkApprovalReady),
+      countsAsFullMemorySotaReview: Boolean(memoryScoreReviewerIntakeEvidence.json?.countsAsFullMemorySotaReview),
+      reviewerApprovalCount: Number(memoryScoreReviewerIntakeEvidence.json?.reviewerApprovalCount ?? 0),
+      independentReviewerCount: Number(memoryScoreReviewerIntakeEvidence.json?.independentReviewerCount ?? 0),
+      blockers: memoryScoreReviewerIntakeEvidence.json?.blockers ?? [],
     },
     answerQualityArmExport: {
       evidencePath: answerQualityArmExportEvidence.path,
@@ -235,6 +249,7 @@ const packet = {
       "answer-quality-arm-export.json",
       "answer-quality-preflight.json",
       "answer-quality-harness-smoke.json",
+      "memory-score-reviewer-intake.json",
       "end-to-end-memory-score-gate.json",
       "reviewer-approval-report.json",
       "ui-evidence-index.md",
@@ -492,8 +507,17 @@ function buildOperatorFlow() {
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.md\"",
         ].join(" "),
         [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --strict-target",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\"",
+          "--review <reviewer-a-memory-score-approval.json>",
+          "--review <reviewer-b-memory-score-approval.json>",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.md\"",
+        ].join(" "),
+        [
           "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready",
           "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json\"",
+          "--reviewer-approval-report \"$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.json\"",
           `--target ${target}`,
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score-gate.md\"",
@@ -574,6 +598,7 @@ function renderMarkdown(value) {
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
     `- End-to-end memory score gate: ${value.currentEvidence.endToEndMemoryScoreGate.status ?? "missing"}`,
+    `- Memory score reviewer intake: ${value.currentEvidence.memoryScoreReviewerIntake.status ?? "missing"}`,
     `- Answer-quality arm export: ${value.currentEvidence.answerQualityArmExport.status ?? "missing"}`,
     `- Answer-quality preflight: ${value.currentEvidence.answerQualityPreflight.status ?? "missing"}`,
     `- Answer-quality harness smoke: ${value.currentEvidence.answerQualityHarnessSmoke.mode ?? "missing"}`,

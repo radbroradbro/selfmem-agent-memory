@@ -278,6 +278,8 @@ harness we will use.
 - Current answer-quality harness smoke:
   `reviews/overnight-20260522/answer-quality-arm-export-20260525.json`,
   `reviews/overnight-20260522/answer-quality-preflight-20260525.json`, and
+  `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`,
+  plus
   `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`.
   The arm-export preflight proves the clean controller shell has the required
   BM25, full-hybrid, query-expansion, provider, local Apple, and local rerank
@@ -289,9 +291,10 @@ harness we will use.
   `benchmark:answer-quality` without provider calls. These files do not count
   as a MemoryBench or LongMemEval answer-quality result. A live result must use
   the private materialized query set, memories, answer labels, and per-strategy
-  response exports from `benchmark:answer-quality:arms -- --execute`, then pass
-  `benchmark:memory-score:result-gate --require-ready` before it can enter any
-  SOTA evidence packet.
+  response exports from `benchmark:answer-quality:arms -- --execute`, collect
+  two reviewer approvals through `benchmark:memory-score:reviewer-intake`, then
+  pass `benchmark:memory-score:result-gate --require-ready` before it can enter
+  any SOTA evidence packet.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and

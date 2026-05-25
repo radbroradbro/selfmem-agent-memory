@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "end-to-end-memory-score-gate",
   "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
-  "generatedAt": "2026-05-25T18:29:47.524Z",
+  "generatedAt": "2026-05-25T19:05:22.851Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -23,7 +23,7 @@
   "result": {
     "source": "generated-fixture-retrieval-proxy-smoke",
     "path": null,
-    "hash": "sha256:0f920e0b8e2f04922fc90243f1e856be4689699d0da692922283fd0507daf13f",
+    "hash": "sha256:c0261f35bd98134df2e74525c65731c6d868b711b7de9b1dcc1879f210d125b9",
     "fixtureOnly": true,
     "mode": "public-benchmark-strategy-compare",
     "benchmark": "longmemeval",
@@ -43,6 +43,18 @@
       "full-hybrid-rerank",
       "query-expanded-full-hybrid-rerank"
     ]
+  },
+  "reviewerApproval": {
+    "source": "missing-reviewer-approval-report",
+    "path": null,
+    "hash": null,
+    "exists": false,
+    "status": null,
+    "publicBenchmarkApprovalReady": false,
+    "countsAsFullMemorySotaReview": false,
+    "reviewerApprovalCount": 0,
+    "independentReviewerCount": 0,
+    "targetBound": false
   },
   "checks": {
     "resultExists": true,
@@ -74,6 +86,9 @@
     "nvidiaOrGeminiProviderArmPresent": false,
     "localAppleArmPresent": false,
     "localRerankArmPresent": false,
+    "reviewerApprovalReportPresent": false,
+    "reviewerApprovalReportReady": false,
+    "reviewerApprovalReportTargetBound": false,
     "reviewerApprovalsPresent": false,
     "privacyLeakCountersClear": true
   },
@@ -93,6 +108,7 @@
     "missing-nvidia-or-gemini-provider-arm",
     "missing-local-apple-arm",
     "missing-local-rerank-arm",
+    "missing-memory-score-reviewer-approval-report",
     "missing-two-independent-reviewer-approvals"
   ],
   "nextActions": [

@@ -340,8 +340,15 @@ npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live \
   --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json" \
   --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.md"
 
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --strict-target \
+  --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json" \
+  --review <reviewer-a-memory-score-approval.json> \
+  --review <reviewer-b-memory-score-approval.json> \
+  --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.json"
+
 npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
-  --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json"
+  --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/end-to-end-memory-score.json" \
+  --reviewer-approval-report "$RECALLWEAVE_SOTA_OUTPUT_DIR/memory-score-reviewer-intake.json"
 ```
 
 The answer-quality report is still metrics-only. It may contain strategy names,

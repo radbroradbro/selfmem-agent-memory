@@ -15,6 +15,7 @@ Use this checklist before making the repository public.
 - [ ] Benchmark notes distinguish retrieval-proxy evidence from end-to-end
   answer-quality evidence and name `benchmark:answer-quality:arms`,
   `benchmark:answer-quality:preflight`, `benchmark:answer-quality`, and
+  `benchmark:memory-score:reviewer-intake`, and
   `benchmark:memory-score:result-gate --require-ready` as the required
   conversion path before SOTA or MemoryBench-style language.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.

@@ -139,8 +139,15 @@ Follow-up implementation evidence on 2026-05-25:
   fail-closed public-claim flags.
 - The answer-quality harness is not complete benchmark proof until it is run
   with `--live` against private materialized LongMemEval inputs, private answer
-  labels, and per-strategy response exports, then passed through
+  labels, and per-strategy response exports, then reviewed through
+  `benchmark:memory-score:reviewer-intake` and passed through
   `benchmark:memory-score:result-gate --require-ready`.
+- `benchmark:memory-score:reviewer-intake` now exists as the fail-closed
+  reviewer-binding step for the exact metrics-only answer-quality packet.
+  Evidence is checked in at
+  `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`;
+  it currently blocks because the only local answer-quality result is a
+  fixture smoke and there are no two independent bound approvals.
 - The live answer-quality output may contain strategy names, hashes, aggregate
   answer-quality metrics, judge-correct rate, latency, context-token counts,
   provider endpoint labels, cost, and privacy counters. It must not contain raw
