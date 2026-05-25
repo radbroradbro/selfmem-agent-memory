@@ -40,6 +40,7 @@ const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-l
 const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const providerChallengerResultGateEvidence = loadEvidence(`${reviewDir}/provider-challenger-result-gate-20260525.json`);
 const endToEndMemoryScoreGateEvidence = loadEvidence(`${reviewDir}/end-to-end-memory-score-gate-20260525.json`);
+const answerQualityPreflightEvidence = loadEvidence(`${reviewDir}/answer-quality-preflight-20260525.json`);
 const answerQualityHarnessSmokeEvidence = loadEvidence(`${reviewDir}/answer-quality-harness-smoke-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
 
@@ -117,6 +118,15 @@ const packet = {
       countsAsEndToEndMemoryBenchmark: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsEndToEndMemoryBenchmark),
       countsAsFullMemorySotaEvidence: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsFullMemorySotaEvidence),
       blockers: endToEndMemoryScoreGateEvidence.json?.blockers ?? [],
+    },
+    answerQualityPreflight: {
+      evidencePath: answerQualityPreflightEvidence.path,
+      evidenceExists: answerQualityPreflightEvidence.exists,
+      evidenceHash: answerQualityPreflightEvidence.hash,
+      status: answerQualityPreflightEvidence.json?.status ?? null,
+      liveAnswerQualityCanRun: Boolean(answerQualityPreflightEvidence.json?.readiness?.liveAnswerQualityCanRun),
+      readyForEndToEndMemoryScoreGate: Boolean(answerQualityPreflightEvidence.json?.readiness?.readyForEndToEndMemoryScoreGate),
+      blockers: answerQualityPreflightEvidence.json?.blockers ?? [],
     },
     answerQualityHarnessSmoke: {
       evidencePath: answerQualityHarnessSmokeEvidence.path,
@@ -209,6 +219,7 @@ const packet = {
       "provider-challenger-result-gate.json",
       "local-rerank-result-gate.json",
       "end-to-end-memory-score.json",
+      "answer-quality-preflight.json",
       "answer-quality-harness-smoke.json",
       "end-to-end-memory-score-gate.json",
       "reviewer-approval-report.json",
@@ -436,6 +447,16 @@ function buildOperatorFlow() {
           "done",
         ].join(" "),
         [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
+          `--target ${target}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl\"",
+          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json\"",
+          answerQualityArms,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-preflight.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-preflight.md\"",
+        ].join(" "),
+        [
           "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
           "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
           "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
@@ -531,6 +552,7 @@ function renderMarkdown(value) {
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Provider challenger result gate: ${value.currentEvidence.providerChallengerResultGate.status ?? "missing"}`,
     `- End-to-end memory score gate: ${value.currentEvidence.endToEndMemoryScoreGate.status ?? "missing"}`,
+    `- Answer-quality preflight: ${value.currentEvidence.answerQualityPreflight.status ?? "missing"}`,
     `- Answer-quality harness smoke: ${value.currentEvidence.answerQualityHarnessSmoke.mode ?? "missing"}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
     `- Local rerank result gate: ${value.currentEvidence.localRerankResultGate.status ?? "missing"}`,

@@ -104,6 +104,8 @@ const files = {
   providerChallengerResultGateMarkdown: `${reviewDir}/provider-challenger-result-gate-20260525.md`,
   endToEndMemoryScoreGateReport: `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
   endToEndMemoryScoreGateMarkdown: `${reviewDir}/end-to-end-memory-score-gate-20260525.md`,
+  answerQualityPreflightReport: `${reviewDir}/answer-quality-preflight-20260525.json`,
+  answerQualityPreflightMarkdown: `${reviewDir}/answer-quality-preflight-20260525.md`,
   answerQualityHarnessSmokeReport: `${reviewDir}/answer-quality-harness-smoke-20260525.json`,
   answerQualityHarnessSmokeMarkdown: `${reviewDir}/answer-quality-harness-smoke-20260525.md`,
 };
@@ -137,6 +139,7 @@ const queryExpansionResultGate = JSON.parse(readFileSync(join(root, files.queryE
 const localRerankResultGate = JSON.parse(readFileSync(join(root, files.localRerankResultGateReport), "utf8"));
 const providerChallengerResultGate = JSON.parse(readFileSync(join(root, files.providerChallengerResultGateReport), "utf8"));
 const endToEndMemoryScoreGate = JSON.parse(readFileSync(join(root, files.endToEndMemoryScoreGateReport), "utf8"));
+const answerQualityPreflight = JSON.parse(readFileSync(join(root, files.answerQualityPreflightReport), "utf8"));
 const answerQualityHarnessSmoke = JSON.parse(readFileSync(join(root, files.answerQualityHarnessSmokeReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
@@ -268,6 +271,8 @@ assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLoca
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.queryExpansionLiveLocalSmoke?.publicBenchmarkClaimsAllowed, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.status, "BLOCKED_END_TO_END_MEMORY_SCORE");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.endToEndMemoryScoreGate?.countsAsEndToEndMemoryBenchmark, false);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.status, "BLOCKED_ANSWER_QUALITY_ENV");
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.liveAnswerQualityCanRun, false);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityHarnessSmoke?.mode, "public-benchmark-answer-quality");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityHarnessSmoke?.readyForEndToEndMemoryScoreGate, false);
 assert.equal(queryExpansionPreflight.mode, "public-benchmark-query-expansion-preflight");
@@ -310,6 +315,14 @@ assert.equal(endToEndMemoryScoreGate.publicBenchmarkClaimsAllowed, false);
 assert.ok(endToEndMemoryScoreGate.blockers.includes("retrieval-proxy-result-cannot-count-as-answer-quality"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("memorybench-answer-quality-not-proven"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("missing-answer-quality-score"));
+assert.equal(answerQualityPreflight.mode, "public-benchmark-answer-quality-preflight");
+assert.equal(answerQualityPreflight.status, "BLOCKED_ANSWER_QUALITY_ENV");
+assert.equal(answerQualityPreflight.callsProviderApis, false);
+assert.equal(answerQualityPreflight.sendsBenchmarkTextToProvider, false);
+assert.equal(answerQualityPreflight.readiness?.liveAnswerQualityCanRun, false);
+assert.equal(answerQualityPreflight.readiness?.readyForEndToEndMemoryScoreGate, false);
+assert.ok(answerQualityPreflight.blockers.includes("private-queryset-missing"));
+assert.ok(answerQualityPreflight.blockers.includes("response-arm-exports-missing"));
 assert.equal(answerQualityHarnessSmoke.mode, "public-benchmark-answer-quality");
 assert.equal(answerQualityHarnessSmoke.fixtureOnly, true);
 assert.equal(answerQualityHarnessSmoke.memoryBenchAnswerQuality, true);
@@ -558,10 +571,13 @@ const requirements = [
     files.providerChallengerResultGateMarkdown,
     files.endToEndMemoryScoreGateReport,
     files.endToEndMemoryScoreGateMarkdown,
+    files.answerQualityPreflightReport,
+    files.answerQualityPreflightMarkdown,
     files.answerQualityHarnessSmokeReport,
     files.answerQualityHarnessSmokeMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
     "packages/bench/public-benchmark-sota-operator-packet.mjs",
+    "packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "packages/bench/public-benchmark-answer-quality.mjs",
     "packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "packages/bench/query-expansion-result-gate.mjs",

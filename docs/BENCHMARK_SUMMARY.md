@@ -182,10 +182,13 @@ The answer-quality harness is now present as the conversion step from
 retrieval-proxy evidence to end-to-end memory evidence:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --fixture
 ```
 
-The checked-in fixture smoke is
+The checked-in preflight evidence is
+`reviews/overnight-20260522/answer-quality-preflight-20260525.json`, and the
+checked-in fixture smoke is
 `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`. It
 proves public-safe metrics output, strategy scoring shape, and fail-closed
 claim flags with zero provider calls. It does not prove a MemoryBench or

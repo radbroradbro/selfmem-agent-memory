@@ -119,7 +119,13 @@ Follow-up implementation evidence on 2026-05-25:
   exported metrics only, and observed no stored-memory payload marker.
 - This is wiring proof only. It is not a same-data quality result and does not
   satisfy the missing live LLM query-expansion benchmark row.
-- `benchmark:answer-quality` now exists as the explicit conversion step from
+- `benchmark:answer-quality:preflight` now exists as a fail-closed live-run
+  readiness check for the answer-quality harness. Evidence is checked in at
+  `reviews/overnight-20260522/answer-quality-preflight-20260525.json` and
+  currently blocks because the clean shell has no model-call consent,
+  public-data consent, no-raw-output consent, private materialized inputs, or
+  response arm exports.
+- `benchmark:answer-quality` exists as the explicit conversion step from
   retrieval-proxy evidence to end-to-end answer-quality evidence. Fixture smoke
   evidence is checked in at
   `reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json` and

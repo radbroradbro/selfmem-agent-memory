@@ -278,6 +278,7 @@ the answer-quality harness.
 First prove parser and safety wiring without model calls:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --fixture
 ```
 
@@ -311,6 +312,16 @@ RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> \
 RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> \
 RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model> \
 RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model> \
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
+  --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json" \
+  --memories "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-memories.private.jsonl" \
+  --answer-labels "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-answer-labels.private.json" \
+  --arm bm25-lite="$RECALLWEAVE_SOTA_OUTPUT_DIR/bm25-lite-responses.private.json" \
+  --arm full-hybrid-rerank="$RECALLWEAVE_SOTA_OUTPUT_DIR/full-hybrid-rerank-responses.private.json" \
+  --arm <provider-or-local-arm>="$RECALLWEAVE_SOTA_OUTPUT_DIR/<provider-or-local-arm>-responses.private.json" \
+  --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/answer-quality-preflight.json"
+
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live \
   --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
   --queryset "$RECALLWEAVE_SOTA_OUTPUT_DIR/materialized/longmemeval-queryset.private.json" \

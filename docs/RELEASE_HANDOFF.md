@@ -224,14 +224,26 @@ It is useful as a blind autoresearch baseline, but it is not a MemoryBench
 answer-quality result and not a public comparison claim.
 
 The current answer-quality harness smoke is
-`reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`. It
+`reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json`, and
+the live-run preflight is
+`reviews/overnight-20260522/answer-quality-preflight-20260525.json`. The smoke
 proves the metrics-only `benchmark:answer-quality` output shape in fixture
-mode with zero provider calls. It is not live benchmark evidence. To turn a
-retrieval or provider canary into end-to-end memory evidence, run the harness
-against private materialized LongMemEval inputs and per-strategy response
-exports, then require:
+mode with zero provider calls. The preflight proves the clean shell is still
+blocked until private materialized inputs, response arm exports, model-call
+consent, public-data consent, and no-raw-output consent are present. Neither is
+live benchmark evidence. To turn a retrieval or provider canary into end-to-end
+memory evidence, run the preflight and harness against private materialized
+LongMemEval inputs and per-strategy response exports, then require:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready \
+  --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json \
+  --queryset <private-queryset.json> \
+  --memories <private-memories.jsonl> \
+  --answer-labels <private-answer-labels.json> \
+  --arm bm25-lite=<private-bm25-responses.json> \
+  --arm full-hybrid-rerank=<private-hybrid-responses.json> \
+  --arm <provider-or-local-arm>=<private-challenger-responses.json>
 npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
   --result <public-answer-quality-output.json>
 ```
