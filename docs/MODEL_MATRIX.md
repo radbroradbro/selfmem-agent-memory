@@ -14,7 +14,7 @@ same public data, dataset revision, and scoring setup as the target row.
 | Lane | Default | Why |
 |---|---|---|
 | Cloud quality | Voyage `voyage-4-large` plus `rerank-2.5` | Strong text and code memory path with same-provider embedding and rerank. Voyage documents `rerank-2.5` as the highest-accuracy reranker and `rerank-2.5-lite` as the latency option. |
-| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus deterministic rerank proxy | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. The live local reranker is a planned challenger, not tested in-stack yet. |
+| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus deterministic rerank proxy | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. A local reranker sidecar is scaffolded as a challenger, not the default. |
 | Multimodal challenger | Gemini Embedding 2 or current Gemini embedding model | Useful for PDFs, images, audio, video, and storage-sensitive dimension tests. Do not make it the default until a matched canary wins. |
 | NVIDIA NIM challenger | NVIDIA NeMo Retriever embedding plus rerank pairs | Useful for hosted latency and retrieval comparisons. Keep this as a benchmark arm until measured on RecallWeave canaries. |
 | Query expansion | Off by default | Enable only when a canary proves better quality without unacceptable latency or exact-identifier damage. |
@@ -156,6 +156,10 @@ local Apple Silicon arms:
 - `local-apple-qwen3-0_6b`: budgeted BM25 preselect, an OpenAI-compatible
   local Apple Silicon embedding server, sparse+dense+graph+temporal fusion,
   then the deterministic local rerank proxy until a local reranker passes.
+- `local-apple-qwen3-0_6b-local-rerank`: same default local embedding lane,
+  but final rerank is delegated to an env-only local reranker sidecar. It
+  requires `SELFMEM_LOCAL_RERANK_ENDPOINT` or `SELFMEM_LOCAL_RERANK_BASE_URL`
+  and is blocked by preflight until that endpoint exists.
 - `local-apple-qwen3-4b`: same local Apple Silicon stack, but labeled for
   Qwen3 Embedding 4B GGUF and 2560-dimensional embeddings.
 

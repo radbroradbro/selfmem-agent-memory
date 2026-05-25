@@ -62,12 +62,20 @@
       "purpose": "Fast Apple Silicon local embedding proof for 24GB-class Macs; local reranker is a challenger."
     },
     {
+      "id": "local-apple-qwen3-0_6b-local-rerank",
+      "lane": "local",
+      "embedder": "Qwen3-Embedding-0.6B-GGUF",
+      "reranker": "Qwen3-Reranker-0.6B sidecar",
+      "status": "method-challenger",
+      "purpose": "First local method challenger: keep the measured 0.6B embedding lane and swap only the final reranker."
+    },
+    {
       "id": "local-apple-qwen3-4b",
       "lane": "local",
       "embedder": "Qwen3-Embedding-4B",
-      "reranker": "Qwen3-Reranker-4B",
+      "reranker": "RecallWeave deterministic rerank proxy",
       "status": "optional-quality-arm",
-      "purpose": "Larger local quality challenger when memory pressure allows."
+      "purpose": "Measured larger local embedding challenger when memory pressure allows; not promoted by the first 30-query run."
     }
   ],
   "gates": [

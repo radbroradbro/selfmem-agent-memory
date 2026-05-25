@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 const script = "packages/bench/public-benchmark-strategy-compare.mjs";
+const preflightScript = "packages/bench/provider-benchmark-live-preflight.mjs";
 
 describe("public benchmark comparison contract", () => {
   it("reports provider promotion from provider-backed arms, not the local hybrid control", () => {
@@ -43,6 +44,25 @@ describe("public benchmark comparison contract", () => {
     expect(apple.provider.embedDimensions).toBe(2560);
   });
 
+  it("keeps the local reranker sidecar arm explicit and fail-closed", () => {
+    const report = runReport([
+      "--gate",
+      "provider",
+      "--fixture",
+      "--format",
+      "json",
+      "--strategies",
+      "bm25-lite,full-hybrid-rerank,local-apple-qwen3-0_6b-local-rerank",
+    ]);
+
+    const apple = report.strategies.find((item: { strategy: string }) => item.strategy === "local-apple-qwen3-0_6b-local-rerank");
+    expect(apple.provider.providers).toEqual(["local-apple", "local-rerank"]);
+    expect(apple.provider.embedModel).toBe("Qwen/Qwen3-Embedding-0.6B-GGUF");
+    expect(apple.provider.embedDimensions).toBe(1024);
+    expect(apple.provider.rerankModel).toBe("Qwen/Qwen3-Reranker-0.6B");
+    expect(apple.provider.rerankCalls).toBeGreaterThan(0);
+  });
+
   it("blocks provider gates without both lexical and full-hybrid controls", () => {
     const result = runRaw([
       "--gate",
@@ -71,6 +91,36 @@ describe("public benchmark comparison contract", () => {
 
     expect(result.status).not.toBe(0);
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/hybrid-family/i);
+  });
+
+  it("requires a local rerank endpoint before a live local reranker run", () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        preflightScript,
+        "--target",
+        "packages/bench/fixtures/public-benchmark-target.fixture.json",
+        "--strategies",
+        "bm25-lite,full-hybrid-rerank,local-apple-qwen3-0_6b-local-rerank",
+        "--require-ready",
+      ],
+      {
+        cwd: new URL("../..", import.meta.url),
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          RECALLWEAVE_PROVIDER_BENCHMARK_CALLS: "1",
+          RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA: "1",
+          SELFMEM_LOCAL_EMBED_BASE_URL: "http://127.0.0.1:18081/v1",
+          SELFMEM_LOCAL_RERANK_ENDPOINT: "",
+          SELFMEM_LOCAL_RERANK_BASE_URL: "",
+        },
+      },
+    );
+
+    expect(result.status).not.toBe(0);
+    expect(`${result.stdout}\n${result.stderr}`).toMatch(/local-rerank-credentials-missing/);
   });
 });
 

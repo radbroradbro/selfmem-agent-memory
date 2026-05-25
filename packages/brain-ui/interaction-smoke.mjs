@@ -304,6 +304,7 @@ try {
   assert.ok(modelMatrix.localLane.runtime.includes("llama.cpp"));
   assert.ok(modelMatrix.arms.some((arm) => arm.id === "cloud-nvidia-nemotron-1b" && arm.lane === "cloud"));
   assert.ok(modelMatrix.arms.some((arm) => arm.id === "local-apple-qwen3-0_6b" && arm.lane === "local"));
+  assert.ok(modelMatrix.arms.some((arm) => arm.id === "local-apple-qwen3-0_6b-local-rerank" && arm.lane === "local"));
   assert.ok(modelMatrix.gates.some((gate) => gate.includes("same dataset slice")));
   assert.ok(modelMatrix.gates.some((gate) => gate.includes("Provider credentials")));
   assert.ok(modelMatrix.blockers.includes("hosted-supermemory-baseline-not-current"));

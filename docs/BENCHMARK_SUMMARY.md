@@ -253,6 +253,13 @@ improve this retrieval target; the next local gain should come from reranking,
 query expansion, candidate selection, or chunking rather than raw embedding
 model size.
 
+The next local method challenger is now explicit:
+`local-apple-qwen3-0_6b-local-rerank`. It keeps the measured 0.6B Apple
+Silicon embedding lane and adds an env-only local reranker sidecar after
+sparse+dense+graph+temporal fusion. This arm is not a default and has no live
+quality result yet. It exists so the next local run can test reranking as one
+methodology change without confusing it with the failed 4B embedder scale-up.
+
 A source-locked 30-query local Apple run is now recorded:
 
 - `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-cached-live-preflight.json`
@@ -591,9 +598,10 @@ The next public-safe benchmark gate will test separated provider arms:
   `cloud-nvidia-nemotron-vl-1b`, and `cloud-nvidia-e5-mistral` for hosted
   NVIDIA retrieval comparisons.
 - `local-apple-qwen3-0_6b` for the default Apple Silicon lane.
-- `local-apple-qwen3-0_6b` with `SELFMEM_LOCAL_EMBED_MODEL` overridden for a
-  measured larger local Apple Silicon arm after the persistent cache gate is
-  green.
+- `local-apple-qwen3-0_6b-local-rerank` for the first local method challenger:
+  same 0.6B Apple Silicon embedding lane, plus a local reranker sidecar.
+- `local-apple-qwen3-4b` for the measured larger local Apple Silicon arm after
+  the persistent cache gate is green.
 
 Query expansion stays off unless it enters as one isolated methodology change
 and beats the no-expansion run without exact-identifier, privacy, or latency

@@ -375,8 +375,9 @@ They need:
 The preferred local experiment for Apple Silicon users is the small
 llama.cpp/Metal lane first: Qwen3 Embedding 0.6B plus the deterministic
 RecallWeave rerank proxy. A live Qwen3 Reranker 0.6B sidecar is a planned
-challenger, not a proven default yet. Qwen3 4B and 8B arms are quality
-challengers, not defaults for 24GB machines.
+challenger through `local-apple-qwen3-0_6b-local-rerank`, not a proven default
+yet. Qwen3 4B and 8B arms are quality challengers, not defaults for 24GB
+machines.
 
 Gemini, NVIDIA hosted retrieval models, and query expansion providers must be
 configured by local environment variables only. Do not paste provider keys into

@@ -41,6 +41,7 @@ const retrievalStrategies = [
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
   "local-apple-qwen3-0_6b",
+  "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
 ];
 const secretPattern =

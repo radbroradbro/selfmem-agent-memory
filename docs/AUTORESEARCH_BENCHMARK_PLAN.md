@@ -430,6 +430,7 @@ same frozen harness.
 | `cloud-nvidia-nemotron-vl-1b` | Multimodal NVIDIA retrieval challenger. |
 | `cloud-nvidia-e5-mistral` | Hosted QA retrieval challenger. |
 | `local-apple-qwen3-0_6b` | Default local Apple Silicon proof. |
+| `local-apple-qwen3-0_6b-local-rerank` | First local method challenger with an env-only reranker sidecar. |
 | `local-apple-qwen3-4b` | Optional local quality challenger. |
 
 The local lane matters because many users will not want hosted embedding and
@@ -446,6 +447,13 @@ Avoid quantization heroics in the default lane. Qwen, Gemma, local Nemotron
 variants, MLX, llama.cpp, Ollama, or other Apple-friendly routes may enter the
 matrix, but each variant needs its own label, source, latency, memory, and
 quality result.
+
+The first local method change after the 0.6B and 4B embedding runs is
+`local-apple-qwen3-0_6b-local-rerank`. It keeps the 0.6B embedding lane fixed
+and swaps only the final reranker from the deterministic proxy to an env-only
+local sidecar. Preflight must block unless both `SELFMEM_LOCAL_EMBED_BASE_URL`
+and `SELFMEM_LOCAL_RERANK_ENDPOINT` or `SELFMEM_LOCAL_RERANK_BASE_URL` are
+present.
 
 ## Research Loop
 

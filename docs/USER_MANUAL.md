@@ -78,8 +78,9 @@ local writes only
 lexical recall as no-credential fallback
 ```
 
-The Qwen3 Reranker 0.6B local sidecar is planned as a challenger arm. It is not
-the current tested local default.
+The Qwen3 Reranker 0.6B local sidecar is a challenger arm through
+`local-apple-qwen3-0_6b-local-rerank`. It needs a local rerank endpoint and is
+not the current tested local default.
 
 Gemini Embedding 2 and NVIDIA hosted retrieval models are benchmark arms, not
 silent fallbacks. Enable them only through local environment variables and only

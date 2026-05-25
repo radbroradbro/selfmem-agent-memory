@@ -31,6 +31,7 @@ const knownStrategies = new Set([
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
   "local-apple-qwen3-0_6b",
+  "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
 ]);
 const secretPattern =
@@ -132,6 +133,7 @@ function requiredProvidersForStrategy(strategy) {
     strategy === "cloud-voyage4-lite-voyage-lite"
   ) return ["voyage"];
   if (strategy.startsWith("cloud-nvidia-")) return ["nvidia"];
+  if (strategy === "local-apple-qwen3-0_6b-local-rerank") return ["local-apple", "local-rerank"];
   if (strategy === "local-apple-qwen3-0_6b" || strategy === "local-apple-qwen3-4b") return ["local-apple"];
   return [];
 }
@@ -156,6 +158,7 @@ function providerValueEnvNames(provider) {
   if (provider === "voyage") return ["VOYAGE_API_KEY", "VOYAGE_API_KEYS"];
   if (provider === "nvidia") return ["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVAPI_KEY", "NVAPI_KEYS"];
   if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL"];
+  if (provider === "local-rerank") return ["SELFMEM_LOCAL_RERANK_ENDPOINT", "SELFMEM_LOCAL_RERANK_BASE_URL"];
   return [];
 }
 
@@ -194,6 +197,7 @@ function providerEnvTemplateLines(provider) {
   if (provider === "voyage") return ["VOYAGE_API_KEY=<env-only-voyage-key>", "VOYAGE_API_KEYS_FILE=<optional-private-voyage-key-file>"];
   if (provider === "nvidia") return ["NVIDIA_API_KEY=<env-only-nvidia-key>", "NVIDIA_API_KEYS_FILE=<optional-private-nvidia-key-file>"];
   if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-local-apple-server-url>"];
+  if (provider === "local-rerank") return ["SELFMEM_LOCAL_RERANK_ENDPOINT=<env-only-local-rerank-endpoint>"];
   return [];
 }
 

@@ -48,6 +48,7 @@ const retrievalStrategies = [
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
   "local-apple-qwen3-0_6b",
+  "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
 ];
 const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
@@ -549,9 +550,11 @@ async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
 
 async function rankLocalAppleQwen(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
+  const config = localAppleStrategyConfig(options.strategy);
   const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("local-apple-embedding");
+    if (config?.rerankMode === "sidecar") options.providerStats?.recordMockCall("local-rerank");
     const dense = rankDenseProxy(queryText, densePool);
     const fused = fuseRankedChannels(
       densePool,
@@ -563,7 +566,8 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
       ],
       { scoreScale: 8 },
     );
-    return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+    const reranked = config?.rerankMode === "sidecar" ? providerMockRerank(query, fused) : rerankProxy(query, fused);
+    return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
   }
   assertProviderBenchmarkAllowed(options.strategy);
   const queryVector = (await localAppleEmbed([queryText], { providerStats: options.providerStats }))[0];
@@ -581,6 +585,11 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
     ],
     { scoreScale: 8 },
   );
+  if (config?.rerankMode === "sidecar") {
+    const rerankLimit = providerCandidateLimit("SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT", config.rerankCandidateLimit ?? 30);
+    const reranked = await localAppleRerank(queryText, fused.slice(0, rerankLimit), { providerStats: options.providerStats, model: config.rerankModel });
+    return [...reranked, ...candidatesNotIn(fused.slice(0, rerankLimit), candidates)].sort(byScoreThenId);
+  }
   return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
 }
 
@@ -831,6 +840,7 @@ function isProviderStrategy(strategy) {
     "cloud-nvidia-e5-mistral",
     "cloud-nvidia-code",
     "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank",
     "local-apple-qwen3-4b",
   ].includes(strategy);
 }
@@ -848,6 +858,7 @@ function requiredProvidersForStrategy(strategy) {
   if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
   if (voyageStrategyConfig(strategy)) return ["voyage"];
   if (nvidiaStrategyConfig(strategy)) return ["nvidia"];
+  if (localAppleStrategyConfig(strategy)?.rerankMode === "sidecar") return ["local-apple", "local-rerank"];
   if (localAppleStrategyConfig(strategy)) return ["local-apple"];
   return [];
 }
@@ -873,7 +884,8 @@ function rerankModelForStrategy(strategy) {
   if (voyageStrategyConfig(strategy)?.rerankModel) return voyageStrategyConfig(strategy).rerankModel;
   if (strategy === "cloud-gemini-embed-rerank-proxy") return "local-deterministic-rerank-proxy";
   if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).rerankModel;
-  if (localAppleStrategyConfig(strategy)) return process.env.SELFMEM_LOCAL_RERANK_MODEL ?? "local-deterministic-rerank-proxy";
+  if (localAppleStrategyConfig(strategy)?.rerankMode === "sidecar") return localAppleRerankModel(strategy);
+  if (localAppleStrategyConfig(strategy)) return "local-deterministic-rerank-proxy";
   return null;
 }
 
@@ -882,6 +894,7 @@ function providerEnvHint(provider) {
   if (provider === "voyage") return "VOYAGE_API_KEY, VOYAGE_API_KEYS, VOYAGE_API_KEY_FILE, or VOYAGE_API_KEYS_FILE";
   if (provider === "nvidia") return "NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, NVAPI_KEYS, or matching *_FILE vars";
   if (provider === "local-apple") return "SELFMEM_LOCAL_EMBED_BASE_URL";
+  if (provider === "local-rerank") return "SELFMEM_LOCAL_RERANK_ENDPOINT or SELFMEM_LOCAL_RERANK_BASE_URL";
   return `${provider.toUpperCase()} provider credentials`;
 }
 
@@ -926,6 +939,9 @@ function providerKeys(provider) {
   }
   if (provider === "local-apple") {
     return splitProviderKeys(process.env.SELFMEM_LOCAL_EMBED_BASE_URL);
+  }
+  if (provider === "local-rerank") {
+    return splitProviderKeys(process.env.SELFMEM_LOCAL_RERANK_ENDPOINT ?? process.env.SELFMEM_LOCAL_RERANK_BASE_URL);
   }
   return [];
 }
@@ -1091,6 +1107,26 @@ async function localAppleEmbed(texts, options = {}) {
   return embeddings;
 }
 
+async function localAppleRerank(query, candidates, options = {}) {
+  const documents = candidates.map((candidate) => candidate.text);
+  options.providerStats?.recordProviderCall("rerank", documents.length);
+  const response = await localAppleRerankPost({
+    model: options.model ?? localAppleRerankModel(),
+    query,
+    documents,
+    top_n: documents.length,
+  });
+  const scores = rerankScoresFromLocalResponse(response);
+  assert.ok(scores.length > 0, "local Apple rerank returned no results");
+  return scores
+    .map((item, rank) => {
+      const candidate = candidates[item.index];
+      assert.ok(candidate, "local Apple rerank returned an invalid document index");
+      return { ...candidate, score: round(Number(item.score ?? 0) + reciprocalRankBoost(rank + 1)) };
+    })
+    .sort(byScoreThenId);
+}
+
 async function geminiPost(path, body, options = {}) {
   const key = chooseProviderKey("gemini", options.seed ?? path);
   const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
@@ -1186,6 +1222,30 @@ async function localApplePost(path, body) {
   }
 }
 
+async function localAppleRerankPost(body) {
+  const endpoint = localAppleRerankEndpoint();
+  const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const headers = { "content-type": "application/json" };
+  const token = process.env.SELFMEM_LOCAL_RERANK_API_KEY;
+  if (token) headers.authorization = `Bearer ${token}`;
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`local Apple rerank request failed with status ${response.status}`);
+    }
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function embeddingsFromVoyageResponse(response) {
   if (Array.isArray(response?.data)) {
     return [...response.data]
@@ -1250,6 +1310,30 @@ function rerankScoresFromNvidiaResponse(response) {
     .map((item) => ({
       index: Number(item.index),
       score: finiteNumberOrDefault(item.logit ?? item.relevance_score ?? item.score, 0),
+    }))
+    .filter((item) => Number.isInteger(item.index) && item.index >= 0)
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+}
+
+function rerankScoresFromLocalResponse(response) {
+  if (Array.isArray(response)) {
+    return response
+      .map((score, index) => ({ index, score: finiteNumberOrDefault(score, 0) }))
+      .sort((left, right) => right.score - left.score || left.index - right.index);
+  }
+  const items = Array.isArray(response?.rankings)
+    ? response.rankings
+    : Array.isArray(response?.data)
+    ? response.data
+    : Array.isArray(response?.results)
+    ? response.results
+    : Array.isArray(response?.scores)
+    ? response.scores.map((score, index) => ({ index, score }))
+    : [];
+  return items
+    .map((item, index) => ({
+      index: Number(item.index ?? item.document_index ?? item.rank_index ?? index),
+      score: finiteNumberOrDefault(item.relevance_score ?? item.score ?? item.logit ?? item.value, 0),
     }))
     .filter((item) => Number.isInteger(item.index) && item.index >= 0)
     .sort((left, right) => right.score - left.score || left.index - right.index);
@@ -1358,6 +1442,13 @@ function localAppleStrategyConfig(strategy = rankingStrategy) {
       model: "Qwen/Qwen3-Embedding-0.6B-GGUF",
       dimensions: 1024,
     },
+    "local-apple-qwen3-0_6b-local-rerank": {
+      model: "Qwen/Qwen3-Embedding-0.6B-GGUF",
+      dimensions: 1024,
+      rerankMode: "sidecar",
+      rerankModel: "Qwen/Qwen3-Reranker-0.6B",
+      rerankCandidateLimit: 30,
+    },
     "local-apple-qwen3-4b": {
       model: "Qwen/Qwen3-Embedding-4B-GGUF",
       dimensions: 2560,
@@ -1375,6 +1466,17 @@ function localAppleEmbedDimensions(strategy = rankingStrategy) {
     process.env.SELFMEM_LOCAL_EMBED_DIMENSIONS ?? String(localAppleStrategyConfig(strategy)?.dimensions ?? 1024),
     "local Apple output dimension",
   );
+}
+
+function localAppleRerankModel(strategy = rankingStrategy) {
+  return String(process.env.SELFMEM_LOCAL_RERANK_MODEL ?? localAppleStrategyConfig(strategy)?.rerankModel ?? "Qwen/Qwen3-Reranker-0.6B");
+}
+
+function localAppleRerankEndpoint() {
+  if (process.env.SELFMEM_LOCAL_RERANK_ENDPOINT) return String(process.env.SELFMEM_LOCAL_RERANK_ENDPOINT);
+  const baseUrl = String(process.env.SELFMEM_LOCAL_RERANK_BASE_URL ?? "").replace(/\/+$/, "");
+  assert.ok(baseUrl, "SELFMEM_LOCAL_RERANK_ENDPOINT or SELFMEM_LOCAL_RERANK_BASE_URL is required for local Apple rerank");
+  return baseUrl.endsWith("/v1") ? `${baseUrl}/rerank` : `${baseUrl}/v1/rerank`;
 }
 
 function localAppleEmbedMaxEstimatedTokens() {

@@ -225,6 +225,7 @@ try {
   assert.ok(modelMatrix.localLane.embedder.includes("Qwen3-Embedding-0.6B"));
   assert.ok(modelMatrix.localLane.runtime.includes("llama.cpp"));
   assert.ok(modelMatrix.arms.some((arm) => arm.id === "cloud-nvidia-nemotron-1b"));
+  assert.ok(modelMatrix.arms.some((arm) => arm.id === "local-apple-qwen3-0_6b-local-rerank"));
   assert.ok(modelMatrix.gates.some((gate) => gate.includes("matched source-locked canary")));
   assert.equal(promptContextPreview.ok, true);
   assert.equal(promptContextPreview.mode, "prompt-context-preview");
