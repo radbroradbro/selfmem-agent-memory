@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T23:27:13.951Z",
+  "generatedAt": "2026-05-25T23:53:20.151Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
@@ -151,7 +151,7 @@
     "endToEndMemoryScoreGate": {
       "path": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "exists": true,
-      "hash": "sha256:cdf199627998c12a69647d8398a1b7d840ed173e50ed003d18f62f9a61c27e95",
+      "hash": "sha256:27b56a0e9cd363039628f427ef28c8262a4721aee982947095e8d04eed5a5ca3",
       "mode": "end-to-end-memory-score-gate",
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -161,7 +161,7 @@
     "readinessNote": {
       "path": "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
       "exists": true,
-      "hash": "sha256:410ea848284a8f37678cdbf07faa7ccbe18ad5514080b54194406a52f475a642",
+      "hash": "sha256:2ddcf01c1d0809492a6a52939a67a44c144f021c68fe559a26f89add0fe440d9",
       "mode": null,
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -306,11 +306,14 @@
       "sourcePath": "reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json",
       "score": 43.1667,
       "scoreUnit": "answer-quality percent",
+      "answerModel": "qwen36-a3b-main-q8kv-8192",
+      "judgeModel": "qwen36-a3b-main-q8kv-8192",
       "memoryBenchAnswerQuality": true,
       "retrievalProxyOnly": false,
       "publicBenchmarkClaimsAllowed": false
     },
     "scoreDelta": -42.0333,
+    "sameJudgeModelAsPrimaryTarget": false,
     "meetsPrimaryReportedTarget": false,
     "matchingBenchmarkSemanticsRequired": true,
     "comparisonRule": "Direct Supermemory usage is optional when quota-blocked, but RecallWeave cannot claim SOTA unless a same-benchmark, same-scoring full-memory result meets or beats the selected reported Supermemory target."
@@ -532,7 +535,7 @@
     "liveLocalAnswerQualityPresent": true,
     "liveProviderAnswerQualityPresent": true,
     "voyageProviderRateLimited": true,
-    "reviewerApprovalsPresent": true,
+    "reviewerApprovalsPresent": false,
     "endToEndMemoryScorePresent": true,
     "bestEndToEndScoreMeetsReportedTarget": false,
     "publicClaimsAllowedByInputs": false,
@@ -544,7 +547,13 @@
     "all-current-result-files-keep-public-claims-disabled",
     "missing-voyage-answer-quality-same-data-result",
     "best-end-to-end-score-below-reported-supermemory-target",
-    "missing-full-or-officially-comparable-memory-benchmark-run"
+    "missing-two-independent-memory-score-reviewer-approvals",
+    "missing-full-or-officially-comparable-memory-benchmark-run",
+    "end-to-end-gate:answer-model-does-not-match-target",
+    "end-to-end-gate:judge-model-does-not-match-target",
+    "end-to-end-gate:missing-voyage-provider-arm",
+    "end-to-end-gate:memory-score-reviewer-approval-report-not-ready",
+    "end-to-end-gate:missing-two-independent-reviewer-approvals"
   ],
   "nextActions": [
     "Use MTEB and model-card evidence only to choose embedding and reranker candidates.",

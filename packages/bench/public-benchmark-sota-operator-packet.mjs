@@ -341,6 +341,7 @@ const packet = {
   },
   passCriteria: [
     "All arms use the exact same source-locked target, query-set hash, scoring-code hash, context budget, and limit.",
+    "The actual answer model and judge model in the result match the target contract before any reported-target comparison counts.",
     "BM25, dense/vector-only, full-hybrid, local Apple embedding, local Apple reranker, Voyage, NVIDIA or Gemini, and query-expansion arms all have same-data rows.",
     "The query-expansion arm states whether it is pure local or mixed local-plus-cloud, and mixed arms name the cloud substep.",
     "The query-expansion arm proves live LLM expansion wiring before it is counted as an LLM query-expansion result.",

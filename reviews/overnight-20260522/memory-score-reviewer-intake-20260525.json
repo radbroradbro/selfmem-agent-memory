@@ -1,27 +1,29 @@
 {
   "schemaVersion": 1,
-  "ok": true,
+  "ok": false,
   "mode": "memory-score-reviewer-approval-intake",
-  "status": "READY_MEMORY_SCORE_REVIEWERS",
+  "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
   "writesRealFiles": true,
   "callsProviderApis": false,
   "sendsBenchmarkTextToProvider": false,
   "metricsOnly": true,
   "publicSafe": true,
   "publicLaunchAllowed": false,
-  "publicBenchmarkApprovalReady": true,
-  "countsAsFullMemorySotaReview": true,
-  "reviewerApprovalCount": 2,
-  "independentReviewerCount": 2,
+  "publicBenchmarkApprovalReady": false,
+  "countsAsFullMemorySotaReview": false,
+  "reviewerApprovalCount": 0,
+  "independentReviewerCount": 0,
   "reviewsSubmitted": 2,
   "target": {
     "resultPresent": true,
-    "resultHash": "sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0",
+    "resultHash": "sha256:066d808e6d8216e829f677c61456642c0862e0de3aeee65d734704eeb0ca43d6",
     "targetHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
     "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
     "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
     "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
     "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "answerModel": "qwen36-a3b-main-q8kv-8192",
+    "judgeModel": "qwen36-a3b-main-q8kv-8192",
     "benchmark": "longmemeval",
     "fixtureOnly": false,
     "metricsOnly": true,
@@ -40,10 +42,12 @@
       "model": "deepseek-v4-pro",
       "verdict": "APPROVE_MEMORY_SCORE_EVIDENCE",
       "claimScope": "source-locked-memory-score",
-      "targetBound": true,
-      "countable": true,
+      "targetBound": false,
+      "countable": false,
       "duplicateReviewer": false,
-      "failedChecks": []
+      "failedChecks": [
+        "target-bound"
+      ]
     },
     {
       "sourceLabel": "zai-glm-5-1-memory-score-approval.json",
@@ -52,13 +56,17 @@
       "model": "glm-5.1",
       "verdict": "APPROVE_MEMORY_SCORE_EVIDENCE",
       "claimScope": "source-locked-memory-score",
-      "targetBound": true,
-      "countable": true,
+      "targetBound": false,
+      "countable": false,
       "duplicateReviewer": false,
-      "failedChecks": []
+      "failedChecks": [
+        "target-bound"
+      ]
     }
   ],
-  "blockers": [],
+  "blockers": [
+    "two-independent-reviewer-approvals-missing"
+  ],
   "safety": {
     "acceptsOnlyMetricsOnlyReviewArtifacts": true,
     "requiresResultBinding": true,
@@ -71,8 +79,8 @@
     "includesRawAnswerText": false
   },
   "nextActions": [
-    "Run benchmark:memory-score:result-gate with --reviewer-approval-report pointing to this intake report.",
-    "Attach the reviewer-approved gate report to the SOTA ladder packet.",
-    "Public launch still remains blocked until owner approval, UI evidence, docs, and release notes are current."
+    "Run the live answer-quality harness and pass its metrics-only result to this reviewer intake.",
+    "Collect two independent reviewer approval JSON files bound to the exact result hash.",
+    "Do not publish SOTA or MemoryBench-style claims until this intake and benchmark:memory-score:result-gate both pass."
   ]
 }

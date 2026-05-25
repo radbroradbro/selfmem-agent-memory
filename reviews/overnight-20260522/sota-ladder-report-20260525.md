@@ -8,7 +8,13 @@
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
 - best-end-to-end-score-below-reported-supermemory-target
+- missing-two-independent-memory-score-reviewer-approvals
 - missing-full-or-officially-comparable-memory-benchmark-run
+- end-to-end-gate:answer-model-does-not-match-target
+- end-to-end-gate:judge-model-does-not-match-target
+- end-to-end-gate:missing-voyage-provider-arm
+- end-to-end-gate:memory-score-reviewer-approval-report-not-ready
+- end-to-end-gate:missing-two-independent-reviewer-approvals
 
 ## Required Full Memory Arms
 - bm25-lite: present (lexical floor)
@@ -23,6 +29,8 @@
 ## Reported Target Comparison
 - Primary reported target: supermemory-production-research-gemini-3-pro (85.2 overall percent)
 - Best end-to-end RecallWeave row: cloud-nvidia-nemotron-1b (43.1667)
+- Best row judge model: qwen36-a3b-main-q8kv-8192
+- Same judge as primary target: false
 - Meets reported target: false
 
 ## Full Benchmark Policy

@@ -162,6 +162,8 @@ function buildTarget(pathLike) {
     materializerHash: null,
     scoringCodeHash: null,
     answerLabelsHash: null,
+    answerModel: null,
+    judgeModel: null,
     benchmark: null,
     fixtureOnly: null,
     metricsOnly: null,
@@ -184,6 +186,8 @@ function buildTarget(pathLike) {
     materializerHash: json.input?.materializerHash ?? json.materializerHash ?? null,
     scoringCodeHash: json.input?.scoringCodeHash ?? json.target?.scoringCodeHash ?? json.scoringCodeHash ?? null,
     answerLabelsHash: json.input?.answerLabelsHash ?? json.target?.answerLabelsHash ?? json.answerLabelsHash ?? null,
+    answerModel: extractActualAnswerModel(json),
+    judgeModel: extractActualJudgeModel(json),
     benchmark: typeof json.benchmark === "string" ? json.benchmark : json.target?.benchmark ?? null,
     fixtureOnly: Boolean(json.fixtureOnly),
     metricsOnly: Boolean(json.metricsOnly),
@@ -227,6 +231,8 @@ function approvalTargetTemplate(targetValue) {
     querySetHash: targetValue.querySetHash ?? "<sha256:query-set>",
     scoringCodeHash: targetValue.scoringCodeHash ?? "<sha256:scoring-code>",
     answerLabelsHash: targetValue.answerLabelsHash ?? "<sha256:answer-labels>",
+    answerModel: targetValue.answerModel ?? "<answer-model>",
+    judgeModel: targetValue.judgeModel ?? "<judge-model>",
     benchmark: targetValue.benchmark ?? "longmemeval",
     strategyNamesHash: targetValue.strategyNamesHash ?? "<sha256:strategy-names>",
   };
@@ -279,7 +285,17 @@ function evaluateReview(input, targetValue) {
 
 function targetMatches(reviewTarget, targetValue) {
   if (!targetValue.hasAnyTarget) return !strictTarget;
-  const fields = ["resultHash", "targetHash", "querySetHash", "scoringCodeHash", "answerLabelsHash", "benchmark", "strategyNamesHash"];
+  const fields = [
+    "resultHash",
+    "targetHash",
+    "querySetHash",
+    "scoringCodeHash",
+    "answerLabelsHash",
+    "answerModel",
+    "judgeModel",
+    "benchmark",
+    "strategyNamesHash",
+  ];
   return fields.every((field) => {
     const expected = targetValue[field];
     if (!expected) return true;
@@ -307,6 +323,35 @@ function normalizeStrategies(json) {
     ...(Array.isArray(json?.results) ? json.results : []),
   ].filter((item) => item && typeof item === "object");
   return rows.map((row) => String(row.strategy ?? row.armId ?? "")).filter(Boolean);
+}
+
+function extractActualAnswerModel(result) {
+  return firstString(
+    result?.provider?.answerModel,
+    result?.input?.answerModel,
+    result?.answerModel,
+    result?.models?.answerModel,
+    result?.model?.answerModel,
+  );
+}
+
+function extractActualJudgeModel(result) {
+  return firstString(
+    result?.provider?.judgeModel,
+    result?.input?.judgeModel,
+    result?.judgeModel,
+    result?.models?.judgeModel,
+    result?.model?.judgeModel,
+  );
+}
+
+function firstString(...values) {
+  for (const value of values) {
+    if (typeof value !== "string") continue;
+    const trimmed = value.trim();
+    if (trimmed.length > 0) return trimmed;
+  }
+  return null;
 }
 
 function findForbiddenKeys(value, path = []) {
@@ -342,6 +387,8 @@ function renderMarkdown(value) {
     `- Reviewer approvals: ${value.reviewerApprovalCount}`,
     `- Independent reviewers: ${value.independentReviewerCount}`,
     `- Result hash: ${value.target?.resultHash ?? "missing"}`,
+    `- Answer model: ${value.target?.answerModel ?? "missing"}`,
+    `- Judge model: ${value.target?.judgeModel ?? "missing"}`,
     "",
     "## Blockers",
     ...(value.blockers?.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),

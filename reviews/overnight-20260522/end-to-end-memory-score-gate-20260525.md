@@ -7,20 +7,26 @@
 - Target: reviews/overnight-20260522/public-longmemeval-expanded-run-target.json
 
 ## Blockers
+- answer-model-does-not-match-target
+- judge-model-does-not-match-target
 - missing-voyage-provider-arm
+- memory-score-reviewer-approval-report-not-ready
+- missing-two-independent-reviewer-approvals
 
 ## Result
 - Source: result-file
 - Fixture only: false
+- Answer model: qwen36-a3b-main-q8kv-8192 (target gpt-4o)
+- Judge model: qwen36-a3b-main-q8kv-8192 (target gpt-4o)
 - Answer quality metric: result=43.1667
-- Reviewer approvals: 2
+- Reviewer approvals: 0
 - Arms: bm25-lite, cloud-nvidia-nemotron-1b, full-hybrid-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank, query-expanded-full-hybrid-rerank
 
 ## Reviewer Approval
 - Report exists: true
-- Report status: READY_MEMORY_SCORE_REVIEWERS
+- Report status: BLOCKED_MEMORY_SCORE_REVIEWERS
 - Target bound: true
-- Independent reviewers: 2
+- Independent reviewers: 0
 
 ## Next Actions
 - Run the same-data LongMemEval/MemoryBench answer-quality harness, not only the retrieval-proxy strategy comparison.

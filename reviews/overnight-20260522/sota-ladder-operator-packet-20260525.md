@@ -9,7 +9,14 @@
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
 - best-end-to-end-score-below-reported-supermemory-target
+- missing-two-independent-memory-score-reviewer-approvals
 - missing-full-or-officially-comparable-memory-benchmark-run
+- end-to-end-gate:answer-model-does-not-match-target
+- end-to-end-gate:judge-model-does-not-match-target
+- end-to-end-gate:missing-voyage-provider-arm
+- end-to-end-gate:memory-score-reviewer-approval-report-not-ready
+- end-to-end-gate:missing-two-independent-reviewer-approvals
+- memory-score-reviewers:two-independent-reviewer-approvals-missing
 - voyage-provider-rate-limited
 
 ## Current Evidence
@@ -23,7 +30,7 @@
 - Live-local winner: local-apple-qwen3-0_6b-local-rerank (36)
 - Live-provider answer quality: true
 - Live-provider winner: cloud-nvidia-nemotron-1b (43.1667)
-- Memory score reviewer intake: READY_MEMORY_SCORE_REVIEWERS
+- Memory score reviewer intake: BLOCKED_MEMORY_SCORE_REVIEWERS
 - Answer-quality arm export: EXPORTED_RESPONSE_ARMS
 - Answer-quality preflight: READY_FOR_LIVE_ANSWER_QUALITY
 - Answer-quality harness smoke: public-benchmark-answer-quality
@@ -203,6 +210,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet <metrics-onl
 
 ## Pass Criteria
 - All arms use the exact same source-locked target, query-set hash, scoring-code hash, context budget, and limit.
+- The actual answer model and judge model in the result match the target contract before any reported-target comparison counts.
 - BM25, dense/vector-only, full-hybrid, local Apple embedding, local Apple reranker, Voyage, NVIDIA or Gemini, and query-expansion arms all have same-data rows.
 - The query-expansion arm states whether it is pure local or mixed local-plus-cloud, and mixed arms name the cloud substep.
 - The query-expansion arm proves live LLM expansion wiring before it is counted as an LLM query-expansion result.

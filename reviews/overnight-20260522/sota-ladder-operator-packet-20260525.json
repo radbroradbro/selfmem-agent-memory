@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T23:41:06.832Z",
+  "generatedAt": "2026-05-25T23:53:54.185Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -32,7 +32,13 @@
         "all-current-result-files-keep-public-claims-disabled",
         "missing-voyage-answer-quality-same-data-result",
         "best-end-to-end-score-below-reported-supermemory-target",
-        "missing-full-or-officially-comparable-memory-benchmark-run"
+        "missing-two-independent-memory-score-reviewer-approvals",
+        "missing-full-or-officially-comparable-memory-benchmark-run",
+        "end-to-end-gate:answer-model-does-not-match-target",
+        "end-to-end-gate:judge-model-does-not-match-target",
+        "end-to-end-gate:missing-voyage-provider-arm",
+        "end-to-end-gate:memory-score-reviewer-approval-report-not-ready",
+        "end-to-end-gate:missing-two-independent-reviewer-approvals"
       ],
       "requiredFullMemoryArms": [
         {
@@ -178,12 +184,16 @@
     "endToEndMemoryScoreGate": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:cdf199627998c12a69647d8398a1b7d840ed173e50ed003d18f62f9a61c27e95",
+      "evidenceHash": "sha256:27b56a0e9cd363039628f427ef28c8262a4721aee982947095e8d04eed5a5ca3",
       "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
       "countsAsEndToEndMemoryBenchmark": false,
       "countsAsFullMemorySotaEvidence": false,
       "blockers": [
-        "missing-voyage-provider-arm"
+        "answer-model-does-not-match-target",
+        "judge-model-does-not-match-target",
+        "missing-voyage-provider-arm",
+        "memory-score-reviewer-approval-report-not-ready",
+        "missing-two-independent-reviewer-approvals"
       ]
     },
     "liveLocalAnswerQuality": {
@@ -222,13 +232,15 @@
     "memoryScoreReviewerIntake": {
       "evidencePath": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:4f97dd049f803762f52b5248b7bbb5eb39cf763f0eceddbdf912c1e590e03182",
-      "status": "READY_MEMORY_SCORE_REVIEWERS",
-      "publicBenchmarkApprovalReady": true,
-      "countsAsFullMemorySotaReview": true,
-      "reviewerApprovalCount": 2,
-      "independentReviewerCount": 2,
-      "blockers": []
+      "evidenceHash": "sha256:5989ff8ff447d258735cfa88c2d5984578242514a2b1b18728ed72972a52295d",
+      "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
+      "publicBenchmarkApprovalReady": false,
+      "countsAsFullMemorySotaReview": false,
+      "reviewerApprovalCount": 0,
+      "independentReviewerCount": 0,
+      "blockers": [
+        "two-independent-reviewer-approvals-missing"
+      ]
     },
     "answerQualityArmExport": {
       "evidencePath": "reviews/overnight-20260522/answer-quality-arm-export-live-local-20260525.json",
@@ -602,6 +614,7 @@
   },
   "passCriteria": [
     "All arms use the exact same source-locked target, query-set hash, scoring-code hash, context budget, and limit.",
+    "The actual answer model and judge model in the result match the target contract before any reported-target comparison counts.",
     "BM25, dense/vector-only, full-hybrid, local Apple embedding, local Apple reranker, Voyage, NVIDIA or Gemini, and query-expansion arms all have same-data rows.",
     "The query-expansion arm states whether it is pure local or mixed local-plus-cloud, and mixed arms name the cloud substep.",
     "The query-expansion arm proves live LLM expansion wiring before it is counted as an LLM query-expansion result.",
@@ -616,7 +629,14 @@
     "all-current-result-files-keep-public-claims-disabled",
     "missing-voyage-answer-quality-same-data-result",
     "best-end-to-end-score-below-reported-supermemory-target",
+    "missing-two-independent-memory-score-reviewer-approvals",
     "missing-full-or-officially-comparable-memory-benchmark-run",
+    "end-to-end-gate:answer-model-does-not-match-target",
+    "end-to-end-gate:judge-model-does-not-match-target",
+    "end-to-end-gate:missing-voyage-provider-arm",
+    "end-to-end-gate:memory-score-reviewer-approval-report-not-ready",
+    "end-to-end-gate:missing-two-independent-reviewer-approvals",
+    "memory-score-reviewers:two-independent-reviewer-approvals-missing",
     "voyage-provider-rate-limited"
   ]
 }

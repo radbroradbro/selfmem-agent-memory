@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "end-to-end-memory-score-gate",
   "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
-  "generatedAt": "2026-05-25T21:45:11.108Z",
+  "generatedAt": "2026-05-25T23:52:21.945Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -18,12 +18,14 @@
     "benchmark": "longmemeval",
     "claimTier": "run-only",
     "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
-    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a"
+    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "answerModel": "gpt-4o",
+    "judgeModel": "gpt-4o"
   },
   "result": {
     "source": "result-file",
     "path": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
-    "hash": "sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0",
+    "hash": "sha256:066d808e6d8216e829f677c61456642c0862e0de3aeee65d734704eeb0ca43d6",
     "fixtureOnly": false,
     "mode": "public-benchmark-answer-quality",
     "benchmark": "longmemeval",
@@ -32,11 +34,13 @@
     "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
     "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
     "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "answerModel": "qwen36-a3b-main-q8kv-8192",
+    "judgeModel": "qwen36-a3b-main-q8kv-8192",
     "answerQualityMetric": {
       "name": "result",
       "value": 43.1667
     },
-    "reviewerApprovalCount": 2,
+    "reviewerApprovalCount": 0,
     "arms": [
       "bm25-lite",
       "cloud-nvidia-nemotron-1b",
@@ -49,13 +53,13 @@
   "reviewerApproval": {
     "source": "reviewer-approval-report-file",
     "path": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
-    "hash": "sha256:4f97dd049f803762f52b5248b7bbb5eb39cf763f0eceddbdf912c1e590e03182",
+    "hash": "sha256:5989ff8ff447d258735cfa88c2d5984578242514a2b1b18728ed72972a52295d",
     "exists": true,
-    "status": "READY_MEMORY_SCORE_REVIEWERS",
-    "publicBenchmarkApprovalReady": true,
-    "countsAsFullMemorySotaReview": true,
-    "reviewerApprovalCount": 2,
-    "independentReviewerCount": 2,
+    "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
+    "publicBenchmarkApprovalReady": false,
+    "countsAsFullMemorySotaReview": false,
+    "reviewerApprovalCount": 0,
+    "independentReviewerCount": 0,
     "targetBound": true
   },
   "checks": {
@@ -78,6 +82,10 @@
     "materializerHashPresent": true,
     "scoringCodeHashMatches": true,
     "answerLabelsHashMatches": true,
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "answerModelMatchesTarget": false,
+    "judgeModelMatchesTarget": false,
     "answerQualityMetricPresent": true,
     "answerQualityMetricInRange": true,
     "bm25ControlPresent": true,
@@ -89,13 +97,17 @@
     "localAppleArmPresent": true,
     "localRerankArmPresent": true,
     "reviewerApprovalReportPresent": true,
-    "reviewerApprovalReportReady": true,
+    "reviewerApprovalReportReady": false,
     "reviewerApprovalReportTargetBound": true,
-    "reviewerApprovalsPresent": true,
+    "reviewerApprovalsPresent": false,
     "privacyLeakCountersClear": true
   },
   "blockers": [
-    "missing-voyage-provider-arm"
+    "answer-model-does-not-match-target",
+    "judge-model-does-not-match-target",
+    "missing-voyage-provider-arm",
+    "memory-score-reviewer-approval-report-not-ready",
+    "missing-two-independent-reviewer-approvals"
   ],
   "nextActions": [
     "Run the same-data LongMemEval/MemoryBench answer-quality harness, not only the retrieval-proxy strategy comparison.",

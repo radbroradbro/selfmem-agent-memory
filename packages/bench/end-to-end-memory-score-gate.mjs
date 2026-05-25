@@ -113,17 +113,23 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
   const targetBenchmark = target.benchmark?.family ?? target.benchmark?.name;
   const targetScoringHash = target.benchmark?.scoringCodeHash ?? null;
   const targetAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
+  const targetAnswerModel = target.benchmark?.answerModel ?? null;
+  const targetJudgeModel = target.benchmark?.judgeModel ?? null;
   const targetHash = `sha256:${sha256(targetRaw)}`;
   const resultTargetHash = result?.target?.hash ?? result?.input?.targetHash ?? result?.sourceLock?.targetHash ?? null;
   const resultScoringHash = result?.scoringCodeHash ?? result?.input?.scoringCodeHash ?? result?.target?.scoringCodeHash ?? null;
   const resultAnswerLabelsHash = result?.answerLabelsHash ?? result?.input?.answerLabelsHash ?? result?.target?.answerLabelsHash ?? null;
+  const resultAnswerModel = extractActualAnswerModel(result);
+  const resultJudgeModel = extractActualJudgeModel(result);
   const reviewerTarget = reviewerApproval.json?.target ?? {};
   const reviewerApprovalReportTargetBound =
     reviewerApproval.exists &&
     reviewerTarget.resultHash === loaded.hash &&
     (!resultTargetHash || reviewerTarget.targetHash === resultTargetHash) &&
     (!resultScoringHash || reviewerTarget.scoringCodeHash === resultScoringHash) &&
-    (!resultAnswerLabelsHash || reviewerTarget.answerLabelsHash === resultAnswerLabelsHash);
+    (!resultAnswerLabelsHash || reviewerTarget.answerLabelsHash === resultAnswerLabelsHash) &&
+    (!resultAnswerModel || reviewerTarget.answerModel === resultAnswerModel) &&
+    (!resultJudgeModel || reviewerTarget.judgeModel === resultJudgeModel);
   const checks = {
     resultExists: loaded.exists,
     modeRecognized: [
@@ -155,6 +161,10 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
       String(result?.input?.materializerHash ?? result?.materializerHash).startsWith("sha256:"),
     scoringCodeHashMatches: Boolean(targetScoringHash) && resultScoringHash === targetScoringHash,
     answerLabelsHashMatches: Boolean(targetAnswerLabelsHash) && resultAnswerLabelsHash === targetAnswerLabelsHash,
+    answerModelPresent: typeof resultAnswerModel === "string" && resultAnswerModel.length > 0,
+    judgeModelPresent: typeof resultJudgeModel === "string" && resultJudgeModel.length > 0,
+    answerModelMatchesTarget: Boolean(targetAnswerModel) && resultAnswerModel === targetAnswerModel,
+    judgeModelMatchesTarget: Boolean(targetJudgeModel) && resultJudgeModel === targetJudgeModel,
     answerQualityMetricPresent: answerMetric.value != null && Number.isFinite(Number(answerMetric.value)),
     answerQualityMetricInRange: answerMetric.value != null && Number(answerMetric.value) >= 0 && Number(answerMetric.value) <= 100,
     bm25ControlPresent: hasAny(rowNames, ["bm25-lite"]),
@@ -193,6 +203,10 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
     !checks.materializerHashPresent ? "missing-materializer-hash" : null,
     !checks.scoringCodeHashMatches ? "scoring-code-hash-does-not-match-target" : null,
     !checks.answerLabelsHashMatches ? "answer-labels-hash-does-not-match-target" : null,
+    !checks.answerModelPresent ? "missing-actual-answer-model" : null,
+    !checks.judgeModelPresent ? "missing-actual-judge-model" : null,
+    !checks.answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
+    !checks.judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
     !checks.answerQualityMetricPresent ? "missing-answer-quality-score" : null,
     !checks.answerQualityMetricInRange ? "answer-quality-score-out-of-range" : null,
     !checks.bm25ControlPresent ? "missing-bm25-control" : null,
@@ -234,6 +248,8 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
       claimTier: target.claimTier ?? null,
       scoringCodeHash: targetScoringHash,
       answerLabelsHash: targetAnswerLabelsHash,
+      answerModel: targetAnswerModel,
+      judgeModel: targetJudgeModel,
     },
     result: {
       source: loaded.source,
@@ -247,6 +263,8 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
       materializerHash: result?.input?.materializerHash ?? result?.materializerHash ?? null,
       scoringCodeHash: resultScoringHash,
       answerLabelsHash: resultAnswerLabelsHash,
+      answerModel: resultAnswerModel,
+      judgeModel: resultJudgeModel,
       answerQualityMetric: answerMetric,
       reviewerApprovalCount,
       arms: rowNames,
@@ -307,6 +325,35 @@ function bestAnswerMetric(rows, result) {
   return { name: null, value: null };
 }
 
+function extractActualAnswerModel(result) {
+  return firstString(
+    result?.provider?.answerModel,
+    result?.input?.answerModel,
+    result?.answerModel,
+    result?.models?.answerModel,
+    result?.model?.answerModel,
+  );
+}
+
+function extractActualJudgeModel(result) {
+  return firstString(
+    result?.provider?.judgeModel,
+    result?.input?.judgeModel,
+    result?.judgeModel,
+    result?.models?.judgeModel,
+    result?.model?.judgeModel,
+  );
+}
+
+function firstString(...values) {
+  for (const value of values) {
+    if (typeof value !== "string") continue;
+    const trimmed = value.trim();
+    if (trimmed.length > 0) return trimmed;
+  }
+  return null;
+}
+
 function hasAny(values, wanted) {
   const set = new Set(values);
   return wanted.some((item) => set.has(item));
@@ -328,6 +375,8 @@ function renderMarkdown(value) {
     "## Result",
     `- Source: ${value.result.source}`,
     `- Fixture only: ${value.result.fixtureOnly}`,
+    `- Answer model: ${value.result.answerModel ?? "missing"} (target ${value.target.answerModel ?? "missing"})`,
+    `- Judge model: ${value.result.judgeModel ?? "missing"} (target ${value.target.judgeModel ?? "missing"})`,
     `- Answer quality metric: ${value.result.answerQualityMetric.name ?? "missing"}=${value.result.answerQualityMetric.value ?? "missing"}`,
     `- Reviewer approvals: ${value.result.reviewerApprovalCount}`,
     `- Arms: ${value.result.arms.join(", ") || "none"}`,

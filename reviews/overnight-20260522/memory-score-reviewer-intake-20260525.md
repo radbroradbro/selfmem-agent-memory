@@ -1,20 +1,22 @@
 # Memory Score Reviewer Approval Intake
 
-- Status: READY_MEMORY_SCORE_REVIEWERS
-- Public benchmark approval ready: true
-- Counts as full memory SOTA review: true
-- Reviewer approvals: 2
-- Independent reviewers: 2
-- Result hash: sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0
+- Status: BLOCKED_MEMORY_SCORE_REVIEWERS
+- Public benchmark approval ready: false
+- Counts as full memory SOTA review: false
+- Reviewer approvals: 0
+- Independent reviewers: 0
+- Result hash: sha256:066d808e6d8216e829f677c61456642c0862e0de3aeee65d734704eeb0ca43d6
+- Answer model: qwen36-a3b-main-q8kv-8192
+- Judge model: qwen36-a3b-main-q8kv-8192
 
 ## Blockers
-- none
+- two-independent-reviewer-approvals-missing
 
 ## Reviews
-- deepseek-pro/deepseek-v4-pro: countable=true, targetBound=true
-- zai/glm-5.1: countable=true, targetBound=true
+- deepseek-pro/deepseek-v4-pro: countable=false, targetBound=false
+- zai/glm-5.1: countable=false, targetBound=false
 
 ## Next Actions
-- Run benchmark:memory-score:result-gate with --reviewer-approval-report pointing to this intake report.
-- Attach the reviewer-approved gate report to the SOTA ladder packet.
-- Public launch still remains blocked until owner approval, UI evidence, docs, and release notes are current.
+- Run the live answer-quality harness and pass its metrics-only result to this reviewer intake.
+- Collect two independent reviewer approval JSON files bound to the exact result hash.
+- Do not publish SOTA or MemoryBench-style claims until this intake and benchmark:memory-score:result-gate both pass.

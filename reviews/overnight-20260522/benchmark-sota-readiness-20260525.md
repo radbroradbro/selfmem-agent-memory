@@ -152,9 +152,11 @@ Follow-up implementation evidence on 2026-05-25:
   reviewer-binding step for the exact metrics-only answer-quality packet.
   Evidence is checked in at
   `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`;
-  it is ready for the current combined same-data answer-quality packet with
-  two independent bound approvals. Those approvals must be refreshed if the
-  combined result hash changes.
+  it is currently blocked because the previous approvals were bound to an
+  older result hash and did not bind the actual answer and judge model. Future
+  approvals must bind `resultHash`, `targetHash`, `querySetHash`,
+  `scoringCodeHash`, `answerLabelsHash`, `answerModel`, `judgeModel`, and the
+  strategy set before they count.
 - The live answer-quality output may contain strategy names, hashes, aggregate
   answer-quality metrics, judge-correct rate, latency, context-token counts,
   provider endpoint labels, cost, and privacy counters. It must not contain raw
@@ -206,8 +208,9 @@ Follow-up provider evidence on 2026-05-25:
   `local-apple-qwen3-0_6b-local-rerank` result of `36` on the current local
   answer-quality judge. Evidence:
   `reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json`.
-- Two independent memory-score reviewers have approved the current combined
-  metrics-only packet. Evidence:
+- The previous two memory-score reviewer approvals no longer count for the
+  current combined metrics-only packet because the stricter intake now requires
+  exact result-hash and answer/judge-model binding. Evidence:
   `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`.
 - The query-expansion and local-rerank component gates now recognize the live
   same-data answer-quality evidence while keeping broad SOTA claims disabled.
@@ -220,6 +223,11 @@ Follow-up provider evidence on 2026-05-25:
   target is Supermemory's reported LongMemEval-S `85.2%` Gemini 3 Pro row;
   delta is `-42.0333`, so the ladder adds
   `best-end-to-end-score-below-reported-supermemory-target`.
+- The end-to-end memory score gate now also checks that the actual answer and
+  judge models used by a result match the target contract. The current canary
+  result was answered and judged by `qwen36-a3b-main-q8kv-8192` while the
+  target contract names `gpt-4o`, so it is explicitly blocked as a harness
+  mismatch instead of being allowed to masquerade as a same-judge comparison.
 - This is progress, not launch clearance. The current ladder still lacks a
   same-data Voyage answer-quality row, an at-or-above-target full-memory score,
   final UI/docs refresh after any changed result hash, real rollout evidence,

@@ -257,6 +257,7 @@ const blockers = [
   !checks.sameDataControlRowsPresent ? "missing-same-data-control-row" : null,
   !checks.fullOrOfficiallyComparableMemoryBenchmarkPresent ? "missing-full-or-officially-comparable-memory-benchmark-run" : null,
   !checks.sourceLockedTargetPresent ? "missing-source-locked-target" : null,
+  ...arrayOf(loaded.endToEndMemoryScoreGate.json?.blockers).map((item) => `end-to-end-gate:${item}`),
 ].filter(Boolean);
 
 const report = {
@@ -327,6 +328,8 @@ function collectRows(loadedEvidence) {
         sourcePath: evidence.path,
         strategy: row.strategy ?? row.armId ?? null,
         metrics: row.metrics ?? null,
+        answerModel: extractActualAnswerModel(json),
+        judgeModel: extractActualJudgeModel(json),
         fixtureOnly: Boolean(json.fixtureOnly),
         retrievalProxyOnly: Boolean(json.retrievalProxyOnly),
         memoryBenchAnswerQuality: Boolean(json.memoryBenchAnswerQuality),
@@ -396,17 +399,58 @@ function compareReportedTarget(row, target) {
           sourcePath: row.sourcePath,
           score,
           scoreUnit: "answer-quality percent",
+          answerModel: row.answerModel ?? null,
+          judgeModel: row.judgeModel ?? null,
           memoryBenchAnswerQuality: row.memoryBenchAnswerQuality,
           retrievalProxyOnly: row.retrievalProxyOnly,
           publicBenchmarkClaimsAllowed: row.publicBenchmarkClaimsAllowed,
         }
       : null,
     scoreDelta: score != null && targetScore != null ? Number((score - targetScore).toFixed(4)) : null,
+    sameJudgeModelAsPrimaryTarget:
+      row?.judgeModel != null && target?.judge != null && normalizeModel(row.judgeModel) === normalizeModel(target.judge),
     meetsPrimaryReportedTarget,
     matchingBenchmarkSemanticsRequired: true,
     comparisonRule:
       "Direct Supermemory usage is optional when quota-blocked, but RecallWeave cannot claim SOTA unless a same-benchmark, same-scoring full-memory result meets or beats the selected reported Supermemory target.",
   };
+}
+
+function extractActualAnswerModel(result) {
+  return firstString(
+    result?.provider?.answerModel,
+    result?.input?.answerModel,
+    result?.answerModel,
+    result?.models?.answerModel,
+    result?.model?.answerModel,
+  );
+}
+
+function extractActualJudgeModel(result) {
+  return firstString(
+    result?.provider?.judgeModel,
+    result?.input?.judgeModel,
+    result?.judgeModel,
+    result?.models?.judgeModel,
+    result?.model?.judgeModel,
+  );
+}
+
+function firstString(...values) {
+  for (const value of values) {
+    if (typeof value !== "string") continue;
+    const trimmed = value.trim();
+    if (trimmed.length > 0) return trimmed;
+  }
+  return null;
+}
+
+function normalizeModel(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function arrayOf(value) {
+  return Array.isArray(value) ? value : [];
 }
 
 function buildFullBenchmarkPolicy(loadedEvidence) {
@@ -485,6 +529,8 @@ function renderMarkdown(value) {
     "## Reported Target Comparison",
     `- Primary reported target: ${value.reportedTargetComparison.primaryTarget?.id ?? "n/a"} (${value.reportedTargetComparison.primaryTarget?.score ?? "n/a"} ${value.reportedTargetComparison.primaryTarget?.scoreUnit ?? ""})`,
     `- Best end-to-end RecallWeave row: ${value.reportedTargetComparison.bestObserved?.strategy ?? "n/a"} (${value.reportedTargetComparison.bestObserved?.score ?? "n/a"})`,
+    `- Best row judge model: ${value.reportedTargetComparison.bestObserved?.judgeModel ?? "n/a"}`,
+    `- Same judge as primary target: ${value.reportedTargetComparison.sameJudgeModelAsPrimaryTarget}`,
     `- Meets reported target: ${value.reportedTargetComparison.meetsPrimaryReportedTarget}`,
     "",
     "## Full Benchmark Policy",
