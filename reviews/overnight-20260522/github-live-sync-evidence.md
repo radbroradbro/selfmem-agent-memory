@@ -191,4 +191,18 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 4fdb777ba06dfe4a79c625883b73e946d95f6c4d3785327cd14b6676c5a164a9
 
+## 2026-05-25 Current-Handoff Refresh
+
+- PR #5 and issue #6 were refreshed again after regenerating the current
+  OpenClaw one-agent handoff packet from controller commit
+  `f21a7e751ddcd0b9e64a96d682a3fa0940c17c11`, while preserving
+  `18d606aff589986b4d8b416a686bedb7ff1506d2` as the approved
+  adapter/report commit for returned one-agent canary evidence.
+- The refreshed live sync check matched the checked-in public-safe drafts.
+- PR body refreshed at: 2026-05-25T22:11:54Z
+- Issue updated at: 2026-05-25T22:11:54Z
+- PR body hash: 779a5fc32bd1e2552f5000867cef555f8d8df837c922318dc176b0bea4e8bd64
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: 0ce76109316c5ca01b2bca19240e4176c57dee65f7e679cdc60e64a3cc8ec5b0
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

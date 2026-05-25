@@ -17,19 +17,19 @@ Purpose:
 - Return only metrics-only evidence.
 
 Send these three current handoff files together:
-- recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip
+- recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip
 - recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md
 - recallweave-SEND-THIS-ONE-checksum.txt
 
 Use the current handoff packet:
-- Zip: recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip
-- SHA-256: f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda
-- Packet generated from controller commit: 18d606aff589986b4d8b416a686bedb7ff1506d2
+- Zip: recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip
+- SHA-256: cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a
+- Packet generated from controller commit: f21a7e751ddcd0b9e64a96d682a3fa0940c17c11
 - Approved adapter commit: 18d606aff589986b4d8b416a686bedb7ff1506d2
 - Expected report commit: 18d606aff589986b4d8b416a686bedb7ff1506d2
 
 Commit note:
-- The packet was generated from controller commit 18d606aff589986b4d8b416a686bedb7ff1506d2.
+- The packet was generated from controller commit f21a7e751ddcd0b9e64a96d682a3fa0940c17c11.
 - The approved adapter/report commit for this canary is 18d606aff589986b4d8b416a686bedb7ff1506d2.
 - If a newer adapter commit should count, regenerate the packet first.
 

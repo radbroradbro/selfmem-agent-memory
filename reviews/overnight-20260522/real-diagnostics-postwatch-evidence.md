@@ -1,7 +1,7 @@
 # Real Diagnostics Post-Watch Evidence
 
 Date: 2026-05-23
-Latest returned-watch refresh: 2026-05-24
+Latest returned-watch refresh: 2026-05-25
 
 ## Scope
 
@@ -17,7 +17,7 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <downloads-
 npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <telegram-download-folder> --allow-failed-inputs --output reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip
 ```
 
 ## Returned Watch Result
@@ -50,10 +50,10 @@ and lacked store latency instrumentation.
 
 ## Fresh Canary Packet
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
-- SHA-256: `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`
+- Packet label: `recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip`
+- SHA-256: `cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a`
 - Packet generated from controller commit:
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`
+  `f21a7e751ddcd0b9e64a96d682a3fa0940c17c11`
 - Approved adapter commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`
 - Entries:

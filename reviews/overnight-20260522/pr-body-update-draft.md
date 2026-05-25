@@ -708,14 +708,14 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Previous verified code baseline before returned downloads supervision:
   `daac851d031d5a2a8c95a307aa7db2a6d2d00762`.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`, SHA256
-  `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`.
+  `recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip`, SHA256
+  `cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a`.
   Send it with `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
   and `recallweave-SEND-THIS-ONE-checksum.txt` so the selected agent can
   verify the exact packet before running it.
   Packet generated from controller commit
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`; approved adapter commit
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
+  `f21a7e751ddcd0b9e64a96d682a3fa0940c17c11`; approved adapter/report
+  commit `18d606aff589986b4d8b416a686bedb7ff1506d2`.
   Returned canary reports must name commit
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
   If a newer adapter commit should count, regenerate the packet first.

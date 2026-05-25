@@ -90,18 +90,18 @@ workspace.
 
 The current selected-agent send set is:
 
-- `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
+- `recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip`
 - `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
 - `recallweave-SEND-THIS-ONE-checksum.txt`
 
 The current handoff packet remains the clearly named sendable packet:
 
 - Zip:
-  `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
+  `recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip`
 - SHA-256:
-  `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`
+  `cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a`
 - Packet generated from controller commit:
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`
+  `f21a7e751ddcd0b9e64a96d682a3fa0940c17c11`
 - Approved adapter commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`
 - Expected returned report commit:
@@ -119,10 +119,10 @@ commit first.
 
 The current standard-inbox scan is
 `reviews/overnight-20260522/returned-downloads-current-scan.md`. It found 0
-production evidence packets, 1 handoff packet, 10 diagnostic bundles, 22
+production evidence packets, 2 handoff packets, 10 diagnostic bundles, 22
 unknown packets, and 0 unreadable packets. That proves the current inbox has
-handoffs and diagnostics only. It does not close the real-container rollout
-blocker. The findings note now includes hash-only safe triage for unknown and
+handoff packets and diagnostics only. It does not close the real-container
+rollout blocker. The findings note now includes hash-only safe triage for unknown and
 unreadable zips, so maintainers can see whether the misses are malformed,
 diagnostic, or non-canary packets before exposing local filenames.
 

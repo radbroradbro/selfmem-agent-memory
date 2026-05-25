@@ -187,6 +187,10 @@ Verdict: resolved for PR body and blocker issue writes.
     containment guard as the latest verified code/product baseline while
     preserving `18d606a` as the approved runtime canary adapter/report commit.
     Updated at: 2026-05-25T02:39:20Z.
+  - PR #5 and issue #6 were refreshed again after regenerating the current
+    OpenClaw one-agent handoff packet for controller commit `f21a7e75` and
+    preserving `18d606a` as the approved runtime canary adapter/report commit
+    in the checked-in drafts. Updated at: 2026-05-25T22:11:54Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
