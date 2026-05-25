@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "provider-challenger-result-gate",
   "status": "BLOCKED_PROVIDER_CHALLENGER_RESULT",
-  "generatedAt": "2026-05-25T18:23:46.289Z",
+  "generatedAt": "2026-05-25T21:59:11.467Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -21,101 +21,79 @@
     "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a"
   },
   "result": {
-    "source": "generated-fixture-provider-challenger-smoke",
-    "path": null,
-    "hash": "sha256:af5e53a8bd7655a62e24ee9a7c18d942a2cf44048c58018e085b0069739aa28b",
-    "fixtureOnly": true,
-    "mode": "public-benchmark-provider-gate",
+    "source": "result-file",
+    "path": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
+    "hash": "sha256:ca8355d8218c8738a3e5cd11123f83466ad8a3779e84874ce2b711c3b76ba1c0",
+    "fixtureOnly": false,
+    "mode": "public-benchmark-answer-quality",
     "benchmark": "longmemeval",
-    "querySetHash": "sha256:b7799e94c2ecb91753e1cce69632cebc99a6a9077a2ef6d2bbd768558d6cf8eb",
-    "materializerHash": null,
-    "queryCount": 3,
+    "querySetHash": "sha256:4386f6fa3280951bffd59b5ae81f067905b1905be3575eff56e2b4168c0ccda7",
+    "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
+    "queryCount": 30,
+    "scoredQueryCount": 30,
     "strategies": [
       "bm25-lite",
-      "full-hybrid-rerank",
-      "cloud-voyage4-voyage",
-      "cloud-gemini-voyage-rerank",
       "cloud-nvidia-nemotron-1b",
-      "local-apple-qwen3-0_6b"
+      "full-hybrid-rerank",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank",
+      "query-expanded-full-hybrid-rerank"
     ],
     "providerArms": [
-      {
-        "strategy": "cloud-voyage4-voyage",
-        "providers": [
-          "voyage"
-        ],
-        "providerCallsMade": 0,
-        "providerMockCalls": 6,
-        "keyCountAvailable": 0
-      },
-      {
-        "strategy": "cloud-gemini-voyage-rerank",
-        "providers": [
-          "gemini",
-          "voyage"
-        ],
-        "providerCallsMade": 0,
-        "providerMockCalls": 6,
-        "keyCountAvailable": 0
-      },
       {
         "strategy": "cloud-nvidia-nemotron-1b",
         "providers": [
           "nvidia"
         ],
-        "providerCallsMade": 0,
-        "providerMockCalls": 6,
-        "keyCountAvailable": 0
+        "providerCallsMade": null,
+        "providerMockCalls": null,
+        "keyCountAvailable": null,
+        "answerQuality": 43.1667
       },
       {
         "strategy": "local-apple-qwen3-0_6b",
         "providers": [
           "local-apple"
         ],
-        "providerCallsMade": 0,
-        "providerMockCalls": 3,
-        "keyCountAvailable": 0
+        "providerCallsMade": null,
+        "providerMockCalls": null,
+        "keyCountAvailable": null,
+        "answerQuality": 26.6667
       }
-    ]
+    ],
+    "providerCallsMade": 480
   },
   "checks": {
     "resultExists": true,
     "modeRecognized": true,
     "metricsOnly": true,
     "publicSafe": true,
-    "fixtureOnlyFalse": false,
-    "retrievalProxyOnly": true,
-    "memoryBenchAnswerQualityFalse": true,
+    "fixtureOnlyFalse": true,
+    "supportedEvidenceType": true,
     "publicClaimsDisabled": true,
     "rawQuestionsExcluded": true,
     "rawAnswersExcluded": true,
     "rawMemoryExcluded": true,
     "rawTranscriptExcluded": true,
-    "sourceLockedTarget": false,
+    "sourceLockedTarget": true,
     "benchmarkMatchesTarget": true,
     "querySetHashPresent": true,
-    "materializerHashPresent": false,
+    "materializerHashPresent": true,
     "bm25ControlPresent": true,
     "fullHybridControlPresent": true,
-    "voyageProviderArmPresent": true,
+    "voyageProviderArmPresent": false,
     "nvidiaOrGeminiProviderArmPresent": true,
     "localAppleProviderArmPresent": true,
     "providerArmsPresent": true,
     "providerArmsAreProviderStrategies": true,
-    "providerConsentProven": false,
-    "liveProviderCallsPresent": false,
-    "providerMockCallsAbsent": false,
-    "keyCountsPresent": false,
+    "providerConsentProven": true,
+    "liveProviderCallsPresent": true,
+    "providerMockCallsAbsent": true,
+    "keyCountsPresent": true,
     "privacyLeakCountersClear": true
   },
   "blockers": [
-    "fixture-result-cannot-count-as-live-provider-ladder",
-    "result-not-bound-to-source-locked-target",
-    "missing-materializer-hash",
-    "provider-live-consent-not-proven",
-    "provider-live-calls-missing",
-    "provider-used-mock-calls",
-    "provider-key-or-endpoint-counts-missing"
+    "missing-voyage-provider-arm"
   ],
   "nextActions": [
     "Run the same-data provider comparison with configured Voyage, NVIDIA or Gemini, and local Apple endpoints.",

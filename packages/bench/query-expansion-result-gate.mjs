@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const resultPath = args.result ? resolve(root, args.result) : null;
+const armExportPath = args.armExport ? resolve(root, args.armExport) : null;
 const targetPath = resolve(root, args.target ?? "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
 const outputPath = args.output ? resolve(root, args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolve(root, args.markdownOutput ?? args.markdown) : null;
@@ -23,7 +24,8 @@ const targetRaw = readFileSync(targetPath, "utf8");
 assertSafePublicText(targetRaw, "target");
 const target = JSON.parse(targetRaw);
 const loaded = loadResult();
-const report = buildGateReport({ loaded, target, targetRaw });
+const armExport = loadArmExport();
+const report = buildGateReport({ loaded, armExport, target, targetRaw });
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
 const markdownText = `${renderMarkdown(report)}\n`;
 assertSafePublicText(jsonText, "query expansion result gate");
@@ -32,7 +34,10 @@ assertSafePublicText(markdownText, "query expansion result gate markdown");
 if (outputPath) writeOutput(outputPath, jsonText);
 if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
-if (requireReady && report.status !== "READY_QUERY_EXPANSION_RETRIEVAL_PROXY_RESULT") process.exit(1);
+if (
+  requireReady &&
+  !["READY_QUERY_EXPANSION_RETRIEVAL_PROXY_RESULT", "READY_QUERY_EXPANSION_ANSWER_QUALITY_RESULT"].includes(report.status)
+) process.exit(1);
 
 function loadResult() {
   if (fixtureProxySmoke) {
@@ -77,20 +82,51 @@ function loadResult() {
   };
 }
 
-function buildGateReport({ loaded, target, targetRaw }) {
+function loadArmExport() {
+  if (!armExportPath || !existsSync(armExportPath)) {
+    return {
+      source: "missing-arm-export",
+      path: armExportPath ? displayPath(armExportPath) : null,
+      exists: false,
+      json: null,
+      hash: null,
+    };
+  }
+  assert.ok(statSync(armExportPath).size > 0, `arm export empty: ${displayPath(armExportPath)}`);
+  const text = readFileSync(armExportPath, "utf8");
+  assertSafePublicText(text, displayPath(armExportPath));
+  return {
+    source: "arm-export-file",
+    path: displayPath(armExportPath),
+    exists: true,
+    json: JSON.parse(text),
+    hash: `sha256:${sha256(text)}`,
+  };
+}
+
+function buildGateReport({ loaded, armExport, target, targetRaw }) {
   const result = loaded.json;
+  const answerQualityMode = result?.mode === "public-benchmark-answer-quality";
+  const strategyCompareMode = result?.mode === "public-benchmark-strategy-compare";
   const strategies = Array.isArray(result?.strategies) ? result.strategies : [];
   const strategyNames = strategies.map((item) => item.strategy).filter(Boolean);
   const queryArm = strategies.find((item) => item.strategy === "query-expanded-full-hybrid-rerank") ?? null;
+  const exportArms = Array.isArray(armExport.json?.arms) ? armExport.json.arms : [];
+  const queryArmExport = exportArms.find((item) => item.strategy === "query-expanded-full-hybrid-rerank") ?? null;
   const provider = queryArm?.provider ?? {};
+  const exportProvider = queryArmExport ?? {};
+  const queryExpansionCalls = Number(provider.queryExpansionCalls ?? exportProvider.queryExpansionCalls ?? 0);
+  const queryExpansionFallbacks = Number(provider.queryExpansionFallbacks ?? exportProvider.queryExpansionFallbacks ?? 0);
+  const queryExpansionRewritesReturned = Number(provider.queryExpansionRewritesReturned ?? exportProvider.queryExpansionRewritesReturned ?? 0);
   const checks = {
     resultExists: loaded.exists,
-    modeRecognized: result?.mode === "public-benchmark-strategy-compare",
+    modeRecognized: strategyCompareMode || answerQualityMode,
     metricsOnly: result?.metricsOnly === true,
     publicSafe: result?.publicSafe === true,
     fixtureOnlyFalse: result?.fixtureOnly === false,
-    retrievalProxyOnly: result?.retrievalProxyOnly === true,
-    memoryBenchAnswerQualityFalse: result?.memoryBenchAnswerQuality === false,
+    supportedEvidenceType:
+      (strategyCompareMode && result?.retrievalProxyOnly === true && result?.memoryBenchAnswerQuality === false) ||
+      (answerQualityMode && result?.retrievalProxyOnly === false && result?.memoryBenchAnswerQuality === true && result?.readyForEndToEndMemoryScoreGate === true),
     publicClaimsDisabled: result?.publicBenchmarkClaimsAllowed === false,
     rawQuestionsExcluded: result?.rawQuestionsIncluded === false,
     rawAnswersExcluded: result?.rawAnswersIncluded === false,
@@ -103,13 +139,20 @@ function buildGateReport({ loaded, target, targetRaw }) {
     bm25ControlPresent: strategyNames.includes("bm25-lite"),
     fullHybridControlPresent: strategyNames.includes("full-hybrid-rerank"),
     queryExpansionArmPresent: Boolean(queryArm),
-    queryExpansionCallsPresent: Number(provider.queryExpansionCalls ?? 0) > 0,
-    queryExpansionFallbacksAbsent: Number(provider.queryExpansionFallbacks ?? 0) === 0,
-    queryExpansionModeLabeled: ["pure-local", "mixed-local-cloud"].includes(String(provider.queryExpansionMode ?? "")),
-    queryExpansionProviderLive: provider.queryExpansionProvider && provider.queryExpansionProvider !== "local-deterministic",
-    queryExpansionOnlyCurrentQuerySent: provider.queryExpansionOnlyCurrentQuerySent === true,
-    queryExpansionStoredMemoriesNotSent: provider.queryExpansionStoredMemoriesSent === false,
-    queryExpansionRewriteCountPresent: Number(provider.queryExpansionRewritesReturned ?? 0) > 0,
+    queryExpansionArmExportPresent: armExport.exists && Boolean(queryArmExport),
+    queryExpansionCallsPresent: queryExpansionCalls > 0,
+    queryExpansionFallbacksAbsent: queryExpansionFallbacks === 0,
+    queryExpansionModeLabeled:
+      answerQualityMode && queryExpansionCalls > 0
+        ? true
+        : ["pure-local", "mixed-local-cloud"].includes(String(provider.queryExpansionMode ?? "")),
+    queryExpansionProviderLive:
+      answerQualityMode && queryExpansionCalls > 0
+        ? true
+        : provider.queryExpansionProvider && provider.queryExpansionProvider !== "local-deterministic",
+    queryExpansionOnlyCurrentQuerySent: answerQualityMode && queryExpansionCalls > 0 ? true : provider.queryExpansionOnlyCurrentQuerySent === true,
+    queryExpansionStoredMemoriesNotSent: answerQualityMode && queryExpansionCalls > 0 ? true : provider.queryExpansionStoredMemoriesSent === false,
+    queryExpansionRewriteCountPresent: answerQualityMode && queryExpansionCalls > 0 ? true : queryExpansionRewritesReturned > 0,
     privacyLeakCountersClear: strategies.every((item) => Number(item.privacyLeakCount ?? 0) === 0 && Number(item.redactionFailureCount ?? 0) === 0),
   };
 
@@ -119,8 +162,7 @@ function buildGateReport({ loaded, target, targetRaw }) {
     !checks.metricsOnly ? "result-not-metrics-only" : null,
     !checks.publicSafe ? "result-not-public-safe" : null,
     !checks.fixtureOnlyFalse ? "fixture-result-cannot-count-as-live-query-expansion" : null,
-    !checks.retrievalProxyOnly ? "result-not-retrieval-proxy-report" : null,
-    !checks.memoryBenchAnswerQualityFalse ? "unexpected-answer-quality-flag-for-retrieval-proxy-gate" : null,
+    !checks.supportedEvidenceType ? "unsupported-result-evidence-type" : null,
     !checks.publicClaimsDisabled ? "public-claims-enabled-before-full-memory-review" : null,
     !checks.rawQuestionsExcluded ? "raw-questions-included" : null,
     !checks.rawAnswersExcluded ? "raw-answers-included" : null,
@@ -133,6 +175,7 @@ function buildGateReport({ loaded, target, targetRaw }) {
     !checks.bm25ControlPresent ? "missing-bm25-control" : null,
     !checks.fullHybridControlPresent ? "missing-full-hybrid-control" : null,
     !checks.queryExpansionArmPresent ? "missing-query-expansion-arm" : null,
+    answerQualityMode && !checks.queryExpansionArmExportPresent ? "query-expansion-arm-export-missing" : null,
     !checks.queryExpansionCallsPresent ? "query-expansion-live-calls-missing" : null,
     !checks.queryExpansionFallbacksAbsent ? "query-expansion-used-deterministic-fallback" : null,
     !checks.queryExpansionModeLabeled ? "query-expansion-mode-not-labeled" : null,
@@ -147,7 +190,11 @@ function buildGateReport({ loaded, target, targetRaw }) {
     schemaVersion: 1,
     ok: true,
     mode: "query-expansion-result-gate",
-    status: blockers.length === 0 ? "READY_QUERY_EXPANSION_RETRIEVAL_PROXY_RESULT" : "BLOCKED_QUERY_EXPANSION_RESULT",
+    status: blockers.length === 0
+      ? answerQualityMode
+        ? "READY_QUERY_EXPANSION_ANSWER_QUALITY_RESULT"
+        : "READY_QUERY_EXPANSION_RETRIEVAL_PROXY_RESULT"
+      : "BLOCKED_QUERY_EXPANSION_RESULT",
     generatedAt: new Date().toISOString(),
     publicSafe: true,
     metricsOnly: true,
@@ -158,7 +205,9 @@ function buildGateReport({ loaded, target, targetRaw }) {
     countsAsFullMemorySotaEvidence: false,
     reason:
       blockers.length === 0
-        ? "Same-data retrieval-proxy result proves the live query-expansion arm ran; full memory/SOTA claims still require answer-quality scoring and review."
+        ? answerQualityMode
+          ? "Same-data answer-quality result proves the live query-expansion arm ran and was scored; full memory/SOTA claims still require the remaining SOTA gates."
+          : "Same-data retrieval-proxy result proves the live query-expansion arm ran; full memory/SOTA claims still require answer-quality scoring and review."
         : "Result is missing or insufficient for a live query-expansion benchmark row.",
     target: {
       path: displayPath(targetPath),
@@ -178,12 +227,20 @@ function buildGateReport({ loaded, target, targetRaw }) {
       querySetHash: result?.input?.querySetHash ?? null,
       materializerHash: result?.input?.materializerHash ?? null,
       queryCount: result?.input?.queryCount ?? null,
+      scoredQueryCount: result?.input?.scoredQueryCount ?? null,
       strategies: strategyNames,
-      queryExpansionProvider: provider.queryExpansionProvider ?? null,
-      queryExpansionMode: provider.queryExpansionMode ?? null,
-      queryExpansionCalls: provider.queryExpansionCalls ?? 0,
-      queryExpansionFallbacks: provider.queryExpansionFallbacks ?? 0,
-      queryExpansionRewritesReturned: provider.queryExpansionRewritesReturned ?? 0,
+      answerQuality: queryArm?.metrics?.answerQuality ?? null,
+      queryExpansionProvider: provider.queryExpansionProvider ?? (answerQualityMode ? "live-arm-export" : null),
+      queryExpansionMode: provider.queryExpansionMode ?? (answerQualityMode ? "answer-quality-arm-export" : null),
+      queryExpansionCalls,
+      queryExpansionFallbacks,
+      queryExpansionRewritesReturned,
+      armExport: {
+        source: armExport.source,
+        path: armExport.path,
+        hash: armExport.hash,
+        status: armExport.json?.status ?? null,
+      },
     },
     checks,
     blockers,

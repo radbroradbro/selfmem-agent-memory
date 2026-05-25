@@ -146,8 +146,9 @@ Follow-up implementation evidence on 2026-05-25:
   reviewer-binding step for the exact metrics-only answer-quality packet.
   Evidence is checked in at
   `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`;
-  it currently blocks because the only local answer-quality result is a
-  fixture smoke and there are no two independent bound approvals.
+  it is ready for the current combined same-data answer-quality packet with
+  two independent bound approvals. Those approvals must be refreshed if the
+  combined result hash changes.
 - The live answer-quality output may contain strategy names, hashes, aggregate
   answer-quality metrics, judge-correct rate, latency, context-token counts,
   provider endpoint labels, cost, and privacy counters. It must not contain raw
@@ -172,9 +173,17 @@ Follow-up provider evidence on 2026-05-25:
   `local-apple-qwen3-0_6b-local-rerank` result of `36` on the current local
   answer-quality judge. Evidence:
   `reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json`.
+- Two independent memory-score reviewers have approved the current combined
+  metrics-only packet. Evidence:
+  `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`.
+- The query-expansion and local-rerank component gates now recognize the live
+  same-data answer-quality evidence while keeping broad SOTA claims disabled.
+  Evidence:
+  `reviews/overnight-20260522/query-expansion-result-gate-20260525.json` and
+  `reviews/overnight-20260522/local-rerank-result-gate-20260525.json`.
 - This is progress, not launch clearance. The current ladder still lacks a
-  same-data Voyage answer-quality row, two independent reviewers, UI/docs
-  refresh against the final result, and owner approval.
+  same-data Voyage answer-quality row, final UI/docs refresh after any changed
+  result hash, real rollout evidence, and owner approval.
 
 ## Claim Boundary
 
@@ -188,8 +197,10 @@ Allowed claim shape:
 - BM25-lite is a lexical control and fallback, not the final design.
 - Live provider/local arms are opt-in and fail closed without explicit public
   data consent plus env-only provider or local endpoint readiness.
-- Existing provider and local Apple evidence is retrieval-proxy evidence, not a
-  full MemoryBench or end-to-end memory score.
+- Existing local Apple, query-expansion, and non-Voyage provider rows include
+  same-data answer-quality evidence. They still do not authorize public SOTA or
+  Supermemory-replacement wording because the Voyage arm, real rollout, and
+  owner approval gates remain open.
 
 Blocked claim shape:
 

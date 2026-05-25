@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T21:45:11.277Z",
+  "generatedAt": "2026-05-25T21:59:11.575Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -144,17 +144,11 @@
     "providerChallengerResultGate": {
       "evidencePath": "reviews/overnight-20260522/provider-challenger-result-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:75621fba8e051ed927a8334c8b62e82120890a02d25703254d09693f0dba41e2",
+      "evidenceHash": "sha256:1609fe3856636764f7624dfe7b913ba0bf51edbb477c0c7f737715bc41018016",
       "status": "BLOCKED_PROVIDER_CHALLENGER_RESULT",
       "countsAsLiveProviderChallengerBenchmark": false,
       "blockers": [
-        "fixture-result-cannot-count-as-live-provider-ladder",
-        "result-not-bound-to-source-locked-target",
-        "missing-materializer-hash",
-        "provider-live-consent-not-proven",
-        "provider-live-calls-missing",
-        "provider-used-mock-calls",
-        "provider-key-or-endpoint-counts-missing"
+        "missing-voyage-provider-arm"
       ]
     },
     "endToEndMemoryScoreGate": {
@@ -261,18 +255,10 @@
     "localRerankResultGate": {
       "evidencePath": "reviews/overnight-20260522/local-rerank-result-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:4996fa1bfcfc3a6f8bdbbf7c91694f4b14fea7805d0ff72ac40cbd449efe6119",
-      "status": "BLOCKED_LOCAL_RERANK_RESULT",
-      "countsAsLiveLocalRerankBenchmark": false,
-      "blockers": [
-        "fixture-result-cannot-count-as-live-local-rerank",
-        "result-not-bound-to-source-locked-target",
-        "missing-materializer-hash",
-        "local-rerank-live-consent-not-proven",
-        "local-rerank-live-calls-missing",
-        "local-rerank-used-mock-calls",
-        "local-rerank-endpoints-not-proven"
-      ]
+      "evidenceHash": "sha256:a4b9a9e9987423bc6cc4bc249de4cef70fd48eb19e19db84b288f7d780766153",
+      "status": "READY_LOCAL_RERANK_ANSWER_QUALITY_RESULT",
+      "countsAsLiveLocalRerankBenchmark": true,
+      "blockers": []
     },
     "queryExpansionLiveLocalSmoke": {
       "evidencePath": "reviews/overnight-20260522/query-expansion-live-local-smoke-20260525.json",
@@ -284,19 +270,10 @@
     "queryExpansionResultGate": {
       "evidencePath": "reviews/overnight-20260522/query-expansion-result-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:f1dfc6d67c55026fca6e31cf4e1ee52edf1b9de7ff42f82515d579864f1cea7f",
-      "status": "BLOCKED_QUERY_EXPANSION_RESULT",
-      "countsAsLiveQueryExpansionBenchmark": false,
-      "blockers": [
-        "fixture-result-cannot-count-as-live-query-expansion",
-        "result-not-bound-to-source-locked-target",
-        "missing-materializer-hash",
-        "query-expansion-live-calls-missing",
-        "query-expansion-used-deterministic-fallback",
-        "query-expansion-mode-not-labeled",
-        "query-expansion-provider-not-live",
-        "query-expansion-rewrite-count-missing"
-      ]
+      "evidenceHash": "sha256:22def751a4dbbdfb822b190168aee3706fa58e19dc46b46ddde7e2d8b4429ddb",
+      "status": "READY_QUERY_EXPANSION_ANSWER_QUALITY_RESULT",
+      "countsAsLiveQueryExpansionBenchmark": true,
+      "blockers": []
     },
     "queryExpansionImplementation": {
       "strategy": "query-expanded-full-hybrid-rerank",

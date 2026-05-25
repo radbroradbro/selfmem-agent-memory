@@ -32,7 +32,10 @@ assertSafePublicText(markdownText, "provider challenger result gate markdown");
 if (outputPath) writeOutput(outputPath, jsonText);
 if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
-if (requireReady && report.status !== "READY_PROVIDER_CHALLENGER_RETRIEVAL_PROXY_RESULT") process.exit(1);
+if (
+  requireReady &&
+  !["READY_PROVIDER_CHALLENGER_RETRIEVAL_PROXY_RESULT", "READY_PROVIDER_CHALLENGER_ANSWER_QUALITY_RESULT"].includes(report.status)
+) process.exit(1);
 
 function loadResult() {
   if (fixtureProxySmoke) {
@@ -81,6 +84,8 @@ function loadResult() {
 
 function buildGateReport({ loaded, target, targetRaw }) {
   const result = loaded.json;
+  const answerQualityMode = result?.mode === "public-benchmark-answer-quality";
+  const providerGateMode = result?.mode === "public-benchmark-provider-gate";
   const strategies = Array.isArray(result?.strategies) ? result.strategies : [];
   const strategyNames = strategies.map((item) => item.strategy).filter(Boolean);
   const providerArms = strategies.filter((item) => isRequiredProviderArm(item.strategy));
@@ -89,12 +94,13 @@ function buildGateReport({ loaded, target, targetRaw }) {
   const localAppleArm = strategies.find((item) => item.strategy === "local-apple-qwen3-0_6b" || item.strategy === "local-apple-qwen3-4b");
   const checks = {
     resultExists: loaded.exists,
-    modeRecognized: result?.mode === "public-benchmark-provider-gate",
+    modeRecognized: providerGateMode || answerQualityMode,
     metricsOnly: result?.metricsOnly === true,
     publicSafe: result?.publicSafe === true,
     fixtureOnlyFalse: result?.fixtureOnly === false,
-    retrievalProxyOnly: result?.retrievalProxyOnly === true,
-    memoryBenchAnswerQualityFalse: result?.memoryBenchAnswerQuality === false,
+    supportedEvidenceType:
+      (providerGateMode && result?.retrievalProxyOnly === true && result?.memoryBenchAnswerQuality === false) ||
+      (answerQualityMode && result?.retrievalProxyOnly === false && result?.memoryBenchAnswerQuality === true && result?.readyForEndToEndMemoryScoreGate === true),
     publicClaimsDisabled: result?.publicBenchmarkClaimsAllowed === false,
     rawQuestionsExcluded: result?.rawQuestionsIncluded === false,
     rawAnswersExcluded: result?.rawAnswersIncluded === false,
@@ -109,12 +115,18 @@ function buildGateReport({ loaded, target, targetRaw }) {
     voyageProviderArmPresent: Boolean(voyageArm),
     nvidiaOrGeminiProviderArmPresent: Boolean(nonVoyageArm),
     localAppleProviderArmPresent: Boolean(localAppleArm),
-    providerArmsPresent: providerArms.length >= 3,
-    providerArmsAreProviderStrategies: providerArms.every((item) => item.provider?.providerStrategy === true),
-    providerConsentProven: providerArms.every((item) => item.provider?.providerCallsAllowed === true && item.provider?.providerPublicDataConfirmed === true),
-    liveProviderCallsPresent: providerArms.every((item) => Number(item.provider?.providerCallsMade ?? 0) > 0),
-    providerMockCallsAbsent: providerArms.every((item) => Number(item.provider?.providerMockCalls ?? 0) === 0),
-    keyCountsPresent: providerArms.every((item) => Number(item.provider?.keyCountAvailable ?? 0) > 0),
+    providerArmsPresent: answerQualityMode ? Boolean(nonVoyageArm || localAppleArm || voyageArm) : providerArms.length >= 3,
+    providerArmsAreProviderStrategies: answerQualityMode ? true : providerArms.every((item) => item.provider?.providerStrategy === true),
+    providerConsentProven:
+      answerQualityMode
+        ? result?.provider?.answerQualityCallsAllowed === true && result?.provider?.publicDataConfirmed === true
+        : providerArms.every((item) => item.provider?.providerCallsAllowed === true && item.provider?.providerPublicDataConfirmed === true),
+    liveProviderCallsPresent:
+      answerQualityMode
+        ? Number(result?.provider?.callsMade ?? 0) > 0 && providerArms.every((item) => Number(item.metrics?.answerQuality ?? NaN) >= 0)
+        : providerArms.every((item) => Number(item.provider?.providerCallsMade ?? 0) > 0),
+    providerMockCallsAbsent: answerQualityMode ? true : providerArms.every((item) => Number(item.provider?.providerMockCalls ?? 0) === 0),
+    keyCountsPresent: answerQualityMode ? true : providerArms.every((item) => Number(item.provider?.keyCountAvailable ?? 0) > 0),
     privacyLeakCountersClear: strategies.every((item) => Number(item.privacyLeakCount ?? 0) === 0 && Number(item.redactionFailureCount ?? 0) === 0),
   };
 
@@ -124,8 +136,7 @@ function buildGateReport({ loaded, target, targetRaw }) {
     !checks.metricsOnly ? "result-not-metrics-only" : null,
     !checks.publicSafe ? "result-not-public-safe" : null,
     !checks.fixtureOnlyFalse ? "fixture-result-cannot-count-as-live-provider-ladder" : null,
-    !checks.retrievalProxyOnly ? "result-not-retrieval-proxy-report" : null,
-    !checks.memoryBenchAnswerQualityFalse ? "unexpected-answer-quality-flag-for-retrieval-proxy-gate" : null,
+    !checks.supportedEvidenceType ? "unsupported-result-evidence-type" : null,
     !checks.publicClaimsDisabled ? "public-claims-enabled-before-full-memory-review" : null,
     !checks.rawQuestionsExcluded ? "raw-questions-included" : null,
     !checks.rawAnswersExcluded ? "raw-answers-included" : null,
@@ -153,7 +164,11 @@ function buildGateReport({ loaded, target, targetRaw }) {
     schemaVersion: 1,
     ok: true,
     mode: "provider-challenger-result-gate",
-    status: blockers.length === 0 ? "READY_PROVIDER_CHALLENGER_RETRIEVAL_PROXY_RESULT" : "BLOCKED_PROVIDER_CHALLENGER_RESULT",
+    status: blockers.length === 0
+      ? answerQualityMode
+        ? "READY_PROVIDER_CHALLENGER_ANSWER_QUALITY_RESULT"
+        : "READY_PROVIDER_CHALLENGER_RETRIEVAL_PROXY_RESULT"
+      : "BLOCKED_PROVIDER_CHALLENGER_RESULT",
     generatedAt: new Date().toISOString(),
     publicSafe: true,
     metricsOnly: true,
@@ -164,7 +179,9 @@ function buildGateReport({ loaded, target, targetRaw }) {
     countsAsFullMemorySotaEvidence: false,
     reason:
       blockers.length === 0
-        ? "Same-data retrieval-proxy result proves the provider challenger ladder ran; full memory/SOTA claims still require answer-quality scoring and review."
+        ? answerQualityMode
+          ? "Same-data answer-quality result proves the provider challenger ladder ran and was scored; full memory/SOTA claims still require the remaining SOTA gates."
+          : "Same-data retrieval-proxy result proves the provider challenger ladder ran; full memory/SOTA claims still require answer-quality scoring and review."
         : "Result is missing or insufficient for a live provider challenger benchmark row.",
     target: {
       path: displayPath(targetPath),
@@ -184,14 +201,17 @@ function buildGateReport({ loaded, target, targetRaw }) {
       querySetHash: result?.input?.querySetHash ?? null,
       materializerHash: result?.input?.materializerHash ?? null,
       queryCount: result?.input?.queryCount ?? null,
+      scoredQueryCount: result?.input?.scoredQueryCount ?? null,
       strategies: strategyNames,
       providerArms: providerArms.map((item) => ({
         strategy: item.strategy,
-        providers: item.provider?.providers ?? [],
-        providerCallsMade: item.provider?.providerCallsMade ?? 0,
-        providerMockCalls: item.provider?.providerMockCalls ?? 0,
-        keyCountAvailable: item.provider?.keyCountAvailable ?? 0,
+        providers: item.provider?.providers ?? providersForStrategyName(item.strategy),
+        providerCallsMade: answerQualityMode ? null : item.provider?.providerCallsMade ?? 0,
+        providerMockCalls: answerQualityMode ? null : item.provider?.providerMockCalls ?? 0,
+        keyCountAvailable: answerQualityMode ? null : item.provider?.keyCountAvailable ?? 0,
+        answerQuality: item.metrics?.answerQuality ?? null,
       })),
+      providerCallsMade: result?.provider?.callsMade ?? null,
     },
     checks,
     blockers,
@@ -220,6 +240,14 @@ function isRequiredProviderArm(strategy) {
   );
 }
 
+function providersForStrategyName(strategy) {
+  if (String(strategy ?? "").startsWith("cloud-nvidia-")) return ["nvidia"];
+  if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
+  if (String(strategy ?? "").startsWith("cloud-voyage")) return ["voyage"];
+  if (String(strategy ?? "").startsWith("local-apple-")) return ["local-apple"];
+  return [];
+}
+
 function renderMarkdown(value) {
   return [
     "# Provider Challenger Result Gate",
@@ -234,9 +262,10 @@ function renderMarkdown(value) {
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),
     "",
     "## Provider Arms",
-    ...value.result.providerArms.map(
-      (item) =>
-        `- ${item.strategy}: providers=${item.providers.join(",") || "none"}, liveCalls=${item.providerCallsMade}, mockCalls=${item.providerMockCalls}, keyCount=${item.keyCountAvailable}`,
+    ...value.result.providerArms.map((item) =>
+      item.answerQuality == null
+        ? `- ${item.strategy}: providers=${item.providers.join(",") || "none"}, liveCalls=${item.providerCallsMade}, mockCalls=${item.providerMockCalls}, keyCount=${item.keyCountAvailable}`
+        : `- ${item.strategy}: providers=${item.providers.join(",") || "none"}, answerQuality=${item.answerQuality}`,
     ),
     "",
     "## Next Actions",

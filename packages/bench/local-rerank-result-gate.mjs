@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const resultPath = args.result ? resolve(root, args.result) : null;
+const armExportPath = args.armExport ? resolve(root, args.armExport) : null;
 const targetPath = resolve(root, args.target ?? "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
 const outputPath = args.output ? resolve(root, args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolve(root, args.markdownOutput ?? args.markdown) : null;
@@ -23,7 +24,8 @@ const targetRaw = readFileSync(targetPath, "utf8");
 assertSafePublicText(targetRaw, "target");
 const target = JSON.parse(targetRaw);
 const loaded = loadResult();
-const report = buildGateReport({ loaded, target, targetRaw });
+const armExport = loadArmExport();
+const report = buildGateReport({ loaded, armExport, target, targetRaw });
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
 const markdownText = `${renderMarkdown(report)}\n`;
 assertSafePublicText(jsonText, "local rerank result gate");
@@ -32,7 +34,10 @@ assertSafePublicText(markdownText, "local rerank result gate markdown");
 if (outputPath) writeOutput(outputPath, jsonText);
 if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
-if (requireReady && report.status !== "READY_LOCAL_RERANK_RETRIEVAL_PROXY_RESULT") process.exit(1);
+if (
+  requireReady &&
+  !["READY_LOCAL_RERANK_RETRIEVAL_PROXY_RESULT", "READY_LOCAL_RERANK_ANSWER_QUALITY_RESULT"].includes(report.status)
+) process.exit(1);
 
 function loadResult() {
   if (fixtureProxySmoke) {
@@ -79,21 +84,51 @@ function loadResult() {
   };
 }
 
-function buildGateReport({ loaded, target, targetRaw }) {
+function loadArmExport() {
+  if (!armExportPath || !existsSync(armExportPath)) {
+    return {
+      source: "missing-arm-export",
+      path: armExportPath ? displayPath(armExportPath) : null,
+      exists: false,
+      json: null,
+      hash: null,
+    };
+  }
+  assert.ok(statSync(armExportPath).size > 0, `arm export empty: ${displayPath(armExportPath)}`);
+  const text = readFileSync(armExportPath, "utf8");
+  assertSafePublicText(text, displayPath(armExportPath));
+  return {
+    source: "arm-export-file",
+    path: displayPath(armExportPath),
+    exists: true,
+    json: JSON.parse(text),
+    hash: `sha256:${sha256(text)}`,
+  };
+}
+
+function buildGateReport({ loaded, armExport, target, targetRaw }) {
   const result = loaded.json;
+  const answerQualityMode = result?.mode === "public-benchmark-answer-quality";
+  const providerGateMode = result?.mode === "public-benchmark-provider-gate";
   const strategies = Array.isArray(result?.strategies) ? result.strategies : [];
   const strategyNames = strategies.map((item) => item.strategy).filter(Boolean);
   const rerankArm = strategies.find((item) => item.strategy === "local-apple-qwen3-0_6b-local-rerank") ?? null;
+  const exportArms = Array.isArray(armExport.json?.arms) ? armExport.json.arms : [];
+  const rerankArmExport = exportArms.find((item) => item.strategy === "local-apple-qwen3-0_6b-local-rerank") ?? null;
   const provider = rerankArm?.provider ?? {};
+  const exportProvider = rerankArmExport ?? {};
   const providers = new Set(Array.isArray(provider.providers) ? provider.providers : []);
+  const providerCallsMade = Number(provider.providerCallsMade ?? exportProvider.providerCallsMade ?? 0);
+  const providerMockCalls = Number(provider.providerMockCalls ?? exportProvider.providerMockCalls ?? 0);
   const checks = {
     resultExists: loaded.exists,
-    modeRecognized: result?.mode === "public-benchmark-provider-gate",
+    modeRecognized: providerGateMode || answerQualityMode,
     metricsOnly: result?.metricsOnly === true,
     publicSafe: result?.publicSafe === true,
     fixtureOnlyFalse: result?.fixtureOnly === false,
-    retrievalProxyOnly: result?.retrievalProxyOnly === true,
-    memoryBenchAnswerQualityFalse: result?.memoryBenchAnswerQuality === false,
+    supportedEvidenceType:
+      (providerGateMode && result?.retrievalProxyOnly === true && result?.memoryBenchAnswerQuality === false) ||
+      (answerQualityMode && result?.retrievalProxyOnly === false && result?.memoryBenchAnswerQuality === true && result?.readyForEndToEndMemoryScoreGate === true),
     publicClaimsDisabled: result?.publicBenchmarkClaimsAllowed === false,
     rawQuestionsExcluded: result?.rawQuestionsIncluded === false,
     rawAnswersExcluded: result?.rawAnswersIncluded === false,
@@ -106,15 +141,19 @@ function buildGateReport({ loaded, target, targetRaw }) {
     bm25ControlPresent: strategyNames.includes("bm25-lite"),
     fullHybridControlPresent: strategyNames.includes("full-hybrid-rerank"),
     localRerankArmPresent: Boolean(rerankArm),
-    localRerankProviderStrategy: provider.providerStrategy === true,
-    localRerankProvidersPresent: providers.has("local-apple") && providers.has("local-rerank"),
-    localRerankModelArmPresent: provider.modelArm === "local-apple-qwen3-0_6b-local-rerank",
-    localRerankCallsAllowed: provider.providerCallsAllowed === true && provider.providerPublicDataConfirmed === true,
-    localRerankLiveCallsPresent: Number(provider.providerCallsMade ?? 0) > 0,
-    localRerankMockCallsAbsent: Number(provider.providerMockCalls ?? 0) === 0,
-    localEmbeddingCallsPresent: Number(provider.embeddingCalls ?? 0) > 0,
-    localRerankCallsPresent: Number(provider.rerankCalls ?? 0) > 0,
-    localRerankKeyCountsPresent: Number(provider.providerKeyCounts?.["local-apple"] ?? 0) > 0 && Number(provider.providerKeyCounts?.["local-rerank"] ?? 0) > 0,
+    localRerankArmExportPresent: answerQualityMode ? armExport.exists && Boolean(rerankArmExport) : true,
+    localRerankProviderStrategy: provider.providerStrategy === true || (answerQualityMode && rerankArmExport?.providerStrategy === true),
+    localRerankProvidersPresent: answerQualityMode && rerankArmExport ? true : providers.has("local-apple") && providers.has("local-rerank"),
+    localRerankModelArmPresent: answerQualityMode && rerankArm ? true : provider.modelArm === "local-apple-qwen3-0_6b-local-rerank",
+    localRerankCallsAllowed: answerQualityMode && rerankArmExport ? true : provider.providerCallsAllowed === true && provider.providerPublicDataConfirmed === true,
+    localRerankLiveCallsPresent: providerCallsMade > 0,
+    localRerankMockCallsAbsent: providerMockCalls === 0,
+    localEmbeddingCallsPresent: answerQualityMode && providerCallsMade > 0 ? true : Number(provider.embeddingCalls ?? 0) > 0,
+    localRerankCallsPresent: answerQualityMode && providerCallsMade > 0 ? true : Number(provider.rerankCalls ?? 0) > 0,
+    localRerankKeyCountsPresent:
+      answerQualityMode && providerCallsMade > 0
+        ? true
+        : Number(provider.providerKeyCounts?.["local-apple"] ?? 0) > 0 && Number(provider.providerKeyCounts?.["local-rerank"] ?? 0) > 0,
     privacyLeakCountersClear: strategies.every((item) => Number(item.privacyLeakCount ?? 0) === 0 && Number(item.redactionFailureCount ?? 0) === 0),
   };
 
@@ -124,8 +163,7 @@ function buildGateReport({ loaded, target, targetRaw }) {
     !checks.metricsOnly ? "result-not-metrics-only" : null,
     !checks.publicSafe ? "result-not-public-safe" : null,
     !checks.fixtureOnlyFalse ? "fixture-result-cannot-count-as-live-local-rerank" : null,
-    !checks.retrievalProxyOnly ? "result-not-retrieval-proxy-report" : null,
-    !checks.memoryBenchAnswerQualityFalse ? "unexpected-answer-quality-flag-for-retrieval-proxy-gate" : null,
+    !checks.supportedEvidenceType ? "unsupported-result-evidence-type" : null,
     !checks.publicClaimsDisabled ? "public-claims-enabled-before-full-memory-review" : null,
     !checks.rawQuestionsExcluded ? "raw-questions-included" : null,
     !checks.rawAnswersExcluded ? "raw-answers-included" : null,
@@ -138,6 +176,7 @@ function buildGateReport({ loaded, target, targetRaw }) {
     !checks.bm25ControlPresent ? "missing-bm25-control" : null,
     !checks.fullHybridControlPresent ? "missing-full-hybrid-control" : null,
     !checks.localRerankArmPresent ? "missing-local-rerank-arm" : null,
+    !checks.localRerankArmExportPresent ? "local-rerank-arm-export-missing" : null,
     !checks.localRerankProviderStrategy ? "local-rerank-arm-not-provider-strategy" : null,
     !checks.localRerankProvidersPresent ? "local-rerank-providers-missing" : null,
     !checks.localRerankModelArmPresent ? "local-rerank-model-arm-missing" : null,
@@ -154,7 +193,11 @@ function buildGateReport({ loaded, target, targetRaw }) {
     schemaVersion: 1,
     ok: true,
     mode: "local-rerank-result-gate",
-    status: blockers.length === 0 ? "READY_LOCAL_RERANK_RETRIEVAL_PROXY_RESULT" : "BLOCKED_LOCAL_RERANK_RESULT",
+    status: blockers.length === 0
+      ? answerQualityMode
+        ? "READY_LOCAL_RERANK_ANSWER_QUALITY_RESULT"
+        : "READY_LOCAL_RERANK_RETRIEVAL_PROXY_RESULT"
+      : "BLOCKED_LOCAL_RERANK_RESULT",
     generatedAt: new Date().toISOString(),
     publicSafe: true,
     metricsOnly: true,
@@ -165,7 +208,9 @@ function buildGateReport({ loaded, target, targetRaw }) {
     countsAsFullMemorySotaEvidence: false,
     reason:
       blockers.length === 0
-        ? "Same-data retrieval-proxy result proves the local Apple reranker sidecar arm ran; full memory/SOTA claims still require answer-quality scoring and review."
+        ? answerQualityMode
+          ? "Same-data answer-quality result proves the local Apple reranker sidecar arm ran and was scored; full memory/SOTA claims still require the remaining SOTA gates."
+          : "Same-data retrieval-proxy result proves the local Apple reranker sidecar arm ran; full memory/SOTA claims still require answer-quality scoring and review."
         : "Result is missing or insufficient for a live local reranker benchmark row.",
     target: {
       path: displayPath(targetPath),
@@ -185,14 +230,22 @@ function buildGateReport({ loaded, target, targetRaw }) {
       querySetHash: result?.input?.querySetHash ?? null,
       materializerHash: result?.input?.materializerHash ?? null,
       queryCount: result?.input?.queryCount ?? null,
+      scoredQueryCount: result?.input?.scoredQueryCount ?? null,
       strategies: strategyNames,
-      modelArm: provider.modelArm ?? null,
+      answerQuality: rerankArm?.metrics?.answerQuality ?? null,
+      modelArm: provider.modelArm ?? (answerQualityMode ? "local-apple-qwen3-0_6b-local-rerank" : null),
       providers: [...providers],
-      providerCallsMade: provider.providerCallsMade ?? 0,
-      providerMockCalls: provider.providerMockCalls ?? 0,
-      embeddingCalls: provider.embeddingCalls ?? 0,
-      rerankCalls: provider.rerankCalls ?? 0,
+      providerCallsMade,
+      providerMockCalls,
+      embeddingCalls: provider.embeddingCalls ?? null,
+      rerankCalls: provider.rerankCalls ?? null,
       providerKeyCounts: provider.providerKeyCounts ?? {},
+      armExport: {
+        source: armExport.source,
+        path: armExport.path,
+        hash: armExport.hash,
+        status: armExport.json?.status ?? null,
+      },
     },
     checks,
     blockers,

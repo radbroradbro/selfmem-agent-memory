@@ -26,9 +26,9 @@
 - Answer-quality preflight: READY_FOR_LIVE_ANSWER_QUALITY
 - Answer-quality harness smoke: public-benchmark-answer-quality
 - Local rerank evidence: true
-- Local rerank result gate: BLOCKED_LOCAL_RERANK_RESULT
+- Local rerank result gate: READY_LOCAL_RERANK_ANSWER_QUALITY_RESULT
 - Query expansion local smoke: true
-- Query expansion result gate: BLOCKED_QUERY_EXPANSION_RESULT
+- Query expansion result gate: READY_QUERY_EXPANSION_ANSWER_QUALITY_RESULT
 - Live LLM query expansion proven: true
 
 ## Operator Flow
