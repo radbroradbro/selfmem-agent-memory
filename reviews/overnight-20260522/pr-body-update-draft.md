@@ -221,26 +221,31 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-  `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`.
+  `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`.
 - Commit `dbac92e7428904a044754de30b7e11189aedeb9c` added public-safe local
   Apple benchmark preflight evidence and corrected the local-model wording so
   the repo does not imply a live local reranker has already been tested. Local
   `release:check`, `release:github-sync`, and `goal:audit` passed after that
   update. It does not change the approved runtime canary adapter/report commit.
-- GitHub Actions run `26367018906`: passed CI after adding the same-data Voyage
-  latency comparison gate. This does not change the approved runtime canary
-  adapter/report commit.
+- Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` recorded live local
+  Apple provider runs for Qwen3 Embedding 0.6B and Qwen3 Embedding 4B on the
+  same 30-query public LongMemEval-S retrieval-proxy target. Both local arms
+  tied BM25 quality on this slice, but the 4B arm added latency and did not
+  earn promotion. This is useful local fallback evidence, not public SOTA proof.
+- GitHub Actions run `26377087807`: passed CI after recording the local Apple
+  provider runs. This does not change the approved runtime canary adapter/report
+  commit.
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-  `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`.
-- GitHub Actions run `26367018906`: passed CI with release checks, release
-  doctor, live GitHub sync, goal audit, secret scan, and private-path scan
+  `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`.
+- GitHub Actions run `26377087807`: passed CI with release checks, live GitHub
+  sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
-  beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice, and
-  requires returned one-agent canary packets to report the approved runtime
-  adapter commit.
+  beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
+  records Qwen3 0.6B and 4B local Apple runs, and requires returned one-agent
+  canary packets to report the approved runtime adapter commit.
 - Current live Voyage provider evidence now includes both a 6-query and
   30-query source-locked public LongMemEval-S canary comparing `bm25-lite`,
   `full-hybrid-rerank`, and live `cloud-voyage4-voyage`. Voyage beat BM25 on

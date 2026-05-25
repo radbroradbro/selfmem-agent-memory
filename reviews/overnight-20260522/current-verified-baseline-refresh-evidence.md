@@ -16,24 +16,27 @@ gate and keeps it as retrieval-proxy evidence, not a MemoryBench/SOTA claim.
 The latest observed PR-head refresh also adds public benchmark caveat updates
 and a local Apple preflight packet. It keeps the local Apple lane explicit:
 scaffolded and fixture-covered, but not live-tested until a local embedding
-endpoint is configured.
+endpoint is configured. The current verified product evidence now includes live
+local Apple provider runs for Qwen3 Embedding 0.6B and Qwen3 Embedding 4B on
+the same public LongMemEval-S retrieval-proxy target.
 
 ## Latest Observed PR Branch Head
 
-- Commit: `ede755d9f77812cc384cc10a625232a379d18098`
-- Commit title: `docs: refresh public benchmark caveats`
-- GitHub Actions run: `26374762450`
+- Commit: `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`
+- Commit title: `bench: record local apple provider runs`
+- GitHub Actions run: `26377087807`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
 This does not change the approved runtime canary adapter/report commit. It only
-updates the public-facing benchmark caveat and local Apple preflight evidence.
+updates the public-facing benchmark evidence and records the measured local
+Apple provider runs.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `2bb8b6b3f024ed3f691196fd739065d8c00dd27a`
-- Commit title: `bench: add Voyage latency comparison gate`
-- GitHub Actions run: `26367018906`
+- Commit: `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`
+- Commit title: `bench: record local apple provider runs`
+- GitHub Actions run: `26377087807`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -55,10 +58,18 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `git diff --check`
-- `npm exec --yes pnpm@10.23.0 -- release:doctor`
+- `npm exec --yes pnpm@10.23.0 -- vitest run tests/bench/benchmark-contract.test.ts`
 - `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the 30-query
   LongMemEval-S target with BM25, full-hybrid, and Voyage provider arms
-- GitHub Actions run `26367018906`
+- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the same
+  30-query LongMemEval-S target with BM25, full-hybrid, and Qwen3 Embedding
+  0.6B local Apple arms
+- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the same
+  30-query LongMemEval-S target with BM25, full-hybrid, and Qwen3 Embedding 4B
+  local Apple arms
+- Targeted public docs/evidence secret and private-path scan
+- Stale local model server check
+- GitHub Actions run `26377087807`
 
 ## Canary Handoff Artifact
 
@@ -103,6 +114,11 @@ The benchmark lane remains conservative:
   hybrid-family candidate.
 - Hosted Supermemory comparisons remain product-parity sanity checks, not the
   main public scoreboard.
+- The local Apple lane currently has a useful negative result: both the Qwen3
+  0.6B and 4B embedding arms tied BM25 quality on this 30-query slice, but the
+  4B arm added latency and did not earn promotion. The next local benchmark
+  should test method changes around query expansion, reranking, topic routing,
+  or chunk/context construction before scaling model size again.
 
 ## Boundary
 

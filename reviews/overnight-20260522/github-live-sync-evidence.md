@@ -155,13 +155,17 @@ Date: 2026-05-23
   to match the cleaned top-level Downloads surface: 0 production evidence
   packets, 1 current handoff packet, 8 diagnostics, 19 unknown packets, and 5
   unreadable packets.
+- PR #5 and issue #6 were refreshed again after recording live local Apple
+  Qwen3 0.6B and 4B provider runs, promoting `6c72c194` as the latest verified
+  code/product baseline while preserving `18d606a` as the approved runtime
+  canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-24T17:13:35Z
+- PR body refreshed at: 2026-05-25T00:37:13Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-24T17:04:58Z
-- PR body hash: 81ed7a001ae6ea8b70062618af503b73e8d1fdab0e4f6884397dba0dc292e6ea
+- Issue updated at: 2026-05-25T00:37:15Z
+- PR body hash: 3d2695e066e6a639b39ebcfde9bc1621902bef70c7b9a17687c405ceea1702d5
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: dd228b25551a84107d9053e3c7789716aae834964981d7e0bea8b3671a1930fa
+- Issue body hash: c27eb9b49893e458fc0fed7cf1e2b726bfdc7683a01aa7a7c7e0eee0cdcb04d7
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
