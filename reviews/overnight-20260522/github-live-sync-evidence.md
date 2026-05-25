@@ -173,13 +173,18 @@ Date: 2026-05-23
   standard-inbox watcher alias as the latest verified code/product baseline
   while preserving `18d606a` as the approved runtime canary adapter/report
   commit.
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26379203538` passed on `9af07283`, promoting the public docs and
+  release-state evidence refresh as the latest verified branch head while
+  preserving `fba92059` as the latest verified code/product baseline and
+  `18d606a` as the approved runtime canary adapter/report commit.
 - PR #5 and issue #6 match the checked-in public-safe drafts after refresh.
-- PR body refreshed at: 2026-05-25T01:52:27Z
+- PR body refreshed at: 2026-05-25T02:02:52Z
 - Note: GitHub PR `updated_at` can advance after branch pushes even when the
   body hash still matches this checked-in draft.
-- Issue updated at: 2026-05-25T01:52:28Z
-- PR body hash: 6744b21d7a4b5b73cd516d0038d6c97a48d95e44521e2652ba4b2421491105d4
+- Issue updated at: 2026-05-25T02:02:53Z
+- PR body hash: 7e1042d30219fa17cad9c063466b3e70e24810563cb718c01afde29e794c4528
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
-- Issue body hash: 7154c8698adab7ac0463255a31e17c87f73611f2c491659ab5732979902c2947
+- Issue body hash: 8277a091e4d30389b8e33e6685eb3223b1e9908fae72891a0adf75a4a063588f
 
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

@@ -10,7 +10,11 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
-- `fba92059552c155436e84bb05d87b1fd6aef9add`.
+- `9af072834ae1ad809e07b145f21c14b647bee688`.
+- GitHub Actions run `26379203538` passed CI after refreshing public docs and
+  release-state evidence for the returned canary watcher. This branch-head
+  verification does not change the latest verified code/product baseline or the
+  approved runtime canary adapter/report commit.
 - GitHub Actions run `26379062431` passed CI after adding the 12-hour returned
   canary standard-inbox watcher alias. The watcher checks Downloads and
   Telegram Desktop every 15 minutes for 12 hours, requires production-grade

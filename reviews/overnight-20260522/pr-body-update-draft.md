@@ -227,7 +227,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-  `fba92059552c155436e84bb05d87b1fd6aef9add`.
+  `9af072834ae1ad809e07b145f21c14b647bee688`.
+- GitHub Actions run `26379203538`: passed CI after refreshing public docs and
+  release-state evidence for the returned canary watcher. This branch-head
+  verification does not change the latest verified code/product baseline or the
+  approved runtime canary adapter/report commit.
 - Commit `fba92059552c155436e84bb05d87b1fd6aef9add` adds the
   `canary:returned-downloads:watch12h` maintainer supervision alias and
   documents the 12-hour watch flow. It does not change the approved runtime

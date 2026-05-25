@@ -176,6 +176,12 @@ Verdict: resolved for PR body and blocker issue writes.
     standard-inbox watcher alias as the latest verified code/product baseline
     while preserving `18d606a` as the approved runtime canary adapter/report
     commit. Updated at: 2026-05-25T01:52:28Z.
+  - PR #5 and issue #6 were refreshed again after GitHub Actions run
+    `26379203538` passed on `9af07283`, promoting the public docs and
+    release-state evidence refresh as the latest verified branch head while
+    preserving `fba92059` as the latest verified code/product baseline and
+    `18d606a` as the approved runtime canary adapter/report commit. Updated at:
+    2026-05-25T02:02:53Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

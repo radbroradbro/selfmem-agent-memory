@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-25T01:51:22Z",
+  "generatedAt": "2026-05-25T02:00:00Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -397,14 +397,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "fba92059552c155436e84bb05d87b1fd6aef9add",
-    "ciRunId": 26379062431,
+    "headSha": "9af072834ae1ad809e07b145f21c14b647bee688",
+    "ciRunId": 26379203538,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_and_goal_audit",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after adding the 12-hour returned canary standard-inbox watcher alias. GitHub Actions run 26379062431 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest observed PR branch head after refreshing public docs and release-state evidence for the 12-hour returned canary standard-inbox watcher alias. GitHub Actions run 26379203538 passed. The latest verified code/product baseline remains fba92059552c155436e84bb05d87b1fd6aef9add, and this branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
