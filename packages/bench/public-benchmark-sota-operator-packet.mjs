@@ -36,6 +36,7 @@ const providerPreflight = runJson([
 ]);
 const localRerankEvidence = loadEvidence(`${reviewDir}/local-rerank-sidecar-baseline-refresh-evidence.md`);
 const queryExpansionSmokeEvidence = loadEvidence(`${reviewDir}/query-expansion-live-local-smoke-20260525.json`);
+const queryExpansionResultGateEvidence = loadEvidence(`${reviewDir}/query-expansion-result-gate-20260525.json`);
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
 
 const blockers = [
@@ -109,6 +110,14 @@ const packet = {
       claimUse: queryExpansionSmokeEvidence.json?.claimUse ?? "wiring-smoke-only",
       publicBenchmarkClaimsAllowed: Boolean(queryExpansionSmokeEvidence.json?.publicBenchmarkClaimsAllowed),
     },
+    queryExpansionResultGate: {
+      evidencePath: queryExpansionResultGateEvidence.path,
+      evidenceExists: queryExpansionResultGateEvidence.exists,
+      evidenceHash: queryExpansionResultGateEvidence.hash,
+      status: queryExpansionResultGateEvidence.json?.status ?? null,
+      countsAsLiveQueryExpansionBenchmark: Boolean(queryExpansionResultGateEvidence.json?.countsAsLiveQueryExpansionBenchmark),
+      blockers: queryExpansionResultGateEvidence.json?.blockers ?? [],
+    },
     queryExpansionImplementation: currentQueryExpansionImpl,
   },
   sameDataContract: {
@@ -155,6 +164,7 @@ const packet = {
       "sota-ladder-report.md",
       "query-expansion-preflight.json",
       "query-expansion-result.json",
+      "query-expansion-result-gate.json",
       "provider-preflight.json",
       "same-data-provider-result.json",
       "end-to-end-memory-score.json",
@@ -234,6 +244,13 @@ function buildOperatorFlow() {
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-result.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-result.md\"",
         ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:query-expansion:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-result.json\"",
+          `--target ${target}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-gate.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-gate.md\"",
+        ].join(" "),
       ],
       beforeCountingAsLlmQueryExpansion: [
         "Verify the strategy used the configured local query-expansion endpoint, not only the deterministic expansion proxy.",
@@ -257,6 +274,13 @@ function buildOperatorFlow() {
           "--limit 5",
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-result.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-result.md\"",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:query-expansion:result-gate -- --require-ready",
+          "--result \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-result.json\"",
+          `--target ${target}`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-gate.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-gate.md\"",
         ].join(" "),
       ],
       beforeCountingAsLlmQueryExpansion: [
@@ -407,6 +431,7 @@ function renderMarkdown(value) {
     `- Provider preflight: ${value.currentEvidence.providerPreflight.status}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
     `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,
+    `- Query expansion result gate: ${value.currentEvidence.queryExpansionResultGate.status ?? "missing"}`,
     `- Live LLM query expansion proven: ${value.currentEvidence.queryExpansionImplementation.liveLlmExpansionProven}`,
     "",
     "## Operator Flow",

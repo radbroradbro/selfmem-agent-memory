@@ -26,6 +26,7 @@
 - Provider preflight: BLOCKED_PROVIDER_ENV
 - Local rerank evidence: true
 - Query expansion local smoke: true
+- Query expansion result gate: BLOCKED_QUERY_EXPANSION_RESULT
 - Live LLM query expansion proven: false
 
 ## Operator Flow
@@ -50,6 +51,7 @@ SELFMEM_QUERY_EXPANSION_MODEL=<local-query-expansion-model>
 RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>
 npm exec --yes pnpm@10.23.0 -- benchmark:query-expansion:preflight -- --require-ready
 npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,dense-proxy,full-hybrid-rerank,query-expanded-full-hybrid-rerank --context-token-budget 800 --limit 5 --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-result.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-result.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:query-expansion:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-result.json" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-gate.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-pure-local-gate.md"
 ```
 
 Before counting this as LLM query expansion:
@@ -68,6 +70,7 @@ NVIDIA_API_KEYS_FILE=<private-file-outside-repo>
 RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>
 npm exec --yes pnpm@10.23.0 -- benchmark:query-expansion:preflight -- --require-ready
 npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --strategies bm25-lite,dense-proxy,full-hybrid-rerank,query-expanded-full-hybrid-rerank --context-token-budget 800 --limit 5 --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-result.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-result.md"
+npm exec --yes pnpm@10.23.0 -- benchmark:query-expansion:result-gate -- --require-ready --result "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-result.json" --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-gate.json" --markdown-output "$RECALLWEAVE_SOTA_OUTPUT_DIR/query-expansion-mixed-cloud-gate.md"
 ```
 
 Before counting this as LLM query expansion:
