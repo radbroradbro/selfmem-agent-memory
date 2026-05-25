@@ -8,6 +8,7 @@
 ## Current Blockers
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
+- best-end-to-end-score-below-reported-supermemory-target
 - voyage-provider-rate-limited
 
 ## Current Evidence

@@ -205,4 +205,16 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 0ce76109316c5ca01b2bca19240e4176c57dee65f7e679cdc60e64a3cc8ec5b0
 
+## 2026-05-25 SOTA Target Refresh
+
+- PR #5 and issue #6 were refreshed again after the benchmark ladder added an
+  explicit comparison between the best current full-memory answer-quality row
+  and Supermemory's selected reported LongMemEval-S target.
+- The refreshed live sync check matched the checked-in public-safe drafts.
+- PR body refreshed at: 2026-05-25T22:18:32Z
+- Issue updated at: 2026-05-25T22:18:32Z
+- PR body hash: e0da3ae6ee7afe53f88e2c6b61d56c5e6f39337ca73c3d1352153d5f4d51b921
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: 2e4ed555be77ee6f6e4f83439e5b69fa8538d034d475c54c28e2667b06168f6c
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

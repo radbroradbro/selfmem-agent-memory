@@ -181,9 +181,16 @@ Follow-up provider evidence on 2026-05-25:
   Evidence:
   `reviews/overnight-20260522/query-expansion-result-gate-20260525.json` and
   `reviews/overnight-20260522/local-rerank-result-gate-20260525.json`.
+- The SOTA ladder now compares the best full-memory answer-quality row against
+  the selected reported Supermemory target instead of merely listing reported
+  targets. Current best is `cloud-nvidia-nemotron-1b` at `43.1667`; selected
+  target is Supermemory's reported LongMemEval-S `85.2%` Gemini 3 Pro row;
+  delta is `-42.0333`, so the ladder adds
+  `best-end-to-end-score-below-reported-supermemory-target`.
 - This is progress, not launch clearance. The current ladder still lacks a
-  same-data Voyage answer-quality row, final UI/docs refresh after any changed
-  result hash, real rollout evidence, and owner approval.
+  same-data Voyage answer-quality row, an at-or-above-target full-memory score,
+  final UI/docs refresh after any changed result hash, real rollout evidence,
+  and owner approval.
 
 ## Claim Boundary
 

@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T21:59:11.575Z",
+  "generatedAt": "2026-05-25T22:17:47.396Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -30,7 +30,8 @@
       "publicBenchmarkClaimsAllowed": false,
       "blockers": [
         "all-current-result-files-keep-public-claims-disabled",
-        "missing-voyage-answer-quality-same-data-result"
+        "missing-voyage-answer-quality-same-data-result",
+        "best-end-to-end-score-below-reported-supermemory-target"
       ],
       "requiredFullMemoryArms": [
         {
@@ -94,6 +95,16 @@
           "source": "https://supermemory.ai/research/",
           "targetUse": "reported-memory-system-target",
           "caveat": "Useful target row for same-benchmark comparison; not replaceable by MTEB component scores."
+        },
+        {
+          "id": "supermemory-production-research-gemini-3-pro",
+          "benchmark": "LongMemEval-S",
+          "score": 85.2,
+          "scoreUnit": "overall percent",
+          "judge": "gemini-3-pro",
+          "source": "https://supermemory.ai/research/",
+          "targetUse": "primary-reported-memory-system-target",
+          "caveat": "Highest reported production/research target on Supermemory's public research page; RecallWeave must meet or beat this under matching benchmark semantics before SOTA wording."
         },
         {
           "id": "supermemory-experimental-asmr",
@@ -480,6 +491,7 @@
   "blockers": [
     "all-current-result-files-keep-public-claims-disabled",
     "missing-voyage-answer-quality-same-data-result",
+    "best-end-to-end-score-below-reported-supermemory-target",
     "voyage-provider-rate-limited"
   ]
 }

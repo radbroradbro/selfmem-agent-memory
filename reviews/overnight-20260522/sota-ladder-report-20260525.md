@@ -7,6 +7,7 @@
 ## Blockers
 - all-current-result-files-keep-public-claims-disabled
 - missing-voyage-answer-quality-same-data-result
+- best-end-to-end-score-below-reported-supermemory-target
 
 ## Required Full Memory Arms
 - bm25-lite: present (lexical floor)
@@ -17,6 +18,11 @@
 - local-apple-embedding: present (zero-spend local challenger)
 - local-apple-reranker-sidecar: present (local rerank method challenger)
 - llm-query-expansion: present (query expansion challenger)
+
+## Reported Target Comparison
+- Primary reported target: supermemory-production-research-gemini-3-pro (85.2 overall percent)
+- Best end-to-end RecallWeave row: cloud-nvidia-nemotron-1b (43.1667)
+- Meets reported target: false
 
 ## Best Observed Rows
 - cloud-nvidia-nemotron-1b: quality 43.1667, answerQuality 43.1667, P@1 n/a, nDCG@10 n/a, p50 9031 ms, retrievalProxyOnly=false, memoryBenchAnswerQuality=true

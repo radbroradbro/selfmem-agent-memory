@@ -224,8 +224,8 @@ requirements are resolved.
 - Current public LongMemEval-S run-only target is generated from that slice
   manifest and passes `benchmark:public-target -- --strict-run`. It is ready
   for a RecallWeave run on the same public benchmark data, but it does not
-  permit public comparison claims until a source-locked reported target row
-  passes `--strict`.
+  permit public comparison claims until a source-locked reported target row is
+  met or beaten by the full-memory answer-quality ladder.
 - GitHub Actions run `26346952139` passed on `9a11452` after the LongMemEval-S
   run-only target and sync evidence refresh.
 - Current benchmark plan also separates component model evidence from

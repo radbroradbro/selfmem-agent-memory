@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T21:45:11.164Z",
+  "generatedAt": "2026-05-25T22:17:47.331Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -141,7 +141,7 @@
     "readinessNote": {
       "path": "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
       "exists": true,
-      "hash": "sha256:da2d24512b54a87111459724394a81c6cb91374f93ae39cb9e8010bab3c655bc",
+      "hash": "sha256:54550a7f2baaf81e08217eda17cad08b779ce4922c56025b66451537db101e94",
       "mode": null,
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -232,6 +232,16 @@
       "caveat": "Useful target row for same-benchmark comparison; not replaceable by MTEB component scores."
     },
     {
+      "id": "supermemory-production-research-gemini-3-pro",
+      "benchmark": "LongMemEval-S",
+      "score": 85.2,
+      "scoreUnit": "overall percent",
+      "judge": "gemini-3-pro",
+      "source": "https://supermemory.ai/research/",
+      "targetUse": "primary-reported-memory-system-target",
+      "caveat": "Highest reported production/research target on Supermemory's public research page; RecallWeave must meet or beat this under matching benchmark semantics before SOTA wording."
+    },
+    {
       "id": "supermemory-experimental-asmr",
       "benchmark": "LongMemEval-S",
       "score": 98.6,
@@ -242,6 +252,30 @@
       "caveat": "The source labels this as experimental/non-production and a parody/social experiment."
     }
   ],
+  "reportedTargetComparison": {
+    "primaryTarget": {
+      "id": "supermemory-production-research-gemini-3-pro",
+      "benchmark": "LongMemEval-S",
+      "score": 85.2,
+      "scoreUnit": "overall percent",
+      "judge": "gemini-3-pro",
+      "source": "https://supermemory.ai/research/",
+      "caveat": "Highest reported production/research target on Supermemory's public research page; RecallWeave must meet or beat this under matching benchmark semantics before SOTA wording."
+    },
+    "bestObserved": {
+      "strategy": "cloud-nvidia-nemotron-1b",
+      "sourcePath": "reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json",
+      "score": 43.1667,
+      "scoreUnit": "answer-quality percent",
+      "memoryBenchAnswerQuality": true,
+      "retrievalProxyOnly": false,
+      "publicBenchmarkClaimsAllowed": false
+    },
+    "scoreDelta": -42.0333,
+    "meetsPrimaryReportedTarget": false,
+    "matchingBenchmarkSemanticsRequired": true,
+    "comparisonRule": "Direct Supermemory usage is optional when quota-blocked, but RecallWeave cannot claim SOTA unless a same-benchmark, same-scoring full-memory result meets or beats the selected reported Supermemory target."
+  },
   "requiredFullMemoryArms": [
     {
       "id": "bm25-lite",
@@ -460,13 +494,15 @@
     "voyageProviderRateLimited": true,
     "reviewerApprovalsPresent": true,
     "endToEndMemoryScorePresent": true,
+    "bestEndToEndScoreMeetsReportedTarget": false,
     "publicClaimsAllowedByInputs": false,
     "reportedMemoryTargetsPresent": true,
     "readinessNotePresent": true
   },
   "blockers": [
     "all-current-result-files-keep-public-claims-disabled",
-    "missing-voyage-answer-quality-same-data-result"
+    "missing-voyage-answer-quality-same-data-result",
+    "best-end-to-end-score-below-reported-supermemory-target"
   ],
   "nextActions": [
     "Use MTEB and model-card evidence only to choose embedding and reranker candidates.",

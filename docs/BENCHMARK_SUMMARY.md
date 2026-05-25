@@ -226,11 +226,16 @@ Voyage full and lite answer-quality attempts hit HTTP `429`, recorded in
 provider/SOTA ladder still has a hard missing-Voyage blocker.
 `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` keeps
 public and SOTA claims blocked because the same-data Voyage answer-quality arm
-is still missing. Two independent memory-score reviewer approvals are now
+is still missing and the best current end-to-end row is below the selected
+reported Supermemory LongMemEval-S production/research target. The refreshed
+SOTA ladder compares `cloud-nvidia-nemotron-1b` at `43.1667` answer-quality
+against Supermemory's reported `85.2%` Gemini 3 Pro row and keeps the delta
+blocked at `-42.0333`. Two independent memory-score reviewer approvals are now
 recorded in
 `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`, bound
 to the current combined metrics-only packet. Those approvals do not override
-the missing Voyage arm, owner approval, or real rollout gates.
+the below-target score, missing Voyage arm, owner approval, or real rollout
+gates.
 
 OpenAI-compatible reviewers can now produce a memory-score approval JSON for
 the exact metrics-only packet. The command writes only the reviewer artifact;

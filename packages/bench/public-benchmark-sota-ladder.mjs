@@ -165,6 +165,16 @@ const reportedMemoryTargets = [
     caveat: "Useful target row for same-benchmark comparison; not replaceable by MTEB component scores.",
   },
   {
+    id: "supermemory-production-research-gemini-3-pro",
+    benchmark: "LongMemEval-S",
+    score: 85.2,
+    scoreUnit: "overall percent",
+    judge: "gemini-3-pro",
+    source: "https://supermemory.ai/research/",
+    targetUse: "primary-reported-memory-system-target",
+    caveat: "Highest reported production/research target on Supermemory's public research page; RecallWeave must meet or beat this under matching benchmark semantics before SOTA wording.",
+  },
+  {
     id: "supermemory-experimental-asmr",
     benchmark: "LongMemEval-S",
     score: 98.6,
@@ -175,6 +185,12 @@ const reportedMemoryTargets = [
     caveat: "The source labels this as experimental/non-production and a parody/social experiment.",
   },
 ];
+const primaryReportedTarget =
+  reportedMemoryTargets
+    .filter((target) => target.targetUse === "primary-reported-memory-system-target" || target.targetUse === "reported-memory-system-target")
+    .sort((a, b) => Number(b.score) - Number(a.score))[0] ?? null;
+const bestEndToEndMemoryRow = bestEndToEndMemoryScoreRow(rows);
+const reportedTargetComparison = compareReportedTarget(bestEndToEndMemoryRow, primaryReportedTarget);
 
 const checks = {
   sourceLockedTargetPresent: loaded.sourceLockedTarget.exists,
@@ -205,6 +221,7 @@ const checks = {
   endToEndMemoryScorePresent:
     rows.some((row) => row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false) ||
     loaded.endToEndMemoryScoreGate.json?.countsAsEndToEndMemoryBenchmark === true,
+  bestEndToEndScoreMeetsReportedTarget: reportedTargetComparison.meetsPrimaryReportedTarget === true,
   publicClaimsAllowedByInputs: rows.some((row) => row.publicBenchmarkClaimsAllowed === true),
   reportedMemoryTargetsPresent: reportedMemoryTargets.length >= 2,
   readinessNotePresent: loaded.readinessNote.exists,
@@ -215,6 +232,9 @@ const blockers = [
   !checks.publicClaimsAllowedByInputs ? "all-current-result-files-keep-public-claims-disabled" : null,
   !checks.voyageProviderCanaryPresent ? "missing-voyage-answer-quality-same-data-result" : null,
   !checks.nvidiaOrGeminiLiveCanaryPresent ? "missing-nvidia-or-gemini-live-same-data-result" : null,
+  checks.endToEndMemoryScorePresent && !checks.bestEndToEndScoreMeetsReportedTarget
+    ? "best-end-to-end-score-below-reported-supermemory-target"
+    : null,
   !checks.reviewerApprovalsPresent ? "missing-two-independent-memory-score-reviewer-approvals" : null,
   !checks.queryExpansionPreflightPresent ? "missing-query-expansion-preflight" : null,
   !checks.queryExpansionPreflightSafe ? "query-expansion-preflight-not-safe" : null,
@@ -259,6 +279,7 @@ const report = {
   componentEvidence,
   queryExpansionPolicy,
   reportedMemoryTargets,
+  reportedTargetComparison,
   requiredFullMemoryArms: requiredArms,
   observedStrategies: allStrategies,
   bestObservedRows: summarizeBestRows(rows),
@@ -329,6 +350,47 @@ function summarizeBestRows(rowsIn) {
     }));
 }
 
+function bestEndToEndMemoryScoreRow(rowsIn) {
+  const candidates = rowsIn.filter((row) => row.memoryBenchAnswerQuality === true && row.retrievalProxyOnly === false);
+  return candidates.sort((a, b) => metricQuality(b) - metricQuality(a) || metricLatency(a) - metricLatency(b))[0] ?? null;
+}
+
+function compareReportedTarget(row, target) {
+  const score = row ? metricQuality(row) : null;
+  const targetScore = target ? Number(target.score) : null;
+  const meetsPrimaryReportedTarget =
+    score != null && targetScore != null && Number.isFinite(score) && Number.isFinite(targetScore) && score >= targetScore;
+  return {
+    primaryTarget: target
+      ? {
+          id: target.id,
+          benchmark: target.benchmark,
+          score: target.score,
+          scoreUnit: target.scoreUnit,
+          judge: target.judge,
+          source: target.source,
+          caveat: target.caveat,
+        }
+      : null,
+    bestObserved: row
+      ? {
+          strategy: row.strategy,
+          sourcePath: row.sourcePath,
+          score,
+          scoreUnit: "answer-quality percent",
+          memoryBenchAnswerQuality: row.memoryBenchAnswerQuality,
+          retrievalProxyOnly: row.retrievalProxyOnly,
+          publicBenchmarkClaimsAllowed: row.publicBenchmarkClaimsAllowed,
+        }
+      : null,
+    scoreDelta: score != null && targetScore != null ? Number((score - targetScore).toFixed(4)) : null,
+    meetsPrimaryReportedTarget,
+    matchingBenchmarkSemanticsRequired: true,
+    comparisonRule:
+      "Direct Supermemory usage is optional when quota-blocked, but RecallWeave cannot claim SOTA unless a same-benchmark, same-scoring full-memory result meets or beats the selected reported Supermemory target.",
+  };
+}
+
 function metricQuality(row) {
   return Number(row.metrics?.answerQuality ?? row.metrics?.quality ?? 0);
 }
@@ -367,6 +429,11 @@ function renderMarkdown(value) {
     "",
     "## Required Full Memory Arms",
     ...value.requiredFullMemoryArms.map((arm) => `- ${arm.id}: ${arm.status} (${arm.role})`),
+    "",
+    "## Reported Target Comparison",
+    `- Primary reported target: ${value.reportedTargetComparison.primaryTarget?.id ?? "n/a"} (${value.reportedTargetComparison.primaryTarget?.score ?? "n/a"} ${value.reportedTargetComparison.primaryTarget?.scoreUnit ?? ""})`,
+    `- Best end-to-end RecallWeave row: ${value.reportedTargetComparison.bestObserved?.strategy ?? "n/a"} (${value.reportedTargetComparison.bestObserved?.score ?? "n/a"})`,
+    `- Meets reported target: ${value.reportedTargetComparison.meetsPrimaryReportedTarget}`,
     "",
     "## Best Observed Rows",
     ...value.bestObservedRows.map(
