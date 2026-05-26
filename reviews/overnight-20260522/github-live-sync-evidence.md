@@ -345,4 +345,18 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: ab2a537a7def7b70b5efa1f87638a35572e39b877973aa642331fb4db08ff3ec
 
+## 2026-05-26 Local-Full Shard Intake Verified Baseline Refresh
+
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26435511093` passed on
+  `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
+- The refreshed public text promotes that commit only as the verified branch
+  baseline for the local-full shard intake harness. It keeps public launch,
+  SOTA claims, and production rollout blocked.
+- PR body refreshed at: 2026-05-26T06:12:21Z
+- Issue updated at: 2026-05-26T06:12:23Z
+- PR body hash: 1c7fce8158c929791d1be211e3b85b937a60aabcf781b5ae0393f6792e44aa37
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: 42662d8b14961b2aaf329948ecbe4799d3461d4a30e5876dd25637e435d1f0bc
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

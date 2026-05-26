@@ -10,13 +10,20 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
+- `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
+- GitHub Actions run `26435511093` passed CI after adding dedicated
+  local-full shard workorder and intake scripts plus the blocked local-full
+  intake artifact. The local benchmark lane now has explicit no-provider-call
+  tracking for zero accepted shards and twenty missing shards, so local-full
+  combine or scoring claims cannot start until the full local shard set exists.
+  This does not change the approved runtime canary adapter/report commit.
+- Previous verified PR branch head before the local-full shard intake harness:
 - `2adc5268da8dd6ed8f65dfc16069ef7793296682`.
 - GitHub Actions run `26434850211` passed CI after adding the `local-full`
   accepted-lane launch doctor and matching release-check coverage. The local
   benchmark lane now has a no-provider-call go/no-go report for local embedding,
   local rerank, answer-quality endpoint, and model-backed query-expansion
   blockers without allowing SOTA or launch claims.
-  This does not change the approved runtime canary adapter/report commit.
 - Previous verified PR branch head before the local-full launch doctor:
 - `27cd17c25cbef6f3483e9b4798af94ea64256cb4`.
 - GitHub Actions run `26434316174` passed CI after adding the `local-full`
@@ -90,8 +97,8 @@ requirements are resolved.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `2adc5268da8dd6ed8f65dfc16069ef7793296682`.
-- GitHub Actions run `26434850211` passed CI with release checks, live GitHub
+- `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
+- GitHub Actions run `26435511093` passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
@@ -103,8 +110,13 @@ requirements are resolved.
   contains release-check temp artifacts so repeated goal-loop checks do not
   exhaust local temp storage, adds the no-provider-call accepted-lane launch
   doctor for the full-shard benchmark gate, adds the `local-full` benchmark
-  shard lane, and adds the local-full launch doctor without allowing SOTA or
-  launch claims.
+  shard lane, adds the local-full launch doctor, and adds dedicated local-full
+  shard workorder/intake harness support without allowing SOTA or launch claims.
+- Previous verified code/product baseline before the local-full shard intake
+  harness:
+- `2adc5268da8dd6ed8f65dfc16069ef7793296682`.
+- GitHub Actions run `26434850211` passed CI after adding the local-full
+  accepted-lane launch doctor and matching release-check coverage.
 - Previous verified code/product baseline before the local-full launch doctor:
 - `27cd17c25cbef6f3483e9b4798af94ea64256cb4`.
 - GitHub Actions run `26434316174` passed CI after adding the `local-full`
