@@ -215,8 +215,11 @@ Use `--strict-run` for a real same-data run target without comparison claims.
 Use `--strict` only when a reported leaderboard or provider row is attached and
 the result will be compared.
 
-The current materialized LongMemEval-S run writes private query and haystack
-files outside the repository and commits only metrics-safe evidence. The
+New LongMemEval-S materialization runs write private raw-source, selected-row,
+query, haystack, answer-label, and source-manifest files outside the repository
+and commit only metrics-safe evidence. The public report keeps hashes and
+counts for the raw source lineage so reviewers can audit compressed or derived
+inputs without exposing raw benchmark text in the repo. The
 checked-in retrieval-proxy result is
 `reviews/overnight-20260522/public-longmemeval-recallweave-run-result.json`.
 It now uses `bm25-lite-b800-k5`, the winning same-data autoresearch setting.

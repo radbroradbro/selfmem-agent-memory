@@ -105,6 +105,9 @@ async function liveMaterialize() {
     answerModel: target.benchmark.answerModel,
     selected,
     target,
+    rawDatasetText: rawText,
+    rawDatasetByteSize: rawBuffer.byteLength,
+    rawDatasetItemCount: dataset.length,
     datasetHash,
     selectedQuestionIdsHash,
     answerLabelsHash,
@@ -127,6 +130,7 @@ async function liveMaterialize() {
     rawMemoryIncluded: false,
     rawTranscriptIncluded: false,
     rawPrivateOutputPathIncluded: false,
+    rawSourcesRetainedPrivate: true,
     generatedAt: new Date().toISOString(),
     source: {
       memoryBenchCommit: sourceLock.source?.commit,
@@ -147,6 +151,7 @@ async function liveMaterialize() {
       retrievalStrategy,
     },
     selection: materialized.selection,
+    sourceRetention: materialized.sourceRetention,
     privateOutputs: materialized.privateOutputs,
     runCommands: runCommandTemplates(materialized.privateOutputs),
     safety: publicSafety(),
@@ -205,6 +210,7 @@ function fixtureMaterialize() {
     },
   };
   const selectedQuestionIdsHash = `sha256:${stableHash(selected.map((item) => item.question_id).join("\n"))}`;
+  const rawDatasetText = JSON.stringify(selected, null, 2);
   const answerLabelsHash = `sha256:${stableHash(canonicalJson(selected.map((item) => ({
     questionId: item.question_id,
     questionType: item.question_type,
@@ -217,6 +223,9 @@ function fixtureMaterialize() {
     answerModel: target.benchmark.answerModel,
     selected,
     target,
+    rawDatasetText,
+    rawDatasetByteSize: Buffer.byteLength(rawDatasetText, "utf8"),
+    rawDatasetItemCount: selected.length,
     datasetHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     selectedQuestionIdsHash,
     answerLabelsHash,
@@ -238,6 +247,7 @@ function fixtureMaterialize() {
     rawMemoryIncluded: false,
     rawTranscriptIncluded: false,
     rawPrivateOutputPathIncluded: false,
+    rawSourcesRetainedPrivate: true,
     generatedAt: "2026-05-23T00:00:00.000Z",
     source: {
       memoryBenchCommit: "118209a746d97d0d85e5a7234267f0b6962857e9",
@@ -258,6 +268,7 @@ function fixtureMaterialize() {
       retrievalStrategy,
     },
     selection: materialized.selection,
+    sourceRetention: materialized.sourceRetention,
     privateOutputs: materialized.privateOutputs,
     runCommands: runCommandTemplates(materialized.privateOutputs),
     safety: publicSafety(),
@@ -358,22 +369,69 @@ function writePrivateBenchmarkInputs(options) {
   const querySetPath = resolve(privateOutputDir, "longmemeval-queryset.private.json");
   const memoriesPath = resolve(privateOutputDir, "longmemeval-memories.private.jsonl");
   const answerLabelsPath = resolve(privateOutputDir, "longmemeval-answer-labels.private.json");
+  const rawDatasetPath = resolve(privateOutputDir, "longmemeval-raw-dataset.private.json");
+  const selectedRawRowsPath = resolve(privateOutputDir, "longmemeval-selected-raw-rows.private.json");
+  const sourceManifestPath = resolve(privateOutputDir, "longmemeval-source-manifest.private.json");
   const readmePath = resolve(privateOutputDir, "README.private.txt");
   assertOutsideRepo(querySetPath, "private query set");
   assertOutsideRepo(memoriesPath, "private memories file");
   assertOutsideRepo(answerLabelsPath, "private answer labels file");
+  assertOutsideRepo(rawDatasetPath, "private raw dataset file");
+  assertOutsideRepo(selectedRawRowsPath, "private selected raw rows file");
+  assertOutsideRepo(sourceManifestPath, "private source manifest file");
   assertNoUnsafePrivateText(JSON.stringify(querySet), "private query set");
   assertNoUnsafePrivateText(memories.map((item) => JSON.stringify(item)).join("\n"), "private memories");
   assertNoUnsafePrivateText(JSON.stringify(answerLabels), "private answer labels");
+  const rawDatasetText = options.rawDatasetText.endsWith("\n") ? options.rawDatasetText : `${options.rawDatasetText}\n`;
+  const selectedRawRowsText = `${JSON.stringify(options.selected, null, 2)}\n`;
+  const querySetHash = `sha256:${stableHash(canonicalJson(querySet))}`;
+  const memoriesFileHash = `sha256:${stableHash(memories.map((item) => JSON.stringify(item)).join("\n"))}`;
+  const rawDatasetHash = `sha256:${stableHash(rawDatasetText)}`;
+  const selectedRawRowsHash = `sha256:${stableHash(selectedRawRowsText)}`;
+  const sourceManifest = {
+    schemaVersion: 1,
+    mode: "longmemeval-source-retention-manifest",
+    fixtureOnly: options.fixtureOnly,
+    benchmark: "longmemeval",
+    datasetSlice: options.datasetSlice,
+    rawDataset: {
+      fileName: basename(rawDatasetPath),
+      hash: rawDatasetHash,
+      datasetHash: options.datasetHash,
+      byteSize: options.rawDatasetByteSize,
+      itemCount: options.rawDatasetItemCount,
+      rawTextPrivate: true,
+    },
+    selectedRawRows: {
+      fileName: basename(selectedRawRowsPath),
+      hash: selectedRawRowsHash,
+      rowCount: options.selected.length,
+      selectedQuestionIdsHash: options.selectedQuestionIdsHash,
+      rawTextPrivate: true,
+    },
+    derivedInputs: {
+      querySetHash,
+      memoriesFileHash,
+      answerLabelsHash: options.answerLabelsHash,
+      scoringCodeHash: options.scoringCodeHash,
+      materializerHash,
+    },
+    publicReportOnlyContainsHashesAndCounts: true,
+  };
   writePrivateFile(querySetPath, `${JSON.stringify(querySet, null, 2)}\n`);
   writePrivateFile(memoriesPath, `${memories.map((item) => JSON.stringify(item)).join("\n")}\n`);
   writePrivateFile(answerLabelsPath, `${JSON.stringify(answerLabels, null, 2)}\n`);
+  writePrivateFile(rawDatasetPath, rawDatasetText);
+  writePrivateFile(selectedRawRowsPath, selectedRawRowsText);
+  writePrivateFile(sourceManifestPath, `${JSON.stringify(sourceManifest, null, 2)}\n`);
+  const sourceManifestHash = `sha256:${fileHash(sourceManifestPath)}`;
   writePrivateFile(
     readmePath,
     [
       "Private RecallWeave public-benchmark inputs.",
       "",
-      "Do not commit these files. The public report contains only hashes and counts.",
+      "Do not commit these files. They include the raw benchmark source, selected raw rows, derived query/memory/label inputs, and a source manifest.",
+      "The public report contains only hashes, counts, file roles, and file names.",
       "Use the command templates in the public materialize report to run response export and scoring.",
       "",
     ].join("\n"),
@@ -391,10 +449,23 @@ function writePrivateBenchmarkInputs(options) {
       haystackSessionCount: memories.length,
       expectedResultRefCount: expectedRefs,
       redactionStats,
-      querySetHash: `sha256:${stableHash(canonicalJson(querySet))}`,
+      querySetHash,
       collectorCompatibleQuerySetHash: `sha256:${stableHash(collectorQuerySetPayload)}`,
-      memoriesFileHash: `sha256:${stableHash(memories.map((item) => JSON.stringify(item)).join("\n"))}`,
+      memoriesFileHash,
       answerLabelsFileHash: `sha256:${fileHash(answerLabelsPath)}`,
+    },
+    sourceRetention: {
+      rawDatasetRetainedPrivate: true,
+      selectedRawRowsRetainedPrivate: true,
+      sourceManifestRetainedPrivate: true,
+      rawTextPubliclyIncluded: false,
+      privateOutputPathIncluded: false,
+      rawDatasetHash,
+      selectedRawRowsHash,
+      sourceManifestHash,
+      rawDatasetByteSize: options.rawDatasetByteSize,
+      rawDatasetItemCount: options.rawDatasetItemCount,
+      selectedRawRowsCount: options.selected.length,
     },
     privateOutputs: {
       directoryLabel: "operator-private-output-dir",
@@ -405,6 +476,9 @@ function writePrivateBenchmarkInputs(options) {
         { role: "queryset", name: basename(querySetPath), hash: `sha256:${fileHash(querySetPath)}`, rawTextPrivate: true },
         { role: "memories", name: basename(memoriesPath), hash: `sha256:${fileHash(memoriesPath)}`, rawTextPrivate: true },
         { role: "answer-labels", name: basename(answerLabelsPath), hash: `sha256:${fileHash(answerLabelsPath)}`, rawTextPrivate: true },
+        { role: "raw-dataset", name: basename(rawDatasetPath), hash: rawDatasetHash, rawTextPrivate: true },
+        { role: "selected-raw-rows", name: basename(selectedRawRowsPath), hash: selectedRawRowsHash, rawTextPrivate: true },
+        { role: "source-manifest", name: basename(sourceManifestPath), hash: sourceManifestHash, rawTextPrivate: false },
         { role: "readme", name: basename(readmePath), hash: `sha256:${fileHash(readmePath)}`, rawTextPrivate: false },
       ],
     },
@@ -545,6 +619,17 @@ function renderMarkdown(value) {
     `- Raw memory included: ${value.rawMemoryIncluded}`,
     `- Raw transcript included: ${value.rawTranscriptIncluded}`,
     `- Private output path included: ${value.rawPrivateOutputPathIncluded}`,
+    `- Raw sources retained privately: ${value.rawSourcesRetainedPrivate}`,
+    "",
+    "## Source Retention",
+    "",
+    `- Raw dataset retained privately: ${value.sourceRetention.rawDatasetRetainedPrivate}`,
+    `- Selected raw rows retained privately: ${value.sourceRetention.selectedRawRowsRetainedPrivate}`,
+    `- Source manifest retained privately: ${value.sourceRetention.sourceManifestRetainedPrivate}`,
+    `- Raw dataset hash: ${value.sourceRetention.rawDatasetHash}`,
+    `- Selected raw rows hash: ${value.sourceRetention.selectedRawRowsHash}`,
+    `- Source manifest hash: ${value.sourceRetention.sourceManifestHash}`,
+    `- Public raw text included: ${value.sourceRetention.rawTextPubliclyIncluded}`,
     "",
     "## Private Outputs",
     "",
@@ -567,6 +652,7 @@ function publicSafety() {
     rawMemoryIncluded: false,
     rawTranscriptIncluded: false,
     rawPrivateOutputPathIncluded: false,
+    rawSourcesRetainedPrivate: true,
     printsCredentials: false,
   };
 }

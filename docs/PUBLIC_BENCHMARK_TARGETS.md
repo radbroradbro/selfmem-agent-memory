@@ -196,6 +196,9 @@ uses the same benchmark and judge semantics, and meets or beats the selected
 reported target score.
 Keep raw benchmark and memory sources outside the repository but reachable to
 the operator through source manifests, hashes, and private materialized paths.
+The materializer now writes a private raw dataset copy, selected raw rows, and
+a source-retention manifest for every materialized run; the public evidence
+keeps only hashes, counts, roles, and file names.
 The UI and default retrieval path may use compressed memories, but benchmark
 and audit review must retain a way to challenge the compression against the raw
 source.

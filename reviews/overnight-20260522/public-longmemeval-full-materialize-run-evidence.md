@@ -25,13 +25,27 @@
 - Raw memory included: false
 - Raw transcript included: false
 - Private output path included: false
+- Raw sources retained privately: true
+
+## Source Retention
+
+- Raw dataset retained privately: true
+- Selected raw rows retained privately: true
+- Source manifest retained privately: true
+- Raw dataset hash: sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a
+- Selected raw rows hash: sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb
+- Source manifest hash: sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe
+- Public raw text included: false
 
 ## Private Outputs
 
 - queryset: longmemeval-queryset.private.json (sha256:9cd221a53f8692f2035a87fc6d5f46495505c5c2571679fdfbdb2fe3f751d89b)
 - memories: longmemeval-memories.private.jsonl (sha256:a4ee0d963c5bafa42a3a6da81568f90a84c80d6cd60a9f8eb055b870f014ef0a)
 - answer-labels: longmemeval-answer-labels.private.json (sha256:302bf9ce65a7471a56fe65529177c9b4d82576096a67e2e345280fa3418c8402)
-- readme: README.private.txt (sha256:c10118c9a418153dd2783a98042b216f212b492ff7a5a508abcd87f483a37d7b)
+- raw-dataset: longmemeval-raw-dataset.private.json (sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a)
+- selected-raw-rows: longmemeval-selected-raw-rows.private.json (sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb)
+- source-manifest: longmemeval-source-manifest.private.json (sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe)
+- readme: README.private.txt (sha256:6e64245a856e59013ea576f493657b52f43cdc0a6b477d810993da70f25d6255)
 
 ## Next Actions
 

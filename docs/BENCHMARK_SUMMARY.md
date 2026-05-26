@@ -236,6 +236,11 @@ expected references. It is the next required broad-SOTA target, but no
 target in query shards using `--query-offset` and `--max-queries`, then merge
 only complete non-overlapping shard coverage with
 `benchmark:answer-quality:combine -- --combine-mode shards`.
+Materialization now also retains the raw dataset, selected raw rows, and a
+source manifest in the private outside-repo output directory while the checked
+in report exposes only hashes, counts, and file roles. This keeps raw-source
+lineage auditable even when compressed or derived memories are what the UI and
+default retrieval path use.
 The first live provider answer-quality run is checked in at
 `reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json`.
 On the same target/query/materializer/scoring hashes, `cloud-nvidia-nemotron-1b`
