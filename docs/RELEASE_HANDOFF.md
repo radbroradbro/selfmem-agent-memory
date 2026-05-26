@@ -355,6 +355,10 @@ has no Voyage/NVIDIA blockers and is blocked only on the local/run consent,
 answer-quality endpoint, and model-backed query-expansion readiness needed to
 actually run it. Treat a completed local-full result as model-method evidence;
 it can explain a local-vs-cloud gap, but it is not SOTA proof or launch approval.
+Its scoring contract is also separate: local answer/judge models may differ
+from the target only when the answer-quality endpoint is local, and
+`benchmark:memory-score:result-gate --claim-scope full-sota` rejects a
+local-full packet instead of promoting it.
 Run `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` for this lane so the local-full
 plan is selected automatically. The checked-in local intake report,

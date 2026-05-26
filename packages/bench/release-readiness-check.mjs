@@ -1811,12 +1811,72 @@ check("fresh public benchmark target check passes", () => {
   );
   const syntheticShardDir = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-"));
   const syntheticShardInputs = writeSyntheticAnswerQualityShardReports(fullAnswerQualityShardPlan, syntheticShardDir);
+  const syntheticLocalFullShardDir = mkdtempSync(join(tmpdir(), "recallweave-local-full-answer-quality-shard-intake-"));
+  const syntheticLocalFullShardInputs = writeSyntheticAnswerQualityShardReports(localFullAnswerQualityShardPlan, syntheticLocalFullShardDir, {
+    answerModel: "local-diagnostic-answer-model",
+    judgeModel: "local-diagnostic-judge-model",
+    endpointIsLocal: true,
+  });
   const answerQualityShardWorkorderReady = JSON.parse(
     run("node", ["packages/bench/public-benchmark-answer-quality-shard-workorder.mjs", "--input", syntheticShardInputs.join(",")]).stdout,
   );
   const answerQualityShardIntakeReady = JSON.parse(
     run("node", ["packages/bench/public-benchmark-answer-quality-shard-intake.mjs", "--input", syntheticShardInputs.join(",")]).stdout,
   );
+  const localFullAnswerQualityShardWorkorderReady = JSON.parse(
+    run("node", [
+      "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
+      "--plan",
+      "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+      "--input",
+      syntheticLocalFullShardInputs.join(","),
+    ]).stdout,
+  );
+  const localFullAnswerQualityShardIntakeReady = JSON.parse(
+    run("node", [
+      "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
+      "--plan",
+      "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+      "--input",
+      syntheticLocalFullShardInputs.join(","),
+    ]).stdout,
+  );
+  const localFullCombinedSyntheticPath = join(syntheticLocalFullShardDir, "end-to-end-memory-score-local-full-combined.json");
+  run("node", [
+    "packages/bench/public-benchmark-answer-quality-combine.mjs",
+    "--input",
+    syntheticLocalFullShardInputs.join(","),
+    "--combine-mode",
+    "shards",
+    "--output",
+    localFullCombinedSyntheticPath,
+  ]);
+  const localFullResultGateReady = JSON.parse(
+    run("node", [
+      "packages/bench/end-to-end-memory-score-gate.mjs",
+      "--claim-scope",
+      "local-full",
+      "--target",
+      "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+      "--result",
+      localFullCombinedSyntheticPath,
+      "--require-ready",
+    ]).stdout,
+  );
+  const fullSotaLocalModelGateRun = spawnSync("node", [
+    "packages/bench/end-to-end-memory-score-gate.mjs",
+    "--claim-scope",
+    "full-sota",
+    "--target",
+    "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "--result",
+    localFullCombinedSyntheticPath,
+    "--require-ready",
+  ], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
   const fullTargetSotaReport = JSON.parse(readFileSync(join(root, reviewDir, "sota-ladder-full-target-report-20260525.json"), "utf8"));
   const fullTargetOperatorPacket = JSON.parse(
     readFileSync(join(root, reviewDir, "sota-ladder-full-target-operator-packet-20260525.json"), "utf8"),
@@ -2393,6 +2453,40 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityModelMismatchPreflight.models?.judgeModelMatchesTarget, false);
   assert.ok(answerQualityModelMismatchPreflight.blockers.includes("answer-model-does-not-match-target"));
   assert.ok(answerQualityModelMismatchPreflight.blockers.includes("judge-model-does-not-match-target"));
+  const localDiagnosticMismatchPreflight = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-answer-quality-preflight.mjs", "--claim-scope", "local-full"], {
+      env: {
+        ...process.env,
+        RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS: "1",
+        RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA: "1",
+        RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT: "1",
+        RECALLWEAVE_MEMORYBENCH_BASE_URL: "http://127.0.0.1:8080",
+        RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL: "local-diagnostic-answer",
+        RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL: "local-diagnostic-judge",
+      },
+    }).stdout,
+  );
+  assert.equal(localDiagnosticMismatchPreflight.claimScope, "local-full");
+  assert.equal(localDiagnosticMismatchPreflight.scoringPolicy?.modelMatchPolicy, "local-diagnostic-allowed");
+  assert.equal(localDiagnosticMismatchPreflight.scoringPolicy?.scoringModelPolicySatisfied, true);
+  assert.equal(localDiagnosticMismatchPreflight.blockers.includes("answer-model-does-not-match-target"), false);
+  assert.equal(localDiagnosticMismatchPreflight.blockers.includes("judge-model-does-not-match-target"), false);
+  const localDiagnosticCloudEndpointPreflight = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-answer-quality-preflight.mjs", "--claim-scope", "local-full"], {
+      env: {
+        ...process.env,
+        RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS: "1",
+        RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA: "1",
+        RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT: "1",
+        RECALLWEAVE_MEMORYBENCH_BASE_URL: "https://api.example.invalid/v1",
+        RECALLWEAVE_MEMORYBENCH_API_KEY: "dummy-local-diagnostic-key",
+        RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL: "local-diagnostic-answer",
+        RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL: "local-diagnostic-judge",
+      },
+    }).stdout,
+  );
+  assert.equal(localDiagnosticCloudEndpointPreflight.scoringPolicy?.scoringModelPolicySatisfied, false);
+  assert.ok(localDiagnosticCloudEndpointPreflight.blockers.includes("local-diagnostic-scoring-requires-local-endpoint"));
   assert.match(answerQualityPreflightMarkdownFresh, /Answer-Quality Benchmark Preflight/);
   assert.match(answerQualityPreflightMarkdownEvidence, /BLOCKED_ANSWER_QUALITY_ENV/);
   const shardPreflightFixture = writeSyntheticShardPreflightFixture(mkdtempSync(join(tmpdir(), "recallweave-shard-preflight-")));
@@ -2977,6 +3071,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(fullLane?.queryExpansionSotaEligible, true);
     assert.equal(fullLane?.answerQualityEndpoint?.answerModel, fullRunTarget.benchmark?.answerModel);
     assert.equal(fullLane?.answerQualityEndpoint?.judgeModel, fullRunTarget.benchmark?.judgeModel);
+    assert.equal(fullLane?.answerQualityEndpoint?.modelMatchPolicy, "exact-target-required");
+    assert.equal(fullLane?.answerQualityEndpoint?.exactTargetModelsRequired, true);
+    assert.equal(fullLane?.answerQualityEndpoint?.localDiagnosticModelAllowed, false);
+    assert.equal(shardPlan.scoringPolicy?.modelMatchPolicy, "exact-target-required");
     assert.deepEqual(shardPlan.blockers, []);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--max-memory-bytes 300000000/);
@@ -3014,7 +3112,16 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(acceptedLocalLane?.queryExpansionEvidenceRequirement, "local-or-cloud-model-required");
     assert.equal(acceptedLocalLane?.queryExpansionDiagnosticFallbackAllowed, false);
     assert.equal(acceptedLocalLane?.queryExpansionSotaEligible, false);
+    assert.equal(acceptedLocalLane?.answerQualityEndpoint?.modelMatchPolicy, "local-diagnostic-allowed");
+    assert.equal(acceptedLocalLane?.answerQualityEndpoint?.exactTargetModelsRequired, false);
+    assert.equal(acceptedLocalLane?.answerQualityEndpoint?.localDiagnosticModelAllowed, true);
+    assert.equal(acceptedLocalLane?.answerQualityEndpoint?.answerModel, "<local-answer-model>");
+    assert.equal(acceptedLocalLane?.answerQualityEndpoint?.judgeModel, "<local-judge-model>");
+    assert.equal(shardPlan.scoringPolicy?.modelMatchPolicy, "local-diagnostic-allowed");
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_QUERY_EXPANSION_BASE_URL/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--claim-scope local-full/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--model-match-policy local-diagnostic-allowed/);
+    assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_QUERY_EXPANSION_CALLS/);
     assert.doesNotMatch(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
     assert.match(shardPlan.runPlan?.combineCommand ?? "", /end-to-end-memory-score-local-full-combined/);
@@ -3123,6 +3230,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
     assert.equal(launchDoctor.acceptedLane?.queryExpansion?.diagnosticFallbackAllowed, false);
     assert.equal(launchDoctor.acceptedLane?.queryExpansion?.readyForAcceptedShardIntake, false);
+    assert.equal(launchDoctor.acceptedLane?.answerQuality?.modelMatchPolicy, "local-diagnostic-allowed");
+    assert.equal(launchDoctor.acceptedLane?.answerQuality?.exactTargetModelsRequired, false);
+    assert.equal(launchDoctor.acceptedLane?.answerQuality?.localDiagnosticModelAllowed, true);
+    assert.equal(launchDoctor.acceptedLane?.answerQuality?.scoringModelPolicySatisfied, false);
     assert.equal(launchDoctor.acceptedLane?.responseArmExport?.providerCallsRequired, false);
     assert.equal(Object.hasOwn(launchDoctor.acceptedLane?.providerReadiness ?? {}, "voyage"), false);
     assert.equal(Object.hasOwn(launchDoctor.acceptedLane?.providerReadiness ?? {}, "nvidia"), false);
@@ -3379,6 +3490,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullAnswerQualityShardWorkorder.fullSotaLaneReadiness, null);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadyForResponseArmExport, false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadyForAnswerQualityScoring, false);
+  assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.answerQuality?.modelMatchPolicy, "local-diagnostic-allowed");
+  assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.answerQuality?.scoringModelPolicySatisfied, false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.canReachFullSotaGateAfterShardIntake, false);
   assert.ok(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("local-apple-credentials-missing"));
   assert.ok(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("local-rerank-credentials-missing"));
@@ -3391,6 +3504,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullAnswerQualityShardWorkorder.gatedCommands?.combineAfterIntakePasses ?? "", /end-to-end-memory-score-local-full-combined/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /local-full-accepted-shards/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /query-expansion=local-or-cloud-model-required/);
+  assert.match(localFullAnswerQualityShardWorkorderEvidence, /scoring-policy=local-diagnostic-allowed/);
   for (const localShardIntake of [localFullShardIntakeFresh, localFullAnswerQualityShardIntake]) {
     assert.equal(localShardIntake.mode, "public-benchmark-answer-quality-shard-intake");
     assert.equal(localShardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
@@ -3461,6 +3575,28 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityShardIntakeReady.intake?.sameSourceLock, true);
   assert.deepEqual(answerQualityShardIntakeReady.blockers, []);
   assert.match(answerQualityShardIntakeReady.combineCommand ?? "", /--combine-mode shards/);
+  assert.equal(localFullAnswerQualityShardWorkorderReady.readyForShardIntake, true);
+  assert.equal(localFullAnswerQualityShardWorkorderReady.acceptedLaneReadyForAnswerQualityScoring, false);
+  assert.equal(localFullAnswerQualityShardWorkorderReady.acceptedLaneReadiness?.canReachFullSotaGateAfterShardIntake, false);
+  assert.equal(localFullAnswerQualityShardIntakeReady.status, "READY_TO_COMBINE_FULL_ANSWER_QUALITY_SHARDS");
+  assert.equal(localFullAnswerQualityShardIntakeReady.readyForShardCombine, true);
+  assert.equal(localFullAnswerQualityShardIntakeReady.intake?.acceptedShardCount, 20);
+  assert.equal(localFullAnswerQualityShardIntakeReady.intake?.sameModels, true);
+  assert.equal(localFullAnswerQualityShardIntakeReady.intake?.scoringModelPolicySatisfied, true);
+  assert.deepEqual(localFullAnswerQualityShardIntakeReady.blockers, []);
+  assert.equal(localFullResultGateReady.status, "READY_LOCAL_FULL_MEMORY_SCORE");
+  assert.equal(localFullResultGateReady.claimScope, "local-full");
+  assert.equal(localFullResultGateReady.countsAsEndToEndMemoryBenchmark, true);
+  assert.equal(localFullResultGateReady.countsAsLocalFullBenchmarkEvidence, true);
+  assert.equal(localFullResultGateReady.countsAsFullMemorySotaEvidence, false);
+  assert.equal(localFullResultGateReady.scoringPolicy?.modelMatchPolicy, "local-diagnostic-allowed");
+  assert.equal(localFullResultGateReady.scoringPolicy?.scoringModelPolicySatisfied, true);
+  assert.ok(localFullResultGateReady.fullSotaBlockers?.includes("local-full-diagnostic-result-not-sota-comparable"));
+  assert.notEqual(fullSotaLocalModelGateRun.status, 0, "full-SOTA gate must reject local diagnostic scoring under --require-ready");
+  assert.match(
+    `${fullSotaLocalModelGateRun.stdout}\n${fullSotaLocalModelGateRun.stderr}`,
+    /result-claim-scope-does-not-match-requested-gate|answer-model-does-not-match-target|judge-model-does-not-match-target/,
+  );
   const shardIntakeMismatchRoot = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-mismatch-"));
   const shardIntakeMismatchInputs = syntheticShardInputs.map((inputPath, index) => {
     const clone = JSON.parse(readFileSync(inputPath, "utf8"));
@@ -7499,13 +7635,16 @@ function assertNativeMemory(value) {
   assert.ok(value.proof.includes("local-store-events-observed"));
 }
 
-function writeSyntheticAnswerQualityShardReports(plan, outputDir) {
+function writeSyntheticAnswerQualityShardReports(plan, outputDir, options = {}) {
   mkdirSync(outputDir, { recursive: true, mode: 0o700 });
   const paths = [];
   const querySetHash = plan.materializeReport?.collectorCompatibleQuerySetHash ?? "sha256:synthetic-query-set";
   const materializerHash = plan.materializeReport?.materializerHash ?? "sha256:synthetic-materializer";
   const answerLabelsHash = plan.target?.answerLabelsHash ?? "sha256:synthetic-answer-labels";
   const scoringCodeHash = plan.target?.scoringCodeHash ?? "sha256:synthetic-scoring";
+  const answerModel = options.answerModel ?? plan.target?.answerModel;
+  const judgeModel = options.judgeModel ?? plan.target?.judgeModel;
+  const endpointIsLocal = options.endpointIsLocal === true;
   for (const shard of plan.shards ?? []) {
     const path = join(outputDir, `answer-quality-${shard.id}.json`);
     const strategies = (plan.runPlan?.strategies ?? []).map((strategy, index) => ({
@@ -7529,6 +7668,13 @@ function writeSyntheticAnswerQualityShardReports(plan, outputDir) {
       privacyLeakCount: 0,
       redactionFailureCount: 0,
       scoredQueryCount: shard.queryCount,
+      resultFingerprints: Array.from({ length: shard.queryCount }, (_, queryIndex) => ({
+        queryIdHash: `synthetic-${shard.id}-${String(queryIndex).padStart(2, "0")}`,
+        score: 10 + index,
+        correct: true,
+        elapsedMs: 10,
+        contextTokens: 100,
+      })),
     }));
     const report = {
       schemaVersion: 1,
@@ -7579,12 +7725,23 @@ function writeSyntheticAnswerQualityShardReports(plan, outputDir) {
         },
       },
       provider: {
-        answerModel: plan.target?.answerModel,
-        judgeModel: plan.target?.judgeModel,
+        answerModel,
+        judgeModel,
         callsMade: shard.queryCount * strategies.length * 2,
         answerQualityCallsAllowed: true,
         publicDataConfirmed: true,
         endpointLabel: "synthetic-release-check",
+        endpointIsLocal,
+      },
+      scoringPolicy: {
+        claimScope: plan.runPlan?.claimScope ?? "full-sota",
+        modelMatchPolicy: plan.scoringPolicy?.modelMatchPolicy ?? "exact-target-required",
+        exactTargetModelsRequired: plan.scoringPolicy?.exactTargetModelsRequired === true,
+        localDiagnosticModelAllowed: plan.scoringPolicy?.localDiagnosticModelAllowed === true,
+        localDiagnosticEndpointSatisfied: endpointIsLocal,
+        modelMismatchAllowed: plan.scoringPolicy?.localDiagnosticModelAllowed === true,
+        countsAsFullMemorySotaEvidence: false,
+        countsAsLocalFullBenchmarkEvidence: plan.runPlan?.claimScope === "local-full" && endpointIsLocal,
       },
       metrics: strategies.at(-1)?.metrics ?? null,
       strategies,

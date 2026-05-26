@@ -16,6 +16,10 @@ const outputPath = args.output ? resolve(root, args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolve(root, args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
 const requireLiveReady = Boolean(args.requireReady);
+const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE ?? "full-sota").trim();
+const modelMatchPolicy = String(
+  args.modelMatchPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY ?? defaultModelMatchPolicy(claimScope),
+).trim();
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_MEMORYBENCH_QUERY_OFFSET ?? 0, "query offset");
 const maxContextChars = optionalPositiveInt(args.maxContextChars ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_CONTEXT_CHARS ?? 12000, "max context chars");
@@ -37,6 +41,15 @@ const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
+assert.ok(
+  ["exact-target-required", "local-diagnostic-allowed"].includes(modelMatchPolicy),
+  "--model-match-policy must be exact-target-required or local-diagnostic-allowed",
+);
+assert.ok(
+  claimScope === "local-full" || modelMatchPolicy === "exact-target-required",
+  "only local-full can use local-diagnostic-allowed scoring",
+);
 assert.ok(!fixtureRequested || queryOffset === 0, "--query-offset is only supported for live answer-quality runs");
 assert.ok(targetPath && existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `target empty: ${displayPath(targetPath)}`);
@@ -96,9 +109,17 @@ async function liveRun() {
   assert.equal(noRawTextOutput, true, "set RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 before live answer-quality scoring");
   assert.ok(answerModel, "answer model is required via --answer-model or RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL");
   assert.ok(judgeModel, "judge model is required via --judge-model or RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL");
-  assert.equal(answerModel, target.benchmark?.answerModel, "answer model must match target contract");
-  assert.equal(judgeModel, target.benchmark?.judgeModel, "judge model must match target contract");
   assert.ok(baseUrl, "OpenAI-compatible base URL is required via --base-url or RECALLWEAVE_MEMORYBENCH_BASE_URL");
+  const exactTargetModelsRequired = modelMatchPolicy === "exact-target-required";
+  const localDiagnosticModelAllowed = modelMatchPolicy === "local-diagnostic-allowed";
+  const endpointIsLocal = isLocalUrl(baseUrl);
+  if (exactTargetModelsRequired) {
+    assert.equal(answerModel, target.benchmark?.answerModel, "answer model must match target contract");
+    assert.equal(judgeModel, target.benchmark?.judgeModel, "judge model must match target contract");
+  }
+  if (localDiagnosticModelAllowed) {
+    assert.equal(endpointIsLocal, true, "local diagnostic scoring requires a local OpenAI-compatible endpoint");
+  }
   if (!isLocalUrl(baseUrl)) assert.ok(apiKey, "cloud answer-quality endpoints require RECALLWEAVE_MEMORYBENCH_API_KEY");
   assertPrivateFile(querySetPath, "private query set");
   assertPrivateFile(memoriesPath, "private memories");
@@ -152,6 +173,7 @@ async function liveRun() {
       callTimeoutMs,
       continueOnCallError,
       endpointLabel: endpointLabel(baseUrl),
+      endpointIsLocal,
     },
   });
 }
@@ -238,6 +260,7 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
     schemaVersion: 1,
     ok: true,
     mode: "public-benchmark-answer-quality",
+    claimScope,
     fixtureOnly,
     benchmark: target.benchmark?.family ?? target.benchmark?.name ?? "longmemeval",
     metricsOnly: true,
@@ -291,6 +314,17 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
       },
     },
     provider,
+    scoringPolicy: {
+      claimScope,
+      modelMatchPolicy,
+      exactTargetModelsRequired: modelMatchPolicy === "exact-target-required",
+      localDiagnosticModelAllowed: modelMatchPolicy === "local-diagnostic-allowed",
+      localDiagnosticEndpointSatisfied: provider.endpointIsLocal === true,
+      modelMismatchAllowed: modelMatchPolicy === "local-diagnostic-allowed",
+      countsAsFullMemorySotaEvidence: false,
+      countsAsLocalFullBenchmarkEvidence:
+        claimScope === "local-full" && !fixtureOnly && provider.callsMade > 0 && provider.endpointIsLocal === true,
+    },
     metrics: bestArm?.metrics ?? null,
     strategies: arms,
     winner: bestArm
@@ -849,6 +883,10 @@ function optionalNonNegativeInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
   return number;
+}
+
+function defaultModelMatchPolicy(scope) {
+  return scope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required";
 }
 
 function truthy(value) {

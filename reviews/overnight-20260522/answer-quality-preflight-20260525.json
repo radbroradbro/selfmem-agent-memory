@@ -3,6 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-answer-quality-preflight",
   "status": "BLOCKED_ANSWER_QUALITY_ENV",
+  "claimScope": "full-sota",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -15,7 +16,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "printsCredentials": false,
-  "generatedAt": "2026-05-26T00:03:22.538Z",
+  "generatedAt": "2026-05-26T06:25:22.651Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
     "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
@@ -45,6 +46,18 @@
     "judgeModelMatchesTarget": false,
     "valuesPrinted": false
   },
+  "scoringPolicy": {
+    "claimScope": "full-sota",
+    "modelMatchPolicy": "exact-target-required",
+    "exactTargetModelsRequired": true,
+    "localDiagnosticModelAllowed": false,
+    "localDiagnosticEndpointRequired": false,
+    "localDiagnosticEndpointSatisfied": false,
+    "modelMismatchAllowed": false,
+    "scoringModelPolicySatisfied": false,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsLocalFullBenchmarkEvidence": false
+  },
   "privateInputs": {
     "querySet": {
       "role": "queryset",
@@ -62,6 +75,7 @@
       "rawTextPrivate": true
     }
   },
+  "queryShard": null,
   "arms": [],
   "requiredStrategyCoverage": {
     "hasBm25Lite": false,
@@ -72,7 +86,8 @@
     "envReady": false,
     "privateInputsReady": false,
     "armsReady": false,
-    "sameDataReady": true,
+    "responseArmsCoverSelectedShard": false,
+    "sameDataReady": false,
     "liveAnswerQualityCanRun": false,
     "readyForEndToEndMemoryScoreGate": false,
     "countsAsFullMemorySotaEvidence": false
@@ -99,6 +114,8 @@
     "Include bm25-lite, full-hybrid-rerank, and at least one provider or local challenger arm."
   ],
   "liveCommandTemplate": [
+    "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota",
+    "RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required",
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
@@ -106,6 +123,6 @@
     "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
     "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o",
     "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o",
-    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json --arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json --output <public-answer-quality-output.json>"
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope full-sota --target reviews/overnight-20260522/public-longmemeval-expanded-run-target.json --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json --arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json --output <public-answer-quality-output.json>"
   ]
 }

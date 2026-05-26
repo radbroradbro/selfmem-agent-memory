@@ -198,6 +198,11 @@ Use `benchmark:answer-quality:local-shard-plan` for the no-spend/local full
 benchmark path. That plan uses the same 500-query target and raw-source-retaining
 private materialization but accepts BM25, full hybrid, model-backed query
 expansion, local Apple embedding, and local rerank as the local strategy set.
+It also uses an explicit local diagnostic scoring policy: local answer and
+judge model names may differ from the target only when the scoring endpoint is
+local, and the resulting packet is barred from SOTA or public superiority
+claims. The full-SOTA lane still requires the exact target answer and judge
+model contract.
 It is a full local benchmark lane, not a SOTA lane: it can show whether the
 local method is limited by model size or missing cloud arms, but broad SOTA and
 public superiority wording still require the provider/SOTA comparison lane,
@@ -518,7 +523,10 @@ not count as a RecallWeave score.
   the checked-in full-SOTA lane remains blocked until live-export consent,
   no-raw-text consent, answer-quality consent, local Apple/local rerank endpoints,
   Voyage/NVIDIA credentials, answer and judge model configuration, a scoring
-  endpoint, and query-expansion readiness are all present.
+  endpoint, exact target model matching, and query-expansion readiness are all
+  present. The local-full workorder permits local diagnostic scoring only under
+  `claimScope=local-full`, and the result gate rejects a local-full packet when
+  it is submitted to the full-SOTA gate.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

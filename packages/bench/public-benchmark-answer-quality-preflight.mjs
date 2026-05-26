@@ -18,11 +18,24 @@ const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
 const requireReady = Boolean(args.requireReady);
+const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE ?? "full-sota").trim();
+const modelMatchPolicy = String(
+  args.modelMatchPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY ?? defaultModelMatchPolicy(claimScope),
+).trim();
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_MEMORYBENCH_QUERY_OFFSET ?? 0, "query offset");
 const armSpecs = parseArmSpecs(args.arm ?? args.arms);
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
+assert.ok(
+  ["exact-target-required", "local-diagnostic-allowed"].includes(modelMatchPolicy),
+  "--model-match-policy must be exact-target-required or local-diagnostic-allowed",
+);
+assert.ok(
+  claimScope === "local-full" || modelMatchPolicy === "exact-target-required",
+  "only local-full can use local-diagnostic-allowed scoring",
+);
 assert.ok(existsSync(targetPath), `benchmark target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `benchmark target empty: ${displayPath(targetPath)}`);
 
@@ -42,6 +55,12 @@ const targetAnswerModel = String(target.benchmark?.answerModel ?? "").trim();
 const targetJudgeModel = String(target.benchmark?.judgeModel ?? "").trim();
 const answerModelMatchesTarget = answerModel.present && targetAnswerModel.length > 0 && answerModel.value === targetAnswerModel;
 const judgeModelMatchesTarget = judgeModel.present && targetJudgeModel.length > 0 && judgeModel.value === targetJudgeModel;
+const exactTargetModelsRequired = modelMatchPolicy === "exact-target-required";
+const localDiagnosticModelAllowed = modelMatchPolicy === "local-diagnostic-allowed";
+const localDiagnosticEndpointSatisfied = localDiagnosticModelAllowed && endpointIsLocal;
+const scoringModelPolicySatisfied = exactTargetModelsRequired
+  ? answerModelMatchesTarget && judgeModelMatchesTarget
+  : answerModel.present && judgeModel.present && localDiagnosticEndpointSatisfied;
 
 let queryShardSelection = null;
 const privateInputs = inspectPrivateInputs();
@@ -54,8 +73,7 @@ const envReady =
   noRawTextOutputConfirmed &&
   answerModel.present &&
   judgeModel.present &&
-  answerModelMatchesTarget &&
-  judgeModelMatchesTarget &&
+  scoringModelPolicySatisfied &&
   baseUrl.present &&
   (endpointIsLocal || apiKey.present);
 const privateInputsReady = privateInputs.querySet.present && privateInputs.memories.present && privateInputs.answerLabels.present;
@@ -81,8 +99,9 @@ const blockers = [
   !judgeModel.present ? "judge-model-missing" : null,
   !targetAnswerModel ? "target-answer-model-missing" : null,
   !targetJudgeModel ? "target-judge-model-missing" : null,
-  answerModel.present && !answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
-  judgeModel.present && !judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
+  exactTargetModelsRequired && answerModel.present && !answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
+  exactTargetModelsRequired && judgeModel.present && !judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
+  localDiagnosticModelAllowed && baseUrl.present && !endpointIsLocal ? "local-diagnostic-scoring-requires-local-endpoint" : null,
   !baseUrl.present ? "openai-compatible-base-url-missing" : null,
   baseUrl.present && !endpointIsLocal && !apiKey.present ? "cloud-endpoint-api-key-missing" : null,
   !privateInputs.querySet.present ? "private-queryset-missing" : null,
@@ -106,6 +125,7 @@ const report = {
   ok: !requireReady || ready,
   mode: "public-benchmark-answer-quality-preflight",
   status: ready ? "READY_FOR_LIVE_ANSWER_QUALITY" : "BLOCKED_ANSWER_QUALITY_ENV",
+  claimScope,
   writesRealFiles: Boolean(outputPath || markdownOutputPath),
   metricsOnly: true,
   publicSafe: true,
@@ -148,6 +168,18 @@ const report = {
     judgeModelMatchesTarget,
     valuesPrinted: false,
   },
+  scoringPolicy: {
+    claimScope,
+    modelMatchPolicy,
+    exactTargetModelsRequired,
+    localDiagnosticModelAllowed,
+    localDiagnosticEndpointRequired: localDiagnosticModelAllowed,
+    localDiagnosticEndpointSatisfied,
+    modelMismatchAllowed: localDiagnosticModelAllowed,
+    scoringModelPolicySatisfied,
+    countsAsFullMemorySotaEvidence: false,
+    countsAsLocalFullBenchmarkEvidence: claimScope === "local-full" && ready,
+  },
   privateInputs,
   queryShard: queryShardSelection
     ? {
@@ -174,10 +206,14 @@ const report = {
   blockers,
   nextActions: ready
     ? [
-        "Run benchmark:answer-quality with --live against the private materialized inputs and response arm exports.",
-        "Attach the metrics-only result to benchmark:memory-score:result-gate --require-ready.",
-        "Send the metrics-only packet to independent reviewers before public benchmark wording changes.",
-      ]
+    "Run benchmark:answer-quality with --live against the private materialized inputs and response arm exports.",
+    claimScope === "local-full"
+      ? "Attach the metrics-only result to benchmark:memory-score:result-gate --claim-scope local-full --require-ready."
+      : "Attach the metrics-only result to benchmark:memory-score:result-gate --require-ready.",
+    claimScope === "local-full"
+      ? "Treat this as local diagnostic evidence only; exact SOTA and public superiority claims still need the full provider/scoring lane."
+      : "Send the metrics-only packet to independent reviewers before public benchmark wording changes.",
+  ]
     : [
         "Materialize the source-locked target into an operator-private directory outside the repository.",
         "Export one private RecallWeave response file per strategy with baseline:export:recallweave.",
@@ -337,15 +373,18 @@ function liveCommandTemplate() {
     maxQueries ? `--max-queries ${maxQueries}` : null,
   ].filter(Boolean);
   return [
+    `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
+    `RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=${modelMatchPolicy}`,
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
     "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
     "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
-    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${targetAnswerModel || "<target-answer-model>"}`,
-    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${targetJudgeModel || "<target-judge-model>"}`,
+    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${exactTargetModelsRequired ? targetAnswerModel || "<target-answer-model>" : "<local-answer-model>"}`,
+    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${exactTargetModelsRequired ? targetJudgeModel || "<target-judge-model>" : "<local-judge-model>"}`,
     [
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
+      `--claim-scope ${claimScope}`,
       `--target ${displayPath(targetPath)}`,
       "--queryset <private-output-dir>/materialized/longmemeval-queryset.private.json",
       "--memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl",
@@ -364,6 +403,8 @@ function renderMarkdown(value) {
     "# Answer-Quality Benchmark Preflight",
     "",
     `- Status: ${value.status}`,
+    `- Claim scope: ${value.claimScope}`,
+    `- Model match policy: ${value.scoringPolicy.modelMatchPolicy}`,
     `- Live answer-quality can run: ${value.readiness.liveAnswerQualityCanRun}`,
     `- Ready for end-to-end memory score gate: ${value.readiness.readyForEndToEndMemoryScoreGate}`,
     `- Calls provider APIs: ${value.callsProviderApis}`,
@@ -382,6 +423,8 @@ function renderMarkdown(value) {
     `- Same-data hashes ready: ${value.readiness.sameDataReady}`,
     `- Answer model matches target: ${value.models.answerModelMatchesTarget}`,
     `- Judge model matches target: ${value.models.judgeModelMatchesTarget}`,
+    `- Scoring model policy satisfied: ${value.scoringPolicy.scoringModelPolicySatisfied}`,
+    `- Counts as local-full benchmark evidence: ${value.scoringPolicy.countsAsLocalFullBenchmarkEvidence}`,
     "",
     "## Strategy Coverage",
     `- BM25 lite: ${value.requiredStrategyCoverage.hasBm25Lite}`,
@@ -412,6 +455,10 @@ function collectorQuerySetHashPayload(querySet) {
       expectedResultHashes: query.expectedResultHashes ?? [],
     })),
   };
+}
+
+function defaultModelMatchPolicy(scope) {
+  return scope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required";
 }
 
 function selectQueries(queries) {

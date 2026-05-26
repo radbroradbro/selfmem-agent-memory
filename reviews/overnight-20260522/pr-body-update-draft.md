@@ -432,7 +432,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Adds a `local-full` answer-quality shard plan and workorder for the same
   500-query target. It lets the local Qwen3/Apple Silicon plus local-rerank
   method run the full benchmark without being blocked by absent Voyage/NVIDIA
-  credentials, while keeping public SOTA and launch claims blocked.
+  credentials, while keeping public SOTA and launch claims blocked. The local
+  plan now uses an explicit diagnostic scoring policy: local answer/judge model
+  names may differ from the target only on a local endpoint, and the full-SOTA
+  gate rejects a local-full packet instead of silently promoting it.
 - Adds a local-full accepted-lane launch doctor so the first shard has a
   no-provider-call go/no-go report with exact local embedding, local rerank,
   answer-quality endpoint, and model-backed query-expansion blockers. It keeps

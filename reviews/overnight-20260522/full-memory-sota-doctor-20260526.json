@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T06:06:56.603Z",
+  "generatedAt": "2026-05-26T06:25:23.322Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -47,35 +47,35 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:5b5d9a12b872662af0198c00a4cff7cf30be2bbc0760e70923d16daf433227cf",
+      "hash": "sha256:934c7cdef74507b719f173540bc9256e22fff05b736cb4521424d7335593c688",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
       "exists": true,
-      "hash": "sha256:f0bec65ea232a7634f107ba940159b59c103b40ede05656b6000cc17afae6dc7",
+      "hash": "sha256:3f1cd815f035169077dc42c20690b33594f586fd61e3bd686f13ffdb09f9f4e6",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
       "exists": true,
-      "hash": "sha256:62b6bd08cf4d5d8ebf1a185c1e1f7cbc0734e3282443dceccbcb735a21fd7277",
+      "hash": "sha256:dc4a205fe2a5049f1942a65cda11d56ace2111d1d6109c1cdf66da6a52ecee02",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
     "localFullShardIntake": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json",
       "exists": true,
-      "hash": "sha256:91cb40ac1823684094424ca9e75ff6c420d8960aeb4ad9d11e926b6870259145",
+      "hash": "sha256:9d78a60d57373ec54b01be8aa4f03038883b135e94d9cb11383406068816b1bf",
       "mode": "public-benchmark-answer-quality-shard-intake",
       "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
     },
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:252959a484400bb8f5462a0143f2a630b88393e79752d6817bc8cfb62c1f5b9c",
+      "hash": "sha256:5316d0ffbab4cbbf225b8effc04f05113bba39e5944c77ce431a512d1d159325",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -103,14 +103,14 @@
     "shardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
       "exists": true,
-      "hash": "sha256:00ded7baaf6565ae750731e31e6a02e44b0c4ab723d46cd4875d9bba93a71dcd",
+      "hash": "sha256:248794b0f2c0f64b6d3f8ed3b45d5e54ed13e8199917fe86a881dcd6a1335f46",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
     "shardIntake": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json",
       "exists": true,
-      "hash": "sha256:50f39ebe0d095aea684aeaad5822b7d01862559157b56ead440ce2b07a3ade75",
+      "hash": "sha256:dbce94f206212d7ef67bbe1dafb601fc44feef6a51d26b48413fefb4aba9a7a4",
       "mode": "public-benchmark-answer-quality-shard-intake",
       "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
     },
@@ -180,7 +180,7 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:6297ca3c37f766ef26e4058c7b512c0fd5452c3f9c65984778f102a99c017f06",
+      "hash": "sha256:20ec471e3a2e7289f901419c911e7faf654e9cb02b7c0c6a9dde72eb493657d0",
       "mode": null,
       "status": null
     },
@@ -924,7 +924,14 @@
           "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
           "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
           "answerModel": "gpt-4o",
-          "judgeModel": "gpt-4o"
+          "judgeModel": "gpt-4o",
+          "targetAnswerModel": "gpt-4o",
+          "targetJudgeModel": "gpt-4o",
+          "requiredAnswerModel": "gpt-4o",
+          "requiredJudgeModel": "gpt-4o",
+          "modelMatchPolicy": "exact-target-required",
+          "exactTargetModelsRequired": true,
+          "localDiagnosticModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -963,7 +970,14 @@
           "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
           "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
           "answerModel": "gpt-4o",
-          "judgeModel": "gpt-4o"
+          "judgeModel": "gpt-4o",
+          "targetAnswerModel": "gpt-4o",
+          "targetJudgeModel": "gpt-4o",
+          "requiredAnswerModel": "gpt-4o",
+          "requiredJudgeModel": "gpt-4o",
+          "modelMatchPolicy": "exact-target-required",
+          "exactTargetModelsRequired": true,
+          "localDiagnosticModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -999,7 +1013,14 @@
           "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
           "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
           "answerModel": "gpt-4o",
-          "judgeModel": "gpt-4o"
+          "judgeModel": "gpt-4o",
+          "targetAnswerModel": "gpt-4o",
+          "targetJudgeModel": "gpt-4o",
+          "requiredAnswerModel": "gpt-4o",
+          "requiredJudgeModel": "gpt-4o",
+          "modelMatchPolicy": "exact-target-required",
+          "exactTargetModelsRequired": true,
+          "localDiagnosticModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1035,7 +1056,14 @@
           "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
           "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
           "answerModel": "gpt-4o",
-          "judgeModel": "gpt-4o"
+          "judgeModel": "gpt-4o",
+          "targetAnswerModel": "gpt-4o",
+          "targetJudgeModel": "gpt-4o",
+          "requiredAnswerModel": "gpt-4o",
+          "requiredJudgeModel": "gpt-4o",
+          "modelMatchPolicy": "exact-target-required",
+          "exactTargetModelsRequired": true,
+          "localDiagnosticModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1078,7 +1106,14 @@
           "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
           "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
           "answerModel": "gpt-4o",
-          "judgeModel": "gpt-4o"
+          "judgeModel": "gpt-4o",
+          "targetAnswerModel": "gpt-4o",
+          "targetJudgeModel": "gpt-4o",
+          "requiredAnswerModel": "gpt-4o",
+          "requiredJudgeModel": "gpt-4o",
+          "modelMatchPolicy": "exact-target-required",
+          "exactTargetModelsRequired": true,
+          "localDiagnosticModelAllowed": false
         },
         "acceptedByFullShardIntake": true,
         "canReachFullSotaGateAfterShardIntake": true,

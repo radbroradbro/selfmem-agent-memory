@@ -80,7 +80,9 @@ requirements are resolved.
   with BM25, full hybrid, model-backed query expansion, local Apple embedding,
   and local rerank, without Voyage/NVIDIA blockers. A completed local-full run
   can diagnose local model limits, but it still cannot authorize SOTA or launch
-  language.
+  language. The local lane now has its own diagnostic scoring policy: local
+  answer/judge model names may differ from the target only on a local endpoint,
+  and submitting that packet to the full-SOTA gate is rejected.
 - The local-full accepted-lane launch doctor now gives the first shard its own
   no-provider-call go/no-go report. It keeps private raw-source lineage private,
   reports missing local embedding, local rerank, answer-quality endpoint, and

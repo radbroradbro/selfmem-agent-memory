@@ -3,6 +3,13 @@
 Date: 2026-05-23
 
 - PR #5 and issue #6 were refreshed again on 2026-05-26 after adding the
+  local-full diagnostic scoring policy split. Live sync passed with PR body hash
+  `c3930f4b4c90f5f0c4a6e121360620a9b799b26050ae6935b3baadfa172228c8`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`,
+  and issue body hash
+  `1b702f8118354977d5d3859ce80fc4f4f9f8a51c0471d0e9aa541aec7cc80216`.
+- PR #5 and issue #6 were refreshed again on 2026-05-26 after adding the
   accepted-lane launch doctor for the full-shard benchmark gate. Live sync
   passed with PR body hash
   `c7e4be14e7fbb1eaff609508d7fda9aaf927bc405f29071c5bf688ada22cba48`,

@@ -59,6 +59,7 @@ assertSafePublicText(targetRaw, "target");
 assertSafePublicText(materializeRaw, "materialize report");
 const target = JSON.parse(targetRaw);
 const materialize = JSON.parse(materializeRaw);
+const scoringPolicy = scoringPolicyForClaimScope(claimScope);
 const targetHash = `sha256:${sha256(targetRaw)}`;
 const materializeHash = `sha256:${sha256(materializeRaw)}`;
 const queryCount = Number(materialize.selection?.queryCount ?? materialize.selection?.selectedCount ?? materialize.sourceRetention?.selectedRawRowsCount ?? 0);
@@ -106,6 +107,7 @@ const report = {
   mode: "public-benchmark-answer-quality-shard-plan",
   status: ready ? "READY_FULL_ANSWER_QUALITY_SHARD_RUN" : "BLOCKED_FULL_ANSWER_QUALITY_SHARD_RUN",
   claimScope,
+  scoringPolicy,
   writesRealFiles: Boolean(outputPath || markdownOutputPath),
   metricsOnly: true,
   publicSafe: true,
@@ -153,6 +155,7 @@ const report = {
   coverageRequirements: Object.fromEntries(requiredChecks.map((key) => [key, true])),
   runPlan: {
     claimScope,
+    scoringPolicy,
     queryCount,
     shardSize,
     shardCount: shards.length,
@@ -343,8 +346,15 @@ function buildExecutionLanes(items, scope) {
       answerQualityEndpoint: {
         baseUrlEnv: "RECALLWEAVE_MEMORYBENCH_BASE_URL",
         apiKeyEnv: "RECALLWEAVE_MEMORYBENCH_API_KEY",
-        answerModel: target.benchmark?.answerModel ?? null,
-        judgeModel: target.benchmark?.judgeModel ?? null,
+        answerModel: scoringPolicy.answerModelTemplate,
+        judgeModel: scoringPolicy.judgeModelTemplate,
+        targetAnswerModel: target.benchmark?.answerModel ?? null,
+        targetJudgeModel: target.benchmark?.judgeModel ?? null,
+        requiredAnswerModel: scoringPolicy.exactTargetModelsRequired ? target.benchmark?.answerModel ?? null : null,
+        requiredJudgeModel: scoringPolicy.exactTargetModelsRequired ? target.benchmark?.judgeModel ?? null : null,
+        modelMatchPolicy: scoringPolicy.modelMatchPolicy,
+        exactTargetModelsRequired: scoringPolicy.exactTargetModelsRequired,
+        localDiagnosticModelAllowed: scoringPolicy.localDiagnosticModelAllowed,
       },
       acceptedByFullShardIntake: lane.acceptedByFullShardIntake,
       canReachFullSotaGateAfterShardIntake: lane.canReachFullSotaGateAfterShardIntake,
@@ -457,14 +467,18 @@ function responseArmExportTemplate() {
 function answerQualityTemplate() {
   const armArgs = strategies.map((strategy) => `--arm ${strategy}=<private-output-dir>/arms/{shardId}/${strategy}-responses.private.json`);
   return [
+    `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
+    `RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=${scoringPolicy.modelMatchPolicy}`,
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
     "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
     "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
-    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${target.benchmark?.answerModel ?? "<target-answer-model>"}`,
-    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${target.benchmark?.judgeModel ?? "<target-judge-model>"}`,
+    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${scoringPolicy.answerModelTemplate}`,
+    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${scoringPolicy.judgeModelTemplate}`,
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
+    `--claim-scope ${claimScope}`,
+    `--model-match-policy ${scoringPolicy.modelMatchPolicy}`,
     `--target ${displayPath(targetPath)}`,
     "--queryset <private-output-dir>/longmemeval-queryset.private.json",
     "--memories <private-output-dir>/longmemeval-memories.private.jsonl",
@@ -480,14 +494,18 @@ function answerQualityTemplate() {
 function preflightTemplate() {
   const armArgs = strategies.map((strategy) => `--arm ${strategy}=<private-output-dir>/arms/{shardId}/${strategy}-responses.private.json`);
   return [
+    `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
+    `RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=${scoringPolicy.modelMatchPolicy}`,
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
     "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
     "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
-    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${target.benchmark?.answerModel ?? "<target-answer-model>"}`,
-    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${target.benchmark?.judgeModel ?? "<target-judge-model>"}`,
+    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${scoringPolicy.answerModelTemplate}`,
+    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${scoringPolicy.judgeModelTemplate}`,
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
+    `--claim-scope ${claimScope}`,
+    `--model-match-policy ${scoringPolicy.modelMatchPolicy}`,
     `--target ${displayPath(targetPath)}`,
     "--queryset <private-output-dir>/longmemeval-queryset.private.json",
     "--memories <private-output-dir>/longmemeval-memories.private.jsonl",
@@ -517,6 +535,7 @@ function resultGateCommand() {
   const reviewerName = claimScope === "full-sota" ? "memory-score-reviewer-intake-full" : `memory-score-reviewer-intake-${claimScope}`;
   return [
     "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate --",
+    `--claim-scope ${claimScope}`,
     `--target ${displayPath(targetPath)}`,
     `--result <public-review-dir>/${combinedName}.json`,
     `--reviewer-approval-report <public-review-dir>/${reviewerName}.json`,
@@ -534,6 +553,20 @@ function reviewerIntakeCommand() {
     "--reviewer <reviewer-b-json>",
     `--output <public-review-dir>/${reviewerName}.json`,
   ].join(" ");
+}
+
+function scoringPolicyForClaimScope(scope) {
+  const exactTargetModelsRequired = scope === "full-sota";
+  const localDiagnosticModelAllowed = scope === "local-full";
+  return {
+    modelMatchPolicy: exactTargetModelsRequired ? "exact-target-required" : "local-diagnostic-allowed",
+    exactTargetModelsRequired,
+    localDiagnosticModelAllowed,
+    answerModelTemplate: exactTargetModelsRequired ? target.benchmark?.answerModel ?? "<target-answer-model>" : "<local-answer-model>",
+    judgeModelTemplate: exactTargetModelsRequired ? target.benchmark?.judgeModel ?? "<target-judge-model>" : "<local-judge-model>",
+    countsAsFullMemorySotaEvidence: false,
+    publicBenchmarkClaimsAllowed: false,
+  };
 }
 
 function defaultStrategies(scope) {
@@ -559,6 +592,7 @@ function renderMarkdown(value) {
     "",
     `- Status: ${value.status}`,
     `- Claim scope: ${value.claimScope}`,
+    `- Model match policy: ${value.scoringPolicy.modelMatchPolicy}`,
     `- Ready for answer-quality shard run: ${value.readyForAnswerQualityShardRun}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
     `- Target: ${value.target.path}`,

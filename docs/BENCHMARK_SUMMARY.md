@@ -226,6 +226,11 @@ full-hybrid, query-expanded hybrid, local Qwen3 0.6B embedding, and local Qwen3
 0.6B embedding plus local rerank arms. The best local arm was
 `local-apple-qwen3-0_6b-local-rerank` at `36` answer-quality / `0.3667`
 correct rate with 300 local model calls and zero answer or judge failures.
+The full 500-query local-full lane now carries the same source-locked target
+through a separate diagnostic scoring contract: local answer/judge models are
+allowed only with a local OpenAI-compatible endpoint, and the result gate can
+count that output as local-full benchmark evidence while still rejecting it as
+full-memory SOTA evidence.
 The full LongMemEval-S run-only target is also checked in at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
 materialization evidence in

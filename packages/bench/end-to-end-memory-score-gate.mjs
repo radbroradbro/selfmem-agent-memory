@@ -19,8 +19,10 @@ const reviewerApprovalReportPath = args.reviewerApprovalReport ?? args.reviewerR
 const format = String(args.format ?? "json").toLowerCase();
 const requireReady = Boolean(args.requireReady);
 const fixtureProxySmoke = Boolean(args.fixtureProxySmoke);
+const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_MEMORY_SCORE_CLAIM_SCOPE ?? "full-sota").trim();
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
 assert.ok(existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `target empty: ${displayPath(targetPath)}`);
 
@@ -39,7 +41,8 @@ assertSafePublicText(markdownText, "end-to-end memory score gate markdown");
 if (outputPath) writeOutput(outputPath, jsonText);
 if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
-if (requireReady && !report.countsAsFullMemorySotaEvidence) process.exit(1);
+if (requireReady && claimScope === "full-sota" && !report.countsAsFullMemorySotaEvidence) process.exit(1);
+if (requireReady && claimScope === "local-full" && !report.countsAsLocalFullBenchmarkEvidence) process.exit(1);
 
 function loadResult() {
   if (fixtureProxySmoke) {
@@ -153,6 +156,10 @@ function loadReportedTargetsEvidence() {
 
 function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, reviewerApproval }) {
   const result = loaded.json;
+  const effectiveClaimScope = String(result?.claimScope ?? result?.scoringPolicy?.claimScope ?? claimScope);
+  const claimScopeMatchesRequest = effectiveClaimScope === claimScope;
+  const isLocalFull = effectiveClaimScope === "local-full";
+  const isFullSota = effectiveClaimScope === "full-sota";
   const rows = normalizeRows(result);
   const rowNames = rows.map((item) => item.strategy ?? item.armId).filter(Boolean);
   const answerMetric = bestAnswerMetric(rows, result);
@@ -170,6 +177,21 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
   const resultAnswerLabelsHash = result?.answerLabelsHash ?? result?.input?.answerLabelsHash ?? result?.target?.answerLabelsHash ?? null;
   const resultAnswerModel = extractActualAnswerModel(result);
   const resultJudgeModel = extractActualJudgeModel(result);
+  const modelMatchPolicy = String(result?.scoringPolicy?.modelMatchPolicy ?? (isLocalFull ? "local-diagnostic-allowed" : "exact-target-required"));
+  const localDiagnosticScoringSatisfied =
+    isLocalFull &&
+    modelMatchPolicy === "local-diagnostic-allowed" &&
+    typeof resultAnswerModel === "string" &&
+    resultAnswerModel.length > 0 &&
+    typeof resultJudgeModel === "string" &&
+    resultJudgeModel.length > 0 &&
+    (result?.scoringPolicy?.localDiagnosticEndpointSatisfied === true || result?.provider?.endpointIsLocal === true);
+  const exactTargetScoringSatisfied =
+    Boolean(targetAnswerModel) &&
+    Boolean(targetJudgeModel) &&
+    resultAnswerModel === targetAnswerModel &&
+    resultJudgeModel === targetJudgeModel;
+  const scoringModelPolicySatisfied = isLocalFull ? localDiagnosticScoringSatisfied : exactTargetScoringSatisfied;
   const reportedTargetComparison = compareReportedTarget({
     answerMetric,
     resultAnswerModel,
@@ -209,6 +231,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       result?.input?.source === "materialized-source-locked-longmemeval" ||
       result?.sourceLock?.sameDataAttestation === true ||
       result?.target?.sourceLocked === true,
+    claimScopeMatchesRequest,
     targetHashMatches: resultTargetHash === targetHash,
     benchmarkMatchesTarget: result?.benchmark === targetBenchmark || result?.benchmark?.family === targetBenchmark || result?.target?.benchmark === targetBenchmark,
     querySetHashPresent: typeof (result?.input?.querySetHash ?? result?.querySetHash) === "string" && String(result?.input?.querySetHash ?? result?.querySetHash).startsWith("sha256:"),
@@ -221,6 +244,8 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     judgeModelPresent: typeof resultJudgeModel === "string" && resultJudgeModel.length > 0,
     answerModelMatchesTarget: Boolean(targetAnswerModel) && resultAnswerModel === targetAnswerModel,
     judgeModelMatchesTarget: Boolean(targetJudgeModel) && resultJudgeModel === targetJudgeModel,
+    scoringModelPolicySatisfied,
+    localDiagnosticScoringSatisfied,
     answerQualityMetricPresent: answerMetric.value != null && Number.isFinite(Number(answerMetric.value)),
     answerQualityMetricInRange: answerMetric.value != null && Number(answerMetric.value) >= 0 && Number(answerMetric.value) <= 100,
     bm25ControlPresent: hasAny(rowNames, ["bm25-lite"]),
@@ -260,6 +285,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     !checks.rawMemoryExcluded ? "raw-memory-included" : null,
     !checks.rawTranscriptExcluded ? "raw-transcript-included" : null,
     !checks.sourceLockedTarget ? "result-not-bound-to-source-locked-target" : null,
+    !checks.claimScopeMatchesRequest ? "result-claim-scope-does-not-match-requested-gate" : null,
     !checks.targetHashMatches ? "target-hash-does-not-match-source-locked-target" : null,
     !checks.benchmarkMatchesTarget ? "benchmark-does-not-match-target" : null,
     !checks.querySetHashPresent ? "missing-query-set-hash" : null,
@@ -268,42 +294,51 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     !checks.answerLabelsHashMatches ? "answer-labels-hash-does-not-match-target" : null,
     !checks.answerModelPresent ? "missing-actual-answer-model" : null,
     !checks.judgeModelPresent ? "missing-actual-judge-model" : null,
-    !checks.answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
-    !checks.judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
+    isFullSota && !checks.answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
+    isFullSota && !checks.judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
+    isLocalFull && !checks.localDiagnosticScoringSatisfied ? "local-diagnostic-scoring-policy-not-satisfied" : null,
     !checks.answerQualityMetricPresent ? "missing-answer-quality-score" : null,
     !checks.answerQualityMetricInRange ? "answer-quality-score-out-of-range" : null,
     !checks.bm25ControlPresent ? "missing-bm25-control" : null,
     !checks.denseControlPresent ? "missing-dense-or-vector-control" : null,
     !checks.fullHybridControlPresent ? "missing-full-hybrid-control" : null,
     !checks.queryExpansionArmPresent ? "missing-query-expansion-arm" : null,
-    !checks.voyageProviderArmPresent ? "missing-voyage-provider-arm" : null,
-    !checks.nvidiaOrGeminiProviderArmPresent ? "missing-nvidia-or-gemini-provider-arm" : null,
+    isFullSota && !checks.voyageProviderArmPresent ? "missing-voyage-provider-arm" : null,
+    isFullSota && !checks.nvidiaOrGeminiProviderArmPresent ? "missing-nvidia-or-gemini-provider-arm" : null,
     !checks.localAppleArmPresent ? "missing-local-apple-arm" : null,
     !checks.localRerankArmPresent ? "missing-local-rerank-arm" : null,
-    !checks.reviewerApprovalReportPresent ? "missing-memory-score-reviewer-approval-report" : null,
-    checks.reviewerApprovalReportPresent && !checks.reviewerApprovalReportReady ? "memory-score-reviewer-approval-report-not-ready" : null,
-    checks.reviewerApprovalReportPresent && !checks.reviewerApprovalReportTargetBound ? "memory-score-reviewer-approval-report-not-bound-to-result" : null,
-    !checks.reviewerApprovalsPresent ? "missing-two-independent-reviewer-approvals" : null,
+    isFullSota && !checks.reviewerApprovalReportPresent ? "missing-memory-score-reviewer-approval-report" : null,
+    isFullSota && checks.reviewerApprovalReportPresent && !checks.reviewerApprovalReportReady
+      ? "memory-score-reviewer-approval-report-not-ready"
+      : null,
+    isFullSota && checks.reviewerApprovalReportPresent && !checks.reviewerApprovalReportTargetBound
+      ? "memory-score-reviewer-approval-report-not-bound-to-result"
+      : null,
+    isFullSota && !checks.reviewerApprovalsPresent ? "missing-two-independent-reviewer-approvals" : null,
     !checks.privacyLeakCountersClear ? "privacy-or-redaction-counter-nonzero" : null,
   ].filter(Boolean);
 
-  const fullSotaBlockers = [
+  const fullSotaBlockers = isFullSota
+    ? [
     !checks.reportedTargetsSourceLocked ? "reported-memory-targets-not-source-locked" : null,
     !checks.primaryReportedMemoryTargetPresent ? "missing-primary-reported-memory-target" : null,
     checks.primaryReportedMemoryTargetPresent && !checks.reportedTargetBenchmarkMatchesResult ? "reported-target-benchmark-does-not-match-result" : null,
     checks.primaryReportedMemoryTargetPresent && !checks.reportedTargetJudgeMatchesResult ? "reported-target-judge-model-does-not-match-result" : null,
     checks.primaryReportedMemoryTargetPresent && !checks.reportedTargetAnswerModelComparable ? "reported-target-answer-model-does-not-match-result" : null,
     !checks.fullOrOfficiallyComparableRunPresent ? "missing-full-or-officially-comparable-memory-benchmark-run" : null,
-    checks.primaryReportedMemoryTargetPresent && !checks.scoreMeetsPrimaryReportedTarget ? "best-end-to-end-score-below-primary-reported-memory-target" : null,
-  ].filter(Boolean);
+      checks.primaryReportedMemoryTargetPresent && !checks.scoreMeetsPrimaryReportedTarget ? "best-end-to-end-score-below-primary-reported-memory-target" : null,
+    ].filter(Boolean)
+    : ["local-full-diagnostic-result-not-sota-comparable"];
   const countsAsEndToEndMemoryBenchmark = blockers.length === 0;
-  const countsAsFullMemorySotaEvidence = countsAsEndToEndMemoryBenchmark && fullSotaBlockers.length === 0;
+  const countsAsLocalFullBenchmarkEvidence = isLocalFull && countsAsEndToEndMemoryBenchmark;
+  const countsAsFullMemorySotaEvidence = isFullSota && countsAsEndToEndMemoryBenchmark && fullSotaBlockers.length === 0;
 
   return {
     schemaVersion: 1,
     ok: true,
     mode: "end-to-end-memory-score-gate",
-    status: blockers.length === 0 ? "READY_END_TO_END_MEMORY_SCORE" : "BLOCKED_END_TO_END_MEMORY_SCORE",
+    status: blockers.length === 0 ? (isLocalFull ? "READY_LOCAL_FULL_MEMORY_SCORE" : "READY_END_TO_END_MEMORY_SCORE") : "BLOCKED_END_TO_END_MEMORY_SCORE",
+    claimScope: effectiveClaimScope,
     generatedAt: new Date().toISOString(),
     publicSafe: true,
     metricsOnly: true,
@@ -311,10 +346,13 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     sendsBenchmarkTextToProvider: false,
     publicBenchmarkClaimsAllowed: false,
     countsAsEndToEndMemoryBenchmark,
+    countsAsLocalFullBenchmarkEvidence,
     countsAsFullMemorySotaEvidence,
     reason:
       countsAsFullMemorySotaEvidence
         ? "Same-data answer-quality result is source-locked, reviewed, and eligible for the full memory SOTA ladder."
+        : countsAsLocalFullBenchmarkEvidence
+          ? "Same-data local-full answer-quality result is source-locked and eligible as local diagnostic benchmark evidence, but not SOTA evidence."
         : blockers.length
           ? "Result is missing, retrieval-only, fixture-only, unreviewed, or otherwise insufficient for end-to-end memory quality claims."
           : "Result passes the end-to-end memory-score checks, but still lacks the full-run or reported-target comparison needed for SOTA evidence.",
@@ -347,6 +385,16 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       reviewerApprovalCount,
       arms: rowNames,
     },
+    scoringPolicy: {
+      modelMatchPolicy,
+      exactTargetModelsRequired: isFullSota,
+      localDiagnosticModelAllowed: isLocalFull,
+      scoringModelPolicySatisfied,
+      localDiagnosticScoringSatisfied,
+      modelMismatchAllowed: isLocalFull,
+      countsAsFullMemorySotaEvidence: false,
+      countsAsLocalFullBenchmarkEvidence,
+    },
     reportedTargetsEvidence: {
       source: reportedTargetsEvidence.source,
       path: reportedTargetsEvidence.path,
@@ -376,15 +424,22 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     blockers,
     fullSotaBlockers,
     nextActions: blockers.length || fullSotaBlockers.length
-      ? [
-          "Run the same-data LongMemEval/MemoryBench answer-quality harness across the full target or an officially comparable benchmark target.",
-          "Include BM25, dense/vector, full-hybrid, live query-expansion, provider challenger, local Apple, and local reranker arms on the exact source-locked target.",
-          "Beat the source-locked reported memory-system target under matching benchmark and judge semantics before claiming full-memory SOTA evidence.",
-          "Attach only metrics-only public-safe output, then re-run this gate with --require-ready before SOTA ladder promotion.",
-          "Send the exact gate-passing packet to two independent reviewers before owner/public release approval.",
-        ]
+      ? isLocalFull
+        ? [
+            "Run the same-data local-full answer-quality harness across the full 500-query target.",
+            "Include BM25, full-hybrid, live query-expansion, local Apple, and local reranker arms on the exact source-locked target.",
+            "Keep SOTA and production-replacement claims blocked until the exact-scoring full provider/SOTA lane passes.",
+            "Attach only metrics-only public-safe output, then send the local-full packet to independent reviewers before release wording changes.",
+          ]
+        : [
+            "Run the same-data LongMemEval/MemoryBench answer-quality harness across the full target or an officially comparable benchmark target.",
+            "Include BM25, dense/vector, full-hybrid, live query-expansion, provider challenger, local Apple, and local reranker arms on the exact source-locked target.",
+            "Beat the source-locked reported memory-system target under matching benchmark and judge semantics before claiming full-memory SOTA evidence.",
+            "Attach only metrics-only public-safe output, then re-run this gate with --require-ready before SOTA ladder promotion.",
+            "Send the exact gate-passing packet to two independent reviewers before owner/public release approval.",
+          ]
       : [
-          "Attach this gate report to the SOTA ladder packet and reviewer packet.",
+          "Attach this gate report to the benchmark packet and reviewer packet.",
           "Update UI evidence, docs, and release notes against the reviewed result before owner approval.",
         ],
   };
@@ -549,7 +604,9 @@ function renderMarkdown(value) {
     "# End-to-End Memory Score Gate",
     "",
     `- Status: ${value.status}`,
+    `- Claim scope: ${value.claimScope}`,
     `- Counts as end-to-end memory benchmark: ${value.countsAsEndToEndMemoryBenchmark}`,
+    `- Counts as local-full benchmark evidence: ${value.countsAsLocalFullBenchmarkEvidence}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
     `- Target: ${value.target.path}`,
@@ -569,6 +626,8 @@ function renderMarkdown(value) {
     `- Answer quality metric: ${value.result.answerQualityMetric.name ?? "missing"}=${value.result.answerQualityMetric.value ?? "missing"}`,
     `- Reviewer approvals: ${value.result.reviewerApprovalCount}`,
     `- Arms: ${value.result.arms.join(", ") || "none"}`,
+    `- Model match policy: ${value.scoringPolicy.modelMatchPolicy}`,
+    `- Scoring model policy satisfied: ${value.scoringPolicy.scoringModelPolicySatisfied}`,
     "",
     "## Reported Target",
     `- Source lock status: ${value.reportedTargetsEvidence.status ?? "missing"}`,

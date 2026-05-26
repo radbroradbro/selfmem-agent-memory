@@ -76,6 +76,8 @@ const report = {
     sameTarget: evaluated.sameTarget,
     sameSourceLock: evaluated.sameSourceLock,
     sameModels: evaluated.sameModels,
+    scoringModelPolicySatisfied: evaluated.scoringModelPolicySatisfied,
+    sameModelsAcrossShards: evaluated.sameModelsAcrossShards,
     sameStrategySet: evaluated.sameStrategySet,
   },
   acceptedShards: evaluated.acceptedShards,
@@ -142,8 +144,11 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
   const duplicateShards = [];
   let sameTarget = true;
   let sameSourceLock = true;
-  let sameModels = true;
+  let scoringModelPolicySatisfied = true;
+  let sameModelsAcrossShards = true;
   let sameStrategySet = true;
+  let firstAnswerModel = null;
+  let firstJudgeModel = null;
 
   for (const item of loadedItems) {
     const result = item.json;
@@ -164,7 +169,14 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
     ) {
       sameSourceLock = false;
     }
-    if (result.provider?.answerModel !== planValue.target?.answerModel || result.provider?.judgeModel !== planValue.target?.judgeModel) sameModels = false;
+    const modelState = scoringModelsSatisfyPlan(result, planValue);
+    if (!modelState.ready) scoringModelPolicySatisfied = false;
+    if (firstAnswerModel == null && firstJudgeModel == null) {
+      firstAnswerModel = result.provider?.answerModel ?? null;
+      firstJudgeModel = result.provider?.judgeModel ?? null;
+    } else if (result.provider?.answerModel !== firstAnswerModel || result.provider?.judgeModel !== firstJudgeModel) {
+      sameModelsAcrossShards = false;
+    }
     if (strategyNamesHash(result) !== strategySetHash) sameStrategySet = false;
     const row = {
       shardId: expected.get(key)?.id ?? null,
@@ -203,7 +215,8 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
     rejected.length > 0 ? "answer-quality-shards-rejected" : null,
     !sameTarget ? "shard-target-hash-mismatch" : null,
     !sameSourceLock ? "shard-source-lock-mismatch" : null,
-    !sameModels ? "shard-answer-or-judge-model-mismatch" : null,
+    !scoringModelPolicySatisfied ? "shard-scoring-model-policy-mismatch" : null,
+    !sameModelsAcrossShards ? "shard-answer-or-judge-model-inconsistent" : null,
     !sameStrategySet ? "shard-strategy-set-mismatch" : null,
     !completeCoverage ? "full-shard-coverage-incomplete" : null,
   ].filter(Boolean);
@@ -216,7 +229,9 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
     completeCoverage,
     sameTarget,
     sameSourceLock,
-    sameModels,
+    sameModels: scoringModelPolicySatisfied && sameModelsAcrossShards,
+    scoringModelPolicySatisfied,
+    sameModelsAcrossShards,
     sameStrategySet,
     blockers,
   };
@@ -242,8 +257,7 @@ function shardFailures({ item, result, range, expected, planValue, strategySetHa
     result.input?.materializerHash !== planValue.materializeReport?.materializerHash ? "materializer-hash-mismatch" : null,
     Number(result.input?.totalQueryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "total-query-count-mismatch" : null,
     Number(result.input?.queryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "input-query-count-mismatch" : null,
-    result.provider?.answerModel !== planValue.target?.answerModel ? "answer-model-mismatch" : null,
-    result.provider?.judgeModel !== planValue.target?.judgeModel ? "judge-model-mismatch" : null,
+    ...scoringModelFailures(result, planValue),
     Number(result.privacyLeakCount ?? 0) !== 0 ? "privacy-leak-count-nonzero" : null,
     Number(result.redactionFailureCount ?? 0) !== 0 ? "redaction-failure-count-nonzero" : null,
     !range ? "query-shard-range-missing" : null,
@@ -260,6 +274,57 @@ function shardFailures({ item, result, range, expected, planValue, strategySetHa
   ].filter(Boolean);
   assert.doesNotMatch(JSON.stringify({ fileName: item.fileName, failures }), privatePathPattern);
   return failures;
+}
+
+function scoringModelFailures(result, planValue) {
+  const state = scoringModelsSatisfyPlan(result, planValue);
+  if (state.ready) return [];
+  if (state.policy === "local-diagnostic-allowed") {
+    return [
+      !state.answerModelPresent ? "answer-model-missing" : null,
+      !state.judgeModelPresent ? "judge-model-missing" : null,
+      !state.localDiagnosticEndpointSatisfied ? "local-diagnostic-scoring-policy-mismatch" : null,
+    ].filter(Boolean);
+  }
+  return [
+    !state.answerModelPresent ? "answer-model-missing" : null,
+    !state.judgeModelPresent ? "judge-model-missing" : null,
+    state.answerModelPresent && !state.answerModelMatchesTarget ? "answer-model-mismatch" : null,
+    state.judgeModelPresent && !state.judgeModelMatchesTarget ? "judge-model-mismatch" : null,
+  ].filter(Boolean);
+}
+
+function scoringModelsSatisfyPlan(result, planValue) {
+  const policy = String(planValue.scoringPolicy?.modelMatchPolicy ?? (planValue.runPlan?.claimScope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required"));
+  const answerModel = String(result.provider?.answerModel ?? "").trim();
+  const judgeModel = String(result.provider?.judgeModel ?? "").trim();
+  const targetAnswerModel = String(planValue.target?.answerModel ?? "").trim();
+  const targetJudgeModel = String(planValue.target?.judgeModel ?? "").trim();
+  const answerModelPresent = answerModel.length > 0;
+  const judgeModelPresent = judgeModel.length > 0;
+  const answerModelMatchesTarget = answerModelPresent && answerModel === targetAnswerModel;
+  const judgeModelMatchesTarget = judgeModelPresent && judgeModel === targetJudgeModel;
+  const localDiagnosticEndpointSatisfied = result.scoringPolicy?.localDiagnosticEndpointSatisfied === true || result.provider?.endpointIsLocal === true;
+  if (policy === "local-diagnostic-allowed") {
+    return {
+      policy,
+      ready: answerModelPresent && judgeModelPresent && localDiagnosticEndpointSatisfied,
+      answerModelPresent,
+      judgeModelPresent,
+      answerModelMatchesTarget,
+      judgeModelMatchesTarget,
+      localDiagnosticEndpointSatisfied,
+    };
+  }
+  return {
+    policy,
+    ready: answerModelMatchesTarget && judgeModelMatchesTarget,
+    answerModelPresent,
+    judgeModelPresent,
+    answerModelMatchesTarget,
+    judgeModelMatchesTarget,
+    localDiagnosticEndpointSatisfied,
+  };
 }
 
 function shardRange(result) {

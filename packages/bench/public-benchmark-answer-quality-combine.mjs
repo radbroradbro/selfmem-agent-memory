@@ -171,7 +171,9 @@ function buildCombinedReport(items) {
       publicDataConfirmed: true,
       callsMade,
       endpointLabel: first.provider?.endpointLabel ?? null,
+      endpointIsLocal: items.every((item) => item.json.provider?.endpointIsLocal === true),
     },
+    scoringPolicy: combineScoringPolicy(items),
     metrics: winner?.metrics ?? null,
     strategies,
     winner: winner
@@ -279,7 +281,9 @@ function buildShardCombinedReport(items) {
       publicDataConfirmed: true,
       callsMade,
       endpointLabel: first.provider?.endpointLabel ?? null,
+      endpointIsLocal: items.every((item) => item.json.provider?.endpointIsLocal === true),
     },
+    scoringPolicy: combineScoringPolicy(items),
     metrics: winner?.metrics ?? null,
     strategies,
     winner: winner
@@ -367,6 +371,27 @@ function mergeProviders(providers) {
     callTimeoutMs: providers.find((provider) => provider.callTimeoutMs != null)?.callTimeoutMs ?? null,
     continueOnCallError: providers.some((provider) => provider.continueOnCallError === true),
     fixtureJudge: false,
+  };
+}
+
+function combineScoringPolicy(items) {
+  const first = items[0].json;
+  const policies = items.map((item) => item.json.scoringPolicy ?? {});
+  const claimScope = first.claimScope ?? first.scoringPolicy?.claimScope ?? "full-sota";
+  const modelMatchPolicy = first.scoringPolicy?.modelMatchPolicy ?? (claimScope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required");
+  return {
+    claimScope,
+    modelMatchPolicy,
+    exactTargetModelsRequired: policies.every((policy) => policy.exactTargetModelsRequired === true),
+    localDiagnosticModelAllowed: policies.some((policy) => policy.localDiagnosticModelAllowed === true),
+    localDiagnosticEndpointSatisfied: items.every(
+      (item) => item.json.scoringPolicy?.localDiagnosticEndpointSatisfied === true || item.json.provider?.endpointIsLocal === true,
+    ),
+    modelMismatchAllowed: policies.some((policy) => policy.modelMismatchAllowed === true),
+    countsAsFullMemorySotaEvidence: false,
+    countsAsLocalFullBenchmarkEvidence:
+      claimScope === "local-full" &&
+      items.every((item) => item.json.scoringPolicy?.localDiagnosticEndpointSatisfied === true || item.json.provider?.endpointIsLocal === true),
   };
 }
 
