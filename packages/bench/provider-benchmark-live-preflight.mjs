@@ -13,7 +13,7 @@ const requireReady = Boolean(args.requireReady);
 const strategies = splitList(
   args.strategies ??
     process.env.RECALLWEAVE_PUBLIC_PROVIDER_PREFLIGHT_STRATEGIES ??
-    "bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-nvidia-retriever-500m,cloud-nvidia-nemotron-1b,cloud-nvidia-e5-mistral,local-apple-qwen3-0_6b",
+    "bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-gemini2-embed-rerank-proxy,cloud-gemini2-voyage-rerank,cloud-nvidia-retriever-500m,cloud-nvidia-nemotron-1b,cloud-nvidia-e5-mistral,local-apple-qwen3-0_6b",
 );
 
 const knownStrategies = new Set([
@@ -25,6 +25,8 @@ const knownStrategies = new Set([
   "cloud-voyage4-lite-voyage-lite",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
+  "cloud-gemini2-embed-rerank-proxy",
+  "cloud-gemini2-voyage-rerank",
   "cloud-nvidia-retriever-500m",
   "cloud-nvidia-nemotron-1b",
   "cloud-nvidia-nemotron-vl-1b",
@@ -124,8 +126,8 @@ process.stdout.write(serialized);
 if (!report.ok) process.exitCode = 1;
 
 function requiredProvidersForStrategy(strategy) {
-  if (strategy === "cloud-gemini-embed-rerank-proxy") return ["gemini"];
-  if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
+  if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini2-embed-rerank-proxy") return ["gemini"];
+  if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-gemini2-voyage-rerank") return ["gemini", "voyage"];
   if (
     strategy === "cloud-voyage-rerank-only" ||
     strategy === "cloud-voyage4-voyage" ||

@@ -30,6 +30,8 @@
     "cloud-voyage4-voyage",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
+    "cloud-gemini2-embed-rerank-proxy",
+    "cloud-gemini2-voyage-rerank",
     "cloud-nvidia-retriever-500m",
     "cloud-nvidia-nemotron-1b",
     "cloud-nvidia-e5-mistral",
@@ -125,6 +127,6 @@
     "NVIDIA_API_KEYS_FILE=<optional-private-nvidia-key-file>",
     "VOYAGE_API_KEY=<env-only-voyage-key>",
     "VOYAGE_API_KEYS_FILE=<optional-private-voyage-key-file>",
-    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-nvidia-retriever-500m,cloud-nvidia-nemotron-1b,cloud-nvidia-e5-mistral,local-apple-qwen3-0_6b"
+    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-run-target.json --strategies bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-gemini2-embed-rerank-proxy,cloud-gemini2-voyage-rerank,cloud-nvidia-retriever-500m,cloud-nvidia-nemotron-1b,cloud-nvidia-e5-mistral,local-apple-qwen3-0_6b"
   ]
 }

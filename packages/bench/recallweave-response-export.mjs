@@ -46,6 +46,8 @@ const retrievalStrategies = [
   "cloud-voyage4-lite-voyage-lite",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
+  "cloud-gemini2-embed-rerank-proxy",
+  "cloud-gemini2-voyage-rerank",
   "cloud-nvidia-retriever-500m",
   "cloud-nvidia-nemotron-1b",
   "cloud-nvidia-nemotron-vl-1b",
@@ -287,8 +289,8 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates, options);
   if (options.strategy === "cloud-voyage-rerank-only") return rankCloudVoyageRerankOnly(query, candidates, options);
   if (voyageStrategyConfig(options.strategy)?.mode === "embed-rerank") return rankCloudVoyage4Voyage(query, candidates, options);
-  if (options.strategy === "cloud-gemini-embed-rerank-proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
-  if (options.strategy === "cloud-gemini-voyage-rerank") return rankCloudGeminiVoyageRerank(query, candidates, options);
+  if (geminiStrategyConfig(options.strategy)?.rerankMode === "proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
+  if (geminiStrategyConfig(options.strategy)?.rerankMode === "voyage") return rankCloudGeminiVoyageRerank(query, candidates, options);
   if (nvidiaStrategyConfig(options.strategy)) return rankCloudNvidiaHybrid(query, candidates, options);
   if (localAppleStrategyConfig(options.strategy)) return rankLocalAppleQwen(query, candidates, options);
   return rankJaccard(queryText, candidates);
@@ -509,6 +511,8 @@ async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
 
 async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
+  const config = geminiStrategyConfig(options.strategy);
+  assert.ok(config?.rerankMode === "proxy", `invalid Gemini proxy strategy: ${options.strategy}`);
   const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("gemini-embedding");
@@ -525,9 +529,12 @@ async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) 
     );
     return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
   }
-  assertProviderBenchmarkAllowed("cloud-gemini-embed-rerank-proxy");
-  const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats }))[0];
-  const documentVectors = await geminiEmbed(densePool.map((candidate) => candidate.text), "document", { providerStats: options.providerStats });
+  assertProviderBenchmarkAllowed(options.strategy);
+  const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats, model: config.embedModel }))[0];
+  const documentVectors = await geminiEmbed(densePool.map((candidate) => candidate.text), "document", {
+    providerStats: options.providerStats,
+    model: config.embedModel,
+  });
   const denseRanked = densePool
     .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
     .sort(byScoreThenId);
@@ -546,6 +553,8 @@ async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) 
 
 async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
+  const config = geminiStrategyConfig(options.strategy);
+  assert.ok(config?.rerankMode === "voyage", `invalid Gemini plus Voyage strategy: ${options.strategy}`);
   const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("gemini-embedding");
@@ -563,9 +572,12 @@ async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
     ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
     return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
   }
-  assertProviderBenchmarkAllowed("cloud-gemini-voyage-rerank");
-  const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats }))[0];
-  const documentVectors = await geminiEmbed(densePool.map((candidate) => candidate.text), "document", { providerStats: options.providerStats });
+  assertProviderBenchmarkAllowed(options.strategy);
+  const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats, model: config.embedModel }))[0];
+  const documentVectors = await geminiEmbed(densePool.map((candidate) => candidate.text), "document", {
+    providerStats: options.providerStats,
+    model: config.embedModel,
+  });
   const denseRanked = densePool
     .map((candidate, index) => ({ ...candidate, score: round(cosine(queryVector, documentVectors[index] ?? [])) }))
     .sort(byScoreThenId);
@@ -964,6 +976,8 @@ function isProviderStrategy(strategy) {
     "cloud-voyage4-lite-voyage-lite",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
+    "cloud-gemini2-embed-rerank-proxy",
+    "cloud-gemini2-voyage-rerank",
     "cloud-nvidia-retriever-500m",
     "cloud-nvidia-nemotron-1b",
     "cloud-nvidia-nemotron-vl-1b",
@@ -984,8 +998,9 @@ function assertProviderBenchmarkAllowed(strategy) {
 }
 
 function requiredProvidersForStrategy(strategy) {
-  if (strategy === "cloud-gemini-embed-rerank-proxy") return ["gemini"];
-  if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
+  const geminiConfig = geminiStrategyConfig(strategy);
+  if (geminiConfig?.rerankMode === "proxy") return ["gemini"];
+  if (geminiConfig?.rerankMode === "voyage") return ["gemini", "voyage"];
   if (voyageStrategyConfig(strategy)) return ["voyage"];
   if (nvidiaStrategyConfig(strategy)) return ["nvidia"];
   if (localAppleStrategyConfig(strategy)?.rerankMode === "sidecar") return ["local-apple", "local-rerank"];
@@ -994,7 +1009,7 @@ function requiredProvidersForStrategy(strategy) {
 }
 
 function embedModelForStrategy(strategy) {
-  if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiEmbedModel();
+  if (geminiStrategyConfig(strategy)) return geminiStrategyConfig(strategy).embedModel;
   if (voyageStrategyConfig(strategy)?.embedModel) return voyageStrategyConfig(strategy).embedModel;
   if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).embedModel;
   if (localAppleStrategyConfig(strategy)) return localAppleEmbedModel(strategy);
@@ -1002,7 +1017,7 @@ function embedModelForStrategy(strategy) {
 }
 
 function embedDimensionsForStrategy(strategy) {
-  if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini-voyage-rerank") return geminiOutputDimensionality();
+  if (geminiStrategyConfig(strategy)) return geminiOutputDimensionality();
   if (voyageStrategyConfig(strategy)?.embedModel) return optionalPositiveInt(process.env.VOYAGE_EMBED_DIMENSIONS ?? process.env.VOYAGE_OUTPUT_DIMENSION ?? null, "Voyage output dimension");
   if (nvidiaStrategyConfig(strategy)) return optionalPositiveInt(process.env.NVIDIA_EMBED_DIMENSIONS ?? null, "NVIDIA output dimension");
   if (localAppleStrategyConfig(strategy)) return localAppleEmbedDimensions(strategy);
@@ -1010,9 +1025,9 @@ function embedDimensionsForStrategy(strategy) {
 }
 
 function rerankModelForStrategy(strategy) {
-  if (strategy === "cloud-gemini-voyage-rerank") return voyageRerankModel();
+  if (geminiStrategyConfig(strategy)?.rerankMode === "voyage") return voyageRerankModel();
   if (voyageStrategyConfig(strategy)?.rerankModel) return voyageStrategyConfig(strategy).rerankModel;
-  if (strategy === "cloud-gemini-embed-rerank-proxy") return "local-deterministic-rerank-proxy";
+  if (geminiStrategyConfig(strategy)?.rerankMode === "proxy") return "local-deterministic-rerank-proxy";
   if (nvidiaStrategyConfig(strategy)) return nvidiaStrategyConfig(strategy).rerankModel;
   if (localAppleStrategyConfig(strategy)?.rerankMode === "sidecar") return localAppleRerankModel(strategy);
   if (localAppleStrategyConfig(strategy)) return "local-deterministic-rerank-proxy";
@@ -1164,7 +1179,7 @@ async function geminiEmbed(texts, inputType, options = {}) {
   const input = texts.map((text) => String(text ?? ""));
   const isQuery = inputType === "query";
   options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : input.length);
-  const model = geminiEmbedModel();
+  const model = String(options.model ?? geminiEmbedModel()).replace(/^models\//, "");
   const modelResource = geminiModelResource(model);
   const outputDimensionality = geminiOutputDimensionality();
   const taskType = isQuery ? "RETRIEVAL_QUERY" : "RETRIEVAL_DOCUMENT";
@@ -1680,8 +1695,8 @@ function voyageStrategyConfig(strategy) {
   return configs[strategy] ?? null;
 }
 
-function geminiEmbedModel() {
-  return String(process.env.GEMINI_EMBED_MODEL ?? "gemini-embedding-001").replace(/^models\//, "");
+function geminiEmbedModel(defaultModel = "gemini-embedding-001") {
+  return String(process.env.GEMINI_EMBED_MODEL ?? defaultModel).replace(/^models\//, "");
 }
 
 function geminiModelResource(model) {
@@ -1690,6 +1705,28 @@ function geminiModelResource(model) {
 
 function geminiOutputDimensionality() {
   return optionalPositiveInt(process.env.GEMINI_EMBED_DIMENSIONS ?? process.env.GEMINI_OUTPUT_DIMENSION ?? "1536", "Gemini output dimension");
+}
+
+function geminiStrategyConfig(strategy) {
+  const configs = {
+    "cloud-gemini-embed-rerank-proxy": {
+      embedModel: geminiEmbedModel("gemini-embedding-001"),
+      rerankMode: "proxy",
+    },
+    "cloud-gemini-voyage-rerank": {
+      embedModel: geminiEmbedModel("gemini-embedding-001"),
+      rerankMode: "voyage",
+    },
+    "cloud-gemini2-embed-rerank-proxy": {
+      embedModel: geminiEmbedModel("gemini-embedding-2"),
+      rerankMode: "proxy",
+    },
+    "cloud-gemini2-voyage-rerank": {
+      embedModel: geminiEmbedModel("gemini-embedding-2"),
+      rerankMode: "voyage",
+    },
+  };
+  return configs[strategy] ?? null;
 }
 
 function nvidiaStrategyConfig(strategy) {

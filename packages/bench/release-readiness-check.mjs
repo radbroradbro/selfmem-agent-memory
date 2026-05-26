@@ -1329,6 +1329,10 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(modelMatrix, /Apple Silicon/i);
   assert.match(modelMatrix, /NVIDIA NIM/i);
   assert.match(modelMatrix, /Query expansion is off by default/i);
+  assert.match(modelMatrix, /cloud-gemini2-voyage-rerank/);
+  assert.match(modelMatrix, /Source Refresh/i);
+  assert.match(modelMatrix, /May 26, 2026/);
+  assert.match(modelMatrix, /Gemini Embedding 2 generally available/);
   assert.match(modelMatrix, /Opus 4\.7/i);
   assert.match(modelMatrix, /Codex GPT-5\.5/i);
   assert.match(autoresearchPlan, /matched source-locked canary/i);
@@ -1359,6 +1363,7 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /cloud-nvidia-nemotron-1b/);
   assert.match(providerMatrix, /cloud-gemini2-cohere4pro/);
+  assert.match(providerMatrix, /cloud-gemini2-voyage-rerank/);
   assert.match(providerMatrix, /defaultProvider: none/);
   assert.match(budget, /requireCleanLocalModelRuntimeForLatency: true/);
   assert.match(budget, /stopOnlyRecallWeaveOwnedProcesses: true/);
@@ -1810,11 +1815,14 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini2-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini2-voyage-rerank" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-nvidia-nemotron-1b" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b" && item.provider?.fixtureProviderMock === true));
   assert.match(providerMarkdown, /Gate: provider/);
   assert.match(providerMarkdown, /cloud-voyage4-voyage/);
   assert.match(providerMarkdown, /cloud-gemini-voyage-rerank/);
+  assert.match(providerMarkdown, /cloud-gemini2-voyage-rerank/);
   assert.match(providerMarkdown, /cloud-nvidia-nemotron-1b/);
   assert.match(providerMarkdown, /local-apple-qwen3-0_6b/);
   assert.equal(autoresearchFixture.ok, true);
@@ -2447,6 +2455,8 @@ check("fresh public benchmark target check passes", () => {
     "cloud-voyage4-lite-voyage-lite",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
+    "cloud-gemini2-embed-rerank-proxy",
+    "cloud-gemini2-voyage-rerank",
     "cloud-nvidia-retriever-500m",
     "cloud-nvidia-nemotron-1b",
     "cloud-nvidia-e5-mistral",
@@ -2460,6 +2470,8 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-voyage-rerank-only" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini2-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-gemini2-voyage-rerank" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "cloud-nvidia-nemotron-1b" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerGateFixtureReport.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b" && item.provider?.fixtureProviderMock === true));
   assert.match(providerGateFixtureEvidence, /Gate: provider/);
@@ -2526,6 +2538,8 @@ check("fresh public benchmark target check passes", () => {
     "cloud-voyage4-voyage",
     "cloud-gemini-embed-rerank-proxy",
     "cloud-gemini-voyage-rerank",
+    "cloud-gemini2-embed-rerank-proxy",
+    "cloud-gemini2-voyage-rerank",
     "cloud-nvidia-retriever-500m",
     "cloud-nvidia-nemotron-1b",
     "cloud-nvidia-e5-mistral",
@@ -2534,6 +2548,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(providerLivePreflightEvidence, /Provider Benchmark Live Preflight/);
   assert.match(providerLivePreflightEvidence, /Live run allowed: false/);
   assert.match(providerLivePreflightEvidence, /cloud-gemini-voyage-rerank/);
+  assert.match(providerLivePreflightEvidence, /cloud-gemini2-voyage-rerank/);
   assert.match(providerLivePreflightEvidence, /cloud-nvidia-nemotron-1b/);
   assert.match(providerLivePreflightEvidence, /local-apple-qwen3-0_6b/);
   assert.equal(expandedProviderLivePreflightReport.ok, true);

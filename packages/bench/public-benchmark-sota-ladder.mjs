@@ -67,11 +67,27 @@ const requiredArms = [
   {
     id: "provider-nvidia-or-gemini",
     role: "non-Voyage provider challenger",
-    status: hasAnyMemoryStrategy(rows, ["cloud-nvidia-retriever-500m", "cloud-nvidia-nemotron-1b", "cloud-nvidia-e5-mistral", "cloud-gemini-embed-rerank-proxy", "cloud-gemini-voyage-rerank"])
+    status: hasAnyMemoryStrategy(rows, [
+      "cloud-nvidia-retriever-500m",
+      "cloud-nvidia-nemotron-1b",
+      "cloud-nvidia-e5-mistral",
+      "cloud-gemini-embed-rerank-proxy",
+      "cloud-gemini-voyage-rerank",
+      "cloud-gemini2-embed-rerank-proxy",
+      "cloud-gemini2-voyage-rerank",
+    ])
       ? "present"
       : retrievalStatus(
           rows,
-          ["cloud-nvidia-retriever-500m", "cloud-nvidia-nemotron-1b", "cloud-nvidia-e5-mistral", "cloud-gemini-embed-rerank-proxy", "cloud-gemini-voyage-rerank"],
+          [
+            "cloud-nvidia-retriever-500m",
+            "cloud-nvidia-nemotron-1b",
+            "cloud-nvidia-e5-mistral",
+            "cloud-gemini-embed-rerank-proxy",
+            "cloud-gemini-voyage-rerank",
+            "cloud-gemini2-embed-rerank-proxy",
+            "cloud-gemini2-voyage-rerank",
+          ],
           "retrieval-proxy-present-answer-quality-missing",
         ),
   },

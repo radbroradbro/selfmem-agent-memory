@@ -15,7 +15,7 @@ same public data, dataset revision, and scoring setup as the target row.
 |---|---|---|
 | Cloud quality | Voyage `voyage-4-large` plus `rerank-2.5` | Strong text and code memory path with same-provider embedding and rerank. Voyage documents `rerank-2.5` as the highest-accuracy reranker and `rerank-2.5-lite` as the latency option. |
 | Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus deterministic rerank proxy | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. This is the consumer-hardware floor, not the assumed quality ceiling. |
-| Multimodal challenger | Gemini Embedding 2 or current Gemini embedding model | Useful for PDFs, images, audio, video, and storage-sensitive dimension tests. Do not make it the default until a matched canary wins. |
+| Multimodal challenger | Gemini Embedding 2 | Current Google multimodal embedding challenger for PDFs, images, audio, video, and storage-sensitive dimension tests. Do not make it the default until a matched canary wins. |
 | NVIDIA NIM challenger | NVIDIA NeMo Retriever embedding plus rerank pairs | Useful for hosted latency and retrieval comparisons. Keep this as a benchmark arm until measured on RecallWeave canaries. |
 | Query expansion | Off by default | Enable only when a canary proves better quality without unacceptable latency or exact-identifier damage. |
 
@@ -113,6 +113,8 @@ OpenAI-compatible interface and let the canary decide.
 | `cloud-voyage4-voyage` | `voyage-4-large` | `rerank-2.5` | Larger quality reference arm. |
 | `cloud-gemini-embed-rerank-proxy` | `gemini-embedding-001`, default 1536 dims | Local deterministic rerank proxy | Gemini embedding challenger without a hosted reranker. |
 | `cloud-gemini-voyage-rerank` | `gemini-embedding-001`, default 1536 dims | `rerank-2.5` | Gemini embedding challenger with Voyage rerank held constant. |
+| `cloud-gemini2-embed-rerank-proxy` | `gemini-embedding-2`, default 1536 dims | Local deterministic rerank proxy | Current Gemini multimodal embedding challenger without a second paid reranker. |
+| `cloud-gemini2-voyage-rerank` | `gemini-embedding-2`, default 1536 dims | `rerank-2.5` | Current Gemini multimodal embedding challenger with Voyage rerank held constant. |
 | `cloud-nvidia-retriever-500m` | `nvidia/llama-nemotron-embed-1b-v2` | `nvidia/llama-3.2-nemoretriever-500m-rerank-v2` | Latency challenger. |
 | `cloud-nvidia-nemotron-1b` | `nvidia/llama-nemotron-embed-1b-v2` | `nvidia/llama-nemotron-rerank-1b-v2` | Current text retrieval challenger. |
 | `cloud-nvidia-nemotron-vl-1b` | `nvidia/llama-nemotron-embed-vl-1b-v2` | `nvidia/llama-nemotron-rerank-vl-1b-v2` | Multimodal retrieval challenger. |
@@ -156,6 +158,12 @@ local Apple Silicon arms:
   fusion, then the local deterministic rerank proxy.
 - `cloud-gemini-voyage-rerank`: budgeted BM25 preselect, Gemini
   `gemini-embedding-001` query/document embeddings, sparse+dense+graph+temporal
+  fusion, then Voyage `rerank-2.5`.
+- `cloud-gemini2-embed-rerank-proxy`: budgeted BM25 preselect, Gemini
+  `gemini-embedding-2` query/document embeddings, sparse+dense+graph+temporal
+  fusion, then the local deterministic rerank proxy.
+- `cloud-gemini2-voyage-rerank`: budgeted BM25 preselect, Gemini
+  `gemini-embedding-2` query/document embeddings, sparse+dense+graph+temporal
   fusion, then Voyage `rerank-2.5`.
 - `cloud-nvidia-retriever-500m`: budgeted BM25 preselect, NVIDIA embedding,
   sparse+dense+graph+temporal fusion, then NVIDIA's smaller reranker challenger.
@@ -202,6 +210,23 @@ The default remains `rewriteQuery: false` until a source-locked canary proves:
 - Claude Opus 4.7 and separate Codex GPT-5.5 reviewer sign-off on the
   methodology.
 
+## Source Refresh
+
+This matrix was refreshed against public provider sources on May 26, 2026. The
+current source-backed challenger set keeps:
+
+- Voyage 4 as the cloud text-quality family, with `voyage-4-large`,
+  `voyage-4`, `voyage-4-lite`, and `rerank-2.5`/`rerank-2.5-lite` as separate
+  benchmarkable arms because the 4-series embedding spaces are compatible.
+- Gemini Embedding 2 as the current Gemini multimodal challenger, while
+  keeping `gemini-embedding-001` as the older text-only comparator.
+- Qwen3 Embedding and Reranker 0.6B, 4B, and 8B as the local model ladder,
+  selected by component benchmarks but promoted only by the same-data memory
+  benchmark.
+- NVIDIA Nemotron/NeMo Retriever embedding plus rerank pairs as hosted
+  challenger arms, with NVIDIA's own retrieval docs treated as component
+  evidence rather than full memory-system proof.
+
 ## Autoresearch Setup Gate
 
 Autoresearch may compare Apple Silicon local, Voyage, Gemini, and NVIDIA arms
@@ -227,6 +252,7 @@ score is exciting.
 - [Voyage AI reranker docs](https://docs.voyageai.com/docs/reranker)
 - [Voyage AI model overview](https://www.mongodb.com/docs/voyageai/models/)
 - [Gemini Embedding 2 announcement](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-embedding-2/)
+- [Gemini Embedding 2 generally available](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-embedding-2-generally-available/)
 - [Gemini embeddings API](https://ai.google.dev/api/embeddings)
 - [Qwen3 Embedding 0.6B model card](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B)
 - [Qwen3 Reranker 0.6B model card](https://huggingface.co/Qwen/Qwen3-Reranker-0.6B)

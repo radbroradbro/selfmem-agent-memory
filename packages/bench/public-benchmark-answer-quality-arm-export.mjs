@@ -53,6 +53,8 @@ const retrievalStrategies = new Set([
   "cloud-voyage4-lite-voyage-lite",
   "cloud-gemini-embed-rerank-proxy",
   "cloud-gemini-voyage-rerank",
+  "cloud-gemini2-embed-rerank-proxy",
+  "cloud-gemini2-voyage-rerank",
   "cloud-nvidia-retriever-500m",
   "cloud-nvidia-nemotron-1b",
   "cloud-nvidia-nemotron-vl-1b",

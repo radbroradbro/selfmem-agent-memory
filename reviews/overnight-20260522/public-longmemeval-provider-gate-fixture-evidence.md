@@ -28,6 +28,8 @@
 | cloud-voyage4-lite-voyage-lite | cloud-voyage4-lite-voyage-lite | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-gemini-embed-rerank-proxy | cloud-gemini-embed-rerank-proxy | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-gemini-voyage-rerank | cloud-gemini-voyage-rerank | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-gemini2-embed-rerank-proxy | cloud-gemini2-embed-rerank-proxy | 1 | 1 | 1 | 1 | 1 | 1 |
+| cloud-gemini2-voyage-rerank | cloud-gemini2-voyage-rerank | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-nvidia-retriever-500m | cloud-nvidia-retriever-500m | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-nvidia-nemotron-1b | cloud-nvidia-nemotron-1b | 1 | 1 | 1 | 1 | 1 | 1 |
 | cloud-nvidia-e5-mistral | cloud-nvidia-e5-mistral | 1 | 1 | 1 | 1 | 1 | 1 |
