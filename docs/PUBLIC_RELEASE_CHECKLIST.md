@@ -37,6 +37,9 @@ Use this checklist before making the repository public.
   checked-in local-full shard is 25 of 500 queries and remains blocked on
   nineteen missing shards; shard 002 is a blocked runtime attempt, not
   accepted evidence.
+- [ ] Local Apple local-full shard retries have a fresh
+  `benchmark:local-embedding:durability -- --require-ready` report before
+  response-arm export, and the report stays synthetic-only and public-safe.
 - [ ] `benchmark:memory-score:result-gate --require-ready` has an empty
   `fullSotaBlockers` list, proving the result meets the selected source-locked
   reported memory-system target under matching benchmark and judge semantics.

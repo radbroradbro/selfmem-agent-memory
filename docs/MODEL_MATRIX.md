@@ -78,7 +78,9 @@ best shard arm was still `full-hybrid-rerank` at `19.4` answer quality;
 `local-apple-qwen3-0_6b-local-rerank` scored `15.8`, and BM25 scored `15.2`.
 The shard 002 local-full attempt is blocked before scoring: the local embedding
 service closed the socket during the `local-apple-qwen3-0_6b` arm, and a public
-synthetic embedding smoke reproduced the failure. Keep the 0.6B local embedding
+synthetic embedding smoke reproduced the failure. The repo now exposes
+`benchmark:local-embedding:durability` as the required bounded public-safe
+preflight for local Apple response-arm export. Keep the 0.6B local embedding
 lane as measured-but-not-default until that runtime durability issue is fixed.
 Treat this as local diagnostic evidence, not a default promotion or SOTA
 claim. Qwen3 Reranker 4B and 8B stay optional quality arms until measured

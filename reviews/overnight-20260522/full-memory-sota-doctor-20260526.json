@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T10:57:03.348Z",
+  "generatedAt": "2026-05-26T11:06:40.629Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -85,6 +85,13 @@
       "hash": "sha256:cc383c3c6b66e473fcd92362ec95c1259d6220970d7486286cb762698a95545f",
       "mode": "answer-quality-local-full-shard-runtime-blocker",
       "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME"
+    },
+    "localEmbeddingDurabilitySmoke": {
+      "path": "reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
+      "exists": true,
+      "hash": "sha256:9daf929cba87df653a5b959da9d13215d851679123b3a39a4e3e30d70df28c42",
+      "mode": "local-embedding-durability-smoke",
+      "status": "BLOCKED_LOCAL_EMBEDDING_DURABILITY"
     },
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
@@ -201,21 +208,21 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:eabe5b074d924386765110f171195cbfc3ff9a40d4c9d3304a31be1d4efab0ac",
+      "hash": "sha256:4b5835ce4b5311014c3f25aa891a3d4d804a6d43fa1db9972bba73fa65c18aba",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:0d758caa2d33052228155849e4a318db7465c339f1089d7b390c91f54b29e723",
+      "hash": "sha256:ca399ce5b7aa5493ff264b70b23c8f9fdac4b1e3b2c704fb05d41e404d86f8af",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:59d81b6463cbc7e1c9f31195b3104147f50bd761409c7be9eaefb29c54808c1c",
+      "hash": "sha256:6364028bb9a6ae1472ec9be44114469d006b428cd5eef2a56e92c43da965cd65",
       "mode": null,
       "status": null
     }
@@ -585,6 +592,13 @@
     "runtimeBlockedShardCount": 1,
     "latestRuntimeBlockedShard": "shard-002",
     "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b",
+    "localEmbeddingDurabilityStatus": "BLOCKED_LOCAL_EMBEDDING_DURABILITY",
+    "localEmbeddingDurabilityReady": false,
+    "localEmbeddingDurabilityProbeCount": 4,
+    "localEmbeddingDurabilityBlockers": [
+      "local-embedding-durability-smoke-not-ready",
+      "local-embedding-base-url-missing"
+    ],
     "runtimeBlockers": [
       {
         "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
@@ -620,7 +634,9 @@
       "full-shard-coverage-incomplete",
       "local-apple-embedding-server-socket-close",
       "local-full-shard-002-incomplete",
-      "local-full-shard-coverage-incomplete"
+      "local-full-shard-coverage-incomplete",
+      "local-embedding-durability-smoke-not-ready",
+      "local-embedding-base-url-missing"
     ],
     "launchBlockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
@@ -790,6 +806,14 @@
       ]
     },
     {
+      "id": "local-embedding-durability",
+      "status": "blocked",
+      "blockers": [
+        "local-embedding-durability-smoke-not-ready",
+        "local-embedding-base-url-missing"
+      ]
+    },
+    {
       "id": "local-full-shard-intake",
       "status": "blocked",
       "blockers": [
@@ -797,7 +821,9 @@
         "full-shard-coverage-incomplete",
         "local-apple-embedding-server-socket-close",
         "local-full-shard-002-incomplete",
-        "local-full-shard-coverage-incomplete"
+        "local-full-shard-coverage-incomplete",
+        "local-embedding-durability-smoke-not-ready",
+        "local-embedding-base-url-missing"
       ]
     },
     {
@@ -894,6 +920,8 @@
     "full-memory-sota-score-not-proven",
     "public-sota-claim-not-allowed",
     "local-full-answer-quality-shard-results-not-returned",
+    "local-embedding-durability-smoke-not-ready",
+    "local-embedding-base-url-missing",
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete",
     "local-apple-embedding-server-socket-close",
@@ -1183,6 +1211,7 @@
     ],
     "requiredAfterShardRuns": [
       "benchmark:answer-quality:shard-workorder",
+      "benchmark:local-embedding:durability before local Apple response-arm export",
       "benchmark:answer-quality:shard-intake --require-ready",
       "benchmark:answer-quality:combine -- --combine-mode shards",
       "benchmark:memory-score:reviewer-intake -- --strict-target",

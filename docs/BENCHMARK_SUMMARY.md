@@ -250,7 +250,13 @@ It is not accepted evidence: BM25, full hybrid, and local query-expanded hybrid
 exported 25 private responses each, but the local Apple embedding arm failed
 when the local Qwen3 Embedding 0.6B GGUF service closed the socket. A public
 synthetic embedding smoke reproduced the same failure, so the local-full lane
-still has only one accepted shard and nineteen missing shards.
+still has only one accepted shard and nineteen missing shards. The bounded
+preflight is now codified as
+`benchmark:local-embedding:durability`, with the current public-safe blocked
+report at
+`reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
+Local Apple response-arm export should require a passing durability report
+before shard 002 or any later local-full shard can count.
 The full LongMemEval-S run-only target is also checked in at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
 materialization evidence in
@@ -547,7 +553,11 @@ contract, but it did not win the shard. It remains a challenger, not a default,
 and the full 500-query local-full result still requires the remaining nineteen
 shards and combine gate. Shard 002 exposed a separate local embedding-runtime
 durability blocker before the local rerank arm could run, so the next accepted
-local-full shard needs a bounded embedding smoke before response export.
+local-full shard needs a passing
+`benchmark:local-embedding:durability -- --require-ready` report before
+response export. The checked-in blocked smoke is synthetic-only, prints no
+endpoint URL or raw probe text, and does not count as local-full or SOTA
+evidence.
 
 A source-locked 30-query local Apple run is now recorded:
 

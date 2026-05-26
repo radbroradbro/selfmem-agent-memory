@@ -34,6 +34,9 @@ const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAV
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = optionalPositiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? null, "max memory bytes");
 const privateOutputDir = resolveOptionalPath(args.privateOutputDir ?? process.env.RECALLWEAVE_SOTA_RESPONSE_ARM_DIR ?? null);
+const localEmbeddingDurabilityReportPath = resolveOptionalPath(
+  args.localEmbeddingDurabilityReport ?? process.env.SELFMEM_LOCAL_EMBED_DURABILITY_REPORT ?? null,
+);
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_SOTA_ANSWER_QUALITY_STRATEGIES ?? defaultStrategies().join(","));
 const requireReady = Boolean(args.requireReady);
 const reuseExisting = Boolean(args.reuseExisting ?? process.env.RECALLWEAVE_RESPONSE_ARM_REUSE_EXISTING === "1");
@@ -84,6 +87,7 @@ const coverage = strategyCoverage(strategies);
 const env = envReadiness(strategies);
 const input = inspectInputs();
 const privateDir = inspectPrivateOutputDir();
+const localEmbeddingDurability = inspectLocalEmbeddingDurability(coverage);
 const preflightBlockers = [
   !targetOk ? "target-not-public-longmemeval-run-only" : null,
   !fixtureRequested && !env.liveExportEnabled ? "RECALLWEAVE_BASELINE_LIVE-not-enabled" : null,
@@ -102,6 +106,7 @@ const preflightBlockers = [
     ? "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"
     : null,
   coverage.hasQueryExpansion && !fixtureRequested && !env.queryExpansionReady ? "query-expansion-endpoint-or-consent-missing" : null,
+  ...localEmbeddingDurability.blockers,
 ].filter(Boolean);
 
 const exportRows = preflightBlockers.length === 0 && executeRequested ? exportResponseArms(privateDir.path) : plannedRows();
@@ -167,6 +172,7 @@ const report = {
     maxMemoryBytes,
   },
   env,
+  localEmbeddingDurability,
   strategyCoverage: coverage,
   arms: exportRows,
   blockers: preflightBlockers,
@@ -334,6 +340,87 @@ function envReadiness(items) {
   };
 }
 
+function inspectLocalEmbeddingDurability(coverageValue) {
+  const applicable = coverageValue.hasLocalApple;
+  const required =
+    applicable && (Boolean(args.requireLocalEmbeddingDurability) || truthyEnv("RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY"));
+  if (!applicable) {
+    return {
+      applicable: false,
+      required: false,
+      ready: null,
+      reportPresent: false,
+      valuePrinted: false,
+      blockers: [],
+    };
+  }
+  if (!required) {
+    return {
+      applicable: true,
+      required: false,
+      ready: null,
+      reportPresent: Boolean(localEmbeddingDurabilityReportPath),
+      valuePrinted: false,
+      blockers: [],
+    };
+  }
+  if (!localEmbeddingDurabilityReportPath || !existsSync(localEmbeddingDurabilityReportPath)) {
+    return {
+      applicable: true,
+      required: true,
+      ready: false,
+      reportPresent: false,
+      valuePrinted: false,
+      blockers: ["local-embedding-durability-report-missing"],
+    };
+  }
+  if (statSync(localEmbeddingDurabilityReportPath).size === 0) {
+    return {
+      applicable: true,
+      required: true,
+      ready: false,
+      reportPresent: true,
+      pathLabel: "public-evidence-file",
+      valuePrinted: false,
+      blockers: ["local-embedding-durability-report-empty"],
+    };
+  }
+  const raw = readFileSync(localEmbeddingDurabilityReportPath, "utf8");
+  assertSafePublicText(raw, "local embedding durability report");
+  const parsed = JSON.parse(raw);
+  const ready =
+    parsed.mode === "local-embedding-durability-smoke" &&
+    parsed.status === "READY_LOCAL_EMBEDDING_DURABILITY" &&
+    parsed.readyForLocalAppleArmExport === true &&
+    parsed.syntheticOnly === true &&
+    parsed.metricsOnly === true &&
+    parsed.publicSafe === true &&
+    parsed.rawSyntheticInputIncluded === false &&
+    parsed.baseUrlPrinted === false &&
+    parsed.endpointPrinted === false &&
+    parsed.publicBenchmarkClaimsAllowed === false &&
+    parsed.countsAsLocalFullBenchmarkEvidence === false &&
+    parsed.countsAsFullMemorySotaEvidence === false &&
+    arrayOf(parsed.blockers).length === 0;
+  return {
+    applicable: true,
+    required: true,
+    ready,
+    reportPresent: true,
+    pathLabel: isInsideRepo(localEmbeddingDurabilityReportPath) ? displayPath(localEmbeddingDurabilityReportPath) : "public-evidence-file",
+    hash: `sha256:${sha256(raw)}`,
+    status: parsed.status ?? null,
+    readyForLocalAppleArmExport: Boolean(parsed.readyForLocalAppleArmExport),
+    syntheticOnly: Boolean(parsed.syntheticOnly),
+    rawSyntheticInputIncluded: Boolean(parsed.rawSyntheticInputIncluded),
+    baseUrlPrinted: Boolean(parsed.baseUrlPrinted),
+    endpointPrinted: Boolean(parsed.endpointPrinted),
+    probeCount: Number(parsed.probes?.length ?? 0),
+    valuePrinted: false,
+    blockers: ready ? [] : ["local-embedding-durability-report-not-ready"],
+  };
+}
+
 function answerQualityArmArgs(items) {
   return items.map((strategy) => `--arm ${strategy}=<private-output-dir>/${strategy}-responses.private.json`);
 }
@@ -356,6 +443,7 @@ function nextActions(statusValue) {
   return [
     "Materialize the source-locked LongMemEval target into a private directory outside the repository.",
     "Set RECALLWEAVE_BASELINE_LIVE=1 and RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 for live exports.",
+    "Run benchmark:local-embedding:durability before exporting local Apple embedding arms.",
     "Enable provider or local endpoint consent only for the arms being tested.",
     "Keep BM25, full-hybrid, query-expansion, provider, local Apple, and local rerank arms on the same data.",
   ];
@@ -462,6 +550,10 @@ function assertNoPattern(text, pattern, message) {
   if (pattern.test(String(text))) throw new Error(message);
 }
 
+function arrayOf(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 function safeError(value) {
   return String(value ?? "")
     .replace(secretPattern, "<redacted-secret>")
@@ -496,6 +588,13 @@ function renderMarkdown(value) {
     `- Provider challenger: ${value.strategyCoverage.hasProviderChallenger}`,
     `- Local Apple: ${value.strategyCoverage.hasLocalApple}`,
     `- Local rerank: ${value.strategyCoverage.hasLocalRerank}`,
+    "",
+    "## Local Embedding Durability",
+    `- Applicable: ${value.localEmbeddingDurability.applicable}`,
+    `- Required: ${value.localEmbeddingDurability.required}`,
+    `- Ready: ${value.localEmbeddingDurability.ready ?? "n/a"}`,
+    `- Report present: ${value.localEmbeddingDurability.reportPresent}`,
+    `- Report: ${value.localEmbeddingDurability.pathLabel ?? "n/a"}`,
     "",
     "## Arms",
     ...value.arms.map(
