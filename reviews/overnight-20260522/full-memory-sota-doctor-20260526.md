@@ -19,7 +19,7 @@
 - bm25-is-control-only: pass
 - local-full-benchmark-lane: pass
 - local-full-launch-readiness: blocked (RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, local-full-answer-quality-shard-results-not-returned)
-- local-full-shard-intake: blocked (answer-quality-shards-missing, full-shard-coverage-incomplete)
+- local-full-shard-intake: blocked (answer-quality-shards-missing, full-shard-coverage-incomplete, local-apple-embedding-server-socket-close, local-full-shard-002-incomplete, local-full-shard-coverage-incomplete)
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
 - full-score-result-gate: blocked (reported-target-judge-model-does-not-match-result, missing-full-or-officially-comparable-memory-benchmark-run, best-end-to-end-score-below-primary-reported-memory-target)
@@ -77,6 +77,9 @@
 - Ready for shard combine: false
 - Accepted local-full shards: 1
 - Missing local-full shards: 19
+- Runtime-blocked local-full shards: 1
+- Latest runtime-blocked shard: shard-002
+- Latest runtime-blocked arm: local-apple-qwen3-0_6b
 - Cloud provider blocker count: 0
 - Operator inputs needed: 5
 - Counts as full memory SOTA evidence: false
@@ -105,6 +108,9 @@
 - local-full-answer-quality-shard-results-not-returned
 - answer-quality-shards-missing
 - full-shard-coverage-incomplete
+- local-apple-embedding-server-socket-close
+- local-full-shard-002-incomplete
+- local-full-shard-coverage-incomplete
 - answer-quality-shard-runs-pending
 - shard-results-missing
 - missing-voyage-answer-quality-same-data-result

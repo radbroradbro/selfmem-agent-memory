@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T10:06:57.444Z",
+  "generatedAt": "2026-05-26T10:57:03.348Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -78,6 +78,13 @@
       "hash": "sha256:d0ed2a8e3cf5a249f2465d74a20d7da1cde3df290b0b21c0328c4254cf748372",
       "mode": "public-benchmark-answer-quality-shard-intake",
       "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
+    },
+    "localFullShard002RuntimeBlocker": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json",
+      "exists": true,
+      "hash": "sha256:cc383c3c6b66e473fcd92362ec95c1259d6220970d7486286cb762698a95545f",
+      "mode": "answer-quality-local-full-shard-runtime-blocker",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME"
     },
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
@@ -194,7 +201,7 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:5ef90fe6d1e16d57825f6629e637b5c414844f765ba88882f12e6558957826f9",
+      "hash": "sha256:eabe5b074d924386765110f171195cbfc3ff9a40d4c9d3304a31be1d4efab0ac",
       "mode": null,
       "status": null
     },
@@ -208,7 +215,7 @@
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:a53c9f0d43da04c0a654998b1dc8101e5f1aeb0f3c141ace09e1e9fbb3ffdc69",
+      "hash": "sha256:59d81b6463cbc7e1c9f31195b3104147f50bd761409c7be9eaefb29c54808c1c",
       "mode": null,
       "status": null
     }
@@ -575,6 +582,21 @@
     "acceptedLaneId": "local-full-accepted-shards",
     "canReachFullSotaGateAfterShardIntake": false,
     "cloudProviderBlockerCount": 0,
+    "runtimeBlockedShardCount": 1,
+    "latestRuntimeBlockedShard": "shard-002",
+    "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b",
+    "runtimeBlockers": [
+      {
+        "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+        "shardId": "shard-002",
+        "failedArm": "local-apple-qwen3-0_6b",
+        "failureClass": "local-embedding-server-socket-close",
+        "publicSyntheticReproduced": true,
+        "acceptedShard": false,
+        "completedArmCount": 3,
+        "missingArmCount": 2
+      }
+    ],
     "operatorInputCount": 5,
     "pendingShardCount": 20,
     "countsAsFullMemorySotaEvidence": false,
@@ -595,7 +617,10 @@
     "blockers": [],
     "shardIntakeBlockers": [
       "answer-quality-shards-missing",
-      "full-shard-coverage-incomplete"
+      "full-shard-coverage-incomplete",
+      "local-apple-embedding-server-socket-close",
+      "local-full-shard-002-incomplete",
+      "local-full-shard-coverage-incomplete"
     ],
     "launchBlockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
@@ -769,7 +794,10 @@
       "status": "blocked",
       "blockers": [
         "answer-quality-shards-missing",
-        "full-shard-coverage-incomplete"
+        "full-shard-coverage-incomplete",
+        "local-apple-embedding-server-socket-close",
+        "local-full-shard-002-incomplete",
+        "local-full-shard-coverage-incomplete"
       ]
     },
     {
@@ -868,6 +896,9 @@
     "local-full-answer-quality-shard-results-not-returned",
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete",
+    "local-apple-embedding-server-socket-close",
+    "local-full-shard-002-incomplete",
+    "local-full-shard-coverage-incomplete",
     "answer-quality-shard-runs-pending",
     "shard-results-missing",
     "missing-voyage-answer-quality-same-data-result",

@@ -22,6 +22,7 @@ const files = {
   localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
+  localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
   localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
   acceptedLaneLaunchDoctor: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
@@ -56,6 +57,7 @@ const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
   evidence.localFullShardIntakeLatest,
 ]);
 const localFullShardIntake = localFullShardIntakeSelection.json;
+const localFullShard002RuntimeBlocker = evidence.localFullShard002RuntimeBlocker.json;
 const localFullAcceptedLaneLaunchDoctor = evidence.localFullAcceptedLaneLaunchDoctor.json;
 const privateInputDoctor = evidence.privateInputDoctor.json;
 const acceptedLaneLaunchDoctor = evidence.acceptedLaneLaunchDoctor.json;
@@ -78,6 +80,7 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullShardWorkorder,
   localFullShardIntake,
   localFullShardIntakePath: localFullShardIntakeSelection.path,
+  localFullShardRuntimeBlockers: [localFullShard002RuntimeBlocker],
   localFullAcceptedLaneLaunchDoctor,
 });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
@@ -307,10 +310,13 @@ function inspectLocalFullLaneState({
   localFullShardWorkorder,
   localFullShardIntake,
   localFullShardIntakePath,
+  localFullShardRuntimeBlockers,
   localFullAcceptedLaneLaunchDoctor,
 }) {
   const acceptedLane = arrayOf(localFullShardWorkorder?.executionLaneReadiness).find((lane) => lane.acceptedByFullShardIntake === true);
   const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
+  const runtimeBlockerReports = arrayOf(localFullShardRuntimeBlockers).filter(Boolean);
+  const runtimeBlockerIds = [...new Set(runtimeBlockerReports.flatMap((report) => arrayOf(report?.blockers)))];
   const cloudProviderBlockers = envBlockers.filter((item) =>
     ["voyage-credentials-missing", "nvidia-credentials-missing", "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled", "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"].includes(item),
   );
@@ -343,13 +349,26 @@ function inspectLocalFullLaneState({
     acceptedLaneId: acceptedLane?.laneId ?? null,
     canReachFullSotaGateAfterShardIntake: Boolean(acceptedLane?.canReachFullSotaGateAfterShardIntake),
     cloudProviderBlockerCount: cloudProviderBlockers.length,
+    runtimeBlockedShardCount: runtimeBlockerReports.length,
+    latestRuntimeBlockedShard: runtimeBlockerReports.at(-1)?.queryShard?.shardId ?? null,
+    latestRuntimeBlockedArm: runtimeBlockerReports.at(-1)?.failedArm?.strategy ?? null,
+    runtimeBlockers: runtimeBlockerReports.map((report) => ({
+      status: report.status ?? null,
+      shardId: report.queryShard?.shardId ?? null,
+      failedArm: report.failedArm?.strategy ?? null,
+      failureClass: report.failedArm?.failureClass ?? null,
+      publicSyntheticReproduced: Boolean(report.publicSyntheticReproduction?.reproduced),
+      acceptedShard: Boolean(report.acceptedShard),
+      completedArmCount: Number(report.partialAttempt?.completedArmCount ?? 0),
+      missingArmCount: Number(report.partialAttempt?.missingArmCount ?? 0),
+    })),
     operatorInputCount: arrayOf(localFullAcceptedLaneLaunchDoctor?.operatorInputsNeeded).length,
     pendingShardCount: Number(localFullShardWorkorder?.progress?.pendingShardCount ?? 0),
     countsAsFullMemorySotaEvidence: false,
     publicBenchmarkClaimsAllowed: false,
     envBlockers,
     blockers,
-    shardIntakeBlockers: arrayOf(localFullShardIntake?.blockers),
+    shardIntakeBlockers: [...arrayOf(localFullShardIntake?.blockers), ...runtimeBlockerIds],
     launchBlockers: arrayOf(localFullAcceptedLaneLaunchDoctor?.blockers),
   };
 }
@@ -636,6 +655,9 @@ function renderMarkdown(value) {
     `- Ready for shard combine: ${value.localFullLaneState.readyForShardCombine}`,
     `- Accepted local-full shards: ${value.localFullLaneState.acceptedShardCount}`,
     `- Missing local-full shards: ${value.localFullLaneState.missingShardCount}`,
+    `- Runtime-blocked local-full shards: ${value.localFullLaneState.runtimeBlockedShardCount}`,
+    `- Latest runtime-blocked shard: ${value.localFullLaneState.latestRuntimeBlockedShard ?? "n/a"}`,
+    `- Latest runtime-blocked arm: ${value.localFullLaneState.latestRuntimeBlockedArm ?? "n/a"}`,
     `- Cloud provider blocker count: ${value.localFullLaneState.cloudProviderBlockerCount}`,
     `- Operator inputs needed: ${value.localFullLaneState.operatorInputCount}`,
     `- Counts as full memory SOTA evidence: ${value.localFullLaneState.countsAsFullMemorySotaEvidence}`,

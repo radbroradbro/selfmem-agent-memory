@@ -371,6 +371,13 @@ The follow-up intake,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
 accepts shard 001 and keeps the lane blocked on nineteen missing shards. Do not
 use this as launch, production, or SOTA support.
+Shard 002 is currently a blocked runtime attempt, not an accepted shard:
+`reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`.
+The BM25, full-hybrid, and local query-expanded arms exported 25 private
+responses each, but the local Apple embedding arm failed with a reproducible
+local embedding-server socket close. The same failure reproduced on a public
+synthetic embedding smoke, so retry shard 002 only after the local embedding
+runtime survives a bounded long-input smoke.
 Run `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` for this lane so the local-full
 plan is selected automatically. The checked-in local intake report,
@@ -564,6 +571,9 @@ scaffolded and fixture-covered for retrieval-proxy runs in a clean controller
 environment. Separately, the local-full answer-quality shard has now live-tested
 Qwen3 local embeddings plus a real Qwen3 Reranker 0.6B Q8 sidecar. That shard
 is local diagnostic evidence only and did not promote the sidecar arm.
+The shard 002 retry surfaced an embedding-server durability blocker before the
+local Apple arm could complete, so do not treat the partial three-arm shard 002
+packet as answer-quality evidence.
 
 The first live Voyage provider canaries have now run:
 

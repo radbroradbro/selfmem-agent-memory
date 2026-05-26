@@ -244,6 +244,13 @@ scored `15.2`, and query expansion scored `12`. The result gate reports
 of the 500-query target, no reviewer approvals, a judge-model mismatch against
 the reported Supermemory target row, and `countsAsFullMemorySotaEvidence:
 false`. This is useful local method evidence, not release or SOTA support.
+The shard 002 local-full attempt is recorded separately at
+`reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`.
+It is not accepted evidence: BM25, full hybrid, and local query-expanded hybrid
+exported 25 private responses each, but the local Apple embedding arm failed
+when the local Qwen3 Embedding 0.6B GGUF service closed the socket. A public
+synthetic embedding smoke reproduced the same failure, so the local-full lane
+still has only one accepted shard and nineteen missing shards.
 The full LongMemEval-S run-only target is also checked in at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
 materialization evidence in
@@ -538,7 +545,9 @@ through llama.cpp with Qwen3 Reranker 0.6B Q8 on the first local-full
 answer-quality shard. That run proved the arm can score under the local-full
 contract, but it did not win the shard. It remains a challenger, not a default,
 and the full 500-query local-full result still requires the remaining nineteen
-shards and combine gate.
+shards and combine gate. Shard 002 exposed a separate local embedding-runtime
+durability blocker before the local rerank arm could run, so the next accepted
+local-full shard needs a bounded embedding smoke before response export.
 
 A source-locked 30-query local Apple run is now recorded:
 

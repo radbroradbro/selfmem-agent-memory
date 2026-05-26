@@ -76,6 +76,10 @@ Embedding 0.6B Q8, `SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=16`, and
 `SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=8`. It proved the sidecar path, but the
 best shard arm was still `full-hybrid-rerank` at `19.4` answer quality;
 `local-apple-qwen3-0_6b-local-rerank` scored `15.8`, and BM25 scored `15.2`.
+The shard 002 local-full attempt is blocked before scoring: the local embedding
+service closed the socket during the `local-apple-qwen3-0_6b` arm, and a public
+synthetic embedding smoke reproduced the failure. Keep the 0.6B local embedding
+lane as measured-but-not-default until that runtime durability issue is fixed.
 Treat this as local diagnostic evidence, not a default promotion or SOTA
 claim. Qwen3 Reranker 4B and 8B stay optional quality arms until measured
 latency and memory pressure justify them.
