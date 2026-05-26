@@ -14,7 +14,7 @@
 - First private command: rerunRuntimeDoctor
 - Second private command: rerunDurabilitySmoke
 - Required placeholders ready: false
-- Unresolved required placeholders: local-answer-model, local-embedding-base-url, local-embedding-model, local-judge-model, local-rerank-base-url, local-rerank-candidate-limit, local-rerank-model, openai-compatible-base-url, private-output-dir, safe-local-embedding-batch-token-limit
+- Unresolved required placeholders: local-answer-model, local-embedding-base-url, local-embedding-model, local-judge-model, local-rerank-base-url, local-rerank-candidate-limit, local-rerank-model, openai-compatible-base-url, private-output-dir, safe-local-dense-candidate-limit, safe-local-embedding-batch-token-limit, safe-local-embedding-max-token-limit
 - Optional defaults applied: 1-when-cloud-query-expansion-runs, env-only-if-cloud-endpoint, local-query-expansion-base-url-if-used, query-expansion-model-if-used
 - Counts as local-full benchmark evidence: false
 
@@ -48,7 +48,9 @@
 - placeholder-unresolved:local-rerank-model
 - placeholder-unresolved:openai-compatible-base-url
 - placeholder-unresolved:private-output-dir
+- placeholder-unresolved:safe-local-dense-candidate-limit
 - placeholder-unresolved:safe-local-embedding-batch-token-limit
+- placeholder-unresolved:safe-local-embedding-max-token-limit
 
 ## Next Actions
 - Provide an outside-repository private input directory with --private-input-dir or RECALLWEAVE_FULL_SHARD_PRIVATE_DIR.

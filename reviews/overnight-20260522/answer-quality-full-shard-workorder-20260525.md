@@ -8,6 +8,8 @@
 - Pending shards: 20
 - Rejected results: 0
 - Workorders emitted: 20
+- Runtime blocker reports: 0
+- Runtime resume plans: 0
 
 ## Workorders
 - shard-001: 0-25
@@ -30,6 +32,9 @@
 - shard-018: 425-450
 - shard-019: 450-475
 - shard-020: 475-500
+
+## Runtime Resume Plans
+- none
 
 ## Execution Lanes
 - deterministic-control-proxy: ready=true; intake-compatible=false; providers=none

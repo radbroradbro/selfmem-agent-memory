@@ -2088,7 +2088,9 @@ check("fresh public benchmark target check passes", () => {
     "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY",
     "SELFMEM_LOCAL_EMBED_BASE_URL",
     "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+    "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
     "SELFMEM_LOCAL_EMBED_MODEL",
+    "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT",
     "SELFMEM_LOCAL_RERANK_BASE_URL",
     "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT",
     "SELFMEM_LOCAL_RERANK_MODEL",
@@ -2158,7 +2160,9 @@ check("fresh public benchmark target check passes", () => {
     ...noLocalFullResumeEnv,
     SELFMEM_LOCAL_EMBED_BASE_URL: "http://127.0.0.1:65535/v1",
     SELFMEM_LOCAL_EMBED_MODEL: "fixture-local-embedding-model",
+    SELFMEM_LOCAL_EMBED_MAX_TOKENS: "900",
     SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS: "700",
+    SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT: "16",
     SELFMEM_LOCAL_RERANK_BASE_URL: "http://127.0.0.1:65534/v1",
     SELFMEM_LOCAL_RERANK_MODEL: "fixture-local-rerank-model",
     SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT: "8",
@@ -3516,6 +3520,8 @@ check("fresh public benchmark target check passes", () => {
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--max-memory-bytes 300000000/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--require-local-embedding-durability/);
@@ -3561,6 +3567,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(acceptedLocalLane?.answerQualityEndpoint?.judgeModel, "<local-judge-model>");
     assert.equal(shardPlan.scoringPolicy?.modelMatchPolicy, "local-diagnostic-allowed");
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--require-local-embedding-durability/);
@@ -3704,6 +3712,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.blockers?.includes("full-memory-sota-score-not-proven"), false);
     assert.equal(launchDoctor.blockers?.includes("public-sota-claim-not-allowed"), false);
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_EMBED_BASE_URL"));
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_EMBED_MAX_TOKENS"));
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_RERANK_BASE_URL"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--require-local-embedding-durability"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_QUERY_EXPANSION_BASE_URL"));

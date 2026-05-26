@@ -4,7 +4,7 @@
   "mode": "local-full-shard-resume-command-materializer",
   "fixtureOnly": false,
   "status": "BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS",
-  "generatedAt": "2026-05-26T14:18:42.551Z",
+  "generatedAt": "2026-05-26T20:54:07.504Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "writesRealPrivateCommandFile": false,
@@ -46,7 +46,7 @@
   },
   "resumePacket": {
     "path": "reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json",
-    "hash": "sha256:dd9c3efc1c3fc7d811076b942aa2923a98456073868d6515ed6376d9c830dd67",
+    "hash": "sha256:bb5a535cdc9fc7c35f1188f0696a82415572d31873710c5fe6298ab28b4d34ec",
     "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
     "targetShard": {
       "shardId": "shard-002",
@@ -91,7 +91,7 @@
       "localShardIntake",
       "fullSotaDoctor"
     ],
-    "templatePlaceholderCount": 15,
+    "templatePlaceholderCount": 17,
     "templatePlaceholderNames": [
       "1-when-cloud-query-expansion-runs",
       "env-only-if-cloud-endpoint",
@@ -107,7 +107,9 @@
       "private-output-dir",
       "public-review-dir",
       "query-expansion-model-if-used",
-      "safe-local-embedding-batch-token-limit"
+      "safe-local-dense-candidate-limit",
+      "safe-local-embedding-batch-token-limit",
+      "safe-local-embedding-max-token-limit"
     ],
     "materializedCommandCount": 0,
     "materializedCommandHashes": [],
@@ -127,7 +129,7 @@
     "guardedCommandId": "missingArmResponseExport"
   },
   "replacementPlan": {
-    "requiredPlaceholderCount": 11,
+    "requiredPlaceholderCount": 13,
     "requiredPlaceholdersReady": false,
     "unresolvedRequiredPlaceholderNames": [
       "local-answer-model",
@@ -139,7 +141,9 @@
       "local-rerank-model",
       "openai-compatible-base-url",
       "private-output-dir",
-      "safe-local-embedding-batch-token-limit"
+      "safe-local-dense-candidate-limit",
+      "safe-local-embedding-batch-token-limit",
+      "safe-local-embedding-max-token-limit"
     ],
     "requiredPlaceholders": [
       {
@@ -203,8 +207,20 @@
         "printsValue": false
       },
       {
+        "name": "safe-local-dense-candidate-limit",
+        "source": "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT",
+        "ready": false,
+        "printsValue": false
+      },
+      {
         "name": "safe-local-embedding-batch-token-limit",
         "source": "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "safe-local-embedding-max-token-limit",
+        "source": "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
         "ready": false,
         "printsValue": false
       }
@@ -236,7 +252,9 @@
     "placeholder-unresolved:local-rerank-model",
     "placeholder-unresolved:openai-compatible-base-url",
     "placeholder-unresolved:private-output-dir",
-    "placeholder-unresolved:safe-local-embedding-batch-token-limit"
+    "placeholder-unresolved:safe-local-dense-candidate-limit",
+    "placeholder-unresolved:safe-local-embedding-batch-token-limit",
+    "placeholder-unresolved:safe-local-embedding-max-token-limit"
   ],
   "nextActions": [
     "Provide an outside-repository private input directory with --private-input-dir or RECALLWEAVE_FULL_SHARD_PRIVATE_DIR.",

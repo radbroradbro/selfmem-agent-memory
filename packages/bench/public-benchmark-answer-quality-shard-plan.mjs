@@ -447,7 +447,9 @@ function responseArmExportTemplate() {
     ? [
         "SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>",
         "SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model>",
+        "SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit>",
         "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS=<safe-local-embedding-batch-token-limit>",
+        "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit>",
         "SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
         "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1",
       ]
