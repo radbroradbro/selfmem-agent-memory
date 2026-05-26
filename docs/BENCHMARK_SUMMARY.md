@@ -284,8 +284,9 @@ It currently blocks because all twenty full answer-quality shard outputs are
 missing. After shard jobs return, run
 `benchmark:answer-quality:shard-intake` against the public shard-result JSONs
 before any combine step; it rejects gaps, duplicates, target/model/hash
-mismatches, mixed strategy sets, and unsafe raw fields. A green intake only
-means the full-shard packet is safe to merge with
+mismatches, query-set/materializer drift, per-shard range-hash drift, mixed
+strategy sets, and unsafe raw fields. A green intake only means the full-shard
+packet is safe to merge with
 `benchmark:answer-quality:combine -- --combine-mode shards`; it still does not
 prove SOTA or authorize public claims until the combined score, reviewer gate,
 SOTA ladder, UI evidence, docs, owner approval, and real canary all pass.

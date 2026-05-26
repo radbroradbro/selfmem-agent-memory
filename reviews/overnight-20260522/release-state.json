@@ -81,6 +81,7 @@
       "packages/bench/public-benchmark-answer-quality.mjs",
       "packages/bench/public-benchmark-answer-quality-combine.mjs",
       "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+      "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
       "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
       "packages/bench/public-benchmark-materialize-run.mjs",
       "packages/bench/public-benchmark-query-expansion-preflight.mjs",

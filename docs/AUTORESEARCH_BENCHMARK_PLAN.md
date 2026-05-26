@@ -387,8 +387,8 @@ returned public shard-result JSONs, then run
 `benchmark:answer-quality:combine -- --combine-mode shards`. The intake and
 combiner must fail closed if shards use different
 target/query/materializer/answer-label hashes, different answer or judge
-models, overlapping ranges, missing ranges, unsafe raw fields, or different
-strategy sets. A merged full packet should report
+models, mismatched per-shard range hashes, overlapping ranges, missing ranges,
+unsafe raw fields, or different strategy sets. A merged full packet should report
 `combineMode=query-shard-answer-quality-union`, `scoredQueryCount=500`, and
 `queryShard.completeDataset=true` before it enters reviewer intake or the SOTA
 ladder.

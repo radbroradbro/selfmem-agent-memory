@@ -21,11 +21,13 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-26T00:56:31.448Z",
+  "generatedAt": "2026-05-26T01:14:25.476Z",
   "plan": {
     "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
     "hash": "sha256:1ce635250aaebbd9f025cfdd94e34e12f727b44dec0905cbf201b1a536760407",
     "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
     "queryCount": 500,
     "shardSize": 25,
     "shardCount": 20,
@@ -48,6 +50,7 @@
     "rejectedShardCount": 0,
     "completeCoverage": false,
     "sameTarget": true,
+    "sameSourceLock": true,
     "sameModels": true,
     "sameStrategySet": true
   },

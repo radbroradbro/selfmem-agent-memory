@@ -57,6 +57,8 @@ const report = {
     path: displayPath(planPath),
     hash: `sha256:${sha256(planRaw)}`,
     targetHash: plan.target?.hash ?? null,
+    querySetHash: plan.materializeReport?.collectorCompatibleQuerySetHash ?? null,
+    materializerHash: plan.materializeReport?.materializerHash ?? null,
     queryCount: plan.runPlan?.queryCount ?? null,
     shardSize: plan.runPlan?.shardSize ?? null,
     shardCount: plan.runPlan?.shardCount ?? null,
@@ -71,6 +73,7 @@ const report = {
     rejectedShardCount: evaluated.rejectedShards.length,
     completeCoverage: evaluated.completeCoverage,
     sameTarget: evaluated.sameTarget,
+    sameSourceLock: evaluated.sameSourceLock,
     sameModels: evaluated.sameModels,
     sameStrategySet: evaluated.sameStrategySet,
   },
@@ -137,6 +140,7 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
   const seen = new Set();
   const duplicateShards = [];
   let sameTarget = true;
+  let sameSourceLock = true;
   let sameModels = true;
   let sameStrategySet = true;
 
@@ -151,6 +155,14 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
     }
     if (key) seen.add(key);
     if (result.target?.hash !== planValue.target?.hash) sameTarget = false;
+    if (
+      result.input?.querySetHash !== planValue.materializeReport?.collectorCompatibleQuerySetHash ||
+      result.input?.materializerHash !== planValue.materializeReport?.materializerHash ||
+      Number(result.input?.totalQueryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ||
+      Number(result.input?.queryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0)
+    ) {
+      sameSourceLock = false;
+    }
     if (result.provider?.answerModel !== planValue.target?.answerModel || result.provider?.judgeModel !== planValue.target?.judgeModel) sameModels = false;
     if (strategyNamesHash(result) !== strategySetHash) sameStrategySet = false;
     const row = {
@@ -189,6 +201,7 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
     duplicateShards.length > 0 ? "duplicate-shard-ranges" : null,
     rejected.length > 0 ? "answer-quality-shards-rejected" : null,
     !sameTarget ? "shard-target-hash-mismatch" : null,
+    !sameSourceLock ? "shard-source-lock-mismatch" : null,
     !sameModels ? "shard-answer-or-judge-model-mismatch" : null,
     !sameStrategySet ? "shard-strategy-set-mismatch" : null,
     !completeCoverage ? "full-shard-coverage-incomplete" : null,
@@ -201,6 +214,7 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
     rejectedShards: rejected,
     completeCoverage,
     sameTarget,
+    sameSourceLock,
     sameModels,
     sameStrategySet,
     blockers,
@@ -223,13 +237,21 @@ function shardFailures({ item, result, range, expected, planValue, strategySetHa
     result.input?.targetHash !== planValue.target?.hash ? "input-target-hash-mismatch" : null,
     result.input?.answerLabelsHash !== planValue.target?.answerLabelsHash ? "answer-labels-hash-mismatch" : null,
     result.input?.scoringCodeHash !== planValue.target?.scoringCodeHash ? "scoring-code-hash-mismatch" : null,
+    result.input?.querySetHash !== planValue.materializeReport?.collectorCompatibleQuerySetHash ? "query-set-hash-mismatch" : null,
+    result.input?.materializerHash !== planValue.materializeReport?.materializerHash ? "materializer-hash-mismatch" : null,
+    Number(result.input?.totalQueryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "total-query-count-mismatch" : null,
+    Number(result.input?.queryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "input-query-count-mismatch" : null,
     result.provider?.answerModel !== planValue.target?.answerModel ? "answer-model-mismatch" : null,
     result.provider?.judgeModel !== planValue.target?.judgeModel ? "judge-model-mismatch" : null,
     Number(result.privacyLeakCount ?? 0) !== 0 ? "privacy-leak-count-nonzero" : null,
     Number(result.redactionFailureCount ?? 0) !== 0 ? "redaction-failure-count-nonzero" : null,
     !range ? "query-shard-range-missing" : null,
     range && !expected.has(rangeKey(range)) ? "query-shard-range-not-in-plan" : null,
+    range && Number(range.totalQueryCount) !== Number(planValue.runPlan?.queryCount ?? 0) ? "range-total-query-count-mismatch" : null,
     range && range.scoredQueryCount !== range.endIndexExclusive - range.startIndex ? "scored-query-count-mismatch" : null,
+    range && expected.has(rangeKey(range)) && range.selectedQueryIdHash !== expected.get(rangeKey(range))?.rangeHash
+      ? "shard-range-hash-mismatch"
+      : null,
     strategyNamesHash(result) !== strategySetHash ? "strategy-set-mismatch" : null,
     (result.strategies ?? []).some((row) => Number(row.privacyLeakCount ?? 0) !== 0 || Number(row.redactionFailureCount ?? 0) !== 0)
       ? "strategy-privacy-or-redaction-count-nonzero"

@@ -270,8 +270,8 @@ The checked-in intake report,
 `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.
 It should turn green only after the full shard set is present, non-overlapping,
-source/model/hash-matched, strategy-matched, and public-safe. Passing intake is
-combine readiness only, not SOTA proof.
+source/model/hash/range-matched, strategy-matched, and public-safe. Passing
+intake is combine readiness only, not SOTA proof.
 This is real benchmark progress, not SOTA proof:
 `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` remains
 blocked by the missing same-data Voyage answer-quality arm recorded in

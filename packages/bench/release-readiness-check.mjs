@@ -2751,6 +2751,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardIntake.plan?.shardCount, 20);
     assert.equal(shardIntake.intake?.inputCount, 0);
     assert.equal(shardIntake.intake?.missingShardCount, 20);
+    assert.equal(shardIntake.intake?.sameSourceLock, true);
     assert.ok(shardIntake.blockers?.includes("shard-results-missing"));
     assert.ok(shardIntake.blockers?.includes("answer-quality-shards-missing"));
   }
@@ -2759,8 +2760,29 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityShardIntakeReady.intake?.acceptedShardCount, 20);
   assert.equal(answerQualityShardIntakeReady.intake?.missingShardCount, 0);
   assert.equal(answerQualityShardIntakeReady.intake?.completeCoverage, true);
+  assert.equal(answerQualityShardIntakeReady.intake?.sameSourceLock, true);
   assert.deepEqual(answerQualityShardIntakeReady.blockers, []);
   assert.match(answerQualityShardIntakeReady.combineCommand ?? "", /--combine-mode shards/);
+  const shardIntakeMismatchRoot = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-mismatch-"));
+  const shardIntakeMismatchInputs = syntheticShardInputs.map((inputPath, index) => {
+    const clone = JSON.parse(readFileSync(inputPath, "utf8"));
+    if (index === 0) clone.input.querySetHash = `sha256:${"0".repeat(64)}`;
+    const outputPath = join(shardIntakeMismatchRoot, `answer-quality-shard-${String(index + 1).padStart(3, "0")}.json`);
+    writeFileSync(outputPath, `${JSON.stringify(clone, null, 2)}\n`, { encoding: "utf8", mode: 0o600 });
+    return outputPath;
+  });
+  const shardIntakeMismatchRun = spawnSync("node", [
+    "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
+    "--require-ready",
+    "--input",
+    shardIntakeMismatchInputs.join(","),
+  ], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.notEqual(shardIntakeMismatchRun.status, 0, "shard intake must fail closed on query-set hash mismatch");
+  assert.match(`${shardIntakeMismatchRun.stdout}\n${shardIntakeMismatchRun.stderr}`, /query-set-hash-mismatch|shard-source-lock-mismatch/);
   assert.match(answerQualityShardIntakeMarkdownFresh, /Full Answer-Quality Shard Intake/);
   assert.match(fullAnswerQualityShardIntakeEvidence, /Missing shards: 20/);
   assert.equal(fullTargetSotaReport.mode, "public-benchmark-sota-ladder");
