@@ -307,6 +307,7 @@ function discoverProgressInputs({ claimScope, reviewDir }) {
   const explicitIntakes = normalizeList([args.progressIntake, args.progressIntakes].flatMap(coerceArray)).map(resolveInputPath);
   const defaultIntakes = claimScope === "local-full"
     ? [
+        resolveInputPath(`${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`),
         resolveInputPath(`${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`),
         resolveInputPath(`${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`),
       ]

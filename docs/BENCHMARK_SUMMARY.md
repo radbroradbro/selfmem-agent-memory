@@ -262,14 +262,20 @@ scored `15.2`, and query expansion scored `12`. The result gate reports
 of the 500-query target, no reviewer approvals, a judge-model mismatch against
 the reported Supermemory target row, and `countsAsFullMemorySotaEvidence:
 false`. This is useful local method evidence, not release or SOTA support.
-The shard 002 local-full attempt is recorded separately at
+The original shard 002 local-full attempt is recorded separately at
 `reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`.
-It is not accepted evidence: BM25, full hybrid, and local query-expanded hybrid
-exported 25 private responses each, but the local Apple embedding arm failed
-when the local Qwen3 Embedding 0.6B GGUF service closed the socket. A public
-synthetic embedding smoke reproduced the same failure at the time, so the local-full lane
-still has only one accepted shard and nineteen missing shards. The bounded
-preflight is now codified as
+That first attempt was not accepted evidence: BM25, full hybrid, and local
+query-expanded hybrid exported 25 private responses each, but the local Apple
+embedding arm failed when the local Qwen3 Embedding 0.6B GGUF service closed the
+socket. The later recovery result is now checked in at
+`reviews/overnight-20260522/answer-quality-local-full-shard-002-recovery-20260526.json`,
+with the matching gate at
+`reviews/overnight-20260522/end-to-end-memory-score-local-full-shard-002-gate-recovery-20260526.json`.
+The cumulative local-full intake now accepts shards 001 and 002:
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`.
+That means 50 of 500 local-full queries are scored, eighteen shards remain
+missing, and the lane is still partial local method evidence rather than SOTA
+support. The bounded preflight is now codified as
 `benchmark:local-embedding:runtime-doctor`, then
 `benchmark:local-embedding:durability`. The checked-in runtime doctor report is
 `reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`;
@@ -279,7 +285,12 @@ endpoint, server path, or raw config. The current public-safe durability report
 is at
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
 It now reports `READY_LOCAL_EMBEDDING_DURABILITY` after bounded synthetic
-probes. These reports clear the historical local embedding preflight only. The
+probes. These reports clear the historical local embedding preflight only. Shard
+003 is now the active local-full blocker:
+`reviews/overnight-20260522/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`.
+BM25, full hybrid, query-expanded hybrid, and local Qwen3 0.6B embedding all
+exported 25 private responses, but the local rerank arm stalled before writing a
+complete response file. The
 latest launch refresh is checked in at
 `reviews/overnight-20260522/local-embedding-launch-diagnostic-20260526.json`
 with the markdown companion
@@ -371,23 +382,25 @@ local embedding durability report, so shard retries cannot omit the local model
 sidecars or durability gate. A completed `local-full` run can diagnose whether the local
 method is model-size limited; it does not count as SOTA evidence or public
 superiority without the provider/SOTA comparison lane.
-The same workorder now consumes the accepted shard 001 result and the shard 002
-runtime-blocker report. It emits nineteen pending workorders, marks one runtime
-resume plan for shard 002, and includes a missing-arm-only response export for
-`local-apple-qwen3-0_6b` and `local-apple-qwen3-0_6b-local-rerank` so the
-already exported BM25, full-hybrid, and local query-expansion arms do not have
-to be regenerated just to retry the unstable local embedding path.
+The same workorder now consumes the accepted shard 001 result, the accepted
+shard 002 recovery result, and the shard 003 runtime-blocker report. It emits
+eighteen pending workorders, marks one runtime resume plan for shard 003, and
+includes a missing-arm-only response export for
+`local-apple-qwen3-0_6b-local-rerank` so the already exported BM25,
+full-hybrid, local query-expansion, and local embedding arms do not have to be
+regenerated just to retry the unstable local rerank path.
 `reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
-is the public-safe operator packet for that retry. It was built from the
-checked-in local embedding runtime and durability preflight reports, preserves
-the three completed private arm hashes, points operators to
+is retained as the public-safe operator packet for the earlier shard 002 retry.
+It was built from the checked-in local embedding runtime and durability
+preflight reports, preserves the three completed private arm hashes, points
+operators to
 `benchmark:answer-quality:local-shard-resume-command` for private script
 materialization, retains the placeholder missing-arm export, preflight,
-answer-quality, and local-intake templates as non-runnable public evidence, and still keeps
-`countsAsLocalFullBenchmarkEvidence: false` until shard 002 returns an accepted
-public result. The later launch diagnostic is the current resume gate: while it
-reports `BLOCKED_LOCAL_EMBEDDING_LAUNCH`, the packet is ready as a public
-operator contract but not runnable as a shard-002 benchmark.
+answer-quality, and local-intake templates as non-runnable public evidence, and
+still keeps `countsAsLocalFullBenchmarkEvidence: false`. The accepted shard 002
+recovery intake now satisfies the old resume-result gate inside
+`benchmark:sota-doctor`; shard 002 is no longer the next pending local-full
+slice.
 `reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json`
 is the matching current-shell readiness report. In this checkout it is blocked:
 no private source directory or local model/scoring environment variables are
@@ -430,23 +443,22 @@ inputs are supplied, it writes concrete runnable commands only to an
 outside-repository private script, while public evidence
 keeps command text, private paths, and env values hidden.
 `benchmark:answer-quality:local-shard-resume-result` is the post-script public
-result doctor for the same shard. Its checked-in report at
+result doctor for the historical shard 002 packet. Its checked-in report at
 `reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.json`
-is blocked because the materializer has not produced a private script in this
-checkout and `answer-quality-local-full-shard-002.json` is not present. Once an
-operator runs the private script, this doctor validates the shard 002 public
-answer-quality result against the local-full plan, confirms shard 001 is still
-accepted, and prints the local shard-intake command without exposing raw
-sources, private paths, endpoint values, or materialized commands.
+is still blocked on its specific canonical filename because the recovery result
+was written as `answer-quality-local-full-shard-002-recovery-20260526.json`.
+The top-level SOTA doctor therefore treats the accepted shard-intake path as the
+current gate for shard 002 while preserving the older resume report for audit.
 `benchmark:answer-quality:local-shard-performance` summarizes accepted
 local-full shard performance without changing claim status. Its checked-in
 report at
 `reviews/overnight-20260522/local-full-shard-performance-report-20260526.json`
-currently covers one accepted shard, 25 of 500 queries, and keeps
+currently covers two accepted shards, 50 of 500 queries, and keeps
 `countsAsLocalFullBenchmarkEvidence`, full-memory SOTA evidence, shard combine,
 and public benchmark claims disabled. It records that `full-hybrid-rerank`
-currently leads the partial local-full snapshot at `19.4` answer quality, while
-shard 002 remains blocked by the local embedding runtime resume path.
+currently leads the partial local-full snapshot at `25.52` answer quality
+versus BM25 at `23.52` and local Qwen3 0.6B embedding at `24.62`, while shard
+003 remains blocked by the local rerank response-body stall.
 `benchmark:sota-doctor` now includes that performance snapshot in the top-level
 local-full lane state, so the main SOTA blocker report can show current
 local-full coverage and quality/latency without upgrading partial local evidence
@@ -461,13 +473,17 @@ be reported.
 After the first scored shard, the follow-up intake at
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`
 accepts shard 001 and keeps the lane blocked on the remaining nineteen shards.
+After the shard 002 recovery, the current progress intake at
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`
+accepts shards 001 and 002 and keeps the lane blocked on the remaining eighteen
+shards.
 The intake also validates shard range hashes so partial local-full packets
 cannot be confused with a full 500-query local benchmark.
 `benchmark:answer-quality:local-accepted-lane-doctor` now turns that into a
 next-missing-shard launch check at
 `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`.
-It reads the checked-in progress intake, counts shard 001 as accepted, and
-prints shard 002 retry commands with `--query-offset 25` as the next pending
+It reads the checked-in progress intake, counts shards 001 and 002 as accepted,
+and prints shard 003 commands with `--query-offset 50` as the next pending
 local-full shard. It reports the exact local-full blockers without provider
 calls, without raw benchmark text, and without adding SOTA/public-claim blockers
 that belong only to the provider comparison lane.

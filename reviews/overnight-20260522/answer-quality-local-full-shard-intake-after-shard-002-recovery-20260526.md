@@ -5,16 +5,16 @@
 - Counts as full memory SOTA evidence: false
 - Claim scope: local-full
 - Plan shard count: 20
-- Accepted shards: 1
-- Missing shards: 19
+- Accepted shards: 2
+- Missing shards: 18
 - Rejected shards: 0
 - Complete coverage: false
 
 ## Accepted Shards
-- shard-002: 25-50 (answer-quality-local-full-shard-002-recovery-public-safe.json)
+- shard-001: 0-25 (answer-quality-local-full-shard-001-20260526.json)
+- shard-002: 25-50 (answer-quality-local-full-shard-002-recovery-20260526.json)
 
 ## Missing Shards
-- shard-001: 0-25
 - shard-003: 50-75
 - shard-004: 75-100
 - shard-005: 100-125

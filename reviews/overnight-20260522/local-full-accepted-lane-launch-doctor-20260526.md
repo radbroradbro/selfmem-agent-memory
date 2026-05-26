@@ -10,8 +10,8 @@
 - Shards: 20
 - Accepted lane: local-full-accepted-shards
 - Progress source: checked-in-progress-intake
-- Progress inputs: 1
-- Pending shards: 19
+- Progress inputs: 2
+- Pending shards: 18
 
 ## Gate
 - Private inputs ready: true

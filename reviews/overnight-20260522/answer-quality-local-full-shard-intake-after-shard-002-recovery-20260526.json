@@ -21,10 +21,10 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-26T18:10:13.832Z",
+  "generatedAt": "2026-05-26T22:55:50.209Z",
   "plan": {
     "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
-    "hash": "sha256:33ab66f5e802ff3490b22b01d531a2abc75695e785ee7fdd4a510782c6a3575a",
+    "hash": "sha256:f7a17aade68cd2a14fa8b56d321b602f61afd8bca2093a2bfffa9062731c82ba",
     "claimScope": "local-full",
     "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
     "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
@@ -41,10 +41,10 @@
     ]
   },
   "intake": {
-    "inputCount": 1,
-    "shardResultsPresent": 1,
-    "acceptedShardCount": 1,
-    "missingShardCount": 19,
+    "inputCount": 2,
+    "shardResultsPresent": 2,
+    "acceptedShardCount": 2,
+    "missingShardCount": 18,
     "duplicateShardCount": 0,
     "rejectedShardCount": 0,
     "completeCoverage": false,
@@ -57,23 +57,25 @@
   },
   "acceptedShards": [
     {
+      "shardId": "shard-001",
+      "range": "0-25",
+      "startIndex": 0,
+      "endIndexExclusive": 25,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-001-20260526.json",
+      "hash": "sha256:6c329ec7c00cc2bff4ad467ff52f39d451bc9aaaf3f822e9ef665e7e13246af1"
+    },
+    {
       "shardId": "shard-002",
       "range": "25-50",
       "startIndex": 25,
       "endIndexExclusive": 50,
       "scoredQueryCount": 25,
-      "fileName": "answer-quality-local-full-shard-002-recovery-public-safe.json",
+      "fileName": "answer-quality-local-full-shard-002-recovery-20260526.json",
       "hash": "sha256:2cae108c8d3bee0e77faf7e223449c86fadc066d5a8d54c6d8258a2bb71c7be0"
     }
   ],
   "missingShards": [
-    {
-      "shardId": "shard-001",
-      "startIndex": 0,
-      "endIndexExclusive": 25,
-      "queryCount": 25,
-      "rangeHash": "sha256:c1bfaf4b31bb2d306fd0b373c62dc9cfbb32df73ef58aa1cc983e45c35829b68"
-    },
     {
       "shardId": "shard-003",
       "startIndex": 50,
@@ -207,7 +209,7 @@
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete"
   ],
-  "combineCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-local-full-shard-002-recovery-public-safe.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-local-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-local-full-combined.md",
+  "combineCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-local-full-shard-001-20260526.json,<public-review-dir>/answer-quality-local-full-shard-002-recovery-20260526.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-local-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-local-full-combined.md",
   "nextActions": [
     "Run the missing shard answer-quality jobs from the checked-in shard plan.",
     "Re-run this intake with all shard outputs before combining.",

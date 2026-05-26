@@ -16,7 +16,7 @@ assert.ok(["json", "markdown"].includes(format), "--format must be json or markd
 const files = {
   plan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
   workorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
-  runtimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
+  runtimeBlocker: String(args.runtimeBlocker ?? `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`),
   runtimeDoctor: `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   durabilitySmoke: `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
   acceptedLaneDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
@@ -43,13 +43,20 @@ const targetShard = {
   shardId: resumeWorkorder?.shardId ?? runtimeBlocker.queryShard?.shardId ?? null,
   startIndex: intOrNull(resumeWorkorder?.startIndex ?? runtimeBlocker.queryShard?.startIndex ?? runtimeBlocker.queryShard?.queryOffset),
   endIndexExclusive: intOrNull(resumeWorkorder?.endIndexExclusive ?? runtimeBlocker.queryShard?.endIndexExclusive),
-  queryOffset: intOrNull(runtimeBlocker.queryShard?.queryOffset ?? resumeWorkorder?.startIndex),
+  queryOffset: intOrNull(resumeWorkorder?.startIndex ?? runtimeBlocker.queryShard?.queryOffset),
   maxQueries: intOrNull(runtimeBlocker.queryShard?.maxQueries ?? resumeWorkorder?.queryCount),
   queryCount: intOrNull(resumeWorkorder?.queryCount ?? runtimeBlocker.queryShard?.maxQueries),
   expectedPublicResult: resumeWorkorder?.expectedPublicResult ?? null,
   expectedPublicMarkdown: resumeWorkorder?.expectedPublicMarkdown ?? null,
   expectedPrivateArmDirectoryLabel: resumeWorkorder?.expectedPrivateArmDirectory ?? null,
 };
+const targetShardSlug = String(targetShard.shardId ?? "shard-unknown");
+const missingArmStrategyArgument = missingStrategies.join(",");
+const acceptedOrTargetShardCount = Math.max(Number(workorder.progress?.acceptedShardCount ?? 0) + 1, 1);
+const localShardIntakeInputs = Array.from({ length: acceptedOrTargetShardCount }, (_, index) => {
+  const shardId = `shard-${String(index + 1).padStart(3, "0")}`;
+  return `<public-review-dir>/answer-quality-local-full-${shardId}.json`;
+}).join(",");
 
 const resumeReady = Boolean(
   workorder.mode === "public-benchmark-answer-quality-shard-workorder" &&
@@ -57,17 +64,18 @@ const resumeReady = Boolean(
     runtimeBlocker.mode === "answer-quality-local-full-shard-runtime-blocker" &&
     runtimeBlocker.claimScope === "local-full" &&
     runtimeResume?.resumeAvailable === true &&
-    targetShard.shardId === "shard-002" &&
-    targetShard.startIndex === 25 &&
-    targetShard.endIndexExclusive === 50 &&
+    targetShard.shardId &&
+    targetShard.shardId === runtimeBlocker.queryShard?.shardId &&
+    targetShard.startIndex === runtimeBlocker.queryShard?.queryOffset &&
+    targetShard.endIndexExclusive === resumeWorkorder?.endIndexExclusive &&
     completedStrategies.length > 0 &&
     missingStrategies.length > 0 &&
     completedArmEvidence.length === completedStrategies.length &&
     runtimeDoctorReady.ready &&
     durabilityReady.ready &&
     typeof resumeWorkorder?.commands?.missingArmResponseExport === "string" &&
-    resumeWorkorder.commands.missingArmResponseExport.includes("--strategies local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank") &&
-    resumeWorkorder.commands.missingArmResponseExport.includes("--query-offset 25"),
+    resumeWorkorder.commands.missingArmResponseExport.includes(`--strategies ${missingArmStrategyArgument}`) &&
+    resumeWorkorder.commands.missingArmResponseExport.includes(`--query-offset ${targetShard.queryOffset}`),
 );
 
 const blockers = [
@@ -76,15 +84,17 @@ const blockers = [
   runtimeBlocker.mode !== "answer-quality-local-full-shard-runtime-blocker" ? "runtime-blocker-mode-mismatch" : null,
   runtimeBlocker.claimScope !== "local-full" ? "runtime-blocker-claim-scope-mismatch" : null,
   runtimeResume?.resumeAvailable !== true ? "runtime-resume-not-available" : null,
-  targetShard.shardId !== "shard-002" ? "resume-target-shard-mismatch" : null,
-  targetShard.startIndex !== 25 || targetShard.endIndexExclusive !== 50 ? "resume-target-range-mismatch" : null,
+  targetShard.shardId !== runtimeBlocker.queryShard?.shardId ? "resume-target-shard-mismatch" : null,
+  targetShard.startIndex !== runtimeBlocker.queryShard?.queryOffset || targetShard.endIndexExclusive !== resumeWorkorder?.endIndexExclusive
+    ? "resume-target-range-mismatch"
+    : null,
   completedStrategies.length === 0 ? "completed-strategy-evidence-missing" : null,
   missingStrategies.length === 0 ? "missing-strategy-list-empty" : null,
   completedArmEvidence.length !== completedStrategies.length ? "completed-arm-evidence-count-mismatch" : null,
   !runtimeDoctorReady.ready ? "local-embedding-runtime-not-ready" : null,
   !durabilityReady.ready ? "local-embedding-durability-smoke-not-ready" : null,
   typeof resumeWorkorder?.commands?.missingArmResponseExport !== "string" ? "missing-arm-export-command-missing" : null,
-  resumeWorkorder?.commands?.missingArmResponseExport && !resumeWorkorder.commands.missingArmResponseExport.includes("--query-offset 25")
+  resumeWorkorder?.commands?.missingArmResponseExport && !resumeWorkorder.commands.missingArmResponseExport.includes(`--query-offset ${targetShard.queryOffset}`)
     ? "missing-arm-export-command-offset-mismatch"
     : null,
 ].filter(Boolean);
@@ -174,20 +184,20 @@ const report = {
     resumeEnvDoctor: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-env --",
       "--private-input-dir <private-output-dir>",
-      `--output ${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.json`,
-      `--markdown-output ${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.md`,
+      `--output ${reviewDir}/local-full-${targetShardSlug}-resume-env-doctor-20260526.json`,
+      `--markdown-output ${reviewDir}/local-full-${targetShardSlug}-resume-env-doctor-20260526.md`,
     ].join(" "),
     resumeCommandMaterializer: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-command --",
       "--private-input-dir <private-output-dir>",
-      "--private-command-output <private-output-dir>/local-full-shard-002-resume.private.sh",
-      `--output ${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.json`,
-      `--markdown-output ${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.md`,
+      `--private-command-output <private-output-dir>/local-full-${targetShardSlug}-resume.private.sh`,
+      `--output ${reviewDir}/local-full-${targetShardSlug}-resume-command-materializer-20260526.json`,
+      `--markdown-output ${reviewDir}/local-full-${targetShardSlug}-resume-command-materializer-20260526.md`,
     ].join(" "),
     resumeResultDoctor: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-result --",
-      `--output ${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
-      `--markdown-output ${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.md`,
+      `--output ${reviewDir}/local-full-${targetShardSlug}-resume-result-doctor-20260526.json`,
+      `--markdown-output ${reviewDir}/local-full-${targetShardSlug}-resume-result-doctor-20260526.md`,
     ].join(" "),
     rerunRuntimeDoctor: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:local-embedding:runtime-doctor --",
@@ -206,9 +216,9 @@ const report = {
     answerQuality: resumeWorkorder?.commands?.answerQuality ?? null,
     localShardIntake: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-intake",
-      "--input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json",
-      `--output ${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002.json`,
-      `--markdown-output ${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002.md`,
+      `--input ${localShardIntakeInputs}`,
+      `--output ${reviewDir}/answer-quality-local-full-shard-intake-after-${targetShardSlug}.json`,
+      `--markdown-output ${reviewDir}/answer-quality-local-full-shard-intake-after-${targetShardSlug}.md`,
       "--require-ready",
     ].join(" "),
     fullSotaDoctor: `npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor -- --output ${reviewDir}/full-memory-sota-doctor-20260526.json --markdown-output ${reviewDir}/full-memory-sota-doctor-20260526.md`,
@@ -232,11 +242,11 @@ const report = {
         "Run the local-full shard resume env doctor against the outside-repository private directory.",
         "Run the local-full shard resume command materializer to write a private shell script outside the repository.",
         "Review and run the generated private script so the missing-arm export, preflight, answer-quality scoring, and local shard intake use concrete private paths and endpoint values.",
-        "Run the local-full shard resume result doctor before accepting shard 002 into the local-full intake trail.",
+        `Run the local-full shard resume result doctor before accepting ${targetShardSlug} into the local-full intake trail.`,
         "Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted.",
       ]
     : [
-        "Fix the packet blockers and regenerate this resume packet before retrying shard-002.",
+        `Fix the packet blockers and regenerate this resume packet before retrying ${targetShardSlug}.`,
         "Keep full-memory SOTA, public benchmark superiority, and launch wording blocked.",
       ],
 };

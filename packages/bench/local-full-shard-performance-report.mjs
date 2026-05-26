@@ -9,10 +9,10 @@ const args = parseArgs(process.argv.slice(2));
 const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
 const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`);
 const intakePath = resolveInputPath(
-  args.intake ?? `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
+  args.intake ?? `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`,
 );
 const runtimeBlockerPath = resolveInputPath(
-  args.runtimeBlocker ?? `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
+  args.runtimeBlocker ?? `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
 );
 const resumeResultDoctorPath = resolveInputPath(
   args.resumeResultDoctor ?? `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
@@ -125,7 +125,9 @@ const report = {
   runtime,
   blockers,
   nextActions: [
-    "Finish the shard-002 local-full resume path before treating the next 25-query slice as accepted.",
+    coverage.nextPendingShardId
+      ? `Finish or rerun ${coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
+      : "No next local-full shard is pending; run shard intake and combine gates before any claim changes.",
     "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
     "Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage.",
   ],

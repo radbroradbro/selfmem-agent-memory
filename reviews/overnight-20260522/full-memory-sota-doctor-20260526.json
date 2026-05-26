@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T15:15:02.886Z",
+  "generatedAt": "2026-05-26T23:37:07.623Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -47,21 +47,21 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:b6f9b29046ba12798ba5d58defd7fea8f071b4f8f68bc34dcd6535921a515754",
+      "hash": "sha256:5f976e72553346b172e05b9bf91736642628137000282b65ce92a67545de94d6",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
       "exists": true,
-      "hash": "sha256:33ab66f5e802ff3490b22b01d531a2abc75695e785ee7fdd4a510782c6a3575a",
+      "hash": "sha256:f7a17aade68cd2a14fa8b56d321b602f61afd8bca2093a2bfffa9062731c82ba",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
       "exists": true,
-      "hash": "sha256:7fe5b66ad27c1232e0b6da64c2712caae659b4a4bf9131a5170160a8fffd80c3",
+      "hash": "sha256:b34b13d7189ad1c05f3f907c1fed3821a285b99f492071be1cab8ec3ee214282",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -73,6 +73,13 @@
       "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
     },
     "localFullShardIntakeLatest": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json",
+      "exists": true,
+      "hash": "sha256:36ef949889dedb8e7ef1c848bfefa2cd34a568137a87d57a759b107f67217c50",
+      "mode": "public-benchmark-answer-quality-shard-intake",
+      "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
+    },
+    "localFullShardIntakeAfterShard001": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json",
       "exists": true,
       "hash": "sha256:d0ed2a8e3cf5a249f2465d74a20d7da1cde3df290b0b21c0328c4254cf748372",
@@ -82,7 +89,7 @@
     "localFullPerformanceReport": {
       "path": "reviews/overnight-20260522/local-full-shard-performance-report-20260526.json",
       "exists": true,
-      "hash": "sha256:a72d67edc4013ce139bba9d43b6565f06f9fbc69ea36800f65f823b5743cd5d4",
+      "hash": "sha256:a85a6b71b2238ea785feede3c6476e0baf5b2ac08537f5abaeb09c55978a8e34",
       "mode": "local-full-shard-performance-report",
       "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT"
     },
@@ -96,7 +103,7 @@
     "localFullResumeCommandSecurity": {
       "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-security-20260526.json",
       "exists": true,
-      "hash": "sha256:511f56899ff112105b64cde786db219369506c1bc555f9d47de86152956a4aa7",
+      "hash": "sha256:b46e34f426c5c956f448d192b5525e6dd21fe59eb82559ce3208033dc5c00cf5",
       "mode": "local-full-shard-resume-command-security-doctor",
       "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY"
     },
@@ -111,6 +118,13 @@
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json",
       "exists": true,
       "hash": "sha256:cc383c3c6b66e473fcd92362ec95c1259d6220970d7486286cb762698a95545f",
+      "mode": "answer-quality-local-full-shard-runtime-blocker",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME"
+    },
+    "localFullShard003RuntimeBlocker": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-003-runtime-blocker-20260526.json",
+      "exists": true,
+      "hash": "sha256:86e5c89bed4541a2b5641ab4e4a7f4bcefab574b889913211b3c8c62c652d4ef",
       "mode": "answer-quality-local-full-shard-runtime-blocker",
       "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME"
     },
@@ -131,7 +145,7 @@
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:7d12423cb3c93a46a9eb38311c8c8a729d43320d9492df7516ef02429c8806b6",
+      "hash": "sha256:a0d34d16b0c603b0f53a709416544aa1654250d029dd7e89bbb47d1264b0398e",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -145,7 +159,7 @@
     "acceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:c8a7c9c24a2173e8f9fbae281a49347fb2be15e0a31a8954bf51ca7b6aa156c1",
+      "hash": "sha256:69e8c9130472fa05fa1677d9d792e2328b5a11f4f1135c768101e0e311ac455b",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -159,7 +173,7 @@
     "shardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
       "exists": true,
-      "hash": "sha256:29821bd53b9da47005514a2f721005ec2717593e0ba99eaa351acbf51fdc3d6c",
+      "hash": "sha256:9cdc33415b22b72333f765d05d93ac821c267f511dcaddd9cf77b678d7dee750",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -236,14 +250,14 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:c15603c55fe5e0a9a2f575b18ba907cfd7d8f3c34e8254ac1c5910d15398e04e",
+      "hash": "sha256:751cce4839cbe948da200ba50d1c8ddf280bb937700eb4f580443ed8bb9d472d",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:61e534ada25316339c45c019a0c3d105dc708f728780276be806295cc55310b5",
+      "hash": "sha256:db51353290cf04072dcd9cc152e95e43baf6c87914edb0b1c61aeabb73cd0b0f",
       "mode": null,
       "status": null
     },
@@ -257,7 +271,7 @@
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:fb6f8a3067cd4f4b2f780a9b009560fa46910194daabeffdb2d115dcd70eb2e5",
+      "hash": "sha256:384f911c6d26fb46182f32fe0d4f151b43c3783e7e3f80192407d84a74ff5622",
       "mode": null,
       "status": null
     }
@@ -599,15 +613,19 @@
   "localFullLaneState": {
     "planPath": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
     "workorderPath": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
-    "intakePath": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json",
+    "intakePath": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json",
     "status": "READY_LOCAL_FULL_BENCHMARK_PLAN",
     "readyForLocalFullBenchmarkPlan": true,
     "readyForResponseArmExport": false,
     "readyForAnswerQualityScoring": false,
     "intakeStatus": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS",
     "readyForShardCombine": false,
-    "acceptedShardCount": 1,
-    "missingShardCount": 19,
+    "acceptedShardCount": 2,
+    "acceptedShardIds": [
+      "shard-001",
+      "shard-002"
+    ],
+    "missingShardCount": 18,
     "launchDoctorStatus": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
     "readyForFirstShardRun": false,
     "readyForLocalFullBenchmarkResult": false,
@@ -624,19 +642,18 @@
     "acceptedLaneId": "local-full-accepted-shards",
     "canReachFullSotaGateAfterShardIntake": false,
     "cloudProviderBlockerCount": 0,
-    "runtimeBlockedShardCount": 1,
-    "latestRuntimeBlockedShard": "shard-002",
-    "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b",
+    "runtimeBlockedShardCount": 2,
+    "latestRuntimeBlockedShard": "shard-003",
+    "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b-local-rerank",
     "runtimeBlockerWorkorderInputCount": 1,
     "runtimeBlockerResumeAvailableCount": 1,
     "nextPendingShardResumeMissingStrategies": [
-      "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
     ],
     "launchProgressSource": "checked-in-progress-intake",
-    "launchProgressInputCount": 1,
-    "launchAcceptedShardCount": 1,
-    "launchPendingShardCount": 19,
+    "launchProgressInputCount": 2,
+    "launchAcceptedShardCount": 2,
+    "launchPendingShardCount": 18,
     "performanceReport": {
       "path": "reviews/overnight-20260522/local-full-shard-performance-report-20260526.json",
       "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
@@ -645,26 +662,26 @@
       "safe": true,
       "evidenceReady": true,
       "evidenceBlockers": [],
-      "generatedAt": "2026-05-26T13:55:26.320Z",
-      "intakeGeneratedAt": "2026-05-26T09:56:40.093Z",
+      "generatedAt": "2026-05-26T23:36:59.054Z",
+      "intakeGeneratedAt": "2026-05-26T22:55:50.209Z",
       "freshForIntake": true,
-      "expectedAcceptedShardCount": 1,
-      "expectedAcceptedQueryCount": 25,
-      "expectedCoveragePercent": 5,
-      "expectedNextPendingShardId": "shard-002",
-      "acceptedShardCount": 1,
-      "acceptedQueryCount": 25,
+      "expectedAcceptedShardCount": 2,
+      "expectedAcceptedQueryCount": 50,
+      "expectedCoveragePercent": 10,
+      "expectedNextPendingShardId": "shard-003",
+      "acceptedShardCount": 2,
+      "acceptedQueryCount": 50,
       "queryCount": 500,
-      "coveragePercent": 5,
-      "nextPendingShardId": "shard-002",
+      "coveragePercent": 10,
+      "nextPendingShardId": "shard-003",
       "bestStrategy": "full-hybrid-rerank",
-      "bestAnswerQuality": 19.4,
-      "bestDeltaVsBm25": 4.2,
-      "localAppleBaseAnswerQuality": 17.4,
-      "localAppleRerankAnswerQuality": 15.8,
-      "localAppleRerankDeltaVsBase": -1.6,
+      "bestAnswerQuality": 25.52,
+      "bestDeltaVsBm25": 2,
+      "localAppleBaseAnswerQuality": 24.62,
+      "localAppleRerankAnswerQuality": 19.82,
+      "localAppleRerankDeltaVsBase": -4.8,
       "runtimeBlockerStatus": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
-      "runtimeFailedArm": "local-apple-qwen3-0_6b",
+      "runtimeFailedArm": "local-apple-qwen3-0_6b-local-rerank",
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "blockers": [
@@ -753,14 +770,7 @@
       "status": "BLOCKED_LOCAL_FULL_SHARD_002_RESULT",
       "publicSafe": true,
       "evidenceReady": false,
-      "evidenceBlockers": [
-        "local-full-resume-result-not-ready",
-        "local-full-resume-result-not-ready-for-intake",
-        "local-full-shard-002-result-not-accepted",
-        "resume-command-materializer-not-ready",
-        "resume-private-command-file-not-written",
-        "shard-002-result-missing"
-      ],
+      "evidenceBlockers": [],
       "readyForLocalShardIntake": false,
       "previousShardAccepted": true,
       "shard002ResultPresent": false,
@@ -775,10 +785,12 @@
         "shard-002-result-missing"
       ],
       "countsAsFullMemorySotaEvidence": false,
-      "publicBenchmarkClaimsAllowed": false
+      "publicBenchmarkClaimsAllowed": false,
+      "gateSatisfiedByAcceptedShardIntake": true,
+      "evidenceGateReady": true
     },
-    "nextPendingShardId": "shard-002",
-    "nextPendingShardRange": "25-50",
+    "nextPendingShardId": "shard-003",
+    "nextPendingShardRange": "50-75",
     "localEmbeddingRuntimeStatus": "READY_LOCAL_EMBEDDING_RUNTIME",
     "localEmbeddingRuntimeReady": true,
     "localEmbeddingRuntimeBlockers": [],
@@ -798,10 +810,20 @@
         "acceptedShard": false,
         "completedArmCount": 3,
         "missingArmCount": 2
+      },
+      {
+        "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+        "shardId": "shard-003",
+        "failedArm": "local-apple-qwen3-0_6b-local-rerank",
+        "failureClass": "local-rerank-response-body-stall",
+        "publicSyntheticReproduced": false,
+        "acceptedShard": false,
+        "completedArmCount": 4,
+        "missingArmCount": 1
       }
     ],
     "operatorInputCount": 5,
-    "pendingShardCount": 19,
+    "pendingShardCount": 18,
     "countsAsFullMemorySotaEvidence": false,
     "publicBenchmarkClaimsAllowed": false,
     "envBlockers": [
@@ -823,7 +845,9 @@
       "full-shard-coverage-incomplete",
       "local-apple-embedding-server-socket-close",
       "local-full-shard-002-incomplete",
-      "local-full-shard-coverage-incomplete"
+      "local-full-shard-coverage-incomplete",
+      "local-rerank-response-body-stall",
+      "local-full-shard-003-incomplete"
     ],
     "launchBlockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
@@ -1010,7 +1034,9 @@
         "full-shard-coverage-incomplete",
         "local-apple-embedding-server-socket-close",
         "local-full-shard-002-incomplete",
-        "local-full-shard-coverage-incomplete"
+        "local-full-shard-coverage-incomplete",
+        "local-rerank-response-body-stall",
+        "local-full-shard-003-incomplete"
       ]
     },
     {
@@ -1041,15 +1067,8 @@
     },
     {
       "id": "local-full-resume-result",
-      "status": "blocked",
-      "blockers": [
-        "local-full-resume-result-not-ready",
-        "local-full-resume-result-not-ready-for-intake",
-        "local-full-shard-002-result-not-accepted",
-        "resume-command-materializer-not-ready",
-        "resume-private-command-file-not-written",
-        "shard-002-result-missing"
-      ]
+      "status": "pass",
+      "blockers": []
     },
     {
       "id": "full-shard-results",
@@ -1150,6 +1169,8 @@
     "local-apple-embedding-server-socket-close",
     "local-full-shard-002-incomplete",
     "local-full-shard-coverage-incomplete",
+    "local-rerank-response-body-stall",
+    "local-full-shard-003-incomplete",
     "local-full-resume-env-not-ready",
     "local-full-resume-missing-arm-export-not-ready",
     "local-full-resume-answer-quality-preflight-not-ready",
@@ -1160,12 +1181,6 @@
     "local-rerank-env-missing",
     "local-safety-env-missing",
     "answer-quality-env-missing",
-    "local-full-resume-result-not-ready",
-    "local-full-resume-result-not-ready-for-intake",
-    "local-full-shard-002-result-not-accepted",
-    "resume-command-materializer-not-ready",
-    "resume-private-command-file-not-written",
-    "shard-002-result-missing",
     "answer-quality-shard-runs-pending",
     "shard-results-missing",
     "missing-voyage-answer-quality-same-data-result",

@@ -21,11 +21,11 @@
 - local-full-launch-readiness: blocked (RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, local-full-answer-quality-shard-results-not-returned)
 - local-embedding-runtime: pass
 - local-embedding-durability: pass
-- local-full-shard-intake: blocked (answer-quality-shards-missing, full-shard-coverage-incomplete, local-apple-embedding-server-socket-close, local-full-shard-002-incomplete, local-full-shard-coverage-incomplete)
+- local-full-shard-intake: blocked (answer-quality-shards-missing, full-shard-coverage-incomplete, local-apple-embedding-server-socket-close, local-full-shard-002-incomplete, local-full-shard-coverage-incomplete, local-rerank-response-body-stall, local-full-shard-003-incomplete)
 - local-full-performance-snapshot: pass
 - local-full-resume-env: blocked (local-full-resume-env-not-ready, local-full-resume-missing-arm-export-not-ready, local-full-resume-answer-quality-preflight-not-ready, local-full-resume-shard-answer-quality-not-ready, local-full-resume-local-shard-intake-not-ready, local-full-resume-command-materialization-not-ready, local-embedding-env-missing, local-rerank-env-missing, local-safety-env-missing, answer-quality-env-missing)
 - local-full-resume-command-security: pass
-- local-full-resume-result: blocked (local-full-resume-result-not-ready, local-full-resume-result-not-ready-for-intake, local-full-shard-002-result-not-accepted, resume-command-materializer-not-ready, resume-private-command-file-not-written, shard-002-result-missing)
+- local-full-resume-result: pass
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
 - full-score-result-gate: blocked (reported-target-judge-model-does-not-match-result, missing-full-or-officially-comparable-memory-benchmark-run, best-end-to-end-score-below-primary-reported-memory-target)
@@ -81,12 +81,12 @@
 - Ready for first shard run: false
 - Intake status: BLOCKED_FULL_ANSWER_QUALITY_SHARDS
 - Ready for shard combine: false
-- Accepted local-full shards: 1
-- Missing local-full shards: 19
+- Accepted local-full shards: 2
+- Missing local-full shards: 18
 - Launch progress source: checked-in-progress-intake
-- Performance coverage: 5%
+- Performance coverage: 10%
 - Performance best strategy: full-hybrid-rerank
-- Performance best answer quality: 19.4
+- Performance best answer quality: 25.52
 - Performance counts as SOTA evidence: false
 - Resume env ready for missing-arm export: false
 - Resume env ready for missing-arm export except env: true
@@ -106,16 +106,17 @@
 - Resume command second guard: rerunDurabilitySmoke
 - Resume command guarded command: missingArmResponseExport
 - Resume command counts as SOTA evidence: false
+- Resume result gate satisfied by accepted shard intake: true
 - Resume result ready for local shard intake: false
 - Resume result previous shard accepted: true
 - Resume result shard 002 present: false
 - Resume result shard 002 accepted: false
-- Next local-full shard: shard-002 (25-50)
-- Runtime-blocked local-full shards: 1
+- Next local-full shard: shard-003 (50-75)
+- Runtime-blocked local-full shards: 2
 - Runtime blocker resume plans: 1
-- Next shard missing resume arms: local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
-- Latest runtime-blocked shard: shard-002
-- Latest runtime-blocked arm: local-apple-qwen3-0_6b
+- Next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank
+- Latest runtime-blocked shard: shard-003
+- Latest runtime-blocked arm: local-apple-qwen3-0_6b-local-rerank
 - Local embedding runtime status: READY_LOCAL_EMBEDDING_RUNTIME
 - Local embedding runtime ready: true
 - Local embedding durability status: READY_LOCAL_EMBEDDING_DURABILITY
@@ -151,6 +152,8 @@
 - local-apple-embedding-server-socket-close
 - local-full-shard-002-incomplete
 - local-full-shard-coverage-incomplete
+- local-rerank-response-body-stall
+- local-full-shard-003-incomplete
 - local-full-resume-env-not-ready
 - local-full-resume-missing-arm-export-not-ready
 - local-full-resume-answer-quality-preflight-not-ready
@@ -161,12 +164,6 @@
 - local-rerank-env-missing
 - local-safety-env-missing
 - answer-quality-env-missing
-- local-full-resume-result-not-ready
-- local-full-resume-result-not-ready-for-intake
-- local-full-shard-002-result-not-accepted
-- resume-command-materializer-not-ready
-- resume-private-command-file-not-written
-- shard-002-result-missing
 - answer-quality-shard-runs-pending
 - shard-results-missing
 - missing-voyage-answer-quality-same-data-result

@@ -21,12 +21,14 @@ const files = {
   localFullShardPlan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
   localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
-  localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
+  localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`,
+  localFullShardIntakeAfterShard001: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
   localFullPerformanceReport: `${reviewDir}/local-full-shard-performance-report-20260526.json`,
   localFullResumeEnvDoctor: `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.json`,
   localFullResumeCommandSecurity: `${reviewDir}/local-full-shard-002-resume-command-security-20260526.json`,
   localFullResumeResultDoctor: `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
   localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
+  localFullShard003RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
   localEmbeddingRuntimeDoctor: `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   localEmbeddingDurabilitySmoke: `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
   localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
@@ -61,6 +63,7 @@ const localFullShardWorkorder = evidence.localFullShardWorkorder.json;
 const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
   evidence.localFullShardIntake,
   evidence.localFullShardIntakeLatest,
+  evidence.localFullShardIntakeAfterShard001,
 ]);
 const localFullShardIntake = localFullShardIntakeSelection.json;
 const localFullPerformanceReport = evidence.localFullPerformanceReport.json;
@@ -68,6 +71,7 @@ const localFullResumeEnvDoctor = evidence.localFullResumeEnvDoctor.json;
 const localFullResumeCommandSecurity = evidence.localFullResumeCommandSecurity.json;
 const localFullResumeResultDoctor = evidence.localFullResumeResultDoctor.json;
 const localFullShard002RuntimeBlocker = evidence.localFullShard002RuntimeBlocker.json;
+const localFullShard003RuntimeBlocker = evidence.localFullShard003RuntimeBlocker.json;
 const localEmbeddingRuntimeDoctor = evidence.localEmbeddingRuntimeDoctor.json;
 const localEmbeddingDurabilitySmoke = evidence.localEmbeddingDurabilitySmoke.json;
 const localFullAcceptedLaneLaunchDoctor = evidence.localFullAcceptedLaneLaunchDoctor.json;
@@ -96,7 +100,7 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullResumeEnvDoctor,
   localFullResumeCommandSecurity,
   localFullResumeResultDoctor,
-  localFullShardRuntimeBlockers: [localFullShard002RuntimeBlocker],
+  localFullShardRuntimeBlockers: [localFullShard002RuntimeBlocker, localFullShard003RuntimeBlocker],
   localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
   localFullAcceptedLaneLaunchDoctor,
@@ -146,7 +150,7 @@ const gates = [
   ),
   gate(
     "local-full-resume-result",
-    localFullLaneState.resumeResult.evidenceReady,
+    localFullLaneState.resumeResult.evidenceGateReady,
     localFullLaneState.resumeResult.evidenceBlockers,
   ),
   gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
@@ -363,6 +367,7 @@ function inspectLocalFullLaneState({
   const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
   const runtimeBlockerReports = arrayOf(localFullShardRuntimeBlockers).filter(Boolean);
   const runtimeBlockerIds = [...new Set(runtimeBlockerReports.flatMap((report) => arrayOf(report?.blockers)))];
+  const acceptedShardIds = new Set(arrayOf(localFullShardIntake?.acceptedShards).map((shard) => String(shard?.shardId ?? "")));
   const localEmbeddingRuntimeReady =
     localEmbeddingRuntimeDoctor?.mode === "local-embedding-runtime-doctor" &&
     localEmbeddingRuntimeDoctor?.status === "READY_LOCAL_EMBEDDING_RUNTIME" &&
@@ -394,6 +399,11 @@ function inspectLocalFullLaneState({
     acceptedLane?.canReachFullSotaGateAfterShardIntake !== false ? "local-full-lane-should-not-claim-sota" : null,
     cloudProviderBlockers.length > 0 ? "local-full-lane-has-cloud-provider-blockers" : null,
   ].filter(Boolean);
+  const resumeResult = inspectLocalFullResumeResultDoctor(localFullResumeResultDoctor);
+  const resumeResultGateSatisfied = resumeResult.evidenceReady || acceptedShardIds.has("shard-002");
+  const resumeResultEvidenceBlockers = resumeResultGateSatisfied
+    ? []
+    : resumeResult.evidenceBlockers;
   return {
     planPath: files.localFullShardPlan,
     workorderPath: files.localFullShardWorkorder,
@@ -405,6 +415,7 @@ function inspectLocalFullLaneState({
     intakeStatus: localFullShardIntake?.status ?? null,
     readyForShardCombine: Boolean(localFullShardIntake?.readyForShardCombine),
     acceptedShardCount: Number(localFullShardIntake?.intake?.acceptedShardCount ?? 0),
+    acceptedShardIds: [...acceptedShardIds].filter(Boolean).sort(),
     missingShardCount: Number(localFullShardIntake?.intake?.missingShardCount ?? 0),
     launchDoctorStatus: localFullAcceptedLaneLaunchDoctor?.status ?? null,
     readyForFirstShardRun: localFullAcceptedLaneLaunchDoctor?.launchGate?.readyForFirstAcceptedShardRun === true,
@@ -434,7 +445,12 @@ function inspectLocalFullLaneState({
     }),
     resumeEnv: inspectLocalFullResumeEnvDoctor(localFullResumeEnvDoctor),
     resumeCommandSecurity: inspectLocalFullResumeCommandSecurity(localFullResumeCommandSecurity),
-    resumeResult: inspectLocalFullResumeResultDoctor(localFullResumeResultDoctor),
+    resumeResult: {
+      ...resumeResult,
+      gateSatisfiedByAcceptedShardIntake: acceptedShardIds.has("shard-002"),
+      evidenceGateReady: resumeResultGateSatisfied,
+      evidenceBlockers: resumeResultEvidenceBlockers,
+    },
     nextPendingShardId: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null,
     nextPendingShardRange: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null,
     localEmbeddingRuntimeStatus: localEmbeddingRuntimeDoctor?.status ?? null,
@@ -1126,6 +1142,7 @@ function renderMarkdown(value) {
     `- Resume command second guard: ${value.localFullLaneState.resumeCommandSecurity.secondCommandId ?? "n/a"}`,
     `- Resume command guarded command: ${value.localFullLaneState.resumeCommandSecurity.guardedCommandId ?? "n/a"}`,
     `- Resume command counts as SOTA evidence: ${value.localFullLaneState.resumeCommandSecurity.countsAsFullMemorySotaEvidence}`,
+    `- Resume result gate satisfied by accepted shard intake: ${value.localFullLaneState.resumeResult.gateSatisfiedByAcceptedShardIntake}`,
     `- Resume result ready for local shard intake: ${value.localFullLaneState.resumeResult.readyForLocalShardIntake}`,
     `- Resume result previous shard accepted: ${value.localFullLaneState.resumeResult.previousShardAccepted}`,
     `- Resume result shard 002 present: ${value.localFullLaneState.resumeResult.shard002ResultPresent}`,
