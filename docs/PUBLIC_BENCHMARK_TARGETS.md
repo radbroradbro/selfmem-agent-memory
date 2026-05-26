@@ -538,7 +538,10 @@ not count as a RecallWeave score.
   commands include explicit local embedding and local rerank endpoint
   placeholders plus the local embedding durability report and required
   durability flag, so the checked-in workorder documents the sidecar
-  requirements without exposing private URLs.
+  requirements without exposing private URLs. It also accepts the shard 002
+  runtime-blocker report as public-safe resume metadata and emits a
+  missing-arm-only retry command for the two local Apple arms while keeping
+  answer-quality scoring and intake blocked until all shard arms exist.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

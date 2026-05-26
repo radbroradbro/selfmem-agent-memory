@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T11:55:40.405Z",
+  "generatedAt": "2026-05-26T12:09:58.452Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -61,7 +61,7 @@
     "localFullShardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
       "exists": true,
-      "hash": "sha256:3396bb0e75c34165a1f9c359245b0ff04412a06fa9300f6214b04a57890f285f",
+      "hash": "sha256:7fe5b66ad27c1232e0b6da64c2712caae659b4a4bf9131a5170160a8fffd80c3",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -215,7 +215,7 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:2fadf4d7405cee28e773deb55e5d3ebf36184e514c3a1d959b2314c1512917f5",
+      "hash": "sha256:91a97bc20df878ae95cebe5ee0573b0c104a749294c87c65d4b2958cd887e810",
       "mode": null,
       "status": null
     },
@@ -229,7 +229,7 @@
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:160c58639a06bbe52096536f26a7aea4958ef960a1c6b70397224344cf63ceb7",
+      "hash": "sha256:973250bf8878944bfd306d35f4e0888cb9de2a99906ba18f88096687e11e908e",
       "mode": null,
       "status": null
     }
@@ -599,6 +599,12 @@
     "runtimeBlockedShardCount": 1,
     "latestRuntimeBlockedShard": "shard-002",
     "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b",
+    "runtimeBlockerWorkorderInputCount": 1,
+    "runtimeBlockerResumeAvailableCount": 1,
+    "nextPendingShardResumeMissingStrategies": [
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
     "launchProgressSource": "checked-in-progress-intake",
     "launchProgressInputCount": 1,
     "launchAcceptedShardCount": 1,
@@ -627,7 +633,7 @@
       }
     ],
     "operatorInputCount": 5,
-    "pendingShardCount": 20,
+    "pendingShardCount": 19,
     "countsAsFullMemorySotaEvidence": false,
     "publicBenchmarkClaimsAllowed": false,
     "envBlockers": [

@@ -346,6 +346,12 @@ local embedding durability report, so shard retries cannot omit the local model
 sidecars or durability gate. A completed `local-full` run can diagnose whether the local
 method is model-size limited; it does not count as SOTA evidence or public
 superiority without the provider/SOTA comparison lane.
+The same workorder now consumes the accepted shard 001 result and the shard 002
+runtime-blocker report. It emits nineteen pending workorders, marks one runtime
+resume plan for shard 002, and includes a missing-arm-only response export for
+`local-apple-qwen3-0_6b` and `local-apple-qwen3-0_6b-local-rerank` so the
+already exported BM25, full-hybrid, and local query-expansion arms do not have
+to be regenerated just to retry the unstable local embedding path.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

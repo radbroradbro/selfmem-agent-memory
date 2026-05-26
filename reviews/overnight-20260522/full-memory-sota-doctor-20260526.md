@@ -82,6 +82,8 @@
 - Launch progress source: checked-in-progress-intake
 - Next local-full shard: shard-002 (25-50)
 - Runtime-blocked local-full shards: 1
+- Runtime blocker resume plans: 1
+- Next shard missing resume arms: local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
 - Latest runtime-blocked shard: shard-002
 - Latest runtime-blocked arm: local-apple-qwen3-0_6b
 - Local embedding runtime status: READY_LOCAL_EMBEDDING_RUNTIME

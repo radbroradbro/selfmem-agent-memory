@@ -4,13 +4,14 @@
 - Ready for shard intake: false
 - Ready for shard combine: false
 - Counts as full memory SOTA evidence: false
-- Accepted shards: 0
-- Pending shards: 20
+- Accepted shards: 1
+- Pending shards: 19
 - Rejected results: 0
-- Workorders emitted: 20
+- Workorders emitted: 19
+- Runtime blocker reports: 1
+- Runtime resume plans: 1
 
 ## Workorders
-- shard-001: 0-25
 - shard-002: 25-50
 - shard-003: 50-75
 - shard-004: 75-100
@@ -30,6 +31,9 @@
 - shard-018: 425-450
 - shard-019: 450-475
 - shard-020: 475-500
+
+## Runtime Resume Plans
+- shard-002: completed=bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank; missing=local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank; failure=local-embedding-server-socket-close
 
 ## Execution Lanes
 - deterministic-control-proxy: ready=true; intake-compatible=false; providers=none

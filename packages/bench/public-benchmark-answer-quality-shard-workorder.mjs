@@ -12,6 +12,7 @@ const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPa
 const format = String(args.format ?? "json").toLowerCase();
 const maxWorkorders = positiveInt(args.maxWorkorders ?? args.max ?? Number.MAX_SAFE_INTEGER, "max workorders");
 const inputs = inputPaths();
+const runtimeBlockerInputs = runtimeBlockerPaths();
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -28,6 +29,7 @@ assert.equal(plan.mode, "public-benchmark-answer-quality-shard-plan", "plan must
 
 const loaded = inputs.map(loadCandidateResult);
 const evaluated = evaluateExistingShardResults({ plan, loaded });
+const runtimeBlockerState = evaluateRuntimeBlockers({ plan, loaded: runtimeBlockerInputs.map(loadRuntimeBlocker) });
 const pendingShards = (plan.shards ?? []).filter((shard) => !evaluated.acceptedByShardId.has(shard.id));
 const selectedPendingShards = pendingShards.slice(0, maxWorkorders);
 const allExpectedPublicInputs = (plan.shards ?? []).map(
@@ -100,7 +102,8 @@ const report = {
   pendingShards: pendingShards.map(publicShardRow),
   rejectedResults: evaluated.rejectedResults,
   duplicateResults: evaluated.duplicateResults,
-  workorders: selectedPendingShards.map((shard) => buildWorkorder(plan, shard)),
+  runtimeBlockers: runtimeBlockerState.report,
+  workorders: selectedPendingShards.map((shard) => buildWorkorder(plan, shard, runtimeBlockerState.byShardId.get(shard.id) ?? null)),
   gatedCommands: {
     shardIntake: [
       `npm exec --yes pnpm@10.23.0 -- ${shardIntakeScript}`,
@@ -151,10 +154,28 @@ function inputPaths() {
   return [...explicit, ...discovered].sort();
 }
 
+function runtimeBlockerPaths() {
+  return normalizeList([args.runtimeBlocker, args.runtimeBlockers].flatMap(coerceArray)).map(resolveInputPath);
+}
+
 function loadCandidateResult(pathLike) {
   const path = resolveInputPath(pathLike);
   assert.ok(existsSync(path), `shard result missing: ${displayPath(path)}`);
   assert.ok(statSync(path).size > 0, `shard result empty: ${displayPath(path)}`);
+  const raw = readFileSync(path, "utf8");
+  assertSafePublicText(raw, displayPath(path));
+  return {
+    fileName: basename(path),
+    path: displayPath(path),
+    hash: `sha256:${sha256(raw)}`,
+    json: JSON.parse(raw),
+  };
+}
+
+function loadRuntimeBlocker(pathLike) {
+  const path = resolveInputPath(pathLike);
+  assert.ok(existsSync(path), `runtime blocker report missing: ${displayPath(path)}`);
+  assert.ok(statSync(path).size > 0, `runtime blocker report empty: ${displayPath(path)}`);
   const raw = readFileSync(path, "utf8");
   assertSafePublicText(raw, displayPath(path));
   return {
@@ -201,6 +222,124 @@ function evaluateExistingShardResults({ plan: planValue, loaded: loadedItems }) 
   return { acceptedByShardId, acceptedResults, rejectedResults, duplicateResults };
 }
 
+function evaluateRuntimeBlockers({ plan: planValue, loaded: loadedItems }) {
+  const expectedById = new Map((planValue.shards ?? []).map((shard) => [shard.id, shard]));
+  const byShardId = new Map();
+  const matched = [];
+  const rejected = [];
+  for (const item of loadedItems) {
+    const shardId = String(item.json.queryShard?.shardId ?? "");
+    const expectedShard = expectedById.get(shardId) ?? null;
+    const failures = runtimeBlockerFailures({ item, expectedShard, planValue });
+    const row = runtimeBlockerRow({ item, expectedShard, failures });
+    if (failures.length) rejected.push(row);
+    else {
+      matched.push(row);
+      byShardId.set(row.shardId, row);
+    }
+  }
+  matched.sort((left, right) => left.startIndex - right.startIndex);
+  rejected.sort((left, right) => (left.startIndex ?? 0) - (right.startIndex ?? 0));
+  return {
+    byShardId,
+    report: {
+      inputCount: loadedItems.length,
+      matchedCount: matched.length,
+      rejectedCount: rejected.length,
+      resumeAvailableCount: matched.filter((item) => item.resumeAvailable).length,
+      matched,
+      rejected,
+      blockers: rejected.length ? ["runtime-blocker-report-rejected"] : [],
+    },
+  };
+}
+
+function runtimeBlockerFailures({ item, expectedShard, planValue }) {
+  const shard = item.json.queryShard ?? {};
+  const completedStrategies = arrayOfStrings(item.json.partialAttempt?.completedStrategies);
+  const missingStrategies = arrayOfStrings(item.json.partialAttempt?.missingStrategies);
+  const plannedStrategies = arrayOfStrings(planValue.runPlan?.strategies);
+  const completedEvidence = arrayOf(item.json.completedPrivateArmEvidence);
+  return [
+    item.json.mode !== "answer-quality-local-full-shard-runtime-blocker" ? "not-local-full-runtime-blocker-report" : null,
+    item.json.publicSafe !== true ? "not-public-safe" : null,
+    item.json.metricsOnly !== true ? "not-metrics-only" : null,
+    item.json.claimScope !== planValue.runPlan?.claimScope ? "claim-scope-mismatch" : null,
+    item.json.acceptedShard !== false ? "runtime-blocker-must-not-be-accepted-shard" : null,
+    item.json.countsAsLocalFullBenchmarkEvidence !== false ? "local-full-claim-enabled" : null,
+    item.json.countsAsFullMemorySotaEvidence !== false ? "sota-claim-enabled" : null,
+    item.json.publicBenchmarkClaimsAllowed !== false ? "public-claims-enabled" : null,
+    item.json.rawQuestionsIncluded !== false ? "raw-questions-included" : null,
+    item.json.rawAnswersIncluded !== false ? "raw-answers-included" : null,
+    item.json.rawMemoryIncluded !== false ? "raw-memory-included" : null,
+    item.json.rawTranscriptIncluded !== false ? "raw-transcript-included" : null,
+    item.json.rawPromptIncluded !== false ? "raw-prompt-included" : null,
+    item.json.rawPrivateOutputPathIncluded !== false ? "raw-private-output-path-included" : null,
+    !expectedShard ? "runtime-blocker-shard-not-in-plan" : null,
+    expectedShard && Number(shard.queryOffset ?? shard.startIndex) !== Number(expectedShard.startIndex) ? "runtime-blocker-offset-mismatch" : null,
+    expectedShard && Number(shard.maxQueries ?? shard.scoredQueryCount) !== Number(expectedShard.queryCount) ? "runtime-blocker-query-count-mismatch" : null,
+    expectedShard && Number(shard.endIndexExclusive) !== Number(expectedShard.endIndexExclusive) ? "runtime-blocker-range-end-mismatch" : null,
+    expectedShard && shard.rangeHash && shard.rangeHash !== expectedShard.rangeHash ? "runtime-blocker-range-hash-mismatch" : null,
+    completedStrategies.length !== Number(item.json.partialAttempt?.completedArmCount ?? completedStrategies.length)
+      ? "completed-arm-count-mismatch"
+      : null,
+    missingStrategies.length !== Number(item.json.partialAttempt?.missingArmCount ?? missingStrategies.length) ? "missing-arm-count-mismatch" : null,
+    completedEvidence.length !== completedStrategies.length ? "completed-arm-evidence-count-mismatch" : null,
+    missingStrategies.length === 0 ? "missing-strategy-list-empty" : null,
+    completedStrategies.some((strategy) => !plannedStrategies.includes(strategy)) ? "completed-strategy-not-in-plan" : null,
+    missingStrategies.some((strategy) => !plannedStrategies.includes(strategy)) ? "missing-strategy-not-in-plan" : null,
+    completedStrategies.some((strategy) => missingStrategies.includes(strategy)) ? "strategy-listed-as-complete-and-missing" : null,
+    [...completedStrategies, ...missingStrategies].sort().join(",") !== plannedStrategies.sort().join(",")
+      ? "runtime-blocker-strategy-set-mismatch"
+      : null,
+    item.json.partialAttempt?.readyForAnswerQualityPreflight !== false ? "partial-attempt-preflight-should-be-blocked" : null,
+    item.json.partialAttempt?.readyForShardIntake !== false ? "partial-attempt-intake-should-be-blocked" : null,
+    item.json.failedArm?.strategy && !missingStrategies.includes(item.json.failedArm.strategy) ? "failed-arm-not-marked-missing" : null,
+    completedEvidence.some((entry) => Number(entry.responseCount ?? 0) !== Number(expectedShard?.queryCount ?? 0))
+      ? "completed-arm-response-count-mismatch"
+      : null,
+    completedEvidence.some((entry) => !String(entry.hash ?? "").startsWith("sha256:")) ? "completed-arm-hash-missing" : null,
+  ].filter(Boolean);
+}
+
+function runtimeBlockerRow({ item, expectedShard, failures }) {
+  const shard = item.json.queryShard ?? {};
+  const completedStrategies = arrayOfStrings(item.json.partialAttempt?.completedStrategies);
+  const missingStrategies = arrayOfStrings(item.json.partialAttempt?.missingStrategies);
+  return {
+    shardId: String(shard.shardId ?? expectedShard?.id ?? ""),
+    startIndex: intOrNull(shard.startIndex ?? shard.queryOffset),
+    endIndexExclusive: intOrNull(shard.endIndexExclusive),
+    queryCount: intOrNull(shard.maxQueries ?? expectedShard?.queryCount),
+    fileName: item.fileName,
+    hash: item.hash,
+    status: item.json.status ?? null,
+    failureClass: item.json.failedArm?.failureClass ?? null,
+    failedStrategy: item.json.failedArm?.strategy ?? null,
+    publicSyntheticReproduced: item.json.publicSyntheticReproduction?.reproduced === true,
+    completedArmCount: completedStrategies.length,
+    missingArmCount: missingStrategies.length,
+    completedStrategies,
+    missingStrategies,
+    completedPrivateArmEvidence: arrayOf(item.json.completedPrivateArmEvidence).map((entry) => ({
+      strategy: entry.strategy,
+      name: entry.name,
+      pathLabel: entry.pathLabel,
+      hash: entry.hash,
+      responseCount: entry.responseCount,
+      providerCallsMade: entry.providerCallsMade,
+      queryExpansionCalls: entry.queryExpansionCalls,
+      queryExpansionMode: entry.queryExpansionMode ?? null,
+      queryExpansionModel: entry.queryExpansionModel ?? null,
+    })),
+    readyForAnswerQualityPreflight: item.json.partialAttempt?.readyForAnswerQualityPreflight === true,
+    readyForShardIntake: item.json.partialAttempt?.readyForShardIntake === true,
+    resumeAvailable: failures.length === 0 && completedStrategies.length > 0 && missingStrategies.length > 0,
+    blockers: arrayOfStrings(item.json.blockers),
+    failures,
+  };
+}
+
 function candidateFailures({ item, range, expectedShard, planValue }) {
   return [
     item.json.mode !== "public-benchmark-answer-quality" ? "not-answer-quality-report" : null,
@@ -237,7 +376,12 @@ function candidateFailures({ item, range, expectedShard, planValue }) {
   ].filter(Boolean);
 }
 
-function buildWorkorder(planValue, shard) {
+function buildWorkorder(planValue, shard, runtimeResume) {
+  const responseArmExport = replaceShardTokens(planValue.runPlan?.responseArmExportTemplate ?? "", shard);
+  const preflight = replaceShardTokens(planValue.runPlan?.preflightTemplate ?? "", shard);
+  const answerQuality = replaceShardTokens(planValue.runPlan?.answerQualityTemplate ?? "", shard);
+  const missingArmResponseExport =
+    runtimeResume?.resumeAvailable === true ? replaceStrategyList(responseArmExport, runtimeResume.missingStrategies) : null;
   return {
     shardId: shard.id,
     startIndex: shard.startIndex,
@@ -246,9 +390,29 @@ function buildWorkorder(planValue, shard) {
     expectedPublicResult: shard.answerQualityOutputLabel ?? `<public-review-dir>/answer-quality-${shard.id}.json`,
     expectedPublicMarkdown: shard.answerQualityMarkdownLabel ?? `<public-review-dir>/answer-quality-${shard.id}.md`,
     expectedPrivateArmDirectory: `<private-output-dir>/arms/${shard.id}`,
+    runtimeResume: runtimeResume
+      ? {
+          sourceFileName: runtimeResume.fileName,
+          sourceHash: runtimeResume.hash,
+          status: runtimeResume.status,
+          failureClass: runtimeResume.failureClass,
+          failedStrategy: runtimeResume.failedStrategy,
+          completedArmCount: runtimeResume.completedArmCount,
+          missingArmCount: runtimeResume.missingArmCount,
+          completedStrategies: runtimeResume.completedStrategies,
+          missingStrategies: runtimeResume.missingStrategies,
+          completedPrivateArmEvidence: runtimeResume.completedPrivateArmEvidence,
+          readyForAnswerQualityPreflight: runtimeResume.readyForAnswerQualityPreflight,
+          readyForShardIntake: runtimeResume.readyForShardIntake,
+          resumeAvailable: runtimeResume.resumeAvailable,
+          blockers: runtimeResume.blockers,
+        }
+      : null,
     commands: {
-      responseArmExport: replaceShardTokens(planValue.runPlan?.responseArmExportTemplate ?? "", shard),
-      answerQuality: replaceShardTokens(planValue.runPlan?.answerQualityTemplate ?? "", shard),
+      responseArmExport,
+      missingArmResponseExport,
+      preflight,
+      answerQuality,
     },
   };
 }
@@ -258,6 +422,12 @@ function replaceShardTokens(template, shard) {
     .replaceAll("{shardId}", shard.id)
     .replaceAll("{startIndex}", String(shard.startIndex))
     .replaceAll("{queryCount}", String(shard.queryCount));
+}
+
+function replaceStrategyList(command, strategies) {
+  const strategyList = arrayOfStrings(strategies).join(",");
+  if (!strategyList) return null;
+  return String(command).replace(/--strategies\s+\S+/u, `--strategies ${strategyList}`);
 }
 
 function publicShardRow(shard) {
@@ -654,10 +824,20 @@ function renderMarkdown(value) {
     `- Pending shards: ${value.progress.pendingShardCount}`,
     `- Rejected results: ${value.progress.rejectedResultCount}`,
     `- Workorders emitted: ${value.progress.workorderCount}`,
+    `- Runtime blocker reports: ${value.runtimeBlockers.inputCount}`,
+    `- Runtime resume plans: ${value.runtimeBlockers.resumeAvailableCount}`,
     "",
     "## Workorders",
     ...(value.workorders.length
       ? value.workorders.map((item) => `- ${item.shardId}: ${item.startIndex}-${item.endIndexExclusive}`)
+      : ["- none"]),
+    "",
+    "## Runtime Resume Plans",
+    ...((value.runtimeBlockers.matched ?? []).length
+      ? value.runtimeBlockers.matched.map(
+          (item) =>
+            `- ${item.shardId}: completed=${item.completedStrategies.join(", ") || "none"}; missing=${item.missingStrategies.join(", ") || "none"}; failure=${item.failureClass ?? "unknown"}`,
+        )
       : ["- none"]),
     "",
     "## Execution Lanes",
@@ -713,6 +893,14 @@ function normalizeList(values) {
 
 function unique(items) {
   return [...new Set(items)].sort();
+}
+
+function arrayOf(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function arrayOfStrings(value) {
+  return arrayOf(value).map((item) => String(item)).filter(Boolean);
 }
 
 function coerceArray(value) {

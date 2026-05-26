@@ -399,7 +399,9 @@ fill those placeholders from the live local sidecars rather than dropping them
 for shard retries.
 Run `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` for this lane so the local-full
-plan is selected automatically. The checked-in local intake report,
+plan is selected automatically. The checked-in local workorder now consumes the
+accepted shard 001 output plus the shard 002 runtime blocker and prints a
+missing-arm-only retry for the two local Apple arms. The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.
 It should turn green only after all twenty local-full public shard-result JSONs
