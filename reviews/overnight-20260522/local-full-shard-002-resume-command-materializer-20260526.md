@@ -10,20 +10,31 @@
 - Prints private paths: false
 - Command count: 8
 - Materialized command count: 0
+- Fresh local runtime guard order ready: true
+- First private command: rerunRuntimeDoctor
+- Second private command: rerunDurabilitySmoke
 - Required placeholders ready: false
 - Unresolved required placeholders: local-answer-model, local-embedding-base-url, local-embedding-model, local-judge-model, local-rerank-base-url, local-rerank-candidate-limit, local-rerank-model, openai-compatible-base-url, private-output-dir, safe-local-embedding-batch-token-limit
 - Optional defaults applied: 1-when-cloud-query-expansion-runs, env-only-if-cloud-endpoint, local-query-expansion-base-url-if-used, query-expansion-model-if-used
 - Counts as local-full benchmark evidence: false
 
 ## Command IDs
-- resumeEnvDoctor
 - rerunRuntimeDoctor
 - rerunDurabilitySmoke
+- resumeEnvDoctor
 - missingArmResponseExport
 - preflight
 - answerQuality
 - localShardIntake
 - fullSotaDoctor
+
+## Guard Plan
+- Starts with fresh local runtime guards: true
+- Runtime guard before durability guard: true
+- Runtime guard before missing arm export: true
+- Durability guard before missing arm export: true
+- Resume env doctor after fresh guards: true
+- Missing arm export after resume env doctor: true
 
 ## Blockers
 - private-dir-not-provided

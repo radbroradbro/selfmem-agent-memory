@@ -4036,6 +4036,16 @@ check("fresh public benchmark target check passes", () => {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }
+  const expectedResumePrivateScriptCommandOrder = [
+    "rerunRuntimeDoctor",
+    "rerunDurabilitySmoke",
+    "resumeEnvDoctor",
+    "missingArmResponseExport",
+    "preflight",
+    "answerQuality",
+    "localShardIntake",
+    "fullSotaDoctor",
+  ];
   for (const materializer of [
     localFullShardResumeCommandMaterializer,
     localFullShardResumeCommandMaterializerFresh,
@@ -4063,8 +4073,21 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.writesRealPrivateCommandFile, false);
     assert.equal(materializer.privateCommandFile?.pathPrinted, false);
     assert.equal(materializer.commandPlan?.commandCount, 8);
+    assert.deepEqual(materializer.commandPlan?.commandIds, expectedResumePrivateScriptCommandOrder);
+    assert.deepEqual(materializer.commandPlan?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
     assert.equal(materializer.commandPlan?.materializedCommandCount, 0);
     assert.equal(materializer.commandPlan?.commandsPrinted, false);
+    assert.equal(materializer.guardPlan?.ready, true);
+    assert.equal(materializer.guardPlan?.startsWithFreshLocalRuntimeGuards, true);
+    assert.equal(materializer.guardPlan?.runtimeBeforeDurability, true);
+    assert.equal(materializer.guardPlan?.runtimeBeforeMissingArm, true);
+    assert.equal(materializer.guardPlan?.durabilityBeforeMissingArm, true);
+    assert.equal(materializer.guardPlan?.resumeEnvAfterFreshGuards, true);
+    assert.equal(materializer.guardPlan?.missingArmAfterResumeEnv, true);
+    assert.deepEqual(materializer.guardPlan?.missingRequiredCommandIds, []);
+    assert.equal(materializer.guardPlan?.firstCommandId, "rerunRuntimeDoctor");
+    assert.equal(materializer.guardPlan?.secondCommandId, "rerunDurabilitySmoke");
+    assert.equal(materializer.guardPlan?.guardedCommandId, "missingArmResponseExport");
     assert.equal(materializer.replacementPlan?.requiredPlaceholdersReady, false);
     assert.ok(materializer.replacementPlan?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
     assert.ok(materializer.replacementPlan?.unresolvedRequiredPlaceholderNames?.includes("local-embedding-base-url"));
@@ -4077,6 +4100,9 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeCommandMaterializerEvidence, /Local-Full Shard Resume Command Materializer/);
   assert.match(localFullShardResumeCommandMaterializerEvidence, /Status: BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS/);
   assert.match(localFullShardResumeCommandMaterializerEvidence, /Prints materialized commands: false/);
+  assert.match(localFullShardResumeCommandMaterializerEvidence, /Fresh local runtime guard order ready: true/);
+  assert.match(localFullShardResumeCommandMaterializerEvidence, /First private command: rerunRuntimeDoctor/);
+  assert.match(localFullShardResumeCommandMaterializerEvidence, /Second private command: rerunDurabilitySmoke/);
   assert.match(localFullShardResumeCommandMaterializerMarkdownFresh, /Ready for materialization: false/);
   for (const materializer of [
     localFullShardResumeCommandMaterializerFixture,
@@ -4091,8 +4117,14 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.privateCommandFile?.mode, "0700");
     assert.match(materializer.privateCommandFile?.hash ?? "", /^sha256:[a-f0-9]{64}$/);
     assert.equal(materializer.commandPlan?.commandCount, 8);
+    assert.deepEqual(materializer.commandPlan?.commandIds, expectedResumePrivateScriptCommandOrder);
+    assert.deepEqual(materializer.commandPlan?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
     assert.equal(materializer.commandPlan?.materializedCommandCount, 8);
     assert.equal(materializer.commandPlan?.commandsPrinted, false);
+    assert.equal(materializer.guardPlan?.ready, true);
+    assert.equal(materializer.guardPlan?.firstCommandId, "rerunRuntimeDoctor");
+    assert.equal(materializer.guardPlan?.secondCommandId, "rerunDurabilitySmoke");
+    assert.equal(materializer.guardPlan?.guardedCommandId, "missingArmResponseExport");
     assert.equal(materializer.replacementPlan?.requiredPlaceholdersReady, true);
     assert.deepEqual(materializer.replacementPlan?.unresolvedRequiredPlaceholderNames, []);
     assert.ok(materializer.replacementPlan?.optionalDefaultsApplied?.includes("env-only-if-cloud-endpoint"));
@@ -4104,6 +4136,18 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.countsAsFullMemorySotaEvidence, false);
   }
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /^#!\/usr\/bin\/env bash/);
+  assert.ok(
+    localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 1. rerunRuntimeDoctor") <
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 2. rerunDurabilitySmoke"),
+  );
+  assert.ok(
+    localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 2. rerunDurabilitySmoke") <
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 3. resumeEnvDoctor"),
+  );
+  assert.ok(
+    localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 3. resumeEnvDoctor") <
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 4. missingArmResponseExport"),
+  );
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:arms/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:preflight/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:local-shard-intake/);

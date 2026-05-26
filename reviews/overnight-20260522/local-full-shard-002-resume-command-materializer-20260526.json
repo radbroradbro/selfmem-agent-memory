@@ -4,7 +4,7 @@
   "mode": "local-full-shard-resume-command-materializer",
   "fixtureOnly": false,
   "status": "BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS",
-  "generatedAt": "2026-05-26T13:43:38.128Z",
+  "generatedAt": "2026-05-26T14:18:42.551Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "writesRealPrivateCommandFile": false,
@@ -72,9 +72,19 @@
   "commandPlan": {
     "commandCount": 8,
     "commandIds": [
-      "resumeEnvDoctor",
       "rerunRuntimeDoctor",
       "rerunDurabilitySmoke",
+      "resumeEnvDoctor",
+      "missingArmResponseExport",
+      "preflight",
+      "answerQuality",
+      "localShardIntake",
+      "fullSotaDoctor"
+    ],
+    "privateScriptCommandOrder": [
+      "rerunRuntimeDoctor",
+      "rerunDurabilitySmoke",
+      "resumeEnvDoctor",
       "missingArmResponseExport",
       "preflight",
       "answerQuality",
@@ -102,6 +112,19 @@
     "materializedCommandCount": 0,
     "materializedCommandHashes": [],
     "commandsPrinted": false
+  },
+  "guardPlan": {
+    "ready": true,
+    "startsWithFreshLocalRuntimeGuards": true,
+    "runtimeBeforeDurability": true,
+    "runtimeBeforeMissingArm": true,
+    "durabilityBeforeMissingArm": true,
+    "resumeEnvAfterFreshGuards": true,
+    "missingArmAfterResumeEnv": true,
+    "missingRequiredCommandIds": [],
+    "firstCommandId": "rerunRuntimeDoctor",
+    "secondCommandId": "rerunDurabilitySmoke",
+    "guardedCommandId": "missingArmResponseExport"
   },
   "replacementPlan": {
     "requiredPlaceholderCount": 11,

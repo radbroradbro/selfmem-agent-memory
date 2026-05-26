@@ -7,6 +7,16 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const packetOnlyCommandIds = new Set(["resumeCommandMaterializer", "resumeResultDoctor"]);
+const privateScriptCommandOrder = [
+  "rerunRuntimeDoctor",
+  "rerunDurabilitySmoke",
+  "resumeEnvDoctor",
+  "missingArmResponseExport",
+  "preflight",
+  "answerQuality",
+  "localShardIntake",
+  "fullSotaDoctor",
+];
 const args = parseArgs(process.argv.slice(2));
 const fixtureTempRoots = [];
 process.on("exit", () => {
@@ -45,6 +55,7 @@ const readyForMaterialization =
   privateCommandOutputState.provided &&
   privateCommandOutputState.outsideRepository &&
   commandState.commandCount > 0 &&
+  commandState.guardOrder.ready &&
   replacementState.unresolvedRequiredPlaceholderNames.length === 0;
 
 const blockers = [
@@ -55,6 +66,7 @@ const blockers = [
   !privateCommandOutputState.provided ? "private-command-output-not-provided" : null,
   privateCommandOutputState.provided && !privateCommandOutputState.outsideRepository ? "private-command-output-inside-repository" : null,
   commandState.commandCount === 0 ? "resume-packet-commands-missing" : null,
+  !commandState.guardOrder.ready ? "fresh-local-runtime-guard-order-invalid" : null,
   ...replacementState.unresolvedRequiredPlaceholderNames.map((name) => `placeholder-unresolved:${name}`),
 ].filter(Boolean);
 
@@ -127,12 +139,14 @@ const report = {
   commandPlan: {
     commandCount: commandState.commandCount,
     commandIds: commandState.commandIds,
+    privateScriptCommandOrder: commandState.privateScriptCommandOrder,
     templatePlaceholderCount: commandState.placeholderNames.length,
     templatePlaceholderNames: commandState.placeholderNames,
     materializedCommandCount: materializedCommands.length,
     materializedCommandHashes: materializedCommands.map((item) => ({ id: item.id, hash: `sha256:${sha256(item.command)}` })),
     commandsPrinted: false,
   },
+  guardPlan: commandState.guardOrder,
   replacementPlan: {
     requiredPlaceholderCount: replacementState.requiredPlaceholders.length,
     requiredPlaceholdersReady: replacementState.unresolvedRequiredPlaceholderNames.length === 0,
@@ -147,7 +161,8 @@ const report = {
   nextActions: readyForMaterialization
     ? [
         "Review and run the generated private command file from the external private location.",
-        "Regenerate the public resume env doctor after command execution.",
+        "Keep the generated order intact so runtime and durability guards run immediately before the shard retry.",
+        "Regenerate the public resume result doctor after command execution.",
         "Keep public reports limited to hashes, counts, and statuses.",
       ]
     : [
@@ -167,16 +182,77 @@ process.stdout.write(format === "markdown" ? markdownText : jsonText);
 
 function inspectCommands(packet) {
   const commands = packet.commands ?? {};
-  const commandIds = Object.keys(commands).filter(
+  const availableCommandIds = Object.keys(commands).filter(
     (id) => !packetOnlyCommandIds.has(id) && typeof commands[id] === "string" && commands[id].trim().length > 0,
   );
+  const commandIds = orderCommandIds(availableCommandIds);
   const placeholderNames = [
     ...new Set(commandIds.flatMap((id) => [...commands[id].matchAll(/<([^>]+)>/gu)].map((match) => match[1]))),
   ].sort();
   return {
     commandCount: commandIds.length,
     commandIds,
+    privateScriptCommandOrder,
+    guardOrder: inspectGuardOrder(commandIds),
     placeholderNames,
+  };
+}
+
+function orderCommandIds(commandIds) {
+  const known = privateScriptCommandOrder.filter((id) => commandIds.includes(id));
+  const unknown = commandIds.filter((id) => !privateScriptCommandOrder.includes(id)).sort();
+  return [...known, ...unknown];
+}
+
+function inspectGuardOrder(commandIds) {
+  const indexes = Object.fromEntries(commandIds.map((id, index) => [id, index]));
+  const required = ["rerunRuntimeDoctor", "rerunDurabilitySmoke", "resumeEnvDoctor", "missingArmResponseExport"];
+  const missing = required.filter((id) => !Object.hasOwn(indexes, id));
+  const runtimeBeforeDurability =
+    indexes.rerunRuntimeDoctor != null &&
+    indexes.rerunDurabilitySmoke != null &&
+    indexes.rerunRuntimeDoctor < indexes.rerunDurabilitySmoke;
+  const runtimeBeforeMissingArm =
+    indexes.rerunRuntimeDoctor != null &&
+    indexes.missingArmResponseExport != null &&
+    indexes.rerunRuntimeDoctor < indexes.missingArmResponseExport;
+  const durabilityBeforeMissingArm =
+    indexes.rerunDurabilitySmoke != null &&
+    indexes.missingArmResponseExport != null &&
+    indexes.rerunDurabilitySmoke < indexes.missingArmResponseExport;
+  const resumeEnvAfterFreshGuards =
+    indexes.resumeEnvDoctor != null &&
+    indexes.rerunRuntimeDoctor != null &&
+    indexes.rerunDurabilitySmoke != null &&
+    indexes.resumeEnvDoctor > indexes.rerunRuntimeDoctor &&
+    indexes.resumeEnvDoctor > indexes.rerunDurabilitySmoke;
+  const missingArmAfterResumeEnv =
+    indexes.missingArmResponseExport != null &&
+    indexes.resumeEnvDoctor != null &&
+    indexes.missingArmResponseExport > indexes.resumeEnvDoctor;
+  const startsWithFreshLocalRuntimeGuards =
+    commandIds[0] === "rerunRuntimeDoctor" &&
+    commandIds[1] === "rerunDurabilitySmoke";
+  const ready =
+    missing.length === 0 &&
+    runtimeBeforeDurability &&
+    runtimeBeforeMissingArm &&
+    durabilityBeforeMissingArm &&
+    resumeEnvAfterFreshGuards &&
+    missingArmAfterResumeEnv &&
+    startsWithFreshLocalRuntimeGuards;
+  return {
+    ready,
+    startsWithFreshLocalRuntimeGuards,
+    runtimeBeforeDurability,
+    runtimeBeforeMissingArm,
+    durabilityBeforeMissingArm,
+    resumeEnvAfterFreshGuards,
+    missingArmAfterResumeEnv,
+    missingRequiredCommandIds: missing,
+    firstCommandId: commandIds[0] ?? null,
+    secondCommandId: commandIds[1] ?? null,
+    guardedCommandId: "missingArmResponseExport",
   };
 }
 
@@ -242,9 +318,8 @@ function inspectReplacements({ privateDirState: privateState, reviewDir: reviewD
 }
 
 function materializeCommands(commands, replacements) {
-  return Object.entries(commands ?? {})
-    .filter(([id, command]) => !packetOnlyCommandIds.has(id) && typeof command === "string" && command.trim().length > 0)
-    .map(([id, command]) => ({ id, command: materializeCommand(command, replacements) }));
+  const commandIds = inspectCommands({ commands }).commandIds;
+  return commandIds.map((id) => ({ id, command: materializeCommand(commands[id], replacements) }));
 }
 
 function materializeCommand(command, replacements) {
@@ -282,6 +357,9 @@ function renderMarkdown(value) {
     `- Prints private paths: ${value.printsPrivatePaths}`,
     `- Command count: ${value.commandPlan.commandCount}`,
     `- Materialized command count: ${value.commandPlan.materializedCommandCount}`,
+    `- Fresh local runtime guard order ready: ${value.guardPlan.ready}`,
+    `- First private command: ${value.guardPlan.firstCommandId ?? "n/a"}`,
+    `- Second private command: ${value.guardPlan.secondCommandId ?? "n/a"}`,
     `- Required placeholders ready: ${value.replacementPlan.requiredPlaceholdersReady}`,
     `- Unresolved required placeholders: ${value.replacementPlan.unresolvedRequiredPlaceholderNames.join(", ") || "none"}`,
     `- Optional defaults applied: ${value.replacementPlan.optionalDefaultsApplied.join(", ") || "none"}`,
@@ -289,6 +367,14 @@ function renderMarkdown(value) {
     "",
     "## Command IDs",
     ...value.commandPlan.commandIds.map((id) => `- ${id}`),
+    "",
+    "## Guard Plan",
+    `- Starts with fresh local runtime guards: ${value.guardPlan.startsWithFreshLocalRuntimeGuards}`,
+    `- Runtime guard before durability guard: ${value.guardPlan.runtimeBeforeDurability}`,
+    `- Runtime guard before missing arm export: ${value.guardPlan.runtimeBeforeMissingArm}`,
+    `- Durability guard before missing arm export: ${value.guardPlan.durabilityBeforeMissingArm}`,
+    `- Resume env doctor after fresh guards: ${value.guardPlan.resumeEnvAfterFreshGuards}`,
+    `- Missing arm export after resume env doctor: ${value.guardPlan.missingArmAfterResumeEnv}`,
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),
