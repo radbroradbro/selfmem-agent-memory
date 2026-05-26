@@ -270,6 +270,10 @@ shards, and carries BM25, full hybrid, query expansion, Voyage, NVIDIA, local
 Apple, and local rerank arms through shard export, answer scoring, shard
 combination, result gate, and reviewer intake commands. This is an execution
 plan and harness upgrade, not a completed full-SOTA result.
+The SOTA operator packet now treats that shard plan as the source of truth:
+each shard must export its own private response-arm files, run answer-quality
+preflight against those per-shard arms, then score only that shard before
+intake or combine can run.
 The shard workorder is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`.
 Run `benchmark:answer-quality:shard-workorder` before and after shard jobs to

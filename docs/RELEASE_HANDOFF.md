@@ -256,7 +256,10 @@ answer-quality harness now supports chunked response exports and scoring with
 `reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json`; it
 splits the full target into twenty 25-query shards and keeps BM25, full hybrid,
 query expansion, Voyage, NVIDIA, local Apple, and local rerank arms on the same
-source-locked data. Merge those chunks only with
+source-locked data. The SOTA operator packet follows that plan directly: each
+shard exports private response arms into its own shard directory, runs
+answer-quality preflight against those shard-local arms, and only then writes
+the public-safe shard score. Merge those chunks only with
 `benchmark:answer-quality:combine -- --combine-mode shards`, which rejects gaps,
 overlaps, target/model mismatches, and mixed strategy sets.
 Use `benchmark:answer-quality:shard-workorder` as the public-safe run tracker

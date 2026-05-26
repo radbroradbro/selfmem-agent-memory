@@ -2801,15 +2801,22 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(fullShardFlow.shardContract?.shardSize, 25);
   assert.equal(fullShardFlow.shardContract?.expectedShardCount, 20);
   assert.equal(fullShardFlow.shardContract?.expectedFullQueryCount, 500);
+  assert.equal(fullShardFlow.shardContract?.strategySetMatchesShardPlan, true);
+  assert.equal(fullShardFlow.shardContract?.responseArmExportPerShardRequired, true);
+  assert.equal(fullShardFlow.shardContract?.preflightPerShardRequired, true);
+  assert.deepEqual(fullShardFlow.shardContract?.strategySet, fullAnswerQualityShardPlan.runPlan?.strategies);
   assert.equal(fullShardFlow.shardContract?.workorderRequiredBeforeIntake, true);
   assert.match(fullShardFlow.shardContract?.publicShardResultPattern ?? "", /answer-quality-shard-001\.json/);
   assert.equal(fullShardFlow.shardContract?.combineMode, "query-shard-answer-quality-union");
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--query-offset")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:arms") && String(line).includes("full-answer-quality-arms/$shard_id")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:preflight") && String(line).includes("full-answer-quality-preflights")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:shard-workorder")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("answer-quality-$shard_id.json")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("answer-quality-shard-020.json")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:shard-intake") && String(line).includes("--require-ready")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--combine-mode shards")));
+  assert.ok(fullShardFlow.commands?.every((line) => !String(line).includes("full-response-arms")));
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
     const keyFile = join(tempRoot, "voyage.keys");

@@ -18,15 +18,6 @@ const sameDataStrategies = splitList(
 );
 const providerPreflightStrategies = sameDataStrategies.filter((strategy) => providerPreflightStrategy(strategy));
 const minimumVoyageAnswerQualityStrategies = ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-lite-voyage-lite"];
-const fullShardSize = 25;
-const fullShardSpecs = Array.from({ length: 20 }, (_, index) => ({
-  id: `shard-${String(index + 1).padStart(3, "0")}`,
-  offset: index * fullShardSize,
-}));
-const fullShardOffsetList = fullShardSpecs.map((shard) => shard.offset).join(" ");
-const fullShardInputList = fullShardSpecs
-  .map((shard) => `$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/answer-quality-${shard.id}.json`)
-  .join(",");
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(existsSync(targetPath), `benchmark target missing: ${displayPath(targetPath)}`);
@@ -71,6 +62,35 @@ const answerQualityPreflightLiveLocalEvidence = loadEvidence(`${reviewDir}/answe
 const answerQualityPreflightEvidence =
   answerQualityPreflightLiveLocalEvidence.json?.status === "READY_FOR_LIVE_ANSWER_QUALITY" ? answerQualityPreflightLiveLocalEvidence : answerQualityPreflightLegacyEvidence;
 const answerQualityHarnessSmokeEvidence = loadEvidence(`${reviewDir}/answer-quality-harness-smoke-20260525.json`);
+const answerQualityFullShardPlanEvidence = loadEvidence(`${reviewDir}/answer-quality-full-shard-plan-20260525.json`);
+const fullShardPlan = answerQualityFullShardPlanEvidence.json ?? {};
+const fullShardSize = Number(fullShardPlan.runPlan?.shardSize ?? 25);
+const fullShardSpecs = Array.isArray(fullShardPlan.shards) && fullShardPlan.shards.length > 0
+  ? fullShardPlan.shards.map((shard, index) => ({
+      id: shard.id ?? `shard-${String(index + 1).padStart(3, "0")}`,
+      startIndex: Number(shard.startIndex ?? index * fullShardSize),
+      queryCount: Number(shard.queryCount ?? fullShardSize),
+      endIndexExclusive: Number(shard.endIndexExclusive ?? Number(shard.startIndex ?? index * fullShardSize) + Number(shard.queryCount ?? fullShardSize)),
+    }))
+  : Array.from({ length: 20 }, (_, index) => ({
+      id: `shard-${String(index + 1).padStart(3, "0")}`,
+      startIndex: index * fullShardSize,
+      queryCount: fullShardSize,
+      endIndexExclusive: (index + 1) * fullShardSize,
+    }));
+const fullShardStrategyList = Array.isArray(fullShardPlan.runPlan?.strategies) && fullShardPlan.runPlan.strategies.length > 0
+  ? fullShardPlan.runPlan.strategies
+  : sameDataStrategies;
+const fullShardStrategyCsv = fullShardStrategyList.join(",");
+const fullShardContextTokenBudget = Number(fullShardPlan.runPlan?.contextTokenBudget ?? 800);
+const fullShardRetrievalLimit = Number(fullShardPlan.runPlan?.limit ?? 5);
+const fullShardSpecList = fullShardSpecs.map((shard) => `${shard.id}:${shard.startIndex}:${shard.queryCount}`).join(" ");
+const fullShardInputList = fullShardSpecs
+  .map((shard) => `$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/answer-quality-${shard.id}.json`)
+  .join(",");
+const fullShardArmArgs = fullShardStrategyList
+  .map((strategy) => `--arm ${strategy}="$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arms/$shard_id/${strategy}-responses.private.json"`)
+  .join(" ");
 const currentQueryExpansionImpl = inspectQueryExpansionImplementation();
 const liveLlmQueryExpansionProven = Boolean(
   answerQualityArmExportEvidence.json?.arms?.some((arm) => arm.strategy === "query-expanded-full-hybrid-rerank" && Number(arm.queryExpansionCalls ?? 0) > 0),
@@ -227,6 +247,16 @@ const packet = {
       fixtureOnly: Boolean(answerQualityHarnessSmokeEvidence.json?.fixtureOnly),
       memoryBenchAnswerQuality: Boolean(answerQualityHarnessSmokeEvidence.json?.memoryBenchAnswerQuality),
       readyForEndToEndMemoryScoreGate: Boolean(answerQualityHarnessSmokeEvidence.json?.readyForEndToEndMemoryScoreGate),
+    },
+    answerQualityFullShardPlan: {
+      evidencePath: answerQualityFullShardPlanEvidence.path,
+      evidenceExists: answerQualityFullShardPlanEvidence.exists,
+      evidenceHash: answerQualityFullShardPlanEvidence.hash,
+      status: answerQualityFullShardPlanEvidence.json?.status ?? null,
+      readyForAnswerQualityShardRun: Boolean(answerQualityFullShardPlanEvidence.json?.readyForAnswerQualityShardRun),
+      shardCount: Number(answerQualityFullShardPlanEvidence.json?.runPlan?.shardCount ?? fullShardSpecs.length),
+      shardSize: Number(answerQualityFullShardPlanEvidence.json?.runPlan?.shardSize ?? fullShardSize),
+      strategies: fullShardStrategyList,
     },
     localRerankSidecar: {
       strategy: "local-apple-qwen3-0_6b-local-rerank",
@@ -462,13 +492,18 @@ function buildOperatorFlow() {
       description:
         "Run the 500-query LongMemEval-S answer-quality benchmark in deterministic query shards. This is the first full-target scoring lane; it stays metrics-only and cannot authorize SOTA wording until the merged shard packet, reviewer intake, and SOTA ladder pass.",
       commands: [
-        "RECALLWEAVE_SOTA_OUTPUT_DIR=<private-output-dir-outside-repo>",
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
-        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
-        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
-        "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-answer-and-judge-url>",
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model>",
-        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model>",
+        "export RECALLWEAVE_SOTA_OUTPUT_DIR=\"<private-output-dir-outside-repo>\"",
+        "export RECALLWEAVE_MEMORYBENCH_BASE_URL=\"<openai-compatible-answer-and-judge-url>\"",
+        "export RECALLWEAVE_MEMORYBENCH_API_KEY=\"<env-only-if-cloud-endpoint>\"",
+        `export RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL="${fullShardPlan.target?.answerModel ?? "<answer-model>"}"`,
+        `export RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL="${fullShardPlan.target?.judgeModel ?? "<judge-model>"}"`,
+        "export VOYAGE_API_KEYS_FILE=\"<private-file-outside-repo-when-voyage-arm-runs>\"",
+        "export NVIDIA_API_KEYS_FILE=\"<private-file-outside-repo-when-nvidia-arm-runs>\"",
+        "export SELFMEM_QUERY_EXPANSION_BASE_URL=\"<local-query-expansion-url-or-approved-cloud-url>\"",
+        "export SELFMEM_QUERY_EXPANSION_MODEL=\"<query-expansion-model>\"",
+        "export SELFMEM_LOCAL_EMBED_BASE_URL=\"<local-embedding-server-url>\"",
+        "export SELFMEM_LOCAL_RERANK_BASE_URL=\"<local-rerank-server-url>\"",
+        "mkdir -p \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards\" \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arm-exports\" \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflights\" \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arms\"",
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
           `--target ${fullAnswerQualityTarget}`,
@@ -476,46 +511,48 @@ function buildOperatorFlow() {
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialize-report.json\"",
         ].join(" "),
         [
-          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --execute",
-          `--target ${fullAnswerQualityTarget}`,
-          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
-          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
-          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms\"",
-          `--strategies ${fullLadderStrategies}`,
-          "--context-token-budget 800",
-          "--limit 5",
-          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arm-export.json\"",
-          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arm-export.md\"",
-        ].join(" "),
-        [
-          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
-          `--target ${fullAnswerQualityTarget}`,
-          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
-          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
-          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-answer-labels.private.json\"",
-          answerQualityArms.replaceAll("$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms", "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms"),
-          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflight.json\"",
-          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflight.md\"",
-        ].join(" "),
-        [
           "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-workorder",
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-workorder-before.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-workorder-before.md\"",
         ].join(" "),
         [
-          `shard_index=1; for offset in ${fullShardOffsetList}; do`,
-          "shard_id=$(printf \"shard-%03d\" \"$shard_index\");",
-          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
+          `for shard_spec in ${fullShardSpecList}; do`,
+          "shard_id=\"${shard_spec%%:*}\"; shard_tail=\"${shard_spec#*:}\"; offset=\"${shard_tail%%:*}\"; query_count=\"${shard_tail##*:}\";",
+          "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1 RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute",
+          `--target ${fullAnswerQualityTarget}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
+          "--private-output-dir \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arms/$shard_id\"",
+          `--strategies ${fullShardStrategyCsv}`,
+          `--context-token-budget ${fullShardContextTokenBudget}`,
+          `--limit ${fullShardRetrievalLimit}`,
+          "--query-offset \"$offset\"",
+          "--max-queries \"$query_count\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arm-exports/answer-quality-arms-$shard_id.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-arm-exports/answer-quality-arms-$shard_id.md\"",
+          "|| exit 1;",
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
           `--target ${fullAnswerQualityTarget}`,
           "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
           "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
           "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-answer-labels.private.json\"",
-          answerQualityArms.replaceAll("$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms", "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms"),
+          fullShardArmArgs,
           "--query-offset \"$offset\"",
-          `--max-queries ${fullShardSize}`,
+          "--max-queries \"$query_count\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflights/answer-quality-preflight-$shard_id.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflights/answer-quality-preflight-$shard_id.md\"",
+          "|| exit 1;",
+          "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
+          `--target ${fullAnswerQualityTarget}`,
+          "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
+          "--memories \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-memories.private.jsonl\"",
+          "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-answer-labels.private.json\"",
+          fullShardArmArgs,
+          "--query-offset \"$offset\"",
+          "--max-queries \"$query_count\"",
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/answer-quality-$shard_id.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/answer-quality-$shard_id.md\"",
-          "|| exit 1; shard_index=$((shard_index + 1)); done",
+          "|| exit 1; done",
         ].join(" "),
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-workorder",
@@ -560,9 +597,15 @@ function buildOperatorFlow() {
         ].join(" "),
       ],
       shardContract: {
+        sourcePlanPath: answerQualityFullShardPlanEvidence.path,
+        sourcePlanHash: answerQualityFullShardPlanEvidence.hash,
         shardSize: fullShardSize,
         expectedShardCount: fullShardSpecs.length,
-        expectedFullQueryCount: 500,
+        expectedFullQueryCount: Number(fullShardPlan.runPlan?.queryCount ?? 500),
+        strategySet: fullShardStrategyList,
+        strategySetMatchesShardPlan: answerQualityFullShardPlanEvidence.exists,
+        responseArmExportPerShardRequired: true,
+        preflightPerShardRequired: true,
         publicShardResultPattern: "full-answer-quality-shards/answer-quality-shard-001.json through answer-quality-shard-020.json",
         workorderRequiredBeforeIntake: true,
         combineMode: "query-shard-answer-quality-union",
@@ -578,6 +621,8 @@ function buildOperatorFlow() {
         ],
       },
       expectedPublicEvidence: [
+        "each shard uses its own response-arm export directory from the checked-in shard plan",
+        "each shard runs answer-quality preflight against its own exported response arms before scoring",
         "each shard report includes scoredQueryStart, scoredQueryEndExclusive, totalQueryCount, and a selected-query hash",
         "the shard intake reports readyForShardCombine=true before combine runs",
         "the combined report uses combineMode=query-shard-answer-quality-union",
@@ -960,6 +1005,7 @@ function renderMarkdown(value) {
     `- Answer-quality arm export: ${value.currentEvidence.answerQualityArmExport.status ?? "missing"}`,
     `- Answer-quality preflight: ${value.currentEvidence.answerQualityPreflight.status ?? "missing"}`,
     `- Answer-quality harness smoke: ${value.currentEvidence.answerQualityHarnessSmoke.mode ?? "missing"}`,
+    `- Full shard plan: ${value.currentEvidence.answerQualityFullShardPlan.status ?? "missing"}`,
     `- Local rerank evidence: ${value.currentEvidence.localRerankSidecar.evidenceExists}`,
     `- Local rerank result gate: ${value.currentEvidence.localRerankResultGate.status ?? "missing"}`,
     `- Query expansion local smoke: ${value.currentEvidence.queryExpansionLiveLocalSmoke.evidenceExists}`,
