@@ -4,9 +4,13 @@
 - Fixture only: false
 - Target shard: shard-002 (25-50)
 - Ready for missing-arm export: false
+- Ready for missing-arm export except env: true
 - Ready for answer-quality preflight: false
 - Ready for local shard intake: false
 - Ready for command materialization: false
+- Private input files ready: true
+- Completed private arm files ready: true
+- Local resume execution env ready: false
 - Resume packet commands runnable as printed: false
 - Private directory provided: true
 - Private directory present: true
@@ -19,6 +23,7 @@
 - Local embedding durability fresher than runtime blocker: true
 - Local embedding env ready: false
 - Local rerank env ready: false
+- Local safety env ready: false
 - Answer-quality env ready: false
 - Counts as local-full benchmark evidence: false
 
@@ -40,9 +45,10 @@
 - RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT
 
 ## Private Inputs
-- queryset: present=true; hashMatched=true
-- memories: present=true; hashMatched=null
-- answer-labels: present=true; hashMatched=true
+- Ready: true
+- queryset: present=true; hashKind=collector-compatible-queryset; hashMatched=true
+- memories: present=true; hashKind=file-sha256; hashMatched=null
+- answer-labels: present=true; hashKind=embedded-answer-labels; hashMatched=true
 
 ## Raw Source Retention
 - Contract ready: true
@@ -65,6 +71,7 @@
 - Failed probe classes: none
 
 ## Completed Arm Files
+- Ready: true
 - bm25-lite: present=true; hashMatched=true
 - full-hybrid-rerank: present=true; hashMatched=true
 - query-expanded-full-hybrid-rerank: present=true; hashMatched=true
@@ -88,7 +95,6 @@
 - answer-quality-env-missing
 
 ## Next Actions
-- Provide RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir for the outside-repository private materialization directory.
-- Set the local embedding and local rerank environment variables for the two missing local Apple arms.
+- Set the local embedding, local rerank, and safety environment variables for the two missing local Apple arms.
 - Set local answer-quality endpoint and model environment variables before preflight/scoring.
-- Regenerate this doctor before running the resume packet commands.
+- Regenerate this doctor before running the next resume packet command.

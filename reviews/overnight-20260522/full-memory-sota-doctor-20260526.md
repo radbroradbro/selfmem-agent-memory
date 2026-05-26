@@ -89,10 +89,14 @@
 - Performance best answer quality: 19.4
 - Performance counts as SOTA evidence: false
 - Resume env ready for missing-arm export: false
+- Resume env ready for missing-arm export except env: true
 - Resume env ready for command materialization: false
+- Resume env private input files ready: true
+- Resume env completed private arm files ready: true
 - Resume env private directory provided: true
 - Resume env raw-source private audit ready: true
 - Resume env compressed default retrieval allowed: true
+- Resume env local execution env ready: false
 - Resume env local embedding env ready: false
 - Resume env local rerank env ready: false
 - Resume env answer-quality env ready: false

@@ -4,7 +4,7 @@
   "mode": "local-full-shard-resume-env-doctor",
   "fixtureOnly": false,
   "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV",
-  "generatedAt": "2026-05-26T15:01:51.481Z",
+  "generatedAt": "2026-05-26T15:15:02.616Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -29,6 +29,11 @@
   "readyForShardAnswerQuality": false,
   "readyForLocalShardIntake": false,
   "readyForCommandMaterialization": false,
+  "privateInputFilesReady": true,
+  "completedPrivateArmFilesReady": true,
+  "readyForMissingArmExportExceptEnv": true,
+  "localResumeExecutionEnvReady": false,
+  "answerQualityEnvReady": false,
   "resumePacketCommandsRunnableAsPrinted": false,
   "resumePacket": {
     "path": "reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json",
@@ -569,9 +574,8 @@
     "answer-quality-env-missing"
   ],
   "nextActions": [
-    "Provide RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir for the outside-repository private materialization directory.",
-    "Set the local embedding and local rerank environment variables for the two missing local Apple arms.",
+    "Set the local embedding, local rerank, and safety environment variables for the two missing local Apple arms.",
     "Set local answer-quality endpoint and model environment variables before preflight/scoring.",
-    "Regenerate this doctor before running the resume packet commands."
+    "Regenerate this doctor before running the next resume packet command."
   ]
 }

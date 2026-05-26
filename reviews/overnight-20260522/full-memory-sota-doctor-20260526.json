@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T15:01:51.621Z",
+  "generatedAt": "2026-05-26T15:15:02.886Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -89,7 +89,7 @@
     "localFullResumeEnvDoctor": {
       "path": "reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:5f0c56fd7639a4ea3c6013616a468eeb6fc4d0072b6533b84dc8455de14ae4db",
+      "hash": "sha256:9b1a67ccaf319c04353601f63484252d2ef90e34c6bcceeed492c88957692bdd",
       "mode": "local-full-shard-resume-env-doctor",
       "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV"
     },
@@ -694,6 +694,10 @@
       "readyForShardAnswerQuality": false,
       "readyForLocalShardIntake": false,
       "readyForCommandMaterialization": false,
+      "privateInputFilesReady": true,
+      "completedPrivateArmFilesReady": true,
+      "readyForMissingArmExportExceptEnv": true,
+      "localResumeExecutionEnvReady": false,
       "privateDirectoryProvided": true,
       "privateDirectoryPresent": true,
       "privateDirectoryOutsideRepository": true,

@@ -82,17 +82,18 @@ const commandMaterializationState = inspectCommandMaterialization({
   reviewDir,
 });
 
-const readyForMissingArmExport =
+const privateInputFilesReady = requiredInputFiles.every(privateFileReady);
+const completedPrivateArmFilesReady = completedArmFiles.every(privateFileReady);
+const localResumeExecutionEnvReady = envState.localEmbedding.ready && envState.localRerank.ready && envState.localSafety.ready;
+const readyForMissingArmExportExceptEnv =
   resumePacket.status === "READY_FOR_LOCAL_FULL_SHARD_RESUME" &&
   privateDirState.present &&
   privateDirState.outsideRepository &&
   sourceRetentionState.readyForPrivateAudit &&
   durabilityState.readyForLocalFullResume &&
-  requiredInputFiles.every(privateFileReady) &&
-  completedArmFiles.every(privateFileReady) &&
-  envState.localEmbedding.ready &&
-  envState.localRerank.ready &&
-  envState.localSafety.ready;
+  privateInputFilesReady &&
+  completedPrivateArmFilesReady;
+const readyForMissingArmExport = readyForMissingArmExportExceptEnv && localResumeExecutionEnvReady;
 const readyForAnswerQualityPreflight =
   readyForMissingArmExport &&
   missingArmFiles.every((file) => file.present && file.nonEmpty) &&
@@ -158,6 +159,11 @@ const report = {
   readyForShardAnswerQuality: readyForAnswerQualityPreflight,
   readyForLocalShardIntake,
   readyForCommandMaterialization,
+  privateInputFilesReady,
+  completedPrivateArmFilesReady,
+  readyForMissingArmExportExceptEnv,
+  localResumeExecutionEnvReady,
+  answerQualityEnvReady: envState.answerQuality.ready,
   resumePacketCommandsRunnableAsPrinted: commandMaterializationState.commandsRunnableAsPrinted,
   resumePacket: {
     path: displayPath(resumePacketPath),
@@ -185,18 +191,19 @@ const report = {
   completedArmFiles,
   missingArmFiles,
   blockers,
-  nextActions: ready
-    ? [
-        "Run the shard-002 missing-arm response export from the resume packet.",
-        "Run shard-002 answer-quality preflight and answer-quality after the missing arm files exist.",
-        "Run local shard intake with shard-001 and shard-002 public result JSONs.",
-      ]
-    : [
-        "Provide RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir for the outside-repository private materialization directory.",
-        "Set the local embedding and local rerank environment variables for the two missing local Apple arms.",
-        "Set local answer-quality endpoint and model environment variables before preflight/scoring.",
-        "Regenerate this doctor before running the resume packet commands.",
-      ],
+  nextActions: buildNextActions({
+    ready,
+    privateDirState,
+    sourceRetentionState,
+    durabilityState,
+    privateInputFilesReady,
+    completedPrivateArmFilesReady,
+    readyForMissingArmExport,
+    readyForAnswerQualityPreflight,
+    readyForLocalShardIntake,
+    envState,
+    missingArmFiles,
+  }),
 };
 
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
@@ -225,6 +232,58 @@ function inspectPrivateDir(value) {
       pathPrinted: false,
     },
   };
+}
+
+function buildNextActions({
+  ready,
+  privateDirState: privateState,
+  sourceRetentionState: sourceState,
+  durabilityState: durability,
+  privateInputFilesReady: inputsReady,
+  completedPrivateArmFilesReady: completedArmsReady,
+  readyForMissingArmExport: missingArmReady,
+  readyForAnswerQualityPreflight: preflightReady,
+  readyForLocalShardIntake: intakeReady,
+  envState: env,
+  missingArmFiles: missingFiles,
+}) {
+  if (ready) {
+    return [
+      "Run the shard-002 missing-arm response export from the resume packet.",
+      "Run shard-002 answer-quality preflight and answer-quality after the missing arm files exist.",
+      "Run local shard intake with shard-001 and shard-002 public result JSONs.",
+    ];
+  }
+  const actions = [];
+  if (!privateState.provided || !privateState.present || !privateState.outsideRepository) {
+    actions.push("Provide RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir for the outside-repository private materialization directory.");
+  }
+  if (privateState.present && !sourceState.readyForPrivateAudit) {
+    actions.push("Restore the private raw-source audit files so the raw dataset, selected rows, and source manifest hashes match the materialize report.");
+  }
+  if (!durability.readyForLocalFullResume) {
+    actions.push("Regenerate the local embedding durability smoke after the runtime blocker with the required long probe passing.");
+  }
+  if (privateState.present && !inputsReady) {
+    actions.push("Restore the private query set, memories file, and answer labels so the resume input contracts validate.");
+  }
+  if (privateState.present && !completedArmsReady) {
+    actions.push("Restore the completed shard-002 private arm response files so already-finished arms can be reused safely.");
+  }
+  if (!env.localEmbedding.ready || !env.localRerank.ready || !env.localSafety.ready) {
+    actions.push("Set the local embedding, local rerank, and safety environment variables for the two missing local Apple arms.");
+  }
+  if (missingArmReady && missingFiles.some((file) => !file.present)) {
+    actions.push("Run the shard-002 missing-arm response export from the resume packet.");
+  }
+  if (!env.answerQuality.ready) {
+    actions.push("Set local answer-quality endpoint and model environment variables before preflight/scoring.");
+  }
+  if (preflightReady && !intakeReady) {
+    actions.push("Run local shard intake with shard-001 and shard-002 public result JSONs.");
+  }
+  actions.push("Regenerate this doctor before running the next resume packet command.");
+  return [...new Set(actions)];
 }
 
 function inspectDurabilityReport({ durabilityReport, durabilityRaw, runtimeBlockerReport, runtimeBlockerRaw, minTokenCount }) {
@@ -649,9 +708,13 @@ function renderMarkdown(value) {
     `- Fixture only: ${value.fixtureOnly}`,
     `- Target shard: ${value.resumePacket.targetShard?.shardId ?? "n/a"} (${value.resumePacket.targetShard?.startIndex ?? "n/a"}-${value.resumePacket.targetShard?.endIndexExclusive ?? "n/a"})`,
     `- Ready for missing-arm export: ${value.readyForMissingArmExport}`,
+    `- Ready for missing-arm export except env: ${value.readyForMissingArmExportExceptEnv}`,
     `- Ready for answer-quality preflight: ${value.readyForAnswerQualityPreflight}`,
     `- Ready for local shard intake: ${value.readyForLocalShardIntake}`,
     `- Ready for command materialization: ${value.readyForCommandMaterialization}`,
+    `- Private input files ready: ${value.privateInputFilesReady}`,
+    `- Completed private arm files ready: ${value.completedPrivateArmFilesReady}`,
+    `- Local resume execution env ready: ${value.localResumeExecutionEnvReady}`,
     `- Resume packet commands runnable as printed: ${value.resumePacketCommandsRunnableAsPrinted}`,
     `- Private directory provided: ${value.privateDir.provided}`,
     `- Private directory present: ${value.privateDir.present}`,
@@ -664,6 +727,7 @@ function renderMarkdown(value) {
     `- Local embedding durability fresher than runtime blocker: ${value.localEmbeddingDurability.generatedAfterRuntimeBlocker}`,
     `- Local embedding env ready: ${value.env.localEmbedding.ready}`,
     `- Local rerank env ready: ${value.env.localRerank.ready}`,
+    `- Local safety env ready: ${value.env.localSafety.ready}`,
     `- Answer-quality env ready: ${value.env.answerQuality.ready}`,
     `- Counts as local-full benchmark evidence: ${value.countsAsLocalFullBenchmarkEvidence}`,
     "",
@@ -676,7 +740,10 @@ function renderMarkdown(value) {
     ].map((name) => `- ${name}`),
     "",
     "## Private Inputs",
-    ...value.requiredInputFiles.map((file) => `- ${file.role}: present=${file.present}; hashMatched=${file.hashMatches}`),
+    `- Ready: ${value.privateInputFilesReady}`,
+    ...value.requiredInputFiles.map(
+      (file) => `- ${file.role}: present=${file.present}; hashKind=${file.hashKind}; hashMatched=${file.hashMatches}`,
+    ),
     "",
     "## Raw Source Retention",
     `- Contract ready: ${value.sourceRetention.contractReady}`,
@@ -697,6 +764,7 @@ function renderMarkdown(value) {
     `- Failed probe classes: ${value.localEmbeddingDurability.failedProbeClasses.join(", ") || "none"}`,
     "",
     "## Completed Arm Files",
+    `- Ready: ${value.completedPrivateArmFilesReady}`,
     ...value.completedArmFiles.map((file) => `- ${file.role}: present=${file.present}; hashMatched=${file.hashMatches}`),
     "",
     "## Missing Arm Files",

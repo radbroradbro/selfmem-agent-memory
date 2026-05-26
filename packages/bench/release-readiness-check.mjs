@@ -3978,6 +3978,11 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(localFullShardResumeEnvDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.hashMatches === true));
   assert.equal(localFullShardResumeEnvDoctor.requiredInputFiles?.length, 3);
   assert.ok(localFullShardResumeEnvDoctor.requiredInputFiles?.every((file) => file.present === true && file.nonEmpty === true));
+  assert.equal(localFullShardResumeEnvDoctor.privateInputFilesReady, true);
+  assert.equal(localFullShardResumeEnvDoctor.completedPrivateArmFilesReady, true);
+  assert.equal(localFullShardResumeEnvDoctor.readyForMissingArmExportExceptEnv, true);
+  assert.equal(localFullShardResumeEnvDoctor.localResumeExecutionEnvReady, false);
+  assert.equal(localFullShardResumeEnvDoctor.answerQualityEnvReady, false);
   assert.deepEqual(
     localFullShardResumeEnvDoctor.requiredInputFiles?.map((file) => [file.role, file.hashKind, file.hashMatches]),
     [
@@ -3994,12 +3999,20 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(!localFullShardResumeEnvDoctor.blockers?.includes("required-private-input-file-hash-mismatch"));
   assert.ok(!localFullShardResumeEnvDoctor.blockers?.includes("completed-private-arm-files-missing"));
   assert.ok(!localFullShardResumeEnvDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
+  assert.deepEqual(localFullShardResumeEnvDoctor.nextActions, [
+    "Set the local embedding, local rerank, and safety environment variables for the two missing local Apple arms.",
+    "Set local answer-quality endpoint and model environment variables before preflight/scoring.",
+    "Regenerate this doctor before running the next resume packet command.",
+  ]);
   assert.equal(localFullShardResumeEnvDoctorFresh.privateDir?.provided, false);
   assert.equal(localFullShardResumeEnvDoctorFresh.privateDir?.present, false);
   assert.equal(localFullShardResumeEnvDoctorFresh.sourceRetention?.readyForPrivateAudit, false);
   assert.ok(localFullShardResumeEnvDoctorFresh.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.present === false));
   assert.ok(localFullShardResumeEnvDoctorFresh.blockers?.includes("private-dir-not-provided"));
   assert.ok(localFullShardResumeEnvDoctorFresh.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
+  assert.ok(localFullShardResumeEnvDoctorFresh.nextActions?.includes(
+    "Provide RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir for the outside-repository private materialization directory.",
+  ));
   assert.equal(localFullShardResumeEnvDoctor.writesRealFiles, true);
   assert.equal(localFullShardResumeEnvDoctorFresh.writesRealFiles, false);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Local-Full Shard Resume Environment Doctor/);
@@ -4008,10 +4021,14 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeEnvDoctorEvidence, /Compressed default retrieval allowed: true/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Local Embedding Durability/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Generated after runtime blocker: true/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Ready for missing-arm export except env: true/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Private input files ready: true/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Completed private arm files ready: true/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Local resume execution env ready: false/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Ready for command materialization: false/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Resume packet commands runnable as printed: false/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /SELFMEM_LOCAL_EMBED_BASE_URL/);
-  assert.match(localFullShardResumeEnvDoctorEvidence, /RECALLWEAVE_FULL_SHARD_PRIVATE_DIR/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Set the local embedding, local rerank, and safety environment variables/);
   assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Private directory provided: false/);
   assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Local embedding durability long probe ready: true/);
   assert.equal(localFullShardResumeEnvDoctorTooShort.localEmbeddingDurability?.longProbeReady, false);
@@ -4037,6 +4054,11 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullShardResumeEnvDoctorFixture.readyForAnswerQualityPreflight, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.readyForLocalShardIntake, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.readyForCommandMaterialization, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.privateInputFilesReady, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.completedPrivateArmFilesReady, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.readyForMissingArmExportExceptEnv, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.localResumeExecutionEnvReady, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.answerQualityEnvReady, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.resumePacketCommandsRunnableAsPrinted, false);
   assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.provided, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.present, true);
@@ -4064,6 +4086,7 @@ check("fresh public benchmark target check passes", () => {
   assert.deepEqual(localFullShardResumeEnvDoctorFixture.blockers, []);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Status: READY_LOCAL_FULL_SHARD_RESUME_ENV/);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Fixture only: true/);
+  assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Ready for missing-arm export except env: true/);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Ready for answer-quality preflight: true/);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Ready for command materialization: true/);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Commands runnable as printed: false/);
@@ -4794,6 +4817,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForShardAnswerQuality, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForLocalShardIntake, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForCommandMaterialization, false);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateInputFilesReady, true);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.completedPrivateArmFilesReady, true);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForMissingArmExportExceptEnv, true);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localResumeExecutionEnvReady, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryProvided, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryPresent, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryOutsideRepository, true);
@@ -4899,9 +4926,13 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-performance-snapshot: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-resume-env: blocked/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export: false/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export except env: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env private input files ready: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env completed private arm files ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env private directory provided: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env raw-source private audit ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env compressed default retrieval allowed: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local execution env ready: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local embedding env ready: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local rerank env ready: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env answer-quality env ready: false/);
