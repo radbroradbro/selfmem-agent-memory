@@ -171,6 +171,12 @@ const report = {
     blockers: [...new Set([...runtimeDoctorReady.blockers, ...durabilityReady.blockers])],
   },
   commands: {
+    resumeEnvDoctor: [
+      "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-env --",
+      "--private-input-dir <private-output-dir>",
+      `--output ${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.json`,
+      `--markdown-output ${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.md`,
+    ].join(" "),
     rerunRuntimeDoctor: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:local-embedding:runtime-doctor --",
       "--require-ready",
@@ -326,6 +332,7 @@ function renderMarkdown(value) {
     `- Completed private arm hashes: ${value.resumeState.completedPrivateArmEvidence.map((item) => `${item.strategy}=${item.hash}`).join("; ") || "none"}`,
     "",
     "## Commands",
+    `- Resume env doctor: ${value.commands.resumeEnvDoctor}`,
     `- Runtime doctor: ${value.commands.rerunRuntimeDoctor}`,
     `- Durability smoke: ${value.commands.rerunDurabilitySmoke}`,
     `- Missing-arm export: ${value.commands.missingArmResponseExport ?? "n/a"}`,

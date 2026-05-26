@@ -408,7 +408,12 @@ durability readiness, lists only hashes/counts/labels for completed private
 arms, emits the missing-arm export, preflight, answer-quality, and local-intake
 commands, and keeps local-full evidence, SOTA evidence, public benchmark
 claims, and launch claims disabled until shard 002 returns an accepted public
-result. The checked-in local intake report,
+result. Before running those commands, run
+`benchmark:answer-quality:local-shard-resume-env`; the checked-in report at
+`reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json`
+shows this shell is blocked because the outside-repository private directory
+and local model/scoring environment are not present. It prints only missing
+variable names, labels, hashes, and counts. The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.
 It should turn green only after all twenty local-full public shard-result JSONs

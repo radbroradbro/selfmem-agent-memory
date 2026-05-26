@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-full-shard-resume-env-doctor",
+  "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV",
+  "generatedAt": "2026-05-26T12:26:06.226Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsEnvValues": false,
+  "printsPrivatePaths": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForMissingArmExport": false,
+  "readyForAnswerQualityPreflight": false,
+  "readyForShardAnswerQuality": false,
+  "readyForLocalShardIntake": false,
+  "resumePacket": {
+    "path": "reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json",
+    "hash": "sha256:74e96341a72ce4d3e55408803e4b53698120d721274e8e4ca98f3d8d317c12d9",
+    "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
+    "targetShard": {
+      "shardId": "shard-002",
+      "startIndex": 25,
+      "endIndexExclusive": 50,
+      "queryOffset": 25,
+      "maxQueries": 25,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-local-full-shard-002.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-local-full-shard-002.md",
+      "expectedPrivateArmDirectoryLabel": "<private-output-dir>/arms/shard-002"
+    },
+    "missingStrategies": [
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "completedStrategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank"
+    ]
+  },
+  "plan": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "hash": "sha256:33ab66f5e802ff3490b22b01d531a2abc75695e785ee7fdd4a510782c6a3575a",
+    "claimScope": "local-full",
+    "queryCount": 500,
+    "shardCount": 20,
+    "maxMemoryBytes": 300000000
+  },
+  "privateDir": {
+    "provided": false,
+    "label": null,
+    "present": false,
+    "outsideRepository": false,
+    "pathPrinted": false
+  },
+  "env": {
+    "localEmbedding": {
+      "ready": false,
+      "requiredNames": [
+        "SELFMEM_LOCAL_EMBED_BASE_URL",
+        "SELFMEM_LOCAL_EMBED_MODEL",
+        "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS"
+      ],
+      "presentNames": [],
+      "missingNames": [
+        "SELFMEM_LOCAL_EMBED_BASE_URL",
+        "SELFMEM_LOCAL_EMBED_MODEL",
+        "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS"
+      ],
+      "nonTruthyNames": [],
+      "printsValues": false
+    },
+    "localRerank": {
+      "ready": false,
+      "requiredNames": [
+        "SELFMEM_LOCAL_RERANK_BASE_URL",
+        "SELFMEM_LOCAL_RERANK_MODEL",
+        "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT"
+      ],
+      "presentNames": [],
+      "missingNames": [
+        "SELFMEM_LOCAL_RERANK_BASE_URL",
+        "SELFMEM_LOCAL_RERANK_MODEL",
+        "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT"
+      ],
+      "nonTruthyNames": [],
+      "printsValues": false
+    },
+    "localSafety": {
+      "ready": false,
+      "requiredNames": [
+        "RECALLWEAVE_BASELINE_LIVE",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT",
+        "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY"
+      ],
+      "presentNames": [],
+      "missingNames": [
+        "RECALLWEAVE_BASELINE_LIVE",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT",
+        "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY"
+      ],
+      "nonTruthyNames": [
+        "RECALLWEAVE_BASELINE_LIVE",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT",
+        "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY"
+      ],
+      "printsValues": false
+    },
+    "answerQuality": {
+      "ready": false,
+      "requiredNames": [
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT"
+      ],
+      "presentNames": [],
+      "missingNames": [
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT"
+      ],
+      "nonTruthyNames": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT"
+      ],
+      "printsValues": false
+    },
+    "optionalQueryExpansionForResume": {
+      "requiredForMissingArmStrategies": false,
+      "presentNames": []
+    }
+  },
+  "commandPlaceholders": {
+    "count": 15,
+    "names": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-answer-model",
+      "local-embedding-base-url",
+      "local-embedding-model",
+      "local-judge-model",
+      "local-query-expansion-base-url-if-used",
+      "local-rerank-base-url",
+      "local-rerank-candidate-limit",
+      "local-rerank-model",
+      "openai-compatible-base-url",
+      "private-output-dir",
+      "public-review-dir",
+      "query-expansion-model-if-used",
+      "safe-local-embedding-batch-token-limit"
+    ],
+    "privateOutputDirPlaceholderPresent": true,
+    "publicReviewDirPlaceholderPresent": true,
+    "envValuePlaceholdersPresent": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-answer-model",
+      "local-embedding-base-url",
+      "local-embedding-model",
+      "local-judge-model",
+      "local-query-expansion-base-url-if-used",
+      "local-rerank-base-url",
+      "local-rerank-candidate-limit",
+      "local-rerank-model",
+      "openai-compatible-base-url",
+      "query-expansion-model-if-used",
+      "safe-local-embedding-batch-token-limit"
+    ]
+  },
+  "requiredInputFiles": [
+    {
+      "role": "queryset",
+      "name": "longmemeval-queryset.private.json",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "actualHash": null,
+      "hashMatches": false
+    },
+    {
+      "role": "memories",
+      "name": "longmemeval-memories.private.jsonl",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": null,
+      "actualHash": null,
+      "hashMatches": null
+    },
+    {
+      "role": "answer-labels",
+      "name": "longmemeval-answer-labels.private.json",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+      "actualHash": null,
+      "hashMatches": false
+    }
+  ],
+  "completedArmFiles": [
+    {
+      "role": "bm25-lite",
+      "name": "bm25-lite-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": "sha256:3eb7b6d8f8fdaa401c8fbb052b21cdd48cb6ae52e924876d0a33ce962cde3956",
+      "actualHash": null,
+      "hashMatches": false
+    },
+    {
+      "role": "full-hybrid-rerank",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": "sha256:22a4656f077df1304177dd2c04c964668f423b1d1826799e0d681d69ec26ac31",
+      "actualHash": null,
+      "hashMatches": false
+    },
+    {
+      "role": "query-expanded-full-hybrid-rerank",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": "sha256:cd3011dc8d751695d9461e66c013ffbb60d7a35c1ad632775293ace4970b6977",
+      "actualHash": null,
+      "hashMatches": false
+    }
+  ],
+  "missingArmFiles": [
+    {
+      "role": "local-apple-qwen3-0_6b",
+      "name": "local-apple-qwen3-0_6b-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": null,
+      "actualHash": null,
+      "hashMatches": null
+    },
+    {
+      "role": "local-apple-qwen3-0_6b-local-rerank",
+      "name": "local-apple-qwen3-0_6b-local-rerank-responses.private.json",
+      "pathLabel": "external-private-file",
+      "present": false,
+      "nonEmpty": false,
+      "sizeBytes": null,
+      "expectedHash": null,
+      "actualHash": null,
+      "hashMatches": null
+    }
+  ],
+  "blockers": [
+    "private-dir-not-provided",
+    "required-private-input-files-missing",
+    "completed-private-arm-files-missing",
+    "local-embedding-env-missing",
+    "local-rerank-env-missing",
+    "local-safety-env-missing",
+    "answer-quality-env-missing"
+  ],
+  "nextActions": [
+    "Provide RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir for the outside-repository private materialization directory.",
+    "Set the local embedding and local rerank environment variables for the two missing local Apple arms.",
+    "Set local answer-quality endpoint and model environment variables before preflight/scoring.",
+    "Regenerate this doctor before running the resume packet commands."
+  ]
+}

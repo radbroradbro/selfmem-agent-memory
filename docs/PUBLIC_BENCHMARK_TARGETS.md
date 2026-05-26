@@ -550,6 +550,12 @@ not count as a RecallWeave score.
   missing-arm export, preflight, answer-quality, and local-intake commands. It
   is not local-full benchmark evidence until shard 002 is accepted, and it is
   never full-SOTA evidence by itself.
+- Local-full shard resume environment doctor:
+  `reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json`
+  checks whether the current shell has the private outside-repository source
+  directory plus the local embedding, local rerank, safety, and answer-quality
+  environment needed to execute the resume packet. The checked-in report is
+  blocked for this shell and prints no environment values or private paths.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

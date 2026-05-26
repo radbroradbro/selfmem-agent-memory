@@ -359,6 +359,12 @@ completed private arm hashes, emits the missing-arm-only export, preflight,
 answer-quality, and local-intake commands, and still keeps
 `countsAsLocalFullBenchmarkEvidence: false` until shard 002 returns an accepted
 public result.
+`reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json`
+is the matching current-shell readiness report. In this checkout it is blocked:
+no private source directory or local model/scoring environment variables are
+present, and it prints only missing variable names, labels, hashes, and counts.
+Use it before launching shard 002 so placeholder commands are not mistaken for
+a runnable local benchmark.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

@@ -130,6 +130,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
   "packages/bench/local-full-shard-resume-packet.mjs",
+  "packages/bench/local-full-shard-resume-env-doctor.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
@@ -200,6 +201,8 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.md`,
   `${reviewDir}/local-full-shard-002-resume-packet-20260526.json`,
   `${reviewDir}/local-full-shard-002-resume-packet-20260526.md`,
+  `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.json`,
+  `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
@@ -603,6 +606,7 @@ const requiredScripts = [
   "benchmark:answer-quality:shard-workorder",
   "benchmark:answer-quality:local-shard-workorder",
   "benchmark:answer-quality:local-shard-resume-packet",
+  "benchmark:answer-quality:local-shard-resume-env",
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:local-shard-intake",
   "benchmark:answer-quality:private-input-doctor",
@@ -1885,6 +1889,40 @@ check("fresh public benchmark target check passes", () => {
   const localFullShardResumePacketEvidence = readFileSync(join(root, reviewDir, "local-full-shard-002-resume-packet-20260526.md"), "utf8");
   const localFullShardResumePacketFresh = JSON.parse(run("node", ["packages/bench/local-full-shard-resume-packet.mjs"]).stdout);
   const localFullShardResumePacketMarkdownFresh = run("node", ["packages/bench/local-full-shard-resume-packet.mjs", "--format", "markdown"]).stdout;
+  const localFullShardResumeEnvDoctor = JSON.parse(
+    readFileSync(join(root, reviewDir, "local-full-shard-002-resume-env-doctor-20260526.json"), "utf8"),
+  );
+  const localFullShardResumeEnvDoctorEvidence = readFileSync(
+    join(root, reviewDir, "local-full-shard-002-resume-env-doctor-20260526.md"),
+    "utf8",
+  );
+  const noLocalFullResumeEnv = { ...process.env };
+  for (const name of [
+    "RECALLWEAVE_BASELINE_LIVE",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT",
+    "RECALLWEAVE_FULL_SHARD_PRIVATE_DIR",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS",
+    "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+    "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
+    "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY",
+    "SELFMEM_LOCAL_EMBED_BASE_URL",
+    "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+    "SELFMEM_LOCAL_EMBED_MODEL",
+    "SELFMEM_LOCAL_RERANK_BASE_URL",
+    "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT",
+    "SELFMEM_LOCAL_RERANK_MODEL",
+  ]) {
+    delete noLocalFullResumeEnv[name];
+  }
+  const localFullShardResumeEnvDoctorFresh = JSON.parse(
+    run("node", ["packages/bench/local-full-shard-resume-env-doctor.mjs"], { env: noLocalFullResumeEnv }).stdout,
+  );
+  const localFullShardResumeEnvDoctorMarkdownFresh = run("node", ["packages/bench/local-full-shard-resume-env-doctor.mjs", "--format", "markdown"], {
+    env: noLocalFullResumeEnv,
+  }).stdout;
   const localFullShardIntakeFresh = JSON.parse(
     run("node", [
       "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
@@ -3693,6 +3731,8 @@ check("fresh public benchmark target check passes", () => {
     assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--strategies local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank/);
     assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--query-offset 25/);
     assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--require-local-embedding-durability/);
+    assert.match(resumePacket.commands?.resumeEnvDoctor ?? "", /benchmark:answer-quality:local-shard-resume-env/);
+    assert.match(resumePacket.commands?.resumeEnvDoctor ?? "", /local-full-shard-002-resume-env-doctor-20260526\.json/);
     assert.match(resumePacket.commands?.preflight ?? "", /benchmark:answer-quality:preflight/);
     assert.match(resumePacket.commands?.answerQuality ?? "", /benchmark:answer-quality/);
     assert.match(resumePacket.commands?.localShardIntake ?? "", /benchmark:answer-quality:local-shard-intake/);
@@ -3711,6 +3751,59 @@ check("fresh public benchmark target check passes", () => {
     JSON.stringify(localFullShardResumePacketFresh),
     localFullShardResumePacketEvidence,
     localFullShardResumePacketMarkdownFresh,
+  ]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+  for (const envDoctor of [localFullShardResumeEnvDoctor, localFullShardResumeEnvDoctorFresh]) {
+    assert.equal(envDoctor.mode, "local-full-shard-resume-env-doctor");
+    assert.equal(envDoctor.status, "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV");
+    assert.equal(envDoctor.metricsOnly, true);
+    assert.equal(envDoctor.publicSafe, true);
+    assert.equal(envDoctor.callsProviderApis, false);
+    assert.equal(envDoctor.callsHostedSupermemory, false);
+    assert.equal(envDoctor.sendsBenchmarkTextToProvider, false);
+    assert.equal(envDoctor.rawQuestionsIncluded, false);
+    assert.equal(envDoctor.rawAnswersIncluded, false);
+    assert.equal(envDoctor.rawMemoryIncluded, false);
+    assert.equal(envDoctor.rawPrivateOutputPathIncluded, false);
+    assert.equal(envDoctor.printsEnvValues, false);
+    assert.equal(envDoctor.printsPrivatePaths, false);
+    assert.equal(envDoctor.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(envDoctor.countsAsFullMemorySotaEvidence, false);
+    assert.equal(envDoctor.publicBenchmarkClaimsAllowed, false);
+    assert.equal(envDoctor.readyForMissingArmExport, false);
+    assert.equal(envDoctor.readyForAnswerQualityPreflight, false);
+    assert.equal(envDoctor.readyForLocalShardIntake, false);
+    assert.equal(envDoctor.privateDir?.provided, false);
+    assert.equal(envDoctor.privateDir?.present, false);
+    assert.equal(envDoctor.privateDir?.pathPrinted, false);
+    assert.deepEqual(envDoctor.resumePacket?.missingStrategies, [
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank",
+    ]);
+    assert.ok(envDoctor.env?.localEmbedding?.missingNames?.includes("SELFMEM_LOCAL_EMBED_BASE_URL"));
+    assert.ok(envDoctor.env?.localRerank?.missingNames?.includes("SELFMEM_LOCAL_RERANK_BASE_URL"));
+    assert.ok(envDoctor.env?.answerQuality?.missingNames?.includes("RECALLWEAVE_MEMORYBENCH_BASE_URL"));
+    assert.ok(envDoctor.blockers?.includes("private-dir-not-provided"));
+    assert.ok(envDoctor.blockers?.includes("local-embedding-env-missing"));
+    assert.ok(envDoctor.blockers?.includes("local-rerank-env-missing"));
+    assert.ok(envDoctor.blockers?.includes("answer-quality-env-missing"));
+    assert.equal(envDoctor.commandPlaceholders?.privateOutputDirPlaceholderPresent, true);
+    assert.equal(envDoctor.commandPlaceholders?.publicReviewDirPlaceholderPresent, true);
+  }
+  assert.equal(localFullShardResumeEnvDoctor.writesRealFiles, true);
+  assert.equal(localFullShardResumeEnvDoctorFresh.writesRealFiles, false);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Local-Full Shard Resume Environment Doctor/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Status: BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /SELFMEM_LOCAL_EMBED_BASE_URL/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /RECALLWEAVE_FULL_SHARD_PRIVATE_DIR/);
+  assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Private directory provided: false/);
+  for (const text of [
+    JSON.stringify(localFullShardResumeEnvDoctor),
+    JSON.stringify(localFullShardResumeEnvDoctorFresh),
+    localFullShardResumeEnvDoctorEvidence,
+    localFullShardResumeEnvDoctorMarkdownFresh,
   ]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
