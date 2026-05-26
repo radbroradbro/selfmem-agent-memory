@@ -202,6 +202,12 @@ It is a full local benchmark lane, not a SOTA lane: it can show whether the
 local method is limited by model size or missing cloud arms, but broad SOTA and
 public superiority wording still require the provider/SOTA comparison lane,
 reviewers, UI/docs refresh, owner approval, and real canary.
+Use `benchmark:answer-quality:local-accepted-lane-doctor` before launching the
+first local-full shard. The checked-in doctor at
+`reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`
+keeps private inputs and raw-source retention visible as public-safe metadata,
+names the missing local embedding/rerank/query-expansion/answer-quality
+readiness, and confirms the lane has no Voyage/NVIDIA or public-SOTA blockers.
 `benchmark:memory-score:result-gate --require-ready` now also checks the
 source-locked reported memory-system target directly. It leaves
 `fullSotaBlockers` non-empty until the result is full or officially comparable,

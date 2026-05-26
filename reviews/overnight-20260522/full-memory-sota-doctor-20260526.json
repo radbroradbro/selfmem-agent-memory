@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T05:31:36.154Z",
+  "generatedAt": "2026-05-26T05:46:33.251Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -65,6 +65,13 @@
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
+    "localFullAcceptedLaneLaunchDoctor": {
+      "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
+      "exists": true,
+      "hash": "sha256:252959a484400bb8f5462a0143f2a630b88393e79752d6817bc8cfb62c1f5b9c",
+      "mode": "full-shard-accepted-lane-launch-doctor",
+      "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
+    },
     "privateInputDoctor": {
       "path": "reviews/overnight-20260522/full-shard-private-input-doctor-current.json",
       "exists": true,
@@ -75,7 +82,7 @@
     "acceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:0ae3c5d1005062ce5d0da416bd483c91977c617c3f6514741255dbeae556ade1",
+      "hash": "sha256:7b75c8a27b0fa3be4c18509bc56b373e23c46cae628d3d1531d365199dd92edb",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -166,28 +173,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:500b7f2c05d03244efedc4c6383b320d35154be3813e97955dbf5feb5ee66295",
+      "hash": "sha256:4aa4e46882677d5bd67b39133757013fd0af58ca8c93c9012251ecdd7a41d5fc",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:4a944de67a167172a8085fd8a2e333a8e1a43d006b591586ded92e85faee20e2",
+      "hash": "sha256:9ff058e849ec56bf9554f82efd32107bc41bfda5a0abccf678f0790a4873ff0c",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:8420587de5261ecf28b42d35a1577ea7949bdc448100253240ebf09d5d84cdb3",
+      "hash": "sha256:065267e276e1b1e37c5eeefef999c92735608a0f7fad2436244f44cd3eb19baa",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:f390f9618dd8a8cd22ece8953b5a68f0aeb5469987b325342e0febe5867e2bdc",
+      "hash": "sha256:cf9f8988e8594c9e0f4d69a50fdd0cf9c92d5efc5bc84c7727bbe151487ecae9",
       "mode": null,
       "status": null
     }
@@ -349,7 +356,7 @@
     "responseExportReady": false,
     "answerQualityScoringReady": false,
     "privateInputsReady": true,
-    "operatorInputCount": 4,
+    "operatorInputCount": 8,
     "pendingShardCount": 20,
     "firstPendingShardId": "shard-001",
     "blockers": [
@@ -533,6 +540,9 @@
     "readyForLocalFullBenchmarkPlan": true,
     "readyForResponseArmExport": false,
     "readyForAnswerQualityScoring": false,
+    "launchDoctorStatus": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
+    "readyForFirstShardRun": false,
+    "readyForLocalFullBenchmarkResult": false,
     "claimScope": "local-full",
     "queryCount": 500,
     "shardCount": 20,
@@ -546,6 +556,7 @@
     "acceptedLaneId": "local-full-accepted-shards",
     "canReachFullSotaGateAfterShardIntake": false,
     "cloudProviderBlockerCount": 0,
+    "operatorInputCount": 5,
     "pendingShardCount": 20,
     "countsAsFullMemorySotaEvidence": false,
     "publicBenchmarkClaimsAllowed": false,
@@ -562,7 +573,23 @@
       "openai-compatible-base-url-missing",
       "query-expansion-local-endpoint-or-cloud-consent-missing"
     ],
-    "blockers": []
+    "blockers": [],
+    "launchBlockers": [
+      "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+      "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+      "answer-model-missing",
+      "judge-model-missing",
+      "local-apple-credentials-missing",
+      "local-rerank-credentials-missing",
+      "openai-compatible-base-url-missing",
+      "query-expansion-local-endpoint-or-cloud-consent-missing",
+      "accepted-lane-response-export-not-ready",
+      "accepted-lane-answer-quality-scoring-not-ready",
+      "local-full-answer-quality-shard-results-not-returned"
+    ]
   },
   "currentCanary": {
     "resultPath": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
@@ -695,6 +722,26 @@
       "blockers": []
     },
     {
+      "id": "local-full-launch-readiness",
+      "status": "blocked",
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "local-apple-credentials-missing",
+        "local-rerank-credentials-missing",
+        "openai-compatible-base-url-missing",
+        "query-expansion-local-endpoint-or-cloud-consent-missing",
+        "accepted-lane-response-export-not-ready",
+        "accepted-lane-answer-quality-scoring-not-ready",
+        "local-full-answer-quality-shard-results-not-returned"
+      ]
+    },
+    {
       "id": "full-shard-results",
       "status": "blocked",
       "blockers": [
@@ -787,6 +834,7 @@
     "full-answer-quality-shard-results-not-returned",
     "full-memory-sota-score-not-proven",
     "public-sota-claim-not-allowed",
+    "local-full-answer-quality-shard-results-not-returned",
     "answer-quality-shard-runs-pending",
     "shard-results-missing",
     "answer-quality-shards-missing",

@@ -28,6 +28,9 @@ const planRaw = readFileSync(planPath, "utf8");
 assertSafePublicText(planRaw, "full-shard plan");
 const plan = JSON.parse(planRaw);
 assert.equal(plan.mode, "public-benchmark-answer-quality-shard-plan", "plan must be a full answer-quality shard plan");
+const claimScope = String(plan.claimScope ?? plan.runPlan?.claimScope ?? "full-sota");
+assert.ok(["full-sota", "local-full"].includes(claimScope), "plan claim scope must be full-sota or local-full");
+const isFullSota = claimScope === "full-sota";
 
 const workorder = runNodeJson("packages/bench/public-benchmark-answer-quality-shard-workorder.mjs", [
   "--plan",
@@ -55,18 +58,24 @@ const acceptedLaneReadyForScoring = acceptedLane.readyForAnswerQualityScoring ==
 const readyForFirstAcceptedShardRun = privateInputReady && acceptedLaneReadyForExport && acceptedLaneReadyForScoring;
 const readyForAcceptedShardIntake = readyForFirstAcceptedShardRun && workorder.readyForShardIntake === true;
 const readyForPublicSotaClaim =
+  isFullSota &&
   readyForAcceptedShardIntake &&
   sotaDoctor?.countsAsFullMemorySotaEvidence === true &&
   sotaDoctor?.publicBenchmarkClaimsAllowed === true;
+const readyForLocalFullBenchmarkResult = !isFullSota && readyForAcceptedShardIntake;
 const blockers = unique([
   ...arrayOf(privateInputDoctor.blockers),
   ...arrayOf(acceptedLane.blockers),
   !privateInputReady ? "full-shard-private-inputs-not-ready" : null,
   !acceptedLaneReadyForExport ? "accepted-lane-response-export-not-ready" : null,
   !acceptedLaneReadyForScoring ? "accepted-lane-answer-quality-scoring-not-ready" : null,
-  workorder.readyForShardIntake !== true ? "full-answer-quality-shard-results-not-returned" : null,
-  sotaDoctor?.countsAsFullMemorySotaEvidence !== true ? "full-memory-sota-score-not-proven" : null,
-  sotaDoctor?.publicBenchmarkClaimsAllowed !== true ? "public-sota-claim-not-allowed" : null,
+  workorder.readyForShardIntake !== true
+    ? isFullSota
+      ? "full-answer-quality-shard-results-not-returned"
+      : "local-full-answer-quality-shard-results-not-returned"
+    : null,
+  isFullSota && sotaDoctor?.countsAsFullMemorySotaEvidence !== true ? "full-memory-sota-score-not-proven" : null,
+  isFullSota && sotaDoctor?.publicBenchmarkClaimsAllowed !== true ? "public-sota-claim-not-allowed" : null,
 ].filter(Boolean));
 
 const report = {
@@ -74,6 +83,7 @@ const report = {
   ok: true,
   mode: "full-shard-accepted-lane-launch-doctor",
   status: readyForFirstAcceptedShardRun ? "READY_FOR_ACCEPTED_LANE_SHARD_LAUNCH" : "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
+  claimScope,
   generatedAt: new Date().toISOString(),
   writesRealFiles: Boolean(outputPath || markdownOutputPath),
   metricsOnly: true,
@@ -94,6 +104,7 @@ const report = {
   plan: {
     path: displayPath(planPath),
     hash: `sha256:${sha256(planRaw)}`,
+    claimScope,
     queryCount: Number(plan.runPlan?.queryCount ?? 0),
     shardCount: Number(plan.runPlan?.shardCount ?? 0),
     shardSize: Number(plan.runPlan?.shardSize ?? 0),
@@ -108,6 +119,7 @@ const report = {
     readyForFirstAcceptedShardRun,
     readyForAcceptedShardIntake,
     readyForPublicSotaClaim,
+    readyForLocalFullBenchmarkResult,
     privateInputsReady: privateInputReady,
     acceptedLaneReadyForResponseArmExport: acceptedLaneReadyForExport,
     acceptedLaneReadyForAnswerQualityScoring: acceptedLaneReadyForScoring,
@@ -133,6 +145,7 @@ const report = {
     laneId: acceptedLane.laneId,
     label: acceptedLane.label,
     acceptedByFullShardIntake: acceptedLane.acceptedByFullShardIntake === true,
+    canReachFullSotaGateAfterShardIntake: acceptedLane.canReachFullSotaGateAfterShardIntake === true,
     diagnosticOnly: acceptedLane.diagnosticOnly === true,
     strategies: acceptedLane.strategies ?? [],
     providerRequirements: acceptedLane.providerRequirements ?? [],
@@ -158,7 +171,7 @@ const report = {
     firstPendingShardRange:
       firstWorkorder == null ? null : `${firstWorkorder.startIndex}-${firstWorkorder.endIndexExclusive}`,
   },
-  operatorInputsNeeded: operatorInputsNeeded(acceptedLane, privateInputDoctor),
+  operatorInputsNeeded: operatorInputsNeeded(acceptedLane, privateInputDoctor, { isFullSota }),
   nextCommands: {
     responseArmExport: firstWorkorder?.commands?.responseArmExport ?? null,
     answerQuality: firstWorkorder?.commands?.answerQuality ?? null,
@@ -167,16 +180,28 @@ const report = {
   },
   blockers,
   nextActions: readyForFirstAcceptedShardRun
-    ? [
-        "Run the accepted full-SOTA lane shard commands into an outside-repository private output directory.",
-        "Commit only public-safe shard result JSON and markdown after answer-quality scoring completes.",
-        "Keep public SOTA and production-replacement claims blocked until shard intake, combine, result gate, reviewers, UI/docs refresh, owner approval, and real canary all pass.",
-      ]
-    : [
-        "Satisfy the private-input doctor, accepted-lane model/provider readiness, answer-quality endpoint, and query-expansion evidence requirements.",
-        "Use local query expansion when available; use cloud query expansion only with explicit public-data and provider-call consent.",
-        "Do not substitute diagnostic BM25/control lanes for the accepted full-SOTA lane.",
-      ],
+    ? isFullSota
+      ? [
+          "Run the accepted full-SOTA lane shard commands into an outside-repository private output directory.",
+          "Commit only public-safe shard result JSON and markdown after answer-quality scoring completes.",
+          "Keep public SOTA and production-replacement claims blocked until shard intake, combine, result gate, reviewers, UI/docs refresh, owner approval, and real canary all pass.",
+        ]
+      : [
+          "Run the accepted local-full lane shard commands into an outside-repository private output directory.",
+          "Commit only public-safe shard result JSON and markdown after answer-quality scoring completes.",
+          "Treat the completed result as local model-method evidence only; SOTA, launch, and production-replacement claims still require the full provider/reviewer/canary gate.",
+        ]
+    : isFullSota
+      ? [
+          "Satisfy the private-input doctor, accepted-lane model/provider readiness, answer-quality endpoint, and query-expansion evidence requirements.",
+          "Use local query expansion when available; use cloud query expansion only with explicit public-data and provider-call consent.",
+          "Do not substitute diagnostic BM25/control lanes for the accepted full-SOTA lane.",
+        ]
+      : [
+          "Satisfy the private-input doctor, local embedding, local rerank, answer-quality endpoint, and model-backed query-expansion requirements.",
+          "Use local query expansion when available; use cloud query expansion only with explicit public-data and provider-call consent.",
+          "Do not substitute BM25, deterministic expansion, or provider-only lanes for the accepted local-full lane.",
+        ],
 };
 
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
@@ -208,13 +233,22 @@ function sanitizeAnswerQualityReadiness(value) {
   };
 }
 
-function operatorInputsNeeded(lane, privateInputDoctorReport) {
+function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
   const needs = [];
   const push = (id, ready, envNames, note) => {
     if (!ready) needs.push({ id, envNames, note, valuePrinted: false });
   };
   push("private-input-dir", privateInputDoctorReport.readyForAnswerQualityShardRun === true, ["--private-input-dir"], "outside-repository full benchmark private inputs");
   push("response-export-consent", lane.responseArmExport?.ready === true, ["RECALLWEAVE_BASELINE_LIVE", "RECALLWEAVE_BASELINE_NO_RAW_TEXT"], "live response export with no raw text output");
+  for (const provider of arrayOf(lane.providerRequirements)) {
+    const readiness = lane.providerReadiness?.[provider] ?? {};
+    push(
+      `${provider}-readiness`,
+      readiness.ready === true,
+      [...arrayOf(readiness.valueEnvNames), ...arrayOf(readiness.keyFileEnvNames)],
+      `${provider} endpoint or credential readiness`,
+    );
+  }
   push(
     "provider-response-arms",
     lane.responseArmExport?.providerCallsRequired !== true || lane.responseArmExport?.providerCallsEnabled === true,
@@ -243,18 +277,23 @@ function operatorInputsNeeded(lane, privateInputDoctorReport) {
       "RECALLWEAVE_QUERY_EXPANSION_CALLS",
       "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA",
     ],
-    "model-backed query expansion for the accepted SOTA lane",
+    options.isFullSota
+      ? "model-backed query expansion for the accepted SOTA lane"
+      : "model-backed query expansion for the accepted local-full lane",
   );
   return needs;
 }
 
 function renderMarkdown(value) {
+  const title = value.claimScope === "local-full" ? "Local-Full Accepted Lane Launch Doctor" : "Full-Shard Accepted Lane Launch Doctor";
   return [
-    "# Full-Shard Accepted Lane Launch Doctor",
+    `# ${title}`,
     "",
     `- Status: ${value.status}`,
+    `- Claim scope: ${value.claimScope}`,
     `- Ready for first accepted shard run: ${value.launchGate.readyForFirstAcceptedShardRun}`,
     `- Ready for public SOTA claim: ${value.launchGate.readyForPublicSotaClaim}`,
+    `- Ready for local-full benchmark result: ${value.launchGate.readyForLocalFullBenchmarkResult}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
     `- Query count: ${value.plan.queryCount}`,
     `- Shards: ${value.plan.shardCount}`,

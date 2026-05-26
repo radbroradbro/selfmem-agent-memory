@@ -302,4 +302,18 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 06f5cb648213785c30eec9a051cdab851a6c85bac8ef9cb538afa57ce054fd64
 
+## 2026-05-26 Local-Full Launch Doctor Refresh
+
+- PR #5 and issue #6 were refreshed again after adding the local-full
+  accepted-lane launch doctor for first-shard go/no-go evidence.
+- The refreshed public text keeps the local-full lane blocked on local
+  embedding, local rerank, answer-quality endpoint, and model-backed
+  query-expansion readiness. It does not add Voyage/NVIDIA or public-SOTA
+  blockers to the local-only run path.
+- PR body refreshed at: 2026-05-26T05:47:59Z
+- Issue updated at: 2026-05-26T05:48:01Z
+- PR body hash: 6379a7161384dc2683561ec5bb1c444e1092213f54442e638be4d22c5a94e6e9
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: e727add80068c9db0cf9c207d5aa35db2d7846ab23ed97b7a53b8964d512f3e3
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

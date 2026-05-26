@@ -67,6 +67,11 @@ requirements are resolved.
   and local rerank, without Voyage/NVIDIA blockers. A completed local-full run
   can diagnose local model limits, but it still cannot authorize SOTA or launch
   language.
+- The local-full accepted-lane launch doctor now gives the first shard its own
+  no-provider-call go/no-go report. It keeps private raw-source lineage private,
+  reports missing local embedding, local rerank, answer-quality endpoint, and
+  model-backed query-expansion readiness, and avoids adding Voyage/NVIDIA or
+  public-SOTA blockers to the local-only path.
 - Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` records live Qwen3
   Embedding 0.6B and Qwen3 Embedding 4B Apple Silicon runs on the same 30-query
   public LongMemEval-S retrieval-proxy target. Both local arms tied BM25

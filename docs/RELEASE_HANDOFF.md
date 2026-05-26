@@ -350,6 +350,12 @@ has no Voyage/NVIDIA blockers and is blocked only on the local/run consent,
 answer-quality endpoint, and model-backed query-expansion readiness needed to
 actually run it. Treat a completed local-full result as model-method evidence;
 it can explain a local-vs-cloud gap, but it is not SOTA proof or launch approval.
+Then run `benchmark:answer-quality:local-accepted-lane-doctor`. The checked-in
+doctor,
+`reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`,
+is the concrete first-shard go/no-go for that local lane. It prints no raw
+benchmark text or credentials, keeps the private raw-source lineage private, and
+does not add Voyage/NVIDIA or public-SOTA blockers to the local-only run path.
 Before combining returned full-shard outputs, run
 `benchmark:answer-quality:shard-intake` against the public shard-result JSONs.
 The checked-in intake report,

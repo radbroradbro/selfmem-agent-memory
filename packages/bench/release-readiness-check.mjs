@@ -195,6 +195,8 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-plan-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.md`,
+  `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
+  `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.md`,
   `${reviewDir}/full-shard-private-input-doctor-current.json`,
   `${reviewDir}/full-shard-private-input-doctor-current.md`,
   `${reviewDir}/full-shard-bm25-control-export-probe-20260526.json`,
@@ -587,6 +589,7 @@ const requiredScripts = [
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:private-input-doctor",
   "benchmark:answer-quality:accepted-lane-doctor",
+  "benchmark:answer-quality:local-accepted-lane-doctor",
   "benchmark:answer-quality:control-probe",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
@@ -1747,6 +1750,27 @@ check("fresh public benchmark target check passes", () => {
   );
   const acceptedLaneLaunchDoctorMarkdownEvidence = readFileSync(
     join(root, reviewDir, "full-shard-accepted-lane-launch-doctor-20260526.md"),
+    "utf8",
+  );
+  const localAcceptedLaneLaunchDoctorFresh = JSON.parse(
+    run("node", [
+      "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
+      "--plan",
+      "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    ]).stdout,
+  );
+  const localAcceptedLaneLaunchDoctorMarkdownFresh = run("node", [
+    "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
+    "--plan",
+    "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "--format",
+    "markdown",
+  ]).stdout;
+  const localAcceptedLaneLaunchDoctorEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "local-full-accepted-lane-launch-doctor-20260526.json"), "utf8"),
+  );
+  const localAcceptedLaneLaunchDoctorMarkdownEvidence = readFileSync(
+    join(root, reviewDir, "local-full-accepted-lane-launch-doctor-20260526.md"),
     "utf8",
   );
   const fullShardBm25ExportProbe = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.json"), "utf8"));
@@ -3002,6 +3026,7 @@ check("fresh public benchmark target check passes", () => {
   for (const launchDoctor of [acceptedLaneLaunchDoctorFresh, acceptedLaneLaunchDoctorEvidence]) {
     assert.equal(launchDoctor.mode, "full-shard-accepted-lane-launch-doctor");
     assert.equal(launchDoctor.status, "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH");
+    assert.equal(launchDoctor.claimScope, "full-sota");
     assert.equal(launchDoctor.publicSafe, true);
     assert.equal(launchDoctor.metricsOnly, true);
     assert.equal(launchDoctor.callsProviderApis, false);
@@ -3011,6 +3036,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.rawPrivateOutputPathIncluded, false);
     assert.equal(launchDoctor.plan?.queryCount, 500);
     assert.equal(launchDoctor.plan?.shardCount, 20);
+    assert.equal(launchDoctor.plan?.claimScope, "full-sota");
     assert.deepEqual(launchDoctor.plan?.acceptedLaneIds, ["full-sota-accepted-shards"]);
     assert.ok(launchDoctor.plan?.diagnosticLaneIds?.includes("deterministic-control-proxy"));
     assert.equal(launchDoctor.launchGate?.privateInputsReady, true);
@@ -3032,6 +3058,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.shardProgress?.pendingShardCount, 20);
     assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-001");
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"));
+    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-apple-readiness"));
+    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-rerank-readiness"));
     assert.ok(launchDoctor.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
     assert.ok(launchDoctor.blockers?.includes("accepted-lane-answer-quality-scoring-not-ready"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--query-offset 0"));
@@ -3040,6 +3068,59 @@ check("fresh public benchmark target check passes", () => {
   assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Accepted Lane Launch Doctor/);
   assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Ready for first accepted shard run: false/);
   assert.match(acceptedLaneLaunchDoctorMarkdownEvidence, /Query expansion requirement: local-or-cloud-model-required/);
+  for (const launchDoctor of [localAcceptedLaneLaunchDoctorFresh, localAcceptedLaneLaunchDoctorEvidence]) {
+    assert.equal(launchDoctor.mode, "full-shard-accepted-lane-launch-doctor");
+    assert.equal(launchDoctor.status, "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH");
+    assert.equal(launchDoctor.claimScope, "local-full");
+    assert.equal(launchDoctor.publicSafe, true);
+    assert.equal(launchDoctor.metricsOnly, true);
+    assert.equal(launchDoctor.callsProviderApis, false);
+    assert.equal(launchDoctor.sendsBenchmarkTextToProvider, false);
+    assert.equal(launchDoctor.countsAsFullMemorySotaEvidence, false);
+    assert.equal(launchDoctor.publicBenchmarkClaimsAllowed, false);
+    assert.equal(launchDoctor.rawPrivateOutputPathIncluded, false);
+    assert.equal(launchDoctor.plan?.claimScope, "local-full");
+    assert.equal(launchDoctor.plan?.queryCount, 500);
+    assert.equal(launchDoctor.plan?.shardCount, 20);
+    assert.deepEqual(launchDoctor.plan?.acceptedLaneIds, ["local-full-accepted-shards"]);
+    assert.ok(launchDoctor.plan?.diagnosticLaneIds?.includes("deterministic-control-proxy"));
+    assert.equal(launchDoctor.launchGate?.privateInputsReady, true);
+    assert.equal(launchDoctor.launchGate?.acceptedLaneReadyForResponseArmExport, false);
+    assert.equal(launchDoctor.launchGate?.acceptedLaneReadyForAnswerQualityScoring, false);
+    assert.equal(launchDoctor.launchGate?.readyForFirstAcceptedShardRun, false);
+    assert.equal(launchDoctor.launchGate?.readyForPublicSotaClaim, false);
+    assert.equal(launchDoctor.launchGate?.readyForLocalFullBenchmarkResult, false);
+    assert.equal(launchDoctor.acceptedLane?.laneId, "local-full-accepted-shards");
+    assert.equal(launchDoctor.acceptedLane?.acceptedByFullShardIntake, true);
+    assert.equal(launchDoctor.acceptedLane?.canReachFullSotaGateAfterShardIntake, false);
+    assert.deepEqual(launchDoctor.acceptedLane?.providerRequirements, ["local-apple", "local-rerank"]);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.evidenceRequirement, "local-or-cloud-model-required");
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.diagnosticFallbackAllowed, false);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.readyForAcceptedShardIntake, false);
+    assert.equal(launchDoctor.acceptedLane?.responseArmExport?.providerCallsRequired, false);
+    assert.equal(Object.hasOwn(launchDoctor.acceptedLane?.providerReadiness ?? {}, "voyage"), false);
+    assert.equal(Object.hasOwn(launchDoctor.acceptedLane?.providerReadiness ?? {}, "nvidia"), false);
+    assert.equal(launchDoctor.shardProgress?.pendingShardCount, 20);
+    assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-001");
+    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"));
+    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-apple-readiness"));
+    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-rerank-readiness"));
+    assert.equal(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "provider-response-arms"), false);
+    assert.ok(launchDoctor.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+    assert.ok(launchDoctor.blockers?.includes("local-apple-credentials-missing"));
+    assert.ok(launchDoctor.blockers?.includes("local-rerank-credentials-missing"));
+    assert.equal(launchDoctor.blockers?.includes("voyage-credentials-missing"), false);
+    assert.equal(launchDoctor.blockers?.includes("nvidia-credentials-missing"), false);
+    assert.equal(launchDoctor.blockers?.includes("full-memory-sota-score-not-proven"), false);
+    assert.equal(launchDoctor.blockers?.includes("public-sota-claim-not-allowed"), false);
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_QUERY_EXPANSION_BASE_URL"));
+    assert.doesNotMatch(launchDoctor.nextCommands?.responseArmExport ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
+    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("answer-quality-local-full-shard-001.json"));
+  }
+  assert.match(localAcceptedLaneLaunchDoctorMarkdownFresh, /Local-Full Accepted Lane Launch Doctor/);
+  assert.match(localAcceptedLaneLaunchDoctorMarkdownFresh, /Claim scope: local-full/);
+  assert.match(localAcceptedLaneLaunchDoctorMarkdownEvidence, /Ready for local-full benchmark result: false/);
   assert.equal(fullShardBm25ExportProbe.mode, "full-shard-bm25-control-export-probe");
   assert.equal(fullShardBm25ExportProbe.status, "READY_FULL_SHARD_BM25_CONTROL_EXPORT_PROBE");
   assert.equal(fullShardBm25ExportProbe.strategy, "bm25-lite");

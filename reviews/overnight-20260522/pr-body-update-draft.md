@@ -408,6 +408,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   500-query target. It lets the local Qwen3/Apple Silicon plus local-rerank
   method run the full benchmark without being blocked by absent Voyage/NVIDIA
   credentials, while keeping public SOTA and launch claims blocked.
+- Adds a local-full accepted-lane launch doctor so the first shard has a
+  no-provider-call go/no-go report with exact local embedding, local rerank,
+  answer-quality endpoint, and model-backed query-expansion blockers. It keeps
+  the local lane out of SOTA/public-claim semantics.
 - Narrows release-check stale temp cleanup so it only removes old
   `recallweave-release-check-root-*` directories. A new regression check proves
   benchmark materialization roots and pointer files like `recallweave-sota-full-*`

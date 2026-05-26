@@ -306,6 +306,12 @@ endpoint configuration, local Apple/local rerank endpoints, and model-backed
 query expansion. A completed `local-full` run can diagnose whether the local
 method is model-size limited; it does not count as SOTA evidence or public
 superiority without the provider/SOTA comparison lane.
+`benchmark:answer-quality:local-accepted-lane-doctor` now turns that into a
+first-shard launch check at
+`reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`.
+It reports the exact local-full blockers and first-shard commands without
+provider calls, without raw benchmark text, and without adding SOTA/public-claim
+blockers that belong only to the provider comparison lane.
 The current regenerated private full-run inputs are checked by
 `benchmark:answer-quality:private-input-doctor`, with public-safe evidence in
 `reviews/overnight-20260522/full-shard-private-input-doctor-current.json`. That
