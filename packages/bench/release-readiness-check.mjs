@@ -132,6 +132,7 @@ const requiredFiles = [
   "packages/bench/local-full-shard-resume-packet.mjs",
   "packages/bench/local-full-shard-resume-env-doctor.mjs",
   "packages/bench/local-full-shard-resume-command-materializer.mjs",
+  "packages/bench/local-full-shard-resume-result-doctor.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
@@ -206,6 +207,8 @@ const requiredFiles = [
   `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.md`,
   `${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.json`,
   `${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.md`,
+  `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
+  `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
@@ -611,6 +614,7 @@ const requiredScripts = [
   "benchmark:answer-quality:local-shard-resume-packet",
   "benchmark:answer-quality:local-shard-resume-env",
   "benchmark:answer-quality:local-shard-resume-command",
+  "benchmark:answer-quality:local-shard-resume-result",
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:local-shard-intake",
   "benchmark:answer-quality:private-input-doctor",
@@ -1992,6 +1996,23 @@ check("fresh public benchmark target check passes", () => {
     ).stdout,
   );
   const localFullShardResumeCommandMaterializerPrivateScript = readFileSync(localFullShardResumeCommandMaterializerReadyOutput, "utf8");
+  const localFullShardResumeResultDoctor = JSON.parse(
+    readFileSync(join(root, reviewDir, "local-full-shard-002-resume-result-doctor-20260526.json"), "utf8"),
+  );
+  const localFullShardResumeResultDoctorEvidence = readFileSync(
+    join(root, reviewDir, "local-full-shard-002-resume-result-doctor-20260526.md"),
+    "utf8",
+  );
+  const localFullShardResumeResultDoctorFresh = JSON.parse(
+    run("node", ["packages/bench/local-full-shard-resume-result-doctor.mjs"]).stdout,
+  );
+  const localFullShardResumeResultDoctorMarkdownFresh = run(
+    "node",
+    ["packages/bench/local-full-shard-resume-result-doctor.mjs", "--format", "markdown"],
+  ).stdout;
+  const localFullShardResumeResultDoctorFixture = JSON.parse(
+    run("node", ["packages/bench/local-full-shard-resume-result-doctor.mjs", "--fixture"]).stdout,
+  );
   const localFullShardIntakeFresh = JSON.parse(
     run("node", [
       "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
@@ -3805,6 +3826,8 @@ check("fresh public benchmark target check passes", () => {
     assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /benchmark:answer-quality:local-shard-resume-command/);
     assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /--private-command-output/);
     assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /local-full-shard-002-resume-command-materializer-20260526\.json/);
+    assert.match(resumePacket.commands?.resumeResultDoctor ?? "", /benchmark:answer-quality:local-shard-resume-result/);
+    assert.match(resumePacket.commands?.resumeResultDoctor ?? "", /local-full-shard-002-resume-result-doctor-20260526\.json/);
     assert.match(resumePacket.commands?.preflight ?? "", /benchmark:answer-quality:preflight/);
     assert.match(resumePacket.commands?.answerQuality ?? "", /benchmark:answer-quality/);
     assert.match(resumePacket.commands?.localShardIntake ?? "", /benchmark:answer-quality:local-shard-intake/);
@@ -3815,8 +3838,10 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumePacketEvidence, /Status: READY_FOR_LOCAL_FULL_SHARD_RESUME/);
   assert.match(localFullShardResumePacketEvidence, /Missing arms: local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank/);
   assert.match(localFullShardResumePacketEvidence, /Resume command materializer: .*benchmark:answer-quality:local-shard-resume-command/);
+  assert.match(localFullShardResumePacketEvidence, /Resume result doctor: .*benchmark:answer-quality:local-shard-resume-result/);
   assert.match(localFullShardResumePacketEvidence, /Counts as local-full benchmark evidence: false/);
   assert.match(localFullShardResumePacketEvidence, /Run the local-full shard resume command materializer to write a private shell script outside the repository/);
+  assert.match(localFullShardResumePacketEvidence, /Run the local-full shard resume result doctor before accepting shard 002/);
   assert.match(localFullShardResumePacketEvidence, /Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted/);
   assert.match(localFullShardResumePacketMarkdownFresh, /Local embedding runtime ready: true/);
   assert.match(localFullShardResumePacketMarkdownFresh, /Raw memory included: false/);
@@ -4072,6 +4097,70 @@ check("fresh public benchmark target check passes", () => {
     JSON.stringify(localFullShardResumeCommandMaterializerReady),
     localFullShardResumeCommandMaterializerEvidence,
     localFullShardResumeCommandMaterializerMarkdownFresh,
+  ]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+  for (const resultDoctor of [
+    localFullShardResumeResultDoctor,
+    localFullShardResumeResultDoctorFresh,
+  ]) {
+    assert.equal(resultDoctor.mode, "local-full-shard-resume-result-doctor");
+    assert.equal(resultDoctor.fixtureOnly, false);
+    assert.equal(resultDoctor.status, "BLOCKED_LOCAL_FULL_SHARD_002_RESULT");
+    assert.equal(resultDoctor.metricsOnly, true);
+    assert.equal(resultDoctor.publicSafe, true);
+    assert.equal(resultDoctor.callsProviderApis, false);
+    assert.equal(resultDoctor.callsHostedSupermemory, false);
+    assert.equal(resultDoctor.callsLocalEndpoint, false);
+    assert.equal(resultDoctor.rawQuestionsIncluded, false);
+    assert.equal(resultDoctor.rawAnswersIncluded, false);
+    assert.equal(resultDoctor.rawMemoryIncluded, false);
+    assert.equal(resultDoctor.rawPrivateOutputPathIncluded, false);
+    assert.equal(resultDoctor.printsPrivatePaths, false);
+    assert.equal(resultDoctor.printsEnvValues, false);
+    assert.equal(resultDoctor.printsMaterializedCommands, false);
+    assert.equal(resultDoctor.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(resultDoctor.countsAsFullMemorySotaEvidence, false);
+    assert.equal(resultDoctor.publicBenchmarkClaimsAllowed, false);
+    assert.equal(resultDoctor.readyForLocalShardIntake, false);
+    assert.equal(resultDoctor.readyForShardCombine, false);
+    assert.equal(resultDoctor.plan?.claimScope, "local-full");
+    assert.equal(resultDoctor.commandMaterializer?.status, "BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS");
+    assert.equal(resultDoctor.commandMaterializer?.ready, false);
+    assert.equal(resultDoctor.commandMaterializer?.writesPrivateCommandFile, false);
+    assert.equal(resultDoctor.previousShard?.present, true);
+    assert.equal(resultDoctor.previousShard?.accepted, true);
+    assert.equal(resultDoctor.shardResult?.present, false);
+    assert.equal(resultDoctor.shardResult?.accepted, false);
+    assert.ok(resultDoctor.blockers?.includes("resume-command-materializer-not-ready"));
+    assert.ok(resultDoctor.blockers?.includes("resume-private-command-file-not-written"));
+    assert.ok(resultDoctor.blockers?.includes("shard-002-result-missing"));
+  }
+  assert.equal(localFullShardResumeResultDoctor.writesRealFiles, true);
+  assert.equal(localFullShardResumeResultDoctorFresh.writesRealFiles, false);
+  assert.match(localFullShardResumeResultDoctorEvidence, /Local-Full Shard Resume Result Doctor/);
+  assert.match(localFullShardResumeResultDoctorEvidence, /Status: BLOCKED_LOCAL_FULL_SHARD_002_RESULT/);
+  assert.match(localFullShardResumeResultDoctorEvidence, /Ready for local shard intake: false/);
+  assert.match(localFullShardResumeResultDoctorMarkdownFresh, /shard-002-result-missing/);
+  assert.equal(localFullShardResumeResultDoctorFixture.mode, "local-full-shard-resume-result-doctor");
+  assert.equal(localFullShardResumeResultDoctorFixture.fixtureOnly, true);
+  assert.equal(localFullShardResumeResultDoctorFixture.status, "READY_LOCAL_FULL_SHARD_002_RESULT_FOR_INTAKE");
+  assert.equal(localFullShardResumeResultDoctorFixture.readyForLocalShardIntake, true);
+  assert.equal(localFullShardResumeResultDoctorFixture.readyForShardCombine, false);
+  assert.equal(localFullShardResumeResultDoctorFixture.commandMaterializer?.ready, true);
+  assert.equal(localFullShardResumeResultDoctorFixture.commandMaterializer?.writesPrivateCommandFile, true);
+  assert.equal(localFullShardResumeResultDoctorFixture.previousShard?.accepted, true);
+  assert.equal(localFullShardResumeResultDoctorFixture.shardResult?.accepted, true);
+  assert.deepEqual(localFullShardResumeResultDoctorFixture.blockers, []);
+  assert.equal(localFullShardResumeResultDoctorFixture.shardResult?.strategyNames?.includes("cloud-voyage4-voyage-lite-rerank"), false);
+  assert.equal(localFullShardResumeResultDoctorFixture.shardResult?.strategyNames?.includes("cloud-nvidia-nemotron-1b"), false);
+  for (const text of [
+    JSON.stringify(localFullShardResumeResultDoctor),
+    JSON.stringify(localFullShardResumeResultDoctorFresh),
+    JSON.stringify(localFullShardResumeResultDoctorFixture),
+    localFullShardResumeResultDoctorEvidence,
+    localFullShardResumeResultDoctorMarkdownFresh,
   ]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);

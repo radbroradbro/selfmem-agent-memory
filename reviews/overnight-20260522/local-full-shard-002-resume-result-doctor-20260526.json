@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-full-shard-resume-result-doctor",
+  "fixtureOnly": false,
+  "status": "BLOCKED_LOCAL_FULL_SHARD_002_RESULT",
+  "generatedAt": "2026-05-26T13:43:44.439Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "callsLocalEndpoint": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsPrivatePaths": false,
+  "printsEnvValues": false,
+  "printsMaterializedCommands": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForLocalShardIntake": false,
+  "readyForShardCombine": false,
+  "readyForEndToEndMemoryScoreGate": false,
+  "plan": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "hash": "sha256:33ab66f5e802ff3490b22b01d531a2abc75695e785ee7fdd4a510782c6a3575a",
+    "claimScope": "local-full",
+    "queryCount": 500,
+    "shardCount": 20,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ]
+  },
+  "resumePacket": {
+    "path": "reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json",
+    "hash": "sha256:dd9c3efc1c3fc7d811076b942aa2923a98456073868d6515ed6376d9c830dd67",
+    "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
+    "targetShard": {
+      "shardId": "shard-002",
+      "startIndex": 25,
+      "endIndexExclusive": 50,
+      "queryOffset": 25,
+      "maxQueries": 25,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-local-full-shard-002.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-local-full-shard-002.md",
+      "expectedPrivateArmDirectoryLabel": "<private-output-dir>/arms/shard-002"
+    }
+  },
+  "commandMaterializer": {
+    "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-materializer-20260526.json",
+    "hash": "sha256:15c884dd78fd5263381f47dac3fe04c794fca1cf3b2e59bd8c499c3993248a32",
+    "present": true,
+    "status": "BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS",
+    "fixtureOnly": false,
+    "ready": false,
+    "writesPrivateCommandFile": false,
+    "privateCommandPathPrinted": false,
+    "privateCommandFileHash": null,
+    "commandCount": 8,
+    "materializedCommandCount": 0,
+    "commandsPrinted": false,
+    "printsMaterializedCommands": false,
+    "printsPrivatePaths": false,
+    "printsEnvValues": false,
+    "blockers": [
+      "private-dir-not-provided",
+      "private-command-output-not-provided",
+      "placeholder-unresolved:local-answer-model",
+      "placeholder-unresolved:local-embedding-base-url",
+      "placeholder-unresolved:local-embedding-model",
+      "placeholder-unresolved:local-judge-model",
+      "placeholder-unresolved:local-rerank-base-url",
+      "placeholder-unresolved:local-rerank-candidate-limit",
+      "placeholder-unresolved:local-rerank-model",
+      "placeholder-unresolved:openai-compatible-base-url",
+      "placeholder-unresolved:private-output-dir",
+      "placeholder-unresolved:safe-local-embedding-batch-token-limit"
+    ]
+  },
+  "previousShard": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-001-20260526.json",
+    "hash": "sha256:6c329ec7c00cc2bff4ad467ff52f39d451bc9aaaf3f822e9ef665e7e13246af1",
+    "present": true,
+    "accepted": true,
+    "startIndex": 0,
+    "endIndexExclusive": 25
+  },
+  "shardResult": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002.json",
+    "hash": null,
+    "present": false,
+    "accepted": false,
+    "failures": [],
+    "metricsSummary": []
+  },
+  "localShardIntakeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-intake --input reviews/overnight-20260522/answer-quality-local-full-shard-001-20260526.json,reviews/overnight-20260522/answer-quality-local-full-shard-002.json --output reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002.json --markdown-output reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002.md",
+  "blockers": [
+    "resume-command-materializer-not-ready",
+    "resume-private-command-file-not-written",
+    "shard-002-result-missing"
+  ],
+  "nextActions": [
+    "Run the resume command materializer with real outside-repository private inputs.",
+    "Run the generated private script to produce the shard-002 public answer-quality result.",
+    "Regenerate this result doctor before running local shard intake."
+  ]
+}

@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "local-full-shard-resume-packet",
   "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
-  "generatedAt": "2026-05-26T13:21:39.081Z",
+  "generatedAt": "2026-05-26T13:43:33.117Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -180,6 +180,7 @@
   "commands": {
     "resumeEnvDoctor": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-env -- --private-input-dir <private-output-dir> --output reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json --markdown-output reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.md",
     "resumeCommandMaterializer": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-command -- --private-input-dir <private-output-dir> --private-command-output <private-output-dir>/local-full-shard-002-resume.private.sh --output reviews/overnight-20260522/local-full-shard-002-resume-command-materializer-20260526.json --markdown-output reviews/overnight-20260522/local-full-shard-002-resume-command-materializer-20260526.md",
+    "resumeResultDoctor": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-result -- --output reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.json --markdown-output reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.md",
     "rerunRuntimeDoctor": "npm exec --yes pnpm@10.23.0 -- benchmark:local-embedding:runtime-doctor -- --require-ready --output reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json --markdown-output reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.md",
     "rerunDurabilitySmoke": "npm exec --yes pnpm@10.23.0 -- benchmark:local-embedding:durability -- --require-ready --output reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json --markdown-output reviews/overnight-20260522/local-embedding-durability-smoke-20260526.md",
     "missingArmResponseExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url> SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model> SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS=<safe-local-embedding-batch-token-limit> SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1 SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url> SELFMEM_LOCAL_RERANK_MODEL=<local-rerank-model> SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=<local-rerank-candidate-limit> SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-002 --strategies local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset 25 --max-queries 25 --require-local-embedding-durability --local-embedding-durability-report reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
@@ -206,6 +207,7 @@
     "Run the local-full shard resume env doctor against the outside-repository private directory.",
     "Run the local-full shard resume command materializer to write a private shell script outside the repository.",
     "Review and run the generated private script so the missing-arm export, preflight, answer-quality scoring, and local shard intake use concrete private paths and endpoint values.",
+    "Run the local-full shard resume result doctor before accepting shard 002 into the local-full intake trail.",
     "Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted."
   ]
 }

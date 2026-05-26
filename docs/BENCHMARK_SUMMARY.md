@@ -392,6 +392,15 @@ safe operator path before any shard 002 retry commands are run. When those
 inputs are supplied, it writes concrete runnable commands only to an
 outside-repository private script, while public evidence
 keeps command text, private paths, and env values hidden.
+`benchmark:answer-quality:local-shard-resume-result` is the post-script public
+result doctor for the same shard. Its checked-in report at
+`reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.json`
+is blocked because the materializer has not produced a private script in this
+checkout and `answer-quality-local-full-shard-002.json` is not present. Once an
+operator runs the private script, this doctor validates the shard 002 public
+answer-quality result against the local-full plan, confirms shard 001 is still
+accepted, and prints the local shard-intake command without exposing raw
+sources, private paths, endpoint values, or materialized commands.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

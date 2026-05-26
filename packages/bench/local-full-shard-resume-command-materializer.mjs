@@ -6,7 +6,7 @@ import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
-const packetOnlyCommandIds = new Set(["resumeCommandMaterializer"]);
+const packetOnlyCommandIds = new Set(["resumeCommandMaterializer", "resumeResultDoctor"]);
 const args = parseArgs(process.argv.slice(2));
 const fixtureTempRoots = [];
 process.on("exit", () => {

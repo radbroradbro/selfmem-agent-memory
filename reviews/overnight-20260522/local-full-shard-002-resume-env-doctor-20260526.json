@@ -4,7 +4,7 @@
   "mode": "local-full-shard-resume-env-doctor",
   "fixtureOnly": false,
   "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV",
-  "generatedAt": "2026-05-26T13:21:39.113Z",
+  "generatedAt": "2026-05-26T13:43:41.300Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -32,7 +32,7 @@
   "resumePacketCommandsRunnableAsPrinted": false,
   "resumePacket": {
     "path": "reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json",
-    "hash": "sha256:03d7d9d62acff9453bb7581608f19bdbe33f7eb05bee197a3d2f179850ab162b",
+    "hash": "sha256:dd9c3efc1c3fc7d811076b942aa2923a98456073868d6515ed6376d9c830dd67",
     "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
     "targetShard": {
       "shardId": "shard-002",

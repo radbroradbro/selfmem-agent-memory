@@ -438,6 +438,16 @@ with `--private-command-output` or
 only command IDs, counts, hashes, and blocker names. The resume packet now
 includes this materializer command so the intended retry flow is env doctor,
 private script materialization, then private script execution.
+After the private script returns, run
+`benchmark:answer-quality:local-shard-resume-result`. The checked-in result
+doctor at
+`reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.json`
+is blocked because the private script has not run and the shard 002 public
+answer-quality result is missing. A passing result doctor validates that the
+returned public shard-002 JSON matches the local-full plan, keeps command text
+and private paths out of public evidence, and prints the local shard-intake
+command for shard 001 plus shard 002. It does not authorize combine, SOTA, or
+launch claims.
 The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.

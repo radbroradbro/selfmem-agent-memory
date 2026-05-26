@@ -184,6 +184,11 @@ const report = {
       `--output ${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.json`,
       `--markdown-output ${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.md`,
     ].join(" "),
+    resumeResultDoctor: [
+      "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-result --",
+      `--output ${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
+      `--markdown-output ${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.md`,
+    ].join(" "),
     rerunRuntimeDoctor: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:local-embedding:runtime-doctor --",
       "--require-ready",
@@ -227,6 +232,7 @@ const report = {
         "Run the local-full shard resume env doctor against the outside-repository private directory.",
         "Run the local-full shard resume command materializer to write a private shell script outside the repository.",
         "Review and run the generated private script so the missing-arm export, preflight, answer-quality scoring, and local shard intake use concrete private paths and endpoint values.",
+        "Run the local-full shard resume result doctor before accepting shard 002 into the local-full intake trail.",
         "Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted.",
       ]
     : [
@@ -341,6 +347,7 @@ function renderMarkdown(value) {
     "## Commands",
     `- Resume env doctor: ${value.commands.resumeEnvDoctor}`,
     `- Resume command materializer: ${value.commands.resumeCommandMaterializer}`,
+    `- Resume result doctor: ${value.commands.resumeResultDoctor}`,
     `- Runtime doctor: ${value.commands.rerunRuntimeDoctor}`,
     `- Durability smoke: ${value.commands.rerunDurabilitySmoke}`,
     `- Missing-arm export: ${value.commands.missingArmResponseExport ?? "n/a"}`,

@@ -578,6 +578,14 @@ not count as a RecallWeave score.
   exist. When ready, it writes concrete commands only to that private script and
   reports public hashes/counts/status without printing the commands, private
   paths, or env values.
+- Local-full shard resume result doctor:
+  `reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.json`
+  is the post-script public result checker. It remains blocked until the safe
+  materializer path has produced a private command file and the shard 002
+  public answer-quality result exists. When ready, it validates shard 002
+  against the local-full plan and points to local shard intake while keeping raw
+  source text, private paths, endpoint values, and materialized commands out of
+  public evidence.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard
