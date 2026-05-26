@@ -252,11 +252,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-  `badef23f65c9004cd78118df806413b1090a23f1`.
-- GitHub Actions run `26380217502`: passed CI after containing release-check
-  temp artifacts in a bounded run root and adding a stale RecallWeave temp
-  cleanup guard. This does not change the approved runtime canary
-  adapter/report commit.
+  `52cec9b00282844cffd65997908c54374c5a5c00`.
+- GitHub Actions run `26433427845`: passed CI after adding the accepted-lane
+  launch doctor and the matching post-baseline release guard allowlist entry.
+  This does not change the approved runtime canary adapter/report commit.
 - Previous verified PR branch head before release-check temp containment:
   `6291832743f003b9693a6ea968f4906112ccfe0f`.
 - GitHub Actions run `26379689695`: passed CI after refreshing the returned
@@ -311,8 +310,8 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `badef23f65c9004cd78118df806413b1090a23f1`.
-- GitHub Actions run `26380217502`: passed CI with release checks, live GitHub
+- `52cec9b00282844cffd65997908c54374c5a5c00`.
+- GitHub Actions run `26433427845`: passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence keeps BM25 and full-hybrid controls in the
   same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
@@ -320,9 +319,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
   a blocked-until-endpoint challenger, hardens returned canary zip
   classification, adds the 12-hour returned canary watcher, requires returned
-  one-agent canary packets to report the approved runtime adapter commit, and
+  one-agent canary packets to report the approved runtime adapter commit,
   contains release-check temp artifacts so repeated goal-loop checks do not
-  exhaust local temp storage.
+  exhaust local temp storage, and adds the no-provider-call accepted-lane launch
+  doctor for the full-shard benchmark gate.
 - Previous verified code/product baseline before release-check temp
   containment:
   `fba92059552c155436e84bb05d87b1fd6aef9add`.

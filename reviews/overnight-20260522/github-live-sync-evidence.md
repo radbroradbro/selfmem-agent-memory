@@ -10,6 +10,16 @@ Date: 2026-05-23
   `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`,
   and issue body hash
   `228b3af51d96ffbebd1eecc6250786ef8c8ba50fc9e98e3bbb6fd54add05fbad`.
+- PR #5 and issue #6 were refreshed again on 2026-05-26 after GitHub Actions
+  run `26433427845` passed on `52cec9b0`, promoting the accepted-lane launch
+  doctor as the latest verified code/product baseline while preserving
+  `18d606a` as the approved runtime canary adapter/report commit. Live sync
+  passed with PR body hash
+  `f5b3c0568e58caf5d439372a740a662d42d68872c2c2095cb0296887c18d15a8`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`,
+  and issue body hash
+  `0102253687de9176da3f854d7acb4e3e3df4994ac3694f633919b96bb5aadde5`.
 - PR #5 and issue #6 were refreshed from checked-in public-safe drafts after
   hosted-baseline run orchestration reached green CI.
 - PR #5 was refreshed again after live hosted prep evidence added the

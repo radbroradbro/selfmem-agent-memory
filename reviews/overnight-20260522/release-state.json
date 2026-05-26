@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-25T02:38:16Z",
+  "generatedAt": "2026-05-26T05:07:48Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "badef23f65c9004cd78118df806413b1090a23f1",
-    "ciRunId": 26380217502,
+    "headSha": "52cec9b00282844cffd65997908c54374c5a5c00",
+    "ciRunId": 26433427845,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_goal_audit_local_apple_provider_runs_local_reranker_sidecar_gate_and_release_temp_cleanup_guard",
+    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_goal_audit_local_apple_provider_runs_local_reranker_sidecar_gate_release_temp_cleanup_guard_and_accepted_lane_launch_doctor",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after containing release-check temp artifacts in a bounded run root and adding a stale RecallWeave temp cleanup guard. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice, records Qwen3 0.6B and 4B Apple Silicon local runs that tied BM25 but did not earn promotion, and keeps local-apple-qwen3-0_6b-local-rerank as a fixture-covered, fail-closed challenger with no live quality result yet. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, temp cleanup guard verification, diff check, secret scan, private-path scan, and GitHub Actions run 26380217502 passed."
+    "note": "Latest inspected code/product baseline after adding the accepted-lane launch doctor for full-shard benchmark launch readiness and allowing that code path in the post-baseline release guard. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice, records Qwen3 0.6B and 4B Apple Silicon local runs that tied BM25 but did not earn promotion, and keeps local-apple-qwen3-0_6b-local-rerank as a fixture-covered, fail-closed challenger with no live quality result yet. The accepted-lane doctor reports private full-shard inputs ready but keeps full-sota-accepted-shards blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, and model-backed query expansion are configured. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, temp cleanup guard verification, diff check, secret scan, private-path scan, and GitHub Actions run 26433427845 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -420,14 +420,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "badef23f65c9004cd78118df806413b1090a23f1",
-    "ciRunId": 26380217502,
+    "headSha": "52cec9b00282844cffd65997908c54374c5a5c00",
+    "ciRunId": 26433427845,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_goal_audit_and_release_temp_cleanup_guard",
+    "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_goal_audit_release_temp_cleanup_guard_and_accepted_lane_launch_doctor",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after containing release-check temp artifacts in a bounded run root and adding a stale RecallWeave temp cleanup guard. GitHub Actions run 26380217502 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest observed PR branch head after adding the accepted-lane launch doctor and post-baseline release guard allowlist entry for that benchmark gate. GitHub Actions run 26433427845 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
