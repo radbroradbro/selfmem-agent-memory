@@ -79,6 +79,8 @@
 - Ready for shard combine: false
 - Accepted local-full shards: 1
 - Missing local-full shards: 19
+- Launch progress source: checked-in-progress-intake
+- Next local-full shard: shard-002 (25-50)
 - Runtime-blocked local-full shards: 1
 - Latest runtime-blocked shard: shard-002
 - Latest runtime-blocked arm: local-apple-qwen3-0_6b

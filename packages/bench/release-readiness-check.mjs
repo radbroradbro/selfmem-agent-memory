@@ -3964,6 +3964,12 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.readyForShardCombine, false);
     assert.equal(doctorReport.localFullLaneState?.acceptedShardCount, 1);
     assert.equal(doctorReport.localFullLaneState?.missingShardCount, 19);
+    assert.equal(doctorReport.localFullLaneState?.launchProgressSource, "checked-in-progress-intake");
+    assert.equal(doctorReport.localFullLaneState?.launchProgressInputCount, 1);
+    assert.equal(doctorReport.localFullLaneState?.launchAcceptedShardCount, 1);
+    assert.equal(doctorReport.localFullLaneState?.launchPendingShardCount, 19);
+    assert.equal(doctorReport.localFullLaneState?.nextPendingShardId, "shard-002");
+    assert.equal(doctorReport.localFullLaneState?.nextPendingShardRange, "25-50");
     assert.equal(doctorReport.localFullLaneState?.runtimeBlockedShardCount, 1);
     assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedShard, "shard-002");
     assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedArm, "local-apple-qwen3-0_6b");
@@ -4007,6 +4013,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Same-data shard ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Full SOTA lane ready for answer-quality scoring: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Missing local-full shards: 19/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next local-full shard: shard-002 \(25-50\)/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime-blocked local-full shards: 1/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding runtime ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding durability ready: true/);

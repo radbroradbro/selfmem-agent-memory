@@ -142,7 +142,7 @@ commit first.
 
 The current standard-inbox scan is
 `reviews/overnight-20260522/returned-downloads-current-scan.md`. It found 0
-production evidence packets, 2 handoff packets, 10 diagnostic bundles, 22
+production evidence packets, 1 handoff packet, 10 diagnostic bundles, 22
 unknown packets, and 0 unreadable packets. That proves the current inbox has
 handoff packets and diagnostics only. It does not close the real-container
 rollout blocker. The findings note now includes hash-only safe triage for unknown and

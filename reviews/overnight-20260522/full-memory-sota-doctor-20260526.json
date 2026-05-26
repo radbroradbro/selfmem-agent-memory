@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T11:50:27.674Z",
+  "generatedAt": "2026-05-26T11:55:40.405Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -215,21 +215,21 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:bb99956859382e1444efe6f5952cabeb90b1d560998ab96545f7b027e0209095",
+      "hash": "sha256:2fadf4d7405cee28e773deb55e5d3ebf36184e514c3a1d959b2314c1512917f5",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:cf588e8cde6a007ef1e7bc06a6f99337d81ab295342d5cafbe25de26ef9a83fc",
+      "hash": "sha256:b00668455bdb24485beac179296b079a9fde6a10fb0f19505c5f2d60dc197c44",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:9e29a52c0aee418b61b29351b8b24b11b461c37ee3f6b4cbb5c4aeb3457970e9",
+      "hash": "sha256:160c58639a06bbe52096536f26a7aea4958ef960a1c6b70397224344cf63ceb7",
       "mode": null,
       "status": null
     }
@@ -599,6 +599,12 @@
     "runtimeBlockedShardCount": 1,
     "latestRuntimeBlockedShard": "shard-002",
     "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b",
+    "launchProgressSource": "checked-in-progress-intake",
+    "launchProgressInputCount": 1,
+    "launchAcceptedShardCount": 1,
+    "launchPendingShardCount": 19,
+    "nextPendingShardId": "shard-002",
+    "nextPendingShardRange": "25-50",
     "localEmbeddingRuntimeStatus": "READY_LOCAL_EMBEDDING_RUNTIME",
     "localEmbeddingRuntimeReady": true,
     "localEmbeddingRuntimeBlockers": [],
