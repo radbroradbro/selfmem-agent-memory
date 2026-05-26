@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-26T05:36:08Z",
+  "generatedAt": "2026-05-26T05:53:21Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "27cd17c25cbef6f3483e9b4798af94ea64256cb4",
-    "ciRunId": 26434316174,
+    "headSha": "2adc5268da8dd6ed8f65dfc16069ef7793296682",
+    "ciRunId": 26434850211,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_goal_audit_local_apple_provider_runs_local_reranker_sidecar_gate_release_temp_cleanup_guard_accepted_lane_launch_doctor_and_local_full_shard_lane",
+    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_goal_audit_local_apple_provider_runs_local_reranker_sidecar_gate_release_temp_cleanup_guard_accepted_lane_launch_doctor_local_full_shard_lane_and_local_full_launch_doctor",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding the local-full answer-quality shard lane and workorder for the same 500-query LongMemEval target while keeping it separate from full-SOTA provider claims. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice, records Qwen3 0.6B and 4B Apple Silicon local runs that tied BM25 but did not earn promotion, and keeps local-apple-qwen3-0_6b-local-rerank as a fixture-covered, fail-closed challenger with no live quality result yet. The local-full lane can produce local model-method evidence without Voyage/NVIDIA blockers, but it cannot authorize SOTA or public superiority claims; full-sota-accepted-shards remains blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, and model-backed query expansion are configured. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, temp cleanup guard verification, diff check, secret scan, private-path scan, and GitHub Actions run 26434316174 passed."
+    "note": "Latest inspected code/product baseline after adding the local-full accepted-lane launch doctor on top of the local-full answer-quality shard lane and workorder for the same 500-query LongMemEval target while keeping it separate from full-SOTA provider claims. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice, records Qwen3 0.6B and 4B Apple Silicon local runs that tied BM25 but did not earn promotion, and keeps local-apple-qwen3-0_6b-local-rerank as a fixture-covered, fail-closed challenger with no live quality result yet. The local-full lane now has a no-provider-call go/no-go doctor for its first shard, including local Apple embedding, local rerank, answer-quality endpoint, and model-backed query-expansion blockers; it can produce local model-method evidence without Voyage/NVIDIA blockers, but it cannot authorize SOTA or public superiority claims. Full-sota-accepted-shards remains blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, and model-backed query expansion are configured. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, temp cleanup guard verification, diff check, secret scan, private-path scan, and GitHub Actions run 26434850211 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -420,14 +420,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "27cd17c25cbef6f3483e9b4798af94ea64256cb4",
-    "ciRunId": 26434316174,
+    "headSha": "2adc5268da8dd6ed8f65dfc16069ef7793296682",
+    "ciRunId": 26434850211,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_goal_audit_release_temp_cleanup_guard_accepted_lane_launch_doctor_and_local_full_shard_lane",
+    "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_goal_audit_release_temp_cleanup_guard_accepted_lane_launch_doctor_local_full_shard_lane_and_local_full_launch_doctor",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after adding the local-full answer-quality shard lane/workorder and post-baseline release guard allowlist entry for that benchmark gate. GitHub Actions run 26434316174 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries."
+    "note": "Latest observed PR branch head after adding the local-full accepted-lane launch doctor and post-baseline release guard allowlist coverage for that benchmark gate. GitHub Actions run 26434850211 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",

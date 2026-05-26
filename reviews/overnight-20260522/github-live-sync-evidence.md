@@ -316,4 +316,18 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: e727add80068c9db0cf9c207d5aa35db2d7846ab23ed97b7a53b8964d512f3e3
 
+## 2026-05-26 Local-Full Launch Doctor Verified Baseline Refresh
+
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26434850211` passed on
+  `2adc5268da8dd6ed8f65dfc16069ef7793296682`.
+- The refreshed public text promotes that commit only as the verified branch
+  baseline for the local-full launch doctor. It keeps public launch, SOTA
+  claims, and production rollout blocked.
+- PR body refreshed at: 2026-05-26T05:54:27Z
+- Issue updated at: 2026-05-26T05:56:00Z
+- PR body hash: ddc9cae0edec95a26545f87ec7b7207fb607ff16ffbfe8add01c6c4d03feb723
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: dac029272b0bc120747a0d1d02844d91df40d2da60aeebdce1ef4ce9d104a120
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
