@@ -4601,6 +4601,17 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.launchAcceptedShardCount, 1);
     assert.equal(doctorReport.localFullLaneState?.launchPendingShardCount, 19);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.safe, true);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.evidenceReady, true);
+    assert.deepEqual(doctorReport.localFullLaneState?.performanceReport?.evidenceBlockers, []);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.freshForIntake, true);
+    assert.ok(
+      Date.parse(doctorReport.localFullLaneState?.performanceReport?.generatedAt ?? "") >=
+        Date.parse(doctorReport.localFullLaneState?.performanceReport?.intakeGeneratedAt ?? ""),
+    );
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedAcceptedShardCount, 1);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedAcceptedQueryCount, 25);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedCoveragePercent, 5);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedNextPendingShardId, "shard-002");
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.status, "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT");
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.acceptedShardCount, 1);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.acceptedQueryCount, 25);
@@ -4645,6 +4656,7 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("answer-quality-shards-missing"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-runtime" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-durability" && item.status === "pass"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-performance-snapshot" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-shard-intake" && item.status === "blocked"));
     assert.equal(doctorReport.currentCanary?.queryCount, 30);
     assert.equal(doctorReport.currentCanary?.scoreDelta, -42.0333);
@@ -4672,6 +4684,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance coverage: 5%/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance best strategy: full-hybrid-rerank/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance counts as SOTA evidence: false/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-performance-snapshot: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next local-full shard: shard-002 \(25-50\)/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime-blocked local-full shards: 1/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime blocker resume plans: 1/);

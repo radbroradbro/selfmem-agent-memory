@@ -120,6 +120,11 @@ const gates = [
   gate("local-embedding-runtime", localFullLaneState.localEmbeddingRuntimeReady, localFullLaneState.localEmbeddingRuntimeBlockers),
   gate("local-embedding-durability", localFullLaneState.localEmbeddingDurabilityReady, localFullLaneState.localEmbeddingDurabilityBlockers),
   gate("local-full-shard-intake", localFullLaneState.readyForShardCombine, localFullLaneState.shardIntakeBlockers),
+  gate(
+    "local-full-performance-snapshot",
+    localFullLaneState.performanceReport.evidenceReady,
+    localFullLaneState.performanceReport.evidenceBlockers,
+  ),
   gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
   gate("same-data-provider-arms", !arrayOf(sotaLadder?.blockers).includes("missing-voyage-answer-quality-same-data-result"), [
     "missing-voyage-answer-quality-same-data-result",
@@ -395,7 +400,11 @@ function inspectLocalFullLaneState({
     launchProgressInputCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.progressInputCount ?? 0),
     launchAcceptedShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.acceptedShardCount ?? 0),
     launchPendingShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.pendingShardCount ?? 0),
-    performanceReport: inspectLocalFullPerformanceReport(localFullPerformanceReport),
+    performanceReport: inspectLocalFullPerformanceReport(localFullPerformanceReport, {
+      localFullShardPlan,
+      localFullShardIntake,
+      localFullAcceptedLaneLaunchDoctor,
+    }),
     nextPendingShardId: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null,
     nextPendingShardRange: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null,
     localEmbeddingRuntimeStatus: localEmbeddingRuntimeDoctor?.status ?? null,
@@ -433,23 +442,85 @@ function inspectLocalFullLaneState({
   };
 }
 
-function inspectLocalFullPerformanceReport(performanceReport) {
+function inspectLocalFullPerformanceReport(
+  performanceReport,
+  { localFullShardPlan, localFullShardIntake, localFullAcceptedLaneLaunchDoctor },
+) {
+  const expectedAcceptedShardCount = Number(localFullShardIntake?.intake?.acceptedShardCount ?? 0);
+  const expectedMissingShardCount = Number(localFullShardIntake?.intake?.missingShardCount ?? 0);
+  const expectedAcceptedQueryCount = arrayOf(localFullShardIntake?.acceptedShards).reduce(
+    (total, shard) => total + Number(shard?.scoredQueryCount ?? 0),
+    0,
+  );
+  const expectedQueryCount = Number(localFullShardPlan?.runPlan?.queryCount ?? 0);
+  const expectedCoveragePercent = expectedQueryCount > 0 ? roundTo((expectedAcceptedQueryCount / expectedQueryCount) * 100, 4) : 0;
+  const expectedNextPendingShardId = localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null;
+  const generatedAtMs = Date.parse(performanceReport?.generatedAt ?? "");
+  const intakeGeneratedAtMs = Date.parse(localFullShardIntake?.generatedAt ?? "");
+  const freshForIntake =
+    Number.isFinite(generatedAtMs) &&
+    Number.isFinite(intakeGeneratedAtMs) &&
+    generatedAtMs >= intakeGeneratedAtMs;
   const safe =
     performanceReport?.mode === "local-full-shard-performance-report" &&
     performanceReport?.publicSafe === true &&
     performanceReport?.metricsOnly === true &&
+    performanceReport?.callsProviderApis === false &&
+    performanceReport?.callsHostedSupermemory === false &&
+    performanceReport?.callsLocalEndpoint === false &&
+    performanceReport?.sendsBenchmarkTextToProvider === false &&
+    performanceReport?.rawQuestionIdsIncluded === false &&
     performanceReport?.rawQuestionsIncluded === false &&
     performanceReport?.rawAnswersIncluded === false &&
     performanceReport?.rawMemoryIncluded === false &&
+    performanceReport?.rawTranscriptIncluded === false &&
+    performanceReport?.rawPromptIncluded === false &&
     performanceReport?.rawPrivateOutputPathIncluded === false &&
+    performanceReport?.printsPrivatePaths === false &&
+    performanceReport?.printsEnvValues === false &&
+    performanceReport?.countsAsLocalFullBenchmarkEvidence === false &&
     performanceReport?.countsAsFullMemorySotaEvidence === false &&
-    performanceReport?.publicBenchmarkClaimsAllowed === false;
+    performanceReport?.publicBenchmarkClaimsAllowed === false &&
+    performanceReport?.readyForShardCombine === false &&
+    performanceReport?.readyForEndToEndMemoryScoreGate === false;
+  const countsMatch =
+    Number(performanceReport?.coverage?.acceptedShardCount ?? -1) === expectedAcceptedShardCount &&
+    Number(performanceReport?.coverage?.missingShardCount ?? -1) === expectedMissingShardCount &&
+    Number(performanceReport?.coverage?.acceptedQueryCount ?? -1) === expectedAcceptedQueryCount &&
+    Number(performanceReport?.coverage?.queryCount ?? -1) === expectedQueryCount &&
+    Number(performanceReport?.coverage?.coveragePercent ?? -1) === expectedCoveragePercent;
+  const nextShardMatches =
+    expectedNextPendingShardId == null ||
+    performanceReport?.coverage?.nextPendingShardId === expectedNextPendingShardId;
+  const evidenceBlockers = [
+    !performanceReport ? "local-full-performance-report-missing" : null,
+    performanceReport?.mode !== "local-full-shard-performance-report" ? "local-full-performance-report-mode-mismatch" : null,
+    performanceReport?.status !== "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT" ? "local-full-performance-report-status-not-partial" : null,
+    !safe ? "local-full-performance-report-unsafe" : null,
+    performanceReport?.countsAsLocalFullBenchmarkEvidence !== false ||
+    performanceReport?.countsAsFullMemorySotaEvidence !== false ||
+    performanceReport?.publicBenchmarkClaimsAllowed !== false
+      ? "local-full-performance-report-claim-enabled"
+      : null,
+    !freshForIntake ? "local-full-performance-report-stale" : null,
+    !countsMatch ? "local-full-performance-report-intake-mismatch" : null,
+    !nextShardMatches ? "local-full-performance-report-next-shard-mismatch" : null,
+  ].filter(Boolean);
   return {
     path: files.localFullPerformanceReport,
     status: performanceReport?.status ?? null,
     publicSafe: Boolean(performanceReport?.publicSafe),
     metricsOnly: Boolean(performanceReport?.metricsOnly),
     safe,
+    evidenceReady: evidenceBlockers.length === 0,
+    evidenceBlockers,
+    generatedAt: performanceReport?.generatedAt ?? null,
+    intakeGeneratedAt: localFullShardIntake?.generatedAt ?? null,
+    freshForIntake,
+    expectedAcceptedShardCount,
+    expectedAcceptedQueryCount,
+    expectedCoveragePercent,
+    expectedNextPendingShardId,
     acceptedShardCount: Number(performanceReport?.coverage?.acceptedShardCount ?? 0),
     acceptedQueryCount: Number(performanceReport?.coverage?.acceptedQueryCount ?? 0),
     queryCount: Number(performanceReport?.coverage?.queryCount ?? 0),
@@ -636,6 +707,11 @@ function gate(id, passed, blockers) {
     status: passed ? "pass" : "blocked",
     blockers: passed ? [] : arrayOf(blockers),
   };
+}
+
+function roundTo(value, digits) {
+  const multiplier = 10 ** digits;
+  return Math.round(value * multiplier) / multiplier;
 }
 
 function buildNextRunPlan({ shardPlan, sotaOperatorPacket }) {

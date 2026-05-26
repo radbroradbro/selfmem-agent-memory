@@ -22,6 +22,7 @@
 - local-embedding-runtime: pass
 - local-embedding-durability: pass
 - local-full-shard-intake: blocked (answer-quality-shards-missing, full-shard-coverage-incomplete, local-apple-embedding-server-socket-close, local-full-shard-002-incomplete, local-full-shard-coverage-incomplete)
+- local-full-performance-snapshot: pass
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
 - full-score-result-gate: blocked (reported-target-judge-model-does-not-match-result, missing-full-or-officially-comparable-memory-benchmark-run, best-end-to-end-score-below-primary-reported-memory-target)

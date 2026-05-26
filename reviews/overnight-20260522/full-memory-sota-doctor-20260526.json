@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T14:01:40.727Z",
+  "generatedAt": "2026-05-26T14:14:08.953Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -222,21 +222,21 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:6dac2684de282e904c95da01333e1271561465f0d1a26cf069046fb01099daee",
+      "hash": "sha256:61e534ada25316339c45c019a0c3d105dc708f728780276be806295cc55310b5",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:2e4af38c5776cb68081131e57abe5ad1d406fc59f91841102ef56de11cf4ff4d",
+      "hash": "sha256:76a07dd33d35b385899ee58e8705bfc0b7cee2b05295ac70c240b15d534be565",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:010ac8cd92a2772fbb476db55743b66561fb84cd3ad7ab701dfee1ed0362ebd2",
+      "hash": "sha256:fb6f8a3067cd4f4b2f780a9b009560fa46910194daabeffdb2d115dcd70eb2e5",
       "mode": null,
       "status": null
     }
@@ -622,6 +622,15 @@
       "publicSafe": true,
       "metricsOnly": true,
       "safe": true,
+      "evidenceReady": true,
+      "evidenceBlockers": [],
+      "generatedAt": "2026-05-26T13:55:26.320Z",
+      "intakeGeneratedAt": "2026-05-26T09:56:40.093Z",
+      "freshForIntake": true,
+      "expectedAcceptedShardCount": 1,
+      "expectedAcceptedQueryCount": 25,
+      "expectedCoveragePercent": 5,
+      "expectedNextPendingShardId": "shard-002",
       "acceptedShardCount": 1,
       "acceptedQueryCount": 25,
       "queryCount": 500,
@@ -877,6 +886,11 @@
         "local-full-shard-002-incomplete",
         "local-full-shard-coverage-incomplete"
       ]
+    },
+    {
+      "id": "local-full-performance-snapshot",
+      "status": "pass",
+      "blockers": []
     },
     {
       "id": "full-shard-results",
