@@ -450,6 +450,14 @@ Component rows in the same artifact remain model-selection evidence only.
   strategy-specific lexical feature profile, commits no private response file,
   and leaves answer-quality scoring, provider/local arms, reviewer gates, and
   SOTA claims blocked.
+- Full-shard deterministic control/proxy export probe:
+  `reviews/overnight-20260522/full-shard-control-export-probe-20260526.json`
+  proves the same `shard-001` response export path for `bm25-lite`,
+  `full-hybrid-rerank`, and `query-expanded-full-hybrid-rerank`. The private
+  response files stay outside the repo at mode `0600`, provider calls remain
+  zero, and the query-expanded arm uses deterministic fallbacks. This is still
+  not answer-quality scoring, provider/local model evidence, reviewer approval,
+  or SOTA support.
 - Full-shard workorder:
   `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`
   is the checked-in public-safe run tracker for the twenty shard jobs. Re-run

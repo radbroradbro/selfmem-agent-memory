@@ -299,6 +299,14 @@ from the regenerated private full inputs in 36 observed wall-clock seconds, with
 zero privacy leaks and no private response file committed. This proves the
 lexical control shard is operationally runnable; it still is not answer-quality
 evidence, reviewer evidence, or SOTA proof.
+`reviews/overnight-20260522/full-shard-control-export-probe-20260526.json`
+extends that same shard probe to `bm25-lite`, `full-hybrid-rerank`, and
+`query-expanded-full-hybrid-rerank`. It writes the private response files outside
+the repo with mode `0600`, confirms 25 responses per arm over the same 19,195
+candidates, makes zero provider calls, and uses deterministic query-expansion
+fallbacks for the expanded arm. It is control/proxy run-path evidence only; the
+full answer-quality shards, local/provider model arms, reviewers, UI/docs refresh,
+owner approval, and canary gates remain blocking.
 The shard workorder is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`.
 Run `benchmark:answer-quality:shard-workorder` before and after shard jobs to

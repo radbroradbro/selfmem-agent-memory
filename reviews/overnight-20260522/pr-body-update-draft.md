@@ -345,6 +345,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   LongMemEval memory set in 36 observed wall-clock seconds with zero privacy
   leaks and no private response file committed. This is run-path evidence only,
   not answer-quality or SOTA evidence.
+- Adds `benchmark:answer-quality:control-probe` and the checked-in
+  `full-shard-control-export-probe-20260526` packet. It exports `bm25-lite`,
+  `full-hybrid-rerank`, and `query-expanded-full-hybrid-rerank` on the same
+  25-query full-memory shard with zero provider calls, private response files
+  outside the repo at mode `0600`, and deterministic query-expansion fallbacks.
+  This is still control/proxy run-path evidence, not scored answer-quality,
+  local/provider model evidence, reviewer approval, or SOTA support.
 - Makes answer-quality preflight shard-aware. Full-shard plans now include a
   per-shard `benchmark:answer-quality:preflight --require-ready` step, and the
   preflight rejects private response-arm files that do not cover the selected

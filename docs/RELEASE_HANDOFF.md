@@ -299,6 +299,14 @@ It confirms `shard-001` can export 25 `bm25-lite` responses against the full
 privacy leaks, and no committed private response file. Treat it as run-path
 evidence only; every remaining arm on the shard still needs its own private
 response export before preflight, answer scoring, intake, or combine.
+The fuller deterministic shard-control probe is recorded at
+`reviews/overnight-20260522/full-shard-control-export-probe-20260526.json`. It
+exports `bm25-lite`, `full-hybrid-rerank`, and
+`query-expanded-full-hybrid-rerank` on the same 25-query shard, keeps all private
+response files outside the repo at mode `0600`, makes zero provider calls, and
+uses deterministic query-expansion fallbacks for the expanded arm. This still
+does not count as answer-quality evidence, local/provider model evidence, or
+SOTA support.
 Use `benchmark:answer-quality:shard-workorder` as the public-safe run tracker
 for those twenty shards. The checked-in workorder,
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`,

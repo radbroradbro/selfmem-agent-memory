@@ -131,6 +131,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/full-shard-private-input-doctor.mjs",
+  "packages/bench/full-shard-control-export-probe.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -193,6 +194,8 @@ const requiredFiles = [
   `${reviewDir}/full-shard-private-input-doctor-current.md`,
   `${reviewDir}/full-shard-bm25-control-export-probe-20260526.json`,
   `${reviewDir}/full-shard-bm25-control-export-probe-20260526.md`,
+  `${reviewDir}/full-shard-control-export-probe-20260526.json`,
+  `${reviewDir}/full-shard-control-export-probe-20260526.md`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
@@ -573,6 +576,7 @@ const requiredScripts = [
   "benchmark:answer-quality:shard-workorder",
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:private-input-doctor",
+  "benchmark:answer-quality:control-probe",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
   "benchmark:local-rerank:result-gate",
@@ -1699,6 +1703,8 @@ check("fresh public benchmark target check passes", () => {
   const privateInputDoctorBlocked = JSON.parse(run("node", ["packages/bench/full-shard-private-input-doctor.mjs"]).stdout);
   const fullShardBm25ExportProbe = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.json"), "utf8"));
   const fullShardBm25ExportProbeEvidence = readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.md"), "utf8");
+  const fullShardControlExportProbe = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-control-export-probe-20260526.json"), "utf8"));
+  const fullShardControlExportProbeEvidence = readFileSync(join(root, reviewDir, "full-shard-control-export-probe-20260526.md"), "utf8");
   const syntheticShardDir = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-"));
   const syntheticShardInputs = writeSyntheticAnswerQualityShardReports(fullAnswerQualityShardPlan, syntheticShardDir);
   const answerQualityShardWorkorderReady = JSON.parse(
@@ -2869,6 +2875,68 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(Number(fullShardBm25ExportProbe.timingMs?.average ?? 0) > 0);
   assert.match(fullShardBm25ExportProbeEvidence, /Full-Shard BM25 Control Export Probe/);
   assert.match(fullShardBm25ExportProbeEvidence, /Private response file committed: false/);
+  assert.equal(fullShardControlExportProbe.mode, "full-shard-control-export-probe");
+  assert.equal(fullShardControlExportProbe.status, "READY_FULL_SHARD_CONTROL_EXPORT_PROBE");
+  assert.equal(fullShardControlExportProbe.ok, true);
+  assert.equal(fullShardControlExportProbe.publicSafe, true);
+  assert.equal(fullShardControlExportProbe.metricsOnly, true);
+  assert.equal(fullShardControlExportProbe.callsProviderApis, false);
+  assert.equal(fullShardControlExportProbe.sendsBenchmarkTextToProvider, false);
+  assert.equal(fullShardControlExportProbe.privateResponseFileCommitted, false);
+  assert.equal(fullShardControlExportProbe.countsAsFullMemorySotaEvidence, false);
+  assert.equal(fullShardControlExportProbe.publicBenchmarkClaimsAllowed, false);
+  assert.equal(fullShardControlExportProbe.target?.shardId, "shard-001");
+  assert.equal(fullShardControlExportProbe.target?.queryCount, 500);
+  assert.equal(fullShardControlExportProbe.target?.startIndex, 0);
+  assert.equal(fullShardControlExportProbe.target?.endIndexExclusive, 25);
+  assert.equal(fullShardControlExportProbe.target?.responseCount, 25);
+  assert.deepEqual(
+    (fullShardControlExportProbe.arms ?? []).map((arm) => arm.strategy),
+    ["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"],
+  );
+  const fullShardControlArms = new Map((fullShardControlExportProbe.arms ?? []).map((arm) => [arm.strategy, arm]));
+  for (const strategy of ["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"]) {
+    const arm = fullShardControlArms.get(strategy);
+    assert.ok(arm, `missing full shard control arm ${strategy}`);
+    assert.equal(arm.responseCount, 25);
+    assert.equal(arm.queryShard?.startIndex, 0);
+    assert.equal(arm.queryShard?.endIndexExclusive, 25);
+    assert.equal(arm.queryShard?.totalQueryCount, 500);
+    assert.equal(arm.inputStats?.candidates, 19195);
+    assert.equal(arm.inputStats?.linesRead, 19195);
+    assert.equal(arm.inputStats?.parsed, 19195);
+    assert.equal(arm.providerCallsMade, 0);
+    assert.equal(arm.providerMockCalls, 0);
+    assert.equal(arm.privacyLeakCount, 0);
+    assert.equal(arm.redactionFailureCount, 0);
+    assert.equal(arm.privateResponseFileOutsideRepo, true);
+    assert.equal(arm.privateResponseFileMode0600, true);
+    assert.match(arm.privateResponseFileHash ?? "", /^sha256:[a-f0-9]{64}$/);
+  }
+  assert.equal(fullShardControlArms.get("bm25-lite")?.featureProfile?.semanticVector, false);
+  assert.equal(fullShardControlArms.get("bm25-lite")?.featureProfile?.topicTermSet, false);
+  assert.equal(fullShardControlArms.get("bm25-lite")?.featureProfile?.dateMs, false);
+  assert.equal(fullShardControlArms.get("full-hybrid-rerank")?.featureProfile?.semanticVector, true);
+  assert.equal(fullShardControlArms.get("full-hybrid-rerank")?.featureProfile?.topicTermSet, true);
+  assert.equal(fullShardControlArms.get("full-hybrid-rerank")?.featureProfile?.dateMs, true);
+  assert.equal(fullShardControlArms.get("query-expanded-full-hybrid-rerank")?.featureProfile?.semanticVector, true);
+  assert.equal(fullShardControlArms.get("query-expanded-full-hybrid-rerank")?.featureProfile?.topicTermSet, true);
+  assert.equal(fullShardControlArms.get("query-expanded-full-hybrid-rerank")?.featureProfile?.dateMs, true);
+  assert.equal(fullShardControlArms.get("query-expanded-full-hybrid-rerank")?.queryExpansionCalls, 0);
+  assert.equal(fullShardControlArms.get("query-expanded-full-hybrid-rerank")?.queryExpansionFallbacks, 25);
+  assert.equal(fullShardControlExportProbe.controls?.queryExpansionMode, "deterministic-proxy");
+  assert.equal(fullShardControlExportProbe.controls?.localModelEvidence, false);
+  assert.equal(fullShardControlExportProbe.controls?.answerQualityEvidence, false);
+  assert.equal(fullShardControlExportProbe.aggregate?.allResponseCountsMatch, true);
+  assert.equal(fullShardControlExportProbe.aggregate?.allProviderCallsZero, true);
+  assert.equal(fullShardControlExportProbe.aggregate?.allPrivateFilesOutsideRepo, true);
+  assert.equal(fullShardControlExportProbe.aggregate?.allPrivateFilesMode0600, true);
+  assert.equal(fullShardControlExportProbe.aggregate?.allPrivacyClean, true);
+  assert.equal(fullShardControlExportProbe.safety?.privacyLeakCount, 0);
+  assert.equal(fullShardControlExportProbe.safety?.redactionFailureCount, 0);
+  assert.match(fullShardControlExportProbeEvidence, /Full-Shard Control Export Probe/);
+  assert.match(fullShardControlExportProbeEvidence, /Counts as full memory SOTA evidence: false/);
+  assert.match(fullShardControlExportProbeEvidence, /All provider calls zero: true/);
   for (const shardWorkorder of [answerQualityShardWorkorderFresh, fullAnswerQualityShardWorkorder]) {
     assert.equal(shardWorkorder.mode, "public-benchmark-answer-quality-shard-workorder");
     assert.equal(shardWorkorder.status, "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS");
