@@ -15,10 +15,10 @@ const chatModel = String(
     "local-openai-compatible-rerank",
 );
 const maxDocuments = positiveInt(args.maxDocuments ?? process.env.SELFMEM_LOCAL_RERANK_MAX_DOCUMENTS ?? 40, "max documents");
-const maxDocumentChars = positiveInt(args.maxDocumentChars ?? process.env.SELFMEM_LOCAL_RERANK_MAX_DOCUMENT_CHARS ?? 700, "max document chars");
+const maxDocumentChars = positiveInt(args.maxDocumentChars ?? process.env.SELFMEM_LOCAL_RERANK_MAX_DOCUMENT_CHARS ?? 320, "max document chars");
 const timeoutMs = positiveInt(args.timeoutMs ?? process.env.SELFMEM_LOCAL_RERANK_TIMEOUT_MS ?? 120_000, "timeout ms");
 const requestMaxBytes = positiveInt(args.requestMaxBytes ?? process.env.SELFMEM_LOCAL_RERANK_REQUEST_MAX_BYTES ?? 2_000_000, "request max bytes");
-const maxOutputTokens = positiveInt(args.maxOutputTokens ?? process.env.SELFMEM_LOCAL_RERANK_MAX_OUTPUT_TOKENS ?? 1024, "max output tokens");
+const maxOutputTokens = positiveInt(args.maxOutputTokens ?? process.env.SELFMEM_LOCAL_RERANK_MAX_OUTPUT_TOKENS ?? 256, "max output tokens");
 
 if (args.help) {
   process.stdout.write(

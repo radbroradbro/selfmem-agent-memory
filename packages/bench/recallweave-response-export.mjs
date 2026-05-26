@@ -76,6 +76,11 @@ const privatePathPattern =
   /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*)/i;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
+if (args.queryExpansionParserSmoke === true) {
+  runQueryExpansionParserSmoke();
+  process.exit(0);
+}
+
 assert.ok(querySetPath, "query set is required. Pass --queryset or RECALLWEAVE_BASELINE_QUERYSET");
 assert.ok(existsSync(querySetPath), `query set missing: ${displayPath(querySetPath)}`);
 assert.ok(statSync(querySetPath).size > 0, `query set empty: ${displayPath(querySetPath)}`);
@@ -456,26 +461,35 @@ async function queryExpansionText(query, options = {}) {
     maxRewrites: queryExpansionMaxRewrites(),
     instruction: queryExpansionInstruction(),
   });
-  let rewrites = [];
-  if (plan.provider === "local-openai-compatible") {
-    rewrites = await openAiCompatibleQueryExpansion(plan, request);
-  } else if (plan.provider === "nvidia-openai-compatible") {
-    rewrites = await openAiCompatibleQueryExpansion(plan, request);
-  } else if (plan.provider === "openrouter-openai-compatible") {
-    rewrites = await openAiCompatibleQueryExpansion(plan, request);
-  } else if (plan.provider === "gemini") {
-    rewrites = await geminiQueryExpansion(plan, request);
-  } else {
-    throw new Error(`unsupported query expansion provider: ${plan.provider}`);
+  let sanitized = [];
+  let attemptCount = 0;
+  for (let attempt = 0; attempt < queryExpansionMaxAttempts(); attempt += 1) {
+    attemptCount = attempt + 1;
+    const attemptRequest =
+      attempt === 0 ? request : { ...request, instruction: queryExpansionRetryInstruction(request.instruction, attempt + 1, request.maxRewrites) };
+    let rewrites = [];
+    if (plan.provider === "local-openai-compatible") {
+      rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+    } else if (plan.provider === "nvidia-openai-compatible") {
+      rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+    } else if (plan.provider === "openrouter-openai-compatible") {
+      rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+    } else if (plan.provider === "gemini") {
+      rewrites = await geminiQueryExpansion(plan, attemptRequest);
+    } else {
+      throw new Error(`unsupported query expansion provider: ${plan.provider}`);
+    }
+    sanitized = sanitizeQueryExpansionRewrites(rewrites, { originalQuery: queryText, maxRewrites: request.maxRewrites });
+    if (sanitized.length > 0) break;
   }
 
-  const sanitized = sanitizeQueryExpansionRewrites(rewrites, { originalQuery: queryText, maxRewrites: request.maxRewrites });
   assert.ok(sanitized.length > 0, "query expansion provider returned no usable rewrites");
   options.providerStats?.recordQueryExpansionCall({
     mode: plan.mode,
     provider: plan.provider,
     model: plan.model,
     rewritesReturned: sanitized.length,
+    attempts: attemptCount,
     elapsedMs: Math.max(1, Math.round(performance.now() - started)),
   });
   return {
@@ -670,7 +684,10 @@ async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
 async function rankLocalAppleQwen(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
   const config = localAppleStrategyConfig(options.strategy);
-  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  const densePool = rankBm25Lite(queryText, candidates).slice(
+    0,
+    providerCandidateLimit("SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT", config?.denseCandidateLimit ?? 120),
+  );
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("local-apple-embedding");
     if (config?.rerankMode === "sidecar") options.providerStats?.recordMockCall("local-rerank");
@@ -1432,6 +1449,13 @@ function providerRetryDelayMs(response, attempt) {
   return Math.min(120_000, baseMs * 2 ** Math.max(0, attempt - 1));
 }
 
+function localProviderRetryDelayMs(response, attempt) {
+  const retryAfter = Number(response?.headers?.get?.("retry-after") ?? 0);
+  if (Number.isFinite(retryAfter) && retryAfter > 0) return Math.min(30_000, Math.ceil(retryAfter * 1000));
+  const baseMs = optionalPositiveInt(process.env.SELFMEM_LOCAL_PROVIDER_RETRY_BASE_MS ?? null, "local provider retry base ms") ?? 1_000;
+  return Math.min(30_000, baseMs * 2 ** Math.max(0, attempt - 1));
+}
+
 function providerDisplayName(provider) {
   if (provider === "gemini") return "Gemini";
   if (provider === "voyage") return "Voyage";
@@ -1448,46 +1472,74 @@ async function localApplePost(path, body) {
   assert.ok(baseUrl, "SELFMEM_LOCAL_EMBED_BASE_URL is required for local Apple embeddings");
   const url = baseUrl.endsWith("/v1") ? `${baseUrl}${path}` : `${baseUrl}/v1${path}`;
   const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`local Apple embedding request failed with status ${response.status}`);
+  const attempts = optionalPositiveInt(process.env.SELFMEM_LOCAL_PROVIDER_RETRY_ATTEMPTS ?? null, "local provider retry attempts") ?? 3;
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      if (response.ok) return response.json();
+      lastError = new Error(`local Apple embedding request failed with status ${response.status}`);
+      if (!retryableProviderStatus(response.status)) {
+        lastError.nonRetryable = true;
+        throw lastError;
+      }
+      if (attempt === attempts) throw lastError;
+      await sleep(localProviderRetryDelayMs(response, attempt));
+    } catch (error) {
+      lastError = error;
+      if (error?.nonRetryable === true) throw error;
+      if (attempt === attempts) throw error;
+      await sleep(localProviderRetryDelayMs(null, attempt));
+    } finally {
+      clearTimeout(timeout);
     }
-    return response.json();
-  } finally {
-    clearTimeout(timeout);
   }
+  throw lastError ?? new Error("local Apple embedding request failed");
 }
 
 async function localAppleRerankPost(body) {
   const endpoint = localAppleRerankEndpoint();
   const timeoutMs = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   const headers = { "content-type": "application/json" };
   const token = process.env.SELFMEM_LOCAL_RERANK_API_KEY;
   if (token) headers.authorization = `Bearer ${token}`;
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`local Apple rerank request failed with status ${response.status}`);
+  const attempts = optionalPositiveInt(process.env.SELFMEM_LOCAL_PROVIDER_RETRY_ATTEMPTS ?? null, "local provider retry attempts") ?? 3;
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      if (response.ok) return response.json();
+      lastError = new Error(`local Apple rerank request failed with status ${response.status}`);
+      if (!retryableProviderStatus(response.status)) {
+        lastError.nonRetryable = true;
+        throw lastError;
+      }
+      if (attempt === attempts) throw lastError;
+      await sleep(localProviderRetryDelayMs(response, attempt));
+    } catch (error) {
+      lastError = error;
+      if (error?.nonRetryable === true) throw error;
+      if (attempt === attempts) throw error;
+      await sleep(localProviderRetryDelayMs(null, attempt));
+    } finally {
+      clearTimeout(timeout);
     }
-    return response.json();
-  } finally {
-    clearTimeout(timeout);
   }
+  throw lastError ?? new Error("local Apple rerank request failed");
 }
 
 async function openAiCompatibleQueryExpansion(plan, request) {
@@ -1651,19 +1703,74 @@ function geminiText(response) {
 function rewritesFromQueryExpansionText(text) {
   const trimmed = String(text ?? "").trim();
   if (!trimmed) return [];
-  const withoutFence = trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
-  try {
-    const parsed = JSON.parse(withoutFence);
-    if (Array.isArray(parsed)) return parsed.map((item) => String(item ?? ""));
-    if (Array.isArray(parsed?.queries)) return parsed.queries.map((item) => String(item ?? ""));
-    if (Array.isArray(parsed?.rewrites)) return parsed.rewrites.map((item) => String(item ?? ""));
-  } catch {
-    // Providers sometimes return plain lines even after JSON instruction.
+  const withoutFence = stripQueryExpansionFence(trimmed);
+  const parsed = rewritesFromQueryExpansionJson(withoutFence);
+  if (parsed.length > 0) return parsed;
+
+  const rewrites = [];
+  for (const rawLine of withoutFence.split(/\r?\n|;/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const lineParsed = firstQueryExpansionJsonParse([
+      line,
+      stripQueryExpansionLine(line),
+      stripQueryExpansionTrailingComma(line),
+    ]);
+    if (lineParsed.length > 0) {
+      rewrites.push(...lineParsed);
+      continue;
+    }
+    const fallback = stripQueryExpansionLine(line);
+    if (fallback) rewrites.push(fallback);
   }
-  return withoutFence
-    .split(/\r?\n|;/)
-    .map((line) => line.replace(/^[-*\d.)\s"]+/, "").replace(/["\s]+$/g, ""))
-    .filter(Boolean);
+  return rewrites;
+}
+
+function firstQueryExpansionJsonParse(candidates) {
+  for (const candidate of candidates) {
+    const parsed = rewritesFromQueryExpansionJson(candidate);
+    if (parsed.length > 0) return parsed;
+  }
+  return [];
+}
+
+function rewritesFromQueryExpansionJson(text) {
+  try {
+    return coerceQueryExpansionRewrites(JSON.parse(text));
+  } catch {
+    return [];
+  }
+}
+
+function coerceQueryExpansionRewrites(value) {
+  if (Array.isArray(value)) return value.flatMap((item) => coerceQueryExpansionRewrites(item));
+  if (typeof value === "string") return [value];
+  if (!value || typeof value !== "object") return [];
+  for (const key of ["queries", "rewrites", "alternatives", "expandedQueries", "expanded_queries"]) {
+    if (Array.isArray(value[key])) return value[key].flatMap((item) => coerceQueryExpansionRewrites(item));
+  }
+  for (const key of ["query", "rewrite", "text"]) {
+    if (typeof value[key] === "string") return [value[key]];
+  }
+  return [];
+}
+
+function stripQueryExpansionFence(text) {
+  const trimmed = String(text ?? "").trim();
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  if (fenced) return fenced[1].trim();
+  return trimmed;
+}
+
+function stripQueryExpansionLine(line) {
+  return stripQueryExpansionTrailingComma(line)
+    .replace(/^[-*\d.)\s"]+/, "")
+    .replace(/["\s]+$/g, "")
+    .trim();
+}
+
+function stripQueryExpansionTrailingComma(line) {
+  return String(line ?? "").trim().replace(/,\s*$/, "");
 }
 
 function sanitizeQueryExpansionRewrites(rewrites, options = {}) {
@@ -1682,6 +1789,52 @@ function sanitizeQueryExpansionRewrites(rewrites, options = {}) {
     if (sanitized.length >= maxRewrites) break;
   }
   return sanitized;
+}
+
+function runQueryExpansionParserSmoke() {
+  const cases = [
+    {
+      name: "single-json-array",
+      text: `["first rewrite","second rewrite"]`,
+      expected: ["first rewrite", "second rewrite"],
+    },
+    {
+      name: "object-rewrites",
+      text: `{"rewrites":["object rewrite"]}`,
+      expected: ["object rewrite"],
+    },
+    {
+      name: "fenced-json",
+      text: "```json\n{\"queries\":[\"fenced rewrite\"]}\n```",
+      expected: ["fenced rewrite"],
+    },
+    {
+      name: "json-array-per-line",
+      text: "[\"Who approved launch after May 2026 canary\"]\n[\"approval launch post May 2026 canary\"]\n[\"who authorized launch May 2026 canary\"]",
+      expected: [
+        "Who approved launch after May 2026 canary",
+        "approval launch post May 2026 canary",
+        "who authorized launch May 2026 canary",
+      ],
+    },
+    {
+      name: "plain-lines",
+      text: "1. first plain rewrite\n- second plain rewrite; third plain rewrite",
+      expected: ["first plain rewrite", "second plain rewrite", "third plain rewrite"],
+    },
+  ];
+  for (const fixture of cases) {
+    assert.deepEqual(rewritesFromQueryExpansionText(fixture.text), fixture.expected, fixture.name);
+  }
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "query-expansion-parser-smoke",
+      cases: cases.length,
+      acceptsJsonArrayPerLine: true,
+      acceptsPlainLines: true,
+    })}\n`,
+  );
 }
 
 function voyageEmbedModel() {
@@ -1868,6 +2021,19 @@ function queryExpansionMaxRewrites() {
   return optionalPositiveInt(process.env.SELFMEM_QUERY_EXPANSION_MAX_REWRITES ?? null, "query expansion max rewrites") ?? 3;
 }
 
+function queryExpansionMaxAttempts() {
+  return optionalPositiveInt(process.env.SELFMEM_QUERY_EXPANSION_MAX_ATTEMPTS ?? null, "query expansion max attempts") ?? 3;
+}
+
+function queryExpansionRetryInstruction(baseInstruction, attempt, maxRewrites) {
+  return [
+    baseInstruction,
+    `Retry ${attempt}: the previous response produced no distinct usable rewrites.`,
+    `Return a JSON array with 1 to ${maxRewrites} short search queries.`,
+    "Do not return the original query verbatim. Do not return an empty array. Do not include explanations.",
+  ].join(" ");
+}
+
 function queryExpansionMaxChars() {
   return optionalPositiveInt(process.env.SELFMEM_QUERY_EXPANSION_MAX_CHARS ?? null, "query expansion max chars") ?? 1200;
 }
@@ -1892,17 +2058,20 @@ function localAppleStrategyConfig(strategy = rankingStrategy) {
     "local-apple-qwen3-0_6b": {
       model: "Qwen/Qwen3-Embedding-0.6B-GGUF",
       dimensions: 1024,
+      denseCandidateLimit: 120,
     },
     "local-apple-qwen3-0_6b-local-rerank": {
       model: "Qwen/Qwen3-Embedding-0.6B-GGUF",
       dimensions: 1024,
       rerankMode: "sidecar",
       rerankModel: "Qwen/Qwen3-Reranker-0.6B",
-      rerankCandidateLimit: 30,
+      denseCandidateLimit: 120,
+      rerankCandidateLimit: 12,
     },
     "local-apple-qwen3-4b": {
       model: "Qwen/Qwen3-Embedding-4B-GGUF",
       dimensions: 2560,
+      denseCandidateLimit: 120,
     },
   };
   return configs[strategy] ?? null;

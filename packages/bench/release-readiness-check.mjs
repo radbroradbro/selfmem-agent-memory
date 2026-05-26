@@ -719,6 +719,16 @@ check("selfmem_update command is mapped", () => {
   }
 });
 
+check("query expansion response parser accepts local model rewrites", () => {
+  const smoke = run("node", ["packages/bench/recallweave-response-export.mjs", "--query-expansion-parser-smoke"]);
+  const report = JSON.parse(smoke.stdout);
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "query-expansion-parser-smoke");
+  assert.equal(report.acceptsJsonArrayPerLine, true);
+  assert.equal(report.acceptsPlainLines, true);
+  assert.ok(report.cases >= 5);
+});
+
 check("dom evidence is sane", () => {
   const vaultEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-vault-preview-dom-evidence.json"), "utf8"),

@@ -36,6 +36,7 @@ const maxMemoryBytes = optionalPositiveInt(args.maxMemoryBytes ?? process.env.RE
 const privateOutputDir = resolveOptionalPath(args.privateOutputDir ?? process.env.RECALLWEAVE_SOTA_RESPONSE_ARM_DIR ?? null);
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_SOTA_ANSWER_QUALITY_STRATEGIES ?? defaultStrategies().join(","));
 const requireReady = Boolean(args.requireReady);
+const reuseExisting = Boolean(args.reuseExisting ?? process.env.RECALLWEAVE_RESPONSE_ARM_REUSE_EXISTING === "1");
 
 const retrievalStrategies = new Set([
   "jaccard",
@@ -119,6 +120,7 @@ const report = {
   fixtureOnly: fixtureRequested,
   executesExports: executeRequested,
   writesPrivateResponseFiles: exported,
+  reusesExistingPrivateResponseFiles: reuseExisting,
   writesRealFiles: Boolean(outputPath || markdownOutputPath),
   metricsOnly: true,
   publicSafe: true,
@@ -216,6 +218,8 @@ function inspectPrivateOutputDir() {
 function exportResponseArms(directory) {
   return strategies.map((strategy) => {
     const responsePath = join(directory, `${strategy}-responses.private.json`);
+    const existing = reuseExisting ? responseArmRowFromFile(responsePath, strategy, { reusedExisting: true }) : null;
+    if (existing) return existing;
     const nodeArgs = [
       "packages/bench/recallweave-response-export.mjs",
       ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", querySetPath, "--memories", memoriesPath, "--preserve-ids"]),
@@ -239,30 +243,45 @@ function exportResponseArms(directory) {
     });
     assert.equal(result.status, 0, `response export failed for ${strategy}: ${safeError(result.stderr || result.stdout)}`);
     assert.ok(existsSync(responsePath), `${strategy} response export missing`);
-    const raw = readFileSync(responsePath, "utf8");
-    assertResponseExportSafe(raw, strategy);
-    const parsed = JSON.parse(raw);
-    const provider = parsed.source?.provider ?? {};
-    return {
-      strategy,
-      exported: true,
-      pathLabel: "external-private-response-file",
-      name: basename(responsePath),
-      hash: `sha256:${sha256(raw)}`,
-      querySetHash: parsed.querySetHash ?? null,
-      responseCount: parsed.responses && typeof parsed.responses === "object" ? Object.keys(parsed.responses).length : 0,
-      fixtureOnly: Boolean(parsed.fixtureOnly),
-      providerStrategy: Boolean(provider.providerStrategy),
-      providerCallsMade: Number(provider.providerCallsMade ?? 0),
-      providerMockCalls: Number(provider.providerMockCalls ?? 0),
-      queryExpansionCalls: Number(provider.queryExpansionCalls ?? 0),
-      queryExpansionFallbacks: Number(provider.queryExpansionFallbacks ?? 0),
-      localEmbeddingCacheEnabled: Boolean(provider.localEmbeddingCacheEnabled),
-      queryShard: parsed.queryShard ?? null,
-      privacyLeakCount: Number(parsed.privacyLeakCount ?? 0),
-      redactionFailureCount: Number(parsed.redactionFailureCount ?? 0),
-    };
+    return responseArmRowFromFile(responsePath, strategy, { reusedExisting: false });
   });
+}
+
+function responseArmRowFromFile(responsePath, strategy, options = {}) {
+  if (!existsSync(responsePath) || statSync(responsePath).size === 0) return null;
+  const raw = readFileSync(responsePath, "utf8");
+  assertResponseExportSafe(raw, strategy);
+  const parsed = JSON.parse(raw);
+  const provider = parsed.source?.provider ?? {};
+  assert.equal(
+    parsed.source?.rankingStrategy ?? provider.strategy,
+    strategy,
+    `${strategy} response export strategy mismatch`,
+  );
+  assert.equal(Number(parsed.queryShard?.startIndex ?? 0), queryOffset, `${strategy} response export query offset mismatch`);
+  if (maxQueries != null) {
+    assert.equal(Number(parsed.queryShard?.requestedLimit ?? parsed.queryShard?.responseCount ?? 0), maxQueries, `${strategy} response export query limit mismatch`);
+  }
+  return {
+    strategy,
+    exported: true,
+    reusedExisting: Boolean(options.reusedExisting),
+    pathLabel: "external-private-response-file",
+    name: basename(responsePath),
+    hash: `sha256:${sha256(raw)}`,
+    querySetHash: parsed.querySetHash ?? null,
+    responseCount: parsed.responses && typeof parsed.responses === "object" ? Object.keys(parsed.responses).length : 0,
+    fixtureOnly: Boolean(parsed.fixtureOnly),
+    providerStrategy: Boolean(provider.providerStrategy),
+    providerCallsMade: Number(provider.providerCallsMade ?? 0),
+    providerMockCalls: Number(provider.providerMockCalls ?? 0),
+    queryExpansionCalls: Number(provider.queryExpansionCalls ?? 0),
+    queryExpansionFallbacks: Number(provider.queryExpansionFallbacks ?? 0),
+    localEmbeddingCacheEnabled: Boolean(provider.localEmbeddingCacheEnabled),
+    queryShard: parsed.queryShard ?? null,
+    privacyLeakCount: Number(parsed.privacyLeakCount ?? 0),
+    redactionFailureCount: Number(parsed.redactionFailureCount ?? 0),
+  };
 }
 
 function plannedRows() {

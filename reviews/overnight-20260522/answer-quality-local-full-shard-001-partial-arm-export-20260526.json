@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "mode": "answer-quality-local-full-shard-partial-arm-export",
+  "status": "PARTIAL_LOCAL_FULL_SHARD_EXPORT",
+  "claimScope": "local-full",
+  "fixtureOnly": false,
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "rawSourcesRetainedPrivate": true,
+  "countsAsFullMemorySotaEvidence": false,
+  "countsAsAcceptedLocalFullShard": false,
+  "queryShard": {
+    "shard": "shard-001",
+    "queryOffset": 0,
+    "maxQueries": 25
+  },
+  "completedArms": [
+    {
+      "strategy": "bm25-lite",
+      "responseCount": 25,
+      "queryExpansionCalls": 0,
+      "providerCallsMade": 0,
+      "embeddingCalls": 0,
+      "rerankCalls": 0
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 25,
+      "queryExpansionCalls": 0,
+      "providerCallsMade": 0,
+      "embeddingCalls": 0,
+      "rerankCalls": 0
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "responseCount": 25,
+      "queryExpansionCalls": 25,
+      "providerCallsMade": 25,
+      "embeddingCalls": 0,
+      "rerankCalls": 0
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "responseCount": 25,
+      "queryExpansionCalls": 0,
+      "providerCallsMade": 2420,
+      "embeddingCalls": 2420,
+      "rerankCalls": 0,
+      "localEmbeddingCacheWrites": 2395,
+      "localEmbeddingCacheHits": 605
+    }
+  ],
+  "blockedArms": [
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "status": "BLOCKED_RUNTIME_SLOW_DIAGNOSTIC_SIDECAR",
+      "reason": "The current local rerank adapter uses a local chat model as a scoring sidecar. It did not complete the 25-query shard within an interactive run window, even after candidate and output caps were reduced.",
+      "countsAsAcceptedShardEvidence": false
+    }
+  ],
+  "harnessChangesExercised": [
+    "query expansion parser accepts newline-delimited JSON arrays from local models",
+    "query expansion retries remain model-backed and fail closed when no usable rewrites are returned",
+    "response-arm export can reuse existing private response files after an interrupted run"
+  ],
+  "nextActions": [
+    "Replace the chat-model rerank diagnostic sidecar with a true local reranker endpoint or run the rerank arm as a separately budgeted slow diagnostic.",
+    "Run answer-quality preflight only after all five private arm files exist for the same shard.",
+    "Do not report SOTA or accepted local-full shard performance from this partial packet."
+  ]
+}
