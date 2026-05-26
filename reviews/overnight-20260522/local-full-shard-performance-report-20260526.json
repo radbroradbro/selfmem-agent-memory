@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-full-shard-performance-report",
+  "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
+  "generatedAt": "2026-05-26T13:55:26.320Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "callsLocalEndpoint": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsPrivatePaths": false,
+  "printsEnvValues": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForShardCombine": false,
+  "readyForEndToEndMemoryScoreGate": false,
+  "performanceSnapshotMature": false,
+  "plan": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "hash": "sha256:33ab66f5e802ff3490b22b01d531a2abc75695e785ee7fdd4a510782c6a3575a",
+    "claimScope": "local-full",
+    "queryCount": 500,
+    "shardCount": 20,
+    "shardSize": 25,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ]
+  },
+  "intake": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json",
+    "hash": "sha256:d0ed2a8e3cf5a249f2465d74a20d7da1cde3df290b0b21c0328c4254cf748372",
+    "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS",
+    "acceptedShardCount": 1,
+    "missingShardCount": 19,
+    "rejectedShardCount": 0,
+    "completeCoverage": false
+  },
+  "coverage": {
+    "acceptedShardCount": 1,
+    "missingShardCount": 19,
+    "shardCount": 20,
+    "acceptedQueryCount": 25,
+    "queryCount": 500,
+    "coveragePercent": 5,
+    "completeCoverage": false,
+    "nextPendingShardId": "shard-002",
+    "nextPendingShardRange": "25-50"
+  },
+  "acceptedShardInputs": [
+    {
+      "fileName": "answer-quality-local-full-shard-001-20260526.json",
+      "hash": "sha256:6c329ec7c00cc2bff4ad467ff52f39d451bc9aaaf3f822e9ef665e7e13246af1",
+      "expectedHash": "sha256:6c329ec7c00cc2bff4ad467ff52f39d451bc9aaaf3f822e9ef665e7e13246af1",
+      "hashMatches": true,
+      "present": true,
+      "startIndex": 0,
+      "endIndexExclusive": 25,
+      "scoredQueryCount": 25
+    }
+  ],
+  "strategySummaries": [
+    {
+      "strategy": "full-hybrid-rerank",
+      "shardCount": 1,
+      "scoredQueryCount": 25,
+      "answerQuality": 19.4,
+      "quality": 0.194,
+      "judgeCorrectRate": 0.2,
+      "answerLatencyP50Ms": 8954,
+      "answerLatencyP95Ms": 10677,
+      "contextTokensAvg": 3371
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "shardCount": 1,
+      "scoredQueryCount": 25,
+      "answerQuality": 17.4,
+      "quality": 0.174,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 9064,
+      "answerLatencyP95Ms": 10675,
+      "contextTokensAvg": 3258
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "shardCount": 1,
+      "scoredQueryCount": 25,
+      "answerQuality": 15.8,
+      "quality": 0.158,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 9199,
+      "answerLatencyP95Ms": 13968,
+      "contextTokensAvg": 3333
+    },
+    {
+      "strategy": "bm25-lite",
+      "shardCount": 1,
+      "scoredQueryCount": 25,
+      "answerQuality": 15.2,
+      "quality": 0.152,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 8353,
+      "answerLatencyP95Ms": 10552,
+      "contextTokensAvg": 3501
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "shardCount": 1,
+      "scoredQueryCount": 25,
+      "answerQuality": 12,
+      "quality": 0.12,
+      "judgeCorrectRate": 0.12,
+      "answerLatencyP50Ms": 9360,
+      "answerLatencyP95Ms": 10436,
+      "contextTokensAvg": 3465
+    }
+  ],
+  "bestAnswerQuality": {
+    "strategy": "full-hybrid-rerank",
+    "shardCount": 1,
+    "scoredQueryCount": 25,
+    "answerQuality": 19.4,
+    "quality": 0.194,
+    "judgeCorrectRate": 0.2,
+    "answerLatencyP50Ms": 8954,
+    "answerLatencyP95Ms": 10677,
+    "contextTokensAvg": 3371,
+    "deltaVsBm25": {
+      "answerQuality": 4.2,
+      "quality": 0.042,
+      "judgeCorrectRate": 0.04,
+      "answerLatencyP50Ms": 601,
+      "answerLatencyP95Ms": 125,
+      "contextTokensAvg": -130
+    }
+  },
+  "lowestLatency": {
+    "strategy": "bm25-lite",
+    "shardCount": 1,
+    "scoredQueryCount": 25,
+    "answerQuality": 15.2,
+    "quality": 0.152,
+    "judgeCorrectRate": 0.16,
+    "answerLatencyP50Ms": 8353,
+    "answerLatencyP95Ms": 10552,
+    "contextTokensAvg": 3501,
+    "deltaVsBm25": {
+      "answerQuality": 0,
+      "quality": 0,
+      "judgeCorrectRate": 0,
+      "answerLatencyP50Ms": 0,
+      "answerLatencyP95Ms": 0,
+      "contextTokensAvg": 0
+    }
+  },
+  "localApple": {
+    "base": {
+      "strategy": "local-apple-qwen3-0_6b",
+      "shardCount": 1,
+      "scoredQueryCount": 25,
+      "answerQuality": 17.4,
+      "quality": 0.174,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 9064,
+      "answerLatencyP95Ms": 10675,
+      "contextTokensAvg": 3258,
+      "deltaVsBm25": {
+        "answerQuality": 2.2,
+        "quality": 0.022,
+        "judgeCorrectRate": 0,
+        "answerLatencyP50Ms": 711,
+        "answerLatencyP95Ms": 123,
+        "contextTokensAvg": -243
+      }
+    },
+    "rerank": {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "shardCount": 1,
+      "scoredQueryCount": 25,
+      "answerQuality": 15.8,
+      "quality": 0.158,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 9199,
+      "answerLatencyP95Ms": 13968,
+      "contextTokensAvg": 3333,
+      "deltaVsBm25": {
+        "answerQuality": 0.6,
+        "quality": 0.006,
+        "judgeCorrectRate": 0,
+        "answerLatencyP50Ms": 846,
+        "answerLatencyP95Ms": 3416,
+        "contextTokensAvg": -168
+      }
+    },
+    "rerankDeltaVsBase": {
+      "answerQuality": -1.6,
+      "quality": -0.016,
+      "judgeCorrectRate": 0,
+      "answerLatencyP50Ms": 135,
+      "answerLatencyP95Ms": 3293,
+      "contextTokensAvg": 75
+    }
+  },
+  "runtime": {
+    "runtimeBlockerPresent": true,
+    "runtimeBlockedShardCount": 1,
+    "runtimeBlockerStatus": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+    "runtimeBlockedShardId": "shard-002",
+    "runtimeBlockedRange": "25-50",
+    "failedArm": "local-apple-qwen3-0_6b",
+    "failureClass": "local-embedding-server-socket-close",
+    "completedArmCount": 3,
+    "missingArmCount": 2,
+    "missingStrategies": [
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "resumeResultDoctorPresent": true,
+    "resumeResultDoctorStatus": "BLOCKED_LOCAL_FULL_SHARD_002_RESULT",
+    "resumeReadyForLocalShardIntake": false,
+    "resumeBlockers": [
+      "resume-command-materializer-not-ready",
+      "resume-private-command-file-not-written",
+      "shard-002-result-missing"
+    ]
+  },
+  "blockers": [
+    "local-full-coverage-incomplete",
+    "local-full-runtime-blocker-present"
+  ],
+  "nextActions": [
+    "Finish the shard-002 local-full resume path before treating the next 25-query slice as accepted.",
+    "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
+    "Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage."
+  ]
+}

@@ -401,6 +401,15 @@ operator runs the private script, this doctor validates the shard 002 public
 answer-quality result against the local-full plan, confirms shard 001 is still
 accepted, and prints the local shard-intake command without exposing raw
 sources, private paths, endpoint values, or materialized commands.
+`benchmark:answer-quality:local-shard-performance` summarizes accepted
+local-full shard performance without changing claim status. Its checked-in
+report at
+`reviews/overnight-20260522/local-full-shard-performance-report-20260526.json`
+currently covers one accepted shard, 25 of 500 queries, and keeps
+`countsAsLocalFullBenchmarkEvidence`, full-memory SOTA evidence, shard combine,
+and public benchmark claims disabled. It records that `full-hybrid-rerank`
+currently leads the partial local-full snapshot at `19.4` answer quality, while
+shard 002 remains blocked by the local embedding runtime resume path.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

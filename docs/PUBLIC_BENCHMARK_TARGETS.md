@@ -586,6 +586,14 @@ not count as a RecallWeave score.
   against the local-full plan and points to local shard intake while keeping raw
   source text, private paths, endpoint values, and materialized commands out of
   public evidence.
+- Local-full shard performance report:
+  `reviews/overnight-20260522/local-full-shard-performance-report-20260526.json`
+  is a public-safe progress and performance snapshot over accepted local-full
+  shards. It currently reports one accepted shard, 25 of 500 queries, 5 percent
+  coverage, `full-hybrid-rerank` as the partial answer-quality leader, and the
+  shard 002 runtime blocker/resume-result-doctor state. It does not count as a
+  local-full benchmark result, full-memory SOTA evidence, shard-combine
+  readiness, or public benchmark claim.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

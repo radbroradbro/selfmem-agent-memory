@@ -133,6 +133,7 @@ const requiredFiles = [
   "packages/bench/local-full-shard-resume-env-doctor.mjs",
   "packages/bench/local-full-shard-resume-command-materializer.mjs",
   "packages/bench/local-full-shard-resume-result-doctor.mjs",
+  "packages/bench/local-full-shard-performance-report.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
@@ -209,6 +210,8 @@ const requiredFiles = [
   `${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.md`,
   `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
   `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.md`,
+  `${reviewDir}/local-full-shard-performance-report-20260526.json`,
+  `${reviewDir}/local-full-shard-performance-report-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
@@ -615,6 +618,7 @@ const requiredScripts = [
   "benchmark:answer-quality:local-shard-resume-env",
   "benchmark:answer-quality:local-shard-resume-command",
   "benchmark:answer-quality:local-shard-resume-result",
+  "benchmark:answer-quality:local-shard-performance",
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:local-shard-intake",
   "benchmark:answer-quality:private-input-doctor",
@@ -2013,6 +2017,20 @@ check("fresh public benchmark target check passes", () => {
   const localFullShardResumeResultDoctorFixture = JSON.parse(
     run("node", ["packages/bench/local-full-shard-resume-result-doctor.mjs", "--fixture"]).stdout,
   );
+  const localFullShardPerformanceReport = JSON.parse(
+    readFileSync(join(root, reviewDir, "local-full-shard-performance-report-20260526.json"), "utf8"),
+  );
+  const localFullShardPerformanceReportEvidence = readFileSync(
+    join(root, reviewDir, "local-full-shard-performance-report-20260526.md"),
+    "utf8",
+  );
+  const localFullShardPerformanceReportFresh = JSON.parse(
+    run("node", ["packages/bench/local-full-shard-performance-report.mjs"]).stdout,
+  );
+  const localFullShardPerformanceReportMarkdownFresh = run(
+    "node",
+    ["packages/bench/local-full-shard-performance-report.mjs", "--format", "markdown"],
+  ).stdout;
   const localFullShardIntakeFresh = JSON.parse(
     run("node", [
       "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
@@ -4161,6 +4179,62 @@ check("fresh public benchmark target check passes", () => {
     JSON.stringify(localFullShardResumeResultDoctorFixture),
     localFullShardResumeResultDoctorEvidence,
     localFullShardResumeResultDoctorMarkdownFresh,
+  ]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+  for (const performanceReport of [
+    localFullShardPerformanceReport,
+    localFullShardPerformanceReportFresh,
+  ]) {
+    assert.equal(performanceReport.mode, "local-full-shard-performance-report");
+    assert.equal(performanceReport.status, "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT");
+    assert.equal(performanceReport.metricsOnly, true);
+    assert.equal(performanceReport.publicSafe, true);
+    assert.equal(performanceReport.callsProviderApis, false);
+    assert.equal(performanceReport.callsHostedSupermemory, false);
+    assert.equal(performanceReport.callsLocalEndpoint, false);
+    assert.equal(performanceReport.rawQuestionIdsIncluded, false);
+    assert.equal(performanceReport.rawQuestionsIncluded, false);
+    assert.equal(performanceReport.rawAnswersIncluded, false);
+    assert.equal(performanceReport.rawMemoryIncluded, false);
+    assert.equal(performanceReport.rawPrivateOutputPathIncluded, false);
+    assert.equal(performanceReport.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(performanceReport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(performanceReport.publicBenchmarkClaimsAllowed, false);
+    assert.equal(performanceReport.readyForShardCombine, false);
+    assert.equal(performanceReport.readyForEndToEndMemoryScoreGate, false);
+    assert.equal(performanceReport.performanceSnapshotMature, false);
+    assert.equal(performanceReport.coverage?.acceptedShardCount, 1);
+    assert.equal(performanceReport.coverage?.missingShardCount, 19);
+    assert.equal(performanceReport.coverage?.acceptedQueryCount, 25);
+    assert.equal(performanceReport.coverage?.queryCount, 500);
+    assert.equal(performanceReport.coverage?.coveragePercent, 5);
+    assert.equal(performanceReport.coverage?.nextPendingShardId, "shard-002");
+    assert.equal(performanceReport.bestAnswerQuality?.strategy, "full-hybrid-rerank");
+    assert.equal(performanceReport.bestAnswerQuality?.answerQuality, 19.4);
+    assert.equal(performanceReport.bestAnswerQuality?.deltaVsBm25?.answerQuality, 4.2);
+    assert.equal(performanceReport.lowestLatency?.strategy, "bm25-lite");
+    assert.equal(performanceReport.localApple?.base?.answerQuality, 17.4);
+    assert.equal(performanceReport.localApple?.rerank?.answerQuality, 15.8);
+    assert.equal(performanceReport.localApple?.rerankDeltaVsBase?.answerQuality, -1.6);
+    assert.equal(performanceReport.runtime?.runtimeBlockerStatus, "BLOCKED_LOCAL_FULL_SHARD_RUNTIME");
+    assert.equal(performanceReport.runtime?.failedArm, "local-apple-qwen3-0_6b");
+    assert.equal(performanceReport.runtime?.resumeResultDoctorStatus, "BLOCKED_LOCAL_FULL_SHARD_002_RESULT");
+    assert.ok(performanceReport.blockers?.includes("local-full-coverage-incomplete"));
+    assert.ok(performanceReport.blockers?.includes("local-full-runtime-blocker-present"));
+  }
+  assert.equal(localFullShardPerformanceReport.writesRealFiles, true);
+  assert.equal(localFullShardPerformanceReportFresh.writesRealFiles, false);
+  assert.match(localFullShardPerformanceReportEvidence, /Local-Full Shard Performance Report/);
+  assert.match(localFullShardPerformanceReportEvidence, /Coverage: 5%/);
+  assert.match(localFullShardPerformanceReportEvidence, /Strategy: full-hybrid-rerank/);
+  assert.match(localFullShardPerformanceReportMarkdownFresh, /Runtime blocker status: BLOCKED_LOCAL_FULL_SHARD_RUNTIME/);
+  for (const text of [
+    JSON.stringify(localFullShardPerformanceReport),
+    JSON.stringify(localFullShardPerformanceReportFresh),
+    localFullShardPerformanceReportEvidence,
+    localFullShardPerformanceReportMarkdownFresh,
   ]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);

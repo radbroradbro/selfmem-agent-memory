@@ -374,6 +374,15 @@ The follow-up intake,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
 accepts shard 001 and keeps the lane blocked on nineteen missing shards. Do not
 use this as launch, production, or SOTA support.
+The local-full performance report,
+`reviews/overnight-20260522/local-full-shard-performance-report-20260526.json`,
+turns that accepted-shard trail into a compact metrics-only progress snapshot.
+It currently covers one shard, 25 of 500 queries, and 5 percent coverage;
+`full-hybrid-rerank` leads the partial local-full snapshot at `19.4` answer
+quality, and the local Apple rerank arm is behind the local Apple base on this
+slice. The report keeps local-full benchmark evidence, full-memory SOTA
+evidence, combine readiness, and public benchmark claims disabled until the
+local-full shard intake reaches complete coverage.
 Shard 002 is currently a blocked runtime attempt, not an accepted shard:
 `reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`.
 The BM25, full-hybrid, and local query-expanded arms exported 25 private
