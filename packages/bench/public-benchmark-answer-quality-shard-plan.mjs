@@ -63,6 +63,7 @@ const contextTokenBudget = positiveInt(args.contextTokenBudget ?? materialize.ta
 const limit = positiveInt(args.limit ?? materialize.target?.limit ?? target.benchmark?.limit ?? 5, "limit");
 const shards = buildShards(queryCount, shardSize, { targetHash });
 const coverage = strategyCoverage(strategies);
+const executionLanes = buildExecutionLanes(strategies);
 const privateOutputRoles = new Map((materialize.privateOutputs?.files ?? []).map((file) => [file.role, file]));
 const checks = {
   targetIsLongMemEvalRunOnly: target.fixtureOnly === false && target.benchmark?.family === "longmemeval" && target.claimTier === "run-only",
@@ -164,6 +165,7 @@ const report = {
     resultGateCommand: resultGateCommand(),
     reviewerIntakeCommand: reviewerIntakeCommand(),
   },
+  executionLanes,
   shards,
   checks,
   blockers,
@@ -221,6 +223,113 @@ function strategyCoverage(items) {
     hasLocalRerank: items.some((item) => item.endsWith("-local-rerank")),
     strategyCount: items.length,
   };
+}
+
+function buildExecutionLanes(items) {
+  const laneDefinitions = [
+    {
+      id: "deterministic-control-proxy",
+      label: "Deterministic control/proxy lane",
+      strategies: ["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"],
+      operatorUse: "Run-path and shard-integrity proof only. This does not score local or provider model quality.",
+      acceptedByFullShardIntake: false,
+      canReachFullSotaGateAfterShardIntake: false,
+      queryExpansionPolicy: "Deterministic fallback only; does not count as large-model query-expansion evidence.",
+    },
+    {
+      id: "local-apple-no-spend",
+      label: "Local Apple no-spend lane",
+      strategies: [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank",
+      ],
+      operatorUse: "Use first when validating the no-spend local method before cloud challenger spend.",
+      acceptedByFullShardIntake: false,
+      canReachFullSotaGateAfterShardIntake: false,
+      queryExpansionPolicy: "Local or deterministic query expansion must be reported separately from cloud expansion.",
+    },
+    {
+      id: "voyage-minimum-challenger",
+      label: "Voyage minimum challenger lane",
+      strategies: ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage-lite-rerank"],
+      operatorUse: "Use when Voyage quota is available to unblock the same-data Voyage answer-quality comparison.",
+      acceptedByFullShardIntake: false,
+      canReachFullSotaGateAfterShardIntake: false,
+      queryExpansionPolicy: "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+    },
+    {
+      id: "nvidia-minimum-challenger",
+      label: "NVIDIA minimum challenger lane",
+      strategies: ["bm25-lite", "full-hybrid-rerank", "cloud-nvidia-nemotron-1b"],
+      operatorUse: "Use for an NVIDIA challenger comparison without spending Voyage quota.",
+      acceptedByFullShardIntake: false,
+      canReachFullSotaGateAfterShardIntake: false,
+      queryExpansionPolicy: "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+    },
+    {
+      id: "full-sota-accepted-shards",
+      label: "Full SOTA shard-intake lane",
+      strategies: items,
+      operatorUse: "Only this lane has the complete strategy set expected by shard intake and combine.",
+      acceptedByFullShardIntake: true,
+      canReachFullSotaGateAfterShardIntake: true,
+      queryExpansionPolicy: "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
+    },
+  ];
+
+  return laneDefinitions.map((lane) => {
+    const missingStrategies = lane.strategies.filter((strategy) => !items.includes(strategy));
+    return {
+      id: lane.id,
+      label: lane.label,
+      operatorUse: lane.operatorUse,
+      strategies: lane.strategies,
+      strategyCount: lane.strategies.length,
+      missingStrategies,
+      coverageReady: missingStrategies.length === 0,
+      providerRequirements: unique(lane.strategies.flatMap(requiredProvidersForStrategy)),
+      consentRequirements: [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+      ],
+      answerQualityEndpoint: {
+        baseUrlEnv: "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        apiKeyEnv: "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        answerModel: target.benchmark?.answerModel ?? null,
+        judgeModel: target.benchmark?.judgeModel ?? null,
+      },
+      acceptedByFullShardIntake: lane.acceptedByFullShardIntake,
+      canReachFullSotaGateAfterShardIntake: lane.canReachFullSotaGateAfterShardIntake,
+      countsAsFullMemorySotaEvidence: false,
+      publicBenchmarkClaimsAllowed: false,
+      queryExpansionPolicy: lane.queryExpansionPolicy,
+      shardIntakeCompatibility: lane.acceptedByFullShardIntake
+        ? "accepted only after every planned shard returns with this complete strategy set"
+        : "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch",
+    };
+  });
+}
+
+function requiredProvidersForStrategy(strategy) {
+  if (
+    strategy === "cloud-voyage4-voyage" ||
+    strategy === "cloud-voyage4-voyage-lite-rerank" ||
+    strategy === "cloud-voyage4-lite-voyage-lite"
+  ) return ["voyage"];
+  if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini2-embed-rerank-proxy") return ["gemini"];
+  if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-gemini2-voyage-rerank") return ["gemini", "voyage"];
+  if (strategy.startsWith("cloud-nvidia-")) return ["nvidia"];
+  if (strategy === "local-apple-qwen3-0_6b" || strategy === "local-apple-qwen3-4b") return ["local-apple"];
+  if (strategy === "local-apple-qwen3-0_6b-local-rerank") return ["local-apple", "local-rerank"];
+  return [];
+}
+
+function unique(items) {
+  return [...new Set(items)].sort();
 }
 
 function materializeCommand() {
@@ -365,6 +474,13 @@ function renderMarkdown(value) {
     `- NVIDIA or Gemini provider: ${value.strategyCoverage.hasNvidiaOrGeminiProvider}`,
     `- Local Apple: ${value.strategyCoverage.hasLocalApple}`,
     `- Local rerank: ${value.strategyCoverage.hasLocalRerank}`,
+    "",
+    "## Execution Lanes",
+    ...value.executionLanes.flatMap((lane) => [
+      `- ${lane.id}: ${lane.coverageReady ? "ready" : "missing"}; intake-compatible=${lane.acceptedByFullShardIntake}; providers=${lane.providerRequirements.join(", ") || "none"}`,
+      `  - ${lane.operatorUse}`,
+      `  - ${lane.shardIntakeCompatibility}`,
+    ]),
     "",
     "## Shards",
     ...value.shards.map((shard) => `- ${shard.id}: ${shard.startIndex}-${shard.endIndexExclusive} (${shard.queryCount})`),

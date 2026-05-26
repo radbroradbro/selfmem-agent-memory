@@ -20,6 +20,23 @@
 - Local Apple: true
 - Local rerank: true
 
+## Execution Lanes
+- deterministic-control-proxy: ready; intake-compatible=false; providers=none
+  - Run-path and shard-integrity proof only. This does not score local or provider model quality.
+  - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
+- local-apple-no-spend: ready; intake-compatible=false; providers=local-apple, local-rerank
+  - Use first when validating the no-spend local method before cloud challenger spend.
+  - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
+- voyage-minimum-challenger: ready; intake-compatible=false; providers=voyage
+  - Use when Voyage quota is available to unblock the same-data Voyage answer-quality comparison.
+  - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
+- nvidia-minimum-challenger: ready; intake-compatible=false; providers=nvidia
+  - Use for an NVIDIA challenger comparison without spending Voyage quota.
+  - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
+- full-sota-accepted-shards: ready; intake-compatible=true; providers=local-apple, local-rerank, nvidia, voyage
+  - Only this lane has the complete strategy set expected by shard intake and combine.
+  - accepted only after every planned shard returns with this complete strategy set
+
 ## Shards
 - shard-001: 0-25 (25)
 - shard-002: 25-50 (25)

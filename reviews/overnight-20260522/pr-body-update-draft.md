@@ -365,6 +365,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   preflight rejects private response-arm files that do not cover the selected
   `--query-offset` / `--max-queries` range before any answer-quality scoring can
   count.
+- Adds explicit full-shard execution lanes to the answer-quality shard plan and
+  workorder: deterministic control/proxy, local Apple no-spend, Voyage minimum
+  challenger, NVIDIA minimum challenger, and the only intake-compatible
+  `full-sota-accepted-shards` lane. This keeps local/provider diagnostic runs
+  useful without letting them masquerade as the full accepted SOTA shard set.
 - Narrows release-check stale temp cleanup so it only removes old
   `recallweave-release-check-root-*` directories. A new regression check proves
   benchmark materialization roots and pointer files like `recallweave-sota-full-*`

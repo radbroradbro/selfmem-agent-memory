@@ -429,7 +429,12 @@ Component rows in the same artifact remain model-selection evidence only.
   Voyage, NVIDIA, local Apple, and local rerank arms, and requires a
   shard-aware answer-quality preflight before scoring each chunk. The preflight
   rejects response-arm files that do not cover the selected query range. It
-  merges with `combineMode=query-shard-answer-quality-union`; that merged packet still needs
+  now separates the run into explicit execution lanes:
+  `deterministic-control-proxy`, `local-apple-no-spend`,
+  `voyage-minimum-challenger`, `nvidia-minimum-challenger`, and
+  `full-sota-accepted-shards`. Only `full-sota-accepted-shards` is accepted by
+  the full-shard intake; the other lanes are diagnostic/comparison evidence.
+  It merges with `combineMode=query-shard-answer-quality-union`; that merged packet still needs
   live execution, reviewer intake, result gate, SOTA ladder, UI evidence, docs,
   owner approval, and real production canary before any broad claim.
 - Full-shard private-input doctor:
@@ -472,6 +477,9 @@ Component rows in the same artifact remain model-selection evidence only.
   is the checked-in public-safe run tracker for the twenty shard jobs. Re-run
   `benchmark:answer-quality:shard-workorder` as shard-result JSONs return; it
   should reach shard-intake readiness before the stricter intake command runs.
+  It also mirrors the execution-lane split so local-only, provider-minimum, and
+  deterministic diagnostic outputs cannot be mistaken for the full accepted
+  shard set.
 - Full-shard return intake:
   `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`
   is the checked-in blocked state for the full answer-quality shard set. It

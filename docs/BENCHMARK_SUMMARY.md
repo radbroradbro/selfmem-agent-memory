@@ -271,6 +271,12 @@ Apple, and local rerank arms through shard export, shard-aware preflight,
 answer scoring, shard combination, result gate, and reviewer intake commands.
 The preflight now validates the selected query range against every private
 response arm before scoring, so an arm for the wrong shard cannot silently count.
+The shard plan now also names the execution lanes explicitly:
+`deterministic-control-proxy`, `local-apple-no-spend`,
+`voyage-minimum-challenger`, `nvidia-minimum-challenger`, and
+`full-sota-accepted-shards`. The first four are diagnostic/comparison lanes;
+only `full-sota-accepted-shards` has the complete strategy set accepted by the
+full-shard intake and combine path.
 This is an execution plan and harness upgrade, not a completed full-SOTA result.
 The SOTA operator packet now treats that shard plan as the source of truth:
 each shard must export its own private response-arm files, run answer-quality
@@ -324,7 +330,9 @@ track accepted, pending, rejected, and duplicate shard outputs without exposing
 raw questions, answers, memory text, or private paths. It turns green only for
 shard intake readiness; it still blocks combine and SOTA claims until the
 separate intake, combine, result gate, reviewer gate, UI/docs, owner approval,
-and real canary evidence pass.
+and real canary evidence pass. It mirrors the plan's execution lanes so partial
+local, Voyage, NVIDIA, or deterministic diagnostic runs cannot be confused with
+the full strategy set required for SOTA intake.
 The shard-return intake is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`.
 It currently blocks because all twenty full answer-quality shard outputs are

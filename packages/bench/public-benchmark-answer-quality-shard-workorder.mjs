@@ -67,6 +67,7 @@ const report = {
     shardCount: plan.runPlan?.shardCount ?? null,
     strategies: plan.runPlan?.strategies ?? [],
   },
+  executionLanes: plan.executionLanes ?? [],
   progress: {
     inputCount: inputs.length,
     acceptedShardCount: evaluated.acceptedResults.length,
@@ -286,6 +287,14 @@ function renderMarkdown(value) {
     "## Workorders",
     ...(value.workorders.length
       ? value.workorders.map((item) => `- ${item.shardId}: ${item.startIndex}-${item.endIndexExclusive}`)
+      : ["- none"]),
+    "",
+    "## Execution Lanes",
+    ...((value.executionLanes ?? []).length
+      ? value.executionLanes.map(
+          (lane) =>
+            `- ${lane.id}: ready=${lane.coverageReady}; intake-compatible=${lane.acceptedByFullShardIntake}; providers=${lane.providerRequirements?.join(", ") || "none"}`,
+        )
       : ["- none"]),
     "",
     "## Blockers",

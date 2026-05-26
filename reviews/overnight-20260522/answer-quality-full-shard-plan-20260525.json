@@ -21,7 +21,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-26T02:46:13.827Z",
+  "generatedAt": "2026-05-26T04:02:44.001Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
     "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
@@ -90,6 +90,181 @@
     "resultGateCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-full.json --require-ready",
     "reviewerIntakeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-full.json"
   },
+  "executionLanes": [
+    {
+      "id": "deterministic-control-proxy",
+      "label": "Deterministic control/proxy lane",
+      "operatorUse": "Run-path and shard-integrity proof only. This does not score local or provider model quality.",
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank"
+      ],
+      "strategyCount": 3,
+      "missingStrategies": [],
+      "coverageReady": true,
+      "providerRequirements": [],
+      "consentRequirements": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1"
+      ],
+      "answerQualityEndpoint": {
+        "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        "answerModel": "gpt-4o",
+        "judgeModel": "gpt-4o"
+      },
+      "acceptedByFullShardIntake": false,
+      "canReachFullSotaGateAfterShardIntake": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "queryExpansionPolicy": "Deterministic fallback only; does not count as large-model query-expansion evidence.",
+      "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
+    },
+    {
+      "id": "local-apple-no-spend",
+      "label": "Local Apple no-spend lane",
+      "operatorUse": "Use first when validating the no-spend local method before cloud challenger spend.",
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank"
+      ],
+      "strategyCount": 5,
+      "missingStrategies": [],
+      "coverageReady": true,
+      "providerRequirements": [
+        "local-apple",
+        "local-rerank"
+      ],
+      "consentRequirements": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1"
+      ],
+      "answerQualityEndpoint": {
+        "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        "answerModel": "gpt-4o",
+        "judgeModel": "gpt-4o"
+      },
+      "acceptedByFullShardIntake": false,
+      "canReachFullSotaGateAfterShardIntake": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "queryExpansionPolicy": "Local or deterministic query expansion must be reported separately from cloud expansion.",
+      "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
+    },
+    {
+      "id": "voyage-minimum-challenger",
+      "label": "Voyage minimum challenger lane",
+      "operatorUse": "Use when Voyage quota is available to unblock the same-data Voyage answer-quality comparison.",
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "cloud-voyage4-voyage-lite-rerank"
+      ],
+      "strategyCount": 3,
+      "missingStrategies": [],
+      "coverageReady": true,
+      "providerRequirements": [
+        "voyage"
+      ],
+      "consentRequirements": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1"
+      ],
+      "answerQualityEndpoint": {
+        "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        "answerModel": "gpt-4o",
+        "judgeModel": "gpt-4o"
+      },
+      "acceptedByFullShardIntake": false,
+      "canReachFullSotaGateAfterShardIntake": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "queryExpansionPolicy": "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
+    },
+    {
+      "id": "nvidia-minimum-challenger",
+      "label": "NVIDIA minimum challenger lane",
+      "operatorUse": "Use for an NVIDIA challenger comparison without spending Voyage quota.",
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "cloud-nvidia-nemotron-1b"
+      ],
+      "strategyCount": 3,
+      "missingStrategies": [],
+      "coverageReady": true,
+      "providerRequirements": [
+        "nvidia"
+      ],
+      "consentRequirements": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1"
+      ],
+      "answerQualityEndpoint": {
+        "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        "answerModel": "gpt-4o",
+        "judgeModel": "gpt-4o"
+      },
+      "acceptedByFullShardIntake": false,
+      "canReachFullSotaGateAfterShardIntake": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "queryExpansionPolicy": "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
+    },
+    {
+      "id": "full-sota-accepted-shards",
+      "label": "Full SOTA shard-intake lane",
+      "operatorUse": "Only this lane has the complete strategy set expected by shard intake and combine.",
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "cloud-voyage4-voyage-lite-rerank",
+        "cloud-nvidia-nemotron-1b",
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank"
+      ],
+      "strategyCount": 7,
+      "missingStrategies": [],
+      "coverageReady": true,
+      "providerRequirements": [
+        "local-apple",
+        "local-rerank",
+        "nvidia",
+        "voyage"
+      ],
+      "consentRequirements": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1"
+      ],
+      "answerQualityEndpoint": {
+        "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        "answerModel": "gpt-4o",
+        "judgeModel": "gpt-4o"
+      },
+      "acceptedByFullShardIntake": true,
+      "canReachFullSotaGateAfterShardIntake": true,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "queryExpansionPolicy": "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
+      "shardIntakeCompatibility": "accepted only after every planned shard returns with this complete strategy set"
+    }
+  ],
   "shards": [
     {
       "id": "shard-001",

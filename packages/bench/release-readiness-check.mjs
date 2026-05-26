@@ -2829,6 +2829,33 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardPlan.strategyCoverage?.hasNvidiaOrGeminiProvider, true);
     assert.equal(shardPlan.strategyCoverage?.hasLocalApple, true);
     assert.equal(shardPlan.strategyCoverage?.hasLocalRerank, true);
+    assert.ok(Array.isArray(shardPlan.executionLanes));
+    assert.ok(shardPlan.executionLanes.length >= 5);
+    const executionLanes = new Map(shardPlan.executionLanes.map((lane) => [lane.id, lane]));
+    const deterministicLane = executionLanes.get("deterministic-control-proxy");
+    const localAppleLane = executionLanes.get("local-apple-no-spend");
+    const voyageLane = executionLanes.get("voyage-minimum-challenger");
+    const nvidiaLane = executionLanes.get("nvidia-minimum-challenger");
+    const fullLane = executionLanes.get("full-sota-accepted-shards");
+    assert.equal(deterministicLane?.coverageReady, true);
+    assert.equal(deterministicLane?.acceptedByFullShardIntake, false);
+    assert.deepEqual(deterministicLane?.providerRequirements, []);
+    assert.equal(localAppleLane?.coverageReady, true);
+    assert.equal(localAppleLane?.acceptedByFullShardIntake, false);
+    assert.deepEqual(localAppleLane?.providerRequirements, ["local-apple", "local-rerank"]);
+    assert.equal(voyageLane?.coverageReady, true);
+    assert.equal(voyageLane?.acceptedByFullShardIntake, false);
+    assert.deepEqual(voyageLane?.providerRequirements, ["voyage"]);
+    assert.equal(nvidiaLane?.coverageReady, true);
+    assert.equal(nvidiaLane?.acceptedByFullShardIntake, false);
+    assert.deepEqual(nvidiaLane?.providerRequirements, ["nvidia"]);
+    assert.equal(fullLane?.coverageReady, true);
+    assert.equal(fullLane?.acceptedByFullShardIntake, true);
+    assert.equal(fullLane?.canReachFullSotaGateAfterShardIntake, true);
+    assert.deepEqual(fullLane?.strategies, shardPlan.runPlan?.strategies);
+    assert.deepEqual(fullLane?.providerRequirements, ["local-apple", "local-rerank", "nvidia", "voyage"]);
+    assert.equal(fullLane?.answerQualityEndpoint?.answerModel, fullRunTarget.benchmark?.answerModel);
+    assert.equal(fullLane?.answerQualityEndpoint?.judgeModel, fullRunTarget.benchmark?.judgeModel);
     assert.deepEqual(shardPlan.blockers, []);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--max-memory-bytes 300000000/);
@@ -2839,8 +2866,10 @@ check("fresh public benchmark target check passes", () => {
     assert.match(shardPlan.runPlan?.combineCommand ?? "", /--combine-mode shards/);
   }
   assert.match(answerQualityShardPlanMarkdownFresh, /Full Answer-Quality Shard Plan/);
+  assert.match(answerQualityShardPlanMarkdownFresh, /Execution Lanes/);
   assert.match(fullAnswerQualityShardPlanEvidence, /Shard count: 20/);
   assert.match(fullAnswerQualityShardPlanEvidence, /Max memory bytes: 300000000/);
+  assert.match(fullAnswerQualityShardPlanEvidence, /full-sota-accepted-shards/);
   assert.equal(privateInputDoctorBlocked.mode, "full-shard-private-input-doctor");
   assert.equal(privateInputDoctorBlocked.status, "BLOCKED_FULL_SHARD_PRIVATE_INPUTS");
   assert.equal(privateInputDoctorBlocked.readyForAnswerQualityShardRun, false);
@@ -3026,6 +3055,9 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardWorkorder.progress?.rejectedResultCount, 0);
     assert.equal(shardWorkorder.progress?.duplicateResultCount, 0);
     assert.equal(shardWorkorder.progress?.workorderCount, 20);
+    assert.equal(shardWorkorder.executionLanes?.length >= 5, true);
+    assert.ok(shardWorkorder.executionLanes?.some((lane) => lane.id === "local-apple-no-spend" && lane.acceptedByFullShardIntake === false));
+    assert.ok(shardWorkorder.executionLanes?.some((lane) => lane.id === "full-sota-accepted-shards" && lane.acceptedByFullShardIntake === true));
     assert.ok(shardWorkorder.blockers?.includes("answer-quality-shard-runs-pending"));
     assert.match(shardWorkorder.gatedCommands?.shardIntake ?? "", /--require-ready/);
     assert.match(shardWorkorder.gatedCommands?.combineAfterIntakePasses ?? "", /--combine-mode shards/);
@@ -3043,7 +3075,9 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityShardWorkorderReady.progress?.workorderCount, 0);
   assert.deepEqual(answerQualityShardWorkorderReady.blockers, []);
   assert.match(answerQualityShardWorkorderMarkdownFresh, /Full Answer-Quality Shard Workorder/);
+  assert.match(answerQualityShardWorkorderMarkdownFresh, /Execution Lanes/);
   assert.match(fullAnswerQualityShardWorkorderEvidence, /Pending shards: 20/);
+  assert.match(fullAnswerQualityShardWorkorderEvidence, /full-sota-accepted-shards/);
   for (const shardIntake of [answerQualityShardIntakeFresh, fullAnswerQualityShardIntake]) {
     assert.equal(shardIntake.mode, "public-benchmark-answer-quality-shard-intake");
     assert.equal(shardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
@@ -3167,6 +3201,9 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
     assert.ok(doctorReport.blockers?.includes("human-public-launch-approval"));
     assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("query-expanded-full-hybrid-rerank"));
+    assert.ok(doctorReport.nextRunPlan?.executionLanes?.some((lane) => lane.id === "local-apple-no-spend" && lane.acceptedByFullShardIntake === false));
+    assert.deepEqual(doctorReport.nextRunPlan?.acceptedShardIntakeLaneIds, ["full-sota-accepted-shards"]);
+    assert.ok(doctorReport.nextRunPlan?.diagnosticLaneIds?.includes("deterministic-control-proxy"));
     assert.equal(doctorReport.nextRunPlan?.rawSourcesStayOutsideRepo, true);
   }
   assert.match(fullMemorySotaDoctorMarkdownFresh, /Full Memory SOTA Doctor/);

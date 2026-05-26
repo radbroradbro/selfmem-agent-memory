@@ -31,6 +31,13 @@
 - shard-019: 450-475
 - shard-020: 475-500
 
+## Execution Lanes
+- deterministic-control-proxy: ready=true; intake-compatible=false; providers=none
+- local-apple-no-spend: ready=true; intake-compatible=false; providers=local-apple, local-rerank
+- voyage-minimum-challenger: ready=true; intake-compatible=false; providers=voyage
+- nvidia-minimum-challenger: ready=true; intake-compatible=false; providers=nvidia
+- full-sota-accepted-shards: ready=true; intake-compatible=true; providers=local-apple, local-rerank, nvidia, voyage
+
 ## Blockers
 - answer-quality-shard-runs-pending
 

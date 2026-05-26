@@ -382,6 +382,13 @@ function buildNextRunPlan({ shardPlan, sotaOperatorPacket }) {
     shardCount: Number(shardPlan?.runPlan?.shardCount ?? 20),
     shardSize: Number(shardPlan?.runPlan?.shardSize ?? 25),
     strategySet: shardPlan?.runPlan?.strategies ?? [],
+    executionLanes: shardPlan?.executionLanes ?? [],
+    acceptedShardIntakeLaneIds: arrayOf(shardPlan?.executionLanes)
+      .filter((lane) => lane.acceptedByFullShardIntake === true)
+      .map((lane) => lane.id),
+    diagnosticLaneIds: arrayOf(shardPlan?.executionLanes)
+      .filter((lane) => lane.acceptedByFullShardIntake !== true)
+      .map((lane) => lane.id),
     commandSource: files.sotaOperatorPacket,
     commandCount: fullShardFlow?.commands?.length ?? 0,
     firstCommands: arrayOf(fullShardFlow?.commands).slice(0, 6),
