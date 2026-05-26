@@ -354,8 +354,9 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   local/provider model evidence, reviewer approval, or SOTA support.
 - Adds the checked-in
   `full-shard-control-answer-quality-preflight-20260526` packet. It proves the
-  three private control response arms are parseable, hash-aligned, and complete
-  for the same 25-query `shard-001` selection, while staying
+  three private control response arms are parseable, hash-aligned, complete
+  for the same 25-query `shard-001` selection, and selected-query-id hash
+  matched on every arm, while staying
   `BLOCKED_ANSWER_QUALITY_ENV` until explicit model-call/public-data/no-raw-output
   consent and an answer/judge endpoint are configured. This is scoring readiness
   only, not an answer-quality score or SOTA support.

@@ -461,7 +461,8 @@ Component rows in the same artifact remain model-selection evidence only.
 - Full-shard deterministic control answer-quality preflight:
   `reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json`
   proves those three private shard response arms are parseable, hash-aligned,
-  and complete for the same 25 selected `shard-001` queries. It stays
+  complete for the same 25 selected `shard-001` queries, with
+  selected-query-id hash matching on every arm. It stays
   `BLOCKED_ANSWER_QUALITY_ENV` until model-call consent, public-data consent,
   no-raw-output consent, and an answer/judge endpoint are configured. It is
   same-data scoring readiness only, not a scored answer-quality result or SOTA

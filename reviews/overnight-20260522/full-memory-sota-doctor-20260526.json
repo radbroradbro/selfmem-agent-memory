@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T03:41:18.621Z",
+  "generatedAt": "2026-05-26T03:54:20.314Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -60,7 +60,7 @@
     "controlPreflight": {
       "path": "reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json",
       "exists": true,
-      "hash": "sha256:b0e4ba1c7681143eaa0858d2b662299d9bc25d736c64425e784cf4df988be455",
+      "hash": "sha256:e5dad8ea8389ee6027661f81e9db2fc0997103071566c4524f7558bf94f99d7e",
       "mode": "public-benchmark-answer-quality-preflight",
       "status": "BLOCKED_ANSWER_QUALITY_ENV"
     },
@@ -144,28 +144,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:9a3d033cc336ecf92d90d721e664d2b9ab5ecfcf0ad968dff2b1f927ab5b063a",
+      "hash": "sha256:6077fe7176bd9fb8e38408be85d4a903404a4423473d229f979e525ded91630a",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:815407f4e6f1b10e283910379efb42ba25b7b4878f47c894f4b3d8307a11acdc",
+      "hash": "sha256:b877a7da2eeea8f830f562a1416e71c6867295a1c854b0d401b119129b014ab0",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:e7c2459fb7be7910e51be30b503730e20e2e0c66f9f5a3985ce6073564c3df7a",
+      "hash": "sha256:6ee7093afb17afba74cbe181c85ec26605b98f5d9ecc8448b7e9b5995499da5a",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:25c68c5e2e2435a550b2730e6ee43119bbda5908f9cd48ff5656fe83c9c0ba45",
+      "hash": "sha256:0545da392dc2616cbd0a86eaffc32bf1ee0d16e2c16b18001a8262b8803c5a05",
       "mode": null,
       "status": null
     }
@@ -303,26 +303,29 @@
       "endIndexExclusive": 25,
       "totalQueryCount": 500,
       "selectedQueryCount": 25,
-      "selectedQueryIdHash": "sha256:1cbe67f8e048d86bcbad56131c1fc46d930c296f0b5b474495607e7ccd02e39c"
+      "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
     },
     "arms": [
       {
         "strategy": "bm25-lite",
         "responseCount": 25,
         "querySetMatches": true,
-        "selectedShardCoverageReady": true
+        "selectedShardCoverageReady": true,
+        "selectedQueryIdHashMatches": true
       },
       {
         "strategy": "full-hybrid-rerank",
         "responseCount": 25,
         "querySetMatches": true,
-        "selectedShardCoverageReady": true
+        "selectedShardCoverageReady": true,
+        "selectedQueryIdHashMatches": true
       },
       {
         "strategy": "query-expanded-full-hybrid-rerank",
         "responseCount": 25,
         "querySetMatches": true,
-        "selectedShardCoverageReady": true
+        "selectedShardCoverageReady": true,
+        "selectedQueryIdHashMatches": true
       }
     ],
     "envBlockers": [

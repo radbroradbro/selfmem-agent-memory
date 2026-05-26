@@ -270,7 +270,13 @@ function inspectControlPreflightState(controlPreflightReport) {
       : null,
     arms.length !== 3 ? "control-preflight-arm-count-mismatch" : null,
     ...["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"].map((strategy) =>
-      arms.some((arm) => arm.strategy === strategy && arm.selectedShardCoverage?.ready === true && arm.querySetMatches === true)
+      arms.some(
+        (arm) =>
+          arm.strategy === strategy &&
+          arm.selectedShardCoverage?.ready === true &&
+          arm.querySetMatches === true &&
+          arm.selectedShardCoverage?.selectedQueryIdHashMatches === true,
+      )
         ? null
         : `control-preflight-${strategy}-not-ready`,
     ),
@@ -291,6 +297,7 @@ function inspectControlPreflightState(controlPreflightReport) {
       responseCount: Number(arm.responseCount ?? 0),
       querySetMatches: Boolean(arm.querySetMatches),
       selectedShardCoverageReady: Boolean(arm.selectedShardCoverage?.ready),
+      selectedQueryIdHashMatches: Boolean(arm.selectedShardCoverage?.selectedQueryIdHashMatches),
     })),
     envBlockers: controlPreflightReport?.blockers ?? [],
     blockers,

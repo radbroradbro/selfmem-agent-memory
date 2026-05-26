@@ -94,6 +94,7 @@ const blockers = [
   !armsReady && arms.length > 0 ? "response-arm-export-not-ready" : null,
   arms.some((arm) => arm.querySetMatches === false) ? "response-arm-queryset-hash-mismatch" : null,
   arms.some((arm) => arm.selectedShardCoverage?.ready === false) ? "response-arm-selected-shard-coverage-mismatch" : null,
+  arms.some((arm) => arm.selectedShardCoverage?.selectedQueryIdHashMatches === false) ? "response-arm-selected-query-hash-mismatch" : null,
   !requiredStrategyCoverage.hasBm25Lite ? "bm25-lite-arm-missing" : null,
   !requiredStrategyCoverage.hasFullHybridRerank ? "full-hybrid-rerank-arm-missing" : null,
   !requiredStrategyCoverage.hasChallenger ? "provider-or-local-challenger-arm-missing" : null,
@@ -286,13 +287,18 @@ function inspectArms() {
         extraResponseCount === 0 &&
         responseCount === selectedIds.length &&
         (parsed.queryShard?.startIndex == null || Number(parsed.queryShard.startIndex) === queryShardSelection?.startIndex) &&
-        (parsed.queryShard?.endIndexExclusive == null || Number(parsed.queryShard.endIndexExclusive) === queryShardSelection?.endIndexExclusive),
+        (parsed.queryShard?.endIndexExclusive == null || Number(parsed.queryShard.endIndexExclusive) === queryShardSelection?.endIndexExclusive) &&
+        (parsed.queryShard?.selectedQueryIdHash == null || parsed.queryShard.selectedQueryIdHash === queryShardSelection?.selectedQueryIdHash),
       expectedResponseCount: selectedIds.length,
       responseCount,
       missingSelectedCount,
       extraResponseCount,
       responseStartIndex: parsed.queryShard?.startIndex ?? null,
       responseEndIndexExclusive: parsed.queryShard?.endIndexExclusive ?? null,
+      responseSelectedQueryIdHash: parsed.queryShard?.selectedQueryIdHash ?? null,
+      expectedSelectedQueryIdHash: queryShardSelection?.selectedQueryIdHash ?? null,
+      selectedQueryIdHashMatches:
+        parsed.queryShard?.selectedQueryIdHash == null ? null : parsed.queryShard.selectedQueryIdHash === queryShardSelection?.selectedQueryIdHash,
     };
     return {
       strategy: arm.strategy,
@@ -417,7 +423,7 @@ function selectQueries(queries) {
     endIndexExclusive,
     totalQueryCount: queries.length,
     ids: selected.map((query) => query.id),
-    selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => query.id).join("\n"))}`,
+    selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => shortHash(query.id)).join("\n"))}`,
   };
 }
 
@@ -534,4 +540,8 @@ function sha256(value) {
 
 function stableHash(value) {
   return sha256(typeof value === "string" ? value : JSON.stringify(value));
+}
+
+function shortHash(value) {
+  return stableHash(String(value)).slice(0, 16);
 }

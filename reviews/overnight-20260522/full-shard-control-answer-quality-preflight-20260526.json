@@ -15,7 +15,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "printsCredentials": false,
-  "generatedAt": "2026-05-26T03:34:21.211Z",
+  "generatedAt": "2026-05-26T03:50:42.554Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
     "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
@@ -56,7 +56,7 @@
       "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
       "queryCount": 500,
       "selectedQueryCount": 25,
-      "selectedQueryIdHash": "sha256:1cbe67f8e048d86bcbad56131c1fc46d930c296f0b5b474495607e7ccd02e39c",
+      "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
       "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
       "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
       "matchesTarget": true
@@ -89,7 +89,7 @@
     "endIndexExclusive": 25,
     "totalQueryCount": 500,
     "selectedQueryCount": 25,
-    "selectedQueryIdHash": "sha256:1cbe67f8e048d86bcbad56131c1fc46d930c296f0b5b474495607e7ccd02e39c"
+    "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
   },
   "arms": [
     {
@@ -110,7 +110,10 @@
         "missingSelectedCount": 0,
         "extraResponseCount": 0,
         "responseStartIndex": 0,
-        "responseEndIndexExclusive": 25
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
       }
     },
     {
@@ -131,7 +134,10 @@
         "missingSelectedCount": 0,
         "extraResponseCount": 0,
         "responseStartIndex": 0,
-        "responseEndIndexExclusive": 25
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
       }
     },
     {
@@ -152,7 +158,10 @@
         "missingSelectedCount": 0,
         "extraResponseCount": 0,
         "responseStartIndex": 0,
-        "responseEndIndexExclusive": 25
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
       }
     }
   ],

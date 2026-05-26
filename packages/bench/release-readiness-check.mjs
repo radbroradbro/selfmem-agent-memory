@@ -2982,10 +2982,13 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(arm.responseCount, 25);
     assert.equal(arm.querySetMatches, true);
     assert.equal(arm.selectedShardCoverage?.ready, true);
+    assert.equal(arm.selectedShardCoverage?.selectedQueryIdHashMatches, true);
     assert.equal(arm.selectedShardCoverage?.missingSelectedCount, 0);
     assert.equal(arm.selectedShardCoverage?.extraResponseCount, 0);
     assert.equal(arm.selectedShardCoverage?.responseStartIndex, 0);
     assert.equal(arm.selectedShardCoverage?.responseEndIndexExclusive, 25);
+    assert.match(arm.selectedShardCoverage?.responseSelectedQueryIdHash ?? "", /^sha256:[a-f0-9]{64}$/);
+    assert.equal(arm.selectedShardCoverage?.responseSelectedQueryIdHash, arm.selectedShardCoverage?.expectedSelectedQueryIdHash);
   }
   for (const blocker of [
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
@@ -3147,6 +3150,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.controlPreflightState?.countsAsFullMemorySotaEvidence, false);
     assert.equal(doctorReport.controlPreflightState?.arms?.length, 3);
     assert.ok(doctorReport.controlPreflightState?.arms?.some((item) => item.strategy === "bm25-lite" && item.selectedShardCoverageReady === true));
+    assert.ok(doctorReport.controlPreflightState?.arms?.every((item) => item.selectedQueryIdHashMatches === true));
     assert.ok(
       doctorReport.controlPreflightState?.arms?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank" && item.responseCount === 25),
     );
