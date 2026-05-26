@@ -111,6 +111,7 @@
     "benchmark:answer-quality:control-probe": "node packages/bench/full-shard-control-export-probe.mjs",
     "benchmark:query-expansion:preflight": "node packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "benchmark:query-expansion:result-gate": "node packages/bench/query-expansion-result-gate.mjs",
+    "benchmark:local-embedding:runtime-doctor": "node packages/bench/local-embedding-runtime-doctor.mjs",
     "benchmark:local-embedding:durability": "node packages/bench/local-embedding-durability-smoke.mjs",
     "benchmark:local-rerank:sidecar": "node packages/bench/local-openai-rerank-sidecar.mjs",
     "benchmark:local-rerank:result-gate": "node packages/bench/local-rerank-result-gate.mjs",

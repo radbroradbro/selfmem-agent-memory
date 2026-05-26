@@ -133,6 +133,7 @@ const requiredFiles = [
   "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
   "packages/bench/full-shard-control-export-probe.mjs",
+  "packages/bench/local-embedding-runtime-doctor.mjs",
   "packages/bench/local-embedding-durability-smoke.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
@@ -202,6 +203,8 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.md`,
+  `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
+  `${reviewDir}/local-embedding-runtime-doctor-20260526.md`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.md`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
@@ -604,6 +607,7 @@ const requiredScripts = [
   "benchmark:answer-quality:control-probe",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
+  "benchmark:local-embedding:runtime-doctor",
   "benchmark:local-embedding:durability",
   "benchmark:local-rerank:result-gate",
   "benchmark:provider-challenger:result-gate",
@@ -1775,6 +1779,11 @@ check("fresh public benchmark target check passes", () => {
     join(root, reviewDir, "answer-quality-local-full-shard-002-runtime-blocker-20260526.md"),
     "utf8",
   );
+  const localEmbeddingRuntimeDoctor = JSON.parse(readFileSync(join(root, reviewDir, "local-embedding-runtime-doctor-20260526.json"), "utf8"));
+  const localEmbeddingRuntimeDoctorEvidence = readFileSync(join(root, reviewDir, "local-embedding-runtime-doctor-20260526.md"), "utf8");
+  const localEmbeddingRuntimeFreshStdout = run("node", ["packages/bench/local-embedding-runtime-doctor.mjs"]).stdout;
+  const localEmbeddingRuntimeFresh = JSON.parse(localEmbeddingRuntimeFreshStdout);
+  const localEmbeddingRuntimeMarkdownFresh = run("node", ["packages/bench/local-embedding-runtime-doctor.mjs", "--format", "markdown"]).stdout;
   const localEmbeddingDurabilitySmoke = JSON.parse(readFileSync(join(root, reviewDir, "local-embedding-durability-smoke-20260526.json"), "utf8"));
   const localEmbeddingDurabilitySmokeEvidence = readFileSync(join(root, reviewDir, "local-embedding-durability-smoke-20260526.md"), "utf8");
   const noLocalEmbeddingEnv = { ...process.env };
@@ -3605,6 +3614,45 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(localFullAnswerQualityShard002RuntimeBlocker.blockers?.includes("local-full-shard-002-incomplete"));
   assert.match(localFullAnswerQualityShard002RuntimeBlockerEvidence, /Counts as local-full benchmark evidence: false/);
   assert.match(localFullAnswerQualityShard002RuntimeBlockerEvidence, /local-embedding-server-socket-close/);
+  for (const runtimeReport of [localEmbeddingRuntimeDoctor, localEmbeddingRuntimeFresh]) {
+    assert.equal(runtimeReport.mode, "local-embedding-runtime-doctor");
+    assert.equal(runtimeReport.status, "BLOCKED_LOCAL_EMBEDDING_RUNTIME");
+    assert.equal(runtimeReport.metricsOnly, true);
+    assert.equal(runtimeReport.publicSafe, true);
+    assert.equal(runtimeReport.callsProviderApis, false);
+    assert.equal(runtimeReport.sendsBenchmarkTextToProvider, false);
+    assert.equal(runtimeReport.rawBenchmarkInputIncluded, false);
+    assert.equal(runtimeReport.rawConfigIncluded, false);
+    assert.equal(runtimeReport.rawServerHelpIncluded, false);
+    assert.equal(runtimeReport.configEnvPathPrinted, false);
+    assert.equal(runtimeReport.privatePathPrinted, false);
+    assert.equal(runtimeReport.endpointPrinted, false);
+    assert.equal(runtimeReport.modelPathPrinted, false);
+    assert.equal(runtimeReport.serverBinPrinted, false);
+    assert.equal(runtimeReport.readyForLocalEmbeddingDurabilitySmoke, false);
+    assert.equal(runtimeReport.readyForLocalAppleArmExport, false);
+    assert.equal(runtimeReport.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(runtimeReport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(runtimeReport.publicBenchmarkClaimsAllowed, false);
+    assert.ok(runtimeReport.blockers?.includes("local-embedding-runtime-not-ready"));
+  }
+  assert.equal(localEmbeddingRuntimeDoctor.configEnvProvided, true);
+  assert.equal(localEmbeddingRuntimeDoctor.serverBinary?.present, true);
+  assert.equal(localEmbeddingRuntimeDoctor.serverBinary?.helpSupportsEmbedding, true);
+  assert.equal(localEmbeddingRuntimeDoctor.modelArtifact?.likelyDedicatedEmbedding, false);
+  assert.equal(localEmbeddingRuntimeDoctor.modelArtifact?.expectedFamilyMatched, false);
+  assert.equal(localEmbeddingRuntimeDoctor.localEndpoint?.modelsEndpointReachable, false);
+  assert.ok(localEmbeddingRuntimeDoctor.blockers?.includes("local-embedding-model-not-dedicated-embedding"));
+  assert.ok(localEmbeddingRuntimeDoctor.blockers?.includes("local-embedding-model-family-mismatch"));
+  assert.ok(localEmbeddingRuntimeDoctor.blockers?.includes("local-embedding-endpoint-not-reachable"));
+  assert.equal(localEmbeddingRuntimeFresh.configEnvProvided, false);
+  assert.ok(localEmbeddingRuntimeFresh.blockers?.includes("local-embedding-server-bin-missing"));
+  assert.ok(localEmbeddingRuntimeFresh.blockers?.includes("local-embedding-model-path-missing"));
+  assert.ok(localEmbeddingRuntimeFresh.blockers?.includes("local-embedding-endpoint-missing"));
+  assert.match(localEmbeddingRuntimeDoctorEvidence, /Local Embedding Runtime Doctor/);
+  assert.match(localEmbeddingRuntimeDoctorEvidence, /Likely dedicated embedding model: false/);
+  assert.match(localEmbeddingRuntimeMarkdownFresh, /Local Embedding Runtime Doctor/);
+  assert.doesNotMatch(localEmbeddingRuntimeFreshStdout, /http:\/\/|127\.0\.0\.1|localhost|\/Users\/|\/private\/|\/tmp\//);
   for (const smokeReport of [localEmbeddingDurabilitySmoke, localEmbeddingDurabilityFresh]) {
     assert.equal(smokeReport.mode, "local-embedding-durability-smoke");
     assert.equal(smokeReport.status, "BLOCKED_LOCAL_EMBEDDING_DURABILITY");
@@ -3822,13 +3870,21 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.runtimeBlockedShardCount, 1);
     assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedShard, "shard-002");
     assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedArm, "local-apple-qwen3-0_6b");
+    assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeStatus, "BLOCKED_LOCAL_EMBEDDING_RUNTIME");
+    assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeReady, false);
+    assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeModelLooksDedicated, false);
+    assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeEndpointReachable, false);
+    assert.ok(doctorReport.localFullLaneState?.localEmbeddingRuntimeBlockers?.includes("local-embedding-runtime-not-ready"));
+    assert.ok(doctorReport.localFullLaneState?.localEmbeddingRuntimeBlockers?.includes("local-embedding-model-not-dedicated-embedding"));
     assert.equal(doctorReport.localFullLaneState?.localEmbeddingDurabilityStatus, "BLOCKED_LOCAL_EMBEDDING_DURABILITY");
     assert.equal(doctorReport.localFullLaneState?.localEmbeddingDurabilityReady, false);
     assert.ok(doctorReport.localFullLaneState?.localEmbeddingDurabilityBlockers?.includes("local-embedding-durability-smoke-not-ready"));
     assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-apple-embedding-server-socket-close"));
+    assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-embedding-runtime-not-ready"));
     assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-embedding-durability-smoke-not-ready"));
     assert.match(doctorReport.localFullLaneState?.intakePath ?? "", /answer-quality-local-full-shard-intake-after-shard-001-20260526\.json$/);
     assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("answer-quality-shards-missing"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-runtime" && item.status === "blocked"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-durability" && item.status === "blocked"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-shard-intake" && item.status === "blocked"));
     assert.equal(doctorReport.currentCanary?.queryCount, 30);
@@ -3855,6 +3911,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Full SOTA lane ready for answer-quality scoring: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Missing local-full shards: 19/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime-blocked local-full shards: 1/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding runtime ready: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding durability ready: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {

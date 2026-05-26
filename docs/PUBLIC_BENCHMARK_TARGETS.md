@@ -217,8 +217,13 @@ first local-full shard. The checked-in doctor at
 keeps private inputs and raw-source retention visible as public-safe metadata,
 names the missing local embedding/rerank/query-expansion/answer-quality
 readiness, and confirms the lane has no Voyage/NVIDIA or public-SOTA blockers.
-Run `benchmark:local-embedding:durability -- --require-ready` before any local
-Apple response-arm export. The current checked-in report at
+Run `benchmark:local-embedding:runtime-doctor -- --require-ready` before the
+durability smoke. The current checked-in runtime report at
+`reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`
+is intentionally blocked because it sees a non-embedding local GGUF selection
+and no reachable local embedding endpoint. Run
+`benchmark:local-embedding:durability -- --require-ready` only after that
+runtime doctor is ready. The current checked-in durability report at
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`
 is intentionally blocked and synthetic-only, so it does not count as
 local-full evidence.

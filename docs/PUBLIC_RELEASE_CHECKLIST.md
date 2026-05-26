@@ -38,6 +38,10 @@ Use this checklist before making the repository public.
   nineteen missing shards; shard 002 is a blocked runtime attempt, not
   accepted evidence.
 - [ ] Local Apple local-full shard retries have a fresh
+  `benchmark:local-embedding:runtime-doctor -- --require-ready` report proving
+  a dedicated local embedding model and reachable local endpoint before the
+  durability smoke.
+- [ ] Local Apple local-full shard retries have a fresh
   `benchmark:local-embedding:durability -- --require-ready` report before
   response-arm export, and the report stays synthetic-only and public-safe.
 - [ ] `benchmark:memory-score:result-gate --require-ready` has an empty

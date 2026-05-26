@@ -377,8 +377,12 @@ The BM25, full-hybrid, and local query-expanded arms exported 25 private
 responses each, but the local Apple embedding arm failed with a reproducible
 local embedding-server socket close. The same failure reproduced on a public
 synthetic embedding smoke, so retry shard 002 only after the local embedding
-runtime survives a bounded long-input smoke. That preflight is now
-`benchmark:local-embedding:durability`; the current checked-in blocked report is
+runtime is provisioned and survives a bounded long-input smoke. Run
+`benchmark:local-embedding:runtime-doctor` first; the current checked-in report,
+`reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`,
+blocks because the local config points at a non-embedding GGUF and no reachable
+embedding endpoint. Then run `benchmark:local-embedding:durability`; the current
+checked-in blocked report is
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
 For local Apple response-arm export, pass a fresh ready report through
 `--local-embedding-durability-report` or
@@ -580,6 +584,7 @@ is local diagnostic evidence only and did not promote the sidecar arm.
 The shard 002 retry surfaced an embedding-server durability blocker before the
 local Apple arm could complete, so do not treat the partial three-arm shard 002
 packet as answer-quality evidence. Run
+`benchmark:local-embedding:runtime-doctor -- --require-ready`, then
 `benchmark:local-embedding:durability -- --require-ready` against the active
 local embedding endpoint before retrying that arm.
 

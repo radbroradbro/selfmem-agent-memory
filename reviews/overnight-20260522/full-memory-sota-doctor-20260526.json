@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T11:06:40.629Z",
+  "generatedAt": "2026-05-26T11:17:19.501Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -85,6 +85,13 @@
       "hash": "sha256:cc383c3c6b66e473fcd92362ec95c1259d6220970d7486286cb762698a95545f",
       "mode": "answer-quality-local-full-shard-runtime-blocker",
       "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME"
+    },
+    "localEmbeddingRuntimeDoctor": {
+      "path": "reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json",
+      "exists": true,
+      "hash": "sha256:32cc9048cfbd851226bee3bad563f222e0cb7cf9f28efdce99bf9ab26a33d184",
+      "mode": "local-embedding-runtime-doctor",
+      "status": "BLOCKED_LOCAL_EMBEDDING_RUNTIME"
     },
     "localEmbeddingDurabilitySmoke": {
       "path": "reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
@@ -592,6 +599,17 @@
     "runtimeBlockedShardCount": 1,
     "latestRuntimeBlockedShard": "shard-002",
     "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b",
+    "localEmbeddingRuntimeStatus": "BLOCKED_LOCAL_EMBEDDING_RUNTIME",
+    "localEmbeddingRuntimeReady": false,
+    "localEmbeddingRuntimeBlockers": [
+      "local-embedding-runtime-not-ready",
+      "local-embedding-model-not-dedicated-embedding",
+      "local-embedding-model-family-mismatch",
+      "local-embedding-endpoint-not-reachable",
+      "local-embedding-models-endpoint-fetch-failed"
+    ],
+    "localEmbeddingRuntimeModelLooksDedicated": false,
+    "localEmbeddingRuntimeEndpointReachable": false,
     "localEmbeddingDurabilityStatus": "BLOCKED_LOCAL_EMBEDDING_DURABILITY",
     "localEmbeddingDurabilityReady": false,
     "localEmbeddingDurabilityProbeCount": 4,
@@ -635,6 +653,11 @@
       "local-apple-embedding-server-socket-close",
       "local-full-shard-002-incomplete",
       "local-full-shard-coverage-incomplete",
+      "local-embedding-runtime-not-ready",
+      "local-embedding-model-not-dedicated-embedding",
+      "local-embedding-model-family-mismatch",
+      "local-embedding-endpoint-not-reachable",
+      "local-embedding-models-endpoint-fetch-failed",
       "local-embedding-durability-smoke-not-ready",
       "local-embedding-base-url-missing"
     ],
@@ -806,6 +829,17 @@
       ]
     },
     {
+      "id": "local-embedding-runtime",
+      "status": "blocked",
+      "blockers": [
+        "local-embedding-runtime-not-ready",
+        "local-embedding-model-not-dedicated-embedding",
+        "local-embedding-model-family-mismatch",
+        "local-embedding-endpoint-not-reachable",
+        "local-embedding-models-endpoint-fetch-failed"
+      ]
+    },
+    {
       "id": "local-embedding-durability",
       "status": "blocked",
       "blockers": [
@@ -822,6 +856,11 @@
         "local-apple-embedding-server-socket-close",
         "local-full-shard-002-incomplete",
         "local-full-shard-coverage-incomplete",
+        "local-embedding-runtime-not-ready",
+        "local-embedding-model-not-dedicated-embedding",
+        "local-embedding-model-family-mismatch",
+        "local-embedding-endpoint-not-reachable",
+        "local-embedding-models-endpoint-fetch-failed",
         "local-embedding-durability-smoke-not-ready",
         "local-embedding-base-url-missing"
       ]
@@ -920,6 +959,11 @@
     "full-memory-sota-score-not-proven",
     "public-sota-claim-not-allowed",
     "local-full-answer-quality-shard-results-not-returned",
+    "local-embedding-runtime-not-ready",
+    "local-embedding-model-not-dedicated-embedding",
+    "local-embedding-model-family-mismatch",
+    "local-embedding-endpoint-not-reachable",
+    "local-embedding-models-endpoint-fetch-failed",
     "local-embedding-durability-smoke-not-ready",
     "local-embedding-base-url-missing",
     "answer-quality-shards-missing",
@@ -1211,6 +1255,7 @@
     ],
     "requiredAfterShardRuns": [
       "benchmark:answer-quality:shard-workorder",
+      "benchmark:local-embedding:runtime-doctor before local Apple embedding durability",
       "benchmark:local-embedding:durability before local Apple response-arm export",
       "benchmark:answer-quality:shard-intake --require-ready",
       "benchmark:answer-quality:combine -- --combine-mode shards",

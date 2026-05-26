@@ -23,6 +23,7 @@ const files = {
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
   localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
+  localEmbeddingRuntimeDoctor: `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   localEmbeddingDurabilitySmoke: `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
   localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
@@ -59,6 +60,7 @@ const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
 ]);
 const localFullShardIntake = localFullShardIntakeSelection.json;
 const localFullShard002RuntimeBlocker = evidence.localFullShard002RuntimeBlocker.json;
+const localEmbeddingRuntimeDoctor = evidence.localEmbeddingRuntimeDoctor.json;
 const localEmbeddingDurabilitySmoke = evidence.localEmbeddingDurabilitySmoke.json;
 const localFullAcceptedLaneLaunchDoctor = evidence.localFullAcceptedLaneLaunchDoctor.json;
 const privateInputDoctor = evidence.privateInputDoctor.json;
@@ -83,6 +85,7 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullShardIntake,
   localFullShardIntakePath: localFullShardIntakeSelection.path,
   localFullShardRuntimeBlockers: [localFullShard002RuntimeBlocker],
+  localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
   localFullAcceptedLaneLaunchDoctor,
 });
@@ -111,6 +114,7 @@ const gates = [
   ]),
   gate("local-full-benchmark-lane", localFullLaneState.readyForLocalFullBenchmarkPlan, localFullLaneState.blockers),
   gate("local-full-launch-readiness", localFullLaneState.readyForFirstShardRun, localFullLaneState.launchBlockers),
+  gate("local-embedding-runtime", localFullLaneState.localEmbeddingRuntimeReady, localFullLaneState.localEmbeddingRuntimeBlockers),
   gate("local-embedding-durability", localFullLaneState.localEmbeddingDurabilityReady, localFullLaneState.localEmbeddingDurabilityBlockers),
   gate("local-full-shard-intake", localFullLaneState.readyForShardCombine, localFullLaneState.shardIntakeBlockers),
   gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
@@ -315,6 +319,7 @@ function inspectLocalFullLaneState({
   localFullShardIntake,
   localFullShardIntakePath,
   localFullShardRuntimeBlockers,
+  localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
   localFullAcceptedLaneLaunchDoctor,
 }) {
@@ -322,6 +327,17 @@ function inspectLocalFullLaneState({
   const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
   const runtimeBlockerReports = arrayOf(localFullShardRuntimeBlockers).filter(Boolean);
   const runtimeBlockerIds = [...new Set(runtimeBlockerReports.flatMap((report) => arrayOf(report?.blockers)))];
+  const localEmbeddingRuntimeReady =
+    localEmbeddingRuntimeDoctor?.mode === "local-embedding-runtime-doctor" &&
+    localEmbeddingRuntimeDoctor?.status === "READY_LOCAL_EMBEDDING_RUNTIME" &&
+    localEmbeddingRuntimeDoctor?.readyForLocalEmbeddingDurabilitySmoke === true &&
+    localEmbeddingRuntimeDoctor?.readyForLocalAppleArmExport === true &&
+    localEmbeddingRuntimeDoctor?.privatePathPrinted === false &&
+    localEmbeddingRuntimeDoctor?.endpointPrinted === false &&
+    localEmbeddingRuntimeDoctor?.rawConfigIncluded === false;
+  const localEmbeddingRuntimeBlockers = localEmbeddingRuntimeReady
+    ? []
+    : [...new Set(["local-embedding-runtime-not-ready", ...arrayOf(localEmbeddingRuntimeDoctor?.blockers)])];
   const localEmbeddingDurabilityReady =
     localEmbeddingDurabilitySmoke?.mode === "local-embedding-durability-smoke" &&
     localEmbeddingDurabilitySmoke?.status === "READY_LOCAL_EMBEDDING_DURABILITY" &&
@@ -367,6 +383,11 @@ function inspectLocalFullLaneState({
     runtimeBlockedShardCount: runtimeBlockerReports.length,
     latestRuntimeBlockedShard: runtimeBlockerReports.at(-1)?.queryShard?.shardId ?? null,
     latestRuntimeBlockedArm: runtimeBlockerReports.at(-1)?.failedArm?.strategy ?? null,
+    localEmbeddingRuntimeStatus: localEmbeddingRuntimeDoctor?.status ?? null,
+    localEmbeddingRuntimeReady,
+    localEmbeddingRuntimeBlockers,
+    localEmbeddingRuntimeModelLooksDedicated: Boolean(localEmbeddingRuntimeDoctor?.modelArtifact?.likelyDedicatedEmbedding),
+    localEmbeddingRuntimeEndpointReachable: Boolean(localEmbeddingRuntimeDoctor?.localEndpoint?.modelsEndpointReachable),
     localEmbeddingDurabilityStatus: localEmbeddingDurabilitySmoke?.status ?? null,
     localEmbeddingDurabilityReady,
     localEmbeddingDurabilityProbeCount: Number(localEmbeddingDurabilitySmoke?.probes?.length ?? 0),
@@ -387,7 +408,12 @@ function inspectLocalFullLaneState({
     publicBenchmarkClaimsAllowed: false,
     envBlockers,
     blockers,
-    shardIntakeBlockers: [...arrayOf(localFullShardIntake?.blockers), ...runtimeBlockerIds, ...localEmbeddingDurabilityBlockers],
+    shardIntakeBlockers: [
+      ...arrayOf(localFullShardIntake?.blockers),
+      ...runtimeBlockerIds,
+      ...localEmbeddingRuntimeBlockers,
+      ...localEmbeddingDurabilityBlockers,
+    ],
     launchBlockers: arrayOf(localFullAcceptedLaneLaunchDoctor?.blockers),
   };
 }
@@ -583,6 +609,7 @@ function buildNextRunPlan({ shardPlan, sotaOperatorPacket }) {
     firstCommands: arrayOf(fullShardFlow?.commands).slice(0, 6),
     requiredAfterShardRuns: [
       "benchmark:answer-quality:shard-workorder",
+      "benchmark:local-embedding:runtime-doctor before local Apple embedding durability",
       "benchmark:local-embedding:durability before local Apple response-arm export",
       "benchmark:answer-quality:shard-intake --require-ready",
       "benchmark:answer-quality:combine -- --combine-mode shards",
@@ -678,6 +705,8 @@ function renderMarkdown(value) {
     `- Runtime-blocked local-full shards: ${value.localFullLaneState.runtimeBlockedShardCount}`,
     `- Latest runtime-blocked shard: ${value.localFullLaneState.latestRuntimeBlockedShard ?? "n/a"}`,
     `- Latest runtime-blocked arm: ${value.localFullLaneState.latestRuntimeBlockedArm ?? "n/a"}`,
+    `- Local embedding runtime status: ${value.localFullLaneState.localEmbeddingRuntimeStatus ?? "n/a"}`,
+    `- Local embedding runtime ready: ${value.localFullLaneState.localEmbeddingRuntimeReady}`,
     `- Local embedding durability status: ${value.localFullLaneState.localEmbeddingDurabilityStatus ?? "n/a"}`,
     `- Local embedding durability ready: ${value.localFullLaneState.localEmbeddingDurabilityReady}`,
     `- Cloud provider blocker count: ${value.localFullLaneState.cloudProviderBlockerCount}`,

@@ -252,8 +252,12 @@ when the local Qwen3 Embedding 0.6B GGUF service closed the socket. A public
 synthetic embedding smoke reproduced the same failure, so the local-full lane
 still has only one accepted shard and nineteen missing shards. The bounded
 preflight is now codified as
-`benchmark:local-embedding:durability`, with the current public-safe blocked
-report at
+`benchmark:local-embedding:runtime-doctor`, then
+`benchmark:local-embedding:durability`. The current runtime doctor report is
+`reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`;
+it found a usable llama.cpp server binary but a non-embedding GGUF selection
+and no reachable local embedding endpoint, so it blocks before any durability
+or shard retry. The current public-safe blocked durability report is at
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
 Local Apple response-arm export should require a passing durability report
 before shard 002 or any later local-full shard can count.
@@ -553,11 +557,11 @@ contract, but it did not win the shard. It remains a challenger, not a default,
 and the full 500-query local-full result still requires the remaining nineteen
 shards and combine gate. Shard 002 exposed a separate local embedding-runtime
 durability blocker before the local rerank arm could run, so the next accepted
-local-full shard needs a passing
-`benchmark:local-embedding:durability -- --require-ready` report before
-response export. The checked-in blocked smoke is synthetic-only, prints no
-endpoint URL or raw probe text, and does not count as local-full or SOTA
-evidence.
+local-full shard needs a passing runtime doctor and durability smoke before
+response export. Run `benchmark:local-embedding:runtime-doctor -- --require-ready`
+before `benchmark:local-embedding:durability -- --require-ready`. The checked-in
+blocked reports are public-safe, print no endpoint URL or raw probe text, and
+do not count as local-full or SOTA evidence.
 
 A source-locked 30-query local Apple run is now recorded:
 
