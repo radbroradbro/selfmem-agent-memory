@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-26T00:15:51.144Z",
+  "generatedAt": "2026-05-26T00:24:03.995Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -151,7 +151,7 @@
     "endToEndMemoryScoreGate": {
       "path": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "exists": true,
-      "hash": "sha256:27b56a0e9cd363039628f427ef28c8262a4721aee982947095e8d04eed5a5ca3",
+      "hash": "sha256:9ef60bf2fe99bdf0825a5f9f3acd97e4dad10468d394d02c8e2df020d1e320af",
       "mode": "end-to-end-memory-score-gate",
       "fixtureOnly": null,
       "retrievalProxyOnly": null,

@@ -389,6 +389,15 @@ assert.ok(endToEndMemoryScoreGate.blockers.includes("answer-model-does-not-match
 assert.ok(endToEndMemoryScoreGate.blockers.includes("judge-model-does-not-match-target"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("memory-score-reviewer-approval-report-not-ready"));
 assert.ok(endToEndMemoryScoreGate.blockers.includes("missing-two-independent-reviewer-approvals"));
+assert.ok(endToEndMemoryScoreGate.fullSotaBlockers.includes("reported-target-judge-model-does-not-match-result"));
+assert.ok(endToEndMemoryScoreGate.fullSotaBlockers.includes("missing-full-or-officially-comparable-memory-benchmark-run"));
+assert.ok(endToEndMemoryScoreGate.fullSotaBlockers.includes("best-end-to-end-score-below-primary-reported-memory-target"));
+assert.equal(endToEndMemoryScoreGate.reportedTargetsEvidence?.status, "READY_REPORTED_TARGETS");
+assert.equal(endToEndMemoryScoreGate.reportedTargetComparison?.primaryTarget?.id, "supermemory-production-research-gemini-3-pro");
+assert.equal(endToEndMemoryScoreGate.reportedTargetComparison?.scoreDelta, -42.0333);
+assert.equal(endToEndMemoryScoreGate.fullBenchmarkPolicy?.currentAnswerQualityQueryCount, 30);
+assert.equal(endToEndMemoryScoreGate.fullBenchmarkPolicy?.minimumFullQueryCount, 500);
+assert.equal(endToEndMemoryScoreGate.fullBenchmarkPolicy?.fullOrOfficiallyComparableRunPresent, false);
 assert.equal(endToEndMemoryScoreGate.reviewerApproval?.exists, true);
 assert.equal(endToEndMemoryScoreGate.reviewerApproval?.targetBound, true);
 assert.equal(endToEndMemoryScoreGate.reviewerApproval?.reviewerApprovalCount, 0);

@@ -2065,6 +2065,17 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("memory-score-reviewer-approval-report-not-ready"));
   assert.ok(endToEndMemoryScoreGateEvidence.blockers.includes("missing-two-independent-reviewer-approvals"));
   assert.equal(endToEndMemoryScoreGateEvidence.blockers.includes("missing-nvidia-or-gemini-provider-arm"), false);
+  assert.ok(endToEndMemoryScoreGateEvidence.fullSotaBlockers.includes("reported-target-judge-model-does-not-match-result"));
+  assert.ok(endToEndMemoryScoreGateEvidence.fullSotaBlockers.includes("missing-full-or-officially-comparable-memory-benchmark-run"));
+  assert.ok(endToEndMemoryScoreGateEvidence.fullSotaBlockers.includes("best-end-to-end-score-below-primary-reported-memory-target"));
+  assert.equal(endToEndMemoryScoreGateEvidence.reportedTargetsEvidence?.status, "READY_REPORTED_TARGETS");
+  assert.equal(endToEndMemoryScoreGateEvidence.reportedTargetComparison?.primaryTarget?.id, "supermemory-production-research-gemini-3-pro");
+  assert.equal(endToEndMemoryScoreGateEvidence.reportedTargetComparison?.scoreDelta, -42.0333);
+  assert.equal(endToEndMemoryScoreGateEvidence.reportedTargetComparison?.meetsPrimaryReportedTarget, false);
+  assert.equal(endToEndMemoryScoreGateEvidence.reportedTargetComparison?.sameJudgeModelAsPrimaryTarget, false);
+  assert.equal(endToEndMemoryScoreGateEvidence.fullBenchmarkPolicy?.currentAnswerQualityQueryCount, 30);
+  assert.equal(endToEndMemoryScoreGateEvidence.fullBenchmarkPolicy?.minimumFullQueryCount, 500);
+  assert.equal(endToEndMemoryScoreGateEvidence.fullBenchmarkPolicy?.fullOrOfficiallyComparableRunPresent, false);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.exists, true);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.targetBound, true);
   assert.equal(endToEndMemoryScoreGateEvidence.reviewerApproval?.reviewerApprovalCount, 0);

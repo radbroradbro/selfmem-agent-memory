@@ -223,6 +223,11 @@ Follow-up provider evidence on 2026-05-25:
   target is Supermemory's reported LongMemEval-S `85.2%` Gemini 3 Pro row;
   delta is `-42.0333`, so the ladder adds
   `best-end-to-end-score-below-reported-supermemory-target`.
+- The end-to-end memory score gate now repeats that comparison in its own
+  `fullSotaBlockers` list. The current gate is blocked for the judge mismatch
+  with the primary reported target, the missing full or officially comparable
+  run, and the below-target score, so `benchmark:memory-score:result-gate
+  --require-ready` cannot pass on the 30-query canary.
 - The reported target rows now have their own public-safe source-lock artifact:
   `reviews/overnight-20260522/reported-memory-targets-20260525.json`, rendered
   at `reviews/overnight-20260522/reported-memory-targets-20260525.md` and

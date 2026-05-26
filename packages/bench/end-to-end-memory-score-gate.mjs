@@ -9,6 +9,10 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const resultPath = args.result ? resolve(root, args.result) : null;
 const targetPath = resolve(root, args.target ?? "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
+const reportedTargetsPath = resolve(
+  root,
+  args.reportedTargets ?? process.env.RECALLWEAVE_REPORTED_TARGETS_INPUT ?? "reviews/overnight-20260522/reported-memory-targets-20260525.json",
+);
 const outputPath = args.output ? resolve(root, args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolve(root, args.markdownOutput ?? args.markdown) : null;
 const reviewerApprovalReportPath = args.reviewerApprovalReport ?? args.reviewerReport ?? process.env.RECALLWEAVE_MEMORY_SCORE_REVIEWER_APPROVAL_REPORT ?? null;
@@ -24,8 +28,9 @@ const targetRaw = readFileSync(targetPath, "utf8");
 assertSafePublicText(targetRaw, "target");
 const target = JSON.parse(targetRaw);
 const loaded = loadResult();
+const reportedTargetsEvidence = loadReportedTargetsEvidence();
 const reviewerApproval = loadReviewerApprovalReport();
-const report = buildGateReport({ loaded, target, targetRaw, reviewerApproval });
+const report = buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, reviewerApproval });
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
 const markdownText = `${renderMarkdown(report)}\n`;
 assertSafePublicText(jsonText, "end-to-end memory score gate");
@@ -34,7 +39,7 @@ assertSafePublicText(markdownText, "end-to-end memory score gate markdown");
 if (outputPath) writeOutput(outputPath, jsonText);
 if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
-if (requireReady && report.status !== "READY_END_TO_END_MEMORY_SCORE") process.exit(1);
+if (requireReady && !report.countsAsFullMemorySotaEvidence) process.exit(1);
 
 function loadResult() {
   if (fixtureProxySmoke) {
@@ -104,11 +109,55 @@ function loadReviewerApprovalReport() {
   };
 }
 
-function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
+function loadReportedTargetsEvidence() {
+  if (!existsSync(reportedTargetsPath)) {
+    return {
+      source: "missing-reported-targets",
+      path: displayPath(reportedTargetsPath),
+      exists: false,
+      json: null,
+      hash: null,
+      status: "MISSING_REPORTED_TARGETS",
+      blockers: ["reported-targets-file-missing"],
+    };
+  }
+  assert.ok(statSync(reportedTargetsPath).size > 0, `reported targets empty: ${displayPath(reportedTargetsPath)}`);
+  const result = spawnSync(
+    "node",
+    ["packages/bench/public-benchmark-reported-targets.mjs", "--input", displayPath(reportedTargetsPath)],
+    { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+  );
+  if (result.status !== 0) {
+    return {
+      source: "reported-targets-validation-failed",
+      path: displayPath(reportedTargetsPath),
+      exists: true,
+      json: null,
+      hash: null,
+      status: "BLOCKED_REPORTED_TARGETS",
+      blockers: ["reported-targets-validation-failed"],
+    };
+  }
+  assertSafePublicText(result.stdout, "reported targets evidence");
+  const json = JSON.parse(result.stdout);
+  return {
+    source: "reported-targets-report",
+    path: displayPath(reportedTargetsPath),
+    exists: true,
+    json,
+    hash: `sha256:${sha256(result.stdout)}`,
+    status: json.status ?? null,
+    blockers: Array.isArray(json.blockers) ? json.blockers : [],
+  };
+}
+
+function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, reviewerApproval }) {
   const result = loaded.json;
   const rows = normalizeRows(result);
   const rowNames = rows.map((item) => item.strategy ?? item.armId).filter(Boolean);
   const answerMetric = bestAnswerMetric(rows, result);
+  const fullBenchmarkPolicy = buildFullBenchmarkPolicy({ target, result, rows });
+  const primaryReportedTarget = reportedTargetsEvidence.json?.primaryReportedMemoryTarget ?? null;
   const reviewerApprovalCount = reviewerApproval.exists ? Number(reviewerApproval.json?.reviewerApprovalCount ?? 0) : 0;
   const targetBenchmark = target.benchmark?.family ?? target.benchmark?.name;
   const targetScoringHash = target.benchmark?.scoringCodeHash ?? null;
@@ -121,6 +170,13 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
   const resultAnswerLabelsHash = result?.answerLabelsHash ?? result?.input?.answerLabelsHash ?? result?.target?.answerLabelsHash ?? null;
   const resultAnswerModel = extractActualAnswerModel(result);
   const resultJudgeModel = extractActualJudgeModel(result);
+  const reportedTargetComparison = compareReportedTarget({
+    answerMetric,
+    resultAnswerModel,
+    resultJudgeModel,
+    targetBenchmark,
+    primaryReportedTarget,
+  });
   const reviewerTarget = reviewerApproval.json?.target ?? {};
   const reviewerApprovalReportTargetBound =
     reviewerApproval.exists &&
@@ -181,6 +237,13 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
     reviewerApprovalReportTargetBound,
     reviewerApprovalsPresent: reviewerApprovalCount >= 2,
     privacyLeakCountersClear: rows.every((item) => Number(item.privacyLeakCount ?? 0) === 0 && Number(item.redactionFailureCount ?? 0) === 0),
+    reportedTargetsSourceLocked: reportedTargetsEvidence.status === "READY_REPORTED_TARGETS",
+    primaryReportedMemoryTargetPresent: Boolean(primaryReportedTarget),
+    reportedTargetBenchmarkMatchesResult: reportedTargetComparison.sameBenchmarkFamilyAsPrimaryTarget === true,
+    reportedTargetJudgeMatchesResult: reportedTargetComparison.sameJudgeModelAsPrimaryTarget === true,
+    reportedTargetAnswerModelComparable: reportedTargetComparison.answerModelComparable !== false,
+    fullOrOfficiallyComparableRunPresent: fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent === true,
+    scoreMeetsPrimaryReportedTarget: reportedTargetComparison.scoreMeetsPrimaryReportedTarget === true,
   };
 
   const blockers = [
@@ -224,6 +287,18 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
     !checks.privacyLeakCountersClear ? "privacy-or-redaction-counter-nonzero" : null,
   ].filter(Boolean);
 
+  const fullSotaBlockers = [
+    !checks.reportedTargetsSourceLocked ? "reported-memory-targets-not-source-locked" : null,
+    !checks.primaryReportedMemoryTargetPresent ? "missing-primary-reported-memory-target" : null,
+    checks.primaryReportedMemoryTargetPresent && !checks.reportedTargetBenchmarkMatchesResult ? "reported-target-benchmark-does-not-match-result" : null,
+    checks.primaryReportedMemoryTargetPresent && !checks.reportedTargetJudgeMatchesResult ? "reported-target-judge-model-does-not-match-result" : null,
+    checks.primaryReportedMemoryTargetPresent && !checks.reportedTargetAnswerModelComparable ? "reported-target-answer-model-does-not-match-result" : null,
+    !checks.fullOrOfficiallyComparableRunPresent ? "missing-full-or-officially-comparable-memory-benchmark-run" : null,
+    checks.primaryReportedMemoryTargetPresent && !checks.scoreMeetsPrimaryReportedTarget ? "best-end-to-end-score-below-primary-reported-memory-target" : null,
+  ].filter(Boolean);
+  const countsAsEndToEndMemoryBenchmark = blockers.length === 0;
+  const countsAsFullMemorySotaEvidence = countsAsEndToEndMemoryBenchmark && fullSotaBlockers.length === 0;
+
   return {
     schemaVersion: 1,
     ok: true,
@@ -235,12 +310,14 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
     callsProviderApis: false,
     sendsBenchmarkTextToProvider: false,
     publicBenchmarkClaimsAllowed: false,
-    countsAsEndToEndMemoryBenchmark: blockers.length === 0,
-    countsAsFullMemorySotaEvidence: blockers.length === 0,
+    countsAsEndToEndMemoryBenchmark,
+    countsAsFullMemorySotaEvidence,
     reason:
-      blockers.length === 0
+      countsAsFullMemorySotaEvidence
         ? "Same-data answer-quality result is source-locked, reviewed, and eligible for the full memory SOTA ladder."
-        : "Result is missing, retrieval-only, fixture-only, unreviewed, or otherwise insufficient for end-to-end memory quality claims.",
+        : blockers.length
+          ? "Result is missing, retrieval-only, fixture-only, unreviewed, or otherwise insufficient for end-to-end memory quality claims."
+          : "Result passes the end-to-end memory-score checks, but still lacks the full-run or reported-target comparison needed for SOTA evidence.",
     target: {
       path: displayPath(targetPath),
       hash: targetHash,
@@ -265,10 +342,24 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
       answerLabelsHash: resultAnswerLabelsHash,
       answerModel: resultAnswerModel,
       judgeModel: resultJudgeModel,
+      scoredQueryCount: fullBenchmarkPolicy.currentAnswerQualityQueryCount,
       answerQualityMetric: answerMetric,
       reviewerApprovalCount,
       arms: rowNames,
     },
+    reportedTargetsEvidence: {
+      source: reportedTargetsEvidence.source,
+      path: reportedTargetsEvidence.path,
+      hash: reportedTargetsEvidence.hash,
+      exists: reportedTargetsEvidence.exists,
+      status: reportedTargetsEvidence.status,
+      primaryReportedMemoryTarget: primaryReportedTarget?.id ?? null,
+      memoryTargetCount: Number(reportedTargetsEvidence.json?.checks?.memoryTargetCount ?? 0),
+      componentTargetCount: Number(reportedTargetsEvidence.json?.checks?.componentTargetCount ?? 0),
+      blockers: reportedTargetsEvidence.blockers,
+    },
+    reportedTargetComparison,
+    fullBenchmarkPolicy,
     reviewerApproval: {
       source: reviewerApproval.source,
       path: reviewerApproval.path,
@@ -283,11 +374,13 @@ function buildGateReport({ loaded, target, targetRaw, reviewerApproval }) {
     },
     checks,
     blockers,
-    nextActions: blockers.length
+    fullSotaBlockers,
+    nextActions: blockers.length || fullSotaBlockers.length
       ? [
-          "Run the same-data LongMemEval/MemoryBench answer-quality harness, not only the retrieval-proxy strategy comparison.",
+          "Run the same-data LongMemEval/MemoryBench answer-quality harness across the full target or an officially comparable benchmark target.",
           "Include BM25, dense/vector, full-hybrid, live query-expansion, provider challenger, local Apple, and local reranker arms on the exact source-locked target.",
-          "Attach only metrics-only public-safe output, then re-run this gate with --require-ready before claiming full-memory SOTA evidence.",
+          "Beat the source-locked reported memory-system target under matching benchmark and judge semantics before claiming full-memory SOTA evidence.",
+          "Attach only metrics-only public-safe output, then re-run this gate with --require-ready before SOTA ladder promotion.",
           "Send the exact gate-passing packet to two independent reviewers before owner/public release approval.",
         ]
       : [
@@ -323,6 +416,98 @@ function bestAnswerMetric(rows, result) {
     }
   }
   return { name: null, value: null };
+}
+
+function buildFullBenchmarkPolicy({ target, result, rows }) {
+  const targetClaimTier = target?.claimTier ?? null;
+  const benchmarkFamily = target?.benchmark?.family ?? target?.benchmark?.name ?? null;
+  const datasetSlice = target?.benchmark?.split ?? null;
+  const currentAnswerQualityQueryCount = Math.max(
+    finiteNumber(result?.input?.scoredQueryCount),
+    finiteNumber(result?.input?.queryCount),
+    finiteNumber(result?.queryShard?.scoredQueryCount),
+    finiteNumber(result?.queryShard?.queryCount),
+    finiteNumber(result?.scoredQueryCount),
+    finiteNumber(result?.queryCount),
+    ...rows.flatMap((row) => [
+      finiteNumber(row.scoredQueryCount),
+      finiteNumber(row.queryCount),
+      finiteNumber(row.input?.scoredQueryCount),
+      finiteNumber(row.input?.queryCount),
+    ]),
+  );
+  const minimumFullQueryCount = String(benchmarkFamily ?? "").toLowerCase().includes("longmemeval") ? 500 : null;
+  const fullQueryCountPresent = minimumFullQueryCount != null && currentAnswerQualityQueryCount >= minimumFullQueryCount;
+  const officiallyComparableClaimTier = ["public-benchmark", "full-benchmark", "officially-comparable", "broad-sota"].includes(
+    String(targetClaimTier ?? ""),
+  );
+  return {
+    requirement:
+      "Broad SOTA or production-replacement wording requires a full benchmark run or an explicitly official comparable target, not only a canary slice.",
+    benchmarkFamily,
+    datasetSlice,
+    targetClaimTier,
+    currentAnswerQualityQueryCount,
+    minimumFullQueryCount,
+    fullQueryCountPresent,
+    officiallyComparableClaimTier,
+    fullOrOfficiallyComparableRunPresent: fullQueryCountPresent || officiallyComparableClaimTier,
+    currentCanaryOnly: !fullQueryCountPresent && !officiallyComparableClaimTier,
+  };
+}
+
+function compareReportedTarget({ answerMetric, resultAnswerModel, resultJudgeModel, targetBenchmark, primaryReportedTarget }) {
+  const score = answerMetric.value != null && Number.isFinite(Number(answerMetric.value)) ? Number(answerMetric.value) : null;
+  const targetScore =
+    primaryReportedTarget?.score != null && Number.isFinite(Number(primaryReportedTarget.score)) ? Number(primaryReportedTarget.score) : null;
+  const targetJudgeModel = primaryReportedTarget?.judge ?? primaryReportedTarget?.judgeModel ?? null;
+  const reportedBenchmark = primaryReportedTarget?.benchmarkFamily ?? primaryReportedTarget?.benchmark ?? null;
+  const answerModelReported = primaryReportedTarget?.answerModelReported === true;
+  const sameBenchmarkFamilyAsPrimaryTarget =
+    primaryReportedTarget != null && normalizeBenchmark(targetBenchmark) === normalizeBenchmark(reportedBenchmark);
+  const sameJudgeModelAsPrimaryTarget =
+    resultJudgeModel != null && targetJudgeModel != null && normalizeModel(resultJudgeModel) === normalizeModel(targetJudgeModel);
+  const answerModelComparable = answerModelReported
+    ? resultAnswerModel != null && normalizeModel(resultAnswerModel) === normalizeModel(primaryReportedTarget?.answerModel)
+    : null;
+  const scoreMeetsPrimaryReportedTarget = score != null && targetScore != null && score >= targetScore;
+  return {
+    primaryTarget: primaryReportedTarget
+      ? {
+          id: primaryReportedTarget.id,
+          benchmark: primaryReportedTarget.benchmark,
+          benchmarkFamily: primaryReportedTarget.benchmarkFamily ?? null,
+          score: primaryReportedTarget.score,
+          scoreUnit: primaryReportedTarget.scoreUnit,
+          judgeModel: targetJudgeModel,
+          answerModel: firstString(primaryReportedTarget.answerModel),
+          answerModelReported,
+          source: primaryReportedTarget.source ?? primaryReportedTarget.sourceUrl,
+          caveat: primaryReportedTarget.caveat,
+        }
+      : null,
+    observed: {
+      metricName: answerMetric.name ?? null,
+      score,
+      scoreUnit: "answer-quality percent",
+      benchmarkFamily: targetBenchmark ?? null,
+      answerModel: resultAnswerModel,
+      judgeModel: resultJudgeModel,
+    },
+    scoreDelta: score != null && targetScore != null ? Number((score - targetScore).toFixed(4)) : null,
+    sameBenchmarkFamilyAsPrimaryTarget,
+    sameJudgeModelAsPrimaryTarget,
+    answerModelComparable,
+    scoreMeetsPrimaryReportedTarget,
+    meetsPrimaryReportedTarget:
+      scoreMeetsPrimaryReportedTarget &&
+      sameBenchmarkFamilyAsPrimaryTarget &&
+      sameJudgeModelAsPrimaryTarget &&
+      answerModelComparable !== false,
+    matchingBenchmarkSemanticsRequired: true,
+    comparisonRule:
+      "Direct hosted usage is optional when quota-blocked, but a RecallWeave win requires same-benchmark, same-scoring, full-memory answer-quality evidence that meets or beats the selected reported memory-system target.",
+  };
 }
 
 function extractActualAnswerModel(result) {
@@ -372,14 +557,32 @@ function renderMarkdown(value) {
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),
     "",
+    "## Full SOTA Blockers",
+    ...(value.fullSotaBlockers.length ? value.fullSotaBlockers.map((item) => `- ${item}`) : ["- none"]),
+    "",
     "## Result",
     `- Source: ${value.result.source}`,
     `- Fixture only: ${value.result.fixtureOnly}`,
     `- Answer model: ${value.result.answerModel ?? "missing"} (target ${value.target.answerModel ?? "missing"})`,
     `- Judge model: ${value.result.judgeModel ?? "missing"} (target ${value.target.judgeModel ?? "missing"})`,
+    `- Scored queries: ${value.result.scoredQueryCount}`,
     `- Answer quality metric: ${value.result.answerQualityMetric.name ?? "missing"}=${value.result.answerQualityMetric.value ?? "missing"}`,
     `- Reviewer approvals: ${value.result.reviewerApprovalCount}`,
     `- Arms: ${value.result.arms.join(", ") || "none"}`,
+    "",
+    "## Reported Target",
+    `- Source lock status: ${value.reportedTargetsEvidence.status ?? "missing"}`,
+    `- Primary target: ${value.reportedTargetComparison.primaryTarget?.id ?? "missing"} (${value.reportedTargetComparison.primaryTarget?.score ?? "missing"} ${value.reportedTargetComparison.primaryTarget?.scoreUnit ?? ""})`,
+    `- Score delta: ${value.reportedTargetComparison.scoreDelta ?? "missing"}`,
+    `- Same benchmark family: ${value.reportedTargetComparison.sameBenchmarkFamilyAsPrimaryTarget}`,
+    `- Same judge model: ${value.reportedTargetComparison.sameJudgeModelAsPrimaryTarget}`,
+    `- Meets reported target: ${value.reportedTargetComparison.meetsPrimaryReportedTarget}`,
+    "",
+    "## Full Benchmark Policy",
+    `- Dataset slice: ${value.fullBenchmarkPolicy.datasetSlice ?? "missing"}`,
+    `- Current answer-quality query count: ${value.fullBenchmarkPolicy.currentAnswerQualityQueryCount}`,
+    `- Minimum full query count: ${value.fullBenchmarkPolicy.minimumFullQueryCount ?? "missing"}`,
+    `- Full or officially comparable run present: ${value.fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent}`,
     "",
     "## Reviewer Approval",
     `- Report exists: ${value.reviewerApproval.exists}`,
@@ -420,6 +623,22 @@ function displayPath(path) {
 
 function sha256(text) {
   return createHash("sha256").update(String(text)).digest("hex");
+}
+
+function finiteNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function normalizeBenchmark(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function normalizeModel(value) {
+  return String(value ?? "").trim().toLowerCase();
 }
 
 function assertSafePublicText(text, label) {

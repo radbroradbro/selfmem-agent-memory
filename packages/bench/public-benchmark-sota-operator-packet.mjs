@@ -157,6 +157,9 @@ const packet = {
       countsAsEndToEndMemoryBenchmark: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsEndToEndMemoryBenchmark),
       countsAsFullMemorySotaEvidence: Boolean(endToEndMemoryScoreGateEvidence.json?.countsAsFullMemorySotaEvidence),
       blockers: endToEndMemoryScoreGateEvidence.json?.blockers ?? [],
+      fullSotaBlockers: endToEndMemoryScoreGateEvidence.json?.fullSotaBlockers ?? [],
+      reportedTargetComparison: endToEndMemoryScoreGateEvidence.json?.reportedTargetComparison ?? null,
+      fullBenchmarkPolicy: endToEndMemoryScoreGateEvidence.json?.fullBenchmarkPolicy ?? null,
     },
     liveLocalAnswerQuality: {
       evidencePath: liveLocalAnswerQualityEvidence.path,

@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-26T00:15:58.271Z",
+  "generatedAt": "2026-05-26T00:24:04.156Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -260,7 +260,7 @@
     "endToEndMemoryScoreGate": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:27b56a0e9cd363039628f427ef28c8262a4721aee982947095e8d04eed5a5ca3",
+      "evidenceHash": "sha256:9ef60bf2fe99bdf0825a5f9f3acd97e4dad10468d394d02c8e2df020d1e320af",
       "status": "BLOCKED_END_TO_END_MEMORY_SCORE",
       "countsAsEndToEndMemoryBenchmark": false,
       "countsAsFullMemorySotaEvidence": false,
@@ -270,7 +270,54 @@
         "missing-voyage-provider-arm",
         "memory-score-reviewer-approval-report-not-ready",
         "missing-two-independent-reviewer-approvals"
-      ]
+      ],
+      "fullSotaBlockers": [
+        "reported-target-judge-model-does-not-match-result",
+        "missing-full-or-officially-comparable-memory-benchmark-run",
+        "best-end-to-end-score-below-primary-reported-memory-target"
+      ],
+      "reportedTargetComparison": {
+        "primaryTarget": {
+          "id": "supermemory-production-research-gemini-3-pro",
+          "benchmark": "LongMemEval-S",
+          "benchmarkFamily": "longmemeval",
+          "score": 85.2,
+          "scoreUnit": "percent",
+          "judgeModel": "gemini-3-pro",
+          "answerModel": null,
+          "answerModelReported": false,
+          "source": "https://supermemory.ai/research/",
+          "caveat": "Highest source-locked production/research target in this artifact. RecallWeave must meet or beat it under matching benchmark semantics before SOTA wording."
+        },
+        "observed": {
+          "metricName": "result",
+          "score": 43.1667,
+          "scoreUnit": "answer-quality percent",
+          "benchmarkFamily": "longmemeval",
+          "answerModel": "qwen36-a3b-main-q8kv-8192",
+          "judgeModel": "qwen36-a3b-main-q8kv-8192"
+        },
+        "scoreDelta": -42.0333,
+        "sameBenchmarkFamilyAsPrimaryTarget": true,
+        "sameJudgeModelAsPrimaryTarget": false,
+        "answerModelComparable": null,
+        "scoreMeetsPrimaryReportedTarget": false,
+        "meetsPrimaryReportedTarget": false,
+        "matchingBenchmarkSemanticsRequired": true,
+        "comparisonRule": "Direct hosted usage is optional when quota-blocked, but a RecallWeave win requires same-benchmark, same-scoring, full-memory answer-quality evidence that meets or beats the selected reported memory-system target."
+      },
+      "fullBenchmarkPolicy": {
+        "requirement": "Broad SOTA or production-replacement wording requires a full benchmark run or an explicitly official comparable target, not only a canary slice.",
+        "benchmarkFamily": "longmemeval",
+        "datasetSlice": "longmemeval-s-cleaned-canary-30-first-per-type-2026-05-24",
+        "targetClaimTier": "run-only",
+        "currentAnswerQualityQueryCount": 30,
+        "minimumFullQueryCount": 500,
+        "fullQueryCountPresent": false,
+        "officiallyComparableClaimTier": false,
+        "fullOrOfficiallyComparableRunPresent": false,
+        "currentCanaryOnly": true
+      }
     },
     "liveLocalAnswerQuality": {
       "evidencePath": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",

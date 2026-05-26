@@ -30,6 +30,9 @@ Use this checklist before making the repository public.
   LongMemEval answer-quality target, either as one run or as complete
   non-overlapping `--query-offset` / `--max-queries` shards merged with
   `benchmark:answer-quality:combine -- --combine-mode shards`.
+- [ ] `benchmark:memory-score:result-gate --require-ready` has an empty
+  `fullSotaBlockers` list, proving the result meets the selected source-locked
+  reported memory-system target under matching benchmark and judge semantics.
 - [ ] Supermemory references are clear, read-only, and non-affiliation-safe.
 
 ## Scans

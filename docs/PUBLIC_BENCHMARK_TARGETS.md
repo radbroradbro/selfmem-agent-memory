@@ -189,6 +189,11 @@ The answer-quality runner now supports full-target scoring in deterministic
 query shards via `--query-offset` and `--max-queries`; the shard combiner must
 merge only complete, non-overlapping coverage with the same target, query set,
 materializer, answer-label, answer-model, judge-model, and strategy set.
+`benchmark:memory-score:result-gate --require-ready` now also checks the
+source-locked reported memory-system target directly. It leaves
+`fullSotaBlockers` non-empty until the result is full or officially comparable,
+uses the same benchmark and judge semantics, and meets or beats the selected
+reported target score.
 Keep raw benchmark and memory sources outside the repository but reachable to
 the operator through source manifests, hashes, and private materialized paths.
 The UI and default retrieval path may use compressed memories, but benchmark
@@ -399,7 +404,9 @@ Component rows in the same artifact remain model-selection evidence only.
   `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`.
   Public comparison and SOTA wording remain blocked because
   `reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json` records
-  a missing same-data Voyage answer-quality arm after HTTP 429.
+  a missing same-data Voyage answer-quality arm after HTTP 429, and because the
+  end-to-end gate now records full-SOTA blockers for the 30-query slice, the
+  below-target score, and the judge mismatch with the primary reported target.
 - Current SOTA operator packet:
   `reviews/overnight-20260522/sota-ladder-operator-packet-20260525.json`.
   Its minimum Voyage answer-quality retry flow reruns only the required BM25,

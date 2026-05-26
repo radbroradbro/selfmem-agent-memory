@@ -254,6 +254,10 @@ blocked at `-42.0333`. The reported target row is now source-locked in
 `reviews/overnight-20260522/reported-memory-targets-20260525.json` and
 validated by `benchmark:reported-targets`; component rows such as Qwen,
 EmbeddingGemma, Voyage, and NVIDIA are kept as model-selection evidence only.
+The end-to-end score gate itself now repeats that reported-target comparison
+and exposes `fullSotaBlockers`, so `benchmark:memory-score:result-gate
+--require-ready` cannot pass on a 30-query canary, a below-target result, or a
+different judge model even if the lower end-to-end checks are otherwise green.
 The end-to-end gate also now verifies exact answer and
 judge model matching against the target contract. The current canary was
 answered and judged by `qwen36-a3b-main-q8kv-8192` while the checked target
@@ -670,6 +674,8 @@ A stronger claim requires:
 - the same settings,
 - a metrics-only end-to-end answer-quality result from `benchmark:answer-quality`
   that passed `benchmark:memory-score:result-gate --require-ready`,
+- the gate's `fullSotaBlockers` list empty, proving the full or officially
+  comparable run met the source-locked reported memory-system target,
 - a source-match preflight showing the local RecallWeave source can score the
   reviewed labels,
 - context-token parity between hosted and local arms, or an explicit local
@@ -681,7 +687,8 @@ A stronger claim requires:
 - no memory text in shared reports,
 - zero redaction failures,
 - cost and latency accounting,
-- a valid Supermemory baseline that is not quota-blocked.
+- a valid Supermemory baseline from live hosted usage, or a source-locked
+  reported Supermemory target row when hosted usage is quota-blocked.
 - a baseline result that is not a fixture and passes the hosted preflight
   result checks.
 
