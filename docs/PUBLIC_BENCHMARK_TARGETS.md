@@ -546,10 +546,12 @@ not count as a RecallWeave score.
   `reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
   packages the shard 002 retry as an operator-ready, metrics-only handoff. It
   verifies the local embedding runtime doctor and durability smoke are ready,
-  lists only hashes/counts/labels for the completed private arms, and emits the
-  missing-arm export, preflight, answer-quality, and local-intake commands. It
-  is not local-full benchmark evidence until shard 002 is accepted, and it is
-  never full-SOTA evidence by itself.
+  lists only hashes/counts/labels for the completed private arms, and names the
+  private command materializer as the safe operator path. The missing-arm
+  export, preflight, answer-quality, and local-intake commands stay as
+  placeholder templates in public evidence and are materialized only into an
+  outside-repository private script. It is not local-full benchmark evidence
+  until shard 002 is accepted, and it is never full-SOTA evidence by itself.
 - Local-full shard resume environment doctor:
   `reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json`
   checks whether the current shell has the private outside-repository source

@@ -355,8 +355,10 @@ to be regenerated just to retry the unstable local embedding path.
 `reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
 is the public-safe operator packet for that retry. It confirms the current
 local embedding runtime and durability reports are ready, preserves the three
-completed private arm hashes, emits the missing-arm-only export, preflight,
-answer-quality, and local-intake commands, and still keeps
+completed private arm hashes, points operators to
+`benchmark:answer-quality:local-shard-resume-command` for private script
+materialization, retains the placeholder missing-arm export, preflight,
+answer-quality, and local-intake templates as non-runnable public evidence, and still keeps
 `countsAsLocalFullBenchmarkEvidence: false` until shard 002 returns an accepted
 public result.
 `reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json`
@@ -385,8 +387,10 @@ false.
 materializer for the same packet. Its public report at
 `reviews/overnight-20260522/local-full-shard-002-resume-command-materializer-20260526.json`
 is blocked in this checkout because no external private command output or local
-env values are present. When those are supplied, it writes concrete runnable
-commands only to an outside-repository private script, while public evidence
+env values are present. The resume packet now names this materializer as the
+safe operator path before any shard 002 retry commands are run. When those
+inputs are supplied, it writes concrete runnable commands only to an
+outside-repository private script, while public evidence
 keeps command text, private paths, and env values hidden.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard

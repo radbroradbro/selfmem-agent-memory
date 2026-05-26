@@ -6,6 +6,7 @@ import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
+const packetOnlyCommandIds = new Set(["resumeCommandMaterializer"]);
 const args = parseArgs(process.argv.slice(2));
 const fixtureTempRoots = [];
 process.on("exit", () => {
@@ -166,7 +167,9 @@ process.stdout.write(format === "markdown" ? markdownText : jsonText);
 
 function inspectCommands(packet) {
   const commands = packet.commands ?? {};
-  const commandIds = Object.keys(commands).filter((id) => typeof commands[id] === "string" && commands[id].trim().length > 0);
+  const commandIds = Object.keys(commands).filter(
+    (id) => !packetOnlyCommandIds.has(id) && typeof commands[id] === "string" && commands[id].trim().length > 0,
+  );
   const placeholderNames = [
     ...new Set(commandIds.flatMap((id) => [...commands[id].matchAll(/<([^>]+)>/gu)].map((match) => match[1]))),
   ].sort();
@@ -240,7 +243,7 @@ function inspectReplacements({ privateDirState: privateState, reviewDir: reviewD
 
 function materializeCommands(commands, replacements) {
   return Object.entries(commands ?? {})
-    .filter(([, command]) => typeof command === "string" && command.trim().length > 0)
+    .filter(([id, command]) => !packetOnlyCommandIds.has(id) && typeof command === "string" && command.trim().length > 0)
     .map(([id, command]) => ({ id, command: materializeCommand(command, replacements) }));
 }
 

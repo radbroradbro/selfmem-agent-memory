@@ -405,8 +405,10 @@ missing-arm-only retry for the two local Apple arms. The resume packet at
 `reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
 turns that state into an operator handoff: it records current local runtime and
 durability readiness, lists only hashes/counts/labels for completed private
-arms, emits the missing-arm export, preflight, answer-quality, and local-intake
-commands, and keeps local-full evidence, SOTA evidence, public benchmark
+arms, points the operator to the private command materializer, keeps the
+missing-arm export, preflight, answer-quality, and local-intake templates as
+public evidence rather than runnable commands, and keeps local-full evidence,
+SOTA evidence, public benchmark
 claims, and launch claims disabled until shard 002 returns an accepted public
 result. Before running those commands, run
 `benchmark:answer-quality:local-shard-resume-env`; the checked-in report at
@@ -433,7 +435,9 @@ env doctor says the required placeholders are materializable. It writes the
 filled command sequence to an outside-repository private shell script selected
 with `--private-command-output` or
 `RECALLWEAVE_LOCAL_FULL_RESUME_PRIVATE_COMMAND_OUTPUT`; the public report keeps
-only command IDs, counts, hashes, and blocker names.
+only command IDs, counts, hashes, and blocker names. The resume packet now
+includes this materializer command so the intended retry flow is env doctor,
+private script materialization, then private script execution.
 The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.

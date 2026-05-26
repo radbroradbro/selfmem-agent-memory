@@ -3802,6 +3802,9 @@ check("fresh public benchmark target check passes", () => {
     assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--require-local-embedding-durability/);
     assert.match(resumePacket.commands?.resumeEnvDoctor ?? "", /benchmark:answer-quality:local-shard-resume-env/);
     assert.match(resumePacket.commands?.resumeEnvDoctor ?? "", /local-full-shard-002-resume-env-doctor-20260526\.json/);
+    assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /benchmark:answer-quality:local-shard-resume-command/);
+    assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /--private-command-output/);
+    assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /local-full-shard-002-resume-command-materializer-20260526\.json/);
     assert.match(resumePacket.commands?.preflight ?? "", /benchmark:answer-quality:preflight/);
     assert.match(resumePacket.commands?.answerQuality ?? "", /benchmark:answer-quality/);
     assert.match(resumePacket.commands?.localShardIntake ?? "", /benchmark:answer-quality:local-shard-intake/);
@@ -3811,7 +3814,9 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumePacketEvidence, /Local-Full Shard Resume Packet/);
   assert.match(localFullShardResumePacketEvidence, /Status: READY_FOR_LOCAL_FULL_SHARD_RESUME/);
   assert.match(localFullShardResumePacketEvidence, /Missing arms: local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank/);
+  assert.match(localFullShardResumePacketEvidence, /Resume command materializer: .*benchmark:answer-quality:local-shard-resume-command/);
   assert.match(localFullShardResumePacketEvidence, /Counts as local-full benchmark evidence: false/);
+  assert.match(localFullShardResumePacketEvidence, /Run the local-full shard resume command materializer to write a private shell script outside the repository/);
   assert.match(localFullShardResumePacketEvidence, /Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted/);
   assert.match(localFullShardResumePacketMarkdownFresh, /Local embedding runtime ready: true/);
   assert.match(localFullShardResumePacketMarkdownFresh, /Raw memory included: false/);
