@@ -105,6 +105,7 @@
     "benchmark:answer-quality:local-shard-workorder": "node packages/bench/public-benchmark-answer-quality-shard-workorder.mjs --plan reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
     "benchmark:answer-quality:local-shard-resume-packet": "node packages/bench/local-full-shard-resume-packet.mjs",
     "benchmark:answer-quality:local-shard-resume-env": "node packages/bench/local-full-shard-resume-env-doctor.mjs",
+    "benchmark:answer-quality:local-shard-resume-command": "node packages/bench/local-full-shard-resume-command-materializer.mjs",
     "benchmark:answer-quality:shard-intake": "node packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
     "benchmark:answer-quality:local-shard-intake": "node packages/bench/public-benchmark-answer-quality-shard-intake.mjs --plan reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
     "benchmark:answer-quality:private-input-doctor": "node packages/bench/full-shard-private-input-doctor.mjs",

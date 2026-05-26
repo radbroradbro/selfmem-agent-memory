@@ -381,6 +381,13 @@ completed-arm, missing-arm, durability, and environment gates can all turn
 green without private data, provider calls, or hosted Supermemory usage. That
 fixture remains `fixtureOnly: true` and still sets all benchmark-claim flags to
 false.
+`benchmark:answer-quality:local-shard-resume-command` is the private-only
+materializer for the same packet. Its public report at
+`reviews/overnight-20260522/local-full-shard-002-resume-command-materializer-20260526.json`
+is blocked in this checkout because no external private command output or local
+env values are present. When those are supplied, it writes concrete runnable
+commands only to an outside-repository private script, while public evidence
+keeps command text, private paths, and env values hidden.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

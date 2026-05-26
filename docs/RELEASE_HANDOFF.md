@@ -428,6 +428,12 @@ the green path without private data or hosted calls. That fixture creates only
 temporary synthetic private files outside the repository, proves the hashes and
 env gates can pass, and remains non-countable evidence with all public claim
 flags disabled.
+Use `benchmark:answer-quality:local-shard-resume-command` only after the resume
+env doctor says the required placeholders are materializable. It writes the
+filled command sequence to an outside-repository private shell script selected
+with `--private-command-output` or
+`RECALLWEAVE_LOCAL_FULL_RESUME_PRIVATE_COMMAND_OUTPUT`; the public report keeps
+only command IDs, counts, hashes, and blocker names.
 The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.

@@ -569,6 +569,13 @@ not count as a RecallWeave score.
   `readyForCommandMaterialization` and `resumePacketCommandsRunnableAsPrinted`
   so public evidence can prove required placeholders are satisfiable without
   printing private paths, endpoint values, or runnable commands.
+- Local-full shard resume command materializer:
+  `reviews/overnight-20260522/local-full-shard-002-resume-command-materializer-20260526.json`
+  is the public-safe companion to the env doctor. It fails closed until an
+  outside-repository private command output path and required local env values
+  exist. When ready, it writes concrete commands only to that private script and
+  reports public hashes/counts/status without printing the commands, private
+  paths, or env values.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard
