@@ -18,6 +18,7 @@ const files = {
   fullTarget: `${reviewDir}/public-longmemeval-full-run-target.json`,
   fullMaterialize: `${reviewDir}/public-longmemeval-full-materialize-run.json`,
   shardPlan: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
+  privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
   shardWorkorder: `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   shardIntake: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   sotaLadder: `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
@@ -41,6 +42,7 @@ const goalAudit = runJson(["packages/bench/goal-completion-audit.mjs"]);
 const fullTarget = evidence.fullTarget.json;
 const fullMaterialize = evidence.fullMaterialize.json;
 const shardPlan = evidence.shardPlan.json;
+const privateInputDoctor = evidence.privateInputDoctor.json;
 const shardWorkorder = evidence.shardWorkorder.json;
 const shardIntake = evidence.shardIntake.json;
 const sotaLadder = evidence.sotaLadder.json;
@@ -65,6 +67,9 @@ const gates = [
   gate("raw-source-retention", rawRetention.retainsRawSourcesPrivately && rawRetention.publicReportIsSafe, [
     "raw-sources-not-retained-privately",
     "raw-source-public-report-not-safe",
+  ]),
+  gate("full-shard-private-inputs", privateInputDoctor?.readyForAnswerQualityShardRun === true, privateInputDoctor?.blockers ?? [
+    "full-shard-private-input-doctor-not-ready",
   ]),
   gate("bm25-is-control-only", sotaOperatorPacket?.sameDataContract?.bm25LexicalFloorRequired === true, [
     "bm25-control-contract-missing",
@@ -147,6 +152,7 @@ const report = {
     expectedReferenceCount: Number(fullMaterialize?.selection?.expectedResultRefCount ?? 0),
   },
   rawSourceRetention: rawRetention,
+  privateInputState: inspectPrivateInputState(privateInputDoctor),
   shardState,
   currentCanary,
   reviewerState,
@@ -223,6 +229,20 @@ function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
       ...arrayOf(shardWorkorder?.blockers),
       ...arrayOf(shardIntake?.blockers),
     ],
+  };
+}
+
+function inspectPrivateInputState(privateInputDoctorReport) {
+  return {
+    path: files.privateInputDoctor,
+    status: privateInputDoctorReport?.status ?? null,
+    readyForAnswerQualityShardRun: Boolean(privateInputDoctorReport?.readyForAnswerQualityShardRun),
+    privateDirectoryPresent: Boolean(privateInputDoctorReport?.privateInput?.directoryPresent),
+    privateDirectoryInsideRepository: Boolean(privateInputDoctorReport?.privateInput?.directoryInsideRepository),
+    maxMemoryBytes: privateInputDoctorReport?.plan?.maxMemoryBytes ?? null,
+    filesPresent: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.present).length),
+    filesHashMatched: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.hashMatches).length),
+    blockers: privateInputDoctorReport?.blockers ?? [],
   };
 }
 
@@ -353,6 +373,14 @@ function renderMarkdown(value) {
     `- Retains raw sources privately: ${value.rawSourceRetention.retainsRawSourcesPrivately}`,
     `- Public report is safe: ${value.rawSourceRetention.publicReportIsSafe}`,
     `- Private raw roles: ${value.rawSourceRetention.roles.map((item) => item.role).join(", ")}`,
+    "",
+    "## Private Inputs",
+    `- Status: ${value.privateInputState.status}`,
+    `- Ready for shard run: ${value.privateInputState.readyForAnswerQualityShardRun}`,
+    `- Private directory present: ${value.privateInputState.privateDirectoryPresent}`,
+    `- Private directory inside repository: ${value.privateInputState.privateDirectoryInsideRepository}`,
+    `- Files present/hash-matched: ${value.privateInputState.filesPresent}/${value.privateInputState.filesHashMatched}`,
+    `- Max memory bytes: ${value.privateInputState.maxMemoryBytes ?? "n/a"}`,
     "",
     "## Shards",
     `- Plan status: ${value.shardState.planStatus}`,

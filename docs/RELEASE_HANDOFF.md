@@ -276,6 +276,15 @@ answer-quality preflight against those shard-local arms, and only then writes
 the public-safe shard score. Merge those chunks only with
 `benchmark:answer-quality:combine -- --combine-mode shards`, which rejects gaps,
 overlaps, target/model mismatches, and mixed strategy sets.
+Before spending model calls on those shards, run
+`benchmark:answer-quality:private-input-doctor` against the regenerated private
+materialized directory. The current evidence,
+`reviews/overnight-20260522/full-shard-private-input-doctor-current.json`,
+shows the private full queryset, memories, answer labels, raw dataset, selected
+raw rows, and source manifest are present outside the repository, hash-matched,
+mode `0600`, and covered by the shard plan's `300000000` byte memory cap. This
+is full-shard run readiness only; it is not a 500-query score, SOTA proof, or a
+public claim.
 Use `benchmark:answer-quality:shard-workorder` as the public-safe run tracker
 for those twenty shards. The checked-in workorder,
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`,

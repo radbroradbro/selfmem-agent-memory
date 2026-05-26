@@ -32,6 +32,7 @@ const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RE
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 5, "limit");
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
+const maxMemoryBytes = optionalPositiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? null, "max memory bytes");
 const privateOutputDir = resolveOptionalPath(args.privateOutputDir ?? process.env.RECALLWEAVE_SOTA_RESPONSE_ARM_DIR ?? null);
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_SOTA_ANSWER_QUALITY_STRATEGIES ?? defaultStrategies().join(","));
 const requireReady = Boolean(args.requireReady);
@@ -158,6 +159,11 @@ const report = {
     queryOffset,
     maxQueries,
   },
+  limits: {
+    contextTokenBudget,
+    limit,
+    maxMemoryBytes,
+  },
   env,
   strategyCoverage: coverage,
   arms: exportRows,
@@ -221,6 +227,7 @@ function exportResponseArms(directory) {
       String(limit),
       ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
       ...(queryOffset > 0 ? ["--query-offset", String(queryOffset)] : []),
+      ...(maxMemoryBytes ? ["--max-memory-bytes", String(maxMemoryBytes)] : []),
       "--output",
       responsePath,
     ];

@@ -430,6 +430,14 @@ Component rows in the same artifact remain model-selection evidence only.
   `combineMode=query-shard-answer-quality-union`; that merged packet still needs
   live execution, reviewer intake, result gate, SOTA ladder, UI evidence, docs,
   owner approval, and real production canary before any broad claim.
+- Full-shard private-input doctor:
+  `reviews/overnight-20260522/full-shard-private-input-doctor-current.json`
+  is the checked-in public-safe readiness proof for the regenerated private
+  full-run inputs. It verifies the private files are outside the repository,
+  hash-matched, mode `0600`, and that the response-arm template carries
+  `--max-memory-bytes 300000000` for the 203,831,507-byte memories file. It
+  does not count as full-memory SOTA evidence and does not permit public
+  benchmark claims.
 - Full-shard workorder:
   `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`
   is the checked-in public-safe run tracker for the twenty shard jobs. Re-run

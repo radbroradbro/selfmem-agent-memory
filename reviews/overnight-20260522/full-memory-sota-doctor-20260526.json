@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T02:01:04.572Z",
+  "generatedAt": "2026-05-26T02:18:58.275Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -46,9 +46,16 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:1ce635250aaebbd9f025cfdd94e34e12f727b44dec0905cbf201b1a536760407",
+      "hash": "sha256:7e6a7c97bb5e847740778a4889a3735c176685ebbb06c626ebf5b6da860abd22",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
+    },
+    "privateInputDoctor": {
+      "path": "reviews/overnight-20260522/full-shard-private-input-doctor-current.json",
+      "exists": true,
+      "hash": "sha256:ce774e9f619f0a032f9822f0ef94f811c54b0b7cb9035089bd9ea3996748b4dd",
+      "mode": "full-shard-private-input-doctor",
+      "status": "READY_FULL_SHARD_PRIVATE_INPUTS"
     },
     "shardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
@@ -262,6 +269,17 @@
     "sourceManifestHash": "sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe",
     "uiMayUseCompressedDefaultButAuditRetainsRawSource": true
   },
+  "privateInputState": {
+    "path": "reviews/overnight-20260522/full-shard-private-input-doctor-current.json",
+    "status": "READY_FULL_SHARD_PRIVATE_INPUTS",
+    "readyForAnswerQualityShardRun": true,
+    "privateDirectoryPresent": true,
+    "privateDirectoryInsideRepository": false,
+    "maxMemoryBytes": 300000000,
+    "filesPresent": 6,
+    "filesHashMatched": 6,
+    "blockers": []
+  },
   "shardState": {
     "planStatus": "READY_FULL_ANSWER_QUALITY_SHARD_RUN",
     "workorderStatus": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS",
@@ -372,6 +390,11 @@
     },
     {
       "id": "raw-source-retention",
+      "status": "pass",
+      "blockers": []
+    },
+    {
+      "id": "full-shard-private-inputs",
       "status": "pass",
       "blockers": []
     },

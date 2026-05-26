@@ -16,6 +16,7 @@ const format = String(args.format ?? "json").toLowerCase();
 const requireReady = Boolean(args.requireReady);
 const shardSize = positiveInt(args.shardSize ?? 25, "shard size");
 const strategies = splitList(args.strategies ?? defaultStrategies().join(","));
+const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -151,6 +152,7 @@ const report = {
     shardCount: shards.length,
     contextTokenBudget,
     limit,
+    maxMemoryBytes,
     strategies,
     privateInputDirectoryLabel: "<private-output-dir>",
     publicOutputDirectoryLabel: "<public-review-dir>",
@@ -243,6 +245,7 @@ function responseArmExportTemplate() {
     `--strategies ${strategies.join(",")}`,
     `--context-token-budget ${contextTokenBudget}`,
     `--limit ${limit}`,
+    `--max-memory-bytes ${maxMemoryBytes}`,
     "--query-offset {startIndex}",
     "--max-queries {queryCount}",
   ].join(" ");
@@ -325,6 +328,7 @@ function renderMarkdown(value) {
     `- Query count: ${value.runPlan.queryCount}`,
     `- Shard size: ${value.runPlan.shardSize}`,
     `- Shard count: ${value.runPlan.shardCount}`,
+    `- Max memory bytes: ${value.runPlan.maxMemoryBytes}`,
     `- Strategies: ${value.runPlan.strategies.join(", ")}`,
     `- Raw sources retained privately: ${value.checks.rawSourcesRetainedPrivate}`,
     "",

@@ -127,6 +127,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
+  "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -185,6 +186,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-full-materialize-run-evidence.md`,
   `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-plan-20260525.md`,
+  `${reviewDir}/full-shard-private-input-doctor-current.json`,
+  `${reviewDir}/full-shard-private-input-doctor-current.md`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
@@ -564,6 +567,7 @@ const requiredScripts = [
   "benchmark:answer-quality:shard-plan",
   "benchmark:answer-quality:shard-workorder",
   "benchmark:answer-quality:shard-intake",
+  "benchmark:answer-quality:private-input-doctor",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
   "benchmark:local-rerank:result-gate",
@@ -1662,6 +1666,9 @@ check("fresh public benchmark target check passes", () => {
   const fullAnswerQualityShardWorkorderEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-workorder-20260525.md"), "utf8");
   const fullAnswerQualityShardIntake = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-intake-20260525.json"), "utf8"));
   const fullAnswerQualityShardIntakeEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-intake-20260525.md"), "utf8");
+  const privateInputDoctorReady = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-private-input-doctor-current.json"), "utf8"));
+  const privateInputDoctorReadyEvidence = readFileSync(join(root, reviewDir, "full-shard-private-input-doctor-current.md"), "utf8");
+  const privateInputDoctorBlocked = JSON.parse(run("node", ["packages/bench/full-shard-private-input-doctor.mjs"]).stdout);
   const syntheticShardDir = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-"));
   const syntheticShardInputs = writeSyntheticAnswerQualityShardReports(fullAnswerQualityShardPlan, syntheticShardDir);
   const answerQualityShardWorkorderReady = JSON.parse(
@@ -2700,6 +2707,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardPlan.runPlan?.queryCount, 500);
     assert.equal(shardPlan.runPlan?.shardSize, 25);
     assert.equal(shardPlan.runPlan?.shardCount, 20);
+    assert.equal(shardPlan.runPlan?.maxMemoryBytes, 300000000);
     assert.equal(shardPlan.shards?.[0]?.startIndex, 0);
     assert.equal(shardPlan.shards?.at(-1)?.endIndexExclusive, 500);
     assert.equal(shardPlan.strategyCoverage?.hasBm25Lite, true);
@@ -2711,11 +2719,34 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardPlan.strategyCoverage?.hasLocalRerank, true);
     assert.deepEqual(shardPlan.blockers, []);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--max-memory-bytes 300000000/);
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /--max-queries \{queryCount\}/);
     assert.match(shardPlan.runPlan?.combineCommand ?? "", /--combine-mode shards/);
   }
   assert.match(answerQualityShardPlanMarkdownFresh, /Full Answer-Quality Shard Plan/);
   assert.match(fullAnswerQualityShardPlanEvidence, /Shard count: 20/);
+  assert.match(fullAnswerQualityShardPlanEvidence, /Max memory bytes: 300000000/);
+  assert.equal(privateInputDoctorBlocked.mode, "full-shard-private-input-doctor");
+  assert.equal(privateInputDoctorBlocked.status, "BLOCKED_FULL_SHARD_PRIVATE_INPUTS");
+  assert.equal(privateInputDoctorBlocked.readyForAnswerQualityShardRun, false);
+  assert.equal(privateInputDoctorBlocked.countsAsFullMemorySotaEvidence, false);
+  assert.equal(privateInputDoctorBlocked.publicBenchmarkClaimsAllowed, false);
+  assert.equal(privateInputDoctorBlocked.rawPrivateOutputPathIncluded, false);
+  assert.ok(privateInputDoctorBlocked.blockers?.includes("private-input-dir-provided"));
+  assert.ok(privateInputDoctorBlocked.blockers?.includes("max-memory-bytes-covers-private-memories"));
+  assert.equal(privateInputDoctorBlocked.checks?.responseArmTemplateCarriesMemoryLimit, true);
+  assert.equal(privateInputDoctorReady.mode, "full-shard-private-input-doctor");
+  assert.equal(privateInputDoctorReady.status, "READY_FULL_SHARD_PRIVATE_INPUTS");
+  assert.equal(privateInputDoctorReady.readyForAnswerQualityShardRun, true);
+  assert.equal(privateInputDoctorReady.countsAsFullMemorySotaEvidence, false);
+  assert.equal(privateInputDoctorReady.publicBenchmarkClaimsAllowed, false);
+  assert.equal(privateInputDoctorReady.rawPrivateOutputPathIncluded, false);
+  assert.equal(privateInputDoctorReady.privateInput?.directoryInsideRepository, false);
+  assert.equal(privateInputDoctorReady.plan?.maxMemoryBytes, 300000000);
+  assert.equal(privateInputDoctorReady.checks?.allPrivateFilesHashMatched, true);
+  assert.equal(privateInputDoctorReady.checks?.allPrivateFilesMode0600, true);
+  assert.equal(privateInputDoctorReady.checks?.maxMemoryBytesCoversPrivateMemories, true);
+  assert.match(privateInputDoctorReadyEvidence, /READY_FULL_SHARD_PRIVATE_INPUTS/);
   for (const shardWorkorder of [answerQualityShardWorkorderFresh, fullAnswerQualityShardWorkorder]) {
     assert.equal(shardWorkorder.mode, "public-benchmark-answer-quality-shard-workorder");
     assert.equal(shardWorkorder.status, "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS");
@@ -2851,6 +2882,12 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.fullTarget?.queryCount, 500);
     assert.equal(doctorReport.rawSourceRetention?.retainsRawSourcesPrivately, true);
     assert.equal(doctorReport.rawSourceRetention?.publicReportIsSafe, true);
+    assert.equal(doctorReport.privateInputState?.readyForAnswerQualityShardRun, true);
+    assert.equal(doctorReport.privateInputState?.privateDirectoryInsideRepository, false);
+    assert.equal(doctorReport.privateInputState?.filesPresent, 6);
+    assert.equal(doctorReport.privateInputState?.filesHashMatched, 6);
+    assert.equal(doctorReport.privateInputState?.maxMemoryBytes, 300000000);
+    assert.ok(doctorReport.gates?.some((item) => item.id === "full-shard-private-inputs" && item.status === "pass"));
     assert.equal(doctorReport.shardState?.acceptedShardCount, 0);
     assert.equal(doctorReport.shardState?.missingShardCount, 20);
     assert.equal(doctorReport.currentCanary?.queryCount, 30);

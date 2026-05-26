@@ -11,6 +11,7 @@
 ## Gates
 - source-locked-full-target: pass
 - raw-source-retention: pass
+- full-shard-private-inputs: pass
 - bm25-is-control-only: pass
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete)
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
@@ -24,6 +25,14 @@
 - Retains raw sources privately: true
 - Public report is safe: true
 - Private raw roles: queryset, memories, answer-labels, raw-dataset, selected-raw-rows, source-manifest, readme
+
+## Private Inputs
+- Status: READY_FULL_SHARD_PRIVATE_INPUTS
+- Ready for shard run: true
+- Private directory present: true
+- Private directory inside repository: false
+- Files present/hash-matched: 6/6
+- Max memory bytes: 300000000
 
 ## Shards
 - Plan status: READY_FULL_ANSWER_QUALITY_SHARD_RUN

@@ -274,6 +274,16 @@ The SOTA operator packet now treats that shard plan as the source of truth:
 each shard must export its own private response-arm files, run answer-quality
 preflight against those per-shard arms, then score only that shard before
 intake or combine can run.
+The current regenerated private full-run inputs are checked by
+`benchmark:answer-quality:private-input-doctor`, with public-safe evidence in
+`reviews/overnight-20260522/full-shard-private-input-doctor-current.json`. That
+doctor proves the private queryset, memories, answer labels, raw dataset,
+selected raw rows, and source manifest are present outside the repository,
+hash-matched, mode `0600`, and that the shard export template raises
+`--max-memory-bytes` to `300000000` so the 203,831,507-byte full memories file
+fits past the old 5 MB guard. It does not count as SOTA evidence or allow
+public benchmark claims; it only proves the full-shard run now has clean private
+inputs.
 The shard workorder is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`.
 Run `benchmark:answer-quality:shard-workorder` before and after shard jobs to
