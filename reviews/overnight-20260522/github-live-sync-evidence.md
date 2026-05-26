@@ -2,6 +2,16 @@
 
 Date: 2026-05-23
 
+- PR #5 was refreshed again on 2026-05-26 after GitHub Actions run
+  `26477753556` passed on
+  `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`, promoting that commit as the
+  latest verified code/product baseline for benchmark-isolation policy. Live
+  sync passed with PR body hash
+  `6465d2f85b8287ebc6a9caf1f748523ba0ec8f5e748a0be5e4a0d604b5a27449`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`,
+  and issue body hash
+  `1b702f8118354977d5d3859ce80fc4f4f9f8a51c0471d0e9aa541aec7cc80216`.
 - PR #5 was refreshed again on 2026-05-26 after pinning the benchmark
   operating policy: cloud Voyage remains the personal/Codex default, local
   Apple Silicon is the methodology-refinement lane, hosted Supermemory search

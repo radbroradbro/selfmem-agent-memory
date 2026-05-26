@@ -265,7 +265,15 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-- `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
+- `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`.
+- GitHub Actions run `26477753556`: passed CI after disabling hosted
+  Supermemory search for methodology benchmark loops, preserving production
+  read-through/search unless explicitly disabled, and adding release-guard
+  coverage for those benchmark-isolation paths. The local-full shard 003
+  attempt is recorded as a local-rerank runtime blocker, not a scored quality
+  result.
+- Previous verified PR branch head before benchmark-isolation policy:
+  `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
 - GitHub Actions run `26435511093`: passed CI after adding dedicated
   local-full shard workorder and intake scripts plus the blocked local-full
   intake artifact. The local benchmark lane now has explicit no-provider-call
@@ -338,14 +346,14 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
-- GitHub Actions run `26435511093`: passed CI with release checks, live GitHub
+- `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`.
+- GitHub Actions run `26477753556`: passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
-  green. The checked-in evidence keeps BM25 and full-hybrid controls in the
-  same comparison, shows the live `voyage-4-lite` plus `rerank-2.5-lite` arm
-  beating BM25 on the 30-query public LongMemEval-S retrieval-proxy slice,
-  records Qwen3 0.6B and 4B local Apple runs, adds the local reranker sidecar as
-  a blocked-until-endpoint challenger, hardens returned canary zip
+  green. The checked-in evidence pins cloud Voyage as the actual Codex/personal
+  memory default, keeps local Apple Silicon as the high-volume methodology
+  lane, disables hosted Supermemory search in methodology benchmark loops
+  unless an explicit hosted-baseline parity lane is being executed, and keeps
+  production read-through/search available when configured and not disabled.
   classification, adds the 12-hour returned canary watcher, requires returned
   one-agent canary packets to report the approved runtime adapter commit,
   contains release-check temp artifacts so repeated goal-loop checks do not

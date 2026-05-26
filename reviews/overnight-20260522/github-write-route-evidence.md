@@ -198,6 +198,11 @@ Verdict: resolved for PR body and blocker issue writes.
     parity lane, and local-full shard 003 is recorded as a local-rerank
     runtime blocker rather than a scored result. Updated at:
     2026-05-26T21:56:09Z.
+  - PR #5 was refreshed again after GitHub Actions run `26477753556` passed on
+    `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`, promoting benchmark-isolation
+    policy as the latest verified code/product baseline while keeping launch,
+    production rollout, and full-SOTA claims blocked. Updated at:
+    2026-05-26T22:07:37Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

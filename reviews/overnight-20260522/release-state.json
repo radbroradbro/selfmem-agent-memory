@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-26T06:11:29Z",
+  "generatedAt": "2026-05-26T22:05:11Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "34ea0a379bfa69982ff79ea59de50b4b15411ed0",
-    "ciRunId": 26435511093,
+    "headSha": "436d1d8cf8e7bb5ae29a666eae26ad36eaa73593",
+    "ciRunId": 26477753556,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_native_default_memory_evidence_github_sync_release_doctor_goal_audit_local_apple_provider_runs_local_reranker_sidecar_gate_release_temp_cleanup_guard_accepted_lane_launch_doctor_local_full_shard_lane_local_full_launch_doctor_and_local_full_shard_intake",
+    "localSmoke": "release_check_covers_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding dedicated local-full shard workorder and intake harness support on top of the local-full accepted-lane launch doctor. Current evidence keeps bm25-lite as the lexical control/fallback, shows the live voyage-4-lite plus rerank-2.5-lite provider arm beating BM25 on a 30-query public LongMemEval-S retrieval-proxy slice, records Qwen3 0.6B and 4B Apple Silicon local runs that tied BM25 but did not earn promotion, and keeps local-apple-qwen3-0_6b-local-rerank as a fixture-covered, fail-closed challenger with no live quality result yet. The local-full lane now has dedicated no-provider-call workorder and intake commands, a checked-in local intake report with zero accepted shards and twenty missing shards, a no-provider-call go/no-go doctor for its first shard, and a diagnostic scoring policy that permits local answer/judge model mismatch only on a local endpoint while keeping full-SOTA exact-model enforcement. It can produce local model-method evidence without Voyage/NVIDIA blockers, but it cannot authorize SOTA or public superiority claims. Full-sota-accepted-shards remains blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, and model-backed query expansion are configured. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, diff check, secret scan, private-path scan, and GitHub Actions run 26435511093 passed."
+    "note": "Latest inspected code/product baseline after pinning the benchmark operating policy and isolating methodology loops from hosted Supermemory search unless an explicit hosted-baseline parity lane is being executed. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, and hosted read-through/search available for production when configured and not disabled. The local-full shard 003 attempt is recorded as a local-rerank runtime blocker rather than a scored quality result. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, and owner approval all pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, diff check, secret scan, private-path scan, and GitHub Actions run 26477753556 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -440,14 +440,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "34ea0a379bfa69982ff79ea59de50b4b15411ed0",
-    "ciRunId": 26435511093,
+    "headSha": "436d1d8cf8e7bb5ae29a666eae26ad36eaa73593",
+    "ciRunId": 26477753556,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_public_caveats_local_apple_live_runs_local_reranker_sidecar_gate_github_sync_goal_audit_release_temp_cleanup_guard_accepted_lane_launch_doctor_local_full_shard_lane_local_full_launch_doctor_and_local_full_shard_intake",
+    "localSmoke": "release_check_covers_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after adding dedicated local-full shard workorder and intake harness support, including a blocked local-full intake artifact with zero accepted shards and twenty missing shards. The local-full lane now has diagnostic local scoring policy coverage, while the full-SOTA gate rejects local-full packets and still requires exact target answer/judge models. GitHub Actions run 26435511093 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
+    "note": "Latest observed PR branch head after disabling hosted Supermemory search for methodology benchmark loops, preserving production read-through/search unless explicitly disabled, and adding the release-guard paths for those benchmark-isolation switches. GitHub Actions run 26477753556 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
