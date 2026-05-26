@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T02:55:25.867Z",
+  "generatedAt": "2026-05-26T03:41:18.621Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -56,6 +56,13 @@
       "hash": "sha256:58ae37a0babeb7f5a3ebf94ddcec58f6bfefed0c641ecea4e7e5f1cd3a1a8ccc",
       "mode": "full-shard-private-input-doctor",
       "status": "READY_FULL_SHARD_PRIVATE_INPUTS"
+    },
+    "controlPreflight": {
+      "path": "reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json",
+      "exists": true,
+      "hash": "sha256:b0e4ba1c7681143eaa0858d2b662299d9bc25d736c64425e784cf4df988be455",
+      "mode": "public-benchmark-answer-quality-preflight",
+      "status": "BLOCKED_ANSWER_QUALITY_ENV"
     },
     "shardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
@@ -137,28 +144,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:a02beb49ee2d820b5a784fe15216da4f2eb44d6d10940d8e19b314ada548b87b",
+      "hash": "sha256:9a3d033cc336ecf92d90d721e664d2b9ab5ecfcf0ad968dff2b1f927ab5b063a",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:43d15f9010701047d098f53127c55068cc7ecabbb20baa73c4f45bc258710ce3",
+      "hash": "sha256:815407f4e6f1b10e283910379efb42ba25b7b4878f47c894f4b3d8307a11acdc",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:ad82438b2fdaca6ac2ca83eb6c0fa05df98a3a5b8abdcad233046324149aa50d",
+      "hash": "sha256:e7c2459fb7be7910e51be30b503730e20e2e0c66f9f5a3985ce6073564c3df7a",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:234fa1bfaa25f4129635626fbfc917b2e8dc61ec15a2eb7b7ccb169b8a5ee0eb",
+      "hash": "sha256:25c68c5e2e2435a550b2730e6ee43119bbda5908f9cd48ff5656fe83c9c0ba45",
       "mode": null,
       "status": null
     }
@@ -280,6 +287,54 @@
     "filesHashMatched": 6,
     "blockers": []
   },
+  "controlPreflightState": {
+    "path": "reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json",
+    "status": "BLOCKED_ANSWER_QUALITY_ENV",
+    "sameDataShardReady": true,
+    "liveAnswerQualityCanRun": false,
+    "countsAsFullMemorySotaEvidence": false,
+    "privateInputsReady": true,
+    "armsReady": true,
+    "responseArmsCoverSelectedShard": true,
+    "sameDataReady": true,
+    "queryShard": {
+      "requested": true,
+      "startIndex": 0,
+      "endIndexExclusive": 25,
+      "totalQueryCount": 500,
+      "selectedQueryCount": 25,
+      "selectedQueryIdHash": "sha256:1cbe67f8e048d86bcbad56131c1fc46d930c296f0b5b474495607e7ccd02e39c"
+    },
+    "arms": [
+      {
+        "strategy": "bm25-lite",
+        "responseCount": 25,
+        "querySetMatches": true,
+        "selectedShardCoverageReady": true
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "responseCount": 25,
+        "querySetMatches": true,
+        "selectedShardCoverageReady": true
+      },
+      {
+        "strategy": "query-expanded-full-hybrid-rerank",
+        "responseCount": 25,
+        "querySetMatches": true,
+        "selectedShardCoverageReady": true
+      }
+    ],
+    "envBlockers": [
+      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+      "answer-model-missing",
+      "judge-model-missing",
+      "openai-compatible-base-url-missing"
+    ],
+    "blockers": []
+  },
   "shardState": {
     "planStatus": "READY_FULL_ANSWER_QUALITY_SHARD_RUN",
     "workorderStatus": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS",
@@ -395,6 +450,11 @@
     },
     {
       "id": "full-shard-private-inputs",
+      "status": "pass",
+      "blockers": []
+    },
+    {
+      "id": "full-shard-control-preflight",
       "status": "pass",
       "blockers": []
     },

@@ -12,6 +12,7 @@
 - source-locked-full-target: pass
 - raw-source-retention: pass
 - full-shard-private-inputs: pass
+- full-shard-control-preflight: pass
 - bm25-is-control-only: pass
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete)
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
@@ -33,6 +34,13 @@
 - Private directory inside repository: false
 - Files present/hash-matched: 6/6
 - Max memory bytes: 300000000
+
+## Control Preflight
+- Status: BLOCKED_ANSWER_QUALITY_ENV
+- Same-data shard ready: true
+- Live answer-quality can run: false
+- Counts as full memory SOTA evidence: false
+- Arms: bm25-lite:25, full-hybrid-rerank:25, query-expanded-full-hybrid-rerank:25
 
 ## Shards
 - Plan status: READY_FULL_ANSWER_QUALITY_SHARD_RUN

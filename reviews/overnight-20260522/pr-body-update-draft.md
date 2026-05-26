@@ -352,6 +352,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   outside the repo at mode `0600`, and deterministic query-expansion fallbacks.
   This is still control/proxy run-path evidence, not scored answer-quality,
   local/provider model evidence, reviewer approval, or SOTA support.
+- Adds the checked-in
+  `full-shard-control-answer-quality-preflight-20260526` packet. It proves the
+  three private control response arms are parseable, hash-aligned, and complete
+  for the same 25-query `shard-001` selection, while staying
+  `BLOCKED_ANSWER_QUALITY_ENV` until explicit model-call/public-data/no-raw-output
+  consent and an answer/judge endpoint are configured. This is scoring readiness
+  only, not an answer-quality score or SOTA support.
 - Makes answer-quality preflight shard-aware. Full-shard plans now include a
   per-shard `benchmark:answer-quality:preflight --require-ready` step, and the
   preflight rejects private response-arm files that do not cover the selected

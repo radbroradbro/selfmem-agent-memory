@@ -307,6 +307,13 @@ response files outside the repo at mode `0600`, makes zero provider calls, and
 uses deterministic query-expansion fallbacks for the expanded arm. This still
 does not count as answer-quality evidence, local/provider model evidence, or
 SOTA support.
+The same shard now has an answer-quality preflight packet at
+`reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json`.
+It proves the private query set, answer labels, memories, and the three control
+response arms are hash-aligned and cover the same 25-query shard. It deliberately
+stays `BLOCKED_ANSWER_QUALITY_ENV` because model-call consent, public-data
+consent, no-raw-output consent, and an answer/judge endpoint are not configured.
+Treat it as scoring readiness only, not an answer-quality score or SOTA support.
 Use `benchmark:answer-quality:shard-workorder` as the public-safe run tracker
 for those twenty shards. The checked-in workorder,
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`,

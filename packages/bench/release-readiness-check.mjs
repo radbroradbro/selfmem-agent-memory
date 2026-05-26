@@ -196,6 +196,8 @@ const requiredFiles = [
   `${reviewDir}/full-shard-bm25-control-export-probe-20260526.md`,
   `${reviewDir}/full-shard-control-export-probe-20260526.json`,
   `${reviewDir}/full-shard-control-export-probe-20260526.md`,
+  `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.json`,
+  `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.md`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
@@ -1705,6 +1707,13 @@ check("fresh public benchmark target check passes", () => {
   const fullShardBm25ExportProbeEvidence = readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.md"), "utf8");
   const fullShardControlExportProbe = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-control-export-probe-20260526.json"), "utf8"));
   const fullShardControlExportProbeEvidence = readFileSync(join(root, reviewDir, "full-shard-control-export-probe-20260526.md"), "utf8");
+  const fullShardControlAnswerQualityPreflight = JSON.parse(
+    readFileSync(join(root, reviewDir, "full-shard-control-answer-quality-preflight-20260526.json"), "utf8"),
+  );
+  const fullShardControlAnswerQualityPreflightEvidence = readFileSync(
+    join(root, reviewDir, "full-shard-control-answer-quality-preflight-20260526.md"),
+    "utf8",
+  );
   const syntheticShardDir = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-"));
   const syntheticShardInputs = writeSyntheticAnswerQualityShardReports(fullAnswerQualityShardPlan, syntheticShardDir);
   const answerQualityShardWorkorderReady = JSON.parse(
@@ -2937,6 +2946,60 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullShardControlExportProbeEvidence, /Full-Shard Control Export Probe/);
   assert.match(fullShardControlExportProbeEvidence, /Counts as full memory SOTA evidence: false/);
   assert.match(fullShardControlExportProbeEvidence, /All provider calls zero: true/);
+  assert.equal(fullShardControlAnswerQualityPreflight.mode, "public-benchmark-answer-quality-preflight");
+  assert.equal(fullShardControlAnswerQualityPreflight.status, "BLOCKED_ANSWER_QUALITY_ENV");
+  assert.equal(fullShardControlAnswerQualityPreflight.publicSafe, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.metricsOnly, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.callsProviderApis, false);
+  assert.equal(fullShardControlAnswerQualityPreflight.sendsBenchmarkTextToProvider, false);
+  assert.equal(fullShardControlAnswerQualityPreflight.target?.benchmark, "longmemeval");
+  assert.equal(fullShardControlAnswerQualityPreflight.target?.answerModel, "gpt-4o");
+  assert.equal(fullShardControlAnswerQualityPreflight.target?.judgeModel, "gpt-4o");
+  assert.equal(fullShardControlAnswerQualityPreflight.privateInputs?.querySet?.present, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.privateInputs?.querySet?.matchesTarget, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.privateInputs?.memories?.present, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.privateInputs?.answerLabels?.present, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.privateInputs?.answerLabels?.matchesTarget, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.queryShard?.startIndex, 0);
+  assert.equal(fullShardControlAnswerQualityPreflight.queryShard?.endIndexExclusive, 25);
+  assert.equal(fullShardControlAnswerQualityPreflight.queryShard?.totalQueryCount, 500);
+  assert.equal(fullShardControlAnswerQualityPreflight.queryShard?.selectedQueryCount, 25);
+  assert.equal(fullShardControlAnswerQualityPreflight.readiness?.privateInputsReady, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.readiness?.armsReady, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.readiness?.responseArmsCoverSelectedShard, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.readiness?.sameDataReady, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.readiness?.liveAnswerQualityCanRun, false);
+  assert.equal(fullShardControlAnswerQualityPreflight.readiness?.readyForEndToEndMemoryScoreGate, false);
+  assert.equal(fullShardControlAnswerQualityPreflight.readiness?.countsAsFullMemorySotaEvidence, false);
+  assert.equal(fullShardControlAnswerQualityPreflight.requiredStrategyCoverage?.hasBm25Lite, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.requiredStrategyCoverage?.hasFullHybridRerank, true);
+  assert.equal(fullShardControlAnswerQualityPreflight.requiredStrategyCoverage?.hasChallenger, true);
+  assert.deepEqual(
+    (fullShardControlAnswerQualityPreflight.arms ?? []).map((arm) => arm.strategy),
+    ["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"],
+  );
+  for (const arm of fullShardControlAnswerQualityPreflight.arms ?? []) {
+    assert.equal(arm.responseCount, 25);
+    assert.equal(arm.querySetMatches, true);
+    assert.equal(arm.selectedShardCoverage?.ready, true);
+    assert.equal(arm.selectedShardCoverage?.missingSelectedCount, 0);
+    assert.equal(arm.selectedShardCoverage?.extraResponseCount, 0);
+    assert.equal(arm.selectedShardCoverage?.responseStartIndex, 0);
+    assert.equal(arm.selectedShardCoverage?.responseEndIndexExclusive, 25);
+  }
+  for (const blocker of [
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+    "answer-model-missing",
+    "judge-model-missing",
+    "openai-compatible-base-url-missing",
+  ]) {
+    assert.ok(fullShardControlAnswerQualityPreflight.blockers?.includes(blocker), `missing control preflight blocker ${blocker}`);
+  }
+  assert.match(fullShardControlAnswerQualityPreflightEvidence, /Answer-Quality Benchmark Preflight/);
+  assert.match(fullShardControlAnswerQualityPreflightEvidence, /Same-data hashes ready: true/);
+  assert.match(fullShardControlAnswerQualityPreflightEvidence, /Live answer-quality can run: false/);
   for (const shardWorkorder of [answerQualityShardWorkorderFresh, fullAnswerQualityShardWorkorder]) {
     assert.equal(shardWorkorder.mode, "public-benchmark-answer-quality-shard-workorder");
     assert.equal(shardWorkorder.status, "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS");
@@ -3078,6 +3141,15 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.privateInputState?.filesHashMatched, 6);
     assert.equal(doctorReport.privateInputState?.maxMemoryBytes, 300000000);
     assert.ok(doctorReport.gates?.some((item) => item.id === "full-shard-private-inputs" && item.status === "pass"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "full-shard-control-preflight" && item.status === "pass"));
+    assert.equal(doctorReport.controlPreflightState?.sameDataShardReady, true);
+    assert.equal(doctorReport.controlPreflightState?.liveAnswerQualityCanRun, false);
+    assert.equal(doctorReport.controlPreflightState?.countsAsFullMemorySotaEvidence, false);
+    assert.equal(doctorReport.controlPreflightState?.arms?.length, 3);
+    assert.ok(doctorReport.controlPreflightState?.arms?.some((item) => item.strategy === "bm25-lite" && item.selectedShardCoverageReady === true));
+    assert.ok(
+      doctorReport.controlPreflightState?.arms?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank" && item.responseCount === 25),
+    );
     assert.equal(doctorReport.shardState?.acceptedShardCount, 0);
     assert.equal(doctorReport.shardState?.missingShardCount, 20);
     assert.equal(doctorReport.currentCanary?.queryCount, 30);
@@ -3095,6 +3167,8 @@ check("fresh public benchmark target check passes", () => {
   }
   assert.match(fullMemorySotaDoctorMarkdownFresh, /Full Memory SOTA Doctor/);
   assert.match(fullMemorySotaDoctorMarkdownFresh, /BM25|bm25/i);
+  assert.match(fullMemorySotaDoctorMarkdownFresh, /Control Preflight/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Same-data shard ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));

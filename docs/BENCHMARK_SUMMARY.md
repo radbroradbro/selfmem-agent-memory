@@ -307,6 +307,15 @@ candidates, makes zero provider calls, and uses deterministic query-expansion
 fallbacks for the expanded arm. It is control/proxy run-path evidence only; the
 full answer-quality shards, local/provider model arms, reviewers, UI/docs refresh,
 owner approval, and canary gates remain blocking.
+`reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json`
+then runs the answer-quality preflight over those three private shard response
+arms. It confirms the query set, answer labels, memories, and all three
+response files are hash-aligned on `shard-001` and cover the same 25 selected
+queries, with no provider calls and no benchmark text in the public artifact.
+It remains `BLOCKED_ANSWER_QUALITY_ENV` until explicit model-call consent,
+public-data consent, no-raw-output consent, and an answer/judge endpoint are
+configured. This is same-data readiness for scoring, not a scored result or
+SOTA support.
 The shard workorder is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`.
 Run `benchmark:answer-quality:shard-workorder` before and after shard jobs to

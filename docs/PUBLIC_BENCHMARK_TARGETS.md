@@ -458,6 +458,14 @@ Component rows in the same artifact remain model-selection evidence only.
   zero, and the query-expanded arm uses deterministic fallbacks. This is still
   not answer-quality scoring, provider/local model evidence, reviewer approval,
   or SOTA support.
+- Full-shard deterministic control answer-quality preflight:
+  `reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json`
+  proves those three private shard response arms are parseable, hash-aligned,
+  and complete for the same 25 selected `shard-001` queries. It stays
+  `BLOCKED_ANSWER_QUALITY_ENV` until model-call consent, public-data consent,
+  no-raw-output consent, and an answer/judge endpoint are configured. It is
+  same-data scoring readiness only, not a scored answer-quality result or SOTA
+  support.
 - Full-shard workorder:
   `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`
   is the checked-in public-safe run tracker for the twenty shard jobs. Re-run

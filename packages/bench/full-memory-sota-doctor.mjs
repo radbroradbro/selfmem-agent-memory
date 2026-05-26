@@ -19,6 +19,7 @@ const files = {
   fullMaterialize: `${reviewDir}/public-longmemeval-full-materialize-run.json`,
   shardPlan: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
+  controlPreflight: `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.json`,
   shardWorkorder: `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   shardIntake: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   sotaLadder: `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
@@ -43,6 +44,7 @@ const fullTarget = evidence.fullTarget.json;
 const fullMaterialize = evidence.fullMaterialize.json;
 const shardPlan = evidence.shardPlan.json;
 const privateInputDoctor = evidence.privateInputDoctor.json;
+const controlPreflight = evidence.controlPreflight.json;
 const shardWorkorder = evidence.shardWorkorder.json;
 const shardIntake = evidence.shardIntake.json;
 const sotaLadder = evidence.sotaLadder.json;
@@ -54,6 +56,7 @@ const reviewerIntake = evidence.reviewerIntake.json;
 const uiEvidence = evidence.uiEvidence.json;
 
 const rawRetention = inspectRawSourceRetention(fullMaterialize);
+const controlPreflightState = inspectControlPreflightState(controlPreflight);
 const shardState = inspectShardState({ shardPlan, shardWorkorder, shardIntake });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
 const reviewerState = inspectReviewerState(reviewerIntake);
@@ -71,6 +74,7 @@ const gates = [
   gate("full-shard-private-inputs", privateInputDoctor?.readyForAnswerQualityShardRun === true, privateInputDoctor?.blockers ?? [
     "full-shard-private-input-doctor-not-ready",
   ]),
+  gate("full-shard-control-preflight", controlPreflightState.sameDataShardReady, controlPreflightState.blockers),
   gate("bm25-is-control-only", sotaOperatorPacket?.sameDataContract?.bm25LexicalFloorRequired === true, [
     "bm25-control-contract-missing",
   ]),
@@ -153,6 +157,7 @@ const report = {
   },
   rawSourceRetention: rawRetention,
   privateInputState: inspectPrivateInputState(privateInputDoctor),
+  controlPreflightState,
   shardState,
   currentCanary,
   reviewerState,
@@ -243,6 +248,52 @@ function inspectPrivateInputState(privateInputDoctorReport) {
     filesPresent: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.present).length),
     filesHashMatched: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.hashMatches).length),
     blockers: privateInputDoctorReport?.blockers ?? [],
+  };
+}
+
+function inspectControlPreflightState(controlPreflightReport) {
+  const arms = arrayOf(controlPreflightReport?.arms);
+  const blockers = [
+    controlPreflightReport?.mode !== "public-benchmark-answer-quality-preflight" ? "control-preflight-mode-mismatch" : null,
+    controlPreflightReport?.status !== "BLOCKED_ANSWER_QUALITY_ENV" ? "control-preflight-status-should-remain-env-blocked" : null,
+    controlPreflightReport?.readiness?.privateInputsReady !== true ? "control-preflight-private-inputs-not-ready" : null,
+    controlPreflightReport?.readiness?.armsReady !== true ? "control-preflight-arms-not-ready" : null,
+    controlPreflightReport?.readiness?.responseArmsCoverSelectedShard !== true ? "control-preflight-shard-coverage-not-ready" : null,
+    controlPreflightReport?.readiness?.sameDataReady !== true ? "control-preflight-same-data-not-ready" : null,
+    controlPreflightReport?.readiness?.liveAnswerQualityCanRun !== false ? "control-preflight-should-not-enable-live-scoring" : null,
+    controlPreflightReport?.readiness?.readyForEndToEndMemoryScoreGate !== false ? "control-preflight-should-not-count-for-score-gate" : null,
+    controlPreflightReport?.readiness?.countsAsFullMemorySotaEvidence !== false ? "control-preflight-should-not-count-as-sota" : null,
+    controlPreflightReport?.callsProviderApis !== false ? "control-preflight-provider-calls-not-zero" : null,
+    controlPreflightReport?.sendsBenchmarkTextToProvider !== false ? "control-preflight-sent-benchmark-text" : null,
+    controlPreflightReport?.queryShard?.startIndex !== 0 || controlPreflightReport?.queryShard?.endIndexExclusive !== 25
+      ? "control-preflight-shard-range-mismatch"
+      : null,
+    arms.length !== 3 ? "control-preflight-arm-count-mismatch" : null,
+    ...["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"].map((strategy) =>
+      arms.some((arm) => arm.strategy === strategy && arm.selectedShardCoverage?.ready === true && arm.querySetMatches === true)
+        ? null
+        : `control-preflight-${strategy}-not-ready`,
+    ),
+  ].filter(Boolean);
+  return {
+    path: files.controlPreflight,
+    status: controlPreflightReport?.status ?? null,
+    sameDataShardReady: blockers.length === 0,
+    liveAnswerQualityCanRun: Boolean(controlPreflightReport?.readiness?.liveAnswerQualityCanRun),
+    countsAsFullMemorySotaEvidence: Boolean(controlPreflightReport?.readiness?.countsAsFullMemorySotaEvidence),
+    privateInputsReady: Boolean(controlPreflightReport?.readiness?.privateInputsReady),
+    armsReady: Boolean(controlPreflightReport?.readiness?.armsReady),
+    responseArmsCoverSelectedShard: Boolean(controlPreflightReport?.readiness?.responseArmsCoverSelectedShard),
+    sameDataReady: Boolean(controlPreflightReport?.readiness?.sameDataReady),
+    queryShard: controlPreflightReport?.queryShard ?? null,
+    arms: arms.map((arm) => ({
+      strategy: arm.strategy,
+      responseCount: Number(arm.responseCount ?? 0),
+      querySetMatches: Boolean(arm.querySetMatches),
+      selectedShardCoverageReady: Boolean(arm.selectedShardCoverage?.ready),
+    })),
+    envBlockers: controlPreflightReport?.blockers ?? [],
+    blockers,
   };
 }
 
@@ -381,6 +432,13 @@ function renderMarkdown(value) {
     `- Private directory inside repository: ${value.privateInputState.privateDirectoryInsideRepository}`,
     `- Files present/hash-matched: ${value.privateInputState.filesPresent}/${value.privateInputState.filesHashMatched}`,
     `- Max memory bytes: ${value.privateInputState.maxMemoryBytes ?? "n/a"}`,
+    "",
+    "## Control Preflight",
+    `- Status: ${value.controlPreflightState.status}`,
+    `- Same-data shard ready: ${value.controlPreflightState.sameDataShardReady}`,
+    `- Live answer-quality can run: ${value.controlPreflightState.liveAnswerQualityCanRun}`,
+    `- Counts as full memory SOTA evidence: ${value.controlPreflightState.countsAsFullMemorySotaEvidence}`,
+    `- Arms: ${value.controlPreflightState.arms.map((item) => `${item.strategy}:${item.responseCount}`).join(", ")}`,
     "",
     "## Shards",
     `- Plan status: ${value.shardState.planStatus}`,
