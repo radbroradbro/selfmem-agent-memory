@@ -132,6 +132,7 @@ const requiredFiles = [
   "packages/bench/local-full-shard-resume-packet.mjs",
   "packages/bench/local-full-shard-resume-env-doctor.mjs",
   "packages/bench/local-full-shard-resume-command-materializer.mjs",
+  "packages/bench/local-full-shard-resume-command-security-doctor.mjs",
   "packages/bench/local-full-shard-resume-result-doctor.mjs",
   "packages/bench/local-full-shard-performance-report.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
@@ -208,6 +209,8 @@ const requiredFiles = [
   `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.md`,
   `${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.json`,
   `${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.md`,
+  `${reviewDir}/local-full-shard-002-resume-command-security-20260526.json`,
+  `${reviewDir}/local-full-shard-002-resume-command-security-20260526.md`,
   `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
   `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.md`,
   `${reviewDir}/local-full-shard-performance-report-20260526.json`,
@@ -617,6 +620,7 @@ const requiredScripts = [
   "benchmark:answer-quality:local-shard-resume-packet",
   "benchmark:answer-quality:local-shard-resume-env",
   "benchmark:answer-quality:local-shard-resume-command",
+  "benchmark:answer-quality:local-shard-resume-command-security",
   "benchmark:answer-quality:local-shard-resume-result",
   "benchmark:answer-quality:local-shard-performance",
   "benchmark:answer-quality:shard-intake",
@@ -1963,6 +1967,20 @@ check("fresh public benchmark target check passes", () => {
     "node",
     ["packages/bench/local-full-shard-resume-command-materializer.mjs", "--format", "markdown"],
     { env: noLocalFullResumeEnv },
+  ).stdout;
+  const localFullShardResumeCommandSecurity = JSON.parse(
+    readFileSync(join(root, reviewDir, "local-full-shard-002-resume-command-security-20260526.json"), "utf8"),
+  );
+  const localFullShardResumeCommandSecurityEvidence = readFileSync(
+    join(root, reviewDir, "local-full-shard-002-resume-command-security-20260526.md"),
+    "utf8",
+  );
+  const localFullShardResumeCommandSecurityFresh = JSON.parse(
+    run("node", ["packages/bench/local-full-shard-resume-command-security-doctor.mjs"]).stdout,
+  );
+  const localFullShardResumeCommandSecurityMarkdownFresh = run(
+    "node",
+    ["packages/bench/local-full-shard-resume-command-security-doctor.mjs", "--format", "markdown"],
   ).stdout;
   const localFullShardResumeCommandMaterializerFixture = JSON.parse(
     run("node", ["packages/bench/local-full-shard-resume-command-materializer.mjs", "--fixture"]).stdout,
@@ -4159,6 +4177,75 @@ check("fresh public benchmark target check passes", () => {
     JSON.stringify(localFullShardResumeCommandMaterializerReady),
     localFullShardResumeCommandMaterializerEvidence,
     localFullShardResumeCommandMaterializerMarkdownFresh,
+  ]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+  for (const securityDoctor of [
+    localFullShardResumeCommandSecurity,
+    localFullShardResumeCommandSecurityFresh,
+  ]) {
+    assert.equal(securityDoctor.mode, "local-full-shard-resume-command-security-doctor");
+    assert.equal(securityDoctor.status, "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY");
+    assert.equal(securityDoctor.securityReady, true);
+    assert.equal(securityDoctor.metricsOnly, true);
+    assert.equal(securityDoctor.publicSafe, true);
+    assert.equal(securityDoctor.callsProviderApis, false);
+    assert.equal(securityDoctor.callsHostedSupermemory, false);
+    assert.equal(securityDoctor.callsLocalEndpoint, false);
+    assert.equal(securityDoctor.sendsBenchmarkTextToProvider, false);
+    assert.equal(securityDoctor.rawQuestionIdsIncluded, false);
+    assert.equal(securityDoctor.rawQuestionsIncluded, false);
+    assert.equal(securityDoctor.rawAnswersIncluded, false);
+    assert.equal(securityDoctor.rawMemoryIncluded, false);
+    assert.equal(securityDoctor.rawTranscriptIncluded, false);
+    assert.equal(securityDoctor.rawPromptIncluded, false);
+    assert.equal(securityDoctor.rawPrivateOutputPathIncluded, false);
+    assert.equal(securityDoctor.printsMaterializedCommands, false);
+    assert.equal(securityDoctor.printsEnvValues, false);
+    assert.equal(securityDoctor.printsPrivatePaths, false);
+    assert.equal(securityDoctor.privateCommandPathPrinted, false);
+    assert.equal(securityDoctor.privateScriptContentPrinted, false);
+    assert.equal(securityDoctor.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(securityDoctor.countsAsFullMemorySotaEvidence, false);
+    assert.equal(securityDoctor.publicBenchmarkClaimsAllowed, false);
+    assert.equal(securityDoctor.materializerReport?.publicReportSafe, true);
+    assert.equal(securityDoctor.materializerReport?.commandsPrinted, false);
+    assert.equal(securityDoctor.materializerReport?.guardPlan?.ready, true);
+    assert.deepEqual(securityDoctor.materializerReport?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
+    assert.equal(securityDoctor.fixtureProbe?.ready, true);
+    assert.equal(securityDoctor.fixtureProbe?.publicOutputSafe, true);
+    assert.equal(securityDoctor.fixtureProbe?.privateCommandFileWritten, true);
+    assert.equal(securityDoctor.fixtureProbe?.privateCommandFileOutsideRepository, true);
+    assert.equal(securityDoctor.fixtureProbe?.privateCommandFileMode, "0700");
+    assert.equal(securityDoctor.fixtureProbe?.privateCommandFilePathPrinted, false);
+    assert.match(securityDoctor.fixtureProbe?.privateCommandFileHash ?? "", /^sha256:[a-f0-9]{64}$/);
+    assert.match(securityDoctor.fixtureProbe?.privateScriptHash ?? "", /^sha256:[a-f0-9]{64}$/);
+    assert.equal(securityDoctor.fixtureProbe?.privateScriptContentPrinted, false);
+    assert.equal(securityDoctor.fixtureProbe?.privateScriptContainsRuntimeValues, true);
+    assert.equal(securityDoctor.fixtureProbe?.privateScriptPlaceholderCount, 0);
+    assert.equal(securityDoctor.fixtureProbe?.privateScriptOrderReady, true);
+    assert.deepEqual(securityDoctor.fixtureProbe?.commandOrder, expectedResumePrivateScriptCommandOrder);
+    assert.equal(securityDoctor.fixtureProbe?.firstCommandId, "rerunRuntimeDoctor");
+    assert.equal(securityDoctor.fixtureProbe?.secondCommandId, "rerunDurabilitySmoke");
+    assert.equal(securityDoctor.fixtureProbe?.guardedCommandId, "missingArmResponseExport");
+    assert.equal(securityDoctor.fixtureProbe?.materializedCommandCount, 8);
+    assert.equal(securityDoctor.fixtureProbe?.printsMaterializedCommands, false);
+    assert.equal(securityDoctor.fixtureProbe?.printsPrivatePaths, false);
+    assert.equal(securityDoctor.fixtureProbe?.printsEnvValues, false);
+    assert.deepEqual(securityDoctor.blockers, []);
+  }
+  assert.match(localFullShardResumeCommandSecurityEvidence, /Local-Full Resume Command Security Doctor/);
+  assert.match(localFullShardResumeCommandSecurityEvidence, /Status: READY_LOCAL_FULL_RESUME_COMMAND_SECURITY/);
+  assert.match(localFullShardResumeCommandSecurityEvidence, /Fixture private command mode: 0700/);
+  assert.match(localFullShardResumeCommandSecurityEvidence, /Fixture private script order ready: true/);
+  assert.match(localFullShardResumeCommandSecurityEvidence, /Fixture first command: rerunRuntimeDoctor/);
+  assert.match(localFullShardResumeCommandSecurityMarkdownFresh, /Security ready: true/);
+  for (const text of [
+    JSON.stringify(localFullShardResumeCommandSecurity),
+    JSON.stringify(localFullShardResumeCommandSecurityFresh),
+    localFullShardResumeCommandSecurityEvidence,
+    localFullShardResumeCommandSecurityMarkdownFresh,
   ]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);

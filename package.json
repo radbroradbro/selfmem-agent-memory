@@ -106,6 +106,7 @@
     "benchmark:answer-quality:local-shard-resume-packet": "node packages/bench/local-full-shard-resume-packet.mjs",
     "benchmark:answer-quality:local-shard-resume-env": "node packages/bench/local-full-shard-resume-env-doctor.mjs",
     "benchmark:answer-quality:local-shard-resume-command": "node packages/bench/local-full-shard-resume-command-materializer.mjs",
+    "benchmark:answer-quality:local-shard-resume-command-security": "node packages/bench/local-full-shard-resume-command-security-doctor.mjs",
     "benchmark:answer-quality:local-shard-resume-result": "node packages/bench/local-full-shard-resume-result-doctor.mjs",
     "benchmark:answer-quality:local-shard-performance": "node packages/bench/local-full-shard-performance-report.mjs",
     "benchmark:answer-quality:shard-intake": "node packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
