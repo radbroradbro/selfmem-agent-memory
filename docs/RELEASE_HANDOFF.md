@@ -419,6 +419,11 @@ and source manifest privately, while keeping compressed/default retrieval and
 UI surfaces separate from the private audit source. It also binds the retry to
 the local embedding durability report generated after the shard 002
 socket-close blocker, including the required long synthetic probe envelope.
+Use `benchmark:answer-quality:local-shard-resume-env -- --fixture` to exercise
+the green path without private data or hosted calls. That fixture creates only
+temporary synthetic private files outside the repository, proves the hashes and
+env gates can pass, and remains non-countable evidence with all public claim
+flags disabled.
 The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.

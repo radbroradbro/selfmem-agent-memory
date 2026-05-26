@@ -562,7 +562,10 @@ not count as a RecallWeave score.
   repository for local-full continuation. It also requires the checked local
   embedding durability smoke to be fresher than the shard 002 socket-close
   blocker and to include the required long synthetic probe before local Apple
-  resume commands are treated as runnable.
+  resume commands are treated as runnable. Its `--fixture` mode now proves the
+  full green path with temporary synthetic private inputs, while keeping
+  `fixtureOnly: true`, provider calls off, hosted Supermemory off, and all
+  public benchmark-claim flags false.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

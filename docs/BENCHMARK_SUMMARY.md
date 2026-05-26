@@ -371,6 +371,12 @@ count. The same doctor now checks that the local embedding durability report is
 newer than the shard 002 socket-close blocker and includes a passing long
 synthetic probe at the required token envelope. Use it before launching shard
 002 so placeholder commands are not mistaken for a runnable local benchmark.
+The same doctor now supports `--fixture`, which builds a tiny outside-repository
+private directory and deterministic reports, then proves the raw-source,
+completed-arm, missing-arm, durability, and environment gates can all turn
+green without private data, provider calls, or hosted Supermemory usage. That
+fixture remains `fixtureOnly: true` and still sets all benchmark-claim flags to
+false.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

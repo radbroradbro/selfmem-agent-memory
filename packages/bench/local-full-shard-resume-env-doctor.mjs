@@ -1,22 +1,49 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
-const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
-const resumePacketPath = resolveInputPath(args.resumePacket ?? `${reviewDir}/local-full-shard-002-resume-packet-20260526.json`);
-const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`);
-const materializePath = resolveInputPath(args.materialize ?? args.materializeReport ?? `${reviewDir}/public-longmemeval-full-materialize-run.json`);
-const durabilityPath = resolveInputPath(args.durabilityReport ?? args.localEmbeddingDurabilityReport ?? `${reviewDir}/local-embedding-durability-smoke-20260526.json`);
-const runtimeBlockerPath = resolveInputPath(args.runtimeBlocker ?? `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`);
+const fixtureTempRoots = [];
+process.on("exit", () => {
+  for (const tempRoot of fixtureTempRoots) {
+    try {
+      rmSync(tempRoot, { recursive: true, force: true });
+    } catch {
+      // Best effort only; fixture mode never writes inside the repository.
+    }
+  }
+});
+const fixtureMode = Boolean(args.fixture);
+const fixtureState = fixtureMode ? createFixtureState() : null;
+const reviewDir = String(fixtureState?.reviewDir ?? args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
+const resumePacketPath = resolveInputPath(
+  args.resumePacket ?? fixtureState?.resumePacketPath ?? `${reviewDir}/local-full-shard-002-resume-packet-20260526.json`,
+);
+const planPath = resolveInputPath(args.plan ?? fixtureState?.planPath ?? `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`);
+const materializePath = resolveInputPath(
+  args.materialize ??
+    args.materializeReport ??
+    fixtureState?.materializePath ??
+    `${reviewDir}/public-longmemeval-full-materialize-run.json`,
+);
+const durabilityPath = resolveInputPath(
+  args.durabilityReport ??
+    args.localEmbeddingDurabilityReport ??
+    fixtureState?.durabilityPath ??
+    `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
+);
+const runtimeBlockerPath = resolveInputPath(
+  args.runtimeBlocker ?? fixtureState?.runtimeBlockerPath ?? `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
+);
 const minDurabilityTokenCount = positiveInt(
   args.minDurabilityTokenCount ?? process.env.RECALLWEAVE_LOCAL_FULL_MIN_DURABILITY_TOKENS ?? 700,
   "minimum durability token count",
 );
-const privateDir = stringOrNull(args.privateInputDir ?? args.privateDir ?? process.env.RECALLWEAVE_FULL_SHARD_PRIVATE_DIR);
+const privateDir = stringOrNull(fixtureState?.privateDir ?? args.privateInputDir ?? args.privateDir ?? process.env.RECALLWEAVE_FULL_SHARD_PRIVATE_DIR);
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
@@ -94,6 +121,7 @@ const report = {
   schemaVersion: 1,
   ok: true,
   mode: "local-full-shard-resume-env-doctor",
+  fixtureOnly: fixtureMode,
   status: ready ? "READY_LOCAL_FULL_SHARD_RESUME_ENV" : "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV",
   generatedAt: new Date().toISOString(),
   reviewDir,
@@ -462,6 +490,7 @@ function renderMarkdown(value) {
     "# Local-Full Shard Resume Environment Doctor",
     "",
     `- Status: ${value.status}`,
+    `- Fixture only: ${value.fixtureOnly}`,
     `- Target shard: ${value.resumePacket.targetShard?.shardId ?? "n/a"} (${value.resumePacket.targetShard?.startIndex ?? "n/a"}-${value.resumePacket.targetShard?.endIndexExclusive ?? "n/a"})`,
     `- Ready for missing-arm export: ${value.readyForMissingArmExport}`,
     `- Ready for answer-quality preflight: ${value.readyForAnswerQualityPreflight}`,
@@ -531,6 +560,239 @@ function readFileSyncChecked(path, label) {
   return raw;
 }
 
+function createFixtureState() {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-local-full-resume-env-fixture-"));
+  fixtureTempRoots.push(tempRoot);
+  const privateDir = join(tempRoot, "private");
+  const reportsDir = join(tempRoot, "reports");
+  const armsDir = join(privateDir, "arms", "shard-002");
+  mkdirSync(armsDir, { recursive: true, mode: 0o700 });
+  mkdirSync(reportsDir, { recursive: true, mode: 0o700 });
+
+  const querySetHash = writeFixtureFile(
+    join(privateDir, "longmemeval-queryset.private.json"),
+    fixtureJson({
+      schemaVersion: 1,
+      datasetSlice: "local-full-resume-env-fixture",
+      queries: [
+        { id: "fixture-query-025", q: "synthetic local resume query", expectedResultIds: ["fixture-memory-025"] },
+        { id: "fixture-query-026", q: "synthetic local rerank query", expectedResultIds: ["fixture-memory-026"] },
+      ],
+    }),
+  );
+  const memoriesHash = writeFixtureFile(
+    join(privateDir, "longmemeval-memories.private.jsonl"),
+    `${JSON.stringify({ id: "fixture-memory-025", text: "synthetic memory one" })}\n${JSON.stringify({
+      id: "fixture-memory-026",
+      text: "synthetic memory two",
+    })}\n`,
+  );
+  const answerLabelsHash = writeFixtureFile(
+    join(privateDir, "longmemeval-answer-labels.private.json"),
+    fixtureJson({
+      schemaVersion: 1,
+      labels: [
+        { queryId: "fixture-query-025", answerId: "fixture-memory-025" },
+        { queryId: "fixture-query-026", answerId: "fixture-memory-026" },
+      ],
+    }),
+  );
+  const rawDatasetHash = writeFixtureFile(
+    join(privateDir, "longmemeval-raw-dataset.private.json"),
+    fixtureJson({ schemaVersion: 1, rows: [{ id: "fixture-query-025" }, { id: "fixture-query-026" }] }),
+  );
+  const selectedRawRowsHash = writeFixtureFile(
+    join(privateDir, "longmemeval-selected-raw-rows.private.json"),
+    fixtureJson({ schemaVersion: 1, selected: ["fixture-query-025", "fixture-query-026"] }),
+  );
+  const sourceManifestHash = writeFixtureFile(
+    join(privateDir, "longmemeval-source-manifest.private.json"),
+    fixtureJson({ schemaVersion: 1, source: "fixture-local-full-resume-env", rowCount: 2 }),
+  );
+
+  const completedArmEvidence = ["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"].map((strategy) => {
+    const name = `${strategy}-responses.private.json`;
+    const hash = writeFixtureFile(
+      join(armsDir, name),
+      fixtureJson({
+        schemaVersion: 1,
+        mode: "public-benchmark-answer-quality-arm-export",
+        strategy,
+        responses: {
+          "fixture-query-025": { resultIds: ["fixture-memory-025"] },
+          "fixture-query-026": { resultIds: ["fixture-memory-026"] },
+        },
+      }),
+    );
+    return { strategy, name, hash, responseCount: 2, providerCallsMade: strategy.includes("query-expanded") ? 2 : 0 };
+  });
+  for (const strategy of ["local-apple-qwen3-0_6b", "local-apple-qwen3-0_6b-local-rerank"]) {
+    writeFixtureFile(
+      join(armsDir, `${strategy}-responses.private.json`),
+      fixtureJson({
+        schemaVersion: 1,
+        mode: "public-benchmark-answer-quality-arm-export",
+        strategy,
+        responses: {
+          "fixture-query-025": { resultIds: ["fixture-memory-025"] },
+          "fixture-query-026": { resultIds: ["fixture-memory-026"] },
+        },
+      }),
+    );
+  }
+
+  const materializePath = join(reportsDir, "materialize.json");
+  const planPath = join(reportsDir, "plan.json");
+  const resumePacketPath = join(reportsDir, "resume-packet.json");
+  const durabilityPath = join(reportsDir, "durability.json");
+  const runtimeBlockerPath = join(reportsDir, "runtime-blocker.json");
+
+  writeJsonFile(materializePath, {
+    schemaVersion: 1,
+    mode: "public-benchmark-materialize-run",
+    rawQuestionsIncluded: false,
+    rawAnswersIncluded: false,
+    rawMemoryIncluded: false,
+    rawPrivateOutputPathIncluded: false,
+    sourceRetention: {
+      rawDatasetRetainedPrivate: true,
+      selectedRawRowsRetainedPrivate: true,
+      sourceManifestRetainedPrivate: true,
+      rawTextPubliclyIncluded: false,
+      privateOutputPathIncluded: false,
+      rawDatasetItemCount: 2,
+      selectedRawRowsCount: 2,
+      rawDatasetHash,
+      selectedRawRowsHash,
+      sourceManifestHash,
+    },
+    privateOutputs: {
+      directoryLabel: "external-private-dir",
+      directoryInsideRepository: false,
+      fileMode: "0600",
+      directoryMode: "0700",
+      files: [
+        { role: "queryset", name: "longmemeval-queryset.private.json", hash: querySetHash },
+        { role: "memories", name: "longmemeval-memories.private.jsonl", hash: memoriesHash },
+        { role: "answer-labels", name: "longmemeval-answer-labels.private.json", hash: answerLabelsHash },
+        { role: "raw-dataset", name: "longmemeval-raw-dataset.private.json", hash: rawDatasetHash },
+        { role: "selected-raw-rows", name: "longmemeval-selected-raw-rows.private.json", hash: selectedRawRowsHash },
+        { role: "source-manifest", name: "longmemeval-source-manifest.private.json", hash: sourceManifestHash },
+      ],
+    },
+  });
+  writeJsonFile(planPath, {
+    schemaVersion: 1,
+    runPlan: {
+      claimScope: "local-full",
+      queryCount: 2,
+      shardCount: 1,
+      maxMemoryBytes: 1024,
+    },
+    materializeReport: {
+      collectorCompatibleQuerySetHash: querySetHash,
+      memoriesFileHash: memoriesHash,
+    },
+    target: {
+      answerLabelsHash,
+    },
+  });
+  writeJsonFile(resumePacketPath, {
+    schemaVersion: 1,
+    status: "READY_FOR_LOCAL_FULL_SHARD_RESUME",
+    targetShard: {
+      shardId: "shard-002",
+      startIndex: 25,
+      endIndexExclusive: 27,
+      queryOffset: 25,
+      maxQueries: 2,
+      queryCount: 2,
+    },
+    resumeState: {
+      missingStrategies: ["local-apple-qwen3-0_6b", "local-apple-qwen3-0_6b-local-rerank"],
+      completedStrategies: completedArmEvidence.map((entry) => entry.strategy),
+      completedPrivateArmEvidence: completedArmEvidence,
+    },
+    commands: {
+      resumeEnvDoctor: "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-env -- --private-input-dir <private-output-dir>",
+      missingArmResponseExport:
+        "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url> SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model> SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url> SELFMEM_LOCAL_RERANK_MODEL=<local-rerank-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --private-output-dir <private-output-dir>/arms/shard-002",
+      preflight:
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model> RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<local-judge-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --output <public-review-dir>/answer-quality-local-full-preflight-shard-002.json",
+      answerQuality:
+        "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model> RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<local-judge-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --output <public-review-dir>/answer-quality-local-full-shard-002.json",
+    },
+  });
+  writeJsonFile(durabilityPath, {
+    schemaVersion: 1,
+    mode: "local-embedding-durability-smoke",
+    status: "READY_LOCAL_EMBEDDING_DURABILITY",
+    generatedAt: "2026-05-26T12:00:00.000Z",
+    readyForLocalAppleArmExport: true,
+    syntheticOnly: true,
+    rawSyntheticInputIncluded: false,
+    baseUrlPrinted: false,
+    endpointPrinted: false,
+    countsAsLocalFullBenchmarkEvidence: false,
+    countsAsFullMemorySotaEvidence: false,
+    publicBenchmarkClaimsAllowed: false,
+    tokenCounts: [32, 128, 512, 700],
+    probes: [
+      { name: "short", status: "pass", tokenCount: 32 },
+      { name: "medium", status: "pass", tokenCount: 128 },
+      { name: "wide", status: "pass", tokenCount: 512 },
+      { name: "long", status: "pass", tokenCount: 700 },
+    ],
+  });
+  writeJsonFile(runtimeBlockerPath, {
+    schemaVersion: 1,
+    mode: "public-benchmark-answer-quality",
+    status: "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+    generatedAt: "2026-05-26T11:00:00.000Z",
+    failedArm: {
+      strategy: "local-apple-qwen3-0_6b",
+      failureClass: "local-embedding-server-socket-close",
+    },
+  });
+
+  setFixtureEnv();
+  return { reviewDir: "fixture-local-full-shard-resume-env", privateDir, resumePacketPath, planPath, materializePath, durabilityPath, runtimeBlockerPath };
+}
+
+function setFixtureEnv() {
+  Object.assign(process.env, {
+    RECALLWEAVE_BASELINE_LIVE: "1",
+    RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+    RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY: "1",
+    SELFMEM_LOCAL_EMBED_BASE_URL: "http://127.0.0.1:65535/v1",
+    SELFMEM_LOCAL_EMBED_MODEL: "fixture-local-embedding-model",
+    SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS: "700",
+    SELFMEM_LOCAL_RERANK_BASE_URL: "http://127.0.0.1:65534/v1",
+    SELFMEM_LOCAL_RERANK_MODEL: "fixture-local-rerank-model",
+    SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT: "8",
+    RECALLWEAVE_MEMORYBENCH_BASE_URL: "http://127.0.0.1:65533/v1",
+    RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL: "fixture-local-answer-model",
+    RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL: "fixture-local-judge-model",
+    RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS: "1",
+    RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA: "1",
+    RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT: "1",
+  });
+}
+
+function fixtureJson(value) {
+  return `${JSON.stringify(value, null, 2)}\n`;
+}
+
+function writeFixtureFile(path, text) {
+  mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+  writeFileSync(path, text, { encoding: "utf8", mode: 0o600 });
+  return `sha256:${sha256(readFileSync(path))}`;
+}
+
+function writeJsonFile(path, value) {
+  writeFileSync(path, fixtureJson(value), { encoding: "utf8", mode: 0o600 });
+}
+
 function parseArgs(argv) {
   const parsed = {};
   for (let index = 0; index < argv.length; index += 1) {
@@ -588,7 +850,8 @@ function resolveInputPath(pathLike) {
 }
 
 function displayPath(path) {
-  return relative(root, path).replaceAll("\\", "/");
+  const rel = relative(root, path).replaceAll("\\", "/");
+  return rel && !rel.startsWith("..") && !isAbsolute(rel) ? rel : "external-file";
 }
 
 function writeOutput(path, text) {

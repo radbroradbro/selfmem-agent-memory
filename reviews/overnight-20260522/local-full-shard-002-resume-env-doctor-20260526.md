@@ -1,6 +1,7 @@
 # Local-Full Shard Resume Environment Doctor
 
 - Status: BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV
+- Fixture only: false
 - Target shard: shard-002 (25-50)
 - Ready for missing-arm export: false
 - Ready for answer-quality preflight: false

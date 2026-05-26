@@ -1928,6 +1928,15 @@ check("fresh public benchmark target check passes", () => {
   const localFullShardResumeEnvDoctorMarkdownFresh = run("node", ["packages/bench/local-full-shard-resume-env-doctor.mjs", "--format", "markdown"], {
     env: noLocalFullResumeEnv,
   }).stdout;
+  const localFullShardResumeEnvDoctorFixture = JSON.parse(
+    run("node", ["packages/bench/local-full-shard-resume-env-doctor.mjs", "--fixture"]).stdout,
+  );
+  const localFullShardResumeEnvDoctorFixtureMarkdown = run("node", [
+    "packages/bench/local-full-shard-resume-env-doctor.mjs",
+    "--fixture",
+    "--format",
+    "markdown",
+  ]).stdout;
   const localFullShardIntakeFresh = JSON.parse(
     run("node", [
       "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
@@ -3762,6 +3771,7 @@ check("fresh public benchmark target check passes", () => {
   }
   for (const envDoctor of [localFullShardResumeEnvDoctor, localFullShardResumeEnvDoctorFresh]) {
     assert.equal(envDoctor.mode, "local-full-shard-resume-env-doctor");
+    assert.equal(envDoctor.fixtureOnly, false);
     assert.equal(envDoctor.status, "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV");
     assert.equal(envDoctor.metricsOnly, true);
     assert.equal(envDoctor.publicSafe, true);
@@ -3844,12 +3854,52 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Local embedding durability long probe ready: true/);
   assert.equal(localFullShardResumeEnvDoctorTooShort.localEmbeddingDurability?.longProbeReady, false);
   assert.ok(localFullShardResumeEnvDoctorTooShort.blockers?.includes("local-embedding-durability-long-probe-not-ready"));
+  assert.equal(localFullShardResumeEnvDoctorFixture.mode, "local-full-shard-resume-env-doctor");
+  assert.equal(localFullShardResumeEnvDoctorFixture.fixtureOnly, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.status, "READY_LOCAL_FULL_SHARD_RESUME_ENV");
+  assert.equal(localFullShardResumeEnvDoctorFixture.metricsOnly, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.publicSafe, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.callsProviderApis, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.callsHostedSupermemory, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.sendsBenchmarkTextToProvider, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.rawQuestionsIncluded, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.rawAnswersIncluded, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.rawMemoryIncluded, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.rawPrivateOutputPathIncluded, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.printsEnvValues, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.printsPrivatePaths, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.countsAsLocalFullBenchmarkEvidence, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.countsAsFullMemorySotaEvidence, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.publicBenchmarkClaimsAllowed, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.readyForMissingArmExport, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.readyForAnswerQualityPreflight, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.readyForLocalShardIntake, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.provided, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.present, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.outsideRepository, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.pathPrinted, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.sourceRetention?.readyForPrivateAudit, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.sourceRetention?.publicReportIsSafe, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.localEmbeddingDurability?.readyForLocalFullResume, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.env?.localEmbedding?.ready, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.env?.localRerank?.ready, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.env?.localSafety?.ready, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.env?.answerQuality?.ready, true);
+  assert.ok(localFullShardResumeEnvDoctorFixture.requiredInputFiles?.every((file) => file.present && file.hashMatches === true));
+  assert.ok(localFullShardResumeEnvDoctorFixture.completedArmFiles?.every((file) => file.present && file.hashMatches === true));
+  assert.ok(localFullShardResumeEnvDoctorFixture.missingArmFiles?.every((file) => file.present && file.nonEmpty));
+  assert.deepEqual(localFullShardResumeEnvDoctorFixture.blockers, []);
+  assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Status: READY_LOCAL_FULL_SHARD_RESUME_ENV/);
+  assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Fixture only: true/);
+  assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Ready for answer-quality preflight: true/);
   for (const text of [
     JSON.stringify(localFullShardResumeEnvDoctor),
     JSON.stringify(localFullShardResumeEnvDoctorFresh),
     JSON.stringify(localFullShardResumeEnvDoctorTooShort),
+    JSON.stringify(localFullShardResumeEnvDoctorFixture),
     localFullShardResumeEnvDoctorEvidence,
     localFullShardResumeEnvDoctorMarkdownFresh,
+    localFullShardResumeEnvDoctorFixtureMarkdown,
   ]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
