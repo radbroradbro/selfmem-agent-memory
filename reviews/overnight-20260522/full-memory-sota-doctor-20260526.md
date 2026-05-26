@@ -23,7 +23,7 @@
 - local-embedding-durability: pass
 - local-full-shard-intake: blocked (answer-quality-shards-missing, full-shard-coverage-incomplete, local-apple-embedding-server-socket-close, local-full-shard-002-incomplete, local-full-shard-coverage-incomplete)
 - local-full-performance-snapshot: pass
-- local-full-resume-env: blocked (local-full-resume-env-not-ready, local-full-resume-missing-arm-export-not-ready, local-full-resume-answer-quality-preflight-not-ready, local-full-resume-shard-answer-quality-not-ready, local-full-resume-local-shard-intake-not-ready, local-full-resume-command-materialization-not-ready, private-dir-not-provided, required-private-input-files-missing, completed-private-arm-files-missing, local-embedding-env-missing, local-rerank-env-missing, local-safety-env-missing, answer-quality-env-missing)
+- local-full-resume-env: blocked (local-full-resume-env-not-ready, local-full-resume-missing-arm-export-not-ready, local-full-resume-answer-quality-preflight-not-ready, local-full-resume-shard-answer-quality-not-ready, local-full-resume-local-shard-intake-not-ready, local-full-resume-command-materialization-not-ready, local-embedding-env-missing, local-rerank-env-missing, local-safety-env-missing, answer-quality-env-missing)
 - local-full-resume-command-security: pass
 - local-full-resume-result: blocked (local-full-resume-result-not-ready, local-full-resume-result-not-ready-for-intake, local-full-shard-002-result-not-accepted, resume-command-materializer-not-ready, resume-private-command-file-not-written, shard-002-result-missing)
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
@@ -90,8 +90,8 @@
 - Performance counts as SOTA evidence: false
 - Resume env ready for missing-arm export: false
 - Resume env ready for command materialization: false
-- Resume env private directory provided: false
-- Resume env raw-source private audit ready: false
+- Resume env private directory provided: true
+- Resume env raw-source private audit ready: true
 - Resume env compressed default retrieval allowed: true
 - Resume env local embedding env ready: false
 - Resume env local rerank env ready: false
@@ -153,9 +153,6 @@
 - local-full-resume-shard-answer-quality-not-ready
 - local-full-resume-local-shard-intake-not-ready
 - local-full-resume-command-materialization-not-ready
-- private-dir-not-provided
-- required-private-input-files-missing
-- completed-private-arm-files-missing
 - local-embedding-env-missing
 - local-rerank-env-missing
 - local-safety-env-missing

@@ -88,8 +88,8 @@ const readyForMissingArmExport =
   privateDirState.outsideRepository &&
   sourceRetentionState.readyForPrivateAudit &&
   durabilityState.readyForLocalFullResume &&
-  requiredInputFiles.every((file) => file.present && file.hashMatches && file.nonEmpty) &&
-  completedArmFiles.every((file) => file.present && file.hashMatches && file.nonEmpty) &&
+  requiredInputFiles.every(privateFileReady) &&
+  completedArmFiles.every(privateFileReady) &&
   envState.localEmbedding.ready &&
   envState.localRerank.ready &&
   envState.localSafety.ready;
@@ -114,9 +114,9 @@ const blockers = [
   !durabilityState.generatedAfterRuntimeBlocker ? "local-embedding-durability-report-not-fresher-than-runtime-blocker" : null,
   durabilityState.failedProbeClasses.length > 0 ? "local-embedding-durability-probes-failed" : null,
   requiredInputFiles.some((file) => !file.present) ? "required-private-input-files-missing" : null,
-  requiredInputFiles.some((file) => file.present && !file.hashMatches) ? "required-private-input-file-hash-mismatch" : null,
+  requiredInputFiles.some(privateFileHashMismatch) ? "required-private-input-file-hash-mismatch" : null,
   completedArmFiles.some((file) => !file.present) ? "completed-private-arm-files-missing" : null,
-  completedArmFiles.some((file) => file.present && !file.hashMatches) ? "completed-private-arm-file-hash-mismatch" : null,
+  completedArmFiles.some(privateFileHashMismatch) ? "completed-private-arm-file-hash-mismatch" : null,
   !envState.localEmbedding.ready ? "local-embedding-env-missing" : null,
   !envState.localRerank.ready ? "local-rerank-env-missing" : null,
   !envState.localSafety.ready ? "local-safety-env-missing" : null,
@@ -438,9 +438,21 @@ function envGroup(names, options = {}) {
 
 function inspectRequiredInputFiles(privatePath, planValue) {
   return [
-    { role: "queryset", name: "longmemeval-queryset.private.json", hash: planValue.materializeReport?.collectorCompatibleQuerySetHash },
+    {
+      role: "queryset",
+      name: "longmemeval-queryset.private.json",
+      hash: planValue.materializeReport?.collectorCompatibleQuerySetHash,
+      hashKind: "collector-compatible-queryset",
+      hashSource: "semantic-json-contract",
+    },
     { role: "memories", name: "longmemeval-memories.private.jsonl", hash: planValue.materializeReport?.memoriesFileHash },
-    { role: "answer-labels", name: "longmemeval-answer-labels.private.json", hash: planValue.target?.answerLabelsHash },
+    {
+      role: "answer-labels",
+      name: "longmemeval-answer-labels.private.json",
+      hash: planValue.target?.answerLabelsHash,
+      hashKind: "embedded-answer-labels",
+      hashSource: "semantic-json-contract",
+    },
   ].map((spec) => inspectPrivateFile(privatePath, spec));
 }
 
@@ -468,7 +480,7 @@ function inspectPrivateFile(basePath, spec) {
   const path = basePath ? join(basePath, spec.name) : null;
   const present = Boolean(path && existsSync(path) && statSync(path).isFile());
   const sizeBytes = present ? statSync(path).size : 0;
-  const actualHash = present ? `sha256:${sha256(readFileSync(path))}` : null;
+  const contract = present ? inspectPrivateFileContract(path, spec) : { actualHash: null, parseOk: null, contractPresent: false };
   return {
     role: spec.role,
     name: spec.name,
@@ -476,9 +488,61 @@ function inspectPrivateFile(basePath, spec) {
     present,
     nonEmpty: sizeBytes > 0,
     sizeBytes: present ? sizeBytes : null,
+    hashKind: spec.hashKind ?? "file-sha256",
+    hashSource: spec.hashSource ?? "file-bytes",
+    parseOk: contract.parseOk,
+    contractPresent: contract.contractPresent,
     expectedHash: spec.hash ?? null,
-    actualHash: actualHash ? "sha256:<redacted-public-hash>" : null,
-    hashMatches: spec.hash ? actualHash === spec.hash : null,
+    actualHash: contract.actualHash ? "sha256:<redacted-public-hash>" : null,
+    hashMatches: spec.hash ? contract.actualHash === spec.hash : null,
+  };
+}
+
+function privateFileReady(file) {
+  return (
+    file.present === true &&
+    file.nonEmpty === true &&
+    file.parseOk !== false &&
+    file.contractPresent !== false &&
+    file.hashMatches !== false
+  );
+}
+
+function privateFileHashMismatch(file) {
+  return file.present === true && file.hashMatches === false;
+}
+
+function inspectPrivateFileContract(path, spec) {
+  if (spec.hashKind === "collector-compatible-queryset") {
+    try {
+      const value = JSON.parse(readFileSync(path, "utf8"));
+      const contractPresent = Array.isArray(value.queries);
+      return {
+        actualHash: contractPresent ? `sha256:${stableHash(collectorQuerySetHashPayload(value))}` : null,
+        parseOk: true,
+        contractPresent,
+      };
+    } catch {
+      return { actualHash: null, parseOk: false, contractPresent: false };
+    }
+  }
+  if (spec.hashKind === "embedded-answer-labels") {
+    try {
+      const value = JSON.parse(readFileSync(path, "utf8"));
+      const actualHash = isSha256Hash(value.answerLabelsHash) ? value.answerLabelsHash : null;
+      return {
+        actualHash,
+        parseOk: true,
+        contractPresent: Boolean(actualHash),
+      };
+    } catch {
+      return { actualHash: null, parseOk: false, contractPresent: false };
+    }
+  }
+  return {
+    actualHash: `sha256:${sha256(readFileSync(path))}`,
+    parseOk: null,
+    contractPresent: true,
   };
 }
 
@@ -671,17 +735,16 @@ function createFixtureState() {
   mkdirSync(armsDir, { recursive: true, mode: 0o700 });
   mkdirSync(reportsDir, { recursive: true, mode: 0o700 });
 
-  const querySetHash = writeFixtureFile(
-    join(privateDir, "longmemeval-queryset.private.json"),
-    fixtureJson({
-      schemaVersion: 1,
-      datasetSlice: "local-full-resume-env-fixture",
-      queries: [
-        { id: "fixture-query-025", q: "synthetic local resume query", expectedResultIds: ["fixture-memory-025"] },
-        { id: "fixture-query-026", q: "synthetic local rerank query", expectedResultIds: ["fixture-memory-026"] },
-      ],
-    }),
-  );
+  const querySet = {
+    schemaVersion: 1,
+    datasetSlice: "local-full-resume-env-fixture",
+    queries: [
+      { id: "fixture-query-025", q: "synthetic local resume query", expectedResultIds: ["fixture-memory-025"] },
+      { id: "fixture-query-026", q: "synthetic local rerank query", expectedResultIds: ["fixture-memory-026"] },
+    ],
+  };
+  const querySetHash = `sha256:${stableHash(collectorQuerySetHashPayload(querySet))}`;
+  const querySetFileHash = writeFixtureFile(join(privateDir, "longmemeval-queryset.private.json"), fixtureJson(querySet));
   const memoriesHash = writeFixtureFile(
     join(privateDir, "longmemeval-memories.private.jsonl"),
     `${JSON.stringify({ id: "fixture-memory-025", text: "synthetic memory one" })}\n${JSON.stringify({
@@ -689,14 +752,25 @@ function createFixtureState() {
       text: "synthetic memory two",
     })}\n`,
   );
-  const answerLabelsHash = writeFixtureFile(
+  const answerLabels = [
+    { queryId: "fixture-query-025", questionId: "fixture-question-025", questionType: "fixture", answer: "synthetic memory one" },
+    { queryId: "fixture-query-026", questionId: "fixture-question-026", questionType: "fixture", answer: "synthetic memory two" },
+  ];
+  const answerLabelsHash = `sha256:${stableHash(
+    canonicalJson(
+      answerLabels.map(({ questionId, questionType, answer }) => ({
+        questionId,
+        questionType,
+        answer,
+      })),
+    ),
+  )}`;
+  const answerLabelsFileHash = writeFixtureFile(
     join(privateDir, "longmemeval-answer-labels.private.json"),
     fixtureJson({
       schemaVersion: 1,
-      labels: [
-        { queryId: "fixture-query-025", answerId: "fixture-memory-025" },
-        { queryId: "fixture-query-026", answerId: "fixture-memory-026" },
-      ],
+      answerLabelsHash,
+      labels: answerLabels,
     }),
   );
   const rawDatasetHash = writeFixtureFile(
@@ -774,9 +848,9 @@ function createFixtureState() {
       fileMode: "0600",
       directoryMode: "0700",
       files: [
-        { role: "queryset", name: "longmemeval-queryset.private.json", hash: querySetHash },
+        { role: "queryset", name: "longmemeval-queryset.private.json", hash: querySetFileHash },
         { role: "memories", name: "longmemeval-memories.private.jsonl", hash: memoriesHash },
-        { role: "answer-labels", name: "longmemeval-answer-labels.private.json", hash: answerLabelsHash },
+        { role: "answer-labels", name: "longmemeval-answer-labels.private.json", hash: answerLabelsFileHash },
         { role: "raw-dataset", name: "longmemeval-raw-dataset.private.json", hash: rawDatasetHash },
         { role: "selected-raw-rows", name: "longmemeval-selected-raw-rows.private.json", hash: selectedRawRowsHash },
         { role: "source-manifest", name: "longmemeval-source-manifest.private.json", hash: sourceManifestHash },
@@ -959,6 +1033,43 @@ function displayPath(path) {
 function writeOutput(path, text) {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, text, "utf8");
+}
+
+function collectorQuerySetHashPayload(querySet) {
+  return {
+    schemaVersion: querySet.schemaVersion ?? 1,
+    datasetSlice: querySet.datasetSlice ?? null,
+    queries: arrayOf(querySet.queries).map((query) => ({
+      id: query.id,
+      q: query.q,
+      expectedResultIds: query.expectedResultIds ?? [],
+      expectedResultHashes: query.expectedResultHashes ?? [],
+    })),
+  };
+}
+
+function stableHash(value) {
+  return sha256(typeof value === "string" ? value : JSON.stringify(value));
+}
+
+function canonicalJson(value) {
+  return JSON.stringify(sortForHash(value));
+}
+
+function sortForHash(value) {
+  if (Array.isArray(value)) return value.map((item) => sortForHash(item));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, child]) => [key, sortForHash(child)]),
+    );
+  }
+  return value;
+}
+
+function isSha256Hash(value) {
+  return /^sha256:[a-f0-9]{64}$/iu.test(String(value ?? ""));
 }
 
 function sha256(value) {

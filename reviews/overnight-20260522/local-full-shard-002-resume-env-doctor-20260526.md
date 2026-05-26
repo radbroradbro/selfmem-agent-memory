@@ -8,11 +8,11 @@
 - Ready for local shard intake: false
 - Ready for command materialization: false
 - Resume packet commands runnable as printed: false
-- Private directory provided: false
-- Private directory present: false
-- Private directory outside repository: false
+- Private directory provided: true
+- Private directory present: true
+- Private directory outside repository: true
 - Raw-source retention contract ready: true
-- Raw-source private audit ready: false
+- Raw-source private audit ready: true
 - Compressed default retrieval allowed: true
 - Local embedding durability report ready: true
 - Local embedding durability long probe ready: true
@@ -40,19 +40,19 @@
 - RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT
 
 ## Private Inputs
-- queryset: present=false; hashMatched=false
-- memories: present=false; hashMatched=null
-- answer-labels: present=false; hashMatched=false
+- queryset: present=true; hashMatched=true
+- memories: present=true; hashMatched=null
+- answer-labels: present=true; hashMatched=true
 
 ## Raw Source Retention
 - Contract ready: true
 - Public report safe: true
-- Ready for private audit: false
+- Ready for private audit: true
 - Compressed default retrieval allowed: true
 - Required private audit roles: raw-dataset, selected-raw-rows, source-manifest
-- raw-dataset: present=false; hashMatched=false
-- selected-raw-rows: present=false; hashMatched=false
-- source-manifest: present=false; hashMatched=false
+- raw-dataset: present=true; hashMatched=true
+- selected-raw-rows: present=true; hashMatched=true
+- source-manifest: present=true; hashMatched=true
 
 ## Local Embedding Durability
 - Report ready: true
@@ -65,9 +65,9 @@
 - Failed probe classes: none
 
 ## Completed Arm Files
-- bm25-lite: present=false; hashMatched=false
-- full-hybrid-rerank: present=false; hashMatched=false
-- query-expanded-full-hybrid-rerank: present=false; hashMatched=false
+- bm25-lite: present=true; hashMatched=true
+- full-hybrid-rerank: present=true; hashMatched=true
+- query-expanded-full-hybrid-rerank: present=true; hashMatched=true
 
 ## Missing Arm Files
 - local-apple-qwen3-0_6b: present=false
@@ -77,14 +77,11 @@
 - Template placeholders present: true
 - Commands runnable as printed: false
 - Required placeholders ready: false
-- Unresolved required placeholders: local-answer-model, local-embedding-base-url, local-embedding-model, local-judge-model, local-rerank-base-url, local-rerank-candidate-limit, local-rerank-model, openai-compatible-base-url, private-output-dir, safe-local-embedding-batch-token-limit
+- Unresolved required placeholders: local-answer-model, local-embedding-base-url, local-embedding-model, local-judge-model, local-rerank-base-url, local-rerank-candidate-limit, local-rerank-model, openai-compatible-base-url, safe-local-embedding-batch-token-limit
 - Optional placeholders requiring operator choice: 1-when-cloud-query-expansion-runs, env-only-if-cloud-endpoint, local-query-expansion-base-url-if-used, query-expansion-model-if-used
 - Prints materialized commands: false
 
 ## Blockers
-- private-dir-not-provided
-- required-private-input-files-missing
-- completed-private-arm-files-missing
 - local-embedding-env-missing
 - local-rerank-env-missing
 - local-safety-env-missing

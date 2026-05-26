@@ -3913,13 +3913,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(envDoctor.readyForLocalShardIntake, false);
     assert.equal(envDoctor.readyForCommandMaterialization, false);
     assert.equal(envDoctor.resumePacketCommandsRunnableAsPrinted, false);
-    assert.equal(envDoctor.privateDir?.provided, false);
-    assert.equal(envDoctor.privateDir?.present, false);
     assert.equal(envDoctor.privateDir?.pathPrinted, false);
     assert.equal(envDoctor.sourceRetention?.contractReady, true);
     assert.equal(envDoctor.sourceRetention?.rawSourcesRetainedPrivately, true);
     assert.equal(envDoctor.sourceRetention?.publicReportIsSafe, true);
-    assert.equal(envDoctor.sourceRetention?.readyForPrivateAudit, false);
     assert.equal(envDoctor.sourceRetention?.compressedDefaultRetrievalAllowed, true);
     assert.equal(envDoctor.sourceRetention?.uiMayUseCompressedDefaultButAuditRetainsRawSource, true);
     assert.equal(envDoctor.sourceRetention?.directoryInsideRepository, false);
@@ -3933,7 +3930,6 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(envDoctor.sourceRetention?.selectedRawRowsCount, 500);
     assert.equal(envDoctor.sourceRetention?.rawSourcePrivateFiles?.length, 3);
     assert.ok(envDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.pathLabel === "external-private-file"));
-    assert.ok(envDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.present === false));
     assert.equal(envDoctor.localEmbeddingDurability?.reportReady, true);
     assert.equal(envDoctor.localEmbeddingDurability?.longProbeReady, true);
     assert.equal(envDoctor.localEmbeddingDurability?.generatedAfterRuntimeBlocker, true);
@@ -3956,9 +3952,9 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(envDoctor.env?.localEmbedding?.missingNames?.includes("SELFMEM_LOCAL_EMBED_BASE_URL"));
     assert.ok(envDoctor.env?.localRerank?.missingNames?.includes("SELFMEM_LOCAL_RERANK_BASE_URL"));
     assert.ok(envDoctor.env?.answerQuality?.missingNames?.includes("RECALLWEAVE_MEMORYBENCH_BASE_URL"));
-    assert.ok(envDoctor.blockers?.includes("private-dir-not-provided"));
     assert.ok(envDoctor.blockers?.includes("local-embedding-env-missing"));
     assert.ok(envDoctor.blockers?.includes("local-rerank-env-missing"));
+    assert.ok(envDoctor.blockers?.includes("local-safety-env-missing"));
     assert.ok(envDoctor.blockers?.includes("answer-quality-env-missing"));
     assert.equal(envDoctor.commandPlaceholders?.privateOutputDirPlaceholderPresent, true);
     assert.equal(envDoctor.commandPlaceholders?.publicReviewDirPlaceholderPresent, true);
@@ -3970,11 +3966,40 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(envDoctor.commandMaterialization?.printsMaterializedCommands, false);
     assert.equal(envDoctor.commandMaterialization?.printsPrivatePaths, false);
     assert.equal(envDoctor.commandMaterialization?.printsEnvValues, false);
-    assert.ok(envDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
     assert.ok(envDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("local-embedding-base-url"));
     assert.ok(envDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("openai-compatible-base-url"));
     assert.ok(envDoctor.commandMaterialization?.optionalPlaceholderNames?.includes("env-only-if-cloud-endpoint"));
   }
+  assert.equal(localFullShardResumeEnvDoctor.privateDir?.provided, true);
+  assert.equal(localFullShardResumeEnvDoctor.privateDir?.present, true);
+  assert.equal(localFullShardResumeEnvDoctor.privateDir?.outsideRepository, true);
+  assert.equal(localFullShardResumeEnvDoctor.sourceRetention?.readyForPrivateAudit, true);
+  assert.ok(localFullShardResumeEnvDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.present === true));
+  assert.ok(localFullShardResumeEnvDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.hashMatches === true));
+  assert.equal(localFullShardResumeEnvDoctor.requiredInputFiles?.length, 3);
+  assert.ok(localFullShardResumeEnvDoctor.requiredInputFiles?.every((file) => file.present === true && file.nonEmpty === true));
+  assert.deepEqual(
+    localFullShardResumeEnvDoctor.requiredInputFiles?.map((file) => [file.role, file.hashKind, file.hashMatches]),
+    [
+      ["queryset", "collector-compatible-queryset", true],
+      ["memories", "file-sha256", null],
+      ["answer-labels", "embedded-answer-labels", true],
+    ],
+  );
+  assert.ok(localFullShardResumeEnvDoctor.requiredInputFiles?.every((file) => file.parseOk !== false));
+  assert.ok(localFullShardResumeEnvDoctor.requiredInputFiles?.every((file) => file.contractPresent !== false));
+  assert.equal(localFullShardResumeEnvDoctor.completedArmFiles?.length, 3);
+  assert.ok(localFullShardResumeEnvDoctor.completedArmFiles?.every((file) => file.present === true && file.hashMatches === true));
+  assert.ok(!localFullShardResumeEnvDoctor.blockers?.includes("private-dir-not-provided"));
+  assert.ok(!localFullShardResumeEnvDoctor.blockers?.includes("required-private-input-file-hash-mismatch"));
+  assert.ok(!localFullShardResumeEnvDoctor.blockers?.includes("completed-private-arm-files-missing"));
+  assert.ok(!localFullShardResumeEnvDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
+  assert.equal(localFullShardResumeEnvDoctorFresh.privateDir?.provided, false);
+  assert.equal(localFullShardResumeEnvDoctorFresh.privateDir?.present, false);
+  assert.equal(localFullShardResumeEnvDoctorFresh.sourceRetention?.readyForPrivateAudit, false);
+  assert.ok(localFullShardResumeEnvDoctorFresh.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.present === false));
+  assert.ok(localFullShardResumeEnvDoctorFresh.blockers?.includes("private-dir-not-provided"));
+  assert.ok(localFullShardResumeEnvDoctorFresh.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
   assert.equal(localFullShardResumeEnvDoctor.writesRealFiles, true);
   assert.equal(localFullShardResumeEnvDoctorFresh.writesRealFiles, false);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Local-Full Shard Resume Environment Doctor/);
@@ -4762,16 +4787,19 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.localFullLaneState?.performanceReport?.blockers?.includes("local-full-coverage-incomplete"));
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.status, "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV");
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.evidenceReady, false);
-    assert.ok(doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers?.includes("private-dir-not-provided"));
+    assert.ok(!doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers?.includes("private-dir-not-provided"));
+    assert.ok(doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers?.includes("local-embedding-env-missing"));
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForMissingArmExport, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForAnswerQualityPreflight, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForShardAnswerQuality, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForLocalShardIntake, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForCommandMaterialization, false);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryProvided, false);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryProvided, true);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryPresent, true);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryOutsideRepository, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.rawSourceRetentionContractReady, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.rawSourcesRetainedPrivately, true);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.rawSourcePrivateAuditReady, false);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.rawSourcePrivateAuditReady, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.compressedDefaultRetrievalAllowed, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.uiMayUseCompressedDefaultButAuditRetainsRawSource, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localEmbeddingDurabilityReady, true);
@@ -4780,6 +4808,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localSafetyEnvReady, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.answerQualityEnvReady, false);
     assert.ok(Number(doctorReport.localFullLaneState?.resumeEnv?.missingEnvironmentNameCount ?? 0) > 0);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.requiredPrivateInputFileCount, 3);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.presentPrivateInputFileCount, 3);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.completedArmFileCount, 3);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.presentCompletedArmFileCount, 3);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.evidenceReady, true);
     assert.deepEqual(doctorReport.localFullLaneState?.resumeCommandSecurity?.evidenceBlockers, []);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.privateCommandFileMode, "0700");
@@ -4846,7 +4878,7 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.blockers?.includes("shard-results-missing"));
     assert.ok(doctorReport.blockers?.includes("voyage-credentials-missing"));
     assert.ok(doctorReport.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
-    assert.ok(doctorReport.blockers?.includes("private-dir-not-provided"));
+    assert.ok(!doctorReport.blockers?.includes("private-dir-not-provided"));
     assert.ok(doctorReport.blockers?.includes("shard-002-result-missing"));
     assert.ok(doctorReport.blockers?.includes("human-public-launch-approval"));
     assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("query-expanded-full-hybrid-rerank"));
@@ -4867,7 +4899,8 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-performance-snapshot: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-resume-env: blocked/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export: false/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env raw-source private audit ready: false/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env private directory provided: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env raw-source private audit ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env compressed default retrieval allowed: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local embedding env ready: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local rerank env ready: false/);
