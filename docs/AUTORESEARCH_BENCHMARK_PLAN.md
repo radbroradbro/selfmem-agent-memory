@@ -108,8 +108,10 @@ too expensive for the next run.
    `benchmark:reported-targets`. The checked-in artifact at
    `reviews/overnight-20260522/reported-memory-targets-20260525.json` selects
    Supermemory's reported LongMemEval-S Gemini 3 Pro row as the current primary
-   target and keeps Qwen, EmbeddingGemma, Voyage, and NVIDIA rows in the
-   component/model-selection lane only.
+   target, requires a 2026-05-26 source refresh, keeps Qwen3 embeddings and
+   rerankers, EmbeddingGemma, Voyage, Gemini Embedding 2, and NVIDIA rows in the
+   component/model-selection lane only, and treats MemoryBench as
+   harness-source-only rather than as a score.
    Start with `benchmark:source-lock -- --strict` to verify the checked-in
    MemoryBench source lock before authoring a target.
    Then run `benchmark:public-slice -- --live` for the current LongMemEval-S

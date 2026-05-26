@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-26T00:24:04.260Z",
+  "generatedAt": "2026-05-26T04:29:45.246Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
@@ -161,7 +161,7 @@
     "readinessNote": {
       "path": "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
       "exists": true,
-      "hash": "sha256:d57c22852bc24860db876ff8279d14a4f07df0a1088f22c1a261a8e82dfc6ef7",
+      "hash": "sha256:0c13798f2c845b04de0644444c46a750c8d3ffc861c96493c11514094d919852",
       "mode": null,
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -172,13 +172,27 @@
   "reportedTargetsEvidence": {
     "path": "reviews/overnight-20260522/reported-memory-targets-20260525.json",
     "status": "READY_REPORTED_TARGETS",
-    "sourceEvidenceCheckedAt": "2026-05-25",
+    "sourceEvidenceCheckedAt": "2026-05-26",
     "primaryReportedMemoryTarget": "supermemory-production-research-gemini-3-pro",
     "memoryTargetCount": 4,
-    "componentTargetCount": 6,
+    "componentTargetCount": 10,
+    "benchmarkHarnessTargetCount": 1,
     "blockers": []
   },
   "componentEvidence": [
+    {
+      "id": "qwen3-embedding-0_6b-mteb-english-v2",
+      "role": "embedding",
+      "modelName": "Qwen3-Embedding-0.6B",
+      "benchmark": "MTEB English v2",
+      "metricName": "mean task score",
+      "score": 70.7,
+      "scoreUnit": "points",
+      "claimUse": "model-selection-only",
+      "source": "https://github.com/QwenLM/Qwen3-Embedding",
+      "checkedAt": "2026-05-26",
+      "finding": "Component evidence only. It selects the zero-spend Apple Silicon local floor but cannot prove full memory-system quality."
+    },
     {
       "id": "qwen3-embedding-8b-mteb-english-v2",
       "role": "embedding",
@@ -189,7 +203,7 @@
       "scoreUnit": "points",
       "claimUse": "model-selection-only",
       "source": "https://github.com/QwenLM/Qwen3-Embedding",
-      "checkedAt": "2026-05-25",
+      "checkedAt": "2026-05-26",
       "finding": "Component evidence only. It chooses local embedding candidates but cannot prove full memory-system quality."
     },
     {
@@ -202,8 +216,21 @@
       "scoreUnit": "points",
       "claimUse": "model-selection-only",
       "source": "https://github.com/QwenLM/Qwen3-Embedding",
-      "checkedAt": "2026-05-25",
+      "checkedAt": "2026-05-26",
       "finding": "Component evidence only. It chooses local embedding candidates but cannot prove full memory-system quality."
+    },
+    {
+      "id": "qwen3-reranker-0_6b-mteb-r",
+      "role": "reranker",
+      "modelName": "Qwen3-Reranker-0.6B",
+      "benchmark": "MTEB-R",
+      "metricName": "reranker score",
+      "score": 65.8,
+      "scoreUnit": "points",
+      "claimUse": "model-selection-only",
+      "source": "https://github.com/QwenLM/Qwen3-Embedding",
+      "checkedAt": "2026-05-26",
+      "finding": "Component evidence only. It selects the first local reranker sidecar to test but cannot prove full memory-system quality."
     },
     {
       "id": "qwen3-reranker-4b-mteb-r",
@@ -215,8 +242,21 @@
       "scoreUnit": "points",
       "claimUse": "model-selection-only",
       "source": "https://github.com/QwenLM/Qwen3-Embedding",
-      "checkedAt": "2026-05-25",
+      "checkedAt": "2026-05-26",
       "finding": "Component evidence only. It chooses local reranker candidates but cannot prove full memory-system quality."
+    },
+    {
+      "id": "qwen3-reranker-8b-mteb-r",
+      "role": "reranker",
+      "modelName": "Qwen3-Reranker-8B",
+      "benchmark": "MTEB-R",
+      "metricName": "reranker score",
+      "score": 69.02,
+      "scoreUnit": "points",
+      "claimUse": "model-selection-only",
+      "source": "https://github.com/QwenLM/Qwen3-Embedding",
+      "checkedAt": "2026-05-26",
+      "finding": "Component evidence only. It selects an optional high-quality local reranker arm but cannot prove full memory-system quality."
     },
     {
       "id": "embeddinggemma-local-model-card",
@@ -228,7 +268,7 @@
       "scoreUnit": "not reported in artifact",
       "claimUse": "model-selection-only",
       "source": "https://ai.google.dev/gemma/docs/embeddinggemma",
-      "checkedAt": "2026-05-25",
+      "checkedAt": "2026-05-26",
       "finding": "Small local embedding candidate evidence only. It is a hardware-friendly baseline, not full memory-system proof."
     },
     {
@@ -241,8 +281,21 @@
       "scoreUnit": "not reported in artifact",
       "claimUse": "model-selection-only",
       "source": "https://www.mongodb.com/docs/voyageai/models/",
-      "checkedAt": "2026-05-25",
+      "checkedAt": "2026-05-26",
       "finding": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required."
+    },
+    {
+      "id": "gemini-embedding-2-model-card",
+      "role": "provider-embedding",
+      "modelName": "Gemini Embedding 2",
+      "benchmark": "provider model card",
+      "metricName": "multimodal embedding endpoint availability",
+      "score": null,
+      "scoreUnit": "not reported in artifact",
+      "claimUse": "model-selection-only",
+      "source": "https://ai.google.dev/gemini-api/docs/embeddings",
+      "checkedAt": "2026-05-26",
+      "finding": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required before using Gemini Embedding 2 in a memory-system claim."
     },
     {
       "id": "nvidia-retrieval-nim-model-card",
@@ -254,7 +307,7 @@
       "scoreUnit": "not reported in artifact",
       "claimUse": "model-selection-only",
       "source": "https://docs.api.nvidia.com/nim/reference/retrieval-apis",
-      "checkedAt": "2026-05-25",
+      "checkedAt": "2026-05-26",
       "finding": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required."
     },
     {
@@ -263,6 +316,35 @@
       "claimUse": "method-selection-only",
       "source": "https://arxiv.org/abs/2602.16989",
       "finding": "A 2026 retrieval pipeline used LLM-based query expansion before sparse retrieval, dense ranking, and Qwen3 reranking under limited compute."
+    }
+  ],
+  "benchmarkHarnessEvidence": [
+    {
+      "id": "memorybench-supermemory-unified-suite",
+      "role": "same-data full-memory benchmark route",
+      "harnessName": "MemoryBench",
+      "benchmarkFamilies": [
+        "locomo",
+        "longmemeval",
+        "convomem"
+      ],
+      "supportedProviders": [
+        "supermemory",
+        "mem0",
+        "zep"
+      ],
+      "phases": [
+        "ingest",
+        "index",
+        "search",
+        "answer",
+        "evaluate",
+        "report"
+      ],
+      "claimUse": "benchmark-harness-source-only",
+      "source": "https://github.com/supermemoryai/memorybench",
+      "checkedAt": "2026-05-26",
+      "finding": "Harness availability source-lock only. It does not provide a RecallWeave score, and it cannot substitute for a same-data full answer-quality benchmark."
     }
   ],
   "queryExpansionPolicy": {
@@ -307,7 +389,7 @@
       "systemName": "Supermemory",
       "sourceName": "Supermemory Research",
       "sourceUrl": "https://supermemory.ai/research/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -336,7 +418,7 @@
       "systemName": "Supermemory",
       "sourceName": "Supermemory Research",
       "sourceUrl": "https://supermemory.ai/research/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -365,7 +447,7 @@
       "systemName": "Supermemory",
       "sourceName": "Supermemory Research",
       "sourceUrl": "https://supermemory.ai/research/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -394,7 +476,7 @@
       "systemName": "Supermemory",
       "sourceName": "Supermemory ASMR Blog",
       "sourceUrl": "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -669,6 +751,7 @@
     "publicClaimsAllowedByInputs": false,
     "reportedMemoryTargetsPresent": true,
     "reportedMemoryTargetsSourceLocked": true,
+    "benchmarkHarnessTargetsSourceLocked": true,
     "fullOrOfficiallyComparableMemoryBenchmarkPresent": false,
     "readinessNotePresent": true
   },

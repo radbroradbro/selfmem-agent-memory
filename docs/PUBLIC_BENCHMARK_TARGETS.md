@@ -233,6 +233,11 @@ score rows. If hosted Supermemory usage is unavailable, those reported rows can
 still act as comparison targets, but only after their source URL, checked date,
 benchmark variant, score, judge, caveat, and comparability conditions validate.
 Component rows in the same artifact remain model-selection evidence only.
+The artifact was refreshed on 2026-05-26 and now mechanically requires source
+coverage for the Qwen3 local embedding/reranker ladder, EmbeddingGemma, Voyage
+4 with `rerank-2.5`, Gemini Embedding 2, NVIDIA retrieval NIM, and the
+MemoryBench harness route. MemoryBench coverage is harness-source-only; it does
+not count as a RecallWeave score.
 
 | Source | Benchmark | Reported metric | Target | Caveat |
 | --- | --- | --- | ---: | --- |
@@ -240,12 +245,17 @@ Component rows in the same artifact remain model-selection evidence only.
 | Supermemory research | LongMemEval-S | overall, gpt-5 judge | 84.6% | Reported provider result; use as a target row, not as live Supermemory usage. |
 | Supermemory research | LongMemEval-S | overall, gemini-3-pro judge | 85.2% | Current primary reported production/research target for the SOTA ladder. |
 | Supermemory ASMR blog | LongMemEval-S | experimental agentic flow | 98.6% | Ceiling reference only. The source labels it experimental and not the core production Supermemory engine. |
+| Qwen3 official repo | MTEB English v2 | embedding mean task | 70.70 | Qwen3 Embedding 0.6B component score; default zero-spend Apple-local floor only. |
 | Qwen3 official repo | MTEB English v2 | embedding mean task | 75.22 | Qwen3 Embedding 8B component score; choose local challenger arms only. |
 | Qwen3 official repo | MTEB English v2 | embedding mean task | 74.60 | Qwen3 Embedding 4B component score; plausible quality-first Apple/local challenger. |
+| Qwen3 official repo | MTEB-R | reranker score | 65.80 | Qwen3 Reranker 0.6B component score; first local reranker sidecar to test. |
 | Qwen3 official repo | MTEB-R | reranker score | 69.76 | Qwen3 Reranker 4B component score; test only if local latency and memory fit. |
+| Qwen3 official repo | MTEB-R | reranker score | 69.02 | Qwen3 Reranker 8B component score; optional quality challenger only. |
 | Google EmbeddingGemma docs | MTEB multilingual v2 | small local embedding class | n/a | Small on-device baseline; lower hardware cost does not imply full memory quality. |
 | Voyage model docs | Retrieval/rerank model card | model recommendation | n/a | Use Voyage 4 and rerank-2.5 as provider challengers; same-data answer-quality run still required. |
+| Google Gemini API docs | Embedding model card | multimodal endpoint availability | n/a | Use Gemini Embedding 2 as a provider challenger; same-data answer-quality run still required. |
 | NVIDIA model docs | Rerank model card | model recommendation | n/a | Use Nemotron/NVIDIA NIM as hosted challenger; same-data answer-quality run still required. |
+| Supermemory MemoryBench repo | locomo, longmemeval, convomem | harness route | n/a | Harness-source-only. It chooses the full comparison route, not a score. |
 | Mem0 state report | LoCoMo | score | 92.5 | Reported provider result with average tokens per query. |
 | Mem0 state report | LongMemEval | score | 94.4 | Reported provider result with average tokens per query. |
 | Mem0 state report | BEAM 1M | score | 64.1 | Use only when the BEAM slice and context depth match. |
@@ -263,6 +273,9 @@ Component rows in the same artifact remain model-selection evidence only.
   dataset source URLs, and key file hashes without raw questions or labels. For
   independent verification, run the source-lock checker with
   `--repo-checkout <memorybench-checkout>` against a local MemoryBench clone.
+- The reported-target artifact separately source-locks the public MemoryBench
+  harness route on 2026-05-26 so the SOTA ladder can require a real full
+  benchmark route even when hosted Supermemory quota is unavailable.
 - MemoryBench's MemScore is a triple: quality, latency, and context tokens. Do
   not collapse that into one score.
 - Current LongMemEval-S public slice manifest: dataset hash

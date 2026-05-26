@@ -243,4 +243,18 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 2ec5708487b2e238b97935f9ce5dd1740c9005ab1d8fa1e93f80191b2ad6cba9
 
+## 2026-05-26 Reported Target Source-Lock Refresh
+
+- PR #5 and issue #6 were refreshed again after the reported-target gate began
+  requiring May 26 source coverage for Qwen3 embeddings/rerankers,
+  EmbeddingGemma, Voyage 4 with `rerank-2.5`, Gemini Embedding 2, NVIDIA
+  retrieval NIM, and MemoryBench.
+- The refreshed public text keeps component rows model-selection-only and
+  MemoryBench harness-source-only. It does not claim a full memory-system win.
+- PR body refreshed at: 2026-05-26T04:33:32Z
+- Issue updated at: 2026-05-26T04:33:33Z
+- PR body hash: 530aaaa01c305eda0678d805de8656414aa04b5d6c02dd87bff6626f5622b642
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: 6ea910be175bdd0709c6fdc31ecb7ddbef79c8c99d23c2b90271c26968ec3445
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

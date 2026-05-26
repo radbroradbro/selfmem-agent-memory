@@ -227,6 +227,14 @@ current source-backed challenger set keeps:
   challenger arms, with NVIDIA's own retrieval docs treated as component
   evidence rather than full memory-system proof.
 
+The machine-readable reported-target source lock at
+`reviews/overnight-20260522/reported-memory-targets-20260525.json` enforces
+that this matrix has current coverage for the Qwen3 0.6B/4B/8B embedding
+ladder, Qwen3 0.6B/4B/8B reranker ladder, EmbeddingGemma, Voyage 4 with
+`rerank-2.5`, Gemini Embedding 2, NVIDIA retrieval NIM, and the MemoryBench
+harness route. Component rows select arms only. MemoryBench source coverage
+selects the full comparison harness only.
+
 ## Autoresearch Setup Gate
 
 Autoresearch may compare Apple Silicon local, Voyage, Gemini, and NVIDIA arms
@@ -259,4 +267,6 @@ score is exciting.
 - [Qwen3 Embedding 0.6B GGUF model card](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF)
 - [NVIDIA retrieval APIs](https://docs.api.nvidia.com/nim/reference/retrieval-apis)
 - [NVIDIA LLM APIs](https://docs.api.nvidia.com/nim/reference/llm-apis)
+- [Supermemory Research](https://supermemory.ai/research/)
+- [MemoryBench](https://github.com/supermemoryai/memorybench)
 - [MemReranker](https://arxiv.org/abs/2605.06132)

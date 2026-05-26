@@ -7,6 +7,8 @@
 - Current canary query count: 30
 - Current best score: 43.1667
 - Current score delta vs reported target: -42.0333
+- Reported target source evidence checked at: 2026-05-26
+- Benchmark harness source locks: 1
 
 ## Gates
 - source-locked-full-target: pass

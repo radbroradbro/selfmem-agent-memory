@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "sourceEvidenceCheckedAt": "2026-05-25",
+  "sourceEvidenceCheckedAt": "2026-05-26",
   "memoryTargets": [
     {
       "id": "supermemory-production-research-gpt4o",
       "systemName": "Supermemory",
       "sourceName": "Supermemory Research",
       "sourceUrl": "https://supermemory.ai/research/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -33,7 +33,7 @@
       "systemName": "Supermemory",
       "sourceName": "Supermemory Research",
       "sourceUrl": "https://supermemory.ai/research/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -59,7 +59,7 @@
       "systemName": "Supermemory",
       "sourceName": "Supermemory Research",
       "sourceUrl": "https://supermemory.ai/research/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -85,7 +85,7 @@
       "systemName": "Supermemory",
       "sourceName": "Supermemory ASMR Blog",
       "sourceUrl": "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "benchmark": "LongMemEval-S",
       "benchmarkFamily": "longmemeval",
       "metricName": "overall",
@@ -109,6 +109,20 @@
   ],
   "componentTargets": [
     {
+      "id": "qwen3-embedding-0_6b-mteb-english-v2",
+      "componentType": "embedding",
+      "modelName": "Qwen3-Embedding-0.6B",
+      "benchmark": "MTEB English v2",
+      "metricName": "mean task score",
+      "score": 70.7,
+      "scoreUnit": "points",
+      "sourceName": "Qwen3-Embedding official repository",
+      "sourceUrl": "https://github.com/QwenLM/Qwen3-Embedding",
+      "retrievedAt": "2026-05-26",
+      "claimUse": "model-selection-only",
+      "caveat": "Component evidence only. It selects the zero-spend Apple Silicon local floor but cannot prove full memory-system quality."
+    },
+    {
       "id": "qwen3-embedding-8b-mteb-english-v2",
       "componentType": "embedding",
       "modelName": "Qwen3-Embedding-8B",
@@ -118,7 +132,7 @@
       "scoreUnit": "points",
       "sourceName": "Qwen3-Embedding official repository",
       "sourceUrl": "https://github.com/QwenLM/Qwen3-Embedding",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "claimUse": "model-selection-only",
       "caveat": "Component evidence only. It chooses local embedding candidates but cannot prove full memory-system quality."
     },
@@ -132,9 +146,23 @@
       "scoreUnit": "points",
       "sourceName": "Qwen3-Embedding official repository",
       "sourceUrl": "https://github.com/QwenLM/Qwen3-Embedding",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "claimUse": "model-selection-only",
       "caveat": "Component evidence only. It chooses local embedding candidates but cannot prove full memory-system quality."
+    },
+    {
+      "id": "qwen3-reranker-0_6b-mteb-r",
+      "componentType": "reranker",
+      "modelName": "Qwen3-Reranker-0.6B",
+      "benchmark": "MTEB-R",
+      "metricName": "reranker score",
+      "score": 65.8,
+      "scoreUnit": "points",
+      "sourceName": "Qwen3-Embedding official repository",
+      "sourceUrl": "https://github.com/QwenLM/Qwen3-Embedding",
+      "retrievedAt": "2026-05-26",
+      "claimUse": "model-selection-only",
+      "caveat": "Component evidence only. It selects the first local reranker sidecar to test but cannot prove full memory-system quality."
     },
     {
       "id": "qwen3-reranker-4b-mteb-r",
@@ -146,9 +174,23 @@
       "scoreUnit": "points",
       "sourceName": "Qwen3-Embedding official repository",
       "sourceUrl": "https://github.com/QwenLM/Qwen3-Embedding",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "claimUse": "model-selection-only",
       "caveat": "Component evidence only. It chooses local reranker candidates but cannot prove full memory-system quality."
+    },
+    {
+      "id": "qwen3-reranker-8b-mteb-r",
+      "componentType": "reranker",
+      "modelName": "Qwen3-Reranker-8B",
+      "benchmark": "MTEB-R",
+      "metricName": "reranker score",
+      "score": 69.02,
+      "scoreUnit": "points",
+      "sourceName": "Qwen3-Embedding official repository",
+      "sourceUrl": "https://github.com/QwenLM/Qwen3-Embedding",
+      "retrievedAt": "2026-05-26",
+      "claimUse": "model-selection-only",
+      "caveat": "Component evidence only. It selects an optional high-quality local reranker arm but cannot prove full memory-system quality."
     },
     {
       "id": "embeddinggemma-local-model-card",
@@ -160,7 +202,7 @@
       "scoreUnit": "not reported in artifact",
       "sourceName": "Google Gemma documentation",
       "sourceUrl": "https://ai.google.dev/gemma/docs/embeddinggemma",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "claimUse": "model-selection-only",
       "caveat": "Small local embedding candidate evidence only. It is a hardware-friendly baseline, not full memory-system proof."
     },
@@ -174,9 +216,23 @@
       "scoreUnit": "not reported in artifact",
       "sourceName": "Voyage AI model documentation",
       "sourceUrl": "https://www.mongodb.com/docs/voyageai/models/",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "claimUse": "model-selection-only",
       "caveat": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required."
+    },
+    {
+      "id": "gemini-embedding-2-model-card",
+      "componentType": "provider-embedding",
+      "modelName": "Gemini Embedding 2",
+      "benchmark": "provider model card",
+      "metricName": "multimodal embedding endpoint availability",
+      "score": null,
+      "scoreUnit": "not reported in artifact",
+      "sourceName": "Google Gemini API documentation",
+      "sourceUrl": "https://ai.google.dev/gemini-api/docs/embeddings",
+      "retrievedAt": "2026-05-26",
+      "claimUse": "model-selection-only",
+      "caveat": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required before using Gemini Embedding 2 in a memory-system claim."
     },
     {
       "id": "nvidia-retrieval-nim-model-card",
@@ -188,9 +244,23 @@
       "scoreUnit": "not reported in artifact",
       "sourceName": "NVIDIA Retrieval APIs documentation",
       "sourceUrl": "https://docs.api.nvidia.com/nim/reference/retrieval-apis",
-      "retrievedAt": "2026-05-25",
+      "retrievedAt": "2026-05-26",
       "claimUse": "model-selection-only",
       "caveat": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required."
+    }
+  ],
+  "benchmarkHarnessTargets": [
+    {
+      "id": "memorybench-supermemory-unified-suite",
+      "harnessName": "MemoryBench",
+      "sourceName": "Supermemory MemoryBench repository",
+      "sourceUrl": "https://github.com/supermemoryai/memorybench",
+      "retrievedAt": "2026-05-26",
+      "benchmarkFamilies": ["locomo", "longmemeval", "convomem"],
+      "supportedProviders": ["supermemory", "mem0", "zep"],
+      "phases": ["ingest", "index", "search", "answer", "evaluate", "report"],
+      "claimUse": "benchmark-harness-source-only",
+      "caveat": "Harness availability source-lock only. It does not provide a RecallWeave score, and it cannot substitute for a same-data full answer-quality benchmark."
     }
   ]
 }

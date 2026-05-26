@@ -124,6 +124,7 @@ const report = {
     bm25IsLexicalFloorOnly: true,
     retrievalProxyOnlyIsNotEnough: true,
     componentBenchmarksAreModelSelectionOnly: true,
+    benchmarkHarnessSourceOnlyIsNotAScore: true,
     fullMemoryAnswerQualityRequired: true,
     sameDataExternalTargetRequired: true,
     sameAnswerAndJudgeModelRequired: true,
@@ -155,6 +156,7 @@ const report = {
     haystackSessionCount: Number(fullMaterialize?.selection?.haystackSessionCount ?? 0),
     expectedReferenceCount: Number(fullMaterialize?.selection?.expectedResultRefCount ?? 0),
   },
+  reportedTargets: inspectReportedTargets(sotaLadder),
   rawSourceRetention: rawRetention,
   privateInputState: inspectPrivateInputState(privateInputDoctor),
   controlPreflightState,
@@ -212,6 +214,26 @@ function inspectRawSourceRetention(materializeReport) {
     selectedRawRowsHash: retention.selectedRawRowsHash ?? null,
     sourceManifestHash: retention.sourceManifestHash ?? null,
     uiMayUseCompressedDefaultButAuditRetainsRawSource: true,
+  };
+}
+
+function inspectReportedTargets(sotaLadderReport) {
+  return {
+    sourceEvidenceCheckedAt: sotaLadderReport?.reportedTargetsEvidence?.sourceEvidenceCheckedAt ?? null,
+    status: sotaLadderReport?.reportedTargetsEvidence?.status ?? null,
+    primaryReportedMemoryTarget: sotaLadderReport?.reportedTargetsEvidence?.primaryReportedMemoryTarget ?? null,
+    memoryTargetCount: Number(sotaLadderReport?.reportedTargetsEvidence?.memoryTargetCount ?? 0),
+    componentTargetCount: Number(sotaLadderReport?.reportedTargetsEvidence?.componentTargetCount ?? 0),
+    benchmarkHarnessTargetCount: Number(sotaLadderReport?.reportedTargetsEvidence?.benchmarkHarnessTargetCount ?? 0),
+    componentBenchmarksAreModelSelectionOnly: Boolean(sotaLadderReport?.componentBenchmarksAreModelSelectionOnly),
+    benchmarkHarnessTargetsSourceLocked: Boolean(sotaLadderReport?.checks?.benchmarkHarnessTargetsSourceLocked),
+    benchmarkHarnessEvidence: arrayOf(sotaLadderReport?.benchmarkHarnessEvidence).map((target) => ({
+      id: target.id,
+      harnessName: target.harnessName,
+      claimUse: target.claimUse,
+      benchmarkFamilies: target.benchmarkFamilies ?? [],
+      supportedProviders: target.supportedProviders ?? [],
+    })),
   };
 }
 
@@ -445,6 +467,8 @@ function renderMarkdown(value) {
     `- Current canary query count: ${value.currentCanary.queryCount}`,
     `- Current best score: ${value.currentCanary.score ?? "n/a"}`,
     `- Current score delta vs reported target: ${value.currentCanary.scoreDelta ?? "n/a"}`,
+    `- Reported target source evidence checked at: ${value.reportedTargets.sourceEvidenceCheckedAt ?? "n/a"}`,
+    `- Benchmark harness source locks: ${value.reportedTargets.benchmarkHarnessTargetCount}`,
     "",
     "## Gates",
     ...value.gates.map((item) => `- ${item.id}: ${item.status}${item.blockers.length ? ` (${item.blockers.join(", ")})` : ""}`),

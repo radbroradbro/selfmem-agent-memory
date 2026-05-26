@@ -257,8 +257,12 @@ SOTA ladder compares `cloud-nvidia-nemotron-1b` at `43.1667` answer-quality
 against Supermemory's reported `85.2%` Gemini 3 Pro row and keeps the delta
 blocked at `-42.0333`. The reported target row is now source-locked in
 `reviews/overnight-20260522/reported-memory-targets-20260525.json` and
-validated by `benchmark:reported-targets`; component rows such as Qwen,
-EmbeddingGemma, Voyage, and NVIDIA are kept as model-selection evidence only.
+validated by `benchmark:reported-targets` with source evidence refreshed on
+2026-05-26. That gate now requires the Qwen3 embedding/reranker local ladder,
+EmbeddingGemma, Voyage 4 plus `rerank-2.5`, Gemini Embedding 2, NVIDIA
+retrieval NIM, and the MemoryBench harness source lock. Component rows remain
+model-selection evidence only, and the MemoryBench row only source-locks the
+same-data full-memory harness route.
 The end-to-end score gate itself now repeats that reported-target comparison
 and exposes `fullSotaBlockers`, so `benchmark:memory-score:result-gate
 --require-ready` cannot pass on a 30-query canary, a below-target result, or a

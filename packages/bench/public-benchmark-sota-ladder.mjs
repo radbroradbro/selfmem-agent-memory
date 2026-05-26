@@ -138,6 +138,18 @@ const componentEvidence = [
     finding: "A 2026 retrieval pipeline used LLM-based query expansion before sparse retrieval, dense ranking, and Qwen3 reranking under limited compute.",
   },
 ];
+const benchmarkHarnessEvidence = arrayOf(reportedTargetsEvidence.benchmarkHarnessTargets).map((target) => ({
+  id: target.id,
+  role: "same-data full-memory benchmark route",
+  harnessName: target.harnessName,
+  benchmarkFamilies: target.benchmarkFamilies,
+  supportedProviders: target.supportedProviders,
+  phases: target.phases,
+  claimUse: target.claimUse,
+  source: target.sourceUrl,
+  checkedAt: target.retrievedAt,
+  finding: target.caveat,
+}));
 
 const queryExpansionPolicy = {
   allowedInLocalBenchmark: true,
@@ -200,12 +212,14 @@ const checks = {
   publicClaimsAllowedByInputs: rows.some((row) => row.publicBenchmarkClaimsAllowed === true),
   reportedMemoryTargetsPresent: reportedMemoryTargets.length >= 2,
   reportedMemoryTargetsSourceLocked: reportedTargetsEvidence.status === "READY_REPORTED_TARGETS",
+  benchmarkHarnessTargetsSourceLocked: reportedTargetsEvidence.checks?.requiredBenchmarkHarnessTargetIdsCovered === true,
   fullOrOfficiallyComparableMemoryBenchmarkPresent: fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent,
   readinessNotePresent: loaded.readinessNote.exists,
 };
 
 const blockers = [
   !checks.reportedMemoryTargetsSourceLocked ? "reported-memory-targets-not-source-locked" : null,
+  !checks.benchmarkHarnessTargetsSourceLocked ? "benchmark-harness-targets-not-source-locked" : null,
   !checks.endToEndMemoryScorePresent ? "missing-end-to-end-memory-benchmark-score" : null,
   !checks.publicClaimsAllowedByInputs ? "all-current-result-files-keep-public-claims-disabled" : null,
   !checks.voyageProviderCanaryPresent ? "missing-voyage-answer-quality-same-data-result" : null,
@@ -263,9 +277,11 @@ const report = {
     primaryReportedMemoryTarget: reportedTargetsEvidence.primaryReportedMemoryTarget?.id ?? null,
     memoryTargetCount: reportedTargetsEvidence.checks?.memoryTargetCount ?? 0,
     componentTargetCount: reportedTargetsEvidence.checks?.componentTargetCount ?? 0,
+    benchmarkHarnessTargetCount: reportedTargetsEvidence.checks?.benchmarkHarnessTargetCount ?? 0,
     blockers: reportedTargetsEvidence.blockers ?? [],
   },
   componentEvidence,
+  benchmarkHarnessEvidence,
   queryExpansionPolicy,
   fullBenchmarkPolicy,
   reportedMemoryTargets,
@@ -496,6 +512,12 @@ function renderMarkdown(value) {
     "",
     "## Required Full Memory Arms",
     ...value.requiredFullMemoryArms.map((arm) => `- ${arm.id}: ${arm.status} (${arm.role})`),
+    "",
+    "## Benchmark Harness Evidence",
+    ...value.benchmarkHarnessEvidence.map(
+      (target) =>
+        `- ${target.id}: ${target.harnessName}; families=${target.benchmarkFamilies.join(", ")}; providers=${target.supportedProviders.join(", ")}; use=${target.claimUse}`,
+    ),
     "",
     "## Reported Target Comparison",
     `- Primary reported target: ${value.reportedTargetComparison.primaryTarget?.id ?? "n/a"} (${value.reportedTargetComparison.primaryTarget?.score ?? "n/a"} ${value.reportedTargetComparison.primaryTarget?.scoreUnit ?? ""})`,

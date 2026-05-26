@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T04:16:01.903Z",
+  "generatedAt": "2026-05-26T04:32:11.855Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -22,6 +22,7 @@
     "bm25IsLexicalFloorOnly": true,
     "retrievalProxyOnlyIsNotEnough": true,
     "componentBenchmarksAreModelSelectionOnly": true,
+    "benchmarkHarnessSourceOnlyIsNotAScore": true,
     "fullMemoryAnswerQualityRequired": true,
     "sameDataExternalTargetRequired": true,
     "sameAnswerAndJudgeModelRequired": true,
@@ -81,14 +82,14 @@
     "sotaLadder": {
       "path": "reviews/overnight-20260522/sota-ladder-full-target-report-20260525.json",
       "exists": true,
-      "hash": "sha256:4985db3ea68f0090caa562523398bf8aa7c264c698308de89ac2c9e69acc7e54",
+      "hash": "sha256:f9c5358ba250817927eea23fabb1857f8a225f383c32e89934496389751c5e95",
       "mode": "public-benchmark-sota-ladder",
       "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE"
     },
     "sotaOperatorPacket": {
       "path": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
       "exists": true,
-      "hash": "sha256:a3bead4da428fe55bdec5afa9e0077e14b466339fbeae81895a03b9c30790be6",
+      "hash": "sha256:8cd3441788889be90d7143a4e74991c9fb50d452e5c5773021075d69b2d06718",
       "mode": "public-benchmark-sota-operator-packet",
       "status": "BLOCKED_SOTA_OPERATOR_INPUTS"
     },
@@ -151,14 +152,14 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:013d08faf1c1b5d02b35f33a144d6ade639011af0a7f33f93361a72f9d085745",
+      "hash": "sha256:e2f88d200966bcd563af7a71e8707657d0e3d6bb709ce192968dda106228f184",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:c11fbd3ce1780c4bb999fe91f5305348b4a61be64dc3a144acffec1e27b719c7",
+      "hash": "sha256:b6b0e254fa74df972862898ae6797d10af16e920961a2df7a5f76af8ad2cef60",
       "mode": null,
       "status": null
     },
@@ -210,6 +211,33 @@
     "queryCount": 500,
     "haystackSessionCount": 19195,
     "expectedReferenceCount": 1896
+  },
+  "reportedTargets": {
+    "sourceEvidenceCheckedAt": "2026-05-26",
+    "status": "READY_REPORTED_TARGETS",
+    "primaryReportedMemoryTarget": "supermemory-production-research-gemini-3-pro",
+    "memoryTargetCount": 4,
+    "componentTargetCount": 10,
+    "benchmarkHarnessTargetCount": 1,
+    "componentBenchmarksAreModelSelectionOnly": true,
+    "benchmarkHarnessTargetsSourceLocked": true,
+    "benchmarkHarnessEvidence": [
+      {
+        "id": "memorybench-supermemory-unified-suite",
+        "harnessName": "MemoryBench",
+        "claimUse": "benchmark-harness-source-only",
+        "benchmarkFamilies": [
+          "locomo",
+          "longmemeval",
+          "convomem"
+        ],
+        "supportedProviders": [
+          "supermemory",
+          "mem0",
+          "zep"
+        ]
+      }
+    ]
   },
   "rawSourceRetention": {
     "retainsRawSourcesPrivately": true,

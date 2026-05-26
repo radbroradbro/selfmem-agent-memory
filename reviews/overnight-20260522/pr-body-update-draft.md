@@ -71,6 +71,13 @@ Live status:
   RecallWeave can run on the same public benchmark data now. It still blocks
   public comparison claims until a source-locked reported target row is met or
   beaten by the full-memory answer-quality ladder.
+- Refreshes the reported-target source lock on 2026-05-26 and makes the gate
+  require the current model/harness coverage before SOTA comparison: Qwen3
+  0.6B/4B/8B embeddings, Qwen3 0.6B/4B/8B rerankers, EmbeddingGemma, Voyage 4
+  plus `rerank-2.5`, Gemini Embedding 2, NVIDIA retrieval NIM, and
+  MemoryBench. Qwen/Gemini/Voyage/NVIDIA rows remain component/model-selection
+  evidence only, and MemoryBench remains harness-source-only until a same-data
+  full answer-quality run exists.
 
 - Adds the public LongMemEval-S materialize-run lane and first blind retrieval-proxy baseline. The materializer writes raw benchmark query and haystack inputs only to an operator-private directory, commits only hashes/counts/command templates, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result to that hash. The canonical `bm25-lite-b800-k5` retrieval-proxy baseline scored 0.4541 quality on the 6-row source-locked slice with average context tokens 800 and zero privacy failures; it is explicitly not MemoryBench answer-quality evidence and not public superiority language.
 - Adds a same-data LongMemEval-S retrieval strategy comparison. `bm25-lite`

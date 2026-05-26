@@ -26,6 +26,9 @@
 - local-apple-reranker-sidecar: present (local rerank method challenger)
 - llm-query-expansion: present (query expansion challenger)
 
+## Benchmark Harness Evidence
+- memorybench-supermemory-unified-suite: MemoryBench; families=locomo, longmemeval, convomem; providers=supermemory, mem0, zep; use=benchmark-harness-source-only
+
 ## Reported Target Comparison
 - Primary reported target: supermemory-production-research-gemini-3-pro (85.2 percent)
 - Best end-to-end RecallWeave row: cloud-nvidia-nemotron-1b (43.1667)

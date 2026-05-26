@@ -7,6 +7,20 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const format = String(args.format ?? "json").toLowerCase();
+const minimumSourceEvidenceCheckedAt = "2026-05-26";
+const requiredComponentTargetIds = [
+  "qwen3-embedding-0_6b-mteb-english-v2",
+  "qwen3-embedding-4b-mteb-english-v2",
+  "qwen3-embedding-8b-mteb-english-v2",
+  "qwen3-reranker-0_6b-mteb-r",
+  "qwen3-reranker-4b-mteb-r",
+  "qwen3-reranker-8b-mteb-r",
+  "embeddinggemma-local-model-card",
+  "voyage-4-rerank-2-5-model-card",
+  "gemini-embedding-2-model-card",
+  "nvidia-retrieval-nim-model-card",
+];
+const requiredBenchmarkHarnessTargetIds = ["memorybench-supermemory-unified-suite"];
 const inputPath = resolveInputPath(
   args.input ?? process.env.RECALLWEAVE_REPORTED_TARGETS_INPUT ?? "reviews/overnight-20260522/reported-memory-targets-20260525.json",
 );
@@ -21,11 +35,23 @@ assertSafePublicText(raw, displayPath(inputPath));
 const input = JSON.parse(raw);
 const memoryTargets = arrayOf(input.memoryTargets).map(normalizeMemoryTarget);
 const componentTargets = arrayOf(input.componentTargets).map(normalizeComponentTarget);
+const benchmarkHarnessTargets = arrayOf(input.benchmarkHarnessTargets).map(normalizeBenchmarkHarnessTarget);
+const missingRequiredComponentTargetIds = requiredComponentTargetIds.filter((id) => !componentTargets.some((target) => target.id === id));
+const missingRequiredBenchmarkHarnessTargetIds = requiredBenchmarkHarnessTargetIds.filter(
+  (id) => !benchmarkHarnessTargets.some((target) => target.id === id),
+);
 const blockers = [
   input.schemaVersion !== 1 ? "unsupported-schema-version" : null,
+  !requiredDate(input.sourceEvidenceCheckedAt) ? "missing-source-evidence-checked-at" : null,
+  requiredDate(input.sourceEvidenceCheckedAt) && input.sourceEvidenceCheckedAt < minimumSourceEvidenceCheckedAt
+    ? "stale-source-evidence-checked-at"
+    : null,
   !memoryTargets.length ? "missing-memory-system-targets" : null,
   memoryTargets.some((target) => target.failedChecks.length > 0) ? "memory-target-validation-failed" : null,
   componentTargets.some((target) => target.failedChecks.length > 0) ? "component-target-validation-failed" : null,
+  benchmarkHarnessTargets.some((target) => target.failedChecks.length > 0) ? "benchmark-harness-target-validation-failed" : null,
+  missingRequiredComponentTargetIds.length ? "missing-required-component-target-source-lock" : null,
+  missingRequiredBenchmarkHarnessTargetIds.length ? "missing-required-benchmark-harness-source-lock" : null,
   !memoryTargets.some((target) => target.eligibleAsPrimaryReportedTarget) ? "missing-primary-eligible-reported-target" : null,
 ].filter(Boolean);
 const primaryReportedMemoryTarget =
@@ -57,14 +83,28 @@ const report = {
   checks: {
     memoryTargetCount: memoryTargets.length,
     componentTargetCount: componentTargets.length,
+    benchmarkHarnessTargetCount: benchmarkHarnessTargets.length,
+    sourceEvidenceCheckedAtCurrent:
+      requiredDate(input.sourceEvidenceCheckedAt) && input.sourceEvidenceCheckedAt >= minimumSourceEvidenceCheckedAt,
     eligiblePrimaryMemoryTargetCount: memoryTargets.filter((target) => target.eligibleAsPrimaryReportedTarget).length,
     componentTargetsAreModelSelectionOnly: componentTargets.every((target) => target.failedChecks.length === 0),
+    requiredComponentTargetIdsCovered: missingRequiredComponentTargetIds.length === 0,
+    requiredBenchmarkHarnessTargetIdsCovered: missingRequiredBenchmarkHarnessTargetIds.length === 0,
+    benchmarkHarnessTargetsAreSourceOnly: benchmarkHarnessTargets.every((target) => target.failedChecks.length === 0),
     everyMemoryTargetHasSourceLock: memoryTargets.every((target) => target.failedChecks.length === 0),
     primaryReportedMemoryTargetSelected: Boolean(primaryReportedMemoryTarget),
+  },
+  requiredCoverage: {
+    minimumSourceEvidenceCheckedAt,
+    requiredComponentTargetIds,
+    missingRequiredComponentTargetIds,
+    requiredBenchmarkHarnessTargetIds,
+    missingRequiredBenchmarkHarnessTargetIds,
   },
   primaryReportedMemoryTarget: primaryReportedMemoryTarget ? stripValidation(primaryReportedMemoryTarget) : null,
   memoryTargets: memoryTargets.map(stripValidation),
   componentTargets: componentTargets.map(stripValidation),
+  benchmarkHarnessTargets: benchmarkHarnessTargets.map(stripValidation),
   targetSelectionRule:
     "Use the highest eligible reported production/research memory-system target as the comparison target. Exclude component-only and experimental ceiling rows from primary SOTA comparison.",
   comparisonRule:
@@ -159,6 +199,34 @@ function normalizeComponentTarget(target) {
   return { ...normalized, failedChecks };
 }
 
+function normalizeBenchmarkHarnessTarget(target) {
+  const normalized = {
+    id: safeString(target.id),
+    harnessName: safeString(target.harnessName),
+    sourceName: safeString(target.sourceName),
+    sourceUrl: safeString(target.sourceUrl ?? target.source),
+    retrievedAt: safeString(target.retrievedAt ?? target.checkedAt),
+    benchmarkFamilies: arrayOf(target.benchmarkFamilies).map(safeString).filter(Boolean),
+    supportedProviders: arrayOf(target.supportedProviders).map(safeString).filter(Boolean),
+    phases: arrayOf(target.phases).map(safeString).filter(Boolean),
+    claimUse: safeString(target.claimUse),
+    caveat: safeString(target.caveat),
+  };
+  const failedChecks = [
+    !requiredId(normalized.id) ? "id" : null,
+    !requiredString(normalized.harnessName) ? "harness-name" : null,
+    !requiredString(normalized.sourceName) ? "source-name" : null,
+    !requiredUrl(normalized.sourceUrl) ? "source-url" : null,
+    !requiredDate(normalized.retrievedAt) ? "retrieved-at" : null,
+    normalized.benchmarkFamilies.length < 2 ? "benchmark-families" : null,
+    normalized.supportedProviders.length < 2 ? "supported-providers" : null,
+    normalized.phases.length < 4 ? "harness-phases" : null,
+    normalized.claimUse !== "benchmark-harness-source-only" ? "benchmark-harness-source-only-claim-use" : null,
+    !requiredString(normalized.caveat) ? "caveat" : null,
+  ].filter(Boolean);
+  return { ...normalized, failedChecks };
+}
+
 function stripValidation(target) {
   const { failedChecks, ...rest } = target;
   return rest;
@@ -169,12 +237,14 @@ function nextActions(blockers) {
     return [
       "Use the primary reported memory target as the SOTA comparison row in the ladder.",
       "Keep component targets in the model-selection lane only.",
+      "Use benchmark harness targets only to choose a same-data full-memory evaluation route.",
       "Refresh this source-lock artifact whenever the public source rows or model matrix changes.",
     ];
   }
   return [
     "Fix the reported target source-lock fields before comparing RecallWeave to reported memory-system scores.",
     "Do not fall back to component benchmark scores for full memory-system claims.",
+    "Do not treat benchmark harness availability as a score; it only source-locks the full evaluation route.",
     "Do not claim a win against a reported target until the source-lock report and SOTA ladder both pass.",
   ];
 }
@@ -202,6 +272,17 @@ function renderMarkdown(value) {
       (target) =>
         `- ${target.id}: ${target.modelName}, ${target.benchmark} ${target.metricName} ${target.score ?? "n/a"}; use=${target.claimUse}`,
     ),
+    "",
+    "## Benchmark Harness Targets",
+    ...value.benchmarkHarnessTargets.map(
+      (target) =>
+        `- ${target.id}: ${target.harnessName}; families=${target.benchmarkFamilies.join(", ")}; providers=${target.supportedProviders.join(", ")}; use=${target.claimUse}`,
+    ),
+    "",
+    "## Required Coverage",
+    `- Minimum source evidence date: ${value.requiredCoverage.minimumSourceEvidenceCheckedAt}`,
+    `- Missing component source locks: ${value.requiredCoverage.missingRequiredComponentTargetIds.join(", ") || "none"}`,
+    `- Missing benchmark harness source locks: ${value.requiredCoverage.missingRequiredBenchmarkHarnessTargetIds.join(", ") || "none"}`,
     "",
     "## Rule",
     value.comparisonRule,

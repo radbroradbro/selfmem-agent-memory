@@ -43,6 +43,12 @@ requirements are resolved.
   `release:check`, `release:github-sync`, and `goal:audit` passed after that
   update. This still does not authorize launch or change the approved runtime
   canary adapter/report commit.
+- The reported-target gate was refreshed on 2026-05-26. It now requires source
+  coverage for the Qwen3 local embedding/reranker ladder, EmbeddingGemma,
+  Voyage 4 with `rerank-2.5`, Gemini Embedding 2, NVIDIA retrieval NIM, and
+  MemoryBench. These rows do not unblock launch: component rows are
+  model-selection-only, MemoryBench is harness-source-only, and the full
+  same-data answer-quality benchmark/SOTA gate is still incomplete.
 - Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` records live Qwen3
   Embedding 0.6B and Qwen3 Embedding 4B Apple Silicon runs on the same 30-query
   public LongMemEval-S retrieval-proxy target. Both local arms tied BM25
