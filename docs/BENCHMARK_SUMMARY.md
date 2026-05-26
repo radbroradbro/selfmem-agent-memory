@@ -284,6 +284,14 @@ hash-matched, mode `0600`, and that the shard export template raises
 fits past the old 5 MB guard. It does not count as SOTA evidence or allow
 public benchmark claims; it only proves the full-shard run now has clean private
 inputs.
+The response export path now builds only the feature profile required by the
+selected strategy. The checked-in
+`reviews/overnight-20260522/full-shard-bm25-control-export-probe-20260526.json`
+shows `bm25-lite` `shard-001` exported 25 responses against 19,195 candidates
+from the regenerated private full inputs in 36 observed wall-clock seconds, with
+zero privacy leaks and no private response file committed. This proves the
+lexical control shard is operationally runnable; it still is not answer-quality
+evidence, reviewer evidence, or SOTA proof.
 The shard workorder is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`.
 Run `benchmark:answer-quality:shard-workorder` before and after shard jobs to

@@ -337,6 +337,14 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   that the shard response-arm template carries `--max-memory-bytes 300000000`
   for the 203,831,507-byte memories file. This is full-shard run readiness only,
   not SOTA proof or public-claim permission.
+- Optimizes `recallweave-response-export` to build strategy-specific feature
+  profiles. `bm25-lite` no longer pays for dense vectors, graph/topic features,
+  role coverage, or date extraction. The checked-in
+  `full-shard-bm25-control-export-probe-20260526` packet shows `shard-001`
+  exported 25 BM25 control responses over the full 19,195-candidate private
+  LongMemEval memory set in 36 observed wall-clock seconds with zero privacy
+  leaks and no private response file committed. This is run-path evidence only,
+  not answer-quality or SOTA evidence.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.

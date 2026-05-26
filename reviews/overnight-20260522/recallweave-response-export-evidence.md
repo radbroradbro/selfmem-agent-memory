@@ -32,6 +32,10 @@ Expected behavior:
 - Output does not include raw memory, transcript, prompt, answer, document,
   chunk, content, text, private tags, private paths, or credentials.
 - Fully private memories are skipped and counted.
+- The exporter now builds strategy-specific candidate features. Lexical control
+  arms such as `bm25-lite` and `jaccard` avoid dense vectors, graph/topic
+  features, role coverage, and date extraction, while hybrid/provider arms keep
+  the richer feature profile they need.
 - The exported response file can feed
   `baseline:collect:recallweave -- --responses <path>`.
 - Operators must use the exporter's `--output` flag. They must not redirect the
@@ -44,6 +48,11 @@ Boundary:
 - This exporter does not close the hosted-baseline blocker by itself.
 - Fixture exports remain fixture-only and cannot support public comparison
   claims.
+- The full-shard BM25 control export probe in
+  `full-shard-bm25-control-export-probe-20260526` proves only that the first
+  25-query lexical control shard is now runnable against the regenerated
+  private 500-row LongMemEval inputs. It is not an answer-quality result,
+  reviewer-approved result, or SOTA claim.
 - Real comparison claims still require a live hosted baseline, a live
   RecallWeave export/result, matched query/scoring hashes, a RecallWeave win,
   and two reviewer approvals.

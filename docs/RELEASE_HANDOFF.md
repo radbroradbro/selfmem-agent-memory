@@ -285,6 +285,13 @@ raw rows, and source manifest are present outside the repository, hash-matched,
 mode `0600`, and covered by the shard plan's `300000000` byte memory cap. This
 is full-shard run readiness only; it is not a 500-query score, SOTA proof, or a
 public claim.
+The first private BM25 control export probe is recorded at
+`reviews/overnight-20260522/full-shard-bm25-control-export-probe-20260526.json`.
+It confirms `shard-001` can export 25 `bm25-lite` responses against the full
+19,195-candidate private memory set with a lexical-only feature profile, zero
+privacy leaks, and no committed private response file. Treat it as run-path
+evidence only; every remaining arm on the shard still needs its own private
+response export before preflight, answer scoring, intake, or combine.
 Use `benchmark:answer-quality:shard-workorder` as the public-safe run tracker
 for those twenty shards. The checked-in workorder,
 `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`,

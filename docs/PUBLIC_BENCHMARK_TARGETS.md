@@ -438,6 +438,13 @@ Component rows in the same artifact remain model-selection evidence only.
   `--max-memory-bytes 300000000` for the 203,831,507-byte memories file. It
   does not count as full-memory SOTA evidence and does not permit public
   benchmark claims.
+- Full-shard BM25 control export probe:
+  `reviews/overnight-20260522/full-shard-bm25-control-export-probe-20260526.json`
+  proves only that `shard-001` can export the 25-query `bm25-lite` lexical
+  control arm against the regenerated private full inputs. It uses a
+  strategy-specific lexical feature profile, commits no private response file,
+  and leaves answer-quality scoring, provider/local arms, reviewer gates, and
+  SOTA claims blocked.
 - Full-shard workorder:
   `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`
   is the checked-in public-safe run tracker for the twenty shard jobs. Re-run

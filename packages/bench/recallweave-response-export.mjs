@@ -106,7 +106,8 @@ for (const query of queries) {
 }
 const querySelection = selectQueries(queries);
 
-const loaded = loadMemories(effectiveMemoriesPath, { preserveIds });
+const memoryFeatures = memoryFeatureProfile(rankingStrategy);
+const loaded = loadMemories(effectiveMemoriesPath, { preserveIds, features: memoryFeatures });
 assert.ok(loaded.candidates.length > 0, "memories input produced no searchable candidates");
 const providerStats = createProviderStats({ strategy: rankingStrategy, fixtureRequested });
 const localAppleDocumentEmbeddingCache = new Map();
@@ -176,6 +177,7 @@ const result = {
   rawAnswerIncluded: false,
   inputStats: {
     maxMemoryBytes,
+    featureProfile: memoryFeatures,
     linesRead: loaded.linesRead,
     parsed: loaded.parsed,
     candidates: loaded.candidates.length,
@@ -228,25 +230,26 @@ function loadMemories(inputPath, options) {
         return;
       }
       const sourceId = safeScalar(item.id ?? item.memory_id ?? item.memoryId ?? item.sourceId ?? `line-${index + 1}`);
-      const metadata = sanitizeMetadata(item.metadata);
-      const tokens = tokenize(redacted.text);
+      const metadata = options.features.metadata ? sanitizeMetadata(item.metadata) : {};
+      const tokens = options.features.tokens ? tokenize(redacted.text) : null;
       const contentHash = `sha256:${stableHash(normalizeText(redacted.text))}`;
-      candidates.push({
+      const candidate = {
         sourceId,
         outputId: options.preserveIds ? sourceId : `memory:${shortHash(sourceId)}`,
         text: redacted.text,
         contentHash,
         estimatedTokens: estimateTokens(redacted.text),
         metadata,
-        dateMs: extractDateMs(item, redacted.text),
-        tokens,
-        tokenSet: new Set(tokens),
-        bigramSet: new Set(ngrams(tokens, 2)),
-        semanticVector: hashedSemanticVector(redacted.text),
-        topicTermSet: topicTerms(`${redacted.text} ${metadata.kind ?? ""} ${metadata.questionType ?? ""}`),
-        roleCoverage: roleCoverageScore(redacted.text),
         baseScore: finiteNumberOrDefault(item.score ?? item.similarity ?? item.confidence, 0),
-      });
+      };
+      if (tokens) candidate.tokens = tokens;
+      if (options.features.tokenSet) candidate.tokenSet = new Set(tokens ?? tokenize(redacted.text));
+      if (options.features.bigramSet) candidate.bigramSet = new Set(ngrams(tokens ?? tokenize(redacted.text), 2));
+      if (options.features.semanticVector) candidate.semanticVector = hashedSemanticVector(redacted.text);
+      if (options.features.topicTermSet) candidate.topicTermSet = topicTerms(`${redacted.text} ${metadata.kind ?? ""} ${metadata.questionType ?? ""}`);
+      if (options.features.roleCoverage) candidate.roleCoverage = roleCoverageScore(redacted.text);
+      if (options.features.dateMs) candidate.dateMs = extractDateMs(item, redacted.text);
+      candidates.push(candidate);
     } catch {
       skippedInvalid += 1;
     }
@@ -260,6 +263,34 @@ function loadMemories(inputPath, options) {
     skippedFullyPrivate,
     redactionCount,
     keyRedactionCount,
+  };
+}
+
+function memoryFeatureProfile(strategy) {
+  const base = {
+    metadata: false,
+    tokens: true,
+    tokenSet: true,
+    bigramSet: false,
+    semanticVector: false,
+    topicTermSet: false,
+    roleCoverage: false,
+    dateMs: false,
+  };
+  if (strategy === "jaccard" || strategy === "bm25-lite") return base;
+  if (strategy === "hybrid-v1") return { ...base, bigramSet: true };
+  if (strategy === "dense-proxy") return { ...base, semanticVector: true };
+  if (strategy === "sparse-dense-rrf") return { ...base, semanticVector: true };
+  if (strategy === "sparse-dense-temporal") return { ...base, semanticVector: true, metadata: true, dateMs: true };
+  return {
+    metadata: true,
+    tokens: true,
+    tokenSet: true,
+    bigramSet: true,
+    semanticVector: true,
+    topicTermSet: true,
+    roleCoverage: true,
+    dateMs: true,
   };
 }
 
