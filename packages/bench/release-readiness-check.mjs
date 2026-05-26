@@ -123,6 +123,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-preflight.mjs",
   "packages/bench/public-benchmark-answer-quality.mjs",
   "packages/bench/public-benchmark-answer-quality-combine.mjs",
+  "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -179,6 +180,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-full-run-target-check.json`,
   `${reviewDir}/public-longmemeval-full-materialize-run.json`,
   `${reviewDir}/public-longmemeval-full-materialize-run-evidence.md`,
+  `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
+  `${reviewDir}/answer-quality-full-shard-plan-20260525.md`,
   `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
   `${reviewDir}/sota-ladder-full-target-report-20260525.md`,
   `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.json`,
@@ -1516,6 +1519,12 @@ check("fresh public benchmark target check passes", () => {
   ]).stdout;
   const answerQualityFixture = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture"]).stdout);
   const answerQualityMarkdown = run("node", ["packages/bench/public-benchmark-answer-quality.mjs", "--fixture", "--format", "markdown"]).stdout;
+  const answerQualityShardPlanFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality-shard-plan.mjs"]).stdout);
+  const answerQualityShardPlanMarkdownFresh = run("node", [
+    "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+    "--format",
+    "markdown",
+  ]).stdout;
   const memoryScoreReviewerIntakeFresh = JSON.parse(
     run("node", [
       "packages/bench/memory-score-reviewer-approval-intake.mjs",
@@ -1616,6 +1625,8 @@ check("fresh public benchmark target check passes", () => {
   const fullRunTargetReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-full-run-target-check.json"), "utf8"));
   const fullMaterializeReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-full-materialize-run.json"), "utf8"));
   const fullMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-full-materialize-run-evidence.md"), "utf8");
+  const fullAnswerQualityShardPlan = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-plan-20260525.json"), "utf8"));
+  const fullAnswerQualityShardPlanEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-plan-20260525.md"), "utf8");
   const fullTargetSotaReport = JSON.parse(readFileSync(join(root, reviewDir, "sota-ladder-full-target-report-20260525.json"), "utf8"));
   const fullTargetOperatorPacket = JSON.parse(
     readFileSync(join(root, reviewDir, "sota-ladder-full-target-operator-packet-20260525.json"), "utf8"),
@@ -1801,6 +1812,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(armExport.readyForAnswerQualityPreflight, false);
     assert.equal(armExport.readyForEndToEndMemoryScoreGate, false);
     assert.equal(armExport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(armExport.queryShard?.requested, false);
+    assert.equal(armExport.queryShard?.queryOffset, 0);
     assert.equal(armExport.callsProviderApis, false);
     assert.equal(armExport.sendsBenchmarkTextToProvider, false);
     assert.equal(armExport.rawQuestionsIncluded, false);
@@ -1831,6 +1844,7 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityArmExportFixture.callsProviderApis, false);
   assert.equal(answerQualityArmExportFixture.rawPrivateOutputPathIncluded, false);
   assert.ok(answerQualityArmExportFixture.arms?.length >= 7);
+  assert.ok(answerQualityArmExportFixture.arms?.every((item) => item.queryShard?.completeDataset === true));
   assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank"));
   assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "cloud-voyage4-voyage-lite-rerank" && item.providerMockCalls > 0));
   assert.ok(answerQualityArmExportFixture.arms?.every((item) => item.privacyLeakCount === 0 && item.redactionFailureCount === 0));
@@ -2611,6 +2625,40 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(fullMaterializeReport.selection?.redactionStats?.keyShapedTokenRedactionCount, 4);
   assert.match(fullMaterializeEvidence, /Query count: 500/);
   assert.match(fullMaterializeEvidence, /Source Retention/);
+  for (const shardPlan of [answerQualityShardPlanFresh, fullAnswerQualityShardPlan]) {
+    assert.equal(shardPlan.mode, "public-benchmark-answer-quality-shard-plan");
+    assert.equal(shardPlan.status, "READY_FULL_ANSWER_QUALITY_SHARD_RUN");
+    assert.equal(shardPlan.publicSafe, true);
+    assert.equal(shardPlan.metricsOnly, true);
+    assert.equal(shardPlan.publicBenchmarkClaimsAllowed, false);
+    assert.equal(shardPlan.readyForAnswerQualityShardRun, true);
+    assert.equal(shardPlan.readyForEndToEndMemoryScoreGate, false);
+    assert.equal(shardPlan.countsAsFullMemorySotaEvidence, false);
+    assert.equal(shardPlan.rawQuestionIdsIncluded, false);
+    assert.equal(shardPlan.rawQuestionsIncluded, false);
+    assert.equal(shardPlan.rawAnswersIncluded, false);
+    assert.equal(shardPlan.rawMemoryIncluded, false);
+    assert.equal(shardPlan.rawTranscriptIncluded, false);
+    assert.equal(shardPlan.rawPrivateOutputPathIncluded, false);
+    assert.equal(shardPlan.runPlan?.queryCount, 500);
+    assert.equal(shardPlan.runPlan?.shardSize, 25);
+    assert.equal(shardPlan.runPlan?.shardCount, 20);
+    assert.equal(shardPlan.shards?.[0]?.startIndex, 0);
+    assert.equal(shardPlan.shards?.at(-1)?.endIndexExclusive, 500);
+    assert.equal(shardPlan.strategyCoverage?.hasBm25Lite, true);
+    assert.equal(shardPlan.strategyCoverage?.hasFullHybridRerank, true);
+    assert.equal(shardPlan.strategyCoverage?.hasQueryExpansion, true);
+    assert.equal(shardPlan.strategyCoverage?.hasVoyageProvider, true);
+    assert.equal(shardPlan.strategyCoverage?.hasNvidiaOrGeminiProvider, true);
+    assert.equal(shardPlan.strategyCoverage?.hasLocalApple, true);
+    assert.equal(shardPlan.strategyCoverage?.hasLocalRerank, true);
+    assert.deepEqual(shardPlan.blockers, []);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
+    assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /--max-queries \{queryCount\}/);
+    assert.match(shardPlan.runPlan?.combineCommand ?? "", /--combine-mode shards/);
+  }
+  assert.match(answerQualityShardPlanMarkdownFresh, /Full Answer-Quality Shard Plan/);
+  assert.match(fullAnswerQualityShardPlanEvidence, /Shard count: 20/);
   assert.equal(fullTargetSotaReport.mode, "public-benchmark-sota-ladder");
   assert.equal(fullTargetSotaReport.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
   assert.equal(fullTargetSotaReport.fullBenchmarkPolicy?.datasetSlice, "longmemeval-s-cleaned-full-500-2026-05-25");
@@ -4602,6 +4650,7 @@ check("fresh hosted baseline preflight passes", () => {
   const collectorResultPath = join(collectorTmp, "collector-result.json");
   const recallWeaveResultPath = join(collectorTmp, "recallweave-result.json");
   const recallWeaveExportPath = join(collectorTmp, "recallweave-export.json");
+  const recallWeaveShardExportPath = join(collectorTmp, "recallweave-shard-export.json");
   const recallWeaveExportCollectorResultPath = join(collectorTmp, "recallweave-export-collector-result.json");
   const recallWeaveLiveExportPath = join(collectorTmp, "recallweave-live-export.json");
   const recallWeaveLiveResponsesPath = join(collectorTmp, "recallweave-live-responses.json");
@@ -4903,6 +4952,16 @@ check("fresh hosted baseline preflight passes", () => {
   const templateResult = run("node", ["packages/bench/hosted-baseline-preflight.mjs", "--print-template"]);
   const collectorResult = run("node", ["packages/bench/hosted-baseline-collector.mjs", "--fixture", "--output", collectorResultPath]);
   const recallWeaveExportResult = run("node", ["packages/bench/recallweave-response-export.mjs", "--fixture", "--output", recallWeaveExportPath]);
+  const recallWeaveShardExportResult = run("node", [
+    "packages/bench/recallweave-response-export.mjs",
+    "--fixture",
+    "--query-offset",
+    "1",
+    "--max-queries",
+    "1",
+    "--output",
+    recallWeaveShardExportPath,
+  ]);
   const recallWeaveCollectorResult = run("node", ["packages/bench/recallweave-baseline-collector.mjs", "--fixture", "--output", recallWeaveResultPath]);
   const recallWeaveExportCollectorResult = run("node", [
     "packages/bench/recallweave-baseline-collector.mjs",
@@ -5217,6 +5276,7 @@ check("fresh hosted baseline preflight passes", () => {
   const templateReport = JSON.parse(templateResult.stdout);
   const collectorReport = JSON.parse(collectorResult.stdout);
   const recallWeaveExportReport = JSON.parse(recallWeaveExportResult.stdout);
+  const recallWeaveShardExportReport = JSON.parse(recallWeaveShardExportResult.stdout);
   const recallWeaveCollectorReport = JSON.parse(recallWeaveCollectorResult.stdout);
   const recallWeaveExportCollectorReport = JSON.parse(recallWeaveExportCollectorResult.stdout);
   const recallWeaveLiveExportReport = JSON.parse(recallWeaveLiveExportResult.stdout);
@@ -5549,6 +5609,15 @@ check("fresh hosted baseline preflight passes", () => {
   assert.equal(recallWeaveExportReport.inputStats?.skippedFullyPrivate, 1);
   assert.equal(recallWeaveExportReport.source?.preserveIds, true);
   assert.equal(Object.keys(recallWeaveExportReport.responses ?? {}).length, 3);
+  assert.equal(recallWeaveExportReport.queryShard?.completeDataset, true);
+  assert.equal(recallWeaveExportReport.queryShard?.responseCount, 3);
+  assert.equal(recallWeaveShardExportReport.evidenceType, "fixture-recallweave-response-export");
+  assert.equal(recallWeaveShardExportReport.queryShard?.startIndex, 1);
+  assert.equal(recallWeaveShardExportReport.queryShard?.endIndexExclusive, 2);
+  assert.equal(recallWeaveShardExportReport.queryShard?.totalQueryCount, 3);
+  assert.equal(recallWeaveShardExportReport.queryShard?.responseCount, 1);
+  assert.equal(recallWeaveShardExportReport.queryShard?.completeDataset, false);
+  assert.equal(Object.keys(recallWeaveShardExportReport.responses ?? {}).length, 1);
   assert.doesNotMatch(recallWeaveExportResult.stdout, /\b(memory|content|chunk|text|raw|rawText|document)"\s*:/);
   assert.equal(recallWeaveExportCollectorReport.provider, "recallweave");
   assert.equal(recallWeaveExportCollectorReport.metricsOnly, true);

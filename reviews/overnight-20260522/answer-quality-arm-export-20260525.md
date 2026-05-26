@@ -8,6 +8,9 @@
 - Counts as full memory SOTA evidence: false
 - Calls provider APIs: false
 - Sends benchmark text to provider: false
+- Query shard requested: false
+- Query offset: 0
+- Max queries: all
 
 ## Strategy Coverage
 - BM25 lite: true
@@ -18,13 +21,13 @@
 - Local rerank: true
 
 ## Arms
-- bm25-lite: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0
-- full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0
-- query-expanded-full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0
-- cloud-voyage4-voyage-lite-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0
-- cloud-nvidia-nemotron-1b: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0
-- local-apple-qwen3-0_6b: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0
-- local-apple-qwen3-0_6b-local-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0
+- bm25-lite: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- query-expanded-full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- cloud-voyage4-voyage-lite-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- cloud-nvidia-nemotron-1b: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- local-apple-qwen3-0_6b: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- local-apple-qwen3-0_6b-local-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 
 ## Blockers
 - RECALLWEAVE_BASELINE_LIVE-not-enabled

@@ -30,6 +30,8 @@ const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 800, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 5, "limit");
+const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
+const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const privateOutputDir = resolveOptionalPath(args.privateOutputDir ?? process.env.RECALLWEAVE_SOTA_RESPONSE_ARM_DIR ?? null);
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_SOTA_ANSWER_QUALITY_STRATEGIES ?? defaultStrategies().join(","));
 const requireReady = Boolean(args.requireReady);
@@ -149,6 +151,11 @@ const report = {
     insideRepository: privateDir.insideRepository,
     valuePrinted: false,
   },
+  queryShard: {
+    requested: maxQueries != null || queryOffset > 0,
+    queryOffset,
+    maxQueries,
+  },
   env,
   strategyCoverage: coverage,
   arms: exportRows,
@@ -210,6 +217,8 @@ function exportResponseArms(directory) {
       String(contextTokenBudget),
       "--limit",
       String(limit),
+      ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
+      ...(queryOffset > 0 ? ["--query-offset", String(queryOffset)] : []),
       "--output",
       responsePath,
     ];
@@ -240,6 +249,7 @@ function exportResponseArms(directory) {
       queryExpansionCalls: Number(provider.queryExpansionCalls ?? 0),
       queryExpansionFallbacks: Number(provider.queryExpansionFallbacks ?? 0),
       localEmbeddingCacheEnabled: Boolean(provider.localEmbeddingCacheEnabled),
+      queryShard: parsed.queryShard ?? null,
       privacyLeakCount: Number(parsed.privacyLeakCount ?? 0),
       redactionFailureCount: Number(parsed.redactionFailureCount ?? 0),
     };
@@ -252,6 +262,10 @@ function plannedRows() {
     exported: false,
     pathLabel: "external-private-response-file",
     plannedName: `${strategy}-responses.private.json`,
+    queryShard: {
+      startIndex: queryOffset,
+      maxQueries,
+    },
   }));
 }
 
@@ -396,6 +410,18 @@ function positiveInt(value, label) {
   return parsed;
 }
 
+function optionalPositiveInt(value, label) {
+  if (value == null || value === "" || value === false) return null;
+  return positiveInt(value, label);
+}
+
+function optionalNonNegativeInt(value, label) {
+  if (value == null || value === "" || value === false) return 0;
+  const parsed = Number(value);
+  assert.ok(Number.isInteger(parsed) && parsed >= 0, `${label} must be a non-negative integer`);
+  return parsed;
+}
+
 function assertSafePublicText(text, label) {
   assertNoPattern(text, secretPattern, `${label} contains a key-shaped secret`);
   assertNoPattern(text, privatePathPattern, `${label} contains a private local path`);
@@ -431,6 +457,9 @@ function renderMarkdown(value) {
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
     `- Calls provider APIs: ${value.callsProviderApis}`,
     `- Sends benchmark text to provider: ${value.sendsBenchmarkTextToProvider}`,
+    `- Query shard requested: ${value.queryShard.requested}`,
+    `- Query offset: ${value.queryShard.queryOffset}`,
+    `- Max queries: ${value.queryShard.maxQueries ?? "all"}`,
     "",
     "## Strategy Coverage",
     `- BM25 lite: ${value.strategyCoverage.hasBm25Lite}`,
@@ -443,7 +472,7 @@ function renderMarkdown(value) {
     "## Arms",
     ...value.arms.map(
       (arm) =>
-        `- ${arm.strategy}: exported=${arm.exported}, responses=${arm.responseCount ?? 0}, providerCalls=${arm.providerCallsMade ?? 0}, queryExpansionCalls=${arm.queryExpansionCalls ?? 0}`,
+        `- ${arm.strategy}: exported=${arm.exported}, responses=${arm.responseCount ?? 0}, providerCalls=${arm.providerCallsMade ?? 0}, queryExpansionCalls=${arm.queryExpansionCalls ?? 0}, shard=${arm.queryShard?.startIndex ?? arm.queryShard?.queryOffset ?? "n/a"}-${arm.queryShard?.endIndexExclusive ?? "n/a"}`,
     ),
     "",
     "## Blockers",

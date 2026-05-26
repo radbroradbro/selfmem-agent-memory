@@ -99,6 +99,7 @@
     "benchmark:answer-quality:preflight": "node packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "benchmark:answer-quality": "node packages/bench/public-benchmark-answer-quality.mjs",
     "benchmark:answer-quality:combine": "node packages/bench/public-benchmark-answer-quality-combine.mjs",
+    "benchmark:answer-quality:shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
     "benchmark:query-expansion:preflight": "node packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "benchmark:query-expansion:result-gate": "node packages/bench/query-expansion-result-gate.mjs",
     "benchmark:local-rerank:sidecar": "node packages/bench/local-openai-rerank-sidecar.mjs",

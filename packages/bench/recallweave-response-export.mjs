@@ -26,6 +26,8 @@ const memoriesPath = resolveInputPath(
 const containerDir = resolveInputPath(args.containerDir ?? process.env.RECALLWEAVE_BASELINE_CONTAINER_DIR ?? null);
 const outputPath = args.output ?? process.env.RECALLWEAVE_BASELINE_RESPONSES_JSON ?? null;
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
+const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
+const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const preserveIds = fixtureRequested || args.preserveIds === true || process.env.RECALLWEAVE_BASELINE_PRESERVE_IDS === "1";
 const retrievalStrategies = [
   "jaccard",
@@ -100,6 +102,7 @@ for (const query of queries) {
   assert.ok(typeof query.id === "string" && query.id.trim(), "each query needs an id");
   assert.ok(typeof query.q === "string" && query.q.trim(), `query ${query.id} needs q`);
 }
+const querySelection = selectQueries(queries);
 
 const loaded = loadMemories(effectiveMemoriesPath, { preserveIds });
 assert.ok(loaded.candidates.length > 0, "memories input produced no searchable candidates");
@@ -109,7 +112,7 @@ let localApplePersistentCacheState = null;
 
 const responses = {};
 const contextBudgetStats = [];
-for (const query of queries) {
+for (const query of querySelection.queries) {
   const startedAt = performance.now();
   const ranked = (await rankCandidates(query, loaded.candidates, { strategy: rankingStrategy, fixtureRequested, providerStats })).slice(0, limit);
   const budgeted = applyContextBudget(ranked, { contextTokenBudget });
@@ -145,6 +148,15 @@ const result = {
       expectedResultHashes: query.expectedResultHashes ?? [],
     })),
   })}`,
+  queryShard: {
+    startIndex: querySelection.startIndex,
+    endIndexExclusive: querySelection.endIndexExclusive,
+    totalQueryCount: querySelection.totalQueryCount,
+    responseCount: querySelection.queries.length,
+    requestedLimit: maxQueries,
+    completeDataset: querySelection.startIndex === 0 && querySelection.endIndexExclusive === querySelection.totalQueryCount,
+    selectedQueryIdHash: querySelection.selectedQueryIdHash,
+  },
   source: {
     kind: fixtureRequested ? "fixture-local-container" : "local-container-memories-jsonl",
     containerDirHash: containerDir ? shortHash(containerDir) : null,
@@ -2335,6 +2347,28 @@ function positiveInt(value, label) {
 function optionalPositiveInt(value, label) {
   if (value == null || value === "" || value === false) return null;
   return positiveInt(value, label);
+}
+
+function optionalNonNegativeInt(value, label) {
+  if (value == null || value === "" || value === false) return 0;
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
+  return number;
+}
+
+function selectQueries(inputQueries) {
+  const totalQueryCount = inputQueries.length;
+  assert.ok(queryOffset <= totalQueryCount, `query offset ${queryOffset} exceeds query count ${totalQueryCount}`);
+  const endIndexExclusive = maxQueries ? Math.min(totalQueryCount, queryOffset + maxQueries) : totalQueryCount;
+  const selected = inputQueries.slice(queryOffset, endIndexExclusive);
+  assert.ok(selected.length > 0, "selected query shard is empty");
+  return {
+    queries: selected,
+    totalQueryCount,
+    startIndex: queryOffset,
+    endIndexExclusive,
+    selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => shortHash(query.id)).join("\n"))}`,
+  };
 }
 
 function envFlagDisabled(value) {

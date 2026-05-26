@@ -251,8 +251,12 @@ answer-quality / `0.4333` correct rate. Two independent reviewer approvals are
 recorded in
 `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json`.
 The full 500-query LongMemEval target is ready as a run target, and the
-answer-quality harness now supports chunked scoring with `--query-offset` and
-`--max-queries`. Merge those chunks only with
+answer-quality harness now supports chunked response exports and scoring with
+`--query-offset` and `--max-queries`. The checked-in shard plan is
+`reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json`; it
+splits the full target into twenty 25-query shards and keeps BM25, full hybrid,
+query expansion, Voyage, NVIDIA, local Apple, and local rerank arms on the same
+source-locked data. Merge those chunks only with
 `benchmark:answer-quality:combine -- --combine-mode shards`, which rejects gaps,
 overlaps, target/model mismatches, and mixed strategy sets.
 This is real benchmark progress, not SOTA proof:

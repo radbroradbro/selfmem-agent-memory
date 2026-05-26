@@ -263,6 +263,13 @@ The end-to-end score gate itself now repeats that reported-target comparison
 and exposes `fullSotaBlockers`, so `benchmark:memory-score:result-gate
 --require-ready` cannot pass on a 30-query canary, a below-target result, or a
 different judge model even if the lower end-to-end checks are otherwise green.
+The full target now also has a checked-in answer-quality shard plan at
+`reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json`. It
+uses the private raw-source-retaining materialization, defines twenty 25-query
+shards, and carries BM25, full hybrid, query expansion, Voyage, NVIDIA, local
+Apple, and local rerank arms through shard export, answer scoring, shard
+combination, result gate, and reviewer intake commands. This is an execution
+plan and harness upgrade, not a completed full-SOTA result.
 The end-to-end gate also now verifies exact answer and
 judge model matching against the target contract. The current canary was
 answered and judged by `qwen36-a3b-main-q8kv-8192` while the checked target

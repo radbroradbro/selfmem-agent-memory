@@ -417,11 +417,14 @@ Component rows in the same artifact remain model-selection evidence only.
   clears, then combines the new metrics-only result with the existing local,
   query-expansion, local-rerank, and NVIDIA answer-quality reports before
   rerunning the provider-challenger, memory-score, and SOTA-ladder gates.
-  It also includes a full LongMemEval-S answer-quality shard flow for ten
-  50-query chunks, merged with
+  It also includes a full LongMemEval-S answer-quality shard flow. The current
+  checked-in shard plan,
+  `reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json`,
+  uses twenty 25-query chunks, includes BM25, full hybrid, query expansion,
+  Voyage, NVIDIA, local Apple, and local rerank arms, and merges with
   `combineMode=query-shard-answer-quality-union`; that merged packet still needs
-  reviewer intake, result gate, SOTA ladder, UI evidence, docs, owner approval,
-  and real production canary before any broad claim.
+  live execution, reviewer intake, result gate, SOTA ladder, UI evidence, docs,
+  owner approval, and real production canary before any broad claim.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and

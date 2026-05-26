@@ -24,7 +24,7 @@
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
   "printsCredentials": false,
-  "generatedAt": "2026-05-25T18:56:44.586Z",
+  "generatedAt": "2026-05-26T00:48:38.272Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
     "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
@@ -52,6 +52,11 @@
     "insideRepository": null,
     "valuePrinted": false
   },
+  "queryShard": {
+    "requested": false,
+    "queryOffset": 0,
+    "maxQueries": null
+  },
   "env": {
     "liveExportEnabled": false,
     "noRawTextConfirmed": false,
@@ -75,43 +80,71 @@
       "strategy": "bm25-lite",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "bm25-lite-responses.private.json"
+      "plannedName": "bm25-lite-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
     },
     {
       "strategy": "full-hybrid-rerank",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "full-hybrid-rerank-responses.private.json"
+      "plannedName": "full-hybrid-rerank-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
     },
     {
       "strategy": "query-expanded-full-hybrid-rerank",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "query-expanded-full-hybrid-rerank-responses.private.json"
+      "plannedName": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
     },
     {
       "strategy": "cloud-voyage4-voyage-lite-rerank",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "cloud-voyage4-voyage-lite-rerank-responses.private.json"
+      "plannedName": "cloud-voyage4-voyage-lite-rerank-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
     },
     {
       "strategy": "cloud-nvidia-nemotron-1b",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "cloud-nvidia-nemotron-1b-responses.private.json"
+      "plannedName": "cloud-nvidia-nemotron-1b-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
     },
     {
       "strategy": "local-apple-qwen3-0_6b",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "local-apple-qwen3-0_6b-responses.private.json"
+      "plannedName": "local-apple-qwen3-0_6b-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
     },
     {
       "strategy": "local-apple-qwen3-0_6b-local-rerank",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "local-apple-qwen3-0_6b-local-rerank-responses.private.json"
+      "plannedName": "local-apple-qwen3-0_6b-local-rerank-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
     }
   ],
   "blockers": [
