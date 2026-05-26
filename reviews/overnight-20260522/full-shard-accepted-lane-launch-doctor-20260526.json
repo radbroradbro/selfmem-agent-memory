@@ -4,7 +4,7 @@
   "mode": "full-shard-accepted-lane-launch-doctor",
   "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
   "claimScope": "full-sota",
-  "generatedAt": "2026-05-26T11:42:19.767Z",
+  "generatedAt": "2026-05-26T11:50:21.218Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -253,6 +253,10 @@
     ]
   },
   "shardProgress": {
+    "progressSource": "checked-in-progress-intake",
+    "progressIntakePath": "reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json",
+    "progressInputCount": 0,
+    "progressInputFiles": [],
     "acceptedShardCount": 0,
     "pendingShardCount": 20,
     "rejectedResultCount": 0,

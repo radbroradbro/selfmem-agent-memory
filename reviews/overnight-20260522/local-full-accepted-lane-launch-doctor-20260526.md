@@ -9,7 +9,9 @@
 - Query count: 500
 - Shards: 20
 - Accepted lane: local-full-accepted-shards
-- Pending shards: 20
+- Progress source: checked-in-progress-intake
+- Progress inputs: 1
+- Pending shards: 19
 
 ## Gate
 - Private inputs ready: true

@@ -9,6 +9,8 @@
 - Query count: 500
 - Shards: 20
 - Accepted lane: full-sota-accepted-shards
+- Progress source: checked-in-progress-intake
+- Progress inputs: 0
 - Pending shards: 20
 
 ## Gate

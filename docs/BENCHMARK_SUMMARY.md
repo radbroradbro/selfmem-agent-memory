@@ -359,11 +359,13 @@ accepts shard 001 and keeps the lane blocked on the remaining nineteen shards.
 The intake also validates shard range hashes so partial local-full packets
 cannot be confused with a full 500-query local benchmark.
 `benchmark:answer-quality:local-accepted-lane-doctor` now turns that into a
-first-shard launch check at
+next-missing-shard launch check at
 `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`.
-It reports the exact local-full blockers and first-shard commands without
-provider calls, without raw benchmark text, and without adding SOTA/public-claim
-blockers that belong only to the provider comparison lane.
+It reads the checked-in progress intake, counts shard 001 as accepted, and
+prints shard 002 retry commands with `--query-offset 25` as the next pending
+local-full shard. It reports the exact local-full blockers without provider
+calls, without raw benchmark text, and without adding SOTA/public-claim blockers
+that belong only to the provider comparison lane.
 The current regenerated private full-run inputs are checked by
 `benchmark:answer-quality:private-input-doctor`, with public-safe evidence in
 `reviews/overnight-20260522/full-shard-private-input-doctor-current.json`. That

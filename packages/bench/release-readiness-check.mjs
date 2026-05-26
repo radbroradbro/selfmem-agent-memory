@@ -3328,8 +3328,14 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.acceptedLane?.responseArmExport?.providerCallsRequired, false);
     assert.equal(Object.hasOwn(launchDoctor.acceptedLane?.providerReadiness ?? {}, "voyage"), false);
     assert.equal(Object.hasOwn(launchDoctor.acceptedLane?.providerReadiness ?? {}, "nvidia"), false);
-    assert.equal(launchDoctor.shardProgress?.pendingShardCount, 20);
-    assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-001");
+    assert.equal(launchDoctor.shardProgress?.progressSource, "checked-in-progress-intake");
+    assert.match(launchDoctor.shardProgress?.progressIntakePath ?? "", /answer-quality-local-full-shard-intake-after-shard-001-20260526\.json$/);
+    assert.equal(launchDoctor.shardProgress?.progressInputCount, 1);
+    assert.deepEqual(launchDoctor.shardProgress?.progressInputFiles, ["answer-quality-local-full-shard-001-20260526.json"]);
+    assert.equal(launchDoctor.shardProgress?.acceptedShardCount, 1);
+    assert.equal(launchDoctor.shardProgress?.pendingShardCount, 19);
+    assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-002");
+    assert.equal(launchDoctor.shardProgress?.firstPendingShardRange, "25-50");
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"));
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-apple-readiness"));
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-rerank-readiness"));
@@ -3345,8 +3351,10 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_RERANK_BASE_URL"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--require-local-embedding-durability"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_QUERY_EXPANSION_BASE_URL"));
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--query-offset 25"));
     assert.doesNotMatch(launchDoctor.nextCommands?.responseArmExport ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
-    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("answer-quality-local-full-shard-001.json"));
+    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("answer-quality-local-full-shard-002.json"));
+    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("--query-offset 25"));
   }
   assert.match(localAcceptedLaneLaunchDoctorMarkdownFresh, /Local-Full Accepted Lane Launch Doctor/);
   assert.match(localAcceptedLaneLaunchDoctorMarkdownFresh, /Claim scope: local-full/);

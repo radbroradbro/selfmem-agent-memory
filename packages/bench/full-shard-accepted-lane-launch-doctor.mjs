@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { dirname, isAbsolute, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -31,12 +31,14 @@ assert.equal(plan.mode, "public-benchmark-answer-quality-shard-plan", "plan must
 const claimScope = String(plan.claimScope ?? plan.runPlan?.claimScope ?? "full-sota");
 assert.ok(["full-sota", "local-full"].includes(claimScope), "plan claim scope must be full-sota or local-full");
 const isFullSota = claimScope === "full-sota";
+const progressInputState = discoverProgressInputs({ claimScope, reviewDir });
 
 const workorder = runNodeJson("packages/bench/public-benchmark-answer-quality-shard-workorder.mjs", [
   "--plan",
   displayPath(planPath),
   "--max-workorders",
   "1",
+  ...progressInputState.inputPaths.flatMap((inputPath) => ["--input", displayPath(inputPath)]),
 ]);
 const privateInputDoctor = privateInputDir
   ? runNodeJson("packages/bench/full-shard-private-input-doctor.mjs", [
@@ -162,6 +164,10 @@ const report = {
     blockers: arrayOf(acceptedLane.blockers),
   },
   shardProgress: {
+    progressSource: progressInputState.source,
+    progressIntakePath: progressInputState.intakePath ? displayPath(progressInputState.intakePath) : null,
+    progressInputCount: progressInputState.inputPaths.length,
+    progressInputFiles: progressInputState.inputPaths.map((inputPath) => basename(inputPath)),
     acceptedShardCount: Number(workorder.progress?.acceptedShardCount ?? 0),
     pendingShardCount: Number(workorder.progress?.pendingShardCount ?? 0),
     rejectedResultCount: Number(workorder.progress?.rejectedResultCount ?? 0),
@@ -289,6 +295,54 @@ function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
   return needs;
 }
 
+function discoverProgressInputs({ claimScope, reviewDir }) {
+  const explicit = normalizeList([args.input, args.inputs].flatMap(coerceArray)).map(resolveInputPath);
+  if (explicit.length) {
+    return {
+      source: "explicit-shard-results",
+      intakePath: null,
+      inputPaths: existingPublicInputs(explicit),
+    };
+  }
+  const explicitIntakes = normalizeList([args.progressIntake, args.progressIntakes].flatMap(coerceArray)).map(resolveInputPath);
+  const defaultIntakes = claimScope === "local-full"
+    ? [
+        resolveInputPath(`${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`),
+        resolveInputPath(`${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`),
+      ]
+    : [resolveInputPath(`${reviewDir}/answer-quality-full-shard-intake-20260525.json`)];
+  const candidateIntakes = explicitIntakes.length ? explicitIntakes : defaultIntakes;
+  const intakeStates = candidateIntakes
+    .filter((intakePath) => existsSync(intakePath))
+    .map((intakePath) => {
+      const raw = readFileSync(intakePath, "utf8");
+      assertSafePublicText(raw, displayPath(intakePath));
+      const intake = JSON.parse(raw);
+      const inputPaths = existingPublicInputs(arrayOf(intake.acceptedShards).map((item) => join(dirname(intakePath), String(item.fileName ?? ""))));
+      return {
+        source: explicitIntakes.length ? "explicit-progress-intake" : "checked-in-progress-intake",
+        intakePath,
+        inputPaths,
+      };
+    })
+    .sort((left, right) => right.inputPaths.length - left.inputPaths.length);
+  return intakeStates[0] ?? {
+    source: "no-progress-inputs",
+    intakePath: null,
+    inputPaths: [],
+  };
+}
+
+function existingPublicInputs(paths) {
+  return paths.filter((inputPath) => {
+    if (!inputPath || basename(inputPath) === "") return false;
+    if (!existsSync(inputPath)) return false;
+    const raw = readFileSync(inputPath, "utf8");
+    assertSafePublicText(raw, displayPath(inputPath));
+    return true;
+  });
+}
+
 function renderMarkdown(value) {
   const title = value.claimScope === "local-full" ? "Local-Full Accepted Lane Launch Doctor" : "Full-Shard Accepted Lane Launch Doctor";
   return [
@@ -303,6 +357,8 @@ function renderMarkdown(value) {
     `- Query count: ${value.plan.queryCount}`,
     `- Shards: ${value.plan.shardCount}`,
     `- Accepted lane: ${value.acceptedLane.laneId}`,
+    `- Progress source: ${value.shardProgress.progressSource}`,
+    `- Progress inputs: ${value.shardProgress.progressInputCount}`,
     `- Pending shards: ${value.shardProgress.pendingShardCount}`,
     "",
     "## Gate",
@@ -385,6 +441,19 @@ function sha256(value) {
 
 function arrayOf(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function coerceArray(value) {
+  if (value == null) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function normalizeList(values) {
+  return values
+    .filter((value) => value != null && value !== true)
+    .flatMap((value) => String(value).split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
 }
 
 function unique(values) {

@@ -547,6 +547,12 @@ not count as a RecallWeave score.
   scoring, provider/local arms, exact target model matching, and model-backed
   query expansion are configured. It is operator readiness evidence only, not a
   scored result or SOTA support.
+- Local-full accepted-lane launch doctor:
+  `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`
+  now consumes the checked-in local progress intake, records shard 001 as
+  accepted, and emits shard 002 retry commands as the next pending local-full
+  work. This keeps local-full continuation aligned with actual shard progress
+  while remaining non-SOTA evidence.
 - Full-shard return intake:
   `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`
   is the checked-in blocked state for the full answer-quality shard set. It

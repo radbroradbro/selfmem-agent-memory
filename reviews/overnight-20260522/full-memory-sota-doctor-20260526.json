@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T11:42:20.016Z",
+  "generatedAt": "2026-05-26T11:50:27.674Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -103,7 +103,7 @@
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:8071fa319c68a3230ac9af210190b5f8c1aac48271d1af223f77952c121b4a61",
+      "hash": "sha256:7d12423cb3c93a46a9eb38311c8c8a729d43320d9492df7516ef02429c8806b6",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -117,7 +117,7 @@
     "acceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:41e4fca13c534106e24fafd451eec65124c6cd1d35a9708482ae6cb0418bd276",
+      "hash": "sha256:c8a7c9c24a2173e8f9fbae281a49347fb2be15e0a31a8954bf51ca7b6aa156c1",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -215,21 +215,21 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:35f93ea0202be365fd253d59c7ffe7e4c30f4e8ab8870bd7c139d15c625609a9",
+      "hash": "sha256:bb99956859382e1444efe6f5952cabeb90b1d560998ab96545f7b027e0209095",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:d4b2eb958d0bc29ed9ff5e07d18c61210da01fb86935c255ea719a04b163d8a2",
+      "hash": "sha256:cf588e8cde6a007ef1e7bc06a6f99337d81ab295342d5cafbe25de26ef9a83fc",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:7d0adc3897fe4ce1cf2e4c308593ba76e62ac4790643b01a744534670d5351b8",
+      "hash": "sha256:9e29a52c0aee418b61b29351b8b24b11b461c37ee3f6b4cbb5c4aeb3457970e9",
       "mode": null,
       "status": null
     }
