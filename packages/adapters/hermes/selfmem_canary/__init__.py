@@ -209,9 +209,14 @@ class SelfmemCanaryProvider(MemoryProvider):
             or os.environ.get("SUPERMEMORY_API_KEY", "")
             or os.environ.get("SUPERMEMORY_CC_API_KEY", "")
         )
+        self._supermemory_search_disabled = (
+            os.environ.get("SELFMEM_SUPERMEMORY_SEARCH_DISABLED", "") == "1"
+            or os.environ.get("RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH", "") == "1"
+        )
         self._supermemory_read_through = bool(
             self._supermemory_key
             and self._source_supermemory_container
+            and not self._supermemory_search_disabled
             and os.environ.get("SELFMEM_SUPERMEMORY_READ_THROUGH", "1") != "0"
         )
         local_mode = "voyage-4-large+rerank-2.5" if self._voyage_keys else "local_lexical"
@@ -230,6 +235,7 @@ class SelfmemCanaryProvider(MemoryProvider):
             "adapter_contract_version": _ADAPTER_CONTRACT["version"],
             "strict_canary_contract": _ADAPTER_CONTRACT["strictCanaryContract"],
             "supermemory_read_through": self._supermemory_read_through,
+            "supermemory_search_disabled": self._supermemory_search_disabled,
             "search_policy": "local_first_then_bounded_supermemory_read_through",
             "recall_latency_budget_ms": _recall_latency_budget_ms(),
             "supermemory_timeout_seconds": _supermemory_timeout_seconds(),
@@ -570,6 +576,7 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "voyage_key_count": len(self._voyage_keys),
                 "supermemory_read_key_present": bool(self._supermemory_key),
                 "supermemory_read_through_ready": bool(self._supermemory_read_through),
+                "supermemory_search_disabled": bool(self._supermemory_search_disabled),
             },
             "recall_policy": {
                 "auto_recall_gate": "every_turn" if os.environ.get("SELFMEM_RECALL_EVERY_TURN") == "1" else "skip_obvious_maintenance",
@@ -577,7 +584,7 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "rerank_token_budget": _rerank_token_budget(),
                 "recall_latency_budget_ms": _recall_latency_budget_ms(),
                 "supermemory_timeout_seconds": _supermemory_timeout_seconds(),
-                "remote_read_through": "explicit_history_intent_or_thin_local_results",
+                "remote_read_through": "disabled_for_benchmark" if self._supermemory_search_disabled else "explicit_history_intent_or_thin_local_results",
             },
             "search_policy": "local_first_then_bounded_supermemory_read_through",
             "tool_aliases": ["supermemory_store", "supermemory_search", "supermemory_forget", "supermemory_profile", "supermemory_status"],
@@ -605,6 +612,7 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "hosted_write_back": False,
             },
             "supermemory_read_through": self._supermemory_read_through,
+            "supermemory_search_disabled": self._supermemory_search_disabled,
             "rerank_policy": "weighted_rrf_union; voyage rerank for local embedded candidates when VOYAGE_API_KEY is present; hosted Supermemory uses its own rerank flag",
             "recall_latency_budget_ms": _recall_latency_budget_ms(),
             "supermemory_timeout_seconds": _supermemory_timeout_seconds(),
@@ -658,6 +666,7 @@ class SelfmemCanaryProvider(MemoryProvider):
                 "search_latency_instrumentation": True,
                 "provider_mode": self._provider_mode,
                 "supermemory_read_through": self._supermemory_read_through,
+                "supermemory_search_disabled": self._supermemory_search_disabled,
                 "supermemory_attempted": remote_attempted,
                 "supermemory_skip_reason": "" if remote_attempted else ("read_through_disabled" if not self._supermemory_read_through else remote_decision["reason"]),
                 "supermemory_error": remote_error,

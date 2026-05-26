@@ -1615,7 +1615,7 @@ async function localApplePost(path, body) {
         body: JSON.stringify(body),
         signal: controller.signal,
       });
-      if (response.ok) return response.json();
+      if (response.ok) return await response.json();
       lastError = new Error(`local Apple embedding request failed with status ${response.status}`);
       if (!retryableProviderStatus(response.status)) {
         lastError.nonRetryable = true;
@@ -1653,7 +1653,7 @@ async function localAppleRerankPost(body) {
         body: JSON.stringify(body),
         signal: controller.signal,
       });
-      if (response.ok) return response.json();
+      if (response.ok) return await response.json();
       lastError = new Error(`local Apple rerank request failed with status ${response.status}`);
       if (!retryableProviderStatus(response.status)) {
         lastError.nonRetryable = true;

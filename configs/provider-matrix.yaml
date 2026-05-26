@@ -1,6 +1,12 @@
 defaultCloudArm: cloud-voyage4-voyage
 defaultLocalArm: local-apple-qwen3-0_6b
 
+usagePolicy:
+  personalAgentDefaultArm: cloud-voyage4-voyage
+  methodologyRefinementDefaultArm: local-apple-qwen3-0_6b
+  rationale: "Use the Voyage cloud arm for actual Codex/personal memory by default. Use local arms for high-volume methodology refinement, plugin benchmark loops, private/offline sweeps, and no-spend question-set experimentation."
+  localPromotionRule: "Do not promote a local arm to the personal default unless it wins a same-data answer-quality benchmark against the cloud default or the owner explicitly changes the policy."
+
 fallbackPolicy:
   enabled: false
   reason: "Do not mix embedding spaces. Rate-limit resilience uses same-provider key rotation or separate benchmark arms."

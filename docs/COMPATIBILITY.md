@@ -34,6 +34,11 @@ The bridge is read-through by default:
 - automatic hosted write-back stays off until a dry-run sync report proves it is
   safe.
 
+Benchmark methodology runs may disable hosted Supermemory search explicitly
+with `SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1` or
+`RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1`. That keeps dataset
+scoring isolated while preserving the production read-through bridge.
+
 ## Agent Identity
 
 Each runtime should pin an agent identity and container mapping. If an identity

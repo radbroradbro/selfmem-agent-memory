@@ -222,6 +222,8 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.md`,
+  `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
+  `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.md`,
   `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   `${reviewDir}/local-embedding-runtime-doctor-20260526.md`,
   `${reviewDir}/local-embedding-launch-diagnostic-20260526.json`,
@@ -1623,11 +1625,15 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(publicTargets, /same public benchmark source, repository or dataset revision/i);
   assert.match(publicTargets, /LongMemEval-V2/i);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
+  assert.match(providerMatrix, /personalAgentDefaultArm: cloud-voyage4-voyage/);
+  assert.match(providerMatrix, /methodologyRefinementDefaultArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /cloud-nvidia-nemotron-1b/);
   assert.match(providerMatrix, /cloud-gemini2-cohere4pro/);
   assert.match(providerMatrix, /cloud-gemini2-voyage-rerank/);
   assert.match(providerMatrix, /defaultProvider: none/);
   assert.match(budget, /requireCleanLocalModelRuntimeForLatency: true/);
+  assert.match(budget, /searchDisabledForMethodologyBenchmarks: true/);
+  assert.match(budget, /enableOnlyForHostedBaselineParity: true/);
   assert.match(budget, /stopOnlyRecallWeaveOwnedProcesses: true/);
   for (const text of [modelMatrix, autoresearchPlan, publicTargets, providerMatrix, budget]) {
     assert.doesNotMatch(text, secretPattern);
@@ -1959,6 +1965,13 @@ check("fresh public benchmark target check passes", () => {
   );
   const localFullAnswerQualityShard002RuntimeBlockerEvidence = readFileSync(
     join(root, reviewDir, "answer-quality-local-full-shard-002-runtime-blocker-20260526.md"),
+    "utf8",
+  );
+  const localFullAnswerQualityShard003RuntimeBlocker = JSON.parse(
+    readFileSync(join(root, reviewDir, "answer-quality-local-full-shard-003-runtime-blocker-20260526.json"), "utf8"),
+  );
+  const localFullAnswerQualityShard003RuntimeBlockerEvidence = readFileSync(
+    join(root, reviewDir, "answer-quality-local-full-shard-003-runtime-blocker-20260526.md"),
     "utf8",
   );
   const localEmbeddingRuntimeDoctor = JSON.parse(readFileSync(join(root, reviewDir, "local-embedding-runtime-doctor-20260526.json"), "utf8"));
@@ -4665,6 +4678,24 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(localFullAnswerQualityShard002RuntimeBlocker.blockers?.includes("local-full-shard-002-incomplete"));
   assert.match(localFullAnswerQualityShard002RuntimeBlockerEvidence, /Counts as local-full benchmark evidence: false/);
   assert.match(localFullAnswerQualityShard002RuntimeBlockerEvidence, /local-embedding-server-socket-close/);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.mode, "answer-quality-local-full-shard-runtime-blocker");
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.status, "BLOCKED_LOCAL_FULL_SHARD_RUNTIME");
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.claimScope, "local-full");
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.acceptedShard, false);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.countsAsLocalFullBenchmarkEvidence, false);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.countsAsFullMemorySotaEvidence, false);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.publicBenchmarkClaimsAllowed, false);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.queryShard?.queryOffset, 50);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.queryShard?.maxQueries, 25);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.partialAttempt?.completedArmCount, 4);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.partialAttempt?.missingArmCount, 1);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.failedArm?.strategy, "local-apple-qwen3-0_6b-local-rerank");
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.failedArm?.failureClass, "local-rerank-response-body-stall");
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.runtimeMitigation?.timeoutPatchApplied, true);
+  assert.equal(localFullAnswerQualityShard003RuntimeBlocker.completedPrivateArmEvidence?.length, 4);
+  assert.ok(localFullAnswerQualityShard003RuntimeBlocker.blockers?.includes("local-full-shard-003-incomplete"));
+  assert.match(localFullAnswerQualityShard003RuntimeBlockerEvidence, /local-rerank-response-body-stall/);
+  assert.match(localFullAnswerQualityShard003RuntimeBlockerEvidence, /cloud Voyage as the default/);
   for (const runtimeReport of [localEmbeddingRuntimeDoctor, localEmbeddingRuntimeFresh, localEmbeddingRuntimeHfNoEndpoint]) {
     assert.equal(runtimeReport.mode, "local-embedding-runtime-doctor");
     assert.equal(runtimeReport.metricsOnly, true);

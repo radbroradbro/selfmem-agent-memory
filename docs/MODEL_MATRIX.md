@@ -88,6 +88,11 @@ reports `BLOCKED_LOCAL_EMBEDDING_LAUNCH` because two relaunch attempts exited
 during model load before endpoint readiness, so keep the 0.6B local embedding
 lane as measured but not default until the endpoint is durable and the remaining
 local-full shards are exported, scored, and combined.
+Shard 003 later completed BM25, full hybrid, query-expanded hybrid, and local
+Qwen3 0.6B embedding response exports, but the local Qwen3 Reranker 0.6B arm
+stalled before a complete response file was written. That is recorded as
+`BLOCKED_LOCAL_FULL_SHARD_RUNTIME`, not as a quality score. Keep the local
+reranker as a bounded challenger until sidecar completion is proven.
 Treat this as local diagnostic evidence, not a default promotion or SOTA
 claim. Qwen3 Reranker 4B and 8B stay optional quality arms until measured
 latency and memory pressure justify them.

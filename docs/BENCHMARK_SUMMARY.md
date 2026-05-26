@@ -17,6 +17,24 @@ system RecallWeave is trying to be. It is the floor. If BM25-lite wins, the
 benchmark found a gap in hybrid weighting, embeddings, reranking, chunking,
 query expansion, graph use, or temporal handling.
 
+## Operating Provider Policy
+
+For actual Codex and personal memory usage, the default provider arm is the
+cloud Voyage path: `cloud-voyage4-voyage`. Local Apple Silicon arms remain
+important, but their primary job is methodology refinement: high-volume
+question-set sweeps, title/topic/subtopic amplification tests, BM25 versus
+vectorized-session comparisons, lifecycle-hook experiments, plugin capability
+loops, and no-spend/offline fallback. A local arm should not replace the
+personal cloud default unless it wins a same-data answer-quality benchmark
+against Voyage or the owner explicitly changes the policy.
+
+Hosted Supermemory search is disabled for methodology refinement runs unless
+the command is explicitly a hosted-baseline parity run. The production bridge
+remains available, but benchmark loops should set
+`SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1` or
+`RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1` so scoring reflects only
+the selected dataset and local/plugin method under test.
+
 The current branch includes a hosted baseline preflight:
 
 ```bash
@@ -665,6 +683,14 @@ intake, and the combine gate. The shard workorder
 now carries `SELFMEM_LOCAL_EMBED_BASE_URL`,
 `SELFMEM_LOCAL_RERANK_BASE_URL`, `RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1`,
 and `--require-local-embedding-durability` on the response export command.
+Shard 003 adds a second local-runtime blocker report at
+`reviews/overnight-20260522/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`.
+BM25, full hybrid, query-expanded hybrid, and local Qwen3 0.6B embedding all
+exported 25 private responses, but the `local-apple-qwen3-0_6b-local-rerank`
+arm stalled before writing a complete response file. That is a runtime blocker,
+not a scored loss. The response exporter now keeps local provider response-body
+parsing inside the same abort timeout as the request, but the local rerank arm
+remains an isolated challenger until its sidecar proves bounded completion.
 
 A source-locked 30-query local Apple run is now recorded:
 
@@ -993,7 +1019,10 @@ A stronger claim requires:
 - a baseline result that is not a fixture and passes the hosted preflight
   result checks.
 
-Until then, RecallWeave should be described as a local-first fallback and experimental native memory lane, not as a proven replacement.
+Until then, RecallWeave should be described as an experimental native memory
+lane and local/no-spend fallback, not as a proven replacement. Personal Codex
+usage remains on the Voyage-backed cloud arm unless a later same-data benchmark
+or explicit owner policy changes that default.
 
 ## Next Canary Matrix
 
@@ -1010,7 +1039,7 @@ The next public-safe benchmark gate will test separated provider arms:
 - `cloud-nvidia-retriever-500m`, `cloud-nvidia-nemotron-1b`,
   `cloud-nvidia-nemotron-vl-1b`, and `cloud-nvidia-e5-mistral` for hosted
   NVIDIA retrieval comparisons.
-- `local-apple-qwen3-0_6b` for the default Apple Silicon lane.
+- `local-apple-qwen3-0_6b` for the Apple Silicon methodology-refinement lane.
 - `local-apple-qwen3-0_6b-local-rerank` for the first local method challenger:
   same 0.6B Apple Silicon embedding lane, plus a local reranker sidecar.
 - `local-apple-qwen3-4b` for the measured larger local Apple Silicon arm after

@@ -61,6 +61,7 @@ export function createSelfmemOpenClawCanary(options = {}) {
     raw: join(storeDir, "raw_events.jsonl"),
     containerMap: join(storeDir, "container-map.json"),
   };
+  const supermemorySearchDisabled = process.env.SELFMEM_SUPERMEMORY_SEARCH_DISABLED === "1" || process.env.RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH === "1";
   writeFileSync(paths.containerMap, JSON.stringify({
     host: "openclaw",
     agent_identity: agentIdentity,
@@ -80,6 +81,7 @@ export function createSelfmemOpenClawCanary(options = {}) {
       hosted_write_back: false,
     },
     search_policy: "local_first_then_bounded_supermemory_read_through",
+    supermemory_search_disabled: supermemorySearchDisabled,
     recall_latency_budget_ms: recallLatencyBudgetMs(),
     supermemory_timeout_ms: supermemoryTimeoutMs(),
     identity_resolved: identityResolved,
@@ -89,7 +91,13 @@ export function createSelfmemOpenClawCanary(options = {}) {
   const state = { home, agentIdentity, identityResolved, readOnly, sourceSupermemoryContainer, localContainer, storeDir, paths };
   state.adapterContract = ADAPTER_CONTRACT;
   state.supermemoryKey = options.supermemoryKey || process.env.SELFMEM_SUPERMEMORY_READ_KEY || process.env.SUPERMEMORY_READ_API_KEY || process.env.SUPERMEMORY_API_KEY || process.env.SUPERMEMORY_CC_API_KEY || "";
-  state.supermemoryReadThrough = Boolean(state.supermemoryKey && sourceSupermemoryContainer && process.env.SELFMEM_SUPERMEMORY_READ_THROUGH !== "0");
+  state.supermemorySearchDisabled = supermemorySearchDisabled;
+  state.supermemoryReadThrough = Boolean(
+    state.supermemoryKey &&
+    sourceSupermemoryContainer &&
+    !state.supermemorySearchDisabled &&
+    process.env.SELFMEM_SUPERMEMORY_READ_THROUGH !== "0",
+  );
   state.voyageKeys = options.voyageKeys || voyageKeysFromEnv();
   state.voyageKeyIndex = 0;
   state.usage = {
@@ -288,6 +296,7 @@ async function search(state, query, limit) {
     adapter_contract_version: ADAPTER_CONTRACT.version,
     search_latency_instrumentation: true,
     supermemory_read_through: state.supermemoryReadThrough,
+    supermemory_search_disabled: state.supermemorySearchDisabled,
     supermemory_attempted: remoteAttempted,
     supermemory_skip_reason: remoteAttempted ? "" : (state.supermemoryReadThrough ? remoteDecision.reason : "read_through_disabled"),
     supermemory_error: remoteError,
@@ -572,6 +581,7 @@ function status(state) {
     source_supermemory_container: state.sourceSupermemoryContainer || null,
     local_container: state.localContainer,
     supermemory_read_through: state.supermemoryReadThrough,
+    supermemory_search_disabled: state.supermemorySearchDisabled,
     search_policy: "local_first_then_bounded_supermemory_read_through",
     provider_mode: state.providerMode,
     native_memory: {
@@ -590,13 +600,14 @@ function status(state) {
       embedding_backfill_limit: Math.max(1, Math.min(64, Number(process.env.SELFMEM_EMBED_BACKFILL_LIMIT || 64))),
       recall_latency_budget_ms: recallLatencyBudgetMs(),
       supermemory_timeout_ms: supermemoryTimeoutMs(),
-      remote_read_through: "explicit_history_intent_or_thin_local_results",
+      remote_read_through: state.supermemorySearchDisabled ? "disabled_for_benchmark" : "explicit_history_intent_or_thin_local_results",
     },
     live_credentials: {
       semantic_provider: state.voyageKeys.length > 0 ? "voyage" : "missing",
       voyage_key_count: state.voyageKeys.length,
       supermemory_read_key_present: Boolean(state.supermemoryKey),
       supermemory_read_through_ready: Boolean(state.supermemoryReadThrough),
+      supermemory_search_disabled: Boolean(state.supermemorySearchDisabled),
     },
     usage: state.usage,
     memory_count: readAll(state).length,

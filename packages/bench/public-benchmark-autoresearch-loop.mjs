@@ -423,6 +423,8 @@ function runNode(argv, options = {}) {
     env: {
       ...process.env,
       ...(options.live ? { RECALLWEAVE_BASELINE_LIVE: "1", RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1" } : {}),
+      RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
+      SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
       ...(options.env ?? {}),
     },
     stdio: ["ignore", "pipe", "pipe"],

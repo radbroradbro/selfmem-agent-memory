@@ -42,6 +42,8 @@ providerCallPolicy:
   supermemory:
     useFreshContainerPrefix: "selfmem-bench-"
     mayUseEnvCredentialsOnly: true
+    searchDisabledForMethodologyBenchmarks: true
+    enableOnlyForHostedBaselineParity: true
   selfmemCloud:
     defaultArm: "cloud-voyage4-voyage"
     mayUseEnvCredentialsOnly: true
