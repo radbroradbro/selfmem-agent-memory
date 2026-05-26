@@ -294,6 +294,13 @@ packet is safe to merge with
 `benchmark:answer-quality:combine -- --combine-mode shards`; it still does not
 prove SOTA or authorize public claims until the combined score, reviewer gate,
 SOTA ladder, UI evidence, docs, owner approval, and real canary all pass.
+The full-memory SOTA doctor is checked in at
+`reviews/overnight-20260522/full-memory-sota-doctor-20260526.json`. Run
+`benchmark:sota-doctor` to see the full gate chain in one place: BM25 is only
+the lexical control, raw sources are retained privately, the public report stays
+hash/count only, and SOTA claims remain blocked until the full shard set,
+provider arms, reviewer intake, UI/docs refresh, owner approval, and real
+canary all pass.
 The end-to-end gate also now verifies exact answer and
 judge model matching against the target contract. The current canary was
 answered and judged by `qwen36-a3b-main-q8kv-8192` while the checked target

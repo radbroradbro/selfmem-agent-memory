@@ -136,6 +136,8 @@ const files = {
   answerQualityFullShardWorkorderMarkdown: `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   answerQualityFullShardIntakeReport: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
+  fullMemorySotaDoctorReport: `${reviewDir}/full-memory-sota-doctor-20260526.json`,
+  fullMemorySotaDoctorMarkdown: `${reviewDir}/full-memory-sota-doctor-20260526.md`,
 };
 
 for (const [name, file] of Object.entries(files)) {
@@ -182,6 +184,7 @@ const answerQualityHarnessSmoke = JSON.parse(readFileSync(join(root, files.answe
 const answerQualityFullShardPlan = JSON.parse(readFileSync(join(root, files.answerQualityFullShardPlanReport), "utf8"));
 const answerQualityFullShardWorkorder = JSON.parse(readFileSync(join(root, files.answerQualityFullShardWorkorderReport), "utf8"));
 const answerQualityFullShardIntake = JSON.parse(readFileSync(join(root, files.answerQualityFullShardIntakeReport), "utf8"));
+const fullMemorySotaDoctor = JSON.parse(readFileSync(join(root, files.fullMemorySotaDoctorReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
     .filter(([, file]) => file.endsWith(".md"))
@@ -525,6 +528,15 @@ assert.equal(answerQualityFullShardIntake.intake?.missingShardCount, 20);
 assert.ok(answerQualityFullShardIntake.blockers?.includes("shard-results-missing"));
 assert.ok(answerQualityFullShardIntake.blockers?.includes("answer-quality-shards-missing"));
 assert.ok(answerQualityFullShardIntake.blockers?.includes("full-shard-coverage-incomplete"));
+assert.equal(fullMemorySotaDoctor.mode, "full-memory-sota-doctor");
+assert.equal(fullMemorySotaDoctor.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+assert.equal(fullMemorySotaDoctor.publicBenchmarkClaimsAllowed, false);
+assert.equal(fullMemorySotaDoctor.countsAsFullMemorySotaEvidence, false);
+assert.equal(fullMemorySotaDoctor.rawSourceRetention?.retainsRawSourcesPrivately, true);
+assert.equal(fullMemorySotaDoctor.rawSourceRetention?.publicReportIsSafe, true);
+assert.equal(fullMemorySotaDoctor.shardState?.missingShardCount, 20);
+assert.ok(fullMemorySotaDoctor.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
+assert.match(texts.fullMemorySotaDoctorMarkdown, /Full Memory SOTA Doctor/);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -798,8 +810,11 @@ const requirements = [
     files.answerQualityFullShardWorkorderMarkdown,
     files.answerQualityFullShardIntakeReport,
     files.answerQualityFullShardIntakeMarkdown,
+    files.fullMemorySotaDoctorReport,
+    files.fullMemorySotaDoctorMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
     "packages/bench/public-benchmark-sota-operator-packet.mjs",
+    "packages/bench/full-memory-sota-doctor.mjs",
     "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
     "packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "packages/bench/public-benchmark-answer-quality.mjs",

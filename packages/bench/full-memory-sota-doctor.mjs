@@ -1,0 +1,445 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = fileURLToPath(new URL("../..", import.meta.url));
+const args = parseArgs(process.argv.slice(2));
+const reviewDir = args.reviewDir ?? "reviews/overnight-20260522";
+const outputPath = args.output ? resolveInputPath(args.output) : null;
+const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
+const format = String(args.format ?? "json").toLowerCase();
+
+assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+
+const files = {
+  fullTarget: `${reviewDir}/public-longmemeval-full-run-target.json`,
+  fullMaterialize: `${reviewDir}/public-longmemeval-full-materialize-run.json`,
+  shardPlan: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
+  shardWorkorder: `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
+  shardIntake: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
+  sotaLadder: `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
+  sotaOperatorPacket: `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.json`,
+  endToEndGate: `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
+  combinedCanary: `${reviewDir}/end-to-end-memory-score-combined-20260525.json`,
+  liveLocalCanary: `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
+  liveProviderCanary: `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
+  voyageRateLimit: `${reviewDir}/voyage-provider-rate-limit-20260525.json`,
+  reviewerIntake: `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
+  uiEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
+  releaseNotes: `${reviewDir}/pr-body-update-draft.md`,
+  benchmarkDocs: "docs/BENCHMARK_SUMMARY.md",
+  targetDocs: "docs/PUBLIC_BENCHMARK_TARGETS.md",
+  releaseHandoff: "docs/RELEASE_HANDOFF.md",
+};
+
+const evidence = Object.fromEntries(Object.entries(files).map(([key, file]) => [key, loadFile(file)]));
+const goalAudit = runJson(["packages/bench/goal-completion-audit.mjs"]);
+
+const fullTarget = evidence.fullTarget.json;
+const fullMaterialize = evidence.fullMaterialize.json;
+const shardPlan = evidence.shardPlan.json;
+const shardWorkorder = evidence.shardWorkorder.json;
+const shardIntake = evidence.shardIntake.json;
+const sotaLadder = evidence.sotaLadder.json;
+const sotaOperatorPacket = evidence.sotaOperatorPacket.json;
+const endToEndGate = evidence.endToEndGate.json;
+const combinedCanary = evidence.combinedCanary.json;
+const voyageRateLimit = evidence.voyageRateLimit.json;
+const reviewerIntake = evidence.reviewerIntake.json;
+const uiEvidence = evidence.uiEvidence.json;
+
+const rawRetention = inspectRawSourceRetention(fullMaterialize);
+const shardState = inspectShardState({ shardPlan, shardWorkorder, shardIntake });
+const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
+const reviewerState = inspectReviewerState(reviewerIntake);
+const docState = inspectDocs(evidence);
+
+const gates = [
+  gate("source-locked-full-target", fullTarget?.fixtureOnly === false && Number(fullMaterialize?.selection?.queryCount ?? 0) === 500, [
+    "missing-or-non-live-full-target",
+    "full-target-query-count-not-500",
+  ]),
+  gate("raw-source-retention", rawRetention.retainsRawSourcesPrivately && rawRetention.publicReportIsSafe, [
+    "raw-sources-not-retained-privately",
+    "raw-source-public-report-not-safe",
+  ]),
+  gate("bm25-is-control-only", sotaOperatorPacket?.sameDataContract?.bm25LexicalFloorRequired === true, [
+    "bm25-control-contract-missing",
+  ]),
+  gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
+  gate("same-data-provider-arms", !arrayOf(sotaLadder?.blockers).includes("missing-voyage-answer-quality-same-data-result"), [
+    "missing-voyage-answer-quality-same-data-result",
+  ]),
+  gate("full-score-result-gate", endToEndGate?.countsAsFullMemorySotaEvidence === true, endToEndGate?.fullSotaBlockers ?? endToEndGate?.blockers ?? []),
+  gate("reported-target-beaten", sotaLadder?.reportedTargetComparison?.meetsPrimaryReportedTarget === true, [
+    "best-end-to-end-score-below-reported-supermemory-target",
+  ]),
+  gate("independent-reviewers", reviewerState.ready, reviewerState.blockers),
+  gate("ui-docs-release-refresh", docState.readyAfterBenchmarkResult, docState.blockers),
+  gate("owner-and-real-canary", goalAudit.goalComplete === true, [
+    ...goalAudit.requirements?.filter((item) => item.status !== "proven").map((item) => item.id) ?? [],
+  ]),
+];
+
+const blockers = [
+  ...new Set([
+    ...gates.flatMap((item) => (item.status === "pass" ? [] : item.blockers)),
+    ...arrayOf(sotaOperatorPacket?.blockers),
+  ]),
+].filter(Boolean);
+
+const report = {
+  schemaVersion: 1,
+  ok: true,
+  mode: "full-memory-sota-doctor",
+  status: blockers.length === 0 ? "READY_FOR_REVIEWED_FULL_MEMORY_SOTA_CLAIM" : "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
+  generatedAt: new Date().toISOString(),
+  reviewDir,
+  metricsOnly: true,
+  publicSafe: true,
+  writesRealFiles: Boolean(outputPath || markdownOutputPath),
+  callsProviderApis: false,
+  sendsBenchmarkTextToProvider: false,
+  rawQuestionIdsIncluded: false,
+  rawQuestionsIncluded: false,
+  rawAnswersIncluded: false,
+  rawMemoryIncluded: false,
+  rawTranscriptIncluded: false,
+  rawPrivateOutputPathIncluded: false,
+  publicBenchmarkClaimsAllowed: blockers.length === 0,
+  countsAsFullMemorySotaEvidence: blockers.length === 0,
+  benchmarkContract: {
+    bm25IsLexicalFloorOnly: true,
+    retrievalProxyOnlyIsNotEnough: true,
+    componentBenchmarksAreModelSelectionOnly: true,
+    fullMemoryAnswerQualityRequired: true,
+    sameDataExternalTargetRequired: true,
+    sameAnswerAndJudgeModelRequired: true,
+    reviewerApprovalRequired: true,
+    uiDocsOwnerAndRealCanaryStillRequired: true,
+  },
+  evidenceFiles: summarizeEvidence(evidence),
+  goalAudit: {
+    mode: goalAudit.mode,
+    goalComplete: goalAudit.goalComplete,
+    mayCallUpdateGoalComplete: goalAudit.mayCallUpdateGoalComplete,
+    counts: goalAudit.counts,
+    openRequirements: goalAudit.requirements?.filter((item) => item.status !== "proven").map((item) => ({
+      id: item.id,
+      status: item.status,
+      requirement: item.requirement,
+    })),
+  },
+  fullTarget: {
+    path: files.fullTarget,
+    hash: evidence.fullTarget.hash,
+    fixtureOnly: fullTarget?.fixtureOnly ?? null,
+    claimTier: fullTarget?.claimTier ?? null,
+    benchmarkFamily: fullTarget?.benchmark?.family ?? fullTarget?.benchmark?.name ?? null,
+    split: fullTarget?.benchmark?.split ?? null,
+    answerModel: fullTarget?.answerModel ?? fullTarget?.target?.answerModel ?? fullMaterialize?.target?.answerModel ?? null,
+    judgeModel: fullTarget?.judgeModel ?? fullTarget?.target?.judgeModel ?? fullMaterialize?.target?.judgeModel ?? null,
+    queryCount: Number(fullMaterialize?.selection?.queryCount ?? shardPlan?.runPlan?.queryCount ?? 0),
+    haystackSessionCount: Number(fullMaterialize?.selection?.haystackSessionCount ?? 0),
+    expectedReferenceCount: Number(fullMaterialize?.selection?.expectedResultRefCount ?? 0),
+  },
+  rawSourceRetention: rawRetention,
+  shardState,
+  currentCanary,
+  reviewerState,
+  docState,
+  gates,
+  blockers,
+  nextRunPlan: buildNextRunPlan({ shardPlan, sotaOperatorPacket }),
+};
+
+const jsonText = `${JSON.stringify(report, null, 2)}\n`;
+const markdownText = `${renderMarkdown(report)}\n`;
+assertSafePublicText(jsonText, "full memory SOTA doctor report");
+assertSafePublicText(markdownText, "full memory SOTA doctor markdown");
+
+if (outputPath) writeOutput(outputPath, jsonText);
+if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
+process.stdout.write(format === "markdown" ? markdownText : jsonText);
+
+function inspectRawSourceRetention(materializeReport) {
+  const retention = materializeReport?.sourceRetention ?? {};
+  const privateFiles = materializeReport?.privateOutputs?.files ?? [];
+  const roles = privateFiles.map((item) => ({
+    role: item.role,
+    name: item.name,
+    hash: item.hash,
+    rawTextPrivate: Boolean(item.rawTextPrivate),
+  }));
+  const requiredRoles = ["queryset", "memories", "answer-labels", "raw-dataset", "selected-raw-rows", "source-manifest"];
+  const presentRoles = new Set(roles.map((item) => item.role));
+  const missingRoles = requiredRoles.filter((role) => !presentRoles.has(role));
+  return {
+    retainsRawSourcesPrivately:
+      retention.rawDatasetRetainedPrivate === true &&
+      retention.selectedRawRowsRetainedPrivate === true &&
+      retention.sourceManifestRetainedPrivate === true &&
+      missingRoles.length === 0,
+    publicReportIsSafe:
+      materializeReport?.rawQuestionsIncluded === false &&
+      materializeReport?.rawAnswersIncluded === false &&
+      materializeReport?.rawMemoryIncluded === false &&
+      materializeReport?.rawPrivateOutputPathIncluded === false &&
+      retention.rawTextPubliclyIncluded === false &&
+      retention.privateOutputPathIncluded === false,
+    privateOutputDirectoryLabel: materializeReport?.privateOutputs?.directoryLabel ?? null,
+    directoryInsideRepository: Boolean(materializeReport?.privateOutputs?.directoryInsideRepository),
+    requiredRoles,
+    missingRoles,
+    roles,
+    rawDatasetItemCount: Number(retention.rawDatasetItemCount ?? 0),
+    selectedRawRowsCount: Number(retention.selectedRawRowsCount ?? 0),
+    rawDatasetHash: retention.rawDatasetHash ?? null,
+    selectedRawRowsHash: retention.selectedRawRowsHash ?? null,
+    sourceManifestHash: retention.sourceManifestHash ?? null,
+    uiMayUseCompressedDefaultButAuditRetainsRawSource: true,
+  };
+}
+
+function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
+  return {
+    planStatus: shardPlan?.status ?? null,
+    workorderStatus: shardWorkorder?.status ?? null,
+    intakeStatus: shardIntake?.status ?? null,
+    queryCount: Number(shardPlan?.runPlan?.queryCount ?? 0),
+    shardSize: Number(shardPlan?.runPlan?.shardSize ?? 0),
+    shardCount: Number(shardPlan?.runPlan?.shardCount ?? 0),
+    strategies: shardPlan?.runPlan?.strategies ?? [],
+    acceptedShardCount: Number(shardIntake?.intake?.acceptedShardCount ?? shardWorkorder?.progress?.acceptedShardCount ?? 0),
+    missingShardCount: Number(shardIntake?.intake?.missingShardCount ?? shardWorkorder?.progress?.pendingShardCount ?? 0),
+    rejectedShardCount: Number(shardIntake?.intake?.rejectedShardCount ?? shardWorkorder?.progress?.rejectedResultCount ?? 0),
+    duplicateShardCount: Number(shardIntake?.intake?.duplicateShardCount ?? shardWorkorder?.progress?.duplicateResultCount ?? 0),
+    completeCoverage: Boolean(shardIntake?.intake?.completeCoverage),
+    readyForShardCombine: Boolean(shardIntake?.readyForShardCombine),
+    blockers: [
+      ...arrayOf(shardWorkorder?.blockers),
+      ...arrayOf(shardIntake?.blockers),
+    ],
+  };
+}
+
+function inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit }) {
+  return {
+    resultPath: files.combinedCanary,
+    gatePath: files.endToEndGate,
+    queryCount: Number(combinedCanary?.input?.scoredQueryCount ?? combinedCanary?.input?.queryCount ?? 0),
+    winner: combinedCanary?.winner ?? null,
+    answerModel: endToEndGate?.result?.answerModel ?? combinedCanary?.provider?.answerModel ?? null,
+    judgeModel: endToEndGate?.result?.judgeModel ?? combinedCanary?.provider?.judgeModel ?? null,
+    targetAnswerModel: endToEndGate?.target?.answerModel ?? null,
+    targetJudgeModel: endToEndGate?.target?.judgeModel ?? null,
+    score: endToEndGate?.result?.answerQualityMetric?.value ?? combinedCanary?.winner?.answerQuality ?? null,
+    primaryReportedTarget: endToEndGate?.reportedTargetComparison?.primaryTarget ?? null,
+    scoreDelta: endToEndGate?.reportedTargetComparison?.scoreDelta ?? null,
+    countsAsEndToEndMemoryBenchmark: Boolean(endToEndGate?.countsAsEndToEndMemoryBenchmark),
+    countsAsFullMemorySotaEvidence: Boolean(endToEndGate?.countsAsFullMemorySotaEvidence),
+    fullSotaBlockers: endToEndGate?.fullSotaBlockers ?? [],
+    gateBlockers: endToEndGate?.blockers ?? [],
+    reviewerApprovalCount: Number(reviewerIntake?.reviewerApprovalCount ?? 0),
+    voyageStatus: voyageRateLimit?.status ?? null,
+    voyageHttpStatus: voyageRateLimit?.httpStatus ?? null,
+  };
+}
+
+function inspectReviewerState(reviewerIntake) {
+  const blockers = reviewerIntake?.blockers ?? ["memory-score-reviewer-intake-missing"];
+  return {
+    path: files.reviewerIntake,
+    status: reviewerIntake?.status ?? null,
+    ready: reviewerIntake?.publicBenchmarkApprovalReady === true && reviewerIntake?.countsAsFullMemorySotaReview === true,
+    reviewerApprovalCount: Number(reviewerIntake?.reviewerApprovalCount ?? 0),
+    independentReviewerCount: Number(reviewerIntake?.independentReviewerCount ?? 0),
+    countsAsFullMemorySotaReview: Boolean(reviewerIntake?.countsAsFullMemorySotaReview),
+    blockers,
+    acceptableRoutes: ["Gemini", "Claude", "NVIDIA/DeepSeek-style external critic", "Codex reviewer not involved in implementation"],
+  };
+}
+
+function inspectDocs(loadedEvidence) {
+  const requiredPhrases = [
+    [loadedEvidence.benchmarkDocs.text, /This is an execution\s+plan and harness upgrade, not a completed full-SOTA result/i],
+    [loadedEvidence.targetDocs.text, /The full LongMemEval-S run-only target is now authored|full 500-row public set/i],
+    [loadedEvidence.releaseHandoff.text, /Do not use MemoryBench, LongMemEval, or SOTA wording/i],
+    [loadedEvidence.releaseNotes.text, /full-memory|SOTA|answer-quality/i],
+  ];
+  const missing = requiredPhrases
+    .map(([text, pattern], index) => (!pattern.test(text ?? "") ? `doc-phrase-${index + 1}-missing` : null))
+    .filter(Boolean);
+  return {
+    docsCurrentForBlockedState: missing.length === 0,
+    readyAfterBenchmarkResult: false,
+    blockers: [
+      ...missing,
+      "docs-release-notes-and-ui-evidence-must-refresh-after-full-result",
+    ],
+    uiEvidencePath: files.uiEvidence,
+    uiFixtureOnly: Boolean(uiEvidence?.fixtureOnly),
+    uiPrivateLeakCount: Number(uiEvidence?.privateLeakCount ?? 0),
+  };
+}
+
+function gate(id, passed, blockers) {
+  return {
+    id,
+    status: passed ? "pass" : "blocked",
+    blockers: passed ? [] : arrayOf(blockers),
+  };
+}
+
+function buildNextRunPlan({ shardPlan, sotaOperatorPacket }) {
+  const fullShardFlow = arrayOf(sotaOperatorPacket?.operatorFlow).find((item) => item.id === "full-longmemeval-answer-quality-shards");
+  return {
+    primaryStage: "full-longmemeval-answer-quality-shards",
+    privateOutputRequired: true,
+    rawSourcesStayOutsideRepo: true,
+    queryCount: Number(shardPlan?.runPlan?.queryCount ?? 500),
+    shardCount: Number(shardPlan?.runPlan?.shardCount ?? 20),
+    shardSize: Number(shardPlan?.runPlan?.shardSize ?? 25),
+    strategySet: shardPlan?.runPlan?.strategies ?? [],
+    commandSource: files.sotaOperatorPacket,
+    commandCount: fullShardFlow?.commands?.length ?? 0,
+    firstCommands: arrayOf(fullShardFlow?.commands).slice(0, 6),
+    requiredAfterShardRuns: [
+      "benchmark:answer-quality:shard-workorder",
+      "benchmark:answer-quality:shard-intake --require-ready",
+      "benchmark:answer-quality:combine -- --combine-mode shards",
+      "benchmark:memory-score:reviewer-intake -- --strict-target",
+      "benchmark:memory-score:result-gate -- --require-ready",
+      "benchmark:sota-ladder",
+      "UI evidence, docs, release notes, owner approval, and real canary refresh",
+    ],
+  };
+}
+
+function summarizeEvidence(loadedEvidence) {
+  return Object.fromEntries(
+    Object.entries(loadedEvidence).map(([key, value]) => [
+      key,
+      {
+        path: value.path,
+        exists: value.exists,
+        hash: value.hash,
+        mode: value.json?.mode ?? null,
+        status: value.json?.status ?? null,
+      },
+    ]),
+  );
+}
+
+function renderMarkdown(value) {
+  const lines = [
+    "# Full Memory SOTA Doctor",
+    "",
+    `- Status: ${value.status}`,
+    `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
+    `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
+    `- Full target query count: ${value.fullTarget.queryCount}`,
+    `- Current canary query count: ${value.currentCanary.queryCount}`,
+    `- Current best score: ${value.currentCanary.score ?? "n/a"}`,
+    `- Current score delta vs reported target: ${value.currentCanary.scoreDelta ?? "n/a"}`,
+    "",
+    "## Gates",
+    ...value.gates.map((item) => `- ${item.id}: ${item.status}${item.blockers.length ? ` (${item.blockers.join(", ")})` : ""}`),
+    "",
+    "## Raw Source Retention",
+    `- Retains raw sources privately: ${value.rawSourceRetention.retainsRawSourcesPrivately}`,
+    `- Public report is safe: ${value.rawSourceRetention.publicReportIsSafe}`,
+    `- Private raw roles: ${value.rawSourceRetention.roles.map((item) => item.role).join(", ")}`,
+    "",
+    "## Shards",
+    `- Plan status: ${value.shardState.planStatus}`,
+    `- Intake status: ${value.shardState.intakeStatus}`,
+    `- Accepted shards: ${value.shardState.acceptedShardCount}`,
+    `- Missing shards: ${value.shardState.missingShardCount}`,
+    "",
+    "## Blockers",
+    ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),
+    "",
+    "## Next Run",
+    `- Primary stage: ${value.nextRunPlan.primaryStage}`,
+    `- Strategy set: ${value.nextRunPlan.strategySet.join(", ")}`,
+    `- Required after shard runs: ${value.nextRunPlan.requiredAfterShardRuns.join("; ")}`,
+  ];
+  return lines.join("\n");
+}
+
+function loadFile(file) {
+  const path = file;
+  const abs = resolveInputPath(file);
+  assert.ok(existsSync(abs), `required evidence missing: ${file}`);
+  const text = readFileSync(abs, "utf8");
+  assertNoCredentialText(text, file);
+  return {
+    path,
+    exists: true,
+    hash: `sha256:${sha256(text)}`,
+    text,
+    json: file.endsWith(".json") ? JSON.parse(text) : null,
+  };
+}
+
+function runJson(nodeArgs) {
+  const result = spawnSync("node", nodeArgs, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `node ${nodeArgs.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
+  assertSafePublicText(result.stdout, nodeArgs.join(" "));
+  return JSON.parse(result.stdout);
+}
+
+function writeOutput(path, text) {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, text, { encoding: "utf8", mode: 0o600 });
+}
+
+function resolveInputPath(path) {
+  return isAbsolute(path) ? path : resolve(root, path);
+}
+
+function arrayOf(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function parseArgs(argv) {
+  const parsed = {};
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (!arg.startsWith("--")) continue;
+    const key = arg.slice(2).replace(/-([a-z])/g, (_, ch) => ch.toUpperCase());
+    const next = argv[i + 1];
+    if (!next || next.startsWith("--")) parsed[key] = true;
+    else {
+      parsed[key] = next;
+      i += 1;
+    }
+  }
+  return parsed;
+}
+
+function sha256(text) {
+  return createHash("sha256").update(text).digest("hex");
+}
+
+function assertSafePublicText(text, label) {
+  const secretPattern =
+    /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
+  const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/|\/home\/|[A-Za-z]:\\Users\\)/i;
+  assert.ok(!secretPattern.test(text), `${label} appears to contain a credential`);
+  assert.ok(!privatePathPattern.test(text), `${label} appears to contain a private path`);
+}
+
+function assertNoCredentialText(text, label) {
+  const secretPattern =
+    /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
+  assert.ok(!secretPattern.test(text), `${label} appears to contain a credential`);
+}

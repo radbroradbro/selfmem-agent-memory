@@ -2,7 +2,7 @@
 
 Live status:
 
-- PR #5 body was updated from this public-safe source on 2026-05-25.
+- PR #5 body was updated from this public-safe source on 2026-05-26.
 - The release blocker issue was created as GitHub issue #6.
 - The GitHub connector itself still returned `401 token_expired`, so the write
   used the local git credential helper without printing or committing the
@@ -324,6 +324,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   existing local, query-expansion, local-rerank, and NVIDIA answer-quality
   reports, then rerun the provider-challenger, memory-score, and SOTA-ladder
   gates before any public wording changes.
+- Adds `benchmark:sota-doctor` and the checked-in
+  `full-memory-sota-doctor-20260526` evidence packet. It gives maintainers a
+  one-command view of the full memory/SOTA gate: the 500-row LongMemEval target
+  and private raw-source retention pass, BM25 remains only the lexical control,
+  and public SOTA claims stay blocked on the 20 answer-quality shards, same-data
+  Voyage answer-quality, reviewer intake, UI/docs refresh, owner approval, and
+  real canary.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.

@@ -119,6 +119,7 @@ const requiredFiles = [
   "packages/bench/memory-score-openai-compatible-reviewer.mjs",
   "packages/bench/end-to-end-memory-score-gate.mjs",
   "packages/bench/public-benchmark-autoresearch-loop.mjs",
+  "packages/bench/full-memory-sota-doctor.mjs",
   "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
   "packages/bench/public-benchmark-answer-quality-preflight.mjs",
   "packages/bench/public-benchmark-answer-quality.mjs",
@@ -192,6 +193,8 @@ const requiredFiles = [
   `${reviewDir}/sota-ladder-full-target-report-20260525.md`,
   `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.json`,
   `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.md`,
+  `${reviewDir}/full-memory-sota-doctor-20260526.json`,
+  `${reviewDir}/full-memory-sota-doctor-20260526.md`,
   `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
   `${reviewDir}/memory-score-reviewer-intake-20260525.md`,
   `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
@@ -570,6 +573,7 @@ const requiredScripts = [
   "benchmark:memory-score:reviewer:openai-compatible",
   "benchmark:sota-ladder",
   "benchmark:sota-ladder:packet",
+  "benchmark:sota-doctor",
   "goal:audit",
   "release:doctor",
   "release:handoff",
@@ -1670,6 +1674,10 @@ check("fresh public benchmark target check passes", () => {
   const fullTargetOperatorPacket = JSON.parse(
     readFileSync(join(root, reviewDir, "sota-ladder-full-target-operator-packet-20260525.json"), "utf8"),
   );
+  const fullMemorySotaDoctorFresh = JSON.parse(run("node", ["packages/bench/full-memory-sota-doctor.mjs"]).stdout);
+  const fullMemorySotaDoctorMarkdownFresh = run("node", ["packages/bench/full-memory-sota-doctor.mjs", "--format", "markdown"]).stdout;
+  const fullMemorySotaDoctorEvidence = JSON.parse(readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260526.json"), "utf8"));
+  const fullMemorySotaDoctorMarkdownEvidence = readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260526.md"), "utf8");
   const providerOperatorPacket = JSON.parse(run("node", ["packages/bench/provider-benchmark-operator-packet.mjs", "--provider", "voyage"]).stdout);
   const providerOperatorPacketMarkdown = run("node", [
     "packages/bench/provider-benchmark-operator-packet.mjs",
@@ -2832,6 +2840,35 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:shard-intake") && String(line).includes("--require-ready")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--combine-mode shards")));
   assert.ok(fullShardFlow.commands?.every((line) => !String(line).includes("full-response-arms")));
+  for (const doctorReport of [fullMemorySotaDoctorFresh, fullMemorySotaDoctorEvidence]) {
+    assert.equal(doctorReport.mode, "full-memory-sota-doctor");
+    assert.equal(doctorReport.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+    assert.equal(doctorReport.publicBenchmarkClaimsAllowed, false);
+    assert.equal(doctorReport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(doctorReport.benchmarkContract?.bm25IsLexicalFloorOnly, true);
+    assert.equal(doctorReport.benchmarkContract?.retrievalProxyOnlyIsNotEnough, true);
+    assert.equal(doctorReport.benchmarkContract?.componentBenchmarksAreModelSelectionOnly, true);
+    assert.equal(doctorReport.fullTarget?.queryCount, 500);
+    assert.equal(doctorReport.rawSourceRetention?.retainsRawSourcesPrivately, true);
+    assert.equal(doctorReport.rawSourceRetention?.publicReportIsSafe, true);
+    assert.equal(doctorReport.shardState?.acceptedShardCount, 0);
+    assert.equal(doctorReport.shardState?.missingShardCount, 20);
+    assert.equal(doctorReport.currentCanary?.queryCount, 30);
+    assert.equal(doctorReport.currentCanary?.scoreDelta, -42.0333);
+    assert.equal(doctorReport.goalAudit?.goalComplete, false);
+    assert.equal(doctorReport.goalAudit?.mayCallUpdateGoalComplete, false);
+    assert.ok(doctorReport.gates?.some((item) => item.id === "raw-source-retention" && item.status === "pass"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "full-shard-results" && item.status === "blocked"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "owner-and-real-canary" && item.status === "blocked"));
+    assert.ok(doctorReport.blockers?.includes("shard-results-missing"));
+    assert.ok(doctorReport.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
+    assert.ok(doctorReport.blockers?.includes("human-public-launch-approval"));
+    assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("query-expanded-full-hybrid-rerank"));
+    assert.equal(doctorReport.nextRunPlan?.rawSourcesStayOutsideRepo, true);
+  }
+  assert.match(fullMemorySotaDoctorMarkdownFresh, /Full Memory SOTA Doctor/);
+  assert.match(fullMemorySotaDoctorMarkdownFresh, /BM25|bm25/i);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
     const keyFile = join(tempRoot, "voyage.keys");

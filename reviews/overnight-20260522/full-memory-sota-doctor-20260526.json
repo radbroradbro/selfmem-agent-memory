@@ -1,0 +1,501 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "full-memory-sota-doctor",
+  "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
+  "generatedAt": "2026-05-26T02:01:04.572Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "benchmarkContract": {
+    "bm25IsLexicalFloorOnly": true,
+    "retrievalProxyOnlyIsNotEnough": true,
+    "componentBenchmarksAreModelSelectionOnly": true,
+    "fullMemoryAnswerQualityRequired": true,
+    "sameDataExternalTargetRequired": true,
+    "sameAnswerAndJudgeModelRequired": true,
+    "reviewerApprovalRequired": true,
+    "uiDocsOwnerAndRealCanaryStillRequired": true
+  },
+  "evidenceFiles": {
+    "fullTarget": {
+      "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+      "exists": true,
+      "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+      "mode": null,
+      "status": null
+    },
+    "fullMaterialize": {
+      "path": "reviews/overnight-20260522/public-longmemeval-full-materialize-run.json",
+      "exists": true,
+      "hash": "sha256:bee741fc5806754c3d9d214d5b9372ac27f991beb1965623ce0344eb1df8e459",
+      "mode": "public-benchmark-materialize-run",
+      "status": null
+    },
+    "shardPlan": {
+      "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
+      "exists": true,
+      "hash": "sha256:1ce635250aaebbd9f025cfdd94e34e12f727b44dec0905cbf201b1a536760407",
+      "mode": "public-benchmark-answer-quality-shard-plan",
+      "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
+    },
+    "shardWorkorder": {
+      "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
+      "exists": true,
+      "hash": "sha256:eccbb928e4c75f21878e6fd0738dc4a5a778c3192a2b794510329aeeb0811cba",
+      "mode": "public-benchmark-answer-quality-shard-workorder",
+      "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
+    },
+    "shardIntake": {
+      "path": "reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json",
+      "exists": true,
+      "hash": "sha256:1efbec33d50c2c2d79f75e212425bbb86c68daceea11d51233c9631cace91e6f",
+      "mode": "public-benchmark-answer-quality-shard-intake",
+      "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
+    },
+    "sotaLadder": {
+      "path": "reviews/overnight-20260522/sota-ladder-full-target-report-20260525.json",
+      "exists": true,
+      "hash": "sha256:4985db3ea68f0090caa562523398bf8aa7c264c698308de89ac2c9e69acc7e54",
+      "mode": "public-benchmark-sota-ladder",
+      "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE"
+    },
+    "sotaOperatorPacket": {
+      "path": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
+      "exists": true,
+      "hash": "sha256:a3bead4da428fe55bdec5afa9e0077e14b466339fbeae81895a03b9c30790be6",
+      "mode": "public-benchmark-sota-operator-packet",
+      "status": "BLOCKED_SOTA_OPERATOR_INPUTS"
+    },
+    "endToEndGate": {
+      "path": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
+      "exists": true,
+      "hash": "sha256:9ef60bf2fe99bdf0825a5f9f3acd97e4dad10468d394d02c8e2df020d1e320af",
+      "mode": "end-to-end-memory-score-gate",
+      "status": "BLOCKED_END_TO_END_MEMORY_SCORE"
+    },
+    "combinedCanary": {
+      "path": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
+      "exists": true,
+      "hash": "sha256:066d808e6d8216e829f677c61456642c0862e0de3aeee65d734704eeb0ca43d6",
+      "mode": "public-benchmark-answer-quality",
+      "status": null
+    },
+    "liveLocalCanary": {
+      "path": "reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json",
+      "exists": true,
+      "hash": "sha256:023efc5150655fce79e997428fa79cef202aed9516d4f8cfd336eb63d6e0f472",
+      "mode": "public-benchmark-answer-quality",
+      "status": null
+    },
+    "liveProviderCanary": {
+      "path": "reviews/overnight-20260522/end-to-end-memory-score-live-provider-20260525.json",
+      "exists": true,
+      "hash": "sha256:182681f12644f886d37e8edfa6a020bf902abefa88677d74c221a74e5f9413dc",
+      "mode": "public-benchmark-answer-quality",
+      "status": null
+    },
+    "voyageRateLimit": {
+      "path": "reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json",
+      "exists": true,
+      "hash": "sha256:ed9e1b8892b6f760d406dca9d9fd8e8d53f7283b412b154d1802a18577f75a0f",
+      "mode": "provider-benchmark-blocker",
+      "status": "BLOCKED_VOYAGE_RATE_LIMIT"
+    },
+    "reviewerIntake": {
+      "path": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
+      "exists": true,
+      "hash": "sha256:5989ff8ff447d258735cfa88c2d5984578242514a2b1b18728ed72972a52295d",
+      "mode": "memory-score-reviewer-approval-intake",
+      "status": "BLOCKED_MEMORY_SCORE_REVIEWERS"
+    },
+    "uiEvidence": {
+      "path": "reviews/overnight-20260522/ui-evidence/brain-ui-current-head-live-evidence.json",
+      "exists": true,
+      "hash": "sha256:daf2160ee6af812ef2569036b4a5d26c8e0ce0e9c611e009a0276300845c4283",
+      "mode": "current-head-live-browser",
+      "status": null
+    },
+    "releaseNotes": {
+      "path": "reviews/overnight-20260522/pr-body-update-draft.md",
+      "exists": true,
+      "hash": "sha256:0941b3dee923eae9d7323311065fd32ce51bcfececd7dea5e811ec24d9fd808d",
+      "mode": null,
+      "status": null
+    },
+    "benchmarkDocs": {
+      "path": "docs/BENCHMARK_SUMMARY.md",
+      "exists": true,
+      "hash": "sha256:6f91e741c9607e599a5e6f48fcb809629547f510d234984e2bedb36c655456c9",
+      "mode": null,
+      "status": null
+    },
+    "targetDocs": {
+      "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
+      "exists": true,
+      "hash": "sha256:d7bf0b678b40eceeab8f5e5fd7cb75ea4829201ec2b31e8333614bba2e31e6ad",
+      "mode": null,
+      "status": null
+    },
+    "releaseHandoff": {
+      "path": "docs/RELEASE_HANDOFF.md",
+      "exists": true,
+      "hash": "sha256:0f84ef18b964bdba95b2cca72e69ca264b644e339177f61a6b281230f6496ec5",
+      "mode": null,
+      "status": null
+    }
+  },
+  "goalAudit": {
+    "mode": "goal-completion-audit",
+    "goalComplete": false,
+    "mayCallUpdateGoalComplete": false,
+    "counts": {
+      "total": 39,
+      "proven": 36,
+      "blocked": 1,
+      "incomplete": 2
+    },
+    "openRequirements": [
+      {
+        "id": "human-public-launch-approval",
+        "status": "blocked",
+        "requirement": "Human approval is required before merge, visibility change, or public live update"
+      },
+      {
+        "id": "full-memory-sota-benchmark-gate",
+        "status": "incomplete",
+        "requirement": "Full same-data memory benchmark/SOTA gate remains incomplete until end-to-end answer quality, live query expansion, local reranker, provider challengers, reviewers, UI, docs, and owner approval all pass"
+      },
+      {
+        "id": "real-container-production-rollout",
+        "status": "incomplete",
+        "requirement": "One-agent real runtime rollout remains a canary step, not a completed production rollout"
+      }
+    ]
+  },
+  "fullTarget": {
+    "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "fixtureOnly": false,
+    "claimTier": "run-only",
+    "benchmarkFamily": "longmemeval",
+    "split": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "answerModel": "gpt-4o",
+    "judgeModel": "gpt-4o",
+    "queryCount": 500,
+    "haystackSessionCount": 19195,
+    "expectedReferenceCount": 1896
+  },
+  "rawSourceRetention": {
+    "retainsRawSourcesPrivately": true,
+    "publicReportIsSafe": true,
+    "privateOutputDirectoryLabel": "operator-private-output-dir",
+    "directoryInsideRepository": false,
+    "requiredRoles": [
+      "queryset",
+      "memories",
+      "answer-labels",
+      "raw-dataset",
+      "selected-raw-rows",
+      "source-manifest"
+    ],
+    "missingRoles": [],
+    "roles": [
+      {
+        "role": "queryset",
+        "name": "longmemeval-queryset.private.json",
+        "hash": "sha256:9cd221a53f8692f2035a87fc6d5f46495505c5c2571679fdfbdb2fe3f751d89b",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "memories",
+        "name": "longmemeval-memories.private.jsonl",
+        "hash": "sha256:a4ee0d963c5bafa42a3a6da81568f90a84c80d6cd60a9f8eb055b870f014ef0a",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "answer-labels",
+        "name": "longmemeval-answer-labels.private.json",
+        "hash": "sha256:302bf9ce65a7471a56fe65529177c9b4d82576096a67e2e345280fa3418c8402",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "raw-dataset",
+        "name": "longmemeval-raw-dataset.private.json",
+        "hash": "sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "selected-raw-rows",
+        "name": "longmemeval-selected-raw-rows.private.json",
+        "hash": "sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb",
+        "rawTextPrivate": true
+      },
+      {
+        "role": "source-manifest",
+        "name": "longmemeval-source-manifest.private.json",
+        "hash": "sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe",
+        "rawTextPrivate": false
+      },
+      {
+        "role": "readme",
+        "name": "README.private.txt",
+        "hash": "sha256:6e64245a856e59013ea576f493657b52f43cdc0a6b477d810993da70f25d6255",
+        "rawTextPrivate": false
+      }
+    ],
+    "rawDatasetItemCount": 500,
+    "selectedRawRowsCount": 500,
+    "rawDatasetHash": "sha256:5d926efba3ef31632a7867dcd4c1ff9f24b5cd9aeccaecf14b4821da07e2d79a",
+    "selectedRawRowsHash": "sha256:88e90c6866901d0cdca617eba083544de8338040c131c2e2eacef60bcf4f86eb",
+    "sourceManifestHash": "sha256:3f827f2d756f8ca93c0bcddce5937f421ad4d5b7f141154cca8beae03679cbbe",
+    "uiMayUseCompressedDefaultButAuditRetainsRawSource": true
+  },
+  "shardState": {
+    "planStatus": "READY_FULL_ANSWER_QUALITY_SHARD_RUN",
+    "workorderStatus": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS",
+    "intakeStatus": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS",
+    "queryCount": 500,
+    "shardSize": 25,
+    "shardCount": 20,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-nvidia-nemotron-1b",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "acceptedShardCount": 0,
+    "missingShardCount": 20,
+    "rejectedShardCount": 0,
+    "duplicateShardCount": 0,
+    "completeCoverage": false,
+    "readyForShardCombine": false,
+    "blockers": [
+      "answer-quality-shard-runs-pending",
+      "shard-results-missing",
+      "answer-quality-shards-missing",
+      "full-shard-coverage-incomplete"
+    ]
+  },
+  "currentCanary": {
+    "resultPath": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
+    "gatePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
+    "queryCount": 30,
+    "winner": {
+      "strategy": "cloud-nvidia-nemotron-1b",
+      "answerQuality": 43.1667,
+      "judgeCorrectRate": 0.4333,
+      "answerLatencyP50Ms": 9031
+    },
+    "answerModel": "qwen36-a3b-main-q8kv-8192",
+    "judgeModel": "qwen36-a3b-main-q8kv-8192",
+    "targetAnswerModel": "gpt-4o",
+    "targetJudgeModel": "gpt-4o",
+    "score": 43.1667,
+    "primaryReportedTarget": {
+      "id": "supermemory-production-research-gemini-3-pro",
+      "benchmark": "LongMemEval-S",
+      "benchmarkFamily": "longmemeval",
+      "score": 85.2,
+      "scoreUnit": "percent",
+      "judgeModel": "gemini-3-pro",
+      "answerModel": null,
+      "answerModelReported": false,
+      "source": "https://supermemory.ai/research/",
+      "caveat": "Highest source-locked production/research target in this artifact. RecallWeave must meet or beat it under matching benchmark semantics before SOTA wording."
+    },
+    "scoreDelta": -42.0333,
+    "countsAsEndToEndMemoryBenchmark": false,
+    "countsAsFullMemorySotaEvidence": false,
+    "fullSotaBlockers": [
+      "reported-target-judge-model-does-not-match-result",
+      "missing-full-or-officially-comparable-memory-benchmark-run",
+      "best-end-to-end-score-below-primary-reported-memory-target"
+    ],
+    "gateBlockers": [
+      "answer-model-does-not-match-target",
+      "judge-model-does-not-match-target",
+      "missing-voyage-provider-arm",
+      "memory-score-reviewer-approval-report-not-ready",
+      "missing-two-independent-reviewer-approvals"
+    ],
+    "reviewerApprovalCount": 0,
+    "voyageStatus": "BLOCKED_VOYAGE_RATE_LIMIT",
+    "voyageHttpStatus": 429
+  },
+  "reviewerState": {
+    "path": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
+    "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
+    "ready": false,
+    "reviewerApprovalCount": 0,
+    "independentReviewerCount": 0,
+    "countsAsFullMemorySotaReview": false,
+    "blockers": [
+      "two-independent-reviewer-approvals-missing"
+    ],
+    "acceptableRoutes": [
+      "Gemini",
+      "Claude",
+      "NVIDIA/DeepSeek-style external critic",
+      "Codex reviewer not involved in implementation"
+    ]
+  },
+  "docState": {
+    "docsCurrentForBlockedState": true,
+    "readyAfterBenchmarkResult": false,
+    "blockers": [
+      "docs-release-notes-and-ui-evidence-must-refresh-after-full-result"
+    ],
+    "uiEvidencePath": "reviews/overnight-20260522/ui-evidence/brain-ui-current-head-live-evidence.json",
+    "uiFixtureOnly": true,
+    "uiPrivateLeakCount": 0
+  },
+  "gates": [
+    {
+      "id": "source-locked-full-target",
+      "status": "pass",
+      "blockers": []
+    },
+    {
+      "id": "raw-source-retention",
+      "status": "pass",
+      "blockers": []
+    },
+    {
+      "id": "bm25-is-control-only",
+      "status": "pass",
+      "blockers": []
+    },
+    {
+      "id": "full-shard-results",
+      "status": "blocked",
+      "blockers": [
+        "answer-quality-shard-runs-pending",
+        "shard-results-missing",
+        "answer-quality-shards-missing",
+        "full-shard-coverage-incomplete"
+      ]
+    },
+    {
+      "id": "same-data-provider-arms",
+      "status": "blocked",
+      "blockers": [
+        "missing-voyage-answer-quality-same-data-result"
+      ]
+    },
+    {
+      "id": "full-score-result-gate",
+      "status": "blocked",
+      "blockers": [
+        "reported-target-judge-model-does-not-match-result",
+        "missing-full-or-officially-comparable-memory-benchmark-run",
+        "best-end-to-end-score-below-primary-reported-memory-target"
+      ]
+    },
+    {
+      "id": "reported-target-beaten",
+      "status": "blocked",
+      "blockers": [
+        "best-end-to-end-score-below-reported-supermemory-target"
+      ]
+    },
+    {
+      "id": "independent-reviewers",
+      "status": "blocked",
+      "blockers": [
+        "two-independent-reviewer-approvals-missing"
+      ]
+    },
+    {
+      "id": "ui-docs-release-refresh",
+      "status": "blocked",
+      "blockers": [
+        "docs-release-notes-and-ui-evidence-must-refresh-after-full-result"
+      ]
+    },
+    {
+      "id": "owner-and-real-canary",
+      "status": "blocked",
+      "blockers": [
+        "human-public-launch-approval",
+        "full-memory-sota-benchmark-gate",
+        "real-container-production-rollout"
+      ]
+    }
+  ],
+  "blockers": [
+    "answer-quality-shard-runs-pending",
+    "shard-results-missing",
+    "answer-quality-shards-missing",
+    "full-shard-coverage-incomplete",
+    "missing-voyage-answer-quality-same-data-result",
+    "reported-target-judge-model-does-not-match-result",
+    "missing-full-or-officially-comparable-memory-benchmark-run",
+    "best-end-to-end-score-below-primary-reported-memory-target",
+    "best-end-to-end-score-below-reported-supermemory-target",
+    "two-independent-reviewer-approvals-missing",
+    "docs-release-notes-and-ui-evidence-must-refresh-after-full-result",
+    "human-public-launch-approval",
+    "full-memory-sota-benchmark-gate",
+    "real-container-production-rollout",
+    "all-current-result-files-keep-public-claims-disabled",
+    "missing-two-independent-memory-score-reviewer-approvals",
+    "end-to-end-gate:answer-model-does-not-match-target",
+    "end-to-end-gate:judge-model-does-not-match-target",
+    "end-to-end-gate:missing-voyage-provider-arm",
+    "end-to-end-gate:memory-score-reviewer-approval-report-not-ready",
+    "end-to-end-gate:missing-two-independent-reviewer-approvals",
+    "memory-score-reviewers:two-independent-reviewer-approvals-missing",
+    "voyage-provider-rate-limited"
+  ],
+  "nextRunPlan": {
+    "primaryStage": "full-longmemeval-answer-quality-shards",
+    "privateOutputRequired": true,
+    "rawSourcesStayOutsideRepo": true,
+    "queryCount": 500,
+    "shardCount": 20,
+    "shardSize": 25,
+    "strategySet": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-nvidia-nemotron-1b",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "commandSource": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
+    "commandCount": 21,
+    "firstCommands": [
+      "export RECALLWEAVE_SOTA_OUTPUT_DIR=\"<private-output-dir-outside-repo>\"",
+      "export RECALLWEAVE_MEMORYBENCH_BASE_URL=\"<openai-compatible-answer-and-judge-url>\"",
+      "export RECALLWEAVE_MEMORYBENCH_API_KEY=\"<env-only-if-cloud-endpoint>\"",
+      "export RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=\"gpt-4o\"",
+      "export RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=\"gpt-4o\"",
+      "export VOYAGE_API_KEYS_FILE=\"<private-file-outside-repo-when-voyage-arm-runs>\""
+    ],
+    "requiredAfterShardRuns": [
+      "benchmark:answer-quality:shard-workorder",
+      "benchmark:answer-quality:shard-intake --require-ready",
+      "benchmark:answer-quality:combine -- --combine-mode shards",
+      "benchmark:memory-score:reviewer-intake -- --strict-target",
+      "benchmark:memory-score:result-gate -- --require-ready",
+      "benchmark:sota-ladder",
+      "UI evidence, docs, release notes, owner approval, and real canary refresh"
+    ]
+  }
+}

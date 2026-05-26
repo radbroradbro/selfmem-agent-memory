@@ -185,6 +185,11 @@ materialization report covers 500 public rows, 19,195 haystack sessions, and
 text outside the repository. This is a ready target, not a completed score:
 the SOTA ladder still stays blocked until the 500-query answer-quality result,
 same-data provider/local arms, reviewer intake, and release gates pass.
+Use `benchmark:sota-doctor` for the one-page state check before and after full
+shard runs. It reports the full target, raw-source retention, BM25-as-control
+contract, shard coverage, current canary score, reported-target delta, reviewer
+state, UI/docs state, and remaining launch blockers without provider calls or
+raw benchmark text.
 The answer-quality runner now supports full-target scoring in deterministic
 query shards via `--query-offset` and `--max-queries`; the shard combiner must
 merge only complete, non-overlapping coverage with the same target, query set,
