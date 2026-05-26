@@ -28,7 +28,11 @@ const retrievalStrategies = [
   "sparse-dense-temporal",
   "sparse-dense-graph-temporal",
   "full-hybrid-rerank",
+  "metadata-aware-full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
+  "wiki-title-amplified-hybrid",
+  "wiki-subtopic-amplified-hybrid",
+  "wiki-summary-session-hybrid",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
   "cloud-voyage4-voyage-lite-rerank",
@@ -451,6 +455,9 @@ function defaultStrategies(value) {
       "sparse-dense-graph-temporal",
       "full-hybrid-rerank",
       "query-expanded-full-hybrid-rerank",
+      "wiki-title-amplified-hybrid",
+      "wiki-subtopic-amplified-hybrid",
+      "wiki-summary-session-hybrid",
     ].join(",");
   }
   return "jaccard,bm25-lite,hybrid-v1";
@@ -505,7 +512,11 @@ function isHybridFamilyStrategy(strategy) {
     "sparse-dense-temporal",
     "sparse-dense-graph-temporal",
     "full-hybrid-rerank",
+    "metadata-aware-full-hybrid-rerank",
     "query-expanded-full-hybrid-rerank",
+    "wiki-title-amplified-hybrid",
+    "wiki-subtopic-amplified-hybrid",
+    "wiki-summary-session-hybrid",
   ].includes(strategy);
 }
 

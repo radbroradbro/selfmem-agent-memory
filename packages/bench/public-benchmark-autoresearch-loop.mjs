@@ -23,6 +23,9 @@ const defaultAutoresearchStrategies = [
   "sparse-dense-graph-temporal",
   "full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
+  "wiki-title-amplified-hybrid",
+  "wiki-subtopic-amplified-hybrid",
+  "wiki-summary-session-hybrid",
 ].join(",");
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_STRATEGIES ?? defaultAutoresearchStrategies);
 const budgets = splitList(args.contextTokenBudgets ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_BUDGETS ?? "800,1200,1600,2400").map((value) =>
@@ -44,6 +47,9 @@ const retrievalStrategies = [
   "full-hybrid-rerank",
   "metadata-aware-full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
+  "wiki-title-amplified-hybrid",
+  "wiki-subtopic-amplified-hybrid",
+  "wiki-summary-session-hybrid",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
   "cloud-voyage4-voyage-lite-rerank",
@@ -265,6 +271,9 @@ function isHybridFamilyStrategy(strategy) {
     "full-hybrid-rerank",
     "metadata-aware-full-hybrid-rerank",
     "query-expanded-full-hybrid-rerank",
+    "wiki-title-amplified-hybrid",
+    "wiki-subtopic-amplified-hybrid",
+    "wiki-summary-session-hybrid",
   ].includes(strategy);
 }
 

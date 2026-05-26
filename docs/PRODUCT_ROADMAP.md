@@ -125,13 +125,23 @@ Current benchmark direction:
   documented memory benchmark.
 - Record the reported leader target, source URL, checked date, metric name,
   judge, answer model, token budget, and caveats.
-- Run RecallWeave on a small canary slice first.
-- Use autoresearch to change one methodology element at a time until the canary
-  trend beats the reported target.
-- Expand only after the small slice is privacy-clean and reviewer-approved.
+- Run RecallWeave on a small canary slice first as a smoke gate, then run full
+  local/offline benchmark sets when the method is stable.
+- Use autoresearch to change one methodology element at a time. Compare BM25 or
+  grep-like wiki retrieval against hybrid methods before promoting vectors.
+- Include title amplification, subtopic amplification, and summary-to-session
+  hybrid arms. The target pattern is condensed wiki pages first, then
+  vectorized full-session chunks only when extra context is needed.
+- Expand public claims only after the same-data slice is privacy-clean,
+  reviewer-approved, and not limited by avoidable harness or UI design flaws.
 
 The allowed claim after a narrow win is "canary trending toward a win." A broad
 SOTA claim needs full comparable benchmark evidence.
+
+For the local Apple lane, M-series unified memory is a real constraint. A result
+should be called model-limited only after the harness, retrieval method, and
+review UI are clean enough that the remaining blocker is model size, context,
+or local runtime capacity.
 
 ## Lifecycle Policy Controls
 

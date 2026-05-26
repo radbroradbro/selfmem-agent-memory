@@ -139,6 +139,7 @@ const requiredFiles = [
   "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
   "packages/bench/full-shard-control-export-probe.mjs",
+  "packages/bench/codex-lifecycle-audit.mjs",
   "packages/bench/local-embedding-runtime-doctor.mjs",
   "packages/bench/local-embedding-durability-smoke.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
@@ -282,6 +283,12 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-autoresearch-loop-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-autoresearch-loop-review.md`,
+  `${reviewDir}/codex-lifecycle-audit-20260526.json`,
+  `${reviewDir}/codex-lifecycle-audit-20260526.md`,
+  `${reviewDir}/public-longmemeval-wiki-amplification-fixture-20260526.json`,
+  `${reviewDir}/public-longmemeval-wiki-amplification-fixture-20260526.md`,
+  `${reviewDir}/brain-ui-sanity-20260526.png`,
+  `${reviewDir}/brain-ui-mobile-overflow-evidence-20260526.md`,
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
@@ -555,6 +562,8 @@ const requiredScripts = [
   "compaction:local-audit:built",
   "compaction:batch-audit",
   "compaction:batch-audit:built",
+  "codex:lifecycle:audit",
+  "codex:lifecycle:audit:local",
   "wiki:smoke",
   "wiki:smoke:built",
   "wiki:sync:smoke",
@@ -605,6 +614,8 @@ const requiredScripts = [
   "benchmark:public-target:author",
   "benchmark:public-materialize",
   "benchmark:public-strategy",
+  "benchmark:public-wiki-amplification",
+  "benchmark:public-wiki-amplification:live",
   "benchmark:public-provider:preflight",
   "benchmark:public-provider:packet",
   "benchmark:public-provider",
@@ -615,6 +626,7 @@ const requiredScripts = [
   "benchmark:answer-quality:combine",
   "benchmark:answer-quality:shard-plan",
   "benchmark:answer-quality:local-shard-plan",
+  "benchmark:answer-quality:local-wiki-shard-plan",
   "benchmark:answer-quality:shard-workorder",
   "benchmark:answer-quality:local-shard-workorder",
   "benchmark:answer-quality:local-shard-resume-packet",
@@ -763,6 +775,145 @@ check("query expansion response parser accepts local model rewrites", () => {
   assert.equal(report.acceptsJsonArrayPerLine, true);
   assert.equal(report.acceptsPlainLines, true);
   assert.ok(report.cases >= 5);
+});
+
+check("fresh Codex lifecycle audit fixture passes", () => {
+  const checked = JSON.parse(readFileSync(join(root, reviewDir, "codex-lifecycle-audit-20260526.json"), "utf8"));
+  const markdown = readFileSync(join(root, reviewDir, "codex-lifecycle-audit-20260526.md"), "utf8");
+  const fresh = JSON.parse(run("node", ["packages/bench/codex-lifecycle-audit.mjs", "--fixture", "--strict"]).stdout);
+
+  for (const report of [checked, fresh]) {
+    assert.equal(report.ok, true);
+    assert.equal(report.status, "READY_CODEX_PROMPT_STOP_LIFECYCLE_AUDIT");
+    assert.equal(report.promptStopReady, true);
+    assert.equal(report.fixtureOnly, true);
+    assert.equal(report.hooks?.userPromptSubmitRecallHook, true);
+    assert.equal(report.hooks?.stopFlushHook, true);
+    assert.equal(report.lcm?.codexPreCompactHookObserved, false);
+    assert.equal(report.lcm?.codexPreCompactStatus, "NOT_EXPOSED_BY_CURRENT_CODEX_HOOKS");
+    assert.equal(report.lcm?.stopFlushPreservesRedactedSessionCopy, true);
+    assert.equal(report.lcm?.defaultRecallUsesDistilledMemory, true);
+    assert.equal(report.lcm?.rawSessionAuditLocalOnly, true);
+    assert.equal(report.lcm?.deepseekFlashCompressionArm?.provider, "deepseek");
+    assert.equal(report.lcm?.deepseekFlashCompressionArm?.model, "deepseek-v4-flash");
+    assert.equal(report.lcm?.deepseekFlashCompressionArm?.defaultEnabled, false);
+    assert.equal(report.lcm?.deepseekFlashCompressionArm?.countsAsBenchmarkEvidence, false);
+    assert.equal(report.modifiesBenchmarkRetrieval, false);
+    assert.equal(report.modifiesBenchmarkScoring, false);
+    assert.equal(report.countsAsBenchmarkEvidence, false);
+    assert.equal(report.publicBenchmarkClaimsAllowed, false);
+    assert.equal(report.bridge?.hostedWriteBackDisabled, true);
+    assert.equal(report.privacy?.privateLeakCount, 0);
+    assert.deepEqual(report.blockers, []);
+  }
+
+  assert.match(markdown, /DeepSeek v4 flash/i);
+  assert.match(markdown, /optional-offline-distillation-arm-after-redaction/i);
+  assert.match(markdown, /Modifies benchmark retrieval: false/i);
+  assert.match(markdown, /Counts as benchmark evidence: false/i);
+  assert.match(markdown, /Blockers\s*\n- none/i);
+});
+
+check("fresh wiki amplification fixture keeps BM25 control honest", () => {
+  const expectedStrategies = [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "wiki-title-amplified-hybrid",
+    "wiki-subtopic-amplified-hybrid",
+    "wiki-summary-session-hybrid",
+  ];
+  const args = [
+    "packages/bench/public-benchmark-strategy-compare.mjs",
+    "--fixture",
+    "--gate",
+    "hybrid",
+    "--strategies",
+    expectedStrategies.join(","),
+  ];
+  const checked = JSON.parse(
+    readFileSync(join(root, reviewDir, "public-longmemeval-wiki-amplification-fixture-20260526.json"), "utf8"),
+  );
+  const markdown = readFileSync(join(root, reviewDir, "public-longmemeval-wiki-amplification-fixture-20260526.md"), "utf8");
+  const fresh = JSON.parse(run("node", args).stdout);
+
+  for (const report of [checked, fresh]) {
+    assert.equal(report.ok, true);
+    assert.equal(report.fixtureOnly, true);
+    assert.equal(report.gate, "hybrid");
+    assert.equal(report.retrievalProxyOnly, true);
+    assert.equal(report.memoryBenchAnswerQuality, false);
+    assert.equal(report.publicBenchmarkClaimsAllowed, false);
+    assert.equal(report.input?.queryCount, 3);
+    assert.equal(report.input?.haystackSessionCount, 6);
+    assert.equal(report.control?.strategy, "bm25-lite");
+    assert.equal(report.promotion?.kind, "hybrid");
+    assert.equal(report.comparisonContract?.sameDataControlsRequired, true);
+    assert.equal(report.comparisonContract?.bm25ControlPresent, true);
+    assert.equal(report.safety?.publicSafe, true);
+    assert.equal(report.safety?.metricsOnly, true);
+    for (const strategy of expectedStrategies) {
+      assert.ok(report.strategies?.some((item) => item.strategy === strategy), `missing strategy ${strategy}`);
+    }
+    for (const strategy of report.strategies ?? []) {
+      assert.equal(strategy.privacyLeakCount, 0, `${strategy.strategy} leaked private text`);
+      assert.equal(strategy.redactionFailureCount, 0, `${strategy.strategy} had redaction failures`);
+    }
+  }
+
+  assert.match(markdown, /wiki-title-amplified-hybrid/);
+  assert.match(markdown, /wiki-subtopic-amplified-hybrid/);
+  assert.match(markdown, /wiki-summary-session-hybrid/);
+  assert.match(markdown, /Retrieval proxy only: true/i);
+  assert.match(markdown, /Public benchmark claims allowed: false/i);
+});
+
+check("fresh local wiki shard plan is ready without SOTA overclaim", () => {
+  const strategies = [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "wiki-title-amplified-hybrid",
+    "wiki-subtopic-amplified-hybrid",
+    "wiki-summary-session-hybrid",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank",
+  ];
+  const report = JSON.parse(
+    run("node", [
+      "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+      "--claim-scope",
+      "local-full",
+      "--require-ready",
+      "--strategies",
+      strategies.join(","),
+    ]).stdout,
+  );
+  assert.equal(report.ok, true);
+  assert.equal(report.status, "READY_FULL_ANSWER_QUALITY_SHARD_RUN");
+  assert.equal(report.claimScope, "local-full");
+  assert.equal(report.readyForAnswerQualityShardRun, true);
+  assert.equal(report.countsAsFullMemorySotaEvidence, false);
+  assert.equal(report.publicBenchmarkClaimsAllowed, false);
+  assert.equal(report.callsProviderApis, false);
+  assert.equal(report.sendsBenchmarkTextToProvider, false);
+  assert.equal(report.strategyCoverage?.hasBm25Lite, true);
+  assert.equal(report.strategyCoverage?.hasFullHybridRerank, true);
+  assert.equal(report.strategyCoverage?.hasQueryExpansion, true);
+  assert.equal(report.strategyCoverage?.hasWikiAmplification, true);
+  assert.equal(report.strategyCoverage?.hasLocalApple, true);
+  assert.equal(report.strategyCoverage?.hasLocalRerank, true);
+  assert.equal(report.strategyCoverage?.hasVoyageProvider, false);
+  assert.equal(report.strategyCoverage?.hasNvidiaOrGeminiProvider, false);
+  assert.equal(report.runPlan?.queryCount, 500);
+  assert.equal(report.runPlan?.shardSize, 25);
+  assert.equal(report.runPlan?.shardCount, 20);
+  assert.deepEqual(report.runPlan?.strategies, strategies);
+  const localLane = report.executionLanes?.find((lane) => lane.id === "local-full-accepted-shards");
+  assert.equal(localLane?.coverageReady, true);
+  assert.equal(localLane?.acceptedByFullShardIntake, true);
+  assert.equal(localLane?.canReachFullSotaGateAfterShardIntake, false);
+  assert.match(localLane?.shardIntakeCompatibility ?? "", /local full benchmark plan only/i);
+  assert.deepEqual(report.blockers, []);
 });
 
 check("dom evidence is sane", () => {
@@ -1248,6 +1399,7 @@ check("release state is conservative", () => {
     "brain-ui-prompt-context-preview",
     "brain-ui-release-readiness-console",
     "brain-ui-current-head-live-browser",
+    "brain-ui-mobile-overflow-fix",
     "model-autoresearch-matrix",
     "session-compaction-benchmark",
     "session-compaction-local-audit",
@@ -1302,12 +1454,15 @@ check("release state is conservative", () => {
     "public-longmemeval-recallweave-run-result",
     "public-longmemeval-strategy-compare",
     "public-longmemeval-hybrid-gate",
+    "public-longmemeval-wiki-amplification-fixture",
     "public-longmemeval-provider-gate",
     "public-longmemeval-provider-live-preflight",
     "public-longmemeval-expanded-hybrid-gate",
     "public-longmemeval-expanded-provider-live-preflight",
     "public-longmemeval-expanded-autoresearch-loop",
     "public-longmemeval-autoresearch-loop",
+    "codex-lifecycle-audit",
+    "local-full-wiki-shard-plan",
   ]) {
     assert.ok(releaseState.provenPreviewSurfaces?.includes(surface), `missing release surface ${surface}`);
   }
@@ -2258,12 +2413,29 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(hybridFixture.rawQuestionsIncluded, false);
   assert.equal(hybridFixture.rawAnswersIncluded, false);
   assert.equal(hybridFixture.rawMemoryIncluded, false);
-  assert.equal(hybridFixture.strategies?.length, 7);
+  assert.ok((hybridFixture.strategies?.length ?? 0) >= 10);
+  for (const strategy of [
+    "bm25-lite",
+    "dense-proxy",
+    "sparse-dense-rrf",
+    "sparse-dense-temporal",
+    "sparse-dense-graph-temporal",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "wiki-title-amplified-hybrid",
+    "wiki-subtopic-amplified-hybrid",
+    "wiki-summary-session-hybrid",
+  ]) {
+    assert.ok(hybridFixture.strategies?.some((item) => item.strategy === strategy), `missing hybrid fixture strategy ${strategy}`);
+  }
   assert.equal(hybridFixture.control?.strategy, "bm25-lite");
   assert.equal(hybridFixture.comparisonContract?.bm25ControlPresent, true);
   assert.equal(hybridFixture.comparisonContract?.hybridFamilyPresent, true);
-  assert.equal(hybridFixture.hybridPromotion?.promoteHybrid, false);
+  assert.equal(hybridFixture.hybridPromotion?.kind, "hybrid");
   assert.match(hybridMarkdown, /Gate: hybrid/);
+  assert.match(hybridMarkdown, /wiki-title-amplified-hybrid/);
+  assert.match(hybridMarkdown, /wiki-subtopic-amplified-hybrid/);
+  assert.match(hybridMarkdown, /wiki-summary-session-hybrid/);
   assert.equal(providerFixture.ok, true);
   assert.equal(providerFixture.mode, "public-benchmark-provider-gate");
   assert.equal(providerFixture.gate, "provider");
@@ -9168,6 +9340,7 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "packages/brain-ui/fixtures/model-matrix.json" ||
     file === "packages/brain-ui/interaction-smoke.mjs" ||
     file === "packages/brain-ui/smoke.mjs" ||
+    file === "packages/brain-ui/src/styles.css" ||
     file.startsWith("packages/bench/") ||
     file.startsWith("tests/bench/") ||
     file === "plugins/selfmem-fallback/scripts/selfmem_update.py"

@@ -40,6 +40,9 @@ const retrievalStrategies = [
   "full-hybrid-rerank",
   "metadata-aware-full-hybrid-rerank",
   "query-expanded-full-hybrid-rerank",
+  "wiki-title-amplified-hybrid",
+  "wiki-subtopic-amplified-hybrid",
+  "wiki-summary-session-hybrid",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
   "cloud-voyage4-voyage-lite-rerank",
@@ -254,6 +257,7 @@ function loadMemories(inputPath, options) {
       if (options.features.topicTermSet) candidate.topicTermSet = topicTerms(`${redacted.text} ${metadata.kind ?? ""} ${metadata.questionType ?? ""}`);
       if (options.features.roleCoverage) candidate.roleCoverage = roleCoverageScore(redacted.text);
       if (options.features.dateMs) candidate.dateMs = extractDateMs(item, redacted.text);
+      if (options.features.wikiSignals) attachWikiSignals(candidate, metadata);
       candidates.push(candidate);
     } catch {
       skippedInvalid += 1;
@@ -281,12 +285,26 @@ function memoryFeatureProfile(strategy) {
     topicTermSet: false,
     roleCoverage: false,
     dateMs: false,
+    wikiSignals: false,
   };
   if (strategy === "jaccard" || strategy === "bm25-lite") return base;
   if (strategy === "hybrid-v1") return { ...base, bigramSet: true };
   if (strategy === "dense-proxy") return { ...base, semanticVector: true };
   if (strategy === "sparse-dense-rrf") return { ...base, semanticVector: true };
   if (strategy === "sparse-dense-temporal") return { ...base, semanticVector: true, metadata: true, dateMs: true };
+  if (isWikiAmplificationStrategy(strategy)) {
+    return {
+      metadata: true,
+      tokens: true,
+      tokenSet: true,
+      bigramSet: true,
+      semanticVector: true,
+      topicTermSet: true,
+      roleCoverage: true,
+      dateMs: true,
+      wikiSignals: true,
+    };
+  }
   return {
     metadata: true,
     tokens: true,
@@ -296,7 +314,12 @@ function memoryFeatureProfile(strategy) {
     topicTermSet: true,
     roleCoverage: true,
     dateMs: true,
+    wikiSignals: false,
   };
+}
+
+function isWikiAmplificationStrategy(strategy) {
+  return ["wiki-title-amplified-hybrid", "wiki-subtopic-amplified-hybrid", "wiki-summary-session-hybrid"].includes(strategy);
 }
 
 function extractMemoryText(item) {
@@ -323,6 +346,9 @@ async function rankCandidates(query, candidates, options = {}) {
   if (options.strategy === "full-hybrid-rerank") return rankFullHybridRerank(query, candidates);
   if (options.strategy === "metadata-aware-full-hybrid-rerank") return rankMetadataAwareFullHybridRerank(query, candidates);
   if (options.strategy === "query-expanded-full-hybrid-rerank") return rankQueryExpandedFullHybridRerank(query, candidates, options);
+  if (options.strategy === "wiki-title-amplified-hybrid") return rankWikiTitleAmplifiedHybrid(query, candidates);
+  if (options.strategy === "wiki-subtopic-amplified-hybrid") return rankWikiSubtopicAmplifiedHybrid(query, candidates);
+  if (options.strategy === "wiki-summary-session-hybrid") return rankWikiSummarySessionHybrid(query, candidates);
   if (options.strategy === "cloud-voyage-rerank-only") return rankCloudVoyageRerankOnly(query, candidates, options);
   if (voyageStrategyConfig(options.strategy)?.mode === "embed-rerank") return rankCloudVoyage4Voyage(query, candidates, options);
   if (geminiStrategyConfig(options.strategy)?.rerankMode === "proxy") return rankCloudGeminiEmbedRerankProxy(query, candidates, options);
@@ -441,6 +467,59 @@ async function rankQueryExpandedFullHybridRerank(query, candidates, options = {}
   const expanded = { ...query, q: expansion.expandedQuery };
   const firstStage = rankSparseDenseGraphTemporal(expanded, candidates);
   return rerankProxy(expanded, firstStage);
+}
+
+function rankWikiTitleAmplifiedHybrid(query, candidates) {
+  const firstStage = fuseRankedChannels(
+    candidates,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryTextValue(query), candidates) },
+      { name: "wiki-title", weight: 0.95, ranked: rankWikiTitleProxy(query, candidates) },
+      { name: "wiki-dense", weight: 0.7, ranked: rankWikiAmplifiedDenseProxy(query, candidates) },
+      { name: "metadata", weight: metadataWeight(query), ranked: rankMetadataAlignment(query, candidates) },
+    ],
+    { scoreScale: 10 },
+  );
+  return wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.12, subtopicWeight: 0.04 });
+}
+
+function rankWikiSubtopicAmplifiedHybrid(query, candidates) {
+  const firstStage = fuseRankedChannels(
+    candidates,
+    [
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryTextValue(query), candidates) },
+      { name: "wiki-title", weight: 0.75, ranked: rankWikiTitleProxy(query, candidates) },
+      { name: "wiki-subtopic", weight: 1, ranked: rankWikiSubtopicProxy(query, candidates) },
+      { name: "graph", weight: 0.65, ranked: rankGraphProxy(query, candidates) },
+      { name: "wiki-dense", weight: 0.55, ranked: rankWikiAmplifiedDenseProxy(query, candidates) },
+    ],
+    { scoreScale: 10 },
+  );
+  return wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.06, subtopicWeight: 0.14 });
+}
+
+function rankWikiSummarySessionHybrid(query, candidates) {
+  const summaryStage = fuseRankedChannels(
+    candidates,
+    [
+      { name: "summary-bm25", weight: 1, ranked: rankBm25Lite(queryTextValue(query), candidates) },
+      { name: "wiki-title", weight: 0.9, ranked: rankWikiTitleProxy(query, candidates) },
+      { name: "wiki-subtopic", weight: 0.72, ranked: rankWikiSubtopicProxy(query, candidates) },
+      { name: "metadata", weight: metadataWeight(query), ranked: rankMetadataAlignment(query, candidates) },
+    ],
+    { scoreScale: 10 },
+  );
+  const sessionWeight = fullSessionContextWeight(query);
+  const firstStage = fuseRankedChannels(
+    candidates,
+    [
+      { name: "condensed-summary", weight: 1.15, ranked: summaryStage },
+      { name: "related-session-vector", weight: sessionWeight, ranked: rankDenseProxy(queryTextValue(query), candidates) },
+      { name: "session-graph", weight: sessionWeight * 0.65, ranked: rankGraphProxy(query, candidates) },
+    ],
+    { scoreScale: 10 },
+  );
+  return wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.08, subtopicWeight: 0.1 });
 }
 
 async function queryExpansionText(query, options = {}) {
@@ -850,10 +929,61 @@ function metadataAwareRerankProxy(query, candidates) {
 }
 
 function rankBm25Lite(query, candidates) {
+  return rankBm25TokenView(query, candidates, (candidate) => candidate.tokens ?? tokenize(candidate.text), (candidate) => candidate.text);
+}
+
+function rankWikiTitleProxy(query, candidates) {
+  return rankBm25TokenView(
+    queryTextValue(query),
+    candidates,
+    (candidate) => candidate.wikiTitleTokens ?? tokenize(wikiTitleText(candidate)),
+    (candidate) => wikiTitleText(candidate),
+  );
+}
+
+function rankWikiSubtopicProxy(query, candidates) {
+  const queryTokens = topicTerms(`${queryTextValue(query)} ${query?.metadata?.questionType ?? ""}`);
+  return candidates
+    .map((candidate) => {
+      const subtopicTokens = candidate.wikiSubtopicTokens ?? topicTerms(wikiSubtopicText(candidate));
+      const titleTokens = new Set(candidate.wikiTitleTokens ?? tokenize(wikiTitleText(candidate)));
+      const topicOverlap = overlapRatio(queryTokens, subtopicTokens);
+      const titleOverlap = overlapRatio(queryTokens, titleTokens);
+      const graphOverlap = overlapRatio(queryTokens, candidate.topicTermSet ?? topicTerms(candidate.text));
+      return { ...candidate, score: round(topicOverlap * 0.58 + titleOverlap * 0.22 + graphOverlap * 0.16 + candidate.baseScore * 0.01) };
+    })
+    .sort(byScoreThenId);
+}
+
+function rankWikiAmplifiedDenseProxy(query, candidates) {
+  const queryVector = hashedSemanticVector(expandQuery(queryTextValue(query)));
+  return candidates
+    .map((candidate) => {
+      const vector = candidate.wikiAmplifiedVector ?? hashedSemanticVector(wikiAmplifiedText(candidate));
+      return { ...candidate, score: round(cosine(queryVector, vector) + candidate.baseScore * 0.02) };
+    })
+    .sort(byScoreThenId);
+}
+
+function wikiAwareRerankProxy(query, candidates, options = {}) {
+  const titleRank = new Map(rankWikiTitleProxy(query, candidates).map((candidate, index) => [candidate.outputId, index + 1]));
+  const subtopicRank = new Map(rankWikiSubtopicProxy(query, candidates).map((candidate, index) => [candidate.outputId, index + 1]));
+  const titleWeight = Number(options.titleWeight ?? 0.08);
+  const subtopicWeight = Number(options.subtopicWeight ?? 0.08);
+  return rerankProxy(query, candidates)
+    .map((candidate) => {
+      const titleBoost = reciprocalRankBoost(titleRank.get(candidate.outputId)) * titleWeight * 60;
+      const subtopicBoost = reciprocalRankBoost(subtopicRank.get(candidate.outputId)) * subtopicWeight * 60;
+      return { ...candidate, score: round(candidate.score + titleBoost + subtopicBoost) };
+    })
+    .sort(byScoreThenId);
+}
+
+function rankBm25TokenView(query, candidates, tokenSelector, exactTextSelector) {
   const queryTokens = tokenize(query);
   const uniqueQueryTokens = [...new Set(queryTokens)];
   const docs = candidates.map((candidate) => {
-    const tokens = candidate.tokens ?? tokenize(candidate.text);
+    const tokens = tokenSelector(candidate);
     return {
       candidate,
       tokens,
@@ -879,7 +1009,8 @@ function rankBm25Lite(query, candidates) {
         const idf = Math.log(1 + (documentCount - df + 0.5) / (df + 0.5));
         score += idf * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + b * (doc.length / averageLength))));
       }
-      const exactBoost = doc.candidate.text.toLowerCase().includes(query.toLowerCase()) ? 0.1 : 0;
+      const exactText = exactTextSelector(doc.candidate);
+      const exactBoost = exactText.toLowerCase().includes(query.toLowerCase()) ? 0.1 : 0;
       return { ...doc.candidate, score: round(score + exactBoost + doc.candidate.baseScore) };
     })
     .sort((left, right) => right.score - left.score || left.outputId.localeCompare(right.outputId));
@@ -2325,6 +2456,71 @@ function topicTerms(text) {
   return new Set(tokenize(text).filter((token) => token.length > 2 && !stop.has(token)));
 }
 
+function attachWikiSignals(candidate, metadata) {
+  const titleText = wikiTitleText(candidate, metadata);
+  const subtopicText = wikiSubtopicText(candidate, metadata);
+  const amplifiedText = wikiAmplifiedText(candidate, metadata);
+  candidate.wikiTitleTokens = amplifiedTokens(titleText, 3);
+  candidate.wikiSubtopicTokens = topicTerms(subtopicText);
+  candidate.wikiAmplifiedVector = hashedSemanticVector(amplifiedText);
+}
+
+function wikiTitleText(candidate, metadata = candidate.metadata ?? {}) {
+  const metadataTitle = [
+    metadata.title,
+    metadata.wikiTitle,
+    metadata.topic,
+    metadata.subtopic,
+    metadata.category,
+    metadata.kind,
+    metadata.questionType,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const sourceTitle = String(candidate.sourceId ?? "")
+    .replace(/[_/-]+/g, " ")
+    .replace(/\b(mem|memory|session|line)\b/g, " ");
+  const derivedTitle = tokenize(candidate.text).slice(0, 12).join(" ");
+  return [metadataTitle, sourceTitle, derivedTitle].filter(Boolean).join(" ");
+}
+
+function wikiSubtopicText(candidate, metadata = candidate.metadata ?? {}) {
+  const metadataSubtopic = [
+    metadata.topic,
+    metadata.topicPath,
+    metadata.subtopic,
+    metadata.subtopicPath,
+    metadata.category,
+    metadata.type,
+    metadata.kind,
+    metadata.questionType,
+    metadata.source,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const denseTopicTerms = [...topicTerms(candidate.text)].slice(0, 18).join(" ");
+  return [metadataSubtopic, denseTopicTerms].filter(Boolean).join(" ");
+}
+
+function wikiAmplifiedText(candidate, metadata = candidate.metadata ?? {}) {
+  const title = wikiTitleText(candidate, metadata);
+  const subtopic = wikiSubtopicText(candidate, metadata);
+  const summaryWindow = tokenize(candidate.text).slice(0, 64).join(" ");
+  return [title, title, title, subtopic, subtopic, summaryWindow].join(" ");
+}
+
+function amplifiedTokens(text, repeat) {
+  const tokens = tokenize(text);
+  return Array.from({ length: repeat }, () => tokens).flat();
+}
+
+function fullSessionContextWeight(query) {
+  const text = normalizeText(`${queryTextValue(query)} ${query?.metadata?.questionType ?? ""}`);
+  return /\b(full|session|transcript|conversation|detail|details|context|source|evidence|why|preference|buried|nugget|history|related|chunk|chunks)\b/.test(text)
+    ? 0.9
+    : 0.38;
+}
+
 function overlapRatio(left, right) {
   if (!left.size || !right.size) return 0;
   let hits = 0;
@@ -2514,7 +2710,22 @@ function safeScalar(value) {
 function sanitizeMetadata(metadata) {
   if (!metadata || typeof metadata !== "object") return {};
   const safe = {};
-  for (const key of ["kind", "type", "category", "questionType", "date", "createdAt", "updatedAt", "source"]) {
+  for (const key of [
+    "kind",
+    "type",
+    "category",
+    "questionType",
+    "title",
+    "wikiTitle",
+    "topic",
+    "topicPath",
+    "subtopic",
+    "subtopicPath",
+    "date",
+    "createdAt",
+    "updatedAt",
+    "source",
+  ]) {
     if (metadata[key] == null) continue;
     const value = String(metadata[key]).slice(0, 160);
     assert.doesNotMatch(value, secretPattern, `metadata.${key} contains a key-shaped secret`);

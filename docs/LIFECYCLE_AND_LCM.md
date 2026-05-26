@@ -48,6 +48,29 @@ Expected behavior:
 - `agent_end` redacts, distills, deduplicates, and stores useful memory locally.
 - compression checkpoint events record compact evidence when available.
 
+## Codex
+
+Codex uses local hook wiring rather than the Hermes provider lifecycle. The
+current safe audit target is:
+
+- `UserPromptSubmit` runs local recall before the prompt is finalized.
+- `Stop` runs local flush after the turn and stores distilled durable
+  candidates.
+- Raw transcripts stay local and public reports print only counts, hashes, and
+  policy flags.
+- Hosted Supermemory write-back stays off unless the operator explicitly
+  enables it.
+
+The current Codex hook surface does not expose a native pre-compaction event in
+the audited hook file. If Codex later exposes a pre-compact or pre-compress
+hook, RecallWeave should record a lifecycle event before any summary replaces
+the full session.
+
+DeepSeek v4 flash, or any similar low-cost compression model, is allowed only
+as an explicit offline LCM experiment. It must not run during prompt-time recall
+by default, must require an operator opt-in, and must not count as benchmark
+retrieval or scoring evidence.
+
 ## Recall Gate
 
 The recall gate should skip maintenance traffic unless there is clear memory intent. Examples include status checks, diagnostics, heartbeat output, and update logs. This reduces provider spend and keeps prompt context cleaner.
