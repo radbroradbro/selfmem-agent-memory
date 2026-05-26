@@ -195,6 +195,8 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-plan-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.md`,
+  `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
+  `${reviewDir}/answer-quality-local-full-shard-intake-20260526.md`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.md`,
   `${reviewDir}/full-shard-private-input-doctor-current.json`,
@@ -586,7 +588,9 @@ const requiredScripts = [
   "benchmark:answer-quality:shard-plan",
   "benchmark:answer-quality:local-shard-plan",
   "benchmark:answer-quality:shard-workorder",
+  "benchmark:answer-quality:local-shard-workorder",
   "benchmark:answer-quality:shard-intake",
+  "benchmark:answer-quality:local-shard-intake",
   "benchmark:answer-quality:private-input-doctor",
   "benchmark:answer-quality:accepted-lane-doctor",
   "benchmark:answer-quality:local-accepted-lane-doctor",
@@ -1732,6 +1736,13 @@ check("fresh public benchmark target check passes", () => {
     join(root, reviewDir, "answer-quality-local-full-shard-workorder-20260526.md"),
     "utf8",
   );
+  const localFullAnswerQualityShardIntake = JSON.parse(
+    readFileSync(join(root, reviewDir, "answer-quality-local-full-shard-intake-20260526.json"), "utf8"),
+  );
+  const localFullAnswerQualityShardIntakeEvidence = readFileSync(
+    join(root, reviewDir, "answer-quality-local-full-shard-intake-20260526.md"),
+    "utf8",
+  );
   const fullAnswerQualityShardWorkorder = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-workorder-20260525.json"), "utf8"));
   const fullAnswerQualityShardWorkorderEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-workorder-20260525.md"), "utf8");
   const fullAnswerQualityShardIntake = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-intake-20260525.json"), "utf8"));
@@ -1772,6 +1783,20 @@ check("fresh public benchmark target check passes", () => {
   const localAcceptedLaneLaunchDoctorMarkdownEvidence = readFileSync(
     join(root, reviewDir, "local-full-accepted-lane-launch-doctor-20260526.md"),
     "utf8",
+  );
+  const localFullShardWorkorderFresh = JSON.parse(
+    run("node", [
+      "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
+      "--plan",
+      "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    ]).stdout,
+  );
+  const localFullShardIntakeFresh = JSON.parse(
+    run("node", [
+      "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
+      "--plan",
+      "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    ]).stdout,
   );
   const fullShardBm25ExportProbe = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.json"), "utf8"));
   const fullShardBm25ExportProbeEvidence = readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.md"), "utf8");
@@ -3346,6 +3371,9 @@ check("fresh public benchmark target check passes", () => {
   }
   assert.equal(localFullAnswerQualityShardWorkorder.mode, "public-benchmark-answer-quality-shard-workorder");
   assert.equal(localFullAnswerQualityShardWorkorder.status, "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS");
+  assert.equal(localFullShardWorkorderFresh.mode, "public-benchmark-answer-quality-shard-workorder");
+  assert.equal(localFullShardWorkorderFresh.status, "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS");
+  assert.equal(localFullShardWorkorderFresh.plan?.claimScope, "local-full");
   assert.equal(localFullAnswerQualityShardWorkorder.plan?.claimScope, "local-full");
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.laneId, "local-full-accepted-shards");
   assert.equal(localFullAnswerQualityShardWorkorder.fullSotaLaneReadiness, null);
@@ -3358,10 +3386,36 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("voyage-credentials-missing"), false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("nvidia-credentials-missing"), false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled"), false);
+  assert.match(localFullAnswerQualityShardWorkorder.gatedCommands?.shardIntake ?? "", /benchmark:answer-quality:local-shard-intake/);
   assert.match(localFullAnswerQualityShardWorkorder.gatedCommands?.shardIntake ?? "", /answer-quality-local-full-shard-intake/);
   assert.match(localFullAnswerQualityShardWorkorder.gatedCommands?.combineAfterIntakePasses ?? "", /end-to-end-memory-score-local-full-combined/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /local-full-accepted-shards/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /query-expansion=local-or-cloud-model-required/);
+  for (const localShardIntake of [localFullShardIntakeFresh, localFullAnswerQualityShardIntake]) {
+    assert.equal(localShardIntake.mode, "public-benchmark-answer-quality-shard-intake");
+    assert.equal(localShardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
+    assert.equal(localShardIntake.plan?.claimScope, "local-full");
+    assert.equal(localShardIntake.publicSafe, true);
+    assert.equal(localShardIntake.metricsOnly, true);
+    assert.equal(localShardIntake.publicBenchmarkClaimsAllowed, false);
+    assert.equal(localShardIntake.readyForShardCombine, false);
+    assert.equal(localShardIntake.readyForEndToEndMemoryScoreGate, false);
+    assert.equal(localShardIntake.countsAsFullMemorySotaEvidence, false);
+    assert.equal(localShardIntake.rawQuestionsIncluded, false);
+    assert.equal(localShardIntake.rawAnswersIncluded, false);
+    assert.equal(localShardIntake.rawMemoryIncluded, false);
+    assert.equal(localShardIntake.rawPrivateOutputPathIncluded, false);
+    assert.equal(localShardIntake.plan?.shardCount, 20);
+    assert.equal(localShardIntake.intake?.inputCount, 0);
+    assert.equal(localShardIntake.intake?.missingShardCount, 20);
+    assert.deepEqual(localShardIntake.plan?.strategies, localFullAnswerQualityShardPlan.runPlan?.strategies);
+    assert.equal(localShardIntake.plan?.strategies?.includes("cloud-voyage4-voyage-lite-rerank"), false);
+    assert.equal(localShardIntake.plan?.strategies?.includes("cloud-nvidia-nemotron-1b"), false);
+    assert.ok(localShardIntake.blockers?.includes("shard-results-missing"));
+    assert.ok(localShardIntake.blockers?.includes("answer-quality-shards-missing"));
+  }
+  assert.match(localFullAnswerQualityShardIntakeEvidence, /Claim scope: local-full/);
+  assert.match(localFullAnswerQualityShardIntakeEvidence, /Missing shards: 20/);
   assert.equal(answerQualityShardWorkorderReady.status, "READY_TO_RUN_FULL_ANSWER_QUALITY_SHARD_INTAKE");
   assert.equal(answerQualityShardWorkorderReady.readyForShardIntake, true);
   assert.equal(answerQualityShardWorkorderReady.readyForShardCombine, false);
@@ -3506,6 +3560,12 @@ check("fresh public benchmark target check passes", () => {
     );
     assert.ok(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("voyage-credentials-missing"));
     assert.ok(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+    assert.equal(doctorReport.localFullLaneState?.intakeStatus, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
+    assert.equal(doctorReport.localFullLaneState?.readyForShardCombine, false);
+    assert.equal(doctorReport.localFullLaneState?.acceptedShardCount, 0);
+    assert.equal(doctorReport.localFullLaneState?.missingShardCount, 20);
+    assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("shard-results-missing"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-shard-intake" && item.status === "blocked"));
     assert.equal(doctorReport.currentCanary?.queryCount, 30);
     assert.equal(doctorReport.currentCanary?.scoreDelta, -42.0333);
     assert.equal(doctorReport.goalAudit?.goalComplete, false);
@@ -3528,6 +3588,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownFresh, /Control Preflight/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Same-data shard ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Full SOTA lane ready for answer-quality scoring: false/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Missing local-full shards: 20/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));

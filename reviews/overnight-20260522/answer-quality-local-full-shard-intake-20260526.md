@@ -3,7 +3,7 @@
 - Status: BLOCKED_FULL_ANSWER_QUALITY_SHARDS
 - Ready for shard combine: false
 - Counts as full memory SOTA evidence: false
-- Claim scope: full-sota
+- Claim scope: local-full
 - Plan shard count: 20
 - Accepted shards: 0
 - Missing shards: 20

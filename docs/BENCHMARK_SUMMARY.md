@@ -306,6 +306,13 @@ endpoint configuration, local Apple/local rerank endpoints, and model-backed
 query expansion. A completed `local-full` run can diagnose whether the local
 method is model-size limited; it does not count as SOTA evidence or public
 superiority without the provider/SOTA comparison lane.
+`benchmark:answer-quality:local-shard-workorder` and
+`benchmark:answer-quality:local-shard-intake` now bind those generic shard
+tools to the local-full plan by default. The checked-in local intake report at
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`
+is intentionally blocked with zero accepted shards and twenty missing shards,
+proving the local path has its own combine gate before any local-full score can
+be reported.
 `benchmark:answer-quality:local-accepted-lane-doctor` now turns that into a
 first-shard launch check at
 `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`.

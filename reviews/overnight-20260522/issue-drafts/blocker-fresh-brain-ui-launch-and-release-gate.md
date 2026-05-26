@@ -79,6 +79,10 @@ requirements are resolved.
   reports missing local embedding, local rerank, answer-quality endpoint, and
   model-backed query-expansion readiness, and avoids adding Voyage/NVIDIA or
   public-SOTA blockers to the local-only path.
+- The local-full shard workorder and intake now have dedicated scripts. The
+  checked-in local intake report is blocked with zero accepted shards and twenty
+  missing shards, so local-full combine/scoring claims cannot start until the
+  full local shard set exists.
 - Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` records live Qwen3
   Embedding 0.6B and Qwen3 Embedding 4B Apple Silicon runs on the same 30-query
   public LongMemEval-S retrieval-proxy target. Both local arms tied BM25

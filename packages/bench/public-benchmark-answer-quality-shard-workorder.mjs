@@ -37,8 +37,11 @@ const readyForShardIntake = pendingShards.length === 0 && evaluated.rejectedResu
 const executionLaneReadiness = buildExecutionLaneReadiness(plan.executionLanes ?? []);
 const acceptedLaneReadiness = executionLaneReadiness.find((lane) => lane.acceptedByFullShardIntake === true) ?? null;
 const fullSotaLaneReadiness = executionLaneReadiness.find((lane) => lane.laneId === "full-sota-accepted-shards") ?? null;
+const claimScope = String(plan.runPlan?.claimScope ?? "full-sota");
 const intakeOutputStem =
-  plan.runPlan?.claimScope === "local-full" ? "answer-quality-local-full-shard-intake" : "answer-quality-full-shard-intake";
+  claimScope === "local-full" ? "answer-quality-local-full-shard-intake" : "answer-quality-full-shard-intake";
+const shardIntakeScript =
+  claimScope === "local-full" ? "benchmark:answer-quality:local-shard-intake" : "benchmark:answer-quality:shard-intake";
 
 const report = {
   schemaVersion: 1,
@@ -100,7 +103,7 @@ const report = {
   workorders: selectedPendingShards.map((shard) => buildWorkorder(plan, shard)),
   gatedCommands: {
     shardIntake: [
-      "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake",
+      `npm exec --yes pnpm@10.23.0 -- ${shardIntakeScript}`,
       `--input ${allExpectedPublicInputs.join(",")}`,
       `--output <public-review-dir>/${intakeOutputStem}.json`,
       `--markdown-output <public-review-dir>/${intakeOutputStem}.md`,

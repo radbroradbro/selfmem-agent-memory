@@ -7,10 +7,29 @@
 - Accepted shards: 0
 - Pending shards: 20
 - Rejected results: 0
-- Workorders emitted: 1
+- Workorders emitted: 20
 
 ## Workorders
 - shard-001: 0-25
+- shard-002: 25-50
+- shard-003: 50-75
+- shard-004: 75-100
+- shard-005: 100-125
+- shard-006: 125-150
+- shard-007: 150-175
+- shard-008: 175-200
+- shard-009: 200-225
+- shard-010: 225-250
+- shard-011: 250-275
+- shard-012: 275-300
+- shard-013: 300-325
+- shard-014: 325-350
+- shard-015: 350-375
+- shard-016: 375-400
+- shard-017: 400-425
+- shard-018: 425-450
+- shard-019: 450-475
+- shard-020: 475-500
 
 ## Execution Lanes
 - deterministic-control-proxy: ready=true; intake-compatible=false; providers=none
@@ -40,7 +59,7 @@
 - answer-quality-shard-runs-pending
 
 ## Gated Commands
-- Intake: npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake --input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json,<public-review-dir>/answer-quality-local-full-shard-003.json,<public-review-dir>/answer-quality-local-full-shard-004.json,<public-review-dir>/answer-quality-local-full-shard-005.json,<public-review-dir>/answer-quality-local-full-shard-006.json,<public-review-dir>/answer-quality-local-full-shard-007.json,<public-review-dir>/answer-quality-local-full-shard-008.json,<public-review-dir>/answer-quality-local-full-shard-009.json,<public-review-dir>/answer-quality-local-full-shard-010.json,<public-review-dir>/answer-quality-local-full-shard-011.json,<public-review-dir>/answer-quality-local-full-shard-012.json,<public-review-dir>/answer-quality-local-full-shard-013.json,<public-review-dir>/answer-quality-local-full-shard-014.json,<public-review-dir>/answer-quality-local-full-shard-015.json,<public-review-dir>/answer-quality-local-full-shard-016.json,<public-review-dir>/answer-quality-local-full-shard-017.json,<public-review-dir>/answer-quality-local-full-shard-018.json,<public-review-dir>/answer-quality-local-full-shard-019.json,<public-review-dir>/answer-quality-local-full-shard-020.json --output <public-review-dir>/answer-quality-local-full-shard-intake.json --markdown-output <public-review-dir>/answer-quality-local-full-shard-intake.md --require-ready
+- Intake: npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-intake --input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json,<public-review-dir>/answer-quality-local-full-shard-003.json,<public-review-dir>/answer-quality-local-full-shard-004.json,<public-review-dir>/answer-quality-local-full-shard-005.json,<public-review-dir>/answer-quality-local-full-shard-006.json,<public-review-dir>/answer-quality-local-full-shard-007.json,<public-review-dir>/answer-quality-local-full-shard-008.json,<public-review-dir>/answer-quality-local-full-shard-009.json,<public-review-dir>/answer-quality-local-full-shard-010.json,<public-review-dir>/answer-quality-local-full-shard-011.json,<public-review-dir>/answer-quality-local-full-shard-012.json,<public-review-dir>/answer-quality-local-full-shard-013.json,<public-review-dir>/answer-quality-local-full-shard-014.json,<public-review-dir>/answer-quality-local-full-shard-015.json,<public-review-dir>/answer-quality-local-full-shard-016.json,<public-review-dir>/answer-quality-local-full-shard-017.json,<public-review-dir>/answer-quality-local-full-shard-018.json,<public-review-dir>/answer-quality-local-full-shard-019.json,<public-review-dir>/answer-quality-local-full-shard-020.json --output <public-review-dir>/answer-quality-local-full-shard-intake.json --markdown-output <public-review-dir>/answer-quality-local-full-shard-intake.md --require-ready
 - Combine after intake passes: npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json,<public-review-dir>/answer-quality-local-full-shard-003.json,<public-review-dir>/answer-quality-local-full-shard-004.json,<public-review-dir>/answer-quality-local-full-shard-005.json,<public-review-dir>/answer-quality-local-full-shard-006.json,<public-review-dir>/answer-quality-local-full-shard-007.json,<public-review-dir>/answer-quality-local-full-shard-008.json,<public-review-dir>/answer-quality-local-full-shard-009.json,<public-review-dir>/answer-quality-local-full-shard-010.json,<public-review-dir>/answer-quality-local-full-shard-011.json,<public-review-dir>/answer-quality-local-full-shard-012.json,<public-review-dir>/answer-quality-local-full-shard-013.json,<public-review-dir>/answer-quality-local-full-shard-014.json,<public-review-dir>/answer-quality-local-full-shard-015.json,<public-review-dir>/answer-quality-local-full-shard-016.json,<public-review-dir>/answer-quality-local-full-shard-017.json,<public-review-dir>/answer-quality-local-full-shard-018.json,<public-review-dir>/answer-quality-local-full-shard-019.json,<public-review-dir>/answer-quality-local-full-shard-020.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-local-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-local-full-combined.md
 - Result gate after combine: npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-local-full-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-local-full.json --require-ready
 - Reviewer intake after combine: npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-local-full-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-local-full.json

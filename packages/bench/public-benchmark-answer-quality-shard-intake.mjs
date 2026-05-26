@@ -56,6 +56,7 @@ const report = {
   plan: {
     path: displayPath(planPath),
     hash: `sha256:${sha256(planRaw)}`,
+    claimScope: plan.runPlan?.claimScope ?? null,
     targetHash: plan.target?.hash ?? null,
     querySetHash: plan.materializeReport?.collectorCompatibleQuerySetHash ?? null,
     materializerHash: plan.materializeReport?.materializerHash ?? null,
@@ -310,6 +311,7 @@ function renderMarkdown(value) {
     `- Status: ${value.status}`,
     `- Ready for shard combine: ${value.readyForShardCombine}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
+    `- Claim scope: ${value.plan.claimScope ?? "n/a"}`,
     `- Plan shard count: ${value.plan.shardCount}`,
     `- Accepted shards: ${value.intake.acceptedShardCount}`,
     `- Missing shards: ${value.intake.missingShardCount}`,

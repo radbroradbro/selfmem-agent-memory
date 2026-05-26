@@ -21,11 +21,11 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-26T06:04:30.256Z",
+  "generatedAt": "2026-05-26T06:04:30.230Z",
   "plan": {
-    "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
-    "hash": "sha256:5b5d9a12b872662af0198c00a4cff7cf30be2bbc0760e70923d16daf433227cf",
-    "claimScope": "full-sota",
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "hash": "sha256:f0bec65ea232a7634f107ba940159b59c103b40ede05656b6000cc17afae6dc7",
+    "claimScope": "local-full",
     "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
     "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
     "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
@@ -36,8 +36,6 @@
       "bm25-lite",
       "full-hybrid-rerank",
       "query-expanded-full-hybrid-rerank",
-      "cloud-voyage4-voyage-lite-rerank",
-      "cloud-nvidia-nemotron-1b",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
     ]

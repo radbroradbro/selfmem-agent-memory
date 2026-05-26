@@ -425,6 +425,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   no-provider-call go/no-go report with exact local embedding, local rerank,
   answer-quality endpoint, and model-backed query-expansion blockers. It keeps
   the local lane out of SOTA/public-claim semantics.
+- Adds local-full shard workorder and intake scripts so the 500-query local
+  lane uses the local plan by default. The checked-in local intake report is
+  blocked with zero accepted shards and twenty missing shards, which prevents
+  local-full combine or scoring claims until the full local shard set exists.
 - Narrows release-check stale temp cleanup so it only removes old
   `recallweave-release-check-root-*` directories. A new regression check proves
   benchmark materialization roots and pointer files like `recallweave-sota-full-*`

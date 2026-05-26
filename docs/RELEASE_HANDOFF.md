@@ -81,12 +81,17 @@ For the benchmark-specific blocker, run:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:accepted-lane-doctor
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-intake
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-accepted-lane-doctor
 npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor
 ```
 
 The accepted-lane doctor does not call providers or expose raw benchmark text.
 It names the exact env-only operator inputs still needed before the only
-full-shard-intake-compatible lane can launch. The SOTA doctor then summarizes
+full-SOTA shard-intake-compatible lane can launch. The local workorder and
+intake commands are no-provider-call checks for the local 500-query path only;
+they do not authorize SOTA or launch language. The SOTA doctor then summarizes
 the full LongMemEval target, raw-source-retention state, accepted-lane launch
 readiness, BM25-as-control contract, full-shard coverage, current canary score,
 reported-target delta, reviewer status, UI/docs refresh status, owner approval,
@@ -350,6 +355,13 @@ has no Voyage/NVIDIA blockers and is blocked only on the local/run consent,
 answer-quality endpoint, and model-backed query-expansion readiness needed to
 actually run it. Treat a completed local-full result as model-method evidence;
 it can explain a local-vs-cloud gap, but it is not SOTA proof or launch approval.
+Run `benchmark:answer-quality:local-shard-workorder` and
+`benchmark:answer-quality:local-shard-intake` for this lane so the local-full
+plan is selected automatically. The checked-in local intake report,
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
+is intentionally blocked with zero accepted shards and twenty missing shards.
+It should turn green only after all twenty local-full public shard-result JSONs
+are present and hash-aligned.
 Then run `benchmark:answer-quality:local-accepted-lane-doctor`. The checked-in
 doctor,
 `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`,

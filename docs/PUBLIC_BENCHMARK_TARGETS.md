@@ -202,6 +202,10 @@ It is a full local benchmark lane, not a SOTA lane: it can show whether the
 local method is limited by model size or missing cloud arms, but broad SOTA and
 public superiority wording still require the provider/SOTA comparison lane,
 reviewers, UI/docs refresh, owner approval, and real canary.
+Use `benchmark:answer-quality:local-shard-workorder` and
+`benchmark:answer-quality:local-shard-intake` for local-full tracking so the
+local plan is selected by default. The checked-in local intake artifact is
+blocked with all twenty shards missing; it is a combine gate, not a score.
 Use `benchmark:answer-quality:local-accepted-lane-doctor` before launching the
 first local-full shard. The checked-in doctor at
 `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`

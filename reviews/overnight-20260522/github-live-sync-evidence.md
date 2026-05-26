@@ -330,4 +330,19 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: dac029272b0bc120747a0d1d02844d91df40d2da60aeebdce1ef4ce9d104a120
 
+## 2026-05-26 Local-Full Shard Intake Harness Refresh
+
+- PR #5 and issue #6 were refreshed again after adding dedicated local-full
+  shard workorder and intake scripts plus the blocked local-full intake
+  artifact.
+- The refreshed public text keeps the local-full lane as model-method evidence
+  only. It records zero accepted local-full shards and twenty missing shards,
+  so combine, scoring, SOTA, launch, and production rollout claims remain
+  blocked.
+- PR body refreshed at: 2026-05-26T06:07:31Z
+- Issue updated at: 2026-05-26T06:07:32Z
+- PR body hash: 014c7e569562ec4a48ad805c72ba8a3e03d2ce7c7bad933f83407e0ee9d2b0fa
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: ab2a537a7def7b70b5efa1f87638a35572e39b877973aa642331fb4db08ff3ec
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
