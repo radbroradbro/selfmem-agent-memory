@@ -91,6 +91,11 @@ Live status:
   launch until live export/no-raw-text consent, answer-quality consent, exact
   target model matching, local/provider arm readiness, and model-backed query
   expansion are configured. It is readiness evidence only, not a scored result.
+- Adds `benchmark:answer-quality:local-shard-plan`, a first-class full local
+  benchmark lane for the same 500-query target. It accepts the local strategy
+  set without Voyage/NVIDIA blockers, keeps raw sources private, and remains
+  explicitly non-SOTA until the provider/SOTA comparison lane and release gates
+  pass.
 
 - Adds the public LongMemEval-S materialize-run lane and first blind retrieval-proxy baseline. The materializer writes raw benchmark query and haystack inputs only to an operator-private directory, commits only hashes/counts/command templates, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result to that hash. The canonical `bm25-lite-b800-k5` retrieval-proxy baseline scored 0.4541 quality on the 6-row source-locked slice with average context tokens 800 and zero privacy failures; it is explicitly not MemoryBench answer-quality evidence and not public superiority language.
 - Adds a same-data LongMemEval-S retrieval strategy comparison. `bm25-lite`
@@ -397,6 +402,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   model configuration, a scoring endpoint, and query-expansion readiness are all
   present. This makes the missing full benchmark lane explicit without spending
   hosted Supermemory or provider usage.
+- Adds a `local-full` answer-quality shard plan and workorder for the same
+  500-query target. It lets the local Qwen3/Apple Silicon plus local-rerank
+  method run the full benchmark without being blocked by absent Voyage/NVIDIA
+  credentials, while keeping public SOTA and launch claims blocked.
 - Narrows release-check stale temp cleanup so it only removes old
   `recallweave-release-check-root-*` directories. A new regression check proves
   benchmark materialization roots and pointer files like `recallweave-sota-full-*`

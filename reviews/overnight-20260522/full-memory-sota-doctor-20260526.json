@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T04:57:11.668Z",
+  "generatedAt": "2026-05-26T05:31:36.154Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -47,9 +47,23 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:2a662bc42fd06dbe465db2fe58bc0f217b1d9ee424d6ad0f79453c1ddb4da3d8",
+      "hash": "sha256:5b5d9a12b872662af0198c00a4cff7cf30be2bbc0760e70923d16daf433227cf",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
+    },
+    "localFullShardPlan": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+      "exists": true,
+      "hash": "sha256:f0bec65ea232a7634f107ba940159b59c103b40ede05656b6000cc17afae6dc7",
+      "mode": "public-benchmark-answer-quality-shard-plan",
+      "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
+    },
+    "localFullShardWorkorder": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
+      "exists": true,
+      "hash": "sha256:ca3d7e7f539d14d15b119f685a873fcfc3aa85cfd93a7957e12c73b8b8619ac1",
+      "mode": "public-benchmark-answer-quality-shard-workorder",
+      "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
     "privateInputDoctor": {
       "path": "reviews/overnight-20260522/full-shard-private-input-doctor-current.json",
@@ -152,28 +166,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:34c3e474246465926d8764f1c23b50fbb914eb5f6f2db1fde99c81c33fa861f2",
+      "hash": "sha256:500b7f2c05d03244efedc4c6383b320d35154be3813e97955dbf5feb5ee66295",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:5aa4af6d6b5243b57d428683d4ee520b5657370fa972e194bf286e3b80762529",
+      "hash": "sha256:4a944de67a167172a8085fd8a2e333a8e1a43d006b591586ded92e85faee20e2",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:b36f44c3449cb4d855e850d77f1c95894663e84a4f269cf5c4fd4c7564fec17f",
+      "hash": "sha256:8420587de5261ecf28b42d35a1577ea7949bdc448100253240ebf09d5d84cdb3",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:e5dcb194a32354079d114debb6819c82f7681b80b52f722845f818bdd41e071f",
+      "hash": "sha256:f390f9618dd8a8cd22ece8953b5a68f0aeb5469987b325342e0febe5867e2bdc",
       "mode": null,
       "status": null
     }
@@ -512,6 +526,44 @@
       "voyage-credentials-missing"
     ]
   },
+  "localFullLaneState": {
+    "planPath": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "workorderPath": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
+    "status": "READY_LOCAL_FULL_BENCHMARK_PLAN",
+    "readyForLocalFullBenchmarkPlan": true,
+    "readyForResponseArmExport": false,
+    "readyForAnswerQualityScoring": false,
+    "claimScope": "local-full",
+    "queryCount": 500,
+    "shardCount": 20,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "acceptedLaneId": "local-full-accepted-shards",
+    "canReachFullSotaGateAfterShardIntake": false,
+    "cloudProviderBlockerCount": 0,
+    "pendingShardCount": 20,
+    "countsAsFullMemorySotaEvidence": false,
+    "publicBenchmarkClaimsAllowed": false,
+    "envBlockers": [
+      "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+      "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+      "answer-model-missing",
+      "judge-model-missing",
+      "local-apple-credentials-missing",
+      "local-rerank-credentials-missing",
+      "openai-compatible-base-url-missing",
+      "query-expansion-local-endpoint-or-cloud-consent-missing"
+    ],
+    "blockers": []
+  },
   "currentCanary": {
     "resultPath": "reviews/overnight-20260522/end-to-end-memory-score-combined-20260525.json",
     "gatePath": "reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json",
@@ -634,6 +686,11 @@
     },
     {
       "id": "bm25-is-control-only",
+      "status": "pass",
+      "blockers": []
+    },
+    {
+      "id": "local-full-benchmark-lane",
       "status": "pass",
       "blockers": []
     },

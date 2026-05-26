@@ -194,6 +194,14 @@ The answer-quality runner now supports full-target scoring in deterministic
 query shards via `--query-offset` and `--max-queries`; the shard combiner must
 merge only complete, non-overlapping coverage with the same target, query set,
 materializer, answer-label, answer-model, judge-model, and strategy set.
+Use `benchmark:answer-quality:local-shard-plan` for the no-spend/local full
+benchmark path. That plan uses the same 500-query target and raw-source-retaining
+private materialization but accepts BM25, full hybrid, model-backed query
+expansion, local Apple embedding, and local rerank as the local strategy set.
+It is a full local benchmark lane, not a SOTA lane: it can show whether the
+local method is limited by model size or missing cloud arms, but broad SOTA and
+public superiority wording still require the provider/SOTA comparison lane,
+reviewers, UI/docs refresh, owner approval, and real canary.
 `benchmark:memory-score:result-gate --require-ready` now also checks the
 source-locked reported memory-system target directly. It leaves
 `fullSotaBlockers` non-empty until the result is full or officially comparable,

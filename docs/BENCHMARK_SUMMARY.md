@@ -293,6 +293,19 @@ The SOTA operator packet now treats that shard plan as the source of truth:
 each shard must export its own private response-arm files, run answer-quality
 preflight against those per-shard arms, then score only that shard before
 intake or combine can run.
+The shard planner now also has a `local-full` claim scope, exposed through
+`benchmark:answer-quality:local-shard-plan`. The checked-in local plan at
+`reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json`
+uses the same 500-query target and private raw-source-retaining materialization
+but requires only BM25, full hybrid, model-backed query expansion, local Apple
+embedding, and local rerank arms. Its workorder,
+`reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json`,
+is accepted for local full-benchmark intake and deliberately has no Voyage or
+NVIDIA blockers. It is still blocked on live/no-raw consent, answer-quality
+endpoint configuration, local Apple/local rerank endpoints, and model-backed
+query expansion. A completed `local-full` run can diagnose whether the local
+method is model-size limited; it does not count as SOTA evidence or public
+superiority without the provider/SOTA comparison lane.
 The current regenerated private full-run inputs are checked by
 `benchmark:answer-quality:private-input-doctor`, with public-safe evidence in
 `reviews/overnight-20260522/full-shard-private-input-doctor-current.json`. That

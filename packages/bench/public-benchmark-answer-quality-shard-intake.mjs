@@ -292,12 +292,14 @@ function rangeKey(value) {
 function combineCommand(accepted) {
   if (!accepted.length) return null;
   const inputsValue = accepted.map((item) => `<public-review-dir>/${item.fileName}`).join(",");
+  const claimScope = String(plan.runPlan?.claimScope ?? "full-sota");
+  const combinedName = claimScope === "full-sota" ? "end-to-end-memory-score-full-combined" : `end-to-end-memory-score-${claimScope}-combined`;
   return [
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine --",
     `--input ${inputsValue}`,
     "--combine-mode shards",
-    "--output <public-review-dir>/end-to-end-memory-score-full-combined.json",
-    "--markdown-output <public-review-dir>/end-to-end-memory-score-full-combined.md",
+    `--output <public-review-dir>/${combinedName}.json`,
+    `--markdown-output <public-review-dir>/${combinedName}.md`,
   ].join(" ");
 }
 

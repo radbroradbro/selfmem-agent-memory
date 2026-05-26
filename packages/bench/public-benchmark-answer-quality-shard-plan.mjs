@@ -15,8 +15,10 @@ const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPa
 const format = String(args.format ?? "json").toLowerCase();
 const requireReady = Boolean(args.requireReady);
 const shardSize = positiveInt(args.shardSize ?? 25, "shard size");
-const strategies = splitList(args.strategies ?? defaultStrategies().join(","));
+const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_ANSWER_QUALITY_CLAIM_SCOPE ?? "full-sota").trim();
+const strategies = splitList(args.strategies ?? defaultStrategies(claimScope).join(","));
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
+const resultPrefix = claimScope === "full-sota" ? "answer-quality" : `answer-quality-${claimScope}`;
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -44,6 +46,7 @@ const knownStrategies = new Set([
 ]);
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
 assert.ok(existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `target empty: ${displayPath(targetPath)}`);
 assert.ok(existsSync(materializeReportPath), `materialize report missing: ${displayPath(materializeReportPath)}`);
@@ -63,7 +66,7 @@ const contextTokenBudget = positiveInt(args.contextTokenBudget ?? materialize.ta
 const limit = positiveInt(args.limit ?? materialize.target?.limit ?? target.benchmark?.limit ?? 5, "limit");
 const shards = buildShards(queryCount, shardSize, { targetHash });
 const coverage = strategyCoverage(strategies);
-const executionLanes = buildExecutionLanes(strategies);
+const executionLanes = buildExecutionLanes(strategies, claimScope);
 const privateOutputRoles = new Map((materialize.privateOutputs?.files ?? []).map((file) => [file.role, file]));
 const checks = {
   targetIsLongMemEvalRunOnly: target.fixtureOnly === false && target.benchmark?.family === "longmemeval" && target.claimTier === "run-only",
@@ -93,9 +96,8 @@ const checks = {
   localRerankPresent: coverage.hasLocalRerank,
   shardCoverageComplete: shards.length > 0 && shards[0].startIndex === 0 && shards.at(-1).endIndexExclusive === queryCount,
 };
-const blockers = Object.entries(checks)
-  .filter(([, value]) => value !== true)
-  .map(([key]) => kebab(key));
+const requiredChecks = requiredChecksForClaimScope(claimScope);
+const blockers = requiredChecks.filter((key) => checks[key] !== true).map((key) => kebab(key));
 const ready = blockers.length === 0;
 
 const report = {
@@ -103,6 +105,7 @@ const report = {
   ok: !requireReady || ready,
   mode: "public-benchmark-answer-quality-shard-plan",
   status: ready ? "READY_FULL_ANSWER_QUALITY_SHARD_RUN" : "BLOCKED_FULL_ANSWER_QUALITY_SHARD_RUN",
+  claimScope,
   writesRealFiles: Boolean(outputPath || markdownOutputPath),
   metricsOnly: true,
   publicSafe: true,
@@ -147,7 +150,9 @@ const report = {
     privateOutputRoles: [...privateOutputRoles.keys()].sort(),
   },
   strategyCoverage: coverage,
+  coverageRequirements: Object.fromEntries(requiredChecks.map((key) => [key, true])),
   runPlan: {
+    claimScope,
     queryCount,
     shardSize,
     shardCount: shards.length,
@@ -175,10 +180,15 @@ const report = {
         "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
         "Run answer-quality scoring for each shard with the target answer and judge models.",
         "Combine the full query-shard result set, then run the memory-score gate and reviewer intake on the combined metrics-only packet.",
+        claimScope === "local-full"
+          ? "Treat the completed result as a full local benchmark result only; SOTA and public superiority claims still need the full provider/comparison lane."
+          : "Treat the completed result as SOTA-candidate evidence only after result gate, reviewer intake, UI/docs, owner approval, and real canary also pass.",
       ]
     : [
         "Regenerate the full LongMemEval-S materialization and preserve the private raw-source outputs outside the repository.",
-        "Include BM25, full-hybrid, query expansion, Voyage, NVIDIA or Gemini, local Apple, and local rerank arms.",
+        claimScope === "local-full"
+          ? "Include BM25, full-hybrid, model-backed query expansion, local Apple, and local rerank arms."
+          : "Include BM25, full-hybrid, query expansion, Voyage, NVIDIA or Gemini, local Apple, and local rerank arms.",
         "Re-run this shard plan with --require-ready before starting the full answer-quality run.",
       ],
 };
@@ -205,8 +215,8 @@ function buildShards(totalQueryCount, requestedShardSize, options) {
       queryCount: endIndexExclusive - startIndex,
       rangeHash: `sha256:${sha256(JSON.stringify({ targetHash: options.targetHash, startIndex, endIndexExclusive, totalQueryCount }))}`,
       armOutputDirectoryLabel: `<private-output-dir>/arms/${id}`,
-      answerQualityOutputLabel: `<public-review-dir>/answer-quality-${id}.json`,
-      answerQualityMarkdownLabel: `<public-review-dir>/answer-quality-${id}.md`,
+      answerQualityOutputLabel: `<public-review-dir>/${resultPrefix}-${id}.json`,
+      answerQualityMarkdownLabel: `<public-review-dir>/${resultPrefix}-${id}.md`,
     });
   }
   return items;
@@ -225,7 +235,7 @@ function strategyCoverage(items) {
   };
 }
 
-function buildExecutionLanes(items) {
+function buildExecutionLanes(items, scope) {
   const laneDefinitions = [
     {
       id: "deterministic-control-proxy",
@@ -281,18 +291,37 @@ function buildExecutionLanes(items) {
       queryExpansionDiagnosticFallbackAllowed: false,
       queryExpansionSotaEligible: false,
     },
-    {
-      id: "full-sota-accepted-shards",
-      label: "Full SOTA shard-intake lane",
-      strategies: items,
-      operatorUse: "Only this lane has the complete strategy set expected by shard intake and combine.",
-      acceptedByFullShardIntake: true,
-      canReachFullSotaGateAfterShardIntake: true,
-      queryExpansionPolicy: "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
-      queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
-      queryExpansionDiagnosticFallbackAllowed: false,
-      queryExpansionSotaEligible: true,
-    },
+    ...(scope === "local-full"
+      ? [
+          {
+            id: "local-full-accepted-shards",
+            label: "Full local answer-quality shard-intake lane",
+            strategies: items,
+            operatorUse:
+              "Use this lane for the full 500-query local method benchmark before spending on cloud challengers.",
+            acceptedByFullShardIntake: true,
+            canReachFullSotaGateAfterShardIntake: false,
+            queryExpansionPolicy:
+              "Query expansion, local Apple, and local rerank arms must all be present on the same shards; cloud query expansion is allowed only when explicitly labeled.",
+            queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
+            queryExpansionDiagnosticFallbackAllowed: false,
+            queryExpansionSotaEligible: false,
+          },
+        ]
+      : [
+          {
+            id: "full-sota-accepted-shards",
+            label: "Full SOTA shard-intake lane",
+            strategies: items,
+            operatorUse: "Only this lane has the complete strategy set expected by shard intake and combine.",
+            acceptedByFullShardIntake: true,
+            canReachFullSotaGateAfterShardIntake: true,
+            queryExpansionPolicy: "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
+            queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
+            queryExpansionDiagnosticFallbackAllowed: false,
+            queryExpansionSotaEligible: true,
+          },
+        ]),
   ];
 
   return laneDefinitions.map((lane) => {
@@ -326,10 +355,43 @@ function buildExecutionLanes(items) {
       queryExpansionDiagnosticFallbackAllowed: lane.queryExpansionDiagnosticFallbackAllowed,
       queryExpansionSotaEligible: lane.queryExpansionSotaEligible,
       shardIntakeCompatibility: lane.acceptedByFullShardIntake
-        ? "accepted only after every planned shard returns with this complete strategy set"
+        ? lane.canReachFullSotaGateAfterShardIntake
+          ? "accepted only after every planned shard returns with this complete strategy set"
+          : "accepted for this local full benchmark plan only; full-SOTA intake still requires the provider comparison plan"
         : "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch",
     };
   });
+}
+
+function requiredChecksForClaimScope(scope) {
+  const base = [
+    "targetIsLongMemEvalRunOnly",
+    "materializeReportMode",
+    "materializeTargetHashMatches",
+    "fullQueryCountPresent",
+    "rawSourcesRetainedPrivate",
+    "rawDatasetRetainedPrivate",
+    "selectedRawRowsRetainedPrivate",
+    "sourceManifestRetainedPrivate",
+    "rawTextPubliclyExcluded",
+    "privateOutputPathExcluded",
+    "querySetPrivateOutputPresent",
+    "memoriesPrivateOutputPresent",
+    "answerLabelsPrivateOutputPresent",
+    "rawDatasetPrivateOutputPresent",
+    "selectedRawRowsPrivateOutputPresent",
+    "sourceManifestPrivateOutputPresent",
+    "answerModelPresent",
+    "judgeModelPresent",
+    "bm25ControlPresent",
+    "fullHybridControlPresent",
+    "queryExpansionPresent",
+    "localApplePresent",
+    "localRerankPresent",
+    "shardCoverageComplete",
+  ];
+  if (scope === "local-full") return base;
+  return [...base, "voyageProviderPresent", "nvidiaOrGeminiProviderPresent"];
 }
 
 function requiredProvidersForStrategy(strategy) {
@@ -361,11 +423,23 @@ function materializeCommand() {
 }
 
 function responseArmExportTemplate() {
+  const providerEnv = claimScope === "local-full"
+    ? []
+    : [
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run>",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run>",
+      ];
+  const queryExpansionEnv = [
+    "SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used>",
+    "SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used>",
+    "RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs>",
+    "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs>",
+  ];
   return [
     "RECALLWEAVE_BASELINE_LIVE=1",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
-    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run>",
-    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run>",
+    ...providerEnv,
+    ...queryExpansionEnv,
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute",
     `--target ${displayPath(targetPath)}`,
     "--queryset <private-output-dir>/longmemeval-queryset.private.json",
@@ -398,8 +472,8 @@ function answerQualityTemplate() {
     "--query-offset {startIndex}",
     "--max-queries {queryCount}",
     ...armArgs,
-    "--output <public-review-dir>/answer-quality-{shardId}.json",
-    "--markdown-output <public-review-dir>/answer-quality-{shardId}.md",
+    `--output <public-review-dir>/${resultPrefix}-{shardId}.json`,
+    `--markdown-output <public-review-dir>/${resultPrefix}-{shardId}.md`,
   ].join(" ");
 }
 
@@ -421,51 +495,61 @@ function preflightTemplate() {
     "--query-offset {startIndex}",
     "--max-queries {queryCount}",
     ...armArgs,
-    "--output <public-review-dir>/answer-quality-preflight-{shardId}.json",
-    "--markdown-output <public-review-dir>/answer-quality-preflight-{shardId}.md",
+    `--output <public-review-dir>/${resultPrefix}-preflight-{shardId}.json`,
+    `--markdown-output <public-review-dir>/${resultPrefix}-preflight-{shardId}.md`,
   ].join(" ");
 }
 
 function combineCommand(shardRows) {
-  const inputs = shardRows.map((shard) => `<public-review-dir>/answer-quality-${shard.id}.json`).join(",");
+  const inputs = shardRows.map((shard) => `<public-review-dir>/${resultPrefix}-${shard.id}.json`).join(",");
+  const combinedName = claimScope === "full-sota" ? "end-to-end-memory-score-full-combined" : `end-to-end-memory-score-${claimScope}-combined`;
   return [
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine --",
     `--input ${inputs}`,
     "--combine-mode shards",
-    "--output <public-review-dir>/end-to-end-memory-score-full-combined.json",
-    "--markdown-output <public-review-dir>/end-to-end-memory-score-full-combined.md",
+    `--output <public-review-dir>/${combinedName}.json`,
+    `--markdown-output <public-review-dir>/${combinedName}.md`,
   ].join(" ");
 }
 
 function resultGateCommand() {
+  const combinedName = claimScope === "full-sota" ? "end-to-end-memory-score-full-combined" : `end-to-end-memory-score-${claimScope}-combined`;
+  const reviewerName = claimScope === "full-sota" ? "memory-score-reviewer-intake-full" : `memory-score-reviewer-intake-${claimScope}`;
   return [
     "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate --",
     `--target ${displayPath(targetPath)}`,
-    "--result <public-review-dir>/end-to-end-memory-score-full-combined.json",
-    "--reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-full.json",
+    `--result <public-review-dir>/${combinedName}.json`,
+    `--reviewer-approval-report <public-review-dir>/${reviewerName}.json`,
     "--require-ready",
   ].join(" ");
 }
 
 function reviewerIntakeCommand() {
+  const combinedName = claimScope === "full-sota" ? "end-to-end-memory-score-full-combined" : `end-to-end-memory-score-${claimScope}-combined`;
+  const reviewerName = claimScope === "full-sota" ? "memory-score-reviewer-intake-full" : `memory-score-reviewer-intake-${claimScope}`;
   return [
     "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake --",
-    "--result <public-review-dir>/end-to-end-memory-score-full-combined.json",
+    `--result <public-review-dir>/${combinedName}.json`,
     "--reviewer <reviewer-a-json>",
     "--reviewer <reviewer-b-json>",
-    "--output <public-review-dir>/memory-score-reviewer-intake-full.json",
+    `--output <public-review-dir>/${reviewerName}.json`,
   ].join(" ");
 }
 
-function defaultStrategies() {
-  return [
+function defaultStrategies(scope) {
+  const local = [
     "bm25-lite",
     "full-hybrid-rerank",
     "query-expanded-full-hybrid-rerank",
-    "cloud-voyage4-voyage-lite-rerank",
-    "cloud-nvidia-nemotron-1b",
     "local-apple-qwen3-0_6b",
     "local-apple-qwen3-0_6b-local-rerank",
+  ];
+  if (scope === "local-full") return local;
+  return [
+    ...local.slice(0, 3),
+    "cloud-voyage4-voyage-lite-rerank",
+    "cloud-nvidia-nemotron-1b",
+    ...local.slice(3),
   ];
 }
 
@@ -474,6 +558,7 @@ function renderMarkdown(value) {
     "# Full Answer-Quality Shard Plan",
     "",
     `- Status: ${value.status}`,
+    `- Claim scope: ${value.claimScope}`,
     `- Ready for answer-quality shard run: ${value.readyForAnswerQualityShardRun}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
     `- Target: ${value.target.path}`,

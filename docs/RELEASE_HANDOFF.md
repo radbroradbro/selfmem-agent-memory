@@ -338,6 +338,18 @@ Query expansion is deliberately lane-scoped: deterministic fallback is allowed
 for the control and local diagnostic lanes without becoming SOTA support, while
 `full-sota-accepted-shards` still requires local or cloud model-backed query
 expansion and exact target answer/judge model matching.
+For the local-first full benchmark, use
+`benchmark:answer-quality:local-shard-plan`. The checked-in plan,
+`reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json`,
+uses the same 500-query LongMemEval target and private raw-source-retaining
+materialization but accepts the local strategy set only: BM25, full hybrid,
+query-expanded full hybrid, Qwen3 local Apple embedding, and local rerank. The
+paired workorder,
+`reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json`,
+has no Voyage/NVIDIA blockers and is blocked only on the local/run consent,
+answer-quality endpoint, and model-backed query-expansion readiness needed to
+actually run it. Treat a completed local-full result as model-method evidence;
+it can explain a local-vs-cloud gap, but it is not SOTA proof or launch approval.
 Before combining returned full-shard outputs, run
 `benchmark:answer-quality:shard-intake` against the public shard-result JSONs.
 The checked-in intake report,

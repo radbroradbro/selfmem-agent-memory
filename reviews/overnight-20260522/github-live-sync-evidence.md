@@ -275,4 +275,17 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: 6ea910be175bdd0709c6fdc31ecb7ddbef79c8c99d23c2b90271c26968ec3445
 
+## 2026-05-26 Local-Full Benchmark Lane Refresh
+
+- PR #5 and issue #6 were refreshed again after adding the `local-full`
+  answer-quality shard plan/workorder as a same-data local benchmark lane.
+- The refreshed public text keeps the local lane separate from the full-SOTA
+  provider lane, keeps BM25 as the lexical control, preserves raw-source
+  lineage privately, and does not claim public benchmark superiority.
+- PR body refreshed at: 2026-05-26T05:29:17Z
+- Issue updated at: 2026-05-26T05:29:18Z
+- PR body hash: ee66ba42eb48acd36cf4fc2bec587e5265a2258e89b4a99490b1443f152a030e
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: a4f14efd9edf0463dd16ca8ed7229ce29d621bfb4caa8f860c106d4a5ddf1afb
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.

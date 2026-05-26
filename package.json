@@ -100,6 +100,7 @@
     "benchmark:answer-quality": "node packages/bench/public-benchmark-answer-quality.mjs",
     "benchmark:answer-quality:combine": "node packages/bench/public-benchmark-answer-quality-combine.mjs",
     "benchmark:answer-quality:shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+    "benchmark:answer-quality:local-shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs --claim-scope local-full",
     "benchmark:answer-quality:shard-workorder": "node packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
     "benchmark:answer-quality:shard-intake": "node packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
     "benchmark:answer-quality:private-input-doctor": "node packages/bench/full-shard-private-input-doctor.mjs",

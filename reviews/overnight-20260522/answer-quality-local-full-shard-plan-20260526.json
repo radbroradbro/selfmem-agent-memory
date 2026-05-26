@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-answer-quality-shard-plan",
   "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN",
-  "claimScope": "full-sota",
+  "claimScope": "local-full",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -22,7 +22,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-26T05:28:27.802Z",
+  "generatedAt": "2026-05-26T05:22:02.423Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
     "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
@@ -59,11 +59,11 @@
     "hasBm25Lite": true,
     "hasFullHybridRerank": true,
     "hasQueryExpansion": true,
-    "hasVoyageProvider": true,
-    "hasNvidiaOrGeminiProvider": true,
+    "hasVoyageProvider": false,
+    "hasNvidiaOrGeminiProvider": false,
     "hasLocalApple": true,
     "hasLocalRerank": true,
-    "strategyCount": 7
+    "strategyCount": 5
   },
   "coverageRequirements": {
     "targetIsLongMemEvalRunOnly": true,
@@ -89,12 +89,10 @@
     "queryExpansionPresent": true,
     "localApplePresent": true,
     "localRerankPresent": true,
-    "shardCoverageComplete": true,
-    "voyageProviderPresent": true,
-    "nvidiaOrGeminiProviderPresent": true
+    "shardCoverageComplete": true
   },
   "runPlan": {
-    "claimScope": "full-sota",
+    "claimScope": "local-full",
     "queryCount": 500,
     "shardSize": 25,
     "shardCount": 20,
@@ -105,20 +103,18 @@
       "bm25-lite",
       "full-hybrid-rerank",
       "query-expanded-full-hybrid-rerank",
-      "cloud-voyage4-voyage-lite-rerank",
-      "cloud-nvidia-nemotron-1b",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
     ],
     "privateInputDirectoryLabel": "<private-output-dir>",
     "publicOutputDirectoryLabel": "<public-review-dir>",
     "materializeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --private-output-dir <private-output-dir> --output <public-review-dir>/public-longmemeval-full-materialize-run.json --markdown-output <public-review-dir>/public-longmemeval-full-materialize-run-evidence.md",
-    "responseArmExportTemplate": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/{shardId} --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset {startIndex} --max-queries {queryCount}",
-    "preflightTemplate": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset {startIndex} --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/arms/{shardId}/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/{shardId}/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/{shardId}/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/{shardId}/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/{shardId}/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-preflight-{shardId}.json --markdown-output <public-review-dir>/answer-quality-preflight-{shardId}.md",
-    "answerQualityTemplate": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset {startIndex} --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/arms/{shardId}/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/{shardId}/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/{shardId}/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/{shardId}/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/{shardId}/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-{shardId}.json --markdown-output <public-review-dir>/answer-quality-{shardId}.md",
-    "combineCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-shard-001.json,<public-review-dir>/answer-quality-shard-002.json,<public-review-dir>/answer-quality-shard-003.json,<public-review-dir>/answer-quality-shard-004.json,<public-review-dir>/answer-quality-shard-005.json,<public-review-dir>/answer-quality-shard-006.json,<public-review-dir>/answer-quality-shard-007.json,<public-review-dir>/answer-quality-shard-008.json,<public-review-dir>/answer-quality-shard-009.json,<public-review-dir>/answer-quality-shard-010.json,<public-review-dir>/answer-quality-shard-011.json,<public-review-dir>/answer-quality-shard-012.json,<public-review-dir>/answer-quality-shard-013.json,<public-review-dir>/answer-quality-shard-014.json,<public-review-dir>/answer-quality-shard-015.json,<public-review-dir>/answer-quality-shard-016.json,<public-review-dir>/answer-quality-shard-017.json,<public-review-dir>/answer-quality-shard-018.json,<public-review-dir>/answer-quality-shard-019.json,<public-review-dir>/answer-quality-shard-020.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-full-combined.md",
-    "resultGateCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-full.json --require-ready",
-    "reviewerIntakeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-full.json"
+    "responseArmExportTemplate": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/{shardId} --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset {startIndex} --max-queries {queryCount}",
+    "preflightTemplate": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset {startIndex} --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/arms/{shardId}/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/{shardId}/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/{shardId}/query-expanded-full-hybrid-rerank-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-local-full-preflight-{shardId}.json --markdown-output <public-review-dir>/answer-quality-local-full-preflight-{shardId}.md",
+    "answerQualityTemplate": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset {startIndex} --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/arms/{shardId}/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/{shardId}/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/{shardId}/query-expanded-full-hybrid-rerank-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-local-full-{shardId}.json --markdown-output <public-review-dir>/answer-quality-local-full-{shardId}.md",
+    "combineCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json,<public-review-dir>/answer-quality-local-full-shard-003.json,<public-review-dir>/answer-quality-local-full-shard-004.json,<public-review-dir>/answer-quality-local-full-shard-005.json,<public-review-dir>/answer-quality-local-full-shard-006.json,<public-review-dir>/answer-quality-local-full-shard-007.json,<public-review-dir>/answer-quality-local-full-shard-008.json,<public-review-dir>/answer-quality-local-full-shard-009.json,<public-review-dir>/answer-quality-local-full-shard-010.json,<public-review-dir>/answer-quality-local-full-shard-011.json,<public-review-dir>/answer-quality-local-full-shard-012.json,<public-review-dir>/answer-quality-local-full-shard-013.json,<public-review-dir>/answer-quality-local-full-shard-014.json,<public-review-dir>/answer-quality-local-full-shard-015.json,<public-review-dir>/answer-quality-local-full-shard-016.json,<public-review-dir>/answer-quality-local-full-shard-017.json,<public-review-dir>/answer-quality-local-full-shard-018.json,<public-review-dir>/answer-quality-local-full-shard-019.json,<public-review-dir>/answer-quality-local-full-shard-020.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-local-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-local-full-combined.md",
+    "resultGateCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-local-full-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-local-full.json --require-ready",
+    "reviewerIntakeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-local-full-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-local-full.json"
   },
   "executionLanes": [
     {
@@ -204,8 +200,10 @@
         "cloud-voyage4-voyage-lite-rerank"
       ],
       "strategyCount": 3,
-      "missingStrategies": [],
-      "coverageReady": true,
+      "missingStrategies": [
+        "cloud-voyage4-voyage-lite-rerank"
+      ],
+      "coverageReady": false,
       "providerRequirements": [
         "voyage"
       ],
@@ -240,8 +238,10 @@
         "cloud-nvidia-nemotron-1b"
       ],
       "strategyCount": 3,
-      "missingStrategies": [],
-      "coverageReady": true,
+      "missingStrategies": [
+        "cloud-nvidia-nemotron-1b"
+      ],
+      "coverageReady": false,
       "providerRequirements": [
         "nvidia"
       ],
@@ -267,26 +267,22 @@
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
     },
     {
-      "id": "full-sota-accepted-shards",
-      "label": "Full SOTA shard-intake lane",
-      "operatorUse": "Only this lane has the complete strategy set expected by shard intake and combine.",
+      "id": "local-full-accepted-shards",
+      "label": "Full local answer-quality shard-intake lane",
+      "operatorUse": "Use this lane for the full 500-query local method benchmark before spending on cloud challengers.",
       "strategies": [
         "bm25-lite",
         "full-hybrid-rerank",
         "query-expanded-full-hybrid-rerank",
-        "cloud-voyage4-voyage-lite-rerank",
-        "cloud-nvidia-nemotron-1b",
         "local-apple-qwen3-0_6b",
         "local-apple-qwen3-0_6b-local-rerank"
       ],
-      "strategyCount": 7,
+      "strategyCount": 5,
       "missingStrategies": [],
       "coverageReady": true,
       "providerRequirements": [
         "local-apple",
-        "local-rerank",
-        "nvidia",
-        "voyage"
+        "local-rerank"
       ],
       "consentRequirements": [
         "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
@@ -300,14 +296,14 @@
         "judgeModel": "gpt-4o"
       },
       "acceptedByFullShardIntake": true,
-      "canReachFullSotaGateAfterShardIntake": true,
+      "canReachFullSotaGateAfterShardIntake": false,
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
-      "queryExpansionPolicy": "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
+      "queryExpansionPolicy": "Query expansion, local Apple, and local rerank arms must all be present on the same shards; cloud query expansion is allowed only when explicitly labeled.",
       "queryExpansionEvidenceRequirement": "local-or-cloud-model-required",
       "queryExpansionDiagnosticFallbackAllowed": false,
-      "queryExpansionSotaEligible": true,
-      "shardIntakeCompatibility": "accepted only after every planned shard returns with this complete strategy set"
+      "queryExpansionSotaEligible": false,
+      "shardIntakeCompatibility": "accepted for this local full benchmark plan only; full-SOTA intake still requires the provider comparison plan"
     }
   ],
   "shards": [
@@ -318,8 +314,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:c1bfaf4b31bb2d306fd0b373c62dc9cfbb32df73ef58aa1cc983e45c35829b68",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-001",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-001.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-001.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-001.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-001.md"
     },
     {
       "id": "shard-002",
@@ -328,8 +324,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:71103d5a2daad08f0b08b4f93b9b1dda09760758eecc545a3d2ab25d55dd6d7e",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-002",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-002.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-002.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-002.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-002.md"
     },
     {
       "id": "shard-003",
@@ -338,8 +334,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:58db3648c91f8830588df1a55353107279ecfda54e6fa9a2d0ea7f57b304a1bb",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-003",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-003.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-003.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-003.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-003.md"
     },
     {
       "id": "shard-004",
@@ -348,8 +344,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:ad9d760a81aeb2e17edc40a6a73ff15805c1712fdf7f56c1ad1c17e52a29233a",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-004",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-004.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-004.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-004.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-004.md"
     },
     {
       "id": "shard-005",
@@ -358,8 +354,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:03066585a3187536499641dc1a094f2e9e8c9ecae0b0189f40b7763835ef51e7",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-005",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-005.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-005.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-005.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-005.md"
     },
     {
       "id": "shard-006",
@@ -368,8 +364,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:ea5c004f58402224c122911a95d5700afebadc6c037e8e99ac8773ac5939b517",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-006",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-006.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-006.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-006.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-006.md"
     },
     {
       "id": "shard-007",
@@ -378,8 +374,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:901380685743d928c30ed268165602ac6001c1ced378d789a2b11ed1ce9cda1c",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-007",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-007.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-007.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-007.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-007.md"
     },
     {
       "id": "shard-008",
@@ -388,8 +384,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:306f93768513b1328d3c84da6921b55853ab1cf72b7bae7fe7cedf186b9cba30",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-008",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-008.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-008.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-008.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-008.md"
     },
     {
       "id": "shard-009",
@@ -398,8 +394,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:a70c0cf325ce9ad211ab08b3449f1b70ac8c780d7d464523bc4e0494b3163606",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-009",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-009.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-009.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-009.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-009.md"
     },
     {
       "id": "shard-010",
@@ -408,8 +404,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:ced258f82d118a9ec9efd2fc6c99610371579814491cff593d3877e93651a622",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-010",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-010.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-010.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-010.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-010.md"
     },
     {
       "id": "shard-011",
@@ -418,8 +414,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:7db76ab4f8e8fca01c723389c68d1121f121dc511921dfd6ac95ad7d9844c026",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-011",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-011.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-011.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-011.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-011.md"
     },
     {
       "id": "shard-012",
@@ -428,8 +424,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:1be862918a3cc513ce05b63dfa918c411b1847ff2d535664a664107aa083ebc6",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-012",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-012.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-012.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-012.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-012.md"
     },
     {
       "id": "shard-013",
@@ -438,8 +434,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:3e28662567e36ed55c72ceec63d62d62a74094e01272786c749a6583b9da72fb",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-013",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-013.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-013.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-013.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-013.md"
     },
     {
       "id": "shard-014",
@@ -448,8 +444,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:873640630ac419aeb0cae04aa6f5801363eacb0199b0a32563baac154c6059b7",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-014",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-014.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-014.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-014.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-014.md"
     },
     {
       "id": "shard-015",
@@ -458,8 +454,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:1af1c6b26c7af96dfa777c818d9619dce29138c3a0e1d473cbcfbf1cf8f4bb2a",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-015",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-015.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-015.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-015.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-015.md"
     },
     {
       "id": "shard-016",
@@ -468,8 +464,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:d5a48a6900a8b84db02a4b22eed89deeff3d3b7412781e4a40a7800594d975ea",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-016",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-016.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-016.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-016.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-016.md"
     },
     {
       "id": "shard-017",
@@ -478,8 +474,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:f5eedb21035b1aebf63db723b3f51f9d63b50ba501b801e49a01f7c289a66716",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-017",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-017.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-017.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-017.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-017.md"
     },
     {
       "id": "shard-018",
@@ -488,8 +484,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:0d8f6d43931f116e3632322367a73c0d50d65b43e622c4d1018be580c253a71c",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-018",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-018.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-018.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-018.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-018.md"
     },
     {
       "id": "shard-019",
@@ -498,8 +494,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:48f3b938408d7530d2b423418288af1eb35eca6a5ea78487ab98c35b17667c90",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-019",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-019.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-019.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-019.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-019.md"
     },
     {
       "id": "shard-020",
@@ -508,8 +504,8 @@
       "queryCount": 25,
       "rangeHash": "sha256:59f4ad0dc9bcc2d8101cae5659b52a82c6e17a2c23d0cebddcb5b7adc1652e76",
       "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-020",
-      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-020.json",
-      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-020.md"
+      "answerQualityOutputLabel": "<public-review-dir>/answer-quality-local-full-shard-020.json",
+      "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-local-full-shard-020.md"
     }
   ],
   "checks": {
@@ -534,8 +530,8 @@
     "bm25ControlPresent": true,
     "fullHybridControlPresent": true,
     "queryExpansionPresent": true,
-    "voyageProviderPresent": true,
-    "nvidiaOrGeminiProviderPresent": true,
+    "voyageProviderPresent": false,
+    "nvidiaOrGeminiProviderPresent": false,
     "localApplePresent": true,
     "localRerankPresent": true,
     "shardCoverageComplete": true
@@ -546,6 +542,6 @@
     "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
     "Run answer-quality scoring for each shard with the target answer and judge models.",
     "Combine the full query-shard result set, then run the memory-score gate and reviewer intake on the combined metrics-only packet.",
-    "Treat the completed result as SOTA-candidate evidence only after result gate, reviewer intake, UI/docs, owner approval, and real canary also pass."
+    "Treat the completed result as a full local benchmark result only; SOTA and public superiority claims still need the full provider/comparison lane."
   ]
 }

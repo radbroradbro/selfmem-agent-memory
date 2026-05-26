@@ -30,10 +30,15 @@ const loaded = inputs.map(loadCandidateResult);
 const evaluated = evaluateExistingShardResults({ plan, loaded });
 const pendingShards = (plan.shards ?? []).filter((shard) => !evaluated.acceptedByShardId.has(shard.id));
 const selectedPendingShards = pendingShards.slice(0, maxWorkorders);
-const allExpectedPublicInputs = (plan.shards ?? []).map((shard) => `<public-review-dir>/answer-quality-${shard.id}.json`);
+const allExpectedPublicInputs = (plan.shards ?? []).map(
+  (shard) => shard.answerQualityOutputLabel ?? `<public-review-dir>/answer-quality-${shard.id}.json`,
+);
 const readyForShardIntake = pendingShards.length === 0 && evaluated.rejectedResults.length === 0 && evaluated.duplicateResults.length === 0;
 const executionLaneReadiness = buildExecutionLaneReadiness(plan.executionLanes ?? []);
-const fullSotaLaneReadiness = executionLaneReadiness.find((lane) => lane.acceptedByFullShardIntake === true) ?? null;
+const acceptedLaneReadiness = executionLaneReadiness.find((lane) => lane.acceptedByFullShardIntake === true) ?? null;
+const fullSotaLaneReadiness = executionLaneReadiness.find((lane) => lane.laneId === "full-sota-accepted-shards") ?? null;
+const intakeOutputStem =
+  plan.runPlan?.claimScope === "local-full" ? "answer-quality-local-full-shard-intake" : "answer-quality-full-shard-intake";
 
 const report = {
   schemaVersion: 1,
@@ -63,6 +68,7 @@ const report = {
   plan: {
     path: displayPath(planPath),
     hash: `sha256:${sha256(planRaw)}`,
+    claimScope: plan.runPlan?.claimScope ?? null,
     targetHash: plan.target?.hash ?? null,
     queryCount: plan.runPlan?.queryCount ?? null,
     shardSize: plan.runPlan?.shardSize ?? null,
@@ -71,6 +77,10 @@ const report = {
   },
   executionLanes: plan.executionLanes ?? [],
   executionLaneReadiness,
+  acceptedLaneReadiness,
+  acceptedLaneReadyForResponseArmExport: Boolean(acceptedLaneReadiness?.readyForResponseArmExport),
+  acceptedLaneReadyForAnswerQualityScoring: Boolean(acceptedLaneReadiness?.readyForAnswerQualityScoring),
+  acceptedLaneEnvironmentBlockers: acceptedLaneReadiness?.blockers ?? [],
   fullSotaLaneReadiness,
   fullSotaLaneReadyForResponseArmExport: Boolean(fullSotaLaneReadiness?.readyForResponseArmExport),
   fullSotaLaneReadyForAnswerQualityScoring: Boolean(fullSotaLaneReadiness?.readyForAnswerQualityScoring),
@@ -92,8 +102,8 @@ const report = {
     shardIntake: [
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake",
       `--input ${allExpectedPublicInputs.join(",")}`,
-      "--output <public-review-dir>/answer-quality-full-shard-intake.json",
-      "--markdown-output <public-review-dir>/answer-quality-full-shard-intake.md",
+      `--output <public-review-dir>/${intakeOutputStem}.json`,
+      `--markdown-output <public-review-dir>/${intakeOutputStem}.md`,
       "--require-ready",
     ].join(" "),
     combineAfterIntakePasses: plan.runPlan?.combineCommand ?? null,
@@ -133,7 +143,7 @@ function inputPaths() {
   const dir = resolveInputPath(directory);
   assert.ok(existsSync(dir), `shard result directory missing: ${displayPath(dir)}`);
   const discovered = readdirSync(dir)
-    .filter((name) => /^answer-quality-shard-\d{3}\.json$/u.test(name))
+    .filter((name) => /^answer-quality(?:-[a-z]+)*-shard-\d{3}\.json$/u.test(name))
     .map((name) => join(dir, name));
   return [...explicit, ...discovered].sort();
 }
@@ -229,8 +239,8 @@ function buildWorkorder(planValue, shard) {
     startIndex: shard.startIndex,
     endIndexExclusive: shard.endIndexExclusive,
     queryCount: shard.queryCount,
-    expectedPublicResult: `<public-review-dir>/answer-quality-${shard.id}.json`,
-    expectedPublicMarkdown: `<public-review-dir>/answer-quality-${shard.id}.md`,
+    expectedPublicResult: shard.answerQualityOutputLabel ?? `<public-review-dir>/answer-quality-${shard.id}.json`,
+    expectedPublicMarkdown: shard.answerQualityMarkdownLabel ?? `<public-review-dir>/answer-quality-${shard.id}.md`,
     expectedPrivateArmDirectory: `<private-output-dir>/arms/${shard.id}`,
     commands: {
       responseArmExport: replaceShardTokens(planValue.runPlan?.responseArmExportTemplate ?? "", shard),
@@ -274,6 +284,7 @@ function buildExecutionLaneReadiness(lanes) {
       laneId: lane.id,
       label: lane.label,
       acceptedByFullShardIntake: Boolean(lane.acceptedByFullShardIntake),
+      canReachFullSotaGateAfterShardIntake: Boolean(lane.canReachFullSotaGateAfterShardIntake),
       diagnosticOnly: lane.acceptedByFullShardIntake !== true,
       coverageReady: Boolean(lane.coverageReady),
       strategies,

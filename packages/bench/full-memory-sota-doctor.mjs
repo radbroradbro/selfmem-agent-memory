@@ -18,6 +18,8 @@ const files = {
   fullTarget: `${reviewDir}/public-longmemeval-full-run-target.json`,
   fullMaterialize: `${reviewDir}/public-longmemeval-full-materialize-run.json`,
   shardPlan: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
+  localFullShardPlan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
+  localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
   acceptedLaneLaunchDoctor: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
   controlPreflight: `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.json`,
@@ -44,6 +46,8 @@ const goalAudit = runJson(["packages/bench/goal-completion-audit.mjs"]);
 const fullTarget = evidence.fullTarget.json;
 const fullMaterialize = evidence.fullMaterialize.json;
 const shardPlan = evidence.shardPlan.json;
+const localFullShardPlan = evidence.localFullShardPlan.json;
+const localFullShardWorkorder = evidence.localFullShardWorkorder.json;
 const privateInputDoctor = evidence.privateInputDoctor.json;
 const acceptedLaneLaunchDoctor = evidence.acceptedLaneLaunchDoctor.json;
 const controlPreflight = evidence.controlPreflight.json;
@@ -60,6 +64,7 @@ const uiEvidence = evidence.uiEvidence.json;
 const rawRetention = inspectRawSourceRetention(fullMaterialize);
 const controlPreflightState = inspectControlPreflightState(controlPreflight);
 const shardState = inspectShardState({ shardPlan, shardWorkorder, shardIntake });
+const localFullLaneState = inspectLocalFullLaneState({ localFullShardPlan, localFullShardWorkorder });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
 const reviewerState = inspectReviewerState(reviewerIntake);
 const docState = inspectDocs(evidence);
@@ -83,6 +88,7 @@ const gates = [
   gate("bm25-is-control-only", sotaOperatorPacket?.sameDataContract?.bm25LexicalFloorRequired === true, [
     "bm25-control-contract-missing",
   ]),
+  gate("local-full-benchmark-lane", localFullLaneState.readyForLocalFullBenchmarkPlan, localFullLaneState.blockers),
   gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
   gate("same-data-provider-arms", !arrayOf(sotaLadder?.blockers).includes("missing-voyage-answer-quality-same-data-result"), [
     "missing-voyage-answer-quality-same-data-result",
@@ -167,6 +173,7 @@ const report = {
   acceptedLaneLaunchState: inspectAcceptedLaneLaunchState(acceptedLaneLaunchDoctor),
   controlPreflightState,
   shardState,
+  localFullLaneState,
   currentCanary,
   reviewerState,
   docState,
@@ -245,9 +252,7 @@ function inspectReportedTargets(sotaLadderReport) {
 
 function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
   const executionLaneReadiness = arrayOf(shardWorkorder?.executionLaneReadiness);
-  const fullSotaLane = executionLaneReadiness.find(
-    (lane) => lane.laneId === "full-sota-accepted-shards" || lane.acceptedByFullShardIntake === true,
-  );
+  const fullSotaLane = executionLaneReadiness.find((lane) => lane.laneId === "full-sota-accepted-shards");
   return {
     planStatus: shardPlan?.status ?? null,
     workorderStatus: shardWorkorder?.status ?? null,
@@ -277,6 +282,41 @@ function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
       ...arrayOf(shardIntake?.blockers),
       ...arrayOf(fullSotaLane?.blockers),
     ],
+  };
+}
+
+function inspectLocalFullLaneState({ localFullShardPlan, localFullShardWorkorder }) {
+  const acceptedLane = arrayOf(localFullShardWorkorder?.executionLaneReadiness).find((lane) => lane.acceptedByFullShardIntake === true);
+  const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
+  const cloudProviderBlockers = envBlockers.filter((item) =>
+    ["voyage-credentials-missing", "nvidia-credentials-missing", "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled", "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"].includes(item),
+  );
+  const blockers = [
+    localFullShardPlan?.claimScope !== "local-full" ? "local-full-claim-scope-missing" : null,
+    localFullShardPlan?.readyForAnswerQualityShardRun !== true ? "local-full-shard-plan-not-ready" : null,
+    acceptedLane?.laneId !== "local-full-accepted-shards" ? "local-full-accepted-lane-missing" : null,
+    acceptedLane?.canReachFullSotaGateAfterShardIntake !== false ? "local-full-lane-should-not-claim-sota" : null,
+    cloudProviderBlockers.length > 0 ? "local-full-lane-has-cloud-provider-blockers" : null,
+  ].filter(Boolean);
+  return {
+    planPath: files.localFullShardPlan,
+    workorderPath: files.localFullShardWorkorder,
+    status: blockers.length === 0 ? "READY_LOCAL_FULL_BENCHMARK_PLAN" : "BLOCKED_LOCAL_FULL_BENCHMARK_PLAN",
+    readyForLocalFullBenchmarkPlan: blockers.length === 0,
+    readyForResponseArmExport: Boolean(localFullShardWorkorder?.acceptedLaneReadyForResponseArmExport),
+    readyForAnswerQualityScoring: Boolean(localFullShardWorkorder?.acceptedLaneReadyForAnswerQualityScoring),
+    claimScope: localFullShardPlan?.claimScope ?? null,
+    queryCount: Number(localFullShardPlan?.runPlan?.queryCount ?? 0),
+    shardCount: Number(localFullShardPlan?.runPlan?.shardCount ?? 0),
+    strategies: localFullShardPlan?.runPlan?.strategies ?? [],
+    acceptedLaneId: acceptedLane?.laneId ?? null,
+    canReachFullSotaGateAfterShardIntake: Boolean(acceptedLane?.canReachFullSotaGateAfterShardIntake),
+    cloudProviderBlockerCount: cloudProviderBlockers.length,
+    pendingShardCount: Number(localFullShardWorkorder?.progress?.pendingShardCount ?? 0),
+    countsAsFullMemorySotaEvidence: false,
+    publicBenchmarkClaimsAllowed: false,
+    envBlockers,
+    blockers,
   };
 }
 
@@ -536,6 +576,16 @@ function renderMarkdown(value) {
     `- Missing shards: ${value.shardState.missingShardCount}`,
     `- Full SOTA lane ready for response export: ${value.shardState.fullSotaLaneReadyForResponseArmExport}`,
     `- Full SOTA lane ready for answer-quality scoring: ${value.shardState.fullSotaLaneReadyForAnswerQualityScoring}`,
+    "",
+    "## Local Full Lane",
+    `- Status: ${value.localFullLaneState.status}`,
+    `- Claim scope: ${value.localFullLaneState.claimScope}`,
+    `- Accepted lane: ${value.localFullLaneState.acceptedLaneId ?? "n/a"}`,
+    `- Query count: ${value.localFullLaneState.queryCount}`,
+    `- Shard count: ${value.localFullLaneState.shardCount}`,
+    `- Ready for response export: ${value.localFullLaneState.readyForResponseArmExport}`,
+    `- Cloud provider blocker count: ${value.localFullLaneState.cloudProviderBlockerCount}`,
+    `- Counts as full memory SOTA evidence: ${value.localFullLaneState.countsAsFullMemorySotaEvidence}`,
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),

@@ -60,6 +60,12 @@ requirements are resolved.
   live export/no-raw-text consent, answer-quality consent, exact target model
   matching, local/provider arms, and model-backed query expansion are
   configured.
+- The local full benchmark lane is now separate from the provider/SOTA lane.
+  `benchmark:answer-quality:local-shard-plan` accepts the same 500-query target
+  with BM25, full hybrid, model-backed query expansion, local Apple embedding,
+  and local rerank, without Voyage/NVIDIA blockers. A completed local-full run
+  can diagnose local model limits, but it still cannot authorize SOTA or launch
+  language.
 - Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` records live Qwen3
   Embedding 0.6B and Qwen3 Embedding 4B Apple Silicon runs on the same 30-query
   public LongMemEval-S retrieval-proxy target. Both local arms tied BM25
