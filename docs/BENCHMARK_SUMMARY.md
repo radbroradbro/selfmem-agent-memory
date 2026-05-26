@@ -267,9 +267,11 @@ The full target now also has a checked-in answer-quality shard plan at
 `reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json`. It
 uses the private raw-source-retaining materialization, defines twenty 25-query
 shards, and carries BM25, full hybrid, query expansion, Voyage, NVIDIA, local
-Apple, and local rerank arms through shard export, answer scoring, shard
-combination, result gate, and reviewer intake commands. This is an execution
-plan and harness upgrade, not a completed full-SOTA result.
+Apple, and local rerank arms through shard export, shard-aware preflight,
+answer scoring, shard combination, result gate, and reviewer intake commands.
+The preflight now validates the selected query range against every private
+response arm before scoring, so an arm for the wrong shard cannot silently count.
+This is an execution plan and harness upgrade, not a completed full-SOTA result.
 The SOTA operator packet now treats that shard plan as the source of truth:
 each shard must export its own private response-arm files, run answer-quality
 preflight against those per-shard arms, then score only that shard before

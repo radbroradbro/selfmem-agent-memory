@@ -426,8 +426,10 @@ Component rows in the same artifact remain model-selection evidence only.
   checked-in shard plan,
   `reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json`,
   uses twenty 25-query chunks, includes BM25, full hybrid, query expansion,
-  Voyage, NVIDIA, local Apple, and local rerank arms, and merges with
-  `combineMode=query-shard-answer-quality-union`; that merged packet still needs
+  Voyage, NVIDIA, local Apple, and local rerank arms, and requires a
+  shard-aware answer-quality preflight before scoring each chunk. The preflight
+  rejects response-arm files that do not cover the selected query range. It
+  merges with `combineMode=query-shard-answer-quality-union`; that merged packet still needs
   live execution, reviewer intake, result gate, SOTA ladder, UI evidence, docs,
   owner approval, and real production canary before any broad claim.
 - Full-shard private-input doctor:

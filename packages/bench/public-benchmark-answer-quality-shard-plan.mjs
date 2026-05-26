@@ -158,6 +158,7 @@ const report = {
     publicOutputDirectoryLabel: "<public-review-dir>",
     materializeCommand: materializeCommand(),
     responseArmExportTemplate: responseArmExportTemplate(),
+    preflightTemplate: preflightTemplate(),
     answerQualityTemplate: answerQualityTemplate(),
     combineCommand: combineCommand(shards),
     resultGateCommand: resultGateCommand(),
@@ -169,6 +170,7 @@ const report = {
   nextActions: ready
     ? [
         "Run response arm exports shard-by-shard with explicit provider and query-expansion consent.",
+        "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
         "Run answer-quality scoring for each shard with the target answer and judge models.",
         "Combine the full query-shard result set, then run the memory-score gate and reviewer intake on the combined metrics-only packet.",
       ]
@@ -274,6 +276,29 @@ function answerQualityTemplate() {
   ].join(" ");
 }
 
+function preflightTemplate() {
+  const armArgs = strategies.map((strategy) => `--arm ${strategy}=<private-output-dir>/arms/{shardId}/${strategy}-responses.private.json`);
+  return [
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+    "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
+    "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
+    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${target.benchmark?.answerModel ?? "<target-answer-model>"}`,
+    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${target.benchmark?.judgeModel ?? "<target-judge-model>"}`,
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready",
+    `--target ${displayPath(targetPath)}`,
+    "--queryset <private-output-dir>/longmemeval-queryset.private.json",
+    "--memories <private-output-dir>/longmemeval-memories.private.jsonl",
+    "--answer-labels <private-output-dir>/longmemeval-answer-labels.private.json",
+    "--query-offset {startIndex}",
+    "--max-queries {queryCount}",
+    ...armArgs,
+    "--output <public-review-dir>/answer-quality-preflight-{shardId}.json",
+    "--markdown-output <public-review-dir>/answer-quality-preflight-{shardId}.md",
+  ].join(" ");
+}
+
 function combineCommand(shardRows) {
   const inputs = shardRows.map((shard) => `<public-review-dir>/answer-quality-${shard.id}.json`).join(",");
   return [
@@ -347,6 +372,7 @@ function renderMarkdown(value) {
     "## Commands",
     "```bash",
     value.runPlan.responseArmExportTemplate,
+    value.runPlan.preflightTemplate,
     value.runPlan.answerQualityTemplate,
     value.runPlan.combineCommand,
     value.runPlan.resultGateCommand,

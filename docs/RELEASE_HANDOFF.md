@@ -273,7 +273,9 @@ query expansion, Voyage, NVIDIA, local Apple, and local rerank arms on the same
 source-locked data. The SOTA operator packet follows that plan directly: each
 shard exports private response arms into its own shard directory, runs
 answer-quality preflight against those shard-local arms, and only then writes
-the public-safe shard score. Merge those chunks only with
+the public-safe shard score. That preflight now checks that every response arm
+covers the selected `--query-offset` / `--max-queries` range before scoring.
+Merge those chunks only with
 `benchmark:answer-quality:combine -- --combine-mode shards`, which rejects gaps,
 overlaps, target/model mismatches, and mixed strategy sets.
 Before spending model calls on those shards, run

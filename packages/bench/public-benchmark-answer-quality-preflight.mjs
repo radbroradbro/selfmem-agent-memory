@@ -18,6 +18,8 @@ const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
 const requireReady = Boolean(args.requireReady);
+const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_QUERIES ?? null, "max queries");
+const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_MEMORYBENCH_QUERY_OFFSET ?? 0, "query offset");
 const armSpecs = parseArmSpecs(args.arm ?? args.arms);
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
@@ -41,6 +43,7 @@ const targetJudgeModel = String(target.benchmark?.judgeModel ?? "").trim();
 const answerModelMatchesTarget = answerModel.present && targetAnswerModel.length > 0 && answerModel.value === targetAnswerModel;
 const judgeModelMatchesTarget = judgeModel.present && targetJudgeModel.length > 0 && judgeModel.value === targetJudgeModel;
 
+let queryShardSelection = null;
 const privateInputs = inspectPrivateInputs();
 const arms = inspectArms();
 const strategyNames = arms.map((arm) => arm.strategy);
@@ -57,10 +60,12 @@ const envReady =
   (endpointIsLocal || apiKey.present);
 const privateInputsReady = privateInputs.querySet.present && privateInputs.memories.present && privateInputs.answerLabels.present;
 const armsReady = arms.length > 0 && arms.every((arm) => arm.present && arm.parseable);
+const responseArmsCoverSelectedShard = arms.length > 0 && arms.every((arm) => arm.selectedShardCoverage?.ready === true);
 const sameDataReady =
   privateInputs.querySet.matchesTarget !== false &&
   privateInputs.answerLabels.matchesTarget !== false &&
-  arms.every((arm) => arm.querySetMatches !== false);
+  arms.every((arm) => arm.querySetMatches !== false) &&
+  responseArmsCoverSelectedShard;
 const requiredStrategyCoverage = {
   hasBm25Lite: strategyNames.includes("bm25-lite"),
   hasFullHybridRerank: strategyNames.includes("full-hybrid-rerank"),
@@ -88,6 +93,7 @@ const blockers = [
   arms.length === 0 ? "response-arm-exports-missing" : null,
   !armsReady && arms.length > 0 ? "response-arm-export-not-ready" : null,
   arms.some((arm) => arm.querySetMatches === false) ? "response-arm-queryset-hash-mismatch" : null,
+  arms.some((arm) => arm.selectedShardCoverage?.ready === false) ? "response-arm-selected-shard-coverage-mismatch" : null,
   !requiredStrategyCoverage.hasBm25Lite ? "bm25-lite-arm-missing" : null,
   !requiredStrategyCoverage.hasFullHybridRerank ? "full-hybrid-rerank-arm-missing" : null,
   !requiredStrategyCoverage.hasChallenger ? "provider-or-local-challenger-arm-missing" : null,
@@ -142,12 +148,23 @@ const report = {
     valuesPrinted: false,
   },
   privateInputs,
+  queryShard: queryShardSelection
+    ? {
+        requested: maxQueries != null || queryOffset > 0,
+        startIndex: queryShardSelection.startIndex,
+        endIndexExclusive: queryShardSelection.endIndexExclusive,
+        totalQueryCount: queryShardSelection.totalQueryCount,
+        selectedQueryCount: queryShardSelection.ids.length,
+        selectedQueryIdHash: queryShardSelection.selectedQueryIdHash,
+      }
+    : null,
   arms,
   requiredStrategyCoverage,
   readiness: {
     envReady,
     privateInputsReady,
     armsReady,
+    responseArmsCoverSelectedShard,
     sameDataReady,
     liveAnswerQualityCanRun: ready,
     readyForEndToEndMemoryScoreGate: ready,
@@ -221,11 +238,14 @@ function inspectPrivateJsonl(path, role) {
 
 function inspectQuerySet(value) {
   const querySetHash = `sha256:${stableHash(collectorQuerySetHashPayload(value))}`;
+  queryShardSelection = selectQueries(value.queries ?? []);
   const expectedAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
   const expectedScoringCodeHash = target.benchmark?.scoringCodeHash ?? null;
   return {
     querySetHash,
     queryCount: Number(value.queries?.length ?? 0),
+    selectedQueryCount: queryShardSelection.ids.length,
+    selectedQueryIdHash: queryShardSelection.selectedQueryIdHash,
     answerLabelsHash: value.authoring?.answerLabelsHash ?? null,
     scoringCodeHash: value.authoring?.scoringCodeHash ?? null,
     matchesTarget:
@@ -253,6 +273,27 @@ function inspectArms() {
     assertNoPattern(raw, secretPattern, `${arm.strategy} response arm contains a key-shaped secret`);
     const parsed = JSON.parse(raw);
     const querySetHash = parsed.querySetHash ?? null;
+    const responses = parsed.responses && typeof parsed.responses === "object" ? parsed.responses : {};
+    const responseIds = new Set(Object.keys(responses));
+    const selectedIds = queryShardSelection?.ids ?? [];
+    const missingSelectedCount = selectedIds.filter((id) => !responseIds.has(id)).length;
+    const extraResponseCount = [...responseIds].filter((id) => !selectedIds.includes(id)).length;
+    const responseCount = responseIds.size;
+    const selectedShardCoverage = {
+      ready:
+        selectedIds.length > 0 &&
+        missingSelectedCount === 0 &&
+        extraResponseCount === 0 &&
+        responseCount === selectedIds.length &&
+        (parsed.queryShard?.startIndex == null || Number(parsed.queryShard.startIndex) === queryShardSelection?.startIndex) &&
+        (parsed.queryShard?.endIndexExclusive == null || Number(parsed.queryShard.endIndexExclusive) === queryShardSelection?.endIndexExclusive),
+      expectedResponseCount: selectedIds.length,
+      responseCount,
+      missingSelectedCount,
+      extraResponseCount,
+      responseStartIndex: parsed.queryShard?.startIndex ?? null,
+      responseEndIndexExclusive: parsed.queryShard?.endIndexExclusive ?? null,
+    };
     return {
       strategy: arm.strategy,
       present: true,
@@ -262,9 +303,10 @@ function inspectArms() {
       name: basename(arm.path),
       hash: `sha256:${sha256(raw)}`,
       querySetHash,
-      responseCount: parsed.responses && typeof parsed.responses === "object" ? Object.keys(parsed.responses).length : 0,
+      responseCount,
       querySetMatches:
         privateInputs?.querySet?.querySetHash && querySetHash ? querySetHash === privateInputs.querySet.querySetHash : null,
+      selectedShardCoverage,
     };
   });
 }
@@ -284,6 +326,10 @@ function parseArmSpecs(value) {
 }
 
 function liveCommandTemplate() {
+  const shardArgs = [
+    queryOffset > 0 ? `--query-offset ${queryOffset}` : null,
+    maxQueries ? `--max-queries ${maxQueries}` : null,
+  ].filter(Boolean);
   return [
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
@@ -298,6 +344,7 @@ function liveCommandTemplate() {
       "--queryset <private-output-dir>/materialized/longmemeval-queryset.private.json",
       "--memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl",
       "--answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json",
+      ...shardArgs,
       "--arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json",
       "--arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json",
       "--arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json",
@@ -318,11 +365,14 @@ function renderMarkdown(value) {
     `- Target hash: ${value.target.hash}`,
     `- Target answer model: ${value.target.answerModel ?? "missing"}`,
     `- Target judge model: ${value.target.judgeModel ?? "missing"}`,
+    `- Query shard requested: ${value.queryShard?.requested ?? false}`,
+    `- Query shard: ${value.queryShard ? `${value.queryShard.startIndex}-${value.queryShard.endIndexExclusive}` : "n/a"}`,
     "",
     "## Readiness",
     `- Env ready: ${value.readiness.envReady}`,
     `- Private inputs ready: ${value.readiness.privateInputsReady}`,
     `- Response arms ready: ${value.readiness.armsReady}`,
+    `- Response arms cover selected shard: ${value.readiness.responseArmsCoverSelectedShard}`,
     `- Same-data hashes ready: ${value.readiness.sameDataReady}`,
     `- Answer model matches target: ${value.models.answerModelMatchesTarget}`,
     `- Judge model matches target: ${value.models.judgeModelMatchesTarget}`,
@@ -355,6 +405,19 @@ function collectorQuerySetHashPayload(querySet) {
       expectedResultIds: query.expectedResultIds ?? [],
       expectedResultHashes: query.expectedResultHashes ?? [],
     })),
+  };
+}
+
+function selectQueries(queries) {
+  const startIndex = Math.min(queryOffset, queries.length);
+  const endIndexExclusive = maxQueries ? Math.min(queries.length, startIndex + maxQueries) : queries.length;
+  const selected = queries.slice(startIndex, endIndexExclusive);
+  return {
+    startIndex,
+    endIndexExclusive,
+    totalQueryCount: queries.length,
+    ids: selected.map((query) => query.id),
+    selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => query.id).join("\n"))}`,
   };
 }
 
@@ -437,6 +500,20 @@ function displayPath(value) {
 function writeOutput(path, text) {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, text, { encoding: "utf8", mode: 0o600 });
+}
+
+function optionalPositiveInt(value, label) {
+  if (value == null || value === "" || value === false) return null;
+  const parsed = Number(value);
+  assert.ok(Number.isInteger(parsed) && parsed > 0, `${label} must be a positive integer`);
+  return parsed;
+}
+
+function optionalNonNegativeInt(value, label) {
+  if (value == null || value === "" || value === false) return 0;
+  const parsed = Number(value);
+  assert.ok(Number.isInteger(parsed) && parsed >= 0, `${label} must be a non-negative integer`);
+  return parsed;
 }
 
 function assertSafePublicText(text, label) {

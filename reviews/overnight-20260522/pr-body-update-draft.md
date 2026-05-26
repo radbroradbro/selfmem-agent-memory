@@ -345,6 +345,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   LongMemEval memory set in 36 observed wall-clock seconds with zero privacy
   leaks and no private response file committed. This is run-path evidence only,
   not answer-quality or SOTA evidence.
+- Makes answer-quality preflight shard-aware. Full-shard plans now include a
+  per-shard `benchmark:answer-quality:preflight --require-ready` step, and the
+  preflight rejects private response-arm files that do not cover the selected
+  `--query-offset` / `--max-queries` range before any answer-quality scoring can
+  count.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.

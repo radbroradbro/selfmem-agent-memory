@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   existsSync,
   lstatSync,
@@ -2245,6 +2246,73 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(answerQualityModelMismatchPreflight.blockers.includes("judge-model-does-not-match-target"));
   assert.match(answerQualityPreflightMarkdownFresh, /Answer-Quality Benchmark Preflight/);
   assert.match(answerQualityPreflightMarkdownEvidence, /BLOCKED_ANSWER_QUALITY_ENV/);
+  const shardPreflightFixture = writeSyntheticShardPreflightFixture(mkdtempSync(join(tmpdir(), "recallweave-shard-preflight-")));
+  const shardPreflightEnv = {
+    ...process.env,
+    RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS: "1",
+    RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA: "1",
+    RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT: "1",
+    RECALLWEAVE_MEMORYBENCH_BASE_URL: "http://127.0.0.1:8080",
+    RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL: "gpt-4o",
+    RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL: "gpt-4o",
+  };
+  const shardPreflightReady = JSON.parse(
+    run(
+      "node",
+      [
+        "packages/bench/public-benchmark-answer-quality-preflight.mjs",
+        "--require-ready",
+        "--target",
+        shardPreflightFixture.targetPath,
+        "--queryset",
+        shardPreflightFixture.querySetPath,
+        "--memories",
+        shardPreflightFixture.memoriesPath,
+        "--answer-labels",
+        shardPreflightFixture.answerLabelsPath,
+        "--query-offset",
+        "1",
+        "--max-queries",
+        "1",
+        ...shardPreflightFixture.armArgs,
+      ],
+      { env: shardPreflightEnv },
+    ).stdout,
+  );
+  assert.equal(shardPreflightReady.status, "READY_FOR_LIVE_ANSWER_QUALITY");
+  assert.equal(shardPreflightReady.queryShard?.startIndex, 1);
+  assert.equal(shardPreflightReady.queryShard?.endIndexExclusive, 2);
+  assert.equal(shardPreflightReady.queryShard?.selectedQueryCount, 1);
+  assert.equal(shardPreflightReady.readiness?.responseArmsCoverSelectedShard, true);
+  assert.equal(shardPreflightReady.readiness?.sameDataReady, true);
+  assert.ok(shardPreflightReady.arms.every((arm) => arm.querySetMatches === true));
+  assert.ok(shardPreflightReady.arms.every((arm) => arm.selectedShardCoverage?.ready === true));
+  assert.ok(shardPreflightReady.arms.every((arm) => arm.selectedShardCoverage?.responseCount === 1));
+  const shardPreflightMismatch = JSON.parse(
+    run(
+      "node",
+      [
+        "packages/bench/public-benchmark-answer-quality-preflight.mjs",
+        "--target",
+        shardPreflightFixture.targetPath,
+        "--queryset",
+        shardPreflightFixture.querySetPath,
+        "--memories",
+        shardPreflightFixture.memoriesPath,
+        "--answer-labels",
+        shardPreflightFixture.answerLabelsPath,
+        "--query-offset",
+        "0",
+        "--max-queries",
+        "1",
+        ...shardPreflightFixture.armArgs,
+      ],
+      { env: shardPreflightEnv },
+    ).stdout,
+  );
+  assert.equal(shardPreflightMismatch.status, "BLOCKED_ANSWER_QUALITY_ENV");
+  assert.equal(shardPreflightMismatch.readiness?.responseArmsCoverSelectedShard, false);
+  assert.ok(shardPreflightMismatch.blockers.includes("response-arm-selected-shard-coverage-mismatch"));
   assert.equal(answerQualityFixture.ok, true);
   assert.equal(answerQualityFixture.mode, "public-benchmark-answer-quality");
   assert.equal(answerQualityFixture.fixtureOnly, true);
@@ -2724,6 +2792,9 @@ check("fresh public benchmark target check passes", () => {
     assert.deepEqual(shardPlan.blockers, []);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--max-memory-bytes 300000000/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /benchmark:answer-quality:preflight/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--query-offset \{startIndex\}/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--max-queries \{queryCount\}/);
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /--max-queries \{queryCount\}/);
     assert.match(shardPlan.runPlan?.combineCommand ?? "", /--combine-mode shards/);
   }
@@ -6947,6 +7018,109 @@ function writeSyntheticAnswerQualityShardReports(plan, outputDir) {
     paths.push(path);
   }
   return paths;
+}
+
+function writeSyntheticShardPreflightFixture(tempRoot) {
+  mkdirSync(tempRoot, { recursive: true, mode: 0o700 });
+  const targetPath = join(tempRoot, "target.json");
+  const querySetPath = join(tempRoot, "longmemeval-queryset.private.json");
+  const memoriesPath = join(tempRoot, "longmemeval-memories.private.jsonl");
+  const answerLabelsPath = join(tempRoot, "longmemeval-answer-labels.private.json");
+  const armsDir = join(tempRoot, "arms", "shard-001");
+  mkdirSync(armsDir, { recursive: true, mode: 0o700 });
+  const answerLabelsHash = "sha256:synthetic-answer-labels";
+  const scoringCodeHash = "sha256:synthetic-scoring-code";
+  const strategies = ["bm25-lite", "full-hybrid-rerank", "local-fixture-challenger"];
+  const querySet = {
+    schemaVersion: 1,
+    datasetSlice: "synthetic-shard-preflight",
+    authoring: {
+      answerLabelsHash,
+      scoringCodeHash,
+    },
+    queries: [
+      { id: "query-one", q: "synthetic first query", expectedResultIds: ["memory-one"] },
+      { id: "query-two", q: "synthetic second query", expectedResultIds: ["memory-two"] },
+    ],
+  };
+  const querySetHash = `sha256:${stableHash(collectorQuerySetHashPayload(querySet))}`;
+  const queryShard = {
+    startIndex: 1,
+    endIndexExclusive: 2,
+    totalQueryCount: 2,
+    selectedQueryCount: 1,
+  };
+
+  writeJson(targetPath, {
+    schemaVersion: 1,
+    fixtureOnly: false,
+    claimTier: "run-only",
+    benchmark: {
+      family: "longmemeval",
+      answerModel: "gpt-4o",
+      judgeModel: "gpt-4o",
+      answerLabelsHash,
+      scoringCodeHash,
+    },
+  });
+  writeJson(querySetPath, querySet);
+  writeFileSync(
+    memoriesPath,
+    `${JSON.stringify({ id: "memory-one", source: "synthetic" })}\n${JSON.stringify({ id: "memory-two", source: "synthetic" })}\n`,
+    { encoding: "utf8", mode: 0o600 },
+  );
+  writeJson(answerLabelsPath, {
+    schemaVersion: 1,
+    answerLabelsHash,
+    scoringCodeHash,
+    labels: [{ queryId: "query-one" }, { queryId: "query-two" }],
+  });
+
+  const armArgs = [];
+  for (const strategy of strategies) {
+    const armPath = join(armsDir, `${strategy}-responses.private.json`);
+    writeJson(armPath, {
+      schemaVersion: 1,
+      mode: "public-benchmark-answer-quality-arm-export",
+      strategy,
+      querySetHash,
+      queryShard,
+      responses: {
+        "query-two": {
+          resultCount: 1,
+          resultIds: ["memory-two"],
+        },
+      },
+    });
+    armArgs.push("--arm", `${strategy}=${armPath}`);
+  }
+
+  return { targetPath, querySetPath, memoriesPath, answerLabelsPath, armArgs };
+}
+
+function writeJson(path, value) {
+  writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, { encoding: "utf8", mode: 0o600 });
+}
+
+function collectorQuerySetHashPayload(querySet) {
+  return {
+    schemaVersion: querySet.schemaVersion ?? 1,
+    datasetSlice: querySet.datasetSlice ?? null,
+    queries: (querySet.queries ?? []).map((query) => ({
+      id: query.id,
+      q: query.q,
+      expectedResultIds: query.expectedResultIds ?? [],
+      expectedResultHashes: query.expectedResultHashes ?? [],
+    })),
+  };
+}
+
+function stableHash(value) {
+  return sha256(typeof value === "string" ? value : JSON.stringify(value));
+}
+
+function sha256(value) {
+  return createHash("sha256").update(String(value)).digest("hex");
 }
 
 function writeUnknownZip(tempRoot, outputPath) {
