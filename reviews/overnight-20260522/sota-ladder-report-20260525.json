@@ -16,7 +16,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "componentBenchmarksAreModelSelectionOnly": true,
   "mtebCanSelectModelsButCannotProveMemoryQuality": true,
-  "generatedAt": "2026-05-25T23:53:20.101Z",
+  "generatedAt": "2026-05-26T00:15:51.144Z",
   "evidenceFiles": {
     "sourceLockedTarget": {
       "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
@@ -161,7 +161,7 @@
     "readinessNote": {
       "path": "reviews/overnight-20260522/benchmark-sota-readiness-20260525.md",
       "exists": true,
-      "hash": "sha256:2ddcf01c1d0809492a6a52939a67a44c144f021c68fe559a26f89add0fe440d9",
+      "hash": "sha256:d57c22852bc24860db876ff8279d14a4f07df0a1088f22c1a261a8e82dfc6ef7",
       "mode": null,
       "fixtureOnly": null,
       "retrievalProxyOnly": null,
@@ -169,41 +169,93 @@
       "publicBenchmarkClaimsAllowed": null
     }
   },
+  "reportedTargetsEvidence": {
+    "path": "reviews/overnight-20260522/reported-memory-targets-20260525.json",
+    "status": "READY_REPORTED_TARGETS",
+    "sourceEvidenceCheckedAt": "2026-05-25",
+    "primaryReportedMemoryTarget": "supermemory-production-research-gemini-3-pro",
+    "memoryTargetCount": 4,
+    "componentTargetCount": 6,
+    "blockers": []
+  },
   "componentEvidence": [
     {
-      "id": "mteb",
-      "role": "embedding benchmark family",
-      "claimUse": "model-selection-only",
-      "source": "https://arxiv.org/abs/2210.07316",
-      "finding": "MTEB covers embedding tasks and says no one embedding method dominates all tasks."
-    },
-    {
-      "id": "qwen3-embedding-reranker",
-      "role": "local/open-weight candidate selector",
+      "id": "qwen3-embedding-8b-mteb-english-v2",
+      "role": "embedding",
+      "modelName": "Qwen3-Embedding-8B",
+      "benchmark": "MTEB English v2",
+      "metricName": "mean task score",
+      "score": 75.22,
+      "scoreUnit": "points",
       "claimUse": "model-selection-only",
       "source": "https://github.com/QwenLM/Qwen3-Embedding",
-      "finding": "Qwen3 4B/8B embedding and Qwen3 reranker reported scores justify local challenger arms where hardware allows."
+      "checkedAt": "2026-05-25",
+      "finding": "Component evidence only. It chooses local embedding candidates but cannot prove full memory-system quality."
     },
     {
-      "id": "embeddinggemma",
-      "role": "small local embedding candidate selector",
+      "id": "qwen3-embedding-4b-mteb-english-v2",
+      "role": "embedding",
+      "modelName": "Qwen3-Embedding-4B",
+      "benchmark": "MTEB English v2",
+      "metricName": "mean task score",
+      "score": 74.6,
+      "scoreUnit": "points",
+      "claimUse": "model-selection-only",
+      "source": "https://github.com/QwenLM/Qwen3-Embedding",
+      "checkedAt": "2026-05-25",
+      "finding": "Component evidence only. It chooses local embedding candidates but cannot prove full memory-system quality."
+    },
+    {
+      "id": "qwen3-reranker-4b-mteb-r",
+      "role": "reranker",
+      "modelName": "Qwen3-Reranker-4B",
+      "benchmark": "MTEB-R",
+      "metricName": "reranker score",
+      "score": 69.76,
+      "scoreUnit": "points",
+      "claimUse": "model-selection-only",
+      "source": "https://github.com/QwenLM/Qwen3-Embedding",
+      "checkedAt": "2026-05-25",
+      "finding": "Component evidence only. It chooses local reranker candidates but cannot prove full memory-system quality."
+    },
+    {
+      "id": "embeddinggemma-local-model-card",
+      "role": "embedding",
+      "modelName": "EmbeddingGemma",
+      "benchmark": "provider model card",
+      "metricName": "small on-device embedding model",
+      "score": null,
+      "scoreUnit": "not reported in artifact",
       "claimUse": "model-selection-only",
       "source": "https://ai.google.dev/gemma/docs/embeddinggemma",
-      "finding": "EmbeddingGemma is a 308M-parameter on-device multilingual embedding model useful as a small local baseline, not full memory proof."
+      "checkedAt": "2026-05-25",
+      "finding": "Small local embedding candidate evidence only. It is a hardware-friendly baseline, not full memory-system proof."
     },
     {
-      "id": "voyage-4-rerank-2_5",
-      "role": "cloud/provider candidate selector",
+      "id": "voyage-4-rerank-2-5-model-card",
+      "role": "provider-retrieval-rerank",
+      "modelName": "Voyage 4 plus rerank-2.5",
+      "benchmark": "provider model card",
+      "metricName": "retrieval and rerank recommendation",
+      "score": null,
+      "scoreUnit": "not reported in artifact",
       "claimUse": "model-selection-only",
       "source": "https://www.mongodb.com/docs/voyageai/models/",
-      "finding": "Voyage 4 and rerank-2.5 are documented high-quality cloud retrieval and rerank candidates."
+      "checkedAt": "2026-05-25",
+      "finding": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required."
     },
     {
-      "id": "nvidia-retrieval-nim",
-      "role": "cloud/provider embedding and rerank selector",
+      "id": "nvidia-retrieval-nim-model-card",
+      "role": "provider-retrieval-rerank",
+      "modelName": "NVIDIA Retrieval NIM",
+      "benchmark": "provider model card",
+      "metricName": "embedding and rerank endpoint availability",
+      "score": null,
+      "scoreUnit": "not reported in artifact",
       "claimUse": "model-selection-only",
       "source": "https://docs.api.nvidia.com/nim/reference/retrieval-apis",
-      "finding": "NVIDIA NIM exposes current embedding and rerank endpoints suitable for same-data challenger arms."
+      "checkedAt": "2026-05-25",
+      "finding": "Provider candidate evidence only. Same-data RecallWeave answer-quality evidence is still required."
     },
     {
       "id": "query-expansion-retrieval-pipeline",
@@ -252,43 +304,119 @@
   "reportedMemoryTargets": [
     {
       "id": "supermemory-production-research-gpt4o",
+      "systemName": "Supermemory",
+      "sourceName": "Supermemory Research",
+      "sourceUrl": "https://supermemory.ai/research/",
+      "retrievedAt": "2026-05-25",
       "benchmark": "LongMemEval-S",
+      "benchmarkFamily": "longmemeval",
+      "metricName": "overall",
       "score": 81.6,
-      "scoreUnit": "overall percent",
+      "scoreUnit": "percent",
       "judge": "gpt-4o",
-      "source": "https://supermemory.ai/research/",
+      "judgeModel": "gpt-4o",
+      "answerModel": "",
+      "answerModelReported": false,
       "targetUse": "reported-memory-system-target",
-      "caveat": "Self-reported production/research target; RecallWeave needs matching benchmark semantics before claiming a win."
+      "claimUse": "reported-memory-system-target",
+      "evidenceType": "provider-reported-public-research-page",
+      "caveat": "Use only as a reported target row until RecallWeave matches dataset, scorer, judge, answer model, and session-ingestion semantics.",
+      "comparableWhen": [
+        "same benchmark variant",
+        "same public dataset source and revision",
+        "same answer-quality metric definition",
+        "same judge model",
+        "same answer model or documented answer-model caveat",
+        "same scoring code or reviewed scoring equivalence"
+      ],
+      "eligibleAsPrimaryReportedTarget": true
     },
     {
       "id": "supermemory-production-research-gpt5",
+      "systemName": "Supermemory",
+      "sourceName": "Supermemory Research",
+      "sourceUrl": "https://supermemory.ai/research/",
+      "retrievedAt": "2026-05-25",
       "benchmark": "LongMemEval-S",
+      "benchmarkFamily": "longmemeval",
+      "metricName": "overall",
       "score": 84.6,
-      "scoreUnit": "overall percent",
+      "scoreUnit": "percent",
       "judge": "gpt-5",
-      "source": "https://supermemory.ai/research/",
+      "judgeModel": "gpt-5",
+      "answerModel": "",
+      "answerModelReported": false,
       "targetUse": "reported-memory-system-target",
-      "caveat": "Useful target row for same-benchmark comparison; not replaceable by MTEB component scores."
+      "claimUse": "reported-memory-system-target",
+      "evidenceType": "provider-reported-public-research-page",
+      "caveat": "Use only as a reported target row until RecallWeave matches dataset, scorer, judge, answer model, and session-ingestion semantics.",
+      "comparableWhen": [
+        "same benchmark variant",
+        "same public dataset source and revision",
+        "same answer-quality metric definition",
+        "same judge model",
+        "same answer model or documented answer-model caveat",
+        "same scoring code or reviewed scoring equivalence"
+      ],
+      "eligibleAsPrimaryReportedTarget": true
     },
     {
       "id": "supermemory-production-research-gemini-3-pro",
+      "systemName": "Supermemory",
+      "sourceName": "Supermemory Research",
+      "sourceUrl": "https://supermemory.ai/research/",
+      "retrievedAt": "2026-05-25",
       "benchmark": "LongMemEval-S",
+      "benchmarkFamily": "longmemeval",
+      "metricName": "overall",
       "score": 85.2,
-      "scoreUnit": "overall percent",
+      "scoreUnit": "percent",
       "judge": "gemini-3-pro",
-      "source": "https://supermemory.ai/research/",
+      "judgeModel": "gemini-3-pro",
+      "answerModel": "",
+      "answerModelReported": false,
       "targetUse": "primary-reported-memory-system-target",
-      "caveat": "Highest reported production/research target on Supermemory's public research page; RecallWeave must meet or beat this under matching benchmark semantics before SOTA wording."
+      "claimUse": "reported-memory-system-target",
+      "evidenceType": "provider-reported-public-research-page",
+      "caveat": "Highest source-locked production/research target in this artifact. RecallWeave must meet or beat it under matching benchmark semantics before SOTA wording.",
+      "comparableWhen": [
+        "same benchmark variant",
+        "same public dataset source and revision",
+        "same answer-quality metric definition",
+        "same judge model",
+        "same answer model or documented answer-model caveat",
+        "same scoring code or reviewed scoring equivalence"
+      ],
+      "eligibleAsPrimaryReportedTarget": true
     },
     {
       "id": "supermemory-experimental-asmr",
+      "systemName": "Supermemory",
+      "sourceName": "Supermemory ASMR Blog",
+      "sourceUrl": "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
+      "retrievedAt": "2026-05-25",
       "benchmark": "LongMemEval-S",
+      "benchmarkFamily": "longmemeval",
+      "metricName": "overall",
       "score": 98.6,
-      "scoreUnit": "overall percent",
+      "scoreUnit": "percent",
       "judge": "multi-agent experimental flow",
-      "source": "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
+      "judgeModel": "multi-agent experimental flow",
+      "answerModel": "",
+      "answerModelReported": false,
       "targetUse": "ceiling-reference-not-production-target",
-      "caveat": "The source labels this as experimental/non-production rather than the core production Supermemory engine."
+      "claimUse": "experimental-ceiling-reference",
+      "evidenceType": "provider-reported-public-blog",
+      "caveat": "Ceiling reference only. Do not use as the primary production replacement target unless the experimental agentic flow is explicitly the claim being tested.",
+      "comparableWhen": [
+        "same benchmark variant",
+        "same public dataset source and revision",
+        "same answer-quality metric definition",
+        "same judge model",
+        "same answer model or documented answer-model caveat",
+        "same scoring code or reviewed scoring equivalence"
+      ],
+      "eligibleAsPrimaryReportedTarget": false
     }
   ],
   "reportedTargetComparison": {
@@ -296,10 +424,10 @@
       "id": "supermemory-production-research-gemini-3-pro",
       "benchmark": "LongMemEval-S",
       "score": 85.2,
-      "scoreUnit": "overall percent",
+      "scoreUnit": "percent",
       "judge": "gemini-3-pro",
       "source": "https://supermemory.ai/research/",
-      "caveat": "Highest reported production/research target on Supermemory's public research page; RecallWeave must meet or beat this under matching benchmark semantics before SOTA wording."
+      "caveat": "Highest source-locked production/research target in this artifact. RecallWeave must meet or beat it under matching benchmark semantics before SOTA wording."
     },
     "bestObserved": {
       "strategy": "cloud-nvidia-nemotron-1b",
@@ -540,6 +668,7 @@
     "bestEndToEndScoreMeetsReportedTarget": false,
     "publicClaimsAllowedByInputs": false,
     "reportedMemoryTargetsPresent": true,
+    "reportedMemoryTargetsSourceLocked": true,
     "fullOrOfficiallyComparableMemoryBenchmarkPresent": false,
     "readinessNotePresent": true
   },

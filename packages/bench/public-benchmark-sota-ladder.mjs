@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -14,6 +15,10 @@ const sourceLockedTargetPath =
   args.targetFile ??
   process.env.RECALLWEAVE_MEMORYBENCH_TARGET ??
   "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json";
+const reportedTargetsPath =
+  args.reportedTargets ??
+  process.env.RECALLWEAVE_REPORTED_TARGETS_INPUT ??
+  "reviews/overnight-20260522/reported-memory-targets-20260525.json";
 
 const evidenceFiles = {
   sourceLockedTarget: sourceLockedTargetPath,
@@ -34,6 +39,11 @@ const evidenceFiles = {
 };
 
 const loaded = Object.fromEntries(Object.entries(evidenceFiles).map(([key, file]) => [key, loadEvidence(file)]));
+const reportedTargetsEvidence = runJson([
+  "packages/bench/public-benchmark-reported-targets.mjs",
+  "--input",
+  reportedTargetsPath,
+]);
 const rows = collectRows(loaded);
 const allStrategies = [...new Set(rows.map((row) => row.strategy).filter(Boolean))].sort();
 
@@ -91,41 +101,19 @@ const requiredArms = [
 ];
 
 const componentEvidence = [
-  {
-    id: "mteb",
-    role: "embedding benchmark family",
-    claimUse: "model-selection-only",
-    source: "https://arxiv.org/abs/2210.07316",
-    finding: "MTEB covers embedding tasks and says no one embedding method dominates all tasks.",
-  },
-  {
-    id: "qwen3-embedding-reranker",
-    role: "local/open-weight candidate selector",
-    claimUse: "model-selection-only",
-    source: "https://github.com/QwenLM/Qwen3-Embedding",
-    finding: "Qwen3 4B/8B embedding and Qwen3 reranker reported scores justify local challenger arms where hardware allows.",
-  },
-  {
-    id: "embeddinggemma",
-    role: "small local embedding candidate selector",
-    claimUse: "model-selection-only",
-    source: "https://ai.google.dev/gemma/docs/embeddinggemma",
-    finding: "EmbeddingGemma is a 308M-parameter on-device multilingual embedding model useful as a small local baseline, not full memory proof.",
-  },
-  {
-    id: "voyage-4-rerank-2_5",
-    role: "cloud/provider candidate selector",
-    claimUse: "model-selection-only",
-    source: "https://www.mongodb.com/docs/voyageai/models/",
-    finding: "Voyage 4 and rerank-2.5 are documented high-quality cloud retrieval and rerank candidates.",
-  },
-  {
-    id: "nvidia-retrieval-nim",
-    role: "cloud/provider embedding and rerank selector",
-    claimUse: "model-selection-only",
-    source: "https://docs.api.nvidia.com/nim/reference/retrieval-apis",
-    finding: "NVIDIA NIM exposes current embedding and rerank endpoints suitable for same-data challenger arms.",
-  },
+  ...arrayOf(reportedTargetsEvidence.componentTargets).map((target) => ({
+    id: target.id,
+    role: target.componentType,
+    modelName: target.modelName,
+    benchmark: target.benchmark,
+    metricName: target.metricName,
+    score: target.score,
+    scoreUnit: target.scoreUnit,
+    claimUse: target.claimUse,
+    source: target.sourceUrl,
+    checkedAt: target.retrievedAt,
+    finding: target.caveat,
+  })),
   {
     id: "query-expansion-retrieval-pipeline",
     role: "query expansion method selector",
@@ -157,52 +145,8 @@ const queryExpansionPolicy = {
     "Query expansion can improve the method, but it does not count as local-only unless the expansion model runs locally; mixed arms must label the cloud substep.",
 };
 
-const reportedMemoryTargets = [
-  {
-    id: "supermemory-production-research-gpt4o",
-    benchmark: "LongMemEval-S",
-    score: 81.6,
-    scoreUnit: "overall percent",
-    judge: "gpt-4o",
-    source: "https://supermemory.ai/research/",
-    targetUse: "reported-memory-system-target",
-    caveat: "Self-reported production/research target; RecallWeave needs matching benchmark semantics before claiming a win.",
-  },
-  {
-    id: "supermemory-production-research-gpt5",
-    benchmark: "LongMemEval-S",
-    score: 84.6,
-    scoreUnit: "overall percent",
-    judge: "gpt-5",
-    source: "https://supermemory.ai/research/",
-    targetUse: "reported-memory-system-target",
-    caveat: "Useful target row for same-benchmark comparison; not replaceable by MTEB component scores.",
-  },
-  {
-    id: "supermemory-production-research-gemini-3-pro",
-    benchmark: "LongMemEval-S",
-    score: 85.2,
-    scoreUnit: "overall percent",
-    judge: "gemini-3-pro",
-    source: "https://supermemory.ai/research/",
-    targetUse: "primary-reported-memory-system-target",
-    caveat: "Highest reported production/research target on Supermemory's public research page; RecallWeave must meet or beat this under matching benchmark semantics before SOTA wording.",
-  },
-  {
-    id: "supermemory-experimental-asmr",
-    benchmark: "LongMemEval-S",
-    score: 98.6,
-    scoreUnit: "overall percent",
-    judge: "multi-agent experimental flow",
-    source: "https://supermemory.ai/blog/we-broke-the-frontier-in-agent-memory-introducing-99-sota-memory-system/",
-    targetUse: "ceiling-reference-not-production-target",
-    caveat: "The source labels this as experimental/non-production rather than the core production Supermemory engine.",
-  },
-];
-const primaryReportedTarget =
-  reportedMemoryTargets
-    .filter((target) => target.targetUse === "primary-reported-memory-system-target" || target.targetUse === "reported-memory-system-target")
-    .sort((a, b) => Number(b.score) - Number(a.score))[0] ?? null;
+const reportedMemoryTargets = arrayOf(reportedTargetsEvidence.memoryTargets);
+const primaryReportedTarget = reportedTargetsEvidence.primaryReportedMemoryTarget ?? null;
 const bestEndToEndMemoryRow = bestEndToEndMemoryScoreRow(rows);
 const reportedTargetComparison = compareReportedTarget(bestEndToEndMemoryRow, primaryReportedTarget);
 const fullBenchmarkPolicy = buildFullBenchmarkPolicy(loaded);
@@ -239,11 +183,13 @@ const checks = {
   bestEndToEndScoreMeetsReportedTarget: reportedTargetComparison.meetsPrimaryReportedTarget === true,
   publicClaimsAllowedByInputs: rows.some((row) => row.publicBenchmarkClaimsAllowed === true),
   reportedMemoryTargetsPresent: reportedMemoryTargets.length >= 2,
+  reportedMemoryTargetsSourceLocked: reportedTargetsEvidence.status === "READY_REPORTED_TARGETS",
   fullOrOfficiallyComparableMemoryBenchmarkPresent: fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent,
   readinessNotePresent: loaded.readinessNote.exists,
 };
 
 const blockers = [
+  !checks.reportedMemoryTargetsSourceLocked ? "reported-memory-targets-not-source-locked" : null,
   !checks.endToEndMemoryScorePresent ? "missing-end-to-end-memory-benchmark-score" : null,
   !checks.publicClaimsAllowedByInputs ? "all-current-result-files-keep-public-claims-disabled" : null,
   !checks.voyageProviderCanaryPresent ? "missing-voyage-answer-quality-same-data-result" : null,
@@ -294,6 +240,15 @@ const report = {
       },
     ]),
   ),
+  reportedTargetsEvidence: {
+    path: reportedTargetsPath,
+    status: reportedTargetsEvidence.status,
+    sourceEvidenceCheckedAt: reportedTargetsEvidence.sourceEvidenceCheckedAt,
+    primaryReportedMemoryTarget: reportedTargetsEvidence.primaryReportedMemoryTarget?.id ?? null,
+    memoryTargetCount: reportedTargetsEvidence.checks?.memoryTargetCount ?? 0,
+    componentTargetCount: reportedTargetsEvidence.checks?.componentTargetCount ?? 0,
+    blockers: reportedTargetsEvidence.blockers ?? [],
+  },
   componentEvidence,
   queryExpansionPolicy,
   fullBenchmarkPolicy,
@@ -388,8 +343,8 @@ function compareReportedTarget(row, target) {
           benchmark: target.benchmark,
           score: target.score,
           scoreUnit: target.scoreUnit,
-          judge: target.judge,
-          source: target.source,
+          judge: target.judge ?? target.judgeModel,
+          source: target.source ?? target.sourceUrl,
           caveat: target.caveat,
         }
       : null,
@@ -582,6 +537,17 @@ function loadEvidence(file) {
   let json = null;
   if (file.endsWith(".json")) json = JSON.parse(text);
   return { path, exists: true, hash: `sha256:${sha256(text)}`, json };
+}
+
+function runJson(nodeArgs) {
+  const result = spawnSync("node", nodeArgs, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `command failed: ${nodeArgs.join(" ")}\n${result.stderr}`);
+  assertSafePublicText(result.stdout, nodeArgs.join(" "));
+  return JSON.parse(result.stdout);
 }
 
 function writeOutput(path, text) {

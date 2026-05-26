@@ -250,7 +250,11 @@ is still missing and the best current end-to-end row is below the selected
 reported Supermemory LongMemEval-S production/research target. The refreshed
 SOTA ladder compares `cloud-nvidia-nemotron-1b` at `43.1667` answer-quality
 against Supermemory's reported `85.2%` Gemini 3 Pro row and keeps the delta
-blocked at `-42.0333`. The end-to-end gate also now verifies exact answer and
+blocked at `-42.0333`. The reported target row is now source-locked in
+`reviews/overnight-20260522/reported-memory-targets-20260525.json` and
+validated by `benchmark:reported-targets`; component rows such as Qwen,
+EmbeddingGemma, Voyage, and NVIDIA are kept as model-selection evidence only.
+The end-to-end gate also now verifies exact answer and
 judge model matching against the target contract. The current canary was
 answered and judged by `qwen36-a3b-main-q8kv-8192` while the checked target
 contract names `gpt-4o`, so it is explicitly blocked as a harness mismatch.

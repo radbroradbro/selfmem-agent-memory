@@ -111,6 +111,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-slice-author.mjs",
   "packages/bench/public-benchmark-target-check.mjs",
   "packages/bench/public-benchmark-target-author.mjs",
+  "packages/bench/public-benchmark-reported-targets.mjs",
   "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
@@ -128,6 +129,8 @@ const requiredFiles = [
   `${reviewDir}/public-memorybench-source-lock.json`,
   `${reviewDir}/public-memorybench-source-lock-evidence.md`,
   `${reviewDir}/public-memorybench-source-lock-checkout-evidence.json`,
+  `${reviewDir}/reported-memory-targets-20260525.json`,
+  `${reviewDir}/reported-memory-targets-20260525.md`,
   `${reviewDir}/public-longmemeval-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-slice-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-slice-review.md`,
@@ -532,6 +535,7 @@ const requiredScripts = [
   "baseline:reviewer:openai-compatible",
   "baseline:reviewer-intake",
   "benchmark:source-lock",
+  "benchmark:reported-targets",
   "benchmark:public-slice",
   "benchmark:public-target",
   "benchmark:public-target:author",
@@ -1526,9 +1530,13 @@ check("fresh public benchmark target check passes", () => {
     "--format",
     "markdown",
   ]).stdout;
+  const reportedTargetsFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-reported-targets.mjs"]).stdout);
+  const reportedTargetsMarkdownFresh = run("node", ["packages/bench/public-benchmark-reported-targets.mjs", "--format", "markdown"]).stdout;
   const sotaLadderFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-sota-ladder.mjs"]).stdout);
   const sotaLadderMarkdownFresh = run("node", ["packages/bench/public-benchmark-sota-ladder.mjs", "--format", "markdown"]).stdout;
   const sotaOperatorPacketFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-sota-operator-packet.mjs"]).stdout);
+  const reportedTargetsEvidence = JSON.parse(readFileSync(join(root, reviewDir, "reported-memory-targets-20260525.json"), "utf8"));
+  const reportedTargetsMarkdownEvidence = readFileSync(join(root, reviewDir, "reported-memory-targets-20260525.md"), "utf8");
   const answerQualityArmExportEvidence = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.json"), "utf8"));
   const answerQualityArmExportMarkdownEvidence = readFileSync(join(root, reviewDir, "answer-quality-arm-export-20260525.md"), "utf8");
   const answerQualityArmExportLiveLocalEvidence = JSON.parse(
@@ -2064,8 +2072,24 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(endToEndMemoryScoreGateEvidence.result?.judgeModel, "qwen36-a3b-main-q8kv-8192");
   assert.equal(endToEndMemoryScoreGateEvidence.target?.answerModel, "gpt-4o");
   assert.equal(endToEndMemoryScoreGateEvidence.target?.judgeModel, "gpt-4o");
+  assert.equal(reportedTargetsFresh.mode, "public-benchmark-reported-targets");
+  assert.equal(reportedTargetsFresh.status, "READY_REPORTED_TARGETS");
+  assert.equal(reportedTargetsFresh.primaryReportedMemoryTarget?.id, "supermemory-production-research-gemini-3-pro");
+  assert.equal(reportedTargetsFresh.primaryReportedMemoryTarget?.score, 85.2);
+  assert.equal(reportedTargetsFresh.primaryReportedMemoryTarget?.judgeModel, "gemini-3-pro");
+  assert.equal(reportedTargetsFresh.primaryReportedMemoryTarget?.eligibleAsPrimaryReportedTarget, true);
+  assert.equal(reportedTargetsFresh.checks?.everyMemoryTargetHasSourceLock, true);
+  assert.equal(reportedTargetsFresh.checks?.componentTargetsAreModelSelectionOnly, true);
+  assert.ok(reportedTargetsFresh.memoryTargets?.some((item) => item.id === "supermemory-experimental-asmr" && item.eligibleAsPrimaryReportedTarget === false));
+  assert.ok(reportedTargetsFresh.componentTargets?.some((item) => item.id === "embeddinggemma-local-model-card"));
+  assert.match(reportedTargetsMarkdownFresh, /Reported Memory Targets/);
+  assert.equal(reportedTargetsEvidence.schemaVersion, 1);
+  assert.equal(reportedTargetsEvidence.sourceEvidenceCheckedAt, "2026-05-25");
+  assert.match(reportedTargetsMarkdownEvidence, /Primary target: supermemory-production-research-gemini-3-pro/);
   assert.equal(sotaLadderFresh.mode, "public-benchmark-sota-ladder");
   assert.equal(sotaLadderFresh.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+  assert.equal(sotaLadderFresh.reportedTargetsEvidence?.status, "READY_REPORTED_TARGETS");
+  assert.equal(sotaLadderFresh.reportedTargetsEvidence?.primaryReportedMemoryTarget, "supermemory-production-research-gemini-3-pro");
   assert.equal(sotaLadderFresh.fullBenchmarkPolicy?.currentAnswerQualityQueryCount, 30);
   assert.equal(sotaLadderFresh.fullBenchmarkPolicy?.minimumFullQueryCount, 500);
   assert.equal(sotaLadderFresh.fullBenchmarkPolicy?.fullOrOfficiallyComparableRunPresent, false);
@@ -2073,7 +2097,7 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(sotaLadderFresh.blockers.includes("end-to-end-gate:answer-model-does-not-match-target"));
   assert.ok(sotaLadderFresh.blockers.includes("end-to-end-gate:judge-model-does-not-match-target"));
   assert.equal(sotaLadderFresh.reportedTargetComparison?.sameJudgeModelAsPrimaryTarget, false);
-  assert.ok(sotaLadderFresh.componentEvidence?.some((item) => item.id === "embeddinggemma"));
+  assert.ok(sotaLadderFresh.componentEvidence?.some((item) => item.id === "embeddinggemma-local-model-card"));
   assert.match(sotaLadderMarkdownFresh, /Full Benchmark Policy/);
   assert.equal(sotaOperatorPacketFresh.mode, "public-benchmark-sota-operator-packet");
   assert.equal(sotaOperatorPacketFresh.sameDataContract?.fullOrOfficiallyComparableBenchmarkRequiredForBroadSota, true);

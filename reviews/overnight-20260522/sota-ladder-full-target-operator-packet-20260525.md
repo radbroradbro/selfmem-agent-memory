@@ -217,6 +217,7 @@ npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet <metrics-onl
 - The final claim uses an end-to-end memory answer-quality score, not retrieval-proxy or MTEB-only evidence.
 - Broad SOTA or production-replacement language waits for a full benchmark or officially comparable target, not only a 30-query canary.
 - Supermemory reported scores are comparison targets only unless the same harness/dataset/judge semantics are matched.
+- Reported target rows come from the source-locked reported-target artifact, and component rows stay model-selection-only.
 - privacyLeakCount and redactionFailureCount are zero for every attached report.
 - Two independent reviewers approve the exact metrics-only packet before owner review or public release wording changes.
 - Brain UI evidence, docs, and release notes are updated after the benchmark result is known.

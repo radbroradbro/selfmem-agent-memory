@@ -104,6 +104,12 @@ too expensive for the next run.
 1. Source-lock the benchmark and target row. Record the source URL, checked
    date, benchmark variant, metric name, score, judge model, answer model,
    token budget if reported, and caveats.
+   Reported leader rows now have their own source-lock gate:
+   `benchmark:reported-targets`. The checked-in artifact at
+   `reviews/overnight-20260522/reported-memory-targets-20260525.json` selects
+   Supermemory's reported LongMemEval-S Gemini 3 Pro row as the current primary
+   target and keeps Qwen, EmbeddingGemma, Voyage, and NVIDIA rows in the
+   component/model-selection lane only.
    Start with `benchmark:source-lock -- --strict` to verify the checked-in
    MemoryBench source lock before authoring a target.
    Then run `benchmark:public-slice -- --live` for the current LongMemEval-S

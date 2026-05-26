@@ -27,7 +27,7 @@
 - llm-query-expansion: present (query expansion challenger)
 
 ## Reported Target Comparison
-- Primary reported target: supermemory-production-research-gemini-3-pro (85.2 overall percent)
+- Primary reported target: supermemory-production-research-gemini-3-pro (85.2 percent)
 - Best end-to-end RecallWeave row: cloud-nvidia-nemotron-1b (43.1667)
 - Best row judge model: qwen36-a3b-main-q8kv-8192
 - Same judge as primary target: false

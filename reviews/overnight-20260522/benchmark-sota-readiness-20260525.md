@@ -223,6 +223,15 @@ Follow-up provider evidence on 2026-05-25:
   target is Supermemory's reported LongMemEval-S `85.2%` Gemini 3 Pro row;
   delta is `-42.0333`, so the ladder adds
   `best-end-to-end-score-below-reported-supermemory-target`.
+- The reported target rows now have their own public-safe source-lock artifact:
+  `reviews/overnight-20260522/reported-memory-targets-20260525.json`, rendered
+  at `reviews/overnight-20260522/reported-memory-targets-20260525.md` and
+  validated by `benchmark:reported-targets`. This keeps direct hosted
+  Supermemory usage optional when quota is blocked, while still requiring
+  source URL, checked date, score, judge, caveat, and comparability conditions
+  before the SOTA ladder uses a reported target. Qwen, EmbeddingGemma, Voyage,
+  and NVIDIA rows in that artifact remain component/model-selection evidence
+  only.
 - The end-to-end memory score gate now also checks that the actual answer and
   judge models used by a result match the target contract. The current canary
   result was answered and judged by `qwen36-a3b-main-q8kv-8192` while the

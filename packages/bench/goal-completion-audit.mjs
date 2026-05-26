@@ -88,6 +88,8 @@ const files = {
   browserEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
   releaseReadinessEvidence: `${reviewDir}/ui-evidence/brain-ui-release-readiness-evidence.json`,
   benchmarkSotaReadiness: `${reviewDir}/benchmark-sota-readiness-20260525.md`,
+  reportedMemoryTargetsReport: `${reviewDir}/reported-memory-targets-20260525.json`,
+  reportedMemoryTargetsMarkdown: `${reviewDir}/reported-memory-targets-20260525.md`,
   benchmarkSotaLadderReport: `${reviewDir}/sota-ladder-report-20260525.json`,
   benchmarkSotaLadderMarkdown: `${reviewDir}/sota-ladder-report-20260525.md`,
   benchmarkSotaOperatorPacket: `${reviewDir}/sota-ladder-operator-packet-20260525.json`,
@@ -152,6 +154,7 @@ const budgetedBaselineReviewedNextRun = JSON.parse(readFileSync(join(root, files
 const releaseReadinessEvidence = JSON.parse(readFileSync(join(root, files.releaseReadinessEvidence), "utf8"));
 const currentHeadLiveEvidence = JSON.parse(readFileSync(join(root, files.browserEvidence), "utf8"));
 const benchmarkSotaLadder = JSON.parse(readFileSync(join(root, files.benchmarkSotaLadderReport), "utf8"));
+const reportedMemoryTargets = JSON.parse(readFileSync(join(root, files.reportedMemoryTargetsReport), "utf8"));
 const benchmarkSotaOperatorPacket = JSON.parse(readFileSync(join(root, files.benchmarkSotaOperatorPacket), "utf8"));
 const queryExpansionPreflight = JSON.parse(readFileSync(join(root, files.queryExpansionPreflightReport), "utf8"));
 const queryExpansionLiveLocalSmoke = JSON.parse(readFileSync(join(root, files.queryExpansionLiveLocalSmokeReport), "utf8"));
@@ -287,6 +290,12 @@ assert.equal(budgetedBaselineReviewedNextRun.publicLaunchAllowed, false);
 assert.equal(benchmarkSotaLadder.mode, "public-benchmark-sota-ladder");
 assert.equal(benchmarkSotaLadder.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
 assert.equal(benchmarkSotaLadder.publicBenchmarkClaimsAllowed, false);
+assert.equal(reportedMemoryTargets.schemaVersion, 1);
+assert.equal(reportedMemoryTargets.sourceEvidenceCheckedAt, "2026-05-25");
+assert.ok(reportedMemoryTargets.memoryTargets?.some((item) => item.id === "supermemory-production-research-gemini-3-pro"));
+assert.ok(reportedMemoryTargets.componentTargets?.some((item) => item.id === "embeddinggemma-local-model-card"));
+assert.equal(benchmarkSotaLadder.reportedTargetsEvidence?.status, "READY_REPORTED_TARGETS");
+assert.equal(benchmarkSotaLadder.reportedTargetsEvidence?.primaryReportedMemoryTarget, "supermemory-production-research-gemini-3-pro");
 assert.equal(benchmarkSotaLadder.componentBenchmarksAreModelSelectionOnly, true);
 assert.ok(benchmarkSotaLadder.blockers.includes("missing-voyage-answer-quality-same-data-result"));
 assert.ok(benchmarkSotaLadder.blockers.includes("best-end-to-end-score-below-reported-supermemory-target"));
@@ -695,6 +704,8 @@ const requirements = [
   ]),
   incomplete("full-memory-sota-benchmark-gate", "Full same-data memory benchmark/SOTA gate remains incomplete until end-to-end answer quality, live query expansion, local reranker, provider challengers, reviewers, UI, docs, and owner approval all pass", [
     files.benchmarkSotaReadiness,
+    files.reportedMemoryTargetsReport,
+    files.reportedMemoryTargetsMarkdown,
     files.benchmarkSotaLadderReport,
     files.benchmarkSotaLadderMarkdown,
     files.benchmarkSotaOperatorPacket,

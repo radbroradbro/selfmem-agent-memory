@@ -205,6 +205,22 @@ approval, and real production canary are all current.
 These are targets for planning, not proof that the cited systems used the same
 harness we will use.
 
+The machine-readable source-lock artifact for these rows is
+`reviews/overnight-20260522/reported-memory-targets-20260525.json`, with a
+public-safe rendered report at
+`reviews/overnight-20260522/reported-memory-targets-20260525.md`. Validate it
+with:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:reported-targets
+```
+
+The SOTA ladder consumes that artifact instead of accepting loose hardcoded
+score rows. If hosted Supermemory usage is unavailable, those reported rows can
+still act as comparison targets, but only after their source URL, checked date,
+benchmark variant, score, judge, caveat, and comparability conditions validate.
+Component rows in the same artifact remain model-selection evidence only.
+
 | Source | Benchmark | Reported metric | Target | Caveat |
 | --- | --- | --- | ---: | --- |
 | Supermemory research | LongMemEval-S | overall, gpt-4o judge | 81.6% | Reported provider result; match dataset, scoring, judge, answer model, and session ingestion semantics before claiming a win. |
