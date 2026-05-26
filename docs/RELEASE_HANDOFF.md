@@ -324,7 +324,12 @@ plan's execution lanes: `deterministic-control-proxy`,
 `nvidia-minimum-challenger`, and `full-sota-accepted-shards`. Only
 `full-sota-accepted-shards` is compatible with full-shard intake; the others
 are diagnostic/comparison lanes. After shard jobs return, the workorder should
-show accepted coverage before the stricter intake step is allowed.
+show accepted coverage before the stricter intake step is allowed. It also
+records no-call environment readiness for each lane; the checked-in accepted
+SOTA lane is blocked until live-export consent, no-raw-text consent,
+answer-quality consent, local Apple/local rerank endpoints, Voyage/NVIDIA
+credentials, answer and judge model configuration, a scoring endpoint, and
+query-expansion readiness are all configured.
 Before combining returned full-shard outputs, run
 `benchmark:answer-quality:shard-intake` against the public shard-result JSONs.
 The checked-in intake report,

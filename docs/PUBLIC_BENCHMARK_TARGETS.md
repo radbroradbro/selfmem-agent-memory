@@ -479,7 +479,11 @@ Component rows in the same artifact remain model-selection evidence only.
   should reach shard-intake readiness before the stricter intake command runs.
   It also mirrors the execution-lane split so local-only, provider-minimum, and
   deterministic diagnostic outputs cannot be mistaken for the full accepted
-  shard set.
+  shard set. The workorder now includes a no-call readiness check for each lane;
+  the checked-in full-SOTA lane remains blocked until live-export consent,
+  no-raw-text consent, answer-quality consent, local Apple/local rerank endpoints,
+  Voyage/NVIDIA credentials, answer and judge model configuration, a scoring
+  endpoint, and query-expansion readiness are all present.
 - Full-shard return intake:
   `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`
   is the checked-in blocked state for the full answer-quality shard set. It

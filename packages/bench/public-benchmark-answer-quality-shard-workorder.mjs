@@ -32,6 +32,8 @@ const pendingShards = (plan.shards ?? []).filter((shard) => !evaluated.acceptedB
 const selectedPendingShards = pendingShards.slice(0, maxWorkorders);
 const allExpectedPublicInputs = (plan.shards ?? []).map((shard) => `<public-review-dir>/answer-quality-${shard.id}.json`);
 const readyForShardIntake = pendingShards.length === 0 && evaluated.rejectedResults.length === 0 && evaluated.duplicateResults.length === 0;
+const executionLaneReadiness = buildExecutionLaneReadiness(plan.executionLanes ?? []);
+const fullSotaLaneReadiness = executionLaneReadiness.find((lane) => lane.acceptedByFullShardIntake === true) ?? null;
 
 const report = {
   schemaVersion: 1,
@@ -68,6 +70,11 @@ const report = {
     strategies: plan.runPlan?.strategies ?? [],
   },
   executionLanes: plan.executionLanes ?? [],
+  executionLaneReadiness,
+  fullSotaLaneReadiness,
+  fullSotaLaneReadyForResponseArmExport: Boolean(fullSotaLaneReadiness?.readyForResponseArmExport),
+  fullSotaLaneReadyForAnswerQualityScoring: Boolean(fullSotaLaneReadiness?.readyForAnswerQualityScoring),
+  fullSotaLaneEnvironmentBlockers: fullSotaLaneReadiness?.blockers ?? [],
   progress: {
     inputCount: inputs.length,
     acceptedShardCount: evaluated.acceptedResults.length,
@@ -249,6 +256,239 @@ function publicShardRow(shard) {
   };
 }
 
+function buildExecutionLaneReadiness(lanes) {
+  return lanes.map((lane) => {
+    const strategies = lane.strategies ?? [];
+    const providers = lane.providerRequirements ?? [];
+    const providerReadiness = Object.fromEntries(providers.map((provider) => [provider, inspectProviderReadiness(provider)]));
+    const exportReadiness = inspectResponseArmExportReadiness({ lane, providers, strategies, providerReadiness });
+    const answerQualityReadiness = inspectAnswerQualityReadiness();
+    const queryExpansionReadiness = inspectQueryExpansionReadiness(strategies);
+    const blockers = unique([
+      !lane.coverageReady ? "lane-strategy-coverage-missing" : null,
+      ...exportReadiness.blockers,
+      ...answerQualityReadiness.blockers,
+      ...queryExpansionReadiness.blockers,
+    ].filter(Boolean));
+    return {
+      laneId: lane.id,
+      label: lane.label,
+      acceptedByFullShardIntake: Boolean(lane.acceptedByFullShardIntake),
+      diagnosticOnly: lane.acceptedByFullShardIntake !== true,
+      coverageReady: Boolean(lane.coverageReady),
+      strategies,
+      providerRequirements: providers,
+      providerReadiness,
+      responseArmExport: exportReadiness,
+      queryExpansion: queryExpansionReadiness,
+      answerQuality: answerQualityReadiness,
+      readyForResponseArmExport: lane.coverageReady === true && exportReadiness.ready && queryExpansionReadiness.ready,
+      readyForAnswerQualityScoring:
+        lane.coverageReady === true && exportReadiness.ready && queryExpansionReadiness.ready && answerQualityReadiness.ready,
+      readyForAcceptedShardIntakeCandidate:
+        lane.acceptedByFullShardIntake === true &&
+        lane.coverageReady === true &&
+        exportReadiness.ready &&
+        queryExpansionReadiness.ready &&
+        answerQualityReadiness.ready,
+      countsAsFullMemorySotaEvidence: false,
+      publicBenchmarkClaimsAllowed: false,
+      blockers,
+    };
+  });
+}
+
+function inspectResponseArmExportReadiness({ lane, providers, strategies, providerReadiness }) {
+  const requiresProviderCalls = providers.some((provider) => provider !== "local-apple" && provider !== "local-rerank");
+  const providerCredentialBlockers = providers.flatMap((provider) => {
+    const state = providerReadiness[provider];
+    return state?.ready ? [] : [`${provider}-credentials-missing`];
+  });
+  const blockers = [
+    !truthyEnv("RECALLWEAVE_BASELINE_LIVE") ? "RECALLWEAVE_BASELINE_LIVE-not-enabled" : null,
+    !truthyEnv("RECALLWEAVE_BASELINE_NO_RAW_TEXT") ? "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed" : null,
+    requiresProviderCalls && !truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS")
+      ? "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled"
+      : null,
+    requiresProviderCalls && !truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA")
+      ? "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"
+      : null,
+    ...providerCredentialBlockers,
+  ].filter(Boolean);
+  return {
+    laneId: lane.id,
+    ready: blockers.length === 0,
+    liveExportEnabled: truthyEnv("RECALLWEAVE_BASELINE_LIVE"),
+    noRawTextConfirmed: truthyEnv("RECALLWEAVE_BASELINE_NO_RAW_TEXT"),
+    providerCallsRequired: requiresProviderCalls,
+    providerCallsEnabled: truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS"),
+    providerPublicDataConfirmed: truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA"),
+    queryExpansionStrategyPresent: strategies.includes("query-expanded-full-hybrid-rerank"),
+    printsEnvValues: false,
+    blockers,
+  };
+}
+
+function inspectAnswerQualityReadiness() {
+  const baseUrl = String(process.env.RECALLWEAVE_MEMORYBENCH_BASE_URL ?? "").trim();
+  const answerModelPresent = hasAnyEnv("RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL", "RECALLWEAVE_BASELINE_ANSWER_MODEL");
+  const judgeModelPresent = hasAnyEnv("RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL", "RECALLWEAVE_BASELINE_JUDGE_MODEL");
+  const baseUrlPresent = baseUrl.length > 0;
+  const cloudEndpointRequiresApiKey = baseUrlPresent && !isLocalUrl(baseUrl);
+  const apiKeyPresent = hasAnyEnv("RECALLWEAVE_MEMORYBENCH_API_KEY");
+  const blockers = [
+    !truthyEnv("RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS")
+      ? "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled"
+      : null,
+    !truthyEnv("RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA") ? "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed" : null,
+    !truthyEnv("RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT")
+      ? "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed"
+      : null,
+    !answerModelPresent ? "answer-model-missing" : null,
+    !judgeModelPresent ? "judge-model-missing" : null,
+    !baseUrlPresent ? "openai-compatible-base-url-missing" : null,
+    cloudEndpointRequiresApiKey && !apiKeyPresent ? "RECALLWEAVE_MEMORYBENCH_API_KEY-missing-for-cloud-endpoint" : null,
+  ].filter(Boolean);
+  return {
+    ready: blockers.length === 0,
+    answerQualityCallsEnabled: truthyEnv("RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS"),
+    publicDataConfirmed: truthyEnv("RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA"),
+    noRawTextOutputConfirmed: truthyEnv("RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT"),
+    answerModelPresent,
+    judgeModelPresent,
+    baseUrlPresent,
+    endpointIsLocal: baseUrlPresent ? isLocalUrl(baseUrl) : false,
+    cloudEndpointRequiresApiKey,
+    apiKeyPresent,
+    printsEnvValues: false,
+    blockers,
+  };
+}
+
+function inspectQueryExpansionReadiness(strategies) {
+  if (!strategies.includes("query-expanded-full-hybrid-rerank")) {
+    return {
+      required: false,
+      ready: true,
+      localEndpointPresent: false,
+      localModelPresent: false,
+      localReady: false,
+      cloudCallsEnabled: false,
+      publicDataConfirmed: false,
+      cloudProviderReady: false,
+      readyProviderKinds: [],
+      printsEnvValues: false,
+      blockers: [],
+    };
+  }
+  const localEndpointPresent = hasAnyEnv("SELFMEM_QUERY_EXPANSION_BASE_URL");
+  const localModelPresent = hasAnyEnv("SELFMEM_QUERY_EXPANSION_MODEL");
+  const localReady = localEndpointPresent && localModelPresent;
+  const cloudCallsEnabled = truthyEnv("RECALLWEAVE_QUERY_EXPANSION_CALLS") || truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS");
+  const publicDataConfirmed =
+    truthyEnv("RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA") || truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA");
+  const readyProviderKinds = ["nvidia", "gemini", "openrouter"].filter((provider) => inspectProviderReadiness(provider).ready);
+  const cloudProviderReady = cloudCallsEnabled && publicDataConfirmed && readyProviderKinds.length > 0;
+  const blockers = [
+    !localReady && !cloudCallsEnabled ? "query-expansion-local-endpoint-or-cloud-consent-missing" : null,
+    !localReady && cloudCallsEnabled && !publicDataConfirmed ? "query-expansion-public-data-not-confirmed" : null,
+    !localReady && cloudCallsEnabled && publicDataConfirmed && readyProviderKinds.length === 0
+      ? "query-expansion-cloud-provider-credentials-missing"
+      : null,
+  ].filter(Boolean);
+  return {
+    required: true,
+    ready: localReady || cloudProviderReady,
+    localEndpointPresent,
+    localModelPresent,
+    localReady,
+    cloudCallsEnabled,
+    publicDataConfirmed,
+    cloudProviderReady,
+    readyProviderKinds,
+    defaultCloudProviderOrder: ["nvidia", "gemini", "openrouter"],
+    printsEnvValues: false,
+    blockers,
+  };
+}
+
+function inspectProviderReadiness(provider) {
+  const valueEnvNames = providerValueEnvNames(provider);
+  const keyFileEnvNames = providerKeyFileEnvNames(provider);
+  const valueKeyCount = valueEnvNames.flatMap((name) => splitEnvList(process.env[name] ?? "")).length;
+  const fileStates = keyFileEnvNames.map(inspectProviderKeyFileEnv);
+  const fileKeyCount = fileStates.reduce((count, state) => count + state.keyCount, 0);
+  const keyCount = valueKeyCount + fileKeyCount;
+  return {
+    ready: keyCount > 0,
+    keyCount,
+    valueEnvNames,
+    keyFileEnvNames,
+    configuredValueEnvNames: valueEnvNames.filter((name) => hasAnyEnv(name)),
+    configuredKeyFileEnvNames: fileStates.filter((state) => state.configured).map((state) => state.envName),
+    keyFileIssues: fileStates.filter((state) => state.issue).map((state) => ({ envName: state.envName, issue: state.issue })),
+    printsEnvValues: false,
+  };
+}
+
+function inspectProviderKeyFileEnv(envName) {
+  const value = process.env[envName];
+  if (!value) return { envName, configured: false, keyCount: 0, issue: null };
+  const resolved = resolve(String(value));
+  if (!existsSync(resolved)) return { envName, configured: true, keyCount: 0, issue: "file-missing" };
+  if (!statSync(resolved).isFile()) return { envName, configured: true, keyCount: 0, issue: "not-a-file" };
+  if (!isOutsideRepo(resolved)) return { envName, configured: true, keyCount: 0, issue: "file-inside-repository" };
+  const fileRaw = readFileSync(resolved, "utf8");
+  return { envName, configured: true, keyCount: splitEnvList(fileRaw).length, issue: null };
+}
+
+function providerValueEnvNames(provider) {
+  if (provider === "gemini") return ["GEMINI_API_KEY", "GEMINI_API_KEYS", "GOOGLE_API_KEY", "GOOGLE_API_KEYS", "AI_STUDIO_API_KEY", "AI_STUDIO_API_KEYS"];
+  if (provider === "voyage") return ["VOYAGE_API_KEY", "VOYAGE_API_KEYS"];
+  if (provider === "nvidia") return ["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVAPI_KEY", "NVAPI_KEYS"];
+  if (provider === "openrouter") return ["OPENROUTER_API_KEY", "OPENROUTER_API_KEYS"];
+  if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL"];
+  if (provider === "local-rerank") return ["SELFMEM_LOCAL_RERANK_ENDPOINT", "SELFMEM_LOCAL_RERANK_BASE_URL"];
+  return [];
+}
+
+function providerKeyFileEnvNames(provider) {
+  if (provider === "gemini") return ["GEMINI_API_KEY_FILE", "GEMINI_API_KEYS_FILE", "GOOGLE_API_KEY_FILE", "GOOGLE_API_KEYS_FILE", "AI_STUDIO_API_KEY_FILE", "AI_STUDIO_API_KEYS_FILE"];
+  if (provider === "voyage") return ["VOYAGE_API_KEY_FILE", "VOYAGE_API_KEYS_FILE"];
+  if (provider === "nvidia") return ["NVIDIA_API_KEY_FILE", "NVIDIA_API_KEYS_FILE", "NVAPI_KEY_FILE", "NVAPI_KEYS_FILE"];
+  if (provider === "openrouter") return ["OPENROUTER_API_KEY_FILE", "OPENROUTER_API_KEYS_FILE"];
+  return [];
+}
+
+function truthyEnv(name) {
+  return process.env[name] === "1";
+}
+
+function hasAnyEnv(...names) {
+  return names.some((name) => String(process.env[name] ?? "").trim().length > 0);
+}
+
+function splitEnvList(value) {
+  return String(value ?? "")
+    .split(/[,\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function isLocalUrl(value) {
+  try {
+    const parsed = new URL(String(value));
+    return ["localhost", "127.0.0.1", "::1"].includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function isOutsideRepo(path) {
+  const rel = relative(root, path);
+  return rel.startsWith("..") || isAbsolute(rel);
+}
+
 function shardRange(result) {
   const shard = result.input?.queryShard ?? {};
   const startIndex = intOrNull(result.input?.scoredQueryStart ?? shard.startIndex ?? result.input?.queryOffset);
@@ -297,6 +537,14 @@ function renderMarkdown(value) {
         )
       : ["- none"]),
     "",
+    "## Execution Lane Readiness",
+    ...((value.executionLaneReadiness ?? []).length
+      ? value.executionLaneReadiness.flatMap((lane) => [
+          `- ${lane.laneId}: response-export=${lane.readyForResponseArmExport}; answer-quality=${lane.readyForAnswerQualityScoring}; intake-candidate=${lane.readyForAcceptedShardIntakeCandidate}`,
+          `  - blockers=${lane.blockers.length ? lane.blockers.join(", ") : "none"}`,
+        ])
+      : ["- none"]),
+    "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),
     "",
@@ -328,6 +576,10 @@ function normalizeList(values) {
     .flatMap((value) => String(value ?? "").split(","))
     .map((value) => value.trim())
     .filter(Boolean);
+}
+
+function unique(items) {
+  return [...new Set(items)].sort();
 }
 
 function coerceArray(value) {

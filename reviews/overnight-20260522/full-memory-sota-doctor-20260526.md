@@ -14,7 +14,7 @@
 - full-shard-private-inputs: pass
 - full-shard-control-preflight: pass
 - bm25-is-control-only: pass
-- full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete)
+- full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
 - full-score-result-gate: blocked (reported-target-judge-model-does-not-match-result, missing-full-or-officially-comparable-memory-benchmark-run, best-end-to-end-score-below-primary-reported-memory-target)
 - reported-target-beaten: blocked (best-end-to-end-score-below-reported-supermemory-target)
@@ -47,12 +47,29 @@
 - Intake status: BLOCKED_FULL_ANSWER_QUALITY_SHARDS
 - Accepted shards: 0
 - Missing shards: 20
+- Full SOTA lane ready for response export: false
+- Full SOTA lane ready for answer-quality scoring: false
 
 ## Blockers
 - answer-quality-shard-runs-pending
 - shard-results-missing
 - answer-quality-shards-missing
 - full-shard-coverage-incomplete
+- RECALLWEAVE_BASELINE_LIVE-not-enabled
+- RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed
+- RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled
+- RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed
+- RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed
+- RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled
+- RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed
+- answer-model-missing
+- judge-model-missing
+- local-apple-credentials-missing
+- local-rerank-credentials-missing
+- nvidia-credentials-missing
+- openai-compatible-base-url-missing
+- query-expansion-local-endpoint-or-cloud-consent-missing
+- voyage-credentials-missing
 - missing-voyage-answer-quality-same-data-result
 - reported-target-judge-model-does-not-match-result
 - missing-full-or-officially-comparable-memory-benchmark-run

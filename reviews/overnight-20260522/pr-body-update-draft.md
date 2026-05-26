@@ -370,6 +370,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   challenger, NVIDIA minimum challenger, and the only intake-compatible
   `full-sota-accepted-shards` lane. This keeps local/provider diagnostic runs
   useful without letting them masquerade as the full accepted SOTA shard set.
+- Adds no-call execution-lane readiness to the full-shard workorder and doctor.
+  The checked-in `full-sota-accepted-shards` lane remains blocked until
+  live-export consent, no-raw-text consent, answer-quality consent, local
+  Apple/local rerank endpoints, Voyage/NVIDIA credentials, answer and judge
+  model configuration, a scoring endpoint, and query-expansion readiness are all
+  present. This makes the missing full benchmark lane explicit without spending
+  hosted Supermemory or provider usage.
 - Narrows release-check stale temp cleanup so it only removes old
   `recallweave-release-check-root-*` directories. A new regression check proves
   benchmark materialization roots and pointer files like `recallweave-sota-full-*`

@@ -332,7 +332,12 @@ shard intake readiness; it still blocks combine and SOTA claims until the
 separate intake, combine, result gate, reviewer gate, UI/docs, owner approval,
 and real canary evidence pass. It mirrors the plan's execution lanes so partial
 local, Voyage, NVIDIA, or deterministic diagnostic runs cannot be confused with
-the full strategy set required for SOTA intake.
+the full strategy set required for SOTA intake. The same workorder now records
+execution-lane readiness without making calls or printing secrets: the checked-in
+state has the accepted full-SOTA lane blocked on live-export consent, no-raw-text
+consent, answer-quality consent, answer/judge endpoint setup, local Apple and
+local rerank endpoints, Voyage and NVIDIA credentials, and query-expansion
+readiness.
 The shard-return intake is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`.
 It currently blocks because all twenty full answer-quality shard outputs are

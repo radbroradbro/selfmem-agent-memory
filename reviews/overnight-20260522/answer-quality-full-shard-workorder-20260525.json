@@ -22,7 +22,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-26T04:03:07.289Z",
+  "generatedAt": "2026-05-26T04:14:22.925Z",
   "plan": {
     "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
     "hash": "sha256:61252b84b12b17e135bf283d79a85cf903ea114bd3e53bac72a44534d9d45c04",
@@ -214,6 +214,782 @@
       "queryExpansionPolicy": "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
       "shardIntakeCompatibility": "accepted only after every planned shard returns with this complete strategy set"
     }
+  ],
+  "executionLaneReadiness": [
+    {
+      "laneId": "deterministic-control-proxy",
+      "label": "Deterministic control/proxy lane",
+      "acceptedByFullShardIntake": false,
+      "diagnosticOnly": true,
+      "coverageReady": true,
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank"
+      ],
+      "providerRequirements": [],
+      "providerReadiness": {},
+      "responseArmExport": {
+        "laneId": "deterministic-control-proxy",
+        "ready": false,
+        "liveExportEnabled": false,
+        "noRawTextConfirmed": false,
+        "providerCallsRequired": false,
+        "providerCallsEnabled": false,
+        "providerPublicDataConfirmed": false,
+        "queryExpansionStrategyPresent": true,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+          "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed"
+        ]
+      },
+      "queryExpansion": {
+        "required": true,
+        "ready": false,
+        "localEndpointPresent": false,
+        "localModelPresent": false,
+        "localReady": false,
+        "cloudCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "cloudProviderReady": false,
+        "readyProviderKinds": [],
+        "defaultCloudProviderOrder": [
+          "nvidia",
+          "gemini",
+          "openrouter"
+        ],
+        "printsEnvValues": false,
+        "blockers": [
+          "query-expansion-local-endpoint-or-cloud-consent-missing"
+        ]
+      },
+      "answerQuality": {
+        "ready": false,
+        "answerQualityCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "noRawTextOutputConfirmed": false,
+        "answerModelPresent": false,
+        "judgeModelPresent": false,
+        "baseUrlPresent": false,
+        "endpointIsLocal": false,
+        "cloudEndpointRequiresApiKey": false,
+        "apiKeyPresent": false,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+          "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+          "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+          "answer-model-missing",
+          "judge-model-missing",
+          "openai-compatible-base-url-missing"
+        ]
+      },
+      "readyForResponseArmExport": false,
+      "readyForAnswerQualityScoring": false,
+      "readyForAcceptedShardIntakeCandidate": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "openai-compatible-base-url-missing",
+        "query-expansion-local-endpoint-or-cloud-consent-missing"
+      ]
+    },
+    {
+      "laneId": "local-apple-no-spend",
+      "label": "Local Apple no-spend lane",
+      "acceptedByFullShardIntake": false,
+      "diagnosticOnly": true,
+      "coverageReady": true,
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank"
+      ],
+      "providerRequirements": [
+        "local-apple",
+        "local-rerank"
+      ],
+      "providerReadiness": {
+        "local-apple": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "SELFMEM_LOCAL_EMBED_BASE_URL"
+          ],
+          "keyFileEnvNames": [],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        },
+        "local-rerank": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "SELFMEM_LOCAL_RERANK_ENDPOINT",
+            "SELFMEM_LOCAL_RERANK_BASE_URL"
+          ],
+          "keyFileEnvNames": [],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        }
+      },
+      "responseArmExport": {
+        "laneId": "local-apple-no-spend",
+        "ready": false,
+        "liveExportEnabled": false,
+        "noRawTextConfirmed": false,
+        "providerCallsRequired": false,
+        "providerCallsEnabled": false,
+        "providerPublicDataConfirmed": false,
+        "queryExpansionStrategyPresent": true,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+          "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+          "local-apple-credentials-missing",
+          "local-rerank-credentials-missing"
+        ]
+      },
+      "queryExpansion": {
+        "required": true,
+        "ready": false,
+        "localEndpointPresent": false,
+        "localModelPresent": false,
+        "localReady": false,
+        "cloudCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "cloudProviderReady": false,
+        "readyProviderKinds": [],
+        "defaultCloudProviderOrder": [
+          "nvidia",
+          "gemini",
+          "openrouter"
+        ],
+        "printsEnvValues": false,
+        "blockers": [
+          "query-expansion-local-endpoint-or-cloud-consent-missing"
+        ]
+      },
+      "answerQuality": {
+        "ready": false,
+        "answerQualityCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "noRawTextOutputConfirmed": false,
+        "answerModelPresent": false,
+        "judgeModelPresent": false,
+        "baseUrlPresent": false,
+        "endpointIsLocal": false,
+        "cloudEndpointRequiresApiKey": false,
+        "apiKeyPresent": false,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+          "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+          "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+          "answer-model-missing",
+          "judge-model-missing",
+          "openai-compatible-base-url-missing"
+        ]
+      },
+      "readyForResponseArmExport": false,
+      "readyForAnswerQualityScoring": false,
+      "readyForAcceptedShardIntakeCandidate": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "local-apple-credentials-missing",
+        "local-rerank-credentials-missing",
+        "openai-compatible-base-url-missing",
+        "query-expansion-local-endpoint-or-cloud-consent-missing"
+      ]
+    },
+    {
+      "laneId": "voyage-minimum-challenger",
+      "label": "Voyage minimum challenger lane",
+      "acceptedByFullShardIntake": false,
+      "diagnosticOnly": true,
+      "coverageReady": true,
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "cloud-voyage4-voyage-lite-rerank"
+      ],
+      "providerRequirements": [
+        "voyage"
+      ],
+      "providerReadiness": {
+        "voyage": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "VOYAGE_API_KEY",
+            "VOYAGE_API_KEYS"
+          ],
+          "keyFileEnvNames": [
+            "VOYAGE_API_KEY_FILE",
+            "VOYAGE_API_KEYS_FILE"
+          ],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        }
+      },
+      "responseArmExport": {
+        "laneId": "voyage-minimum-challenger",
+        "ready": false,
+        "liveExportEnabled": false,
+        "noRawTextConfirmed": false,
+        "providerCallsRequired": true,
+        "providerCallsEnabled": false,
+        "providerPublicDataConfirmed": false,
+        "queryExpansionStrategyPresent": false,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+          "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+          "voyage-credentials-missing"
+        ]
+      },
+      "queryExpansion": {
+        "required": false,
+        "ready": true,
+        "localEndpointPresent": false,
+        "localModelPresent": false,
+        "localReady": false,
+        "cloudCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "cloudProviderReady": false,
+        "readyProviderKinds": [],
+        "printsEnvValues": false,
+        "blockers": []
+      },
+      "answerQuality": {
+        "ready": false,
+        "answerQualityCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "noRawTextOutputConfirmed": false,
+        "answerModelPresent": false,
+        "judgeModelPresent": false,
+        "baseUrlPresent": false,
+        "endpointIsLocal": false,
+        "cloudEndpointRequiresApiKey": false,
+        "apiKeyPresent": false,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+          "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+          "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+          "answer-model-missing",
+          "judge-model-missing",
+          "openai-compatible-base-url-missing"
+        ]
+      },
+      "readyForResponseArmExport": false,
+      "readyForAnswerQualityScoring": false,
+      "readyForAcceptedShardIntakeCandidate": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "openai-compatible-base-url-missing",
+        "voyage-credentials-missing"
+      ]
+    },
+    {
+      "laneId": "nvidia-minimum-challenger",
+      "label": "NVIDIA minimum challenger lane",
+      "acceptedByFullShardIntake": false,
+      "diagnosticOnly": true,
+      "coverageReady": true,
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "cloud-nvidia-nemotron-1b"
+      ],
+      "providerRequirements": [
+        "nvidia"
+      ],
+      "providerReadiness": {
+        "nvidia": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "NVIDIA_API_KEY",
+            "NVIDIA_API_KEYS",
+            "NVAPI_KEY",
+            "NVAPI_KEYS"
+          ],
+          "keyFileEnvNames": [
+            "NVIDIA_API_KEY_FILE",
+            "NVIDIA_API_KEYS_FILE",
+            "NVAPI_KEY_FILE",
+            "NVAPI_KEYS_FILE"
+          ],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        }
+      },
+      "responseArmExport": {
+        "laneId": "nvidia-minimum-challenger",
+        "ready": false,
+        "liveExportEnabled": false,
+        "noRawTextConfirmed": false,
+        "providerCallsRequired": true,
+        "providerCallsEnabled": false,
+        "providerPublicDataConfirmed": false,
+        "queryExpansionStrategyPresent": false,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+          "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+          "nvidia-credentials-missing"
+        ]
+      },
+      "queryExpansion": {
+        "required": false,
+        "ready": true,
+        "localEndpointPresent": false,
+        "localModelPresent": false,
+        "localReady": false,
+        "cloudCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "cloudProviderReady": false,
+        "readyProviderKinds": [],
+        "printsEnvValues": false,
+        "blockers": []
+      },
+      "answerQuality": {
+        "ready": false,
+        "answerQualityCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "noRawTextOutputConfirmed": false,
+        "answerModelPresent": false,
+        "judgeModelPresent": false,
+        "baseUrlPresent": false,
+        "endpointIsLocal": false,
+        "cloudEndpointRequiresApiKey": false,
+        "apiKeyPresent": false,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+          "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+          "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+          "answer-model-missing",
+          "judge-model-missing",
+          "openai-compatible-base-url-missing"
+        ]
+      },
+      "readyForResponseArmExport": false,
+      "readyForAnswerQualityScoring": false,
+      "readyForAcceptedShardIntakeCandidate": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "nvidia-credentials-missing",
+        "openai-compatible-base-url-missing"
+      ]
+    },
+    {
+      "laneId": "full-sota-accepted-shards",
+      "label": "Full SOTA shard-intake lane",
+      "acceptedByFullShardIntake": true,
+      "diagnosticOnly": false,
+      "coverageReady": true,
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "cloud-voyage4-voyage-lite-rerank",
+        "cloud-nvidia-nemotron-1b",
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank"
+      ],
+      "providerRequirements": [
+        "local-apple",
+        "local-rerank",
+        "nvidia",
+        "voyage"
+      ],
+      "providerReadiness": {
+        "local-apple": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "SELFMEM_LOCAL_EMBED_BASE_URL"
+          ],
+          "keyFileEnvNames": [],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        },
+        "local-rerank": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "SELFMEM_LOCAL_RERANK_ENDPOINT",
+            "SELFMEM_LOCAL_RERANK_BASE_URL"
+          ],
+          "keyFileEnvNames": [],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        },
+        "nvidia": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "NVIDIA_API_KEY",
+            "NVIDIA_API_KEYS",
+            "NVAPI_KEY",
+            "NVAPI_KEYS"
+          ],
+          "keyFileEnvNames": [
+            "NVIDIA_API_KEY_FILE",
+            "NVIDIA_API_KEYS_FILE",
+            "NVAPI_KEY_FILE",
+            "NVAPI_KEYS_FILE"
+          ],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        },
+        "voyage": {
+          "ready": false,
+          "keyCount": 0,
+          "valueEnvNames": [
+            "VOYAGE_API_KEY",
+            "VOYAGE_API_KEYS"
+          ],
+          "keyFileEnvNames": [
+            "VOYAGE_API_KEY_FILE",
+            "VOYAGE_API_KEYS_FILE"
+          ],
+          "configuredValueEnvNames": [],
+          "configuredKeyFileEnvNames": [],
+          "keyFileIssues": [],
+          "printsEnvValues": false
+        }
+      },
+      "responseArmExport": {
+        "laneId": "full-sota-accepted-shards",
+        "ready": false,
+        "liveExportEnabled": false,
+        "noRawTextConfirmed": false,
+        "providerCallsRequired": true,
+        "providerCallsEnabled": false,
+        "providerPublicDataConfirmed": false,
+        "queryExpansionStrategyPresent": true,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+          "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+          "local-apple-credentials-missing",
+          "local-rerank-credentials-missing",
+          "nvidia-credentials-missing",
+          "voyage-credentials-missing"
+        ]
+      },
+      "queryExpansion": {
+        "required": true,
+        "ready": false,
+        "localEndpointPresent": false,
+        "localModelPresent": false,
+        "localReady": false,
+        "cloudCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "cloudProviderReady": false,
+        "readyProviderKinds": [],
+        "defaultCloudProviderOrder": [
+          "nvidia",
+          "gemini",
+          "openrouter"
+        ],
+        "printsEnvValues": false,
+        "blockers": [
+          "query-expansion-local-endpoint-or-cloud-consent-missing"
+        ]
+      },
+      "answerQuality": {
+        "ready": false,
+        "answerQualityCallsEnabled": false,
+        "publicDataConfirmed": false,
+        "noRawTextOutputConfirmed": false,
+        "answerModelPresent": false,
+        "judgeModelPresent": false,
+        "baseUrlPresent": false,
+        "endpointIsLocal": false,
+        "cloudEndpointRequiresApiKey": false,
+        "apiKeyPresent": false,
+        "printsEnvValues": false,
+        "blockers": [
+          "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+          "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+          "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+          "answer-model-missing",
+          "judge-model-missing",
+          "openai-compatible-base-url-missing"
+        ]
+      },
+      "readyForResponseArmExport": false,
+      "readyForAnswerQualityScoring": false,
+      "readyForAcceptedShardIntakeCandidate": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "local-apple-credentials-missing",
+        "local-rerank-credentials-missing",
+        "nvidia-credentials-missing",
+        "openai-compatible-base-url-missing",
+        "query-expansion-local-endpoint-or-cloud-consent-missing",
+        "voyage-credentials-missing"
+      ]
+    }
+  ],
+  "fullSotaLaneReadiness": {
+    "laneId": "full-sota-accepted-shards",
+    "label": "Full SOTA shard-intake lane",
+    "acceptedByFullShardIntake": true,
+    "diagnosticOnly": false,
+    "coverageReady": true,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-nvidia-nemotron-1b",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "providerRequirements": [
+      "local-apple",
+      "local-rerank",
+      "nvidia",
+      "voyage"
+    ],
+    "providerReadiness": {
+      "local-apple": {
+        "ready": false,
+        "keyCount": 0,
+        "valueEnvNames": [
+          "SELFMEM_LOCAL_EMBED_BASE_URL"
+        ],
+        "keyFileEnvNames": [],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      },
+      "local-rerank": {
+        "ready": false,
+        "keyCount": 0,
+        "valueEnvNames": [
+          "SELFMEM_LOCAL_RERANK_ENDPOINT",
+          "SELFMEM_LOCAL_RERANK_BASE_URL"
+        ],
+        "keyFileEnvNames": [],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      },
+      "nvidia": {
+        "ready": false,
+        "keyCount": 0,
+        "valueEnvNames": [
+          "NVIDIA_API_KEY",
+          "NVIDIA_API_KEYS",
+          "NVAPI_KEY",
+          "NVAPI_KEYS"
+        ],
+        "keyFileEnvNames": [
+          "NVIDIA_API_KEY_FILE",
+          "NVIDIA_API_KEYS_FILE",
+          "NVAPI_KEY_FILE",
+          "NVAPI_KEYS_FILE"
+        ],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      },
+      "voyage": {
+        "ready": false,
+        "keyCount": 0,
+        "valueEnvNames": [
+          "VOYAGE_API_KEY",
+          "VOYAGE_API_KEYS"
+        ],
+        "keyFileEnvNames": [
+          "VOYAGE_API_KEY_FILE",
+          "VOYAGE_API_KEYS_FILE"
+        ],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      }
+    },
+    "responseArmExport": {
+      "laneId": "full-sota-accepted-shards",
+      "ready": false,
+      "liveExportEnabled": false,
+      "noRawTextConfirmed": false,
+      "providerCallsRequired": true,
+      "providerCallsEnabled": false,
+      "providerPublicDataConfirmed": false,
+      "queryExpansionStrategyPresent": true,
+      "printsEnvValues": false,
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+        "local-apple-credentials-missing",
+        "local-rerank-credentials-missing",
+        "nvidia-credentials-missing",
+        "voyage-credentials-missing"
+      ]
+    },
+    "queryExpansion": {
+      "required": true,
+      "ready": false,
+      "localEndpointPresent": false,
+      "localModelPresent": false,
+      "localReady": false,
+      "cloudCallsEnabled": false,
+      "publicDataConfirmed": false,
+      "cloudProviderReady": false,
+      "readyProviderKinds": [],
+      "defaultCloudProviderOrder": [
+        "nvidia",
+        "gemini",
+        "openrouter"
+      ],
+      "printsEnvValues": false,
+      "blockers": [
+        "query-expansion-local-endpoint-or-cloud-consent-missing"
+      ]
+    },
+    "answerQuality": {
+      "ready": false,
+      "answerQualityCallsEnabled": false,
+      "publicDataConfirmed": false,
+      "noRawTextOutputConfirmed": false,
+      "answerModelPresent": false,
+      "judgeModelPresent": false,
+      "baseUrlPresent": false,
+      "endpointIsLocal": false,
+      "cloudEndpointRequiresApiKey": false,
+      "apiKeyPresent": false,
+      "printsEnvValues": false,
+      "blockers": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "openai-compatible-base-url-missing"
+      ]
+    },
+    "readyForResponseArmExport": false,
+    "readyForAnswerQualityScoring": false,
+    "readyForAcceptedShardIntakeCandidate": false,
+    "countsAsFullMemorySotaEvidence": false,
+    "publicBenchmarkClaimsAllowed": false,
+    "blockers": [
+      "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+      "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+      "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+      "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+      "answer-model-missing",
+      "judge-model-missing",
+      "local-apple-credentials-missing",
+      "local-rerank-credentials-missing",
+      "nvidia-credentials-missing",
+      "openai-compatible-base-url-missing",
+      "query-expansion-local-endpoint-or-cloud-consent-missing",
+      "voyage-credentials-missing"
+    ]
+  },
+  "fullSotaLaneReadyForResponseArmExport": false,
+  "fullSotaLaneReadyForAnswerQualityScoring": false,
+  "fullSotaLaneEnvironmentBlockers": [
+    "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+    "answer-model-missing",
+    "judge-model-missing",
+    "local-apple-credentials-missing",
+    "local-rerank-credentials-missing",
+    "nvidia-credentials-missing",
+    "openai-compatible-base-url-missing",
+    "query-expansion-local-endpoint-or-cloud-consent-missing",
+    "voyage-credentials-missing"
   ],
   "progress": {
     "inputCount": 0,

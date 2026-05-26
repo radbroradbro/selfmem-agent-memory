@@ -216,6 +216,10 @@ function inspectRawSourceRetention(materializeReport) {
 }
 
 function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
+  const executionLaneReadiness = arrayOf(shardWorkorder?.executionLaneReadiness);
+  const fullSotaLane = executionLaneReadiness.find(
+    (lane) => lane.laneId === "full-sota-accepted-shards" || lane.acceptedByFullShardIntake === true,
+  );
   return {
     planStatus: shardPlan?.status ?? null,
     workorderStatus: shardWorkorder?.status ?? null,
@@ -230,9 +234,20 @@ function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
     duplicateShardCount: Number(shardIntake?.intake?.duplicateShardCount ?? shardWorkorder?.progress?.duplicateResultCount ?? 0),
     completeCoverage: Boolean(shardIntake?.intake?.completeCoverage),
     readyForShardCombine: Boolean(shardIntake?.readyForShardCombine),
+    executionLaneReadiness: executionLaneReadiness.map((lane) => ({
+      laneId: lane.laneId,
+      acceptedByFullShardIntake: Boolean(lane.acceptedByFullShardIntake),
+      readyForResponseArmExport: Boolean(lane.readyForResponseArmExport),
+      readyForAnswerQualityScoring: Boolean(lane.readyForAnswerQualityScoring),
+      blockerCount: Number(lane.blockers?.length ?? 0),
+    })),
+    fullSotaLaneReadyForResponseArmExport: Boolean(fullSotaLane?.readyForResponseArmExport),
+    fullSotaLaneReadyForAnswerQualityScoring: Boolean(fullSotaLane?.readyForAnswerQualityScoring),
+    fullSotaLaneEnvironmentBlockers: fullSotaLane?.blockers ?? [],
     blockers: [
       ...arrayOf(shardWorkorder?.blockers),
       ...arrayOf(shardIntake?.blockers),
+      ...arrayOf(fullSotaLane?.blockers),
     ],
   };
 }
@@ -459,6 +474,8 @@ function renderMarkdown(value) {
     `- Intake status: ${value.shardState.intakeStatus}`,
     `- Accepted shards: ${value.shardState.acceptedShardCount}`,
     `- Missing shards: ${value.shardState.missingShardCount}`,
+    `- Full SOTA lane ready for response export: ${value.shardState.fullSotaLaneReadyForResponseArmExport}`,
+    `- Full SOTA lane ready for answer-quality scoring: ${value.shardState.fullSotaLaneReadyForAnswerQualityScoring}`,
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),
