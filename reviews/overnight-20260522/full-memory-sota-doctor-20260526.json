@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T14:14:08.953Z",
+  "generatedAt": "2026-05-26T14:39:49.963Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -85,6 +85,13 @@
       "hash": "sha256:a72d67edc4013ce139bba9d43b6565f06f9fbc69ea36800f65f823b5743cd5d4",
       "mode": "local-full-shard-performance-report",
       "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT"
+    },
+    "localFullResumeCommandSecurity": {
+      "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-security-20260526.json",
+      "exists": true,
+      "hash": "sha256:511f56899ff112105b64cde786db219369506c1bc555f9d47de86152956a4aa7",
+      "mode": "local-full-shard-resume-command-security-doctor",
+      "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY"
     },
     "localFullShard002RuntimeBlocker": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json",
@@ -651,6 +658,29 @@
         "local-full-runtime-blocker-present"
       ]
     },
+    "resumeCommandSecurity": {
+      "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-security-20260526.json",
+      "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY",
+      "publicSafe": true,
+      "fixtureSafe": true,
+      "materializerReportSafe": true,
+      "evidenceReady": true,
+      "evidenceBlockers": [],
+      "privateCommandFileMode": "0700",
+      "privateCommandFileOutsideRepository": true,
+      "privateScriptPlaceholderCount": 0,
+      "privateScriptOrderReady": true,
+      "firstCommandId": "rerunRuntimeDoctor",
+      "secondCommandId": "rerunDurabilitySmoke",
+      "guardedCommandId": "missingArmResponseExport",
+      "materializedCommandCount": 8,
+      "printsMaterializedCommands": false,
+      "printsPrivatePaths": false,
+      "printsEnvValues": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "blockers": []
+    },
     "nextPendingShardId": "shard-002",
     "nextPendingShardRange": "25-50",
     "localEmbeddingRuntimeStatus": "READY_LOCAL_EMBEDDING_RUNTIME",
@@ -889,6 +919,11 @@
     },
     {
       "id": "local-full-performance-snapshot",
+      "status": "pass",
+      "blockers": []
+    },
+    {
+      "id": "local-full-resume-command-security",
       "status": "pass",
       "blockers": []
     },
