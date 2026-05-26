@@ -2,6 +2,18 @@
 
 Date: 2026-05-23
 
+- PR #5 was refreshed again on 2026-05-26 after pinning the benchmark
+  operating policy: cloud Voyage remains the personal/Codex default, local
+  Apple Silicon is the methodology-refinement lane, hosted Supermemory search
+  is disabled for methodology benchmarks unless an explicit hosted-baseline
+  parity run is being executed, and shard 003 is recorded as a local-rerank
+  runtime blocker rather than a scored quality result. Live sync passed with PR
+  body hash
+  `3737e91d5adc09e3bff876f71e92756c591c817260c68adf33b35ac7fa4d4572`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`,
+  and issue body hash
+  `1b702f8118354977d5d3859ce80fc4f4f9f8a51c0471d0e9aa541aec7cc80216`.
 - PR #5 and issue #6 were refreshed again on 2026-05-26 after adding the
   local-full diagnostic scoring policy split. Live sync passed with PR body hash
   `c3930f4b4c90f5f0c4a6e121360620a9b799b26050ae6935b3baadfa172228c8`,

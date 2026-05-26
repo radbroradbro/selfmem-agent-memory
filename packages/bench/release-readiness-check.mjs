@@ -9416,9 +9416,12 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
   return allowedCodePaths.has(file) && (
     file === ".gitignore" ||
     file === ".env.example" ||
+    file === "configs/bench-budget.yaml" ||
     file === "configs/default.local.yaml" ||
     file === "configs/provider-matrix.yaml" ||
     file === "package.json" ||
+    file === "packages/adapters/hermes/selfmem_canary/__init__.py" ||
+    file === "packages/adapters/openclaw/selfmem_canary/index.mjs" ||
     file === "packages/brain-ui/fixtures/model-matrix.json" ||
     file === "packages/brain-ui/interaction-smoke.mjs" ||
     file === "packages/brain-ui/smoke.mjs" ||

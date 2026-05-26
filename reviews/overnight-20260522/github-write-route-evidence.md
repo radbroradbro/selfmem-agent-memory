@@ -191,6 +191,13 @@ Verdict: resolved for PR body and blocker issue writes.
     OpenClaw one-agent handoff packet for controller commit `f21a7e75` and
     preserving `18d606a` as the approved runtime canary adapter/report commit
     in the checked-in drafts. Updated at: 2026-05-25T22:11:54Z.
+  - PR #5 was refreshed again after pinning the benchmark operating policy:
+    cloud Voyage remains the personal/Codex default, local Apple Silicon is
+    the methodology-refinement lane, hosted Supermemory search is disabled for
+    methodology benchmarks unless the run is an explicit hosted-baseline
+    parity lane, and local-full shard 003 is recorded as a local-rerank
+    runtime blocker rather than a scored result. Updated at:
+    2026-05-26T21:56:09Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail
