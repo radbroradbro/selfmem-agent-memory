@@ -230,7 +230,9 @@ function candidateFailures({ item, range, expectedShard, planValue }) {
     range && Number(range.totalQueryCount) !== Number(planValue.runPlan?.queryCount ?? 0) ? "range-total-query-count-mismatch" : null,
     range && expectedShard && range.scoredQueryCount !== expectedShard.queryCount ? "scored-query-count-mismatch" : null,
     range && range.scoredQueryCount !== range.endIndexExclusive - range.startIndex ? "range-count-mismatch" : null,
-    expectedShard && item.json.input?.queryShard?.selectedQueryIdHash !== expectedShard.rangeHash ? "shard-range-hash-mismatch" : null,
+    expectedShard && (item.json.input?.queryShard?.rangeHash ?? item.json.input?.queryShard?.selectedQueryIdHash) !== expectedShard.rangeHash
+      ? "shard-range-hash-mismatch"
+      : null,
     strategyNamesHash(item.json) !== planStrategyHash(planValue) ? "strategy-set-mismatch" : null,
   ].filter(Boolean);
 }
@@ -571,7 +573,7 @@ function shardRange(result) {
   const totalQueryCount = intOrNull(result.input?.totalQueryCount ?? shard.totalQueryCount ?? result.input?.queryCount);
   const scoredQueryCount = intOrNull(result.input?.scoredQueryCount ?? shard.scoredQueryCount);
   if ([startIndex, endIndexExclusive, totalQueryCount, scoredQueryCount].some((value) => value == null)) return null;
-  return { startIndex, endIndexExclusive, totalQueryCount, scoredQueryCount };
+  return { startIndex, endIndexExclusive, totalQueryCount, scoredQueryCount, rangeHash: shard.rangeHash ?? null };
 }
 
 function strategyNamesHash(result) {

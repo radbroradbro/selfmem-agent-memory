@@ -381,6 +381,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       answerModel: resultAnswerModel,
       judgeModel: resultJudgeModel,
       scoredQueryCount: fullBenchmarkPolicy.currentAnswerQualityQueryCount,
+      totalQueryCount: fullBenchmarkPolicy.totalQueryCount,
       answerQualityMetric: answerMetric,
       reviewerApprovalCount,
       arms: rowNames,
@@ -477,22 +478,32 @@ function buildFullBenchmarkPolicy({ target, result, rows }) {
   const targetClaimTier = target?.claimTier ?? null;
   const benchmarkFamily = target?.benchmark?.family ?? target?.benchmark?.name ?? null;
   const datasetSlice = target?.benchmark?.split ?? null;
-  const currentAnswerQualityQueryCount = Math.max(
+  const scoredQueryCandidates = [
     finiteNumber(result?.input?.scoredQueryCount),
-    finiteNumber(result?.input?.queryCount),
     finiteNumber(result?.queryShard?.scoredQueryCount),
-    finiteNumber(result?.queryShard?.queryCount),
     finiteNumber(result?.scoredQueryCount),
-    finiteNumber(result?.queryCount),
     ...rows.flatMap((row) => [
       finiteNumber(row.scoredQueryCount),
-      finiteNumber(row.queryCount),
       finiteNumber(row.input?.scoredQueryCount),
-      finiteNumber(row.input?.queryCount),
     ]),
+  ];
+  const fallbackQueryCountCandidates = [
+    finiteNumber(result?.queryShard?.queryCount),
+    finiteNumber(result?.queryCount),
+    ...rows.flatMap((row) => [finiteNumber(row.queryCount), finiteNumber(row.input?.queryCount)]),
+  ];
+  const totalQueryCount = Math.max(
+    finiteNumber(result?.input?.totalQueryCount),
+    finiteNumber(result?.input?.queryCount),
+    finiteNumber(result?.queryShard?.totalQueryCount),
+    finiteNumber(target?.benchmark?.queryCount),
+    ...fallbackQueryCountCandidates,
   );
+  const currentAnswerQualityQueryCount = Math.max(...scoredQueryCandidates);
+  const effectiveAnswerQualityQueryCount =
+    currentAnswerQualityQueryCount > 0 ? currentAnswerQualityQueryCount : Math.max(...fallbackQueryCountCandidates);
   const minimumFullQueryCount = String(benchmarkFamily ?? "").toLowerCase().includes("longmemeval") ? 500 : null;
-  const fullQueryCountPresent = minimumFullQueryCount != null && currentAnswerQualityQueryCount >= minimumFullQueryCount;
+  const fullQueryCountPresent = minimumFullQueryCount != null && effectiveAnswerQualityQueryCount >= minimumFullQueryCount;
   const officiallyComparableClaimTier = ["public-benchmark", "full-benchmark", "officially-comparable", "broad-sota"].includes(
     String(targetClaimTier ?? ""),
   );
@@ -502,7 +513,8 @@ function buildFullBenchmarkPolicy({ target, result, rows }) {
     benchmarkFamily,
     datasetSlice,
     targetClaimTier,
-    currentAnswerQualityQueryCount,
+    currentAnswerQualityQueryCount: effectiveAnswerQualityQueryCount,
+    totalQueryCount,
     minimumFullQueryCount,
     fullQueryCountPresent,
     officiallyComparableClaimTier,
@@ -640,6 +652,7 @@ function renderMarkdown(value) {
     "## Full Benchmark Policy",
     `- Dataset slice: ${value.fullBenchmarkPolicy.datasetSlice ?? "missing"}`,
     `- Current answer-quality query count: ${value.fullBenchmarkPolicy.currentAnswerQualityQueryCount}`,
+    `- Total query count: ${value.fullBenchmarkPolicy.totalQueryCount}`,
     `- Minimum full query count: ${value.fullBenchmarkPolicy.minimumFullQueryCount ?? "missing"}`,
     `- Full or officially comparable run present: ${value.fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent}`,
     "",

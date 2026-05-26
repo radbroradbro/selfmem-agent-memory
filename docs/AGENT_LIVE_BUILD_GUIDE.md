@@ -380,10 +380,11 @@ They need:
 - no raw memory in reports.
 
 The preferred local experiment for Apple Silicon users is the small
-llama.cpp/Metal lane first: Qwen3 Embedding 0.6B plus the deterministic
-RecallWeave rerank proxy. A live Qwen3 Reranker 0.6B sidecar is a planned
-challenger through `local-apple-qwen3-0_6b-local-rerank`, not a proven default
-yet. Qwen3 4B and 8B arms are quality challengers, not defaults for 24GB
+llama.cpp/Metal lane first: Qwen3 Embedding 0.6B, then the
+`local-apple-qwen3-0_6b-local-rerank` sidecar challenger. The Qwen3 Reranker
+0.6B Q8 sidecar has been live-tested on one 25-query local-full
+answer-quality shard, but it did not win that shard, so it is not a proven
+default. Qwen3 4B and 8B arms are quality challengers, not defaults for 24GB
 machines.
 
 Gemini, NVIDIA hosted retrieval models, and query expansion providers must be

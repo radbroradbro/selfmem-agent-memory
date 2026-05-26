@@ -264,7 +264,7 @@ function shardFailures({ item, result, range, expected, planValue, strategySetHa
     range && !expected.has(rangeKey(range)) ? "query-shard-range-not-in-plan" : null,
     range && Number(range.totalQueryCount) !== Number(planValue.runPlan?.queryCount ?? 0) ? "range-total-query-count-mismatch" : null,
     range && range.scoredQueryCount !== range.endIndexExclusive - range.startIndex ? "scored-query-count-mismatch" : null,
-    range && expected.has(rangeKey(range)) && range.selectedQueryIdHash !== expected.get(rangeKey(range))?.rangeHash
+    range && expected.has(rangeKey(range)) && (range.rangeHash ?? range.selectedQueryIdHash) !== expected.get(rangeKey(range))?.rangeHash
       ? "shard-range-hash-mismatch"
       : null,
     strategyNamesHash(result) !== strategySetHash ? "strategy-set-mismatch" : null,
@@ -339,6 +339,7 @@ function shardRange(result) {
     endIndexExclusive,
     totalQueryCount,
     scoredQueryCount,
+    rangeHash: shard.rangeHash ?? null,
     selectedQueryIdHash: shard.selectedQueryIdHash ?? null,
   };
 }

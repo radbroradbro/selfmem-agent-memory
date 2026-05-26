@@ -310,6 +310,7 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
         scoredQueryCount: arms[0]?.scoredQueryCount ?? 0,
         requestedLimit: maxQueries,
         completeDataset: querySelection.startIndex === 0 && querySelection.endIndexExclusive === querySelection.totalQueryCount,
+        rangeHash: querySelection.rangeHash,
         selectedQueryIdHash: querySelection.selectedQueryIdHash,
       },
     },
@@ -417,6 +418,12 @@ function selectQueries(queries) {
     totalQueryCount,
     startIndex: queryOffset,
     endIndexExclusive,
+    rangeHash: `sha256:${stableHash(JSON.stringify({
+      targetHash: `sha256:${stableHash(targetRaw)}`,
+      startIndex: queryOffset,
+      endIndexExclusive,
+      totalQueryCount,
+    }))}`,
     selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => shortHash(query.id)).join("\n"))}`,
   };
 }

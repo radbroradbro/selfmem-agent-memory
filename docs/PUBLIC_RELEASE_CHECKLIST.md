@@ -32,6 +32,10 @@ Use this checklist before making the repository public.
   `benchmark:answer-quality:shard-workorder`, accepted by
   `benchmark:answer-quality:shard-intake`, and then merged with
   `benchmark:answer-quality:combine -- --combine-mode shards`.
+- [ ] Local-full diagnostic wording uses either a complete 500-query combined
+  local-full result or clearly states the exact shard coverage. The first
+  checked-in local-full shard is 25 of 500 queries and remains blocked on
+  nineteen missing shards.
 - [ ] `benchmark:memory-score:result-gate --require-ready` has an empty
   `fullSotaBlockers` list, proving the result meets the selected source-locked
   reported memory-system target under matching benchmark and judge semantics.

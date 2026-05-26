@@ -14,7 +14,7 @@ same public data, dataset revision, and scoring setup as the target row.
 | Lane | Default | Why |
 |---|---|---|
 | Cloud quality | Voyage `voyage-4-large` plus `rerank-2.5` | Strong text and code memory path with same-provider embedding and rerank. Voyage documents `rerank-2.5` as the highest-accuracy reranker and `rerank-2.5-lite` as the latency option. |
-| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus deterministic rerank proxy | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. This is the consumer-hardware floor, not the assumed quality ceiling. |
+| Local Apple Silicon | Qwen3 Embedding 0.6B GGUF plus optional Qwen3 Reranker 0.6B GGUF sidecar | Fits 24GB-class Macs better than 4B/8B arms and has 32K context, 1024-dimensional embeddings, and Apache-2.0 model licensing. This is the consumer-hardware floor, not the assumed quality ceiling; the sidecar is live-proven as a benchmark arm, but it is not the default winner. |
 | Multimodal challenger | Gemini Embedding 2 | Current Google multimodal embedding challenger for PDFs, images, audio, video, and storage-sensitive dimension tests. Do not make it the default until a matched canary wins. |
 | NVIDIA NIM challenger | NVIDIA NeMo Retriever embedding plus rerank pairs | Useful for hosted latency and retrieval comparisons. Keep this as a benchmark arm until measured on RecallWeave canaries. |
 | Query expansion | Off by default | Enable only when a canary proves better quality without unacceptable latency or exact-identifier damage. |
@@ -60,10 +60,25 @@ work with other local runtimes, but it crashed this llama.cpp server on the
 30-query local Apple run. Treat that as a runtime configuration blocker until a
 new local server build or sidecar proves otherwise.
 
-The reranker lane should first test Qwen3 Reranker 0.6B through a local
-OpenAI-compatible rerank endpoint or a small sidecar process. Qwen3 Reranker
-4B and 8B stay optional quality arms. They are not the default for 24GB Macs
-until measured latency and memory pressure justify them.
+The reranker lane has now run Qwen3 Reranker 0.6B Q8 GGUF through llama.cpp's
+local `/v1/rerank` endpoint. The stable Apple Silicon settings for the
+25-query local-full shard were single-slot reranking with no prompt cache and
+a large physical batch:
+
+```bash
+llama-server -hf ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF:Q8_0 \
+  --rerank --host 127.0.0.1 --port 8092 --no-webui \
+  -c 8192 -b 5120 -ub 5120 -np 1 -cram 0 -ngl 999
+```
+
+The first local-full answer-quality shard used that sidecar with Qwen3
+Embedding 0.6B Q8, `SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=16`, and
+`SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=8`. It proved the sidecar path, but the
+best shard arm was still `full-hybrid-rerank` at `19.4` answer quality;
+`local-apple-qwen3-0_6b-local-rerank` scored `15.8`, and BM25 scored `15.2`.
+Treat this as local diagnostic evidence, not a default promotion or SOTA
+claim. Qwen3 Reranker 4B and 8B stay optional quality arms until measured
+latency and memory pressure justify them.
 
 The quality-first local search lane is Qwen3 Embedding 4B or 8B plus Qwen3
 Reranker 4B or 8B when the machine can run them without stale model-server
@@ -265,6 +280,8 @@ score is exciting.
 - [Qwen3 Embedding 0.6B model card](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B)
 - [Qwen3 Reranker 0.6B model card](https://huggingface.co/Qwen/Qwen3-Reranker-0.6B)
 - [Qwen3 Embedding 0.6B GGUF model card](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF)
+- [Qwen3 Reranker 0.6B Q8 GGUF model card](https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF)
+- [llama.cpp server docs](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md)
 - [NVIDIA retrieval APIs](https://docs.api.nvidia.com/nim/reference/retrieval-apis)
 - [NVIDIA LLM APIs](https://docs.api.nvidia.com/nim/reference/llm-apis)
 - [Supermemory Research](https://supermemory.ai/research/)

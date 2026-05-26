@@ -359,6 +359,18 @@ Its scoring contract is also separate: local answer/judge models may differ
 from the target only when the answer-quality endpoint is local, and
 `benchmark:memory-score:result-gate --claim-scope full-sota` rejects a
 local-full packet instead of promoting it.
+The first local-full shard has now run end-to-end with a real local Qwen3
+Reranker 0.6B Q8 sidecar:
+`reviews/overnight-20260522/answer-quality-local-full-shard-001-20260526.json`.
+The result is accepted by
+`reviews/overnight-20260522/end-to-end-memory-score-local-full-shard-001-gate-20260526.json`
+as `local-full` evidence only. It scored 25 of 500 target queries; the best arm
+was `full-hybrid-rerank` at `19.4`, while
+`local-apple-qwen3-0_6b-local-rerank` scored `15.8` and BM25 scored `15.2`.
+The follow-up intake,
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
+accepts shard 001 and keeps the lane blocked on nineteen missing shards. Do not
+use this as launch, production, or SOTA support.
 Run `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` for this lane so the local-full
 plan is selected automatically. The checked-in local intake report,
@@ -548,9 +560,10 @@ It is also public-safe and metrics-only. Its paired preflight,
 `reviews/overnight-20260522/public-longmemeval-expanded-local-apple-live-preflight.json`,
 currently reports `BLOCKED_PROVIDER_ENV` because no local embedding endpoint is
 configured through `SELFMEM_LOCAL_EMBED_BASE_URL`. The local Apple arm is
-scaffolded and fixture-covered, but it is not live-tested yet. The implemented
-local path is Qwen3 local embeddings plus RecallWeave's deterministic rerank
-proxy; a live Qwen3 reranker sidecar remains a future challenger.
+scaffolded and fixture-covered for retrieval-proxy runs in a clean controller
+environment. Separately, the local-full answer-quality shard has now live-tested
+Qwen3 local embeddings plus a real Qwen3 Reranker 0.6B Q8 sidecar. That shard
+is local diagnostic evidence only and did not promote the sidecar arm.
 
 The first live Voyage provider canaries have now run:
 

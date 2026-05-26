@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality",
+  "claimScope": "local-full",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "readyForEndToEndMemoryScoreGate": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "callsProviderApis": true,
+  "sendsBenchmarkTextToProvider": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "generatedAt": "2026-05-26T09:32:15.184Z",
+  "target": {
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o"
+  },
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
+    "memoriesHash": "sha256:a4ee0d963c5bafa42a3a6da81568f90a84c80d6cd60a9f8eb055b870f014ef0a",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "queryCount": 500,
+    "totalQueryCount": 500,
+    "scoredQueryCount": 1,
+    "queryOffset": 0,
+    "queryLimit": 1,
+    "scoredQueryStart": 0,
+    "scoredQueryEndExclusive": 1,
+    "queryShard": {
+      "startIndex": 0,
+      "endIndexExclusive": 1,
+      "totalQueryCount": 500,
+      "scoredQueryCount": 1,
+      "requestedLimit": 1,
+      "completeDataset": false,
+      "selectedQueryIdHash": "sha256:99a29ecd531aaa647734570511e0cc306bb96c540d4f6472dc4bd3eedcdb9b35"
+    }
+  },
+  "provider": {
+    "answerModel": "qwen36-a3b-main-q8kv-8192",
+    "judgeModel": "qwen36-a3b-main-q8kv-8192",
+    "answerQualityCallsAllowed": true,
+    "publicDataConfirmed": true,
+    "callsMade": 10,
+    "callTimeoutMs": 180000,
+    "continueOnCallError": false,
+    "endpointLabel": "http://127.0.0.1:8080",
+    "endpointIsLocal": true
+  },
+  "scoringPolicy": {
+    "claimScope": "local-full",
+    "modelMatchPolicy": "local-diagnostic-allowed",
+    "exactTargetModelsRequired": false,
+    "localDiagnosticModelAllowed": true,
+    "localDiagnosticEndpointSatisfied": true,
+    "modelMismatchAllowed": true,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsLocalFullBenchmarkEvidence": true
+  },
+  "metrics": {
+    "answerQuality": 95,
+    "memoryScore": 95,
+    "longmemevalScore": 95,
+    "quality": 0.95,
+    "judgeCorrectRate": 1,
+    "answerLatencyP50Ms": 2144,
+    "answerLatencyP95Ms": 2144,
+    "contextTokensAvg": 4562
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "metrics": {
+        "answerQuality": 95,
+        "memoryScore": 95,
+        "longmemevalScore": 95,
+        "quality": 0.95,
+        "judgeCorrectRate": 1,
+        "answerLatencyP50Ms": 6738,
+        "answerLatencyP95Ms": 6738,
+        "contextTokensAvg": 4562
+      },
+      "provider": {
+        "answerCalls": 1,
+        "judgeCalls": 1,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 180000,
+        "continueOnCallError": false,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 1,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b22d27fa84aff706f7aae62cdc6dc58f996fa6941a9890c856ca99869c6088f2",
+          "judgeDecisionHash": "sha256:d4eec94936f06e776c9b43058ec2834eb1aa15ae333bb6738e99a84d344197fb",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "elapsedMs": 6738,
+          "contextTokens": 4562,
+          "score": 95,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 0,
+        "memoryScore": 0,
+        "longmemevalScore": 0,
+        "quality": 0,
+        "judgeCorrectRate": 0,
+        "answerLatencyP50Ms": 6467,
+        "answerLatencyP95Ms": 6467,
+        "contextTokensAvg": 4412
+      },
+      "provider": {
+        "answerCalls": 1,
+        "judgeCalls": 1,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 180000,
+        "continueOnCallError": false,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 1,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:478a4b6daf5ec28a809be567d137efe77c8a81f426eb8319d3a4add812446835",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "elapsedMs": 6467,
+          "contextTokens": 4412,
+          "score": 0,
+          "correct": false
+        }
+      ]
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 0,
+        "memoryScore": 0,
+        "longmemevalScore": 0,
+        "quality": 0,
+        "judgeCorrectRate": 0,
+        "answerLatencyP50Ms": 1877,
+        "answerLatencyP95Ms": 1877,
+        "contextTokensAvg": 4412
+      },
+      "provider": {
+        "answerCalls": 1,
+        "judgeCalls": 1,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 180000,
+        "continueOnCallError": false,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 1,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:478a4b6daf5ec28a809be567d137efe77c8a81f426eb8319d3a4add812446835",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "elapsedMs": 1877,
+          "contextTokens": 4412,
+          "score": 0,
+          "correct": false
+        }
+      ]
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "metrics": {
+        "answerQuality": 0,
+        "memoryScore": 0,
+        "longmemevalScore": 0,
+        "quality": 0,
+        "judgeCorrectRate": 0,
+        "answerLatencyP50Ms": 6392,
+        "answerLatencyP95Ms": 6392,
+        "contextTokensAvg": 3835
+      },
+      "provider": {
+        "answerCalls": 1,
+        "judgeCalls": 1,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 180000,
+        "continueOnCallError": false,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 1,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:478a4b6daf5ec28a809be567d137efe77c8a81f426eb8319d3a4add812446835",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "elapsedMs": 6392,
+          "contextTokens": 3835,
+          "score": 0,
+          "correct": false
+        }
+      ]
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "metrics": {
+        "answerQuality": 95,
+        "memoryScore": 95,
+        "longmemevalScore": 95,
+        "quality": 0.95,
+        "judgeCorrectRate": 1,
+        "answerLatencyP50Ms": 2144,
+        "answerLatencyP95Ms": 2144,
+        "contextTokensAvg": 4562
+      },
+      "provider": {
+        "answerCalls": 1,
+        "judgeCalls": 1,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 180000,
+        "continueOnCallError": false,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 1,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:b22d27fa84aff706f7aae62cdc6dc58f996fa6941a9890c856ca99869c6088f2",
+          "judgeDecisionHash": "sha256:d4eec94936f06e776c9b43058ec2834eb1aa15ae333bb6738e99a84d344197fb",
+          "contextResultCount": 1,
+          "responseTotal": 1,
+          "elapsedMs": 2144,
+          "contextTokens": 4562,
+          "score": 95,
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "local-apple-qwen3-0_6b-local-rerank",
+    "answerQuality": 95,
+    "judgeCorrectRate": 1,
+    "answerLatencyP50Ms": 2144
+  },
+  "reviewerApprovalCount": 0,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "safety": {
+    "metricsOnly": true,
+    "publicSafe": true,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "privateInputsStoredOutsideRepository": true
+  },
+  "nextActions": [
+    "Run benchmark:memory-score:result-gate with this result.",
+    "Send the exact metrics-only packet to independent reviewers before public benchmark wording changes."
+  ]
+}

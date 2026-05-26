@@ -230,7 +230,20 @@ The full 500-query local-full lane now carries the same source-locked target
 through a separate diagnostic scoring contract: local answer/judge models are
 allowed only with a local OpenAI-compatible endpoint, and the result gate can
 count that output as local-full benchmark evidence while still rejecting it as
-full-memory SOTA evidence.
+full-memory SOTA evidence. The first local-full 25-query shard is now checked
+in at
+`reviews/overnight-20260522/answer-quality-local-full-shard-001-20260526.json`,
+with the matching gate at
+`reviews/overnight-20260522/end-to-end-memory-score-local-full-shard-001-gate-20260526.json`.
+It scored BM25, full hybrid, query-expanded hybrid, local Qwen3 0.6B
+embedding, and a real local Qwen3 Reranker 0.6B Q8 sidecar. The best shard arm
+was `full-hybrid-rerank` at `19.4` answer quality; `local-apple-qwen3-0_6b`
+scored `17.4`, `local-apple-qwen3-0_6b-local-rerank` scored `15.8`, BM25
+scored `15.2`, and query expansion scored `12`. The result gate reports
+`READY_LOCAL_FULL_MEMORY_SCORE`, but it also reports only 25 scored queries out
+of the 500-query target, no reviewer approvals, a judge-model mismatch against
+the reported Supermemory target row, and `countsAsFullMemorySotaEvidence:
+false`. This is useful local method evidence, not release or SOTA support.
 The full LongMemEval-S run-only target is also checked in at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
 materialization evidence in
@@ -318,6 +331,11 @@ tools to the local-full plan by default. The checked-in local intake report at
 is intentionally blocked with zero accepted shards and twenty missing shards,
 proving the local path has its own combine gate before any local-full score can
 be reported.
+After the first scored shard, the follow-up intake at
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`
+accepts shard 001 and keeps the lane blocked on the remaining nineteen shards.
+The intake also validates shard range hashes so partial local-full packets
+cannot be confused with a full 500-query local benchmark.
 `benchmark:answer-quality:local-accepted-lane-doctor` now turns that into a
 first-shard launch check at
 `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`.
@@ -515,9 +533,12 @@ model size.
 The next local method challenger is now explicit:
 `local-apple-qwen3-0_6b-local-rerank`. It keeps the measured 0.6B Apple
 Silicon embedding lane and adds an env-only local reranker sidecar after
-sparse+dense+graph+temporal fusion. This arm is not a default and has no live
-quality result yet. It exists so the next local run can test reranking as one
-methodology change without confusing it with the failed 4B embedder scale-up.
+sparse+dense+graph+temporal fusion. The sidecar path has now been live-tested
+through llama.cpp with Qwen3 Reranker 0.6B Q8 on the first local-full
+answer-quality shard. That run proved the arm can score under the local-full
+contract, but it did not win the shard. It remains a challenger, not a default,
+and the full 500-query local-full result still requires the remaining nineteen
+shards and combine gate.
 
 A source-locked 30-query local Apple run is now recorded:
 
