@@ -270,6 +270,14 @@ shards, and carries BM25, full hybrid, query expansion, Voyage, NVIDIA, local
 Apple, and local rerank arms through shard export, answer scoring, shard
 combination, result gate, and reviewer intake commands. This is an execution
 plan and harness upgrade, not a completed full-SOTA result.
+The shard workorder is checked in at
+`reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`.
+Run `benchmark:answer-quality:shard-workorder` before and after shard jobs to
+track accepted, pending, rejected, and duplicate shard outputs without exposing
+raw questions, answers, memory text, or private paths. It turns green only for
+shard intake readiness; it still blocks combine and SOTA claims until the
+separate intake, combine, result gate, reviewer gate, UI/docs, owner approval,
+and real canary evidence pass.
 The shard-return intake is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`.
 It currently blocks because all twenty full answer-quality shard outputs are

@@ -1,0 +1,472 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-shard-workorder",
+  "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": false,
+  "readyForShardIntake": false,
+  "readyForShardCombine": false,
+  "readyForEndToEndMemoryScoreGate": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-26T01:09:42.815Z",
+  "plan": {
+    "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
+    "hash": "sha256:1ce635250aaebbd9f025cfdd94e34e12f727b44dec0905cbf201b1a536760407",
+    "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "queryCount": 500,
+    "shardSize": 25,
+    "shardCount": 20,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-nvidia-nemotron-1b",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ]
+  },
+  "progress": {
+    "inputCount": 0,
+    "acceptedShardCount": 0,
+    "pendingShardCount": 20,
+    "rejectedResultCount": 0,
+    "duplicateResultCount": 0,
+    "workorderCount": 20
+  },
+  "acceptedShards": [],
+  "pendingShards": [
+    {
+      "shardId": "shard-001",
+      "startIndex": 0,
+      "endIndexExclusive": 25,
+      "queryCount": 25,
+      "rangeHash": "sha256:c1bfaf4b31bb2d306fd0b373c62dc9cfbb32df73ef58aa1cc983e45c35829b68"
+    },
+    {
+      "shardId": "shard-002",
+      "startIndex": 25,
+      "endIndexExclusive": 50,
+      "queryCount": 25,
+      "rangeHash": "sha256:71103d5a2daad08f0b08b4f93b9b1dda09760758eecc545a3d2ab25d55dd6d7e"
+    },
+    {
+      "shardId": "shard-003",
+      "startIndex": 50,
+      "endIndexExclusive": 75,
+      "queryCount": 25,
+      "rangeHash": "sha256:58db3648c91f8830588df1a55353107279ecfda54e6fa9a2d0ea7f57b304a1bb"
+    },
+    {
+      "shardId": "shard-004",
+      "startIndex": 75,
+      "endIndexExclusive": 100,
+      "queryCount": 25,
+      "rangeHash": "sha256:ad9d760a81aeb2e17edc40a6a73ff15805c1712fdf7f56c1ad1c17e52a29233a"
+    },
+    {
+      "shardId": "shard-005",
+      "startIndex": 100,
+      "endIndexExclusive": 125,
+      "queryCount": 25,
+      "rangeHash": "sha256:03066585a3187536499641dc1a094f2e9e8c9ecae0b0189f40b7763835ef51e7"
+    },
+    {
+      "shardId": "shard-006",
+      "startIndex": 125,
+      "endIndexExclusive": 150,
+      "queryCount": 25,
+      "rangeHash": "sha256:ea5c004f58402224c122911a95d5700afebadc6c037e8e99ac8773ac5939b517"
+    },
+    {
+      "shardId": "shard-007",
+      "startIndex": 150,
+      "endIndexExclusive": 175,
+      "queryCount": 25,
+      "rangeHash": "sha256:901380685743d928c30ed268165602ac6001c1ced378d789a2b11ed1ce9cda1c"
+    },
+    {
+      "shardId": "shard-008",
+      "startIndex": 175,
+      "endIndexExclusive": 200,
+      "queryCount": 25,
+      "rangeHash": "sha256:306f93768513b1328d3c84da6921b55853ab1cf72b7bae7fe7cedf186b9cba30"
+    },
+    {
+      "shardId": "shard-009",
+      "startIndex": 200,
+      "endIndexExclusive": 225,
+      "queryCount": 25,
+      "rangeHash": "sha256:a70c0cf325ce9ad211ab08b3449f1b70ac8c780d7d464523bc4e0494b3163606"
+    },
+    {
+      "shardId": "shard-010",
+      "startIndex": 225,
+      "endIndexExclusive": 250,
+      "queryCount": 25,
+      "rangeHash": "sha256:ced258f82d118a9ec9efd2fc6c99610371579814491cff593d3877e93651a622"
+    },
+    {
+      "shardId": "shard-011",
+      "startIndex": 250,
+      "endIndexExclusive": 275,
+      "queryCount": 25,
+      "rangeHash": "sha256:7db76ab4f8e8fca01c723389c68d1121f121dc511921dfd6ac95ad7d9844c026"
+    },
+    {
+      "shardId": "shard-012",
+      "startIndex": 275,
+      "endIndexExclusive": 300,
+      "queryCount": 25,
+      "rangeHash": "sha256:1be862918a3cc513ce05b63dfa918c411b1847ff2d535664a664107aa083ebc6"
+    },
+    {
+      "shardId": "shard-013",
+      "startIndex": 300,
+      "endIndexExclusive": 325,
+      "queryCount": 25,
+      "rangeHash": "sha256:3e28662567e36ed55c72ceec63d62d62a74094e01272786c749a6583b9da72fb"
+    },
+    {
+      "shardId": "shard-014",
+      "startIndex": 325,
+      "endIndexExclusive": 350,
+      "queryCount": 25,
+      "rangeHash": "sha256:873640630ac419aeb0cae04aa6f5801363eacb0199b0a32563baac154c6059b7"
+    },
+    {
+      "shardId": "shard-015",
+      "startIndex": 350,
+      "endIndexExclusive": 375,
+      "queryCount": 25,
+      "rangeHash": "sha256:1af1c6b26c7af96dfa777c818d9619dce29138c3a0e1d473cbcfbf1cf8f4bb2a"
+    },
+    {
+      "shardId": "shard-016",
+      "startIndex": 375,
+      "endIndexExclusive": 400,
+      "queryCount": 25,
+      "rangeHash": "sha256:d5a48a6900a8b84db02a4b22eed89deeff3d3b7412781e4a40a7800594d975ea"
+    },
+    {
+      "shardId": "shard-017",
+      "startIndex": 400,
+      "endIndexExclusive": 425,
+      "queryCount": 25,
+      "rangeHash": "sha256:f5eedb21035b1aebf63db723b3f51f9d63b50ba501b801e49a01f7c289a66716"
+    },
+    {
+      "shardId": "shard-018",
+      "startIndex": 425,
+      "endIndexExclusive": 450,
+      "queryCount": 25,
+      "rangeHash": "sha256:0d8f6d43931f116e3632322367a73c0d50d65b43e622c4d1018be580c253a71c"
+    },
+    {
+      "shardId": "shard-019",
+      "startIndex": 450,
+      "endIndexExclusive": 475,
+      "queryCount": 25,
+      "rangeHash": "sha256:48f3b938408d7530d2b423418288af1eb35eca6a5ea78487ab98c35b17667c90"
+    },
+    {
+      "shardId": "shard-020",
+      "startIndex": 475,
+      "endIndexExclusive": 500,
+      "queryCount": 25,
+      "rangeHash": "sha256:59f4ad0dc9bcc2d8101cae5659b52a82c6e17a2c23d0cebddcb5b7adc1652e76"
+    }
+  ],
+  "rejectedResults": [],
+  "duplicateResults": [],
+  "workorders": [
+    {
+      "shardId": "shard-001",
+      "startIndex": 0,
+      "endIndexExclusive": 25,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-001.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-001.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-001",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-001 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 0 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 0 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-001/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-001/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-001/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-001/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-001/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-001/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-001/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-001.json --markdown-output <public-review-dir>/answer-quality-shard-001.md"
+      }
+    },
+    {
+      "shardId": "shard-002",
+      "startIndex": 25,
+      "endIndexExclusive": 50,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-002.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-002.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-002",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-002 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 25 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 25 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-002/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-002/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-002/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-002/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-002/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-002/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-002/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-002.json --markdown-output <public-review-dir>/answer-quality-shard-002.md"
+      }
+    },
+    {
+      "shardId": "shard-003",
+      "startIndex": 50,
+      "endIndexExclusive": 75,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-003.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-003.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-003",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-003 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 50 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 50 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-003/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-003/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-003/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-003/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-003/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-003/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-003/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-003.json --markdown-output <public-review-dir>/answer-quality-shard-003.md"
+      }
+    },
+    {
+      "shardId": "shard-004",
+      "startIndex": 75,
+      "endIndexExclusive": 100,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-004.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-004.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-004",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-004 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 75 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 75 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-004/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-004/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-004/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-004/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-004/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-004/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-004/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-004.json --markdown-output <public-review-dir>/answer-quality-shard-004.md"
+      }
+    },
+    {
+      "shardId": "shard-005",
+      "startIndex": 100,
+      "endIndexExclusive": 125,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-005.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-005.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-005",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-005 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 100 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 100 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-005/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-005/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-005/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-005/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-005/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-005/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-005/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-005.json --markdown-output <public-review-dir>/answer-quality-shard-005.md"
+      }
+    },
+    {
+      "shardId": "shard-006",
+      "startIndex": 125,
+      "endIndexExclusive": 150,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-006.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-006.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-006",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-006 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 125 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 125 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-006/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-006/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-006/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-006/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-006/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-006/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-006/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-006.json --markdown-output <public-review-dir>/answer-quality-shard-006.md"
+      }
+    },
+    {
+      "shardId": "shard-007",
+      "startIndex": 150,
+      "endIndexExclusive": 175,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-007.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-007.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-007",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-007 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 150 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 150 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-007/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-007/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-007/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-007/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-007/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-007/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-007/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-007.json --markdown-output <public-review-dir>/answer-quality-shard-007.md"
+      }
+    },
+    {
+      "shardId": "shard-008",
+      "startIndex": 175,
+      "endIndexExclusive": 200,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-008.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-008.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-008",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-008 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 175 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 175 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-008/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-008/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-008/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-008/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-008/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-008/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-008/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-008.json --markdown-output <public-review-dir>/answer-quality-shard-008.md"
+      }
+    },
+    {
+      "shardId": "shard-009",
+      "startIndex": 200,
+      "endIndexExclusive": 225,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-009.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-009.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-009",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-009 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 200 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 200 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-009/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-009/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-009/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-009/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-009/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-009/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-009/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-009.json --markdown-output <public-review-dir>/answer-quality-shard-009.md"
+      }
+    },
+    {
+      "shardId": "shard-010",
+      "startIndex": 225,
+      "endIndexExclusive": 250,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-010.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-010.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-010",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-010 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 225 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 225 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-010/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-010/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-010/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-010/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-010/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-010/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-010/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-010.json --markdown-output <public-review-dir>/answer-quality-shard-010.md"
+      }
+    },
+    {
+      "shardId": "shard-011",
+      "startIndex": 250,
+      "endIndexExclusive": 275,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-011.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-011.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-011",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-011 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 250 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 250 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-011/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-011/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-011/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-011/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-011/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-011/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-011/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-011.json --markdown-output <public-review-dir>/answer-quality-shard-011.md"
+      }
+    },
+    {
+      "shardId": "shard-012",
+      "startIndex": 275,
+      "endIndexExclusive": 300,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-012.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-012.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-012",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-012 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 275 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 275 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-012/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-012/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-012/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-012/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-012/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-012/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-012/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-012.json --markdown-output <public-review-dir>/answer-quality-shard-012.md"
+      }
+    },
+    {
+      "shardId": "shard-013",
+      "startIndex": 300,
+      "endIndexExclusive": 325,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-013.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-013.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-013",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-013 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 300 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 300 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-013/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-013/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-013/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-013/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-013/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-013/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-013/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-013.json --markdown-output <public-review-dir>/answer-quality-shard-013.md"
+      }
+    },
+    {
+      "shardId": "shard-014",
+      "startIndex": 325,
+      "endIndexExclusive": 350,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-014.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-014.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-014",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-014 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 325 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 325 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-014/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-014/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-014/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-014/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-014/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-014/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-014/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-014.json --markdown-output <public-review-dir>/answer-quality-shard-014.md"
+      }
+    },
+    {
+      "shardId": "shard-015",
+      "startIndex": 350,
+      "endIndexExclusive": 375,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-015.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-015.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-015",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-015 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 350 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 350 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-015/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-015/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-015/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-015/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-015/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-015/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-015/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-015.json --markdown-output <public-review-dir>/answer-quality-shard-015.md"
+      }
+    },
+    {
+      "shardId": "shard-016",
+      "startIndex": 375,
+      "endIndexExclusive": 400,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-016.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-016.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-016",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-016 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 375 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 375 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-016/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-016/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-016/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-016/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-016/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-016/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-016/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-016.json --markdown-output <public-review-dir>/answer-quality-shard-016.md"
+      }
+    },
+    {
+      "shardId": "shard-017",
+      "startIndex": 400,
+      "endIndexExclusive": 425,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-017.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-017.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-017",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-017 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 400 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 400 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-017/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-017/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-017/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-017/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-017/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-017/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-017/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-017.json --markdown-output <public-review-dir>/answer-quality-shard-017.md"
+      }
+    },
+    {
+      "shardId": "shard-018",
+      "startIndex": 425,
+      "endIndexExclusive": 450,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-018.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-018.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-018",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-018 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 425 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 425 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-018/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-018/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-018/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-018/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-018/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-018/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-018/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-018.json --markdown-output <public-review-dir>/answer-quality-shard-018.md"
+      }
+    },
+    {
+      "shardId": "shard-019",
+      "startIndex": 450,
+      "endIndexExclusive": 475,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-019.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-019.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-019",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-019 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 450 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 450 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-019/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-019/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-019/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-019/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-019/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-019/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-019/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-019.json --markdown-output <public-review-dir>/answer-quality-shard-019.md"
+      }
+    },
+    {
+      "shardId": "shard-020",
+      "startIndex": 475,
+      "endIndexExclusive": 500,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-shard-020.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-shard-020.md",
+      "expectedPrivateArmDirectory": "<private-output-dir>/arms/shard-020",
+      "commands": {
+        "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-020 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --query-offset 475 --max-queries 25",
+        "answerQuality": "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 475 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-020/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-020/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-020/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-020/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-020/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-020/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-020/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-020.json --markdown-output <public-review-dir>/answer-quality-shard-020.md"
+      }
+    }
+  ],
+  "gatedCommands": {
+    "shardIntake": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake --input <public-review-dir>/answer-quality-shard-001.json,<public-review-dir>/answer-quality-shard-002.json,<public-review-dir>/answer-quality-shard-003.json,<public-review-dir>/answer-quality-shard-004.json,<public-review-dir>/answer-quality-shard-005.json,<public-review-dir>/answer-quality-shard-006.json,<public-review-dir>/answer-quality-shard-007.json,<public-review-dir>/answer-quality-shard-008.json,<public-review-dir>/answer-quality-shard-009.json,<public-review-dir>/answer-quality-shard-010.json,<public-review-dir>/answer-quality-shard-011.json,<public-review-dir>/answer-quality-shard-012.json,<public-review-dir>/answer-quality-shard-013.json,<public-review-dir>/answer-quality-shard-014.json,<public-review-dir>/answer-quality-shard-015.json,<public-review-dir>/answer-quality-shard-016.json,<public-review-dir>/answer-quality-shard-017.json,<public-review-dir>/answer-quality-shard-018.json,<public-review-dir>/answer-quality-shard-019.json,<public-review-dir>/answer-quality-shard-020.json --output <public-review-dir>/answer-quality-full-shard-intake.json --markdown-output <public-review-dir>/answer-quality-full-shard-intake.md --require-ready",
+    "combineAfterIntakePasses": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-shard-001.json,<public-review-dir>/answer-quality-shard-002.json,<public-review-dir>/answer-quality-shard-003.json,<public-review-dir>/answer-quality-shard-004.json,<public-review-dir>/answer-quality-shard-005.json,<public-review-dir>/answer-quality-shard-006.json,<public-review-dir>/answer-quality-shard-007.json,<public-review-dir>/answer-quality-shard-008.json,<public-review-dir>/answer-quality-shard-009.json,<public-review-dir>/answer-quality-shard-010.json,<public-review-dir>/answer-quality-shard-011.json,<public-review-dir>/answer-quality-shard-012.json,<public-review-dir>/answer-quality-shard-013.json,<public-review-dir>/answer-quality-shard-014.json,<public-review-dir>/answer-quality-shard-015.json,<public-review-dir>/answer-quality-shard-016.json,<public-review-dir>/answer-quality-shard-017.json,<public-review-dir>/answer-quality-shard-018.json,<public-review-dir>/answer-quality-shard-019.json,<public-review-dir>/answer-quality-shard-020.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-full-combined.md",
+    "resultGateAfterCombine": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-full.json --require-ready",
+    "reviewerIntakeAfterCombine": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-full.json"
+  },
+  "blockers": [
+    "answer-quality-shard-runs-pending"
+  ],
+  "nextActions": [
+    "Run the listed response-arm export and answer-quality commands for the pending shards.",
+    "Re-run this workorder with the returned public shard-result JSONs to track progress.",
+    "Do not run combine until benchmark:answer-quality:shard-intake passes with complete coverage."
+  ]
+}

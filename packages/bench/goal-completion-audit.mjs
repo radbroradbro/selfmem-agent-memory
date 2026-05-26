@@ -132,6 +132,8 @@ const files = {
   answerQualityHarnessSmokeMarkdown: `${reviewDir}/answer-quality-harness-smoke-20260525.md`,
   answerQualityFullShardPlanReport: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
   answerQualityFullShardPlanMarkdown: `${reviewDir}/answer-quality-full-shard-plan-20260525.md`,
+  answerQualityFullShardWorkorderReport: `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
+  answerQualityFullShardWorkorderMarkdown: `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   answerQualityFullShardIntakeReport: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
 };
@@ -178,6 +180,7 @@ const answerQualityArmExport = JSON.parse(readFileSync(join(root, files.answerQu
 const answerQualityPreflight = JSON.parse(readFileSync(join(root, files.answerQualityPreflightReport), "utf8"));
 const answerQualityHarnessSmoke = JSON.parse(readFileSync(join(root, files.answerQualityHarnessSmokeReport), "utf8"));
 const answerQualityFullShardPlan = JSON.parse(readFileSync(join(root, files.answerQualityFullShardPlanReport), "utf8"));
+const answerQualityFullShardWorkorder = JSON.parse(readFileSync(join(root, files.answerQualityFullShardWorkorderReport), "utf8"));
 const answerQualityFullShardIntake = JSON.parse(readFileSync(join(root, files.answerQualityFullShardIntakeReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
@@ -503,6 +506,15 @@ assert.equal(answerQualityFullShardPlan.runPlan?.shardSize, 25);
 assert.equal(answerQualityFullShardPlan.runPlan?.shardCount, 20);
 assert.equal(answerQualityFullShardPlan.shards?.[0]?.startIndex, 0);
 assert.equal(answerQualityFullShardPlan.shards?.at(-1)?.endIndexExclusive, 500);
+assert.equal(answerQualityFullShardWorkorder.mode, "public-benchmark-answer-quality-shard-workorder");
+assert.equal(answerQualityFullShardWorkorder.status, "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS");
+assert.equal(answerQualityFullShardWorkorder.readyForShardIntake, false);
+assert.equal(answerQualityFullShardWorkorder.readyForShardCombine, false);
+assert.equal(answerQualityFullShardWorkorder.countsAsFullMemorySotaEvidence, false);
+assert.equal(answerQualityFullShardWorkorder.plan?.shardCount, 20);
+assert.equal(answerQualityFullShardWorkorder.progress?.acceptedShardCount, 0);
+assert.equal(answerQualityFullShardWorkorder.progress?.pendingShardCount, 20);
+assert.ok(answerQualityFullShardWorkorder.blockers?.includes("answer-quality-shard-runs-pending"));
 assert.equal(answerQualityFullShardIntake.mode, "public-benchmark-answer-quality-shard-intake");
 assert.equal(answerQualityFullShardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
 assert.equal(answerQualityFullShardIntake.readyForShardCombine, false);
@@ -782,6 +794,8 @@ const requirements = [
     files.answerQualityHarnessSmokeMarkdown,
     files.answerQualityFullShardPlanReport,
     files.answerQualityFullShardPlanMarkdown,
+    files.answerQualityFullShardWorkorderReport,
+    files.answerQualityFullShardWorkorderMarkdown,
     files.answerQualityFullShardIntakeReport,
     files.answerQualityFullShardIntakeMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
@@ -791,6 +805,7 @@ const requirements = [
     "packages/bench/public-benchmark-answer-quality.mjs",
     "packages/bench/public-benchmark-answer-quality-combine.mjs",
     "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+    "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
     "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
     "packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "packages/bench/query-expansion-result-gate.mjs",

@@ -259,6 +259,11 @@ query expansion, Voyage, NVIDIA, local Apple, and local rerank arms on the same
 source-locked data. Merge those chunks only with
 `benchmark:answer-quality:combine -- --combine-mode shards`, which rejects gaps,
 overlaps, target/model mismatches, and mixed strategy sets.
+Use `benchmark:answer-quality:shard-workorder` as the public-safe run tracker
+for those twenty shards. The checked-in workorder,
+`reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`,
+is intentionally pending with zero accepted shards; after shard jobs return, it
+should show accepted coverage before the stricter intake step is allowed.
 Before combining returned full-shard outputs, run
 `benchmark:answer-quality:shard-intake` against the public shard-result JSONs.
 The checked-in intake report,

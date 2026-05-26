@@ -425,6 +425,11 @@ Component rows in the same artifact remain model-selection evidence only.
   `combineMode=query-shard-answer-quality-union`; that merged packet still needs
   live execution, reviewer intake, result gate, SOTA ladder, UI evidence, docs,
   owner approval, and real production canary before any broad claim.
+- Full-shard workorder:
+  `reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json`
+  is the checked-in public-safe run tracker for the twenty shard jobs. Re-run
+  `benchmark:answer-quality:shard-workorder` as shard-result JSONs return; it
+  should reach shard-intake readiness before the stricter intake command runs.
 - Full-shard return intake:
   `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`
   is the checked-in blocked state for the full answer-quality shard set. It

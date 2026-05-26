@@ -124,6 +124,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality.mjs",
   "packages/bench/public-benchmark-answer-quality-combine.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+  "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
@@ -183,6 +184,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-full-materialize-run-evidence.md`,
   `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-plan-20260525.md`,
+  `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
+  `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
   `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
@@ -556,6 +559,7 @@ const requiredScripts = [
   "benchmark:answer-quality",
   "benchmark:answer-quality:combine",
   "benchmark:answer-quality:shard-plan",
+  "benchmark:answer-quality:shard-workorder",
   "benchmark:answer-quality:shard-intake",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
@@ -1531,6 +1535,12 @@ check("fresh public benchmark target check passes", () => {
     "--format",
     "markdown",
   ]).stdout;
+  const answerQualityShardWorkorderFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality-shard-workorder.mjs"]).stdout);
+  const answerQualityShardWorkorderMarkdownFresh = run("node", [
+    "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
+    "--format",
+    "markdown",
+  ]).stdout;
   const answerQualityShardIntakeFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality-shard-intake.mjs"]).stdout);
   const answerQualityShardIntakeMarkdownFresh = run("node", [
     "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
@@ -1639,10 +1649,15 @@ check("fresh public benchmark target check passes", () => {
   const fullMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-full-materialize-run-evidence.md"), "utf8");
   const fullAnswerQualityShardPlan = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-plan-20260525.json"), "utf8"));
   const fullAnswerQualityShardPlanEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-plan-20260525.md"), "utf8");
+  const fullAnswerQualityShardWorkorder = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-workorder-20260525.json"), "utf8"));
+  const fullAnswerQualityShardWorkorderEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-workorder-20260525.md"), "utf8");
   const fullAnswerQualityShardIntake = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-intake-20260525.json"), "utf8"));
   const fullAnswerQualityShardIntakeEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-intake-20260525.md"), "utf8");
   const syntheticShardDir = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-"));
   const syntheticShardInputs = writeSyntheticAnswerQualityShardReports(fullAnswerQualityShardPlan, syntheticShardDir);
+  const answerQualityShardWorkorderReady = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-answer-quality-shard-workorder.mjs", "--input", syntheticShardInputs.join(",")]).stdout,
+  );
   const answerQualityShardIntakeReady = JSON.parse(
     run("node", ["packages/bench/public-benchmark-answer-quality-shard-intake.mjs", "--input", syntheticShardInputs.join(",")]).stdout,
   );
@@ -2678,6 +2693,47 @@ check("fresh public benchmark target check passes", () => {
   }
   assert.match(answerQualityShardPlanMarkdownFresh, /Full Answer-Quality Shard Plan/);
   assert.match(fullAnswerQualityShardPlanEvidence, /Shard count: 20/);
+  for (const shardWorkorder of [answerQualityShardWorkorderFresh, fullAnswerQualityShardWorkorder]) {
+    assert.equal(shardWorkorder.mode, "public-benchmark-answer-quality-shard-workorder");
+    assert.equal(shardWorkorder.status, "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS");
+    assert.equal(shardWorkorder.publicSafe, true);
+    assert.equal(shardWorkorder.metricsOnly, true);
+    assert.equal(shardWorkorder.publicBenchmarkClaimsAllowed, false);
+    assert.equal(shardWorkorder.readyForShardIntake, false);
+    assert.equal(shardWorkorder.readyForShardCombine, false);
+    assert.equal(shardWorkorder.readyForEndToEndMemoryScoreGate, false);
+    assert.equal(shardWorkorder.countsAsFullMemorySotaEvidence, false);
+    assert.equal(shardWorkorder.rawQuestionIdsIncluded, false);
+    assert.equal(shardWorkorder.rawQuestionsIncluded, false);
+    assert.equal(shardWorkorder.rawAnswersIncluded, false);
+    assert.equal(shardWorkorder.rawMemoryIncluded, false);
+    assert.equal(shardWorkorder.rawTranscriptIncluded, false);
+    assert.equal(shardWorkorder.rawPrivateOutputPathIncluded, false);
+    assert.equal(shardWorkorder.plan?.shardCount, 20);
+    assert.equal(shardWorkorder.progress?.inputCount, 0);
+    assert.equal(shardWorkorder.progress?.acceptedShardCount, 0);
+    assert.equal(shardWorkorder.progress?.pendingShardCount, 20);
+    assert.equal(shardWorkorder.progress?.rejectedResultCount, 0);
+    assert.equal(shardWorkorder.progress?.duplicateResultCount, 0);
+    assert.equal(shardWorkorder.progress?.workorderCount, 20);
+    assert.ok(shardWorkorder.blockers?.includes("answer-quality-shard-runs-pending"));
+    assert.match(shardWorkorder.gatedCommands?.shardIntake ?? "", /--require-ready/);
+    assert.match(shardWorkorder.gatedCommands?.combineAfterIntakePasses ?? "", /--combine-mode shards/);
+    assert.match(shardWorkorder.gatedCommands?.resultGateAfterCombine ?? "", /benchmark:memory-score:result-gate/);
+    assert.match(shardWorkorder.gatedCommands?.reviewerIntakeAfterCombine ?? "", /benchmark:memory-score:reviewer-intake/);
+  }
+  assert.equal(answerQualityShardWorkorderReady.status, "READY_TO_RUN_FULL_ANSWER_QUALITY_SHARD_INTAKE");
+  assert.equal(answerQualityShardWorkorderReady.readyForShardIntake, true);
+  assert.equal(answerQualityShardWorkorderReady.readyForShardCombine, false);
+  assert.equal(answerQualityShardWorkorderReady.progress?.inputCount, 20);
+  assert.equal(answerQualityShardWorkorderReady.progress?.acceptedShardCount, 20);
+  assert.equal(answerQualityShardWorkorderReady.progress?.pendingShardCount, 0);
+  assert.equal(answerQualityShardWorkorderReady.progress?.rejectedResultCount, 0);
+  assert.equal(answerQualityShardWorkorderReady.progress?.duplicateResultCount, 0);
+  assert.equal(answerQualityShardWorkorderReady.progress?.workorderCount, 0);
+  assert.deepEqual(answerQualityShardWorkorderReady.blockers, []);
+  assert.match(answerQualityShardWorkorderMarkdownFresh, /Full Answer-Quality Shard Workorder/);
+  assert.match(fullAnswerQualityShardWorkorderEvidence, /Pending shards: 20/);
   for (const shardIntake of [answerQualityShardIntakeFresh, fullAnswerQualityShardIntake]) {
     assert.equal(shardIntake.mode, "public-benchmark-answer-quality-shard-intake");
     assert.equal(shardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");

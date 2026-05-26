@@ -381,8 +381,9 @@ npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-r
 
 For the full 500-query LongMemEval-S target, use the same answer-quality
 contract but score deterministic shards with `--query-offset` and
-`--max-queries`, then run `benchmark:answer-quality:shard-intake` on the
-returned public shard-result JSONs before merging them with
+`--max-queries`, use `benchmark:answer-quality:shard-workorder` to track the
+returned public shard-result JSONs, then run
+`benchmark:answer-quality:shard-intake` before merging them with
 `benchmark:answer-quality:combine -- --combine-mode shards`. The intake and
 combiner must fail closed if shards use different
 target/query/materializer/answer-label hashes, different answer or judge
