@@ -262,8 +262,8 @@ function buildExecutionLaneReadiness(lanes) {
     const providers = lane.providerRequirements ?? [];
     const providerReadiness = Object.fromEntries(providers.map((provider) => [provider, inspectProviderReadiness(provider)]));
     const exportReadiness = inspectResponseArmExportReadiness({ lane, providers, strategies, providerReadiness });
-    const answerQualityReadiness = inspectAnswerQualityReadiness();
-    const queryExpansionReadiness = inspectQueryExpansionReadiness(strategies);
+    const answerQualityReadiness = inspectAnswerQualityReadiness(lane);
+    const queryExpansionReadiness = inspectQueryExpansionReadiness(lane);
     const blockers = unique([
       !lane.coverageReady ? "lane-strategy-coverage-missing" : null,
       ...exportReadiness.blockers,
@@ -282,14 +282,17 @@ function buildExecutionLaneReadiness(lanes) {
       responseArmExport: exportReadiness,
       queryExpansion: queryExpansionReadiness,
       answerQuality: answerQualityReadiness,
-      readyForResponseArmExport: lane.coverageReady === true && exportReadiness.ready && queryExpansionReadiness.ready,
+      readyForResponseArmExport: lane.coverageReady === true && exportReadiness.ready && queryExpansionReadiness.readyForResponseArmExport,
       readyForAnswerQualityScoring:
-        lane.coverageReady === true && exportReadiness.ready && queryExpansionReadiness.ready && answerQualityReadiness.ready,
+        lane.coverageReady === true &&
+        exportReadiness.ready &&
+        queryExpansionReadiness.readyForAnswerQualityScoring &&
+        answerQualityReadiness.ready,
       readyForAcceptedShardIntakeCandidate:
         lane.acceptedByFullShardIntake === true &&
         lane.coverageReady === true &&
         exportReadiness.ready &&
-        queryExpansionReadiness.ready &&
+        queryExpansionReadiness.readyForAcceptedShardIntake &&
         answerQualityReadiness.ready,
       countsAsFullMemorySotaEvidence: false,
       publicBenchmarkClaimsAllowed: false,
@@ -329,10 +332,14 @@ function inspectResponseArmExportReadiness({ lane, providers, strategies, provid
   };
 }
 
-function inspectAnswerQualityReadiness() {
+function inspectAnswerQualityReadiness(lane) {
   const baseUrl = String(process.env.RECALLWEAVE_MEMORYBENCH_BASE_URL ?? "").trim();
-  const answerModelPresent = hasAnyEnv("RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL", "RECALLWEAVE_BASELINE_ANSWER_MODEL");
-  const judgeModelPresent = hasAnyEnv("RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL", "RECALLWEAVE_BASELINE_JUDGE_MODEL");
+  const answerModel = envPresence("RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL", "RECALLWEAVE_BASELINE_ANSWER_MODEL");
+  const judgeModel = envPresence("RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL", "RECALLWEAVE_BASELINE_JUDGE_MODEL");
+  const targetAnswerModel = String(lane.answerQualityEndpoint?.answerModel ?? "").trim();
+  const targetJudgeModel = String(lane.answerQualityEndpoint?.judgeModel ?? "").trim();
+  const answerModelMatchesTarget = answerModel.present && targetAnswerModel.length > 0 && answerModel.value === targetAnswerModel;
+  const judgeModelMatchesTarget = judgeModel.present && targetJudgeModel.length > 0 && judgeModel.value === targetJudgeModel;
   const baseUrlPresent = baseUrl.length > 0;
   const cloudEndpointRequiresApiKey = baseUrlPresent && !isLocalUrl(baseUrl);
   const apiKeyPresent = hasAnyEnv("RECALLWEAVE_MEMORYBENCH_API_KEY");
@@ -344,8 +351,10 @@ function inspectAnswerQualityReadiness() {
     !truthyEnv("RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT")
       ? "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed"
       : null,
-    !answerModelPresent ? "answer-model-missing" : null,
-    !judgeModelPresent ? "judge-model-missing" : null,
+    !answerModel.present ? "answer-model-missing" : null,
+    !judgeModel.present ? "judge-model-missing" : null,
+    answerModel.present && !answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
+    judgeModel.present && !judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
     !baseUrlPresent ? "openai-compatible-base-url-missing" : null,
     cloudEndpointRequiresApiKey && !apiKeyPresent ? "RECALLWEAVE_MEMORYBENCH_API_KEY-missing-for-cloud-endpoint" : null,
   ].filter(Boolean);
@@ -354,8 +363,12 @@ function inspectAnswerQualityReadiness() {
     answerQualityCallsEnabled: truthyEnv("RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS"),
     publicDataConfirmed: truthyEnv("RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA"),
     noRawTextOutputConfirmed: truthyEnv("RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT"),
-    answerModelPresent,
-    judgeModelPresent,
+    answerModelPresent: answerModel.present,
+    judgeModelPresent: judgeModel.present,
+    targetAnswerModel: targetAnswerModel || null,
+    targetJudgeModel: targetJudgeModel || null,
+    answerModelMatchesTarget,
+    judgeModelMatchesTarget,
     baseUrlPresent,
     endpointIsLocal: baseUrlPresent ? isLocalUrl(baseUrl) : false,
     cloudEndpointRequiresApiKey,
@@ -365,11 +378,21 @@ function inspectAnswerQualityReadiness() {
   };
 }
 
-function inspectQueryExpansionReadiness(strategies) {
+function inspectQueryExpansionReadiness(lane) {
+  const strategies = lane.strategies ?? [];
+  const requirement = lane.queryExpansionEvidenceRequirement ?? (lane.acceptedByFullShardIntake ? "local-or-cloud-model-required" : "local-or-cloud-model-required");
   if (!strategies.includes("query-expanded-full-hybrid-rerank")) {
     return {
       required: false,
+      evidenceRequirement: "not-required",
       ready: true,
+      readyForResponseArmExport: true,
+      readyForAnswerQualityScoring: true,
+      readyForAcceptedShardIntake: true,
+      diagnosticFallbackAllowed: false,
+      deterministicFallbackOnly: false,
+      countsAsQueryExpansionEvidence: false,
+      countsAsFullSotaQueryExpansionEvidence: false,
       localEndpointPresent: false,
       localModelPresent: false,
       localReady: false,
@@ -389,16 +412,33 @@ function inspectQueryExpansionReadiness(strategies) {
     truthyEnv("RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA") || truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA");
   const readyProviderKinds = ["nvidia", "gemini", "openrouter"].filter((provider) => inspectProviderReadiness(provider).ready);
   const cloudProviderReady = cloudCallsEnabled && publicDataConfirmed && readyProviderKinds.length > 0;
-  const blockers = [
-    !localReady && !cloudCallsEnabled ? "query-expansion-local-endpoint-or-cloud-consent-missing" : null,
-    !localReady && cloudCallsEnabled && !publicDataConfirmed ? "query-expansion-public-data-not-confirmed" : null,
-    !localReady && cloudCallsEnabled && publicDataConfirmed && readyProviderKinds.length === 0
-      ? "query-expansion-cloud-provider-credentials-missing"
-      : null,
-  ].filter(Boolean);
+  const modelBackedReady = localReady || cloudProviderReady;
+  const diagnosticFallbackAllowed = Boolean(lane.queryExpansionDiagnosticFallbackAllowed);
+  const deterministicFallbackOnly = requirement === "deterministic-fallback-only";
+  const blocksAcceptedShardIntake = requirement === "local-or-cloud-model-required";
+  const blockers = blocksAcceptedShardIntake
+    ? [
+        !modelBackedReady && !cloudCallsEnabled ? "query-expansion-local-endpoint-or-cloud-consent-missing" : null,
+        !localReady && cloudCallsEnabled && !publicDataConfirmed ? "query-expansion-public-data-not-confirmed" : null,
+        !localReady && cloudCallsEnabled && publicDataConfirmed && readyProviderKinds.length === 0
+          ? "query-expansion-cloud-provider-credentials-missing"
+          : null,
+      ].filter(Boolean)
+    : [];
+  const readyForResponseArmExport = modelBackedReady || diagnosticFallbackAllowed || deterministicFallbackOnly;
+  const readyForAnswerQualityScoring = blocksAcceptedShardIntake ? modelBackedReady : readyForResponseArmExport;
   return {
     required: true,
-    ready: localReady || cloudProviderReady,
+    evidenceRequirement: requirement,
+    ready: readyForAnswerQualityScoring,
+    readyForResponseArmExport,
+    readyForAnswerQualityScoring,
+    readyForAcceptedShardIntake: blocksAcceptedShardIntake ? modelBackedReady : false,
+    diagnosticFallbackAllowed,
+    deterministicFallbackOnly,
+    modelBackedReady,
+    countsAsQueryExpansionEvidence: modelBackedReady,
+    countsAsFullSotaQueryExpansionEvidence: Boolean(lane.queryExpansionSotaEligible) && modelBackedReady,
     localEndpointPresent,
     localModelPresent,
     localReady,
@@ -466,6 +506,14 @@ function truthyEnv(name) {
 
 function hasAnyEnv(...names) {
   return names.some((name) => String(process.env[name] ?? "").trim().length > 0);
+}
+
+function envPresence(...names) {
+  for (const name of names) {
+    const value = String(process.env[name] ?? "").trim();
+    if (value.length > 0) return { present: true, envName: name, value };
+  }
+  return { present: false, envName: null, value: null };
 }
 
 function splitEnvList(value) {
@@ -541,6 +589,7 @@ function renderMarkdown(value) {
     ...((value.executionLaneReadiness ?? []).length
       ? value.executionLaneReadiness.flatMap((lane) => [
           `- ${lane.laneId}: response-export=${lane.readyForResponseArmExport}; answer-quality=${lane.readyForAnswerQualityScoring}; intake-candidate=${lane.readyForAcceptedShardIntakeCandidate}`,
+          `  - query-expansion=${lane.queryExpansion.evidenceRequirement}; model-backed=${lane.queryExpansion.modelBackedReady ?? false}; fallback-allowed=${lane.queryExpansion.diagnosticFallbackAllowed}`,
           `  - blockers=${lane.blockers.length ? lane.blockers.join(", ") : "none"}`,
         ])
       : ["- none"]),

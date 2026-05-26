@@ -330,6 +330,10 @@ SOTA lane is blocked until live-export consent, no-raw-text consent,
 answer-quality consent, local Apple/local rerank endpoints, Voyage/NVIDIA
 credentials, answer and judge model configuration, a scoring endpoint, and
 query-expansion readiness are all configured.
+Query expansion is deliberately lane-scoped: deterministic fallback is allowed
+for the control and local diagnostic lanes without becoming SOTA support, while
+`full-sota-accepted-shards` still requires local or cloud model-backed query
+expansion and exact target answer/judge model matching.
 Before combining returned full-shard outputs, run
 `benchmark:answer-quality:shard-intake` against the public shard-result JSONs.
 The checked-in intake report,

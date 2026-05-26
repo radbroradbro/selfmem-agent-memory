@@ -447,6 +447,10 @@ not count as a RecallWeave score.
   `voyage-minimum-challenger`, `nvidia-minimum-challenger`, and
   `full-sota-accepted-shards`. Only `full-sota-accepted-shards` is accepted by
   the full-shard intake; the other lanes are diagnostic/comparison evidence.
+  Query expansion is tiered by lane: deterministic fallback is allowed only for
+  diagnostic run-path proof, the local no-spend lane can report local-model
+  expansion separately when configured, and the full accepted lane stays blocked
+  until local or cloud model-backed expansion is ready.
   It merges with `combineMode=query-shard-answer-quality-union`; that merged packet still needs
   live execution, reviewer intake, result gate, SOTA ladder, UI evidence, docs,
   owner approval, and real production canary before any broad claim.

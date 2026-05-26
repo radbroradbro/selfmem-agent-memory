@@ -235,6 +235,9 @@ function buildExecutionLanes(items) {
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
       queryExpansionPolicy: "Deterministic fallback only; does not count as large-model query-expansion evidence.",
+      queryExpansionEvidenceRequirement: "deterministic-fallback-only",
+      queryExpansionDiagnosticFallbackAllowed: true,
+      queryExpansionSotaEligible: false,
     },
     {
       id: "local-apple-no-spend",
@@ -250,6 +253,9 @@ function buildExecutionLanes(items) {
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
       queryExpansionPolicy: "Local or deterministic query expansion must be reported separately from cloud expansion.",
+      queryExpansionEvidenceRequirement: "local-model-or-deterministic-diagnostic",
+      queryExpansionDiagnosticFallbackAllowed: true,
+      queryExpansionSotaEligible: false,
     },
     {
       id: "voyage-minimum-challenger",
@@ -259,6 +265,9 @@ function buildExecutionLanes(items) {
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
       queryExpansionPolicy: "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      queryExpansionEvidenceRequirement: "not-required",
+      queryExpansionDiagnosticFallbackAllowed: false,
+      queryExpansionSotaEligible: false,
     },
     {
       id: "nvidia-minimum-challenger",
@@ -268,6 +277,9 @@ function buildExecutionLanes(items) {
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
       queryExpansionPolicy: "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      queryExpansionEvidenceRequirement: "not-required",
+      queryExpansionDiagnosticFallbackAllowed: false,
+      queryExpansionSotaEligible: false,
     },
     {
       id: "full-sota-accepted-shards",
@@ -277,6 +289,9 @@ function buildExecutionLanes(items) {
       acceptedByFullShardIntake: true,
       canReachFullSotaGateAfterShardIntake: true,
       queryExpansionPolicy: "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
+      queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
+      queryExpansionDiagnosticFallbackAllowed: false,
+      queryExpansionSotaEligible: true,
     },
   ];
 
@@ -307,6 +322,9 @@ function buildExecutionLanes(items) {
       countsAsFullMemorySotaEvidence: false,
       publicBenchmarkClaimsAllowed: false,
       queryExpansionPolicy: lane.queryExpansionPolicy,
+      queryExpansionEvidenceRequirement: lane.queryExpansionEvidenceRequirement,
+      queryExpansionDiagnosticFallbackAllowed: lane.queryExpansionDiagnosticFallbackAllowed,
+      queryExpansionSotaEligible: lane.queryExpansionSotaEligible,
       shardIntakeCompatibility: lane.acceptedByFullShardIntake
         ? "accepted only after every planned shard returns with this complete strategy set"
         : "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch",
@@ -479,6 +497,7 @@ function renderMarkdown(value) {
     ...value.executionLanes.flatMap((lane) => [
       `- ${lane.id}: ${lane.coverageReady ? "ready" : "missing"}; intake-compatible=${lane.acceptedByFullShardIntake}; providers=${lane.providerRequirements.join(", ") || "none"}`,
       `  - ${lane.operatorUse}`,
+      `  - query-expansion=${lane.queryExpansionEvidenceRequirement}`,
       `  - ${lane.shardIntakeCompatibility}`,
     ]),
     "",

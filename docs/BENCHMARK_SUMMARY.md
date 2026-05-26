@@ -281,6 +281,13 @@ The shard plan now also names the execution lanes explicitly:
 `full-sota-accepted-shards`. The first four are diagnostic/comparison lanes;
 only `full-sota-accepted-shards` has the complete strategy set accepted by the
 full-shard intake and combine path.
+The lane contract now separates query-expansion evidence from run-path
+diagnostics. `deterministic-control-proxy` may use deterministic query-expansion
+fallbacks and still remains non-counting. `local-apple-no-spend` may use a local
+query-expansion model when one is configured, or a deterministic diagnostic
+fallback when no local model is present; either way it is not full-SOTA
+evidence. Only `full-sota-accepted-shards` requires local or cloud model-backed
+query expansion before the accepted shard-intake path can open.
 This is an execution plan and harness upgrade, not a completed full-SOTA result.
 The SOTA operator packet now treats that shard plan as the source of truth:
 each shard must export its own private response-arm files, run answer-quality
@@ -342,6 +349,10 @@ state has the accepted full-SOTA lane blocked on live-export consent, no-raw-tex
 consent, answer-quality consent, answer/judge endpoint setup, local Apple and
 local rerank endpoints, Voyage and NVIDIA credentials, and query-expansion
 readiness.
+The same workorder now reports query-expansion readiness per lane: deterministic
+fallback is accepted only for diagnostic lanes, model-backed expansion is
+required for the full accepted lane, and configured answer/judge model names
+must match the target contract before live answer-quality scoring can count.
 The shard-return intake is checked in at
 `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`.
 It currently blocks because all twenty full answer-quality shard outputs are

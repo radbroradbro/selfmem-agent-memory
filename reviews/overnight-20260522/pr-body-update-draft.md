@@ -78,6 +78,13 @@ Live status:
   MemoryBench. Qwen/Gemini/Voyage/NVIDIA rows remain component/model-selection
   evidence only, and MemoryBench remains harness-source-only until a same-data
   full answer-quality run exists.
+- Hardens the full-shard benchmark workorder so query expansion is lane-scoped.
+  Deterministic query-expansion fallback is allowed only for diagnostic
+  run-path evidence, `local-apple-no-spend` can report local-model expansion
+  separately when configured, and `full-sota-accepted-shards` stays blocked
+  until local or cloud model-backed query expansion, exact target answer/judge
+  model matching, all provider/local arms, shard intake, reviewers, UI/docs,
+  owner approval, and real canary evidence pass.
 
 - Adds the public LongMemEval-S materialize-run lane and first blind retrieval-proxy baseline. The materializer writes raw benchmark query and haystack inputs only to an operator-private directory, commits only hashes/counts/command templates, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result to that hash. The canonical `bm25-lite-b800-k5` retrieval-proxy baseline scored 0.4541 quality on the 6-row source-locked slice with average context tokens 800 and zero privacy failures; it is explicitly not MemoryBench answer-quality evidence and not public superiority language.
 - Adds a same-data LongMemEval-S retrieval strategy comparison. `bm25-lite`

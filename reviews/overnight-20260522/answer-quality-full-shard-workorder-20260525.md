@@ -40,14 +40,19 @@
 
 ## Execution Lane Readiness
 - deterministic-control-proxy: response-export=false; answer-quality=false; intake-candidate=false
-  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing
+  - query-expansion=deterministic-fallback-only; model-backed=false; fallback-allowed=true
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, openai-compatible-base-url-missing
 - local-apple-no-spend: response-export=false; answer-quality=false; intake-candidate=false
-  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing
+  - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
 - voyage-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, openai-compatible-base-url-missing, voyage-credentials-missing
 - nvidia-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, nvidia-credentials-missing, openai-compatible-base-url-missing
 - full-sota-accepted-shards: response-export=false; answer-quality=false; intake-candidate=false
+  - query-expansion=local-or-cloud-model-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing
 
 ## Blockers

@@ -49,6 +49,12 @@ requirements are resolved.
   MemoryBench. These rows do not unblock launch: component rows are
   model-selection-only, MemoryBench is harness-source-only, and the full
   same-data answer-quality benchmark/SOTA gate is still incomplete.
+- The full-shard workorder now makes query expansion lane-scoped. Deterministic
+  fallback is allowed only for diagnostic run-path evidence, the local no-spend
+  lane can report local-model expansion separately when configured, and
+  `full-sota-accepted-shards` remains blocked until model-backed query
+  expansion, exact target answer/judge model matching, and all full benchmark
+  evidence are present.
 - Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` records live Qwen3
   Embedding 0.6B and Qwen3 Embedding 4B Apple Silicon runs on the same 30-query
   public LongMemEval-S retrieval-proxy target. Both local arms tied BM25

@@ -21,7 +21,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-26T04:02:44.001Z",
+  "generatedAt": "2026-05-26T04:43:11.932Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
     "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
@@ -120,6 +120,9 @@
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "queryExpansionPolicy": "Deterministic fallback only; does not count as large-model query-expansion evidence.",
+      "queryExpansionEvidenceRequirement": "deterministic-fallback-only",
+      "queryExpansionDiagnosticFallbackAllowed": true,
+      "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
     },
     {
@@ -156,6 +159,9 @@
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "queryExpansionPolicy": "Local or deterministic query expansion must be reported separately from cloud expansion.",
+      "queryExpansionEvidenceRequirement": "local-model-or-deterministic-diagnostic",
+      "queryExpansionDiagnosticFallbackAllowed": true,
+      "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
     },
     {
@@ -189,6 +195,9 @@
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "queryExpansionPolicy": "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      "queryExpansionEvidenceRequirement": "not-required",
+      "queryExpansionDiagnosticFallbackAllowed": false,
+      "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
     },
     {
@@ -222,6 +231,9 @@
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "queryExpansionPolicy": "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      "queryExpansionEvidenceRequirement": "not-required",
+      "queryExpansionDiagnosticFallbackAllowed": false,
+      "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
     },
     {
@@ -262,6 +274,9 @@
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "queryExpansionPolicy": "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
+      "queryExpansionEvidenceRequirement": "local-or-cloud-model-required",
+      "queryExpansionDiagnosticFallbackAllowed": false,
+      "queryExpansionSotaEligible": true,
       "shardIntakeCompatibility": "accepted only after every planned shard returns with this complete strategy set"
     }
   ],
