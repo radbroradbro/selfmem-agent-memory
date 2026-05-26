@@ -257,7 +257,10 @@ contract names `gpt-4o`, so it is explicitly blocked as a harness mismatch.
 The previous reviewer approvals are preserved as historical evidence, but
 `reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json` now
 marks them uncountable until reviewers approve the exact current result hash
-and answer/judge model.
+and answer/judge model. The answer-quality preflight and live runner also
+block this mismatch before a new live scoring run starts, so the full 500-query
+flow must be launched with answer and judge models that match the target
+contract.
 
 OpenAI-compatible reviewers can now produce a memory-score approval JSON for
 the exact metrics-only packet. The command writes only the reviewer artifact;

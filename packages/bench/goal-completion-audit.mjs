@@ -324,8 +324,12 @@ assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.memoryScoreReviewerInt
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.status, "EXPORTED_RESPONSE_ARMS");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.readyForAnswerQualityPreflight, true);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityArmExport?.writesPrivateResponseFiles, true);
-assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.status, "READY_FOR_LIVE_ANSWER_QUALITY");
-assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.liveAnswerQualityCanRun, true);
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.status, "BLOCKED_ANSWER_QUALITY_ENV");
+assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.liveAnswerQualityCanRun, false);
+assert.ok(
+  benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.blockers?.includes("answer-model-missing") ||
+    benchmarkSotaOperatorPacket.currentEvidence?.answerQualityPreflight?.blockers?.includes("answer-model-does-not-match-target"),
+);
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityHarnessSmoke?.mode, "public-benchmark-answer-quality");
 assert.equal(benchmarkSotaOperatorPacket.currentEvidence?.answerQualityHarnessSmoke?.readyForEndToEndMemoryScoreGate, false);
 assert.equal(queryExpansionPreflight.mode, "public-benchmark-query-expansion-preflight");
@@ -429,9 +433,13 @@ assert.equal(answerQualityArmExportLiveLocal.fixtureOnly, false);
 assert.equal(answerQualityArmExportLiveLocal.readyForAnswerQualityPreflight, true);
 assert.equal(answerQualityArmExportLiveLocal.arms?.length, 5);
 assert.equal(answerQualityPreflightLiveLocal.mode, "public-benchmark-answer-quality-preflight");
-assert.equal(answerQualityPreflightLiveLocal.status, "READY_FOR_LIVE_ANSWER_QUALITY");
+assert.equal(answerQualityPreflightLiveLocal.status, "BLOCKED_ANSWER_QUALITY_ENV");
 assert.equal(answerQualityPreflightLiveLocal.readiness?.sameDataReady, true);
-assert.equal(answerQualityPreflightLiveLocal.readiness?.readyForEndToEndMemoryScoreGate, true);
+assert.equal(answerQualityPreflightLiveLocal.readiness?.readyForEndToEndMemoryScoreGate, false);
+assert.equal(answerQualityPreflightLiveLocal.models?.answerModelMatchesTarget, false);
+assert.equal(answerQualityPreflightLiveLocal.models?.judgeModelMatchesTarget, false);
+assert.ok(answerQualityPreflightLiveLocal.blockers.includes("answer-model-does-not-match-target"));
+assert.ok(answerQualityPreflightLiveLocal.blockers.includes("judge-model-does-not-match-target"));
 assert.equal(answerQualityArmExport.mode, "public-benchmark-answer-quality-arm-export");
 assert.equal(answerQualityArmExport.status, "BLOCKED_RESPONSE_ARM_EXPORT_ENV");
 assert.equal(answerQualityArmExport.callsProviderApis, false);

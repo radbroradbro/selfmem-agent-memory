@@ -1866,9 +1866,13 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityArmExportLiveLocalEvidence.arms?.length, 5);
   assert.ok(answerQualityArmExportLiveLocalEvidence.arms?.some((item) => item.strategy === "local-apple-qwen3-0_6b-local-rerank"));
   assert.equal(answerQualityPreflightLiveLocalEvidence.mode, "public-benchmark-answer-quality-preflight");
-  assert.equal(answerQualityPreflightLiveLocalEvidence.status, "READY_FOR_LIVE_ANSWER_QUALITY");
+  assert.equal(answerQualityPreflightLiveLocalEvidence.status, "BLOCKED_ANSWER_QUALITY_ENV");
   assert.equal(answerQualityPreflightLiveLocalEvidence.readiness?.sameDataReady, true);
-  assert.equal(answerQualityPreflightLiveLocalEvidence.readiness?.readyForEndToEndMemoryScoreGate, true);
+  assert.equal(answerQualityPreflightLiveLocalEvidence.readiness?.readyForEndToEndMemoryScoreGate, false);
+  assert.equal(answerQualityPreflightLiveLocalEvidence.models?.answerModelMatchesTarget, false);
+  assert.equal(answerQualityPreflightLiveLocalEvidence.models?.judgeModelMatchesTarget, false);
+  assert.ok(answerQualityPreflightLiveLocalEvidence.blockers.includes("answer-model-does-not-match-target"));
+  assert.ok(answerQualityPreflightLiveLocalEvidence.blockers.includes("judge-model-does-not-match-target"));
   assert.equal(answerQualityLiveLocalEvidence.mode, "public-benchmark-answer-quality");
   assert.equal(answerQualityLiveLocalEvidence.fixtureOnly, false);
   assert.equal(answerQualityLiveLocalEvidence.readyForEndToEndMemoryScoreGate, true);
@@ -1876,9 +1880,13 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityLiveLocalEvidence.winner?.strategy, "local-apple-qwen3-0_6b-local-rerank");
   assert.equal(answerQualityLiveLocalEvidence.winner?.answerQuality, 36);
   assert.equal(answerQualityPreflightLiveProviderEvidence.mode, "public-benchmark-answer-quality-preflight");
-  assert.equal(answerQualityPreflightLiveProviderEvidence.status, "READY_FOR_LIVE_ANSWER_QUALITY");
+  assert.equal(answerQualityPreflightLiveProviderEvidence.status, "BLOCKED_ANSWER_QUALITY_ENV");
   assert.equal(answerQualityPreflightLiveProviderEvidence.readiness?.sameDataReady, true);
-  assert.equal(answerQualityPreflightLiveProviderEvidence.readiness?.readyForEndToEndMemoryScoreGate, true);
+  assert.equal(answerQualityPreflightLiveProviderEvidence.readiness?.readyForEndToEndMemoryScoreGate, false);
+  assert.equal(answerQualityPreflightLiveProviderEvidence.models?.answerModelMatchesTarget, false);
+  assert.equal(answerQualityPreflightLiveProviderEvidence.models?.judgeModelMatchesTarget, false);
+  assert.ok(answerQualityPreflightLiveProviderEvidence.blockers.includes("answer-model-does-not-match-target"));
+  assert.ok(answerQualityPreflightLiveProviderEvidence.blockers.includes("judge-model-does-not-match-target"));
   assert.equal(answerQualityLiveProviderEvidence.mode, "public-benchmark-answer-quality");
   assert.equal(answerQualityLiveProviderEvidence.fixtureOnly, false);
   assert.equal(answerQualityLiveProviderEvidence.readyForEndToEndMemoryScoreGate, true);
@@ -2085,12 +2093,34 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(preflight.rawTranscriptIncluded, false);
     assert.equal(preflight.readiness?.liveAnswerQualityCanRun, false);
     assert.equal(preflight.readiness?.readyForEndToEndMemoryScoreGate, false);
+    assert.equal(preflight.models?.answerModelMatchesTarget, false);
+    assert.equal(preflight.models?.judgeModelMatchesTarget, false);
+    assert.equal(preflight.target?.answerModel, "gpt-4o");
+    assert.equal(preflight.target?.judgeModel, "gpt-4o");
     assert.ok(preflight.blockers.includes("private-queryset-missing"));
     assert.ok(preflight.blockers.includes("response-arm-exports-missing"));
     assert.equal(preflight.requiredStrategyCoverage?.hasBm25Lite, false);
     assert.equal(preflight.requiredStrategyCoverage?.hasFullHybridRerank, false);
     assert.equal(preflight.requiredStrategyCoverage?.hasChallenger, false);
   }
+  const answerQualityModelMismatchPreflight = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-answer-quality-preflight.mjs"], {
+      env: {
+        ...process.env,
+        RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS: "1",
+        RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA: "1",
+        RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT: "1",
+        RECALLWEAVE_MEMORYBENCH_BASE_URL: "http://127.0.0.1:8080",
+        RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL: "fixture-wrong-answer",
+        RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL: "fixture-wrong-judge",
+      },
+    }).stdout,
+  );
+  assert.equal(answerQualityModelMismatchPreflight.status, "BLOCKED_ANSWER_QUALITY_ENV");
+  assert.equal(answerQualityModelMismatchPreflight.models?.answerModelMatchesTarget, false);
+  assert.equal(answerQualityModelMismatchPreflight.models?.judgeModelMatchesTarget, false);
+  assert.ok(answerQualityModelMismatchPreflight.blockers.includes("answer-model-does-not-match-target"));
+  assert.ok(answerQualityModelMismatchPreflight.blockers.includes("judge-model-does-not-match-target"));
   assert.match(answerQualityPreflightMarkdownFresh, /Answer-Quality Benchmark Preflight/);
   assert.match(answerQualityPreflightMarkdownEvidence, /BLOCKED_ANSWER_QUALITY_ENV/);
   assert.equal(answerQualityFixture.ok, true);

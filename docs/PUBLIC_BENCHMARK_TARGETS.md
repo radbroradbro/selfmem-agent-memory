@@ -48,8 +48,10 @@ split, question ids where available, answer labels, judge rule, and scoring
 script. The exact answer model and judge model are part of that contract: a
 result must report the actual models used during scoring, and
 `benchmark:memory-score:result-gate` fails closed when they do not match the
-target. A custom memory set can be useful for product QA, but it is not the
-benchmark lane unless it is clearly labeled as a private canary.
+target. `benchmark:answer-quality:preflight` and the live answer-quality runner
+also enforce this before scoring starts. A custom memory set can be useful for
+product QA, but it is not the benchmark lane unless it is clearly labeled as a
+private canary.
 
 Run the target validator before starting a public canary:
 

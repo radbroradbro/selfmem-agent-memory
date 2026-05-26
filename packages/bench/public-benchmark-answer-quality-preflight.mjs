@@ -36,6 +36,10 @@ const judgeModel = envPresence("RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL", "RECALLWEA
 const baseUrl = envPresence("RECALLWEAVE_MEMORYBENCH_BASE_URL");
 const apiKey = envPresence("RECALLWEAVE_MEMORYBENCH_API_KEY");
 const endpointIsLocal = isLocalUrl(process.env.RECALLWEAVE_MEMORYBENCH_BASE_URL ?? "");
+const targetAnswerModel = String(target.benchmark?.answerModel ?? "").trim();
+const targetJudgeModel = String(target.benchmark?.judgeModel ?? "").trim();
+const answerModelMatchesTarget = answerModel.present && targetAnswerModel.length > 0 && answerModel.value === targetAnswerModel;
+const judgeModelMatchesTarget = judgeModel.present && targetJudgeModel.length > 0 && judgeModel.value === targetJudgeModel;
 
 const privateInputs = inspectPrivateInputs();
 const arms = inspectArms();
@@ -47,6 +51,8 @@ const envReady =
   noRawTextOutputConfirmed &&
   answerModel.present &&
   judgeModel.present &&
+  answerModelMatchesTarget &&
+  judgeModelMatchesTarget &&
   baseUrl.present &&
   (endpointIsLocal || apiKey.present);
 const privateInputsReady = privateInputs.querySet.present && privateInputs.memories.present && privateInputs.answerLabels.present;
@@ -68,6 +74,10 @@ const blockers = [
   !noRawTextOutputConfirmed ? "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed" : null,
   !answerModel.present ? "answer-model-missing" : null,
   !judgeModel.present ? "judge-model-missing" : null,
+  !targetAnswerModel ? "target-answer-model-missing" : null,
+  !targetJudgeModel ? "target-judge-model-missing" : null,
+  answerModel.present && !answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
+  judgeModel.present && !judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
   !baseUrl.present ? "openai-compatible-base-url-missing" : null,
   baseUrl.present && !endpointIsLocal && !apiKey.present ? "cloud-endpoint-api-key-missing" : null,
   !privateInputs.querySet.present ? "private-queryset-missing" : null,
@@ -110,6 +120,8 @@ const report = {
     claimTier: target.claimTier ?? null,
     answerLabelsHash: target.benchmark?.answerLabelsHash ?? null,
     scoringCodeHash: target.benchmark?.scoringCodeHash ?? null,
+    answerModel: targetAnswerModel || null,
+    judgeModel: targetJudgeModel || null,
   },
   consent: {
     answerQualityCallsEnabled,
@@ -125,6 +137,8 @@ const report = {
   models: {
     answerModelPresent: answerModel.present,
     judgeModelPresent: judgeModel.present,
+    answerModelMatchesTarget,
+    judgeModelMatchesTarget,
     valuesPrinted: false,
   },
   privateInputs,
@@ -276,8 +290,8 @@ function liveCommandTemplate() {
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
     "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
     "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
-    "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<answer-model>",
-    "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<judge-model>",
+    `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=${targetAnswerModel || "<target-answer-model>"}`,
+    `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=${targetJudgeModel || "<target-judge-model>"}`,
     [
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
       `--target ${displayPath(targetPath)}`,
@@ -302,12 +316,16 @@ function renderMarkdown(value) {
     `- Calls provider APIs: ${value.callsProviderApis}`,
     `- Sends benchmark text to provider: ${value.sendsBenchmarkTextToProvider}`,
     `- Target hash: ${value.target.hash}`,
+    `- Target answer model: ${value.target.answerModel ?? "missing"}`,
+    `- Target judge model: ${value.target.judgeModel ?? "missing"}`,
     "",
     "## Readiness",
     `- Env ready: ${value.readiness.envReady}`,
     `- Private inputs ready: ${value.readiness.privateInputsReady}`,
     `- Response arms ready: ${value.readiness.armsReady}`,
     `- Same-data hashes ready: ${value.readiness.sameDataReady}`,
+    `- Answer model matches target: ${value.models.answerModelMatchesTarget}`,
+    `- Judge model matches target: ${value.models.judgeModelMatchesTarget}`,
     "",
     "## Strategy Coverage",
     `- BM25 lite: ${value.requiredStrategyCoverage.hasBm25Lite}`,
@@ -358,7 +376,14 @@ function assertSafeStrategy(value) {
 
 function envPresence(...names) {
   const presentNames = names.filter((name) => String(process.env[name] ?? "").trim());
-  return { present: presentNames.length > 0, envNames: names, presentEnvNames: presentNames, valuePrinted: false };
+  const firstPresentName = presentNames[0] ?? null;
+  return {
+    present: presentNames.length > 0,
+    value: firstPresentName ? String(process.env[firstPresentName] ?? "").trim() : null,
+    envNames: names,
+    presentEnvNames: presentNames,
+    valuePrinted: false,
+  };
 }
 
 function truthyEnv(name) {

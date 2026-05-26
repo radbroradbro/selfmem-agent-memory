@@ -32,7 +32,7 @@
 - Live-provider winner: cloud-nvidia-nemotron-1b (43.1667)
 - Memory score reviewer intake: BLOCKED_MEMORY_SCORE_REVIEWERS
 - Answer-quality arm export: EXPORTED_RESPONSE_ARMS
-- Answer-quality preflight: READY_FOR_LIVE_ANSWER_QUALITY
+- Answer-quality preflight: BLOCKED_ANSWER_QUALITY_ENV
 - Answer-quality harness smoke: public-benchmark-answer-quality
 - Local rerank evidence: true
 - Local rerank result gate: READY_LOCAL_RERANK_ANSWER_QUALITY_RESULT

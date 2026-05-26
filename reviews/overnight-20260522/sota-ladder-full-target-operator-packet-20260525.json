@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "public-benchmark-sota-operator-packet",
   "status": "BLOCKED_SOTA_OPERATOR_INPUTS",
-  "generatedAt": "2026-05-25T23:53:54.290Z",
+  "generatedAt": "2026-05-26T00:03:38.614Z",
   "publicSafe": true,
   "metricsOnly": true,
   "writesRealFiles": true,
@@ -261,13 +261,27 @@
       "blockers": []
     },
     "answerQualityPreflight": {
-      "evidencePath": "reviews/overnight-20260522/answer-quality-preflight-live-local-20260525.json",
+      "evidencePath": "reviews/overnight-20260522/answer-quality-preflight-20260525.json",
       "evidenceExists": true,
-      "evidenceHash": "sha256:21ef3224390734c48772089590d72e0e3125a1d38163c5c1097474a8ea87bb75",
-      "status": "READY_FOR_LIVE_ANSWER_QUALITY",
-      "liveAnswerQualityCanRun": true,
-      "readyForEndToEndMemoryScoreGate": true,
-      "blockers": []
+      "evidenceHash": "sha256:c81ea19e7d2f584cbdaca231aa6c5c408a1eb0621937bdd1da32c59b76cf1172",
+      "status": "BLOCKED_ANSWER_QUALITY_ENV",
+      "liveAnswerQualityCanRun": false,
+      "readyForEndToEndMemoryScoreGate": false,
+      "blockers": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "openai-compatible-base-url-missing",
+        "private-queryset-missing",
+        "private-memories-missing",
+        "private-answer-labels-missing",
+        "response-arm-exports-missing",
+        "bm25-lite-arm-missing",
+        "full-hybrid-rerank-arm-missing",
+        "provider-or-local-challenger-arm-missing"
+      ]
     },
     "answerQualityHarnessSmoke": {
       "evidencePath": "reviews/overnight-20260522/answer-quality-harness-smoke-20260525.json",

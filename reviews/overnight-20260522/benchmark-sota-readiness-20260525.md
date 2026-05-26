@@ -228,6 +228,10 @@ Follow-up provider evidence on 2026-05-25:
   result was answered and judged by `qwen36-a3b-main-q8kv-8192` while the
   target contract names `gpt-4o`, so it is explicitly blocked as a harness
   mismatch instead of being allowed to masquerade as a same-judge comparison.
+- The answer-quality preflight and live runner now enforce the same model
+  contract before scoring starts. This blocks an expensive full benchmark run
+  when `RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL` or
+  `RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL` differ from the source-locked target.
 - This is progress, not launch clearance. The current ladder still lacks a
   same-data Voyage answer-quality row, an at-or-above-target full-memory score,
   final UI/docs refresh after any changed result hash, real rollout evidence,

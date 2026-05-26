@@ -96,6 +96,8 @@ async function liveRun() {
   assert.equal(noRawTextOutput, true, "set RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 before live answer-quality scoring");
   assert.ok(answerModel, "answer model is required via --answer-model or RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL");
   assert.ok(judgeModel, "judge model is required via --judge-model or RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL");
+  assert.equal(answerModel, target.benchmark?.answerModel, "answer model must match target contract");
+  assert.equal(judgeModel, target.benchmark?.judgeModel, "judge model must match target contract");
   assert.ok(baseUrl, "OpenAI-compatible base URL is required via --base-url or RECALLWEAVE_MEMORYBENCH_BASE_URL");
   if (!isLocalUrl(baseUrl)) assert.ok(apiKey, "cloud answer-quality endpoints require RECALLWEAVE_MEMORYBENCH_API_KEY");
   assertPrivateFile(querySetPath, "private query set");
