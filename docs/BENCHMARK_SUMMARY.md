@@ -270,6 +270,17 @@ shards, and carries BM25, full hybrid, query expansion, Voyage, NVIDIA, local
 Apple, and local rerank arms through shard export, answer scoring, shard
 combination, result gate, and reviewer intake commands. This is an execution
 plan and harness upgrade, not a completed full-SOTA result.
+The shard-return intake is checked in at
+`reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`.
+It currently blocks because all twenty full answer-quality shard outputs are
+missing. After shard jobs return, run
+`benchmark:answer-quality:shard-intake` against the public shard-result JSONs
+before any combine step; it rejects gaps, duplicates, target/model/hash
+mismatches, mixed strategy sets, and unsafe raw fields. A green intake only
+means the full-shard packet is safe to merge with
+`benchmark:answer-quality:combine -- --combine-mode shards`; it still does not
+prove SOTA or authorize public claims until the combined score, reviewer gate,
+SOTA ladder, UI evidence, docs, owner approval, and real canary all pass.
 The end-to-end gate also now verifies exact answer and
 judge model matching against the target contract. The current canary was
 answered and judged by `qwen36-a3b-main-q8kv-8192` while the checked target

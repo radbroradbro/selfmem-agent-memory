@@ -130,6 +130,10 @@ const files = {
   answerQualityPreflightMarkdown: `${reviewDir}/answer-quality-preflight-20260525.md`,
   answerQualityHarnessSmokeReport: `${reviewDir}/answer-quality-harness-smoke-20260525.json`,
   answerQualityHarnessSmokeMarkdown: `${reviewDir}/answer-quality-harness-smoke-20260525.md`,
+  answerQualityFullShardPlanReport: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
+  answerQualityFullShardPlanMarkdown: `${reviewDir}/answer-quality-full-shard-plan-20260525.md`,
+  answerQualityFullShardIntakeReport: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
+  answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
 };
 
 for (const [name, file] of Object.entries(files)) {
@@ -173,6 +177,8 @@ const answerQualityPreflightLiveLocal = JSON.parse(readFileSync(join(root, files
 const answerQualityArmExport = JSON.parse(readFileSync(join(root, files.answerQualityArmExportReport), "utf8"));
 const answerQualityPreflight = JSON.parse(readFileSync(join(root, files.answerQualityPreflightReport), "utf8"));
 const answerQualityHarnessSmoke = JSON.parse(readFileSync(join(root, files.answerQualityHarnessSmokeReport), "utf8"));
+const answerQualityFullShardPlan = JSON.parse(readFileSync(join(root, files.answerQualityFullShardPlanReport), "utf8"));
+const answerQualityFullShardIntake = JSON.parse(readFileSync(join(root, files.answerQualityFullShardIntakeReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
     .filter(([, file]) => file.endsWith(".md"))
@@ -488,6 +494,25 @@ assert.equal(answerQualityHarnessSmoke.readyForEndToEndMemoryScoreGate, false);
 assert.equal(answerQualityHarnessSmoke.publicBenchmarkClaimsAllowed, false);
 assert.equal(answerQualityHarnessSmoke.rawAnswersIncluded, false);
 assert.equal(answerQualityHarnessSmoke.rawMemoryIncluded, false);
+assert.equal(answerQualityFullShardPlan.mode, "public-benchmark-answer-quality-shard-plan");
+assert.equal(answerQualityFullShardPlan.status, "READY_FULL_ANSWER_QUALITY_SHARD_RUN");
+assert.equal(answerQualityFullShardPlan.readyForAnswerQualityShardRun, true);
+assert.equal(answerQualityFullShardPlan.countsAsFullMemorySotaEvidence, false);
+assert.equal(answerQualityFullShardPlan.runPlan?.queryCount, 500);
+assert.equal(answerQualityFullShardPlan.runPlan?.shardSize, 25);
+assert.equal(answerQualityFullShardPlan.runPlan?.shardCount, 20);
+assert.equal(answerQualityFullShardPlan.shards?.[0]?.startIndex, 0);
+assert.equal(answerQualityFullShardPlan.shards?.at(-1)?.endIndexExclusive, 500);
+assert.equal(answerQualityFullShardIntake.mode, "public-benchmark-answer-quality-shard-intake");
+assert.equal(answerQualityFullShardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
+assert.equal(answerQualityFullShardIntake.readyForShardCombine, false);
+assert.equal(answerQualityFullShardIntake.countsAsFullMemorySotaEvidence, false);
+assert.equal(answerQualityFullShardIntake.plan?.shardCount, 20);
+assert.equal(answerQualityFullShardIntake.intake?.inputCount, 0);
+assert.equal(answerQualityFullShardIntake.intake?.missingShardCount, 20);
+assert.ok(answerQualityFullShardIntake.blockers?.includes("shard-results-missing"));
+assert.ok(answerQualityFullShardIntake.blockers?.includes("answer-quality-shards-missing"));
+assert.ok(answerQualityFullShardIntake.blockers?.includes("full-shard-coverage-incomplete"));
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -755,11 +780,18 @@ const requirements = [
     files.answerQualityPreflightMarkdown,
     files.answerQualityHarnessSmokeReport,
     files.answerQualityHarnessSmokeMarkdown,
+    files.answerQualityFullShardPlanReport,
+    files.answerQualityFullShardPlanMarkdown,
+    files.answerQualityFullShardIntakeReport,
+    files.answerQualityFullShardIntakeMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
     "packages/bench/public-benchmark-sota-operator-packet.mjs",
     "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
     "packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "packages/bench/public-benchmark-answer-quality.mjs",
+    "packages/bench/public-benchmark-answer-quality-combine.mjs",
+    "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+    "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
     "packages/bench/public-benchmark-query-expansion-preflight.mjs",
     "packages/bench/query-expansion-result-gate.mjs",
     "packages/bench/local-rerank-result-gate.mjs",

@@ -28,7 +28,8 @@ Use this checklist before making the repository public.
   memory-score, and SOTA-ladder gates before changing public wording.
 - [ ] Broad SOTA or production-replacement wording uses the full 500-query
   LongMemEval answer-quality target, either as one run or as complete
-  non-overlapping `--query-offset` / `--max-queries` shards merged with
+  non-overlapping `--query-offset` / `--max-queries` shards accepted by
+  `benchmark:answer-quality:shard-intake` and then merged with
   `benchmark:answer-quality:combine -- --combine-mode shards`.
 - [ ] `benchmark:memory-score:result-gate --require-ready` has an empty
   `fullSotaBlockers` list, proving the result meets the selected source-locked

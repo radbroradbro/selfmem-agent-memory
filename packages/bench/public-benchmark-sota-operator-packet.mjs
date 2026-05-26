@@ -18,6 +18,10 @@ const sameDataStrategies = splitList(
 );
 const providerPreflightStrategies = sameDataStrategies.filter((strategy) => providerPreflightStrategy(strategy));
 const minimumVoyageAnswerQualityStrategies = ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-lite-voyage-lite"];
+const fullShardSize = 25;
+const fullShardOffsets = Array.from({ length: 20 }, (_, index) => index * fullShardSize);
+const fullShardOffsetList = fullShardOffsets.join(" ");
+const fullShardInputList = fullShardOffsets.map((offset) => `$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-${offset}.json`).join(",");
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(existsSync(targetPath), `benchmark target missing: ${displayPath(targetPath)}`);
@@ -489,7 +493,7 @@ function buildOperatorFlow() {
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflight.md\"",
         ].join(" "),
         [
-          "for offset in 0 50 100 150 200 250 300 350 400 450; do",
+          `for offset in ${fullShardOffsetList}; do`,
           "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
           `--target ${fullAnswerQualityTarget}`,
           "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
@@ -497,14 +501,21 @@ function buildOperatorFlow() {
           "--answer-labels \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-answer-labels.private.json\"",
           answerQualityArms.replaceAll("$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms", "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms"),
           "--query-offset \"$offset\"",
-          "--max-queries 50",
+          `--max-queries ${fullShardSize}`,
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-$offset.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-$offset.md\"",
           "|| exit 1; done",
         ].join(" "),
         [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake",
+          `--input "${fullShardInputList}"`,
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-intake.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-intake.md\"",
+          "--require-ready",
+        ].join(" "),
+        [
           "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --combine-mode shards",
-          "--input \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-0.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-50.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-100.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-150.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-200.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-250.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-300.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-350.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-400.json,$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-450.json\"",
+          `--input "${fullShardInputList}"`,
           "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score.json\"",
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-end-to-end-memory-score.md\"",
         ].join(" "),
@@ -532,14 +543,24 @@ function buildOperatorFlow() {
         ].join(" "),
       ],
       shardContract: {
-        shardSize: 50,
-        expectedShardCount: 10,
+        shardSize: fullShardSize,
+        expectedShardCount: fullShardOffsets.length,
         expectedFullQueryCount: 500,
         combineMode: "query-shard-answer-quality-union",
-        failClosedOn: ["target mismatch", "query-set mismatch", "answer-model mismatch", "judge-model mismatch", "query-shard gap", "query-shard overlap"],
+        failClosedOn: [
+          "target mismatch",
+          "query-set mismatch",
+          "answer-model mismatch",
+          "judge-model mismatch",
+          "query-shard gap",
+          "query-shard overlap",
+          "unsafe raw fields",
+          "strategy-set mismatch",
+        ],
       },
       expectedPublicEvidence: [
         "each shard report includes scoredQueryStart, scoredQueryEndExclusive, totalQueryCount, and a selected-query hash",
+        "the shard intake reports readyForShardCombine=true before combine runs",
         "the combined report uses combineMode=query-shard-answer-quality-union",
         "the combined report scoredQueryCount is 500 and queryShard.completeDataset is true",
         "publicBenchmarkClaimsAllowed remains false until result gate, SOTA ladder, and reviewer intake all pass",

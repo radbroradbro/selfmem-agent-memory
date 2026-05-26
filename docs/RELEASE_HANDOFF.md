@@ -259,6 +259,14 @@ query expansion, Voyage, NVIDIA, local Apple, and local rerank arms on the same
 source-locked data. Merge those chunks only with
 `benchmark:answer-quality:combine -- --combine-mode shards`, which rejects gaps,
 overlaps, target/model mismatches, and mixed strategy sets.
+Before combining returned full-shard outputs, run
+`benchmark:answer-quality:shard-intake` against the public shard-result JSONs.
+The checked-in intake report,
+`reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`,
+is intentionally blocked with zero accepted shards and twenty missing shards.
+It should turn green only after the full shard set is present, non-overlapping,
+source/model/hash-matched, strategy-matched, and public-safe. Passing intake is
+combine readiness only, not SOTA proof.
 This is real benchmark progress, not SOTA proof:
 `reviews/overnight-20260522/end-to-end-memory-score-gate-20260525.json` remains
 blocked by the missing same-data Voyage answer-quality arm recorded in

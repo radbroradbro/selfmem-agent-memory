@@ -425,6 +425,13 @@ Component rows in the same artifact remain model-selection evidence only.
   `combineMode=query-shard-answer-quality-union`; that merged packet still needs
   live execution, reviewer intake, result gate, SOTA ladder, UI evidence, docs,
   owner approval, and real production canary before any broad claim.
+- Full-shard return intake:
+  `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`
+  is the checked-in blocked state for the full answer-quality shard set. It
+  reports zero accepted shards, twenty missing shards, and no public-claim
+  permission. Re-run `benchmark:answer-quality:shard-intake` with all returned
+  shard-result JSONs before combine; it is a coverage and safety gate, not a
+  SOTA result.
 - Single-provider expanded preflights:
   `reviews/overnight-20260522/public-longmemeval-expanded-provider-live-preflight-voyage.json`
   and

@@ -124,6 +124,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality.mjs",
   "packages/bench/public-benchmark-answer-quality-combine.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+  "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -182,6 +183,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-full-materialize-run-evidence.md`,
   `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-plan-20260525.md`,
+  `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
+  `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
   `${reviewDir}/sota-ladder-full-target-report-20260525.json`,
   `${reviewDir}/sota-ladder-full-target-report-20260525.md`,
   `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.json`,
@@ -551,6 +554,9 @@ const requiredScripts = [
   "benchmark:answer-quality:arms",
   "benchmark:answer-quality:preflight",
   "benchmark:answer-quality",
+  "benchmark:answer-quality:combine",
+  "benchmark:answer-quality:shard-plan",
+  "benchmark:answer-quality:shard-intake",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
   "benchmark:local-rerank:result-gate",
@@ -1525,6 +1531,12 @@ check("fresh public benchmark target check passes", () => {
     "--format",
     "markdown",
   ]).stdout;
+  const answerQualityShardIntakeFresh = JSON.parse(run("node", ["packages/bench/public-benchmark-answer-quality-shard-intake.mjs"]).stdout);
+  const answerQualityShardIntakeMarkdownFresh = run("node", [
+    "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
+    "--format",
+    "markdown",
+  ]).stdout;
   const memoryScoreReviewerIntakeFresh = JSON.parse(
     run("node", [
       "packages/bench/memory-score-reviewer-approval-intake.mjs",
@@ -1627,6 +1639,13 @@ check("fresh public benchmark target check passes", () => {
   const fullMaterializeEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-full-materialize-run-evidence.md"), "utf8");
   const fullAnswerQualityShardPlan = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-plan-20260525.json"), "utf8"));
   const fullAnswerQualityShardPlanEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-plan-20260525.md"), "utf8");
+  const fullAnswerQualityShardIntake = JSON.parse(readFileSync(join(root, reviewDir, "answer-quality-full-shard-intake-20260525.json"), "utf8"));
+  const fullAnswerQualityShardIntakeEvidence = readFileSync(join(root, reviewDir, "answer-quality-full-shard-intake-20260525.md"), "utf8");
+  const syntheticShardDir = mkdtempSync(join(tmpdir(), "recallweave-answer-quality-shard-intake-"));
+  const syntheticShardInputs = writeSyntheticAnswerQualityShardReports(fullAnswerQualityShardPlan, syntheticShardDir);
+  const answerQualityShardIntakeReady = JSON.parse(
+    run("node", ["packages/bench/public-benchmark-answer-quality-shard-intake.mjs", "--input", syntheticShardInputs.join(",")]).stdout,
+  );
   const fullTargetSotaReport = JSON.parse(readFileSync(join(root, reviewDir, "sota-ladder-full-target-report-20260525.json"), "utf8"));
   const fullTargetOperatorPacket = JSON.parse(
     readFileSync(join(root, reviewDir, "sota-ladder-full-target-operator-packet-20260525.json"), "utf8"),
@@ -2659,6 +2678,35 @@ check("fresh public benchmark target check passes", () => {
   }
   assert.match(answerQualityShardPlanMarkdownFresh, /Full Answer-Quality Shard Plan/);
   assert.match(fullAnswerQualityShardPlanEvidence, /Shard count: 20/);
+  for (const shardIntake of [answerQualityShardIntakeFresh, fullAnswerQualityShardIntake]) {
+    assert.equal(shardIntake.mode, "public-benchmark-answer-quality-shard-intake");
+    assert.equal(shardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
+    assert.equal(shardIntake.publicSafe, true);
+    assert.equal(shardIntake.metricsOnly, true);
+    assert.equal(shardIntake.publicBenchmarkClaimsAllowed, false);
+    assert.equal(shardIntake.readyForShardCombine, false);
+    assert.equal(shardIntake.readyForEndToEndMemoryScoreGate, false);
+    assert.equal(shardIntake.countsAsFullMemorySotaEvidence, false);
+    assert.equal(shardIntake.rawQuestionsIncluded, false);
+    assert.equal(shardIntake.rawAnswersIncluded, false);
+    assert.equal(shardIntake.rawMemoryIncluded, false);
+    assert.equal(shardIntake.rawTranscriptIncluded, false);
+    assert.equal(shardIntake.rawPrivateOutputPathIncluded, false);
+    assert.equal(shardIntake.plan?.shardCount, 20);
+    assert.equal(shardIntake.intake?.inputCount, 0);
+    assert.equal(shardIntake.intake?.missingShardCount, 20);
+    assert.ok(shardIntake.blockers?.includes("shard-results-missing"));
+    assert.ok(shardIntake.blockers?.includes("answer-quality-shards-missing"));
+  }
+  assert.equal(answerQualityShardIntakeReady.status, "READY_TO_COMBINE_FULL_ANSWER_QUALITY_SHARDS");
+  assert.equal(answerQualityShardIntakeReady.readyForShardCombine, true);
+  assert.equal(answerQualityShardIntakeReady.intake?.acceptedShardCount, 20);
+  assert.equal(answerQualityShardIntakeReady.intake?.missingShardCount, 0);
+  assert.equal(answerQualityShardIntakeReady.intake?.completeCoverage, true);
+  assert.deepEqual(answerQualityShardIntakeReady.blockers, []);
+  assert.match(answerQualityShardIntakeReady.combineCommand ?? "", /--combine-mode shards/);
+  assert.match(answerQualityShardIntakeMarkdownFresh, /Full Answer-Quality Shard Intake/);
+  assert.match(fullAnswerQualityShardIntakeEvidence, /Missing shards: 20/);
   assert.equal(fullTargetSotaReport.mode, "public-benchmark-sota-ladder");
   assert.equal(fullTargetSotaReport.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
   assert.equal(fullTargetSotaReport.fullBenchmarkPolicy?.datasetSlice, "longmemeval-s-cleaned-full-500-2026-05-25");
@@ -2672,9 +2720,12 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(fullTargetOperatorPacket.operatorFlow?.some((item) => item.id === "author-full-longmemeval-target"));
   const fullShardFlow = fullTargetOperatorPacket.operatorFlow?.find((item) => item.id === "full-longmemeval-answer-quality-shards");
   assert.ok(fullShardFlow, "full target operator packet must include sharded answer-quality flow");
+  assert.equal(fullShardFlow.shardContract?.shardSize, 25);
+  assert.equal(fullShardFlow.shardContract?.expectedShardCount, 20);
   assert.equal(fullShardFlow.shardContract?.expectedFullQueryCount, 500);
   assert.equal(fullShardFlow.shardContract?.combineMode, "query-shard-answer-quality-union");
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--query-offset")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:shard-intake") && String(line).includes("--require-ready")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--combine-mode shards")));
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
@@ -6558,6 +6609,120 @@ function assertNativeMemory(value) {
   assert.ok(value.proof.includes("explicit-native-default-config"));
   assert.ok(value.proof.includes("before-prompt-lifecycle-fired"));
   assert.ok(value.proof.includes("local-store-events-observed"));
+}
+
+function writeSyntheticAnswerQualityShardReports(plan, outputDir) {
+  mkdirSync(outputDir, { recursive: true, mode: 0o700 });
+  const paths = [];
+  const querySetHash = plan.materializeReport?.collectorCompatibleQuerySetHash ?? "sha256:synthetic-query-set";
+  const materializerHash = plan.materializeReport?.materializerHash ?? "sha256:synthetic-materializer";
+  const answerLabelsHash = plan.target?.answerLabelsHash ?? "sha256:synthetic-answer-labels";
+  const scoringCodeHash = plan.target?.scoringCodeHash ?? "sha256:synthetic-scoring";
+  for (const shard of plan.shards ?? []) {
+    const path = join(outputDir, `answer-quality-${shard.id}.json`);
+    const strategies = (plan.runPlan?.strategies ?? []).map((strategy, index) => ({
+      strategy,
+      metrics: {
+        answerQuality: 10 + index,
+        memoryScore: 10 + index,
+        longmemevalScore: 10 + index,
+        quality: Number(((10 + index) / 100).toFixed(4)),
+        judgeCorrectRate: 0.1,
+        answerLatencyP50Ms: 10,
+        answerLatencyP95Ms: 10,
+        contextTokensAvg: 100,
+      },
+      provider: {
+        answerCalls: shard.queryCount,
+        judgeCalls: shard.queryCount,
+        answerFailures: 0,
+        judgeFailures: 0,
+      },
+      privacyLeakCount: 0,
+      redactionFailureCount: 0,
+      scoredQueryCount: shard.queryCount,
+    }));
+    const report = {
+      schemaVersion: 1,
+      ok: true,
+      mode: "public-benchmark-answer-quality",
+      fixtureOnly: false,
+      benchmark: plan.target?.benchmark ?? "longmemeval",
+      metricsOnly: true,
+      publicSafe: true,
+      retrievalProxyOnly: false,
+      memoryBenchAnswerQuality: true,
+      readyForEndToEndMemoryScoreGate: true,
+      publicBenchmarkClaimsAllowed: false,
+      callsProviderApis: true,
+      sendsBenchmarkTextToProvider: true,
+      rawQuestionIdsIncluded: false,
+      rawQuestionsIncluded: false,
+      rawAnswersIncluded: false,
+      rawMemoryIncluded: false,
+      rawTranscriptIncluded: false,
+      rawPromptIncluded: false,
+      target: {
+        hash: plan.target?.hash,
+        benchmark: plan.target?.benchmark,
+        answerLabelsHash,
+        scoringCodeHash,
+        answerModel: plan.target?.answerModel,
+        judgeModel: plan.target?.judgeModel,
+      },
+      input: {
+        source: "materialized-source-locked-longmemeval",
+        targetHash: plan.target?.hash,
+        querySetHash,
+        materializerHash,
+        answerLabelsHash,
+        scoringCodeHash,
+        totalQueryCount: plan.runPlan?.queryCount,
+        queryCount: plan.runPlan?.queryCount,
+        scoredQueryCount: shard.queryCount,
+        scoredQueryStart: shard.startIndex,
+        scoredQueryEndExclusive: shard.endIndexExclusive,
+        queryShard: {
+          startIndex: shard.startIndex,
+          endIndexExclusive: shard.endIndexExclusive,
+          totalQueryCount: plan.runPlan?.queryCount,
+          scoredQueryCount: shard.queryCount,
+          selectedQueryIdHash: shard.rangeHash,
+        },
+      },
+      provider: {
+        answerModel: plan.target?.answerModel,
+        judgeModel: plan.target?.judgeModel,
+        callsMade: shard.queryCount * strategies.length * 2,
+        answerQualityCallsAllowed: true,
+        publicDataConfirmed: true,
+        endpointLabel: "synthetic-release-check",
+      },
+      metrics: strategies.at(-1)?.metrics ?? null,
+      strategies,
+      winner: {
+        strategy: strategies.at(-1)?.strategy ?? null,
+        answerQuality: strategies.at(-1)?.metrics?.answerQuality ?? null,
+        judgeCorrectRate: strategies.at(-1)?.metrics?.judgeCorrectRate ?? null,
+        answerLatencyP50Ms: strategies.at(-1)?.metrics?.answerLatencyP50Ms ?? null,
+      },
+      reviewerApprovalCount: 0,
+      privacyLeakCount: 0,
+      redactionFailureCount: 0,
+      safety: {
+        metricsOnly: true,
+        publicSafe: true,
+        rawQuestionsIncluded: false,
+        rawAnswersIncluded: false,
+        rawMemoryIncluded: false,
+        rawTranscriptIncluded: false,
+        privateInputsStoredOutsideRepository: true,
+      },
+    };
+    writeFileSync(path, `${JSON.stringify(report, null, 2)}\n`, { encoding: "utf8", mode: 0o600 });
+    paths.push(path);
+  }
+  return paths;
 }
 
 function writeUnknownZip(tempRoot, outputPath) {
