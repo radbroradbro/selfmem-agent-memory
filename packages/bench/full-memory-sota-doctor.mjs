@@ -21,6 +21,7 @@ const files = {
   localFullShardPlan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
   localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
+  localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
   localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
   acceptedLaneLaunchDoctor: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
@@ -50,7 +51,11 @@ const fullMaterialize = evidence.fullMaterialize.json;
 const shardPlan = evidence.shardPlan.json;
 const localFullShardPlan = evidence.localFullShardPlan.json;
 const localFullShardWorkorder = evidence.localFullShardWorkorder.json;
-const localFullShardIntake = evidence.localFullShardIntake.json;
+const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
+  evidence.localFullShardIntake,
+  evidence.localFullShardIntakeLatest,
+]);
+const localFullShardIntake = localFullShardIntakeSelection.json;
 const localFullAcceptedLaneLaunchDoctor = evidence.localFullAcceptedLaneLaunchDoctor.json;
 const privateInputDoctor = evidence.privateInputDoctor.json;
 const acceptedLaneLaunchDoctor = evidence.acceptedLaneLaunchDoctor.json;
@@ -72,6 +77,7 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullShardPlan,
   localFullShardWorkorder,
   localFullShardIntake,
+  localFullShardIntakePath: localFullShardIntakeSelection.path,
   localFullAcceptedLaneLaunchDoctor,
 });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
@@ -296,7 +302,13 @@ function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
   };
 }
 
-function inspectLocalFullLaneState({ localFullShardPlan, localFullShardWorkorder, localFullShardIntake, localFullAcceptedLaneLaunchDoctor }) {
+function inspectLocalFullLaneState({
+  localFullShardPlan,
+  localFullShardWorkorder,
+  localFullShardIntake,
+  localFullShardIntakePath,
+  localFullAcceptedLaneLaunchDoctor,
+}) {
   const acceptedLane = arrayOf(localFullShardWorkorder?.executionLaneReadiness).find((lane) => lane.acceptedByFullShardIntake === true);
   const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
   const cloudProviderBlockers = envBlockers.filter((item) =>
@@ -312,7 +324,7 @@ function inspectLocalFullLaneState({ localFullShardPlan, localFullShardWorkorder
   return {
     planPath: files.localFullShardPlan,
     workorderPath: files.localFullShardWorkorder,
-    intakePath: files.localFullShardIntake,
+    intakePath: localFullShardIntakePath ?? files.localFullShardIntake,
     status: blockers.length === 0 ? "READY_LOCAL_FULL_BENCHMARK_PLAN" : "BLOCKED_LOCAL_FULL_BENCHMARK_PLAN",
     readyForLocalFullBenchmarkPlan: blockers.length === 0,
     readyForResponseArmExport: Boolean(localFullShardWorkorder?.acceptedLaneReadyForResponseArmExport),
@@ -340,6 +352,19 @@ function inspectLocalFullLaneState({ localFullShardPlan, localFullShardWorkorder
     shardIntakeBlockers: arrayOf(localFullShardIntake?.blockers),
     launchBlockers: arrayOf(localFullAcceptedLaneLaunchDoctor?.blockers),
   };
+}
+
+function selectPreferredLocalFullShardIntake(candidates) {
+  const present = candidates.filter((candidate) => candidate?.json);
+  assert.ok(present.length > 0, "required local-full shard intake evidence missing");
+  return present.sort((left, right) => {
+    const rightAccepted = Number(right.json?.intake?.acceptedShardCount ?? 0);
+    const leftAccepted = Number(left.json?.intake?.acceptedShardCount ?? 0);
+    if (rightAccepted !== leftAccepted) return rightAccepted - leftAccepted;
+    const rightGeneratedAt = Date.parse(right.json?.generatedAt ?? "") || 0;
+    const leftGeneratedAt = Date.parse(left.json?.generatedAt ?? "") || 0;
+    return rightGeneratedAt - leftGeneratedAt;
+  })[0];
 }
 
 function inspectPrivateInputState(privateInputDoctorReport) {

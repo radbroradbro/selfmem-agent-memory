@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T06:25:23.322Z",
+  "generatedAt": "2026-05-26T10:06:57.444Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -72,10 +72,17 @@
       "mode": "public-benchmark-answer-quality-shard-intake",
       "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
     },
+    "localFullShardIntakeLatest": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json",
+      "exists": true,
+      "hash": "sha256:d0ed2a8e3cf5a249f2465d74a20d7da1cde3df290b0b21c0328c4254cf748372",
+      "mode": "public-benchmark-answer-quality-shard-intake",
+      "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
+    },
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:5316d0ffbab4cbbf225b8effc04f05113bba39e5944c77ce431a512d1d159325",
+      "hash": "sha256:3ba4ea043ea1b0ca406a224feb83a1e3fd4dcd6114a89e4eb24701e149f4236f",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -89,7 +96,7 @@
     "acceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:7b75c8a27b0fa3be4c18509bc56b373e23c46cae628d3d1531d365199dd92edb",
+      "hash": "sha256:1c4c75d9df318000c4e3c4e8dcbcd6965fbdb41aba33982ab856668ebaa5640d",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -180,28 +187,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:20ec471e3a2e7289f901419c911e7faf654e9cb02b7c0c6a9dde72eb493657d0",
+      "hash": "sha256:c15603c55fe5e0a9a2f575b18ba907cfd7d8f3c34e8254ac1c5910d15398e04e",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:9eb1414232f14c92aaf2f8a41a33a6c61ab34969599aa2b8ea64a9f110be5c96",
+      "hash": "sha256:5ef90fe6d1e16d57825f6629e637b5c414844f765ba88882f12e6558957826f9",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:a8a4e9f6c21a462110e8b15bdd4ba8280147ec2490648ffb78e55abb6becdeec",
+      "hash": "sha256:0d758caa2d33052228155849e4a318db7465c339f1089d7b390c91f54b29e723",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:55336e0d9ee57ac232624c8e3751655265f50fa4de3cc68954343d985f250693",
+      "hash": "sha256:a53c9f0d43da04c0a654998b1dc8101e5f1aeb0f3c141ace09e1e9fbb3ffdc69",
       "mode": null,
       "status": null
     }
@@ -543,15 +550,15 @@
   "localFullLaneState": {
     "planPath": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
     "workorderPath": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
-    "intakePath": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json",
+    "intakePath": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json",
     "status": "READY_LOCAL_FULL_BENCHMARK_PLAN",
     "readyForLocalFullBenchmarkPlan": true,
     "readyForResponseArmExport": false,
     "readyForAnswerQualityScoring": false,
     "intakeStatus": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS",
     "readyForShardCombine": false,
-    "acceptedShardCount": 0,
-    "missingShardCount": 20,
+    "acceptedShardCount": 1,
+    "missingShardCount": 19,
     "launchDoctorStatus": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
     "readyForFirstShardRun": false,
     "readyForLocalFullBenchmarkResult": false,
@@ -587,7 +594,6 @@
     ],
     "blockers": [],
     "shardIntakeBlockers": [
-      "shard-results-missing",
       "answer-quality-shards-missing",
       "full-shard-coverage-incomplete"
     ],
@@ -762,7 +768,6 @@
       "id": "local-full-shard-intake",
       "status": "blocked",
       "blockers": [
-        "shard-results-missing",
         "answer-quality-shards-missing",
         "full-shard-coverage-incomplete"
       ]
@@ -861,10 +866,10 @@
     "full-memory-sota-score-not-proven",
     "public-sota-claim-not-allowed",
     "local-full-answer-quality-shard-results-not-returned",
-    "shard-results-missing",
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete",
     "answer-quality-shard-runs-pending",
+    "shard-results-missing",
     "missing-voyage-answer-quality-same-data-result",
     "reported-target-judge-model-does-not-match-result",
     "missing-full-or-officially-comparable-memory-benchmark-run",
