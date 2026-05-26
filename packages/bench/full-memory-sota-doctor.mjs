@@ -22,6 +22,7 @@ const files = {
   localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
+  localFullPerformanceReport: `${reviewDir}/local-full-shard-performance-report-20260526.json`,
   localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
   localEmbeddingRuntimeDoctor: `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   localEmbeddingDurabilitySmoke: `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
@@ -59,6 +60,7 @@ const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
   evidence.localFullShardIntakeLatest,
 ]);
 const localFullShardIntake = localFullShardIntakeSelection.json;
+const localFullPerformanceReport = evidence.localFullPerformanceReport.json;
 const localFullShard002RuntimeBlocker = evidence.localFullShard002RuntimeBlocker.json;
 const localEmbeddingRuntimeDoctor = evidence.localEmbeddingRuntimeDoctor.json;
 const localEmbeddingDurabilitySmoke = evidence.localEmbeddingDurabilitySmoke.json;
@@ -84,6 +86,7 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullShardWorkorder,
   localFullShardIntake,
   localFullShardIntakePath: localFullShardIntakeSelection.path,
+  localFullPerformanceReport,
   localFullShardRuntimeBlockers: [localFullShard002RuntimeBlocker],
   localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
@@ -318,6 +321,7 @@ function inspectLocalFullLaneState({
   localFullShardWorkorder,
   localFullShardIntake,
   localFullShardIntakePath,
+  localFullPerformanceReport,
   localFullShardRuntimeBlockers,
   localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
@@ -391,6 +395,7 @@ function inspectLocalFullLaneState({
     launchProgressInputCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.progressInputCount ?? 0),
     launchAcceptedShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.acceptedShardCount ?? 0),
     launchPendingShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.pendingShardCount ?? 0),
+    performanceReport: inspectLocalFullPerformanceReport(localFullPerformanceReport),
     nextPendingShardId: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null,
     nextPendingShardRange: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null,
     localEmbeddingRuntimeStatus: localEmbeddingRuntimeDoctor?.status ?? null,
@@ -425,6 +430,42 @@ function inspectLocalFullLaneState({
       ...localEmbeddingDurabilityBlockers,
     ],
     launchBlockers: arrayOf(localFullAcceptedLaneLaunchDoctor?.blockers),
+  };
+}
+
+function inspectLocalFullPerformanceReport(performanceReport) {
+  const safe =
+    performanceReport?.mode === "local-full-shard-performance-report" &&
+    performanceReport?.publicSafe === true &&
+    performanceReport?.metricsOnly === true &&
+    performanceReport?.rawQuestionsIncluded === false &&
+    performanceReport?.rawAnswersIncluded === false &&
+    performanceReport?.rawMemoryIncluded === false &&
+    performanceReport?.rawPrivateOutputPathIncluded === false &&
+    performanceReport?.countsAsFullMemorySotaEvidence === false &&
+    performanceReport?.publicBenchmarkClaimsAllowed === false;
+  return {
+    path: files.localFullPerformanceReport,
+    status: performanceReport?.status ?? null,
+    publicSafe: Boolean(performanceReport?.publicSafe),
+    metricsOnly: Boolean(performanceReport?.metricsOnly),
+    safe,
+    acceptedShardCount: Number(performanceReport?.coverage?.acceptedShardCount ?? 0),
+    acceptedQueryCount: Number(performanceReport?.coverage?.acceptedQueryCount ?? 0),
+    queryCount: Number(performanceReport?.coverage?.queryCount ?? 0),
+    coveragePercent: Number(performanceReport?.coverage?.coveragePercent ?? 0),
+    nextPendingShardId: performanceReport?.coverage?.nextPendingShardId ?? null,
+    bestStrategy: performanceReport?.bestAnswerQuality?.strategy ?? null,
+    bestAnswerQuality: performanceReport?.bestAnswerQuality?.answerQuality ?? null,
+    bestDeltaVsBm25: performanceReport?.bestAnswerQuality?.deltaVsBm25?.answerQuality ?? null,
+    localAppleBaseAnswerQuality: performanceReport?.localApple?.base?.answerQuality ?? null,
+    localAppleRerankAnswerQuality: performanceReport?.localApple?.rerank?.answerQuality ?? null,
+    localAppleRerankDeltaVsBase: performanceReport?.localApple?.rerankDeltaVsBase?.answerQuality ?? null,
+    runtimeBlockerStatus: performanceReport?.runtime?.runtimeBlockerStatus ?? null,
+    runtimeFailedArm: performanceReport?.runtime?.failedArm ?? null,
+    countsAsFullMemorySotaEvidence: Boolean(performanceReport?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(performanceReport?.publicBenchmarkClaimsAllowed),
+    blockers: arrayOf(performanceReport?.blockers),
   };
 }
 
@@ -713,6 +754,10 @@ function renderMarkdown(value) {
     `- Accepted local-full shards: ${value.localFullLaneState.acceptedShardCount}`,
     `- Missing local-full shards: ${value.localFullLaneState.missingShardCount}`,
     `- Launch progress source: ${value.localFullLaneState.launchProgressSource ?? "n/a"}`,
+    `- Performance coverage: ${value.localFullLaneState.performanceReport.coveragePercent}%`,
+    `- Performance best strategy: ${value.localFullLaneState.performanceReport.bestStrategy ?? "n/a"}`,
+    `- Performance best answer quality: ${value.localFullLaneState.performanceReport.bestAnswerQuality ?? "n/a"}`,
+    `- Performance counts as SOTA evidence: ${value.localFullLaneState.performanceReport.countsAsFullMemorySotaEvidence}`,
     `- Next local-full shard: ${value.localFullLaneState.nextPendingShardId ?? "n/a"} (${value.localFullLaneState.nextPendingShardRange ?? "n/a"})`,
     `- Runtime-blocked local-full shards: ${value.localFullLaneState.runtimeBlockedShardCount}`,
     `- Runtime blocker resume plans: ${value.localFullLaneState.runtimeBlockerResumeAvailableCount}`,

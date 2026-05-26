@@ -80,6 +80,10 @@
 - Accepted local-full shards: 1
 - Missing local-full shards: 19
 - Launch progress source: checked-in-progress-intake
+- Performance coverage: 5%
+- Performance best strategy: full-hybrid-rerank
+- Performance best answer quality: 19.4
+- Performance counts as SOTA evidence: false
 - Next local-full shard: shard-002 (25-50)
 - Runtime-blocked local-full shards: 1
 - Runtime blocker resume plans: 1

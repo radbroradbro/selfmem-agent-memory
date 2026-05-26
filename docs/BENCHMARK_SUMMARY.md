@@ -410,6 +410,10 @@ currently covers one accepted shard, 25 of 500 queries, and keeps
 and public benchmark claims disabled. It records that `full-hybrid-rerank`
 currently leads the partial local-full snapshot at `19.4` answer quality, while
 shard 002 remains blocked by the local embedding runtime resume path.
+`benchmark:sota-doctor` now includes that performance snapshot in the top-level
+local-full lane state, so the main SOTA blocker report can show current
+local-full coverage and quality/latency without upgrading partial local evidence
+into SOTA support.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

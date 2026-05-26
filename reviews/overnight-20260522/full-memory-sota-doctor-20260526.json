@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T12:09:58.452Z",
+  "generatedAt": "2026-05-26T14:01:40.727Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -78,6 +78,13 @@
       "hash": "sha256:d0ed2a8e3cf5a249f2465d74a20d7da1cde3df290b0b21c0328c4254cf748372",
       "mode": "public-benchmark-answer-quality-shard-intake",
       "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
+    },
+    "localFullPerformanceReport": {
+      "path": "reviews/overnight-20260522/local-full-shard-performance-report-20260526.json",
+      "exists": true,
+      "hash": "sha256:a72d67edc4013ce139bba9d43b6565f06f9fbc69ea36800f65f823b5743cd5d4",
+      "mode": "local-full-shard-performance-report",
+      "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT"
     },
     "localFullShard002RuntimeBlocker": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json",
@@ -215,21 +222,21 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:91a97bc20df878ae95cebe5ee0573b0c104a749294c87c65d4b2958cd887e810",
+      "hash": "sha256:6dac2684de282e904c95da01333e1271561465f0d1a26cf069046fb01099daee",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:b00668455bdb24485beac179296b079a9fde6a10fb0f19505c5f2d60dc197c44",
+      "hash": "sha256:2e4af38c5776cb68081131e57abe5ad1d406fc59f91841102ef56de11cf4ff4d",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:973250bf8878944bfd306d35f4e0888cb9de2a99906ba18f88096687e11e908e",
+      "hash": "sha256:010ac8cd92a2772fbb476db55743b66561fb84cd3ad7ab701dfee1ed0362ebd2",
       "mode": null,
       "status": null
     }
@@ -609,6 +616,32 @@
     "launchProgressInputCount": 1,
     "launchAcceptedShardCount": 1,
     "launchPendingShardCount": 19,
+    "performanceReport": {
+      "path": "reviews/overnight-20260522/local-full-shard-performance-report-20260526.json",
+      "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
+      "publicSafe": true,
+      "metricsOnly": true,
+      "safe": true,
+      "acceptedShardCount": 1,
+      "acceptedQueryCount": 25,
+      "queryCount": 500,
+      "coveragePercent": 5,
+      "nextPendingShardId": "shard-002",
+      "bestStrategy": "full-hybrid-rerank",
+      "bestAnswerQuality": 19.4,
+      "bestDeltaVsBm25": 4.2,
+      "localAppleBaseAnswerQuality": 17.4,
+      "localAppleRerankAnswerQuality": 15.8,
+      "localAppleRerankDeltaVsBase": -1.6,
+      "runtimeBlockerStatus": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+      "runtimeFailedArm": "local-apple-qwen3-0_6b",
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "blockers": [
+        "local-full-coverage-incomplete",
+        "local-full-runtime-blocker-present"
+      ]
+    },
     "nextPendingShardId": "shard-002",
     "nextPendingShardRange": "25-50",
     "localEmbeddingRuntimeStatus": "READY_LOCAL_EMBEDDING_RUNTIME",

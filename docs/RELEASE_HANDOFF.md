@@ -383,6 +383,9 @@ quality, and the local Apple rerank arm is behind the local Apple base on this
 slice. The report keeps local-full benchmark evidence, full-memory SOTA
 evidence, combine readiness, and public benchmark claims disabled until the
 local-full shard intake reaches complete coverage.
+`benchmark:sota-doctor` now carries this same performance snapshot inside
+`localFullLaneState.performanceReport`, so the top-level SOTA/blocker evidence
+shows partial local-full quality and latency without treating it as SOTA proof.
 Shard 002 is currently a blocked runtime attempt, not an accepted shard:
 `reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`.
 The BM25, full-hybrid, and local query-expanded arms exported 25 private

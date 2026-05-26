@@ -594,6 +594,9 @@ not count as a RecallWeave score.
   shard 002 runtime blocker/resume-result-doctor state. It does not count as a
   local-full benchmark result, full-memory SOTA evidence, shard-combine
   readiness, or public benchmark claim.
+  `benchmark:sota-doctor` consumes this report as local-full lane state, so the
+  main SOTA doctor now exposes partial local-full quality and latency while
+  preserving the same blocked claim flags.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard
