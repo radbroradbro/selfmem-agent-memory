@@ -376,14 +376,15 @@ Shard 002 is currently a blocked runtime attempt, not an accepted shard:
 The BM25, full-hybrid, and local query-expanded arms exported 25 private
 responses each, but the local Apple embedding arm failed with a reproducible
 local embedding-server socket close. The same failure reproduced on a public
-synthetic embedding smoke, so retry shard 002 only after the local embedding
-runtime is provisioned and survives a bounded long-input smoke. Run
-`benchmark:local-embedding:runtime-doctor` first; the current checked-in report,
+synthetic embedding smoke at the time. The current checked-in runtime preflight,
 `reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`,
-blocks because the local config points at a non-embedding GGUF and no reachable
-embedding endpoint. Then run `benchmark:local-embedding:durability`; the current
-checked-in blocked report is
-`reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
+now reports `READY_LOCAL_EMBEDDING_RUNTIME` for a dedicated Qwen3 Embedding
+0.6B GGUF local llama.cpp endpoint without exposing endpoint or path details.
+The current checked-in durability preflight,
+`reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`,
+now reports `READY_LOCAL_EMBEDDING_DURABILITY` on bounded synthetic probes.
+These clear only the local embedding preflight; restart the same local endpoint
+and rerun shard 002 before treating that shard as accepted evidence.
 For local Apple response-arm export, pass a fresh ready report through
 `--local-embedding-durability-report` or
 `SELFMEM_LOCAL_EMBED_DURABILITY_REPORT` with
@@ -582,11 +583,10 @@ environment. Separately, the local-full answer-quality shard has now live-tested
 Qwen3 local embeddings plus a real Qwen3 Reranker 0.6B Q8 sidecar. That shard
 is local diagnostic evidence only and did not promote the sidecar arm.
 The shard 002 retry surfaced an embedding-server durability blocker before the
-local Apple arm could complete, so do not treat the partial three-arm shard 002
-packet as answer-quality evidence. Run
-`benchmark:local-embedding:runtime-doctor -- --require-ready`, then
-`benchmark:local-embedding:durability -- --require-ready` against the active
-local embedding endpoint before retrying that arm.
+local Apple arm could complete. The runtime doctor and durability smoke now
+pass as preflight evidence, but do not treat the partial three-arm shard 002
+packet as answer-quality evidence until that shard is rerun, scored, and
+accepted by intake.
 
 The first live Voyage provider canaries have now run:
 

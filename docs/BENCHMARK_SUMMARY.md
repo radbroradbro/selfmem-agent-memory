@@ -249,18 +249,20 @@ The shard 002 local-full attempt is recorded separately at
 It is not accepted evidence: BM25, full hybrid, and local query-expanded hybrid
 exported 25 private responses each, but the local Apple embedding arm failed
 when the local Qwen3 Embedding 0.6B GGUF service closed the socket. A public
-synthetic embedding smoke reproduced the same failure, so the local-full lane
+synthetic embedding smoke reproduced the same failure at the time, so the local-full lane
 still has only one accepted shard and nineteen missing shards. The bounded
 preflight is now codified as
 `benchmark:local-embedding:runtime-doctor`, then
 `benchmark:local-embedding:durability`. The current runtime doctor report is
 `reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`;
-it found a usable llama.cpp server binary but a non-embedding GGUF selection
-and no reachable local embedding endpoint, so it blocks before any durability
-or shard retry. The current public-safe blocked durability report is at
+it now reports `READY_LOCAL_EMBEDDING_RUNTIME` for a dedicated Qwen3 Embedding
+0.6B GGUF served through a local llama.cpp endpoint without printing the
+endpoint, server path, or raw config. The current public-safe durability report
+is at
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
-Local Apple response-arm export should require a passing durability report
-before shard 002 or any later local-full shard can count.
+It now reports `READY_LOCAL_EMBEDDING_DURABILITY` after bounded synthetic
+probes. These reports clear the local embedding preflight only; shard 002 still
+has to be rerun and accepted before it can count.
 The full LongMemEval-S run-only target is also checked in at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
 materialization evidence in
@@ -556,12 +558,12 @@ answer-quality shard. That run proved the arm can score under the local-full
 contract, but it did not win the shard. It remains a challenger, not a default,
 and the full 500-query local-full result still requires the remaining nineteen
 shards and combine gate. Shard 002 exposed a separate local embedding-runtime
-durability blocker before the local rerank arm could run, so the next accepted
-local-full shard needs a passing runtime doctor and durability smoke before
-response export. Run `benchmark:local-embedding:runtime-doctor -- --require-ready`
-before `benchmark:local-embedding:durability -- --require-ready`. The checked-in
-blocked reports are public-safe, print no endpoint URL or raw probe text, and
-do not count as local-full or SOTA evidence.
+durability blocker before the local rerank arm could run. The checked-in
+runtime doctor and durability smoke now pass for the Qwen3 Embedding 0.6B
+llama.cpp lane, but they are preflight artifacts only: they are public-safe,
+print no endpoint URL or raw probe text, and do not count as local-full or SOTA
+evidence. The next accepted local-full shard still requires response export,
+answer-quality scoring, shard intake, and the combine gate.
 
 A source-locked 30-query local Apple run is now recorded:
 

@@ -220,13 +220,11 @@ readiness, and confirms the lane has no Voyage/NVIDIA or public-SOTA blockers.
 Run `benchmark:local-embedding:runtime-doctor -- --require-ready` before the
 durability smoke. The current checked-in runtime report at
 `reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`
-is intentionally blocked because it sees a non-embedding local GGUF selection
-and no reachable local embedding endpoint. Run
-`benchmark:local-embedding:durability -- --require-ready` only after that
-runtime doctor is ready. The current checked-in durability report at
+now reports `READY_LOCAL_EMBEDDING_RUNTIME` for a dedicated Qwen3 Embedding
+0.6B GGUF local endpoint. The current checked-in durability report at
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`
-is intentionally blocked and synthetic-only, so it does not count as
-local-full evidence.
+now reports `READY_LOCAL_EMBEDDING_DURABILITY` and stays synthetic-only, so it
+clears only the embedding preflight and does not count as local-full evidence.
 `benchmark:memory-score:result-gate --require-ready` now also checks the
 source-locked reported memory-system target directly. It leaves
 `fullSotaBlockers` non-empty until the result is full or officially comparable,

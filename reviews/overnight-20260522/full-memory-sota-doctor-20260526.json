@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T11:17:19.501Z",
+  "generatedAt": "2026-05-26T11:35:33.417Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -89,16 +89,16 @@
     "localEmbeddingRuntimeDoctor": {
       "path": "reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:32cc9048cfbd851226bee3bad563f222e0cb7cf9f28efdce99bf9ab26a33d184",
+      "hash": "sha256:c61940a6a6844a60c5e0103dd15ead351ced1d19b7ebddb0ee5699cb78e9c66b",
       "mode": "local-embedding-runtime-doctor",
-      "status": "BLOCKED_LOCAL_EMBEDDING_RUNTIME"
+      "status": "READY_LOCAL_EMBEDDING_RUNTIME"
     },
     "localEmbeddingDurabilitySmoke": {
       "path": "reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
       "exists": true,
-      "hash": "sha256:9daf929cba87df653a5b959da9d13215d851679123b3a39a4e3e30d70df28c42",
+      "hash": "sha256:ce57c801807937baf0715d32e015d7db76a73b7230e1038c9058412dc4613eb5",
       "mode": "local-embedding-durability-smoke",
-      "status": "BLOCKED_LOCAL_EMBEDDING_DURABILITY"
+      "status": "READY_LOCAL_EMBEDDING_DURABILITY"
     },
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
@@ -215,21 +215,21 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:4b5835ce4b5311014c3f25aa891a3d4d804a6d43fa1db9972bba73fa65c18aba",
+      "hash": "sha256:35f93ea0202be365fd253d59c7ffe7e4c30f4e8ab8870bd7c139d15c625609a9",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:ca399ce5b7aa5493ff264b70b23c8f9fdac4b1e3b2c704fb05d41e404d86f8af",
+      "hash": "sha256:d4b2eb958d0bc29ed9ff5e07d18c61210da01fb86935c255ea719a04b163d8a2",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:6364028bb9a6ae1472ec9be44114469d006b428cd5eef2a56e92c43da965cd65",
+      "hash": "sha256:7d0adc3897fe4ce1cf2e4c308593ba76e62ac4790643b01a744534670d5351b8",
       "mode": null,
       "status": null
     }
@@ -599,24 +599,15 @@
     "runtimeBlockedShardCount": 1,
     "latestRuntimeBlockedShard": "shard-002",
     "latestRuntimeBlockedArm": "local-apple-qwen3-0_6b",
-    "localEmbeddingRuntimeStatus": "BLOCKED_LOCAL_EMBEDDING_RUNTIME",
-    "localEmbeddingRuntimeReady": false,
-    "localEmbeddingRuntimeBlockers": [
-      "local-embedding-runtime-not-ready",
-      "local-embedding-model-not-dedicated-embedding",
-      "local-embedding-model-family-mismatch",
-      "local-embedding-endpoint-not-reachable",
-      "local-embedding-models-endpoint-fetch-failed"
-    ],
-    "localEmbeddingRuntimeModelLooksDedicated": false,
-    "localEmbeddingRuntimeEndpointReachable": false,
-    "localEmbeddingDurabilityStatus": "BLOCKED_LOCAL_EMBEDDING_DURABILITY",
-    "localEmbeddingDurabilityReady": false,
+    "localEmbeddingRuntimeStatus": "READY_LOCAL_EMBEDDING_RUNTIME",
+    "localEmbeddingRuntimeReady": true,
+    "localEmbeddingRuntimeBlockers": [],
+    "localEmbeddingRuntimeModelLooksDedicated": true,
+    "localEmbeddingRuntimeEndpointReachable": true,
+    "localEmbeddingDurabilityStatus": "READY_LOCAL_EMBEDDING_DURABILITY",
+    "localEmbeddingDurabilityReady": true,
     "localEmbeddingDurabilityProbeCount": 4,
-    "localEmbeddingDurabilityBlockers": [
-      "local-embedding-durability-smoke-not-ready",
-      "local-embedding-base-url-missing"
-    ],
+    "localEmbeddingDurabilityBlockers": [],
     "runtimeBlockers": [
       {
         "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
@@ -652,14 +643,7 @@
       "full-shard-coverage-incomplete",
       "local-apple-embedding-server-socket-close",
       "local-full-shard-002-incomplete",
-      "local-full-shard-coverage-incomplete",
-      "local-embedding-runtime-not-ready",
-      "local-embedding-model-not-dedicated-embedding",
-      "local-embedding-model-family-mismatch",
-      "local-embedding-endpoint-not-reachable",
-      "local-embedding-models-endpoint-fetch-failed",
-      "local-embedding-durability-smoke-not-ready",
-      "local-embedding-base-url-missing"
+      "local-full-shard-coverage-incomplete"
     ],
     "launchBlockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
@@ -830,22 +814,13 @@
     },
     {
       "id": "local-embedding-runtime",
-      "status": "blocked",
-      "blockers": [
-        "local-embedding-runtime-not-ready",
-        "local-embedding-model-not-dedicated-embedding",
-        "local-embedding-model-family-mismatch",
-        "local-embedding-endpoint-not-reachable",
-        "local-embedding-models-endpoint-fetch-failed"
-      ]
+      "status": "pass",
+      "blockers": []
     },
     {
       "id": "local-embedding-durability",
-      "status": "blocked",
-      "blockers": [
-        "local-embedding-durability-smoke-not-ready",
-        "local-embedding-base-url-missing"
-      ]
+      "status": "pass",
+      "blockers": []
     },
     {
       "id": "local-full-shard-intake",
@@ -855,14 +830,7 @@
         "full-shard-coverage-incomplete",
         "local-apple-embedding-server-socket-close",
         "local-full-shard-002-incomplete",
-        "local-full-shard-coverage-incomplete",
-        "local-embedding-runtime-not-ready",
-        "local-embedding-model-not-dedicated-embedding",
-        "local-embedding-model-family-mismatch",
-        "local-embedding-endpoint-not-reachable",
-        "local-embedding-models-endpoint-fetch-failed",
-        "local-embedding-durability-smoke-not-ready",
-        "local-embedding-base-url-missing"
+        "local-full-shard-coverage-incomplete"
       ]
     },
     {
@@ -959,13 +927,6 @@
     "full-memory-sota-score-not-proven",
     "public-sota-claim-not-allowed",
     "local-full-answer-quality-shard-results-not-returned",
-    "local-embedding-runtime-not-ready",
-    "local-embedding-model-not-dedicated-embedding",
-    "local-embedding-model-family-mismatch",
-    "local-embedding-endpoint-not-reachable",
-    "local-embedding-models-endpoint-fetch-failed",
-    "local-embedding-durability-smoke-not-ready",
-    "local-embedding-base-url-missing",
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete",
     "local-apple-embedding-server-socket-close",

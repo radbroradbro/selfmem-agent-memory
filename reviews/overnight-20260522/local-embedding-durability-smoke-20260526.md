@@ -1,24 +1,24 @@
 # Local Embedding Durability Smoke
 
-- Status: BLOCKED_LOCAL_EMBEDDING_DURABILITY
+- Status: READY_LOCAL_EMBEDDING_DURABILITY
 - Strategy: local-apple-qwen3-0_6b
-- Local endpoint configured: false
+- Local endpoint configured: true
 - Base URL printed: false
 - Raw synthetic input included: false
-- Ready for local Apple arm export: false
+- Ready for local Apple arm export: true
 - Counts as local-full benchmark evidence: false
 - Counts as full memory SOTA evidence: false
 
 ## Probes
-- tokens=16, status=not-run, dims=n/a, elapsedMs=0, failure=local-embedding-base-url-missing
-- tokens=128, status=not-run, dims=n/a, elapsedMs=0, failure=local-embedding-base-url-missing
-- tokens=512, status=not-run, dims=n/a, elapsedMs=0, failure=local-embedding-base-url-missing
-- tokens=700, status=not-run, dims=n/a, elapsedMs=0, failure=local-embedding-base-url-missing
+- tokens=16, status=pass, dims=1024, elapsedMs=62, failure=none
+- tokens=128, status=pass, dims=1024, elapsedMs=113, failure=none
+- tokens=512, status=pass, dims=1024, elapsedMs=800, failure=none
+- tokens=700, status=pass, dims=1024, elapsedMs=343, failure=none
 
 ## Blockers
-- local-embedding-base-url-missing
+- none
 
 ## Next Actions
-- Start the local OpenAI-compatible embedding endpoint and rerun this smoke before local Apple arm export.
-- If the endpoint closes sockets on public synthetic probes, fix the local runtime before retrying shard 002.
-- Do not count partial local-full shard attempts as benchmark evidence until every required arm exports.
+- Use this report as the local Apple embedding preflight before response-arm export.
+- Run the local-full answer-quality shard export with the same local embedding server still alive.
+- Keep raw benchmark inputs and response files outside the repository.

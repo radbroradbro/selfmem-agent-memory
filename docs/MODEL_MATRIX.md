@@ -81,10 +81,11 @@ service closed the socket during the `local-apple-qwen3-0_6b` arm, and a public
 synthetic embedding smoke reproduced the failure. The repo now exposes
 `benchmark:local-embedding:runtime-doctor` to prove a dedicated embedding GGUF
 and reachable local endpoint before `benchmark:local-embedding:durability`
-runs the bounded public-safe probe. The current runtime doctor is blocked
-because the available local config points at a non-embedding GGUF and no live
-embedding endpoint. Keep the 0.6B local embedding lane as measured but not
-default until that runtime issue is fixed.
+runs the bounded public-safe probe. The current runtime doctor and durability
+smoke now pass for the Qwen3 Embedding 0.6B GGUF local llama.cpp lane, but
+they are preflight artifacts only. Keep the 0.6B local embedding lane as
+measured but not default until the remaining local-full shards are exported,
+scored, and combined.
 Treat this as local diagnostic evidence, not a default promotion or SOTA
 claim. Qwen3 Reranker 4B and 8B stay optional quality arms until measured
 latency and memory pressure justify them.

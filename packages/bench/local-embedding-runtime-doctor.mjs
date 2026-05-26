@@ -17,7 +17,8 @@ const configEnvPath = stringOrNull(args.configEnv ?? process.env.SELFMEM_LOCAL_E
 const configEnv = configEnvPath ? loadEnvFile(configEnvPath) : {};
 const strategy = String(args.strategy ?? process.env.SELFMEM_LOCAL_EMBED_STRATEGY ?? "local-apple-qwen3-0_6b");
 const expectedFamily = String(args.expectedFamily ?? process.env.SELFMEM_LOCAL_EMBED_EXPECTED_FAMILY ?? "qwen3-embedding");
-const modelName = String(args.model ?? process.env.SELFMEM_LOCAL_EMBED_MODEL ?? configEnv.MODEL_REPO ?? configEnv.MODEL_ALIAS ?? "");
+const hfRepo = stringOrNull(args.hfRepo ?? args.hf ?? process.env.SELFMEM_LOCAL_EMBED_HF_REPO);
+const modelName = String(args.model ?? process.env.SELFMEM_LOCAL_EMBED_MODEL ?? hfRepo ?? configEnv.MODEL_REPO ?? configEnv.MODEL_ALIAS ?? "");
 const modelPath = stringOrNull(args.modelPath ?? process.env.SELFMEM_LOCAL_EMBED_MODEL_PATH ?? configEnv.MODEL_PATH);
 const serverBin = stringOrNull(args.serverBin ?? process.env.SELFMEM_LOCAL_EMBED_SERVER_BIN ?? configEnv.SERVER_BIN);
 const baseUrl = stringOrNull(args.baseUrl ?? process.env.SELFMEM_LOCAL_EMBED_BASE_URL) ?? localBaseUrlFromConfig(configEnv);
@@ -26,15 +27,16 @@ const timeoutMs = positiveInt(args.timeoutMs ?? process.env.RECALLWEAVE_LOCAL_RU
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
 const serverBinary = inspectServerBinary(serverBin);
-const modelArtifact = inspectModelArtifact({ modelName, modelPath, expectedFamily });
+const modelArtifact = inspectModelArtifact({ modelName, modelPath, hfRepo, expectedFamily });
 const localEndpoint = await inspectLocalEndpoint(baseUrl, timeoutMs);
 
 const ready =
   serverBinary.present === true &&
   serverBinary.executable === true &&
   serverBinary.helpSupportsEmbedding === true &&
-  modelArtifact.present === true &&
-  modelArtifact.extension === ".gguf" &&
+  modelArtifact.configured === true &&
+  modelArtifact.resolvable === true &&
+  (modelArtifact.extension == null || modelArtifact.extension === ".gguf") &&
   modelArtifact.likelyDedicatedEmbedding === true &&
   modelArtifact.likelyVocabFixture === false &&
   modelArtifact.expectedFamilyMatched === true &&
@@ -48,11 +50,11 @@ const detailBlockers = [
   serverBinary.present && !serverBinary.executable ? "local-embedding-server-bin-not-executable" : null,
   serverBinary.present && serverBinary.helpChecked && !serverBinary.helpSupportsEmbedding ? "local-embedding-server-bin-no-embedding-flag" : null,
   modelArtifact.configured ? null : "local-embedding-model-path-missing",
-  modelArtifact.configured && !modelArtifact.present ? "local-embedding-model-not-found" : null,
+  modelArtifact.configured && modelArtifact.source === "local-path" && !modelArtifact.present ? "local-embedding-model-not-found" : null,
   modelArtifact.present && modelArtifact.extension !== ".gguf" ? "local-embedding-model-not-gguf" : null,
-  modelArtifact.present && modelArtifact.likelyVocabFixture ? "local-embedding-model-vocab-fixture" : null,
-  modelArtifact.present && !modelArtifact.likelyDedicatedEmbedding ? "local-embedding-model-not-dedicated-embedding" : null,
-  modelArtifact.present && !modelArtifact.expectedFamilyMatched ? "local-embedding-model-family-mismatch" : null,
+  modelArtifact.configured && modelArtifact.likelyVocabFixture ? "local-embedding-model-vocab-fixture" : null,
+  modelArtifact.configured && !modelArtifact.likelyDedicatedEmbedding ? "local-embedding-model-not-dedicated-embedding" : null,
+  modelArtifact.configured && !modelArtifact.expectedFamilyMatched ? "local-embedding-model-family-mismatch" : null,
   localEndpoint.configured ? null : "local-embedding-endpoint-missing",
   localEndpoint.configured && !localEndpoint.localOnly ? "local-embedding-endpoint-not-local" : null,
   localEndpoint.localOnly && !localEndpoint.modelsEndpointReachable ? "local-embedding-endpoint-not-reachable" : null,
@@ -78,7 +80,9 @@ const report = {
   rawConfigIncluded: false,
   rawServerHelpIncluded: false,
   configEnvProvided: Boolean(configEnvPath),
+  hfRepoConfigured: Boolean(hfRepo),
   configEnvPathPrinted: false,
+  hfRepoPrinted: false,
   privatePathPrinted: false,
   endpointPrinted: false,
   modelPathPrinted: false,
@@ -123,10 +127,12 @@ function inspectServerBinary(path) {
   };
 }
 
-function inspectModelArtifact({ modelName: rawModelName, modelPath: rawModelPath, expectedFamily: rawExpectedFamily }) {
-  const configured = Boolean(rawModelPath);
-  const present = configured && existsSync(rawModelPath);
-  const descriptor = [basename(String(rawModelPath ?? "")), rawModelName].filter(Boolean).join(" ");
+function inspectModelArtifact({ modelName: rawModelName, modelPath: rawModelPath, hfRepo: rawHfRepo, expectedFamily: rawExpectedFamily }) {
+  const source = rawModelPath ? "local-path" : rawHfRepo ? "hf-repo" : rawModelName ? "model-name" : "missing";
+  const configured = source !== "missing";
+  const present = Boolean(rawModelPath) && existsSync(rawModelPath);
+  const resolvable = source === "hf-repo" || source === "model-name" || present;
+  const descriptor = [rawModelPath ? basename(String(rawModelPath)) : "", rawHfRepo, rawModelName].filter(Boolean).join(" ");
   const normalized = descriptor.toLowerCase();
   const family = rawExpectedFamily.toLowerCase();
   const likelyVocabFixture = /\bvocab\b|ggml-vocab/.test(normalized);
@@ -135,6 +141,9 @@ function inspectModelArtifact({ modelName: rawModelName, modelPath: rawModelPath
   return {
     configured,
     present,
+    resolvable,
+    source,
+    hfRepoConfigured: Boolean(rawHfRepo),
     descriptorHash: descriptor ? `sha256:${sha256(descriptor)}` : null,
     extension: present ? extname(rawModelPath).toLowerCase() : null,
     sizeClass: present ? sizeClass(statSync(rawModelPath).size) : null,
@@ -312,6 +321,8 @@ function renderMarkdown(value) {
     `- Server supports embedding flag: ${value.serverBinary.helpSupportsEmbedding}`,
     `- Model configured: ${value.modelArtifact.configured}`,
     `- Model present: ${value.modelArtifact.present}`,
+    `- Model source: ${value.modelArtifact.source}`,
+    `- HF repo configured: ${value.modelArtifact.hfRepoConfigured}`,
     `- Model size class: ${value.modelArtifact.sizeClass ?? "n/a"}`,
     `- Likely dedicated embedding model: ${value.modelArtifact.likelyDedicatedEmbedding}`,
     `- Likely vocab fixture: ${value.modelArtifact.likelyVocabFixture}`,
