@@ -23,7 +23,9 @@ const files = {
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
   localFullPerformanceReport: `${reviewDir}/local-full-shard-performance-report-20260526.json`,
+  localFullResumeEnvDoctor: `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.json`,
   localFullResumeCommandSecurity: `${reviewDir}/local-full-shard-002-resume-command-security-20260526.json`,
+  localFullResumeResultDoctor: `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
   localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
   localEmbeddingRuntimeDoctor: `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   localEmbeddingDurabilitySmoke: `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
@@ -62,7 +64,9 @@ const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
 ]);
 const localFullShardIntake = localFullShardIntakeSelection.json;
 const localFullPerformanceReport = evidence.localFullPerformanceReport.json;
+const localFullResumeEnvDoctor = evidence.localFullResumeEnvDoctor.json;
 const localFullResumeCommandSecurity = evidence.localFullResumeCommandSecurity.json;
+const localFullResumeResultDoctor = evidence.localFullResumeResultDoctor.json;
 const localFullShard002RuntimeBlocker = evidence.localFullShard002RuntimeBlocker.json;
 const localEmbeddingRuntimeDoctor = evidence.localEmbeddingRuntimeDoctor.json;
 const localEmbeddingDurabilitySmoke = evidence.localEmbeddingDurabilitySmoke.json;
@@ -89,7 +93,9 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullShardIntake,
   localFullShardIntakePath: localFullShardIntakeSelection.path,
   localFullPerformanceReport,
+  localFullResumeEnvDoctor,
   localFullResumeCommandSecurity,
+  localFullResumeResultDoctor,
   localFullShardRuntimeBlockers: [localFullShard002RuntimeBlocker],
   localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
@@ -129,9 +135,19 @@ const gates = [
     localFullLaneState.performanceReport.evidenceBlockers,
   ),
   gate(
+    "local-full-resume-env",
+    localFullLaneState.resumeEnv.evidenceReady,
+    localFullLaneState.resumeEnv.evidenceBlockers,
+  ),
+  gate(
     "local-full-resume-command-security",
     localFullLaneState.resumeCommandSecurity.evidenceReady,
     localFullLaneState.resumeCommandSecurity.evidenceBlockers,
+  ),
+  gate(
+    "local-full-resume-result",
+    localFullLaneState.resumeResult.evidenceReady,
+    localFullLaneState.resumeResult.evidenceBlockers,
   ),
   gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
   gate("same-data-provider-arms", !arrayOf(sotaLadder?.blockers).includes("missing-voyage-answer-quality-same-data-result"), [
@@ -335,7 +351,9 @@ function inspectLocalFullLaneState({
   localFullShardIntake,
   localFullShardIntakePath,
   localFullPerformanceReport,
+  localFullResumeEnvDoctor,
   localFullResumeCommandSecurity,
+  localFullResumeResultDoctor,
   localFullShardRuntimeBlockers,
   localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
@@ -414,7 +432,9 @@ function inspectLocalFullLaneState({
       localFullShardIntake,
       localFullAcceptedLaneLaunchDoctor,
     }),
+    resumeEnv: inspectLocalFullResumeEnvDoctor(localFullResumeEnvDoctor),
     resumeCommandSecurity: inspectLocalFullResumeCommandSecurity(localFullResumeCommandSecurity),
+    resumeResult: inspectLocalFullResumeResultDoctor(localFullResumeResultDoctor),
     nextPendingShardId: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null,
     nextPendingShardRange: localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null,
     localEmbeddingRuntimeStatus: localEmbeddingRuntimeDoctor?.status ?? null,
@@ -550,6 +570,102 @@ function inspectLocalFullPerformanceReport(
   };
 }
 
+function inspectLocalFullResumeEnvDoctor(envDoctor) {
+  const publicSafe =
+    envDoctor?.mode === "local-full-shard-resume-env-doctor" &&
+    envDoctor?.publicSafe === true &&
+    envDoctor?.metricsOnly === true &&
+    envDoctor?.callsProviderApis === false &&
+    envDoctor?.callsHostedSupermemory === false &&
+    envDoctor?.sendsBenchmarkTextToProvider === false &&
+    envDoctor?.rawQuestionIdsIncluded === false &&
+    envDoctor?.rawQuestionsIncluded === false &&
+    envDoctor?.rawAnswersIncluded === false &&
+    envDoctor?.rawMemoryIncluded === false &&
+    envDoctor?.rawTranscriptIncluded === false &&
+    envDoctor?.rawPromptIncluded === false &&
+    envDoctor?.rawPrivateOutputPathIncluded === false &&
+    envDoctor?.printsEnvValues === false &&
+    envDoctor?.printsPrivatePaths === false &&
+    envDoctor?.countsAsLocalFullBenchmarkEvidence === false &&
+    envDoctor?.countsAsFullMemorySotaEvidence === false &&
+    envDoctor?.publicBenchmarkClaimsAllowed === false;
+  const sourceRetentionReady =
+    envDoctor?.sourceRetention?.contractReady === true &&
+    envDoctor?.sourceRetention?.rawSourcesRetainedPrivately === true &&
+    envDoctor?.sourceRetention?.publicReportIsSafe === true &&
+    envDoctor?.sourceRetention?.compressedDefaultRetrievalAllowed === true &&
+    envDoctor?.sourceRetention?.uiMayUseCompressedDefaultButAuditRetainsRawSource === true;
+  const durabilityReady =
+    envDoctor?.localEmbeddingDurability?.reportReady === true &&
+    envDoctor?.localEmbeddingDurability?.longProbeReady === true &&
+    envDoctor?.localEmbeddingDurability?.generatedAfterRuntimeBlocker === true &&
+    envDoctor?.localEmbeddingDurability?.readyForLocalFullResume === true;
+  const evidenceReady =
+    publicSafe &&
+    sourceRetentionReady &&
+    durabilityReady &&
+    envDoctor?.status === "READY_LOCAL_FULL_SHARD_RESUME_ENV" &&
+    envDoctor?.readyForMissingArmExport === true &&
+    envDoctor?.readyForAnswerQualityPreflight === true &&
+    envDoctor?.readyForShardAnswerQuality === true &&
+    envDoctor?.readyForLocalShardIntake === true &&
+    envDoctor?.readyForCommandMaterialization === true;
+  const evidenceBlockers = [
+    !envDoctor ? "local-full-resume-env-doctor-missing" : null,
+    envDoctor?.mode !== "local-full-shard-resume-env-doctor" ? "local-full-resume-env-mode-mismatch" : null,
+    !publicSafe ? "local-full-resume-env-public-report-unsafe" : null,
+    !sourceRetentionReady ? "local-full-resume-env-source-retention-not-ready" : null,
+    !durabilityReady ? "local-full-resume-env-durability-not-ready" : null,
+    envDoctor?.status !== "READY_LOCAL_FULL_SHARD_RESUME_ENV" ? "local-full-resume-env-not-ready" : null,
+    envDoctor?.readyForMissingArmExport !== true ? "local-full-resume-missing-arm-export-not-ready" : null,
+    envDoctor?.readyForAnswerQualityPreflight !== true ? "local-full-resume-answer-quality-preflight-not-ready" : null,
+    envDoctor?.readyForShardAnswerQuality !== true ? "local-full-resume-shard-answer-quality-not-ready" : null,
+    envDoctor?.readyForLocalShardIntake !== true ? "local-full-resume-local-shard-intake-not-ready" : null,
+    envDoctor?.readyForCommandMaterialization !== true ? "local-full-resume-command-materialization-not-ready" : null,
+    ...arrayOf(envDoctor?.blockers),
+  ].filter(Boolean);
+  return {
+    path: files.localFullResumeEnvDoctor,
+    status: envDoctor?.status ?? null,
+    publicSafe,
+    evidenceReady,
+    evidenceBlockers,
+    readyForMissingArmExport: Boolean(envDoctor?.readyForMissingArmExport),
+    readyForAnswerQualityPreflight: Boolean(envDoctor?.readyForAnswerQualityPreflight),
+    readyForShardAnswerQuality: Boolean(envDoctor?.readyForShardAnswerQuality),
+    readyForLocalShardIntake: Boolean(envDoctor?.readyForLocalShardIntake),
+    readyForCommandMaterialization: Boolean(envDoctor?.readyForCommandMaterialization),
+    privateDirectoryProvided: Boolean(envDoctor?.privateDir?.provided),
+    privateDirectoryPresent: Boolean(envDoctor?.privateDir?.present),
+    privateDirectoryOutsideRepository: Boolean(envDoctor?.privateDir?.outsideRepository),
+    rawSourceRetentionContractReady: Boolean(envDoctor?.sourceRetention?.contractReady),
+    rawSourcesRetainedPrivately: Boolean(envDoctor?.sourceRetention?.rawSourcesRetainedPrivately),
+    rawSourcePrivateAuditReady: Boolean(envDoctor?.sourceRetention?.readyForPrivateAudit),
+    compressedDefaultRetrievalAllowed: Boolean(envDoctor?.sourceRetention?.compressedDefaultRetrievalAllowed),
+    uiMayUseCompressedDefaultButAuditRetainsRawSource: Boolean(
+      envDoctor?.sourceRetention?.uiMayUseCompressedDefaultButAuditRetainsRawSource,
+    ),
+    localEmbeddingDurabilityReady: durabilityReady,
+    localEmbeddingEnvReady: Boolean(envDoctor?.env?.localEmbedding?.ready),
+    localRerankEnvReady: Boolean(envDoctor?.env?.localRerank?.ready),
+    localSafetyEnvReady: Boolean(envDoctor?.env?.localSafety?.ready),
+    answerQualityEnvReady: Boolean(envDoctor?.env?.answerQuality?.ready),
+    missingEnvironmentNameCount:
+      arrayOf(envDoctor?.env?.localEmbedding?.missingNames).length +
+      arrayOf(envDoctor?.env?.localRerank?.missingNames).length +
+      arrayOf(envDoctor?.env?.localSafety?.missingNames).length +
+      arrayOf(envDoctor?.env?.answerQuality?.missingNames).length,
+    requiredPrivateInputFileCount: arrayOf(envDoctor?.requiredInputFiles).length,
+    presentPrivateInputFileCount: arrayOf(envDoctor?.requiredInputFiles).filter((file) => file.present === true).length,
+    completedArmFileCount: arrayOf(envDoctor?.completedArmFiles).length,
+    presentCompletedArmFileCount: arrayOf(envDoctor?.completedArmFiles).filter((file) => file.present === true).length,
+    blockers: arrayOf(envDoctor?.blockers),
+    countsAsFullMemorySotaEvidence: Boolean(envDoctor?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(envDoctor?.publicBenchmarkClaimsAllowed),
+  };
+}
+
 function inspectLocalFullResumeCommandSecurity(securityReport) {
   const publicSafe =
     securityReport?.mode === "local-full-shard-resume-command-security-doctor" &&
@@ -633,6 +749,64 @@ function inspectLocalFullResumeCommandSecurity(securityReport) {
     countsAsFullMemorySotaEvidence: Boolean(securityReport?.countsAsFullMemorySotaEvidence),
     publicBenchmarkClaimsAllowed: Boolean(securityReport?.publicBenchmarkClaimsAllowed),
     blockers: arrayOf(securityReport?.blockers),
+  };
+}
+
+function inspectLocalFullResumeResultDoctor(resultDoctor) {
+  const publicSafe =
+    resultDoctor?.mode === "local-full-shard-resume-result-doctor" &&
+    resultDoctor?.publicSafe === true &&
+    resultDoctor?.metricsOnly === true &&
+    resultDoctor?.callsProviderApis === false &&
+    resultDoctor?.callsHostedSupermemory === false &&
+    resultDoctor?.callsLocalEndpoint === false &&
+    resultDoctor?.sendsBenchmarkTextToProvider === false &&
+    resultDoctor?.rawQuestionIdsIncluded === false &&
+    resultDoctor?.rawQuestionsIncluded === false &&
+    resultDoctor?.rawAnswersIncluded === false &&
+    resultDoctor?.rawMemoryIncluded === false &&
+    resultDoctor?.rawTranscriptIncluded === false &&
+    resultDoctor?.rawPromptIncluded === false &&
+    resultDoctor?.rawPrivateOutputPathIncluded === false &&
+    resultDoctor?.printsPrivatePaths === false &&
+    resultDoctor?.printsEnvValues === false &&
+    resultDoctor?.printsMaterializedCommands === false &&
+    resultDoctor?.countsAsLocalFullBenchmarkEvidence === false &&
+    resultDoctor?.countsAsFullMemorySotaEvidence === false &&
+    resultDoctor?.publicBenchmarkClaimsAllowed === false;
+  const evidenceReady =
+    publicSafe &&
+    resultDoctor?.status === "READY_LOCAL_FULL_SHARD_002_RESULT_FOR_INTAKE" &&
+    resultDoctor?.readyForLocalShardIntake === true &&
+    resultDoctor?.previousShard?.accepted === true &&
+    resultDoctor?.shardResult?.accepted === true;
+  const evidenceBlockers = [
+    !resultDoctor ? "local-full-resume-result-doctor-missing" : null,
+    resultDoctor?.mode !== "local-full-shard-resume-result-doctor" ? "local-full-resume-result-mode-mismatch" : null,
+    !publicSafe ? "local-full-resume-result-public-report-unsafe" : null,
+    resultDoctor?.status !== "READY_LOCAL_FULL_SHARD_002_RESULT_FOR_INTAKE" ? "local-full-resume-result-not-ready" : null,
+    resultDoctor?.readyForLocalShardIntake !== true ? "local-full-resume-result-not-ready-for-intake" : null,
+    resultDoctor?.previousShard?.accepted !== true ? "local-full-previous-shard-not-accepted" : null,
+    resultDoctor?.shardResult?.accepted !== true ? "local-full-shard-002-result-not-accepted" : null,
+    ...arrayOf(resultDoctor?.blockers),
+  ].filter(Boolean);
+  return {
+    path: files.localFullResumeResultDoctor,
+    status: resultDoctor?.status ?? null,
+    publicSafe,
+    evidenceReady,
+    evidenceBlockers,
+    readyForLocalShardIntake: Boolean(resultDoctor?.readyForLocalShardIntake),
+    previousShardAccepted: Boolean(resultDoctor?.previousShard?.accepted),
+    shard002ResultPresent: Boolean(resultDoctor?.shardResult?.present),
+    shard002ResultAccepted: Boolean(resultDoctor?.shardResult?.accepted),
+    shard002ScoredQueryCount: Number(resultDoctor?.shardResult?.scoredQueryCount ?? 0),
+    shard002StrategyCount: Number(resultDoctor?.shardResult?.strategyCount ?? 0),
+    commandMaterializerReady: Boolean(resultDoctor?.commandMaterializer?.ready),
+    commandMaterializerWrotePrivateCommandFile: Boolean(resultDoctor?.commandMaterializer?.writesPrivateCommandFile),
+    blockers: arrayOf(resultDoctor?.blockers),
+    countsAsFullMemorySotaEvidence: Boolean(resultDoctor?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(resultDoctor?.publicBenchmarkClaimsAllowed),
   };
 }
 
@@ -930,12 +1104,24 @@ function renderMarkdown(value) {
     `- Performance best strategy: ${value.localFullLaneState.performanceReport.bestStrategy ?? "n/a"}`,
     `- Performance best answer quality: ${value.localFullLaneState.performanceReport.bestAnswerQuality ?? "n/a"}`,
     `- Performance counts as SOTA evidence: ${value.localFullLaneState.performanceReport.countsAsFullMemorySotaEvidence}`,
+    `- Resume env ready for missing-arm export: ${value.localFullLaneState.resumeEnv.readyForMissingArmExport}`,
+    `- Resume env ready for command materialization: ${value.localFullLaneState.resumeEnv.readyForCommandMaterialization}`,
+    `- Resume env private directory provided: ${value.localFullLaneState.resumeEnv.privateDirectoryProvided}`,
+    `- Resume env raw-source private audit ready: ${value.localFullLaneState.resumeEnv.rawSourcePrivateAuditReady}`,
+    `- Resume env compressed default retrieval allowed: ${value.localFullLaneState.resumeEnv.compressedDefaultRetrievalAllowed}`,
+    `- Resume env local embedding env ready: ${value.localFullLaneState.resumeEnv.localEmbeddingEnvReady}`,
+    `- Resume env local rerank env ready: ${value.localFullLaneState.resumeEnv.localRerankEnvReady}`,
+    `- Resume env answer-quality env ready: ${value.localFullLaneState.resumeEnv.answerQualityEnvReady}`,
     `- Resume command security ready: ${value.localFullLaneState.resumeCommandSecurity.evidenceReady}`,
     `- Resume command private file mode: ${value.localFullLaneState.resumeCommandSecurity.privateCommandFileMode ?? "n/a"}`,
     `- Resume command first guard: ${value.localFullLaneState.resumeCommandSecurity.firstCommandId ?? "n/a"}`,
     `- Resume command second guard: ${value.localFullLaneState.resumeCommandSecurity.secondCommandId ?? "n/a"}`,
     `- Resume command guarded command: ${value.localFullLaneState.resumeCommandSecurity.guardedCommandId ?? "n/a"}`,
     `- Resume command counts as SOTA evidence: ${value.localFullLaneState.resumeCommandSecurity.countsAsFullMemorySotaEvidence}`,
+    `- Resume result ready for local shard intake: ${value.localFullLaneState.resumeResult.readyForLocalShardIntake}`,
+    `- Resume result previous shard accepted: ${value.localFullLaneState.resumeResult.previousShardAccepted}`,
+    `- Resume result shard 002 present: ${value.localFullLaneState.resumeResult.shard002ResultPresent}`,
+    `- Resume result shard 002 accepted: ${value.localFullLaneState.resumeResult.shard002ResultAccepted}`,
     `- Next local-full shard: ${value.localFullLaneState.nextPendingShardId ?? "n/a"} (${value.localFullLaneState.nextPendingShardRange ?? "n/a"})`,
     `- Runtime-blocked local-full shards: ${value.localFullLaneState.runtimeBlockedShardCount}`,
     `- Runtime blocker resume plans: ${value.localFullLaneState.runtimeBlockerResumeAvailableCount}`,

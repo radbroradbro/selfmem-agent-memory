@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T14:39:49.963Z",
+  "generatedAt": "2026-05-26T14:49:14.146Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -86,12 +86,26 @@
       "mode": "local-full-shard-performance-report",
       "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT"
     },
+    "localFullResumeEnvDoctor": {
+      "path": "reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json",
+      "exists": true,
+      "hash": "sha256:eec2d088432e23ab2745f221c861356c826b489e275fb7cdb38bfcc6ce6a9f6a",
+      "mode": "local-full-shard-resume-env-doctor",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV"
+    },
     "localFullResumeCommandSecurity": {
       "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-security-20260526.json",
       "exists": true,
       "hash": "sha256:511f56899ff112105b64cde786db219369506c1bc555f9d47de86152956a4aa7",
       "mode": "local-full-shard-resume-command-security-doctor",
       "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY"
+    },
+    "localFullResumeResultDoctor": {
+      "path": "reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.json",
+      "exists": true,
+      "hash": "sha256:1b12e57ef8fffed5f5eaafb9670a181b31868d5fc3f252672f3948339c11173b",
+      "mode": "local-full-shard-resume-result-doctor",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_002_RESULT"
     },
     "localFullShard002RuntimeBlocker": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json",
@@ -658,6 +672,61 @@
         "local-full-runtime-blocker-present"
       ]
     },
+    "resumeEnv": {
+      "path": "reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV",
+      "publicSafe": true,
+      "evidenceReady": false,
+      "evidenceBlockers": [
+        "local-full-resume-env-not-ready",
+        "local-full-resume-missing-arm-export-not-ready",
+        "local-full-resume-answer-quality-preflight-not-ready",
+        "local-full-resume-shard-answer-quality-not-ready",
+        "local-full-resume-local-shard-intake-not-ready",
+        "local-full-resume-command-materialization-not-ready",
+        "private-dir-not-provided",
+        "required-private-input-files-missing",
+        "completed-private-arm-files-missing",
+        "local-embedding-env-missing",
+        "local-rerank-env-missing",
+        "local-safety-env-missing",
+        "answer-quality-env-missing"
+      ],
+      "readyForMissingArmExport": false,
+      "readyForAnswerQualityPreflight": false,
+      "readyForShardAnswerQuality": false,
+      "readyForLocalShardIntake": false,
+      "readyForCommandMaterialization": false,
+      "privateDirectoryProvided": false,
+      "privateDirectoryPresent": false,
+      "privateDirectoryOutsideRepository": false,
+      "rawSourceRetentionContractReady": true,
+      "rawSourcesRetainedPrivately": true,
+      "rawSourcePrivateAuditReady": false,
+      "compressedDefaultRetrievalAllowed": true,
+      "uiMayUseCompressedDefaultButAuditRetainsRawSource": true,
+      "localEmbeddingDurabilityReady": true,
+      "localEmbeddingEnvReady": false,
+      "localRerankEnvReady": false,
+      "localSafetyEnvReady": false,
+      "answerQualityEnvReady": false,
+      "missingEnvironmentNameCount": 15,
+      "requiredPrivateInputFileCount": 3,
+      "presentPrivateInputFileCount": 0,
+      "completedArmFileCount": 3,
+      "presentCompletedArmFileCount": 0,
+      "blockers": [
+        "private-dir-not-provided",
+        "required-private-input-files-missing",
+        "completed-private-arm-files-missing",
+        "local-embedding-env-missing",
+        "local-rerank-env-missing",
+        "local-safety-env-missing",
+        "answer-quality-env-missing"
+      ],
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false
+    },
     "resumeCommandSecurity": {
       "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-security-20260526.json",
       "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY",
@@ -680,6 +749,35 @@
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "blockers": []
+    },
+    "resumeResult": {
+      "path": "reviews/overnight-20260522/local-full-shard-002-resume-result-doctor-20260526.json",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_002_RESULT",
+      "publicSafe": true,
+      "evidenceReady": false,
+      "evidenceBlockers": [
+        "local-full-resume-result-not-ready",
+        "local-full-resume-result-not-ready-for-intake",
+        "local-full-shard-002-result-not-accepted",
+        "resume-command-materializer-not-ready",
+        "resume-private-command-file-not-written",
+        "shard-002-result-missing"
+      ],
+      "readyForLocalShardIntake": false,
+      "previousShardAccepted": true,
+      "shard002ResultPresent": false,
+      "shard002ResultAccepted": false,
+      "shard002ScoredQueryCount": 0,
+      "shard002StrategyCount": 0,
+      "commandMaterializerReady": false,
+      "commandMaterializerWrotePrivateCommandFile": false,
+      "blockers": [
+        "resume-command-materializer-not-ready",
+        "resume-private-command-file-not-written",
+        "shard-002-result-missing"
+      ],
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false
     },
     "nextPendingShardId": "shard-002",
     "nextPendingShardRange": "25-50",
@@ -923,9 +1021,40 @@
       "blockers": []
     },
     {
+      "id": "local-full-resume-env",
+      "status": "blocked",
+      "blockers": [
+        "local-full-resume-env-not-ready",
+        "local-full-resume-missing-arm-export-not-ready",
+        "local-full-resume-answer-quality-preflight-not-ready",
+        "local-full-resume-shard-answer-quality-not-ready",
+        "local-full-resume-local-shard-intake-not-ready",
+        "local-full-resume-command-materialization-not-ready",
+        "private-dir-not-provided",
+        "required-private-input-files-missing",
+        "completed-private-arm-files-missing",
+        "local-embedding-env-missing",
+        "local-rerank-env-missing",
+        "local-safety-env-missing",
+        "answer-quality-env-missing"
+      ]
+    },
+    {
       "id": "local-full-resume-command-security",
       "status": "pass",
       "blockers": []
+    },
+    {
+      "id": "local-full-resume-result",
+      "status": "blocked",
+      "blockers": [
+        "local-full-resume-result-not-ready",
+        "local-full-resume-result-not-ready-for-intake",
+        "local-full-shard-002-result-not-accepted",
+        "resume-command-materializer-not-ready",
+        "resume-private-command-file-not-written",
+        "shard-002-result-missing"
+      ]
     },
     {
       "id": "full-shard-results",
@@ -1026,6 +1155,25 @@
     "local-apple-embedding-server-socket-close",
     "local-full-shard-002-incomplete",
     "local-full-shard-coverage-incomplete",
+    "local-full-resume-env-not-ready",
+    "local-full-resume-missing-arm-export-not-ready",
+    "local-full-resume-answer-quality-preflight-not-ready",
+    "local-full-resume-shard-answer-quality-not-ready",
+    "local-full-resume-local-shard-intake-not-ready",
+    "local-full-resume-command-materialization-not-ready",
+    "private-dir-not-provided",
+    "required-private-input-files-missing",
+    "completed-private-arm-files-missing",
+    "local-embedding-env-missing",
+    "local-rerank-env-missing",
+    "local-safety-env-missing",
+    "answer-quality-env-missing",
+    "local-full-resume-result-not-ready",
+    "local-full-resume-result-not-ready-for-intake",
+    "local-full-shard-002-result-not-accepted",
+    "resume-command-materializer-not-ready",
+    "resume-private-command-file-not-written",
+    "shard-002-result-missing",
     "answer-quality-shard-runs-pending",
     "shard-results-missing",
     "missing-voyage-answer-quality-same-data-result",
