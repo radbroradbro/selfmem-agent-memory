@@ -2801,8 +2801,13 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(fullShardFlow.shardContract?.shardSize, 25);
   assert.equal(fullShardFlow.shardContract?.expectedShardCount, 20);
   assert.equal(fullShardFlow.shardContract?.expectedFullQueryCount, 500);
+  assert.equal(fullShardFlow.shardContract?.workorderRequiredBeforeIntake, true);
+  assert.match(fullShardFlow.shardContract?.publicShardResultPattern ?? "", /answer-quality-shard-001\.json/);
   assert.equal(fullShardFlow.shardContract?.combineMode, "query-shard-answer-quality-union");
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--query-offset")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:shard-workorder")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("answer-quality-$shard_id.json")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("answer-quality-shard-020.json")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:shard-intake") && String(line).includes("--require-ready")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--combine-mode shards")));
   {

@@ -19,9 +19,14 @@ const sameDataStrategies = splitList(
 const providerPreflightStrategies = sameDataStrategies.filter((strategy) => providerPreflightStrategy(strategy));
 const minimumVoyageAnswerQualityStrategies = ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-lite-voyage-lite"];
 const fullShardSize = 25;
-const fullShardOffsets = Array.from({ length: 20 }, (_, index) => index * fullShardSize);
-const fullShardOffsetList = fullShardOffsets.join(" ");
-const fullShardInputList = fullShardOffsets.map((offset) => `$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-${offset}.json`).join(",");
+const fullShardSpecs = Array.from({ length: 20 }, (_, index) => ({
+  id: `shard-${String(index + 1).padStart(3, "0")}`,
+  offset: index * fullShardSize,
+}));
+const fullShardOffsetList = fullShardSpecs.map((shard) => shard.offset).join(" ");
+const fullShardInputList = fullShardSpecs
+  .map((shard) => `$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/answer-quality-${shard.id}.json`)
+  .join(",");
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(existsSync(targetPath), `benchmark target missing: ${displayPath(targetPath)}`);
@@ -493,7 +498,13 @@ function buildOperatorFlow() {
           "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-preflight.md\"",
         ].join(" "),
         [
-          `for offset in ${fullShardOffsetList}; do`,
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-workorder",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-workorder-before.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-workorder-before.md\"",
+        ].join(" "),
+        [
+          `shard_index=1; for offset in ${fullShardOffsetList}; do`,
+          "shard_id=$(printf \"shard-%03d\" \"$shard_index\");",
           "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live",
           `--target ${fullAnswerQualityTarget}`,
           "--queryset \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-materialized/longmemeval-queryset.private.json\"",
@@ -502,9 +513,15 @@ function buildOperatorFlow() {
           answerQualityArms.replaceAll("$RECALLWEAVE_SOTA_OUTPUT_DIR/response-arms", "$RECALLWEAVE_SOTA_OUTPUT_DIR/full-response-arms"),
           "--query-offset \"$offset\"",
           `--max-queries ${fullShardSize}`,
-          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-$offset.json\"",
-          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/shard-$offset.md\"",
-          "|| exit 1; done",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/answer-quality-$shard_id.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards/answer-quality-$shard_id.md\"",
+          "|| exit 1; shard_index=$((shard_index + 1)); done",
+        ].join(" "),
+        [
+          "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-workorder",
+          "--directory \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shards\"",
+          "--output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-workorder-after.json\"",
+          "--markdown-output \"$RECALLWEAVE_SOTA_OUTPUT_DIR/full-answer-quality-shard-workorder-after.md\"",
         ].join(" "),
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake",
@@ -544,8 +561,10 @@ function buildOperatorFlow() {
       ],
       shardContract: {
         shardSize: fullShardSize,
-        expectedShardCount: fullShardOffsets.length,
+        expectedShardCount: fullShardSpecs.length,
         expectedFullQueryCount: 500,
+        publicShardResultPattern: "full-answer-quality-shards/answer-quality-shard-001.json through answer-quality-shard-020.json",
+        workorderRequiredBeforeIntake: true,
         combineMode: "query-shard-answer-quality-union",
         failClosedOn: [
           "target mismatch",
