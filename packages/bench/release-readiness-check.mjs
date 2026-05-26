@@ -3778,6 +3778,24 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(envDoctor.privateDir?.provided, false);
     assert.equal(envDoctor.privateDir?.present, false);
     assert.equal(envDoctor.privateDir?.pathPrinted, false);
+    assert.equal(envDoctor.sourceRetention?.contractReady, true);
+    assert.equal(envDoctor.sourceRetention?.rawSourcesRetainedPrivately, true);
+    assert.equal(envDoctor.sourceRetention?.publicReportIsSafe, true);
+    assert.equal(envDoctor.sourceRetention?.readyForPrivateAudit, false);
+    assert.equal(envDoctor.sourceRetention?.compressedDefaultRetrievalAllowed, true);
+    assert.equal(envDoctor.sourceRetention?.uiMayUseCompressedDefaultButAuditRetainsRawSource, true);
+    assert.equal(envDoctor.sourceRetention?.directoryInsideRepository, false);
+    assert.deepEqual(envDoctor.sourceRetention?.requiredPrivateAuditRoles, [
+      "raw-dataset",
+      "selected-raw-rows",
+      "source-manifest",
+    ]);
+    assert.deepEqual(envDoctor.sourceRetention?.missingMaterializeRoles, []);
+    assert.equal(envDoctor.sourceRetention?.rawDatasetItemCount, 500);
+    assert.equal(envDoctor.sourceRetention?.selectedRawRowsCount, 500);
+    assert.equal(envDoctor.sourceRetention?.rawSourcePrivateFiles?.length, 3);
+    assert.ok(envDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.pathLabel === "external-private-file"));
+    assert.ok(envDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.present === false));
     assert.deepEqual(envDoctor.resumePacket?.missingStrategies, [
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank",
@@ -3796,6 +3814,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullShardResumeEnvDoctorFresh.writesRealFiles, false);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Local-Full Shard Resume Environment Doctor/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Status: BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Raw Source Retention/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Compressed default retrieval allowed: true/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /SELFMEM_LOCAL_EMBED_BASE_URL/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /RECALLWEAVE_FULL_SHARD_PRIVATE_DIR/);
   assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Private directory provided: false/);

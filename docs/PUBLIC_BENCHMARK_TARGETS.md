@@ -555,7 +555,11 @@ not count as a RecallWeave score.
   checks whether the current shell has the private outside-repository source
   directory plus the local embedding, local rerank, safety, and answer-quality
   environment needed to execute the resume packet. The checked-in report is
-  blocked for this shell and prints no environment values or private paths.
+  blocked for this shell and prints no environment values or private paths. It
+  also checks the private raw-source audit contract from the full materialize
+  report, so compressed/default retrieval may be used while raw dataset,
+  selected-row, and source-manifest files remain required outside the
+  repository for local-full continuation.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

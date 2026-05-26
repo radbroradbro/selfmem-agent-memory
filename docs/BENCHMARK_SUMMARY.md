@@ -363,8 +363,12 @@ public result.
 is the matching current-shell readiness report. In this checkout it is blocked:
 no private source directory or local model/scoring environment variables are
 present, and it prints only missing variable names, labels, hashes, and counts.
-Use it before launching shard 002 so placeholder commands are not mistaken for
-a runnable local benchmark.
+It also reloads the full LongMemEval materialization report and verifies the
+raw-source retention contract: compressed or derived UI/retrieval surfaces are
+allowed, but the raw dataset, selected rows, and source manifest must stay
+present in the outside-repository private directory before a resumed shard can
+count. Use it before launching shard 002 so placeholder commands are not
+mistaken for a runnable local benchmark.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

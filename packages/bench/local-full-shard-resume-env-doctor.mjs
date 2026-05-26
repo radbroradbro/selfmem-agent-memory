@@ -9,6 +9,7 @@ const args = parseArgs(process.argv.slice(2));
 const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
 const resumePacketPath = resolveInputPath(args.resumePacket ?? `${reviewDir}/local-full-shard-002-resume-packet-20260526.json`);
 const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`);
+const materializePath = resolveInputPath(args.materialize ?? args.materializeReport ?? `${reviewDir}/public-longmemeval-full-materialize-run.json`);
 const privateDir = stringOrNull(args.privateInputDir ?? args.privateDir ?? process.env.RECALLWEAVE_FULL_SHARD_PRIVATE_DIR);
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
@@ -18,11 +19,14 @@ assert.ok(["json", "markdown"].includes(format), "--format must be json or markd
 
 const resumeRaw = readFileSyncChecked(resumePacketPath, "resume packet");
 const planRaw = readFileSyncChecked(planPath, "local-full shard plan");
+const materializeRaw = readFileSyncChecked(materializePath, "full materialize report");
 const resumePacket = JSON.parse(resumeRaw);
 const plan = JSON.parse(planRaw);
+const materializeReport = JSON.parse(materializeRaw);
 
 const privateDirState = inspectPrivateDir(privateDir);
 const envState = inspectEnv();
+const sourceRetentionState = inspectSourceRetention(materializeReport, materializeRaw, privateDirState.resolvedPath);
 const requiredInputFiles = inspectRequiredInputFiles(privateDirState.resolvedPath, plan);
 const completedArmFiles = inspectCompletedArmFiles(privateDirState.resolvedPath, resumePacket);
 const missingArmFiles = inspectMissingArmFiles(privateDirState.resolvedPath, resumePacket);
@@ -32,6 +36,7 @@ const readyForMissingArmExport =
   resumePacket.status === "READY_FOR_LOCAL_FULL_SHARD_RESUME" &&
   privateDirState.present &&
   privateDirState.outsideRepository &&
+  sourceRetentionState.readyForPrivateAudit &&
   requiredInputFiles.every((file) => file.present && file.hashMatches && file.nonEmpty) &&
   completedArmFiles.every((file) => file.present && file.hashMatches && file.nonEmpty) &&
   envState.localEmbedding.ready &&
@@ -49,6 +54,9 @@ const blockers = [
   !privateDirState.provided ? "private-dir-not-provided" : null,
   privateDirState.provided && !privateDirState.present ? "private-dir-not-present" : null,
   privateDirState.present && !privateDirState.outsideRepository ? "private-dir-inside-repository" : null,
+  !sourceRetentionState.contractReady ? "raw-source-retention-contract-not-ready" : null,
+  privateDirState.present && sourceRetentionState.rawSourcePrivateFiles.some((file) => !file.present) ? "raw-source-private-files-missing" : null,
+  privateDirState.present && sourceRetentionState.rawSourcePrivateFiles.some((file) => file.present && !file.hashMatches) ? "raw-source-private-file-hash-mismatch" : null,
   requiredInputFiles.some((file) => !file.present) ? "required-private-input-files-missing" : null,
   requiredInputFiles.some((file) => file.present && !file.hashMatches) ? "required-private-input-file-hash-mismatch" : null,
   completedArmFiles.some((file) => !file.present) ? "completed-private-arm-files-missing" : null,
@@ -106,6 +114,7 @@ const report = {
     maxMemoryBytes: Number(plan.runPlan?.maxMemoryBytes ?? 0),
   },
   privateDir: privateDirState.public,
+  sourceRetention: sourceRetentionState.public,
   env: envState.public,
   commandPlaceholders: commandPlaceholderState,
   requiredInputFiles,
@@ -150,6 +159,79 @@ function inspectPrivateDir(value) {
       present,
       outsideRepository: Boolean(resolvedPath && present && !insideRepository),
       pathPrinted: false,
+    },
+  };
+}
+
+function inspectSourceRetention(materializeReportValue, materializeRawValue, privatePath) {
+  const retention = materializeReportValue?.sourceRetention ?? {};
+  const privateOutputs = materializeReportValue?.privateOutputs ?? {};
+  const outputFiles = arrayOf(privateOutputs.files);
+  const requiredMaterializeRoles = ["queryset", "memories", "answer-labels", "raw-dataset", "selected-raw-rows", "source-manifest"];
+  const requiredPrivateAuditRoles = ["raw-dataset", "selected-raw-rows", "source-manifest"];
+  const presentRoles = new Set(outputFiles.map((file) => file.role).filter(Boolean));
+  const missingMaterializeRoles = requiredMaterializeRoles.filter((role) => !presentRoles.has(role));
+  const rawSourcePrivateFiles = requiredPrivateAuditRoles.map((role) => {
+    const spec = outputFiles.find((file) => file.role === role) ?? { role, name: `${role}.private`, hash: null };
+    return inspectPrivateFile(privatePath, {
+      role: spec.role,
+      name: spec.name,
+      hash: spec.hash,
+    });
+  });
+  const rawSourcePrivateFilesReady =
+    Boolean(privatePath) &&
+    rawSourcePrivateFiles.every((file) => file.present && file.nonEmpty && file.hashMatches === true);
+  const publicReportIsSafe =
+    materializeReportValue?.rawQuestionsIncluded === false &&
+    materializeReportValue?.rawAnswersIncluded === false &&
+    materializeReportValue?.rawMemoryIncluded === false &&
+    materializeReportValue?.rawPrivateOutputPathIncluded === false &&
+    retention.rawTextPubliclyIncluded === false &&
+    retention.privateOutputPathIncluded === false;
+  const rawSourcesRetainedPrivately =
+    retention.rawDatasetRetainedPrivate === true &&
+    retention.selectedRawRowsRetainedPrivate === true &&
+    retention.sourceManifestRetainedPrivate === true &&
+    missingMaterializeRoles.length === 0;
+  const contractReady =
+    materializeReportValue?.mode === "public-benchmark-materialize-run" &&
+    rawSourcesRetainedPrivately &&
+    publicReportIsSafe &&
+    privateOutputs.directoryInsideRepository === false;
+  return {
+    contractReady,
+    rawSourcesRetainedPrivately,
+    publicReportIsSafe,
+    rawSourcePrivateFiles,
+    readyForPrivateAudit: contractReady && rawSourcePrivateFilesReady,
+    public: {
+      materializeReport: {
+        path: displayPath(materializePath),
+        hash: `sha256:${sha256(materializeRawValue)}`,
+        mode: materializeReportValue?.mode ?? null,
+      },
+      contractReady,
+      rawSourcesRetainedPrivately,
+      publicReportIsSafe,
+      readyForPrivateAudit: contractReady && rawSourcePrivateFilesReady,
+      compressedDefaultRetrievalAllowed: true,
+      uiMayUseCompressedDefaultButAuditRetainsRawSource: true,
+      rawTextPubliclyIncluded: Boolean(retention.rawTextPubliclyIncluded),
+      privateOutputPathIncluded: Boolean(retention.privateOutputPathIncluded),
+      privateOutputDirectoryLabel: privateOutputs.directoryLabel ?? null,
+      directoryInsideRepository: Boolean(privateOutputs.directoryInsideRepository),
+      fileMode: privateOutputs.fileMode ?? null,
+      directoryMode: privateOutputs.directoryMode ?? null,
+      requiredMaterializeRoles,
+      requiredPrivateAuditRoles,
+      missingMaterializeRoles,
+      rawDatasetItemCount: Number(retention.rawDatasetItemCount ?? 0),
+      selectedRawRowsCount: Number(retention.selectedRawRowsCount ?? 0),
+      rawDatasetHash: retention.rawDatasetHash ?? null,
+      selectedRawRowsHash: retention.selectedRawRowsHash ?? null,
+      sourceManifestHash: retention.sourceManifestHash ?? null,
+      rawSourcePrivateFiles,
     },
   };
 }
@@ -297,6 +379,9 @@ function renderMarkdown(value) {
     `- Private directory provided: ${value.privateDir.provided}`,
     `- Private directory present: ${value.privateDir.present}`,
     `- Private directory outside repository: ${value.privateDir.outsideRepository}`,
+    `- Raw-source retention contract ready: ${value.sourceRetention.contractReady}`,
+    `- Raw-source private audit ready: ${value.sourceRetention.readyForPrivateAudit}`,
+    `- Compressed default retrieval allowed: ${value.sourceRetention.compressedDefaultRetrievalAllowed}`,
     `- Local embedding env ready: ${value.env.localEmbedding.ready}`,
     `- Local rerank env ready: ${value.env.localRerank.ready}`,
     `- Answer-quality env ready: ${value.env.answerQuality.ready}`,
@@ -312,6 +397,14 @@ function renderMarkdown(value) {
     "",
     "## Private Inputs",
     ...value.requiredInputFiles.map((file) => `- ${file.role}: present=${file.present}; hashMatched=${file.hashMatches}`),
+    "",
+    "## Raw Source Retention",
+    `- Contract ready: ${value.sourceRetention.contractReady}`,
+    `- Public report safe: ${value.sourceRetention.publicReportIsSafe}`,
+    `- Ready for private audit: ${value.sourceRetention.readyForPrivateAudit}`,
+    `- Compressed default retrieval allowed: ${value.sourceRetention.compressedDefaultRetrievalAllowed}`,
+    `- Required private audit roles: ${value.sourceRetention.requiredPrivateAuditRoles.join(", ")}`,
+    ...value.sourceRetention.rawSourcePrivateFiles.map((file) => `- ${file.role}: present=${file.present}; hashMatched=${file.hashMatches}`),
     "",
     "## Completed Arm Files",
     ...value.completedArmFiles.map((file) => `- ${file.role}: present=${file.present}; hashMatched=${file.hashMatches}`),

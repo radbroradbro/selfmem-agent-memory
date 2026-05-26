@@ -140,8 +140,8 @@ host emitted the same event.
 ## Source-Lock References
 
 The overnight source-lock scout should compare RecallWeave with public
-LLM-wiki and agent-brain projects such as GBrain before the UI contract is
-considered stable.
+folder-and-Markdown brain projects such as LLM-wiki, GBrain, and OpenBrain
+before the UI contract is considered stable.
 
 ## Research Lineage
 

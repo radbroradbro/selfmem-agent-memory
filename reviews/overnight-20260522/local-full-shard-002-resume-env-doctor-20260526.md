@@ -8,6 +8,9 @@
 - Private directory provided: false
 - Private directory present: false
 - Private directory outside repository: false
+- Raw-source retention contract ready: true
+- Raw-source private audit ready: false
+- Compressed default retrieval allowed: true
 - Local embedding env ready: false
 - Local rerank env ready: false
 - Answer-quality env ready: false
@@ -34,6 +37,16 @@
 - queryset: present=false; hashMatched=false
 - memories: present=false; hashMatched=null
 - answer-labels: present=false; hashMatched=false
+
+## Raw Source Retention
+- Contract ready: true
+- Public report safe: true
+- Ready for private audit: false
+- Compressed default retrieval allowed: true
+- Required private audit roles: raw-dataset, selected-raw-rows, source-manifest
+- raw-dataset: present=false; hashMatched=false
+- selected-raw-rows: present=false; hashMatched=false
+- source-manifest: present=false; hashMatched=false
 
 ## Completed Arm Files
 - bm25-lite: present=false; hashMatched=false
