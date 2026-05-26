@@ -224,6 +224,8 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.md`,
   `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   `${reviewDir}/local-embedding-runtime-doctor-20260526.md`,
+  `${reviewDir}/local-embedding-launch-diagnostic-20260526.json`,
+  `${reviewDir}/local-embedding-launch-diagnostic-20260526.md`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.md`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
@@ -1961,6 +1963,8 @@ check("fresh public benchmark target check passes", () => {
   );
   const localEmbeddingRuntimeDoctor = JSON.parse(readFileSync(join(root, reviewDir, "local-embedding-runtime-doctor-20260526.json"), "utf8"));
   const localEmbeddingRuntimeDoctorEvidence = readFileSync(join(root, reviewDir, "local-embedding-runtime-doctor-20260526.md"), "utf8");
+  const localEmbeddingLaunchDiagnostic = JSON.parse(readFileSync(join(root, reviewDir, "local-embedding-launch-diagnostic-20260526.json"), "utf8"));
+  const localEmbeddingLaunchDiagnosticEvidence = readFileSync(join(root, reviewDir, "local-embedding-launch-diagnostic-20260526.md"), "utf8");
   const noLocalEmbeddingEnv = { ...process.env };
   for (const name of [
     "SELFMEM_LOCAL_EMBED_BASE_URL",
@@ -1991,6 +1995,9 @@ check("fresh public benchmark target check passes", () => {
     { env: noLocalEmbeddingEnv },
   ).stdout;
   const localEmbeddingRuntimeHfNoEndpoint = JSON.parse(localEmbeddingRuntimeHfNoEndpointStdout);
+  const localEmbeddingLaunchDiagnosticFixture = JSON.parse(
+    run("node", ["packages/bench/local-embedding-launch-diagnostic.mjs", "--fixture"]).stdout,
+  );
   const localEmbeddingDurabilitySmoke = JSON.parse(readFileSync(join(root, reviewDir, "local-embedding-durability-smoke-20260526.json"), "utf8"));
   const localEmbeddingDurabilitySmokeEvidence = readFileSync(join(root, reviewDir, "local-embedding-durability-smoke-20260526.md"), "utf8");
   const localEmbeddingDurabilityFresh = JSON.parse(
@@ -4703,6 +4710,40 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localEmbeddingRuntimeMarkdownFresh, /Local Embedding Runtime Doctor/);
   assert.doesNotMatch(localEmbeddingRuntimeFreshStdout, /http:\/\/|127\.0\.0\.1|localhost|\/Users\/|\/private\/|\/tmp\//);
   assert.doesNotMatch(localEmbeddingRuntimeHfNoEndpointStdout, /http:\/\/|127\.0\.0\.1|localhost|\/Users\/|\/private\/|\/tmp\//);
+  for (const launchReport of [localEmbeddingLaunchDiagnostic, localEmbeddingLaunchDiagnosticFixture]) {
+    assert.equal(launchReport.mode, "local-embedding-launch-diagnostic");
+    assert.equal(launchReport.metricsOnly, true);
+    assert.equal(launchReport.publicSafe, true);
+    assert.equal(launchReport.callsProviderApis, false);
+    assert.equal(launchReport.callsHostedSupermemory, false);
+    assert.equal(launchReport.callsLocalEndpoint, false);
+    assert.equal(launchReport.sendsBenchmarkTextToProvider, false);
+    assert.equal(launchReport.rawLogIncluded, false);
+    assert.equal(launchReport.rawConfigIncluded, false);
+    assert.equal(launchReport.rawBenchmarkInputIncluded, false);
+    assert.equal(launchReport.rawPrivateOutputPathIncluded, false);
+    assert.equal(launchReport.privatePathPrinted, false);
+    assert.equal(launchReport.endpointPrinted, false);
+    assert.equal(launchReport.modelPathPrinted, false);
+    assert.equal(launchReport.serverBinPrinted, false);
+    assert.equal(launchReport.printsEnvValues, false);
+    assert.equal(launchReport.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(launchReport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(launchReport.publicBenchmarkClaimsAllowed, false);
+    assert.ok(Array.isArray(launchReport.attempts));
+    assert.ok(launchReport.attempts.every((attempt) => attempt.rawLogPrinted === false && attempt.privatePathPrinted === false));
+  }
+  assert.equal(localEmbeddingLaunchDiagnostic.status, "BLOCKED_LOCAL_EMBEDDING_LAUNCH");
+  assert.equal(localEmbeddingLaunchDiagnostic.fixtureOnly, false);
+  assert.equal(localEmbeddingLaunchDiagnostic.readyForShard002Resume, false);
+  assert.equal(localEmbeddingLaunchDiagnostic.launchRecovered, false);
+  assert.equal(localEmbeddingLaunchDiagnostic.launchBlocked, true);
+  assert.equal(localEmbeddingLaunchDiagnostic.attemptCount, 2);
+  assert.ok(localEmbeddingLaunchDiagnostic.blockers?.includes("local-embedding-launch-exited-before-endpoint-ready"));
+  assert.ok(localEmbeddingLaunchDiagnostic.attempts?.some((attempt) => attempt.failureClass === "local-embedding-launch-exited-during-model-load"));
+  assert.match(localEmbeddingLaunchDiagnosticEvidence, /Local Embedding Launch Diagnostic/);
+  assert.match(localEmbeddingLaunchDiagnosticEvidence, /Ready for shard 002 resume: false/);
+  assert.match(localEmbeddingLaunchDiagnosticEvidence, /raw log printed false/);
   for (const smokeReport of [localEmbeddingDurabilitySmoke, localEmbeddingDurabilityFresh]) {
     assert.equal(smokeReport.mode, "local-embedding-durability-smoke");
     assert.equal(smokeReport.syntheticOnly, true);

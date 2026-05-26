@@ -124,6 +124,7 @@
     "benchmark:query-expansion:result-gate": "node packages/bench/query-expansion-result-gate.mjs",
     "benchmark:local-embedding:runtime-doctor": "node packages/bench/local-embedding-runtime-doctor.mjs",
     "benchmark:local-embedding:durability": "node packages/bench/local-embedding-durability-smoke.mjs",
+    "benchmark:local-embedding:launch-diagnostic": "node packages/bench/local-embedding-launch-diagnostic.mjs",
     "benchmark:local-rerank:sidecar": "node packages/bench/local-openai-rerank-sidecar.mjs",
     "benchmark:local-rerank:result-gate": "node packages/bench/local-rerank-result-gate.mjs",
     "benchmark:provider-challenger:result-gate": "node packages/bench/provider-challenger-result-gate.mjs",

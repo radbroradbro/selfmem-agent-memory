@@ -253,7 +253,7 @@ synthetic embedding smoke reproduced the same failure at the time, so the local-
 still has only one accepted shard and nineteen missing shards. The bounded
 preflight is now codified as
 `benchmark:local-embedding:runtime-doctor`, then
-`benchmark:local-embedding:durability`. The current runtime doctor report is
+`benchmark:local-embedding:durability`. The checked-in runtime doctor report is
 `reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`;
 it now reports `READY_LOCAL_EMBEDDING_RUNTIME` for a dedicated Qwen3 Embedding
 0.6B GGUF served through a local llama.cpp endpoint without printing the
@@ -261,8 +261,15 @@ endpoint, server path, or raw config. The current public-safe durability report
 is at
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
 It now reports `READY_LOCAL_EMBEDDING_DURABILITY` after bounded synthetic
-probes. These reports clear the local embedding preflight only; shard 002 still
-has to be rerun and accepted before it can count.
+probes. These reports clear the historical local embedding preflight only. The
+latest launch refresh is checked in at
+`reviews/overnight-20260522/local-embedding-launch-diagnostic-20260526.json`
+with the markdown companion
+`reviews/overnight-20260522/local-embedding-launch-diagnostic-20260526.md`.
+It reports `BLOCKED_LOCAL_EMBEDDING_LAUNCH`: two relaunch attempts exited
+during model load before the local endpoint became ready, prints no raw logs or
+private paths, and sets `readyForShard002Resume: false`. Shard 002 still has to
+be rerun and accepted before it can count.
 The full LongMemEval-S run-only target is also checked in at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
 materialization evidence in
@@ -353,14 +360,16 @@ resume plan for shard 002, and includes a missing-arm-only response export for
 already exported BM25, full-hybrid, and local query-expansion arms do not have
 to be regenerated just to retry the unstable local embedding path.
 `reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
-is the public-safe operator packet for that retry. It confirms the current
-local embedding runtime and durability reports are ready, preserves the three
-completed private arm hashes, points operators to
+is the public-safe operator packet for that retry. It was built from the
+checked-in local embedding runtime and durability preflight reports, preserves
+the three completed private arm hashes, points operators to
 `benchmark:answer-quality:local-shard-resume-command` for private script
 materialization, retains the placeholder missing-arm export, preflight,
 answer-quality, and local-intake templates as non-runnable public evidence, and still keeps
 `countsAsLocalFullBenchmarkEvidence: false` until shard 002 returns an accepted
-public result.
+public result. The later launch diagnostic is the current resume gate: while it
+reports `BLOCKED_LOCAL_EMBEDDING_LAUNCH`, the packet is ready as a public
+operator contract but not runnable as a shard-002 benchmark.
 `reviews/overnight-20260522/local-full-shard-002-resume-env-doctor-20260526.json`
 is the matching current-shell readiness report. In this checkout it is blocked:
 no private source directory or local model/scoring environment variables are
@@ -383,6 +392,16 @@ completed-arm, missing-arm, durability, and environment gates can all turn
 green without private data, provider calls, or hosted Supermemory usage. That
 fixture remains `fixtureOnly: true` and still sets all benchmark-claim flags to
 false.
+`benchmark:local-embedding:launch-diagnostic` is the public-safe follow-up when
+the endpoint does not stay alive long enough for the runtime doctor. Its current
+report at
+`reviews/overnight-20260522/local-embedding-launch-diagnostic-20260526.json`
+summarizes two private launch logs by label, line count, last phase, and failure
+class only. It records that both attempts exited during model load, marks
+`launchRecovered: false`, `readyForShard002Resume: false`, and
+`countsAsLocalFullBenchmarkEvidence: false`, and does not print raw log text,
+private paths, endpoints, model paths, or env values. This keeps the blocked
+state auditable without turning launch attempts into benchmark evidence.
 `benchmark:answer-quality:local-shard-resume-command` is the private-only
 materializer for the same packet. Its public report at
 `reviews/overnight-20260522/local-full-shard-002-resume-command-materializer-20260526.json`
@@ -635,11 +654,14 @@ contract, but it did not win the shard. It remains a challenger, not a default,
 and the full 500-query local-full result still requires the remaining nineteen
 shards and combine gate. Shard 002 exposed a separate local embedding-runtime
 durability blocker before the local rerank arm could run. The checked-in
-runtime doctor and durability smoke now pass for the Qwen3 Embedding 0.6B
-llama.cpp lane, but they are preflight artifacts only: they are public-safe,
-print no endpoint URL or raw probe text, and do not count as local-full or SOTA
-evidence. The next accepted local-full shard still requires response export,
-answer-quality scoring, shard intake, and the combine gate. The shard workorder
+runtime doctor and durability smoke pass for the Qwen3 Embedding 0.6B llama.cpp
+lane as preflight artifacts only, and the current launch diagnostic reports
+`BLOCKED_LOCAL_EMBEDDING_LAUNCH` because two relaunch attempts exited during
+model load before endpoint readiness. These artifacts are public-safe, print no
+endpoint URL, raw probe text, raw launch log, or private path, and do not count
+as local-full or SOTA evidence. The next accepted local-full shard still
+requires a durable endpoint, response export, answer-quality scoring, shard
+intake, and the combine gate. The shard workorder
 now carries `SELFMEM_LOCAL_EMBED_BASE_URL`,
 `SELFMEM_LOCAL_RERANK_BASE_URL`, `RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1`,
 and `--require-local-embedding-durability` on the response export command.

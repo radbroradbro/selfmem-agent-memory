@@ -398,8 +398,14 @@ now reports `READY_LOCAL_EMBEDDING_RUNTIME` for a dedicated Qwen3 Embedding
 The current checked-in durability preflight,
 `reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`,
 now reports `READY_LOCAL_EMBEDDING_DURABILITY` on bounded synthetic probes.
-These clear only the local embedding preflight; restart the same local endpoint
-and rerun shard 002 before treating that shard as accepted evidence.
+These clear only the historical local embedding preflight. The latest launch
+refresh at
+`reviews/overnight-20260522/local-embedding-launch-diagnostic-20260526.json`
+reports `BLOCKED_LOCAL_EMBEDDING_LAUNCH`: two relaunch attempts exited during
+model load before endpoint readiness, while preserving only public-safe labels,
+counts, phases, and failure classes. Restart the same local endpoint, rerun the
+runtime doctor and durability smoke, then rerun shard 002 before treating that
+shard as accepted evidence.
 For local Apple response-arm export, pass a fresh ready report through
 `--local-embedding-durability-report` or
 `SELFMEM_LOCAL_EMBED_DURABILITY_REPORT` with
@@ -654,10 +660,11 @@ environment. Separately, the local-full answer-quality shard has now live-tested
 Qwen3 local embeddings plus a real Qwen3 Reranker 0.6B Q8 sidecar. That shard
 is local diagnostic evidence only and did not promote the sidecar arm.
 The shard 002 retry surfaced an embedding-server durability blocker before the
-local Apple arm could complete. The runtime doctor and durability smoke now
-pass as preflight evidence, but do not treat the partial three-arm shard 002
-packet as answer-quality evidence until that shard is rerun, scored, and
-accepted by intake.
+local Apple arm could complete. The runtime doctor and durability smoke pass as
+preflight evidence, but the current launch diagnostic still blocks resume
+because the endpoint exits during model load. Do not treat the partial three-arm
+shard 002 packet as answer-quality evidence until that shard is rerun, scored,
+and accepted by intake.
 
 The first live Voyage provider canaries have now run:
 
