@@ -14,6 +14,7 @@
 - source-locked-full-target: pass
 - raw-source-retention: pass
 - full-shard-private-inputs: pass
+- accepted-sota-lane-launch-readiness: blocked (RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, full-answer-quality-shard-results-not-returned, full-memory-sota-score-not-proven, public-sota-claim-not-allowed)
 - full-shard-control-preflight: pass
 - bm25-is-control-only: pass
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
@@ -37,6 +38,15 @@
 - Files present/hash-matched: 6/6
 - Max memory bytes: 300000000
 
+## Accepted Lane Launch
+- Status: BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH
+- Ready for first accepted shard run: false
+- Query expansion requirement: local-or-cloud-model-required
+- Query expansion model-backed: false
+- Response export ready: false
+- Answer-quality scoring ready: false
+- Operator inputs needed: 4
+
 ## Control Preflight
 - Status: BLOCKED_ANSWER_QUALITY_ENV
 - Same-data shard ready: true
@@ -53,10 +63,6 @@
 - Full SOTA lane ready for answer-quality scoring: false
 
 ## Blockers
-- answer-quality-shard-runs-pending
-- shard-results-missing
-- answer-quality-shards-missing
-- full-shard-coverage-incomplete
 - RECALLWEAVE_BASELINE_LIVE-not-enabled
 - RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed
 - RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled
@@ -72,6 +78,15 @@
 - openai-compatible-base-url-missing
 - query-expansion-local-endpoint-or-cloud-consent-missing
 - voyage-credentials-missing
+- accepted-lane-response-export-not-ready
+- accepted-lane-answer-quality-scoring-not-ready
+- full-answer-quality-shard-results-not-returned
+- full-memory-sota-score-not-proven
+- public-sota-claim-not-allowed
+- answer-quality-shard-runs-pending
+- shard-results-missing
+- answer-quality-shards-missing
+- full-shard-coverage-incomplete
 - missing-voyage-answer-quality-same-data-result
 - reported-target-judge-model-does-not-match-result
 - missing-full-or-officially-comparable-memory-benchmark-run

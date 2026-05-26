@@ -131,6 +131,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/full-shard-private-input-doctor.mjs",
+  "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
   "packages/bench/full-shard-control-export-probe.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
@@ -198,6 +199,8 @@ const requiredFiles = [
   `${reviewDir}/full-shard-control-export-probe-20260526.md`,
   `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.json`,
   `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.md`,
+  `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
+  `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.md`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
@@ -578,6 +581,7 @@ const requiredScripts = [
   "benchmark:answer-quality:shard-workorder",
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:private-input-doctor",
+  "benchmark:answer-quality:accepted-lane-doctor",
   "benchmark:answer-quality:control-probe",
   "benchmark:query-expansion:preflight",
   "benchmark:query-expansion:result-gate",
@@ -1703,6 +1707,19 @@ check("fresh public benchmark target check passes", () => {
   const privateInputDoctorReady = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-private-input-doctor-current.json"), "utf8"));
   const privateInputDoctorReadyEvidence = readFileSync(join(root, reviewDir, "full-shard-private-input-doctor-current.md"), "utf8");
   const privateInputDoctorBlocked = JSON.parse(run("node", ["packages/bench/full-shard-private-input-doctor.mjs"]).stdout);
+  const acceptedLaneLaunchDoctorFresh = JSON.parse(run("node", ["packages/bench/full-shard-accepted-lane-launch-doctor.mjs"]).stdout);
+  const acceptedLaneLaunchDoctorMarkdownFresh = run("node", [
+    "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
+    "--format",
+    "markdown",
+  ]).stdout;
+  const acceptedLaneLaunchDoctorEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "full-shard-accepted-lane-launch-doctor-20260526.json"), "utf8"),
+  );
+  const acceptedLaneLaunchDoctorMarkdownEvidence = readFileSync(
+    join(root, reviewDir, "full-shard-accepted-lane-launch-doctor-20260526.md"),
+    "utf8",
+  );
   const fullShardBm25ExportProbe = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.json"), "utf8"));
   const fullShardBm25ExportProbeEvidence = readFileSync(join(root, reviewDir, "full-shard-bm25-control-export-probe-20260526.md"), "utf8");
   const fullShardControlExportProbe = JSON.parse(readFileSync(join(root, reviewDir, "full-shard-control-export-probe-20260526.json"), "utf8"));
@@ -2916,6 +2933,47 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(privateInputDoctorReady.checks?.allPrivateFilesMode0600, true);
   assert.equal(privateInputDoctorReady.checks?.maxMemoryBytesCoversPrivateMemories, true);
   assert.match(privateInputDoctorReadyEvidence, /READY_FULL_SHARD_PRIVATE_INPUTS/);
+  for (const launchDoctor of [acceptedLaneLaunchDoctorFresh, acceptedLaneLaunchDoctorEvidence]) {
+    assert.equal(launchDoctor.mode, "full-shard-accepted-lane-launch-doctor");
+    assert.equal(launchDoctor.status, "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH");
+    assert.equal(launchDoctor.publicSafe, true);
+    assert.equal(launchDoctor.metricsOnly, true);
+    assert.equal(launchDoctor.callsProviderApis, false);
+    assert.equal(launchDoctor.sendsBenchmarkTextToProvider, false);
+    assert.equal(launchDoctor.countsAsFullMemorySotaEvidence, false);
+    assert.equal(launchDoctor.publicBenchmarkClaimsAllowed, false);
+    assert.equal(launchDoctor.rawPrivateOutputPathIncluded, false);
+    assert.equal(launchDoctor.plan?.queryCount, 500);
+    assert.equal(launchDoctor.plan?.shardCount, 20);
+    assert.deepEqual(launchDoctor.plan?.acceptedLaneIds, ["full-sota-accepted-shards"]);
+    assert.ok(launchDoctor.plan?.diagnosticLaneIds?.includes("deterministic-control-proxy"));
+    assert.equal(launchDoctor.launchGate?.privateInputsReady, true);
+    assert.equal(launchDoctor.launchGate?.acceptedLaneReadyForResponseArmExport, false);
+    assert.equal(launchDoctor.launchGate?.acceptedLaneReadyForAnswerQualityScoring, false);
+    assert.equal(launchDoctor.launchGate?.readyForFirstAcceptedShardRun, false);
+    assert.equal(launchDoctor.launchGate?.readyForPublicSotaClaim, false);
+    assert.equal(launchDoctor.privateInput?.source, "checked-in-private-input-doctor");
+    assert.equal(launchDoctor.privateInput?.readyForAnswerQualityShardRun, true);
+    assert.equal(launchDoctor.privateInput?.rawSourcesRetainedPrivate, true);
+    assert.equal(launchDoctor.privateInput?.privateDirectoryInsideRepository, false);
+    assert.equal(launchDoctor.acceptedLane?.laneId, "full-sota-accepted-shards");
+    assert.equal(launchDoctor.acceptedLane?.acceptedByFullShardIntake, true);
+    assert.equal(launchDoctor.acceptedLane?.diagnosticOnly, false);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.evidenceRequirement, "local-or-cloud-model-required");
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.diagnosticFallbackAllowed, false);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.readyForAcceptedShardIntake, false);
+    assert.equal(launchDoctor.shardProgress?.pendingShardCount, 20);
+    assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-001");
+    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"));
+    assert.ok(launchDoctor.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+    assert.ok(launchDoctor.blockers?.includes("accepted-lane-answer-quality-scoring-not-ready"));
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--query-offset 0"));
+    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("--query-offset 0"));
+  }
+  assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Accepted Lane Launch Doctor/);
+  assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Ready for first accepted shard run: false/);
+  assert.match(acceptedLaneLaunchDoctorMarkdownEvidence, /Query expansion requirement: local-or-cloud-model-required/);
   assert.equal(fullShardBm25ExportProbe.mode, "full-shard-bm25-control-export-probe");
   assert.equal(fullShardBm25ExportProbe.status, "READY_FULL_SHARD_BM25_CONTROL_EXPORT_PROBE");
   assert.equal(fullShardBm25ExportProbe.strategy, "bm25-lite");

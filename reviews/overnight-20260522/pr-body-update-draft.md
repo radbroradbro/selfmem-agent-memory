@@ -85,6 +85,12 @@ Live status:
   until local or cloud model-backed query expansion, exact target answer/judge
   model matching, all provider/local arms, shard intake, reviewers, UI/docs,
   owner approval, and real canary evidence pass.
+- Adds `benchmark:answer-quality:accepted-lane-doctor`, a no-call launch doctor
+  for the only full-shard lane accepted by the SOTA intake. It confirms the raw
+  full benchmark inputs are retained privately and ready, then blocks shard
+  launch until live export/no-raw-text consent, answer-quality consent, exact
+  target model matching, local/provider arm readiness, and model-backed query
+  expansion are configured. It is readiness evidence only, not a scored result.
 
 - Adds the public LongMemEval-S materialize-run lane and first blind retrieval-proxy baseline. The materializer writes raw benchmark query and haystack inputs only to an operator-private directory, commits only hashes/counts/command templates, emits a collector-compatible query-set hash, and the release gate binds the RecallWeave result to that hash. The canonical `bm25-lite-b800-k5` retrieval-proxy baseline scored 0.4541 quality on the 6-row source-locked slice with average context tokens 800 and zero privacy failures; it is explicitly not MemoryBench answer-quality evidence and not public superiority language.
 - Adds a same-data LongMemEval-S retrieval strategy comparison. `bm25-lite`

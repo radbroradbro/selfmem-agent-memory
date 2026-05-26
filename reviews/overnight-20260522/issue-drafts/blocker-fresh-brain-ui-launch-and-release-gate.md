@@ -55,6 +55,12 @@ requirements are resolved.
   `full-sota-accepted-shards` remains blocked until model-backed query
   expansion, exact target answer/judge model matching, and all full benchmark
   evidence are present.
+- The accepted-lane launch doctor now makes that go/no-go state explicit
+  without provider calls or raw benchmark text. It reports the private
+  full-shard inputs ready, but keeps `full-sota-accepted-shards` blocked until
+  live export/no-raw-text consent, answer-quality consent, exact target model
+  matching, local/provider arms, and model-backed query expansion are
+  configured.
 - Commit `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4` records live Qwen3
   Embedding 0.6B and Qwen3 Embedding 4B Apple Silicon runs on the same 30-query
   public LongMemEval-S retrieval-proxy target. Both local arms tied BM25

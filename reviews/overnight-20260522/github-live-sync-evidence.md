@@ -2,6 +2,14 @@
 
 Date: 2026-05-23
 
+- PR #5 and issue #6 were refreshed again on 2026-05-26 after adding the
+  accepted-lane launch doctor for the full-shard benchmark gate. Live sync
+  passed with PR body hash
+  `c7e4be14e7fbb1eaff609508d7fda9aaf927bc405f29071c5bf688ada22cba48`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`,
+  and issue body hash
+  `228b3af51d96ffbebd1eecc6250786ef8c8ba50fc9e98e3bbb6fd54add05fbad`.
 - PR #5 and issue #6 were refreshed from checked-in public-safe drafts after
   hosted-baseline run orchestration reached green CI.
 - PR #5 was refreshed again after live hosted prep evidence added the

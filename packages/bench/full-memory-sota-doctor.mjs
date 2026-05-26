@@ -19,6 +19,7 @@ const files = {
   fullMaterialize: `${reviewDir}/public-longmemeval-full-materialize-run.json`,
   shardPlan: `${reviewDir}/answer-quality-full-shard-plan-20260525.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
+  acceptedLaneLaunchDoctor: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
   controlPreflight: `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.json`,
   shardWorkorder: `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   shardIntake: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
@@ -44,6 +45,7 @@ const fullTarget = evidence.fullTarget.json;
 const fullMaterialize = evidence.fullMaterialize.json;
 const shardPlan = evidence.shardPlan.json;
 const privateInputDoctor = evidence.privateInputDoctor.json;
+const acceptedLaneLaunchDoctor = evidence.acceptedLaneLaunchDoctor.json;
 const controlPreflight = evidence.controlPreflight.json;
 const shardWorkorder = evidence.shardWorkorder.json;
 const shardIntake = evidence.shardIntake.json;
@@ -73,6 +75,9 @@ const gates = [
   ]),
   gate("full-shard-private-inputs", privateInputDoctor?.readyForAnswerQualityShardRun === true, privateInputDoctor?.blockers ?? [
     "full-shard-private-input-doctor-not-ready",
+  ]),
+  gate("accepted-sota-lane-launch-readiness", acceptedLaneLaunchDoctor?.launchGate?.readyForFirstAcceptedShardRun === true, acceptedLaneLaunchDoctor?.blockers ?? [
+    "accepted-sota-lane-launch-doctor-not-ready",
   ]),
   gate("full-shard-control-preflight", controlPreflightState.sameDataShardReady, controlPreflightState.blockers),
   gate("bm25-is-control-only", sotaOperatorPacket?.sameDataContract?.bm25LexicalFloorRequired === true, [
@@ -159,6 +164,7 @@ const report = {
   reportedTargets: inspectReportedTargets(sotaLadder),
   rawSourceRetention: rawRetention,
   privateInputState: inspectPrivateInputState(privateInputDoctor),
+  acceptedLaneLaunchState: inspectAcceptedLaneLaunchState(acceptedLaneLaunchDoctor),
   controlPreflightState,
   shardState,
   currentCanary,
@@ -285,6 +291,27 @@ function inspectPrivateInputState(privateInputDoctorReport) {
     filesPresent: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.present).length),
     filesHashMatched: Number((privateInputDoctorReport?.privateInput?.files ?? []).filter((file) => file.hashMatches).length),
     blockers: privateInputDoctorReport?.blockers ?? [],
+  };
+}
+
+function inspectAcceptedLaneLaunchState(launchDoctorReport) {
+  return {
+    path: files.acceptedLaneLaunchDoctor,
+    status: launchDoctorReport?.status ?? null,
+    readyForFirstAcceptedShardRun: Boolean(launchDoctorReport?.launchGate?.readyForFirstAcceptedShardRun),
+    readyForAcceptedShardIntake: Boolean(launchDoctorReport?.launchGate?.readyForAcceptedShardIntake),
+    readyForPublicSotaClaim: Boolean(launchDoctorReport?.launchGate?.readyForPublicSotaClaim),
+    acceptedLaneId: launchDoctorReport?.acceptedLane?.laneId ?? null,
+    queryExpansionRequirement: launchDoctorReport?.acceptedLane?.queryExpansion?.evidenceRequirement ?? null,
+    queryExpansionModelBacked: Boolean(launchDoctorReport?.acceptedLane?.queryExpansion?.modelBackedReady),
+    queryExpansionSotaEligible: Boolean(launchDoctorReport?.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence),
+    responseExportReady: Boolean(launchDoctorReport?.launchGate?.acceptedLaneReadyForResponseArmExport),
+    answerQualityScoringReady: Boolean(launchDoctorReport?.launchGate?.acceptedLaneReadyForAnswerQualityScoring),
+    privateInputsReady: Boolean(launchDoctorReport?.launchGate?.privateInputsReady),
+    operatorInputCount: Number(launchDoctorReport?.operatorInputsNeeded?.length ?? 0),
+    pendingShardCount: Number(launchDoctorReport?.shardProgress?.pendingShardCount ?? 0),
+    firstPendingShardId: launchDoctorReport?.shardProgress?.firstPendingShardId ?? null,
+    blockers: launchDoctorReport?.blockers ?? [],
   };
 }
 
@@ -485,6 +512,15 @@ function renderMarkdown(value) {
     `- Private directory inside repository: ${value.privateInputState.privateDirectoryInsideRepository}`,
     `- Files present/hash-matched: ${value.privateInputState.filesPresent}/${value.privateInputState.filesHashMatched}`,
     `- Max memory bytes: ${value.privateInputState.maxMemoryBytes ?? "n/a"}`,
+    "",
+    "## Accepted Lane Launch",
+    `- Status: ${value.acceptedLaneLaunchState.status}`,
+    `- Ready for first accepted shard run: ${value.acceptedLaneLaunchState.readyForFirstAcceptedShardRun}`,
+    `- Query expansion requirement: ${value.acceptedLaneLaunchState.queryExpansionRequirement ?? "n/a"}`,
+    `- Query expansion model-backed: ${value.acceptedLaneLaunchState.queryExpansionModelBacked}`,
+    `- Response export ready: ${value.acceptedLaneLaunchState.responseExportReady}`,
+    `- Answer-quality scoring ready: ${value.acceptedLaneLaunchState.answerQualityScoringReady}`,
+    `- Operator inputs needed: ${value.acceptedLaneLaunchState.operatorInputCount}`,
     "",
     "## Control Preflight",
     `- Status: ${value.controlPreflightState.status}`,

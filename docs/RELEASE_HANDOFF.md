@@ -80,16 +80,20 @@ Use its `manualCommands` list as the next-action checklist for agents.
 For the benchmark-specific blocker, run:
 
 ```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:accepted-lane-doctor
 npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor
 ```
 
-That doctor does not call providers or expose raw benchmark text. It summarizes
-the full LongMemEval target, raw-source-retention state, BM25-as-control
-contract, full-shard coverage, current canary score, reported-target delta,
-reviewer status, UI/docs refresh status, owner approval, and real-canary
-blockers. It must remain `BLOCKED_FULL_MEMORY_SOTA_EVIDENCE` until the full
-same-data answer-quality result, provider arms, reviewers, UI/docs, owner
-approval, and real canary all pass.
+The accepted-lane doctor does not call providers or expose raw benchmark text.
+It names the exact env-only operator inputs still needed before the only
+full-shard-intake-compatible lane can launch. The SOTA doctor then summarizes
+the full LongMemEval target, raw-source-retention state, accepted-lane launch
+readiness, BM25-as-control contract, full-shard coverage, current canary score,
+reported-target delta, reviewer status, UI/docs refresh status, owner approval,
+and real-canary blockers. It must remain
+`BLOCKED_FULL_MEMORY_SOTA_EVIDENCE` until the full same-data answer-quality
+result, provider arms, reviewers, UI/docs, owner approval, and real canary all
+pass.
 
 ## One-Agent Canary Workspace
 

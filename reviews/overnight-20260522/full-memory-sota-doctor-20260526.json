@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T04:43:16.333Z",
+  "generatedAt": "2026-05-26T04:57:11.668Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -57,6 +57,13 @@
       "hash": "sha256:58ae37a0babeb7f5a3ebf94ddcec58f6bfefed0c641ecea4e7e5f1cd3a1a8ccc",
       "mode": "full-shard-private-input-doctor",
       "status": "READY_FULL_SHARD_PRIVATE_INPUTS"
+    },
+    "acceptedLaneLaunchDoctor": {
+      "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
+      "exists": true,
+      "hash": "sha256:0ae3c5d1005062ce5d0da416bd483c91977c617c3f6514741255dbeae556ade1",
+      "mode": "full-shard-accepted-lane-launch-doctor",
+      "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
     "controlPreflight": {
       "path": "reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json",
@@ -145,28 +152,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:3dcfdc593481b47c9e55c477449a234b23060a33dab12084f724434bf024a601",
+      "hash": "sha256:34c3e474246465926d8764f1c23b50fbb914eb5f6f2db1fde99c81c33fa861f2",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:e2f88d200966bcd563af7a71e8707657d0e3d6bb709ce192968dda106228f184",
+      "hash": "sha256:5aa4af6d6b5243b57d428683d4ee520b5657370fa972e194bf286e3b80762529",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:b6b0e254fa74df972862898ae6797d10af16e920961a2df7a5f76af8ad2cef60",
+      "hash": "sha256:b36f44c3449cb4d855e850d77f1c95894663e84a4f269cf5c4fd4c7564fec17f",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:3b2051511f20aad7c5c3f99335d2fc52f89002c551d207f13734332497535c1d",
+      "hash": "sha256:e5dcb194a32354079d114debb6819c82f7681b80b52f722845f818bdd41e071f",
       "mode": null,
       "status": null
     }
@@ -314,6 +321,45 @@
     "filesPresent": 6,
     "filesHashMatched": 6,
     "blockers": []
+  },
+  "acceptedLaneLaunchState": {
+    "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
+    "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
+    "readyForFirstAcceptedShardRun": false,
+    "readyForAcceptedShardIntake": false,
+    "readyForPublicSotaClaim": false,
+    "acceptedLaneId": "full-sota-accepted-shards",
+    "queryExpansionRequirement": "local-or-cloud-model-required",
+    "queryExpansionModelBacked": false,
+    "queryExpansionSotaEligible": false,
+    "responseExportReady": false,
+    "answerQualityScoringReady": false,
+    "privateInputsReady": true,
+    "operatorInputCount": 4,
+    "pendingShardCount": 20,
+    "firstPendingShardId": "shard-001",
+    "blockers": [
+      "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+      "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+      "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+      "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+      "answer-model-missing",
+      "judge-model-missing",
+      "local-apple-credentials-missing",
+      "local-rerank-credentials-missing",
+      "nvidia-credentials-missing",
+      "openai-compatible-base-url-missing",
+      "query-expansion-local-endpoint-or-cloud-consent-missing",
+      "voyage-credentials-missing",
+      "accepted-lane-response-export-not-ready",
+      "accepted-lane-answer-quality-scoring-not-ready",
+      "full-answer-quality-shard-results-not-returned",
+      "full-memory-sota-score-not-proven",
+      "public-sota-claim-not-allowed"
+    ]
   },
   "controlPreflightState": {
     "path": "reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json",
@@ -556,6 +602,32 @@
       "blockers": []
     },
     {
+      "id": "accepted-sota-lane-launch-readiness",
+      "status": "blocked",
+      "blockers": [
+        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "local-apple-credentials-missing",
+        "local-rerank-credentials-missing",
+        "nvidia-credentials-missing",
+        "openai-compatible-base-url-missing",
+        "query-expansion-local-endpoint-or-cloud-consent-missing",
+        "voyage-credentials-missing",
+        "accepted-lane-response-export-not-ready",
+        "accepted-lane-answer-quality-scoring-not-ready",
+        "full-answer-quality-shard-results-not-returned",
+        "full-memory-sota-score-not-proven",
+        "public-sota-claim-not-allowed"
+      ]
+    },
+    {
       "id": "full-shard-control-preflight",
       "status": "pass",
       "blockers": []
@@ -638,10 +710,6 @@
     }
   ],
   "blockers": [
-    "answer-quality-shard-runs-pending",
-    "shard-results-missing",
-    "answer-quality-shards-missing",
-    "full-shard-coverage-incomplete",
     "RECALLWEAVE_BASELINE_LIVE-not-enabled",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
@@ -657,6 +725,15 @@
     "openai-compatible-base-url-missing",
     "query-expansion-local-endpoint-or-cloud-consent-missing",
     "voyage-credentials-missing",
+    "accepted-lane-response-export-not-ready",
+    "accepted-lane-answer-quality-scoring-not-ready",
+    "full-answer-quality-shard-results-not-returned",
+    "full-memory-sota-score-not-proven",
+    "public-sota-claim-not-allowed",
+    "answer-quality-shard-runs-pending",
+    "shard-results-missing",
+    "answer-quality-shards-missing",
+    "full-shard-coverage-incomplete",
     "missing-voyage-answer-quality-same-data-result",
     "reported-target-judge-model-does-not-match-result",
     "missing-full-or-officially-comparable-memory-benchmark-run",

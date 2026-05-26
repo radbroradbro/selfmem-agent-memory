@@ -501,6 +501,14 @@ not count as a RecallWeave score.
   no-raw-text consent, answer-quality consent, local Apple/local rerank endpoints,
   Voyage/NVIDIA credentials, answer and judge model configuration, a scoring
   endpoint, and query-expansion readiness are all present.
+- Full-shard accepted-lane launch doctor:
+  `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
+  is the no-call go/no-go packet for the only lane accepted by full-shard
+  intake. It confirms private inputs are ready, then keeps
+  `full-sota-accepted-shards` blocked until response export, answer-quality
+  scoring, provider/local arms, exact target model matching, and model-backed
+  query expansion are configured. It is operator readiness evidence only, not a
+  scored result or SOTA support.
 - Full-shard return intake:
   `reviews/overnight-20260522/answer-quality-full-shard-intake-20260525.json`
   is the checked-in blocked state for the full answer-quality shard set. It

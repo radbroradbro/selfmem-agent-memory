@@ -303,6 +303,15 @@ hash-matched, mode `0600`, and that the shard export template raises
 fits past the old 5 MB guard. It does not count as SOTA evidence or allow
 public benchmark claims; it only proves the full-shard run now has clean private
 inputs.
+`benchmark:answer-quality:accepted-lane-doctor` now sits above the private
+input doctor and shard workorder. Its checked-in evidence at
+`reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
+keeps the private inputs marked ready while blocking the accepted
+`full-sota-accepted-shards` lane until live export/no-raw-text consent,
+answer-quality consent, exact `gpt-4o` answer/judge target matching, local
+Apple and local rerank endpoints, Voyage/NVIDIA credentials, and model-backed
+query expansion are present. It calls no providers, sends no benchmark text,
+prints no env values or private paths, and does not count as SOTA evidence.
 The release-check temp cleanup is now scoped to stale
 `recallweave-release-check-root-*` directories only. It explicitly preserves
 benchmark materialization roots and pointer files such as
