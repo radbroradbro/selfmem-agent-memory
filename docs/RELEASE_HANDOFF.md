@@ -416,7 +416,10 @@ and local model/scoring environment are not present. It prints only missing
 variable names, labels, hashes, and counts. It now also verifies that the
 source-locked full materialization retained the raw dataset, selected raw rows,
 and source manifest privately, while keeping compressed/default retrieval and
-UI surfaces separate from the private audit source. The checked-in local intake report,
+UI surfaces separate from the private audit source. It also binds the retry to
+the local embedding durability report generated after the shard 002
+socket-close blocker, including the required long synthetic probe envelope.
+The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.
 It should turn green only after all twenty local-full public shard-result JSONs

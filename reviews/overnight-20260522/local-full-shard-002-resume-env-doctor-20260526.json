@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "local-full-shard-resume-env-doctor",
   "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV",
-  "generatedAt": "2026-05-26T12:35:27.514Z",
+  "generatedAt": "2026-05-26T12:42:44.970Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -139,6 +139,42 @@
         "hashMatches": false
       }
     ]
+  },
+  "localEmbeddingDurability": {
+    "report": {
+      "path": "reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
+      "hash": "sha256:ce57c801807937baf0715d32e015d7db76a73b7230e1038c9058412dc4613eb5",
+      "mode": "local-embedding-durability-smoke",
+      "status": "READY_LOCAL_EMBEDDING_DURABILITY"
+    },
+    "runtimeBlocker": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json",
+      "hash": "sha256:cc383c3c6b66e473fcd92362ec95c1259d6220970d7486286cb762698a95545f",
+      "mode": "answer-quality-local-full-shard-runtime-blocker",
+      "status": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+      "failedArm": "local-apple-qwen3-0_6b",
+      "failureClass": "local-embedding-server-socket-close"
+    },
+    "reportReady": true,
+    "longProbeReady": true,
+    "generatedAfterRuntimeBlocker": true,
+    "readyForLocalFullResume": true,
+    "minRequiredTokenCount": 700,
+    "maxProbeTokenCount": 700,
+    "probeCount": 4,
+    "passProbeCount": 4,
+    "tokenCounts": [
+      16,
+      128,
+      512,
+      700
+    ],
+    "failedProbeClasses": [],
+    "rawSyntheticInputIncluded": false,
+    "baseUrlPrinted": false,
+    "endpointPrinted": false,
+    "countsAsLocalFullBenchmarkEvidence": false,
+    "countsAsFullMemorySotaEvidence": false
   },
   "env": {
     "localEmbedding": {

@@ -559,7 +559,10 @@ not count as a RecallWeave score.
   also checks the private raw-source audit contract from the full materialize
   report, so compressed/default retrieval may be used while raw dataset,
   selected-row, and source-manifest files remain required outside the
-  repository for local-full continuation.
+  repository for local-full continuation. It also requires the checked local
+  embedding durability smoke to be fresher than the shard 002 socket-close
+  blocker and to include the required long synthetic probe before local Apple
+  resume commands are treated as runnable.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

@@ -11,6 +11,9 @@
 - Raw-source retention contract ready: true
 - Raw-source private audit ready: false
 - Compressed default retrieval allowed: true
+- Local embedding durability report ready: true
+- Local embedding durability long probe ready: true
+- Local embedding durability fresher than runtime blocker: true
 - Local embedding env ready: false
 - Local rerank env ready: false
 - Answer-quality env ready: false
@@ -47,6 +50,16 @@
 - raw-dataset: present=false; hashMatched=false
 - selected-raw-rows: present=false; hashMatched=false
 - source-manifest: present=false; hashMatched=false
+
+## Local Embedding Durability
+- Report ready: true
+- Ready for local-full resume: true
+- Long probe ready: true
+- Generated after runtime blocker: true
+- Minimum required token count: 700
+- Maximum probe token count: 700
+- Probe count: 4
+- Failed probe classes: none
 
 ## Completed Arm Files
 - bm25-lite: present=false; hashMatched=false

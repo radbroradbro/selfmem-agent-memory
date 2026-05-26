@@ -367,8 +367,10 @@ It also reloads the full LongMemEval materialization report and verifies the
 raw-source retention contract: compressed or derived UI/retrieval surfaces are
 allowed, but the raw dataset, selected rows, and source manifest must stay
 present in the outside-repository private directory before a resumed shard can
-count. Use it before launching shard 002 so placeholder commands are not
-mistaken for a runnable local benchmark.
+count. The same doctor now checks that the local embedding durability report is
+newer than the shard 002 socket-close blocker and includes a passing long
+synthetic probe at the required token envelope. Use it before launching shard
+002 so placeholder commands are not mistaken for a runnable local benchmark.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

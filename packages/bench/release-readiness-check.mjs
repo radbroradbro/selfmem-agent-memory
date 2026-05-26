@@ -1920,6 +1920,11 @@ check("fresh public benchmark target check passes", () => {
   const localFullShardResumeEnvDoctorFresh = JSON.parse(
     run("node", ["packages/bench/local-full-shard-resume-env-doctor.mjs"], { env: noLocalFullResumeEnv }).stdout,
   );
+  const localFullShardResumeEnvDoctorTooShort = JSON.parse(
+    run("node", ["packages/bench/local-full-shard-resume-env-doctor.mjs", "--min-durability-token-count", "701"], {
+      env: noLocalFullResumeEnv,
+    }).stdout,
+  );
   const localFullShardResumeEnvDoctorMarkdownFresh = run("node", ["packages/bench/local-full-shard-resume-env-doctor.mjs", "--format", "markdown"], {
     env: noLocalFullResumeEnv,
   }).stdout;
@@ -3796,6 +3801,21 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(envDoctor.sourceRetention?.rawSourcePrivateFiles?.length, 3);
     assert.ok(envDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.pathLabel === "external-private-file"));
     assert.ok(envDoctor.sourceRetention?.rawSourcePrivateFiles?.every((file) => file.present === false));
+    assert.equal(envDoctor.localEmbeddingDurability?.reportReady, true);
+    assert.equal(envDoctor.localEmbeddingDurability?.longProbeReady, true);
+    assert.equal(envDoctor.localEmbeddingDurability?.generatedAfterRuntimeBlocker, true);
+    assert.equal(envDoctor.localEmbeddingDurability?.readyForLocalFullResume, true);
+    assert.equal(envDoctor.localEmbeddingDurability?.minRequiredTokenCount, 700);
+    assert.equal(envDoctor.localEmbeddingDurability?.maxProbeTokenCount, 700);
+    assert.equal(envDoctor.localEmbeddingDurability?.probeCount, 4);
+    assert.equal(envDoctor.localEmbeddingDurability?.passProbeCount, 4);
+    assert.deepEqual(envDoctor.localEmbeddingDurability?.failedProbeClasses, []);
+    assert.equal(envDoctor.localEmbeddingDurability?.rawSyntheticInputIncluded, false);
+    assert.equal(envDoctor.localEmbeddingDurability?.baseUrlPrinted, false);
+    assert.equal(envDoctor.localEmbeddingDurability?.endpointPrinted, false);
+    assert.equal(envDoctor.localEmbeddingDurability?.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(envDoctor.localEmbeddingDurability?.countsAsFullMemorySotaEvidence, false);
+    assert.equal(envDoctor.localEmbeddingDurability?.runtimeBlocker?.failureClass, "local-embedding-server-socket-close");
     assert.deepEqual(envDoctor.resumePacket?.missingStrategies, [
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank",
@@ -3816,12 +3836,18 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeEnvDoctorEvidence, /Status: BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Raw Source Retention/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Compressed default retrieval allowed: true/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Local Embedding Durability/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Generated after runtime blocker: true/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /SELFMEM_LOCAL_EMBED_BASE_URL/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /RECALLWEAVE_FULL_SHARD_PRIVATE_DIR/);
   assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Private directory provided: false/);
+  assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Local embedding durability long probe ready: true/);
+  assert.equal(localFullShardResumeEnvDoctorTooShort.localEmbeddingDurability?.longProbeReady, false);
+  assert.ok(localFullShardResumeEnvDoctorTooShort.blockers?.includes("local-embedding-durability-long-probe-not-ready"));
   for (const text of [
     JSON.stringify(localFullShardResumeEnvDoctor),
     JSON.stringify(localFullShardResumeEnvDoctorFresh),
+    JSON.stringify(localFullShardResumeEnvDoctorTooShort),
     localFullShardResumeEnvDoctorEvidence,
     localFullShardResumeEnvDoctorMarkdownFresh,
   ]) {

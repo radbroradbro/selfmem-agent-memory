@@ -10,6 +10,12 @@ const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ??
 const resumePacketPath = resolveInputPath(args.resumePacket ?? `${reviewDir}/local-full-shard-002-resume-packet-20260526.json`);
 const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`);
 const materializePath = resolveInputPath(args.materialize ?? args.materializeReport ?? `${reviewDir}/public-longmemeval-full-materialize-run.json`);
+const durabilityPath = resolveInputPath(args.durabilityReport ?? args.localEmbeddingDurabilityReport ?? `${reviewDir}/local-embedding-durability-smoke-20260526.json`);
+const runtimeBlockerPath = resolveInputPath(args.runtimeBlocker ?? `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`);
+const minDurabilityTokenCount = positiveInt(
+  args.minDurabilityTokenCount ?? process.env.RECALLWEAVE_LOCAL_FULL_MIN_DURABILITY_TOKENS ?? 700,
+  "minimum durability token count",
+);
 const privateDir = stringOrNull(args.privateInputDir ?? args.privateDir ?? process.env.RECALLWEAVE_FULL_SHARD_PRIVATE_DIR);
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
@@ -20,13 +26,24 @@ assert.ok(["json", "markdown"].includes(format), "--format must be json or markd
 const resumeRaw = readFileSyncChecked(resumePacketPath, "resume packet");
 const planRaw = readFileSyncChecked(planPath, "local-full shard plan");
 const materializeRaw = readFileSyncChecked(materializePath, "full materialize report");
+const durabilityRaw = readFileSyncChecked(durabilityPath, "local embedding durability report");
+const runtimeBlockerRaw = readFileSyncChecked(runtimeBlockerPath, "local-full runtime blocker report");
 const resumePacket = JSON.parse(resumeRaw);
 const plan = JSON.parse(planRaw);
 const materializeReport = JSON.parse(materializeRaw);
+const durabilityReport = JSON.parse(durabilityRaw);
+const runtimeBlockerReport = JSON.parse(runtimeBlockerRaw);
 
 const privateDirState = inspectPrivateDir(privateDir);
 const envState = inspectEnv();
 const sourceRetentionState = inspectSourceRetention(materializeReport, materializeRaw, privateDirState.resolvedPath);
+const durabilityState = inspectDurabilityReport({
+  durabilityReport,
+  durabilityRaw,
+  runtimeBlockerReport,
+  runtimeBlockerRaw,
+  minTokenCount: minDurabilityTokenCount,
+});
 const requiredInputFiles = inspectRequiredInputFiles(privateDirState.resolvedPath, plan);
 const completedArmFiles = inspectCompletedArmFiles(privateDirState.resolvedPath, resumePacket);
 const missingArmFiles = inspectMissingArmFiles(privateDirState.resolvedPath, resumePacket);
@@ -37,6 +54,7 @@ const readyForMissingArmExport =
   privateDirState.present &&
   privateDirState.outsideRepository &&
   sourceRetentionState.readyForPrivateAudit &&
+  durabilityState.readyForLocalFullResume &&
   requiredInputFiles.every((file) => file.present && file.hashMatches && file.nonEmpty) &&
   completedArmFiles.every((file) => file.present && file.hashMatches && file.nonEmpty) &&
   envState.localEmbedding.ready &&
@@ -57,6 +75,10 @@ const blockers = [
   !sourceRetentionState.contractReady ? "raw-source-retention-contract-not-ready" : null,
   privateDirState.present && sourceRetentionState.rawSourcePrivateFiles.some((file) => !file.present) ? "raw-source-private-files-missing" : null,
   privateDirState.present && sourceRetentionState.rawSourcePrivateFiles.some((file) => file.present && !file.hashMatches) ? "raw-source-private-file-hash-mismatch" : null,
+  !durabilityState.reportReady ? "local-embedding-durability-report-not-ready" : null,
+  !durabilityState.longProbeReady ? "local-embedding-durability-long-probe-not-ready" : null,
+  !durabilityState.generatedAfterRuntimeBlocker ? "local-embedding-durability-report-not-fresher-than-runtime-blocker" : null,
+  durabilityState.failedProbeClasses.length > 0 ? "local-embedding-durability-probes-failed" : null,
   requiredInputFiles.some((file) => !file.present) ? "required-private-input-files-missing" : null,
   requiredInputFiles.some((file) => file.present && !file.hashMatches) ? "required-private-input-file-hash-mismatch" : null,
   completedArmFiles.some((file) => !file.present) ? "completed-private-arm-files-missing" : null,
@@ -115,6 +137,7 @@ const report = {
   },
   privateDir: privateDirState.public,
   sourceRetention: sourceRetentionState.public,
+  localEmbeddingDurability: durabilityState.public,
   env: envState.public,
   commandPlaceholders: commandPlaceholderState,
   requiredInputFiles,
@@ -159,6 +182,73 @@ function inspectPrivateDir(value) {
       present,
       outsideRepository: Boolean(resolvedPath && present && !insideRepository),
       pathPrinted: false,
+    },
+  };
+}
+
+function inspectDurabilityReport({ durabilityReport, durabilityRaw, runtimeBlockerReport, runtimeBlockerRaw, minTokenCount }) {
+  const probes = arrayOf(durabilityReport?.probes);
+  const tokenCounts = arrayOf(durabilityReport?.tokenCounts)
+    .map((value) => Number(value))
+    .filter((value) => Number.isInteger(value) && value > 0)
+    .sort((left, right) => left - right);
+  const maxTokenCount = tokenCounts.at(-1) ?? 0;
+  const failedProbeClasses = [...new Set(probes.map((probe) => probe?.failureClass).filter(Boolean))];
+  const passProbeCount = probes.filter((probe) => probe?.status === "pass").length;
+  const generatedAfterRuntimeBlocker = timestampAfter(durabilityReport?.generatedAt, runtimeBlockerReport?.generatedAt);
+  const reportReady =
+    durabilityReport?.mode === "local-embedding-durability-smoke" &&
+    durabilityReport?.status === "READY_LOCAL_EMBEDDING_DURABILITY" &&
+    durabilityReport?.readyForLocalAppleArmExport === true &&
+    durabilityReport?.syntheticOnly === true &&
+    durabilityReport?.rawSyntheticInputIncluded === false &&
+    durabilityReport?.baseUrlPrinted === false &&
+    durabilityReport?.endpointPrinted === false &&
+    durabilityReport?.countsAsLocalFullBenchmarkEvidence === false &&
+    durabilityReport?.countsAsFullMemorySotaEvidence === false &&
+    durabilityReport?.publicBenchmarkClaimsAllowed === false &&
+    failedProbeClasses.length === 0;
+  const longProbeReady =
+    reportReady &&
+    maxTokenCount >= minTokenCount &&
+    probes.some((probe) => probe?.status === "pass" && Number(probe?.tokenCount ?? 0) >= minTokenCount);
+  const readyForLocalFullResume = reportReady && longProbeReady && generatedAfterRuntimeBlocker;
+  return {
+    reportReady,
+    longProbeReady,
+    generatedAfterRuntimeBlocker,
+    failedProbeClasses,
+    readyForLocalFullResume,
+    public: {
+      report: {
+        path: displayPath(durabilityPath),
+        hash: `sha256:${sha256(durabilityRaw)}`,
+        mode: durabilityReport?.mode ?? null,
+        status: durabilityReport?.status ?? null,
+      },
+      runtimeBlocker: {
+        path: displayPath(runtimeBlockerPath),
+        hash: `sha256:${sha256(runtimeBlockerRaw)}`,
+        mode: runtimeBlockerReport?.mode ?? null,
+        status: runtimeBlockerReport?.status ?? null,
+        failedArm: runtimeBlockerReport?.failedArm?.strategy ?? null,
+        failureClass: runtimeBlockerReport?.failedArm?.failureClass ?? null,
+      },
+      reportReady,
+      longProbeReady,
+      generatedAfterRuntimeBlocker,
+      readyForLocalFullResume,
+      minRequiredTokenCount: minTokenCount,
+      maxProbeTokenCount: maxTokenCount,
+      probeCount: probes.length,
+      passProbeCount,
+      tokenCounts,
+      failedProbeClasses,
+      rawSyntheticInputIncluded: Boolean(durabilityReport?.rawSyntheticInputIncluded),
+      baseUrlPrinted: Boolean(durabilityReport?.baseUrlPrinted),
+      endpointPrinted: Boolean(durabilityReport?.endpointPrinted),
+      countsAsLocalFullBenchmarkEvidence: Boolean(durabilityReport?.countsAsLocalFullBenchmarkEvidence),
+      countsAsFullMemorySotaEvidence: Boolean(durabilityReport?.countsAsFullMemorySotaEvidence),
     },
   };
 }
@@ -382,6 +472,9 @@ function renderMarkdown(value) {
     `- Raw-source retention contract ready: ${value.sourceRetention.contractReady}`,
     `- Raw-source private audit ready: ${value.sourceRetention.readyForPrivateAudit}`,
     `- Compressed default retrieval allowed: ${value.sourceRetention.compressedDefaultRetrievalAllowed}`,
+    `- Local embedding durability report ready: ${value.localEmbeddingDurability.reportReady}`,
+    `- Local embedding durability long probe ready: ${value.localEmbeddingDurability.longProbeReady}`,
+    `- Local embedding durability fresher than runtime blocker: ${value.localEmbeddingDurability.generatedAfterRuntimeBlocker}`,
     `- Local embedding env ready: ${value.env.localEmbedding.ready}`,
     `- Local rerank env ready: ${value.env.localRerank.ready}`,
     `- Answer-quality env ready: ${value.env.answerQuality.ready}`,
@@ -405,6 +498,16 @@ function renderMarkdown(value) {
     `- Compressed default retrieval allowed: ${value.sourceRetention.compressedDefaultRetrievalAllowed}`,
     `- Required private audit roles: ${value.sourceRetention.requiredPrivateAuditRoles.join(", ")}`,
     ...value.sourceRetention.rawSourcePrivateFiles.map((file) => `- ${file.role}: present=${file.present}; hashMatched=${file.hashMatches}`),
+    "",
+    "## Local Embedding Durability",
+    `- Report ready: ${value.localEmbeddingDurability.reportReady}`,
+    `- Ready for local-full resume: ${value.localEmbeddingDurability.readyForLocalFullResume}`,
+    `- Long probe ready: ${value.localEmbeddingDurability.longProbeReady}`,
+    `- Generated after runtime blocker: ${value.localEmbeddingDurability.generatedAfterRuntimeBlocker}`,
+    `- Minimum required token count: ${value.localEmbeddingDurability.minRequiredTokenCount}`,
+    `- Maximum probe token count: ${value.localEmbeddingDurability.maxProbeTokenCount}`,
+    `- Probe count: ${value.localEmbeddingDurability.probeCount}`,
+    `- Failed probe classes: ${value.localEmbeddingDurability.failedProbeClasses.join(", ") || "none"}`,
     "",
     "## Completed Arm Files",
     ...value.completedArmFiles.map((file) => `- ${file.role}: present=${file.present}; hashMatched=${file.hashMatches}`),
@@ -455,6 +558,18 @@ function presentNames(names) {
 function stringOrNull(value) {
   const string = String(value ?? "").trim();
   return string.length ? string : null;
+}
+
+function positiveInt(value, label) {
+  const parsed = Number(value);
+  assert.ok(Number.isInteger(parsed) && parsed > 0, `${label} must be a positive integer`);
+  return parsed;
+}
+
+function timestampAfter(candidate, baseline) {
+  const candidateMs = Date.parse(String(candidate ?? ""));
+  const baselineMs = Date.parse(String(baseline ?? ""));
+  return Number.isFinite(candidateMs) && Number.isFinite(baselineMs) && candidateMs > baselineMs;
 }
 
 function arrayOf(value) {
