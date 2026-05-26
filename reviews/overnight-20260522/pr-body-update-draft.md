@@ -350,6 +350,11 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   preflight rejects private response-arm files that do not cover the selected
   `--query-offset` / `--max-queries` range before any answer-quality scoring can
   count.
+- Narrows release-check stale temp cleanup so it only removes old
+  `recallweave-release-check-root-*` directories. A new regression check proves
+  benchmark materialization roots and pointer files like `recallweave-sota-full-*`
+  survive release verification, preserving private raw-source lineage for the
+  full shard benchmark.
 - Previous verified code/product baseline before provider-arm expansion:
   `8aa98265e84db5a1e2dda2b66d16065c7be30902`.
 - GitHub Actions run `26351957568`: passed CI after requiring a same-data benchmark comparator matrix and binding returned canary evidence to the approved adapter commit.

@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T02:18:58.275Z",
+  "generatedAt": "2026-05-26T02:55:25.867Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -46,14 +46,14 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:7e6a7c97bb5e847740778a4889a3735c176685ebbb06c626ebf5b6da860abd22",
+      "hash": "sha256:be5cadd01f11b0aad025bc79d88b3e25c592e506525066e639057087cb5ecc55",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "privateInputDoctor": {
       "path": "reviews/overnight-20260522/full-shard-private-input-doctor-current.json",
       "exists": true,
-      "hash": "sha256:ce774e9f619f0a032f9822f0ef94f811c54b0b7cb9035089bd9ea3996748b4dd",
+      "hash": "sha256:58ae37a0babeb7f5a3ebf94ddcec58f6bfefed0c641ecea4e7e5f1cd3a1a8ccc",
       "mode": "full-shard-private-input-doctor",
       "status": "READY_FULL_SHARD_PRIVATE_INPUTS"
     },
@@ -137,28 +137,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:0941b3dee923eae9d7323311065fd32ce51bcfececd7dea5e811ec24d9fd808d",
+      "hash": "sha256:a02beb49ee2d820b5a784fe15216da4f2eb44d6d10940d8e19b314ada548b87b",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:6f91e741c9607e599a5e6f48fcb809629547f510d234984e2bedb36c655456c9",
+      "hash": "sha256:43d15f9010701047d098f53127c55068cc7ecabbb20baa73c4f45bc258710ce3",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:d7bf0b678b40eceeab8f5e5fd7cb75ea4829201ec2b31e8333614bba2e31e6ad",
+      "hash": "sha256:ad82438b2fdaca6ac2ca83eb6c0fa05df98a3a5b8abdcad233046324149aa50d",
       "mode": null,
       "status": null
     },
     "releaseHandoff": {
       "path": "docs/RELEASE_HANDOFF.md",
       "exists": true,
-      "hash": "sha256:0f84ef18b964bdba95b2cca72e69ca264b644e339177f61a6b281230f6496ec5",
+      "hash": "sha256:234fa1bfaa25f4129635626fbfc917b2e8dc61ec15a2eb7b7ccb169b8a5ee0eb",
       "mode": null,
       "status": null
     }

@@ -287,6 +287,11 @@ raw rows, and source manifest are present outside the repository, hash-matched,
 mode `0600`, and covered by the shard plan's `300000000` byte memory cap. This
 is full-shard run readiness only; it is not a 500-query score, SOTA proof, or a
 public claim.
+Release verification now preserves those private benchmark materials: the stale
+temp cleanup in `release:check` only removes old
+`recallweave-release-check-root-*` directories and has a regression check that
+keeps `recallweave-sota-full-*` materialization roots and current-path pointer
+files intact.
 The first private BM25 control export probe is recorded at
 `reviews/overnight-20260522/full-shard-bm25-control-export-probe-20260526.json`.
 It confirms `shard-001` can export 25 `bm25-lite` responses against the full

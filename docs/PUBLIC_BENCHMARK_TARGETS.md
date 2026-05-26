@@ -440,6 +440,9 @@ Component rows in the same artifact remain model-selection evidence only.
   `--max-memory-bytes 300000000` for the 203,831,507-byte memories file. It
   does not count as full-memory SOTA evidence and does not permit public
   benchmark claims.
+  `release:check` now protects that private benchmark lane by cleaning up only
+  stale `recallweave-release-check-root-*` directories. It must not delete
+  `recallweave-sota-full-*` materialization roots or current-path pointer files.
 - Full-shard BM25 control export probe:
   `reviews/overnight-20260522/full-shard-bm25-control-export-probe-20260526.json`
   proves only that `shard-001` can export the 25-query `bm25-lite` lexical

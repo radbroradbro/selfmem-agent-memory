@@ -286,6 +286,11 @@ hash-matched, mode `0600`, and that the shard export template raises
 fits past the old 5 MB guard. It does not count as SOTA evidence or allow
 public benchmark claims; it only proves the full-shard run now has clean private
 inputs.
+The release-check temp cleanup is now scoped to stale
+`recallweave-release-check-root-*` directories only. It explicitly preserves
+benchmark materialization roots and pointer files such as
+`recallweave-sota-full-*`, so a public-safe verification run cannot erase the
+private raw-source lineage needed for the full shard benchmark.
 The response export path now builds only the feature profile required by the
 selected strategy. The checked-in
 `reviews/overnight-20260522/full-shard-bm25-control-export-probe-20260526.json`

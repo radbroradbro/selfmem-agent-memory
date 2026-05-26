@@ -11,6 +11,7 @@ import {
   rmSync,
   statSync,
   symlinkSync,
+  utimesSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -22,10 +23,11 @@ import process from "node:process";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir());
 const originalTmpDir = tmpdir();
-const staleTempCleanupReport = cleanupStaleRecallWeaveTempRoots([originalTmpDir, "/private/tmp"], {
+const releaseCheckTempPrefix = "recallweave-release-check-root-";
+const staleTempCleanupReport = cleanupStaleReleaseCheckTempRoots([originalTmpDir, "/private/tmp"], {
   maxAgeMs: Number(process.env.RECALLWEAVE_RELEASE_TEMP_MAX_AGE_MS ?? 30 * 60 * 1000),
 });
-const releaseTempRoot = mkdtempSync(join(originalTmpDir, "recallweave-release-check-root-"));
+const releaseTempRoot = mkdtempSync(join(originalTmpDir, releaseCheckTempPrefix));
 process.env.TMPDIR = releaseTempRoot;
 process.env.TMP = releaseTempRoot;
 process.env.TEMP = releaseTempRoot;
@@ -34,7 +36,7 @@ process.on("exit", () => {
   try {
     rmSync(releaseTempRoot, { recursive: true, force: true });
   } catch {
-    // Best effort only. The next release check removes stale RecallWeave temp roots.
+    // Best effort only. The next release check removes stale release-check temp roots.
   }
 });
 
@@ -641,8 +643,31 @@ check("stale RecallWeave temp cleanup guard passes", () => {
   assert.equal(staleTempCleanupReport.ok, true);
   assert.equal(staleTempCleanupReport.metricsOnly, true);
   assert.equal(staleTempCleanupReport.printsPaths, false);
-  assert.equal(staleTempCleanupReport.onlyRecallWeavePrefix, true);
+  assert.equal(staleTempCleanupReport.onlyReleaseCheckRootPrefix, true);
+  assert.equal(staleTempCleanupReport.cleanupPrefix, releaseCheckTempPrefix);
   assert.ok(staleTempCleanupReport.maxAgeMs >= 0);
+
+  const guardRoot = mkdtempSync(join(tmpdir(), "recallweave-cleanup-guard-"));
+  try {
+    const protectedBenchmarkDir = join(guardRoot, "recallweave-sota-full-20260526T000000Z");
+    const protectedPointerFile = join(guardRoot, "recallweave-sota-full-current-path");
+    const staleReleaseRoot = join(guardRoot, `${releaseCheckTempPrefix}old`);
+    mkdirSync(protectedBenchmarkDir, { recursive: true, mode: 0o700 });
+    writeFileSync(protectedPointerFile, `${protectedBenchmarkDir}\n`, { encoding: "utf8", mode: 0o600 });
+    mkdirSync(staleReleaseRoot, { recursive: true, mode: 0o700 });
+    const oldDate = new Date(0);
+    utimesSync(staleReleaseRoot, oldDate, oldDate);
+
+    const cleanupProbe = cleanupStaleReleaseCheckTempRoots([guardRoot], { maxAgeMs: 0 });
+    assert.equal(cleanupProbe.ok, true);
+    assert.equal(cleanupProbe.candidates, 1);
+    assert.equal(cleanupProbe.removed, 1);
+    assert.equal(existsSync(staleReleaseRoot), false);
+    assert.equal(existsSync(protectedBenchmarkDir), true);
+    assert.equal(existsSync(protectedPointerFile), true);
+  } finally {
+    rmSync(guardRoot, { recursive: true, force: true });
+  }
 });
 
 check("selfmem_update command is mapped", () => {
@@ -6847,7 +6872,7 @@ function run(command, args, options = {}) {
   return result;
 }
 
-function cleanupStaleRecallWeaveTempRoots(roots, { maxAgeMs }) {
+function cleanupStaleReleaseCheckTempRoots(roots, { maxAgeMs }) {
   const now = Date.now();
   const seen = new Set();
   const report = {
@@ -6855,13 +6880,15 @@ function cleanupStaleRecallWeaveTempRoots(roots, { maxAgeMs }) {
     mode: "release-temp-cleanup-guard",
     metricsOnly: true,
     printsPaths: false,
-    onlyRecallWeavePrefix: true,
+    cleanupPrefix: releaseCheckTempPrefix,
+    onlyReleaseCheckRootPrefix: true,
     maxAgeMs,
     rootCount: 0,
     candidates: 0,
     removed: 0,
     skippedYoung: 0,
     skippedSymlink: 0,
+    skippedNonDirectory: 0,
     skippedError: 0,
   };
 
@@ -6870,13 +6897,17 @@ function cleanupStaleRecallWeaveTempRoots(roots, { maxAgeMs }) {
     seen.add(rootPath);
     report.rootCount += 1;
     for (const entry of readdirSync(rootPath, { withFileTypes: true })) {
-      if (!entry.name.startsWith("recallweave-")) continue;
+      if (!entry.name.startsWith(releaseCheckTempPrefix)) continue;
       report.candidates += 1;
       const candidate = join(rootPath, entry.name);
       try {
         const stat = lstatSync(candidate);
         if (stat.isSymbolicLink()) {
           report.skippedSymlink += 1;
+          continue;
+        }
+        if (!stat.isDirectory()) {
+          report.skippedNonDirectory += 1;
           continue;
         }
         if (now - stat.mtimeMs < maxAgeMs) {
