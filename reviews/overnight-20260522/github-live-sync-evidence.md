@@ -288,4 +288,18 @@ Date: 2026-05-23
 - Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
 - Issue body hash: a4f14efd9edf0463dd16ca8ed7229ce29d621bfb4caa8f860c106d4a5ddf1afb
 
+## 2026-05-26 Local-Full Verified Baseline Refresh
+
+- PR #5 and issue #6 were refreshed again after GitHub Actions run
+  `26434316174` passed on
+  `27cd17c25cbef6f3483e9b4798af94ea64256cb4`.
+- The refreshed public text promotes that commit only as the verified branch
+  baseline for the local-full benchmark lane. It keeps public launch, SOTA
+  claims, and production rollout blocked.
+- PR body refreshed at: 2026-05-26T05:37:33Z
+- Issue updated at: 2026-05-26T05:37:34Z
+- PR body hash: 6269d3b45e43887e6859ea28d1ff6163c184fa08aa8de6fbecf7cef1b5a81f7c
+- Issue title hash: e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c
+- Issue body hash: 06f5cb648213785c30eec9a051cdab851a6c85bac8ef9cb538afa57ce054fd64
+
 No credentials, raw memories, transcripts, private local paths, or diagnostic contents were printed or committed.
