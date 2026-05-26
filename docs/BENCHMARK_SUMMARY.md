@@ -340,7 +340,10 @@ embedding, and local rerank arms. Its workorder,
 is accepted for local full-benchmark intake and deliberately has no Voyage or
 NVIDIA blockers. It is still blocked on live/no-raw consent, answer-quality
 endpoint configuration, local Apple/local rerank endpoints, and model-backed
-query expansion. A completed `local-full` run can diagnose whether the local
+query expansion. The regenerated response-arm commands now require explicit
+local embedding and local rerank endpoint placeholders plus the public-safe
+local embedding durability report, so shard retries cannot omit the local model
+sidecars or durability gate. A completed `local-full` run can diagnose whether the local
 method is model-size limited; it does not count as SOTA evidence or public
 superiority without the provider/SOTA comparison lane.
 `benchmark:answer-quality:local-shard-workorder` and
@@ -563,7 +566,10 @@ runtime doctor and durability smoke now pass for the Qwen3 Embedding 0.6B
 llama.cpp lane, but they are preflight artifacts only: they are public-safe,
 print no endpoint URL or raw probe text, and do not count as local-full or SOTA
 evidence. The next accepted local-full shard still requires response export,
-answer-quality scoring, shard intake, and the combine gate.
+answer-quality scoring, shard intake, and the combine gate. The shard workorder
+now carries `SELFMEM_LOCAL_EMBED_BASE_URL`,
+`SELFMEM_LOCAL_RERANK_BASE_URL`, `RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1`,
+and `--require-local-embedding-durability` on the response export command.
 
 A source-locked 30-query local Apple run is now recorded:
 

@@ -534,7 +534,11 @@ not count as a RecallWeave score.
   endpoint, exact target model matching, and query-expansion readiness are all
   present. The local-full workorder permits local diagnostic scoring only under
   `claimScope=local-full`, and the result gate rejects a local-full packet when
-  it is submitted to the full-SOTA gate.
+  it is submitted to the full-SOTA gate. The local-full response export
+  commands include explicit local embedding and local rerank endpoint
+  placeholders plus the local embedding durability report and required
+  durability flag, so the checked-in workorder documents the sidecar
+  requirements without exposing private URLs.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

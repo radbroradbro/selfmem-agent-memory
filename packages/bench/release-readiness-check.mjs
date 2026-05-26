@@ -3159,6 +3159,11 @@ check("fresh public benchmark target check passes", () => {
     assert.deepEqual(shardPlan.blockers, []);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--max-memory-bytes 300000000/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--require-local-embedding-durability/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--local-embedding-durability-report reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /benchmark:answer-quality:preflight/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--query-offset \{startIndex\}/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--max-queries \{queryCount\}/);
@@ -3199,6 +3204,11 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(acceptedLocalLane?.answerQualityEndpoint?.answerModel, "<local-answer-model>");
     assert.equal(acceptedLocalLane?.answerQualityEndpoint?.judgeModel, "<local-judge-model>");
     assert.equal(shardPlan.scoringPolicy?.modelMatchPolicy, "local-diagnostic-allowed");
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url>/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--require-local-embedding-durability/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--local-embedding-durability-report reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_QUERY_EXPANSION_BASE_URL/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--claim-scope local-full/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--model-match-policy local-diagnostic-allowed/);
@@ -3331,6 +3341,9 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.blockers?.includes("nvidia-credentials-missing"), false);
     assert.equal(launchDoctor.blockers?.includes("full-memory-sota-score-not-proven"), false);
     assert.equal(launchDoctor.blockers?.includes("public-sota-claim-not-allowed"), false);
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_EMBED_BASE_URL"));
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_RERANK_BASE_URL"));
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--require-local-embedding-durability"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_QUERY_EXPANSION_BASE_URL"));
     assert.doesNotMatch(launchDoctor.nextCommands?.responseArmExport ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
     assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("answer-quality-local-full-shard-001.json"));

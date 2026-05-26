@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T11:35:33.417Z",
+  "generatedAt": "2026-05-26T11:42:20.016Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -47,21 +47,21 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:934c7cdef74507b719f173540bc9256e22fff05b736cb4521424d7335593c688",
+      "hash": "sha256:b6f9b29046ba12798ba5d58defd7fea8f071b4f8f68bc34dcd6535921a515754",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
       "exists": true,
-      "hash": "sha256:3f1cd815f035169077dc42c20690b33594f586fd61e3bd686f13ffdb09f9f4e6",
+      "hash": "sha256:33ab66f5e802ff3490b22b01d531a2abc75695e785ee7fdd4a510782c6a3575a",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
       "exists": true,
-      "hash": "sha256:dc4a205fe2a5049f1942a65cda11d56ace2111d1d6109c1cdf66da6a52ecee02",
+      "hash": "sha256:3396bb0e75c34165a1f9c359245b0ff04412a06fa9300f6214b04a57890f285f",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -103,7 +103,7 @@
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:3ba4ea043ea1b0ca406a224feb83a1e3fd4dcd6114a89e4eb24701e149f4236f",
+      "hash": "sha256:8071fa319c68a3230ac9af210190b5f8c1aac48271d1af223f77952c121b4a61",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -117,7 +117,7 @@
     "acceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:1c4c75d9df318000c4e3c4e8dcbcd6965fbdb41aba33982ab856668ebaa5640d",
+      "hash": "sha256:41e4fca13c534106e24fafd451eec65124c6cd1d35a9708482ae6cb0418bd276",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -131,7 +131,7 @@
     "shardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
       "exists": true,
-      "hash": "sha256:248794b0f2c0f64b6d3f8ed3b45d5e54ed13e8199917fe86a881dcd6a1335f46",
+      "hash": "sha256:29821bd53b9da47005514a2f721005ec2717593e0ba99eaa351acbf51fdc3d6c",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },

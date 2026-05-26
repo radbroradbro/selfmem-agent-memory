@@ -43,6 +43,9 @@ Use this checklist before making the repository public.
 - [ ] Local Apple local-full shard retries have a ready
   `benchmark:local-embedding:durability -- --require-ready` report before
   response-arm export; the report must stay synthetic-only and public-safe.
+  The shard workorder response export command must keep the local embedding
+  endpoint, local rerank endpoint, durability report, and required durability
+  flag placeholders in place.
 - [ ] `benchmark:memory-score:result-gate --require-ready` has an empty
   `fullSotaBlockers` list, proving the result meets the selected source-locked
   reported memory-system target under matching benchmark and judge semantics.

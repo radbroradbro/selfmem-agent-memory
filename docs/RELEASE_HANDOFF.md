@@ -389,6 +389,11 @@ For local Apple response-arm export, pass a fresh ready report through
 `--local-embedding-durability-report` or
 `SELFMEM_LOCAL_EMBED_DURABILITY_REPORT` with
 `RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1`.
+The regenerated local-full plan and workorder already put the local embedding
+endpoint, local rerank endpoint, durability report, and
+`--require-local-embedding-durability` into each response-arm export command;
+fill those placeholders from the live local sidecars rather than dropping them
+for shard retries.
 Run `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` for this lane so the local-full
 plan is selected automatically. The checked-in local intake report,

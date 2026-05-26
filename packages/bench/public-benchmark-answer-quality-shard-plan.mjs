@@ -439,6 +439,22 @@ function responseArmExportTemplate() {
         "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run>",
         "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run>",
       ];
+  const localAppleEnv = coverage.hasLocalApple
+    ? [
+        "SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>",
+        "SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model>",
+        "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS=<safe-local-embedding-batch-token-limit>",
+        "SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
+        "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1",
+      ]
+    : [];
+  const localRerankEnv = coverage.hasLocalRerank
+    ? [
+        "SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url>",
+        "SELFMEM_LOCAL_RERANK_MODEL=<local-rerank-model>",
+        "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=<local-rerank-candidate-limit>",
+      ]
+    : [];
   const queryExpansionEnv = [
     "SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used>",
     "SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used>",
@@ -449,6 +465,8 @@ function responseArmExportTemplate() {
     "RECALLWEAVE_BASELINE_LIVE=1",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
     ...providerEnv,
+    ...localAppleEnv,
+    ...localRerankEnv,
     ...queryExpansionEnv,
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute",
     `--target ${displayPath(targetPath)}`,
@@ -461,6 +479,12 @@ function responseArmExportTemplate() {
     `--max-memory-bytes ${maxMemoryBytes}`,
     "--query-offset {startIndex}",
     "--max-queries {queryCount}",
+    ...(coverage.hasLocalApple
+      ? [
+          "--require-local-embedding-durability",
+          "--local-embedding-durability-report reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
+        ]
+      : []),
   ].join(" ");
 }
 
