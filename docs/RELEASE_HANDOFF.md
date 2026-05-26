@@ -401,7 +401,14 @@ Run `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` for this lane so the local-full
 plan is selected automatically. The checked-in local workorder now consumes the
 accepted shard 001 output plus the shard 002 runtime blocker and prints a
-missing-arm-only retry for the two local Apple arms. The checked-in local intake report,
+missing-arm-only retry for the two local Apple arms. The resume packet at
+`reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
+turns that state into an operator handoff: it records current local runtime and
+durability readiness, lists only hashes/counts/labels for completed private
+arms, emits the missing-arm export, preflight, answer-quality, and local-intake
+commands, and keeps local-full evidence, SOTA evidence, public benchmark
+claims, and launch claims disabled until shard 002 returns an accepted public
+result. The checked-in local intake report,
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-20260526.json`,
 is intentionally blocked with zero accepted shards and twenty missing shards.
 It should turn green only after all twenty local-full public shard-result JSONs

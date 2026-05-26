@@ -542,6 +542,14 @@ not count as a RecallWeave score.
   runtime-blocker report as public-safe resume metadata and emits a
   missing-arm-only retry command for the two local Apple arms while keeping
   answer-quality scoring and intake blocked until all shard arms exist.
+- Local-full shard resume packet:
+  `reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
+  packages the shard 002 retry as an operator-ready, metrics-only handoff. It
+  verifies the local embedding runtime doctor and durability smoke are ready,
+  lists only hashes/counts/labels for the completed private arms, and emits the
+  missing-arm export, preflight, answer-quality, and local-intake commands. It
+  is not local-full benchmark evidence until shard 002 is accepted, and it is
+  never full-SOTA evidence by itself.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

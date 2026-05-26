@@ -352,6 +352,13 @@ resume plan for shard 002, and includes a missing-arm-only response export for
 `local-apple-qwen3-0_6b` and `local-apple-qwen3-0_6b-local-rerank` so the
 already exported BM25, full-hybrid, and local query-expansion arms do not have
 to be regenerated just to retry the unstable local embedding path.
+`reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
+is the public-safe operator packet for that retry. It confirms the current
+local embedding runtime and durability reports are ready, preserves the three
+completed private arm hashes, emits the missing-arm-only export, preflight,
+answer-quality, and local-intake commands, and still keeps
+`countsAsLocalFullBenchmarkEvidence: false` until shard 002 returns an accepted
+public result.
 `benchmark:answer-quality:local-shard-workorder` and
 `benchmark:answer-quality:local-shard-intake` now bind those generic shard
 tools to the local-full plan by default. The checked-in local intake report at

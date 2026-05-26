@@ -129,6 +129,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-combine.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
+  "packages/bench/local-full-shard-resume-packet.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
   "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
@@ -197,6 +198,8 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-plan-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.md`,
+  `${reviewDir}/local-full-shard-002-resume-packet-20260526.json`,
+  `${reviewDir}/local-full-shard-002-resume-packet-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
@@ -599,6 +602,7 @@ const requiredScripts = [
   "benchmark:answer-quality:local-shard-plan",
   "benchmark:answer-quality:shard-workorder",
   "benchmark:answer-quality:local-shard-workorder",
+  "benchmark:answer-quality:local-shard-resume-packet",
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:local-shard-intake",
   "benchmark:answer-quality:private-input-doctor",
@@ -1877,6 +1881,10 @@ check("fresh public benchmark target check passes", () => {
       "reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json",
     ]).stdout,
   );
+  const localFullShardResumePacket = JSON.parse(readFileSync(join(root, reviewDir, "local-full-shard-002-resume-packet-20260526.json"), "utf8"));
+  const localFullShardResumePacketEvidence = readFileSync(join(root, reviewDir, "local-full-shard-002-resume-packet-20260526.md"), "utf8");
+  const localFullShardResumePacketFresh = JSON.parse(run("node", ["packages/bench/local-full-shard-resume-packet.mjs"]).stdout);
+  const localFullShardResumePacketMarkdownFresh = run("node", ["packages/bench/local-full-shard-resume-packet.mjs", "--format", "markdown"]).stdout;
   const localFullShardIntakeFresh = JSON.parse(
     run("node", [
       "packages/bench/public-benchmark-answer-quality-shard-intake.mjs",
@@ -3638,6 +3646,75 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /scoring-policy=local-diagnostic-allowed/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /Runtime resume plans: 1/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /missing=local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank/);
+  for (const resumePacket of [localFullShardResumePacket, localFullShardResumePacketFresh]) {
+    assert.equal(resumePacket.mode, "local-full-shard-resume-packet");
+    assert.equal(resumePacket.status, "READY_FOR_LOCAL_FULL_SHARD_RESUME");
+    assert.equal(resumePacket.metricsOnly, true);
+    assert.equal(resumePacket.publicSafe, true);
+    assert.equal(resumePacket.callsProviderApis, false);
+    assert.equal(resumePacket.callsHostedSupermemory, false);
+    assert.equal(resumePacket.sendsBenchmarkTextToProvider, false);
+    assert.equal(resumePacket.rawQuestionsIncluded, false);
+    assert.equal(resumePacket.rawAnswersIncluded, false);
+    assert.equal(resumePacket.rawMemoryIncluded, false);
+    assert.equal(resumePacket.rawTranscriptIncluded, false);
+    assert.equal(resumePacket.rawPromptIncluded, false);
+    assert.equal(resumePacket.rawPrivateOutputPathIncluded, false);
+    assert.equal(resumePacket.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(resumePacket.countsAsFullMemorySotaEvidence, false);
+    assert.equal(resumePacket.readyForShardIntake, false);
+    assert.equal(resumePacket.readyForShardCombine, false);
+    assert.equal(resumePacket.publicBenchmarkClaimsAllowed, false);
+    assert.equal(resumePacket.progress?.acceptedShardCount, 1);
+    assert.equal(resumePacket.progress?.pendingShardCount, 19);
+    assert.equal(resumePacket.progress?.runtimeBlockerResumeAvailableCount, 1);
+    assert.equal(resumePacket.targetShard?.shardId, "shard-002");
+    assert.equal(resumePacket.targetShard?.startIndex, 25);
+    assert.equal(resumePacket.targetShard?.endIndexExclusive, 50);
+    assert.equal(resumePacket.targetShard?.queryOffset, 25);
+    assert.equal(resumePacket.targetShard?.maxQueries, 25);
+    assert.deepEqual(resumePacket.resumeState?.completedStrategies, [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+    ]);
+    assert.deepEqual(resumePacket.resumeState?.missingStrategies, [
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank",
+    ]);
+    assert.equal(resumePacket.resumeState?.completedArmCount, 3);
+    assert.equal(resumePacket.resumeState?.missingArmCount, 2);
+    assert.equal(resumePacket.resumeState?.previousFailureClass, "local-embedding-server-socket-close");
+    assert.equal(resumePacket.resumeState?.publicSyntheticReproduced, true);
+    assert.equal(resumePacket.localRuntime?.runtimeReady, true);
+    assert.equal(resumePacket.localRuntime?.durabilityReady, true);
+    assert.deepEqual(resumePacket.localRuntime?.blockers, []);
+    assert.deepEqual(resumePacket.blockers, []);
+    assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--strategies local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank/);
+    assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--query-offset 25/);
+    assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--require-local-embedding-durability/);
+    assert.match(resumePacket.commands?.preflight ?? "", /benchmark:answer-quality:preflight/);
+    assert.match(resumePacket.commands?.answerQuality ?? "", /benchmark:answer-quality/);
+    assert.match(resumePacket.commands?.localShardIntake ?? "", /benchmark:answer-quality:local-shard-intake/);
+  }
+  assert.equal(localFullShardResumePacket.writesRealFiles, true);
+  assert.equal(localFullShardResumePacketFresh.writesRealFiles, false);
+  assert.match(localFullShardResumePacketEvidence, /Local-Full Shard Resume Packet/);
+  assert.match(localFullShardResumePacketEvidence, /Status: READY_FOR_LOCAL_FULL_SHARD_RESUME/);
+  assert.match(localFullShardResumePacketEvidence, /Missing arms: local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank/);
+  assert.match(localFullShardResumePacketEvidence, /Counts as local-full benchmark evidence: false/);
+  assert.match(localFullShardResumePacketEvidence, /Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted/);
+  assert.match(localFullShardResumePacketMarkdownFresh, /Local embedding runtime ready: true/);
+  assert.match(localFullShardResumePacketMarkdownFresh, /Raw memory included: false/);
+  for (const text of [
+    JSON.stringify(localFullShardResumePacket),
+    JSON.stringify(localFullShardResumePacketFresh),
+    localFullShardResumePacketEvidence,
+    localFullShardResumePacketMarkdownFresh,
+  ]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
   for (const localShardIntake of [localFullShardIntakeFresh, localFullAnswerQualityShardIntake]) {
     assert.equal(localShardIntake.mode, "public-benchmark-answer-quality-shard-intake");
     assert.equal(localShardIntake.status, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
