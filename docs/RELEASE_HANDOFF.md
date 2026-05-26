@@ -73,8 +73,11 @@ npm exec --yes pnpm@10.23.0 -- release:doctor
 ```
 
 The doctor is intentionally conservative. It should report
-`publicLaunchAllowed: false` until Claude review, human approval, and
-hosted-baseline blockers are resolved or explicitly accepted.
+`publicLaunchAllowed: false` until owner approval, the full-memory SOTA
+benchmark gate, and the real canary blocker are resolved or explicitly
+accepted. Its blocker list must include
+`full-memory-sota-benchmark-gate-incomplete` while the full same-data
+answer-quality shard ladder is incomplete.
 Use its `manualCommands` list as the next-action checklist for agents.
 
 For the benchmark-specific blocker, run:

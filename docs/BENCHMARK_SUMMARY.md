@@ -454,6 +454,9 @@ the lexical control, raw sources are retained privately, the public report stays
 hash/count only, and SOTA claims remain blocked until the full shard set,
 provider arms, reviewer intake, UI/docs refresh, owner approval, and real
 canary all pass.
+The release blocker doctor now also exposes this as
+`full-memory-sota-benchmark-gate-incomplete`, so release review cannot show only
+the owner/canary blockers while the full-memory benchmark gate is still open.
 The end-to-end gate also now verifies exact answer and
 judge model matching against the target contract. The current canary was
 answered and judged by `qwen36-a3b-main-q8kv-8192` while the checked target

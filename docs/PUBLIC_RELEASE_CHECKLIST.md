@@ -75,6 +75,10 @@ Use this checklist before making the repository public.
 - [ ] Security review completed.
 - [ ] Docs clarity review completed.
 - [ ] Release claim review completed.
+- [ ] `pnpm release:doctor` shows
+  `full-memory-sota-benchmark-gate-incomplete` until the full same-data
+  answer-quality shard ladder, reviewer gate, owner approval, and real canary
+  are complete.
 - [ ] Any `CONCERNS` decision has an explicit acceptance note.
 - [ ] Public live-update draft says whether the release is production ready or
   alpha only.

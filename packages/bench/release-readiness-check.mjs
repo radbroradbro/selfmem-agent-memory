@@ -1292,6 +1292,7 @@ check("release state is conservative", () => {
   assert.equal(releaseState.reviewerEvidence?.claudeOpus?.countsAsPublicLaunchApproval, false);
   for (const blocker of [
     "human-public-launch-approval-required",
+    "full-memory-sota-benchmark-gate-incomplete",
     "fresh-real-container-canary-not-current",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
@@ -5909,7 +5910,22 @@ check("fresh release blocker doctor passes", () => {
   const doctorRun = run("node", ["packages/bench/release-blocker-doctor.mjs"]);
   const report = JSON.parse(doctorRun.stdout);
   const canaryBlocker = report.blockers.find((item) => item.id === "fresh-real-container-canary-not-current");
+  const benchmarkBlocker = report.blockers.find((item) => item.id === "full-memory-sota-benchmark-gate-incomplete");
+  assert.ok(canaryBlocker, "missing fresh canary release blocker");
+  assert.ok(benchmarkBlocker, "missing full-memory SOTA benchmark release blocker");
   assert.equal(report.blockers.some((item) => item.id === "hosted-supermemory-baseline-not-current"), false);
+  assert.equal(report.checks.fullMemorySotaDoctor.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+  assert.equal(report.checks.fullMemorySotaDoctor.publicBenchmarkClaimsAllowed, false);
+  assert.equal(report.checks.fullMemorySotaDoctor.countsAsFullMemorySotaEvidence, false);
+  assert.equal(report.checks.fullMemorySotaDoctor.bm25IsLexicalFloorOnly, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.rawSourcesRetainedPrivately, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.rawPublicReportSafe, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.nextLocalFullShard, "shard-002");
+  assert.equal(report.checks.fullMemorySotaDoctor.nextLocalFullShardRange, "25-50");
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullPendingShardCount, 19);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullAcceptedShardCount, 1);
+  assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingRuntimeReady, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingDurabilityReady, true);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.status, "READY_FOR_BASELINE_REVIEW");
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.callsHostedProvider, true);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.recallWeaveWin, true);
@@ -5947,6 +5963,9 @@ check("fresh release blocker doctor passes", () => {
   assert.match(approvedAdapterCommit, /^[a-f0-9]{40}$/);
   assert.match(report.latestVerifiedRepositoryHead?.headSha ?? "", /^[a-f0-9]{40}$/);
   assert.notEqual(report.latestVerifiedRepositoryHead?.headSha, approvedAdapterCommit);
+  assert.match(benchmarkBlocker.nextAction, /full same-data answer-quality shard ladder/);
+  assert.match(benchmarkBlocker.nextAction, /local-full shard-002 \(25-50\)/);
+  assert.match(benchmarkBlocker.nextAction, /real canary gate/);
   assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent handoff packet/);
   assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
   assert.match(canaryBlocker.nextAction, new RegExp(`canary:returned-(?:inbox|packet).*--require-production-canary.*--expected-commit ${approvedAdapterCommit}`));

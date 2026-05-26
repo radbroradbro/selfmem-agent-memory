@@ -412,6 +412,7 @@
   },
   "remainingBlockers": [
     "human-public-launch-approval-required",
+    "full-memory-sota-benchmark-gate-incomplete",
     "fresh-real-container-canary-not-current"
   ],
   "safetyBoundary": {
