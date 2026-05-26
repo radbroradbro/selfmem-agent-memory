@@ -371,6 +371,10 @@ count. The same doctor now checks that the local embedding durability report is
 newer than the shard 002 socket-close blocker and includes a passing long
 synthetic probe at the required token envelope. Use it before launching shard
 002 so placeholder commands are not mistaken for a runnable local benchmark.
+The report now separates environment readiness from command-template readiness:
+`readyForCommandMaterialization` means the required private directory and env
+placeholders can be filled, while `resumePacketCommandsRunnableAsPrinted: false`
+keeps the operator from running placeholder templates literally.
 The same doctor now supports `--fixture`, which builds a tiny outside-repository
 private directory and deterministic reports, then proves the raw-source,
 completed-arm, missing-arm, durability, and environment gates can all turn

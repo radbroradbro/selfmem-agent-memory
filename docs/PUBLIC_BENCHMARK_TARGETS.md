@@ -565,7 +565,10 @@ not count as a RecallWeave score.
   resume commands are treated as runnable. Its `--fixture` mode now proves the
   full green path with temporary synthetic private inputs, while keeping
   `fixtureOnly: true`, provider calls off, hosted Supermemory off, and all
-  public benchmark-claim flags false.
+  public benchmark-claim flags false. The report also exposes
+  `readyForCommandMaterialization` and `resumePacketCommandsRunnableAsPrinted`
+  so public evidence can prove required placeholders are satisfiable without
+  printing private paths, endpoint values, or runnable commands.
 - Full-shard accepted-lane launch doctor:
   `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json`
   is the no-call go/no-go packet for the only lane accepted by full-shard

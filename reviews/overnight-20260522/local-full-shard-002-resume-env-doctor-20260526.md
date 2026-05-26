@@ -6,6 +6,8 @@
 - Ready for missing-arm export: false
 - Ready for answer-quality preflight: false
 - Ready for local shard intake: false
+- Ready for command materialization: false
+- Resume packet commands runnable as printed: false
 - Private directory provided: false
 - Private directory present: false
 - Private directory outside repository: false
@@ -70,6 +72,14 @@
 ## Missing Arm Files
 - local-apple-qwen3-0_6b: present=false
 - local-apple-qwen3-0_6b-local-rerank: present=false
+
+## Command Materialization
+- Template placeholders present: true
+- Commands runnable as printed: false
+- Required placeholders ready: false
+- Unresolved required placeholders: local-answer-model, local-embedding-base-url, local-embedding-model, local-judge-model, local-rerank-base-url, local-rerank-candidate-limit, local-rerank-model, openai-compatible-base-url, private-output-dir, safe-local-embedding-batch-token-limit
+- Optional placeholders requiring operator choice: 1-when-cloud-query-expansion-runs, env-only-if-cloud-endpoint, local-query-expansion-base-url-if-used, query-expansion-model-if-used
+- Prints materialized commands: false
 
 ## Blockers
 - private-dir-not-provided

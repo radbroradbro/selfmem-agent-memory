@@ -75,6 +75,12 @@ const requiredInputFiles = inspectRequiredInputFiles(privateDirState.resolvedPat
 const completedArmFiles = inspectCompletedArmFiles(privateDirState.resolvedPath, resumePacket);
 const missingArmFiles = inspectMissingArmFiles(privateDirState.resolvedPath, resumePacket);
 const commandPlaceholderState = inspectCommandPlaceholders(resumePacket);
+const commandMaterializationState = inspectCommandMaterialization({
+  commandPlaceholderState,
+  privateDirState,
+  envState,
+  reviewDir,
+});
 
 const readyForMissingArmExport =
   resumePacket.status === "READY_FOR_LOCAL_FULL_SHARD_RESUME" &&
@@ -93,6 +99,7 @@ const readyForAnswerQualityPreflight =
   envState.answerQuality.ready;
 const readyForLocalShardIntake = readyForAnswerQualityPreflight;
 const ready = readyForMissingArmExport && readyForAnswerQualityPreflight && readyForLocalShardIntake;
+const readyForCommandMaterialization = readyForAnswerQualityPreflight && commandMaterializationState.readyForCommandMaterialization;
 
 const blockers = [
   resumePacket.status !== "READY_FOR_LOCAL_FULL_SHARD_RESUME" ? "resume-packet-not-ready" : null,
@@ -115,6 +122,9 @@ const blockers = [
   !envState.localSafety.ready ? "local-safety-env-missing" : null,
   !envState.answerQuality.ready ? "answer-quality-env-missing" : null,
   readyForMissingArmExport && missingArmFiles.some((file) => !file.present) ? "missing-arm-files-not-yet-exported" : null,
+  readyForAnswerQualityPreflight && !commandMaterializationState.readyForCommandMaterialization
+    ? "resume-command-materialization-placeholders-unresolved"
+    : null,
 ].filter(Boolean);
 
 const report = {
@@ -147,6 +157,8 @@ const report = {
   readyForAnswerQualityPreflight,
   readyForShardAnswerQuality: readyForAnswerQualityPreflight,
   readyForLocalShardIntake,
+  readyForCommandMaterialization,
+  resumePacketCommandsRunnableAsPrinted: commandMaterializationState.commandsRunnableAsPrinted,
   resumePacket: {
     path: displayPath(resumePacketPath),
     hash: `sha256:${sha256(resumeRaw)}`,
@@ -168,6 +180,7 @@ const report = {
   localEmbeddingDurability: durabilityState.public,
   env: envState.public,
   commandPlaceholders: commandPlaceholderState,
+  commandMaterialization: commandMaterializationState,
   requiredInputFiles,
   completedArmFiles,
   missingArmFiles,
@@ -481,6 +494,85 @@ function inspectCommandPlaceholders(packet) {
   };
 }
 
+function inspectCommandMaterialization({ commandPlaceholderState: placeholders, privateDirState: privateState, envState: env, reviewDir: reviewDirectory }) {
+  const optionalPlaceholderPolicy = {
+    "1-when-cloud-query-expansion-runs": "Set to 1 only when a cloud query-expansion arm is intentionally enabled; otherwise remove or set to 0.",
+    "env-only-if-cloud-endpoint": "Provide only for an authenticated cloud scoring endpoint; omit for local no-auth scoring endpoints.",
+    "local-query-expansion-base-url-if-used": "Fill only when a local query-expansion sidecar is used for the retry.",
+    "query-expansion-model-if-used": "Fill only when a query-expansion sidecar is used for the retry.",
+  };
+  const requiredPlaceholderSpecs = {
+    "private-output-dir": {
+      source: "RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir",
+      ready: privateState.present && privateState.outsideRepository,
+      printsValue: false,
+    },
+    "public-review-dir": {
+      source: "--review-dir or RECALLWEAVE_REVIEW_DIR",
+      ready: String(reviewDirectory ?? "").trim().length > 0,
+      printsValue: false,
+    },
+    "local-embedding-base-url": envPlaceholder("SELFMEM_LOCAL_EMBED_BASE_URL", env),
+    "local-embedding-model": envPlaceholder("SELFMEM_LOCAL_EMBED_MODEL", env),
+    "safe-local-embedding-batch-token-limit": envPlaceholder("SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS", env),
+    "local-rerank-base-url": envPlaceholder("SELFMEM_LOCAL_RERANK_BASE_URL", env),
+    "local-rerank-model": envPlaceholder("SELFMEM_LOCAL_RERANK_MODEL", env),
+    "local-rerank-candidate-limit": envPlaceholder("SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT", env),
+    "openai-compatible-base-url": envPlaceholder("RECALLWEAVE_MEMORYBENCH_BASE_URL", env),
+    "local-answer-model": envPlaceholder("RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL", env),
+    "local-judge-model": envPlaceholder("RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL", env),
+  };
+  const required = placeholders.names
+    .filter((name) => !Object.hasOwn(optionalPlaceholderPolicy, name))
+    .map((name) => {
+      const spec = requiredPlaceholderSpecs[name] ?? {
+        source: "unknown-placeholder",
+        ready: false,
+        printsValue: false,
+      };
+      return {
+        name,
+        source: spec.source,
+        ready: Boolean(spec.ready),
+        printsValue: false,
+      };
+    });
+  const optional = placeholders.names
+    .filter((name) => Object.hasOwn(optionalPlaceholderPolicy, name))
+    .map((name) => ({
+      name,
+      operatorChoiceRequired: true,
+      policy: optionalPlaceholderPolicy[name],
+      printsValue: false,
+    }));
+  const unresolvedRequiredPlaceholderNames = required.filter((entry) => !entry.ready).map((entry) => entry.name);
+  return {
+    templatePlaceholdersPresent: placeholders.count > 0,
+    commandsRunnableAsPrinted: placeholders.count === 0,
+    requiresOperatorPlaceholderSubstitution: placeholders.count > 0,
+    readyForCommandMaterialization: unresolvedRequiredPlaceholderNames.length === 0,
+    requiredPlaceholderCount: required.length,
+    requiredPlaceholdersReady: unresolvedRequiredPlaceholderNames.length === 0,
+    requiredPlaceholders: required,
+    unresolvedRequiredPlaceholderNames,
+    optionalPlaceholderCount: optional.length,
+    optionalPlaceholders: optional,
+    optionalPlaceholderNames: optional.map((entry) => entry.name),
+    printsMaterializedCommands: false,
+    printsPrivatePaths: false,
+    printsEnvValues: false,
+    materializedCommandHashesIncluded: false,
+  };
+}
+
+function envPlaceholder(name, env) {
+  return {
+    source: name,
+    ready: Object.values(env).some((group) => Array.isArray(group?.public?.presentNames) && group.public.presentNames.includes(name)),
+    printsValue: false,
+  };
+}
+
 function placeholderNames(command) {
   return [...String(command ?? "").matchAll(/<([^>]+)>/gu)].map((match) => match[1]);
 }
@@ -495,6 +587,8 @@ function renderMarkdown(value) {
     `- Ready for missing-arm export: ${value.readyForMissingArmExport}`,
     `- Ready for answer-quality preflight: ${value.readyForAnswerQualityPreflight}`,
     `- Ready for local shard intake: ${value.readyForLocalShardIntake}`,
+    `- Ready for command materialization: ${value.readyForCommandMaterialization}`,
+    `- Resume packet commands runnable as printed: ${value.resumePacketCommandsRunnableAsPrinted}`,
     `- Private directory provided: ${value.privateDir.provided}`,
     `- Private directory present: ${value.privateDir.present}`,
     `- Private directory outside repository: ${value.privateDir.outsideRepository}`,
@@ -543,6 +637,14 @@ function renderMarkdown(value) {
     "",
     "## Missing Arm Files",
     ...value.missingArmFiles.map((file) => `- ${file.role}: present=${file.present}`),
+    "",
+    "## Command Materialization",
+    `- Template placeholders present: ${value.commandMaterialization.templatePlaceholdersPresent}`,
+    `- Commands runnable as printed: ${value.commandMaterialization.commandsRunnableAsPrinted}`,
+    `- Required placeholders ready: ${value.commandMaterialization.requiredPlaceholdersReady}`,
+    `- Unresolved required placeholders: ${value.commandMaterialization.unresolvedRequiredPlaceholderNames.join(", ") || "none"}`,
+    `- Optional placeholders requiring operator choice: ${value.commandMaterialization.optionalPlaceholderNames.join(", ") || "none"}`,
+    `- Prints materialized commands: ${value.commandMaterialization.printsMaterializedCommands}`,
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),

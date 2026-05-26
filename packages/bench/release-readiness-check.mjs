@@ -3790,6 +3790,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(envDoctor.readyForMissingArmExport, false);
     assert.equal(envDoctor.readyForAnswerQualityPreflight, false);
     assert.equal(envDoctor.readyForLocalShardIntake, false);
+    assert.equal(envDoctor.readyForCommandMaterialization, false);
+    assert.equal(envDoctor.resumePacketCommandsRunnableAsPrinted, false);
     assert.equal(envDoctor.privateDir?.provided, false);
     assert.equal(envDoctor.privateDir?.present, false);
     assert.equal(envDoctor.privateDir?.pathPrinted, false);
@@ -3839,6 +3841,18 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(envDoctor.blockers?.includes("answer-quality-env-missing"));
     assert.equal(envDoctor.commandPlaceholders?.privateOutputDirPlaceholderPresent, true);
     assert.equal(envDoctor.commandPlaceholders?.publicReviewDirPlaceholderPresent, true);
+    assert.equal(envDoctor.commandMaterialization?.templatePlaceholdersPresent, true);
+    assert.equal(envDoctor.commandMaterialization?.commandsRunnableAsPrinted, false);
+    assert.equal(envDoctor.commandMaterialization?.requiresOperatorPlaceholderSubstitution, true);
+    assert.equal(envDoctor.commandMaterialization?.requiredPlaceholdersReady, false);
+    assert.equal(envDoctor.commandMaterialization?.readyForCommandMaterialization, false);
+    assert.equal(envDoctor.commandMaterialization?.printsMaterializedCommands, false);
+    assert.equal(envDoctor.commandMaterialization?.printsPrivatePaths, false);
+    assert.equal(envDoctor.commandMaterialization?.printsEnvValues, false);
+    assert.ok(envDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
+    assert.ok(envDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("local-embedding-base-url"));
+    assert.ok(envDoctor.commandMaterialization?.unresolvedRequiredPlaceholderNames?.includes("openai-compatible-base-url"));
+    assert.ok(envDoctor.commandMaterialization?.optionalPlaceholderNames?.includes("env-only-if-cloud-endpoint"));
   }
   assert.equal(localFullShardResumeEnvDoctor.writesRealFiles, true);
   assert.equal(localFullShardResumeEnvDoctorFresh.writesRealFiles, false);
@@ -3848,6 +3862,8 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeEnvDoctorEvidence, /Compressed default retrieval allowed: true/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Local Embedding Durability/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /Generated after runtime blocker: true/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Ready for command materialization: false/);
+  assert.match(localFullShardResumeEnvDoctorEvidence, /Resume packet commands runnable as printed: false/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /SELFMEM_LOCAL_EMBED_BASE_URL/);
   assert.match(localFullShardResumeEnvDoctorEvidence, /RECALLWEAVE_FULL_SHARD_PRIVATE_DIR/);
   assert.match(localFullShardResumeEnvDoctorMarkdownFresh, /Private directory provided: false/);
@@ -3874,6 +3890,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullShardResumeEnvDoctorFixture.readyForMissingArmExport, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.readyForAnswerQualityPreflight, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.readyForLocalShardIntake, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.readyForCommandMaterialization, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.resumePacketCommandsRunnableAsPrinted, false);
   assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.provided, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.present, true);
   assert.equal(localFullShardResumeEnvDoctorFixture.privateDir?.outsideRepository, true);
@@ -3888,10 +3906,21 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(localFullShardResumeEnvDoctorFixture.requiredInputFiles?.every((file) => file.present && file.hashMatches === true));
   assert.ok(localFullShardResumeEnvDoctorFixture.completedArmFiles?.every((file) => file.present && file.hashMatches === true));
   assert.ok(localFullShardResumeEnvDoctorFixture.missingArmFiles?.every((file) => file.present && file.nonEmpty));
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.templatePlaceholdersPresent, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.commandsRunnableAsPrinted, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.requiresOperatorPlaceholderSubstitution, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.requiredPlaceholdersReady, true);
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.readyForCommandMaterialization, true);
+  assert.deepEqual(localFullShardResumeEnvDoctorFixture.commandMaterialization?.unresolvedRequiredPlaceholderNames, []);
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.printsMaterializedCommands, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.printsPrivatePaths, false);
+  assert.equal(localFullShardResumeEnvDoctorFixture.commandMaterialization?.printsEnvValues, false);
   assert.deepEqual(localFullShardResumeEnvDoctorFixture.blockers, []);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Status: READY_LOCAL_FULL_SHARD_RESUME_ENV/);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Fixture only: true/);
   assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Ready for answer-quality preflight: true/);
+  assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Ready for command materialization: true/);
+  assert.match(localFullShardResumeEnvDoctorFixtureMarkdown, /Commands runnable as printed: false/);
   for (const text of [
     JSON.stringify(localFullShardResumeEnvDoctor),
     JSON.stringify(localFullShardResumeEnvDoctorFresh),

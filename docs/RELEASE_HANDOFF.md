@@ -419,6 +419,10 @@ and source manifest privately, while keeping compressed/default retrieval and
 UI surfaces separate from the private audit source. It also binds the retry to
 the local embedding durability report generated after the shard 002
 socket-close blocker, including the required long synthetic probe envelope.
+The same report distinguishes a shell that has enough inputs to materialize the
+commands from the resume packet templates themselves: `readyForCommandMaterialization`
+can become true, but `resumePacketCommandsRunnableAsPrinted` stays false until
+the operator replaces placeholders outside the public report.
 Use `benchmark:answer-quality:local-shard-resume-env -- --fixture` to exercise
 the green path without private data or hosted calls. That fixture creates only
 temporary synthetic private files outside the repository, proves the hashes and
