@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "mode": "public-benchmark-answer-quality-arm-export",
+  "status": "BLOCKED_RESPONSE_ARM_EXPORT_ENV",
+  "fixtureOnly": false,
+  "executesExports": true,
+  "writesPrivateResponseFiles": false,
+  "reusesExistingPrivateResponseFiles": false,
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "readyForAnswerQualityPreflight": false,
+  "readyForEndToEndMemoryScoreGate": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "callsProviderApis": true,
+  "sendsBenchmarkTextToProvider": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-05-27T18:37:49.994Z",
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "input": {
+    "querySet": {
+      "role": "queryset",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": null,
+      "hash": "sha256:9cd221a53f8692f2035a87fc6d5f46495505c5c2571679fdfbdb2fe3f751d89b",
+      "sizeBytes": 278725
+    },
+    "memories": {
+      "role": "memories",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": null,
+      "hash": "sha256:a4ee0d963c5bafa42a3a6da81568f90a84c80d6cd60a9f8eb055b870f014ef0a",
+      "sizeBytes": 203831507
+    }
+  },
+  "privateOutput": {
+    "present": true,
+    "pathLabel": "external-private-output-dir",
+    "insideRepository": false,
+    "valuePrinted": false
+  },
+  "queryShard": {
+    "requested": true,
+    "queryOffset": 100,
+    "maxQueries": 25
+  },
+  "limits": {
+    "contextTokenBudget": 800,
+    "limit": 5,
+    "maxMemoryBytes": 300000000
+  },
+  "env": {
+    "liveExportEnabled": true,
+    "noRawTextConfirmed": true,
+    "supermemorySearchPolicy": "disabled-for-benchmark-methodology",
+    "supermemorySearchDisabled": true,
+    "providerCallsEnabled": true,
+    "providerPublicDataConfirmed": true,
+    "queryExpansionReady": true,
+    "localQueryExpansionEndpointPresent": true,
+    "valuePrinted": false
+  },
+  "localEmbeddingDurability": {
+    "applicable": false,
+    "required": false,
+    "ready": null,
+    "reportPresent": false,
+    "valuePrinted": false,
+    "blockers": []
+  },
+  "strategyCoverage": {
+    "hasBm25Lite": false,
+    "hasFullHybridRerank": false,
+    "hasQueryExpansion": false,
+    "hasProviderChallenger": true,
+    "hasLocalApple": false,
+    "hasLocalRerank": true,
+    "strategyCount": 1
+  },
+  "arms": [
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "local-apple-qwen3-0_6b-local-rerank-responses.private.json",
+      "queryShard": {
+        "startIndex": 100,
+        "maxQueries": 25
+      }
+    }
+  ],
+  "blockers": [
+    "bm25-lite-arm-missing",
+    "full-hybrid-rerank-arm-missing",
+    "query-expansion-arm-missing",
+    "local-apple-arm-missing"
+  ],
+  "answerQualityArmArgs": [
+    "--arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/local-apple-qwen3-0_6b-local-rerank-responses.private.json"
+  ],
+  "nextActions": [
+    "Materialize the source-locked LongMemEval target into a private directory outside the repository.",
+    "Set RECALLWEAVE_BASELINE_LIVE=1 and RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 for live exports.",
+    "Run benchmark:local-embedding:durability before exporting local Apple embedding arms.",
+    "Enable provider or local endpoint consent only for the arms being tested.",
+    "Keep BM25, full-hybrid, query-expansion, provider, local Apple, and local rerank arms on the same data."
+  ]
+}

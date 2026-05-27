@@ -30,6 +30,7 @@ const apiKey = String(args.apiKey ?? process.env.RECALLWEAVE_MEMORYBENCH_API_KEY
 const maxOutputTokens = optionalPositiveInt(args.maxOutputTokens ?? process.env.RECALLWEAVE_MEMORYBENCH_MAX_OUTPUT_TOKENS ?? 512, "max output tokens");
 const callTimeoutMs = optionalPositiveInt(args.callTimeoutMs ?? process.env.RECALLWEAVE_MEMORYBENCH_CALL_TIMEOUT_MS ?? 120000, "call timeout ms");
 const continueOnCallError = truthy(args.continueOnCallError ?? process.env.RECALLWEAVE_MEMORYBENCH_CONTINUE_ON_CALL_ERROR ?? "");
+const disableJsonResponseFormat = truthy(args.disableJsonResponseFormat ?? process.env.RECALLWEAVE_MEMORYBENCH_DISABLE_JSON_RESPONSE_FORMAT ?? "");
 const progressEnabled = !fixtureRequested && !truthy(args.noProgress ?? process.env.RECALLWEAVE_MEMORYBENCH_NO_PROGRESS ?? "");
 const allowAnswerQualityCalls = process.env.RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS === "1";
 const publicDataConfirmed = process.env.RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA === "1";
@@ -172,6 +173,7 @@ async function liveRun() {
       callsMade: providerCalls,
       callTimeoutMs,
       continueOnCallError,
+      disableJsonResponseFormat,
       endpointLabel: endpointLabel(baseUrl),
       endpointIsLocal,
     },
@@ -474,7 +476,7 @@ async function callOpenAiCompatible({ model, system, prompt, jsonMode = false })
     chat_template_kwargs: { enable_thinking: false, preserve_thinking: false },
     stream: false,
   };
-  if (jsonMode) body.response_format = { type: "json_object" };
+  if (jsonMode && !disableJsonResponseFormat) body.response_format = { type: "json_object" };
   const headers = { "Content-Type": "application/json" };
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
   const response = await fetch(chatCompletionsUrl(baseUrl), {
