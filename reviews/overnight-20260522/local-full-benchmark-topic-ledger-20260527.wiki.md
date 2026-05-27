@@ -1,14 +1,29 @@
-# Local-Full Benchmark Topic Ledger
+---
+title: "LongMemEval Benchmark Topics"
+type: "methodology"
+category: "benchmark"
+tags: ["longmemeval", "benchmark", "local-full", "wiki"]
+aliases: []
+sources:
+  - "reviews/overnight-20260522/local-full-shard-performance-report-20260527.json"
+  - "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-006-20260527.json"
+confidence: 0.7
+version: 1
+provenance:
+  extracted: []
+  inferred:
+    - "Derived from public-safe local-full benchmark metrics."
+  ambiguous:
+    - "Topic categories are method-level summaries, not raw benchmark question categories."
+reviewed: false
+---
 
-- Status: PARTIAL_LOCAL_FULL_TOPIC_LEDGER
-- Accepted questions: 150/500
-- Coverage: 30%
-- Next pending shard: shard-007 (150-175)
-- Best strategy: local-apple-qwen3-0_6b-local-rerank
-- Best answer quality: 28.8067
-- Public benchmark claims allowed: false
+# LongMemEval Benchmark Topics
 
-## Topics
+Accepted questions: 150/500.
+Current best local strategy: local-apple-qwen3-0_6b-local-rerank (28.8067).
+
+## Topic Ledger
 
 ### Local-full coverage is still partial
 
@@ -61,11 +76,7 @@
 
 ## Storage Policy
 
-- Rule: Use public wiki pages for method recall and private local indexes for raw evidence review.
-- Public wiki stores: strategy names, metric aggregates, query shard ranges, hashes, method decisions, blocker classes
-- Private index stores: raw benchmark questions, raw answer labels, raw memory/session text, retrieved candidate chunks, local vector index payloads
+Use public wiki pages for method recall and private local indexes for raw evidence review.
 
-## Next Actions
-- Run shard-007 with hosted Supermemory search disabled and regenerate this ledger.
-- Run a local-wiki shard plan before promoting title or subtopic amplification beyond fixture status.
-- Keep raw LongMemEval material outside repo-facing wiki artifacts; index it only in local private storage.
+Public wiki stores method notes, aggregate scores, hashes, shard ranges, and blocker classes. Raw benchmark questions, answer labels, session text, candidate chunks, and vector payloads stay in local private indexes.
+

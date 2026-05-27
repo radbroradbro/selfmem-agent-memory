@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "local-full-benchmark-topic-ledger",
   "status": "PARTIAL_LOCAL_FULL_TOPIC_LEDGER",
-  "generatedAt": "2026-05-27T17:31:04.194Z",
+  "generatedAt": "2026-05-27T20:53:32.001Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -26,11 +26,11 @@
   "sourceEvidence": {
     "performance": {
       "path": "reviews/overnight-20260522/local-full-shard-performance-report-20260527.json",
-      "hash": "sha256:773cf4a948db1ddde60296982597659f5a393dff5bbe17c1f9c2261d26d92474"
+      "hash": "sha256:b48dfa7c2cc7538f768716cc08c5fc396450cecfd96c76242d483cbf3fe62e19"
     },
     "intake": {
-      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-004-20260527.json",
-      "hash": "sha256:f469b2dbc5dbfec766f6a310075dbc7733e1b6d1ebac8c16ea50a08cc33459f8"
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-006-20260527.json",
+      "hash": "sha256:a9a42864706d8ecd69881c0d01dc16464e2a377238bf766cc4b0c7973db32092"
     },
     "wikiFixture": {
       "path": "reviews/overnight-20260522/public-longmemeval-wiki-amplification-fixture-20260526.json",
@@ -42,13 +42,13 @@
     }
   },
   "coverage": {
-    "acceptedShards": 4,
+    "acceptedShards": 6,
     "shardCount": 20,
-    "acceptedQueries": 100,
+    "acceptedQueries": 150,
     "queryCount": 500,
-    "coveragePercent": 20,
-    "nextPendingShardId": "shard-005",
-    "nextPendingShardRange": "100-125",
+    "coveragePercent": 30,
+    "nextPendingShardId": "shard-007",
+    "nextPendingShardRange": "150-175",
     "blockers": [
       "local-full-coverage-incomplete"
     ]
@@ -56,57 +56,57 @@
   "currentScores": {
     "bestStrategy": {
       "strategy": "local-apple-qwen3-0_6b-local-rerank",
-      "scoredQueryCount": 100,
-      "answerQuality": 26.41,
-      "quality": 0.2641,
-      "judgeCorrectRate": 0.26,
-      "answerLatencyP50Ms": 10226.75,
-      "deltaVsBm25": 3.15
+      "scoredQueryCount": 150,
+      "answerQuality": 28.8067,
+      "quality": 0.2881,
+      "judgeCorrectRate": 0.28,
+      "answerLatencyP50Ms": 10026.6667,
+      "deltaVsBm25": 3.9667
     },
     "bm25": {
       "strategy": "bm25-lite",
-      "scoredQueryCount": 100,
-      "answerQuality": 23.26,
-      "quality": 0.2326,
-      "judgeCorrectRate": 0.23,
-      "answerLatencyP50Ms": 8822.25,
+      "scoredQueryCount": 150,
+      "answerQuality": 24.84,
+      "quality": 0.2484,
+      "judgeCorrectRate": 0.2467,
+      "answerLatencyP50Ms": 8464.1667,
       "deltaVsBm25": 0
     },
     "fullHybrid": {
       "strategy": "full-hybrid-rerank",
-      "scoredQueryCount": 100,
-      "answerQuality": 23.16,
-      "quality": 0.2316,
-      "judgeCorrectRate": 0.22,
-      "answerLatencyP50Ms": 10217.5,
-      "deltaVsBm25": -0.1
+      "scoredQueryCount": 150,
+      "answerQuality": 21.3067,
+      "quality": 0.2131,
+      "judgeCorrectRate": 0.2,
+      "answerLatencyP50Ms": 9957.3333,
+      "deltaVsBm25": -3.5333
     },
     "queryExpanded": {
       "strategy": "query-expanded-full-hybrid-rerank",
-      "scoredQueryCount": 100,
-      "answerQuality": 21.16,
-      "quality": 0.2116,
-      "judgeCorrectRate": 0.2,
-      "answerLatencyP50Ms": 8835.25,
-      "deltaVsBm25": -2.1
+      "scoredQueryCount": 150,
+      "answerQuality": 19.9733,
+      "quality": 0.1997,
+      "judgeCorrectRate": 0.1867,
+      "answerLatencyP50Ms": 9583.1667,
+      "deltaVsBm25": -4.8667
     },
     "localApple": {
       "strategy": "local-apple-qwen3-0_6b",
-      "scoredQueryCount": 100,
-      "answerQuality": 23.96,
-      "quality": 0.2396,
-      "judgeCorrectRate": 0.22,
-      "answerLatencyP50Ms": 9291.5,
-      "deltaVsBm25": 0.7
+      "scoredQueryCount": 150,
+      "answerQuality": 21.9733,
+      "quality": 0.2197,
+      "judgeCorrectRate": 0.2067,
+      "answerLatencyP50Ms": 9384.6667,
+      "deltaVsBm25": -2.8667
     },
     "localAppleLocalRerank": {
       "strategy": "local-apple-qwen3-0_6b-local-rerank",
-      "scoredQueryCount": 100,
-      "answerQuality": 26.41,
-      "quality": 0.2641,
-      "judgeCorrectRate": 0.26,
-      "answerLatencyP50Ms": 10226.75,
-      "deltaVsBm25": 3.15
+      "scoredQueryCount": 150,
+      "answerQuality": 28.8067,
+      "quality": 0.2881,
+      "judgeCorrectRate": 0.28,
+      "answerLatencyP50Ms": 10026.6667,
+      "deltaVsBm25": 3.9667
     }
   },
   "topicLedger": [
@@ -114,15 +114,15 @@
       "id": "local-full-coverage",
       "title": "Local-full coverage is still partial",
       "status": "blocked",
-      "evidence": "100/500 questions accepted across 4/20 shards.",
+      "evidence": "150/500 questions accepted across 6/20 shards.",
       "decision": "Do not claim local-full or SOTA completion until all planned shards are accepted and combined.",
-      "nextAction": "Run shard-005 (100-125)."
+      "nextAction": "Run shard-007 (150-175)."
     },
     {
       "id": "bm25-control",
       "title": "BM25 remains the lexical floor",
       "status": "active-control",
-      "evidence": "bm25-lite score 23.26; p50 8822.25 ms.",
+      "evidence": "bm25-lite score 24.84; p50 8464.1667 ms.",
       "decision": "Keep BM25 in every fair comparison and use it as the fallback/control arm.",
       "nextAction": "Compare every promoted retrieval method against BM25 on the same accepted shard set."
     },
@@ -130,15 +130,15 @@
       "id": "local-rerank-positive",
       "title": "Local Apple rerank is the current local winner",
       "status": "positive-signal",
-      "evidence": "local-apple-qwen3-0_6b-local-rerank score 26.41; delta vs BM25 3.15; delta vs base 2.45.",
+      "evidence": "local-apple-qwen3-0_6b-local-rerank score 28.8067; delta vs BM25 3.9667; delta vs base 6.8334.",
       "decision": "Treat local rerank as the current method-refinement candidate, not as a public benchmark claim.",
-      "nextAction": "Keep local rerank in shard-005 and watch whether the gain survives beyond 20% coverage."
+      "nextAction": "Keep local rerank in shard-007 and watch whether the gain survives beyond 30% coverage."
     },
     {
       "id": "full-hybrid-regressed",
       "title": "Plain full-hybrid is not promoted on current answer-quality evidence",
       "status": "not-promoted",
-      "evidence": "full-hybrid-rerank score 23.16; delta vs BM25 -0.1.",
+      "evidence": "full-hybrid-rerank score 21.3067; delta vs BM25 -3.5333.",
       "decision": "Do not treat deterministic full-hybrid as superior after shard-004 aggregation.",
       "nextAction": "Use per-shard diagnostics to identify whether dense or rerank ordering is hurting specific categories."
     },
@@ -146,7 +146,7 @@
       "id": "query-expansion-negative",
       "title": "Query expansion remains negative",
       "status": "negative-signal",
-      "evidence": "query-expanded-full-hybrid-rerank score 21.16; delta vs BM25 -2.1.",
+      "evidence": "query-expanded-full-hybrid-rerank score 19.9733; delta vs BM25 -4.8667.",
       "decision": "Keep query expansion experimental and disabled as a default method until a same-data accepted shard win appears.",
       "nextAction": "Audit rewrite quality, fallback frequency, and category sensitivity before spending more full-shard cycles."
     },
@@ -193,7 +193,7 @@
     "wikiAmplificationRole": "experimental-unproven-until-accepted-shard-win"
   },
   "nextActions": [
-    "Run shard-005 with hosted Supermemory search disabled and regenerate this ledger.",
+    "Run shard-007 with hosted Supermemory search disabled and regenerate this ledger.",
     "Run a local-wiki shard plan before promoting title or subtopic amplification beyond fixture status.",
     "Keep raw LongMemEval material outside repo-facing wiki artifacts; index it only in local private storage."
   ]

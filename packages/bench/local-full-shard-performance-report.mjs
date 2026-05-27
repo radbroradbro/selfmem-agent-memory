@@ -11,6 +11,7 @@ const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-loca
 const intakePath = resolveInputPath(
   args.intake ??
     preferReviewFile(
+      "answer-quality-local-full-shard-intake-after-shard-006-20260527.json",
       "answer-quality-local-full-shard-intake-after-shard-005-common-arm-20260527.json",
       "answer-quality-local-full-shard-intake-after-shard-004-20260527.json",
       "answer-quality-local-full-shard-intake-after-shard-003-20260527.json",

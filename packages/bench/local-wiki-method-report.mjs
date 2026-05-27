@@ -30,6 +30,7 @@ const commonShardPaths = coercePathList(
       `${reviewDir}/answer-quality-local-full-shard-003-20260527.json`,
       `${reviewDir}/answer-quality-local-full-shard-004-20260527.json`,
       `${reviewDir}/answer-quality-local-full-shard-005-20260527.json`,
+      `${reviewDir}/answer-quality-local-full-shard-006-20260527.json`,
     ].join(","),
 );
 const outputPath = args.output ? resolveInputPath(args.output) : null;
