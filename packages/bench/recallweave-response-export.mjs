@@ -547,19 +547,40 @@ async function queryExpansionText(query, options = {}) {
     const attemptRequest =
       attempt === 0 ? request : { ...request, instruction: queryExpansionRetryInstruction(request.instruction, attempt + 1, request.maxRewrites) };
     let rewrites = [];
-    if (plan.provider === "local-openai-compatible") {
-      rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-    } else if (plan.provider === "nvidia-openai-compatible") {
-      rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-    } else if (plan.provider === "openrouter-openai-compatible") {
-      rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-    } else if (plan.provider === "gemini") {
-      rewrites = await geminiQueryExpansion(plan, attemptRequest);
-    } else {
-      throw new Error(`unsupported query expansion provider: ${plan.provider}`);
+    try {
+      if (plan.provider === "local-openai-compatible") {
+        rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+      } else if (plan.provider === "nvidia-openai-compatible") {
+        rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+      } else if (plan.provider === "openrouter-openai-compatible") {
+        rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+      } else if (plan.provider === "gemini") {
+        rewrites = await geminiQueryExpansion(plan, attemptRequest);
+      } else {
+        throw new Error(`unsupported query expansion provider: ${plan.provider}`);
+      }
+    } catch (error) {
+      if (queryExpansionProviderFallbackAllowed()) {
+        options.providerStats?.recordQueryExpansionFallback(`provider-error:${queryExpansionFailureClass(error)}`);
+        return {
+          mode: "deterministic-proxy",
+          expandedQuery: expandQuery(queryText),
+          rewrites: [],
+        };
+      }
+      throw error;
     }
     sanitized = sanitizeQueryExpansionRewrites(rewrites, { originalQuery: queryText, maxRewrites: request.maxRewrites });
     if (sanitized.length > 0) break;
+  }
+
+  if (sanitized.length === 0 && queryExpansionProviderFallbackAllowed()) {
+    options.providerStats?.recordQueryExpansionFallback("provider-no-usable-rewrites");
+    return {
+      mode: "deterministic-proxy",
+      expandedQuery: expandQuery(queryText),
+      rewrites: [],
+    };
   }
 
   assert.ok(sanitized.length > 0, "query expansion provider returned no usable rewrites");
@@ -2154,6 +2175,17 @@ function queryExpansionMaxRewrites() {
 
 function queryExpansionMaxAttempts() {
   return optionalPositiveInt(process.env.SELFMEM_QUERY_EXPANSION_MAX_ATTEMPTS ?? null, "query expansion max attempts") ?? 3;
+}
+
+function queryExpansionProviderFallbackAllowed() {
+  return process.env.SELFMEM_QUERY_EXPANSION_ALLOW_PROVIDER_FALLBACK === "1";
+}
+
+function queryExpansionFailureClass(error) {
+  const code = String(error?.code ?? error?.cause?.code ?? "").trim();
+  if (code) return code;
+  if (error?.name === "TimeoutError" || error?.name === "AbortError") return "timeout";
+  return "fetch-or-parse-failed";
 }
 
 function queryExpansionRetryInstruction(baseInstruction, attempt, maxRewrites) {
