@@ -397,9 +397,9 @@ assert.equal(fullMemorySotaDoctor.benchmarkContract?.bm25IsLexicalFloorOnly, tru
 assert.equal(fullMemorySotaDoctor.benchmarkContract?.retrievalProxyOnlyIsNotEnough, true);
 assert.equal(fullMemorySotaDoctor.rawSourceRetention?.retainsRawSourcesPrivately, true);
 assert.equal(fullMemorySotaDoctor.rawSourceRetention?.publicReportIsSafe, true);
-assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId, "shard-005");
-assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange, "100-125");
-assert.match(fullMemorySotaDoctorText, /Next local-full shard: shard-005 \(100-125\)/);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId, "shard-006");
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange, "125-150");
+assert.match(fullMemorySotaDoctorText, /Next local-full shard: shard-006 \(125-150\)/);
 assert.match(fullMemorySotaDoctorText, /Counts as full memory SOTA evidence: false/i);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
@@ -785,7 +785,7 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:returned-packet -- --packet /tmp/recallweave-baseline-evidence-packet.zip --require-public-benchmark --output /tmp/recallweave-returned-baseline-intake.json",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor -- --format markdown",
-        "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder -- --shard-id shard-005 --query-offset 100 --query-limit 25 --output /tmp/recallweave-local-full-shard-005-workorder.json",
+        "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder -- --shard-id shard-006 --query-offset 125 --query-limit 25 --output /tmp/recallweave-local-full-shard-006-workorder.json",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },
