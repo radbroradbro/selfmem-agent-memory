@@ -265,12 +265,21 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-- `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`.
+- `67362b1944592e6b5dc0290c5cafd4f1f145dcda`.
+- GitHub Actions run `26481662771`: passed CI after correcting local-full
+  benchmark shard progress. Shard 002 recovery is accepted, the local-full
+  partial answer-quality snapshot now covers 50 of 500 queries, and shard 003 is
+  the next runtime-blocked local rerank slice. The benchmark-isolation policy
+  remains unchanged: methodology loops disable hosted Supermemory search unless
+  the run is an explicit hosted-baseline parity lane, while production
+  read-through/search remains available when configured and not disabled.
+- Previous verified PR branch head before the shard-progress correction:
+  `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`.
 - GitHub Actions run `26477753556`: passed CI after disabling hosted
   Supermemory search for methodology benchmark loops, preserving production
   read-through/search unless explicitly disabled, and adding release-guard
   coverage for those benchmark-isolation paths. The local-full shard 003
-  attempt is recorded as a local-rerank runtime blocker, not a scored quality
+  attempt was recorded as a local-rerank runtime blocker, not a scored quality
   result.
 - Previous verified PR branch head before benchmark-isolation policy:
   `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
@@ -346,7 +355,19 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`.
+- `67362b1944592e6b5dc0290c5cafd4f1f145dcda`.
+- GitHub Actions run `26481662771`: passed CI with release checks, live GitHub
+  sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
+  green. The checked-in evidence now accepts shard 002 recovery for the
+  local-full lane, records 50/500 scored local-full queries, keeps shard 003 as
+  the next local rerank runtime blocker, pins cloud Voyage as the actual
+  Codex/personal memory default, keeps local Apple Silicon as the high-volume
+  methodology lane, disables hosted Supermemory search in methodology benchmark
+  loops unless an explicit hosted-baseline parity lane is being executed, and
+  keeps production read-through/search available when configured and not
+  disabled.
+- Previous verified code/product baseline before the shard-progress correction:
+  `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`.
 - GitHub Actions run `26477753556`: passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence pins cloud Voyage as the actual Codex/personal

@@ -3,11 +3,11 @@
 Date: 2026-05-23
 
 - PR #5 was refreshed again on 2026-05-26 after GitHub Actions run
-  `26477753556` passed on
-  `436d1d8cf8e7bb5ae29a666eae26ad36eaa73593`, promoting that commit as the
-  latest verified code/product baseline for benchmark-isolation policy. Live
-  sync passed with PR body hash
-  `6465d2f85b8287ebc6a9caf1f748523ba0ec8f5e748a0be5e4a0d604b5a27449`,
+  `26481662771` passed on
+  `67362b1944592e6b5dc0290c5cafd4f1f145dcda`, promoting that commit as the
+  latest verified code/product baseline for corrected local-full shard progress
+  while preserving benchmark-isolation policy. Live sync passed with PR body hash
+  `dfaeed3fc50dc1a45cbf42ec01d7a8acd55224d5b1097536e901894675741646`,
   issue title hash
   `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`,
   and issue body hash
