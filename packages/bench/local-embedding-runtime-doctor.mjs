@@ -23,10 +23,11 @@ const modelPath = stringOrNull(args.modelPath ?? process.env.SELFMEM_LOCAL_EMBED
 const serverBin = stringOrNull(args.serverBin ?? process.env.SELFMEM_LOCAL_EMBED_SERVER_BIN ?? configEnv.SERVER_BIN);
 const baseUrl = stringOrNull(args.baseUrl ?? process.env.SELFMEM_LOCAL_EMBED_BASE_URL) ?? localBaseUrlFromConfig(configEnv);
 const timeoutMs = positiveInt(args.timeoutMs ?? process.env.RECALLWEAVE_LOCAL_RUNTIME_TIMEOUT_MS ?? 3_000, "timeout ms");
+const helpTimeoutMs = positiveInt(args.helpTimeoutMs ?? process.env.RECALLWEAVE_LOCAL_RUNTIME_HELP_TIMEOUT_MS ?? 15_000, "help timeout ms");
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
-const serverBinary = inspectServerBinary(serverBin);
+const serverBinary = inspectServerBinary(serverBin, helpTimeoutMs);
 const modelArtifact = inspectModelArtifact({ modelName, modelPath, hfRepo, expectedFamily });
 const localEndpoint = await inspectLocalEndpoint(baseUrl, timeoutMs);
 
@@ -87,6 +88,7 @@ const report = {
   endpointPrinted: false,
   modelPathPrinted: false,
   serverBinPrinted: false,
+  helpTimeoutMs,
   readyForLocalEmbeddingDurabilitySmoke: ready,
   readyForLocalAppleArmExport: ready,
   countsAsLocalFullBenchmarkEvidence: false,
@@ -110,11 +112,11 @@ if (markdownOutputPath) await writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
 if (!report.ok) process.exitCode = 1;
 
-function inspectServerBinary(path) {
+function inspectServerBinary(path, helpTimeout) {
   const configured = Boolean(path);
   const present = configured && existsSync(path);
   const executable = present ? isExecutable(path) : false;
-  const help = executable ? readServerHelp(path) : { checked: false, supportsEmbedding: false, supportsRerank: false, timedOut: false };
+  const help = executable ? readServerHelp(path, helpTimeout) : { checked: false, supportsEmbedding: false, supportsRerank: false, timedOut: false };
   return {
     configured,
     present,
@@ -213,11 +215,11 @@ async function inspectLocalEndpoint(rawBaseUrl, timeout) {
   }
 }
 
-function readServerHelp(path) {
+function readServerHelp(path, timeoutMsValue) {
   const result = spawnSync(path, ["--help"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
-    timeout: 5_000,
+    timeout: timeoutMsValue,
   });
   const text = `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
   return {
