@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "local-wiki-method-report",
   "status": "WIKI_METHOD_SHARD_EVALUATED",
-  "generatedAt": "2026-05-27T20:55:24.043Z",
+  "generatedAt": "2026-05-27T22:01:30.222Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -42,7 +42,7 @@
     },
     "priorPerformance": {
       "path": "reviews/overnight-20260522/local-full-shard-performance-report-20260527.json",
-      "hash": "sha256:b48dfa7c2cc7538f768716cc08c5fc396450cecfd96c76242d483cbf3fe62e19"
+      "hash": "sha256:6ba28201c2161a08e8b443ed67f8d1bf8ae5c1457d6031307ee4e66d2c284e9b"
     },
     "commonShardResults": [
       {
@@ -68,6 +68,10 @@
       {
         "path": "reviews/overnight-20260522/answer-quality-local-full-shard-006-20260527.json",
         "hash": "sha256:97e81b56ca75fff5674beb3fcffac6bdedbb1b0396ad218b6b7167c2a29e3f5a"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-007-20260527.json",
+        "hash": "sha256:f2a5567f572fba5779aca33a7ce7776cf87d76de447b5c53029f5a806fa0ef8e"
       }
     ]
   },
@@ -277,18 +281,18 @@
   ],
   "priorLocalFullContext": {
     "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
-    "acceptedShards": 6,
-    "acceptedQueries": 150,
+    "acceptedShards": 7,
+    "acceptedQueries": 175,
     "queryCount": 500,
     "bestStrategy": "local-apple-qwen3-0_6b-local-rerank",
-    "bestAnswerQuality": 28.8067
+    "bestAnswerQuality": 29.2629
   },
   "observedArmSnapshot": [
     {
       "strategy": "local-apple-qwen3-0_6b-local-rerank",
-      "answerQuality": 28.8067,
-      "scoredQueryCount": 150,
-      "shardCount": 6
+      "answerQuality": 29.2629,
+      "scoredQueryCount": 175,
+      "shardCount": 7
     },
     {
       "strategy": "wiki-subtopic-amplified-hybrid",
@@ -298,27 +302,27 @@
     },
     {
       "strategy": "bm25-lite",
-      "answerQuality": 24.84,
-      "scoredQueryCount": 150,
-      "shardCount": 6
+      "answerQuality": 24.72,
+      "scoredQueryCount": 175,
+      "shardCount": 7
     },
     {
       "strategy": "local-apple-qwen3-0_6b",
-      "answerQuality": 21.9733,
-      "scoredQueryCount": 150,
-      "shardCount": 6
+      "answerQuality": 22.2629,
+      "scoredQueryCount": 175,
+      "shardCount": 7
     },
     {
       "strategy": "full-hybrid-rerank",
-      "answerQuality": 21.3067,
-      "scoredQueryCount": 150,
-      "shardCount": 6
+      "answerQuality": 21.6914,
+      "scoredQueryCount": 175,
+      "shardCount": 7
     },
     {
       "strategy": "query-expanded-full-hybrid-rerank",
-      "answerQuality": 19.9733,
-      "scoredQueryCount": 150,
-      "shardCount": 6
+      "answerQuality": 21.12,
+      "scoredQueryCount": 175,
+      "shardCount": 7
     },
     {
       "strategy": "wiki-summary-session-hybrid",

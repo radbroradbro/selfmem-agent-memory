@@ -22,12 +22,12 @@
 
 ## Observed Arm Snapshot
 
-- local-apple-qwen3-0_6b-local-rerank: answerQuality=28.8067, scoredQueries=150, shards=6
+- local-apple-qwen3-0_6b-local-rerank: answerQuality=29.2629, scoredQueries=175, shards=7
 - wiki-subtopic-amplified-hybrid: answerQuality=28, scoredQueries=25, shards=1
-- bm25-lite: answerQuality=24.84, scoredQueries=150, shards=6
-- local-apple-qwen3-0_6b: answerQuality=21.9733, scoredQueries=150, shards=6
-- full-hybrid-rerank: answerQuality=21.3067, scoredQueries=150, shards=6
-- query-expanded-full-hybrid-rerank: answerQuality=19.9733, scoredQueries=150, shards=6
+- bm25-lite: answerQuality=24.72, scoredQueries=175, shards=7
+- local-apple-qwen3-0_6b: answerQuality=22.2629, scoredQueries=175, shards=7
+- full-hybrid-rerank: answerQuality=21.6914, scoredQueries=175, shards=7
+- query-expanded-full-hybrid-rerank: answerQuality=21.12, scoredQueries=175, shards=7
 - wiki-summary-session-hybrid: answerQuality=16, scoredQueries=25, shards=1
 - wiki-title-amplified-hybrid: answerQuality=4, scoredQueries=25, shards=1
 

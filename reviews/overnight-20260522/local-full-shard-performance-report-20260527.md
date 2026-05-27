@@ -1,10 +1,10 @@
 # Local-Full Shard Performance Report
 
 - Status: PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT
-- Accepted shards: 6/20
-- Accepted queries: 150/500
-- Coverage: 30%
-- Next pending shard: shard-007 (150-175)
+- Accepted shards: 7/20
+- Accepted queries: 175/500
+- Coverage: 35%
+- Next pending shard: shard-008 (175-200)
 - Performance snapshot mature: false
 - Counts as local-full benchmark evidence: false
 - Counts as full memory SOTA evidence: false
@@ -12,14 +12,14 @@
 
 ## Best Current Strategy
 - Strategy: local-apple-qwen3-0_6b-local-rerank
-- Answer quality: 28.8067
-- Delta vs BM25: 3.9667
-- P50 latency ms: 10026.6667
+- Answer quality: 29.2629
+- Delta vs BM25: 4.5429
+- P50 latency ms: 9665.8571
 
 ## Local Apple
-- Base answer quality: 21.9733
-- Rerank answer quality: 28.8067
-- Rerank delta vs base: 6.8334
+- Base answer quality: 22.2629
+- Rerank answer quality: 29.2629
+- Rerank delta vs base: 7
 
 ## Runtime
 - Runtime blocker status: BLOCKED_LOCAL_FULL_SHARD_RUNTIME
@@ -34,16 +34,16 @@
 - Resume result doctor: BLOCKED_LOCAL_FULL_SHARD_002_RESULT
 
 ## Strategy Summary
-- local-apple-qwen3-0_6b-local-rerank: answerQuality=28.8067; p50=10026.6667; scored=150
-- bm25-lite: answerQuality=24.84; p50=8464.1667; scored=150
-- local-apple-qwen3-0_6b: answerQuality=21.9733; p50=9384.6667; scored=150
-- full-hybrid-rerank: answerQuality=21.3067; p50=9957.3333; scored=150
-- query-expanded-full-hybrid-rerank: answerQuality=19.9733; p50=9583.1667; scored=150
+- local-apple-qwen3-0_6b-local-rerank: answerQuality=29.2629; p50=9665.8571; scored=175
+- bm25-lite: answerQuality=24.72; p50=8336.1429; scored=175
+- local-apple-qwen3-0_6b: answerQuality=22.2629; p50=12074.2857; scored=175
+- full-hybrid-rerank: answerQuality=21.6914; p50=9806; scored=175
+- query-expanded-full-hybrid-rerank: answerQuality=21.12; p50=9534.5714; scored=175
 
 ## Blockers
 - local-full-coverage-incomplete
 
 ## Next Actions
-- Finish or rerun shard-007 before treating the next 25-query slice as accepted.
+- Finish or rerun shard-008 before treating the next 25-query slice as accepted.
 - Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.
 - Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage.
