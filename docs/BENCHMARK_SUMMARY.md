@@ -30,7 +30,8 @@ against Voyage or the owner explicitly changes the policy.
 
 Hosted Supermemory search is disabled for methodology refinement runs unless
 the command is explicitly a hosted-baseline parity run. The production bridge
-remains available, but benchmark loops should set
+remains available, but benchmark loops and generated shard-resume scripts now
+carry
 `SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1` or
 `RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1` so scoring reflects only
 the selected dataset and local/plugin method under test.

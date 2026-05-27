@@ -38,10 +38,18 @@ const blockers = [
   materializer.guardPlan?.firstCommandId !== "rerunRuntimeDoctor" ? "materializer-first-command-not-runtime-doctor" : null,
   materializer.guardPlan?.secondCommandId !== "rerunDurabilitySmoke" ? "materializer-second-command-not-durability-smoke" : null,
   materializer.guardPlan?.guardedCommandId !== "missingArmResponseExport" ? "materializer-guarded-command-mismatch" : null,
+  materializer.privateScriptExportsSupermemorySearchDisabled !== true ? "materializer-supermemory-disable-export-missing" : null,
+  !arrayOfStrings(materializer.commandPlan?.privateScriptExports).includes("RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH")
+    ? "materializer-benchmark-supermemory-disable-env-missing"
+    : null,
+  !arrayOfStrings(materializer.commandPlan?.privateScriptExports).includes("SELFMEM_SUPERMEMORY_SEARCH_DISABLED")
+    ? "materializer-selfmem-supermemory-disable-env-missing"
+    : null,
   !fixtureProbe.ready ? "fixture-materializer-not-ready" : null,
   fixtureProbe.privateCommandFileWritten !== true ? "fixture-private-command-file-not-written" : null,
   fixtureProbe.privateCommandFileOutsideRepository !== true ? "fixture-private-command-file-inside-repository" : null,
   fixtureProbe.privateCommandFileMode !== "0700" ? "fixture-private-command-file-mode-not-0700" : null,
+  fixtureProbe.privateScriptExportsSupermemorySearchDisabled !== true ? "fixture-private-script-supermemory-disable-export-missing" : null,
   fixtureProbe.privateScriptPlaceholderCount > 0 ? "fixture-private-script-placeholders-present" : null,
   fixtureProbe.privateScriptOrderReady !== true ? "fixture-private-script-order-invalid" : null,
   fixtureProbe.publicOutputSafe !== true ? "fixture-public-output-unsafe" : null,
@@ -74,6 +82,7 @@ const report = {
   printsPrivatePaths: false,
   privateCommandPathPrinted: false,
   privateScriptContentPrinted: false,
+  supermemorySearchPolicy: "disabled-for-benchmark-methodology",
   countsAsLocalFullBenchmarkEvidence: false,
   countsAsFullMemorySotaEvidence: false,
   publicBenchmarkClaimsAllowed: false,
@@ -90,6 +99,8 @@ const report = {
     commandsPrinted: Boolean(materializer.commandPlan?.commandsPrinted),
     privateScriptCommandOrder: materializer.commandPlan?.commandIds ?? [],
     guardPlan: materializer.guardPlan ?? null,
+    privateScriptExportsSupermemorySearchDisabled: Boolean(materializer.privateScriptExportsSupermemorySearchDisabled),
+    privateScriptExports: materializer.commandPlan?.privateScriptExports ?? [],
   },
   fixtureProbe,
   blockers,
@@ -166,6 +177,7 @@ function runFixtureMaterializer() {
     privateCommandFileHash: fixture.privateCommandFile?.hash ?? null,
     privateScriptHash: `sha256:${sha256(privateScript)}`,
     privateScriptContentPrinted: false,
+    privateScriptExportsSupermemorySearchDisabled: privateScriptExportsSupermemorySearchDisabled(privateScript),
     privateScriptContainsRuntimeValues: containsPrivateRuntimeValues(privateScript),
     privateScriptPlaceholderCount: countPlaceholders(privateScript),
     privateScriptOrderReady: order.ready,
@@ -178,6 +190,13 @@ function runFixtureMaterializer() {
     printsPrivatePaths: Boolean(fixture.printsPrivatePaths),
     printsEnvValues: Boolean(fixture.printsEnvValues),
   };
+}
+
+function privateScriptExportsSupermemorySearchDisabled(text) {
+  return (
+    /^export RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=['"]?1['"]?$/mu.test(text) &&
+    /^export SELFMEM_SUPERMEMORY_SEARCH_DISABLED=['"]?1['"]?$/mu.test(text)
+  );
 }
 
 function inspectPrivateScriptOrder(privateScript) {
@@ -209,10 +228,15 @@ function publicReportSafe(value) {
       value?.printsPrivatePaths === false &&
       value?.privateCommandFile?.pathPrinted === false &&
       value?.commandPlan?.commandsPrinted === false &&
+      value?.privateScriptExportsSupermemorySearchDisabled === true &&
       value?.countsAsLocalFullBenchmarkEvidence === false &&
       value?.countsAsFullMemorySotaEvidence === false &&
       value?.publicBenchmarkClaimsAllowed === false,
   );
+}
+
+function arrayOfStrings(value) {
+  return Array.isArray(value) ? value.filter((item) => typeof item === "string") : [];
 }
 
 function containsPrivateRuntimeValues(text) {
@@ -257,6 +281,7 @@ function renderMarkdown(value) {
     `- Fixture private command file written: ${value.fixtureProbe.privateCommandFileWritten}`,
     `- Fixture private command outside repository: ${value.fixtureProbe.privateCommandFileOutsideRepository}`,
     `- Fixture private command mode: ${value.fixtureProbe.privateCommandFileMode}`,
+    `- Fixture exports Supermemory search disable: ${value.fixtureProbe.privateScriptExportsSupermemorySearchDisabled}`,
     `- Fixture private script placeholder count: ${value.fixtureProbe.privateScriptPlaceholderCount}`,
     `- Fixture private script order ready: ${value.fixtureProbe.privateScriptOrderReady}`,
     `- Fixture first command: ${value.fixtureProbe.firstCommandId ?? "n/a"}`,

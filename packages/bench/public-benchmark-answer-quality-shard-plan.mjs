@@ -19,6 +19,10 @@ const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_ANSWER_QUAL
 const strategies = splitList(args.strategies ?? defaultStrategies(claimScope).join(","));
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 const resultPrefix = claimScope === "full-sota" ? "answer-quality" : `answer-quality-${claimScope}`;
+const benchmarkSupermemoryDisableEnv = [
+  "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1",
+  "SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1",
+];
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -159,6 +163,8 @@ const report = {
   runPlan: {
     claimScope,
     scoringPolicy,
+    supermemorySearchPolicy: "disabled-for-benchmark-methodology",
+    supermemorySearchDisabledEnv: benchmarkSupermemoryDisableEnv,
     queryCount,
     shardSize,
     shardCount: shards.length,
@@ -470,6 +476,7 @@ function responseArmExportTemplate() {
   return [
     "RECALLWEAVE_BASELINE_LIVE=1",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
+    ...benchmarkSupermemoryDisableEnv,
     ...providerEnv,
     ...localAppleEnv,
     ...localRerankEnv,
@@ -499,6 +506,7 @@ function answerQualityTemplate() {
   return [
     `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
     `RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=${scoringPolicy.modelMatchPolicy}`,
+    ...benchmarkSupermemoryDisableEnv,
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
@@ -526,6 +534,7 @@ function preflightTemplate() {
   return [
     `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
     `RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=${scoringPolicy.modelMatchPolicy}`,
+    ...benchmarkSupermemoryDisableEnv,
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",

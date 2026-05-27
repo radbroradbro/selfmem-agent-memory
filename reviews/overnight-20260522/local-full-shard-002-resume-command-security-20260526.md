@@ -9,6 +9,7 @@
 - Fixture private command file written: true
 - Fixture private command outside repository: true
 - Fixture private command mode: 0700
+- Fixture exports Supermemory search disable: true
 - Fixture private script placeholder count: 0
 - Fixture private script order ready: true
 - Fixture first command: rerunRuntimeDoctor

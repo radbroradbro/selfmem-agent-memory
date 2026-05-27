@@ -4,7 +4,7 @@
   "mode": "local-full-shard-resume-command-materializer",
   "fixtureOnly": false,
   "status": "BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS",
-  "generatedAt": "2026-05-26T20:54:07.504Z",
+  "generatedAt": "2026-05-27T00:12:09.904Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "writesRealPrivateCommandFile": false,
@@ -24,6 +24,8 @@
   "printsMaterializedCommands": false,
   "printsEnvValues": false,
   "printsPrivatePaths": false,
+  "supermemorySearchPolicy": "disabled-for-benchmark-methodology",
+  "privateScriptExportsSupermemorySearchDisabled": true,
   "countsAsLocalFullBenchmarkEvidence": false,
   "countsAsFullMemorySotaEvidence": false,
   "publicBenchmarkClaimsAllowed": false,
@@ -113,7 +115,11 @@
     ],
     "materializedCommandCount": 0,
     "materializedCommandHashes": [],
-    "commandsPrinted": false
+    "commandsPrinted": false,
+    "privateScriptExports": [
+      "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH",
+      "SELFMEM_SUPERMEMORY_SEARCH_DISABLED"
+    ]
   },
   "guardPlan": {
     "ready": true,

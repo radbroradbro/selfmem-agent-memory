@@ -3588,6 +3588,13 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(acceptedLocalLane?.answerQualityEndpoint?.answerModel, "<local-answer-model>");
     assert.equal(acceptedLocalLane?.answerQualityEndpoint?.judgeModel, "<local-judge-model>");
     assert.equal(shardPlan.scoringPolicy?.modelMatchPolicy, "local-diagnostic-allowed");
+    assert.equal(shardPlan.runPlan?.supermemorySearchPolicy, "disabled-for-benchmark-methodology");
+    assert.deepEqual(shardPlan.runPlan?.supermemorySearchDisabledEnv, [
+      "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1",
+      "SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1",
+    ]);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit>/);
@@ -3598,7 +3605,11 @@ check("fresh public benchmark target check passes", () => {
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_QUERY_EXPANSION_BASE_URL/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--claim-scope local-full/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--model-match-policy local-diagnostic-allowed/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1/);
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model>/);
+    assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1/);
+    assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_QUERY_EXPANSION_CALLS/);
     assert.doesNotMatch(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
     assert.match(shardPlan.runPlan?.combineCommand ?? "", /end-to-end-memory-score-local-full-combined/);
@@ -4110,6 +4121,21 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumePacketFresh.commands?.resumeCommandMaterializer ?? "", /local-full-shard-003-resume-command-materializer-20260526\.json/);
   assert.match(localFullShardResumePacketFresh.commands?.resumeResultDoctor ?? "", /local-full-shard-003-resume-result-doctor-20260526\.json/);
   assert.match(localFullShardResumePacketFresh.commands?.localShardIntake ?? "", /answer-quality-local-full-shard-003\.json/);
+  assert.equal(localFullShardResumePacketFresh.safety?.supermemorySearchPolicy, "disabled-for-benchmark-methodology");
+  assert.deepEqual(localFullShardResumePacketFresh.safety?.supermemorySearchDisabledEnv, [
+    "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1",
+    "SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1",
+  ]);
+  for (const command of [
+    localFullShardResumePacketFresh.commands?.resumeEnvDoctor,
+    localFullShardResumePacketFresh.commands?.missingArmResponseExport,
+    localFullShardResumePacketFresh.commands?.preflight,
+    localFullShardResumePacketFresh.commands?.answerQuality,
+    localFullShardResumePacketFresh.commands?.localShardIntake,
+  ]) {
+    assert.match(command ?? "", /RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1/);
+    assert.match(command ?? "", /SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1/);
+  }
   assert.equal(localFullShardResumePacket.writesRealFiles, true);
   assert.equal(localFullShardResumePacketFresh.writesRealFiles, false);
   assert.match(localFullShardResumePacketEvidence, /Local-Full Shard Resume Packet/);
@@ -4374,6 +4400,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.printsMaterializedCommands, false);
     assert.equal(materializer.printsEnvValues, false);
     assert.equal(materializer.printsPrivatePaths, false);
+    assert.equal(materializer.supermemorySearchPolicy, "disabled-for-benchmark-methodology");
+    assert.equal(materializer.privateScriptExportsSupermemorySearchDisabled, true);
     assert.equal(materializer.countsAsLocalFullBenchmarkEvidence, false);
     assert.equal(materializer.countsAsFullMemorySotaEvidence, false);
     assert.equal(materializer.publicBenchmarkClaimsAllowed, false);
@@ -4385,6 +4413,10 @@ check("fresh public benchmark target check passes", () => {
     assert.deepEqual(materializer.commandPlan?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
     assert.equal(materializer.commandPlan?.materializedCommandCount, 0);
     assert.equal(materializer.commandPlan?.commandsPrinted, false);
+    assert.deepEqual(materializer.commandPlan?.privateScriptExports, [
+      "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH",
+      "SELFMEM_SUPERMEMORY_SEARCH_DISABLED",
+    ]);
     assert.equal(materializer.guardPlan?.ready, true);
     assert.equal(materializer.guardPlan?.startsWithFreshLocalRuntimeGuards, true);
     assert.equal(materializer.guardPlan?.runtimeBeforeDurability, true);
@@ -4440,6 +4472,11 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.printsMaterializedCommands, false);
     assert.equal(materializer.printsEnvValues, false);
     assert.equal(materializer.printsPrivatePaths, false);
+    assert.equal(materializer.privateScriptExportsSupermemorySearchDisabled, true);
+    assert.deepEqual(materializer.commandPlan?.privateScriptExports, [
+      "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH",
+      "SELFMEM_SUPERMEMORY_SEARCH_DISABLED",
+    ]);
     assert.equal(materializer.countsAsLocalFullBenchmarkEvidence, false);
     assert.equal(materializer.countsAsFullMemorySotaEvidence, false);
   }
@@ -4457,6 +4494,8 @@ check("fresh public benchmark target check passes", () => {
       localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 4. missingArmResponseExport"),
   );
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:arms/);
+  assert.match(localFullShardResumeCommandMaterializerPrivateScript, /^export RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1$/m);
+  assert.match(localFullShardResumeCommandMaterializerPrivateScript, /^export SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1$/m);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:preflight/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:local-shard-intake/);
   assert.doesNotMatch(localFullShardResumeCommandMaterializerPrivateScript, /<[^>]+>/);
@@ -4496,12 +4535,18 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(securityDoctor.printsPrivatePaths, false);
     assert.equal(securityDoctor.privateCommandPathPrinted, false);
     assert.equal(securityDoctor.privateScriptContentPrinted, false);
+    assert.equal(securityDoctor.supermemorySearchPolicy, "disabled-for-benchmark-methodology");
     assert.equal(securityDoctor.countsAsLocalFullBenchmarkEvidence, false);
     assert.equal(securityDoctor.countsAsFullMemorySotaEvidence, false);
     assert.equal(securityDoctor.publicBenchmarkClaimsAllowed, false);
     assert.equal(securityDoctor.materializerReport?.publicReportSafe, true);
     assert.equal(securityDoctor.materializerReport?.commandsPrinted, false);
     assert.equal(securityDoctor.materializerReport?.guardPlan?.ready, true);
+    assert.equal(securityDoctor.materializerReport?.privateScriptExportsSupermemorySearchDisabled, true);
+    assert.deepEqual(securityDoctor.materializerReport?.privateScriptExports, [
+      "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH",
+      "SELFMEM_SUPERMEMORY_SEARCH_DISABLED",
+    ]);
     assert.deepEqual(securityDoctor.materializerReport?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
     assert.equal(securityDoctor.fixtureProbe?.ready, true);
     assert.equal(securityDoctor.fixtureProbe?.publicOutputSafe, true);
@@ -4512,6 +4557,7 @@ check("fresh public benchmark target check passes", () => {
     assert.match(securityDoctor.fixtureProbe?.privateCommandFileHash ?? "", /^sha256:[a-f0-9]{64}$/);
     assert.match(securityDoctor.fixtureProbe?.privateScriptHash ?? "", /^sha256:[a-f0-9]{64}$/);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptContentPrinted, false);
+    assert.equal(securityDoctor.fixtureProbe?.privateScriptExportsSupermemorySearchDisabled, true);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptContainsRuntimeValues, true);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptPlaceholderCount, 0);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptOrderReady, true);
@@ -4528,6 +4574,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeCommandSecurityEvidence, /Local-Full Resume Command Security Doctor/);
   assert.match(localFullShardResumeCommandSecurityEvidence, /Status: READY_LOCAL_FULL_RESUME_COMMAND_SECURITY/);
   assert.match(localFullShardResumeCommandSecurityEvidence, /Fixture private command mode: 0700/);
+  assert.match(localFullShardResumeCommandSecurityEvidence, /Fixture exports Supermemory search disable: true/);
   assert.match(localFullShardResumeCommandSecurityEvidence, /Fixture private script order ready: true/);
   assert.match(localFullShardResumeCommandSecurityEvidence, /Fixture first command: rerunRuntimeDoctor/);
   assert.match(localFullShardResumeCommandSecurityMarkdownFresh, /Security ready: true/);

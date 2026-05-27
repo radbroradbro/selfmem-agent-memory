@@ -40,6 +40,10 @@ const localEmbeddingDurabilityReportPath = resolveOptionalPath(
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_SOTA_ANSWER_QUALITY_STRATEGIES ?? defaultStrategies().join(","));
 const requireReady = Boolean(args.requireReady);
 const reuseExisting = Boolean(args.reuseExisting ?? process.env.RECALLWEAVE_RESPONSE_ARM_REUSE_EXISTING === "1");
+const benchmarkSupermemoryDisableEnv = {
+  RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
+  SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
+};
 
 const retrievalStrategies = new Set([
   "jaccard",
@@ -248,7 +252,10 @@ function exportResponseArms(directory) {
       cwd: root,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
-      env: process.env,
+      env: {
+        ...process.env,
+        ...benchmarkSupermemoryDisableEnv,
+      },
     });
     assert.equal(result.status, 0, `response export failed for ${strategy}: ${safeError(result.stderr || result.stdout)}`);
     assert.ok(existsSync(responsePath), `${strategy} response export missing`);
@@ -335,6 +342,8 @@ function envReadiness(items) {
   return {
     liveExportEnabled: Boolean(args.live) || truthyEnv("RECALLWEAVE_BASELINE_LIVE"),
     noRawTextConfirmed: truthyEnv("RECALLWEAVE_BASELINE_NO_RAW_TEXT"),
+    supermemorySearchPolicy: "disabled-for-benchmark-methodology",
+    supermemorySearchDisabled: true,
     providerCallsEnabled: truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS"),
     providerPublicDataConfirmed: truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA"),
     queryExpansionReady: !items.includes("query-expanded-full-hybrid-rerank") || localQueryExpansionReady || cloudQueryExpansionReady || fixtureRequested,

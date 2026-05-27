@@ -10,6 +10,10 @@ const reviewDir = String(args.reviewDir ?? "reviews/overnight-20260522");
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
+const benchmarkSupermemoryDisableEnv = [
+  "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1",
+  "SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1",
+];
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
@@ -181,47 +185,47 @@ const report = {
     blockers: [...new Set([...runtimeDoctorReady.blockers, ...durabilityReady.blockers])],
   },
   commands: {
-    resumeEnvDoctor: [
+    resumeEnvDoctor: withBenchmarkSupermemorySearchDisabled([
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-env --",
       "--private-input-dir <private-output-dir>",
       `--output ${reviewDir}/local-full-${targetShardSlug}-resume-env-doctor-20260526.json`,
       `--markdown-output ${reviewDir}/local-full-${targetShardSlug}-resume-env-doctor-20260526.md`,
-    ].join(" "),
-    resumeCommandMaterializer: [
+    ].join(" ")),
+    resumeCommandMaterializer: withBenchmarkSupermemorySearchDisabled([
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-command --",
       "--private-input-dir <private-output-dir>",
       `--private-command-output <private-output-dir>/local-full-${targetShardSlug}-resume.private.sh`,
       `--output ${reviewDir}/local-full-${targetShardSlug}-resume-command-materializer-20260526.json`,
       `--markdown-output ${reviewDir}/local-full-${targetShardSlug}-resume-command-materializer-20260526.md`,
-    ].join(" "),
-    resumeResultDoctor: [
+    ].join(" ")),
+    resumeResultDoctor: withBenchmarkSupermemorySearchDisabled([
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-resume-result --",
       `--output ${reviewDir}/local-full-${targetShardSlug}-resume-result-doctor-20260526.json`,
       `--markdown-output ${reviewDir}/local-full-${targetShardSlug}-resume-result-doctor-20260526.md`,
-    ].join(" "),
-    rerunRuntimeDoctor: [
+    ].join(" ")),
+    rerunRuntimeDoctor: withBenchmarkSupermemorySearchDisabled([
       "npm exec --yes pnpm@10.23.0 -- benchmark:local-embedding:runtime-doctor --",
       "--require-ready",
       `--output ${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
       `--markdown-output ${reviewDir}/local-embedding-runtime-doctor-20260526.md`,
-    ].join(" "),
-    rerunDurabilitySmoke: [
+    ].join(" ")),
+    rerunDurabilitySmoke: withBenchmarkSupermemorySearchDisabled([
       "npm exec --yes pnpm@10.23.0 -- benchmark:local-embedding:durability --",
       "--require-ready",
       `--output ${reviewDir}/local-embedding-durability-smoke-20260526.json`,
       `--markdown-output ${reviewDir}/local-embedding-durability-smoke-20260526.md`,
-    ].join(" "),
-    missingArmResponseExport: resumeWorkorder?.commands?.missingArmResponseExport ?? null,
-    preflight: resumeWorkorder?.commands?.preflight ?? null,
-    answerQuality: resumeWorkorder?.commands?.answerQuality ?? null,
-    localShardIntake: [
+    ].join(" ")),
+    missingArmResponseExport: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.missingArmResponseExport),
+    preflight: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.preflight),
+    answerQuality: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.answerQuality),
+    localShardIntake: withBenchmarkSupermemorySearchDisabled([
       "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-intake",
       `--input ${localShardIntakeInputs}`,
       `--output ${reviewDir}/answer-quality-local-full-shard-intake-after-${targetShardSlug}.json`,
       `--markdown-output ${reviewDir}/answer-quality-local-full-shard-intake-after-${targetShardSlug}.md`,
       "--require-ready",
-    ].join(" "),
-    fullSotaDoctor: `npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor -- --output ${reviewDir}/full-memory-sota-doctor-20260526.json --markdown-output ${reviewDir}/full-memory-sota-doctor-20260526.md`,
+    ].join(" ")),
+    fullSotaDoctor: withBenchmarkSupermemorySearchDisabled(`npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor -- --output ${reviewDir}/full-memory-sota-doctor-20260526.json --markdown-output ${reviewDir}/full-memory-sota-doctor-20260526.md`),
   },
   safety: {
     noRawQuestionIds: true,
@@ -233,6 +237,8 @@ const report = {
     noAbsolutePrivatePaths: true,
     privateSourcesRetainedOutsideRepo: true,
     publicOutputUsesHashesCountsAndLabelsOnly: true,
+    supermemorySearchPolicy: "disabled-for-benchmark-methodology",
+    supermemorySearchDisabledEnv: benchmarkSupermemoryDisableEnv,
   },
   blockers,
   nextActions: resumeReady
@@ -331,6 +337,19 @@ function isDurabilityReady(report) {
     ready,
     blockers: ready ? [] : [...new Set(["local-embedding-durability-smoke-not-ready", ...arrayOfStrings(report?.blockers)])],
   };
+}
+
+function withBenchmarkSupermemorySearchDisabled(command) {
+  if (command == null) return null;
+  const trimmed = String(command).trim();
+  if (!trimmed) return null;
+  if (
+    trimmed.includes("RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1") &&
+    trimmed.includes("SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1")
+  ) {
+    return trimmed;
+  }
+  return `${benchmarkSupermemoryDisableEnv.join(" ")} ${trimmed}`;
 }
 
 function renderMarkdown(value) {

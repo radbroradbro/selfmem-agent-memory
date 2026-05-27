@@ -38,6 +38,10 @@ const privateCommandOutput = stringOrNull(fixtureState?.privateCommandOutput ?? 
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
+const benchmarkSupermemoryDisableEnv = {
+  RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
+  SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
+};
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 
@@ -122,6 +126,8 @@ const report = {
   printsMaterializedCommands: false,
   printsEnvValues: false,
   printsPrivatePaths: false,
+  supermemorySearchPolicy: "disabled-for-benchmark-methodology",
+  privateScriptExportsSupermemorySearchDisabled: true,
   countsAsLocalFullBenchmarkEvidence: false,
   countsAsFullMemorySotaEvidence: false,
   publicBenchmarkClaimsAllowed: false,
@@ -145,6 +151,7 @@ const report = {
     materializedCommandCount: materializedCommands.length,
     materializedCommandHashes: materializedCommands.map((item) => ({ id: item.id, hash: `sha256:${sha256(item.command)}` })),
     commandsPrinted: false,
+    privateScriptExports: Object.keys(benchmarkSupermemoryDisableEnv).sort(),
   },
   guardPlan: commandState.guardOrder,
   replacementPlan: {
@@ -335,6 +342,9 @@ function renderPrivateScript(commands) {
     "",
     "# Private RecallWeave local-full shard resume commands.",
     "# Contains private paths and local endpoint values. Do not commit.",
+    "",
+    `export RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=${shellQuote(benchmarkSupermemoryDisableEnv.RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH)}`,
+    `export SELFMEM_SUPERMEMORY_SEARCH_DISABLED=${shellQuote(benchmarkSupermemoryDisableEnv.SELFMEM_SUPERMEMORY_SEARCH_DISABLED)}`,
     "",
   ];
   commands.forEach((item, index) => {
