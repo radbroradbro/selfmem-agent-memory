@@ -509,6 +509,8 @@ const requiredFiles = [
   `${reviewDir}/github-live-sync-evidence.md`,
   `${reviewDir}/goal-completion-audit-evidence.md`,
   `${reviewDir}/gemini-goal-completion-audit-review.md`,
+  `${reviewDir}/local-wiki-method-report-20260527.json`,
+  `${reviewDir}/local-wiki-method-report-20260527.md`,
   `${reviewDir}/release-state.json`,
   `${reviewDir}/gemini-release-state-guard-review.md`,
   `${reviewDir}/production-readiness.md`,
@@ -670,6 +672,8 @@ const requiredScripts = [
   "benchmark:answer-quality:local-shard-resume-command-security",
   "benchmark:answer-quality:local-shard-resume-result",
   "benchmark:answer-quality:local-shard-performance",
+  "benchmark:answer-quality:local-topic-ledger",
+  "benchmark:answer-quality:local-wiki-method",
   "benchmark:answer-quality:shard-intake",
   "benchmark:answer-quality:local-shard-intake",
   "benchmark:answer-quality:private-input-doctor",
@@ -950,6 +954,44 @@ check("fresh local wiki shard plan is ready without SOTA overclaim", () => {
   assert.equal(localLane?.canReachFullSotaGateAfterShardIntake, false);
   assert.match(localLane?.shardIntakeCompatibility ?? "", /local full benchmark plan only/i);
   assert.deepEqual(report.blockers, []);
+});
+
+check("fresh local wiki method report preserves benchmark boundaries", () => {
+  const checked = JSON.parse(readFileSync(join(root, reviewDir, "local-wiki-method-report-20260527.json"), "utf8"));
+  const markdown = readFileSync(join(root, reviewDir, "local-wiki-method-report-20260527.md"), "utf8");
+  const fresh = JSON.parse(run("node", ["packages/bench/local-wiki-method-report.mjs"]).stdout);
+
+  for (const report of [checked, fresh]) {
+    assert.equal(report.ok, true);
+    assert.equal(report.mode, "local-wiki-method-report");
+    assert.equal(report.status, "WIKI_METHOD_SHARD_EVALUATED");
+    assert.equal(report.metricsOnly, true);
+    assert.equal(report.publicSafe, true);
+    assert.equal(report.callsHostedSupermemory, false);
+    assert.equal(report.sendsBenchmarkTextToProvider, false);
+    assert.equal(report.rawQuestionsIncluded, false);
+    assert.equal(report.rawAnswersIncluded, false);
+    assert.equal(report.rawMemoryIncluded, false);
+    assert.equal(report.countsAsLocalFullBenchmarkEvidence, true);
+    assert.equal(report.countsAsFullMemorySotaEvidence, false);
+    assert.equal(report.publicBenchmarkClaimsAllowed, false);
+    assert.equal(report.methodIsolation?.hostedSupermemorySearchDisabled, true);
+    assert.equal(report.methodIsolation?.compatibleWithLegacyShardIntake, false);
+    assert.equal(report.comparisons?.bestStrategy, "local-apple-qwen3-0_6b-local-rerank");
+    assert.equal(report.comparisons?.localAppleLocalRerank?.winsVsBm25, true);
+    assert.equal(report.comparisons?.wikiTitle?.winsVsBm25, false);
+    assert.equal(report.comparisons?.wikiSubtopic?.winsVsBm25, false);
+    assert.equal(report.comparisons?.wikiSummarySession?.winsVsBm25, false);
+    assert.ok(report.decisions?.some((item) => item.id === "wiki-title-amplification" && item.status === "negative-signal"));
+    assert.ok(report.decisions?.some((item) => item.id === "wiki-subtopic-amplification" && item.status === "not-yet-positive"));
+    assert.ok(report.observedArmSnapshot?.some((item) => item.strategy === "bm25-lite" && item.scoredQueryCount === 125));
+    assert.ok(report.observedArmSnapshot?.some((item) => item.strategy === "wiki-subtopic-amplified-hybrid" && item.scoredQueryCount === 25));
+  }
+
+  assert.match(markdown, /wiki-title-amplified-hybrid/);
+  assert.match(markdown, /wiki-subtopic-amplified-hybrid/);
+  assert.match(markdown, /Compatible with legacy shard intake: false/i);
+  assert.match(markdown, /Counts as full memory SOTA evidence: false/i);
 });
 
 check("dom evidence is sane", () => {
@@ -4738,20 +4780,20 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(performanceReport.readyForShardCombine, false);
     assert.equal(performanceReport.readyForEndToEndMemoryScoreGate, false);
     assert.equal(performanceReport.performanceSnapshotMature, false);
-    assert.equal(performanceReport.coverage?.acceptedShardCount, 3);
-    assert.equal(performanceReport.coverage?.missingShardCount, 17);
-    assert.equal(performanceReport.coverage?.acceptedQueryCount, 75);
+    assert.equal(performanceReport.coverage?.acceptedShardCount, 4);
+    assert.equal(performanceReport.coverage?.missingShardCount, 16);
+    assert.equal(performanceReport.coverage?.acceptedQueryCount, 100);
     assert.equal(performanceReport.coverage?.queryCount, 500);
-    assert.equal(performanceReport.coverage?.coveragePercent, 15);
-    assert.equal(performanceReport.coverage?.nextPendingShardId, "shard-004");
-    assert.equal(performanceReport.coverage?.nextPendingShardRange, "75-100");
-    assert.equal(performanceReport.bestAnswerQuality?.strategy, "full-hybrid-rerank");
-    assert.equal(performanceReport.bestAnswerQuality?.answerQuality, 25.0133);
-    assert.equal(performanceReport.bestAnswerQuality?.deltaVsBm25?.answerQuality, 2.4);
-    assert.equal(performanceReport.lowestLatency?.strategy, "query-expanded-full-hybrid-rerank");
-    assert.equal(performanceReport.localApple?.base?.answerQuality, 24.4133);
-    assert.equal(performanceReport.localApple?.rerank?.answerQuality, 23.88);
-    assert.equal(performanceReport.localApple?.rerankDeltaVsBase?.answerQuality, -0.5333);
+    assert.equal(performanceReport.coverage?.coveragePercent, 20);
+    assert.equal(performanceReport.coverage?.nextPendingShardId, "shard-005");
+    assert.equal(performanceReport.coverage?.nextPendingShardRange, "100-125");
+    assert.equal(performanceReport.bestAnswerQuality?.strategy, "local-apple-qwen3-0_6b-local-rerank");
+    assert.equal(performanceReport.bestAnswerQuality?.answerQuality, 26.41);
+    assert.equal(performanceReport.bestAnswerQuality?.deltaVsBm25?.answerQuality, 3.15);
+    assert.equal(performanceReport.lowestLatency?.strategy, "bm25-lite");
+    assert.equal(performanceReport.localApple?.base?.answerQuality, 23.96);
+    assert.equal(performanceReport.localApple?.rerank?.answerQuality, 26.41);
+    assert.equal(performanceReport.localApple?.rerankDeltaVsBase?.answerQuality, 2.45);
     assert.equal(performanceReport.runtime?.runtimeBlockerStatus, "BLOCKED_LOCAL_FULL_SHARD_RUNTIME");
     assert.equal(performanceReport.runtime?.runtimeRecoveryStatus, "RETRIEVAL_AND_SCORING_READY");
     assert.equal(performanceReport.runtime?.runtimeBlockedShardCount, 0);
@@ -4767,8 +4809,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullShardPerformanceReport.writesRealFiles, true);
   assert.equal(localFullShardPerformanceReportFresh.writesRealFiles, false);
   assert.match(localFullShardPerformanceReportEvidence, /Local-Full Shard Performance Report/);
-  assert.match(localFullShardPerformanceReportEvidence, /Coverage: 15%/);
-  assert.match(localFullShardPerformanceReportEvidence, /Strategy: full-hybrid-rerank/);
+  assert.match(localFullShardPerformanceReportEvidence, /Coverage: 20%/);
+  assert.match(localFullShardPerformanceReportEvidence, /Strategy: local-apple-qwen3-0_6b-local-rerank/);
   assert.match(localFullShardPerformanceReportMarkdownFresh, /Runtime blocker status: BLOCKED_LOCAL_FULL_SHARD_RUNTIME/);
   assert.match(localFullShardPerformanceReportMarkdownFresh, /Runtime recovery status: RETRIEVAL_AND_SCORING_READY/);
   assert.match(localFullShardPerformanceReportMarkdownFresh, /Active runtime-blocked shards: 0/);
@@ -5236,8 +5278,8 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
     assert.equal(doctorReport.localFullLaneState?.intakeStatus, "BLOCKED_FULL_ANSWER_QUALITY_SHARDS");
     assert.equal(doctorReport.localFullLaneState?.readyForShardCombine, false);
-    assert.equal(doctorReport.localFullLaneState?.acceptedShardCount, 3);
-    assert.equal(doctorReport.localFullLaneState?.missingShardCount, 17);
+    assert.equal(doctorReport.localFullLaneState?.acceptedShardCount, 4);
+    assert.equal(doctorReport.localFullLaneState?.missingShardCount, 16);
     assert.equal(doctorReport.localFullLaneState?.launchProgressSource, "checked-in-progress-intake");
     assert.equal(doctorReport.localFullLaneState?.launchProgressInputCount, 2);
     assert.equal(doctorReport.localFullLaneState?.launchAcceptedShardCount, 2);
@@ -5250,24 +5292,24 @@ check("fresh public benchmark target check passes", () => {
       Date.parse(doctorReport.localFullLaneState?.performanceReport?.generatedAt ?? "") >=
         Date.parse(doctorReport.localFullLaneState?.performanceReport?.intakeGeneratedAt ?? ""),
     );
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedAcceptedShardCount, 3);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedAcceptedQueryCount, 75);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedCoveragePercent, 15);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedNextPendingShardId, "shard-004");
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedNextPendingShardRange, "75-100");
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedAcceptedShardCount, 4);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedAcceptedQueryCount, 100);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedCoveragePercent, 20);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedNextPendingShardId, "shard-005");
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.expectedNextPendingShardRange, "100-125");
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.status, "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT");
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.acceptedShardCount, 3);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.acceptedQueryCount, 75);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.acceptedShardCount, 4);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.acceptedQueryCount, 100);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.queryCount, 500);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.coveragePercent, 15);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.nextPendingShardId, "shard-004");
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.nextPendingShardRange, "75-100");
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.bestStrategy, "full-hybrid-rerank");
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.bestAnswerQuality, 25.0133);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.bestDeltaVsBm25, 2.4);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.localAppleBaseAnswerQuality, 24.4133);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.localAppleRerankAnswerQuality, 23.88);
-    assert.equal(doctorReport.localFullLaneState?.performanceReport?.localAppleRerankDeltaVsBase, -0.5333);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.coveragePercent, 20);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.nextPendingShardId, "shard-005");
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.nextPendingShardRange, "100-125");
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.bestStrategy, "local-apple-qwen3-0_6b-local-rerank");
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.bestAnswerQuality, 26.41);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.bestDeltaVsBm25, 3.15);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.localAppleBaseAnswerQuality, 23.96);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.localAppleRerankAnswerQuality, 26.41);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.localAppleRerankDeltaVsBase, 2.45);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeBlockerStatus, "BLOCKED_LOCAL_FULL_SHARD_RUNTIME");
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeFailedArm, "local-apple-qwen3-0_6b-local-rerank");
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeRecoveryStatus, "RETRIEVAL_AND_SCORING_READY");
@@ -5339,8 +5381,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.resumeResult?.commandMaterializerReady, false);
     assert.equal(doctorReport.localFullLaneState?.resumeResult?.commandMaterializerWrotePrivateCommandFile, false);
     assert.ok(doctorReport.localFullLaneState?.resumeResult?.blockers?.includes("shard-002-result-missing"));
-    assert.equal(doctorReport.localFullLaneState?.nextPendingShardId, "shard-004");
-    assert.equal(doctorReport.localFullLaneState?.nextPendingShardRange, "75-100");
+    assert.equal(doctorReport.localFullLaneState?.nextPendingShardId, "shard-005");
+    assert.equal(doctorReport.localFullLaneState?.nextPendingShardRange, "100-125");
     assert.equal(doctorReport.localFullLaneState?.runtimeBlockedShardCount, 0);
     assert.equal(doctorReport.localFullLaneState?.historicalRuntimeBlockedShardCount, 2);
     assert.equal(doctorReport.localFullLaneState?.recoveredRuntimeBlockedShardCount, 2);
@@ -5369,7 +5411,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-full-shard-003-scoring-env-missing"), false);
     assert.ok(!doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-embedding-runtime-not-ready"));
     assert.ok(!doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-embedding-durability-smoke-not-ready"));
-    assert.match(doctorReport.localFullLaneState?.intakePath ?? "", /answer-quality-local-full-shard-intake-after-shard-003-20260527\.json$/);
+    assert.match(doctorReport.localFullLaneState?.intakePath ?? "", /answer-quality-local-full-shard-intake-after-shard-004-20260527\.json$/);
     assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("answer-quality-shards-missing"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-runtime" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-durability" && item.status === "pass"));
@@ -5404,9 +5446,9 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownFresh, /Control Preflight/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Same-data shard ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Full SOTA lane ready for answer-quality scoring: false/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Missing local-full shards: 17/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance coverage: 15%/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance best strategy: full-hybrid-rerank/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Missing local-full shards: 16/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance coverage: 20%/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance best strategy: local-apple-qwen3-0_6b-local-rerank/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance counts as SOTA evidence: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-performance-snapshot: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-resume-env: pass/);
@@ -5433,7 +5475,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume result ready for local shard intake: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume result previous shard accepted: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume result shard 002 present: false/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next local-full shard: shard-004 \(75-100\)/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next local-full shard: shard-005 \(100-125\)/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime-blocked local-full shards: 0/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Historical runtime-blocked local-full shards: 2/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Recovered runtime-blocked local-full shards: 2/);
@@ -7345,10 +7387,10 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.fullMemorySotaDoctor.bm25IsLexicalFloorOnly, true);
   assert.equal(report.checks.fullMemorySotaDoctor.rawSourcesRetainedPrivately, true);
   assert.equal(report.checks.fullMemorySotaDoctor.rawPublicReportSafe, true);
-  assert.equal(report.checks.fullMemorySotaDoctor.nextLocalFullShard, "shard-004");
-  assert.equal(report.checks.fullMemorySotaDoctor.nextLocalFullShardRange, "75-100");
-  assert.equal(report.checks.fullMemorySotaDoctor.localFullPendingShardCount, 17);
-  assert.equal(report.checks.fullMemorySotaDoctor.localFullAcceptedShardCount, 3);
+  assert.equal(report.checks.fullMemorySotaDoctor.nextLocalFullShard, "shard-005");
+  assert.equal(report.checks.fullMemorySotaDoctor.nextLocalFullShardRange, "100-125");
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullPendingShardCount, 16);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullAcceptedShardCount, 4);
   assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingRuntimeReady, true);
   assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingDurabilityReady, true);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.status, "READY_FOR_BASELINE_REVIEW");
@@ -7389,7 +7431,7 @@ check("fresh release blocker doctor passes", () => {
   assert.match(report.latestVerifiedRepositoryHead?.headSha ?? "", /^[a-f0-9]{40}$/);
   assert.notEqual(report.latestVerifiedRepositoryHead?.headSha, approvedAdapterCommit);
   assert.match(benchmarkBlocker.nextAction, /full same-data answer-quality shard ladder/);
-  assert.match(benchmarkBlocker.nextAction, /local-full shard-004 \(75-100\)/);
+  assert.match(benchmarkBlocker.nextAction, /local-full shard-005 \(100-125\)/);
   assert.match(benchmarkBlocker.nextAction, /real canary gate/);
   assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent handoff packet/);
   assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
@@ -9641,6 +9683,7 @@ function isPublicEvidencePath(file) {
   return (
     file.startsWith("reviews/") ||
     file.startsWith("docs/") ||
+    file === "vault-template/wiki/longmemeval-benchmark-topics.md" ||
     file === "CHANGELOG.md" ||
     file === "README.md" ||
     file === "SECURITY.md" ||

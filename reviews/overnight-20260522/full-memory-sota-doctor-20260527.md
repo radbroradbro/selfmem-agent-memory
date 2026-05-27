@@ -81,12 +81,12 @@
 - Ready for first shard run: false
 - Intake status: BLOCKED_FULL_ANSWER_QUALITY_SHARDS
 - Ready for shard combine: false
-- Accepted local-full shards: 3
-- Missing local-full shards: 17
+- Accepted local-full shards: 4
+- Missing local-full shards: 16
 - Launch progress source: checked-in-progress-intake
-- Performance coverage: 15%
-- Performance best strategy: full-hybrid-rerank
-- Performance best answer quality: 25.0133
+- Performance coverage: 20%
+- Performance best strategy: local-apple-qwen3-0_6b-local-rerank
+- Performance best answer quality: 26.41
 - Performance counts as SOTA evidence: false
 - Resume env ready for missing-arm export: true
 - Resume env ready for missing-arm export except env: true
@@ -112,7 +112,7 @@
 - Resume result previous shard accepted: true
 - Resume result shard 002 present: false
 - Resume result shard 002 accepted: false
-- Next local-full shard: shard-004 (75-100)
+- Next local-full shard: shard-005 (100-125)
 - Runtime-blocked local-full shards: 0
 - Historical runtime-blocked local-full shards: 2
 - Recovered runtime-blocked local-full shards: 2

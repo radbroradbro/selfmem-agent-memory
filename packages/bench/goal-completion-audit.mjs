@@ -138,6 +138,8 @@ const files = {
   answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
   fullMemorySotaDoctorReport: `${reviewDir}/full-memory-sota-doctor-20260526.json`,
   fullMemorySotaDoctorMarkdown: `${reviewDir}/full-memory-sota-doctor-20260526.md`,
+  localWikiMethodReport: `${reviewDir}/local-wiki-method-report-20260527.json`,
+  localWikiMethodMarkdown: `${reviewDir}/local-wiki-method-report-20260527.md`,
 };
 
 for (const [name, file] of Object.entries(files)) {
@@ -185,6 +187,7 @@ const answerQualityFullShardPlan = JSON.parse(readFileSync(join(root, files.answ
 const answerQualityFullShardWorkorder = JSON.parse(readFileSync(join(root, files.answerQualityFullShardWorkorderReport), "utf8"));
 const answerQualityFullShardIntake = JSON.parse(readFileSync(join(root, files.answerQualityFullShardIntakeReport), "utf8"));
 const fullMemorySotaDoctor = JSON.parse(readFileSync(join(root, files.fullMemorySotaDoctorReport), "utf8"));
+const localWikiMethod = JSON.parse(readFileSync(join(root, files.localWikiMethodReport), "utf8"));
 const texts = Object.fromEntries(
   Object.entries(files)
     .filter(([, file]) => file.endsWith(".md"))
@@ -543,6 +546,19 @@ assert.equal(fullMemorySotaDoctor.rawSourceRetention?.publicReportIsSafe, true);
 assert.equal(fullMemorySotaDoctor.shardState?.missingShardCount, 20);
 assert.ok(fullMemorySotaDoctor.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
 assert.match(texts.fullMemorySotaDoctorMarkdown, /Full Memory SOTA Doctor/);
+assert.equal(localWikiMethod.mode, "local-wiki-method-report");
+assert.equal(localWikiMethod.status, "WIKI_METHOD_SHARD_EVALUATED");
+assert.equal(localWikiMethod.countsAsLocalFullBenchmarkEvidence, true);
+assert.equal(localWikiMethod.countsAsFullMemorySotaEvidence, false);
+assert.equal(localWikiMethod.publicBenchmarkClaimsAllowed, false);
+assert.equal(localWikiMethod.methodIsolation?.hostedSupermemorySearchDisabled, true);
+assert.equal(localWikiMethod.methodIsolation?.compatibleWithLegacyShardIntake, false);
+assert.equal(localWikiMethod.comparisons?.bestStrategy, "local-apple-qwen3-0_6b-local-rerank");
+assert.equal(localWikiMethod.comparisons?.wikiTitle?.winsVsBm25, false);
+assert.equal(localWikiMethod.comparisons?.wikiSubtopic?.winsVsBm25, false);
+assert.ok(localWikiMethod.decisions?.some((item) => item.id === "wiki-title-amplification" && item.status === "negative-signal"));
+assert.ok(localWikiMethod.decisions?.some((item) => item.id === "wiki-subtopic-amplification" && item.status === "not-yet-positive"));
+assert.match(texts.localWikiMethodMarkdown, /Compatible with legacy shard intake: false/i);
 assert.match(texts.completionAudit, /Verdict: not complete/i);
 assert.match(texts.productionReadiness, /verdict.*FAIL|not production ready/i);
 assert.match(texts.claudeReview, /Verdict:\s*CONCERNS/i);
@@ -818,6 +834,8 @@ const requirements = [
     files.answerQualityFullShardIntakeMarkdown,
     files.fullMemorySotaDoctorReport,
     files.fullMemorySotaDoctorMarkdown,
+    files.localWikiMethodReport,
+    files.localWikiMethodMarkdown,
     "packages/bench/public-benchmark-sota-ladder.mjs",
     "packages/bench/public-benchmark-sota-operator-packet.mjs",
     "packages/bench/full-memory-sota-doctor.mjs",
@@ -836,6 +854,7 @@ const requirements = [
     "packages/bench/memory-score-reviewer-approval-intake.mjs",
     "packages/bench/memory-score-openai-compatible-reviewer.mjs",
     "packages/bench/local-openai-rerank-sidecar.mjs",
+    "packages/bench/local-wiki-method-report.mjs",
     "packages/bench/recallweave-response-export.mjs",
   ]),
   incomplete("real-container-production-rollout", "One-agent real runtime rollout remains a canary step, not a completed production rollout", [
