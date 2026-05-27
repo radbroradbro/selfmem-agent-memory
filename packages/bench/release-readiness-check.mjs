@@ -221,8 +221,12 @@ const requiredFiles = [
   `${reviewDir}/local-full-shard-003-resume-command-materializer-20260526.md`,
   `${reviewDir}/local-full-shard-003-resume-command-security-20260526.json`,
   `${reviewDir}/local-full-shard-003-resume-command-security-20260526.md`,
+  `${reviewDir}/local-full-shard-003-resume-env-doctor-20260527.json`,
+  `${reviewDir}/local-full-shard-003-resume-env-doctor-20260527.md`,
   `${reviewDir}/local-full-shard-performance-report-20260526.json`,
   `${reviewDir}/local-full-shard-performance-report-20260526.md`,
+  `${reviewDir}/local-full-shard-performance-report-20260527.json`,
+  `${reviewDir}/local-full-shard-performance-report-20260527.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
@@ -233,14 +237,24 @@ const requiredFiles = [
   `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
   `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.md`,
+  `${reviewDir}/answer-quality-local-full-shard-003-arm-export-20260527.json`,
+  `${reviewDir}/answer-quality-local-full-shard-003-arm-export-20260527.md`,
+  `${reviewDir}/answer-quality-local-full-shard-003-preflight-20260527.json`,
+  `${reviewDir}/answer-quality-local-full-shard-003-preflight-20260527.md`,
   `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
   `${reviewDir}/local-embedding-runtime-doctor-20260526.md`,
+  `${reviewDir}/local-embedding-runtime-doctor-20260527.json`,
+  `${reviewDir}/local-embedding-runtime-doctor-20260527.md`,
   `${reviewDir}/local-embedding-launch-diagnostic-20260526.json`,
   `${reviewDir}/local-embedding-launch-diagnostic-20260526.md`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.md`,
+  `${reviewDir}/local-embedding-durability-smoke-20260527.json`,
+  `${reviewDir}/local-embedding-durability-smoke-20260527.md`,
   `${reviewDir}/local-rerank-durability-smoke-20260526.json`,
   `${reviewDir}/local-rerank-durability-smoke-20260526.md`,
+  `${reviewDir}/local-rerank-durability-smoke-20260527.json`,
+  `${reviewDir}/local-rerank-durability-smoke-20260527.md`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.md`,
   `${reviewDir}/full-shard-private-input-doctor-current.json`,
@@ -263,6 +277,8 @@ const requiredFiles = [
   `${reviewDir}/sota-ladder-full-target-operator-packet-20260525.md`,
   `${reviewDir}/full-memory-sota-doctor-20260526.json`,
   `${reviewDir}/full-memory-sota-doctor-20260526.md`,
+  `${reviewDir}/full-memory-sota-doctor-20260527.json`,
+  `${reviewDir}/full-memory-sota-doctor-20260527.md`,
   `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
   `${reviewDir}/memory-score-reviewer-intake-20260525.md`,
   `${reviewDir}/end-to-end-memory-score-gate-20260525.json`,
@@ -2257,10 +2273,10 @@ check("fresh public benchmark target check passes", () => {
     run("node", ["packages/bench/local-full-shard-resume-result-doctor.mjs", "--fixture"]).stdout,
   );
   const localFullShardPerformanceReport = JSON.parse(
-    readFileSync(join(root, reviewDir, "local-full-shard-performance-report-20260526.json"), "utf8"),
+    readFileSync(join(root, reviewDir, "local-full-shard-performance-report-20260527.json"), "utf8"),
   );
   const localFullShardPerformanceReportEvidence = readFileSync(
-    join(root, reviewDir, "local-full-shard-performance-report-20260526.md"),
+    join(root, reviewDir, "local-full-shard-performance-report-20260527.md"),
     "utf8",
   );
   const localFullShardPerformanceReportFresh = JSON.parse(
@@ -2362,8 +2378,8 @@ check("fresh public benchmark target check passes", () => {
   );
   const fullMemorySotaDoctorFresh = JSON.parse(run("node", ["packages/bench/full-memory-sota-doctor.mjs"]).stdout);
   const fullMemorySotaDoctorMarkdownFresh = run("node", ["packages/bench/full-memory-sota-doctor.mjs", "--format", "markdown"]).stdout;
-  const fullMemorySotaDoctorEvidence = JSON.parse(readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260526.json"), "utf8"));
-  const fullMemorySotaDoctorMarkdownEvidence = readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260526.md"), "utf8");
+  const fullMemorySotaDoctorEvidence = JSON.parse(readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260527.json"), "utf8"));
+  const fullMemorySotaDoctorMarkdownEvidence = readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260527.md"), "utf8");
   const providerOperatorPacket = JSON.parse(run("node", ["packages/bench/provider-benchmark-operator-packet.mjs", "--provider", "voyage"]).stdout);
   const providerOperatorPacketMarkdown = run("node", [
     "packages/bench/provider-benchmark-operator-packet.mjs",
@@ -4732,10 +4748,16 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(performanceReport.localApple?.rerank?.answerQuality, 19.82);
     assert.equal(performanceReport.localApple?.rerankDeltaVsBase?.answerQuality, -4.8);
     assert.equal(performanceReport.runtime?.runtimeBlockerStatus, "BLOCKED_LOCAL_FULL_SHARD_RUNTIME");
+    assert.equal(performanceReport.runtime?.runtimeRecoveryStatus, "RETRIEVAL_RECOVERED_SCORING_PENDING");
+    assert.equal(performanceReport.runtime?.runtimeBlockedShardCount, 0);
+    assert.equal(performanceReport.runtime?.historicalRuntimeBlockedShardCount, 1);
+    assert.equal(performanceReport.runtime?.recovery?.retrievalRecovered, true);
+    assert.equal(performanceReport.runtime?.recovery?.answerQualityEnvReady, false);
     assert.equal(performanceReport.runtime?.failedArm, "local-apple-qwen3-0_6b-local-rerank");
     assert.equal(performanceReport.runtime?.resumeResultDoctorStatus, "BLOCKED_LOCAL_FULL_SHARD_002_RESULT");
     assert.ok(performanceReport.blockers?.includes("local-full-coverage-incomplete"));
-    assert.ok(performanceReport.blockers?.includes("local-full-runtime-blocker-present"));
+    assert.ok(performanceReport.blockers?.includes("local-full-shard-003-scoring-env-missing"));
+    assert.equal(performanceReport.blockers?.includes("local-full-runtime-blocker-present"), false);
   }
   assert.equal(localFullShardPerformanceReport.writesRealFiles, true);
   assert.equal(localFullShardPerformanceReportFresh.writesRealFiles, false);
@@ -4743,6 +4765,8 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardPerformanceReportEvidence, /Coverage: 10%/);
   assert.match(localFullShardPerformanceReportEvidence, /Strategy: full-hybrid-rerank/);
   assert.match(localFullShardPerformanceReportMarkdownFresh, /Runtime blocker status: BLOCKED_LOCAL_FULL_SHARD_RUNTIME/);
+  assert.match(localFullShardPerformanceReportMarkdownFresh, /Runtime recovery status: RETRIEVAL_RECOVERED_SCORING_PENDING/);
+  assert.match(localFullShardPerformanceReportMarkdownFresh, /Active runtime-blocked shards: 0/);
   for (const text of [
     JSON.stringify(localFullShardPerformanceReport),
     JSON.stringify(localFullShardPerformanceReportFresh),
@@ -5239,14 +5263,21 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.localAppleRerankDeltaVsBase, -4.8);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeBlockerStatus, "BLOCKED_LOCAL_FULL_SHARD_RUNTIME");
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeFailedArm, "local-apple-qwen3-0_6b-local-rerank");
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeRecoveryStatus, "RETRIEVAL_RECOVERED_SCORING_PENDING");
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeRecoveryRetrievalRecovered, true);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.runtimeRecoveryAnswerQualityEnvReady, false);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.activeRuntimeBlockedShardCount, 0);
+    assert.equal(doctorReport.localFullLaneState?.performanceReport?.historicalRuntimeBlockedShardCount, 1);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.countsAsFullMemorySotaEvidence, false);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.publicBenchmarkClaimsAllowed, false);
     assert.ok(doctorReport.localFullLaneState?.performanceReport?.blockers?.includes("local-full-coverage-incomplete"));
+    assert.ok(doctorReport.localFullLaneState?.performanceReport?.blockers?.includes("local-full-shard-003-scoring-env-missing"));
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.status, "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV");
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.evidenceReady, false);
     assert.ok(!doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers?.includes("private-dir-not-provided"));
-    assert.ok(doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers?.includes("local-embedding-env-missing"));
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForMissingArmExport, false);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers?.includes("local-embedding-env-missing"), false);
+    assert.ok(doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers?.includes("answer-quality-env-missing"));
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForMissingArmExport, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForAnswerQualityPreflight, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForShardAnswerQuality, false);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForLocalShardIntake, false);
@@ -5254,7 +5285,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateInputFilesReady, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.completedPrivateArmFilesReady, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.readyForMissingArmExportExceptEnv, true);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localResumeExecutionEnvReady, false);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localResumeExecutionEnvReady, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryProvided, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryPresent, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.privateDirectoryOutsideRepository, true);
@@ -5264,15 +5295,15 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.compressedDefaultRetrievalAllowed, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.uiMayUseCompressedDefaultButAuditRetainsRawSource, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localEmbeddingDurabilityReady, true);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localEmbeddingEnvReady, false);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localRerankEnvReady, false);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localSafetyEnvReady, false);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localEmbeddingEnvReady, true);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localRerankEnvReady, true);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.localSafetyEnvReady, true);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.answerQualityEnvReady, false);
-    assert.ok(Number(doctorReport.localFullLaneState?.resumeEnv?.missingEnvironmentNameCount ?? 0) > 0);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.missingEnvironmentNameCount, 6);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.requiredPrivateInputFileCount, 3);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.presentPrivateInputFileCount, 3);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.completedArmFileCount, 3);
-    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.presentCompletedArmFileCount, 3);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.completedArmFileCount, 4);
+    assert.equal(doctorReport.localFullLaneState?.resumeEnv?.presentCompletedArmFileCount, 4);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.evidenceReady, true);
     assert.deepEqual(doctorReport.localFullLaneState?.resumeCommandSecurity?.evidenceBlockers, []);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.privateCommandFileMode, "0700");
@@ -5302,14 +5333,20 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.localFullLaneState?.resumeResult?.blockers?.includes("shard-002-result-missing"));
     assert.equal(doctorReport.localFullLaneState?.nextPendingShardId, "shard-003");
     assert.equal(doctorReport.localFullLaneState?.nextPendingShardRange, "50-75");
-    assert.equal(doctorReport.localFullLaneState?.runtimeBlockedShardCount, 2);
+    assert.equal(doctorReport.localFullLaneState?.runtimeBlockedShardCount, 0);
+    assert.equal(doctorReport.localFullLaneState?.historicalRuntimeBlockedShardCount, 2);
+    assert.equal(doctorReport.localFullLaneState?.recoveredRuntimeBlockedShardCount, 2);
+    assert.equal(doctorReport.localFullLaneState?.runtimeRecoveryStatus, "RETRIEVAL_RECOVERED_SCORING_PENDING");
+    assert.equal(doctorReport.localFullLaneState?.runtimeRecoveryRetrievalRecovered, true);
+    assert.equal(doctorReport.localFullLaneState?.runtimeRecoveryAnswerQualityEnvReady, false);
     assert.equal(doctorReport.localFullLaneState?.runtimeBlockerWorkorderInputCount, 1);
     assert.equal(doctorReport.localFullLaneState?.runtimeBlockerResumeAvailableCount, 1);
-    assert.deepEqual(doctorReport.localFullLaneState?.nextPendingShardResumeMissingStrategies, [
+    assert.deepEqual(doctorReport.localFullLaneState?.nextPendingShardResumeMissingStrategies, []);
+    assert.deepEqual(doctorReport.localFullLaneState?.historicalNextPendingShardResumeMissingStrategies, [
       "local-apple-qwen3-0_6b-local-rerank",
     ]);
-    assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedShard, "shard-003");
-    assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedArm, "local-apple-qwen3-0_6b-local-rerank");
+    assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedShard, null);
+    assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedArm, null);
     assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeStatus, "READY_LOCAL_EMBEDDING_RUNTIME");
     assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeReady, true);
     assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeModelLooksDedicated, true);
@@ -5319,7 +5356,9 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.localEmbeddingDurabilityReady, true);
     assert.ok(Number(doctorReport.localFullLaneState?.localEmbeddingDurabilityProbeCount ?? 0) >= 4);
     assert.deepEqual(doctorReport.localFullLaneState?.localEmbeddingDurabilityBlockers, []);
-    assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-apple-embedding-server-socket-close"));
+    assert.equal(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-apple-embedding-server-socket-close"), false);
+    assert.equal(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-rerank-response-body-stall"), false);
+    assert.ok(doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-full-shard-003-scoring-env-missing"));
     assert.ok(!doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-embedding-runtime-not-ready"));
     assert.ok(!doctorReport.localFullLaneState?.shardIntakeBlockers?.includes("local-embedding-durability-smoke-not-ready"));
     assert.match(doctorReport.localFullLaneState?.intakePath ?? "", /answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526\.json$/);
@@ -5343,7 +5382,8 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
     assert.ok(!doctorReport.blockers?.includes("private-dir-not-provided"));
     assert.equal(doctorReport.blockers?.includes("shard-002-result-missing"), false);
-    assert.ok(doctorReport.blockers?.includes("local-full-shard-003-incomplete"));
+    assert.equal(doctorReport.blockers?.includes("local-full-shard-003-incomplete"), false);
+    assert.ok(doctorReport.blockers?.includes("local-full-shard-003-scoring-env-missing"));
     assert.ok(doctorReport.blockers?.includes("human-public-launch-approval"));
     assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("query-expanded-full-hybrid-rerank"));
     assert.ok(doctorReport.nextRunPlan?.executionLanes?.some((lane) => lane.id === "local-apple-no-spend" && lane.acceptedByFullShardIntake === false));
@@ -5362,16 +5402,16 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance counts as SOTA evidence: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-performance-snapshot: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-resume-env: blocked/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export: false/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export except env: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env private input files ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env completed private arm files ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env private directory provided: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env raw-source private audit ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env compressed default retrieval allowed: true/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local execution env ready: false/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local embedding env ready: false/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local rerank env ready: false/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local execution env ready: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local embedding env ready: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env local rerank env ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env answer-quality env ready: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-resume-command-security: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume command security ready: true/);
@@ -5386,9 +5426,13 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume result previous shard accepted: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume result shard 002 present: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next local-full shard: shard-003 \(50-75\)/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime-blocked local-full shards: 2/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime-blocked local-full shards: 0/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Historical runtime-blocked local-full shards: 2/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Recovered runtime-blocked local-full shards: 2/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime recovery status: RETRIEVAL_RECOVERED_SCORING_PENDING/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime blocker resume plans: 1/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next shard missing resume arms: none/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Historical next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding runtime ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding durability ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);

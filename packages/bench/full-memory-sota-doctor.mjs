@@ -23,14 +23,26 @@ const files = {
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
   localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`,
   localFullShardIntakeAfterShard001: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
-  localFullPerformanceReport: `${reviewDir}/local-full-shard-performance-report-20260526.json`,
-  localFullResumeEnvDoctor: `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.json`,
+  localFullPerformanceReport: preferReviewFile(
+    "local-full-shard-performance-report-20260527.json",
+    "local-full-shard-performance-report-20260526.json",
+  ),
+  localFullResumeEnvDoctor: preferReviewFile(
+    "local-full-shard-003-resume-env-doctor-20260527.json",
+    "local-full-shard-002-resume-env-doctor-20260526.json",
+  ),
   localFullResumeCommandSecurity: `${reviewDir}/local-full-shard-003-resume-command-security-20260526.json`,
   localFullResumeResultDoctor: `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
   localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
   localFullShard003RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
-  localEmbeddingRuntimeDoctor: `${reviewDir}/local-embedding-runtime-doctor-20260526.json`,
-  localEmbeddingDurabilitySmoke: `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
+  localEmbeddingRuntimeDoctor: preferReviewFile(
+    "local-embedding-runtime-doctor-20260527.json",
+    "local-embedding-runtime-doctor-20260526.json",
+  ),
+  localEmbeddingDurabilitySmoke: preferReviewFile(
+    "local-embedding-durability-smoke-20260527.json",
+    "local-embedding-durability-smoke-20260526.json",
+  ),
   localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
   acceptedLaneLaunchDoctor: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
@@ -366,8 +378,33 @@ function inspectLocalFullLaneState({
   const acceptedLane = arrayOf(localFullShardWorkorder?.executionLaneReadiness).find((lane) => lane.acceptedByFullShardIntake === true);
   const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
   const runtimeBlockerReports = arrayOf(localFullShardRuntimeBlockers).filter(Boolean);
-  const runtimeBlockerIds = [...new Set(runtimeBlockerReports.flatMap((report) => arrayOf(report?.blockers)))];
   const acceptedShardIds = new Set(arrayOf(localFullShardIntake?.acceptedShards).map((shard) => String(shard?.shardId ?? "")));
+  const performanceReportState = inspectLocalFullPerformanceReport(localFullPerformanceReport, {
+    localFullShardPlan,
+    localFullShardIntake,
+    localFullAcceptedLaneLaunchDoctor,
+  });
+  const recoveredRuntimeShardIds = new Set(
+    performanceReportState.runtimeRecoveryRetrievalRecovered && performanceReportState.runtimeRecoveryShardId
+      ? [performanceReportState.runtimeRecoveryShardId]
+      : [],
+  );
+  const recoveredRuntimeBlockerReports = runtimeBlockerReports.filter((report) => {
+    const shardId = String(report?.queryShard?.shardId ?? "");
+    return acceptedShardIds.has(shardId) || recoveredRuntimeShardIds.has(shardId);
+  });
+  const activeRuntimeBlockerReports = runtimeBlockerReports.filter((report) => {
+    const shardId = String(report?.queryShard?.shardId ?? "");
+    return !acceptedShardIds.has(shardId) && !recoveredRuntimeShardIds.has(shardId);
+  });
+  const activeRuntimeBlockerIds = [...new Set(activeRuntimeBlockerReports.flatMap((report) => arrayOf(report?.blockers)))];
+  const historicalNextPendingShardResumeMissingStrategies =
+    localFullShardWorkorder?.workorders?.[0]?.runtimeResume?.missingStrategies ?? [];
+  const nextPendingShardResumeMissingStrategies =
+    performanceReportState.runtimeRecoveryRetrievalRecovered === true &&
+    performanceReportState.runtimeRecoveryShardId === performanceReportState.nextPendingShardId
+      ? []
+      : historicalNextPendingShardResumeMissingStrategies;
   const localEmbeddingRuntimeReady =
     localEmbeddingRuntimeDoctor?.mode === "local-embedding-runtime-doctor" &&
     localEmbeddingRuntimeDoctor?.status === "READY_LOCAL_EMBEDDING_RUNTIME" &&
@@ -427,22 +464,24 @@ function inspectLocalFullLaneState({
     acceptedLaneId: acceptedLane?.laneId ?? null,
     canReachFullSotaGateAfterShardIntake: Boolean(acceptedLane?.canReachFullSotaGateAfterShardIntake),
     cloudProviderBlockerCount: cloudProviderBlockers.length,
-    runtimeBlockedShardCount: runtimeBlockerReports.length,
-    latestRuntimeBlockedShard: runtimeBlockerReports.at(-1)?.queryShard?.shardId ?? null,
-    latestRuntimeBlockedArm: runtimeBlockerReports.at(-1)?.failedArm?.strategy ?? null,
+    runtimeBlockedShardCount: activeRuntimeBlockerReports.length,
+    historicalRuntimeBlockedShardCount: runtimeBlockerReports.length,
+    recoveredRuntimeBlockedShardCount: recoveredRuntimeBlockerReports.length,
+    latestRuntimeBlockedShard: activeRuntimeBlockerReports.at(-1)?.queryShard?.shardId ?? null,
+    latestRuntimeBlockedArm: activeRuntimeBlockerReports.at(-1)?.failedArm?.strategy ?? null,
+    runtimeRecoveryStatus: performanceReportState.runtimeRecoveryStatus,
+    runtimeRecoveryRetrievalRecovered: performanceReportState.runtimeRecoveryRetrievalRecovered,
+    runtimeRecoveryAnswerQualityEnvReady: performanceReportState.runtimeRecoveryAnswerQualityEnvReady,
+    runtimeRecoveryBlockers: performanceReportState.runtimeRecoveryBlockers,
     runtimeBlockerWorkorderInputCount: Number(localFullShardWorkorder?.runtimeBlockers?.inputCount ?? 0),
     runtimeBlockerResumeAvailableCount: Number(localFullShardWorkorder?.runtimeBlockers?.resumeAvailableCount ?? 0),
-    nextPendingShardResumeMissingStrategies:
-      localFullShardWorkorder?.workorders?.[0]?.runtimeResume?.missingStrategies ?? [],
+    nextPendingShardResumeMissingStrategies,
+    historicalNextPendingShardResumeMissingStrategies,
     launchProgressSource: localFullAcceptedLaneLaunchDoctor?.shardProgress?.progressSource ?? null,
     launchProgressInputCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.progressInputCount ?? 0),
     launchAcceptedShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.acceptedShardCount ?? 0),
     launchPendingShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.pendingShardCount ?? 0),
-    performanceReport: inspectLocalFullPerformanceReport(localFullPerformanceReport, {
-      localFullShardPlan,
-      localFullShardIntake,
-      localFullAcceptedLaneLaunchDoctor,
-    }),
+    performanceReport: performanceReportState,
     resumeEnv: inspectLocalFullResumeEnvDoctor(localFullResumeEnvDoctor),
     resumeCommandSecurity: inspectLocalFullResumeCommandSecurity(localFullResumeCommandSecurity),
     resumeResult: {
@@ -468,7 +507,11 @@ function inspectLocalFullLaneState({
       failedArm: report.failedArm?.strategy ?? null,
       failureClass: report.failedArm?.failureClass ?? null,
       publicSyntheticReproduced: Boolean(report.publicSyntheticReproduction?.reproduced),
-      acceptedShard: Boolean(report.acceptedShard),
+      acceptedShard: acceptedShardIds.has(String(report.queryShard?.shardId ?? "")),
+      recoveredByCurrentEvidence: recoveredRuntimeShardIds.has(String(report.queryShard?.shardId ?? "")),
+      activeRuntimeBlocker:
+        !acceptedShardIds.has(String(report.queryShard?.shardId ?? "")) &&
+        !recoveredRuntimeShardIds.has(String(report.queryShard?.shardId ?? "")),
       completedArmCount: Number(report.partialAttempt?.completedArmCount ?? 0),
       missingArmCount: Number(report.partialAttempt?.missingArmCount ?? 0),
     })),
@@ -480,7 +523,8 @@ function inspectLocalFullLaneState({
     blockers,
     shardIntakeBlockers: [
       ...arrayOf(localFullShardIntake?.blockers),
-      ...runtimeBlockerIds,
+      ...activeRuntimeBlockerIds,
+      ...performanceReportState.blockers,
       ...localEmbeddingRuntimeBlockers,
       ...localEmbeddingDurabilityBlockers,
     ],
@@ -580,6 +624,15 @@ function inspectLocalFullPerformanceReport(
     localAppleRerankDeltaVsBase: performanceReport?.localApple?.rerankDeltaVsBase?.answerQuality ?? null,
     runtimeBlockerStatus: performanceReport?.runtime?.runtimeBlockerStatus ?? null,
     runtimeFailedArm: performanceReport?.runtime?.failedArm ?? null,
+    runtimeRecoveryStatus: performanceReport?.runtime?.runtimeRecoveryStatus ?? null,
+    runtimeRecoveryShardId: performanceReport?.runtime?.recovery?.shardId ?? null,
+    runtimeRecoveryFailedArm: performanceReport?.runtime?.recovery?.failedArm ?? null,
+    runtimeRecoveryRetrievalRecovered: Boolean(performanceReport?.runtime?.recovery?.retrievalRecovered),
+    runtimeRecoveryAnswerQualityPreflightReady: Boolean(performanceReport?.runtime?.recovery?.answerQualityPreflightReady),
+    runtimeRecoveryAnswerQualityEnvReady: Boolean(performanceReport?.runtime?.recovery?.answerQualityEnvReady),
+    runtimeRecoveryBlockers: arrayOf(performanceReport?.runtime?.recovery?.blockers),
+    activeRuntimeBlockedShardCount: Number(performanceReport?.runtime?.runtimeBlockedShardCount ?? 0),
+    historicalRuntimeBlockedShardCount: Number(performanceReport?.runtime?.historicalRuntimeBlockedShardCount ?? 0),
     countsAsFullMemorySotaEvidence: Boolean(performanceReport?.countsAsFullMemorySotaEvidence),
     publicBenchmarkClaimsAllowed: Boolean(performanceReport?.publicBenchmarkClaimsAllowed),
     blockers: arrayOf(performanceReport?.blockers),
@@ -1152,8 +1205,14 @@ function renderMarkdown(value) {
     `- Resume result shard 002 accepted: ${value.localFullLaneState.resumeResult.shard002ResultAccepted}`,
     `- Next local-full shard: ${value.localFullLaneState.nextPendingShardId ?? "n/a"} (${value.localFullLaneState.nextPendingShardRange ?? "n/a"})`,
     `- Runtime-blocked local-full shards: ${value.localFullLaneState.runtimeBlockedShardCount}`,
+    `- Historical runtime-blocked local-full shards: ${value.localFullLaneState.historicalRuntimeBlockedShardCount}`,
+    `- Recovered runtime-blocked local-full shards: ${value.localFullLaneState.recoveredRuntimeBlockedShardCount}`,
+    `- Runtime recovery status: ${value.localFullLaneState.runtimeRecoveryStatus ?? "n/a"}`,
+    `- Runtime recovery retrieval recovered: ${value.localFullLaneState.runtimeRecoveryRetrievalRecovered}`,
+    `- Runtime recovery answer-quality env ready: ${value.localFullLaneState.runtimeRecoveryAnswerQualityEnvReady}`,
     `- Runtime blocker resume plans: ${value.localFullLaneState.runtimeBlockerResumeAvailableCount}`,
     `- Next shard missing resume arms: ${value.localFullLaneState.nextPendingShardResumeMissingStrategies.join(", ") || "none"}`,
+    `- Historical next shard missing resume arms: ${value.localFullLaneState.historicalNextPendingShardResumeMissingStrategies.join(", ") || "none"}`,
     `- Latest runtime-blocked shard: ${value.localFullLaneState.latestRuntimeBlockedShard ?? "n/a"}`,
     `- Latest runtime-blocked arm: ${value.localFullLaneState.latestRuntimeBlockedArm ?? "n/a"}`,
     `- Local embedding runtime status: ${value.localFullLaneState.localEmbeddingRuntimeStatus ?? "n/a"}`,
@@ -1188,6 +1247,14 @@ function loadFile(file) {
     text,
     json: file.endsWith(".json") ? JSON.parse(text) : null,
   };
+}
+
+function preferReviewFile(...names) {
+  for (const name of names) {
+    const candidate = `${reviewDir}/${name}`;
+    if (existsSync(resolveInputPath(candidate))) return candidate;
+  }
+  return `${reviewDir}/${names.at(-1)}`;
 }
 
 function runJson(nodeArgs) {

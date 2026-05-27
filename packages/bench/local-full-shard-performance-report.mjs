@@ -17,6 +17,12 @@ const runtimeBlockerPath = resolveInputPath(
 const resumeResultDoctorPath = resolveInputPath(
   args.resumeResultDoctor ?? `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
 );
+const recoveryArmExportPath = resolveInputPath(
+  args.recoveryArmExport ?? `${reviewDir}/answer-quality-local-full-shard-003-arm-export-20260527.json`,
+);
+const recoveryPreflightPath = resolveInputPath(
+  args.recoveryPreflight ?? `${reviewDir}/answer-quality-local-full-shard-003-preflight-20260527.json`,
+);
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
@@ -27,10 +33,14 @@ const planState = loadRequiredJson(planPath, "local-full shard plan");
 const intakeState = loadRequiredJson(intakePath, "local-full shard intake");
 const runtimeBlockerState = loadOptionalJson(runtimeBlockerPath, "local-full runtime blocker");
 const resumeResultDoctorState = loadOptionalJson(resumeResultDoctorPath, "local-full resume result doctor");
+const recoveryArmExportState = loadOptionalJson(recoveryArmExportPath, "local-full shard recovery arm export");
+const recoveryPreflightState = loadOptionalJson(recoveryPreflightPath, "local-full shard recovery preflight");
 const plan = planState.json;
 const intake = intakeState.json;
 const runtimeBlocker = runtimeBlockerState.json;
 const resumeResultDoctor = resumeResultDoctorState.json;
+const recoveryArmExport = recoveryArmExportState.json;
+const recoveryPreflight = recoveryPreflightState.json;
 const acceptedShardStates = loadAcceptedShardStates(intake);
 const acceptedResults = acceptedShardStates.filter((state) => state.present).map((state) => state.json);
 const strategySummaries = summarizeStrategies(acceptedResults);
@@ -42,7 +52,16 @@ const lowestLatency = bestBy(
   (item) => -item.answerLatencyP50Ms,
 );
 const localApple = summarizeLocalApple(strategySummaries);
-const runtime = summarizeRuntimeBlocker(runtimeBlockerState, runtimeBlocker, resumeResultDoctorState, resumeResultDoctor);
+const runtime = summarizeRuntimeBlocker({
+  runtimeState: runtimeBlockerState,
+  runtimeReport: runtimeBlocker,
+  resultDoctorState: resumeResultDoctorState,
+  resultDoctor: resumeResultDoctor,
+  recoveryArmExportState,
+  recoveryArmExport,
+  recoveryPreflightState,
+  recoveryPreflight,
+});
 const blockers = [
   plan.mode !== "public-benchmark-answer-quality-shard-plan" ? "local-full-plan-mode-mismatch" : null,
   (plan.runPlan?.claimScope ?? plan.claimScope) !== "local-full" ? "local-full-plan-claim-scope-mismatch" : null,
@@ -54,6 +73,9 @@ const blockers = [
   !bestAnswerQuality ? "best-answer-quality-unavailable" : null,
   coverage.acceptedShardCount < coverage.shardCount ? "local-full-coverage-incomplete" : null,
   runtime.runtimeBlockedShardCount > 0 ? "local-full-runtime-blocker-present" : null,
+  runtime.recovery?.retrievalRecovered === true && runtime.recovery?.answerQualityPreflightReady !== true
+    ? "local-full-shard-003-scoring-env-missing"
+    : null,
 ].filter(Boolean);
 
 const report = {
@@ -125,9 +147,11 @@ const report = {
   runtime,
   blockers,
   nextActions: [
-    coverage.nextPendingShardId
-      ? `Finish or rerun ${coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
-      : "No next local-full shard is pending; run shard intake and combine gates before any claim changes.",
+    runtime.recovery?.retrievalRecovered === true
+      ? `Score and intake ${runtime.recovery.shardId ?? coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
+      : coverage.nextPendingShardId
+        ? `Finish or rerun ${coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
+        : "No next local-full shard is pending; run shard intake and combine gates before any claim changes.",
     "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
     "Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage.",
   ],
@@ -256,11 +280,31 @@ function summarizeLocalApple(strategies) {
   };
 }
 
-function summarizeRuntimeBlocker(runtimeState, runtimeReport, resultDoctorState, resultDoctor) {
+function summarizeRuntimeBlocker({
+  runtimeState,
+  runtimeReport,
+  resultDoctorState,
+  resultDoctor,
+  recoveryArmExportState,
+  recoveryArmExport,
+  recoveryPreflightState,
+  recoveryPreflight,
+}) {
+  const recovery = inspectRuntimeRecovery({
+    runtimeReport,
+    recoveryArmExportState,
+    recoveryArmExport,
+    recoveryPreflightState,
+    recoveryPreflight,
+  });
+  const activeRuntimeBlocked = Boolean(runtimeState.present && !recovery.retrievalRecovered);
   return {
-    runtimeBlockerPresent: Boolean(runtimeState.present),
-    runtimeBlockedShardCount: runtimeState.present ? 1 : 0,
+    runtimeBlockerPresent: activeRuntimeBlocked,
+    runtimeBlockedShardCount: activeRuntimeBlocked ? 1 : 0,
+    historicalRuntimeBlockerPresent: Boolean(runtimeState.present),
+    historicalRuntimeBlockedShardCount: runtimeState.present ? 1 : 0,
     runtimeBlockerStatus: runtimeReport?.status ?? null,
+    runtimeRecoveryStatus: recovery.status,
     runtimeBlockedShardId: runtimeReport?.queryShard?.shardId ?? null,
     runtimeBlockedRange:
       runtimeReport?.queryShard?.startIndex != null && runtimeReport?.queryShard?.endIndexExclusive != null
@@ -271,10 +315,69 @@ function summarizeRuntimeBlocker(runtimeState, runtimeReport, resultDoctorState,
     completedArmCount: Number(runtimeReport?.partialAttempt?.completedArmCount ?? 0),
     missingArmCount: Number(runtimeReport?.partialAttempt?.missingArmCount ?? 0),
     missingStrategies: arrayOf(runtimeReport?.partialAttempt?.missingStrategies),
+    recovery,
     resumeResultDoctorPresent: Boolean(resultDoctorState.present),
     resumeResultDoctorStatus: resultDoctor?.status ?? null,
     resumeReadyForLocalShardIntake: Boolean(resultDoctor?.readyForLocalShardIntake),
     resumeBlockers: arrayOf(resultDoctor?.blockers),
+  };
+}
+
+function inspectRuntimeRecovery({ runtimeReport, recoveryArmExportState, recoveryArmExport, recoveryPreflightState, recoveryPreflight }) {
+  const failedArm = runtimeReport?.failedArm?.strategy ?? null;
+  const shardId = runtimeReport?.queryShard?.shardId ?? null;
+  const armRows = arrayOf(recoveryArmExport?.arms);
+  const recoveredArm = armRows.find((arm) => arm.strategy === failedArm) ?? null;
+  const selectedShard = recoveryPreflight?.queryShard ?? null;
+  const expectedStart = Number(runtimeReport?.queryShard?.startIndex ?? Number.NaN);
+  const expectedEnd = Number(runtimeReport?.queryShard?.endIndexExclusive ?? Number.NaN);
+  const shardMatches =
+    Number(selectedShard?.startIndex ?? Number.NaN) === expectedStart &&
+    Number(selectedShard?.endIndexExclusive ?? Number.NaN) === expectedEnd;
+  const armExportReady =
+    recoveryArmExport?.mode === "public-benchmark-answer-quality-arm-export" &&
+    recoveryArmExport?.status === "EXPORTED_RESPONSE_ARMS" &&
+    recoveryArmExport?.readyForAnswerQualityPreflight === true &&
+    recoveryArmExport?.publicSafe === true &&
+    recoveryArmExport?.metricsOnly === true &&
+    recoveredArm?.exported === true &&
+    Number(recoveredArm?.responseCount ?? 0) === Number(runtimeReport?.queryShard?.queryCount ?? 25);
+  const preflightReadyForScoring =
+    recoveryPreflight?.mode === "public-benchmark-answer-quality-preflight" &&
+    recoveryPreflight?.status === "READY_FOR_LIVE_ANSWER_QUALITY" &&
+    recoveryPreflight?.readiness?.liveAnswerQualityCanRun === true;
+  const retrievalRecovered =
+    armExportReady &&
+    recoveryPreflight?.mode === "public-benchmark-answer-quality-preflight" &&
+    recoveryPreflight?.readiness?.armsReady === true &&
+    recoveryPreflight?.readiness?.sameDataReady === true &&
+    recoveryPreflight?.readiness?.responseArmsCoverSelectedShard === true &&
+    shardMatches;
+  return {
+    status: retrievalRecovered
+      ? preflightReadyForScoring
+        ? "RETRIEVAL_AND_SCORING_READY"
+        : "RETRIEVAL_RECOVERED_SCORING_PENDING"
+      : "RUNTIME_BLOCKER_ACTIVE",
+    shardId,
+    failedArm,
+    armExportPresent: Boolean(recoveryArmExportState.present),
+    armExportStatus: recoveryArmExport?.status ?? null,
+    armExportReady,
+    armExportHash: recoveryArmExportState.hash,
+    recoveredArmHash: recoveredArm?.hash ?? null,
+    recoveredArmResponseCount: Number(recoveredArm?.responseCount ?? 0),
+    preflightPresent: Boolean(recoveryPreflightState.present),
+    preflightStatus: recoveryPreflight?.status ?? null,
+    preflightHash: recoveryPreflightState.hash,
+    responseArmsReady: Boolean(recoveryPreflight?.readiness?.armsReady),
+    sameDataReady: Boolean(recoveryPreflight?.readiness?.sameDataReady),
+    responseArmsCoverSelectedShard: Boolean(recoveryPreflight?.readiness?.responseArmsCoverSelectedShard),
+    selectedShardMatchesRuntimeBlocker: shardMatches,
+    retrievalRecovered,
+    answerQualityPreflightReady: preflightReadyForScoring,
+    answerQualityEnvReady: Boolean(recoveryPreflight?.readiness?.envReady),
+    blockers: arrayOf(recoveryPreflight?.blockers),
   };
 }
 
@@ -323,8 +426,14 @@ function renderMarkdown(value) {
     "",
     "## Runtime",
     `- Runtime blocker status: ${value.runtime.runtimeBlockerStatus ?? "n/a"}`,
+    `- Runtime recovery status: ${value.runtime.runtimeRecoveryStatus ?? "n/a"}`,
+    `- Active runtime-blocked shards: ${value.runtime.runtimeBlockedShardCount}`,
+    `- Historical runtime-blocked shards: ${value.runtime.historicalRuntimeBlockedShardCount}`,
     `- Failed arm: ${value.runtime.failedArm ?? "n/a"}`,
     `- Failure class: ${value.runtime.failureClass ?? "n/a"}`,
+    `- Recovery arm export ready: ${value.runtime.recovery?.armExportReady ?? false}`,
+    `- Recovery preflight same-data ready: ${value.runtime.recovery?.sameDataReady ?? false}`,
+    `- Recovery scoring env ready: ${value.runtime.recovery?.answerQualityEnvReady ?? false}`,
     `- Resume result doctor: ${value.runtime.resumeResultDoctorStatus ?? "n/a"}`,
     "",
     "## Strategy Summary",

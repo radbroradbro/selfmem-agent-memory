@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "local-full-shard-performance-report",
   "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
-  "generatedAt": "2026-05-27T11:30:07.800Z",
+  "generatedAt": "2026-05-27T12:19:32.567Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -228,9 +228,12 @@
     }
   },
   "runtime": {
-    "runtimeBlockerPresent": true,
-    "runtimeBlockedShardCount": 1,
+    "runtimeBlockerPresent": false,
+    "runtimeBlockedShardCount": 0,
+    "historicalRuntimeBlockerPresent": true,
+    "historicalRuntimeBlockedShardCount": 1,
     "runtimeBlockerStatus": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
+    "runtimeRecoveryStatus": "RETRIEVAL_RECOVERED_SCORING_PENDING",
     "runtimeBlockedShardId": "shard-003",
     "runtimeBlockedRange": "50-75",
     "failedArm": "local-apple-qwen3-0_6b-local-rerank",
@@ -240,6 +243,35 @@
     "missingStrategies": [
       "local-apple-qwen3-0_6b-local-rerank"
     ],
+    "recovery": {
+      "status": "RETRIEVAL_RECOVERED_SCORING_PENDING",
+      "shardId": "shard-003",
+      "failedArm": "local-apple-qwen3-0_6b-local-rerank",
+      "armExportPresent": true,
+      "armExportStatus": "EXPORTED_RESPONSE_ARMS",
+      "armExportReady": true,
+      "armExportHash": "sha256:bd7d476d412100a38f189a88ceb66840376da8e733afa1c5ba9ed2af7220f60f",
+      "recoveredArmHash": "sha256:0a183c75bd46fac676d16451422f0a3ccff8857c77ff764328d6c42bbfec00af",
+      "recoveredArmResponseCount": 25,
+      "preflightPresent": true,
+      "preflightStatus": "BLOCKED_ANSWER_QUALITY_ENV",
+      "preflightHash": "sha256:1bddcc2e26151111ed22e872b82fb348c57cb6b3b386cf14e6abc7a1c150154a",
+      "responseArmsReady": true,
+      "sameDataReady": true,
+      "responseArmsCoverSelectedShard": true,
+      "selectedShardMatchesRuntimeBlocker": true,
+      "retrievalRecovered": true,
+      "answerQualityPreflightReady": false,
+      "answerQualityEnvReady": false,
+      "blockers": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+        "answer-model-missing",
+        "judge-model-missing",
+        "openai-compatible-base-url-missing"
+      ]
+    },
     "resumeResultDoctorPresent": true,
     "resumeResultDoctorStatus": "BLOCKED_LOCAL_FULL_SHARD_002_RESULT",
     "resumeReadyForLocalShardIntake": false,
@@ -251,10 +283,10 @@
   },
   "blockers": [
     "local-full-coverage-incomplete",
-    "local-full-runtime-blocker-present"
+    "local-full-shard-003-scoring-env-missing"
   ],
   "nextActions": [
-    "Finish or rerun shard-003 before treating the next 25-query slice as accepted.",
+    "Score and intake shard-003 before treating the next 25-query slice as accepted.",
     "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
     "Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage."
   ]

@@ -23,8 +23,14 @@
 
 ## Runtime
 - Runtime blocker status: BLOCKED_LOCAL_FULL_SHARD_RUNTIME
+- Runtime recovery status: RETRIEVAL_RECOVERED_SCORING_PENDING
+- Active runtime-blocked shards: 0
+- Historical runtime-blocked shards: 1
 - Failed arm: local-apple-qwen3-0_6b-local-rerank
 - Failure class: local-rerank-response-body-stall
+- Recovery arm export ready: true
+- Recovery preflight same-data ready: true
+- Recovery scoring env ready: false
 - Resume result doctor: BLOCKED_LOCAL_FULL_SHARD_002_RESULT
 
 ## Strategy Summary
@@ -36,9 +42,9 @@
 
 ## Blockers
 - local-full-coverage-incomplete
-- local-full-runtime-blocker-present
+- local-full-shard-003-scoring-env-missing
 
 ## Next Actions
-- Finish or rerun shard-003 before treating the next 25-query slice as accepted.
+- Score and intake shard-003 before treating the next 25-query slice as accepted.
 - Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.
 - Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage.
