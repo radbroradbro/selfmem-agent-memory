@@ -9,7 +9,11 @@ const args = parseArgs(process.argv.slice(2));
 const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
 const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`);
 const intakePath = resolveInputPath(
-  args.intake ?? `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`,
+  args.intake ??
+    preferReviewFile(
+      "answer-quality-local-full-shard-intake-after-shard-003-20260527.json",
+      "answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json",
+    ),
 );
 const runtimeBlockerPath = resolveInputPath(
   args.runtimeBlocker ?? `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
@@ -147,11 +151,9 @@ const report = {
   runtime,
   blockers,
   nextActions: [
-    runtime.recovery?.retrievalRecovered === true
-      ? `Score and intake ${runtime.recovery.shardId ?? coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
-      : coverage.nextPendingShardId
-        ? `Finish or rerun ${coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
-        : "No next local-full shard is pending; run shard intake and combine gates before any claim changes.",
+    coverage.nextPendingShardId
+      ? `Finish or rerun ${coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
+      : "No next local-full shard is pending; run shard intake and combine gates before any claim changes.",
     "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
     "Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage.",
   ],
@@ -197,6 +199,14 @@ function loadAcceptedShardStates(intakeReport) {
       scoredQueryCount: Number(state.json.input?.scoredQueryCount ?? accepted.scoredQueryCount ?? 0),
     };
   });
+}
+
+function preferReviewFile(...names) {
+  for (const name of names) {
+    const candidate = `${reviewDir}/${name}`;
+    if (existsSync(resolveInputPath(candidate))) return candidate;
+  }
+  return `${reviewDir}/${names.at(-1)}`;
 }
 
 function summarizeStrategies(results) {

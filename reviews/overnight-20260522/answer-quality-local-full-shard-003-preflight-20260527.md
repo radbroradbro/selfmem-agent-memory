@@ -1,10 +1,10 @@
 # Answer-Quality Benchmark Preflight
 
-- Status: BLOCKED_ANSWER_QUALITY_ENV
+- Status: READY_FOR_LIVE_ANSWER_QUALITY
 - Claim scope: local-full
 - Model match policy: local-diagnostic-allowed
-- Live answer-quality can run: false
-- Ready for end-to-end memory score gate: false
+- Live answer-quality can run: true
+- Ready for end-to-end memory score gate: true
 - Calls provider APIs: false
 - Sends benchmark text to provider: false
 - Target hash: sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e
@@ -14,15 +14,15 @@
 - Query shard: 50-75
 
 ## Readiness
-- Env ready: false
+- Env ready: true
 - Private inputs ready: true
 - Response arms ready: true
 - Response arms cover selected shard: true
 - Same-data hashes ready: true
 - Answer model matches target: false
 - Judge model matches target: false
-- Scoring model policy satisfied: false
-- Counts as local-full benchmark evidence: false
+- Scoring model policy satisfied: true
+- Counts as local-full benchmark evidence: true
 
 ## Strategy Coverage
 - BM25 lite: true
@@ -30,18 +30,12 @@
 - Provider or local challenger: true
 
 ## Blockers
-- RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled
-- RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed
-- RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed
-- answer-model-missing
-- judge-model-missing
-- openai-compatible-base-url-missing
+- none
 
 ## Next Actions
-- Materialize the source-locked target into an operator-private directory outside the repository.
-- Export one private RecallWeave response file per strategy with baseline:export:recallweave.
-- Set explicit answer-quality model-call, public-data, and no-raw-output consent flags before live scoring.
-- Include bm25-lite, full-hybrid-rerank, and at least one provider or local challenger arm.
+- Run benchmark:answer-quality with --live against the private materialized inputs and response arm exports.
+- Attach the metrics-only result to benchmark:memory-score:result-gate --claim-scope local-full --require-ready.
+- Treat this as local diagnostic evidence only; exact SOTA and public superiority claims still need the full provider/scoring lane.
 
 ## Live Command Template
 ```bash

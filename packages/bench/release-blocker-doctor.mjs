@@ -64,8 +64,8 @@ const requiredFiles = {
   budgetedBaselineReviewedNextRun: "reviewer-work/budgeted-baseline-reviewed-next-run.json",
   hostedBaselineCollector: "hosted-baseline-collector-evidence.md",
   hostedBaselineCollectorReview: "gemini-hosted-baseline-collector-review.md",
-  fullMemorySotaDoctor: "full-memory-sota-doctor-20260526.json",
-  fullMemorySotaDoctorMarkdown: "full-memory-sota-doctor-20260526.md",
+  fullMemorySotaDoctor: "full-memory-sota-doctor-20260527.json",
+  fullMemorySotaDoctorMarkdown: "full-memory-sota-doctor-20260527.md",
   realCanaryDiagnostic: "real-canary-diagnostic-evidence.md",
   canaryDiagnosticBatchAudit: "canary-diagnostic-batch-audit-evidence.md",
   canaryNextAgentPlan: "canary-next-agent-plan-evidence.md",
@@ -174,8 +174,8 @@ const publicLongmemEvalAutoresearchLoop = JSON.parse(readFileSync(join(root, rev
 const publicLongmemEvalExpandedAutoresearchLoop = JSON.parse(
   readFileSync(join(root, reviewDir, "public-longmemeval-expanded-autoresearch-loop.json"), "utf8"),
 );
-const fullMemorySotaDoctor = JSON.parse(readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260526.json"), "utf8"));
-const fullMemorySotaDoctorText = readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260526.md"), "utf8");
+const fullMemorySotaDoctor = JSON.parse(readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260527.json"), "utf8"));
+const fullMemorySotaDoctorText = readFileSync(join(root, reviewDir, "full-memory-sota-doctor-20260527.md"), "utf8");
 
 assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
@@ -397,9 +397,9 @@ assert.equal(fullMemorySotaDoctor.benchmarkContract?.bm25IsLexicalFloorOnly, tru
 assert.equal(fullMemorySotaDoctor.benchmarkContract?.retrievalProxyOnlyIsNotEnough, true);
 assert.equal(fullMemorySotaDoctor.rawSourceRetention?.retainsRawSourcesPrivately, true);
 assert.equal(fullMemorySotaDoctor.rawSourceRetention?.publicReportIsSafe, true);
-assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId, "shard-003");
-assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange, "50-75");
-assert.match(fullMemorySotaDoctorText, /Next local-full shard: shard-003 \(50-75\)/);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId, "shard-004");
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange, "75-100");
+assert.match(fullMemorySotaDoctorText, /Next local-full shard: shard-004 \(75-100\)/);
 assert.match(fullMemorySotaDoctorText, /Counts as full memory SOTA evidence: false/i);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
@@ -495,7 +495,7 @@ const blockerReport = [
   {
     id: "full-memory-sota-benchmark-gate-incomplete",
     status: "incomplete",
-    evidence: "full-memory-sota-doctor-20260526.json",
+    evidence: "full-memory-sota-doctor-20260527.json",
     nextAction: fullMemorySotaNextAction,
   },
   {
@@ -724,8 +724,8 @@ console.log(
           rawPublicReportSafe: fullMemorySotaDoctor.rawSourceRetention?.publicReportIsSafe,
           nextLocalFullShard: fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId,
           nextLocalFullShardRange: fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange,
-          localFullPendingShardCount: fullMemorySotaDoctor.localFullLaneState?.launchPendingShardCount,
-          localFullAcceptedShardCount: fullMemorySotaDoctor.localFullLaneState?.launchAcceptedShardCount,
+          localFullPendingShardCount: fullMemorySotaDoctor.localFullLaneState?.missingShardCount,
+          localFullAcceptedShardCount: fullMemorySotaDoctor.localFullLaneState?.acceptedShardCount,
           localEmbeddingRuntimeReady: fullMemorySotaDoctor.localFullLaneState?.localEmbeddingRuntimeReady,
           localEmbeddingDurabilityReady: fullMemorySotaDoctor.localFullLaneState?.localEmbeddingDurabilityReady,
         },
@@ -785,7 +785,7 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:returned-packet -- --packet /tmp/recallweave-baseline-evidence-packet.zip --require-public-benchmark --output /tmp/recallweave-returned-baseline-intake.json",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor -- --format markdown",
-        "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder -- --shard-id shard-003 --query-offset 50 --query-limit 25 --output /tmp/recallweave-local-full-shard-003-workorder.json",
+        "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder -- --shard-id shard-004 --query-offset 75 --query-limit 25 --output /tmp/recallweave-local-full-shard-004-workorder.json",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },

@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-27T12:19:32.669Z",
+  "generatedAt": "2026-05-27T14:14:09.902Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -72,6 +72,13 @@
       "mode": "public-benchmark-answer-quality-shard-intake",
       "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
     },
+    "localFullShardIntakeAfterShard003": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-003-20260527.json",
+      "exists": true,
+      "hash": "sha256:e9f6632a6a40726f02f67c773ed9ac43dd34a2e74e17d0f442e3db7349899ffe",
+      "mode": "public-benchmark-answer-quality-shard-intake",
+      "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS"
+    },
     "localFullShardIntakeLatest": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json",
       "exists": true,
@@ -89,16 +96,16 @@
     "localFullPerformanceReport": {
       "path": "reviews/overnight-20260522/local-full-shard-performance-report-20260527.json",
       "exists": true,
-      "hash": "sha256:a23a0874b109e4189239d29052152be814a2caf4b1fc0b8dd023d4a491852903",
+      "hash": "sha256:e4d5770d16bb41317ce6d0caf457fdd53813a0d0da1299bbd22d3185b1bd881e",
       "mode": "local-full-shard-performance-report",
       "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT"
     },
     "localFullResumeEnvDoctor": {
       "path": "reviews/overnight-20260522/local-full-shard-003-resume-env-doctor-20260527.json",
       "exists": true,
-      "hash": "sha256:14cb4cca2bdeab8f8d57b7df84dfb18df9ebc1929a3fda3fc17e3c2d350580d5",
+      "hash": "sha256:2c04242e652cf7c591e48bb88acee428c871cfafe7a98346b4d9d7343d376525",
       "mode": "local-full-shard-resume-env-doctor",
-      "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV"
+      "status": "READY_LOCAL_FULL_SHARD_RESUME_ENV"
     },
     "localFullResumeCommandSecurity": {
       "path": "reviews/overnight-20260522/local-full-shard-003-resume-command-security-20260526.json",
@@ -613,19 +620,20 @@
   "localFullLaneState": {
     "planPath": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
     "workorderPath": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
-    "intakePath": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json",
+    "intakePath": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-003-20260527.json",
     "status": "READY_LOCAL_FULL_BENCHMARK_PLAN",
     "readyForLocalFullBenchmarkPlan": true,
     "readyForResponseArmExport": false,
     "readyForAnswerQualityScoring": false,
     "intakeStatus": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS",
     "readyForShardCombine": false,
-    "acceptedShardCount": 2,
+    "acceptedShardCount": 3,
     "acceptedShardIds": [
       "shard-001",
-      "shard-002"
+      "shard-002",
+      "shard-003"
     ],
-    "missingShardCount": 18,
+    "missingShardCount": 17,
     "launchDoctorStatus": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
     "readyForFirstShardRun": false,
     "readyForLocalFullBenchmarkResult": false,
@@ -647,17 +655,10 @@
     "recoveredRuntimeBlockedShardCount": 2,
     "latestRuntimeBlockedShard": null,
     "latestRuntimeBlockedArm": null,
-    "runtimeRecoveryStatus": "RETRIEVAL_RECOVERED_SCORING_PENDING",
+    "runtimeRecoveryStatus": "RETRIEVAL_AND_SCORING_READY",
     "runtimeRecoveryRetrievalRecovered": true,
-    "runtimeRecoveryAnswerQualityEnvReady": false,
-    "runtimeRecoveryBlockers": [
-      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-      "answer-model-missing",
-      "judge-model-missing",
-      "openai-compatible-base-url-missing"
-    ],
+    "runtimeRecoveryAnswerQualityEnvReady": true,
+    "runtimeRecoveryBlockers": [],
     "runtimeBlockerWorkorderInputCount": 1,
     "runtimeBlockerResumeAvailableCount": 1,
     "nextPendingShardResumeMissingStrategies": [],
@@ -676,67 +677,54 @@
       "safe": true,
       "evidenceReady": true,
       "evidenceBlockers": [],
-      "generatedAt": "2026-05-27T12:19:32.567Z",
-      "intakeGeneratedAt": "2026-05-26T22:55:50.209Z",
+      "generatedAt": "2026-05-27T14:12:41.760Z",
+      "intakeGeneratedAt": "2026-05-27T14:06:08.316Z",
       "freshForIntake": true,
-      "expectedAcceptedShardCount": 2,
-      "expectedAcceptedQueryCount": 50,
-      "expectedCoveragePercent": 10,
-      "expectedNextPendingShardId": "shard-003",
-      "acceptedShardCount": 2,
-      "acceptedQueryCount": 50,
+      "expectedAcceptedShardCount": 3,
+      "expectedAcceptedQueryCount": 75,
+      "expectedCoveragePercent": 15,
+      "expectedNextPendingShardId": "shard-004",
+      "expectedNextPendingShardRange": "75-100",
+      "acceptedShardCount": 3,
+      "acceptedQueryCount": 75,
       "queryCount": 500,
-      "coveragePercent": 10,
-      "nextPendingShardId": "shard-003",
+      "coveragePercent": 15,
+      "nextPendingShardId": "shard-004",
+      "nextPendingShardRange": "75-100",
       "bestStrategy": "full-hybrid-rerank",
-      "bestAnswerQuality": 25.52,
-      "bestDeltaVsBm25": 2,
-      "localAppleBaseAnswerQuality": 24.62,
-      "localAppleRerankAnswerQuality": 19.82,
-      "localAppleRerankDeltaVsBase": -4.8,
+      "bestAnswerQuality": 25.0133,
+      "bestDeltaVsBm25": 2.4,
+      "localAppleBaseAnswerQuality": 24.4133,
+      "localAppleRerankAnswerQuality": 23.88,
+      "localAppleRerankDeltaVsBase": -0.5333,
       "runtimeBlockerStatus": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
       "runtimeFailedArm": "local-apple-qwen3-0_6b-local-rerank",
-      "runtimeRecoveryStatus": "RETRIEVAL_RECOVERED_SCORING_PENDING",
+      "runtimeRecoveryStatus": "RETRIEVAL_AND_SCORING_READY",
       "runtimeRecoveryShardId": "shard-003",
       "runtimeRecoveryFailedArm": "local-apple-qwen3-0_6b-local-rerank",
       "runtimeRecoveryRetrievalRecovered": true,
-      "runtimeRecoveryAnswerQualityPreflightReady": false,
-      "runtimeRecoveryAnswerQualityEnvReady": false,
-      "runtimeRecoveryBlockers": [
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-        "answer-model-missing",
-        "judge-model-missing",
-        "openai-compatible-base-url-missing"
-      ],
+      "runtimeRecoveryAnswerQualityPreflightReady": true,
+      "runtimeRecoveryAnswerQualityEnvReady": true,
+      "runtimeRecoveryBlockers": [],
       "activeRuntimeBlockedShardCount": 0,
       "historicalRuntimeBlockedShardCount": 1,
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
       "blockers": [
-        "local-full-coverage-incomplete",
-        "local-full-shard-003-scoring-env-missing"
+        "local-full-coverage-incomplete"
       ]
     },
     "resumeEnv": {
       "path": "reviews/overnight-20260522/local-full-shard-003-resume-env-doctor-20260527.json",
-      "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV",
+      "status": "READY_LOCAL_FULL_SHARD_RESUME_ENV",
       "publicSafe": true,
-      "evidenceReady": false,
-      "evidenceBlockers": [
-        "local-full-resume-env-not-ready",
-        "local-full-resume-answer-quality-preflight-not-ready",
-        "local-full-resume-shard-answer-quality-not-ready",
-        "local-full-resume-local-shard-intake-not-ready",
-        "local-full-resume-command-materialization-not-ready",
-        "answer-quality-env-missing"
-      ],
+      "evidenceReady": true,
+      "evidenceBlockers": [],
       "readyForMissingArmExport": true,
-      "readyForAnswerQualityPreflight": false,
-      "readyForShardAnswerQuality": false,
-      "readyForLocalShardIntake": false,
-      "readyForCommandMaterialization": false,
+      "readyForAnswerQualityPreflight": true,
+      "readyForShardAnswerQuality": true,
+      "readyForLocalShardIntake": true,
+      "readyForCommandMaterialization": true,
       "privateInputFilesReady": true,
       "completedPrivateArmFilesReady": true,
       "readyForMissingArmExportExceptEnv": true,
@@ -753,15 +741,13 @@
       "localEmbeddingEnvReady": true,
       "localRerankEnvReady": true,
       "localSafetyEnvReady": true,
-      "answerQualityEnvReady": false,
-      "missingEnvironmentNameCount": 6,
+      "answerQualityEnvReady": true,
+      "missingEnvironmentNameCount": 0,
       "requiredPrivateInputFileCount": 3,
       "presentPrivateInputFileCount": 3,
       "completedArmFileCount": 4,
       "presentCompletedArmFileCount": 4,
-      "blockers": [
-        "answer-quality-env-missing"
-      ],
+      "blockers": [],
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false
     },
@@ -813,8 +799,8 @@
       "gateSatisfiedByAcceptedShardIntake": true,
       "evidenceGateReady": true
     },
-    "nextPendingShardId": "shard-003",
-    "nextPendingShardRange": "50-75",
+    "nextPendingShardId": "shard-004",
+    "nextPendingShardRange": "75-100",
     "localEmbeddingRuntimeStatus": "READY_LOCAL_EMBEDDING_RUNTIME",
     "localEmbeddingRuntimeReady": true,
     "localEmbeddingRuntimeBlockers": [],
@@ -843,7 +829,7 @@
         "failedArm": "local-apple-qwen3-0_6b-local-rerank",
         "failureClass": "local-rerank-response-body-stall",
         "publicSyntheticReproduced": false,
-        "acceptedShard": false,
+        "acceptedShard": true,
         "recoveredByCurrentEvidence": true,
         "activeRuntimeBlocker": false,
         "completedArmCount": 4,
@@ -871,8 +857,7 @@
     "shardIntakeBlockers": [
       "answer-quality-shards-missing",
       "full-shard-coverage-incomplete",
-      "local-full-coverage-incomplete",
-      "local-full-shard-003-scoring-env-missing"
+      "local-full-coverage-incomplete"
     ],
     "launchBlockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
@@ -1057,8 +1042,7 @@
       "blockers": [
         "answer-quality-shards-missing",
         "full-shard-coverage-incomplete",
-        "local-full-coverage-incomplete",
-        "local-full-shard-003-scoring-env-missing"
+        "local-full-coverage-incomplete"
       ]
     },
     {
@@ -1068,15 +1052,8 @@
     },
     {
       "id": "local-full-resume-env",
-      "status": "blocked",
-      "blockers": [
-        "local-full-resume-env-not-ready",
-        "local-full-resume-answer-quality-preflight-not-ready",
-        "local-full-resume-shard-answer-quality-not-ready",
-        "local-full-resume-local-shard-intake-not-ready",
-        "local-full-resume-command-materialization-not-ready",
-        "answer-quality-env-missing"
-      ]
+      "status": "pass",
+      "blockers": []
     },
     {
       "id": "local-full-resume-command-security",
@@ -1185,13 +1162,6 @@
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete",
     "local-full-coverage-incomplete",
-    "local-full-shard-003-scoring-env-missing",
-    "local-full-resume-env-not-ready",
-    "local-full-resume-answer-quality-preflight-not-ready",
-    "local-full-resume-shard-answer-quality-not-ready",
-    "local-full-resume-local-shard-intake-not-ready",
-    "local-full-resume-command-materialization-not-ready",
-    "answer-quality-env-missing",
     "answer-quality-shard-runs-pending",
     "shard-results-missing",
     "missing-voyage-answer-quality-same-data-result",

@@ -201,6 +201,7 @@ const report = {
     readyForMissingArmExport,
     readyForAnswerQualityPreflight,
     readyForLocalShardIntake,
+    resumePacket,
     envState,
     missingArmFiles,
   }),
@@ -244,14 +245,16 @@ function buildNextActions({
   readyForMissingArmExport: missingArmReady,
   readyForAnswerQualityPreflight: preflightReady,
   readyForLocalShardIntake: intakeReady,
+  resumePacket: packet,
   envState: env,
   missingArmFiles: missingFiles,
 }) {
+  const shardId = packet?.targetShard?.shardId ?? "target shard";
   if (ready) {
     return [
-      "Run the shard-002 missing-arm response export from the resume packet.",
-      "Run shard-002 answer-quality preflight and answer-quality after the missing arm files exist.",
-      "Run local shard intake with shard-001 and shard-002 public result JSONs.",
+      `Run the ${shardId} missing-arm response export from the resume packet if the recovered arm file has not already been written.`,
+      `Run ${shardId} answer-quality preflight and answer-quality after all private arm files exist.`,
+      `Run local shard intake including public result JSONs through ${shardId}.`,
     ];
   }
   const actions = [];
@@ -268,19 +271,19 @@ function buildNextActions({
     actions.push("Restore the private query set, memories file, and answer labels so the resume input contracts validate.");
   }
   if (privateState.present && !completedArmsReady) {
-    actions.push("Restore the completed shard-002 private arm response files so already-finished arms can be reused safely.");
+    actions.push(`Restore the completed ${shardId} private arm response files so already-finished arms can be reused safely.`);
   }
   if (!env.localEmbedding.ready || !env.localRerank.ready || !env.localSafety.ready) {
     actions.push("Set the local embedding, local rerank, and safety environment variables for the two missing local Apple arms.");
   }
   if (missingArmReady && missingFiles.some((file) => !file.present)) {
-    actions.push("Run the shard-002 missing-arm response export from the resume packet.");
+    actions.push(`Run the ${shardId} missing-arm response export from the resume packet.`);
   }
   if (!env.answerQuality.ready) {
     actions.push("Set local answer-quality endpoint and model environment variables before preflight/scoring.");
   }
   if (preflightReady && !intakeReady) {
-    actions.push("Run local shard intake with shard-001 and shard-002 public result JSONs.");
+    actions.push(`Run local shard intake including public result JSONs through ${shardId}.`);
   }
   actions.push("Regenerate this doctor before running the next resume packet command.");
   return [...new Set(actions)];

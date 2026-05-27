@@ -1,13 +1,13 @@
 # Local-Full Shard Resume Environment Doctor
 
-- Status: BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV
+- Status: READY_LOCAL_FULL_SHARD_RESUME_ENV
 - Fixture only: false
 - Target shard: shard-003 (50-75)
 - Ready for missing-arm export: true
 - Ready for missing-arm export except env: true
-- Ready for answer-quality preflight: false
-- Ready for local shard intake: false
-- Ready for command materialization: false
+- Ready for answer-quality preflight: true
+- Ready for local shard intake: true
+- Ready for command materialization: true
 - Private input files ready: true
 - Completed private arm files ready: true
 - Local resume execution env ready: true
@@ -24,16 +24,10 @@
 - Local embedding env ready: true
 - Local rerank env ready: true
 - Local safety env ready: true
-- Answer-quality env ready: false
+- Answer-quality env ready: true
 - Counts as local-full benchmark evidence: false
 
 ## Missing Environment Names
-- RECALLWEAVE_MEMORYBENCH_BASE_URL
-- RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL
-- RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL
-- RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS
-- RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA
-- RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT
 
 ## Private Inputs
 - Ready: true
@@ -74,14 +68,15 @@
 ## Command Materialization
 - Template placeholders present: true
 - Commands runnable as printed: false
-- Required placeholders ready: false
-- Unresolved required placeholders: local-answer-model, local-judge-model, openai-compatible-base-url
+- Required placeholders ready: true
+- Unresolved required placeholders: none
 - Optional placeholders requiring operator choice: 1-when-cloud-query-expansion-runs, env-only-if-cloud-endpoint, local-query-expansion-base-url-if-used, query-expansion-model-if-used
 - Prints materialized commands: false
 
 ## Blockers
-- answer-quality-env-missing
+- none
 
 ## Next Actions
-- Set local answer-quality endpoint and model environment variables before preflight/scoring.
-- Regenerate this doctor before running the next resume packet command.
+- Run the shard-003 missing-arm response export from the resume packet if the recovered arm file has not already been written.
+- Run shard-003 answer-quality preflight and answer-quality after all private arm files exist.
+- Run local shard intake including public result JSONs through shard-003.

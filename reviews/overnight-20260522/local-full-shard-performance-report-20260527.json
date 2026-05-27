@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "local-full-shard-performance-report",
   "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
-  "generatedAt": "2026-05-27T12:19:32.567Z",
+  "generatedAt": "2026-05-27T14:12:41.760Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -43,24 +43,24 @@
     ]
   },
   "intake": {
-    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json",
-    "hash": "sha256:36ef949889dedb8e7ef1c848bfefa2cd34a568137a87d57a759b107f67217c50",
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-003-20260527.json",
+    "hash": "sha256:e9f6632a6a40726f02f67c773ed9ac43dd34a2e74e17d0f442e3db7349899ffe",
     "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS",
-    "acceptedShardCount": 2,
-    "missingShardCount": 18,
+    "acceptedShardCount": 3,
+    "missingShardCount": 17,
     "rejectedShardCount": 0,
     "completeCoverage": false
   },
   "coverage": {
-    "acceptedShardCount": 2,
-    "missingShardCount": 18,
+    "acceptedShardCount": 3,
+    "missingShardCount": 17,
     "shardCount": 20,
-    "acceptedQueryCount": 50,
+    "acceptedQueryCount": 75,
     "queryCount": 500,
-    "coveragePercent": 10,
+    "coveragePercent": 15,
     "completeCoverage": false,
-    "nextPendingShardId": "shard-003",
-    "nextPendingShardRange": "50-75"
+    "nextPendingShardId": "shard-004",
+    "nextPendingShardRange": "75-100"
   },
   "acceptedShardInputs": [
     {
@@ -82,149 +82,159 @@
       "startIndex": 25,
       "endIndexExclusive": 50,
       "scoredQueryCount": 25
+    },
+    {
+      "fileName": "answer-quality-local-full-shard-003-20260527.json",
+      "hash": "sha256:22093f44f751bfe39108a7033359d92432ca0c4f8b5c7feb558c5317e96f1f0d",
+      "expectedHash": "sha256:22093f44f751bfe39108a7033359d92432ca0c4f8b5c7feb558c5317e96f1f0d",
+      "hashMatches": true,
+      "present": true,
+      "startIndex": 50,
+      "endIndexExclusive": 75,
+      "scoredQueryCount": 25
     }
   ],
   "strategySummaries": [
     {
       "strategy": "full-hybrid-rerank",
-      "shardCount": 2,
-      "scoredQueryCount": 50,
-      "answerQuality": 25.52,
-      "quality": 0.2552,
-      "judgeCorrectRate": 0.26,
-      "answerLatencyP50Ms": 9329.5,
-      "answerLatencyP95Ms": 10877,
-      "contextTokensAvg": 3407.5
+      "shardCount": 3,
+      "scoredQueryCount": 75,
+      "answerQuality": 25.0133,
+      "quality": 0.2501,
+      "judgeCorrectRate": 0.24,
+      "answerLatencyP50Ms": 10885,
+      "answerLatencyP95Ms": 36549,
+      "contextTokensAvg": 3344.6667
     },
     {
       "strategy": "local-apple-qwen3-0_6b",
-      "shardCount": 2,
-      "scoredQueryCount": 50,
-      "answerQuality": 24.62,
-      "quality": 0.2462,
-      "judgeCorrectRate": 0.24,
-      "answerLatencyP50Ms": 9887.5,
-      "answerLatencyP95Ms": 13761,
-      "contextTokensAvg": 3366.5
-    },
-    {
-      "strategy": "bm25-lite",
-      "shardCount": 2,
-      "scoredQueryCount": 50,
-      "answerQuality": 23.52,
-      "quality": 0.2352,
-      "judgeCorrectRate": 0.24,
-      "answerLatencyP50Ms": 7516,
-      "answerLatencyP95Ms": 10287,
-      "contextTokensAvg": 3233.5
-    },
-    {
-      "strategy": "query-expanded-full-hybrid-rerank",
-      "shardCount": 2,
-      "scoredQueryCount": 50,
-      "answerQuality": 21.82,
-      "quality": 0.2182,
-      "judgeCorrectRate": 0.22,
-      "answerLatencyP50Ms": 9642,
-      "answerLatencyP95Ms": 11532,
-      "contextTokensAvg": 3484
+      "shardCount": 3,
+      "scoredQueryCount": 75,
+      "answerQuality": 24.4133,
+      "quality": 0.2441,
+      "judgeCorrectRate": 0.2267,
+      "answerLatencyP50Ms": 8923.3333,
+      "answerLatencyP95Ms": 11971,
+      "contextTokensAvg": 3382.3333
     },
     {
       "strategy": "local-apple-qwen3-0_6b-local-rerank",
-      "shardCount": 2,
-      "scoredQueryCount": 50,
-      "answerQuality": 19.82,
-      "quality": 0.1982,
+      "shardCount": 3,
+      "scoredQueryCount": 75,
+      "answerQuality": 23.88,
+      "quality": 0.2388,
+      "judgeCorrectRate": 0.24,
+      "answerLatencyP50Ms": 10045.3333,
+      "answerLatencyP95Ms": 13114.6667,
+      "contextTokensAvg": 3283
+    },
+    {
+      "strategy": "bm25-lite",
+      "shardCount": 3,
+      "scoredQueryCount": 75,
+      "answerQuality": 22.6133,
+      "quality": 0.2261,
+      "judgeCorrectRate": 0.2267,
+      "answerLatencyP50Ms": 9434.3333,
+      "answerLatencyP95Ms": 20539.3333,
+      "contextTokensAvg": 3166.3333
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "shardCount": 3,
+      "scoredQueryCount": 75,
+      "answerQuality": 21.2133,
+      "quality": 0.2121,
       "judgeCorrectRate": 0.2,
-      "answerLatencyP50Ms": 11383.5,
-      "answerLatencyP95Ms": 15432,
-      "contextTokensAvg": 3248.5
+      "answerLatencyP50Ms": 8680,
+      "answerLatencyP95Ms": 14031.6667,
+      "contextTokensAvg": 3420
     }
   ],
   "bestAnswerQuality": {
     "strategy": "full-hybrid-rerank",
-    "shardCount": 2,
-    "scoredQueryCount": 50,
-    "answerQuality": 25.52,
-    "quality": 0.2552,
-    "judgeCorrectRate": 0.26,
-    "answerLatencyP50Ms": 9329.5,
-    "answerLatencyP95Ms": 10877,
-    "contextTokensAvg": 3407.5,
+    "shardCount": 3,
+    "scoredQueryCount": 75,
+    "answerQuality": 25.0133,
+    "quality": 0.2501,
+    "judgeCorrectRate": 0.24,
+    "answerLatencyP50Ms": 10885,
+    "answerLatencyP95Ms": 36549,
+    "contextTokensAvg": 3344.6667,
     "deltaVsBm25": {
-      "answerQuality": 2,
-      "quality": 0.02,
-      "judgeCorrectRate": 0.02,
-      "answerLatencyP50Ms": 1813.5,
-      "answerLatencyP95Ms": 590,
-      "contextTokensAvg": 174
+      "answerQuality": 2.4,
+      "quality": 0.024,
+      "judgeCorrectRate": 0.0133,
+      "answerLatencyP50Ms": 1450.6667,
+      "answerLatencyP95Ms": 16009.6667,
+      "contextTokensAvg": 178.3334
     }
   },
   "lowestLatency": {
-    "strategy": "bm25-lite",
-    "shardCount": 2,
-    "scoredQueryCount": 50,
-    "answerQuality": 23.52,
-    "quality": 0.2352,
-    "judgeCorrectRate": 0.24,
-    "answerLatencyP50Ms": 7516,
-    "answerLatencyP95Ms": 10287,
-    "contextTokensAvg": 3233.5,
+    "strategy": "query-expanded-full-hybrid-rerank",
+    "shardCount": 3,
+    "scoredQueryCount": 75,
+    "answerQuality": 21.2133,
+    "quality": 0.2121,
+    "judgeCorrectRate": 0.2,
+    "answerLatencyP50Ms": 8680,
+    "answerLatencyP95Ms": 14031.6667,
+    "contextTokensAvg": 3420,
     "deltaVsBm25": {
-      "answerQuality": 0,
-      "quality": 0,
-      "judgeCorrectRate": 0,
-      "answerLatencyP50Ms": 0,
-      "answerLatencyP95Ms": 0,
-      "contextTokensAvg": 0
+      "answerQuality": -1.4,
+      "quality": -0.014,
+      "judgeCorrectRate": -0.0267,
+      "answerLatencyP50Ms": -754.3333,
+      "answerLatencyP95Ms": -6507.6666,
+      "contextTokensAvg": 253.6667
     }
   },
   "localApple": {
     "base": {
       "strategy": "local-apple-qwen3-0_6b",
-      "shardCount": 2,
-      "scoredQueryCount": 50,
-      "answerQuality": 24.62,
-      "quality": 0.2462,
-      "judgeCorrectRate": 0.24,
-      "answerLatencyP50Ms": 9887.5,
-      "answerLatencyP95Ms": 13761,
-      "contextTokensAvg": 3366.5,
+      "shardCount": 3,
+      "scoredQueryCount": 75,
+      "answerQuality": 24.4133,
+      "quality": 0.2441,
+      "judgeCorrectRate": 0.2267,
+      "answerLatencyP50Ms": 8923.3333,
+      "answerLatencyP95Ms": 11971,
+      "contextTokensAvg": 3382.3333,
       "deltaVsBm25": {
-        "answerQuality": 1.1,
-        "quality": 0.011,
+        "answerQuality": 1.8,
+        "quality": 0.018,
         "judgeCorrectRate": 0,
-        "answerLatencyP50Ms": 2371.5,
-        "answerLatencyP95Ms": 3474,
-        "contextTokensAvg": 133
+        "answerLatencyP50Ms": -511,
+        "answerLatencyP95Ms": -8568.3333,
+        "contextTokensAvg": 216
       }
     },
     "rerank": {
       "strategy": "local-apple-qwen3-0_6b-local-rerank",
-      "shardCount": 2,
-      "scoredQueryCount": 50,
-      "answerQuality": 19.82,
-      "quality": 0.1982,
-      "judgeCorrectRate": 0.2,
-      "answerLatencyP50Ms": 11383.5,
-      "answerLatencyP95Ms": 15432,
-      "contextTokensAvg": 3248.5,
+      "shardCount": 3,
+      "scoredQueryCount": 75,
+      "answerQuality": 23.88,
+      "quality": 0.2388,
+      "judgeCorrectRate": 0.24,
+      "answerLatencyP50Ms": 10045.3333,
+      "answerLatencyP95Ms": 13114.6667,
+      "contextTokensAvg": 3283,
       "deltaVsBm25": {
-        "answerQuality": -3.7,
-        "quality": -0.037,
-        "judgeCorrectRate": -0.04,
-        "answerLatencyP50Ms": 3867.5,
-        "answerLatencyP95Ms": 5145,
-        "contextTokensAvg": 15
+        "answerQuality": 1.2667,
+        "quality": 0.0127,
+        "judgeCorrectRate": 0.0133,
+        "answerLatencyP50Ms": 611,
+        "answerLatencyP95Ms": -7424.6666,
+        "contextTokensAvg": 116.6667
       }
     },
     "rerankDeltaVsBase": {
-      "answerQuality": -4.8,
-      "quality": -0.048,
-      "judgeCorrectRate": -0.04,
-      "answerLatencyP50Ms": 1496,
-      "answerLatencyP95Ms": 1671,
-      "contextTokensAvg": -118
+      "answerQuality": -0.5333,
+      "quality": -0.0053,
+      "judgeCorrectRate": 0.0133,
+      "answerLatencyP50Ms": 1122,
+      "answerLatencyP95Ms": 1143.6667,
+      "contextTokensAvg": -99.3333
     }
   },
   "runtime": {
@@ -233,7 +243,7 @@
     "historicalRuntimeBlockerPresent": true,
     "historicalRuntimeBlockedShardCount": 1,
     "runtimeBlockerStatus": "BLOCKED_LOCAL_FULL_SHARD_RUNTIME",
-    "runtimeRecoveryStatus": "RETRIEVAL_RECOVERED_SCORING_PENDING",
+    "runtimeRecoveryStatus": "RETRIEVAL_AND_SCORING_READY",
     "runtimeBlockedShardId": "shard-003",
     "runtimeBlockedRange": "50-75",
     "failedArm": "local-apple-qwen3-0_6b-local-rerank",
@@ -244,7 +254,7 @@
       "local-apple-qwen3-0_6b-local-rerank"
     ],
     "recovery": {
-      "status": "RETRIEVAL_RECOVERED_SCORING_PENDING",
+      "status": "RETRIEVAL_AND_SCORING_READY",
       "shardId": "shard-003",
       "failedArm": "local-apple-qwen3-0_6b-local-rerank",
       "armExportPresent": true,
@@ -254,23 +264,16 @@
       "recoveredArmHash": "sha256:0a183c75bd46fac676d16451422f0a3ccff8857c77ff764328d6c42bbfec00af",
       "recoveredArmResponseCount": 25,
       "preflightPresent": true,
-      "preflightStatus": "BLOCKED_ANSWER_QUALITY_ENV",
-      "preflightHash": "sha256:1bddcc2e26151111ed22e872b82fb348c57cb6b3b386cf14e6abc7a1c150154a",
+      "preflightStatus": "READY_FOR_LIVE_ANSWER_QUALITY",
+      "preflightHash": "sha256:5b757da94b7d30339445feb8649dd8879048f0b4f97eb8356ac1a2902fd0217a",
       "responseArmsReady": true,
       "sameDataReady": true,
       "responseArmsCoverSelectedShard": true,
       "selectedShardMatchesRuntimeBlocker": true,
       "retrievalRecovered": true,
-      "answerQualityPreflightReady": false,
-      "answerQualityEnvReady": false,
-      "blockers": [
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-        "answer-model-missing",
-        "judge-model-missing",
-        "openai-compatible-base-url-missing"
-      ]
+      "answerQualityPreflightReady": true,
+      "answerQualityEnvReady": true,
+      "blockers": []
     },
     "resumeResultDoctorPresent": true,
     "resumeResultDoctorStatus": "BLOCKED_LOCAL_FULL_SHARD_002_RESULT",
@@ -282,11 +285,10 @@
     ]
   },
   "blockers": [
-    "local-full-coverage-incomplete",
-    "local-full-shard-003-scoring-env-missing"
+    "local-full-coverage-incomplete"
   ],
   "nextActions": [
-    "Score and intake shard-003 before treating the next 25-query slice as accepted.",
+    "Finish or rerun shard-004 before treating the next 25-query slice as accepted.",
     "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
     "Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage."
   ]
