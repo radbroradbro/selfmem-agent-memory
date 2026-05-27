@@ -706,8 +706,13 @@ BM25, full hybrid, query-expanded hybrid, and local Qwen3 0.6B embedding all
 exported 25 private responses, but the `local-apple-qwen3-0_6b-local-rerank`
 arm stalled before writing a complete response file. That is a runtime blocker,
 not a scored loss. The response exporter now keeps local provider response-body
-parsing inside the same abort timeout as the request, but the local rerank arm
-remains an isolated challenger until its sidecar proves bounded completion.
+parsing inside the same abort timeout as the request. The corrected llama.cpp
+reranker launch must include `--embedding --pooling rank --rerank`; a
+`--rerank`-only launch can return HTTP 200 with `null` relevance scores. The
+checked-in `local-rerank-durability-smoke-20260526` report now proves bounded
+synthetic completion with finite scores, but the local rerank arm remains an
+isolated challenger until shard-003 missing-arm export, scoring, intake, and
+combine all pass.
 
 A source-locked 30-query local Apple run is now recorded:
 

@@ -67,9 +67,14 @@ a large physical batch:
 
 ```bash
 llama-server -hf ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF:Q8_0 \
-  --rerank --host 127.0.0.1 --port 8092 --no-webui \
+  --embedding --pooling rank --rerank --host 127.0.0.1 --port 8092 --no-webui \
   -c 8192 -b 5120 -ub 5120 -np 1 -cram 0 -ngl 999
 ```
+
+Do not omit `--embedding --pooling rank`: a `--rerank`-only llama.cpp launch can
+return HTTP 200 with `null` relevance scores. The public-safe
+`benchmark:local-rerank:durability` smoke now checks bounded response-body
+completion and finite scores before shard resume.
 
 The first local-full answer-quality shard used that sidecar with Qwen3
 Embedding 0.6B Q8, `SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=16`, and
@@ -92,7 +97,9 @@ Shard 003 later completed BM25, full hybrid, query-expanded hybrid, and local
 Qwen3 0.6B embedding response exports, but the local Qwen3 Reranker 0.6B arm
 stalled before a complete response file was written. That is recorded as
 `BLOCKED_LOCAL_FULL_SHARD_RUNTIME`, not as a quality score. Keep the local
-reranker as a bounded challenger until sidecar completion is proven.
+reranker as a bounded challenger until sidecar completion is proven. The
+corrected rank-pooling sidecar now passes the synthetic durability smoke, but
+the shard-003 missing-arm export, scoring, and intake still need to run.
 Treat this as local diagnostic evidence, not a default promotion or SOTA
 claim. Qwen3 Reranker 4B and 8B stay optional quality arms until measured
 latency and memory pressure justify them.

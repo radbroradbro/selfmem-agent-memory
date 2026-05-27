@@ -4967,9 +4967,17 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(smokeReport.publicBenchmarkClaimsAllowed, false);
     assert.ok(Number(smokeReport.probes?.length ?? 0) >= 3);
   }
-  assert.equal(localRerankDurabilitySmoke.status, "BLOCKED_LOCAL_RERANK_DURABILITY");
-  assert.equal(localRerankDurabilitySmoke.readyForLocalRerankArmExport, false);
-  assert.ok(localRerankDurabilitySmoke.blockers?.includes("local-rerank-endpoint-missing"));
+  if (localRerankDurabilitySmoke.status === "READY_LOCAL_RERANK_DURABILITY") {
+    assert.equal(localRerankDurabilitySmoke.fixtureOnly, false);
+    assert.equal(localRerankDurabilitySmoke.callsLocalEndpoint, true);
+    assert.equal(localRerankDurabilitySmoke.readyForLocalRerankArmExport, true);
+    assert.ok(localRerankDurabilitySmoke.probes?.every((probe) => probe.status === "pass"));
+    assert.deepEqual(localRerankDurabilitySmoke.blockers, []);
+  } else {
+    assert.equal(localRerankDurabilitySmoke.status, "BLOCKED_LOCAL_RERANK_DURABILITY");
+    assert.equal(localRerankDurabilitySmoke.readyForLocalRerankArmExport, false);
+    assert.ok(localRerankDurabilitySmoke.blockers?.includes("local-rerank-endpoint-missing"));
+  }
   assert.equal(localRerankDurabilityFresh.status, "BLOCKED_LOCAL_RERANK_DURABILITY");
   assert.equal(localRerankDurabilityFresh.readyForLocalRerankArmExport, false);
   assert.ok(localRerankDurabilityFresh.blockers?.includes("local-rerank-endpoint-missing"));

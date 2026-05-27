@@ -387,6 +387,11 @@ answer-quality shard, but it did not win that shard, so it is not a proven
 default. Qwen3 4B and 8B arms are quality challengers, not defaults for 24GB
 machines.
 
+For llama.cpp reranking, launch the sidecar with rank pooling:
+`--embedding --pooling rank --rerank`. A `--rerank`-only server can answer
+`/v1/rerank` with `null` scores. Before resuming a shard, run
+`benchmark:local-rerank:durability -- --require-ready` against the sidecar.
+
 Gemini, NVIDIA hosted retrieval models, and query expansion providers must be
 configured by local environment variables only. Do not paste provider keys into
 PRs, docs, traces, screenshots, or diagnostics.

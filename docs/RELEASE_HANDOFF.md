@@ -665,6 +665,12 @@ preflight evidence, but the current launch diagnostic still blocks resume
 because the endpoint exits during model load. Do not treat the partial three-arm
 shard 002 packet as answer-quality evidence until that shard is rerun, scored,
 and accepted by intake.
+Shard 003 then completed the base local Apple embedding arm and blocked on the
+reranker sidecar response body. The corrected llama.cpp reranker launch needs
+`--embedding --pooling rank --rerank`; a `--rerank`-only launch can return
+HTTP 200 with `null` scores. The public-safe local rerank durability smoke now
+passes against a corrected sidecar, but shard-003 still needs missing-arm
+export, preflight, scoring, and intake before it becomes benchmark evidence.
 
 The first live Voyage provider canaries have now run:
 

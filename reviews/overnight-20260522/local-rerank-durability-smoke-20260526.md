@@ -1,25 +1,25 @@
 # Local Rerank Durability Smoke
 
-- Status: BLOCKED_LOCAL_RERANK_DURABILITY
+- Status: READY_LOCAL_RERANK_DURABILITY
 - Fixture only: false
 - Strategy: local-apple-qwen3-0_6b-local-rerank
-- Local endpoint configured: false
+- Local endpoint configured: true
 - Endpoint printed: false
 - Raw synthetic input included: false
 - Response body timeout bounded: true
-- Ready for local rerank arm export: false
+- Ready for local rerank arm export: true
 - Counts as local-full benchmark evidence: false
 - Counts as full memory SOTA evidence: false
 
 ## Probes
-- documents=3, status=not-run, scoreCount=0, elapsedMs=0, failure=local-rerank-endpoint-missing
-- documents=8, status=not-run, scoreCount=0, elapsedMs=0, failure=local-rerank-endpoint-missing
-- documents=12, status=not-run, scoreCount=0, elapsedMs=0, failure=local-rerank-endpoint-missing
+- documents=3, status=pass, scoreCount=3, elapsedMs=317, failure=none
+- documents=8, status=pass, scoreCount=8, elapsedMs=262, failure=none
+- documents=12, status=pass, scoreCount=12, elapsedMs=309, failure=none
 
 ## Blockers
-- local-rerank-endpoint-missing
+- none
 
 ## Next Actions
-- Start the local rerank sidecar or endpoint and rerun this smoke before local-rerank arm export.
-- If the endpoint accepts work but times out on these public synthetic probes, lower candidate count or fix the local sidecar before retrying the shard.
-- Do not count partial local-full shard attempts as benchmark evidence until every required arm exports and scores.
+- Use this report as the local rerank response-body completion guard before missing-arm export.
+- Run the local-full shard retry with the same local rerank sidecar still alive.
+- Keep raw benchmark inputs and response files outside the repository.
