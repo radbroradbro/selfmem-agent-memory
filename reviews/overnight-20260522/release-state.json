@@ -114,6 +114,7 @@
       "packages/bench/local-embedding-runtime-doctor.mjs",
       "packages/bench/local-embedding-launch-diagnostic.mjs",
       "packages/bench/local-embedding-durability-smoke.mjs",
+      "packages/bench/local-rerank-durability-smoke.mjs",
       "packages/bench/local-openai-rerank-sidecar.mjs",
       "packages/bench/local-rerank-result-gate.mjs",
       "packages/bench/provider-challenger-result-gate.mjs",
