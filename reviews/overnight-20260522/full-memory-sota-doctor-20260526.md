@@ -104,6 +104,7 @@
 - Resume command private file mode: 0700
 - Resume command first guard: rerunRuntimeDoctor
 - Resume command second guard: rerunDurabilitySmoke
+- Resume command third guard: rerunLocalRerankDurabilitySmoke
 - Resume command guarded command: missingArmResponseExport
 - Resume command counts as SOTA evidence: false
 - Resume result gate satisfied by accepted shard intake: true

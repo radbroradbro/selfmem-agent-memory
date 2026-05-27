@@ -10,6 +10,7 @@ const packetOnlyCommandIds = new Set(["resumeCommandMaterializer", "resumeResult
 const privateScriptCommandOrder = [
   "rerunRuntimeDoctor",
   "rerunDurabilitySmoke",
+  "rerunLocalRerankDurabilitySmoke",
   "resumeEnvDoctor",
   "missingArmResponseExport",
   "preflight",
@@ -32,7 +33,7 @@ process.on("exit", () => {
 const fixtureMode = Boolean(args.fixture);
 const fixtureState = fixtureMode ? createFixtureState() : null;
 const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
-const resumePacketPath = resolveInputPath(args.resumePacket ?? `${reviewDir}/local-full-shard-002-resume-packet-20260526.json`);
+const resumePacketPath = resolveInputPath(args.resumePacket ?? `${reviewDir}/local-full-shard-003-resume-packet-20260526.json`);
 const privateDir = stringOrNull(fixtureState?.privateDir ?? args.privateInputDir ?? args.privateDir ?? process.env.RECALLWEAVE_FULL_SHARD_PRIVATE_DIR);
 const privateCommandOutput = stringOrNull(fixtureState?.privateCommandOutput ?? args.privateCommandOutput ?? process.env.RECALLWEAVE_LOCAL_FULL_RESUME_PRIVATE_COMMAND_OUTPUT);
 const outputPath = args.output ? resolveInputPath(args.output) : null;
@@ -168,7 +169,7 @@ const report = {
   nextActions: readyForMaterialization
     ? [
         "Review and run the generated private command file from the external private location.",
-        "Keep the generated order intact so runtime and durability guards run immediately before the shard retry.",
+        "Keep the generated order intact so runtime, embedding durability, and local rerank durability guards run immediately before the shard retry.",
         "Regenerate the public resume result doctor after command execution.",
         "Keep public reports limited to hashes, counts, and statuses.",
       ]
@@ -213,7 +214,13 @@ function orderCommandIds(commandIds) {
 
 function inspectGuardOrder(commandIds) {
   const indexes = Object.fromEntries(commandIds.map((id, index) => [id, index]));
-  const required = ["rerunRuntimeDoctor", "rerunDurabilitySmoke", "resumeEnvDoctor", "missingArmResponseExport"];
+  const required = [
+    "rerunRuntimeDoctor",
+    "rerunDurabilitySmoke",
+    "rerunLocalRerankDurabilitySmoke",
+    "resumeEnvDoctor",
+    "missingArmResponseExport",
+  ];
   const missing = required.filter((id) => !Object.hasOwn(indexes, id));
   const runtimeBeforeDurability =
     indexes.rerunRuntimeDoctor != null &&
@@ -227,24 +234,37 @@ function inspectGuardOrder(commandIds) {
     indexes.rerunDurabilitySmoke != null &&
     indexes.missingArmResponseExport != null &&
     indexes.rerunDurabilitySmoke < indexes.missingArmResponseExport;
+  const rerankDurabilityAfterEmbeddingDurability =
+    indexes.rerunLocalRerankDurabilitySmoke != null &&
+    indexes.rerunDurabilitySmoke != null &&
+    indexes.rerunLocalRerankDurabilitySmoke > indexes.rerunDurabilitySmoke;
+  const rerankDurabilityBeforeMissingArm =
+    indexes.rerunLocalRerankDurabilitySmoke != null &&
+    indexes.missingArmResponseExport != null &&
+    indexes.rerunLocalRerankDurabilitySmoke < indexes.missingArmResponseExport;
   const resumeEnvAfterFreshGuards =
     indexes.resumeEnvDoctor != null &&
     indexes.rerunRuntimeDoctor != null &&
     indexes.rerunDurabilitySmoke != null &&
+    indexes.rerunLocalRerankDurabilitySmoke != null &&
     indexes.resumeEnvDoctor > indexes.rerunRuntimeDoctor &&
-    indexes.resumeEnvDoctor > indexes.rerunDurabilitySmoke;
+    indexes.resumeEnvDoctor > indexes.rerunDurabilitySmoke &&
+    indexes.resumeEnvDoctor > indexes.rerunLocalRerankDurabilitySmoke;
   const missingArmAfterResumeEnv =
     indexes.missingArmResponseExport != null &&
     indexes.resumeEnvDoctor != null &&
     indexes.missingArmResponseExport > indexes.resumeEnvDoctor;
   const startsWithFreshLocalRuntimeGuards =
     commandIds[0] === "rerunRuntimeDoctor" &&
-    commandIds[1] === "rerunDurabilitySmoke";
+    commandIds[1] === "rerunDurabilitySmoke" &&
+    commandIds[2] === "rerunLocalRerankDurabilitySmoke";
   const ready =
     missing.length === 0 &&
     runtimeBeforeDurability &&
     runtimeBeforeMissingArm &&
     durabilityBeforeMissingArm &&
+    rerankDurabilityAfterEmbeddingDurability &&
+    rerankDurabilityBeforeMissingArm &&
     resumeEnvAfterFreshGuards &&
     missingArmAfterResumeEnv &&
     startsWithFreshLocalRuntimeGuards;
@@ -254,11 +274,14 @@ function inspectGuardOrder(commandIds) {
     runtimeBeforeDurability,
     runtimeBeforeMissingArm,
     durabilityBeforeMissingArm,
+    rerankDurabilityAfterEmbeddingDurability,
+    rerankDurabilityBeforeMissingArm,
     resumeEnvAfterFreshGuards,
     missingArmAfterResumeEnv,
     missingRequiredCommandIds: missing,
     firstCommandId: commandIds[0] ?? null,
     secondCommandId: commandIds[1] ?? null,
+    thirdCommandId: commandIds[2] ?? null,
     guardedCommandId: "missingArmResponseExport",
   };
 }
@@ -372,6 +395,7 @@ function renderMarkdown(value) {
     `- Fresh local runtime guard order ready: ${value.guardPlan.ready}`,
     `- First private command: ${value.guardPlan.firstCommandId ?? "n/a"}`,
     `- Second private command: ${value.guardPlan.secondCommandId ?? "n/a"}`,
+    `- Third private command: ${value.guardPlan.thirdCommandId ?? "n/a"}`,
     `- Required placeholders ready: ${value.replacementPlan.requiredPlaceholdersReady}`,
     `- Unresolved required placeholders: ${value.replacementPlan.unresolvedRequiredPlaceholderNames.join(", ") || "none"}`,
     `- Optional defaults applied: ${value.replacementPlan.optionalDefaultsApplied.join(", ") || "none"}`,
@@ -385,6 +409,8 @@ function renderMarkdown(value) {
     `- Runtime guard before durability guard: ${value.guardPlan.runtimeBeforeDurability}`,
     `- Runtime guard before missing arm export: ${value.guardPlan.runtimeBeforeMissingArm}`,
     `- Durability guard before missing arm export: ${value.guardPlan.durabilityBeforeMissingArm}`,
+    `- Local rerank durability after embedding durability: ${value.guardPlan.rerankDurabilityAfterEmbeddingDurability}`,
+    `- Local rerank durability before missing arm export: ${value.guardPlan.rerankDurabilityBeforeMissingArm}`,
     `- Resume env doctor after fresh guards: ${value.guardPlan.resumeEnvAfterFreshGuards}`,
     `- Missing arm export after resume env doctor: ${value.guardPlan.missingArmAfterResumeEnv}`,
     "",

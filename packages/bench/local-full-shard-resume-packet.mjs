@@ -215,6 +215,12 @@ const report = {
       `--output ${reviewDir}/local-embedding-durability-smoke-20260526.json`,
       `--markdown-output ${reviewDir}/local-embedding-durability-smoke-20260526.md`,
     ].join(" ")),
+    rerunLocalRerankDurabilitySmoke: withBenchmarkSupermemorySearchDisabled([
+      "npm exec --yes pnpm@10.23.0 -- benchmark:local-rerank:durability --",
+      "--require-ready",
+      `--output ${reviewDir}/local-rerank-durability-smoke-20260526.json`,
+      `--markdown-output ${reviewDir}/local-rerank-durability-smoke-20260526.md`,
+    ].join(" ")),
     missingArmResponseExport: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.missingArmResponseExport),
     preflight: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.preflight),
     answerQuality: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.answerQuality),
@@ -245,6 +251,7 @@ const report = {
     ? [
         "Re-run the local embedding runtime doctor while the same local endpoint is alive.",
         "Re-run the local embedding durability smoke with --require-ready.",
+        "Re-run the local rerank durability smoke with --require-ready so the sidecar proves bounded response-body completion before shard retry.",
         "Run the local-full shard resume env doctor against the outside-repository private directory.",
         "Run the local-full shard resume command materializer to write a private shell script outside the repository.",
         "Review and run the generated private script so the missing-arm export, preflight, answer-quality scoring, and local shard intake use concrete private paths and endpoint values.",
@@ -379,6 +386,7 @@ function renderMarkdown(value) {
     `- Resume result doctor: ${value.commands.resumeResultDoctor}`,
     `- Runtime doctor: ${value.commands.rerunRuntimeDoctor}`,
     `- Durability smoke: ${value.commands.rerunDurabilitySmoke}`,
+    `- Local rerank durability smoke: ${value.commands.rerunLocalRerankDurabilitySmoke}`,
     `- Missing-arm export: ${value.commands.missingArmResponseExport ?? "n/a"}`,
     `- Preflight: ${value.commands.preflight ?? "n/a"}`,
     `- Answer quality: ${value.commands.answerQuality ?? "n/a"}`,

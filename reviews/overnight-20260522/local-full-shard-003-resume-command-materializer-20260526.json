@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-full-shard-resume-command-materializer",
+  "fixtureOnly": false,
+  "status": "BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS",
+  "generatedAt": "2026-05-27T00:44:42.985Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "writesRealPrivateCommandFile": false,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "callsLocalEndpoint": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsMaterializedCommands": false,
+  "printsEnvValues": false,
+  "printsPrivatePaths": false,
+  "supermemorySearchPolicy": "disabled-for-benchmark-methodology",
+  "privateScriptExportsSupermemorySearchDisabled": true,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForMaterialization": false,
+  "privateDir": {
+    "provided": false,
+    "label": null,
+    "present": false,
+    "outsideRepository": false,
+    "pathPrinted": false
+  },
+  "privateCommandFile": {
+    "written": false,
+    "label": null,
+    "pathPrinted": false,
+    "outsideRepository": false,
+    "mode": null,
+    "sizeBytes": null,
+    "hash": null
+  },
+  "resumePacket": {
+    "path": "reviews/overnight-20260522/local-full-shard-003-resume-packet-20260526.json",
+    "hash": "sha256:6f30f10c19b5f4f0929c48a0ca3c07723e459cae8f3c8dddb20896226eb020e9",
+    "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
+    "targetShard": {
+      "shardId": "shard-003",
+      "startIndex": 50,
+      "endIndexExclusive": 75,
+      "queryOffset": 50,
+      "maxQueries": 25,
+      "queryCount": 25,
+      "expectedPublicResult": "<public-review-dir>/answer-quality-local-full-shard-003.json",
+      "expectedPublicMarkdown": "<public-review-dir>/answer-quality-local-full-shard-003.md",
+      "expectedPrivateArmDirectoryLabel": "<private-output-dir>/arms/shard-003"
+    },
+    "missingStrategies": [
+      "local-apple-qwen3-0_6b-local-rerank"
+    ],
+    "completedStrategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "local-apple-qwen3-0_6b"
+    ]
+  },
+  "commandPlan": {
+    "commandCount": 9,
+    "commandIds": [
+      "rerunRuntimeDoctor",
+      "rerunDurabilitySmoke",
+      "rerunLocalRerankDurabilitySmoke",
+      "resumeEnvDoctor",
+      "missingArmResponseExport",
+      "preflight",
+      "answerQuality",
+      "localShardIntake",
+      "fullSotaDoctor"
+    ],
+    "privateScriptCommandOrder": [
+      "rerunRuntimeDoctor",
+      "rerunDurabilitySmoke",
+      "rerunLocalRerankDurabilitySmoke",
+      "resumeEnvDoctor",
+      "missingArmResponseExport",
+      "preflight",
+      "answerQuality",
+      "localShardIntake",
+      "fullSotaDoctor"
+    ],
+    "templatePlaceholderCount": 17,
+    "templatePlaceholderNames": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-answer-model",
+      "local-embedding-base-url",
+      "local-embedding-model",
+      "local-judge-model",
+      "local-query-expansion-base-url-if-used",
+      "local-rerank-base-url",
+      "local-rerank-candidate-limit",
+      "local-rerank-model",
+      "openai-compatible-base-url",
+      "private-output-dir",
+      "public-review-dir",
+      "query-expansion-model-if-used",
+      "safe-local-dense-candidate-limit",
+      "safe-local-embedding-batch-token-limit",
+      "safe-local-embedding-max-token-limit"
+    ],
+    "materializedCommandCount": 0,
+    "materializedCommandHashes": [],
+    "commandsPrinted": false,
+    "privateScriptExports": [
+      "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH",
+      "SELFMEM_SUPERMEMORY_SEARCH_DISABLED"
+    ]
+  },
+  "guardPlan": {
+    "ready": true,
+    "startsWithFreshLocalRuntimeGuards": true,
+    "runtimeBeforeDurability": true,
+    "runtimeBeforeMissingArm": true,
+    "durabilityBeforeMissingArm": true,
+    "rerankDurabilityAfterEmbeddingDurability": true,
+    "rerankDurabilityBeforeMissingArm": true,
+    "resumeEnvAfterFreshGuards": true,
+    "missingArmAfterResumeEnv": true,
+    "missingRequiredCommandIds": [],
+    "firstCommandId": "rerunRuntimeDoctor",
+    "secondCommandId": "rerunDurabilitySmoke",
+    "thirdCommandId": "rerunLocalRerankDurabilitySmoke",
+    "guardedCommandId": "missingArmResponseExport"
+  },
+  "replacementPlan": {
+    "requiredPlaceholderCount": 13,
+    "requiredPlaceholdersReady": false,
+    "unresolvedRequiredPlaceholderNames": [
+      "local-answer-model",
+      "local-embedding-base-url",
+      "local-embedding-model",
+      "local-judge-model",
+      "local-rerank-base-url",
+      "local-rerank-candidate-limit",
+      "local-rerank-model",
+      "openai-compatible-base-url",
+      "private-output-dir",
+      "safe-local-dense-candidate-limit",
+      "safe-local-embedding-batch-token-limit",
+      "safe-local-embedding-max-token-limit"
+    ],
+    "requiredPlaceholders": [
+      {
+        "name": "local-answer-model",
+        "source": "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "local-embedding-base-url",
+        "source": "SELFMEM_LOCAL_EMBED_BASE_URL",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "local-embedding-model",
+        "source": "SELFMEM_LOCAL_EMBED_MODEL",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "local-judge-model",
+        "source": "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "local-rerank-base-url",
+        "source": "SELFMEM_LOCAL_RERANK_BASE_URL",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "local-rerank-candidate-limit",
+        "source": "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "local-rerank-model",
+        "source": "SELFMEM_LOCAL_RERANK_MODEL",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "openai-compatible-base-url",
+        "source": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "private-output-dir",
+        "source": "RECALLWEAVE_FULL_SHARD_PRIVATE_DIR or --private-input-dir",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "public-review-dir",
+        "source": "--review-dir or RECALLWEAVE_REVIEW_DIR",
+        "ready": true,
+        "printsValue": false
+      },
+      {
+        "name": "safe-local-dense-candidate-limit",
+        "source": "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "safe-local-embedding-batch-token-limit",
+        "source": "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+        "ready": false,
+        "printsValue": false
+      },
+      {
+        "name": "safe-local-embedding-max-token-limit",
+        "source": "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
+        "ready": false,
+        "printsValue": false
+      }
+    ],
+    "optionalPlaceholderCount": 4,
+    "optionalPlaceholderNames": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-query-expansion-base-url-if-used",
+      "query-expansion-model-if-used"
+    ],
+    "optionalDefaultsApplied": [
+      "1-when-cloud-query-expansion-runs",
+      "env-only-if-cloud-endpoint",
+      "local-query-expansion-base-url-if-used",
+      "query-expansion-model-if-used"
+    ],
+    "printsReplacementValues": false
+  },
+  "blockers": [
+    "private-dir-not-provided",
+    "private-command-output-not-provided",
+    "placeholder-unresolved:local-answer-model",
+    "placeholder-unresolved:local-embedding-base-url",
+    "placeholder-unresolved:local-embedding-model",
+    "placeholder-unresolved:local-judge-model",
+    "placeholder-unresolved:local-rerank-base-url",
+    "placeholder-unresolved:local-rerank-candidate-limit",
+    "placeholder-unresolved:local-rerank-model",
+    "placeholder-unresolved:openai-compatible-base-url",
+    "placeholder-unresolved:private-output-dir",
+    "placeholder-unresolved:safe-local-dense-candidate-limit",
+    "placeholder-unresolved:safe-local-embedding-batch-token-limit",
+    "placeholder-unresolved:safe-local-embedding-max-token-limit"
+  ],
+  "nextActions": [
+    "Provide an outside-repository private input directory with --private-input-dir or RECALLWEAVE_FULL_SHARD_PRIVATE_DIR.",
+    "Provide an outside-repository private command output path with --private-command-output or RECALLWEAVE_LOCAL_FULL_RESUME_PRIVATE_COMMAND_OUTPUT.",
+    "Set the required local embedding, local rerank, and answer-quality environment variables."
+  ]
+}

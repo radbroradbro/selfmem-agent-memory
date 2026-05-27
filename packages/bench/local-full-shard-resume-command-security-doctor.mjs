@@ -21,7 +21,7 @@ process.on("exit", () => {
 
 const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
 const materializerPath = resolveInputPath(
-  args.materializer ?? `${reviewDir}/local-full-shard-002-resume-command-materializer-20260526.json`,
+  args.materializer ?? `${reviewDir}/local-full-shard-003-resume-command-materializer-20260526.json`,
 );
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
@@ -37,6 +37,7 @@ const blockers = [
   materializer.guardPlan?.ready !== true ? "materializer-guard-plan-not-ready" : null,
   materializer.guardPlan?.firstCommandId !== "rerunRuntimeDoctor" ? "materializer-first-command-not-runtime-doctor" : null,
   materializer.guardPlan?.secondCommandId !== "rerunDurabilitySmoke" ? "materializer-second-command-not-durability-smoke" : null,
+  materializer.guardPlan?.thirdCommandId !== "rerunLocalRerankDurabilitySmoke" ? "materializer-third-command-not-local-rerank-durability-smoke" : null,
   materializer.guardPlan?.guardedCommandId !== "missingArmResponseExport" ? "materializer-guarded-command-mismatch" : null,
   materializer.privateScriptExportsSupermemorySearchDisabled !== true ? "materializer-supermemory-disable-export-missing" : null,
   !arrayOfStrings(materializer.commandPlan?.privateScriptExports).includes("RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH")
@@ -109,11 +110,11 @@ const report = {
       ? [
           "Use the checked materializer flow when generating a real private resume script outside the repository.",
           "Keep public reports limited to hashes, counts, labels, and booleans.",
-          "Run the resume result doctor before accepting shard 002 into local-full intake.",
+          "Run the resume result doctor before accepting shard 003 into local-full intake.",
         ]
       : [
           "Fix the command materializer security blockers before generating a real private resume script.",
-          "Do not run or publish local-full shard 002 resume evidence while the security doctor is blocked.",
+          "Do not run or publish local-full shard 003 resume evidence while the security doctor is blocked.",
         ],
 };
 
@@ -129,12 +130,23 @@ function runFixtureMaterializer() {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-local-full-resume-command-security-"));
   tempRoots.push(tempRoot);
   const privateDir = join(tempRoot, "private");
-  const privateCommandOutput = join(tempRoot, "resume-shard-002.private.sh");
+  const resumePacketOutput = join(tempRoot, "resume-packet.json");
+  const privateCommandOutput = join(tempRoot, "resume-shard-003.private.sh");
   mkdirSync(privateDir, { recursive: true, mode: 0o700 });
+  const packetResult = spawnSync(process.execPath, ["packages/bench/local-full-shard-resume-packet.mjs", "--output", resumePacketOutput], {
+    cwd: root,
+    encoding: "utf8",
+    env: process.env,
+  });
+  assert.equal(packetResult.status, 0, `fixture resume packet failed: ${packetResult.stderr}`);
+  assertSafePublicText(packetResult.stdout, "fixture resume packet stdout");
+  assertSafePublicText(packetResult.stderr, "fixture resume packet stderr");
   const result = spawnSync(
     process.execPath,
     [
       "packages/bench/local-full-shard-resume-command-materializer.mjs",
+      "--resume-packet",
+      resumePacketOutput,
       "--private-input-dir",
       privateDir,
       "--private-command-output",
@@ -184,6 +196,7 @@ function runFixtureMaterializer() {
     commandOrder: order.commandOrder,
     firstCommandId: order.commandOrder[0] ?? null,
     secondCommandId: order.commandOrder[1] ?? null,
+    thirdCommandId: order.commandOrder[2] ?? null,
     guardedCommandId: "missingArmResponseExport",
     materializedCommandCount: Number(fixture.commandPlan?.materializedCommandCount ?? 0),
     printsMaterializedCommands: Boolean(fixture.printsMaterializedCommands),
@@ -201,7 +214,13 @@ function privateScriptExportsSupermemorySearchDisabled(text) {
 
 function inspectPrivateScriptOrder(privateScript) {
   const commandOrder = [...privateScript.matchAll(/^# \d+\. ([A-Za-z0-9_-]+)$/gmu)].map((match) => match[1]);
-  const expectedPrefix = ["rerunRuntimeDoctor", "rerunDurabilitySmoke", "resumeEnvDoctor", "missingArmResponseExport"];
+  const expectedPrefix = [
+    "rerunRuntimeDoctor",
+    "rerunDurabilitySmoke",
+    "rerunLocalRerankDurabilitySmoke",
+    "resumeEnvDoctor",
+    "missingArmResponseExport",
+  ];
   return {
     commandOrder,
     ready: expectedPrefix.every((id, index) => commandOrder[index] === id),
@@ -286,6 +305,7 @@ function renderMarkdown(value) {
     `- Fixture private script order ready: ${value.fixtureProbe.privateScriptOrderReady}`,
     `- Fixture first command: ${value.fixtureProbe.firstCommandId ?? "n/a"}`,
     `- Fixture second command: ${value.fixtureProbe.secondCommandId ?? "n/a"}`,
+    `- Fixture third command: ${value.fixtureProbe.thirdCommandId ?? "n/a"}`,
     `- Fixture guarded command: ${value.fixtureProbe.guardedCommandId}`,
     `- Counts as local-full benchmark evidence: ${value.countsAsLocalFullBenchmarkEvidence}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,

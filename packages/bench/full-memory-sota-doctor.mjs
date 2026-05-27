@@ -25,7 +25,7 @@ const files = {
   localFullShardIntakeAfterShard001: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
   localFullPerformanceReport: `${reviewDir}/local-full-shard-performance-report-20260526.json`,
   localFullResumeEnvDoctor: `${reviewDir}/local-full-shard-002-resume-env-doctor-20260526.json`,
-  localFullResumeCommandSecurity: `${reviewDir}/local-full-shard-002-resume-command-security-20260526.json`,
+  localFullResumeCommandSecurity: `${reviewDir}/local-full-shard-003-resume-command-security-20260526.json`,
   localFullResumeResultDoctor: `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
   localFullShard002RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
   localFullShard003RuntimeBlocker: `${reviewDir}/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`,
@@ -725,8 +725,9 @@ function inspectLocalFullResumeCommandSecurity(securityReport) {
     securityReport?.fixtureProbe?.privateScriptOrderReady === true &&
     securityReport?.fixtureProbe?.firstCommandId === "rerunRuntimeDoctor" &&
     securityReport?.fixtureProbe?.secondCommandId === "rerunDurabilitySmoke" &&
+    securityReport?.fixtureProbe?.thirdCommandId === "rerunLocalRerankDurabilitySmoke" &&
     securityReport?.fixtureProbe?.guardedCommandId === "missingArmResponseExport" &&
-    securityReport?.fixtureProbe?.materializedCommandCount === 8 &&
+    securityReport?.fixtureProbe?.materializedCommandCount === 9 &&
     securityReport?.fixtureProbe?.printsMaterializedCommands === false &&
     securityReport?.fixtureProbe?.printsPrivatePaths === false &&
     securityReport?.fixtureProbe?.printsEnvValues === false;
@@ -761,6 +762,7 @@ function inspectLocalFullResumeCommandSecurity(securityReport) {
     privateScriptOrderReady: Boolean(securityReport?.fixtureProbe?.privateScriptOrderReady),
     firstCommandId: securityReport?.fixtureProbe?.firstCommandId ?? null,
     secondCommandId: securityReport?.fixtureProbe?.secondCommandId ?? null,
+    thirdCommandId: securityReport?.fixtureProbe?.thirdCommandId ?? null,
     guardedCommandId: securityReport?.fixtureProbe?.guardedCommandId ?? null,
     materializedCommandCount: Number(securityReport?.fixtureProbe?.materializedCommandCount ?? 0),
     printsMaterializedCommands: Boolean(securityReport?.fixtureProbe?.printsMaterializedCommands),
@@ -1140,6 +1142,7 @@ function renderMarkdown(value) {
     `- Resume command private file mode: ${value.localFullLaneState.resumeCommandSecurity.privateCommandFileMode ?? "n/a"}`,
     `- Resume command first guard: ${value.localFullLaneState.resumeCommandSecurity.firstCommandId ?? "n/a"}`,
     `- Resume command second guard: ${value.localFullLaneState.resumeCommandSecurity.secondCommandId ?? "n/a"}`,
+    `- Resume command third guard: ${value.localFullLaneState.resumeCommandSecurity.thirdCommandId ?? "n/a"}`,
     `- Resume command guarded command: ${value.localFullLaneState.resumeCommandSecurity.guardedCommandId ?? "n/a"}`,
     `- Resume command counts as SOTA evidence: ${value.localFullLaneState.resumeCommandSecurity.countsAsFullMemorySotaEvidence}`,
     `- Resume result gate satisfied by accepted shard intake: ${value.localFullLaneState.resumeResult.gateSatisfiedByAcceptedShardIntake}`,

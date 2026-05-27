@@ -142,6 +142,7 @@ const requiredFiles = [
   "packages/bench/codex-lifecycle-audit.mjs",
   "packages/bench/local-embedding-runtime-doctor.mjs",
   "packages/bench/local-embedding-durability-smoke.mjs",
+  "packages/bench/local-rerank-durability-smoke.mjs",
   "packages/bench/local-openai-rerank-sidecar.mjs",
   "packages/bench/fixtures/baseline-reviewer-approval-a.fixture.json",
   "packages/bench/fixtures/public-benchmark-target.fixture.json",
@@ -214,6 +215,12 @@ const requiredFiles = [
   `${reviewDir}/local-full-shard-002-resume-command-security-20260526.md`,
   `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.json`,
   `${reviewDir}/local-full-shard-002-resume-result-doctor-20260526.md`,
+  `${reviewDir}/local-full-shard-003-resume-packet-20260526.json`,
+  `${reviewDir}/local-full-shard-003-resume-packet-20260526.md`,
+  `${reviewDir}/local-full-shard-003-resume-command-materializer-20260526.json`,
+  `${reviewDir}/local-full-shard-003-resume-command-materializer-20260526.md`,
+  `${reviewDir}/local-full-shard-003-resume-command-security-20260526.json`,
+  `${reviewDir}/local-full-shard-003-resume-command-security-20260526.md`,
   `${reviewDir}/local-full-shard-performance-report-20260526.json`,
   `${reviewDir}/local-full-shard-performance-report-20260526.md`,
   `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
@@ -232,6 +239,8 @@ const requiredFiles = [
   `${reviewDir}/local-embedding-launch-diagnostic-20260526.md`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.json`,
   `${reviewDir}/local-embedding-durability-smoke-20260526.md`,
+  `${reviewDir}/local-rerank-durability-smoke-20260526.json`,
+  `${reviewDir}/local-rerank-durability-smoke-20260526.md`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.md`,
   `${reviewDir}/full-shard-private-input-doctor-current.json`,
@@ -651,6 +660,7 @@ const requiredScripts = [
   "benchmark:query-expansion:result-gate",
   "benchmark:local-embedding:runtime-doctor",
   "benchmark:local-embedding:durability",
+  "benchmark:local-rerank:durability",
   "benchmark:local-rerank:result-gate",
   "benchmark:provider-challenger:result-gate",
   "benchmark:memory-score:result-gate",
@@ -2028,6 +2038,29 @@ check("fresh public benchmark target check passes", () => {
   const localEmbeddingDurabilityMarkdownFresh = run("node", ["packages/bench/local-embedding-durability-smoke.mjs", "--format", "markdown"], {
     env: noLocalEmbeddingEnv,
   }).stdout;
+  const noLocalRerankEnv = { ...process.env };
+  for (const name of [
+    "SELFMEM_LOCAL_RERANK_API_KEY",
+    "SELFMEM_LOCAL_RERANK_BASE_URL",
+    "SELFMEM_LOCAL_RERANK_ENDPOINT",
+    "SELFMEM_LOCAL_RERANK_MAX_DOCUMENT_CHARS",
+    "SELFMEM_LOCAL_RERANK_MODEL",
+    "SELFMEM_LOCAL_RERANK_STRATEGY",
+    "SELFMEM_LOCAL_RERANK_TIMEOUT_MS",
+  ]) {
+    delete noLocalRerankEnv[name];
+  }
+  const localRerankDurabilitySmoke = JSON.parse(readFileSync(join(root, reviewDir, "local-rerank-durability-smoke-20260526.json"), "utf8"));
+  const localRerankDurabilitySmokeEvidence = readFileSync(join(root, reviewDir, "local-rerank-durability-smoke-20260526.md"), "utf8");
+  const localRerankDurabilityFresh = JSON.parse(
+    run("node", ["packages/bench/local-rerank-durability-smoke.mjs"], { env: noLocalRerankEnv }).stdout,
+  );
+  const localRerankDurabilityMarkdownFresh = run("node", ["packages/bench/local-rerank-durability-smoke.mjs", "--format", "markdown"], {
+    env: noLocalRerankEnv,
+  }).stdout;
+  const localRerankDurabilityFixture = JSON.parse(
+    run("node", ["packages/bench/local-rerank-durability-smoke.mjs", "--fixture", "--require-ready"], { env: noLocalRerankEnv }).stdout,
+  );
   const blockedLocalEmbeddingDurabilityReportPath = join(releaseTempRoot, "blocked-local-embedding-durability-smoke.json");
   writeFileSync(blockedLocalEmbeddingDurabilityReportPath, `${JSON.stringify(localEmbeddingDurabilityFresh, null, 2)}\n`, {
     encoding: "utf8",
@@ -2140,10 +2173,10 @@ check("fresh public benchmark target check passes", () => {
     "markdown",
   ]).stdout;
   const localFullShardResumeCommandMaterializer = JSON.parse(
-    readFileSync(join(root, reviewDir, "local-full-shard-002-resume-command-materializer-20260526.json"), "utf8"),
+    readFileSync(join(root, reviewDir, "local-full-shard-003-resume-command-materializer-20260526.json"), "utf8"),
   );
   const localFullShardResumeCommandMaterializerEvidence = readFileSync(
-    join(root, reviewDir, "local-full-shard-002-resume-command-materializer-20260526.md"),
+    join(root, reviewDir, "local-full-shard-003-resume-command-materializer-20260526.md"),
     "utf8",
   );
   const localFullShardResumeCommandMaterializerFresh = JSON.parse(
@@ -2155,10 +2188,10 @@ check("fresh public benchmark target check passes", () => {
     { env: noLocalFullResumeEnv },
   ).stdout;
   const localFullShardResumeCommandSecurity = JSON.parse(
-    readFileSync(join(root, reviewDir, "local-full-shard-002-resume-command-security-20260526.json"), "utf8"),
+    readFileSync(join(root, reviewDir, "local-full-shard-003-resume-command-security-20260526.json"), "utf8"),
   );
   const localFullShardResumeCommandSecurityEvidence = readFileSync(
-    join(root, reviewDir, "local-full-shard-002-resume-command-security-20260526.md"),
+    join(root, reviewDir, "local-full-shard-003-resume-command-security-20260526.md"),
     "utf8",
   );
   const localFullShardResumeCommandSecurityFresh = JSON.parse(
@@ -2175,7 +2208,7 @@ check("fresh public benchmark target check passes", () => {
   const localFullShardResumeCommandMaterializerReadyPrivateDir = join(localFullShardResumeCommandMaterializerReadyRoot, "private");
   const localFullShardResumeCommandMaterializerReadyOutput = join(
     localFullShardResumeCommandMaterializerReadyRoot,
-    "resume-shard-002.private.sh",
+    "resume-shard-003.private.sh",
   );
   mkdirSync(localFullShardResumeCommandMaterializerReadyPrivateDir, { recursive: true, mode: 0o700 });
   const localFullShardResumeCommandMaterializerReadyEnv = {
@@ -4373,6 +4406,7 @@ check("fresh public benchmark target check passes", () => {
   const expectedResumePrivateScriptCommandOrder = [
     "rerunRuntimeDoctor",
     "rerunDurabilitySmoke",
+    "rerunLocalRerankDurabilitySmoke",
     "resumeEnvDoctor",
     "missingArmResponseExport",
     "preflight",
@@ -4408,7 +4442,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.readyForMaterialization, false);
     assert.equal(materializer.writesRealPrivateCommandFile, false);
     assert.equal(materializer.privateCommandFile?.pathPrinted, false);
-    assert.equal(materializer.commandPlan?.commandCount, 8);
+    assert.equal(materializer.commandPlan?.commandCount, 9);
     assert.deepEqual(materializer.commandPlan?.commandIds, expectedResumePrivateScriptCommandOrder);
     assert.deepEqual(materializer.commandPlan?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
     assert.equal(materializer.commandPlan?.materializedCommandCount, 0);
@@ -4422,11 +4456,14 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.guardPlan?.runtimeBeforeDurability, true);
     assert.equal(materializer.guardPlan?.runtimeBeforeMissingArm, true);
     assert.equal(materializer.guardPlan?.durabilityBeforeMissingArm, true);
+    assert.equal(materializer.guardPlan?.rerankDurabilityAfterEmbeddingDurability, true);
+    assert.equal(materializer.guardPlan?.rerankDurabilityBeforeMissingArm, true);
     assert.equal(materializer.guardPlan?.resumeEnvAfterFreshGuards, true);
     assert.equal(materializer.guardPlan?.missingArmAfterResumeEnv, true);
     assert.deepEqual(materializer.guardPlan?.missingRequiredCommandIds, []);
     assert.equal(materializer.guardPlan?.firstCommandId, "rerunRuntimeDoctor");
     assert.equal(materializer.guardPlan?.secondCommandId, "rerunDurabilitySmoke");
+    assert.equal(materializer.guardPlan?.thirdCommandId, "rerunLocalRerankDurabilitySmoke");
     assert.equal(materializer.guardPlan?.guardedCommandId, "missingArmResponseExport");
     assert.equal(materializer.replacementPlan?.requiredPlaceholdersReady, false);
     assert.ok(materializer.replacementPlan?.unresolvedRequiredPlaceholderNames?.includes("private-output-dir"));
@@ -4443,6 +4480,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeCommandMaterializerEvidence, /Fresh local runtime guard order ready: true/);
   assert.match(localFullShardResumeCommandMaterializerEvidence, /First private command: rerunRuntimeDoctor/);
   assert.match(localFullShardResumeCommandMaterializerEvidence, /Second private command: rerunDurabilitySmoke/);
+  assert.match(localFullShardResumeCommandMaterializerEvidence, /Third private command: rerunLocalRerankDurabilitySmoke/);
   assert.match(localFullShardResumeCommandMaterializerMarkdownFresh, /Ready for materialization: false/);
   for (const materializer of [
     localFullShardResumeCommandMaterializerFixture,
@@ -4456,14 +4494,15 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.privateCommandFile?.outsideRepository, true);
     assert.equal(materializer.privateCommandFile?.mode, "0700");
     assert.match(materializer.privateCommandFile?.hash ?? "", /^sha256:[a-f0-9]{64}$/);
-    assert.equal(materializer.commandPlan?.commandCount, 8);
+    assert.equal(materializer.commandPlan?.commandCount, 9);
     assert.deepEqual(materializer.commandPlan?.commandIds, expectedResumePrivateScriptCommandOrder);
     assert.deepEqual(materializer.commandPlan?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
-    assert.equal(materializer.commandPlan?.materializedCommandCount, 8);
+    assert.equal(materializer.commandPlan?.materializedCommandCount, 9);
     assert.equal(materializer.commandPlan?.commandsPrinted, false);
     assert.equal(materializer.guardPlan?.ready, true);
     assert.equal(materializer.guardPlan?.firstCommandId, "rerunRuntimeDoctor");
     assert.equal(materializer.guardPlan?.secondCommandId, "rerunDurabilitySmoke");
+    assert.equal(materializer.guardPlan?.thirdCommandId, "rerunLocalRerankDurabilitySmoke");
     assert.equal(materializer.guardPlan?.guardedCommandId, "missingArmResponseExport");
     assert.equal(materializer.replacementPlan?.requiredPlaceholdersReady, true);
     assert.deepEqual(materializer.replacementPlan?.unresolvedRequiredPlaceholderNames, []);
@@ -4487,12 +4526,17 @@ check("fresh public benchmark target check passes", () => {
   );
   assert.ok(
     localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 2. rerunDurabilitySmoke") <
-      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 3. resumeEnvDoctor"),
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 3. rerunLocalRerankDurabilitySmoke"),
   );
   assert.ok(
-    localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 3. resumeEnvDoctor") <
-      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 4. missingArmResponseExport"),
+    localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 3. rerunLocalRerankDurabilitySmoke") <
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 4. resumeEnvDoctor"),
   );
+  assert.ok(
+    localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 4. resumeEnvDoctor") <
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 5. missingArmResponseExport"),
+  );
+  assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:local-rerank:durability/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:arms/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /^export RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1$/m);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /^export SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1$/m);
@@ -4564,8 +4608,9 @@ check("fresh public benchmark target check passes", () => {
     assert.deepEqual(securityDoctor.fixtureProbe?.commandOrder, expectedResumePrivateScriptCommandOrder);
     assert.equal(securityDoctor.fixtureProbe?.firstCommandId, "rerunRuntimeDoctor");
     assert.equal(securityDoctor.fixtureProbe?.secondCommandId, "rerunDurabilitySmoke");
+    assert.equal(securityDoctor.fixtureProbe?.thirdCommandId, "rerunLocalRerankDurabilitySmoke");
     assert.equal(securityDoctor.fixtureProbe?.guardedCommandId, "missingArmResponseExport");
-    assert.equal(securityDoctor.fixtureProbe?.materializedCommandCount, 8);
+    assert.equal(securityDoctor.fixtureProbe?.materializedCommandCount, 9);
     assert.equal(securityDoctor.fixtureProbe?.printsMaterializedCommands, false);
     assert.equal(securityDoctor.fixtureProbe?.printsPrivatePaths, false);
     assert.equal(securityDoctor.fixtureProbe?.printsEnvValues, false);
@@ -4908,6 +4953,33 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localEmbeddingDurabilitySmokeEvidence, /Local Embedding Durability Smoke/);
   assert.match(localEmbeddingDurabilitySmokeEvidence, /Ready for local Apple arm export: true/);
   assert.match(localEmbeddingDurabilityMarkdownFresh, /Local Embedding Durability Smoke/);
+  for (const smokeReport of [localRerankDurabilitySmoke, localRerankDurabilityFresh, localRerankDurabilityFixture]) {
+    assert.equal(smokeReport.mode, "local-rerank-durability-smoke");
+    assert.equal(smokeReport.syntheticOnly, true);
+    assert.equal(smokeReport.metricsOnly, true);
+    assert.equal(smokeReport.publicSafe, true);
+    assert.equal(smokeReport.rawSyntheticInputIncluded, false);
+    assert.equal(smokeReport.baseUrlPrinted, false);
+    assert.equal(smokeReport.endpointPrinted, false);
+    assert.equal(smokeReport.responseBodyTimeoutBounded, true);
+    assert.equal(smokeReport.countsAsLocalFullBenchmarkEvidence, false);
+    assert.equal(smokeReport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(smokeReport.publicBenchmarkClaimsAllowed, false);
+    assert.ok(Number(smokeReport.probes?.length ?? 0) >= 3);
+  }
+  assert.equal(localRerankDurabilitySmoke.status, "BLOCKED_LOCAL_RERANK_DURABILITY");
+  assert.equal(localRerankDurabilitySmoke.readyForLocalRerankArmExport, false);
+  assert.ok(localRerankDurabilitySmoke.blockers?.includes("local-rerank-endpoint-missing"));
+  assert.equal(localRerankDurabilityFresh.status, "BLOCKED_LOCAL_RERANK_DURABILITY");
+  assert.equal(localRerankDurabilityFresh.readyForLocalRerankArmExport, false);
+  assert.ok(localRerankDurabilityFresh.blockers?.includes("local-rerank-endpoint-missing"));
+  assert.equal(localRerankDurabilityFixture.status, "READY_LOCAL_RERANK_DURABILITY");
+  assert.equal(localRerankDurabilityFixture.fixtureOnly, true);
+  assert.equal(localRerankDurabilityFixture.readyForLocalRerankArmExport, true);
+  assert.deepEqual(localRerankDurabilityFixture.blockers, []);
+  assert.match(localRerankDurabilitySmokeEvidence, /Local Rerank Durability Smoke/);
+  assert.match(localRerankDurabilitySmokeEvidence, /Response body timeout bounded: true/);
+  assert.match(localRerankDurabilityMarkdownFresh, /Local Rerank Durability Smoke/);
   const localEmbeddingDurabilityArmExport = spawnSync(
     "node",
     [
@@ -5201,8 +5273,9 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.privateScriptOrderReady, true);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.firstCommandId, "rerunRuntimeDoctor");
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.secondCommandId, "rerunDurabilitySmoke");
+    assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.thirdCommandId, "rerunLocalRerankDurabilitySmoke");
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.guardedCommandId, "missingArmResponseExport");
-    assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.materializedCommandCount, 8);
+    assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.materializedCommandCount, 9);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.printsMaterializedCommands, false);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.printsPrivatePaths, false);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.printsEnvValues, false);

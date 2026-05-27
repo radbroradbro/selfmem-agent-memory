@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-26T23:37:07.623Z",
+  "generatedAt": "2026-05-27T00:46:38.986Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -54,14 +54,14 @@
     "localFullShardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
       "exists": true,
-      "hash": "sha256:f7a17aade68cd2a14fa8b56d321b602f61afd8bca2093a2bfffa9062731c82ba",
+      "hash": "sha256:99543578972eee549dc79af0b3a1b68e1750aad12e19d9320315a8b437ee2737",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
       "exists": true,
-      "hash": "sha256:b34b13d7189ad1c05f3f907c1fed3821a285b99f492071be1cab8ec3ee214282",
+      "hash": "sha256:898373c62d88b0d1d4e3557f1d9ddde1d6d1256e7036db28d29678d2440a93d6",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -101,9 +101,9 @@
       "status": "BLOCKED_LOCAL_FULL_SHARD_RESUME_ENV"
     },
     "localFullResumeCommandSecurity": {
-      "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-security-20260526.json",
+      "path": "reviews/overnight-20260522/local-full-shard-003-resume-command-security-20260526.json",
       "exists": true,
-      "hash": "sha256:b46e34f426c5c956f448d192b5525e6dd21fe59eb82559ce3208033dc5c00cf5",
+      "hash": "sha256:5fba81ba9343d1f4a4257b67882369f3ad30a03509eaaed8e731571b0a0ca68b",
       "mode": "local-full-shard-resume-command-security-doctor",
       "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY"
     },
@@ -250,14 +250,14 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:751cce4839cbe948da200ba50d1c8ddf280bb937700eb4f580443ed8bb9d472d",
+      "hash": "sha256:5e8ef2e6b918ad375b94472007d20f4bfeb1f268f58985b7434199e0cd42b4c8",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:db51353290cf04072dcd9cc152e95e43baf6c87914edb0b1c61aeabb73cd0b0f",
+      "hash": "sha256:fb458ab044a1910442bd26e763781430d0611343f781f6cbb9480697701bf0b9",
       "mode": null,
       "status": null
     },
@@ -743,7 +743,7 @@
       "publicBenchmarkClaimsAllowed": false
     },
     "resumeCommandSecurity": {
-      "path": "reviews/overnight-20260522/local-full-shard-002-resume-command-security-20260526.json",
+      "path": "reviews/overnight-20260522/local-full-shard-003-resume-command-security-20260526.json",
       "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY",
       "publicSafe": true,
       "fixtureSafe": true,
@@ -756,8 +756,9 @@
       "privateScriptOrderReady": true,
       "firstCommandId": "rerunRuntimeDoctor",
       "secondCommandId": "rerunDurabilitySmoke",
+      "thirdCommandId": "rerunLocalRerankDurabilitySmoke",
       "guardedCommandId": "missingArmResponseExport",
-      "materializedCommandCount": 8,
+      "materializedCommandCount": 9,
       "printsMaterializedCommands": false,
       "printsPrivatePaths": false,
       "printsEnvValues": false,
