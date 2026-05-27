@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "67362b1944592e6b5dc0290c5cafd4f1f145dcda",
-    "ciRunId": 26481662771,
+    "headSha": "147a9ca1c00a89f89ee03706db8699b7be86f50d",
+    "ciRunId": 26482745060,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_current_local_full_shard_progress_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after correcting the local-full benchmark shard progress: shard 002 recovery is accepted, the local-full partial answer-quality snapshot covers 50/500 queries, and shard 003 is the next runtime-blocked local rerank slice. The benchmark operating policy remains pinned: methodology loops isolate from hosted Supermemory search unless an explicit hosted-baseline parity lane is being executed. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, and owner approval all pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, diff check, secret scan, private-path scan, and GitHub Actions run 26481662771 passed."
+    "note": "Latest inspected code/product baseline after hardening benchmark-methodology isolation: shard commands, response-arm export children, and private resume scripts now disable hosted Supermemory search unless an explicit hosted-baseline parity lane is being executed. Shard 002 recovery remains accepted, the local-full partial answer-quality snapshot covers 50/500 queries, and shard 003 is the next runtime-blocked local rerank slice. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, and owner approval all pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, diff check, secret scan, private-path scan, and GitHub Actions run 26482745060 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -440,14 +440,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "67362b1944592e6b5dc0290c5cafd4f1f145dcda",
-    "ciRunId": 26481662771,
+    "headSha": "147a9ca1c00a89f89ee03706db8699b7be86f50d",
+    "ciRunId": 26482745060,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_current_local_full_shard_progress_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after correcting local-full benchmark shard progress, preserving hosted Supermemory search disablement for methodology benchmark loops, and preserving production read-through/search unless explicitly disabled. GitHub Actions run 26481662771 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
+    "note": "Latest observed PR branch head after hardening local-full benchmark shard commands, response-arm export child environments, and private resume scripts so hosted Supermemory search is disabled for methodology loops while production read-through/search remains available unless explicitly disabled. GitHub Actions run 26482745060 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
