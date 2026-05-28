@@ -21,6 +21,7 @@ const files = {
   localFullShardPlan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
   localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
+  localFullShardIntakeAfterShard008: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-008-20260527.json`,
   localFullShardIntakeAfterShard007: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-007-20260527.json`,
   localFullShardIntakeAfterShard006: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-006-20260527.json`,
   localFullShardIntakeAfterShard005: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-005-common-arm-20260527.json`,
@@ -79,6 +80,7 @@ const localFullShardPlan = evidence.localFullShardPlan.json;
 const localFullShardWorkorder = evidence.localFullShardWorkorder.json;
 const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
   evidence.localFullShardIntake,
+  evidence.localFullShardIntakeAfterShard008,
   evidence.localFullShardIntakeAfterShard007,
   evidence.localFullShardIntakeAfterShard006,
   evidence.localFullShardIntakeAfterShard005,

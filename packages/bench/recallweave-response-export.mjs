@@ -1455,6 +1455,7 @@ async function localAppleEmbed(texts, options = {}) {
     const batchEmbeddings = embeddingsFromOpenAiCompatibleResponse(response);
     assert.equal(batchEmbeddings.length, batch.length, "local Apple embeddings response length mismatch");
     embeddings.push(...batchEmbeddings);
+    await maybePauseLocalAppleEmbeddingBatch();
   }
   return embeddings;
 }
@@ -1632,7 +1633,7 @@ async function localApplePost(path, body) {
     try {
       const response = await fetch(url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", connection: "close" },
         body: JSON.stringify(body),
         signal: controller.signal,
       });
@@ -1654,6 +1655,11 @@ async function localApplePost(path, body) {
     }
   }
   throw lastError ?? new Error("local Apple embedding request failed");
+}
+
+async function maybePauseLocalAppleEmbeddingBatch() {
+  const pauseMs = optionalPositiveInt(process.env.SELFMEM_LOCAL_EMBED_BATCH_PAUSE_MS ?? null, "local Apple embedding batch pause ms") ?? 0;
+  if (pauseMs > 0) await sleep(pauseMs);
 }
 
 async function localAppleRerankPost(body) {

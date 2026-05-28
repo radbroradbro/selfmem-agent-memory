@@ -11,7 +11,7 @@ const performancePath = resolveInputPath(
   args.performance ?? `${reviewDir}/local-full-shard-performance-report-20260527.json`,
 );
 const intakePath = resolveInputPath(
-  args.intake ?? `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-007-20260527.json`,
+  args.intake ?? `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-008-20260527.json`,
 );
 const wikiFixturePath = resolveInputPath(
   args.wikiFixture ?? `${reviewDir}/public-longmemeval-wiki-amplification-fixture-20260526.json`,
@@ -120,7 +120,7 @@ const ledger = {
     wikiAmplificationRole: "experimental-unproven-until-accepted-shard-win",
   },
   nextActions: [
-    "Run shard-008 with hosted Supermemory search disabled and regenerate this ledger.",
+    "Run shard-009 with hosted Supermemory search disabled and regenerate this ledger.",
     "Run a local-wiki shard plan before promoting title or subtopic amplification beyond fixture status.",
     "Keep raw LongMemEval material outside repo-facing wiki artifacts; index it only in local private storage.",
   ],
@@ -179,7 +179,7 @@ function buildTopics() {
           ? `local-apple-qwen3-0_6b-local-rerank score ${localRerank.answerQuality}; delta vs BM25 ${localRerankDelta}; delta vs base ${localRerankDeltaVsBase}.`
           : "Local rerank or BM25 row missing.",
       decision: "Treat local rerank as the current method-refinement candidate, not as a public benchmark claim.",
-      nextAction: "Keep local rerank in shard-008 and watch whether the gain survives beyond 35% coverage.",
+      nextAction: "Keep local rerank in shard-009 and watch whether the gain survives beyond 40% coverage.",
     },
     {
       id: "full-hybrid-regressed",
