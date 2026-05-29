@@ -171,6 +171,15 @@ function buildReport({ contract: value, supplied: proof, liveChecks, liveSourceS
   const blockers = proofChecks.filter((item) => !item.provided).map((item) => `missing-${item.field}`);
   const structuralFailures = structuralChecks.filter((item) => !item.ok).map((item) => item.name);
   const ready = blockers.length === 0;
+  const nextMissingProofActions = [
+    blockers.includes("missing-trajectoryIngestContractHash")
+      ? "Map trajectory history into the RecallWeave ingest/wiki-session contract before materialization."
+      : null,
+    blockers.some((blocker) => blocker !== "missing-trajectoryIngestContractHash")
+      ? "Fill the remaining missing proof fields with hashes and model ids, not raw rows."
+      : null,
+    "Regenerate this report, then materialize only from a source-lock-ready report.",
+  ].filter(Boolean);
 
   return {
     schemaVersion: 1,
@@ -210,11 +219,7 @@ function buildReport({ contract: value, supplied: proof, liveChecks, liveSourceS
           "Run the same reader and judge model declared in this source-lock report.",
           "Compare only against the same leaderboard tier and scoring contract.",
         ]
-      : [
-          "Fill the missing proof fields with hashes and model ids, not raw rows.",
-          "Map trajectory history into the RecallWeave ingest/wiki-session contract before materialization.",
-          "Regenerate this report, then materialize only from a source-lock-ready report.",
-        ],
+      : nextMissingProofActions,
     safety: {
       storesRawBenchmarkData: false,
       storesCredentials: false,

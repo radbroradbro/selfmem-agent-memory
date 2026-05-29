@@ -119,6 +119,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
   "packages/bench/agentic-memory-target-watch.mjs",
+  "packages/bench/agentic-memory-ingest-contract.mjs",
   "packages/bench/agentic-memory-source-lock-check.mjs",
   "packages/bench/memory-score-reviewer-approval-intake.mjs",
   "packages/bench/memory-score-openai-compatible-reviewer.mjs",
@@ -197,6 +198,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
   `${reviewDir}/agentic-memory-target-watch-20260529.json`,
   `${reviewDir}/agentic-memory-target-watch-20260529.md`,
+  `${reviewDir}/agentic-memory-ingest-contract-20260529.json`,
+  `${reviewDir}/agentic-memory-ingest-contract-20260529.md`,
   `${reviewDir}/agentic-memory-source-lock-20260529.json`,
   `${reviewDir}/agentic-memory-source-lock-20260529.md`,
   `${reviewDir}/agentic-memory-source-lock-live-20260529.json`,
@@ -778,6 +781,7 @@ const requiredScripts = [
   "benchmark:public-provider",
   "benchmark:public-autoresearch",
   "benchmark:agentic-watch",
+  "benchmark:agentic-ingest-contract",
   "benchmark:agentic-source-lock",
   "benchmark:answer-quality:arms",
   "benchmark:answer-quality:preflight",
@@ -1828,9 +1832,11 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(publicTargets, /same public benchmark source, repository or dataset revision/i);
   assert.match(publicTargets, /LongMemEval-V2/i);
   assert.match(publicTargets, /benchmark:agentic-watch/);
+  assert.match(publicTargets, /benchmark:agentic-ingest-contract/);
   assert.match(publicTargets, /benchmark:agentic-source-lock/);
   assert.match(publicTargets, /sourceLockReadyForMaterialization/);
   assert.match(publicTargets, /agentic-memory-source-lock-live-20260529\.json/);
+  assert.match(publicTargets, /agentic-memory-ingest-contract-20260529\.json/);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /personalAgentDefaultArm: cloud-voyage4-voyage/);
   assert.match(providerMatrix, /methodologyRefinementDefaultArm: local-apple-qwen3-0_6b/);
@@ -1878,9 +1884,44 @@ check("fresh agentic memory target watch passes", () => {
   }
 });
 
+check("fresh agentic memory ingest contract passes", () => {
+  const result = run("node", ["packages/bench/agentic-memory-ingest-contract.mjs", "--strict"]);
+  const markdown = run("node", ["packages/bench/agentic-memory-ingest-contract.mjs", "--format", "markdown"]).stdout;
+  const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-ingest-contract-20260529.json"), "utf8"));
+  const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-ingest-contract-20260529.md"), "utf8");
+  const report = JSON.parse(result.stdout);
+  for (const item of [report, evidence]) {
+    assert.equal(item.ok, true);
+    assert.equal(item.mode, "agentic-memory-ingest-contract");
+    assert.equal(item.metricsOnly, true);
+    assert.equal(item.publicSafe, true);
+    assert.equal(item.countsAsBenchmarkScore, false);
+    assert.equal(item.publicBenchmarkClaimsAllowed, false);
+    assert.equal(item.readyForSourceLockProof, true);
+    assert.match(item.contractHash, /^sha256:[a-f0-9]{64}$/);
+    assert.equal(item.rawTrajectoryIncluded, false);
+    assert.equal(item.contract?.sessionization?.sessionUnit, "one benchmark trajectory becomes one RecallWeave session");
+    assert.equal(item.contract?.topicMapping?.multiTopicLinks, true);
+    assert.equal(item.contract?.wikiLayer?.publicWikiStoresRawText, false);
+    assert.equal(item.contract?.vectorLayer?.vectorizesFullSessionChunks, true);
+    assert.equal(item.contract?.lifecycleAndCompaction?.preCompactCheckpointRequired, true);
+    assert.equal(item.sourceLockProof?.proofField, "trajectoryIngestContractHash");
+    assert.equal(item.sourceLockProof?.proofValue, item.contractHash);
+    assert.deepEqual(item.failedChecks, []);
+  }
+  assert.match(markdown, /Agentic Memory Ingest Contract/);
+  assert.match(evidenceMarkdown, /Ready for source-lock proof: true/);
+  assert.match(evidenceMarkdown, /Pre-compact checkpoint: true/);
+  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+});
+
 check("fresh agentic memory source-lock contract passes", () => {
   const result = run("node", ["packages/bench/agentic-memory-source-lock-check.mjs", "--strict"]);
   const markdown = run("node", ["packages/bench/agentic-memory-source-lock-check.mjs", "--format", "markdown"]).stdout;
+  const ingestContract = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-ingest-contract-20260529.json"), "utf8"));
   const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.json"), "utf8"));
   const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.md"), "utf8");
   const liveEvidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-live-20260529.json"), "utf8"));
@@ -1911,8 +1952,13 @@ check("fresh agentic memory source-lock contract passes", () => {
   assert.match(liveEvidence.liveSourceSnapshot?.datasetRevision ?? "", /^[a-f0-9]{40}$/);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "repoCommit")?.provided, true);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "datasetRevision")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "trajectoryIngestContractHash")?.provided, true);
+  assert.equal(
+    liveEvidence.proofChecks?.find((proof) => proof.field === "trajectoryIngestContractHash")?.valueHash,
+    `sha256:${stableHash(ingestContract.contractHash)}`,
+  );
   assert.equal(liveEvidence.sourceLockReadyForMaterialization, false);
-  assert.ok(liveEvidence.blockersBeforeRun?.includes("missing-trajectoryIngestContractHash"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-trajectoryIngestContractHash"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-repoCommit"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-datasetRevision"));
   assert.match(markdown, /Agentic Memory Source Lock Check/);
@@ -1920,6 +1966,7 @@ check("fresh agentic memory source-lock contract passes", () => {
   assert.match(evidenceMarkdown, /trajectoryIngestContractHash: missing/);
   assert.match(liveEvidenceMarkdown, /repoCommit: provided/);
   assert.match(liveEvidenceMarkdown, /datasetRevision: provided/);
+  assert.match(liveEvidenceMarkdown, /trajectoryIngestContractHash: provided/);
   for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown, JSON.stringify(liveEvidence), liveEvidenceMarkdown]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);

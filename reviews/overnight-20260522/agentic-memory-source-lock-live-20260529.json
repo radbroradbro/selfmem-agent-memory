@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "agentic-memory-source-lock-check",
-  "generatedAt": "2026-05-29T22:25:24.967Z",
+  "generatedAt": "2026-05-29T22:34:07.226Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -106,10 +106,10 @@
     },
     {
       "field": "trajectoryIngestContractHash",
-      "provided": false,
+      "provided": true,
       "kind": "sha256",
       "reason": "Pin how agent trajectories become RecallWeave sessions/wiki topics.",
-      "valueHash": null
+      "valueHash": "sha256:c122bc98db72af6817440ddc53ba82f33c6bd57619edcd388b293033f7a8c25f"
     },
     {
       "field": "readerModel",
@@ -200,7 +200,7 @@
   ],
   "liveSourceSnapshot": {
     "ok": true,
-    "checkedAt": "2026-05-29T22:25:24.311Z",
+    "checkedAt": "2026-05-29T22:34:06.907Z",
     "repoHost": "github.com",
     "datasetHost": "huggingface.co",
     "repoCommit": "8e8b92a3cece71af6af0d3aa2d7957df49dd9f65",
@@ -232,13 +232,11 @@
     "missing-answerLabelsHash",
     "missing-scoringCodeHash",
     "missing-leaderboardRowHash",
-    "missing-trajectoryIngestContractHash",
     "missing-readerModel",
     "missing-judgeModel"
   ],
   "nextActions": [
-    "Fill the missing proof fields with hashes and model ids, not raw rows.",
-    "Map trajectory history into the RecallWeave ingest/wiki-session contract before materialization.",
+    "Fill the remaining missing proof fields with hashes and model ids, not raw rows.",
     "Regenerate this report, then materialize only from a source-lock-ready report."
   ],
   "safety": {
