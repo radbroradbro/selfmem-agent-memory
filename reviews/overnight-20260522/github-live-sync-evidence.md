@@ -2,6 +2,11 @@
 
 Date: 2026-05-23
 
+- On 2026-05-29, `packages/bench/github-live-sync-check.mjs` was hardened with
+  bounded retry/timeout handling for transient GitHub API fetch failures. This
+  is CI/runtime hygiene for the existing public-safe PR/issue sync gate; it does
+  not change benchmark scoring, provider defaults, launch status, or public
+  memory-system claims.
 - PR #5 was refreshed again on 2026-05-26 after GitHub Actions run
   `26481662771` passed on
   `67362b1944592e6b5dc0290c5cafd4f1f145dcda`, promoting that commit as the
