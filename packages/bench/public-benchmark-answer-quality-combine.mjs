@@ -16,16 +16,21 @@ const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
 const format = String(args.format ?? "json").toLowerCase();
 const requestedCombineMode = args.combineMode ? String(args.combineMode) : null;
+const fingerprintPolicy = String(args.fingerprints ?? args.fingerprintPolicy ?? "digest").toLowerCase();
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(!requestedCombineMode || ["same-data", "shards"].includes(requestedCombineMode), "--combine-mode must be same-data or shards");
+assert.ok(["digest", "include", "omit"].includes(fingerprintPolicy), "--fingerprints must be digest, include, or omit");
 assert.ok(inputs.length >= 2, "at least two answer-quality inputs are required");
 
 const loaded = inputs.map(loadAnswerQualityResult);
 const combineMode = requestedCombineMode ?? autoCombineMode(loaded);
 if (combineMode === "same-data") assertSameData(loaded);
 else assertShardData(loaded);
-const combined = combineMode === "same-data" ? buildCombinedReport(loaded) : buildShardCombinedReport(loaded);
+const combined = applyFingerprintPolicy(
+  combineMode === "same-data" ? buildCombinedReport(loaded) : buildShardCombinedReport(loaded),
+  fingerprintPolicy,
+);
 const jsonText = `${JSON.stringify(combined, null, 2)}\n`;
 const markdownText = `${renderMarkdown(combined)}\n`;
 assertSafePublicText(jsonText, "combined answer-quality report");
@@ -371,6 +376,64 @@ function mergeProviders(providers) {
     callTimeoutMs: providers.find((provider) => provider.callTimeoutMs != null)?.callTimeoutMs ?? null,
     continueOnCallError: providers.some((provider) => provider.continueOnCallError === true),
     fixtureJudge: false,
+  };
+}
+
+function applyFingerprintPolicy(report, policy) {
+  if (policy === "include") {
+    return {
+      ...report,
+      artifactProfile: {
+        ...(report.artifactProfile ?? {}),
+        fingerprintPolicy: "include",
+        fullResultFingerprintsIncluded: true,
+        publicSummaryPreferred: false,
+      },
+      safety: {
+        ...(report.safety ?? {}),
+        fullResultFingerprintsIncluded: true,
+      },
+    };
+  }
+  const strategies = (report.strategies ?? []).map((strategy) => compactStrategyFingerprints(strategy, policy));
+  return {
+    ...report,
+    strategies,
+    artifactProfile: {
+      ...(report.artifactProfile ?? {}),
+      fingerprintPolicy: policy,
+      fullResultFingerprintsIncluded: false,
+      publicSummaryPreferred: true,
+    },
+    safety: {
+      ...(report.safety ?? {}),
+      fullResultFingerprintsIncluded: false,
+      resultFingerprintsRetainedAsDigest: policy === "digest",
+    },
+  };
+}
+
+function compactStrategyFingerprints(strategy, policy) {
+  const fingerprints = Array.isArray(strategy.resultFingerprints) ? strategy.resultFingerprints : [];
+  if (!fingerprints.length) {
+    const { resultFingerprints: _unused, ...rest } = strategy;
+    return rest;
+  }
+  const { resultFingerprints: _unused, ...rest } = strategy;
+  if (policy === "omit") {
+    return {
+      ...rest,
+      resultFingerprintCount: fingerprints.length,
+    };
+  }
+  return {
+    ...rest,
+    resultFingerprintDigest: {
+      count: fingerprints.length,
+      hash: `sha256:${sha256(JSON.stringify(fingerprints))}`,
+      fields: ["queryIdHash", "score", "correct", "elapsedMs", "contextTokens"],
+      policy: "digest-only",
+    },
   };
 }
 

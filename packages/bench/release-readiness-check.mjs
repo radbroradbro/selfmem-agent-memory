@@ -3081,6 +3081,9 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardCombined.input?.scoredQueryCount, 2);
     assert.equal(shardCombined.sourceLock?.queryShardCoverage?.complete, true);
     assert.ok(shardCombined.strategies?.every((item) => item.scoredQueryCount === 2));
+    assert.equal(shardCombined.artifactProfile?.fingerprintPolicy, "digest");
+    assert.ok(shardCombined.strategies?.every((item) => !Array.isArray(item.resultFingerprints)));
+    assert.ok(shardCombined.strategies?.every((item) => item.resultFingerprintDigest?.count === 2));
 
     const overlapShard = writeShard("overlap", 0, 1, [0]);
     const overlapRun = spawnSync("node", [

@@ -194,6 +194,10 @@ The answer-quality runner now supports full-target scoring in deterministic
 query shards via `--query-offset` and `--max-queries`; the shard combiner must
 merge only complete, non-overlapping coverage with the same target, query set,
 materializer, answer-label, answer-model, judge-model, and strategy set.
+Repo-facing combined score files should use the combiner's default
+fingerprint digest profile: public artifacts keep per-strategy counts, hashes,
+scores, and latency metrics, while the bulky per-query fingerprint arrays stay
+in the shard-level evidence or private run directory.
 Use `benchmark:answer-quality:local-shard-plan` for the no-spend/local full
 benchmark path. That plan uses the same 500-query target and raw-source-retaining
 private materialization but accepts BM25, full hybrid, model-backed query
@@ -291,6 +295,18 @@ not count as a RecallWeave score.
 | Mem0 state report | LongMemEval | score | 94.4 | Reported provider result with average tokens per query. |
 | Mem0 state report | BEAM 1M | score | 64.1 | Use only when the BEAM slice and context depth match. |
 | Mem0 state report | BEAM 10M | score | 48.6 | Use only when the BEAM slice and context depth match. |
+
+## Agentic Memory Watch Targets
+
+These are real public benchmark families worth source-locking next, but none
+should replace the current LongMemEval-S lane until data, scorer, split, and
+comparison rows are pinned.
+
+| Benchmark | Why it fits RecallWeave | Current use |
+| --- | --- | --- |
+| LongMemEval-V2 | Agent-work memory: state recall, dynamic state tracking, workflow knowledge, premise awareness, and environment gotchas. | Best next source-lock candidate for Codex-style compaction/session memory once public data and scorer are pinned. |
+| AMA-Bench | Long-horizon agent-memory applications with a public dataset/leaderboard shape. | Research target only until the exact task format and comparable rows are source-locked. |
+| Agent Memory Benchmark | Product-facing agent memory comparison route. | Product-parity sanity target only; use after confirming it has a reproducible scorer and comparable public rows. |
 
 ## Source Lock Notes
 
@@ -665,3 +681,6 @@ not count as a RecallWeave score.
 - https://huggingface.co/mteb
 - https://arxiv.org/abs/2210.07316
 - https://arxiv.org/abs/2605.12493
+- https://huggingface.co/datasets/AMA-bench/AMA-bench
+- https://huggingface.co/spaces/AMA-bench/AMA-bench-Leaderboard
+- https://agentmemorybenchmark.ai/

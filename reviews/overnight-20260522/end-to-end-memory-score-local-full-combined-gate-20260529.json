@@ -4,7 +4,7 @@
   "mode": "end-to-end-memory-score-gate",
   "status": "READY_LOCAL_FULL_MEMORY_SCORE",
   "claimScope": "local-full",
-  "generatedAt": "2026-05-29T21:30:36.698Z",
+  "generatedAt": "2026-05-29T21:54:37.367Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -28,7 +28,7 @@
   "result": {
     "source": "result-file",
     "path": "reviews/overnight-20260522/end-to-end-memory-score-local-full-combined-20260529.json",
-    "hash": "sha256:186f0bfbc97d09cd6205613a2c355c30f0daaf961e77ddcc705eebc57c267e79",
+    "hash": "sha256:887b9463c094b02b04c05600ea2658b531e905649d4da746e871434374934f89",
     "fixtureOnly": false,
     "mode": "public-benchmark-answer-quality",
     "benchmark": "longmemeval",
@@ -70,7 +70,7 @@
   "reportedTargetsEvidence": {
     "source": "reported-targets-report",
     "path": "reviews/overnight-20260522/reported-memory-targets-20260525.json",
-    "hash": "sha256:a516f796d9b5cb9d1d331cc8198197eef80f50197c9b7ee33dc6882b831f515d",
+    "hash": "sha256:6566be36a13722bd059d9ba4817bca24dd7b4c09c8e4c2aeb5c92100d6bf4f6c",
     "exists": true,
     "status": "READY_REPORTED_TARGETS",
     "primaryReportedMemoryTarget": "supermemory-production-research-gemini-3-pro",
