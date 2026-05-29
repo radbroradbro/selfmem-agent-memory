@@ -311,11 +311,17 @@ fields are missing, the report should stay green as a contract check but
 `sourceLockReadyForMaterialization` stays false.
 Use `benchmark:agentic-source-lock -- --live` for a public-safe source snapshot:
 it verifies source reachability and captures the current public repo and dataset
-revisions, counts, and hashes without downloading or committing raw rows.
+revisions, public question-id hash, public answer-label hash, scoring-code
+hash, counts, and source-shape hashes without writing raw rows.
 Use `benchmark:agentic-ingest-contract` to regenerate the trajectory ingest
 contract hash. This contract defines how LongMemEval-V2 trajectories become
 RecallWeave sessions, wiki topics/subtopics, private vector chunks, and
 pre-compaction lifecycle checkpoints.
+Use `benchmark:agentic-provider-plan` to regenerate the controlled provider
+autoresearch plan. It keeps Voyage as the personal/prod default, local Apple
+lanes as the high-volume method-refinement default, and NVIDIA/Gemini/Voyage as
+cloud challengers behind source-lock, rate-limit, and early-stop watchdog gates.
+That plan is not a run and does not call providers.
 
 | Benchmark | Why it fits RecallWeave | Current use |
 | --- | --- | --- |

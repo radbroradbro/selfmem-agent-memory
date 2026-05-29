@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "agentic-memory-provider-autoresearch-plan",
+  "generatedAt": "2026-05-29T22:51:46.244Z",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "writesRealFiles": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "target": {
+    "id": "longmemeval-v2",
+    "name": "LongMemEval-V2",
+    "sourceLockHash": "sha256:2b550b57a40d62f768e7cb8ddf2bd78708ca00461429cdc8622da90ebf179494",
+    "questionCount": 451,
+    "sourceLockReadyForMaterialization": false,
+    "sourceLockReadyForPublicClaim": false,
+    "remainingSourceLockBlockers": [
+      "missing-leaderboardTier",
+      "missing-leaderboardRowHash",
+      "missing-readerModel",
+      "missing-judgeModel"
+    ]
+  },
+  "sourceLockProof": {
+    "repoCommit": true,
+    "datasetRevision": true,
+    "questionIdsHash": true,
+    "answerLabelsHash": true,
+    "scoringCodeHash": true,
+    "trajectoryIngestContractHash": true,
+    "leaderboardTier": false,
+    "leaderboardRowHash": false,
+    "readerModel": false,
+    "judgeModel": false
+  },
+  "cloudDefaultForPersonalUse": "cloud-voyage4-voyage",
+  "methodologyDefault": "local-apple-controlled-lanes",
+  "hostedSupermemorySearchForMethodology": "disabled",
+  "providerMatrix": [
+    {
+      "family": "voyage",
+      "harnessArm": "cloud-voyage4-voyage",
+      "role": "prod-default-and-quality-challenger",
+      "embedModel": "voyage-4",
+      "rerankModel": "rerank-2.5-or-lite",
+      "safeRpmCap": 3,
+      "higherCapWhenDashboardConfirms": 60,
+      "freeTierNote": "Use low-RPM free-trial pacing unless the dashboard confirms higher basic limits."
+    },
+    {
+      "family": "gemini",
+      "harnessArm": "cloud-gemini2-embed-rerank-proxy",
+      "role": "free-tier-embedding-challenger",
+      "embedModel": "gemini-embedding-001-or-gemini-embedding",
+      "rerankModel": "proxy-or-voyage-rerank",
+      "safeRpmCap": 20,
+      "publishedFreeTierRpm": 100,
+      "publishedFreeTierRpd": 1000,
+      "freeTierNote": "Cap below the published free-tier RPM because TPM is tighter for embedding."
+    },
+    {
+      "family": "nvidia",
+      "harnessArm": "cloud-nvidia-nemotron-vl-1b",
+      "role": "free-nim-retrieval-challenger",
+      "embedModel": "nvidia/llama-nemotron-embed-vl-1b-v2",
+      "rerankModel": "nvidia/llama-nemotron-rerank-vl-1b-v2",
+      "safeRpmCap": 10,
+      "upperRpmCapByUserBudget": 20,
+      "freeTierNote": "Use low pacing and retry budget even if the account advertises a higher per-model cap."
+    },
+    {
+      "family": "local-apple",
+      "harnessArm": "local-apple-qwen3-4b-local-rerank",
+      "role": "methodology-refinement-baseline",
+      "embedModel": "qwen3-embedding-local",
+      "rerankModel": "qwen3-reranker-local",
+      "safeRpmCap": null,
+      "freeTierNote": "No provider quota; bounded by unified memory, sidecar stability, and cache reuse."
+    }
+  ],
+  "runPolicy": {
+    "fullSetPreferred": true,
+    "fullQuestionCount": 451,
+    "sampleWaveQuestionCounts": [
+      45,
+      150,
+      451
+    ],
+    "concurrentProviderFamiliesAllowed": true,
+    "maxConcurrentProviderFamilies": 3,
+    "scheduleStyle": "completion-waves",
+    "publicClaimRequiresFullRun": true,
+    "publicClaimRequiresReviewerIntake": true,
+    "publicClaimRequiresZeroPrivacyFailures": true
+  },
+  "watchdog": {
+    "enabled": true,
+    "minimumQuestionsBeforeQualityStop": 45,
+    "stopArmIfScoreTrailsBestControlByPoints": 8,
+    "stopArmIfPrivacyFailuresAbove": 0,
+    "stopArmIfErrorRateAbove": 0.05,
+    "stopArmIfRateLimitRetryStreakAbove": 6,
+    "stopArmIfLatencyExceedsBudgetMultiplier": 2,
+    "keepRunningIfArmIsWithinPointsOfLeader": 3,
+    "reasonCodes": [
+      "quality-under-control",
+      "privacy-failure",
+      "provider-error-rate",
+      "rate-limit-streak",
+      "latency-budget",
+      "source-lock-mismatch"
+    ]
+  },
+  "phases": [
+    {
+      "id": "source-lock-closeout",
+      "status": "blocked",
+      "purpose": "Pin the exact LongMemEval-V2 tier, comparable row, reader model, and judge/scorer before any public-comparable run.",
+      "requiredBeforeProviderSpend": true,
+      "blockers": [
+        "missing-leaderboardTier",
+        "missing-leaderboardRowHash",
+        "missing-readerModel",
+        "missing-judgeModel"
+      ]
+    },
+    {
+      "id": "local-method-refinement",
+      "status": "ready",
+      "purpose": "Use local Apple lanes to refine chunking, topic/subtopic amplification, query expansion gates, and hybrid retrieval without spending provider quota.",
+      "arms": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "wiki-title-amplified-hybrid",
+        "wiki-subtopic-amplified-hybrid",
+        "wiki-summary-session-hybrid",
+        "local-apple-qwen3-0_6b",
+        "local-apple-qwen3-0_6b-local-rerank",
+        "local-apple-qwen3-4b",
+        "local-apple-qwen3-4b-local-rerank"
+      ]
+    },
+    {
+      "id": "cloud-challenger-run",
+      "status": "blocked-until-source-lock-ready",
+      "purpose": "Run the best local method against controlled NVIDIA, Gemini, and Voyage challengers on the same source-locked rows.",
+      "arms": [
+        "cloud-voyage4-voyage",
+        "cloud-gemini2-embed-rerank-proxy",
+        "cloud-nvidia-nemotron-vl-1b",
+        "local-apple-qwen3-4b-local-rerank"
+      ],
+      "requiredBeforeProviderSpend": true,
+      "blockers": [
+        "missing-leaderboardTier",
+        "missing-leaderboardRowHash",
+        "missing-readerModel",
+        "missing-judgeModel"
+      ]
+    },
+    {
+      "id": "answer-quality-and-review",
+      "status": "blocked-until-source-lock-ready",
+      "purpose": "Use Codex GPT-5.5 as the reader/actor when declared, then score with the official scorer or the declared judge model and attach reviewer intake.",
+      "readerModel": "codex-gpt-5.5",
+      "judgePolicy": "Prefer the benchmark official scorer when available; use deepseek-v4-pro only as the declared judge/reviewer lane when the scoring contract permits LLM judging."
+    }
+  ],
+  "nextActions": [
+    "Close the remaining LongMemEval-V2 source-lock choices before spending provider calls on a public-comparable run.",
+    "Run local-method-refinement waves first, then cloud challengers with NVIDIA, Gemini, Voyage, and local Apple controls on the same rows.",
+    "Keep Voyage as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
+    "Do not enable hosted Supermemory search inside methodology runs; keep it as a separate parity lane."
+  ]
+}

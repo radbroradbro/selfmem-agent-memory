@@ -121,6 +121,7 @@ const requiredFiles = [
   "packages/bench/agentic-memory-target-watch.mjs",
   "packages/bench/agentic-memory-ingest-contract.mjs",
   "packages/bench/agentic-memory-source-lock-check.mjs",
+  "packages/bench/agentic-memory-provider-autoresearch-plan.mjs",
   "packages/bench/memory-score-reviewer-approval-intake.mjs",
   "packages/bench/memory-score-openai-compatible-reviewer.mjs",
   "packages/bench/end-to-end-memory-score-gate.mjs",
@@ -204,6 +205,8 @@ const requiredFiles = [
   `${reviewDir}/agentic-memory-source-lock-20260529.md`,
   `${reviewDir}/agentic-memory-source-lock-live-20260529.json`,
   `${reviewDir}/agentic-memory-source-lock-live-20260529.md`,
+  `${reviewDir}/agentic-memory-provider-autoresearch-plan-20260529.json`,
+  `${reviewDir}/agentic-memory-provider-autoresearch-plan-20260529.md`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.md`,
   `${reviewDir}/public-longmemeval-full-run-target.json`,
@@ -1950,8 +1953,16 @@ check("fresh agentic memory source-lock contract passes", () => {
   assert.equal(liveEvidence.liveSourceSnapshot?.ok, true);
   assert.match(liveEvidence.liveSourceSnapshot?.repoCommit ?? "", /^[a-f0-9]{40}$/);
   assert.match(liveEvidence.liveSourceSnapshot?.datasetRevision ?? "", /^[a-f0-9]{40}$/);
+  assert.match(liveEvidence.liveSourceSnapshot?.questionIdsHash ?? "", /^sha256:[a-f0-9]{64}$/);
+  assert.match(liveEvidence.liveSourceSnapshot?.answerLabelsHash ?? "", /^sha256:[a-f0-9]{64}$/);
+  assert.match(liveEvidence.liveSourceSnapshot?.scoringCodeHash ?? "", /^sha256:[a-f0-9]{64}$/);
+  assert.equal(liveEvidence.liveSourceSnapshot?.questionCount, 451);
+  assert.ok(liveEvidence.liveSourceSnapshot?.scoringCodeBlobCount > 0);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "repoCommit")?.provided, true);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "datasetRevision")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "questionIdsHash")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "answerLabelsHash")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "scoringCodeHash")?.provided, true);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "trajectoryIngestContractHash")?.provided, true);
   assert.equal(
     liveEvidence.proofChecks?.find((proof) => proof.field === "trajectoryIngestContractHash")?.valueHash,
@@ -1961,13 +1972,57 @@ check("fresh agentic memory source-lock contract passes", () => {
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-trajectoryIngestContractHash"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-repoCommit"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-datasetRevision"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-questionIdsHash"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-answerLabelsHash"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-scoringCodeHash"));
   assert.match(markdown, /Agentic Memory Source Lock Check/);
   assert.match(evidenceMarkdown, /Source-lock ready for materialization: false/);
   assert.match(evidenceMarkdown, /trajectoryIngestContractHash: missing/);
   assert.match(liveEvidenceMarkdown, /repoCommit: provided/);
   assert.match(liveEvidenceMarkdown, /datasetRevision: provided/);
+  assert.match(liveEvidenceMarkdown, /questionIdsHash: provided/);
+  assert.match(liveEvidenceMarkdown, /answerLabelsHash: provided/);
+  assert.match(liveEvidenceMarkdown, /scoringCodeHash: provided/);
   assert.match(liveEvidenceMarkdown, /trajectoryIngestContractHash: provided/);
   for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown, JSON.stringify(liveEvidence), liveEvidenceMarkdown]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+});
+
+check("fresh agentic provider autoresearch plan passes", () => {
+  const result = run("node", ["packages/bench/agentic-memory-provider-autoresearch-plan.mjs", "--strict"]);
+  const markdown = run("node", ["packages/bench/agentic-memory-provider-autoresearch-plan.mjs", "--format", "markdown"]).stdout;
+  const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-provider-autoresearch-plan-20260529.json"), "utf8"));
+  const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-provider-autoresearch-plan-20260529.md"), "utf8");
+  const report = JSON.parse(result.stdout);
+  for (const item of [report, evidence]) {
+    assert.equal(item.ok, true);
+    assert.equal(item.mode, "agentic-memory-provider-autoresearch-plan");
+    assert.equal(item.metricsOnly, true);
+    assert.equal(item.publicSafe, true);
+    assert.equal(item.callsProviderApis, false);
+    assert.equal(item.sendsBenchmarkTextToProvider, false);
+    assert.equal(item.cloudDefaultForPersonalUse, "cloud-voyage4-voyage");
+    assert.equal(item.methodologyDefault, "local-apple-controlled-lanes");
+    assert.equal(item.hostedSupermemorySearchForMethodology, "disabled");
+    assert.equal(item.watchdog?.enabled, true);
+    assert.ok(item.providerMatrix?.some((provider) => provider.family === "voyage"));
+    assert.ok(item.providerMatrix?.some((provider) => provider.family === "gemini"));
+    assert.ok(item.providerMatrix?.some((provider) => provider.family === "nvidia"));
+    assert.ok(item.providerMatrix?.some((provider) => provider.family === "local-apple"));
+    assert.ok(item.phases?.some((phase) => phase.id === "cloud-challenger-run"));
+    assert.equal(item.runPolicy?.fullSetPreferred, true);
+    assert.equal(item.rawQuestionsIncluded, false);
+    assert.equal(item.rawAnswersIncluded, false);
+    assert.equal(item.rawMemoryIncluded, false);
+  }
+  assert.match(markdown, /Agentic Provider Autoresearch Plan/);
+  assert.match(evidenceMarkdown, /Provider Matrix/);
+  assert.match(evidenceMarkdown, /cloud-voyage4-voyage/);
+  assert.match(evidenceMarkdown, /cloud-gemini2-embed-rerank-proxy/);
+  assert.match(evidenceMarkdown, /cloud-nvidia-nemotron-vl-1b/);
+  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "agentic-memory-source-lock-check",
-  "generatedAt": "2026-05-29T22:34:07.226Z",
+  "generatedAt": "2026-05-29T22:45:21.449Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -78,24 +78,24 @@
     },
     {
       "field": "questionIdsHash",
-      "provided": false,
+      "provided": true,
       "kind": "sha256",
       "reason": "Prove the evaluated question set while hiding raw ids.",
-      "valueHash": null
+      "valueHash": "sha256:4d55e549847bbb99a4335ac7689c96a34f5094b23b1d18a8fdd5b9cfaf852a47"
     },
     {
       "field": "answerLabelsHash",
-      "provided": false,
+      "provided": true,
       "kind": "sha256",
       "reason": "Bind scoring to the exact labels without committing labels.",
-      "valueHash": null
+      "valueHash": "sha256:9212bf36da601061def69850f663ea61b2b56d0c43b3c1331d31cbf27a21e510"
     },
     {
       "field": "scoringCodeHash",
-      "provided": false,
+      "provided": true,
       "kind": "sha256",
       "reason": "Make score changes reviewable when the scorer changes.",
-      "valueHash": null
+      "valueHash": "sha256:29d2aa507c6c55aa0a967207e4ef00cd7c48d47dba3d5b87052d41b7ac12beaf"
     },
     {
       "field": "leaderboardRowHash",
@@ -200,13 +200,21 @@
   ],
   "liveSourceSnapshot": {
     "ok": true,
-    "checkedAt": "2026-05-29T22:34:06.907Z",
+    "checkedAt": "2026-05-29T22:45:20.479Z",
     "repoHost": "github.com",
     "datasetHost": "huggingface.co",
     "repoCommit": "8e8b92a3cece71af6af0d3aa2d7957df49dd9f65",
     "datasetRevision": "f152293e235517d504809563c833d7190b8c713b",
     "repoContentsHash": "sha256:3d09d12e19ae6331d90eb9396c8e53285ad5b679a79ef267f610e029afc8a911",
     "datasetSiblingsHash": "sha256:8c412be7d7c772cb91cfed53043c7882a77271a4a913380f13fcd42438b503c8",
+    "scoringCodeHash": "sha256:a83a33038481eff08d1d8305f28f668bdf735ab09a861df40198e4efece6ed86",
+    "scoringCodeBlobCount": 22,
+    "scoringCodeBytes": 161374,
+    "scoringCodePathHash": "sha256:737b4086ff56636a4ed3c446a74b7ff7e6b13023d84821f8878bc2471e5fc0c8",
+    "questionIdsHash": "sha256:3ff7161a63a2c36797d7513d7a6cea27f198639bbda5d41257f9334aa998b47d",
+    "answerLabelsHash": "sha256:4bee3374026eaecd0efb8ba2c6dc90366d150bc627fb2d3732162ea01e3f6122",
+    "questionSchemaHash": "sha256:622bd5e9b2fd6151cab458e1ff9ccf213ac67c61857892ebb0dfeec6cba4f5a5",
+    "questionCount": 451,
     "repoEntryCount": 11,
     "datasetSiblingCount": 41,
     "requiredRepoEntriesPresent": [
@@ -228,9 +236,6 @@
   "failedChecks": [],
   "blockersBeforeRun": [
     "missing-leaderboardTier",
-    "missing-questionIdsHash",
-    "missing-answerLabelsHash",
-    "missing-scoringCodeHash",
     "missing-leaderboardRowHash",
     "missing-readerModel",
     "missing-judgeModel"

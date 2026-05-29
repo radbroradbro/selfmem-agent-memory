@@ -102,6 +102,7 @@
     "benchmark:agentic-watch": "node packages/bench/agentic-memory-target-watch.mjs",
     "benchmark:agentic-ingest-contract": "node packages/bench/agentic-memory-ingest-contract.mjs",
     "benchmark:agentic-source-lock": "node packages/bench/agentic-memory-source-lock-check.mjs",
+    "benchmark:agentic-provider-plan": "node packages/bench/agentic-memory-provider-autoresearch-plan.mjs",
     "benchmark:answer-quality:arms": "node packages/bench/public-benchmark-answer-quality-arm-export.mjs",
     "benchmark:answer-quality:preflight": "node packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "benchmark:answer-quality": "node packages/bench/public-benchmark-answer-quality.mjs",

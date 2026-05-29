@@ -236,6 +236,9 @@ function applyLiveProofs(proof, snapshot) {
     ...proof,
     repoCommit: proof.repoCommit || snapshot.repoCommit || "",
     datasetRevision: proof.datasetRevision || snapshot.datasetRevision || "",
+    questionIdsHash: proof.questionIdsHash || snapshot.questionIdsHash || "",
+    answerLabelsHash: proof.answerLabelsHash || snapshot.answerLabelsHash || "",
+    scoringCodeHash: proof.scoringCodeHash || snapshot.scoringCodeHash || "",
   };
 }
 
@@ -243,8 +246,20 @@ async function fetchLiveSourceSnapshot(value) {
   const checkedAt = new Date().toISOString();
   const repo = await fetchJson("https://api.github.com/repos/xiaowu0162/LongMemEval-V2/commits/main");
   const repoRoot = await fetchJson("https://api.github.com/repos/xiaowu0162/LongMemEval-V2/contents?ref=main");
+  const repoTree = await fetchJson("https://api.github.com/repos/xiaowu0162/LongMemEval-V2/git/trees/main?recursive=1");
   const dataset = await fetchJson("https://huggingface.co/api/datasets/xiaowu0162/longmemeval-v2");
+  const questions = await fetchQuestionProofs("https://huggingface.co/datasets/xiaowu0162/longmemeval-v2/resolve/main/questions.jsonl");
   const repoNames = Array.isArray(repoRoot.data) ? repoRoot.data.map((item) => String(item.name ?? "")).filter(Boolean).sort() : [];
+  const treeEntries = Array.isArray(repoTree.data?.tree) ? repoTree.data.tree : [];
+  const scoringEntries = treeEntries
+    .filter((item) => item.type === "blob")
+    .filter((item) => String(item.path ?? "").startsWith("evaluation/") || String(item.path ?? "").startsWith("leaderboard/"))
+    .map((item) => ({
+      path: String(item.path ?? ""),
+      sha: String(item.sha ?? ""),
+      size: Number(item.size ?? 0),
+    }))
+    .sort((left, right) => left.path.localeCompare(right.path));
   const datasetSiblings = Array.isArray(dataset.data?.siblings)
     ? dataset.data.siblings.map((item) => String(item.rfilename ?? "")).filter(Boolean).sort()
     : [];
@@ -254,11 +269,15 @@ async function fetchLiveSourceSnapshot(value) {
   const datasetRevision = String(dataset.data?.sha ?? "");
   const ok =
     repo.ok &&
+    repoTree.ok &&
     dataset.ok &&
+    questions.ok &&
     commitPattern.test(repoCommit) &&
     commitPattern.test(datasetRevision) &&
     requiredRepoEntries.every((entry) => repoNames.includes(entry)) &&
-    requiredDatasetEntries.every((entry) => datasetSiblings.includes(entry));
+    requiredDatasetEntries.every((entry) => datasetSiblings.includes(entry)) &&
+    scoringEntries.length > 0 &&
+    questions.questionCount === value.expectedPublicShape.questionCount;
   return {
     ok,
     checkedAt,
@@ -268,14 +287,67 @@ async function fetchLiveSourceSnapshot(value) {
     datasetRevision,
     repoContentsHash: `sha256:${stableHash(repoNames.join("\n"))}`,
     datasetSiblingsHash: `sha256:${stableHash(datasetSiblings.join("\n"))}`,
+    scoringCodeHash: scoringEntries.length ? `sha256:${stableHash(canonicalJson(scoringEntries))}` : null,
+    scoringCodeBlobCount: scoringEntries.length,
+    scoringCodeBytes: scoringEntries.reduce((sum, item) => sum + item.size, 0),
+    scoringCodePathHash: scoringEntries.length ? `sha256:${stableHash(scoringEntries.map((item) => item.path).join("\n"))}` : null,
+    questionIdsHash: questions.questionIdsHash,
+    answerLabelsHash: questions.answerLabelsHash,
+    questionSchemaHash: questions.questionSchemaHash,
+    questionCount: questions.questionCount,
     repoEntryCount: repoNames.length,
     datasetSiblingCount: datasetSiblings.length,
     requiredRepoEntriesPresent: requiredRepoEntries.filter((entry) => repoNames.includes(entry)),
     requiredDatasetEntriesPresent: requiredDatasetEntries.filter((entry) => datasetSiblings.includes(entry)),
-    errors: [repo, repoRoot, dataset]
+    errors: [repo, repoRoot, repoTree, dataset, questions]
       .filter((item) => !item.ok)
       .map((item) => ({ role: item.role, status: item.status, error: item.error ?? null })),
   };
+}
+
+async function fetchQuestionProofs(url) {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        accept: "application/jsonl,text/plain,*/*",
+        "user-agent": "recallweave-source-lock-check",
+      },
+      redirect: "follow",
+    });
+    if (!response.ok) {
+      return { role: "questions.jsonl", ok: false, status: response.status };
+    }
+    const text = await response.text();
+    const rows = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => JSON.parse(line));
+    const questionIds = rows.map((row) => String(row.id ?? ""));
+    const answerLabels = rows.map((row) => ({
+      id: String(row.id ?? ""),
+      answer: row.answer ?? null,
+      evalFunction: row.eval_function ?? null,
+    }));
+    const schemaKeys = [...new Set(rows.flatMap((row) => Object.keys(row).sort()))].sort();
+    const idsArePresent = questionIds.length > 0 && questionIds.every(Boolean) && new Set(questionIds).size === questionIds.length;
+    return {
+      role: "questions.jsonl",
+      ok: idsArePresent,
+      status: response.status,
+      questionCount: rows.length,
+      questionIdsHash: `sha256:${stableHash(questionIds.join("\n"))}`,
+      answerLabelsHash: `sha256:${stableHash(canonicalJson(answerLabels))}`,
+      questionSchemaHash: `sha256:${stableHash(schemaKeys.join("\n"))}`,
+    };
+  } catch (error) {
+    return {
+      role: "questions.jsonl",
+      ok: false,
+      status: null,
+      error: String(error?.name ?? "fetch-error"),
+    };
+  }
 }
 
 async function fetchJson(url) {
@@ -403,6 +475,16 @@ function urlHost(value) {
 
 function stableHash(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function canonicalJson(value) {
+  return JSON.stringify(sortCanonical(value));
+}
+
+function sortCanonical(value) {
+  if (Array.isArray(value)) return value.map((item) => sortCanonical(item));
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortCanonical(value[key])]));
 }
 
 function check(name, ok) {
