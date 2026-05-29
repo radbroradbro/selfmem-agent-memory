@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "mode": "brain-ui-runtime-check",
+  "status": "READY_BRAIN_UI_RUNTIME",
+  "generatedAt": "2026-05-29T06:15:47Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawMemoryIncluded": false,
+  "rawBenchmarkTextIncluded": false,
+  "privatePathsIncluded": false,
+  "url": "http://127.0.0.1:4189/",
+  "title": "RecallWeave Brain",
+  "readyState": "complete",
+  "bodyTextLength": 1693,
+  "hasRoot": true,
+  "hasRecallWeaveSignal": true,
+  "headings": [
+    "Container",
+    "Update Flow",
+    "Nucleus",
+    "Timeline",
+    "Loading"
+  ],
+  "sampleControls": [
+    "All",
+    "Memory",
+    "Docs",
+    "Trace",
+    "Research",
+    "Lifecycle",
+    "Neighborhood",
+    "Center",
+    "Stage policy",
+    "Apply policy",
+    "Stage review"
+  ],
+  "consoleErrorCount": 0,
+  "consoleErrors": []
+}
