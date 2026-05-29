@@ -293,15 +293,15 @@ through a separate diagnostic scoring contract: local answer/judge models are
 allowed only with a local OpenAI-compatible endpoint, and the result gate can
 count that output as local-full benchmark evidence while still rejecting it as
 full-memory SOTA evidence. The current accepted local-full intake is
-`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-015-20260529.json`.
-It accepts 15 of 20 shards, covering 375 of 500 queries, and leaves shard 016
-(`375-400`) as the next pending local-full slice. The latest performance
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-017-20260529.json`.
+It accepts 17 of 20 shards, covering 425 of 500 queries, and leaves shard 018
+(`425-450`) as the next pending local-full slice. The latest performance
 snapshot is
-`reviews/overnight-20260522/local-full-shard-performance-report-after-shard-015-20260529.json`:
+`reviews/overnight-20260522/local-full-shard-performance-report-after-shard-017-20260529.json`:
 `local-apple-qwen3-0_6b-local-rerank` leads the accepted local-full diagnostic
-lane at `29.9733` answer quality, versus BM25 at `25.4693`, a `+4.504` delta.
-The local Apple base embedding arm is at `23.8`, full hybrid at `20.9493`,
-and query-expanded full hybrid at `20.896`. This is useful local method
+lane at `27.8824` answer quality, versus BM25 at `24.6612`, a `+3.2212` delta.
+The local Apple base embedding arm is at `22.6706`, full hybrid at `20.6259`,
+and query-expanded full hybrid at `20.3435`. This is useful local method
 evidence, not release or SOTA support.
 
 Earlier local-full history is preserved as audit evidence. Shard 001 is checked
@@ -485,13 +485,13 @@ current gate for shard 002 while preserving the older resume report for audit.
 `benchmark:answer-quality:local-shard-performance` summarizes accepted
 local-full shard performance without changing claim status. Its checked-in
 report at
-`reviews/overnight-20260522/local-full-shard-performance-report-after-shard-015-20260529.json`
-currently covers fifteen accepted shards, 375 of 500 queries, and keeps
+`reviews/overnight-20260522/local-full-shard-performance-report-after-shard-017-20260529.json`
+currently covers seventeen accepted shards, 425 of 500 queries, and keeps
 `countsAsLocalFullBenchmarkEvidence`, full-memory SOTA evidence, shard combine,
 and public benchmark claims disabled. It records that
 `local-apple-qwen3-0_6b-local-rerank` currently leads the partial local-full
-snapshot at `29.9733` answer quality versus BM25 at `25.4693` and local Qwen3
-0.6B embedding at `23.8`, while shard 016 remains the next pending
+snapshot at `27.8824` answer quality versus BM25 at `24.6612` and local Qwen3
+0.6B embedding at `22.6706`, while shard 018 remains the next pending
 local-full slice.
 `benchmark:sota-doctor` now includes that performance snapshot in the top-level
 local-full lane state, so the main SOTA blocker report can show current
@@ -512,9 +512,9 @@ After the shard 002 recovery, the earlier progress intake at
 accepts shards 001 and 002 and keeps the lane blocked on the remaining eighteen
 shards.
 The current progress intake at
-`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-015-20260529.json`
-accepts shards 001 through 015 and keeps the lane blocked on the remaining five
-shards, with shard 016 (`375-400`) next.
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-017-20260529.json`
+accepts shards 001 through 017 and keeps the lane blocked on the remaining
+three shards, with shard 018 (`425-450`) next.
 The intake also validates shard range hashes so partial local-full packets
 cannot be confused with a full 500-query local benchmark.
 `benchmark:answer-quality:local-accepted-lane-doctor` now turns that into a
@@ -721,16 +721,16 @@ Silicon embedding lane and adds an env-only local reranker sidecar after
 sparse+dense+graph+temporal fusion. The sidecar path has now been live-tested
 through llama.cpp with Qwen3 Reranker 0.6B Q8 across the accepted local-full
 diagnostic shards. It is now the current partial local-full aggregate leader:
-`29.9733` answer quality over 375 scored queries, `+4.504` over BM25. It
+`27.8824` answer quality over 425 scored queries, `+3.2212` over BM25. It
 still remains a diagnostic challenger, not a public default or SOTA result,
-because the full 500-query local-full result requires the remaining five shards,
+because the full 500-query local-full result requires the remaining three shards,
 the combine gate, and a separate provider/SOTA comparison lane. Earlier shards
 exposed local embedding and local rerank durability blockers; the checked-in
 runtime doctor and durability smoke reports for the Qwen3 Embedding 0.6B and
 Qwen3 Reranker 0.6B llama.cpp lanes are preflight artifacts only. These
 artifacts are public-safe, print no endpoint URL, raw probe text, raw launch
 log, or private path, and do not count as SOTA evidence. The next accepted
-local-full shard is shard 016 (`375-400`) and still requires a durable endpoint,
+local-full shard is shard 018 (`425-450`) and still requires a durable endpoint,
 response export, answer-quality scoring, shard intake, and later combine gate.
 The shard workorder
 now carries `SELFMEM_LOCAL_EMBED_BASE_URL`,

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "mode": "local-embedding-durability-smoke",
+  "status": "BLOCKED_LOCAL_EMBEDDING_DURABILITY",
+  "generatedAt": "2026-05-29T07:36:52.744Z",
+  "strategy": "local-apple-qwen3-0_6b",
+  "model": "Qwen/Qwen3-Embedding-0.6B-GGUF",
+  "localEndpointConfigured": true,
+  "baseUrlPrinted": false,
+  "endpointPrinted": false,
+  "syntheticOnly": true,
+  "rawSyntheticInputIncluded": false,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "writesRealFiles": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "countsAsLocalFullBenchmarkEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "readyForLocalAppleArmExport": false,
+  "expectedDimensions": 1024,
+  "tokenCounts": [
+    96,
+    384,
+    704
+  ],
+  "timeoutMs": 60000,
+  "probes": [
+    {
+      "tokenCount": 96,
+      "inputHash": "sha256:385f28f5ca6ce2762d36dc92d776158a5ccb6884ee565eb1ded30bb0ea41e497",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 133,
+      "failureClass": null
+    },
+    {
+      "tokenCount": 384,
+      "inputHash": "sha256:267739187f7925f85809458e362f4c01db5e57008d30b52afcd2b1dc1e13a3de",
+      "status": "pass",
+      "vectorDimensions": 1024,
+      "httpStatus": 200,
+      "elapsedMs": 371,
+      "failureClass": null
+    },
+    {
+      "tokenCount": 704,
+      "inputHash": "sha256:92407abe32530a05c097f14bb6f422b6cc0495972a29ad942ceb3d00f22e4653",
+      "status": "blocked",
+      "vectorDimensions": null,
+      "httpStatus": null,
+      "elapsedMs": 81,
+      "failureClass": "local-embedding-fetch-failed"
+    }
+  ],
+  "blockers": [
+    "local-embedding-fetch-failed"
+  ],
+  "nextActions": [
+    "Start the local OpenAI-compatible embedding endpoint and rerun this smoke before local Apple arm export.",
+    "If the endpoint closes sockets on public synthetic probes, fix the local runtime before retrying shard 002.",
+    "Do not count partial local-full shard attempts as benchmark evidence until every required arm exports."
+  ]
+}
