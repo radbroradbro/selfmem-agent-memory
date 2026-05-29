@@ -22,6 +22,7 @@ const wikiPlanPath = resolveInputPath(
 const performancePath = resolveInputPath(
   args.performance ??
     preferReviewFile(
+      "local-full-shard-performance-report-after-shard-016-20260529.json",
       "local-full-shard-performance-report-after-shard-015-20260529.json",
       "local-full-shard-performance-report-after-shard-014-20260528.json",
       "local-full-shard-performance-report-after-shard-013-20260528.json",
@@ -51,6 +52,7 @@ const commonShardPaths = coercePathList(
       `${reviewDir}/answer-quality-local-full-shard-013-20260528.json`,
       `${reviewDir}/answer-quality-local-full-shard-014-20260528.json`,
       `${reviewDir}/answer-quality-local-full-shard-015-20260529.json`,
+      `${reviewDir}/answer-quality-local-full-shard-016-20260529.json`,
     ].join(","),
 );
 const outputPath = args.output ? resolveInputPath(args.output) : null;
@@ -159,12 +161,7 @@ const report = {
   decisions: buildDecisions(),
   priorLocalFullContext: summarizePriorPerformance(performance),
   observedArmSnapshot: summarizeArmCoverage(commonShardStates.filter((state) => state.present).map((state) => state.json)),
-  nextActions: [
-    "Do not promote wiki-title amplification; this shard produced a negative signal.",
-    "Keep wiki-subtopic amplification experimental; it tied BM25 on this shard but did not beat it.",
-    "Keep the local rerank arm in the next expanded shard because it won this shard.",
-    "If aggregating old and new shards, use a common-arm report or rerun earlier shards with the expanded strategy set.",
-  ],
+  nextActions: buildNextActions(),
 };
 
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
@@ -240,6 +237,30 @@ function buildDecisions() {
       evidence: `full-hybrid delta ${fullHybrid?.deltaVsBm25 ?? "n/a"}; query-expanded delta ${queryExpanded?.deltaVsBm25 ?? "n/a"}`,
       decision: "Do not promote query expansion; continue measuring full hybrid against BM25 shard by shard.",
     },
+  ];
+}
+
+function buildNextActions() {
+  const title = compare("wiki-title-amplified-hybrid");
+  const subtopic = compare("wiki-subtopic-amplified-hybrid");
+  const localRerank = compare("local-apple-qwen3-0_6b-local-rerank");
+  return [
+    title?.winsVsBm25
+      ? `Review wiki-title amplification on the next shard; it beat BM25 by ${title.deltaVsBm25} here.`
+      : title
+        ? `Do not promote wiki-title amplification; it trailed BM25 by ${Math.abs(Number(title.deltaVsBm25 ?? 0))} on this shard.`
+        : "Do not promote wiki-title amplification; this shard did not include a wiki-title arm.",
+    subtopic?.winsVsBm25
+      ? `Review wiki-subtopic amplification on the next shard; it beat BM25 by ${subtopic.deltaVsBm25} here.`
+      : subtopic
+        ? `Keep wiki-subtopic amplification experimental; it did not beat BM25 on this shard.`
+        : "Keep wiki-subtopic amplification experimental; this shard did not include a wiki-subtopic arm.",
+    localRerank?.winsVsBm25
+      ? `Keep the local rerank arm in the next expanded shard; it beat BM25 by ${localRerank.deltaVsBm25} here.`
+      : localRerank
+        ? `Keep local rerank measured, but do not promote it from this shard; it trailed BM25 by ${Math.abs(Number(localRerank.deltaVsBm25 ?? 0))}.`
+        : "Keep local rerank measured in the next shard; this shard did not include the local rerank arm.",
+    "If aggregating old and new shards, use a common-arm report or rerun earlier shards with the expanded strategy set.",
   ];
 }
 

@@ -10,6 +10,7 @@ const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ??
 const performancePath = resolveInputPath(
   args.performance ??
     preferReviewFile(
+      "local-full-shard-performance-report-after-shard-016-20260529.json",
       "local-full-shard-performance-report-after-shard-015-20260529.json",
       "local-full-shard-performance-report-after-shard-014-20260528.json",
       "local-full-shard-performance-report-after-shard-013-20260528.json",
@@ -22,6 +23,7 @@ const performancePath = resolveInputPath(
 const intakePath = resolveInputPath(
   args.intake ??
     preferReviewFile(
+      "answer-quality-local-full-shard-intake-after-shard-016-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-015-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-014-20260528.json",
       "answer-quality-local-full-shard-intake-after-shard-013-20260528.json",
