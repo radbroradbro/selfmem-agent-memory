@@ -12,6 +12,9 @@ const repository = "radbroradbro/selfmem-agent-memory";
 const pullRequest = 5;
 const issueNumber = 6;
 const expectedHeadRef = "feat/nucleus-wiki-native-contract";
+const githubFetchAttempts = positiveInt(process.env.RECALLWEAVE_GITHUB_FETCH_ATTEMPTS ?? 3, "GitHub fetch attempts");
+const githubFetchTimeoutMs = positiveInt(process.env.RECALLWEAVE_GITHUB_FETCH_TIMEOUT_MS ?? 20_000, "GitHub fetch timeout ms");
+const githubFetchRetryBaseMs = positiveInt(process.env.RECALLWEAVE_GITHUB_FETCH_RETRY_BASE_MS ?? 1_000, "GitHub fetch retry base ms");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -96,15 +99,31 @@ console.log(serialized);
 
 async function githubJson(apiPath) {
   const authHeader = gitCredentialAuthHeader();
-  const response = await fetch(`https://api.github.com${apiPath}`, {
-    headers: {
-      accept: "application/vnd.github+json",
-      "user-agent": "recallweave-live-sync-check",
-      ...(authHeader ? { authorization: authHeader } : {}),
-    },
-  });
-  assert.equal(response.ok, true, `GitHub API request failed for ${apiPath}: ${response.status}`);
-  return response.json();
+  let lastError = null;
+  let lastStatus = null;
+  for (let attempt = 1; attempt <= githubFetchAttempts; attempt += 1) {
+    try {
+      const response = await fetch(`https://api.github.com${apiPath}`, {
+        headers: {
+          accept: "application/vnd.github+json",
+          "user-agent": "recallweave-live-sync-check",
+          ...(authHeader ? { authorization: authHeader } : {}),
+        },
+        signal: AbortSignal.timeout(githubFetchTimeoutMs),
+      });
+      if (response.ok) return response.json();
+      lastStatus = response.status;
+      if (!retryableGitHubStatus(response.status) || attempt === githubFetchAttempts) {
+        assert.equal(response.ok, true, `GitHub API request failed for ${apiPath}: ${response.status}`);
+      }
+    } catch (error) {
+      lastError = error;
+      if (attempt === githubFetchAttempts) break;
+    }
+    await sleep(githubFetchRetryDelayMs(attempt));
+  }
+  const reason = lastStatus ? `status ${lastStatus}` : `${lastError?.name ?? "Error"}: ${lastError?.message ?? "unknown error"}`;
+  assert.fail(`GitHub API request failed for ${apiPath} after ${githubFetchAttempts} attempts: ${reason}`);
 }
 
 function gitCredentialAuthHeader() {
@@ -132,6 +151,24 @@ function extractIssueTitle(text) {
 
 function sha256(text) {
   return createHash("sha256").update(text).digest("hex");
+}
+
+function retryableGitHubStatus(status) {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+function githubFetchRetryDelayMs(attempt) {
+  return githubFetchRetryBaseMs * attempt;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function positiveInt(value, label) {
+  const parsed = Number.parseInt(String(value ?? ""), 10);
+  assert.ok(Number.isInteger(parsed) && parsed > 0, `${label} must be a positive integer`);
+  return parsed;
 }
 
 async function latestReviewDir() {
