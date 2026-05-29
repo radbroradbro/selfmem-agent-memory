@@ -20,7 +20,18 @@ const wikiPlanPath = resolveInputPath(
   args.wikiPlan ?? `${reviewDir}/answer-quality-local-wiki-shard-plan-20260527.json`,
 );
 const performancePath = resolveInputPath(
-  args.performance ?? `${reviewDir}/local-full-shard-performance-report-20260527.json`,
+  args.performance ??
+    preferReviewFile(
+      "local-full-shard-performance-report-after-shard-015-20260529.json",
+      "local-full-shard-performance-report-after-shard-014-20260528.json",
+      "local-full-shard-performance-report-after-shard-013-20260528.json",
+      "local-full-shard-performance-report-after-shard-012-20260528.json",
+      "local-full-shard-performance-report-after-shard-011-20260528.json",
+      "local-full-shard-performance-report-after-shard-010-20260528.json",
+      "local-full-shard-performance-report-after-shard-009-common-arm-20260528.json",
+      "local-full-shard-performance-report-after-shard-009-20260528.json",
+      "local-full-shard-performance-report-20260527.json",
+    ),
 );
 const commonShardPaths = coercePathList(
   args.commonShardResults ??
@@ -29,10 +40,17 @@ const commonShardPaths = coercePathList(
       `${reviewDir}/answer-quality-local-full-shard-002-recovery-20260526.json`,
       `${reviewDir}/answer-quality-local-full-shard-003-20260527.json`,
       `${reviewDir}/answer-quality-local-full-shard-004-20260527.json`,
-      `${reviewDir}/answer-quality-local-full-shard-005-20260527.json`,
+      `${reviewDir}/answer-quality-local-full-shard-005-common-arm-projection-20260527.json`,
       `${reviewDir}/answer-quality-local-full-shard-006-20260527.json`,
       `${reviewDir}/answer-quality-local-full-shard-007-20260527.json`,
       `${reviewDir}/answer-quality-local-full-shard-008-20260527.json`,
+      `${reviewDir}/answer-quality-local-full-shard-009-20260528.json`,
+      `${reviewDir}/answer-quality-local-full-shard-010-20260528.json`,
+      `${reviewDir}/answer-quality-local-full-shard-011-20260528.json`,
+      `${reviewDir}/answer-quality-local-full-shard-012-20260528.json`,
+      `${reviewDir}/answer-quality-local-full-shard-013-20260528.json`,
+      `${reviewDir}/answer-quality-local-full-shard-014-20260528.json`,
+      `${reviewDir}/answer-quality-local-full-shard-015-20260529.json`,
     ].join(","),
 );
 const outputPath = args.output ? resolveInputPath(args.output) : null;
@@ -357,6 +375,14 @@ function parseArgs(argv) {
 function resolveInputPath(pathLike) {
   const value = String(pathLike);
   return isAbsolute(value) ? value : resolve(root, value);
+}
+
+function preferReviewFile(...names) {
+  for (const name of names) {
+    const path = `${reviewDir}/${name}`;
+    if (existsSync(resolveInputPath(path))) return path;
+  }
+  return `${reviewDir}/${names.at(-1)}`;
 }
 
 function displayPath(path) {

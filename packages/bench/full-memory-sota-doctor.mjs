@@ -21,6 +21,12 @@ const files = {
   localFullShardPlan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
   localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
+  localFullShardIntakeAfterShard015: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-015-20260529.json`,
+  localFullShardIntakeAfterShard014: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-014-20260528.json`,
+  localFullShardIntakeAfterShard013: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-013-20260528.json`,
+  localFullShardIntakeAfterShard012: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-012-20260528.json`,
+  localFullShardIntakeAfterShard011: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-011-20260528.json`,
+  localFullShardIntakeAfterShard010: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-010-20260528.json`,
   localFullShardIntakeAfterShard009: preferReviewFile(
     "answer-quality-local-full-shard-intake-after-shard-009-common-arm-20260528.json",
     "answer-quality-local-full-shard-intake-after-shard-009-20260528.json",
@@ -34,6 +40,12 @@ const files = {
   localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`,
   localFullShardIntakeAfterShard001: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
   localFullPerformanceReport: preferReviewFile(
+    "local-full-shard-performance-report-after-shard-015-20260529.json",
+    "local-full-shard-performance-report-after-shard-014-20260528.json",
+    "local-full-shard-performance-report-after-shard-013-20260528.json",
+    "local-full-shard-performance-report-after-shard-012-20260528.json",
+    "local-full-shard-performance-report-after-shard-011-20260528.json",
+    "local-full-shard-performance-report-after-shard-010-20260528.json",
     "local-full-shard-performance-report-after-shard-009-common-arm-20260528.json",
     "local-full-shard-performance-report-after-shard-009-20260528.json",
     "local-full-shard-performance-report-20260527.json",
@@ -86,6 +98,12 @@ const localFullShardPlan = evidence.localFullShardPlan.json;
 const localFullShardWorkorder = evidence.localFullShardWorkorder.json;
 const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
   evidence.localFullShardIntake,
+  evidence.localFullShardIntakeAfterShard015,
+  evidence.localFullShardIntakeAfterShard014,
+  evidence.localFullShardIntakeAfterShard013,
+  evidence.localFullShardIntakeAfterShard012,
+  evidence.localFullShardIntakeAfterShard011,
+  evidence.localFullShardIntakeAfterShard010,
   evidence.localFullShardIntakeAfterShard009,
   evidence.localFullShardIntakeAfterShard008,
   evidence.localFullShardIntakeAfterShard007,

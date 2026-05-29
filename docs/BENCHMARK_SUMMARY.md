@@ -238,6 +238,49 @@ npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-r
   --reviewer-approval-report <memory-score-reviewer-intake.json>
 ```
 
+There is now a separate `model-challenger` claim scope for the narrower claim:
+RecallWeave, using a named stronger answer/judge model, beat a selected
+reported Supermemory row on the same source-locked benchmark target. This is
+not strict same-model SOTA evidence. It keeps the full-SOTA gate unchanged and
+requires the report to say exactly which model was used and which reported row
+was selected:
+
+```text
+RecallWeave ran LongMemEval-S answer-quality with deepseek-v4-pro and surpassed Supermemory's reported gpt-4o score (81.6 percent) with 82 percent, a +0.4 point delta.
+```
+
+That line is the intended model-challenger wording: "we ran with this model and
+surpassed their reported 4o score." It still stays separate from strict
+same-model SOTA unless the full-SOTA gate also passes.
+
+```bash
+RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 \
+RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 \
+RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 \
+RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=deepseek-v4-pro \
+RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=deepseek-v4-pro \
+RECALLWEAVE_MEMORYBENCH_BASE_URL=https://api.deepseek.com \
+RECALLWEAVE_MEMORYBENCH_API_KEY="$DEEPSEEK_API_KEY" \
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live \
+  --claim-scope model-challenger \
+  --target reviews/overnight-20260522/public-longmemeval-full-run-target.json \
+  --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json \
+  --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl \
+  --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json \
+  --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json \
+  --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json \
+  --arm query-expanded-full-hybrid-rerank=<private-output-dir>/query-expanded-full-hybrid-rerank-responses.private.json \
+  --arm local-apple-qwen3-0_6b=<private-output-dir>/local-apple-qwen3-0_6b-responses.private.json \
+  --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/local-apple-qwen3-0_6b-local-rerank-responses.private.json \
+  --output <public-answer-quality-output.json>
+
+npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-ready \
+  --claim-scope model-challenger \
+  --reported-target-id supermemory-production-research-gpt4o \
+  --target reviews/overnight-20260522/public-longmemeval-full-run-target.json \
+  --result <public-answer-quality-output.json>
+```
+
 The first full local answer-quality run is checked in at
 `reviews/overnight-20260522/end-to-end-memory-score-live-local-20260525.json`.
 It scored the 30-query source-locked LongMemEval target across BM25,
@@ -249,57 +292,46 @@ The full 500-query local-full lane now carries the same source-locked target
 through a separate diagnostic scoring contract: local answer/judge models are
 allowed only with a local OpenAI-compatible endpoint, and the result gate can
 count that output as local-full benchmark evidence while still rejecting it as
-full-memory SOTA evidence. The first local-full 25-query shard is now checked
+full-memory SOTA evidence. The current accepted local-full intake is
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-015-20260529.json`.
+It accepts 15 of 20 shards, covering 375 of 500 queries, and leaves shard 016
+(`375-400`) as the next pending local-full slice. The latest performance
+snapshot is
+`reviews/overnight-20260522/local-full-shard-performance-report-after-shard-015-20260529.json`:
+`local-apple-qwen3-0_6b-local-rerank` leads the accepted local-full diagnostic
+lane at `29.9733` answer quality, versus BM25 at `25.4693`, a `+4.504` delta.
+The local Apple base embedding arm is at `23.8`, full hybrid at `20.9493`,
+and query-expanded full hybrid at `20.896`. This is useful local method
+evidence, not release or SOTA support.
+
+Earlier local-full history is preserved as audit evidence. Shard 001 is checked
 in at
-`reviews/overnight-20260522/answer-quality-local-full-shard-001-20260526.json`,
-with the matching gate at
-`reviews/overnight-20260522/end-to-end-memory-score-local-full-shard-001-gate-20260526.json`.
-It scored BM25, full hybrid, query-expanded hybrid, local Qwen3 0.6B
-embedding, and a real local Qwen3 Reranker 0.6B Q8 sidecar. The best shard arm
-was `full-hybrid-rerank` at `19.4` answer quality; `local-apple-qwen3-0_6b`
-scored `17.4`, `local-apple-qwen3-0_6b-local-rerank` scored `15.8`, BM25
-scored `15.2`, and query expansion scored `12`. The result gate reports
-`READY_LOCAL_FULL_MEMORY_SCORE`, but it also reports only 25 scored queries out
-of the 500-query target, no reviewer approvals, a judge-model mismatch against
-the reported Supermemory target row, and `countsAsFullMemorySotaEvidence:
-false`. This is useful local method evidence, not release or SOTA support.
-The original shard 002 local-full attempt is recorded separately at
-`reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`.
-That first attempt was not accepted evidence: BM25, full hybrid, and local
-query-expanded hybrid exported 25 private responses each, but the local Apple
-embedding arm failed when the local Qwen3 Embedding 0.6B GGUF service closed the
-socket. The later recovery result is now checked in at
-`reviews/overnight-20260522/answer-quality-local-full-shard-002-recovery-20260526.json`,
-with the matching gate at
-`reviews/overnight-20260522/end-to-end-memory-score-local-full-shard-002-gate-recovery-20260526.json`.
-The cumulative local-full intake now accepts shards 001 and 002:
-`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`.
-That means 50 of 500 local-full queries are scored, eighteen shards remain
-missing, and the lane is still partial local method evidence rather than SOTA
-support. The bounded preflight is now codified as
+`reviews/overnight-20260522/answer-quality-local-full-shard-001-20260526.json`;
+the original shard 002 attempt is recorded at
+`reviews/overnight-20260522/answer-quality-local-full-shard-002-runtime-blocker-20260526.json`,
+and the recovery result is checked in at
+`reviews/overnight-20260522/answer-quality-local-full-shard-002-recovery-20260526.json`.
+Shard 003 originally blocked on a local rerank response-body stall, recorded in
+`reviews/overnight-20260522/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`;
+that blocker has since been recovered in accepted shard intake. The latest
+shard-003 max-token relaunch attempt failed as a runtime/methodology retry, not
+as model-quality evidence, because the exporter exited without stdout and
+reported an assertion failure for the local rerank response export.
+
+The bounded local preflight is codified as
 `benchmark:local-embedding:runtime-doctor`, then
-`benchmark:local-embedding:durability`. The checked-in runtime doctor report is
-`reviews/overnight-20260522/local-embedding-runtime-doctor-20260526.json`;
-it now reports `READY_LOCAL_EMBEDDING_RUNTIME` for a dedicated Qwen3 Embedding
-0.6B GGUF served through a local llama.cpp endpoint without printing the
-endpoint, server path, or raw config. The current public-safe durability report
-is at
-`reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json`.
-It now reports `READY_LOCAL_EMBEDDING_DURABILITY` after bounded synthetic
-probes. These reports clear the historical local embedding preflight only. Shard
-003 is now the active local-full blocker:
-`reviews/overnight-20260522/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`.
-BM25, full hybrid, query-expanded hybrid, and local Qwen3 0.6B embedding all
-exported 25 private responses, but the local rerank arm stalled before writing a
-complete response file. The
-latest launch refresh is checked in at
+`benchmark:local-embedding:durability`, with per-shard public-safe reports now
+checked in for later shards such as shard 011. The current reports preserve
+endpoint secrecy and clear only the local runtime path needed for diagnostic
+local-full shards; they do not promote local-full results into SOTA evidence.
+The latest launch refresh is checked in at
 `reviews/overnight-20260522/local-embedding-launch-diagnostic-20260526.json`
 with the markdown companion
 `reviews/overnight-20260522/local-embedding-launch-diagnostic-20260526.md`.
 It reports `BLOCKED_LOCAL_EMBEDDING_LAUNCH`: two relaunch attempts exited
 during model load before the local endpoint became ready, prints no raw logs or
-private paths, and sets `readyForShard002Resume: false`. Shard 002 still has to
-be rerun and accepted before it can count.
+private paths, and sets `readyForShard002Resume: false`. That report is now
+historical because the accepted intake path has moved past shard 002.
 The full LongMemEval-S run-only target is also checked in at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`, with
 materialization evidence in
@@ -453,13 +485,14 @@ current gate for shard 002 while preserving the older resume report for audit.
 `benchmark:answer-quality:local-shard-performance` summarizes accepted
 local-full shard performance without changing claim status. Its checked-in
 report at
-`reviews/overnight-20260522/local-full-shard-performance-report-20260526.json`
-currently covers two accepted shards, 50 of 500 queries, and keeps
+`reviews/overnight-20260522/local-full-shard-performance-report-after-shard-015-20260529.json`
+currently covers fifteen accepted shards, 375 of 500 queries, and keeps
 `countsAsLocalFullBenchmarkEvidence`, full-memory SOTA evidence, shard combine,
-and public benchmark claims disabled. It records that `full-hybrid-rerank`
-currently leads the partial local-full snapshot at `25.52` answer quality
-versus BM25 at `23.52` and local Qwen3 0.6B embedding at `24.62`, while shard
-003 remains blocked by the local rerank response-body stall.
+and public benchmark claims disabled. It records that
+`local-apple-qwen3-0_6b-local-rerank` currently leads the partial local-full
+snapshot at `29.9733` answer quality versus BM25 at `25.4693` and local Qwen3
+0.6B embedding at `23.8`, while shard 016 remains the next pending
+local-full slice.
 `benchmark:sota-doctor` now includes that performance snapshot in the top-level
 local-full lane state, so the main SOTA blocker report can show current
 local-full coverage and quality/latency without upgrading partial local evidence
@@ -474,18 +507,21 @@ be reported.
 After the first scored shard, the follow-up intake at
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`
 accepts shard 001 and keeps the lane blocked on the remaining nineteen shards.
-After the shard 002 recovery, the current progress intake at
+After the shard 002 recovery, the earlier progress intake at
 `reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`
 accepts shards 001 and 002 and keeps the lane blocked on the remaining eighteen
 shards.
+The current progress intake at
+`reviews/overnight-20260522/answer-quality-local-full-shard-intake-after-shard-015-20260529.json`
+accepts shards 001 through 015 and keeps the lane blocked on the remaining five
+shards, with shard 016 (`375-400`) next.
 The intake also validates shard range hashes so partial local-full packets
 cannot be confused with a full 500-query local benchmark.
 `benchmark:answer-quality:local-accepted-lane-doctor` now turns that into a
 next-missing-shard launch check at
 `reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json`.
-It reads the checked-in progress intake, counts shards 001 and 002 as accepted,
-and prints shard 003 commands with `--query-offset 50` as the next pending
-local-full shard. It reports the exact local-full blockers without provider
+It reads the checked-in progress intake and prints next pending local-full shard
+commands from the latest accepted shard coverage. It reports the exact local-full blockers without provider
 calls, without raw benchmark text, and without adding SOTA/public-claim blockers
 that belong only to the provider comparison lane.
 The current regenerated private full-run inputs are checked by
@@ -683,36 +719,31 @@ The next local method challenger is now explicit:
 `local-apple-qwen3-0_6b-local-rerank`. It keeps the measured 0.6B Apple
 Silicon embedding lane and adds an env-only local reranker sidecar after
 sparse+dense+graph+temporal fusion. The sidecar path has now been live-tested
-through llama.cpp with Qwen3 Reranker 0.6B Q8 on the first local-full
-answer-quality shard. That run proved the arm can score under the local-full
-contract, but it did not win the shard. It remains a challenger, not a default,
-and the full 500-query local-full result still requires the remaining nineteen
-shards and combine gate. Shard 002 exposed a separate local embedding-runtime
-durability blocker before the local rerank arm could run. The checked-in
-runtime doctor and durability smoke pass for the Qwen3 Embedding 0.6B llama.cpp
-lane as preflight artifacts only, and the current launch diagnostic reports
-`BLOCKED_LOCAL_EMBEDDING_LAUNCH` because two relaunch attempts exited during
-model load before endpoint readiness. These artifacts are public-safe, print no
-endpoint URL, raw probe text, raw launch log, or private path, and do not count
-as local-full or SOTA evidence. The next accepted local-full shard still
-requires a durable endpoint, response export, answer-quality scoring, shard
-intake, and the combine gate. The shard workorder
+through llama.cpp with Qwen3 Reranker 0.6B Q8 across the accepted local-full
+diagnostic shards. It is now the current partial local-full aggregate leader:
+`29.9733` answer quality over 375 scored queries, `+4.504` over BM25. It
+still remains a diagnostic challenger, not a public default or SOTA result,
+because the full 500-query local-full result requires the remaining five shards,
+the combine gate, and a separate provider/SOTA comparison lane. Earlier shards
+exposed local embedding and local rerank durability blockers; the checked-in
+runtime doctor and durability smoke reports for the Qwen3 Embedding 0.6B and
+Qwen3 Reranker 0.6B llama.cpp lanes are preflight artifacts only. These
+artifacts are public-safe, print no endpoint URL, raw probe text, raw launch
+log, or private path, and do not count as SOTA evidence. The next accepted
+local-full shard is shard 016 (`375-400`) and still requires a durable endpoint,
+response export, answer-quality scoring, shard intake, and later combine gate.
+The shard workorder
 now carries `SELFMEM_LOCAL_EMBED_BASE_URL`,
 `SELFMEM_LOCAL_RERANK_BASE_URL`, `RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1`,
 and `--require-local-embedding-durability` on the response export command.
-Shard 003 adds a second local-runtime blocker report at
-`reviews/overnight-20260522/answer-quality-local-full-shard-003-runtime-blocker-20260526.json`.
-BM25, full hybrid, query-expanded hybrid, and local Qwen3 0.6B embedding all
-exported 25 private responses, but the `local-apple-qwen3-0_6b-local-rerank`
-arm stalled before writing a complete response file. That is a runtime blocker,
-not a scored loss. The response exporter now keeps local provider response-body
-parsing inside the same abort timeout as the request. The corrected llama.cpp
-reranker launch must include `--embedding --pooling rank --rerank`; a
-`--rerank`-only launch can return HTTP 200 with `null` relevance scores. The
-checked-in `local-rerank-durability-smoke-20260526` report now proves bounded
-synthetic completion with finite scores, but the local rerank arm remains an
-isolated challenger until shard-003 missing-arm export, scoring, intake, and
-combine all pass.
+Shard 003's historical local rerank response-body stall is a runtime blocker
+record, not a scored loss. The response exporter now keeps local provider
+response-body parsing inside the same abort timeout as the request. The
+corrected llama.cpp reranker launch must include `--embedding --pooling rank
+--rerank`; a `--rerank`-only launch can return HTTP 200 with `null` relevance
+scores. The checked-in local rerank durability reports now prove bounded
+synthetic completion with finite scores, while shard-level scoring remains
+accepted only through the local-full intake reports.
 
 A source-locked 30-query local Apple run is now recorded:
 

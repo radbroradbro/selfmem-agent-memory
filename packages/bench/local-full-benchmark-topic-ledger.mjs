@@ -8,10 +8,28 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
 const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ?? "reviews/overnight-20260522");
 const performancePath = resolveInputPath(
-  args.performance ?? `${reviewDir}/local-full-shard-performance-report-20260527.json`,
+  args.performance ??
+    preferReviewFile(
+      "local-full-shard-performance-report-after-shard-015-20260529.json",
+      "local-full-shard-performance-report-after-shard-014-20260528.json",
+      "local-full-shard-performance-report-after-shard-013-20260528.json",
+      "local-full-shard-performance-report-after-shard-012-20260528.json",
+      "local-full-shard-performance-report-after-shard-011-20260528.json",
+      "local-full-shard-performance-report-after-shard-010-20260528.json",
+      "local-full-shard-performance-report-20260527.json",
+    ),
 );
 const intakePath = resolveInputPath(
-  args.intake ?? `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-008-20260527.json`,
+  args.intake ??
+    preferReviewFile(
+      "answer-quality-local-full-shard-intake-after-shard-015-20260529.json",
+      "answer-quality-local-full-shard-intake-after-shard-014-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-013-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-012-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-011-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-010-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-008-20260527.json",
+    ),
 );
 const wikiFixturePath = resolveInputPath(
   args.wikiFixture ?? `${reviewDir}/public-longmemeval-wiki-amplification-fixture-20260526.json`,
@@ -120,7 +138,9 @@ const ledger = {
     wikiAmplificationRole: "experimental-unproven-until-accepted-shard-win",
   },
   nextActions: [
-    "Run shard-009 with hosted Supermemory search disabled and regenerate this ledger.",
+    coverage.nextPendingShardId
+      ? `Run ${coverage.nextPendingShardId} with hosted Supermemory search disabled and regenerate this ledger.`
+      : "Run combine and memory-score gates after complete local-full coverage.",
     "Run a local-wiki shard plan before promoting title or subtopic amplification beyond fixture status.",
     "Keep raw LongMemEval material outside repo-facing wiki artifacts; index it only in local private storage.",
   ],
@@ -179,7 +199,9 @@ function buildTopics() {
           ? `local-apple-qwen3-0_6b-local-rerank score ${localRerank.answerQuality}; delta vs BM25 ${localRerankDelta}; delta vs base ${localRerankDeltaVsBase}.`
           : "Local rerank or BM25 row missing.",
       decision: "Treat local rerank as the current method-refinement candidate, not as a public benchmark claim.",
-      nextAction: "Keep local rerank in shard-009 and watch whether the gain survives beyond 40% coverage.",
+      nextAction: coverage.nextPendingShardId
+        ? `Keep local rerank in ${coverage.nextPendingShardId} and watch whether the gain survives beyond ${coverage.coveragePercent ?? "current"}% coverage.`
+        : "Keep local rerank through final combine and memory-score gates.",
     },
     {
       id: "full-hybrid-regressed",
@@ -189,7 +211,7 @@ function buildTopics() {
         fullHybrid && bm25
           ? `full-hybrid-rerank score ${fullHybrid.answerQuality}; delta vs BM25 ${fullHybridDelta}.`
           : "Full-hybrid or BM25 row missing.",
-      decision: "Do not treat deterministic full-hybrid as superior after shard-004 aggregation.",
+      decision: "Do not treat deterministic full-hybrid as superior on the current accepted-shard aggregation.",
       nextAction: "Use per-shard diagnostics to identify whether dense or rerank ordering is hurting specific categories.",
     },
     {
@@ -376,6 +398,14 @@ function parseArgs(argv) {
 function resolveInputPath(pathLike) {
   const value = String(pathLike);
   return isAbsolute(value) ? value : resolve(root, value);
+}
+
+function preferReviewFile(...names) {
+  for (const name of names) {
+    const candidate = `${reviewDir}/${name}`;
+    if (existsSync(resolveInputPath(candidate))) return candidate;
+  }
+  return `${reviewDir}/${names.at(-1)}`;
 }
 
 function displayPath(path) {

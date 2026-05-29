@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "local-wiki-method-report",
+  "status": "WIKI_METHOD_SHARD_EVALUATED",
+  "generatedAt": "2026-05-29T01:43:54.396Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "callsLocalEndpoint": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsPrivatePaths": false,
+  "countsAsLocalFullBenchmarkEvidence": true,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "sourceEvidence": {
+    "shardResult": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-005-20260527.json",
+      "hash": "sha256:7cdab843053d4388680dd26bb732ccf6b7aa92c3df8a4d6acb2dfa42448a675b"
+    },
+    "armExport": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-005-arm-export-20260527.json",
+      "hash": "sha256:37c9a7645760e8de5f91981ff8a61e5fd2d122ce06e7ac9d2b52a9525e184d8e"
+    },
+    "legacyPlan": {
+      "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+      "hash": "sha256:99543578972eee549dc79af0b3a1b68e1750aad12e19d9320315a8b437ee2737"
+    },
+    "wikiPlan": {
+      "path": "reviews/overnight-20260522/answer-quality-local-wiki-shard-plan-20260527.json",
+      "hash": "sha256:71bdadfb930bc5497d0003c932f219911a8fa53ec8d89857133b560117c32979"
+    },
+    "priorPerformance": {
+      "path": "reviews/overnight-20260522/local-full-shard-performance-report-after-shard-014-20260528.json",
+      "hash": "sha256:19e254471ede7c2abe2525ad0dbabb4356d18a4e81026a7f6bd84f4feb0f60b0"
+    },
+    "commonShardResults": [
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-001-20260526.json",
+        "hash": "sha256:6c329ec7c00cc2bff4ad467ff52f39d451bc9aaaf3f822e9ef665e7e13246af1"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-002-recovery-20260526.json",
+        "hash": "sha256:2cae108c8d3bee0e77faf7e223449c86fadc066d5a8d54c6d8258a2bb71c7be0"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-003-20260527.json",
+        "hash": "sha256:22093f44f751bfe39108a7033359d92432ca0c4f8b5c7feb558c5317e96f1f0d"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-004-20260527.json",
+        "hash": "sha256:d759315f4d09b6e0eea6a92afa0fb0108a4c1697abba0fb7bfd7c16709f3d8de"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-005-common-arm-projection-20260527.json",
+        "hash": "sha256:ba54e0bc9b075e16ca5f7216af543dada25953ac4f485b27b21bcd9ef6b947fe"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-006-20260527.json",
+        "hash": "sha256:97e81b56ca75fff5674beb3fcffac6bdedbb1b0396ad218b6b7167c2a29e3f5a"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-007-20260527.json",
+        "hash": "sha256:f2a5567f572fba5779aca33a7ce7776cf87d76de447b5c53029f5a806fa0ef8e"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-008-20260527.json",
+        "hash": "sha256:b650a76bfffd524d6b049e825e05719daad4e1ba18b09751aa148553239505e0"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-009-20260528.json",
+        "hash": "sha256:1d4f19deecd5eee5579fbe12182e8a155ac6687640a1ff5af17ac2bda5a0e765"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-010-20260528.json",
+        "hash": "sha256:a68bef535cca95a086ffe5a1661f6481d9e483f8b02c09632d32b2dc693296ac"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-011-20260528.json",
+        "hash": "sha256:8e2348eecf2d6bba8815e734c2bf6a00c34d58b00b63c85889869197717312b1"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-012-20260528.json",
+        "hash": "sha256:50417192ab845cdf041c5881c9209ea287a757a9de5951beeb62a25bda712276"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-013-20260528.json",
+        "hash": "sha256:7b5c793200b66fb45aa2161f132a1d1895ba567620bbd1f02651469b4278ec8f"
+      },
+      {
+        "path": "reviews/overnight-20260522/answer-quality-local-full-shard-014-20260528.json",
+        "hash": "sha256:91527b6777ba83b9d48335a4d5c0491c07c0d7f0e112f415dffb5db5bbb14b35"
+      }
+    ]
+  },
+  "shard": {
+    "startIndex": 100,
+    "endIndexExclusive": 125,
+    "scoredQueryCount": 25,
+    "totalQueryCount": 500,
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "selectedQueryIdHash": "sha256:781776d80398b03b31beca52825f5f7e5d25647ccf765e0ebf0a4c31efa5b6b0"
+  },
+  "provider": {
+    "answerModel": "qwen36-a3b-main-q8kv-8192",
+    "judgeModel": "qwen36-a3b-main-q8kv-8192",
+    "endpointIsLocal": true,
+    "localDiagnosticScoring": true,
+    "disableJsonResponseFormat": true,
+    "callsMade": 400
+  },
+  "methodIsolation": {
+    "hostedSupermemorySearchDisabled": true,
+    "hostedSupermemorySearchPolicy": "disabled-for-benchmark-methodology",
+    "compatibleWithLegacyShardIntake": false,
+    "compatibilityReason": "expanded wiki-method shard has a different strategy set than earlier local-full shards"
+  },
+  "strategies": {
+    "bm25-lite": {
+      "strategy": "bm25-lite",
+      "scoredQueryCount": 25,
+      "answerQuality": 28,
+      "quality": 0.28,
+      "judgeCorrectRate": 0.28,
+      "answerLatencyP50Ms": 7269,
+      "contextTokensAvg": 2963
+    },
+    "full-hybrid-rerank": {
+      "strategy": "full-hybrid-rerank",
+      "scoredQueryCount": 25,
+      "answerQuality": 24,
+      "quality": 0.24,
+      "judgeCorrectRate": 0.24,
+      "answerLatencyP50Ms": 9208,
+      "contextTokensAvg": 3149
+    },
+    "query-expanded-full-hybrid-rerank": {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "scoredQueryCount": 25,
+      "answerQuality": 24,
+      "quality": 0.24,
+      "judgeCorrectRate": 0.24,
+      "answerLatencyP50Ms": 11725,
+      "contextTokensAvg": 3040
+    },
+    "wiki-title-amplified-hybrid": {
+      "strategy": "wiki-title-amplified-hybrid",
+      "scoredQueryCount": 25,
+      "answerQuality": 4,
+      "quality": 0.04,
+      "judgeCorrectRate": 0.04,
+      "answerLatencyP50Ms": 10278,
+      "contextTokensAvg": 2908
+    },
+    "wiki-subtopic-amplified-hybrid": {
+      "strategy": "wiki-subtopic-amplified-hybrid",
+      "scoredQueryCount": 25,
+      "answerQuality": 28,
+      "quality": 0.28,
+      "judgeCorrectRate": 0.28,
+      "answerLatencyP50Ms": 9045,
+      "contextTokensAvg": 2859
+    },
+    "wiki-summary-session-hybrid": {
+      "strategy": "wiki-summary-session-hybrid",
+      "scoredQueryCount": 25,
+      "answerQuality": 16,
+      "quality": 0.16,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 8881,
+      "contextTokensAvg": 2987
+    },
+    "local-apple-qwen3-0_6b": {
+      "strategy": "local-apple-qwen3-0_6b",
+      "scoredQueryCount": 25,
+      "answerQuality": 16,
+      "quality": 0.16,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 9479,
+      "contextTokensAvg": 3286
+    },
+    "local-apple-qwen3-0_6b-local-rerank": {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "scoredQueryCount": 25,
+      "answerQuality": 36,
+      "quality": 0.36,
+      "judgeCorrectRate": 0.36,
+      "answerLatencyP50Ms": 9675,
+      "contextTokensAvg": 2834
+    }
+  },
+  "comparisons": {
+    "bestStrategy": "local-apple-qwen3-0_6b-local-rerank",
+    "bestAnswerQuality": 36,
+    "bm25": {
+      "strategy": "bm25-lite",
+      "answerQuality": 28,
+      "judgeCorrectRate": 0.28,
+      "answerLatencyP50Ms": 7269,
+      "contextTokensAvg": 2963,
+      "deltaVsBm25": 0,
+      "winsVsBm25": false
+    },
+    "fullHybrid": {
+      "strategy": "full-hybrid-rerank",
+      "answerQuality": 24,
+      "judgeCorrectRate": 0.24,
+      "answerLatencyP50Ms": 9208,
+      "contextTokensAvg": 3149,
+      "deltaVsBm25": -4,
+      "winsVsBm25": false
+    },
+    "queryExpanded": {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "answerQuality": 24,
+      "judgeCorrectRate": 0.24,
+      "answerLatencyP50Ms": 11725,
+      "contextTokensAvg": 3040,
+      "deltaVsBm25": -4,
+      "winsVsBm25": false
+    },
+    "wikiTitle": {
+      "strategy": "wiki-title-amplified-hybrid",
+      "answerQuality": 4,
+      "judgeCorrectRate": 0.04,
+      "answerLatencyP50Ms": 10278,
+      "contextTokensAvg": 2908,
+      "deltaVsBm25": -24,
+      "winsVsBm25": false
+    },
+    "wikiSubtopic": {
+      "strategy": "wiki-subtopic-amplified-hybrid",
+      "answerQuality": 28,
+      "judgeCorrectRate": 0.28,
+      "answerLatencyP50Ms": 9045,
+      "contextTokensAvg": 2859,
+      "deltaVsBm25": 0,
+      "winsVsBm25": false
+    },
+    "wikiSummarySession": {
+      "strategy": "wiki-summary-session-hybrid",
+      "answerQuality": 16,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 8881,
+      "contextTokensAvg": 2987,
+      "deltaVsBm25": -12,
+      "winsVsBm25": false
+    },
+    "localApple": {
+      "strategy": "local-apple-qwen3-0_6b",
+      "answerQuality": 16,
+      "judgeCorrectRate": 0.16,
+      "answerLatencyP50Ms": 9479,
+      "contextTokensAvg": 3286,
+      "deltaVsBm25": -12,
+      "winsVsBm25": false
+    },
+    "localAppleLocalRerank": {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "answerQuality": 36,
+      "judgeCorrectRate": 0.36,
+      "answerLatencyP50Ms": 9675,
+      "contextTokensAvg": 2834,
+      "deltaVsBm25": 8,
+      "winsVsBm25": true
+    }
+  },
+  "decisions": [
+    {
+      "id": "wiki-title-amplification",
+      "status": "negative-signal",
+      "evidence": "score 4; delta vs BM25 -24",
+      "decision": "Do not promote title amplification from the current evidence."
+    },
+    {
+      "id": "wiki-subtopic-amplification",
+      "status": "not-yet-positive",
+      "evidence": "score 28; delta vs BM25 0",
+      "decision": "Keep subtopic amplification as an experimental arm, not a default."
+    },
+    {
+      "id": "wiki-summary-session",
+      "status": "negative-signal",
+      "evidence": "score 16; delta vs BM25 -12",
+      "decision": "Do not promote summary-session wiki retrieval on this shard."
+    },
+    {
+      "id": "local-rerank",
+      "status": "positive-signal",
+      "evidence": "score 36; delta vs BM25 8",
+      "decision": "Keep local rerank as the next method-refinement candidate."
+    },
+    {
+      "id": "full-hybrid-and-query-expansion",
+      "status": "not-promoted",
+      "evidence": "full-hybrid delta -4; query-expanded delta -4",
+      "decision": "Do not promote query expansion; continue measuring full hybrid against BM25 shard by shard."
+    }
+  ],
+  "priorLocalFullContext": {
+    "status": "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
+    "acceptedShards": 14,
+    "acceptedQueries": 350,
+    "queryCount": 500,
+    "bestStrategy": "local-apple-qwen3-0_6b-local-rerank",
+    "bestAnswerQuality": 29.3429
+  },
+  "observedArmSnapshot": [
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "answerQuality": 29.3429,
+      "scoredQueryCount": 350,
+      "shardCount": 14
+    },
+    {
+      "strategy": "bm25-lite",
+      "answerQuality": 25.8886,
+      "scoredQueryCount": 350,
+      "shardCount": 14
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "answerQuality": 23.7857,
+      "scoredQueryCount": 350,
+      "shardCount": 14
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "answerQuality": 21.2743,
+      "scoredQueryCount": 350,
+      "shardCount": 14
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "answerQuality": 21.0457,
+      "scoredQueryCount": 350,
+      "shardCount": 14
+    }
+  ],
+  "nextActions": [
+    "Do not promote wiki-title amplification; this shard produced a negative signal.",
+    "Keep wiki-subtopic amplification experimental; it tied BM25 on this shard but did not beat it.",
+    "Keep the local rerank arm in the next expanded shard because it won this shard.",
+    "If aggregating old and new shards, use a common-arm report or rerun earlier shards with the expanded strategy set."
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-preflight",
+  "status": "READY_FOR_LIVE_ANSWER_QUALITY",
+  "claimScope": "local-full",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-05-28T20:50:29.107Z",
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "answerModel": "gpt-4o",
+    "judgeModel": "gpt-4o"
+  },
+  "consent": {
+    "answerQualityCallsEnabled": true,
+    "publicDataConfirmed": true,
+    "noRawTextOutputConfirmed": true
+  },
+  "endpoint": {
+    "baseUrlPresent": true,
+    "endpointIsLocal": true,
+    "apiKeyPresent": false,
+    "valuePrinted": false
+  },
+  "models": {
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "answerModelMatchesTarget": false,
+    "judgeModelMatchesTarget": false,
+    "valuesPrinted": false
+  },
+  "scoringPolicy": {
+    "claimScope": "local-full",
+    "modelMatchPolicy": "local-diagnostic-allowed",
+    "exactTargetModelsRequired": false,
+    "localDiagnosticModelAllowed": true,
+    "challengerModelAllowed": false,
+    "localDiagnosticEndpointRequired": true,
+    "localDiagnosticEndpointSatisfied": true,
+    "modelMismatchAllowed": true,
+    "scoringModelPolicySatisfied": true,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsLocalFullBenchmarkEvidence": true,
+    "countsAsModelChallengerBenchmarkEvidence": false
+  },
+  "privateInputs": {
+    "querySet": {
+      "role": "queryset",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-queryset.private.json",
+      "hash": "sha256:9cd221a53f8692f2035a87fc6d5f46495505c5c2571679fdfbdb2fe3f751d89b",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "queryCount": 500,
+      "selectedQueryCount": 25,
+      "selectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+      "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "matchesTarget": true
+    },
+    "memories": {
+      "role": "memories",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-memories.private.jsonl",
+      "hash": "sha256:a4ee0d963c5bafa42a3a6da81568f90a84c80d6cd60a9f8eb055b870f014ef0a",
+      "lineCount": 19195
+    },
+    "answerLabels": {
+      "role": "answer-labels",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-answer-labels.private.json",
+      "hash": "sha256:302bf9ce65a7471a56fe65529177c9b4d82576096a67e2e345280fa3418c8402",
+      "labelCount": 500,
+      "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "matchesTarget": true
+    }
+  },
+  "queryShard": {
+    "requested": true,
+    "startIndex": 275,
+    "endIndexExclusive": 300,
+    "totalQueryCount": 500,
+    "selectedQueryCount": 25,
+    "selectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5"
+  },
+  "arms": [
+    {
+      "strategy": "bm25-lite",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "bm25-lite-responses.private.json",
+      "hash": "sha256:c61ffa425b525c4ef77d11294ed94e7c4f411757c9c4e67118bf5398c0559cb7",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 275,
+        "responseEndIndexExclusive": 300,
+        "responseSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "expectedSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "hash": "sha256:4b9540ce645eb6ab218f40443aa32f6b61fbc0ffad046f506aacf17ac401042f",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 275,
+        "responseEndIndexExclusive": 300,
+        "responseSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "expectedSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "hash": "sha256:b0ec70824dd374673d0e223b546f5653e41afbb89886c156a2ad6602c28e9513",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 275,
+        "responseEndIndexExclusive": 300,
+        "responseSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "expectedSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "local-apple-qwen3-0_6b-responses.private.json",
+      "hash": "sha256:753fd738df3838ff7a86c91b0725a6a4d714074179653baf38d8d5f27c4f7e83",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 275,
+        "responseEndIndexExclusive": 300,
+        "responseSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "expectedSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "local-apple-qwen3-0_6b-local-rerank-responses.private.json",
+      "hash": "sha256:b57b3e0b89cb6da5fd4a925f902d8f2c244717dbeff593941b3f93f6ded4660a",
+      "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 275,
+        "responseEndIndexExclusive": 300,
+        "responseSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "expectedSelectedQueryIdHash": "sha256:6b8bbedefecfa23f62ff6eae12fd22a5fa7e887aeb3366e96ca6d05dabdcc7f5",
+        "selectedQueryIdHashMatches": true
+      }
+    }
+  ],
+  "requiredStrategyCoverage": {
+    "hasBm25Lite": true,
+    "hasFullHybridRerank": true,
+    "hasChallenger": true
+  },
+  "readiness": {
+    "envReady": true,
+    "privateInputsReady": true,
+    "armsReady": true,
+    "responseArmsCoverSelectedShard": true,
+    "sameDataReady": true,
+    "liveAnswerQualityCanRun": true,
+    "readyForEndToEndMemoryScoreGate": true,
+    "countsAsFullMemorySotaEvidence": false
+  },
+  "blockers": [],
+  "nextActions": [
+    "Run benchmark:answer-quality with --live against the private materialized inputs and response arm exports.",
+    "Attach the metrics-only result to benchmark:memory-score:result-gate --claim-scope local-full --require-ready.",
+    "Treat this as local diagnostic evidence only; exact SOTA and public superiority claims still need the full provider/scoring lane."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=local-full",
+    "RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=local-diagnostic-allowed",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+    "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
+    "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model>",
+    "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<local-judge-model>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope local-full --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json --query-offset 275 --max-queries 25 --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json --arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json --output <public-answer-quality-output.json>"
+  ]
+}

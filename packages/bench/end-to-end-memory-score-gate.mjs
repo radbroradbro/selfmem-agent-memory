@@ -20,9 +20,13 @@ const format = String(args.format ?? "json").toLowerCase();
 const requireReady = Boolean(args.requireReady);
 const fixtureProxySmoke = Boolean(args.fixtureProxySmoke);
 const claimScope = String(args.claimScope ?? process.env.RECALLWEAVE_MEMORY_SCORE_CLAIM_SCOPE ?? "full-sota").trim();
+const reportedTargetId = String(args.reportedTargetId ?? process.env.RECALLWEAVE_REPORTED_TARGET_ID ?? "").trim();
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
-assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
+assert.ok(
+  ["full-sota", "local-full", "model-challenger"].includes(claimScope),
+  "--claim-scope must be full-sota, local-full, or model-challenger",
+);
 assert.ok(existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `target empty: ${displayPath(targetPath)}`);
 
@@ -43,6 +47,7 @@ if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
 if (requireReady && claimScope === "full-sota" && !report.countsAsFullMemorySotaEvidence) process.exit(1);
 if (requireReady && claimScope === "local-full" && !report.countsAsLocalFullBenchmarkEvidence) process.exit(1);
+if (requireReady && claimScope === "model-challenger" && !report.countsAsModelChallengerReportedScoreEvidence) process.exit(1);
 
 function loadResult() {
   if (fixtureProxySmoke) {
@@ -160,11 +165,13 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
   const claimScopeMatchesRequest = effectiveClaimScope === claimScope;
   const isLocalFull = effectiveClaimScope === "local-full";
   const isFullSota = effectiveClaimScope === "full-sota";
+  const isModelChallenger = effectiveClaimScope === "model-challenger";
   const rows = normalizeRows(result);
   const rowNames = rows.map((item) => item.strategy ?? item.armId).filter(Boolean);
   const answerMetric = bestAnswerMetric(rows, result);
   const fullBenchmarkPolicy = buildFullBenchmarkPolicy({ target, result, rows });
-  const primaryReportedTarget = reportedTargetsEvidence.json?.primaryReportedMemoryTarget ?? null;
+  const selectedReportedTarget = selectReportedTarget(reportedTargetsEvidence.json, { isModelChallenger });
+  const primaryReportedTarget = selectedReportedTarget ?? null;
   const reviewerApprovalCount = reviewerApproval.exists ? Number(reviewerApproval.json?.reviewerApprovalCount ?? 0) : 0;
   const targetBenchmark = target.benchmark?.family ?? target.benchmark?.name;
   const targetScoringHash = target.benchmark?.scoringCodeHash ?? null;
@@ -191,7 +198,18 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     Boolean(targetJudgeModel) &&
     resultAnswerModel === targetAnswerModel &&
     resultJudgeModel === targetJudgeModel;
-  const scoringModelPolicySatisfied = isLocalFull ? localDiagnosticScoringSatisfied : exactTargetScoringSatisfied;
+  const challengerModelScoringSatisfied =
+    isModelChallenger &&
+    modelMatchPolicy === "challenger-model-allowed" &&
+    typeof resultAnswerModel === "string" &&
+    resultAnswerModel.length > 0 &&
+    typeof resultJudgeModel === "string" &&
+    resultJudgeModel.length > 0;
+  const scoringModelPolicySatisfied = isLocalFull
+    ? localDiagnosticScoringSatisfied
+    : isModelChallenger
+      ? challengerModelScoringSatisfied
+      : exactTargetScoringSatisfied;
   const reportedTargetComparison = compareReportedTarget({
     answerMetric,
     resultAnswerModel,
@@ -246,6 +264,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     judgeModelMatchesTarget: Boolean(targetJudgeModel) && resultJudgeModel === targetJudgeModel,
     scoringModelPolicySatisfied,
     localDiagnosticScoringSatisfied,
+    challengerModelScoringSatisfied,
     answerQualityMetricPresent: answerMetric.value != null && Number.isFinite(Number(answerMetric.value)),
     answerQualityMetricInRange: answerMetric.value != null && Number(answerMetric.value) >= 0 && Number(answerMetric.value) <= 100,
     bm25ControlPresent: hasAny(rowNames, ["bm25-lite"]),
@@ -269,6 +288,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     reportedTargetAnswerModelComparable: reportedTargetComparison.answerModelComparable !== false,
     fullOrOfficiallyComparableRunPresent: fullBenchmarkPolicy.fullOrOfficiallyComparableRunPresent === true,
     scoreMeetsPrimaryReportedTarget: reportedTargetComparison.scoreMeetsPrimaryReportedTarget === true,
+    modelChallengerReportedScoreComparisonReady: reportedTargetComparison.meetsReportedScoreComparison === true,
   };
 
   const blockers = [
@@ -297,6 +317,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     isFullSota && !checks.answerModelMatchesTarget ? "answer-model-does-not-match-target" : null,
     isFullSota && !checks.judgeModelMatchesTarget ? "judge-model-does-not-match-target" : null,
     isLocalFull && !checks.localDiagnosticScoringSatisfied ? "local-diagnostic-scoring-policy-not-satisfied" : null,
+    isModelChallenger && !checks.challengerModelScoringSatisfied ? "challenger-model-scoring-policy-not-satisfied" : null,
     !checks.answerQualityMetricPresent ? "missing-answer-quality-score" : null,
     !checks.answerQualityMetricInRange ? "answer-quality-score-out-of-range" : null,
     !checks.bm25ControlPresent ? "missing-bm25-control" : null,
@@ -328,16 +349,42 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     !checks.fullOrOfficiallyComparableRunPresent ? "missing-full-or-officially-comparable-memory-benchmark-run" : null,
       checks.primaryReportedMemoryTargetPresent && !checks.scoreMeetsPrimaryReportedTarget ? "best-end-to-end-score-below-primary-reported-memory-target" : null,
     ].filter(Boolean)
-    : ["local-full-diagnostic-result-not-sota-comparable"];
+    : [isLocalFull ? "local-full-diagnostic-result-not-sota-comparable" : "model-challenger-result-not-strict-sota-comparable"];
+  const modelChallengerBlockers = isModelChallenger
+    ? [
+        !checks.reportedTargetsSourceLocked ? "reported-memory-targets-not-source-locked" : null,
+        !checks.primaryReportedMemoryTargetPresent ? "missing-selected-reported-memory-target" : null,
+        checks.primaryReportedMemoryTargetPresent && !checks.reportedTargetBenchmarkMatchesResult
+          ? "reported-target-benchmark-does-not-match-result"
+          : null,
+        !checks.fullOrOfficiallyComparableRunPresent ? "missing-full-or-officially-comparable-memory-benchmark-run" : null,
+        checks.primaryReportedMemoryTargetPresent && !checks.scoreMeetsPrimaryReportedTarget
+          ? "best-end-to-end-score-below-selected-reported-memory-target"
+          : null,
+      ].filter(Boolean)
+    : ["not-a-model-challenger-claim-scope"];
   const countsAsEndToEndMemoryBenchmark = blockers.length === 0;
   const countsAsLocalFullBenchmarkEvidence = isLocalFull && countsAsEndToEndMemoryBenchmark;
   const countsAsFullMemorySotaEvidence = isFullSota && countsAsEndToEndMemoryBenchmark && fullSotaBlockers.length === 0;
+  const countsAsModelChallengerReportedScoreEvidence =
+    isModelChallenger && countsAsEndToEndMemoryBenchmark && modelChallengerBlockers.length === 0;
+  const activeClaimBlockers = isFullSota ? fullSotaBlockers : isModelChallenger ? modelChallengerBlockers : [];
+  const readyModelChallengerClaim = buildModelChallengerClaim({
+    ready: countsAsModelChallengerReportedScoreEvidence,
+    reportedTargetComparison,
+  });
 
   return {
     schemaVersion: 1,
     ok: true,
     mode: "end-to-end-memory-score-gate",
-    status: blockers.length === 0 ? (isLocalFull ? "READY_LOCAL_FULL_MEMORY_SCORE" : "READY_END_TO_END_MEMORY_SCORE") : "BLOCKED_END_TO_END_MEMORY_SCORE",
+    status: blockers.length === 0
+      ? isLocalFull
+        ? "READY_LOCAL_FULL_MEMORY_SCORE"
+        : isModelChallenger
+          ? "READY_MODEL_CHALLENGER_MEMORY_SCORE"
+          : "READY_END_TO_END_MEMORY_SCORE"
+      : "BLOCKED_END_TO_END_MEMORY_SCORE",
     claimScope: effectiveClaimScope,
     generatedAt: new Date().toISOString(),
     publicSafe: true,
@@ -348,9 +395,12 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     countsAsEndToEndMemoryBenchmark,
     countsAsLocalFullBenchmarkEvidence,
     countsAsFullMemorySotaEvidence,
+    countsAsModelChallengerReportedScoreEvidence,
     reason:
       countsAsFullMemorySotaEvidence
         ? "Same-data answer-quality result is source-locked, reviewed, and eligible for the full memory SOTA ladder."
+        : countsAsModelChallengerReportedScoreEvidence
+          ? "Same-data answer-quality result is source-locked and beats the selected reported Supermemory score as an explicitly labeled stronger-model challenger lane, not strict same-model SOTA evidence."
         : countsAsLocalFullBenchmarkEvidence
           ? "Same-data local-full answer-quality result is source-locked and eligible as local diagnostic benchmark evidence, but not SOTA evidence."
         : blockers.length
@@ -390,11 +440,14 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       modelMatchPolicy,
       exactTargetModelsRequired: isFullSota,
       localDiagnosticModelAllowed: isLocalFull,
+      challengerModelAllowed: isModelChallenger,
       scoringModelPolicySatisfied,
       localDiagnosticScoringSatisfied,
-      modelMismatchAllowed: isLocalFull,
+      challengerModelScoringSatisfied,
+      modelMismatchAllowed: isLocalFull || isModelChallenger,
       countsAsFullMemorySotaEvidence: false,
       countsAsLocalFullBenchmarkEvidence,
+      countsAsModelChallengerReportedScoreEvidence,
     },
     reportedTargetsEvidence: {
       source: reportedTargetsEvidence.source,
@@ -408,6 +461,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       blockers: reportedTargetsEvidence.blockers,
     },
     reportedTargetComparison,
+    modelChallengerClaim: readyModelChallengerClaim,
     fullBenchmarkPolicy,
     reviewerApproval: {
       source: reviewerApproval.source,
@@ -424,7 +478,8 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     checks,
     blockers,
     fullSotaBlockers,
-    nextActions: blockers.length || fullSotaBlockers.length
+    modelChallengerBlockers,
+    nextActions: blockers.length || activeClaimBlockers.length
       ? isLocalFull
         ? [
             "Run the same-data local-full answer-quality harness across the full 500-query target.",
@@ -432,6 +487,12 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
             "Keep SOTA and production-replacement claims blocked until the exact-scoring full provider/SOTA lane passes.",
             "Attach only metrics-only public-safe output, then send the local-full packet to independent reviewers before release wording changes.",
           ]
+        : isModelChallenger
+          ? [
+              "Run the same-data LongMemEval/MemoryBench answer-quality harness across the full target with the selected stronger answer/judge model.",
+              "Compare the resulting score to the selected reported Supermemory row with --reported-target-id, keeping same-judge/SOTA wording separate.",
+              "Attach only metrics-only public-safe output, then send the model-challenger packet to independent reviewers before public wording changes.",
+            ]
         : [
             "Run the same-data LongMemEval/MemoryBench answer-quality harness across the full target or an officially comparable benchmark target.",
             "Include BM25, dense/vector, full-hybrid, live query-expansion, provider challenger, local Apple, and local reranker arms on the exact source-locked target.",
@@ -523,6 +584,17 @@ function buildFullBenchmarkPolicy({ target, result, rows }) {
   };
 }
 
+function selectReportedTarget(json, { isModelChallenger }) {
+  const targets = Array.isArray(json?.memoryTargets) ? json.memoryTargets : [];
+  if (reportedTargetId) {
+    return targets.find((target) => target.id === reportedTargetId) ?? null;
+  }
+  if (isModelChallenger) {
+    return targets.find((target) => target.id === "supermemory-production-research-gpt4o") ?? json?.primaryReportedMemoryTarget ?? null;
+  }
+  return json?.primaryReportedMemoryTarget ?? null;
+}
+
 function compareReportedTarget({ answerMetric, resultAnswerModel, resultJudgeModel, targetBenchmark, primaryReportedTarget }) {
   const score = answerMetric.value != null && Number.isFinite(Number(answerMetric.value)) ? Number(answerMetric.value) : null;
   const targetScore =
@@ -538,10 +610,15 @@ function compareReportedTarget({ answerMetric, resultAnswerModel, resultJudgeMod
     ? resultAnswerModel != null && normalizeModel(resultAnswerModel) === normalizeModel(primaryReportedTarget?.answerModel)
     : null;
   const scoreMeetsPrimaryReportedTarget = score != null && targetScore != null && score >= targetScore;
+  const meetsReportedScoreComparison =
+    scoreMeetsPrimaryReportedTarget &&
+    sameBenchmarkFamilyAsPrimaryTarget &&
+    answerModelComparable !== false;
   return {
     primaryTarget: primaryReportedTarget
       ? {
           id: primaryReportedTarget.id,
+          systemName: primaryReportedTarget.systemName ?? null,
           benchmark: primaryReportedTarget.benchmark,
           benchmarkFamily: primaryReportedTarget.benchmarkFamily ?? null,
           score: primaryReportedTarget.score,
@@ -566,14 +643,50 @@ function compareReportedTarget({ answerMetric, resultAnswerModel, resultJudgeMod
     sameJudgeModelAsPrimaryTarget,
     answerModelComparable,
     scoreMeetsPrimaryReportedTarget,
+    meetsReportedScoreComparison,
     meetsPrimaryReportedTarget:
       scoreMeetsPrimaryReportedTarget &&
       sameBenchmarkFamilyAsPrimaryTarget &&
       sameJudgeModelAsPrimaryTarget &&
       answerModelComparable !== false,
+    sameJudgeStrictComparisonRequired: true,
+    reportedScoreOnlyComparisonAllowed: true,
     matchingBenchmarkSemanticsRequired: true,
     comparisonRule:
-      "Direct hosted usage is optional when quota-blocked, but a RecallWeave win requires same-benchmark, same-scoring, full-memory answer-quality evidence that meets or beats the selected reported memory-system target.",
+      "Strict SOTA requires same-benchmark, same-scoring, same-judge full-memory answer-quality evidence. A model-challenger claim may compare a clearly labeled stronger-model RecallWeave score to a selected reported Supermemory score without treating it as strict same-model SOTA.",
+  };
+}
+
+function buildModelChallengerClaim({ ready, reportedTargetComparison }) {
+  const target = reportedTargetComparison.primaryTarget;
+  const observed = reportedTargetComparison.observed ?? {};
+  const answerModel = observed.answerModel ?? "missing-answer-model";
+  const judgeModel = observed.judgeModel ?? "missing-judge-model";
+  const modelPhrase = answerModel === judgeModel ? answerModel : `${answerModel} answer / ${judgeModel} judge`;
+  const targetSystem = target?.systemName ?? "Supermemory";
+  const targetJudge = target?.judgeModel ?? "reported";
+  const targetScore = target?.score ?? "missing";
+  const targetUnit = target?.scoreUnit ?? "percent";
+  const observedScore = observed.score ?? "missing";
+  const delta = reportedTargetComparison.scoreDelta ?? "missing";
+  const benchmark = target?.benchmark ?? observed.benchmarkFamily ?? "selected benchmark";
+  const selectedTargetId = target?.id ?? "missing";
+  const statement = ready
+    ? `RecallWeave ran ${benchmark} answer-quality with ${modelPhrase} and surpassed ${targetSystem}'s reported ${targetJudge} score (${targetScore} ${targetUnit}) with ${observedScore} ${targetUnit}, a +${delta} point delta.`
+    : `No model-challenger claim is ready yet; run the full same-data answer-quality benchmark with the selected challenger model and beat ${targetSystem}'s reported ${targetJudge} score (${targetScore} ${targetUnit}).`;
+  return {
+    ready,
+    statement,
+    selectedReportedTargetId: selectedTargetId,
+    observedModel: modelPhrase,
+    observedScore,
+    reportedSystem: targetSystem,
+    reportedJudgeModel: targetJudge,
+    reportedScore: targetScore,
+    reportedScoreUnit: targetUnit,
+    scoreDelta: delta,
+    strictSameModelSotaEvidence: false,
+    caveat: "This statement is valid only as a labeled model-challenger comparison; strict SOTA still requires matching judge/model semantics.",
   };
 }
 
@@ -620,6 +733,7 @@ function renderMarkdown(value) {
     `- Counts as end-to-end memory benchmark: ${value.countsAsEndToEndMemoryBenchmark}`,
     `- Counts as local-full benchmark evidence: ${value.countsAsLocalFullBenchmarkEvidence}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
+    `- Counts as model-challenger reported-score evidence: ${value.countsAsModelChallengerReportedScoreEvidence}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
     `- Target: ${value.target.path}`,
     "",
@@ -628,6 +742,9 @@ function renderMarkdown(value) {
     "",
     "## Full SOTA Blockers",
     ...(value.fullSotaBlockers.length ? value.fullSotaBlockers.map((item) => `- ${item}`) : ["- none"]),
+    "",
+    "## Model-Challenger Blockers",
+    ...(value.modelChallengerBlockers.length ? value.modelChallengerBlockers.map((item) => `- ${item}`) : ["- none"]),
     "",
     "## Result",
     `- Source: ${value.result.source}`,
@@ -647,7 +764,13 @@ function renderMarkdown(value) {
     `- Score delta: ${value.reportedTargetComparison.scoreDelta ?? "missing"}`,
     `- Same benchmark family: ${value.reportedTargetComparison.sameBenchmarkFamilyAsPrimaryTarget}`,
     `- Same judge model: ${value.reportedTargetComparison.sameJudgeModelAsPrimaryTarget}`,
+    `- Meets reported score comparison: ${value.reportedTargetComparison.meetsReportedScoreComparison}`,
     `- Meets reported target: ${value.reportedTargetComparison.meetsPrimaryReportedTarget}`,
+    "",
+    "## Model-Challenger Claim",
+    `- Ready: ${value.modelChallengerClaim.ready}`,
+    `- Statement: ${value.modelChallengerClaim.statement}`,
+    `- Caveat: ${value.modelChallengerClaim.caveat}`,
     "",
     "## Full Benchmark Policy",
     `- Dataset slice: ${value.fullBenchmarkPolicy.datasetSlice ?? "missing"}`,

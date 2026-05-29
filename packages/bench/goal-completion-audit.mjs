@@ -136,10 +136,26 @@ const files = {
   answerQualityFullShardWorkorderMarkdown: `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   answerQualityFullShardIntakeReport: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
-  fullMemorySotaDoctorReport: `${reviewDir}/full-memory-sota-doctor-20260527.json`,
-  fullMemorySotaDoctorMarkdown: `${reviewDir}/full-memory-sota-doctor-20260527.md`,
-  localWikiMethodReport: `${reviewDir}/local-wiki-method-report-20260527.json`,
-  localWikiMethodMarkdown: `${reviewDir}/local-wiki-method-report-20260527.md`,
+  fullMemorySotaDoctorReport: preferReviewFile(
+    "full-memory-sota-doctor-after-shard-013-20260528.json",
+    "full-memory-sota-doctor-after-shard-012-20260528.json",
+    "full-memory-sota-doctor-after-shard-011-20260528.json",
+    "full-memory-sota-doctor-after-shard-010-20260528.json",
+    "full-memory-sota-doctor-after-shard-009-common-arm-20260528.json",
+    "full-memory-sota-doctor-after-shard-009-20260528.json",
+    "full-memory-sota-doctor-20260527.json",
+  ),
+  fullMemorySotaDoctorMarkdown: preferReviewFile(
+    "full-memory-sota-doctor-after-shard-013-20260528.md",
+    "full-memory-sota-doctor-after-shard-012-20260528.md",
+    "full-memory-sota-doctor-after-shard-011-20260528.md",
+    "full-memory-sota-doctor-after-shard-010-20260528.md",
+    "full-memory-sota-doctor-after-shard-009-common-arm-20260528.md",
+    "full-memory-sota-doctor-after-shard-009-20260528.md",
+    "full-memory-sota-doctor-20260527.md",
+  ),
+  localWikiMethodReport: preferReviewFile("local-wiki-method-report-20260528.json", "local-wiki-method-report-20260527.json"),
+  localWikiMethodMarkdown: preferReviewFile("local-wiki-method-report-20260528.md", "local-wiki-method-report-20260527.md"),
 };
 
 for (const [name, file] of Object.entries(files)) {
@@ -972,6 +988,11 @@ function run(command, args) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
   return result;
+}
+
+function preferReviewFile(...names) {
+  const existing = names.find((name) => existsSync(join(root, reviewDir, name)));
+  return `${reviewDir}/${existing ?? names.at(-1)}`;
 }
 
 async function latestReviewDir() {

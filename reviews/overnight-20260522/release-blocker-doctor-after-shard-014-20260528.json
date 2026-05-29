@@ -1,0 +1,357 @@
+{
+  "ok": true,
+  "mode": "release-blocker-doctor",
+  "writesRealFiles": false,
+  "publicLaunchAllowed": false,
+  "productionReady": false,
+  "reviewDir": "reviews/overnight-20260522",
+  "branch": "feat/nucleus-wiki-native-contract",
+  "head": "6d98f89a20aa6037d497d4ef1247a39e2eb23f04",
+  "latestVerifiedCodeBaseline": {
+    "headSha": "147a9ca1c00a89f89ee03706db8699b7be86f50d",
+    "ciRunId": 26482745060,
+    "ciConclusion": "success",
+    "localReleaseCheck": "passed",
+    "localSmoke": "release_check_covers_current_local_full_shard_progress_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
+    "secretScan": "zero_hits",
+    "privateNameScan": "zero_hits",
+    "note": "Latest inspected code/product baseline after hardening benchmark-methodology isolation: shard commands, response-arm export children, and private resume scripts now disable hosted Supermemory search unless an explicit hosted-baseline parity lane is being executed. Shard 002 recovery remains accepted, the local-full partial answer-quality snapshot covers 50/500 queries, and shard 003 is the next runtime-blocked local rerank slice. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, and owner approval all pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, diff check, secret scan, private-path scan, and GitHub Actions run 26482745060 passed."
+  },
+  "latestVerifiedRepositoryHead": {
+    "headSha": "147a9ca1c00a89f89ee03706db8699b7be86f50d",
+    "ciRunId": 26482745060,
+    "ciConclusion": "success",
+    "localReleaseCheck": "passed",
+    "localSmoke": "release_check_covers_current_local_full_shard_progress_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
+    "secretScan": "zero_hits",
+    "privateNameScan": "zero_hits",
+    "note": "Latest observed PR branch head after hardening local-full benchmark shard commands, response-arm export child environments, and private resume scripts so hosted Supermemory search is disabled for methodology loops while production read-through/search remains available unless explicitly disabled. GitHub Actions run 26482745060 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
+  },
+  "approvedRuntimeCanaryBaseline": {
+    "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
+    "ciRunId": 26353888297,
+    "ciConclusion": "success",
+    "role": "approved-runtime-canary-adapter",
+    "expectedReportCommit": "18d606aff589986b4d8b416a686bedb7ff1506d2",
+    "packetLabel": "recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip",
+    "packetSha256": "cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a",
+    "note": "Returned one-agent runtime canary reports must name this approved adapter/report commit. The current handoff packet was regenerated locally from the current controller HEAD, but later docs, evidence, benchmark-gate, or packet-tooling commits do not change the canary expected commit unless the handoff packet is regenerated with a newer CI-verified adapter commit."
+  },
+  "reviewers": [
+    {
+      "id": "claude-opus-pr5-review",
+      "status": "completed_with_concerns",
+      "evidence": "claude-pr5-review.md",
+      "nextAction": "Treat the Claude review as alpha-PR support only. It does not authorize public launch or goal completion."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "human-public-launch-approval-required",
+      "status": "blocked",
+      "evidence": "release-state.json",
+      "nextAction": "Owner must approve merge, visibility, and any public live update with the blocker list visible."
+    },
+    {
+      "id": "full-memory-sota-benchmark-gate-incomplete",
+      "status": "incomplete",
+      "evidence": "full-memory-sota-doctor-after-shard-014-20260528.json",
+      "nextAction": "Complete the full same-data answer-quality shard ladder before any public SOTA or production-memory claim: finish local-full shard-015 (350-375), then run the accepted full-SOTA lane with provider arms, exact answer/judge model matching, reviewer intake, UI/docs refresh, owner approval, and the real canary gate."
+    },
+    {
+      "id": "fresh-real-container-canary-not-current",
+      "status": "incomplete",
+      "evidence": "real-diagnostics-postwatch-evidence.md",
+      "nextAction": "Send the generated postwatch OpenClaw next-agent handoff packet to exactly one selected agent, apply the current adapter, follow the strict-real drill for a fresh 15-minute runtime window, then verify the returned metrics-only packet with `canary:returned-inbox -- --require-production-canary --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2` or `canary:returned-packet -- --require-production-canary --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2`. Use `canary:returned-workspace` to convert the returned packet into public-safe markdown findings."
+    }
+  ],
+  "checks": {
+    "releaseStateConservative": true,
+    "requiredEvidenceFilesPresent": true,
+    "remoteHasNoToken": true,
+    "hostedBaselinePreflight": {
+      "ok": true,
+      "callsHostedProvider": false,
+      "benchmarkClaimsAllowed": false
+    },
+    "baselineSourceMatchPreflight": {
+      "ok": true,
+      "sourceMatchReady": true,
+      "collectableQueryCount": 3,
+      "rawMemoryIncluded": false
+    },
+    "hostedBaselineLiveDiscovery": {
+      "callsHostedProvider": true,
+      "documentsSeen": 200,
+      "containerCandidateCount": 14,
+      "rawLabelsIncluded": false,
+      "rawMemoryIncluded": false
+    },
+    "hostedBaselineLivePrep": {
+      "queryCount": 8,
+      "uniqueQueryCount": 8,
+      "duplicateQueryCount": 0,
+      "publicBenchmarkReady": true
+    },
+    "hostedBaselineLiveCodexLocalRun": {
+      "status": "READY_FOR_BASELINE_REVIEW",
+      "callsHostedProvider": true,
+      "countsAsProductionBaselineEvidence": true,
+      "countsAsPublicBenchmarkEvidence": false,
+      "hostedQuality": 0,
+      "recallWeaveQuality": 0,
+      "recallWeaveWin": false,
+      "privacyLeakCount": 0
+    },
+    "hostedBaselineLiveMirrorRun": {
+      "status": "READY_FOR_BASELINE_REVIEW",
+      "callsHostedProvider": true,
+      "countsAsProductionBaselineEvidence": true,
+      "countsAsPublicBenchmarkEvidence": false,
+      "hostedQuality": 0,
+      "recallWeaveQuality": 0.1212,
+      "recallWeaveWin": true,
+      "reviewerApprovalCount": 0,
+      "failedChecks": [
+        "two-reviewer-approvals"
+      ],
+      "hostedContextTokensAvg": 1397,
+      "recallWeaveContextTokensAvg": 10849,
+      "privacyLeakCount": 0,
+      "strictRealPacket": true
+    },
+    "hostedBaselineLiveBudgetedRun": {
+      "status": "READY_FOR_BASELINE_REVIEW",
+      "callsHostedProvider": true,
+      "countsAsProductionBaselineEvidence": true,
+      "countsAsPublicBenchmarkEvidence": false,
+      "hostedQuality": 0,
+      "recallWeaveQuality": 0.1212,
+      "recallWeaveWin": true,
+      "reviewerApprovalCount": 0,
+      "failedChecks": [
+        "two-reviewer-approvals"
+      ],
+      "hostedContextTokensAvg": 1397,
+      "recallWeaveContextTokensAvg": 1600,
+      "contextBudget": {
+        "applied": true,
+        "tokenBudget": 1600,
+        "strategy": "ranked-prefix-with-last-result-clipping",
+        "queryCount": 8,
+        "queriesClipped": 8,
+        "clippedResultCount": 8,
+        "skippedByBudgetCount": 41,
+        "fullCandidateTokensAvg": 10849,
+        "exportedContextTokensAvg": 1600
+      },
+      "privacyLeakCount": 0,
+      "strictRealPacket": true
+    },
+    "budgetedBaselineReviewerIntake": {
+      "ok": true,
+      "publicBenchmarkApprovalReady": true,
+      "reviewerApprovalCount": 2,
+      "independentReviewerCount": 2,
+      "failedChecks": []
+    },
+    "budgetedBaselineReviewedComparison": {
+      "countsAsComparisonEvidence": true,
+      "publicBenchmarkClaimsAllowed": true,
+      "reviewerApprovalCount": 2,
+      "failedChecks": []
+    },
+    "budgetedBaselineReviewedPacketReview": {
+      "countsAsPublicBenchmarkEvidence": true,
+      "publicBenchmarkClaimsAllowed": true,
+      "publicLaunchAllowed": false,
+      "failedChecks": []
+    },
+    "budgetedBaselineReviewedNextRun": {
+      "readyForOwnerReview": true,
+      "requireReadyPassed": true,
+      "status": "READY_FOR_OWNER_REVIEW",
+      "publicLaunchAllowed": false
+    },
+    "hostedBaselineCollector": {
+      "provider": "hosted-supermemory",
+      "metricsOnly": true,
+      "fixtureOnly": true,
+      "rawMemoryIncluded": false
+    },
+    "canaryDiagnosticBatchAudit": {
+      "ok": true,
+      "metricsOnly": true,
+      "fixtureOnly": true,
+      "countsAsRealRolloutEvidence": false,
+      "publicLaunchAllowed": false,
+      "fleetRolloutAllowed": false
+    },
+    "canaryNextAgentPlan": {
+      "ok": true,
+      "metricsOnly": true,
+      "oneAgentCanaryAllowed": false,
+      "publicLaunchAllowed": false,
+      "fleetRolloutAllowed": false,
+      "status": "FIXTURE_PLAN_ONLY"
+    },
+    "realDiagnosticsPostwatch": {
+      "returnedWatchStatus": "AWAITING_RETURNED_PRODUCTION_CANARY",
+      "productionEvidencePackets": 0,
+      "diagnosticInputCount": 9,
+      "parsedInputCount": 8,
+      "strictRealPassCount": 0,
+      "selectedHost": "openclaw",
+      "selectedFailedChecks": [
+        "adapter-contract",
+        "store-latency-instrumented",
+        "store-p95"
+      ],
+      "oneAgentCanaryAllowed": true,
+      "status": "READY_FOR_ONE_AGENT_FRESH_CANARY",
+      "publicLaunchAllowed": false
+    },
+    "publicBenchmarkLane": {
+      "soloRunsAreSmokeOnly": true,
+      "sameDataComparatorsRequired": true,
+      "publicClaimsAllowedFromRetrievalProxy": false,
+      "sixQueryHybridGate": {
+        "queryCount": 6,
+        "control": "bm25-lite",
+        "winner": "bm25-lite",
+        "hybridPromotion": false,
+        "publicBenchmarkClaimsAllowed": false
+      },
+      "expandedHybridGate": {
+        "queryCount": 30,
+        "expectedResultRefCount": 92,
+        "control": "bm25-lite",
+        "winner": "bm25-lite",
+        "bestHybridStrategy": "full-hybrid-rerank",
+        "hybridPromotion": false,
+        "publicBenchmarkClaimsAllowed": false
+      },
+      "providerGate": {
+        "fixtureOnly": true,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-voyage-rerank-only",
+          "cloud-voyage4-voyage",
+          "cloud-voyage4-voyage-lite-rerank",
+          "cloud-voyage4-lite-voyage-lite",
+          "cloud-gemini-embed-rerank-proxy",
+          "cloud-gemini-voyage-rerank",
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-gemini2-voyage-rerank",
+          "cloud-nvidia-retriever-500m",
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-e5-mistral",
+          "local-apple-qwen3-0_6b"
+        ],
+        "liveRunAllowed": false,
+        "expandedLiveRunAllowed": false,
+        "voyageSingleArmLiveRunAllowed": false,
+        "nvidiaSingleArmLiveRunAllowed": false,
+        "providerPreflightStatus": "BLOCKED_PROVIDER_ENV",
+        "expandedProviderPreflightStatus": "BLOCKED_PROVIDER_ENV",
+        "voyageSingleArmPreflightStatus": "BLOCKED_PROVIDER_ENV",
+        "nvidiaSingleArmPreflightStatus": "BLOCKED_PROVIDER_ENV"
+      },
+      "autoresearchLoop": {
+        "armCount": 72,
+        "winner": "bm25-lite-b800-k5",
+        "publicBenchmarkClaimsAllowed": false
+      },
+      "expandedAutoresearchLoop": {
+        "queryCount": 30,
+        "expectedResultRefCount": 92,
+        "armCount": 48,
+        "winner": "bm25-lite-b800-k5",
+        "publicBenchmarkClaimsAllowed": false
+      }
+    },
+    "fullMemorySotaDoctor": {
+      "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
+      "publicBenchmarkClaimsAllowed": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "bm25IsLexicalFloorOnly": true,
+      "rawSourcesRetainedPrivately": true,
+      "rawPublicReportSafe": true,
+      "nextLocalFullShard": "shard-015",
+      "nextLocalFullShardRange": "350-375",
+      "localFullPendingShardCount": 6,
+      "localFullAcceptedShardCount": 14,
+      "localEmbeddingRuntimeReady": true,
+      "localEmbeddingDurabilityReady": true
+    },
+    "githubLiveSync": {
+      "ok": true,
+      "prBodyMatches": true,
+      "issueTitleMatches": true,
+      "issueBodyMatches": true
+    },
+    "claudeCommand": {
+      "ok": true,
+      "status": 0,
+      "stdout": "2.1.154 (Claude Code)",
+      "stderr": ""
+    },
+    "claudeLiveHealth": null,
+    "githubCli": {
+      "ok": false,
+      "status": null,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "manualCommands": [
+    "npm exec --yes pnpm@10.23.0 -- release:check",
+    "npm exec --yes pnpm@10.23.0 -- release:github-sync",
+    "npm exec --yes pnpm@10.23.0 -- smoke",
+    "npm exec --yes pnpm@10.23.0 -- baseline:preflight",
+    "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --fixture",
+    "npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --print-template --output /tmp/recallweave-hosted-baseline-template.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output /tmp/recallweave-hosted-baseline-discovery.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_ALLOW_PRIVATE_LABELS=1 npm exec --yes pnpm@10.23.0 -- baseline:discover -- --live --output /tmp/recallweave-hosted-baseline-discovery.json --private-map-output /tmp/recallweave-hosted-container-map.private.jsonl",
+    "npm exec --yes pnpm@10.23.0 -- baseline:select-container -- --discovery /tmp/recallweave-hosted-baseline-discovery.json --private-map /tmp/recallweave-hosted-container-map.private.jsonl --env-output /tmp/recallweave-hosted-baseline.private.env",
+    "RECALLWEAVE_BASELINE_LIVE=1 npm exec --yes pnpm@10.23.0 -- baseline:author-queryset -- --live --discovery /tmp/recallweave-hosted-baseline-discovery.json --private-map /tmp/recallweave-hosted-container-map.private.jsonl --queryset-output /tmp/recallweave-hosted-baseline-queryset.json --output /tmp/recallweave-hosted-baseline-queryset-author-report.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:queryset -- --queryset /tmp/recallweave-hosted-baseline-queryset.json --strict --output /tmp/recallweave-hosted-baseline-queryset-report.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 npm exec --yes pnpm@10.23.0 -- baseline:mirror-hosted -- --live --discovery /tmp/recallweave-hosted-baseline-discovery.json --private-map /tmp/recallweave-hosted-container-map.private.jsonl --output-dir /tmp/recallweave-hosted-local-mirror --output /tmp/recallweave-hosted-local-mirror.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:source-match -- --live --queryset /tmp/recallweave-hosted-baseline-queryset.json --container-dir /tmp/recallweave-hosted-local-mirror --preserve-ids --strict --output /tmp/recallweave-baseline-source-match.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:source-align -- --source-match /tmp/recallweave-baseline-source-match.json --local-map /tmp/recallweave-hosted-local-mirror/container-map.json --private-map /tmp/recallweave-hosted-container-map.private.jsonl --strict --output /tmp/recallweave-baseline-source-alignment.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:source-gap -- --source-match /tmp/recallweave-baseline-source-match.json --source-alignment /tmp/recallweave-baseline-source-alignment.json --output /tmp/recallweave-baseline-source-gap.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_QUERYSET_REVIEWED=1 RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=1600 RECALLWEAVE_BASELINE_PRESERVE_IDS=1 npm exec --yes pnpm@10.23.0 -- baseline:run -- --live --container-env /tmp/recallweave-hosted-baseline.private.env --queryset /tmp/recallweave-hosted-baseline-queryset.json --container-dir /tmp/recallweave-hosted-local-mirror --local-map /tmp/recallweave-hosted-local-mirror/container-map.json --private-map /tmp/recallweave-hosted-container-map.private.jsonl --preserve-ids --reviewed-queryset --context-token-budget 1600 --output /tmp/recallweave-baseline-run.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:collect -- --fixture",
+    "npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --fixture",
+    "npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --fixture",
+    "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --output /tmp/recallweave-canary-batch-audit.json",
+    "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-canary-next-agent-plan.json",
+    "npm exec --yes pnpm@10.23.0 -- canary:operator-packet -- --host openclaw",
+    "npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown --output /tmp/recallweave-canary-drill.md",
+    "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --output /tmp/recallweave-canary-batch-audit.json",
+    "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-canary-next-agent-plan.json",
+    "npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --require-ready --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output /tmp/recallweave-next-agent-handoff.zip",
+    "npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output /tmp/recallweave-next-agent-handoff.zip",
+    "npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output /tmp/recallweave-returned-canary-inbox.json",
+    "npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json",
+    "npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /tmp/recallweave-canary-evidence-packet.zip --require-production-canary --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output /tmp/recallweave-returned-canary-intake.json",
+    "npm exec --yes pnpm@10.23.0 -- canary:returned-workspace -- --packet /tmp/recallweave-canary-evidence-packet.zip --workspace reviews/overnight-20260522/next-agent-workspace --output /tmp/recallweave-returned-workspace.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=1600 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir <local-recallweave-container-dir> --context-token-budget 1600 --output /tmp/recallweave-search-responses.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect:recallweave -- --live --responses /tmp/recallweave-search-responses.json --output /tmp/recallweave-result.json",
+    "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:preflight -- --result /tmp/recallweave-hosted-baseline-result.json --output /tmp/recallweave-hosted-baseline-preflight.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --output /tmp/recallweave-baseline-comparison.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:packet -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --comparison /tmp/recallweave-baseline-comparison.json --preflight /tmp/recallweave-hosted-baseline-preflight.json --strict-real --output /tmp/recallweave-baseline-evidence-packet.zip",
+    "Set RECALLWEAVE_REVIEW_OPENAI_API_KEY in the environment, not in this command or any file.",
+    "RECALLWEAVE_REVIEW_OPENAI_PROVIDER=deepseek RECALLWEAVE_REVIEW_OPENAI_MODEL=deepseek-v4-pro npm exec --yes pnpm@10.23.0 -- baseline:reviewer:openai-compatible -- --packet /tmp/recallweave-baseline-evidence-packet.zip --comparison /tmp/recallweave-baseline-comparison.json --reviewer-id deepseek-reviewer-a --output /tmp/reviewer-a-approval.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:reviewer-intake -- --packet /tmp/recallweave-baseline-evidence-packet.zip --comparison /tmp/recallweave-baseline-comparison.json --strict-target --review /tmp/reviewer-a-approval.json --review /tmp/reviewer-b-approval.json --output /tmp/recallweave-reviewer-approval-report.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:compare -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --reviewer-approval-report /tmp/recallweave-reviewer-approval-report.json --output /tmp/recallweave-baseline-comparison.json",
+    "npm exec --yes pnpm@10.23.0 -- baseline:next-run -- --hosted /tmp/recallweave-hosted-baseline-result.json --recallweave /tmp/recallweave-result.json --preflight /tmp/recallweave-hosted-baseline-preflight.json --comparison /tmp/recallweave-baseline-comparison.json --require-ready",
+    "npm exec --yes pnpm@10.23.0 -- baseline:returned-packet -- --packet /tmp/recallweave-baseline-evidence-packet.zip --require-public-benchmark --output /tmp/recallweave-returned-baseline-intake.json",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor -- --format markdown",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder -- --shard-id shard-015 --query-offset 350 --query-limit 25 --output /tmp/recallweave-local-full-shard-015-workorder.json",
+    "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts."
+  ]
+}

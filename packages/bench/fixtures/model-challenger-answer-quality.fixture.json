@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality",
+  "claimScope": "model-challenger",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "readyForEndToEndMemoryScoreGate": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "target": {
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o"
+  },
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "querySetHash": "sha256:fixture-model-challenger-query-set",
+    "materializerHash": "sha256:fixture-model-challenger-materializer",
+    "memoriesHash": "sha256:fixture-model-challenger-memories",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "queryCount": 500,
+    "totalQueryCount": 500,
+    "scoredQueryCount": 500
+  },
+  "provider": {
+    "answerModel": "deepseek-v4-pro",
+    "judgeModel": "deepseek-v4-pro",
+    "answerQualityCallsAllowed": true,
+    "publicDataConfirmed": true,
+    "callsMade": 1000,
+    "endpointLabel": "https://api.deepseek.com"
+  },
+  "scoringPolicy": {
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "exactTargetModelsRequired": false,
+    "challengerModelAllowed": true,
+    "modelMismatchAllowed": true,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsModelChallengerBenchmarkEvidence": true
+  },
+  "metrics": {
+    "answerQuality": 82,
+    "memoryScore": 82,
+    "longmemevalScore": 82,
+    "quality": 0.82,
+    "judgeCorrectRate": 0.82
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "metrics": {
+        "answerQuality": 70,
+        "memoryScore": 70,
+        "longmemevalScore": 70,
+        "quality": 0.7
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 500
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 79,
+        "memoryScore": 79,
+        "longmemevalScore": 79,
+        "quality": 0.79
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 500
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 81,
+        "memoryScore": 81,
+        "longmemevalScore": 81,
+        "quality": 0.81
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 500
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b",
+      "metrics": {
+        "answerQuality": 77,
+        "memoryScore": 77,
+        "longmemevalScore": 77,
+        "quality": 0.77
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 500
+    },
+    {
+      "strategy": "local-apple-qwen3-0_6b-local-rerank",
+      "metrics": {
+        "answerQuality": 82,
+        "memoryScore": 82,
+        "longmemevalScore": 82,
+        "quality": 0.82
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 500
+    }
+  ],
+  "winner": {
+    "strategy": "local-apple-qwen3-0_6b-local-rerank",
+    "answerQuality": 82,
+    "judgeCorrectRate": 0.82
+  },
+  "reviewerApprovalCount": 0,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0
+}

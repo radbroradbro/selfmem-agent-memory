@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-shard-intake",
+  "status": "BLOCKED_FULL_ANSWER_QUALITY_SHARDS",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": false,
+  "readyForShardCombine": false,
+  "readyForEndToEndMemoryScoreGate": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "generatedAt": "2026-05-29T03:28:03.925Z",
+  "plan": {
+    "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
+    "hash": "sha256:99543578972eee549dc79af0b3a1b68e1750aad12e19d9320315a8b437ee2737",
+    "claimScope": "local-full",
+    "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
+    "queryCount": 500,
+    "shardSize": 25,
+    "shardCount": 20,
+    "strategies": [
+      "bm25-lite",
+      "full-hybrid-rerank",
+      "query-expanded-full-hybrid-rerank",
+      "local-apple-qwen3-0_6b",
+      "local-apple-qwen3-0_6b-local-rerank"
+    ]
+  },
+  "intake": {
+    "inputCount": 15,
+    "shardResultsPresent": 15,
+    "acceptedShardCount": 15,
+    "missingShardCount": 5,
+    "duplicateShardCount": 0,
+    "rejectedShardCount": 0,
+    "completeCoverage": false,
+    "sameTarget": true,
+    "sameSourceLock": true,
+    "sameModels": true,
+    "scoringModelPolicySatisfied": true,
+    "sameModelsAcrossShards": true,
+    "sameStrategySet": true
+  },
+  "acceptedShards": [
+    {
+      "shardId": "shard-001",
+      "range": "0-25",
+      "startIndex": 0,
+      "endIndexExclusive": 25,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-001-20260526.json",
+      "hash": "sha256:6c329ec7c00cc2bff4ad467ff52f39d451bc9aaaf3f822e9ef665e7e13246af1"
+    },
+    {
+      "shardId": "shard-002",
+      "range": "25-50",
+      "startIndex": 25,
+      "endIndexExclusive": 50,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-002-recovery-20260526.json",
+      "hash": "sha256:2cae108c8d3bee0e77faf7e223449c86fadc066d5a8d54c6d8258a2bb71c7be0"
+    },
+    {
+      "shardId": "shard-003",
+      "range": "50-75",
+      "startIndex": 50,
+      "endIndexExclusive": 75,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-003-20260527.json",
+      "hash": "sha256:22093f44f751bfe39108a7033359d92432ca0c4f8b5c7feb558c5317e96f1f0d"
+    },
+    {
+      "shardId": "shard-004",
+      "range": "75-100",
+      "startIndex": 75,
+      "endIndexExclusive": 100,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-004-20260527.json",
+      "hash": "sha256:d759315f4d09b6e0eea6a92afa0fb0108a4c1697abba0fb7bfd7c16709f3d8de"
+    },
+    {
+      "shardId": "shard-005",
+      "range": "100-125",
+      "startIndex": 100,
+      "endIndexExclusive": 125,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-005-common-arm-projection-20260527.json",
+      "hash": "sha256:ba54e0bc9b075e16ca5f7216af543dada25953ac4f485b27b21bcd9ef6b947fe"
+    },
+    {
+      "shardId": "shard-006",
+      "range": "125-150",
+      "startIndex": 125,
+      "endIndexExclusive": 150,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-006-20260527.json",
+      "hash": "sha256:97e81b56ca75fff5674beb3fcffac6bdedbb1b0396ad218b6b7167c2a29e3f5a"
+    },
+    {
+      "shardId": "shard-007",
+      "range": "150-175",
+      "startIndex": 150,
+      "endIndexExclusive": 175,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-007-20260527.json",
+      "hash": "sha256:f2a5567f572fba5779aca33a7ce7776cf87d76de447b5c53029f5a806fa0ef8e"
+    },
+    {
+      "shardId": "shard-008",
+      "range": "175-200",
+      "startIndex": 175,
+      "endIndexExclusive": 200,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-008-20260527.json",
+      "hash": "sha256:b650a76bfffd524d6b049e825e05719daad4e1ba18b09751aa148553239505e0"
+    },
+    {
+      "shardId": "shard-009",
+      "range": "200-225",
+      "startIndex": 200,
+      "endIndexExclusive": 225,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-009-20260528.json",
+      "hash": "sha256:1d4f19deecd5eee5579fbe12182e8a155ac6687640a1ff5af17ac2bda5a0e765"
+    },
+    {
+      "shardId": "shard-010",
+      "range": "225-250",
+      "startIndex": 225,
+      "endIndexExclusive": 250,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-010-20260528.json",
+      "hash": "sha256:a68bef535cca95a086ffe5a1661f6481d9e483f8b02c09632d32b2dc693296ac"
+    },
+    {
+      "shardId": "shard-011",
+      "range": "250-275",
+      "startIndex": 250,
+      "endIndexExclusive": 275,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-011-20260528.json",
+      "hash": "sha256:8e2348eecf2d6bba8815e734c2bf6a00c34d58b00b63c85889869197717312b1"
+    },
+    {
+      "shardId": "shard-012",
+      "range": "275-300",
+      "startIndex": 275,
+      "endIndexExclusive": 300,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-012-20260528.json",
+      "hash": "sha256:50417192ab845cdf041c5881c9209ea287a757a9de5951beeb62a25bda712276"
+    },
+    {
+      "shardId": "shard-013",
+      "range": "300-325",
+      "startIndex": 300,
+      "endIndexExclusive": 325,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-013-20260528.json",
+      "hash": "sha256:7b5c793200b66fb45aa2161f132a1d1895ba567620bbd1f02651469b4278ec8f"
+    },
+    {
+      "shardId": "shard-014",
+      "range": "325-350",
+      "startIndex": 325,
+      "endIndexExclusive": 350,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-014-20260528.json",
+      "hash": "sha256:91527b6777ba83b9d48335a4d5c0491c07c0d7f0e112f415dffb5db5bbb14b35"
+    },
+    {
+      "shardId": "shard-015",
+      "range": "350-375",
+      "startIndex": 350,
+      "endIndexExclusive": 375,
+      "scoredQueryCount": 25,
+      "fileName": "answer-quality-local-full-shard-015-20260529.json",
+      "hash": "sha256:220d56608eea13cfcc0a940531429f9c78885038cd0b808c7d371c5a52541a62"
+    }
+  ],
+  "missingShards": [
+    {
+      "shardId": "shard-016",
+      "startIndex": 375,
+      "endIndexExclusive": 400,
+      "queryCount": 25,
+      "rangeHash": "sha256:d5a48a6900a8b84db02a4b22eed89deeff3d3b7412781e4a40a7800594d975ea"
+    },
+    {
+      "shardId": "shard-017",
+      "startIndex": 400,
+      "endIndexExclusive": 425,
+      "queryCount": 25,
+      "rangeHash": "sha256:f5eedb21035b1aebf63db723b3f51f9d63b50ba501b801e49a01f7c289a66716"
+    },
+    {
+      "shardId": "shard-018",
+      "startIndex": 425,
+      "endIndexExclusive": 450,
+      "queryCount": 25,
+      "rangeHash": "sha256:0d8f6d43931f116e3632322367a73c0d50d65b43e622c4d1018be580c253a71c"
+    },
+    {
+      "shardId": "shard-019",
+      "startIndex": 450,
+      "endIndexExclusive": 475,
+      "queryCount": 25,
+      "rangeHash": "sha256:48f3b938408d7530d2b423418288af1eb35eca6a5ea78487ab98c35b17667c90"
+    },
+    {
+      "shardId": "shard-020",
+      "startIndex": 475,
+      "endIndexExclusive": 500,
+      "queryCount": 25,
+      "rangeHash": "sha256:59f4ad0dc9bcc2d8101cae5659b52a82c6e17a2c23d0cebddcb5b7adc1652e76"
+    }
+  ],
+  "duplicateShards": [],
+  "rejectedShards": [],
+  "blockers": [
+    "answer-quality-shards-missing",
+    "full-shard-coverage-incomplete"
+  ],
+  "combineCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-local-full-shard-001-20260526.json,<public-review-dir>/answer-quality-local-full-shard-002-recovery-20260526.json,<public-review-dir>/answer-quality-local-full-shard-003-20260527.json,<public-review-dir>/answer-quality-local-full-shard-004-20260527.json,<public-review-dir>/answer-quality-local-full-shard-005-common-arm-projection-20260527.json,<public-review-dir>/answer-quality-local-full-shard-006-20260527.json,<public-review-dir>/answer-quality-local-full-shard-007-20260527.json,<public-review-dir>/answer-quality-local-full-shard-008-20260527.json,<public-review-dir>/answer-quality-local-full-shard-009-20260528.json,<public-review-dir>/answer-quality-local-full-shard-010-20260528.json,<public-review-dir>/answer-quality-local-full-shard-011-20260528.json,<public-review-dir>/answer-quality-local-full-shard-012-20260528.json,<public-review-dir>/answer-quality-local-full-shard-013-20260528.json,<public-review-dir>/answer-quality-local-full-shard-014-20260528.json,<public-review-dir>/answer-quality-local-full-shard-015-20260529.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-local-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-local-full-combined.md",
+  "nextActions": [
+    "Run the missing shard answer-quality jobs from the checked-in shard plan.",
+    "Re-run this intake with all shard outputs before combining.",
+    "Do not hand-build a combine input list unless this intake reports complete coverage."
+  ]
+}

@@ -1461,7 +1461,7 @@ async function localAppleEmbed(texts, options = {}) {
 }
 
 async function localAppleRerank(query, candidates, options = {}) {
-  const documents = candidates.map((candidate) => candidate.text);
+  const documents = candidates.map((candidate) => prepareLocalAppleRerankDocument(candidate.text));
   options.providerStats?.recordProviderCall("rerank", documents.length);
   const response = await localAppleRerankPost({
     model: options.model ?? localAppleRerankModel(),
@@ -2407,6 +2407,17 @@ function prepareLocalAppleEmbeddingInput(text) {
   if (estimateTokens(source) <= maxEstimatedTokens) return source;
   const maxChars = Math.max(64, maxEstimatedTokens * 4);
   const marker = "\n\n[RecallWeave local embedding view: middle elided]\n\n";
+  const available = Math.max(64, maxChars - marker.length);
+  const headChars = Math.max(32, Math.floor(available * 0.6));
+  const tailChars = Math.max(32, available - headChars);
+  return `${source.slice(0, headChars)}${marker}${source.slice(-tailChars)}`;
+}
+
+function prepareLocalAppleRerankDocument(text) {
+  const source = providerSafeText(text);
+  const maxChars = optionalPositiveInt(process.env.SELFMEM_LOCAL_RERANK_MAX_DOCUMENT_CHARS ?? null, "local Apple rerank max document chars");
+  if (!maxChars || source.length <= maxChars) return source;
+  const marker = "\n\n[RecallWeave local rerank view: middle elided]\n\n";
   const available = Math.max(64, maxChars - marker.length);
   const headChars = Math.max(32, Math.floor(available * 0.6));
   const tailChars = Math.max(32, available - headChars);

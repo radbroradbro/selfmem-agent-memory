@@ -96,13 +96,14 @@ local-full shards are exported, scored, and combined.
 Shard 003 later completed BM25, full hybrid, query-expanded hybrid, and local
 Qwen3 0.6B embedding response exports, but the local Qwen3 Reranker 0.6B arm
 stalled before a complete response file was written. That is recorded as
-`BLOCKED_LOCAL_FULL_SHARD_RUNTIME`, not as a quality score. Keep the local
-reranker as a bounded challenger until sidecar completion is proven. The
-corrected rank-pooling sidecar now passes the synthetic durability smoke, but
-the shard-003 missing-arm export, scoring, and intake still need to run.
-Treat this as local diagnostic evidence, not a default promotion or SOTA
-claim. Qwen3 Reranker 4B and 8B stay optional quality arms until measured
-latency and memory pressure justify them.
+`BLOCKED_LOCAL_FULL_SHARD_RUNTIME`, not as a quality score. That shard was later
+recovered through the bounded local-rerank sidecar path, and the accepted
+local-full diagnostic lane now covers 13/20 shards, 325/500 queries. The current
+partial aggregate leader is `local-apple-qwen3-0_6b-local-rerank` at `29.1385`
+answer quality versus BM25 at `25.88`, with shard 014 (`325-350`) next.
+Treat this as local diagnostic evidence, not a default promotion or SOTA claim.
+Qwen3 Reranker 4B and 8B stay optional quality arms until measured latency and
+memory pressure justify them.
 
 The quality-first local search lane is Qwen3 Embedding 4B or 8B plus Qwen3
 Reranker 4B or 8B when the machine can run them without stale model-server

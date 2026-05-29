@@ -11,6 +11,14 @@ const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-loca
 const intakePath = resolveInputPath(
   args.intake ??
     preferReviewFile(
+      "answer-quality-local-full-shard-intake-after-shard-015-20260529.json",
+      "answer-quality-local-full-shard-intake-after-shard-014-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-013-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-012-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-011-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-010-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-009-common-arm-20260528.json",
+      "answer-quality-local-full-shard-intake-after-shard-009-20260528.json",
       "answer-quality-local-full-shard-intake-after-shard-008-20260527.json",
       "answer-quality-local-full-shard-intake-after-shard-007-20260527.json",
       "answer-quality-local-full-shard-intake-after-shard-006-20260527.json",

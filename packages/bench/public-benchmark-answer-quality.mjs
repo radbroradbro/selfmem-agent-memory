@@ -42,14 +42,21 @@ const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
-assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
 assert.ok(
-  ["exact-target-required", "local-diagnostic-allowed"].includes(modelMatchPolicy),
-  "--model-match-policy must be exact-target-required or local-diagnostic-allowed",
+  ["full-sota", "local-full", "model-challenger"].includes(claimScope),
+  "--claim-scope must be full-sota, local-full, or model-challenger",
 );
 assert.ok(
-  claimScope === "local-full" || modelMatchPolicy === "exact-target-required",
+  ["exact-target-required", "local-diagnostic-allowed", "challenger-model-allowed"].includes(modelMatchPolicy),
+  "--model-match-policy must be exact-target-required, local-diagnostic-allowed, or challenger-model-allowed",
+);
+assert.ok(
+  claimScope === "local-full" || modelMatchPolicy !== "local-diagnostic-allowed",
   "only local-full can use local-diagnostic-allowed scoring",
+);
+assert.ok(
+  claimScope === "model-challenger" || modelMatchPolicy !== "challenger-model-allowed",
+  "only model-challenger can use challenger-model-allowed scoring",
 );
 assert.ok(!fixtureRequested || queryOffset === 0, "--query-offset is only supported for live answer-quality runs");
 assert.ok(targetPath && existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
@@ -113,6 +120,7 @@ async function liveRun() {
   assert.ok(baseUrl, "OpenAI-compatible base URL is required via --base-url or RECALLWEAVE_MEMORYBENCH_BASE_URL");
   const exactTargetModelsRequired = modelMatchPolicy === "exact-target-required";
   const localDiagnosticModelAllowed = modelMatchPolicy === "local-diagnostic-allowed";
+  const challengerModelAllowed = modelMatchPolicy === "challenger-model-allowed";
   const endpointIsLocal = isLocalUrl(baseUrl);
   if (exactTargetModelsRequired) {
     assert.equal(answerModel, target.benchmark?.answerModel, "answer model must match target contract");
@@ -120,6 +128,10 @@ async function liveRun() {
   }
   if (localDiagnosticModelAllowed) {
     assert.equal(endpointIsLocal, true, "local diagnostic scoring requires a local OpenAI-compatible endpoint");
+  }
+  if (challengerModelAllowed) {
+    assert.ok(answerModel.length > 0, "challenger answer model is required");
+    assert.ok(judgeModel.length > 0, "challenger judge model is required");
   }
   if (!isLocalUrl(baseUrl)) assert.ok(apiKey, "cloud answer-quality endpoints require RECALLWEAVE_MEMORYBENCH_API_KEY");
   assertPrivateFile(querySetPath, "private query set");
@@ -322,11 +334,14 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
       modelMatchPolicy,
       exactTargetModelsRequired: modelMatchPolicy === "exact-target-required",
       localDiagnosticModelAllowed: modelMatchPolicy === "local-diagnostic-allowed",
+      challengerModelAllowed: modelMatchPolicy === "challenger-model-allowed",
       localDiagnosticEndpointSatisfied: provider.endpointIsLocal === true,
-      modelMismatchAllowed: modelMatchPolicy === "local-diagnostic-allowed",
+      modelMismatchAllowed: ["local-diagnostic-allowed", "challenger-model-allowed"].includes(modelMatchPolicy),
       countsAsFullMemorySotaEvidence: false,
       countsAsLocalFullBenchmarkEvidence:
         claimScope === "local-full" && !fixtureOnly && provider.callsMade > 0 && provider.endpointIsLocal === true,
+      countsAsModelChallengerBenchmarkEvidence:
+        claimScope === "model-challenger" && !fixtureOnly && provider.callsMade > 0,
     },
     metrics: bestArm?.metrics ?? null,
     strategies: arms,
@@ -654,6 +669,9 @@ function renderMarkdown(value) {
     `- Ready for end-to-end memory score gate: ${value.readyForEndToEndMemoryScoreGate}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
     `- Benchmark: ${value.benchmark}`,
+    `- Claim scope: ${value.claimScope}`,
+    `- Model match policy: ${value.scoringPolicy.modelMatchPolicy}`,
+    `- Counts as model-challenger benchmark evidence: ${value.scoringPolicy.countsAsModelChallengerBenchmarkEvidence}`,
     `- Query count: ${value.input.queryCount}`,
     `- Scored query count: ${value.input.scoredQueryCount}`,
     `- Query shard: ${value.input.scoredQueryStart}-${value.input.scoredQueryEndExclusive} of ${value.input.totalQueryCount}`,
@@ -895,7 +913,9 @@ function optionalNonNegativeInt(value, label) {
 }
 
 function defaultModelMatchPolicy(scope) {
-  return scope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required";
+  if (scope === "local-full") return "local-diagnostic-allowed";
+  if (scope === "model-challenger") return "challenger-model-allowed";
+  return "exact-target-required";
 }
 
 function truthy(value) {

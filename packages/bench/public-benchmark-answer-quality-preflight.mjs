@@ -27,14 +27,21 @@ const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECAL
 const armSpecs = parseArmSpecs(args.arm ?? args.arms);
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
-assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
 assert.ok(
-  ["exact-target-required", "local-diagnostic-allowed"].includes(modelMatchPolicy),
-  "--model-match-policy must be exact-target-required or local-diagnostic-allowed",
+  ["full-sota", "local-full", "model-challenger"].includes(claimScope),
+  "--claim-scope must be full-sota, local-full, or model-challenger",
 );
 assert.ok(
-  claimScope === "local-full" || modelMatchPolicy === "exact-target-required",
+  ["exact-target-required", "local-diagnostic-allowed", "challenger-model-allowed"].includes(modelMatchPolicy),
+  "--model-match-policy must be exact-target-required, local-diagnostic-allowed, or challenger-model-allowed",
+);
+assert.ok(
+  claimScope === "local-full" || modelMatchPolicy !== "local-diagnostic-allowed",
   "only local-full can use local-diagnostic-allowed scoring",
+);
+assert.ok(
+  claimScope === "model-challenger" || modelMatchPolicy !== "challenger-model-allowed",
+  "only model-challenger can use challenger-model-allowed scoring",
 );
 assert.ok(existsSync(targetPath), `benchmark target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `benchmark target empty: ${displayPath(targetPath)}`);
@@ -57,10 +64,13 @@ const answerModelMatchesTarget = answerModel.present && targetAnswerModel.length
 const judgeModelMatchesTarget = judgeModel.present && targetJudgeModel.length > 0 && judgeModel.value === targetJudgeModel;
 const exactTargetModelsRequired = modelMatchPolicy === "exact-target-required";
 const localDiagnosticModelAllowed = modelMatchPolicy === "local-diagnostic-allowed";
+const challengerModelAllowed = modelMatchPolicy === "challenger-model-allowed";
 const localDiagnosticEndpointSatisfied = localDiagnosticModelAllowed && endpointIsLocal;
 const scoringModelPolicySatisfied = exactTargetModelsRequired
   ? answerModelMatchesTarget && judgeModelMatchesTarget
-  : answerModel.present && judgeModel.present && localDiagnosticEndpointSatisfied;
+  : localDiagnosticModelAllowed
+    ? answerModel.present && judgeModel.present && localDiagnosticEndpointSatisfied
+    : challengerModelAllowed && answerModel.present && judgeModel.present;
 
 let queryShardSelection = null;
 const privateInputs = inspectPrivateInputs();
@@ -173,12 +183,14 @@ const report = {
     modelMatchPolicy,
     exactTargetModelsRequired,
     localDiagnosticModelAllowed,
+    challengerModelAllowed,
     localDiagnosticEndpointRequired: localDiagnosticModelAllowed,
     localDiagnosticEndpointSatisfied,
-    modelMismatchAllowed: localDiagnosticModelAllowed,
+    modelMismatchAllowed: localDiagnosticModelAllowed || challengerModelAllowed,
     scoringModelPolicySatisfied,
     countsAsFullMemorySotaEvidence: false,
     countsAsLocalFullBenchmarkEvidence: claimScope === "local-full" && ready,
+    countsAsModelChallengerBenchmarkEvidence: claimScope === "model-challenger" && ready,
   },
   privateInputs,
   queryShard: queryShardSelection
@@ -212,6 +224,8 @@ const report = {
       : "Attach the metrics-only result to benchmark:memory-score:result-gate --require-ready.",
     claimScope === "local-full"
       ? "Treat this as local diagnostic evidence only; exact SOTA and public superiority claims still need the full provider/scoring lane."
+      : claimScope === "model-challenger"
+        ? "Treat this as a stronger-model reported-score comparison lane, not strict same-model SOTA evidence."
       : "Send the metrics-only packet to independent reviewers before public benchmark wording changes.",
   ]
     : [
@@ -425,6 +439,7 @@ function renderMarkdown(value) {
     `- Judge model matches target: ${value.models.judgeModelMatchesTarget}`,
     `- Scoring model policy satisfied: ${value.scoringPolicy.scoringModelPolicySatisfied}`,
     `- Counts as local-full benchmark evidence: ${value.scoringPolicy.countsAsLocalFullBenchmarkEvidence}`,
+    `- Counts as model-challenger benchmark evidence: ${value.scoringPolicy.countsAsModelChallengerBenchmarkEvidence}`,
     "",
     "## Strategy Coverage",
     `- BM25 lite: ${value.requiredStrategyCoverage.hasBm25Lite}`,
@@ -458,7 +473,9 @@ function collectorQuerySetHashPayload(querySet) {
 }
 
 function defaultModelMatchPolicy(scope) {
-  return scope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required";
+  if (scope === "local-full") return "local-diagnostic-allowed";
+  if (scope === "model-challenger") return "challenger-model-allowed";
+  return "exact-target-required";
 }
 
 function selectQueries(queries) {
