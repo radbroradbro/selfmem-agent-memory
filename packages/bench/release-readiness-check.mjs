@@ -3774,6 +3774,7 @@ check("fresh public benchmark target check passes", () => {
     const deterministicLane = executionLanes.get("deterministic-control-proxy");
     const localAppleLane = executionLanes.get("local-apple-no-spend");
     const voyageLane = executionLanes.get("voyage-minimum-challenger");
+    const geminiLane = executionLanes.get("gemini2-minimum-challenger");
     const nvidiaLane = executionLanes.get("nvidia-minimum-challenger");
     const fullLane = executionLanes.get("full-sota-accepted-shards");
     assert.equal(deterministicLane?.coverageReady, true);
@@ -3792,6 +3793,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(voyageLane?.acceptedByFullShardIntake, false);
     assert.deepEqual(voyageLane?.providerRequirements, ["voyage"]);
     assert.equal(voyageLane?.queryExpansionEvidenceRequirement, "not-required");
+    assert.equal(geminiLane?.coverageReady, true);
+    assert.equal(geminiLane?.acceptedByFullShardIntake, false);
+    assert.deepEqual(geminiLane?.providerRequirements, ["gemini"]);
+    assert.equal(geminiLane?.queryExpansionEvidenceRequirement, "not-required");
     assert.equal(nvidiaLane?.coverageReady, true);
     assert.equal(nvidiaLane?.acceptedByFullShardIntake, false);
     assert.deepEqual(nvidiaLane?.providerRequirements, ["nvidia"]);
@@ -3800,7 +3805,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(fullLane?.acceptedByFullShardIntake, true);
     assert.equal(fullLane?.canReachFullSotaGateAfterShardIntake, true);
     assert.deepEqual(fullLane?.strategies, shardPlan.runPlan?.strategies);
-    assert.deepEqual(fullLane?.providerRequirements, ["local-apple", "local-rerank", "nvidia", "voyage"]);
+    assert.deepEqual(fullLane?.providerRequirements, ["gemini", "local-apple", "local-rerank", "nvidia", "voyage"]);
     assert.equal(fullLane?.queryExpansionEvidenceRequirement, "local-or-cloud-model-required");
     assert.equal(fullLane?.queryExpansionDiagnosticFallbackAllowed, false);
     assert.equal(fullLane?.queryExpansionSotaEligible, true);
@@ -5538,6 +5543,7 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(fullShardFlow.shardContract?.combineMode, "query-shard-answer-quality-union");
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("--query-offset")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:arms") && String(line).includes("full-answer-quality-arms/$shard_id")));
+  assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("GEMINI_API_KEYS_FILE")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:preflight") && String(line).includes("full-answer-quality-preflights")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("benchmark:answer-quality:shard-workorder")));
   assert.ok(fullShardFlow.commands?.some((line) => String(line).includes("answer-quality-$shard_id.json")));

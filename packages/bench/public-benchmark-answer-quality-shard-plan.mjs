@@ -652,6 +652,7 @@ function defaultStrategies(scope) {
   if (scope === "local-full") return local;
   return [
     ...local.slice(0, 3),
+    "cloud-gemini2-embed-rerank-proxy",
     "cloud-voyage4-voyage-lite-rerank",
     "cloud-nvidia-nemotron-1b",
     ...local.slice(3),

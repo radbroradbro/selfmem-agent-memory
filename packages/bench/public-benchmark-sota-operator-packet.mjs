@@ -497,6 +497,7 @@ function buildOperatorFlow() {
         "export RECALLWEAVE_MEMORYBENCH_API_KEY=\"<env-only-if-cloud-endpoint>\"",
         `export RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL="${fullShardPlan.target?.answerModel ?? "<answer-model>"}"`,
         `export RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL="${fullShardPlan.target?.judgeModel ?? "<judge-model>"}"`,
+        "export GEMINI_API_KEYS_FILE=\"<private-file-outside-repo-when-gemini-arm-runs>\"",
         "export VOYAGE_API_KEYS_FILE=\"<private-file-outside-repo-when-voyage-arm-runs>\"",
         "export NVIDIA_API_KEYS_FILE=\"<private-file-outside-repo-when-nvidia-arm-runs>\"",
         "export SELFMEM_QUERY_EXPANSION_BASE_URL=\"<local-query-expansion-url-or-approved-cloud-url>\"",
