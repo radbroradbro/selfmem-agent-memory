@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "agentic-memory-target-watch",
+  "generatedAt": "2026-05-29T22:05:11.095Z",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "liveChecksRequested": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsBenchmarkScore": false,
+  "sourceLockReady": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "primaryCandidate": {
+    "id": "longmemeval-v2",
+    "name": "LongMemEval-V2",
+    "priority": 1,
+    "status": "NEXT_SOURCE_LOCK_CANDIDATE",
+    "fit": "agent-work-memory",
+    "why": [
+      "state-recall",
+      "dynamic-state-tracking",
+      "workflow-knowledge",
+      "environment-gotchas",
+      "premise-awareness"
+    ],
+    "publicSourceHosts": [
+      "github.com",
+      "huggingface.co",
+      "xiaowu0162.github.io",
+      "arxiv.org"
+    ],
+    "publicSourcesHash": "sha256:e314964c6aa15570881efb6a32e4be931ba9a7c424d916244853760fd202d4ff",
+    "knownShape": {
+      "questionCount": 451,
+      "publicLeaderboardTiers": [
+        "small",
+        "medium"
+      ],
+      "largestHaystackTokens": "up-to-115M",
+      "domains": [
+        "web",
+        "enterprise"
+      ],
+      "runnerLanguage": "python",
+      "memoryModules": [
+        "no_retrieval",
+        "rag_query_to_slice",
+        "rag_query_to_slice_notes",
+        "agentrunbook_r",
+        "codex",
+        "agentrunbook_c"
+      ]
+    },
+    "blockersBeforeRun": [
+      "source-lock-repo-commit-and-data-revision",
+      "pin-small-or-medium-tier",
+      "hash-question-ids-labels-and-scoring-code",
+      "map-trajectory-history-to-recallweave-ingest-contract",
+      "pin-reader-answer-model-and-judge-model",
+      "attach-comparable-leaderboard-row"
+    ]
+  },
+  "candidates": [
+    {
+      "id": "longmemeval-v2",
+      "name": "LongMemEval-V2",
+      "priority": 1,
+      "status": "NEXT_SOURCE_LOCK_CANDIDATE",
+      "fit": "agent-work-memory",
+      "why": [
+        "state-recall",
+        "dynamic-state-tracking",
+        "workflow-knowledge",
+        "environment-gotchas",
+        "premise-awareness"
+      ],
+      "publicSourceHosts": [
+        "github.com",
+        "huggingface.co",
+        "xiaowu0162.github.io",
+        "arxiv.org"
+      ],
+      "publicSourcesHash": "sha256:e314964c6aa15570881efb6a32e4be931ba9a7c424d916244853760fd202d4ff",
+      "knownShape": {
+        "questionCount": 451,
+        "publicLeaderboardTiers": [
+          "small",
+          "medium"
+        ],
+        "largestHaystackTokens": "up-to-115M",
+        "domains": [
+          "web",
+          "enterprise"
+        ],
+        "runnerLanguage": "python",
+        "memoryModules": [
+          "no_retrieval",
+          "rag_query_to_slice",
+          "rag_query_to_slice_notes",
+          "agentrunbook_r",
+          "codex",
+          "agentrunbook_c"
+        ]
+      },
+      "blockersBeforeRun": [
+        "source-lock-repo-commit-and-data-revision",
+        "pin-small-or-medium-tier",
+        "hash-question-ids-labels-and-scoring-code",
+        "map-trajectory-history-to-recallweave-ingest-contract",
+        "pin-reader-answer-model-and-judge-model",
+        "attach-comparable-leaderboard-row"
+      ]
+    },
+    {
+      "id": "ama-bench",
+      "name": "AMA-Bench",
+      "priority": 2,
+      "status": "WATCH_TARGET",
+      "fit": "long-horizon-agent-trajectories",
+      "why": [
+        "recall",
+        "causal-inference",
+        "state-updating",
+        "state-abstraction"
+      ],
+      "publicSourceHosts": [
+        "huggingface.co",
+        "huggingface.co",
+        "github.com",
+        "arxiv.org"
+      ],
+      "publicSourcesHash": "sha256:c3dc7d2b6813064ae90dac4c3f86d7c8af2eef17532b85730079c3f3fd98941d",
+      "knownShape": {
+        "datasetFile": "test/open_end_qa_set.jsonl",
+        "evaluation": "llm-as-judge",
+        "trajectoryFields": [
+          "action",
+          "observation"
+        ],
+        "questionTypes": [
+          "recall",
+          "causal-inference",
+          "state-updating",
+          "state-abstraction"
+        ]
+      },
+      "blockersBeforeRun": [
+        "source-lock-github-and-dataset-revision",
+        "pin-llm-as-judge-rule",
+        "hash-open-ended-qa-labels",
+        "attach-comparable-leaderboard-row"
+      ]
+    },
+    {
+      "id": "agent-memory-benchmark",
+      "name": "Agent Memory Benchmark",
+      "priority": 3,
+      "status": "WATCH_TARGET",
+      "fit": "provider-memory-product-parity",
+      "why": [
+        "agentic-tasks",
+        "document-research-memory",
+        "preferences-in-multi-step-decisions",
+        "accuracy-speed-token-cost"
+      ],
+      "publicSourceHosts": [
+        "github.com",
+        "agentmemorybenchmark.ai"
+      ],
+      "publicSourcesHash": "sha256:cebd23a2c38bbbf643833e2213308f181569b5de660ac45043714076537faec5",
+      "knownShape": {
+        "harness": "ingest-retrieve-generate-judge",
+        "judgeFamily": "gemini",
+        "outputPathPattern": "outputs/{dataset}/{memory}/{mode}/{domain}.json",
+        "reportedDimensions": [
+          "accuracy",
+          "speed",
+          "token-cost"
+        ]
+      },
+      "blockersBeforeRun": [
+        "source-lock-repo-commit",
+        "select-dataset-domain-and-mode",
+        "pin-gemini-generation-and-judge-models",
+        "attach-reproducible-comparison-row"
+      ]
+    }
+  ],
+  "liveChecks": [],
+  "failedChecks": [],
+  "nextActions": [
+    "Source-lock LongMemEval-V2 repo commit, dataset revision, tier, scorer, labels, and leaderboard row before materialization.",
+    "Add a LongMemEval-V2 materializer only after the source-lock report proves no raw data or private paths are committed.",
+    "Keep AMA-Bench and Agent Memory Benchmark as second-wave targets until their scorer/model/split parity is pinned."
+  ],
+  "safety": {
+    "storesRawBenchmarkData": false,
+    "storesCredentials": false,
+    "sourceWatchOnly": true,
+    "publicClaimsRequireFutureScoreGate": true
+  }
+}

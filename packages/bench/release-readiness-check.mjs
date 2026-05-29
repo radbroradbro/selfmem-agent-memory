@@ -118,6 +118,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
+  "packages/bench/agentic-memory-target-watch.mjs",
   "packages/bench/memory-score-reviewer-approval-intake.mjs",
   "packages/bench/memory-score-openai-compatible-reviewer.mjs",
   "packages/bench/end-to-end-memory-score-gate.mjs",
@@ -193,6 +194,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop.json`,
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
+  `${reviewDir}/agentic-memory-target-watch-20260529.json`,
+  `${reviewDir}/agentic-memory-target-watch-20260529.md`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.md`,
   `${reviewDir}/public-longmemeval-full-run-target.json`,
@@ -1817,6 +1820,7 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(autoresearchPlan, /benchmark:source-lock -- --strict/);
   assert.match(publicTargets, /same public benchmark source, repository or dataset revision/i);
   assert.match(publicTargets, /LongMemEval-V2/i);
+  assert.match(publicTargets, /benchmark:agentic-watch/);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /personalAgentDefaultArm: cloud-voyage4-voyage/);
   assert.match(providerMatrix, /methodologyRefinementDefaultArm: local-apple-qwen3-0_6b/);
@@ -1829,6 +1833,36 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(budget, /enableOnlyForHostedBaselineParity: true/);
   assert.match(budget, /stopOnlyRecallWeaveOwnedProcesses: true/);
   for (const text of [modelMatrix, autoresearchPlan, publicTargets, providerMatrix, budget]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+});
+
+check("fresh agentic memory target watch passes", () => {
+  const result = run("node", ["packages/bench/agentic-memory-target-watch.mjs", "--strict"]);
+  const markdown = run("node", ["packages/bench/agentic-memory-target-watch.mjs", "--format", "markdown"]).stdout;
+  const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-target-watch-20260529.json"), "utf8"));
+  const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-target-watch-20260529.md"), "utf8");
+  const report = JSON.parse(result.stdout);
+  for (const item of [report, evidence]) {
+    assert.equal(item.ok, true);
+    assert.equal(item.mode, "agentic-memory-target-watch");
+    assert.equal(item.metricsOnly, true);
+    assert.equal(item.publicSafe, true);
+    assert.equal(item.countsAsBenchmarkScore, false);
+    assert.equal(item.sourceLockReady, false);
+    assert.equal(item.publicBenchmarkClaimsAllowed, false);
+    assert.equal(item.primaryCandidate?.id, "longmemeval-v2");
+    assert.equal(item.primaryCandidate?.status, "NEXT_SOURCE_LOCK_CANDIDATE");
+    assert.ok(item.primaryCandidate?.blockersBeforeRun?.includes("pin-small-or-medium-tier"));
+    assert.ok(item.primaryCandidate?.blockersBeforeRun?.includes("hash-question-ids-labels-and-scoring-code"));
+    assert.ok(item.candidates?.some((candidate) => candidate.id === "ama-bench"));
+    assert.ok(item.candidates?.some((candidate) => candidate.id === "agent-memory-benchmark"));
+    assert.deepEqual(item.failedChecks, []);
+  }
+  assert.match(markdown, /Agentic Memory Target Watch/);
+  assert.match(evidenceMarkdown, /LongMemEval-V2: NEXT_SOURCE_LOCK_CANDIDATE/);
+  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }

@@ -301,6 +301,8 @@ not count as a RecallWeave score.
 These are real public benchmark families worth source-locking next, but none
 should replace the current LongMemEval-S lane until data, scorer, split, and
 comparison rows are pinned.
+Use `benchmark:agentic-watch` to regenerate the metrics-only watch report. It
+is a planning gate, not a score.
 
 | Benchmark | Why it fits RecallWeave | Current use |
 | --- | --- | --- |

@@ -99,6 +99,7 @@
     "benchmark:public-provider:packet": "node packages/bench/provider-benchmark-operator-packet.mjs",
     "benchmark:public-provider": "node packages/bench/public-benchmark-strategy-compare.mjs --gate provider --context-token-budget 800 --limit 5",
     "benchmark:public-autoresearch": "node packages/bench/public-benchmark-autoresearch-loop.mjs",
+    "benchmark:agentic-watch": "node packages/bench/agentic-memory-target-watch.mjs",
     "benchmark:answer-quality:arms": "node packages/bench/public-benchmark-answer-quality-arm-export.mjs",
     "benchmark:answer-quality:preflight": "node packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "benchmark:answer-quality": "node packages/bench/public-benchmark-answer-quality.mjs",
