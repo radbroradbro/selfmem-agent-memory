@@ -1568,6 +1568,7 @@ async function queryExpansionPost(plan, body) {
   if (plan.apiKey) headers.authorization = `Bearer ${plan.apiKey}`;
   let lastStatus = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    await waitProviderTurn(plan.provider);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -1592,14 +1593,29 @@ async function queryExpansionPost(plan, body) {
 }
 
 async function waitProviderTurn(provider) {
-  const providerSpecific = process.env[`${String(provider).toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`];
+  const providerKey = providerThrottleKey(provider);
+  const providerSpecific = process.env[`${providerKey.toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`];
   const intervalMs = optionalPositiveInt(providerSpecific ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0;
   if (!intervalMs) return;
   const now = Date.now();
-  const previous = providerLastRequestAt.get(provider) ?? 0;
+  const previous = providerLastRequestAt.get(providerKey) ?? 0;
   const waitMs = Math.max(0, previous + intervalMs - now);
   if (waitMs > 0) await sleep(waitMs);
-  providerLastRequestAt.set(provider, Date.now());
+  providerLastRequestAt.set(providerKey, Date.now());
+}
+
+function providerThrottleKey(provider) {
+  const normalized = String(provider ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (normalized.startsWith("nvidia")) return "nvidia";
+  if (normalized.startsWith("openrouter")) return "openrouter";
+  if (normalized.startsWith("gemini")) return "gemini";
+  if (normalized.startsWith("voyage")) return "voyage";
+  if (normalized.startsWith("local")) return "local";
+  return normalized.replace(/-/g, "_") || "provider";
 }
 
 function retryableProviderStatus(status) {
