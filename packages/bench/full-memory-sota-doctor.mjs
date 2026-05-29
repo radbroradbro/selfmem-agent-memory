@@ -21,6 +21,7 @@ const files = {
   localFullShardPlan: `${reviewDir}/answer-quality-local-full-shard-plan-20260526.json`,
   localFullShardWorkorder: `${reviewDir}/answer-quality-local-full-shard-workorder-20260526.json`,
   localFullShardIntake: `${reviewDir}/answer-quality-local-full-shard-intake-20260526.json`,
+  localFullShardIntakeAfterShard020: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-020-20260529.json`,
   localFullShardIntakeAfterShard019: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-019-20260529.json`,
   localFullShardIntakeAfterShard018: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-018-20260529.json`,
   localFullShardIntakeAfterShard017: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-017-20260529.json`,
@@ -44,6 +45,7 @@ const files = {
   localFullShardIntakeLatest: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-002-recovery-20260526.json`,
   localFullShardIntakeAfterShard001: `${reviewDir}/answer-quality-local-full-shard-intake-after-shard-001-20260526.json`,
   localFullPerformanceReport: preferReviewFile(
+    "local-full-shard-performance-report-after-shard-020-20260529.json",
     "local-full-shard-performance-report-after-shard-019-20260529.json",
     "local-full-shard-performance-report-after-shard-018-20260529.json",
     "local-full-shard-performance-report-after-shard-017-20260529.json",
@@ -106,6 +108,7 @@ const localFullShardPlan = evidence.localFullShardPlan.json;
 const localFullShardWorkorder = evidence.localFullShardWorkorder.json;
 const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
   evidence.localFullShardIntake,
+  evidence.localFullShardIntakeAfterShard020,
   evidence.localFullShardIntakeAfterShard019,
   evidence.localFullShardIntakeAfterShard018,
   evidence.localFullShardIntakeAfterShard017,
@@ -427,16 +430,19 @@ function inspectLocalFullLaneState({
   const acceptedLane = arrayOf(localFullShardWorkorder?.executionLaneReadiness).find((lane) => lane.acceptedByFullShardIntake === true);
   const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
   const runtimeBlockerReports = arrayOf(localFullShardRuntimeBlockers).filter(Boolean);
+  const localFullCompleteCoverage = Boolean(localFullShardIntake?.intake?.completeCoverage);
   const acceptedShardIds = new Set(arrayOf(localFullShardIntake?.acceptedShards).map((shard) => String(shard?.shardId ?? "")));
   const performanceReportState = inspectLocalFullPerformanceReport(localFullPerformanceReport, {
     localFullShardPlan,
     localFullShardIntake,
     localFullAcceptedLaneLaunchDoctor,
   });
-  const nextPendingShardId =
-    performanceReportState.nextPendingShardId ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null;
-  const nextPendingShardRange =
-    performanceReportState.nextPendingShardRange ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null;
+  const nextPendingShardId = localFullCompleteCoverage
+    ? null
+    : (performanceReportState.nextPendingShardId ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null);
+  const nextPendingShardRange = localFullCompleteCoverage
+    ? null
+    : (performanceReportState.nextPendingShardRange ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null);
   const recoveredRuntimeShardIds = new Set(
     performanceReportState.runtimeRecoveryRetrievalRecovered && performanceReportState.runtimeRecoveryShardId
       ? [performanceReportState.runtimeRecoveryShardId]
@@ -454,6 +460,7 @@ function inspectLocalFullLaneState({
   const historicalNextPendingShardResumeMissingStrategies =
     localFullShardWorkorder?.workorders?.[0]?.runtimeResume?.missingStrategies ?? [];
   const nextPendingShardResumeMissingStrategies =
+    localFullCompleteCoverage ||
     performanceReportState.runtimeRecoveryRetrievalRecovered === true ||
     performanceReportState.runtimeRecoveryShardId !== nextPendingShardId
       ? []
@@ -507,6 +514,7 @@ function inspectLocalFullLaneState({
     acceptedShardCount: Number(localFullShardIntake?.intake?.acceptedShardCount ?? 0),
     acceptedShardIds: [...acceptedShardIds].filter(Boolean).sort(),
     missingShardCount: Number(localFullShardIntake?.intake?.missingShardCount ?? 0),
+    completeCoverage: localFullCompleteCoverage,
     launchDoctorStatus: localFullAcceptedLaneLaunchDoctor?.status ?? null,
     readyForFirstShardRun: localFullAcceptedLaneLaunchDoctor?.launchGate?.readyForFirstAcceptedShardRun === true,
     readyForLocalFullBenchmarkResult: localFullAcceptedLaneLaunchDoctor?.launchGate?.readyForLocalFullBenchmarkResult === true,
@@ -598,11 +606,16 @@ function inspectLocalFullPerformanceReport(
   const expectedQueryCount = Number(localFullShardPlan?.runPlan?.queryCount ?? 0);
   const expectedCoveragePercent = expectedQueryCount > 0 ? roundTo((expectedAcceptedQueryCount / expectedQueryCount) * 100, 4) : 0;
   const expectedNextPendingShard = arrayOf(localFullShardIntake?.missingShards).at(0);
-  const expectedNextPendingShardId = expectedNextPendingShard?.shardId ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null;
+  const completeCoverage = Boolean(localFullShardIntake?.intake?.completeCoverage);
+  const expectedNextPendingShardId = completeCoverage
+    ? null
+    : (expectedNextPendingShard?.shardId ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null);
   const expectedNextPendingShardRange =
-    expectedNextPendingShard && Number.isInteger(Number(expectedNextPendingShard.startIndex)) && Number.isInteger(Number(expectedNextPendingShard.endIndexExclusive))
-      ? `${expectedNextPendingShard.startIndex}-${expectedNextPendingShard.endIndexExclusive}`
-      : (localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null);
+    completeCoverage
+      ? null
+      : expectedNextPendingShard && Number.isInteger(Number(expectedNextPendingShard.startIndex)) && Number.isInteger(Number(expectedNextPendingShard.endIndexExclusive))
+        ? `${expectedNextPendingShard.startIndex}-${expectedNextPendingShard.endIndexExclusive}`
+        : (localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardRange ?? null);
   const generatedAtMs = Date.parse(performanceReport?.generatedAt ?? "");
   const intakeGeneratedAtMs = Date.parse(localFullShardIntake?.generatedAt ?? "");
   const freshForIntake =
@@ -643,7 +656,9 @@ function inspectLocalFullPerformanceReport(
   const evidenceBlockers = [
     !performanceReport ? "local-full-performance-report-missing" : null,
     performanceReport?.mode !== "local-full-shard-performance-report" ? "local-full-performance-report-mode-mismatch" : null,
-    performanceReport?.status !== "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT" ? "local-full-performance-report-status-not-partial" : null,
+    !["PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT", "COMPLETE_LOCAL_FULL_PERFORMANCE_SNAPSHOT"].includes(performanceReport?.status)
+      ? "local-full-performance-report-status-invalid"
+      : null,
     !safe ? "local-full-performance-report-unsafe" : null,
     performanceReport?.countsAsLocalFullBenchmarkEvidence !== false ||
     performanceReport?.countsAsFullMemorySotaEvidence !== false ||

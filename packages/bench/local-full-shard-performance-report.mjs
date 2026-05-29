@@ -11,6 +11,7 @@ const planPath = resolveInputPath(args.plan ?? `${reviewDir}/answer-quality-loca
 const intakePath = resolveInputPath(
   args.intake ??
     preferReviewFile(
+      "answer-quality-local-full-shard-intake-after-shard-020-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-019-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-018-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-017-20260529.json",
@@ -103,7 +104,12 @@ const report = {
   schemaVersion: 1,
   ok: true,
   mode: "local-full-shard-performance-report",
-  status: coverage.acceptedShardCount > 0 ? "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT" : "NO_LOCAL_FULL_PERFORMANCE_YET",
+  status:
+    coverage.acceptedShardCount === 0
+      ? "NO_LOCAL_FULL_PERFORMANCE_YET"
+      : coverage.completeCoverage
+        ? "COMPLETE_LOCAL_FULL_PERFORMANCE_SNAPSHOT"
+        : "PARTIAL_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
   generatedAt: new Date().toISOString(),
   reviewDir,
   writesRealFiles: Boolean(outputPath || markdownOutputPath),
@@ -171,7 +177,9 @@ const report = {
     coverage.nextPendingShardId
       ? `Finish or rerun ${coverage.nextPendingShardId} before treating the next 25-query slice as accepted.`
       : "No next local-full shard is pending; run shard intake and combine gates before any claim changes.",
-    "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
+    coverage.completeCoverage
+      ? "Use the combined local-full and memory-score gates as the stable local diagnostic baseline; keep public SOTA claims blocked."
+      : "Regenerate this report after each accepted local-full shard to track quality and latency without claiming SOTA.",
     "Only use combine and full-memory SOTA gates after local-full or full-SOTA intake reports complete non-overlapping shard coverage.",
   ],
 };

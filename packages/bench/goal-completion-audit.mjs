@@ -137,6 +137,7 @@ const files = {
   answerQualityFullShardIntakeReport: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
   fullMemorySotaDoctorReport: preferReviewFile(
+    "full-memory-sota-doctor-after-shard-020-20260529.json",
     "full-memory-sota-doctor-after-shard-019-20260529.json",
     "full-memory-sota-doctor-after-shard-018-20260529.json",
     "full-memory-sota-doctor-after-shard-017-20260529.json",
@@ -152,6 +153,7 @@ const files = {
     "full-memory-sota-doctor-20260527.json",
   ),
   fullMemorySotaDoctorMarkdown: preferReviewFile(
+    "full-memory-sota-doctor-after-shard-020-20260529.md",
     "full-memory-sota-doctor-after-shard-019-20260529.md",
     "full-memory-sota-doctor-after-shard-018-20260529.md",
     "full-memory-sota-doctor-after-shard-017-20260529.md",
@@ -167,6 +169,7 @@ const files = {
     "full-memory-sota-doctor-20260527.md",
   ),
   localWikiMethodReport: preferReviewFile(
+    "local-wiki-method-report-after-shard-020-20260529.json",
     "local-wiki-method-report-after-shard-019-20260529.json",
     "local-wiki-method-report-after-shard-018-20260529.json",
     "local-wiki-method-report-after-shard-017-20260529.json",
@@ -175,6 +178,7 @@ const files = {
     "local-wiki-method-report-20260527.json",
   ),
   localWikiMethodMarkdown: preferReviewFile(
+    "local-wiki-method-report-after-shard-020-20260529.md",
     "local-wiki-method-report-after-shard-019-20260529.md",
     "local-wiki-method-report-after-shard-018-20260529.md",
     "local-wiki-method-report-after-shard-017-20260529.md",

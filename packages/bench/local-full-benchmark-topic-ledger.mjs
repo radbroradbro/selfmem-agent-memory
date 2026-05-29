@@ -10,6 +10,7 @@ const reviewDir = String(args.reviewDir ?? process.env.RECALLWEAVE_REVIEW_DIR ??
 const performancePath = resolveInputPath(
   args.performance ??
     preferReviewFile(
+      "local-full-shard-performance-report-after-shard-020-20260529.json",
       "local-full-shard-performance-report-after-shard-019-20260529.json",
       "local-full-shard-performance-report-after-shard-018-20260529.json",
       "local-full-shard-performance-report-after-shard-017-20260529.json",
@@ -26,6 +27,7 @@ const performancePath = resolveInputPath(
 const intakePath = resolveInputPath(
   args.intake ??
     preferReviewFile(
+      "answer-quality-local-full-shard-intake-after-shard-020-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-019-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-018-20260529.json",
       "answer-quality-local-full-shard-intake-after-shard-017-20260529.json",
@@ -148,7 +150,7 @@ const ledger = {
   nextActions: [
     coverage.nextPendingShardId
       ? `Run ${coverage.nextPendingShardId} with hosted Supermemory search disabled and regenerate this ledger.`
-      : "Run combine and memory-score gates after complete local-full coverage.",
+      : "Use the completed local-full lane to guide method refinement while keeping full SOTA and production claims blocked.",
     "Run a local-wiki shard plan before promoting title or subtopic amplification beyond fixture status.",
     "Keep raw LongMemEval material outside repo-facing wiki artifacts; index it only in local private storage.",
   ],
@@ -180,13 +182,15 @@ function buildTopics() {
   return [
     {
       id: "local-full-coverage",
-      title: "Local-full coverage is still partial",
+      title: coverage.completeCoverage ? "Local-full coverage is complete" : "Local-full coverage is still partial",
       status: coverage.completeCoverage ? "complete" : "blocked",
       evidence: `${coverage.acceptedQueryCount ?? 0}/${coverage.queryCount ?? 0} questions accepted across ${coverage.acceptedShardCount ?? 0}/${coverage.shardCount ?? 0} shards.`,
-      decision: "Do not claim local-full or SOTA completion until all planned shards are accepted and combined.",
+      decision: coverage.completeCoverage
+        ? "Treat the completed local-full lane as diagnostic evidence only; full SOTA and production claims still require the provider/full-memory gates."
+        : "Do not claim local-full or SOTA completion until all planned shards are accepted and combined.",
       nextAction: coverage.nextPendingShardId
         ? `Run ${coverage.nextPendingShardId} (${coverage.nextPendingShardRange ?? "next range"}).`
-        : "Run combine and memory-score gates.",
+        : "Run combine, memory-score, reviewer, and provider/full-memory gates before any public claim changes.",
     },
     {
       id: "bm25-control",
