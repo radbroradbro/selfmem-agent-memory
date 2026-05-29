@@ -87,6 +87,7 @@ const modelMatrixGates = document.querySelector("#modelMatrixGates");
 const modelMatrixExport = document.querySelector("#modelMatrixExport");
 const compactionAuditSummary = document.querySelector("#compactionAuditSummary");
 const compactionAuditFingerprints = document.querySelector("#compactionAuditFingerprints");
+const compactionAuditSessionMap = document.querySelector("#compactionAuditSessionMap");
 const compactionAuditExport = document.querySelector("#compactionAuditExport");
 const benchmarkStatus = document.querySelector("#benchmarkStatus");
 const benchmarkSummary = document.querySelector("#benchmarkSummary");
@@ -942,6 +943,10 @@ function renderSessionCompactionAudit() {
     stat("Noise skipped", packet.metrics.skippedNoise),
     stat("Chronological", packet.metrics.chronological ? "yes" : "no"),
     stat("Exact IDs", packet.quality.exactIdentifierCandidateCount),
+    stat("Topic links", packet.sessionMap.topicLinkCount),
+    stat("Lifecycle", packet.sessionMap.lifecycleEventCount),
+    stat("Unlinked", packet.sessionMap.unlinkedCandidateCount),
+    stat("Waste", packet.sessionMap.wasteSignals.length),
   );
 
   compactionAuditFingerprints.replaceChildren();
@@ -956,6 +961,42 @@ function renderSessionCompactionAudit() {
     meta.textContent = `${candidate.idHash} | ${formatTime(candidate.observedAt)} | ${candidate.sourceEventCount} source event${candidate.sourceEventCount === 1 ? "" : "s"}`;
     item.append(label, value, meta);
     compactionAuditFingerprints.append(item);
+  }
+
+  compactionAuditSessionMap.replaceChildren();
+  for (const [phase, count] of Object.entries(packet.sessionMap.lifecyclePhaseCounts)) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    const meta = document.createElement("small");
+    item.dataset.kind = "lifecycle";
+    label.textContent = "phase";
+    value.textContent = phase;
+    meta.textContent = `${count} event${count === 1 ? "" : "s"}`;
+    item.append(label, value, meta);
+    compactionAuditSessionMap.append(item);
+  }
+  for (const signal of packet.sessionMap.wasteSignals) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    item.dataset.kind = "waste";
+    label.textContent = "signal";
+    value.textContent = signal;
+    item.append(label, value);
+    compactionAuditSessionMap.append(item);
+  }
+  for (const topic of packet.sessionMap.topicFingerprints) {
+    const item = document.createElement("li");
+    const label = document.createElement("strong");
+    const value = document.createElement("span");
+    const meta = document.createElement("small");
+    item.dataset.kind = "topic";
+    label.textContent = "topic";
+    value.textContent = `${topic.topicPathHash} | ${Math.round(topic.salience * 100)}% salience`;
+    meta.textContent = `${topic.candidateCount} candidate${topic.candidateCount === 1 ? "" : "s"} | ${topic.sourceEventCount} source event${topic.sourceEventCount === 1 ? "" : "s"} | depth ${topic.depth}`;
+    item.append(label, value, meta);
+    compactionAuditSessionMap.append(item);
   }
 
   compactionAuditExport.textContent = JSON.stringify(packet, null, 2);

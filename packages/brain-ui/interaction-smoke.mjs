@@ -228,7 +228,18 @@ try {
   assert.equal(sessionCompactionAudit.quality.privacyLeakCount, 0);
   assert.equal(sessionCompactionAudit.quality.exactIdentifierCandidateCount, 1);
   assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
+  assert.equal(sessionCompactionAudit.sessionMap.topicLinkCount, 4);
+  assert.equal(sessionCompactionAudit.sessionMap.lifecycleEventCount, 6);
+  assert.equal(sessionCompactionAudit.sessionMap.linkedCandidateCount, 4);
+  assert.equal(sessionCompactionAudit.sessionMap.unlinkedCandidateCount, 0);
+  assert.equal(sessionCompactionAudit.sessionMap.statementsInspected, 6);
+  assert.equal(sessionCompactionAudit.sessionMap.durableStatements, 4);
+  assert.equal(sessionCompactionAudit.sessionMap.lifecyclePhaseCounts.pre_compact, 1);
+  assert.equal(sessionCompactionAudit.sessionMap.lifecyclePhaseCounts.session_map_ready, 1);
+  assert.equal(sessionCompactionAudit.sessionMap.topicFingerprints.length, 4);
+  assert.ok(sessionCompactionAudit.sessionMap.wasteSignals.includes("redaction-observed"));
   assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
+  assert.ok(!sessionCompactionAudit.sessionMap.topicFingerprints.some((topic) => Object.hasOwn(topic, "topicPath")));
   assert.doesNotMatch(JSON.stringify(sessionCompactionAudit), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const benchmarkDashboard = buildBenchmarkDashboard(benchmarkSummaryFixture);

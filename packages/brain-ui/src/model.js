@@ -417,8 +417,39 @@ function buildSessionCompactionAudit(report) {
       lastObservedAt: safeOptionalTimestamp(report?.quality?.lastObservedAt),
       privacyLeakCount: numeric(report?.quality?.privacyLeakCount),
     },
+    sessionMap: buildSessionCompactionSessionMap(report?.sessionMap),
     candidateFingerprints,
     strict: Boolean(report?.strict),
+  };
+}
+
+function buildSessionCompactionSessionMap(sessionMap = {}) {
+  const topicFingerprints = Array.isArray(sessionMap?.topicFingerprints)
+    ? sessionMap.topicFingerprints.map((topic) => ({
+        idHash: safeExportText(topic?.idHash ?? ""),
+        topicPathHash: safeExportText(topic?.topicPathHash ?? ""),
+        depth: numeric(topic?.depth),
+        candidateCount: numeric(topic?.candidateCount),
+        sourceEventCount: numeric(topic?.sourceEventCount),
+        reasonCount: numeric(topic?.reasonCount),
+        salience: score(topic?.salience),
+        firstObservedAt: safeTimestamp(topic?.firstObservedAt, "1970-01-01T00:00:00.000Z"),
+        lastObservedAt: safeTimestamp(topic?.lastObservedAt, "1970-01-01T00:00:00.000Z"),
+      }))
+    : [];
+  return {
+    idHash: safeExportText(sessionMap?.idHash ?? ""),
+    topicLinkCount: numeric(sessionMap?.topicLinkCount),
+    lifecycleEventCount: numeric(sessionMap?.lifecycleEventCount),
+    linkedCandidateCount: numeric(sessionMap?.linkedCandidateCount),
+    unlinkedCandidateCount: numeric(sessionMap?.unlinkedCandidateCount),
+    statementsInspected: numeric(sessionMap?.statementsInspected),
+    durableStatements: numeric(sessionMap?.durableStatements),
+    duplicateCandidateMerges: numeric(sessionMap?.duplicateCandidateMerges),
+    wasteSignals: safeStringList(sessionMap?.wasteSignals),
+    warnings: safeStringList(sessionMap?.warnings),
+    lifecyclePhaseCounts: safeNumberMap(sessionMap?.lifecyclePhaseCounts),
+    topicFingerprints,
   };
 }
 

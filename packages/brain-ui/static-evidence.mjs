@@ -13,6 +13,7 @@ const styles = read("src/styles.css");
 const fixture = JSON.parse(read("fixtures/nucleus.fixture.json"));
 const releaseReadiness = JSON.parse(read("fixtures/release-readiness.json"));
 const promptContext = JSON.parse(read("fixtures/prompt-context-preview.json"));
+const sessionCompactionAudit = JSON.parse(read("fixtures/session-compaction-local-audit.json"));
 
 const requiredSections = {
   graph: "Interactive Nucleus graph",
@@ -67,6 +68,7 @@ const requiredRenderers = [
   "renderSelectedAudit",
   "buildPromptContextPreview",
   "buildReleaseReadinessConsole",
+  "buildSessionCompactionSessionMap",
 ];
 
 const sectionChecks = Object.fromEntries(
@@ -85,6 +87,7 @@ const allText = [
   JSON.stringify(fixture),
   JSON.stringify(releaseReadiness),
   JSON.stringify(promptContext),
+  JSON.stringify(sessionCompactionAudit),
 ].join("\n");
 
 const secretPattern =
@@ -98,6 +101,11 @@ assert.equal(fixture.roots.container.privacyLeakCount, 0);
 assert.equal(releaseReadiness.productionReady, false);
 assert.equal(releaseReadiness.safetyBoundary.enablesHostedWriteBack, false);
 assert.equal(promptContext.safety.privacyLeakCount, 0);
+assert.equal(sessionCompactionAudit.ok, true);
+assert.equal(sessionCompactionAudit.metricsOnly, true);
+assert.equal(sessionCompactionAudit.sessionMap.topicLinkCount, 4);
+assert.equal(sessionCompactionAudit.sessionMap.lifecycleEventCount, 6);
+assert.equal(sessionCompactionAudit.sessionMap.unlinkedCandidateCount, 0);
 assert.equal(secretPattern.test(allText), false);
 
 const nodeKinds = [...new Set(fixture.nodes.map((node) => node.kind))].sort();
@@ -116,6 +124,12 @@ const report = {
   productionReady: releaseReadiness.productionReady,
   hostedWriteBackEnabled: releaseReadiness.safetyBoundary.enablesHostedWriteBack,
   privacyLeakCount: fixture.roots.container.privacyLeakCount + promptContext.safety.privacyLeakCount,
+  sessionCompactionMap: {
+    topicLinkCount: sessionCompactionAudit.sessionMap.topicLinkCount,
+    lifecycleEventCount: sessionCompactionAudit.sessionMap.lifecycleEventCount,
+    unlinkedCandidateCount: sessionCompactionAudit.sessionMap.unlinkedCandidateCount,
+    wasteSignalCount: sessionCompactionAudit.sessionMap.wasteSignals.length,
+  },
 };
 
 console.log(JSON.stringify(report, null, 2));

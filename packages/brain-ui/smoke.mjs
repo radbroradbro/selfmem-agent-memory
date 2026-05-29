@@ -182,6 +182,11 @@ try {
   assert.equal(sessionCompactionAudit.quality.privacyLeakCount, 0);
   assert.equal(sessionCompactionAudit.quality.exactIdentifierCandidateCount, 1);
   assert.equal(sessionCompactionAudit.candidateFingerprints.length, 4);
+  assert.equal(sessionCompactionAudit.sessionMap.topicLinkCount, 4);
+  assert.equal(sessionCompactionAudit.sessionMap.lifecycleEventCount, 6);
+  assert.equal(sessionCompactionAudit.sessionMap.unlinkedCandidateCount, 0);
+  assert.equal(sessionCompactionAudit.sessionMap.lifecyclePhaseCounts.pre_compact, 1);
+  assert.equal(sessionCompactionAudit.sessionMap.lifecyclePhaseCounts.session_map_ready, 1);
   assert.ok(!sessionCompactionAudit.candidateFingerprints.some((candidate) => Object.hasOwn(candidate, "text")));
   assert.equal(benchmarkSummary.mode, "local-compaction-benchmark-summary");
   assert.equal(benchmarkSummary.writesRealFiles, false);

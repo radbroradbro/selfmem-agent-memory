@@ -30,7 +30,7 @@
   `brain-ui-research-lineage-dom-evidence.json`.
 - Headless Chrome captured the fixture-only Research Lineage panel in
   `brain-ui-research-lineage.png`.
-- Codex Browser captured Compaction Audit DOM evidence in
+- Headless Chrome captured refreshed Compaction Audit DOM evidence in
   `brain-ui-compaction-audit-evidence.json`.
 - Headless Chrome captured the fixture-only Compaction Audit panel in
   `brain-ui-compaction-audit.png`.
@@ -89,13 +89,14 @@
   `brain-ui-graph-navigation-evidence.json` reports neighborhood scope,
   jump-to-node options, selected-node visibility, zero console errors, and no
   private/key-shaped visible text.
-- The Compaction Audit slice was verified by Codex Browser DOM evidence, fresh
+- The Compaction Audit slice was verified by refreshed DOM evidence, fresh
   Brain UI smoke, and interaction smoke. A fixture-only screenshot was captured
   at `brain-ui-compaction-audit.png`, and
   `brain-ui-compaction-audit-evidence.json` reports metrics-only mode, 6 input
   events, 4 candidate fingerprints, 2 redactions, chronological output, 1
-  exact-identifier candidate, zero privacy leaks, zero console errors, and no
-  raw candidate text.
+  exact-identifier candidate, 4 topic links, 6 lifecycle events, 0 unlinked
+  candidates, zero privacy leaks, zero console errors, and no raw candidate
+  text.
 - The Benchmark Dashboard slice was verified by Codex Browser DOM evidence,
   fresh Brain UI smoke, interaction smoke, and Gemini focused review. A
   fixture-only screenshot was captured at `brain-ui-benchmark-dashboard.png`,

@@ -1265,6 +1265,11 @@ check("dom evidence is sane", () => {
   assert.equal(compactionAuditEvidence.evidence.privacyLeakCount, 0);
   assert.ok(compactionAuditEvidence.evidence.exactIdentifierCandidateCount >= 1);
   assert.ok(compactionAuditEvidence.evidence.fingerprintCount >= 4);
+  assert.equal(compactionAuditEvidence.evidence.hasSessionMapTelemetry, true);
+  assert.ok(compactionAuditEvidence.evidence.topicLinkCount >= 4);
+  assert.equal(compactionAuditEvidence.evidence.lifecycleEventCount, 6);
+  assert.equal(compactionAuditEvidence.evidence.unlinkedCandidateCount, 0);
+  assert.ok(compactionAuditEvidence.evidence.sessionMapRowCount >= 6);
   assert.equal(compactionAuditEvidence.evidence.candidateTextVisible, false);
   assert.equal(compactionAuditEvidence.evidence.hasPrivateOrKeyText, false);
   assert.equal(compactionAuditEvidence.evidence.exportHasCandidateText, false);
@@ -10051,11 +10056,28 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "packages/adapters/openclaw/selfmem_canary/index.mjs" ||
     file === "packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs" ||
     file === "packages/brain-ui/fixtures/model-matrix.json" ||
+    file === "packages/brain-ui/fixtures/session-compaction-local-audit.json" ||
     file === "packages/brain-ui/interaction-smoke.mjs" ||
     file === "packages/brain-ui/smoke.mjs" ||
+    file === "packages/brain-ui/static-evidence.mjs" ||
+    file === "packages/brain-ui/src/app.js" ||
+    file === "packages/brain-ui/src/index.html" ||
+    file === "packages/brain-ui/src/model.js" ||
     file === "packages/brain-ui/src/styles.css" ||
+    file === "packages/core/dist/compaction/session.d.ts" ||
+    file === "packages/core/dist/compaction/session.d.ts.map" ||
+    file === "packages/core/dist/compaction/session.js" ||
+    file === "packages/core/dist/compaction/session.js.map" ||
+    file === "packages/core/dist/nucleus/index.d.ts" ||
+    file === "packages/core/dist/nucleus/index.d.ts.map" ||
+    file === "packages/core/dist/nucleus/index.js" ||
+    file === "packages/core/dist/nucleus/index.js.map" ||
+    file === "packages/core/src/compaction/session.ts" ||
+    file === "packages/core/src/nucleus/index.ts" ||
     file.startsWith("packages/bench/") ||
     file.startsWith("tests/bench/") ||
+    file === "tests/compaction/session-compaction.test.ts" ||
+    file === "tests/nucleus/nucleus-snapshot.test.ts" ||
     file === "plugins/selfmem-fallback/scripts/selfmem_update.py"
   );
 }
