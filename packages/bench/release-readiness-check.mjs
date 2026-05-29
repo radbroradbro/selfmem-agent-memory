@@ -119,6 +119,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
   "packages/bench/agentic-memory-target-watch.mjs",
+  "packages/bench/agentic-memory-source-lock-check.mjs",
   "packages/bench/memory-score-reviewer-approval-intake.mjs",
   "packages/bench/memory-score-openai-compatible-reviewer.mjs",
   "packages/bench/end-to-end-memory-score-gate.mjs",
@@ -196,6 +197,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-autoresearch-loop-evidence.md`,
   `${reviewDir}/agentic-memory-target-watch-20260529.json`,
   `${reviewDir}/agentic-memory-target-watch-20260529.md`,
+  `${reviewDir}/agentic-memory-source-lock-20260529.json`,
+  `${reviewDir}/agentic-memory-source-lock-20260529.md`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.md`,
   `${reviewDir}/public-longmemeval-full-run-target.json`,
@@ -772,6 +775,8 @@ const requiredScripts = [
   "benchmark:public-provider:packet",
   "benchmark:public-provider",
   "benchmark:public-autoresearch",
+  "benchmark:agentic-watch",
+  "benchmark:agentic-source-lock",
   "benchmark:answer-quality:arms",
   "benchmark:answer-quality:preflight",
   "benchmark:answer-quality",
@@ -1821,6 +1826,8 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(publicTargets, /same public benchmark source, repository or dataset revision/i);
   assert.match(publicTargets, /LongMemEval-V2/i);
   assert.match(publicTargets, /benchmark:agentic-watch/);
+  assert.match(publicTargets, /benchmark:agentic-source-lock/);
+  assert.match(publicTargets, /sourceLockReadyForMaterialization/);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /personalAgentDefaultArm: cloud-voyage4-voyage/);
   assert.match(providerMatrix, /methodologyRefinementDefaultArm: local-apple-qwen3-0_6b/);
@@ -1862,6 +1869,38 @@ check("fresh agentic memory target watch passes", () => {
   }
   assert.match(markdown, /Agentic Memory Target Watch/);
   assert.match(evidenceMarkdown, /LongMemEval-V2: NEXT_SOURCE_LOCK_CANDIDATE/);
+  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+});
+
+check("fresh agentic memory source-lock contract passes", () => {
+  const result = run("node", ["packages/bench/agentic-memory-source-lock-check.mjs", "--strict"]);
+  const markdown = run("node", ["packages/bench/agentic-memory-source-lock-check.mjs", "--format", "markdown"]).stdout;
+  const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.json"), "utf8"));
+  const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.md"), "utf8");
+  const report = JSON.parse(result.stdout);
+  for (const item of [report, evidence]) {
+    assert.equal(item.ok, true);
+    assert.equal(item.mode, "agentic-memory-source-lock-check");
+    assert.equal(item.metricsOnly, true);
+    assert.equal(item.publicSafe, true);
+    assert.equal(item.countsAsBenchmarkScore, false);
+    assert.equal(item.publicBenchmarkClaimsAllowed, false);
+    assert.equal(item.sourceLockReadyForMaterialization, false);
+    assert.equal(item.sourceLockReadyForPublicClaim, false);
+    assert.equal(item.target?.id, "longmemeval-v2");
+    assert.equal(item.target?.expectedPublicShape?.questionCount, 451);
+    assert.ok(item.proofChecks?.some((proof) => proof.field === "trajectoryIngestContractHash"));
+    assert.ok(item.blockersBeforeRun?.includes("missing-repoCommit"));
+    assert.ok(item.blockersBeforeRun?.includes("missing-datasetRevision"));
+    assert.ok(item.blockersBeforeRun?.includes("missing-judgeModel"));
+    assert.deepEqual(item.failedChecks, []);
+  }
+  assert.match(markdown, /Agentic Memory Source Lock Check/);
+  assert.match(evidenceMarkdown, /Source-lock ready for materialization: false/);
+  assert.match(evidenceMarkdown, /trajectoryIngestContractHash: missing/);
   for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);

@@ -303,6 +303,12 @@ should replace the current LongMemEval-S lane until data, scorer, split, and
 comparison rows are pinned.
 Use `benchmark:agentic-watch` to regenerate the metrics-only watch report. It
 is a planning gate, not a score.
+Use `benchmark:agentic-source-lock` before any LongMemEval-V2 materialization.
+That report is also metrics-only: it records the required repo commit, dataset
+revision, tier, question-id hash, label hash, scoring-code hash, leaderboard-row
+hash, trajectory-ingest contract hash, reader model, and judge model. If those
+fields are missing, the report should stay green as a contract check but
+`sourceLockReadyForMaterialization` stays false.
 
 | Benchmark | Why it fits RecallWeave | Current use |
 | --- | --- | --- |
@@ -660,6 +666,14 @@ is a planning gate, not a score.
   environment gotchas, and premise awareness. Treat it as a custom-benchmark
   candidate until its data, scoring code, and comparable target rows are
   source-locked.
+- Current LongMemEval-V2 source-lock contract:
+  `reviews/overnight-20260522/agentic-memory-source-lock-20260529.json`.
+  It is intentionally blocked for materialization until exact public revisions,
+  hashes, tier, reader model, judge model, and the trajectory-to-session/wiki
+  ingest contract are supplied. This is the next benchmark lane for checking
+  whether session maps, wiki topics, and vectorized full-session retrieval help
+  real agent-work memory, not a replacement for the current LongMemEval-S SOTA
+  lane.
 - Reported provider scores are useful objective targets, but they are weaker
   than same-harness head-to-head runs. Every target row must keep its source URL
   and date checked.

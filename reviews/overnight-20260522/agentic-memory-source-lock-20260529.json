@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "agentic-memory-source-lock-check",
+  "generatedAt": "2026-05-29T22:15:27.480Z",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "liveChecksRequested": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsBenchmarkScore": false,
+  "sourceLockReadyForMaterialization": false,
+  "sourceLockReadyForPublicClaim": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "target": {
+    "id": "longmemeval-v2",
+    "name": "LongMemEval-V2",
+    "sourceHosts": {
+      "repository": "github.com",
+      "dataset": "huggingface.co",
+      "leaderboard": "xiaowu0162.github.io",
+      "paper": "arxiv.org"
+    },
+    "sourceUrlsHash": "sha256:e314964c6aa15570881efb6a32e4be931ba9a7c424d916244853760fd202d4ff",
+    "expectedPublicShape": {
+      "questionCount": 451,
+      "publicLeaderboardTiers": [
+        "small",
+        "medium"
+      ],
+      "largestHaystackTokens": "up-to-115M",
+      "domains": [
+        "web",
+        "enterprise"
+      ],
+      "abilityFamilies": [
+        "state-recall",
+        "dynamic-state-tracking",
+        "workflow-knowledge",
+        "environment-gotchas",
+        "premise-awareness"
+      ],
+      "memoryModules": [
+        "no_retrieval",
+        "rag_query_to_slice",
+        "rag_query_to_slice_notes",
+        "agentrunbook_r",
+        "codex",
+        "agentrunbook_c"
+      ]
+    }
+  },
+  "proofChecks": [
+    {
+      "field": "repoCommit",
+      "provided": false,
+      "kind": "git-commit",
+      "reason": "Pin the exact benchmark harness revision before comparing scores.",
+      "valueHash": null
+    },
+    {
+      "field": "datasetRevision",
+      "provided": false,
+      "kind": "revision-id",
+      "reason": "Pin the public dataset snapshot without committing raw rows.",
+      "valueHash": null
+    },
+    {
+      "field": "leaderboardTier",
+      "provided": false,
+      "kind": "enum:small|medium",
+      "reason": "Keep comparison rows on the same cost/scale tier.",
+      "valueHash": null
+    },
+    {
+      "field": "questionIdsHash",
+      "provided": false,
+      "kind": "sha256",
+      "reason": "Prove the evaluated question set while hiding raw ids.",
+      "valueHash": null
+    },
+    {
+      "field": "answerLabelsHash",
+      "provided": false,
+      "kind": "sha256",
+      "reason": "Bind scoring to the exact labels without committing labels.",
+      "valueHash": null
+    },
+    {
+      "field": "scoringCodeHash",
+      "provided": false,
+      "kind": "sha256",
+      "reason": "Make score changes reviewable when the scorer changes.",
+      "valueHash": null
+    },
+    {
+      "field": "leaderboardRowHash",
+      "provided": false,
+      "kind": "sha256",
+      "reason": "Attach a comparable public row without copying leaderboard text.",
+      "valueHash": null
+    },
+    {
+      "field": "trajectoryIngestContractHash",
+      "provided": false,
+      "kind": "sha256",
+      "reason": "Pin how agent trajectories become RecallWeave sessions/wiki topics.",
+      "valueHash": null
+    },
+    {
+      "field": "readerModel",
+      "provided": false,
+      "kind": "model-id",
+      "reason": "Record the model that answers from retrieved memory.",
+      "valueHash": null
+    },
+    {
+      "field": "judgeModel",
+      "provided": false,
+      "kind": "model-id",
+      "reason": "Record the model that grades output so judge strength is not hidden.",
+      "valueHash": null
+    }
+  ],
+  "structuralChecks": [
+    {
+      "name": "target-is-longmemeval-v2",
+      "ok": true
+    },
+    {
+      "name": "source-url-count",
+      "ok": true
+    },
+    {
+      "name": "source-urls-https",
+      "ok": true
+    },
+    {
+      "name": "expected-public-shape",
+      "ok": true
+    },
+    {
+      "name": "required-proof-fields",
+      "ok": true
+    }
+  ],
+  "liveChecks": [],
+  "failedChecks": [],
+  "blockersBeforeRun": [
+    "missing-repoCommit",
+    "missing-datasetRevision",
+    "missing-leaderboardTier",
+    "missing-questionIdsHash",
+    "missing-answerLabelsHash",
+    "missing-scoringCodeHash",
+    "missing-leaderboardRowHash",
+    "missing-trajectoryIngestContractHash",
+    "missing-readerModel",
+    "missing-judgeModel"
+  ],
+  "nextActions": [
+    "Fill the missing proof fields with hashes and model ids, not raw rows.",
+    "Map trajectory history into the RecallWeave ingest/wiki-session contract before materialization.",
+    "Regenerate this report, then materialize only from a source-lock-ready report."
+  ],
+  "safety": {
+    "storesRawBenchmarkData": false,
+    "storesCredentials": false,
+    "printsPrivatePaths": false,
+    "permitsProviderCalls": false,
+    "sourceLockOnly": true
+  }
+}

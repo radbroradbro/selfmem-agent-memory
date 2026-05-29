@@ -83,6 +83,8 @@
       "packages/bench/hosted-baseline-run.mjs",
       "packages/bench/provider-benchmark-operator-packet.mjs",
       "packages/bench/provider-benchmark-live-preflight.mjs",
+      "packages/bench/agentic-memory-target-watch.mjs",
+      "packages/bench/agentic-memory-source-lock-check.mjs",
       "packages/bench/public-benchmark-autoresearch-loop.mjs",
       "packages/bench/memory-score-reviewer-approval-intake.mjs",
       "packages/bench/memory-score-openai-compatible-reviewer.mjs",
