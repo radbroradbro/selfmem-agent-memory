@@ -168,7 +168,9 @@ function buildReport(lock) {
     },
     phases,
     nextActions: [
-      "Close the remaining LongMemEval-V2 source-lock choices before spending provider calls on a public-comparable run.",
+      ...(missingBeforeFullRun.length
+        ? ["Close the remaining LongMemEval-V2 source-lock choices before spending provider calls on a public-comparable run."]
+        : ["Materialize LongMemEval-V2 in an operator-private run directory, then start local-method-refinement waves."]),
       "Run local-method-refinement waves first, then cloud challengers with NVIDIA, Gemini, Voyage, and local Apple controls on the same rows.",
       "Keep Voyage as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
       "Do not enable hosted Supermemory search inside methodology runs; keep it as a separate parity lane.",

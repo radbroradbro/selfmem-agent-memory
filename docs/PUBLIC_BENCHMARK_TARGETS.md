@@ -313,6 +313,11 @@ Use `benchmark:agentic-source-lock -- --live` for a public-safe source snapshot:
 it verifies source reachability and captures the current public repo and dataset
 revisions, public question-id hash, public answer-label hash, scoring-code
 hash, counts, and source-shape hashes without writing raw rows.
+Use `benchmark:agentic-source-lock-decision` to pin the official-comparable
+run settings. The current decision selects LME-V2-Small, the released
+Qwen/Qwen3.5-9B reader, the released gpt-5.2 evaluator, and the small-tier
+reference-frontier hash. Codex GPT-5.5 remains an internal actor/controller
+experiment unless the official leaderboard model contract changes.
 Use `benchmark:agentic-ingest-contract` to regenerate the trajectory ingest
 contract hash. This contract defines how LongMemEval-V2 trajectories become
 RecallWeave sessions, wiki topics/subtopics, private vector chunks, and

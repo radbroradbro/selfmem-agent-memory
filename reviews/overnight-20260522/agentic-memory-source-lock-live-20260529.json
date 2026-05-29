@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "agentic-memory-source-lock-check",
-  "generatedAt": "2026-05-29T22:45:21.449Z",
+  "generatedAt": "2026-05-29T22:58:10.353Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
   "liveChecksRequested": true,
   "publicBenchmarkClaimsAllowed": false,
   "countsAsBenchmarkScore": false,
-  "sourceLockReadyForMaterialization": false,
+  "sourceLockReadyForMaterialization": true,
   "sourceLockReadyForPublicClaim": false,
   "rawQuestionIdsIncluded": false,
   "rawQuestionsIncluded": false,
@@ -71,10 +71,10 @@
     },
     {
       "field": "leaderboardTier",
-      "provided": false,
+      "provided": true,
       "kind": "enum:small|medium",
       "reason": "Keep comparison rows on the same cost/scale tier.",
-      "valueHash": null
+      "valueHash": "sha256:81db8ebbbbc69c6c6ad4a6aa92b76e0c08af547da236b9e2c9dbe1d8285a8130"
     },
     {
       "field": "questionIdsHash",
@@ -99,10 +99,10 @@
     },
     {
       "field": "leaderboardRowHash",
-      "provided": false,
+      "provided": true,
       "kind": "sha256",
       "reason": "Attach a comparable public row without copying leaderboard text.",
-      "valueHash": null
+      "valueHash": "sha256:5de99594a1f0c1dbead7c58598f36bf68a1fd89ebf552054fbb31154601edf96"
     },
     {
       "field": "trajectoryIngestContractHash",
@@ -113,17 +113,17 @@
     },
     {
       "field": "readerModel",
-      "provided": false,
+      "provided": true,
       "kind": "model-id",
       "reason": "Record the model that answers from retrieved memory.",
-      "valueHash": null
+      "valueHash": "sha256:4c87a62360872f7904c5236e147a37926beb24bebd1feb85e794be847055021d"
     },
     {
       "field": "judgeModel",
-      "provided": false,
+      "provided": true,
       "kind": "model-id",
       "reason": "Record the model that grades output so judge strength is not hidden.",
-      "valueHash": null
+      "valueHash": "sha256:131e2083b68bde4fe879efc38ed9651b1623f8735eeb42157fa3b63ef943fdc6"
     }
   ],
   "structuralChecks": [
@@ -200,7 +200,7 @@
   ],
   "liveSourceSnapshot": {
     "ok": true,
-    "checkedAt": "2026-05-29T22:45:20.479Z",
+    "checkedAt": "2026-05-29T22:58:09.430Z",
     "repoHost": "github.com",
     "datasetHost": "huggingface.co",
     "repoCommit": "8e8b92a3cece71af6af0d3aa2d7957df49dd9f65",
@@ -234,15 +234,12 @@
     "errors": []
   },
   "failedChecks": [],
-  "blockersBeforeRun": [
-    "missing-leaderboardTier",
-    "missing-leaderboardRowHash",
-    "missing-readerModel",
-    "missing-judgeModel"
-  ],
+  "blockersBeforeRun": [],
   "nextActions": [
-    "Fill the remaining missing proof fields with hashes and model ids, not raw rows.",
-    "Regenerate this report, then materialize only from a source-lock-ready report."
+    "Materialize LongMemEval-V2 through an operator-private run directory.",
+    "Export RecallWeave arms with raw rows retained outside the repository.",
+    "Run the same reader and judge model declared in this source-lock report.",
+    "Compare only against the same leaderboard tier and scoring contract."
   ],
   "safety": {
     "storesRawBenchmarkData": false,

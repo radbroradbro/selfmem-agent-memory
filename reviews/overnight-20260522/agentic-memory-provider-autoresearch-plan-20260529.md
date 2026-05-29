@@ -2,8 +2,8 @@
 
 - OK: true
 - Target: LongMemEval-V2
-- Source-lock ready: false
-- Remaining source-lock blockers: missing-leaderboardTier, missing-leaderboardRowHash, missing-readerModel, missing-judgeModel
+- Source-lock ready: true
+- Remaining source-lock blockers: none
 - Personal/prod default: cloud-voyage4-voyage
 - Methodology default: local-apple-controlled-lanes
 - Calls provider APIs: false
@@ -23,14 +23,14 @@
 
 ## Phases
 
-- source-lock-closeout: blocked
+- source-lock-closeout: ready
 - local-method-refinement: ready
-- cloud-challenger-run: blocked-until-source-lock-ready
-- answer-quality-and-review: blocked-until-source-lock-ready
+- cloud-challenger-run: ready
+- answer-quality-and-review: ready
 
 ## Next Actions
 
-- Close the remaining LongMemEval-V2 source-lock choices before spending provider calls on a public-comparable run.
+- Materialize LongMemEval-V2 in an operator-private run directory, then start local-method-refinement waves.
 - Run local-method-refinement waves first, then cloud challengers with NVIDIA, Gemini, Voyage, and local Apple controls on the same rows.
 - Keep Voyage as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.
 - Do not enable hosted Supermemory search inside methodology runs; keep it as a separate parity lane.

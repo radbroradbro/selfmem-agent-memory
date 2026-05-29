@@ -2,25 +2,27 @@
 
 - OK: true
 - Target: LongMemEval-V2
-- Source-lock ready for materialization: false
+- Source-lock ready for materialization: true
 - Counts as benchmark score: false
 - Public benchmark claims allowed: false
-- Missing proof fields: missing-leaderboardTier, missing-leaderboardRowHash, missing-readerModel, missing-judgeModel
+- Missing proof fields: none
 
 ## Required Proof
 
 - repoCommit: provided (git-commit)
 - datasetRevision: provided (revision-id)
-- leaderboardTier: missing (enum:small|medium)
+- leaderboardTier: provided (enum:small|medium)
 - questionIdsHash: provided (sha256)
 - answerLabelsHash: provided (sha256)
 - scoringCodeHash: provided (sha256)
-- leaderboardRowHash: missing (sha256)
+- leaderboardRowHash: provided (sha256)
 - trajectoryIngestContractHash: provided (sha256)
-- readerModel: missing (model-id)
-- judgeModel: missing (model-id)
+- readerModel: provided (model-id)
+- judgeModel: provided (model-id)
 
 ## Next Actions
 
-- Fill the remaining missing proof fields with hashes and model ids, not raw rows.
-- Regenerate this report, then materialize only from a source-lock-ready report.
+- Materialize LongMemEval-V2 through an operator-private run directory.
+- Export RecallWeave arms with raw rows retained outside the repository.
+- Run the same reader and judge model declared in this source-lock report.
+- Compare only against the same leaderboard tier and scoring contract.

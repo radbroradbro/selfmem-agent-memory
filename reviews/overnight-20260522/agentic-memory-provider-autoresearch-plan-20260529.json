@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "agentic-memory-provider-autoresearch-plan",
-  "generatedAt": "2026-05-29T22:51:46.244Z",
+  "generatedAt": "2026-05-29T23:00:03.980Z",
   "metricsOnly": true,
   "publicSafe": true,
   "callsProviderApis": false,
@@ -16,16 +16,11 @@
   "target": {
     "id": "longmemeval-v2",
     "name": "LongMemEval-V2",
-    "sourceLockHash": "sha256:2b550b57a40d62f768e7cb8ddf2bd78708ca00461429cdc8622da90ebf179494",
+    "sourceLockHash": "sha256:fa58d81bba1ef3d21d18293178cba414bca11488d6d4fb02d3b7bc2a6cb8b90f",
     "questionCount": 451,
-    "sourceLockReadyForMaterialization": false,
+    "sourceLockReadyForMaterialization": true,
     "sourceLockReadyForPublicClaim": false,
-    "remainingSourceLockBlockers": [
-      "missing-leaderboardTier",
-      "missing-leaderboardRowHash",
-      "missing-readerModel",
-      "missing-judgeModel"
-    ]
+    "remainingSourceLockBlockers": []
   },
   "sourceLockProof": {
     "repoCommit": true,
@@ -34,10 +29,10 @@
     "answerLabelsHash": true,
     "scoringCodeHash": true,
     "trajectoryIngestContractHash": true,
-    "leaderboardTier": false,
-    "leaderboardRowHash": false,
-    "readerModel": false,
-    "judgeModel": false
+    "leaderboardTier": true,
+    "leaderboardRowHash": true,
+    "readerModel": true,
+    "judgeModel": true
   },
   "cloudDefaultForPersonalUse": "cloud-voyage4-voyage",
   "methodologyDefault": "local-apple-controlled-lanes",
@@ -120,15 +115,10 @@
   "phases": [
     {
       "id": "source-lock-closeout",
-      "status": "blocked",
+      "status": "ready",
       "purpose": "Pin the exact LongMemEval-V2 tier, comparable row, reader model, and judge/scorer before any public-comparable run.",
       "requiredBeforeProviderSpend": true,
-      "blockers": [
-        "missing-leaderboardTier",
-        "missing-leaderboardRowHash",
-        "missing-readerModel",
-        "missing-judgeModel"
-      ]
+      "blockers": []
     },
     {
       "id": "local-method-refinement",
@@ -149,7 +139,7 @@
     },
     {
       "id": "cloud-challenger-run",
-      "status": "blocked-until-source-lock-ready",
+      "status": "ready",
       "purpose": "Run the best local method against controlled NVIDIA, Gemini, and Voyage challengers on the same source-locked rows.",
       "arms": [
         "cloud-voyage4-voyage",
@@ -158,23 +148,18 @@
         "local-apple-qwen3-4b-local-rerank"
       ],
       "requiredBeforeProviderSpend": true,
-      "blockers": [
-        "missing-leaderboardTier",
-        "missing-leaderboardRowHash",
-        "missing-readerModel",
-        "missing-judgeModel"
-      ]
+      "blockers": []
     },
     {
       "id": "answer-quality-and-review",
-      "status": "blocked-until-source-lock-ready",
+      "status": "ready",
       "purpose": "Use Codex GPT-5.5 as the reader/actor when declared, then score with the official scorer or the declared judge model and attach reviewer intake.",
       "readerModel": "codex-gpt-5.5",
       "judgePolicy": "Prefer the benchmark official scorer when available; use deepseek-v4-pro only as the declared judge/reviewer lane when the scoring contract permits LLM judging."
     }
   ],
   "nextActions": [
-    "Close the remaining LongMemEval-V2 source-lock choices before spending provider calls on a public-comparable run.",
+    "Materialize LongMemEval-V2 in an operator-private run directory, then start local-method-refinement waves.",
     "Run local-method-refinement waves first, then cloud challengers with NVIDIA, Gemini, Voyage, and local Apple controls on the same rows.",
     "Keep Voyage as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
     "Do not enable hosted Supermemory search inside methodology runs; keep it as a separate parity lane."

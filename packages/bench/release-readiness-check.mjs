@@ -121,6 +121,7 @@ const requiredFiles = [
   "packages/bench/agentic-memory-target-watch.mjs",
   "packages/bench/agentic-memory-ingest-contract.mjs",
   "packages/bench/agentic-memory-source-lock-check.mjs",
+  "packages/bench/agentic-memory-source-lock-decision.mjs",
   "packages/bench/agentic-memory-provider-autoresearch-plan.mjs",
   "packages/bench/memory-score-reviewer-approval-intake.mjs",
   "packages/bench/memory-score-openai-compatible-reviewer.mjs",
@@ -203,6 +204,8 @@ const requiredFiles = [
   `${reviewDir}/agentic-memory-ingest-contract-20260529.md`,
   `${reviewDir}/agentic-memory-source-lock-20260529.json`,
   `${reviewDir}/agentic-memory-source-lock-20260529.md`,
+  `${reviewDir}/agentic-memory-source-lock-decision-20260529.json`,
+  `${reviewDir}/agentic-memory-source-lock-decision-20260529.md`,
   `${reviewDir}/agentic-memory-source-lock-live-20260529.json`,
   `${reviewDir}/agentic-memory-source-lock-live-20260529.md`,
   `${reviewDir}/agentic-memory-provider-autoresearch-plan-20260529.json`,
@@ -786,6 +789,8 @@ const requiredScripts = [
   "benchmark:agentic-watch",
   "benchmark:agentic-ingest-contract",
   "benchmark:agentic-source-lock",
+  "benchmark:agentic-source-lock-decision",
+  "benchmark:agentic-provider-plan",
   "benchmark:answer-quality:arms",
   "benchmark:answer-quality:preflight",
   "benchmark:answer-quality",
@@ -1927,6 +1932,7 @@ check("fresh agentic memory source-lock contract passes", () => {
   const ingestContract = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-ingest-contract-20260529.json"), "utf8"));
   const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.json"), "utf8"));
   const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.md"), "utf8");
+  const decision = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-decision-20260529.json"), "utf8"));
   const liveEvidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-live-20260529.json"), "utf8"));
   const liveEvidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-source-lock-live-20260529.md"), "utf8");
   const report = JSON.parse(result.stdout);
@@ -1963,28 +1969,75 @@ check("fresh agentic memory source-lock contract passes", () => {
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "questionIdsHash")?.provided, true);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "answerLabelsHash")?.provided, true);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "scoringCodeHash")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "leaderboardTier")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "leaderboardRowHash")?.provided, true);
   assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "trajectoryIngestContractHash")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "readerModel")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "judgeModel")?.provided, true);
   assert.equal(
     liveEvidence.proofChecks?.find((proof) => proof.field === "trajectoryIngestContractHash")?.valueHash,
     `sha256:${stableHash(ingestContract.contractHash)}`,
   );
-  assert.equal(liveEvidence.sourceLockReadyForMaterialization, false);
+  assert.equal(liveEvidence.sourceLockReadyForMaterialization, true);
+  assert.equal(liveEvidence.sourceLockReadyForPublicClaim, false);
+  assert.deepEqual(liveEvidence.blockersBeforeRun, []);
+  assert.equal(decision.sourceLockArguments?.tier, "small");
+  assert.equal(decision.sourceLockArguments?.leaderboardRowHash, decision.officialRunContract?.referenceFrontier ? decision.sourceLockArguments.leaderboardRowHash : null);
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-trajectoryIngestContractHash"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-repoCommit"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-datasetRevision"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-questionIdsHash"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-answerLabelsHash"));
   assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-scoringCodeHash"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-leaderboardTier"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-leaderboardRowHash"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-readerModel"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-judgeModel"));
   assert.match(markdown, /Agentic Memory Source Lock Check/);
   assert.match(evidenceMarkdown, /Source-lock ready for materialization: false/);
   assert.match(evidenceMarkdown, /trajectoryIngestContractHash: missing/);
+  assert.match(liveEvidenceMarkdown, /Source-lock ready for materialization: true/);
+  assert.match(liveEvidenceMarkdown, /Missing proof fields: none/);
   assert.match(liveEvidenceMarkdown, /repoCommit: provided/);
   assert.match(liveEvidenceMarkdown, /datasetRevision: provided/);
+  assert.match(liveEvidenceMarkdown, /leaderboardTier: provided/);
   assert.match(liveEvidenceMarkdown, /questionIdsHash: provided/);
   assert.match(liveEvidenceMarkdown, /answerLabelsHash: provided/);
   assert.match(liveEvidenceMarkdown, /scoringCodeHash: provided/);
+  assert.match(liveEvidenceMarkdown, /leaderboardRowHash: provided/);
   assert.match(liveEvidenceMarkdown, /trajectoryIngestContractHash: provided/);
-  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown, JSON.stringify(liveEvidence), liveEvidenceMarkdown]) {
+  assert.match(liveEvidenceMarkdown, /readerModel: provided/);
+  assert.match(liveEvidenceMarkdown, /judgeModel: provided/);
+  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown, JSON.stringify(decision), JSON.stringify(liveEvidence), liveEvidenceMarkdown]) {
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+});
+
+check("fresh agentic memory source-lock decision passes", () => {
+  const result = run("node", ["packages/bench/agentic-memory-source-lock-decision.mjs", "--strict"]);
+  const markdown = run("node", ["packages/bench/agentic-memory-source-lock-decision.mjs", "--format", "markdown"]).stdout;
+  const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-decision-20260529.json"), "utf8"));
+  const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-source-lock-decision-20260529.md"), "utf8");
+  const report = JSON.parse(result.stdout);
+  for (const item of [report, evidence]) {
+    assert.equal(item.ok, true);
+    assert.equal(item.mode, "agentic-memory-source-lock-decision");
+    assert.equal(item.metricsOnly, true);
+    assert.equal(item.publicSafe, true);
+    assert.equal(item.countsAsBenchmarkScore, false);
+    assert.equal(item.publicBenchmarkClaimsAllowed, false);
+    assert.equal(item.sourceLockArguments?.tier, "small");
+    assert.equal(item.sourceLockArguments?.readerModel, "Qwen/Qwen3.5-9B");
+    assert.equal(item.sourceLockArguments?.judgeModel, "gpt-5.2");
+    assert.match(item.sourceLockArguments?.leaderboardRowHash ?? "", /^sha256:[a-f0-9]{64}$/);
+    assert.match(item.officialRunContract?.codexActorLane ?? "", /internal memory-controller or actor lane/);
+    assert.deepEqual(item.failedChecks, []);
+  }
+  assert.match(markdown, /Agentic Memory Source-Lock Decision/);
+  assert.match(evidenceMarkdown, /Reader model: Qwen\/Qwen3\.5-9B/);
+  assert.match(evidenceMarkdown, /Judge model: gpt-5\.2/);
+  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }
@@ -2006,12 +2059,16 @@ check("fresh agentic provider autoresearch plan passes", () => {
     assert.equal(item.cloudDefaultForPersonalUse, "cloud-voyage4-voyage");
     assert.equal(item.methodologyDefault, "local-apple-controlled-lanes");
     assert.equal(item.hostedSupermemorySearchForMethodology, "disabled");
+    assert.equal(item.target?.sourceLockReadyForMaterialization, true);
+    assert.deepEqual(item.target?.remainingSourceLockBlockers, []);
     assert.equal(item.watchdog?.enabled, true);
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "voyage"));
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "gemini"));
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "nvidia"));
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "local-apple"));
-    assert.ok(item.phases?.some((phase) => phase.id === "cloud-challenger-run"));
+    assert.ok(item.phases?.some((phase) => phase.id === "source-lock-closeout" && phase.status === "ready"));
+    assert.ok(item.phases?.some((phase) => phase.id === "cloud-challenger-run" && phase.status === "ready"));
+    assert.ok(item.phases?.some((phase) => phase.id === "answer-quality-and-review" && phase.status === "ready"));
     assert.equal(item.runPolicy?.fullSetPreferred, true);
     assert.equal(item.rawQuestionsIncluded, false);
     assert.equal(item.rawAnswersIncluded, false);

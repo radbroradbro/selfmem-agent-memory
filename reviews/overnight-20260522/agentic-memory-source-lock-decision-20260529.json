@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "agentic-memory-source-lock-decision",
+  "generatedAt": "2026-05-29T22:57:52.696Z",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "countsAsBenchmarkScore": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "sourceLockTarget": {
+    "id": "longmemeval-v2",
+    "name": "LongMemEval-V2",
+    "questionCount": 451,
+    "existingSourceLockReady": false
+  },
+  "officialRunContract": {
+    "tier": "small",
+    "tierReason": "Use LME-V2-Small for the first materialized official-comparable run because it is a supported public tier and the lower-resource tier for the M5 24GB lane; Medium stays a follow-up once Small is stable.",
+    "readerModel": "Qwen/Qwen3.5-9B",
+    "judgeModel": "gpt-5.2",
+    "judgeReason": "The released runner defaults to gpt-5.2 and the leaderboard package validator requires evaluator model names to contain gpt-5.2.",
+    "readerReason": "The released runner defaults to Qwen/Qwen3.5-9B and the leaderboard package validator requires reader model names to contain qwen3.5-9b.",
+    "codexActorLane": "Codex GPT-5.5 may be used as an internal memory-controller or actor lane, but a Codex-reader run is not leaderboard-comparable unless the official model contract changes.",
+    "referenceFrontier": {
+      "source": "LongMemEval-V2 leaderboard fixed reference frontier",
+      "metric": "LAFS gain",
+      "tier": "small",
+      "tMinSeconds": 1,
+      "tMaxSeconds": 200,
+      "points": [
+        {
+          "name": "RAG: query -> slice + notes",
+          "accuracyPercent": 51,
+          "latencySeconds": 0.2
+        },
+        {
+          "name": "Codex",
+          "accuracyPercent": 69.9,
+          "latencySeconds": 177.2
+        },
+        {
+          "name": "AgentRunbook-R",
+          "accuracyPercent": 58.6,
+          "latencySeconds": 26.9
+        },
+        {
+          "name": "AgentRunbook-C",
+          "accuracyPercent": 74.9,
+          "latencySeconds": 108.3
+        }
+      ]
+    },
+    "sourceUrls": {
+      "repositoryReadme": "https://github.com/xiaowu0162/LongMemEval-V2",
+      "leaderboardReadme": "https://github.com/xiaowu0162/LongMemEval-V2/tree/main/leaderboard",
+      "websiteLeaderboard": "https://xiaowu0162.github.io/longmemeval-v2/#leaderboard"
+    }
+  },
+  "sourceProof": {
+    "repoCommit": "8e8b92a3cece71af6af0d3aa2d7957df49dd9f65",
+    "datasetRevision": "f152293e235517d504809563c833d7190b8c713b",
+    "questionIdsHash": "sha256:3ff7161a63a2c36797d7513d7a6cea27f198639bbda5d41257f9334aa998b47d",
+    "answerLabelsHash": "sha256:4bee3374026eaecd0efb8ba2c6dc90366d150bc627fb2d3732162ea01e3f6122",
+    "scoringCodeHash": "sha256:a83a33038481eff08d1d8305f28f668bdf735ab09a861df40198e4efece6ed86",
+    "trajectoryIngestContractHash": true
+  },
+  "checks": [
+    {
+      "name": "source-lock-live",
+      "ok": true
+    },
+    {
+      "name": "question-count",
+      "ok": true
+    },
+    {
+      "name": "source-proofs-present",
+      "ok": true
+    },
+    {
+      "name": "tier-supported",
+      "ok": true
+    },
+    {
+      "name": "official-reader-model",
+      "ok": true
+    },
+    {
+      "name": "official-judge-model",
+      "ok": true
+    },
+    {
+      "name": "reference-frontier-pinned",
+      "ok": true
+    }
+  ],
+  "failedChecks": [],
+  "sourceLockArguments": {
+    "tier": "small",
+    "leaderboardRowHash": "sha256:edd142ab5b0576cacb8a23c364a2e96761c031a7f478254e0ed1045e5788255f",
+    "readerModel": "Qwen/Qwen3.5-9B",
+    "judgeModel": "gpt-5.2"
+  },
+  "sourceLockCommandTemplate": "benchmark:agentic-source-lock -- --live --tier small --leaderboard-row-hash sha256:edd142ab5b0576cacb8a23c364a2e96761c031a7f478254e0ed1045e5788255f --reader-model Qwen/Qwen3.5-9B --judge-model gpt-5.2 --ingest-contract-hash <agentic-ingest-contract-hash>",
+  "nextActions": [
+    "Regenerate the live source-lock packet with these four decision fields.",
+    "Keep Codex GPT-5.5 as a separate internal actor/controller lane unless the official leaderboard model contract changes.",
+    "Start official-comparable materialization only after the regenerated source-lock says sourceLockReadyForMaterialization=true."
+  ]
+}

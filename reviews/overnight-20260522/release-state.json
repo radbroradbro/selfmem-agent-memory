@@ -86,6 +86,8 @@
       "packages/bench/agentic-memory-target-watch.mjs",
       "packages/bench/agentic-memory-ingest-contract.mjs",
       "packages/bench/agentic-memory-source-lock-check.mjs",
+      "packages/bench/agentic-memory-source-lock-decision.mjs",
+      "packages/bench/agentic-memory-provider-autoresearch-plan.mjs",
       "packages/bench/public-benchmark-autoresearch-loop.mjs",
       "packages/bench/memory-score-reviewer-approval-intake.mjs",
       "packages/bench/memory-score-openai-compatible-reviewer.mjs",
