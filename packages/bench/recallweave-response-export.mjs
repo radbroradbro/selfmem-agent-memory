@@ -525,8 +525,8 @@ function rankWikiSummarySessionHybrid(query, candidates) {
 
 async function queryExpansionText(query, options = {}) {
   const queryText = queryTextValue(query);
-  const plan = queryExpansionPlan(options);
-  if (!plan) {
+  const plans = queryExpansionPlans(options);
+  if (plans.length === 0) {
     options.providerStats?.recordQueryExpansionFallback("deterministic-proxy-not-configured");
     return {
       mode: "deterministic-proxy",
@@ -543,35 +543,36 @@ async function queryExpansionText(query, options = {}) {
   });
   let sanitized = [];
   let attemptCount = 0;
+  let selectedPlan = null;
+  let lastError = null;
   for (let attempt = 0; attempt < queryExpansionMaxAttempts(); attempt += 1) {
     attemptCount = attempt + 1;
     const attemptRequest =
       attempt === 0 ? request : { ...request, instruction: queryExpansionRetryInstruction(request.instruction, attempt + 1, request.maxRewrites) };
-    let rewrites = [];
-    try {
-      if (plan.provider === "local-openai-compatible") {
-        rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-      } else if (plan.provider === "nvidia-openai-compatible") {
-        rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-      } else if (plan.provider === "openrouter-openai-compatible") {
-        rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-      } else if (plan.provider === "gemini") {
-        rewrites = await geminiQueryExpansion(plan, attemptRequest);
-      } else {
-        throw new Error(`unsupported query expansion provider: ${plan.provider}`);
+    for (const plan of plans) {
+      let rewrites = [];
+      try {
+        if (plan.provider === "local-openai-compatible") {
+          rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+        } else if (plan.provider === "nvidia-openai-compatible") {
+          rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+        } else if (plan.provider === "openrouter-openai-compatible") {
+          rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
+        } else if (plan.provider === "gemini") {
+          rewrites = await geminiQueryExpansion(plan, attemptRequest);
+        } else {
+          throw new Error(`unsupported query expansion provider: ${plan.provider}`);
+        }
+      } catch (error) {
+        lastError = error;
+        continue;
       }
-    } catch (error) {
-      if (queryExpansionProviderFallbackAllowed()) {
-        options.providerStats?.recordQueryExpansionFallback(`provider-error:${queryExpansionFailureClass(error)}`);
-        return {
-          mode: "deterministic-proxy",
-          expandedQuery: expandQuery(queryText),
-          rewrites: [],
-        };
+      sanitized = sanitizeQueryExpansionRewrites(rewrites, { originalQuery: queryText, maxRewrites: request.maxRewrites });
+      if (sanitized.length > 0) {
+        selectedPlan = plan;
+        break;
       }
-      throw error;
     }
-    sanitized = sanitizeQueryExpansionRewrites(rewrites, { originalQuery: queryText, maxRewrites: request.maxRewrites });
     if (sanitized.length > 0) break;
   }
 
@@ -584,17 +585,28 @@ async function queryExpansionText(query, options = {}) {
     };
   }
 
+  if (sanitized.length === 0 && queryExpansionProviderFallbackAllowed()) {
+    options.providerStats?.recordQueryExpansionFallback(lastError ? `provider-error:${queryExpansionFailureClass(lastError)}` : "provider-empty");
+    return {
+      mode: "deterministic-proxy",
+      expandedQuery: expandQuery(queryText),
+      rewrites: [],
+    };
+  }
+
+  if (sanitized.length === 0 && lastError) throw lastError;
   assert.ok(sanitized.length > 0, "query expansion provider returned no usable rewrites");
+  assert.ok(selectedPlan, "query expansion provider plan missing after successful rewrite");
   options.providerStats?.recordQueryExpansionCall({
-    mode: plan.mode,
-    provider: plan.provider,
-    model: plan.model,
+    mode: selectedPlan.mode,
+    provider: selectedPlan.provider,
+    model: selectedPlan.model,
     rewritesReturned: sanitized.length,
     attempts: attemptCount,
     elapsedMs: Math.max(1, Math.round(performance.now() - started)),
   });
   return {
-    mode: plan.mode,
+    mode: selectedPlan.mode,
     expandedQuery: clipQueryExpansion([queryText, ...sanitized].join(" ")),
     rewrites: sanitized,
   };
@@ -2011,6 +2023,36 @@ function runQueryExpansionParserSmoke() {
   for (const fixture of cases) {
     assert.deepEqual(rewritesFromQueryExpansionText(fixture.text), fixture.expected, fixture.name);
   }
+  const originalEnv = snapshotEnv([
+    "SELFMEM_QUERY_EXPANSION_BASE_URL",
+    "SELFMEM_QUERY_EXPANSION_MODEL",
+    "RECALLWEAVE_QUERY_EXPANSION_CALLS",
+    "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA",
+    "RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER",
+    "NVIDIA_API_KEY",
+    "OPENROUTER_API_KEY",
+    "OPENROUTER_QUERY_EXPANSION_MODEL",
+    "OPENROUTER_FALLBACK_QUERY_EXPANSION_MODEL",
+  ]);
+  try {
+    delete process.env.SELFMEM_QUERY_EXPANSION_BASE_URL;
+    delete process.env.SELFMEM_QUERY_EXPANSION_MODEL;
+    process.env.RECALLWEAVE_QUERY_EXPANSION_CALLS = "1";
+    process.env.RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA = "1";
+    process.env.RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER = "openrouter,nvidia";
+    process.env.OPENROUTER_API_KEY = "fixture-openrouter-key";
+    process.env.NVIDIA_API_KEY = "fixture-nvidia-key";
+    process.env.OPENROUTER_QUERY_EXPANSION_MODEL = "moonshotai/kimi-k2.6:free";
+    process.env.OPENROUTER_FALLBACK_QUERY_EXPANSION_MODEL = "qwen/qwen3-next-80b-a3b-instruct:free";
+    const plans = queryExpansionPlans();
+    assert.equal(plans[0]?.provider, "openrouter-openai-compatible");
+    assert.equal(plans[0]?.model, "moonshotai/kimi-k2.6:free");
+    assert.equal(plans[1]?.provider, "openrouter-openai-compatible");
+    assert.equal(plans[1]?.model, "qwen/qwen3-next-80b-a3b-instruct:free");
+    assert.equal(plans[2]?.provider, "nvidia-openai-compatible");
+  } finally {
+    restoreEnv(originalEnv);
+  }
   process.stdout.write(
     `${JSON.stringify({
       ok: true,
@@ -2018,8 +2060,20 @@ function runQueryExpansionParserSmoke() {
       cases: cases.length,
       acceptsJsonArrayPerLine: true,
       acceptsPlainLines: true,
+      providerOrderFallbackSmoke: true,
     })}\n`,
   );
+}
+
+function snapshotEnv(names) {
+  return Object.fromEntries(names.map((name) => [name, process.env[name]]));
+}
+
+function restoreEnv(snapshot) {
+  for (const [name, value] of Object.entries(snapshot)) {
+    if (value == null) delete process.env[name];
+    else process.env[name] = value;
+  }
 }
 
 function voyageEmbedModel() {
@@ -2142,50 +2196,91 @@ function nvidiaRerankEndpoint(config) {
 }
 
 function queryExpansionPlan(options = {}) {
-  if (options.fixtureRequested) return null;
+  const plans = queryExpansionPlans(options);
+  return plans[0] ?? null;
+}
+
+function queryExpansionPlans(options = {}) {
+  if (options.fixtureRequested) return [];
   const localBaseUrl = String(process.env.SELFMEM_QUERY_EXPANSION_BASE_URL ?? "").trim();
   const localModel = String(process.env.SELFMEM_QUERY_EXPANSION_MODEL ?? "").trim();
   if (localBaseUrl && localModel) {
-    return {
+    return [{
       mode: "pure-local",
       provider: "local-openai-compatible",
       endpoint: openAiCompatibleChatEndpoint(localBaseUrl),
       model: localModel,
       apiKey: String(process.env.SELFMEM_QUERY_EXPANSION_API_KEY ?? "").trim() || null,
-    };
+    }];
   }
 
   const cloudCallsAllowed = process.env.RECALLWEAVE_QUERY_EXPANSION_CALLS === "1" || providerBenchmarkCallsAllowed;
   const publicDataConfirmed = process.env.RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA === "1" || providerBenchmarkPublicData;
-  if (!cloudCallsAllowed || !publicDataConfirmed) return null;
-  if (providerKeyCount("nvidia") > 0) {
-    return {
-      mode: "mixed-local-cloud",
-      provider: "nvidia-openai-compatible",
-      endpoint: openAiCompatibleChatEndpoint(process.env.NVIDIA_QUERY_EXPANSION_BASE_URL ?? "https://integrate.api.nvidia.com/v1"),
-      model: String(process.env.NVIDIA_QUERY_EXPANSION_MODEL ?? process.env.SELFMEM_QUERY_EXPANSION_MODEL ?? "nvidia/llama-3.1-nemotron-nano-8b-v1"),
-      apiKey: chooseProviderKey("nvidia", "query-expansion"),
-    };
+  if (!cloudCallsAllowed || !publicDataConfirmed) return [];
+  const plans = [];
+  for (const provider of queryExpansionProviderOrder()) {
+    if (provider === "nvidia" && providerKeyCount("nvidia") > 0) {
+      plans.push({
+        mode: "mixed-local-cloud",
+        provider: "nvidia-openai-compatible",
+        endpoint: openAiCompatibleChatEndpoint(process.env.NVIDIA_QUERY_EXPANSION_BASE_URL ?? "https://integrate.api.nvidia.com/v1"),
+        model: nonEmptyEnv("NVIDIA_QUERY_EXPANSION_MODEL", "SELFMEM_QUERY_EXPANSION_MODEL") ?? "nvidia/llama-3.1-nemotron-nano-8b-v1",
+        apiKey: chooseProviderKey("nvidia", "query-expansion"),
+      });
+    } else if (provider === "gemini" && providerKeyCount("gemini") > 0) {
+      plans.push({
+        mode: "mixed-local-cloud",
+        provider: "gemini",
+        endpoint: null,
+        model: nonEmptyEnv("GEMINI_QUERY_EXPANSION_MODEL") ?? "gemini-2.5-flash",
+        apiKey: null,
+      });
+    } else if (provider === "openrouter" && providerKeyCount("openrouter") > 0) {
+      const primaryModel =
+        nonEmptyEnv("OPENROUTER_QUERY_EXPANSION_MODEL", "RECALLWEAVE_OPENROUTER_QUERY_EXPANSION_MODEL", "SELFMEM_QUERY_EXPANSION_MODEL") ??
+        "qwen/qwen3-next-80b-a3b-instruct:free";
+      plans.push({
+        mode: "mixed-local-cloud",
+        provider: "openrouter-openai-compatible",
+        endpoint: openAiCompatibleChatEndpoint(process.env.OPENROUTER_QUERY_EXPANSION_BASE_URL ?? "https://openrouter.ai/api/v1"),
+        model: primaryModel,
+        apiKey: chooseProviderKey("openrouter", "query-expansion"),
+      });
+      const fallbackModel = nonEmptyEnv("OPENROUTER_FALLBACK_QUERY_EXPANSION_MODEL", "RECALLWEAVE_OPENROUTER_FALLBACK_QUERY_EXPANSION_MODEL");
+      if (fallbackModel && fallbackModel !== primaryModel) {
+        plans.push({
+          mode: "mixed-local-cloud",
+          provider: "openrouter-openai-compatible",
+          endpoint: openAiCompatibleChatEndpoint(process.env.OPENROUTER_QUERY_EXPANSION_BASE_URL ?? "https://openrouter.ai/api/v1"),
+          model: fallbackModel,
+          apiKey: chooseProviderKey("openrouter", "query-expansion-fallback"),
+        });
+      }
+    }
   }
-  if (providerKeyCount("gemini") > 0) {
-    return {
-      mode: "mixed-local-cloud",
-      provider: "gemini",
-      endpoint: null,
-      model: String(process.env.GEMINI_QUERY_EXPANSION_MODEL ?? "gemini-2.5-flash"),
-      apiKey: null,
-    };
-  }
-  if (providerKeyCount("openrouter") > 0) {
-    return {
-      mode: "mixed-local-cloud",
-      provider: "openrouter-openai-compatible",
-      endpoint: openAiCompatibleChatEndpoint(process.env.OPENROUTER_QUERY_EXPANSION_BASE_URL ?? "https://openrouter.ai/api/v1"),
-      model: String(process.env.OPENROUTER_QUERY_EXPANSION_MODEL ?? process.env.SELFMEM_QUERY_EXPANSION_MODEL ?? "qwen/qwen3-next-80b-a3b-instruct:free"),
-      apiKey: chooseProviderKey("openrouter", "query-expansion"),
-    };
+  return plans;
+}
+
+function nonEmptyEnv(...names) {
+  for (const name of names) {
+    const value = String(process.env[name] ?? "").trim();
+    if (value) return value;
   }
   return null;
+}
+
+function queryExpansionProviderOrder() {
+  const value = process.env.RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER ?? process.env.SELFMEM_QUERY_EXPANSION_PROVIDER_ORDER ?? "nvidia,gemini,openrouter";
+  const providers = splitProviderKeys(value)
+    .map((provider) => provider.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
+    .map((provider) => {
+      if (provider.startsWith("nvidia")) return "nvidia";
+      if (provider.startsWith("gemini") || provider.startsWith("google") || provider.startsWith("ai-studio")) return "gemini";
+      if (provider.startsWith("openrouter")) return "openrouter";
+      return provider;
+    })
+    .filter((provider) => ["nvidia", "gemini", "openrouter"].includes(provider));
+  return [...new Set(providers)].length ? [...new Set(providers)] : ["nvidia", "gemini", "openrouter"];
 }
 
 function openAiCompatibleChatEndpoint(baseUrl) {
