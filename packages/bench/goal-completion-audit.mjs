@@ -137,6 +137,12 @@ const files = {
   answerQualityFullShardIntakeReport: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
   fullMemorySotaDoctorReport: preferReviewFile(
+    "full-memory-sota-doctor-after-shard-019-20260529.json",
+    "full-memory-sota-doctor-after-shard-018-20260529.json",
+    "full-memory-sota-doctor-after-shard-017-20260529.json",
+    "full-memory-sota-doctor-after-shard-016-20260529.json",
+    "full-memory-sota-doctor-after-shard-015-20260529.json",
+    "full-memory-sota-doctor-after-shard-014-20260528.json",
     "full-memory-sota-doctor-after-shard-013-20260528.json",
     "full-memory-sota-doctor-after-shard-012-20260528.json",
     "full-memory-sota-doctor-after-shard-011-20260528.json",
@@ -146,6 +152,12 @@ const files = {
     "full-memory-sota-doctor-20260527.json",
   ),
   fullMemorySotaDoctorMarkdown: preferReviewFile(
+    "full-memory-sota-doctor-after-shard-019-20260529.md",
+    "full-memory-sota-doctor-after-shard-018-20260529.md",
+    "full-memory-sota-doctor-after-shard-017-20260529.md",
+    "full-memory-sota-doctor-after-shard-016-20260529.md",
+    "full-memory-sota-doctor-after-shard-015-20260529.md",
+    "full-memory-sota-doctor-after-shard-014-20260528.md",
     "full-memory-sota-doctor-after-shard-013-20260528.md",
     "full-memory-sota-doctor-after-shard-012-20260528.md",
     "full-memory-sota-doctor-after-shard-011-20260528.md",
@@ -154,8 +166,22 @@ const files = {
     "full-memory-sota-doctor-after-shard-009-20260528.md",
     "full-memory-sota-doctor-20260527.md",
   ),
-  localWikiMethodReport: preferReviewFile("local-wiki-method-report-20260528.json", "local-wiki-method-report-20260527.json"),
-  localWikiMethodMarkdown: preferReviewFile("local-wiki-method-report-20260528.md", "local-wiki-method-report-20260527.md"),
+  localWikiMethodReport: preferReviewFile(
+    "local-wiki-method-report-after-shard-019-20260529.json",
+    "local-wiki-method-report-after-shard-018-20260529.json",
+    "local-wiki-method-report-after-shard-017-20260529.json",
+    "local-wiki-method-report-after-shard-016-20260529.json",
+    "local-wiki-method-report-20260528.json",
+    "local-wiki-method-report-20260527.json",
+  ),
+  localWikiMethodMarkdown: preferReviewFile(
+    "local-wiki-method-report-after-shard-019-20260529.md",
+    "local-wiki-method-report-after-shard-018-20260529.md",
+    "local-wiki-method-report-after-shard-017-20260529.md",
+    "local-wiki-method-report-after-shard-016-20260529.md",
+    "local-wiki-method-report-20260528.md",
+    "local-wiki-method-report-20260527.md",
+  ),
 };
 
 for (const [name, file] of Object.entries(files)) {

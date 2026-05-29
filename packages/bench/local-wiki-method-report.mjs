@@ -22,6 +22,7 @@ const wikiPlanPath = resolveInputPath(
 const performancePath = resolveInputPath(
   args.performance ??
     preferReviewFile(
+      "local-full-shard-performance-report-after-shard-019-20260529.json",
       "local-full-shard-performance-report-after-shard-018-20260529.json",
       "local-full-shard-performance-report-after-shard-017-20260529.json",
       "local-full-shard-performance-report-after-shard-016-20260529.json",
@@ -57,6 +58,7 @@ const commonShardPaths = coercePathList(
       `${reviewDir}/answer-quality-local-full-shard-016-20260529.json`,
       `${reviewDir}/answer-quality-local-full-shard-017-cpu-recovery-20260529.json`,
       `${reviewDir}/answer-quality-local-full-shard-018-20260529.json`,
+      `${reviewDir}/answer-quality-local-full-shard-019-20260529.json`,
     ].join(","),
 );
 const outputPath = args.output ? resolveInputPath(args.output) : null;

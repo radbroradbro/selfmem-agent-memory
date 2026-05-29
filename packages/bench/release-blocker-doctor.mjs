@@ -16,6 +16,7 @@ const requiredBlockers = [
   "fresh-real-container-canary-not-current",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
+  "full-memory-sota-doctor-after-shard-019-20260529.json",
   "full-memory-sota-doctor-after-shard-018-20260529.json",
   "full-memory-sota-doctor-after-shard-017-20260529.json",
   "full-memory-sota-doctor-after-shard-016-20260529.json",
@@ -30,6 +31,7 @@ const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-20260527.json",
 );
 const fullMemorySotaDoctorMarkdown = preferReviewFile(
+  "full-memory-sota-doctor-after-shard-019-20260529.md",
   "full-memory-sota-doctor-after-shard-018-20260529.md",
   "full-memory-sota-doctor-after-shard-017-20260529.md",
   "full-memory-sota-doctor-after-shard-016-20260529.md",
@@ -425,9 +427,9 @@ assert.equal(fullMemorySotaDoctor.benchmarkContract?.bm25IsLexicalFloorOnly, tru
 assert.equal(fullMemorySotaDoctor.benchmarkContract?.retrievalProxyOnlyIsNotEnough, true);
 assert.equal(fullMemorySotaDoctor.rawSourceRetention?.retainsRawSourcesPrivately, true);
 assert.equal(fullMemorySotaDoctor.rawSourceRetention?.publicReportIsSafe, true);
-assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId, "shard-019");
-assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange, "450-475");
-assert.match(fullMemorySotaDoctorText, /Next local-full shard: shard-019 \(450-475\)/);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId, "shard-020");
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange, "475-500");
+assert.match(fullMemorySotaDoctorText, /Next local-full shard: shard-020 \(475-500\)/);
 assert.match(fullMemorySotaDoctorText, /Counts as full memory SOTA evidence: false/i);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
@@ -813,7 +815,7 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- baseline:returned-packet -- --packet /tmp/recallweave-baseline-evidence-packet.zip --require-public-benchmark --output /tmp/recallweave-returned-baseline-intake.json",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor",
         "npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor -- --format markdown",
-        "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder -- --shard-id shard-019 --query-offset 450 --query-limit 25 --output /tmp/recallweave-local-full-shard-019-workorder.json",
+        "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-workorder -- --shard-id shard-020 --query-offset 475 --query-limit 25 --output /tmp/recallweave-local-full-shard-020-workorder.json",
         "Verify the live sync check still reports PR #5 and issue #6 matching checked-in drafts.",
       ],
     },
