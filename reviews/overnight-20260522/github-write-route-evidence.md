@@ -208,6 +208,12 @@ Verdict: resolved for PR body and blocker issue writes.
     local-full shard progress as the latest verified code/product baseline
     while keeping launch, production rollout, and full-SOTA claims blocked.
     Updated at: 2026-05-26T23:57:33Z.
+  - PR #5 was refreshed again after GitHub Actions run `26622358308` passed on
+    `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`, promoting the scaled local
+    benchmark challenger lane, Brain UI runtime evidence, and GitHub live-sync
+    retry hardening as the latest verified code/product baseline while keeping
+    launch, production rollout, full-SOTA, and real-canary blockers open.
+    Updated at: 2026-05-29T06:46:50Z.
 - Release blocker issue created:
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/issues/6
   - GitHub status: 201 on create, 200 on refresh, 200 on lifecycle-trail

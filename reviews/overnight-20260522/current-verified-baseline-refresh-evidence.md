@@ -19,24 +19,30 @@ scaffolded and fixture-covered, but not live-tested until a local embedding
 endpoint is configured. The current verified product evidence now includes live
 local Apple provider runs for Qwen3 Embedding 0.6B and Qwen3 Embedding 4B on
 the same public LongMemEval-S retrieval-proxy target.
+The latest verified branch-head refresh adds the scaled local-full answer
+quality challenger lane, keeps direct Gemini Embedding 2 wired as a same-data
+provider challenger pending env-only credentials, records current Brain UI
+runtime evidence, and hardens GitHub live-sync retry behavior without changing
+benchmark scoring or launch claims.
 
 ## Latest Observed PR Branch Head
 
-- Commit: `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`
-- Commit title: `bench: record local apple provider runs`
-- GitHub Actions run: `26377087807`
+- Commit: `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`
+- Commit title: `Document GitHub sync retry hardening`
+- GitHub Actions run: `26622358308`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
-This does not change the approved runtime canary adapter/report commit. It only
-updates the public-facing benchmark evidence and records the measured local
-Apple provider runs.
+This does not change the approved runtime canary adapter/report commit. It
+updates the current PR-head evidence, records the scaled local challenger and
+Brain UI runtime evidence, and keeps GitHub live-sync retry hardening as
+runtime hygiene only.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `6c72c194c69b04abdc2029aecb0a8dc7dd9818f4`
-- Commit title: `bench: record local apple provider runs`
-- GitHub Actions run: `26377087807`
+- Commit: `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`
+- Commit title: `Document GitHub sync retry hardening`
+- GitHub Actions run: `26622358308`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -69,7 +75,7 @@ before this baseline refresh:
   local Apple arms
 - Targeted public docs/evidence secret and private-path scan
 - Stale local model server check
-- GitHub Actions run `26377087807`
+- GitHub Actions run `26622358308`
 
 ## Canary Handoff Artifact
 

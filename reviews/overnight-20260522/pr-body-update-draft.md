@@ -265,7 +265,18 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-- `147a9ca1c00a89f89ee03706db8699b7be86f50d`.
+- `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`.
+- GitHub Actions run `26622358308`: passed CI after adding the scaled local
+  benchmark challenger lane, Brain UI runtime evidence, bounded GitHub
+  live-sync retry handling, and the matching post-baseline public-evidence
+  guard update. Direct Gemini Embedding 2 is wired as a same-data provider
+  challenger, but live Gemini runs remain blocked until env-only Gemini
+  credentials are visible to the benchmark process. Cloud Voyage remains the
+  Codex/personal memory default; local Apple Silicon remains the high-volume
+  methodology-refinement lane.
+- Previous verified PR branch head before the scaled local challenger and
+  GitHub sync retry hardening:
+  `147a9ca1c00a89f89ee03706db8699b7be86f50d`.
 - GitHub Actions run `26482745060`: passed CI after hardening
   benchmark-methodology isolation. Local-full shard plans, response-arm export
   children, generated private resume scripts, and resume-packet commands now
@@ -359,7 +370,18 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `147a9ca1c00a89f89ee03706db8699b7be86f50d`.
+- `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`.
+- GitHub Actions run `26622358308`: passed CI with release checks, live GitHub
+  sync, benchmark-contract tests, secret scan, and private-path scan green. The
+  checked-in evidence includes the scaled local benchmark challenger lane,
+  current Brain UI runtime evidence, and bounded GitHub live-sync retry
+  handling. It keeps cloud Voyage as the actual Codex/personal memory default,
+  keeps local Apple Silicon as the high-volume methodology lane, treats direct
+  Gemini Embedding 2 as a credential-gated same-data challenger, and preserves
+  launch, production rollout, and full-SOTA blockers.
+- Previous verified code/product baseline before the scaled local challenger
+  and GitHub sync retry hardening:
+  `147a9ca1c00a89f89ee03706db8699b7be86f50d`.
 - GitHub Actions run `26482745060`: passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan
   green. The checked-in evidence accepts shard 002 recovery for the local-full

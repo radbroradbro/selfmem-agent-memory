@@ -7,6 +7,16 @@ Date: 2026-05-23
   is CI/runtime hygiene for the existing public-safe PR/issue sync gate; it does
   not change benchmark scoring, provider defaults, launch status, or public
   memory-system claims.
+- PR #5 was refreshed again on 2026-05-29 after GitHub Actions run
+  `26622358308` passed on
+  `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`, promoting that commit as the
+  latest verified code/product baseline while preserving launch, production
+  rollout, full-SOTA, and real-canary blockers. Live sync passed with PR body
+  hash `f312fff26c0386cf14bb653bba551a96a684bca0650e0718dbf74464b08be7bd`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`, and
+  issue body hash
+  `1b702f8118354977d5d3859ce80fc4f4f9f8a51c0471d0e9aa541aec7cc80216`.
 - PR #5 was refreshed again on 2026-05-26 after GitHub Actions run
   `26481662771` passed on
   `67362b1944592e6b5dc0290c5cafd4f1f145dcda`, promoting that commit as the

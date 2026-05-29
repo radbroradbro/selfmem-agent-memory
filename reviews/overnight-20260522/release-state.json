@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-26T23:46:30Z",
+  "generatedAt": "2026-05-29T06:44:53Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "147a9ca1c00a89f89ee03706db8699b7be86f50d",
-    "ciRunId": 26482745060,
+    "headSha": "5e5cf716d83c39dcaeef34ea1bbb77ca36869927",
+    "ciRunId": 26622358308,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_current_local_full_shard_progress_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
+    "localSmoke": "release_check_covers_scaled_local_benchmark_challenger_lane_brain_ui_runtime_evidence_github_sync_retry_hardening_and_guard_paths",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after hardening benchmark-methodology isolation: shard commands, response-arm export children, and private resume scripts now disable hosted Supermemory search unless an explicit hosted-baseline parity lane is being executed. Shard 002 recovery remains accepted, the local-full partial answer-quality snapshot covers 50/500 queries, and shard 003 is the next runtime-blocked local rerank slice. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, and owner approval all pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, release:github-sync, goal:audit, diff check, secret scan, private-path scan, and GitHub Actions run 26482745060 passed."
+    "note": "Latest inspected code/product baseline after adding the scaled local benchmark challenger lane, Brain UI runtime evidence, bounded GitHub live-sync retry handling, and the matching public-evidence guard update. Direct Gemini Embedding 2 remains wired as a same-data provider challenger but is blocked until env-only Gemini credentials are visible to the benchmark process. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, hosted Supermemory search disabled for isolated methodology benchmark loops unless an explicit hosted-baseline parity lane is running, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, owner approval, and full local/provider shard coverage pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, diff check, secret scan, private-path scan, and GitHub Actions run 26622358308 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -449,14 +449,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "147a9ca1c00a89f89ee03706db8699b7be86f50d",
-    "ciRunId": 26482745060,
+    "headSha": "5e5cf716d83c39dcaeef34ea1bbb77ca36869927",
+    "ciRunId": 26622358308,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_current_local_full_shard_progress_benchmark_isolation_supermemory_disable_policy_github_sync_release_doctor_goal_audit_and_ci_verified_guard_paths",
+    "localSmoke": "release_check_covers_scaled_local_benchmark_challenger_lane_brain_ui_runtime_evidence_github_sync_retry_hardening_and_guard_paths",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after hardening local-full benchmark shard commands, response-arm export child environments, and private resume scripts so hosted Supermemory search is disabled for methodology loops while production read-through/search remains available unless explicitly disabled. GitHub Actions run 26482745060 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
+    "note": "Latest observed PR branch head after adding the scaled local benchmark challenger lane, Brain UI runtime evidence, bounded GitHub live-sync retry handling, and the matching public-evidence guard update. GitHub Actions run 26622358308 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
