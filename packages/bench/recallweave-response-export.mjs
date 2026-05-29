@@ -1380,21 +1380,30 @@ async function voyageRerank(query, candidates, options = {}) {
 async function geminiEmbed(texts, inputType, options = {}) {
   const input = texts.map((text) => String(text ?? ""));
   const isQuery = inputType === "query";
-  options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : input.length);
   const model = String(options.model ?? geminiEmbedModel()).replace(/^models\//, "");
   const modelResource = geminiModelResource(model);
   const outputDimensionality = geminiOutputDimensionality();
   const taskType = isQuery ? "RETRIEVAL_QUERY" : "RETRIEVAL_DOCUMENT";
-  const body = {
-    requests: input.map((text) => ({
-      model: modelResource,
-      content: { parts: [{ text }] },
-      taskType,
-      ...(outputDimensionality ? { outputDimensionality } : {}),
-    })),
-  };
-  const response = await geminiPost(`${modelResource}:batchEmbedContents`, body, { seed: `${inputType}:${input.length}:${input[0] ?? ""}` });
-  const embeddings = embeddingsFromGeminiResponse(response);
+  const batches = batchProviderInputs(input, {
+    maxCount: optionalPositiveInt(process.env.GEMINI_EMBED_BATCH_SIZE ?? null, "Gemini embed batch size") ?? 100,
+    maxEstimatedTokens: optionalPositiveInt(process.env.GEMINI_EMBED_BATCH_TOKENS ?? null, "Gemini embed batch tokens") ?? 60_000,
+  });
+  const embeddings = [];
+  for (const [batchIndex, batch] of batches.entries()) {
+    options.providerStats?.recordProviderCall(isQuery ? "query-embedding" : "embedding", isQuery ? 0 : batch.length);
+    const body = {
+      requests: batch.map((text) => ({
+        model: modelResource,
+        content: { parts: [{ text }] },
+        taskType,
+        ...(outputDimensionality ? { outputDimensionality } : {}),
+      })),
+    };
+    const response = await geminiPost(`${modelResource}:batchEmbedContents`, body, {
+      seed: `${inputType}:${batchIndex}:${batch.length}:${batch[0] ?? ""}`,
+    });
+    embeddings.push(...embeddingsFromGeminiResponse(response));
+  }
   assert.equal(embeddings.length, input.length, "Gemini embeddings response length mismatch");
   return embeddings;
 }
