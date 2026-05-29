@@ -24,6 +24,14 @@ export interface SessionCompactionInput {
   staleRules?: SessionCompactionStaleRule[];
 }
 
+export type SessionLifecyclePhase =
+  | "session_start"
+  | "pre_compact"
+  | "candidate_distilled"
+  | "topic_linked"
+  | "session_map_ready"
+  | "session_end";
+
 export interface CompactedMemoryCandidate {
   id: string;
   kind: MemoryKind;
@@ -34,6 +42,59 @@ export interface CompactedMemoryCandidate {
   salience: number;
   reasons: string[];
   stale?: boolean;
+}
+
+export interface SessionTopicLink {
+  id: string;
+  topicPath: string[];
+  candidateIds: string[];
+  sourceEventIds: string[];
+  firstObservedAt: string;
+  lastObservedAt: string;
+  salience: number;
+  reasons: string[];
+}
+
+export interface SessionLifecycleEvent {
+  id: string;
+  phase: SessionLifecyclePhase;
+  observedAt: string;
+  sourceEventIds: string[];
+  candidateIds: string[];
+  topicIds: string[];
+  counters: Record<string, number>;
+  warnings: string[];
+}
+
+export interface SessionMapTelemetry {
+  counters: {
+    inputEvents: number;
+    statementsInspected: number;
+    durableStatements: number;
+    duplicateCandidateMerges: number;
+    redactionCount: number;
+    skippedFullyPrivate: number;
+    skippedNoise: number;
+    outputCandidates: number;
+    topicLinks: number;
+    linkedCandidates: number;
+    unlinkedCandidates: number;
+    staleCandidates: number;
+  };
+  wasteSignals: string[];
+  warnings: string[];
+}
+
+export interface SessionMap {
+  id: string;
+  sessionId: string;
+  source: SessionSource;
+  startedAt: string;
+  endedAt?: string;
+  candidateIds: string[];
+  topicLinks: SessionTopicLink[];
+  lifecycleEvents: SessionLifecycleEvent[];
+  telemetry: SessionMapTelemetry;
 }
 
 export interface SessionCompactionMetrics {
@@ -51,6 +112,7 @@ export interface SessionCompactionResult {
   source: SessionSource;
   candidates: CompactedMemoryCandidate[];
   metrics: SessionCompactionMetrics;
+  sessionMap: SessionMap;
 }
 
 export interface SessionCompactionStaleRule {
@@ -100,6 +162,9 @@ export function compactSession(input: SessionCompactionInput): SessionCompaction
   let redactionCount = 0;
   let skippedFullyPrivate = 0;
   let skippedNoise = 0;
+  let statementsInspected = 0;
+  let durableStatements = 0;
+  let duplicateCandidateMerges = 0;
 
   for (const event of sortedEvents) {
     const redacted = redactPrivate(event.content);
@@ -111,6 +176,7 @@ export function compactSession(input: SessionCompactionInput): SessionCompaction
 
     const statements = splitStatements(redacted.text);
     for (const statement of statements) {
+      statementsInspected += 1;
       const compacted = compactStatement({
         sessionId: input.sessionId,
         eventId: event.id,
@@ -124,8 +190,10 @@ export function compactSession(input: SessionCompactionInput): SessionCompaction
         continue;
       }
 
+      durableStatements += 1;
       const existing = candidates.get(compacted.id);
       if (existing) {
+        duplicateCandidateMerges += 1;
         existing.sourceEventIds.push(event.id);
         existing.salience = Math.max(existing.salience, compacted.salience);
         existing.reasons = [...new Set([...existing.reasons, ...compacted.reasons])];
@@ -139,19 +207,31 @@ export function compactSession(input: SessionCompactionInput): SessionCompaction
   }
 
   const output = [...candidates.values()].sort((a, b) => a.observedAt.localeCompare(b.observedAt));
+  const metrics = {
+    inputEvents: input.events.length,
+    redactionCount,
+    skippedFullyPrivate,
+    skippedNoise,
+    outputCandidates: output.length,
+    chronological: isChronological(output),
+    noiseReductionRatio: input.events.length === 0 ? 0 : 1 - output.length / input.events.length,
+  };
   return {
     sessionId: input.sessionId,
     source: input.source,
     candidates: output,
-    metrics: {
-      inputEvents: input.events.length,
-      redactionCount,
-      skippedFullyPrivate,
-      skippedNoise,
-      outputCandidates: output.length,
-      chronological: isChronological(output),
-      noiseReductionRatio: input.events.length === 0 ? 0 : 1 - output.length / input.events.length,
-    },
+    metrics,
+    sessionMap: buildSessionMap({
+      input,
+      sortedEvents,
+      candidates: output,
+      metrics,
+      counters: {
+        statementsInspected,
+        durableStatements,
+        duplicateCandidateMerges,
+      },
+    }),
   };
 }
 
@@ -238,4 +318,199 @@ function stableHash(input: string): string {
 
 function isChronological(candidates: CompactedMemoryCandidate[]): boolean {
   return candidates.every((candidate, index) => index === 0 || candidates[index - 1]!.observedAt <= candidate.observedAt);
+}
+
+function buildSessionMap(input: {
+  input: SessionCompactionInput;
+  sortedEvents: SessionEvent[];
+  candidates: CompactedMemoryCandidate[];
+  metrics: SessionCompactionMetrics;
+  counters: {
+    statementsInspected: number;
+    durableStatements: number;
+    duplicateCandidateMerges: number;
+  };
+}): SessionMap {
+  const topicLinks = buildTopicLinks(input.candidates);
+  const linkedCandidateIds = new Set(topicLinks.flatMap((link) => link.candidateIds));
+  const warnings = buildSessionMapWarnings(input.metrics, topicLinks, linkedCandidateIds);
+  const telemetry: SessionMapTelemetry = {
+    counters: {
+      inputEvents: input.metrics.inputEvents,
+      statementsInspected: input.counters.statementsInspected,
+      durableStatements: input.counters.durableStatements,
+      duplicateCandidateMerges: input.counters.duplicateCandidateMerges,
+      redactionCount: input.metrics.redactionCount,
+      skippedFullyPrivate: input.metrics.skippedFullyPrivate,
+      skippedNoise: input.metrics.skippedNoise,
+      outputCandidates: input.metrics.outputCandidates,
+      topicLinks: topicLinks.length,
+      linkedCandidates: linkedCandidateIds.size,
+      unlinkedCandidates: input.candidates.length - linkedCandidateIds.size,
+      staleCandidates: input.candidates.filter((candidate) => candidate.stale).length,
+    },
+    wasteSignals: buildWasteSignals(input.metrics, topicLinks, linkedCandidateIds.size, input.candidates.length),
+    warnings,
+  };
+  const sessionMapId = `session-map:${stableHash(`${input.input.source}:${input.input.sessionId}`).slice(0, 24)}`;
+  const base = {
+    sessionMapId,
+    events: input.sortedEvents,
+    candidates: input.candidates,
+    topicLinks,
+    telemetry,
+  };
+  return {
+    id: sessionMapId,
+    sessionId: input.input.sessionId,
+    source: input.input.source,
+    startedAt: input.input.startedAt,
+    ...(input.input.endedAt ? { endedAt: input.input.endedAt } : {}),
+    candidateIds: input.candidates.map((candidate) => candidate.id),
+    topicLinks,
+    lifecycleEvents: [
+      lifecycleEvent({ ...base, phase: "session_start", observedAt: input.input.startedAt, sourceEventIds: [], candidateIds: [], topicIds: [] }),
+      lifecycleEvent({ ...base, phase: "pre_compact", observedAt: input.sortedEvents[0]?.timestamp ?? input.input.startedAt, sourceEventIds: input.sortedEvents.map((event) => event.id), candidateIds: [], topicIds: [] }),
+      lifecycleEvent({ ...base, phase: "candidate_distilled", observedAt: input.candidates.at(-1)?.observedAt ?? input.input.startedAt, sourceEventIds: [...new Set(input.candidates.flatMap((candidate) => candidate.sourceEventIds))], candidateIds: input.candidates.map((candidate) => candidate.id), topicIds: [] }),
+      lifecycleEvent({ ...base, phase: "topic_linked", observedAt: input.candidates.at(-1)?.observedAt ?? input.input.startedAt, sourceEventIds: [...new Set(topicLinks.flatMap((link) => link.sourceEventIds))], candidateIds: [...linkedCandidateIds], topicIds: topicLinks.map((link) => link.id) }),
+      lifecycleEvent({ ...base, phase: "session_map_ready", observedAt: input.input.endedAt ?? input.sortedEvents.at(-1)?.timestamp ?? input.input.startedAt, sourceEventIds: input.sortedEvents.map((event) => event.id), candidateIds: input.candidates.map((candidate) => candidate.id), topicIds: topicLinks.map((link) => link.id) }),
+      lifecycleEvent({ ...base, phase: "session_end", observedAt: input.input.endedAt ?? input.sortedEvents.at(-1)?.timestamp ?? input.input.startedAt, sourceEventIds: [], candidateIds: [], topicIds: [] }),
+    ],
+    telemetry,
+  };
+}
+
+function buildTopicLinks(candidates: CompactedMemoryCandidate[]): SessionTopicLink[] {
+  const grouped = new Map<string, SessionTopicLink>();
+  for (const candidate of candidates) {
+    const topicPath = topicPathForCandidate(candidate);
+    const topicKey = topicPath.join(" / ");
+    const existing = grouped.get(topicKey);
+    if (existing) {
+      existing.candidateIds.push(candidate.id);
+      existing.sourceEventIds = [...new Set([...existing.sourceEventIds, ...candidate.sourceEventIds])];
+      existing.firstObservedAt = existing.firstObservedAt < candidate.observedAt ? existing.firstObservedAt : candidate.observedAt;
+      existing.lastObservedAt = existing.lastObservedAt > candidate.observedAt ? existing.lastObservedAt : candidate.observedAt;
+      existing.salience = Number(Math.max(existing.salience, candidate.salience).toFixed(2));
+      existing.reasons = [...new Set([...existing.reasons, ...candidate.reasons])];
+      continue;
+    }
+    grouped.set(topicKey, {
+      id: `topic-link:${stableHash(topicKey).slice(0, 24)}`,
+      topicPath,
+      candidateIds: [candidate.id],
+      sourceEventIds: [...candidate.sourceEventIds],
+      firstObservedAt: candidate.observedAt,
+      lastObservedAt: candidate.observedAt,
+      salience: candidate.salience,
+      reasons: [...candidate.reasons],
+    });
+  }
+  return [...grouped.values()].sort((a, b) => b.salience - a.salience || a.topicPath.join(" / ").localeCompare(b.topicPath.join(" / ")));
+}
+
+function topicPathForCandidate(candidate: CompactedMemoryCandidate): string[] {
+  const topicText = candidate.text.replace(/^\s*(Decision|Preference|Procedure|Bug|Fix|Methodology|Research hypothesis|Fact|Profile|Source)\s*:\s*/i, "");
+  const exact = topicText.match(/\b[A-Z][A-Z0-9]+-\d{2,}\b/)?.[0];
+  const properName = topicText.match(/\b[A-Z][A-Za-z0-9]*(?:\s+[A-Z][A-Za-z0-9]*){0,2}\b/)?.[0];
+  const root = exact ?? properName ?? candidate.kind;
+  return [normalizeTopicSegment(root), normalizeTopicSegment(candidate.kind)];
+}
+
+function normalizeTopicSegment(value: string): string {
+  const cleaned = value
+    .replace(/[^\p{L}\p{N}\s_-]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned) return "General";
+  return cleaned
+    .split(" ")
+    .slice(0, 6)
+    .map((word) => (word.match(/^[A-Z0-9_-]+$/) ? word : word[0]!.toUpperCase() + word.slice(1)))
+    .join(" ");
+}
+
+function lifecycleEvent(input: {
+  sessionMapId: string;
+  phase: SessionLifecyclePhase;
+  observedAt: string;
+  sourceEventIds: string[];
+  candidateIds: string[];
+  topicIds: string[];
+  telemetry: SessionMapTelemetry;
+}): SessionLifecycleEvent {
+  return {
+    id: `lifecycle:${stableHash(`${input.sessionMapId}:${input.phase}:${input.observedAt}`).slice(0, 24)}`,
+    phase: input.phase,
+    observedAt: input.observedAt,
+    sourceEventIds: input.sourceEventIds,
+    candidateIds: input.candidateIds,
+    topicIds: input.topicIds,
+    counters: countersForLifecyclePhase(input.phase, input.telemetry),
+    warnings: input.telemetry.warnings,
+  };
+}
+
+function countersForLifecyclePhase(phase: SessionLifecyclePhase, telemetry: SessionMapTelemetry): Record<string, number> {
+  if (phase === "pre_compact") {
+    return {
+      inputEvents: telemetry.counters.inputEvents,
+      statementsInspected: telemetry.counters.statementsInspected,
+      redactionCount: telemetry.counters.redactionCount,
+      skippedFullyPrivate: telemetry.counters.skippedFullyPrivate,
+    };
+  }
+  if (phase === "candidate_distilled") {
+    return {
+      durableStatements: telemetry.counters.durableStatements,
+      duplicateCandidateMerges: telemetry.counters.duplicateCandidateMerges,
+      outputCandidates: telemetry.counters.outputCandidates,
+      skippedNoise: telemetry.counters.skippedNoise,
+      staleCandidates: telemetry.counters.staleCandidates,
+    };
+  }
+  if (phase === "topic_linked") {
+    return {
+      topicLinks: telemetry.counters.topicLinks,
+      linkedCandidates: telemetry.counters.linkedCandidates,
+      unlinkedCandidates: telemetry.counters.unlinkedCandidates,
+    };
+  }
+  if (phase === "session_map_ready") {
+    return {
+      outputCandidates: telemetry.counters.outputCandidates,
+      topicLinks: telemetry.counters.topicLinks,
+      warningCount: telemetry.warnings.length,
+      wasteSignalCount: telemetry.wasteSignals.length,
+    };
+  }
+  return {};
+}
+
+function buildWasteSignals(
+  metrics: SessionCompactionMetrics,
+  topicLinks: SessionTopicLink[],
+  linkedCandidateCount: number,
+  candidateCount: number,
+): string[] {
+  const signals = [];
+  if (metrics.skippedNoise > Math.max(3, metrics.outputCandidates * 2)) signals.push("high-noise-skip-rate");
+  if (metrics.redactionCount > 0) signals.push("redaction-observed");
+  if (topicLinks.length === 0 && candidateCount > 0) signals.push("no-topic-links");
+  if (candidateCount > linkedCandidateCount) signals.push("unlinked-candidates");
+  if (metrics.noiseReductionRatio < 0.2 && metrics.inputEvents > 3) signals.push("low-noise-reduction");
+  return signals;
+}
+
+function buildSessionMapWarnings(
+  metrics: SessionCompactionMetrics,
+  topicLinks: SessionTopicLink[],
+  linkedCandidateIds: Set<string>,
+): string[] {
+  const warnings = [];
+  if (!metrics.chronological) warnings.push("candidate-order-not-chronological");
+  if (metrics.outputCandidates === 0 && metrics.inputEvents > 0) warnings.push("no-durable-candidates");
+  if (topicLinks.length === 0 && metrics.outputCandidates > 0) warnings.push("topic-map-empty");
+  if (linkedCandidateIds.size < metrics.outputCandidates) warnings.push("some-candidates-unlinked");
+  return warnings;
 }

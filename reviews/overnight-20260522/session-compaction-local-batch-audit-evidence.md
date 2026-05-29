@@ -46,3 +46,34 @@ Public-safety notes:
   `privacyLeakCount: 0`.
 - The report includes no provider credentials, raw memory files, raw
   transcripts, diagnostics bundles, or private local paths.
+
+## 2026-05-29 Refresh: Lifecycle And Topic Map Batch Audit
+
+The batch audit now aggregates session-map telemetry across Codex, Claude, and
+Hermes-style fixture exports.
+
+Refresh result:
+
+```json
+{
+  "sessionCount": 3,
+  "events": 12,
+  "candidates": 9,
+  "topicLinkCount": 9,
+  "lifecycleEventCount": 18,
+  "unlinkedCandidateCount": 0,
+  "duplicateCandidateMerges": 0,
+  "privacyLeakCount": 0,
+  "lifecyclePhaseCounts": {
+    "session_start": 3,
+    "pre_compact": 3,
+    "candidate_distilled": 3,
+    "topic_linked": 3,
+    "session_map_ready": 3,
+    "session_end": 3
+  }
+}
+```
+
+Strict mode now verifies lifecycle coverage and zero unlinked session-map
+candidates while preserving the metrics-only public-safety boundary.

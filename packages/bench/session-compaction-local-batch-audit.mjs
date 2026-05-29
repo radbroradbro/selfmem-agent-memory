@@ -53,6 +53,10 @@ if (strict) {
   assert.ok(report.quality.sourceCounts.claude >= 1, JSON.stringify(report, null, 2));
   assert.ok(report.quality.sourceCounts.hermes >= 1, JSON.stringify(report, null, 2));
   assert.ok(report.aggregate.averageNoiseReductionRatio >= 0.2, JSON.stringify(report, null, 2));
+  assert.ok(report.quality.topicLinkCount >= report.aggregate.outputCandidates, JSON.stringify(report, null, 2));
+  assert.equal(report.quality.unlinkedCandidateCount, 0, JSON.stringify(report, null, 2));
+  assert.equal(report.quality.lifecyclePhaseCounts.pre_compact, report.aggregate.sessionCount, JSON.stringify(report, null, 2));
+  assert.equal(report.quality.lifecyclePhaseCounts.session_map_ready, report.aggregate.sessionCount, JSON.stringify(report, null, 2));
 }
 
 const output = `${JSON.stringify(report, null, 2)}\n`;
@@ -83,6 +87,7 @@ function buildSessionReport(result, inputPath, raw) {
     source: result.source,
     metrics: result.metrics,
     candidateFingerprints: candidates.map(candidateFingerprint),
+    sessionMap: sessionMapFingerprint(result.sessionMap),
   });
   const privacyLeakCount =
     (containsRedactionBoundaryText(candidateText) ? 1 : 0) +
@@ -102,6 +107,7 @@ function buildSessionReport(result, inputPath, raw) {
       privacyLeakCount,
       chronological: result.metrics.chronological,
     },
+    sessionMap: sessionMapFingerprint(result.sessionMap),
     candidateFingerprints: candidates.map(candidateFingerprint),
   };
 }
@@ -119,6 +125,12 @@ function buildBatchReport(sessionReports, options) {
   let staleCandidateCount = 0;
   let privacyLeakCount = 0;
   let chronologicalFailureCount = 0;
+  let topicLinkCount = 0;
+  let lifecycleEventCount = 0;
+  let unlinkedCandidateCount = 0;
+  let duplicateCandidateMerges = 0;
+  const wasteSignalCounts = {};
+  const lifecyclePhaseCounts = {};
   const noiseReductionValues = [];
 
   for (const report of sessionReports) {
@@ -132,7 +144,13 @@ function buildBatchReport(sessionReports, options) {
     staleCandidateCount += report.quality.staleCandidateCount;
     privacyLeakCount += report.quality.privacyLeakCount;
     if (!report.quality.chronological) chronologicalFailureCount += 1;
+    topicLinkCount += report.sessionMap.topicLinkCount;
+    lifecycleEventCount += report.sessionMap.lifecycleEventCount;
+    unlinkedCandidateCount += report.sessionMap.unlinkedCandidateCount;
+    duplicateCandidateMerges += report.sessionMap.duplicateCandidateMerges;
     noiseReductionValues.push(report.metrics.noiseReductionRatio);
+    incrementCounts(wasteSignalCounts, report.sessionMap.wasteSignals);
+    incrementObjectCounts(lifecyclePhaseCounts, report.sessionMap.lifecyclePhaseCounts);
 
     for (const candidate of report.candidateFingerprints) {
       kindCounts[candidate.kind] = (kindCounts[candidate.kind] ?? 0) + 1;
@@ -172,6 +190,12 @@ function buildBatchReport(sessionReports, options) {
       chronologicalFailureCount,
       privacyLeakCount,
       candidateFingerprintCount: sessionReports.reduce((sum, report) => sum + report.candidateFingerprints.length, 0),
+      topicLinkCount,
+      lifecycleEventCount,
+      lifecyclePhaseCounts,
+      unlinkedCandidateCount,
+      duplicateCandidateMerges,
+      wasteSignalCounts,
     },
     sessions: sessionReports.map((report) => ({
       source: report.source,
@@ -187,6 +211,7 @@ function buildBatchReport(sessionReports, options) {
       staleCandidateCount: report.quality.staleCandidateCount,
       exactIdentifierCandidateCount: report.quality.exactIdentifierCandidateCount,
       averageSalience: report.quality.averageSalience,
+      sessionMap: report.sessionMap,
       candidateFingerprints: report.candidateFingerprints,
     })),
     strict: options.strict,
@@ -313,6 +338,56 @@ function candidateFingerprint(candidate) {
     sourceEventCount: candidate.sourceEventIds.length,
     observedAt: candidate.observedAt,
   };
+}
+
+function sessionMapFingerprint(sessionMap) {
+  return {
+    idHash: hashForDisplay(sessionMap.id),
+    topicLinkCount: sessionMap.topicLinks.length,
+    lifecycleEventCount: sessionMap.lifecycleEvents.length,
+    linkedCandidateCount: sessionMap.telemetry.counters.linkedCandidates,
+    unlinkedCandidateCount: sessionMap.telemetry.counters.unlinkedCandidates,
+    statementsInspected: sessionMap.telemetry.counters.statementsInspected,
+    durableStatements: sessionMap.telemetry.counters.durableStatements,
+    duplicateCandidateMerges: sessionMap.telemetry.counters.duplicateCandidateMerges,
+    wasteSignals: sessionMap.telemetry.wasteSignals,
+    warnings: sessionMap.telemetry.warnings,
+    lifecyclePhaseCounts: countBy(sessionMap.lifecycleEvents.map((event) => event.phase)),
+    topicFingerprints: sessionMap.topicLinks.map(topicLinkFingerprint),
+  };
+}
+
+function topicLinkFingerprint(link) {
+  return {
+    idHash: hashForDisplay(link.id),
+    topicPathHash: hashForDisplay(link.topicPath.join("/")),
+    depth: link.topicPath.length,
+    candidateCount: link.candidateIds.length,
+    sourceEventCount: link.sourceEventIds.length,
+    reasonCount: link.reasons.length,
+    salience: link.salience,
+    firstObservedAt: link.firstObservedAt,
+    lastObservedAt: link.lastObservedAt,
+  };
+}
+
+function countBy(values) {
+  return values.reduce((counts, value) => {
+    counts[value] = (counts[value] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
+function incrementCounts(target, values) {
+  for (const value of values) {
+    target[value] = (target[value] ?? 0) + 1;
+  }
+}
+
+function incrementObjectCounts(target, values) {
+  for (const [key, value] of Object.entries(values)) {
+    target[key] = (target[key] ?? 0) + Number(value);
+  }
 }
 
 function hashForDisplay(value) {

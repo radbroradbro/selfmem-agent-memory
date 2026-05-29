@@ -43,7 +43,11 @@ The audit is metrics-only by default. It emits:
 - stale candidate count,
 - exact-identifier candidate count,
 - average salience,
-- candidate fingerprints.
+- candidate fingerprints,
+- session-map fingerprints,
+- topic-link counts and hashed topic fingerprints,
+- lifecycle phase counts,
+- warning and waste-signal reason codes.
 
 It does not emit candidate memory text, raw source text, local paths, or session
 IDs. The input path is reduced to a redacted `.../filename` label, and the
@@ -58,7 +62,8 @@ pnpm compaction:local-audit
 That smoke uses
 `packages/bench/fixtures/session-compaction-local-audit.fixture.jsonl` and
 requires chronological output, at least two redactions, exact-identifier
-coverage, and zero privacy leaks.
+coverage, session-map lifecycle phases, linked topic fingerprints, and zero
+privacy leaks.
 
 ## Batch Local Session Audit
 
@@ -75,7 +80,8 @@ node packages/bench/session-compaction-local-batch-audit.mjs \
 
 The report stays metrics-only. It emits source counts, aggregate event and
 candidate counts, average noise reduction, chronological failures, privacy
-counts, exact-identifier coverage, and per-session candidate fingerprints. It
+counts, exact-identifier coverage, lifecycle phase counts, topic-link counts,
+waste-signal counts, and per-session candidate/session-map fingerprints. It
 does not emit raw session text, candidate memory text, full local paths, or raw
 session ids. Input files are represented by hashes and a redacted extension
 label.
@@ -101,6 +107,10 @@ leaks.
 - chronological order,
 - noise reduction ratio,
 - stale background handling.
+- lifecycle coverage from `pre_compact` through `session_map_ready`,
+- topic/subtopic links for future wiki/RAG retrieval,
+- waste signals such as high noise, redaction, low noise reduction, or unlinked
+  candidates.
 
 The multi-scenario benchmark also measures:
 
@@ -165,3 +175,28 @@ Production readiness should require this benchmark to show:
 - repeated durable statements merged into one memory with multiple source
   events,
 - no bulk stale school-note retention.
+- every compacted candidate is linked to a session-map topic,
+- lifecycle phase telemetry is present so hooks can write local session maps
+  before runtime compaction,
+- public audit output contains only counts, hashes, timestamps, and reason
+  codes.
+
+## Autoresearch Feedback Loop
+
+Autoresearch should use these metrics to refine method, not merely rerun a fixed
+harness. A model can safely compare retrieval and compaction policies by using
+the metrics-only logs:
+
+- `topicLinkCount` and hashed topic fingerprints show whether wiki/subtopic
+  linking is broad enough for later RAG without leaking session text.
+- `lifecyclePhaseCounts` proves whether Codex, Claude Code, Hermes, or OpenClaw
+  hooks actually reached the pre-compaction and session-map-ready phases.
+- `wasteSignals` identify likely useless work, such as query expansion on
+  lexical queries, high noise skip rates, or redaction-heavy sessions.
+- `duplicateCandidateMerges` and `linkedCandidateCount` show whether repeated
+  memories and session chunks are being compacted into durable, searchable
+  structure instead of noisy duplicates.
+
+The policy should remain data-gated: if a retrieval feature helps only some
+query classes, promote it behind a classifier or threshold rather than making it
+the default for every recall.

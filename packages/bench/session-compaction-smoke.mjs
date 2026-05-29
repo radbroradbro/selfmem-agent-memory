@@ -28,5 +28,13 @@ console.log(JSON.stringify({
     stale: Boolean(candidate.stale),
     text: candidate.text,
   })),
+  sessionMap: {
+    topicLinkCount: result.sessionMap.topicLinks.length,
+    lifecycleEventCount: result.sessionMap.lifecycleEvents.length,
+    linkedCandidateCount: result.sessionMap.telemetry.counters.linkedCandidates,
+    unlinkedCandidateCount: result.sessionMap.telemetry.counters.unlinkedCandidates,
+    wasteSignals: result.sessionMap.telemetry.wasteSignals,
+    warnings: result.sessionMap.telemetry.warnings,
+  },
   metrics: result.metrics,
 }, null, 2));

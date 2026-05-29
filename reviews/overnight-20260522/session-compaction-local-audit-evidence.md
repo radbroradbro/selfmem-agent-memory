@@ -54,3 +54,27 @@ No raw candidate memory text appears in this evidence file.
 - Gemini session compaction local audit review: `CLEAN`.
 - GitHub Actions CI run `26298965544` on commit `be08302`: passed Test, Full
   smoke, and Release readiness check.
+
+## 2026-05-29 Refresh: Lifecycle And Topic Map Audit
+
+The local audit now includes a metrics-only session-map block. The public report
+still does not print candidate memory text, raw session text, local paths, raw
+session ids, or credentials.
+
+Fixture result:
+
+- topic link count: 4,
+- lifecycle event count: 6,
+- linked candidate count: 4,
+- unlinked candidate count: 0,
+- lifecycle phases: `session_start`, `pre_compact`, `candidate_distilled`,
+  `topic_linked`, `session_map_ready`, `session_end`,
+- waste signals: `redaction-observed`,
+- warnings: none,
+- privacy leak count: 0.
+
+Verification:
+
+- `node packages/bench/session-compaction-local-audit.mjs --strict`: passed.
+- Strict mode now requires session-map lifecycle phases and zero unlinked
+  candidates.

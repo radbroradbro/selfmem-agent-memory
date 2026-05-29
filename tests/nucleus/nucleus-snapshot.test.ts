@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  createNucleusSessionMapNodes,
   createNucleusRetrievalTraceNode,
   createResearchLineageNodes,
   sanitizeNucleusSnapshot,
   type NucleusIndexSnapshot,
 } from "../../packages/core/src/nucleus/index.js";
+import { compactSession } from "../../packages/core/src/compaction/session.js";
 
 describe("nucleus index", () => {
   it("redacts private and key-shaped content from public snapshots", () => {
@@ -126,5 +128,43 @@ describe("nucleus index", () => {
     expect(serialized).not.toContain("secret vendor");
     expect(serialized).not.toContain("hidden");
     expect(serialized).not.toMatch(/sm_A/);
+  });
+
+  it("projects compacted session maps into topic and lifecycle graph nodes", () => {
+    const compaction = compactSession({
+      sessionId: "session sm_" + "F".repeat(42),
+      source: "codex",
+      startedAt: "2026-05-22T08:00:00.000Z",
+      endedAt: "2026-05-22T08:05:00.000Z",
+      events: [
+        {
+          id: "e1",
+          role: "user",
+          timestamp: "2026-05-22T08:01:00.000Z",
+          content: "Decision: RecallWeave should map compacted sessions to wiki topics before compaction finishes.",
+        },
+        {
+          id: "e2",
+          role: "assistant",
+          timestamp: "2026-05-22T08:02:00.000Z",
+          content: "Procedure: log lifecycle counters, topic links, and cache hits for later autoresearch review.",
+        },
+      ],
+    });
+
+    const graph = createNucleusSessionMapNodes({
+      sessionMap: compaction.sessionMap,
+      containerTag: "container pa-" + "C".repeat(44),
+    });
+    const serialized = JSON.stringify(graph);
+
+    expect(graph.sessionNode.kind).toBe("session_summary");
+    expect(graph.topicNodes.length).toBeGreaterThanOrEqual(2);
+    expect(graph.lifecycleNodes.map((node) => node.kind)).toContain("lifecycle_event");
+    expect(graph.edges.map((edge) => edge.kind)).toContain("syncs_to");
+    expect(graph.edges.map((edge) => edge.kind)).toContain("captured_by");
+    expect(serialized).toContain("topicLinkCount");
+    expect(serialized).not.toMatch(/sm_F/);
+    expect(serialized).not.toMatch(/pa-C/);
   });
 });

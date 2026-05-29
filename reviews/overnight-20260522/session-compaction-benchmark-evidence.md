@@ -48,3 +48,36 @@ Known limits:
 - This is still a fixture benchmark, not a private-session import.
 - It scores extraction quality and safety, not downstream retrieval answer
   quality.
+
+## 2026-05-29 Refresh: Session Map Telemetry
+
+Scope:
+
+- Added session-map output to `compactSession`.
+- Added lifecycle phases: `session_start`, `pre_compact`,
+  `candidate_distilled`, `topic_linked`, `session_map_ready`, and
+  `session_end`.
+- Added topic/subtopic links from compacted candidates to support later wiki
+  and RAG follow-up without requiring a wiki summary rewrite.
+- Added metrics-only waste signals for review, including redaction-observed,
+  low-noise-reduction, no-topic-links, unlinked-candidates, and high
+  noise-skip-rate.
+
+Verification:
+
+- `pnpm typecheck`: passed.
+- `pnpm test -- tests/compaction/session-compaction.test.ts tests/nucleus/nucleus-snapshot.test.ts`: passed.
+- `node packages/bench/session-compaction-smoke.mjs`: passed.
+- `node packages/bench/session-compaction-benchmark.mjs`: passed 5 of 5
+  scenarios.
+- Aggregate lifecycle coverage: 1.0.
+- Aggregate unlinked candidate count: 0.
+- Aggregate topic links: 10.
+- Aggregate privacy leak count: 0.
+
+Public-safety boundary:
+
+- Public evidence contains counts, hashes, phase names, timestamps, and reason
+  codes only.
+- Raw session chunks remain private local material for future RAG/session
+  retrieval.

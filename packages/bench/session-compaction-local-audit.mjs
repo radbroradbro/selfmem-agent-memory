@@ -33,6 +33,11 @@ if (strict) {
   assert.ok(report.quality.kindCounts.decision >= 1, JSON.stringify(report, null, 2));
   assert.ok(report.quality.kindCounts.procedure >= 1, JSON.stringify(report, null, 2));
   assert.ok(report.quality.exactIdentifierCandidateCount >= 1, JSON.stringify(report, null, 2));
+  assert.equal(report.sessionMap.lifecycleEventCount, 6, JSON.stringify(report, null, 2));
+  assert.equal(report.sessionMap.unlinkedCandidateCount, 0, JSON.stringify(report, null, 2));
+  assert.ok(report.sessionMap.topicLinkCount >= report.metrics.outputCandidates, JSON.stringify(report, null, 2));
+  assert.equal(report.sessionMap.lifecyclePhaseCounts.pre_compact, 1, JSON.stringify(report, null, 2));
+  assert.equal(report.sessionMap.lifecyclePhaseCounts.session_map_ready, 1, JSON.stringify(report, null, 2));
 }
 
 console.log(JSON.stringify(report, null, 2));
@@ -45,6 +50,7 @@ function buildMetricsOnlyReport(result, options) {
     source: result.source,
     metrics: result.metrics,
     candidateFingerprints: candidates.map(candidateFingerprint),
+    sessionMap: sessionMapFingerprint(result.sessionMap),
   });
   const privacyLeakCount =
     (containsRedactionBoundaryText(candidateText) ? 1 : 0) +
@@ -80,6 +86,7 @@ function buildMetricsOnlyReport(result, options) {
       lastObservedAt: candidates.at(-1)?.observedAt ?? null,
       privacyLeakCount,
     },
+    sessionMap: sessionMapFingerprint(result.sessionMap),
     candidateFingerprints: candidates.map(candidateFingerprint),
     strict: options.strict,
   };
@@ -95,6 +102,44 @@ function candidateFingerprint(candidate) {
     sourceEventCount: candidate.sourceEventIds.length,
     observedAt: candidate.observedAt,
   };
+}
+
+function sessionMapFingerprint(sessionMap) {
+  return {
+    idHash: hashForDisplay(sessionMap.id),
+    topicLinkCount: sessionMap.topicLinks.length,
+    lifecycleEventCount: sessionMap.lifecycleEvents.length,
+    linkedCandidateCount: sessionMap.telemetry.counters.linkedCandidates,
+    unlinkedCandidateCount: sessionMap.telemetry.counters.unlinkedCandidates,
+    statementsInspected: sessionMap.telemetry.counters.statementsInspected,
+    durableStatements: sessionMap.telemetry.counters.durableStatements,
+    duplicateCandidateMerges: sessionMap.telemetry.counters.duplicateCandidateMerges,
+    wasteSignals: sessionMap.telemetry.wasteSignals,
+    warnings: sessionMap.telemetry.warnings,
+    lifecyclePhaseCounts: countBy(sessionMap.lifecycleEvents.map((event) => event.phase)),
+    topicFingerprints: sessionMap.topicLinks.map(topicLinkFingerprint),
+  };
+}
+
+function topicLinkFingerprint(link) {
+  return {
+    idHash: hashForDisplay(link.id),
+    topicPathHash: hashForDisplay(link.topicPath.join("/")),
+    depth: link.topicPath.length,
+    candidateCount: link.candidateIds.length,
+    sourceEventCount: link.sourceEventIds.length,
+    reasonCount: link.reasons.length,
+    salience: link.salience,
+    firstObservedAt: link.firstObservedAt,
+    lastObservedAt: link.lastObservedAt,
+  };
+}
+
+function countBy(values) {
+  return values.reduce((counts, value) => {
+    counts[value] = (counts[value] ?? 0) + 1;
+    return counts;
+  }, {});
 }
 
 function parseSession(raw, fallback) {

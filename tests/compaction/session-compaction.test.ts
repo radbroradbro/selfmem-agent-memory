@@ -48,6 +48,18 @@ describe("session compaction", () => {
     expect(result.metrics.chronological).toBe(true);
     expect(result.metrics.outputCandidates).toBeGreaterThanOrEqual(3);
     expect(result.metrics.noiseReductionRatio).toBeGreaterThan(0);
+    expect(result.sessionMap.topicLinks.length).toBeGreaterThanOrEqual(3);
+    expect(result.sessionMap.lifecycleEvents.map((event) => event.phase)).toEqual([
+      "session_start",
+      "pre_compact",
+      "candidate_distilled",
+      "topic_linked",
+      "session_map_ready",
+      "session_end",
+    ]);
+    expect(result.sessionMap.telemetry.counters.inputEvents).toBe(5);
+    expect(result.sessionMap.telemetry.counters.linkedCandidates).toBe(result.candidates.length);
+    expect(result.sessionMap.telemetry.wasteSignals).toContain("redaction-observed");
     expect(serialized).not.toContain("secret");
     expect(result.candidates.map((candidate) => candidate.kind)).toContain("decision");
     expect(result.candidates.map((candidate) => candidate.kind)).toContain("fix");

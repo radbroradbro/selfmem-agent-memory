@@ -1,3 +1,4 @@
+import type { SessionMap } from "../compaction/session.js";
 import type { MemoryScope, ProvenanceRef, RetrievalTrace } from "../types.js";
 export type NucleusNodeKind = "memory" | "source" | "wiki_page" | "derived_doc" | "session_summary" | "entity" | "project" | "decision" | "contradiction" | "research_query" | "source_claim" | "hypothesis" | "lifecycle_event" | "retrieval_trace";
 export type NucleusEdgeKind = "derived_from" | "cites" | "mentions" | "decides" | "contradicts" | "supports" | "challenges" | "answers" | "tests" | "informs" | "supersedes" | "related_to" | "captured_by" | "injected_into" | "syncs_to" | "edited_by";
@@ -99,6 +100,12 @@ export interface ResearchLineageRecord {
     nextQuestions?: string[];
     metadata?: Record<string, unknown>;
 }
+export interface NucleusSessionMapNodes {
+    sessionNode: NucleusNode;
+    topicNodes: NucleusNode[];
+    lifecycleNodes: NucleusNode[];
+    edges: NucleusEdge[];
+}
 export interface BrainUiEvidenceSpec {
     fixtureOnly: true;
     requiredFlow: Array<"launch" | "search" | "open_node" | "edit_derived_doc" | "view_provenance" | "view_retrieval_trace" | "view_lifecycle" | "save_or_cancel">;
@@ -118,6 +125,11 @@ export declare function createResearchLineageNodes(record: ResearchLineageRecord
     decisionNode?: NucleusNode;
     edges: NucleusEdge[];
 };
+export declare function createNucleusSessionMapNodes(input: {
+    sessionMap: SessionMap;
+    createdAt?: string;
+    containerTag?: string;
+}): NucleusSessionMapNodes;
 export declare function sanitizeNucleusSnapshot(snapshot: NucleusIndexSnapshot): NucleusIndexSnapshot;
 export declare function sanitizeNucleusNode(node: NucleusNode, nodeIdMap?: Map<string, string>): NucleusNode;
 export declare function sanitizeNucleusEdge(edge: NucleusEdge, nodeIdMap?: Map<string, string>): NucleusEdge;

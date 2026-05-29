@@ -95,6 +95,96 @@ export function createResearchLineageNodes(record) {
         ? { queryNode, hypothesisNode, decisionNode, edges }
         : { queryNode, hypothesisNode, edges };
 }
+export function createNucleusSessionMapNodes(input) {
+    const createdAt = input.createdAt ?? input.sessionMap.startedAt;
+    const sessionNodeInput = {
+        id: input.sessionMap.id,
+        kind: "session_summary",
+        title: `Session map: ${input.sessionMap.source}`,
+        createdAt,
+        updatedAt: input.sessionMap.endedAt ?? createdAt,
+        tags: ["session-map", input.sessionMap.source],
+        metadata: {
+            candidateCount: input.sessionMap.candidateIds.length,
+            topicLinkCount: input.sessionMap.topicLinks.length,
+            lifecycleEventCount: input.sessionMap.lifecycleEvents.length,
+            wasteSignals: input.sessionMap.telemetry.wasteSignals,
+            warnings: input.sessionMap.telemetry.warnings,
+        },
+    };
+    if (input.containerTag)
+        sessionNodeInput.containerTag = input.containerTag;
+    const sessionNode = sanitizeNucleusNode(sessionNodeInput);
+    const topicNodes = input.sessionMap.topicLinks.map((link) => {
+        const node = {
+            id: link.id,
+            kind: "wiki_page",
+            title: link.topicPath.join(" / "),
+            createdAt: link.firstObservedAt,
+            updatedAt: link.lastObservedAt,
+            tags: ["session-topic", ...link.topicPath.map((part) => part.toLowerCase().replace(/\s+/g, "-"))],
+            confidence: link.salience,
+            metadata: {
+                topicPath: link.topicPath,
+                candidateCount: link.candidateIds.length,
+                sourceEventCount: link.sourceEventIds.length,
+                reasons: link.reasons,
+            },
+        };
+        if (input.containerTag)
+            node.containerTag = input.containerTag;
+        return sanitizeNucleusNode(node);
+    });
+    const lifecycleNodes = input.sessionMap.lifecycleEvents.map((event) => {
+        const node = {
+            id: event.id,
+            kind: "lifecycle_event",
+            title: `Lifecycle: ${event.phase}`,
+            createdAt: event.observedAt,
+            updatedAt: event.observedAt,
+            tags: ["lifecycle", event.phase],
+            metadata: {
+                phase: event.phase,
+                sourceEventCount: event.sourceEventIds.length,
+                candidateCount: event.candidateIds.length,
+                topicCount: event.topicIds.length,
+                counters: event.counters,
+                warnings: event.warnings,
+            },
+        };
+        if (input.containerTag)
+            node.containerTag = input.containerTag;
+        return sanitizeNucleusNode(node);
+    });
+    const edges = [
+        ...input.sessionMap.topicLinks.map((link) => sanitizeNucleusEdge({
+            id: `${input.sessionMap.id}:syncs-to:${link.id}`,
+            from: sessionNode.id,
+            to: publicId("node", link.id),
+            kind: "syncs_to",
+            createdAt: link.lastObservedAt,
+            weight: link.salience,
+            metadata: {
+                candidateCount: link.candidateIds.length,
+                sourceEventCount: link.sourceEventIds.length,
+                reasons: link.reasons,
+            },
+        })),
+        ...input.sessionMap.lifecycleEvents.map((event) => sanitizeNucleusEdge({
+            id: `${event.id}:captures:${input.sessionMap.id}`,
+            from: publicId("node", event.id),
+            to: sessionNode.id,
+            kind: "captured_by",
+            createdAt: event.observedAt,
+            metadata: {
+                phase: event.phase,
+                candidateCount: event.candidateIds.length,
+                topicCount: event.topicIds.length,
+            },
+        })),
+    ];
+    return { sessionNode, topicNodes, lifecycleNodes, edges };
+}
 export function sanitizeNucleusSnapshot(snapshot) {
     const nodeIdMap = new Map(snapshot.nodes.map((node) => [node.id, publicId("node", node.id)]));
     return {

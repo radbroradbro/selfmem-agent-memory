@@ -670,6 +670,38 @@ The expansion arm must stay within free-tier or approved budget limits where
 possible. If a provider rate limit appears, the run should pause or narrow the
 slice instead of quietly changing models or mixing providers inside one arm.
 
+## Continuous Method Refinement
+
+Autoresearch is allowed to change retrieval policy, but only through measured
+arms. It should not blindly keep a technique just because it sounds more
+advanced.
+
+Every method iteration should log metrics-only evidence for:
+
+- query class or feature profile,
+- enabled boosts or amplifiers,
+- cache hits and re-embedding count,
+- provider attempts, retries, fallbacks, and rate-limit pauses,
+- retrieval latency by phase,
+- candidate overlap with BM25 and prior winning arms,
+- answer-quality win/loss against the current control,
+- lifecycle and session-map coverage when compaction or wiki sync is involved,
+- waste signals such as no-op query expansion, unlinked session candidates, or
+  high-cost arms that never improve answers.
+
+Promotion should be conditional. Query expansion, title amplification, topic
+boosting, subtopic following, dense search, rerank, and graph traversal can each
+be useful for a subset of queries. A winning subset should become a gated policy
+or classifier rule, not an always-on default, until the full benchmark confirms
+that always-on improves aggregate quality and latency.
+
+For compaction and lifecycle research, each run should preserve a local
+session-map record before runtime compaction finishes. The committed public
+evidence may contain only counts, hashes, timestamps, phase names, and reason
+codes. The private local store may keep raw session chunks for later RAG so a
+future agent can follow a wiki topic back to the exact session context when the
+summary is insufficient.
+
 ## Pruning Gate
 
 Pruning is a review queue, not automatic deletion.

@@ -11,6 +11,8 @@ const aggregate = summarize(scenarioReports);
 assert.equal(aggregate.failedScenarios, 0, JSON.stringify(scenarioReports, null, 2));
 assert.equal(aggregate.privacyLeakCount, 0, JSON.stringify(scenarioReports, null, 2));
 assert.equal(aggregate.exactIdentifierAccuracy, 1);
+assert.equal(aggregate.lifecycleCoverage, 1);
+assert.equal(aggregate.unlinkedCandidateCount, 0);
 assert.ok(aggregate.averageNoiseReductionRatio >= 0.2);
 
 console.log(JSON.stringify({
@@ -26,6 +28,7 @@ console.log(JSON.stringify({
     kindCoverage: report.kindCoverage,
     requiredTermCoverage: report.requiredTermCoverage,
     exactIdentifierAccuracy: report.exactIdentifierAccuracy,
+    sessionMap: report.sessionMap,
     metrics: report.metrics,
     failures: report.failures,
   })),
@@ -45,6 +48,7 @@ function evaluateScenario(scenario) {
   const exactHits = exactIdentifierTerms.filter((term) => text.includes(term)).length;
   const staleCandidates = result.candidates.filter((candidate) => candidate.stale).length;
   const mergedSourceEventMax = Math.max(0, ...result.candidates.map((candidate) => candidate.sourceEventIds.length));
+  const lifecyclePhases = new Set(result.sessionMap.lifecycleEvents.map((event) => event.phase));
   const forbiddenHits = forbiddenTerms.filter((term) => text.includes(term));
   const serialized = JSON.stringify(result);
   const privateLeakHits = [
@@ -69,6 +73,8 @@ function evaluateScenario(scenario) {
   }
   if (forbiddenHits.length > 0) failures.push(`forbidden-term:${forbiddenHits.join(",")}`);
   if (privateLeakHits.length > 0) failures.push(`private-leak:${privateLeakHits.join(",")}`);
+  if (!lifecyclePhases.has("pre_compact") || !lifecyclePhases.has("session_map_ready")) failures.push("missing-lifecycle-map-phase");
+  if (result.sessionMap.telemetry.counters.unlinkedCandidates > 0) failures.push("unlinked-session-map-candidates");
 
   return {
     id: scenario.id,
@@ -80,6 +86,15 @@ function evaluateScenario(scenario) {
     kindCoverage: requiredKinds.length === 0 ? 1 : Number((kindHits / requiredKinds.length).toFixed(3)),
     requiredTermCoverage: requiredTerms.length === 0 ? 1 : Number((termHits / requiredTerms.length).toFixed(3)),
     exactIdentifierAccuracy: exactIdentifierTerms.length === 0 ? 1 : Number((exactHits / exactIdentifierTerms.length).toFixed(3)),
+    sessionMap: {
+      topicLinkCount: result.sessionMap.topicLinks.length,
+      lifecycleEventCount: result.sessionMap.lifecycleEvents.length,
+      lifecycleCoverage: lifecyclePhases.has("pre_compact") && lifecyclePhases.has("session_map_ready") ? 1 : 0,
+      linkedCandidateCount: result.sessionMap.telemetry.counters.linkedCandidates,
+      unlinkedCandidateCount: result.sessionMap.telemetry.counters.unlinkedCandidates,
+      wasteSignals: result.sessionMap.telemetry.wasteSignals,
+      warningCount: result.sessionMap.telemetry.warnings.length,
+    },
     staleCandidates,
     mergedSourceEventMax,
     privacyLeakCount: privateLeakHits.length,
@@ -97,10 +112,21 @@ function summarize(reports) {
     averageRequiredTermCoverage: average(reports.map((report) => report.requiredTermCoverage)),
     averageNoiseReductionRatio: average(reports.map((report) => report.metrics.noiseReductionRatio)),
     totalOutputCandidates: reports.reduce((sum, report) => sum + report.candidateCount, 0),
+    totalTopicLinks: reports.reduce((sum, report) => sum + report.sessionMap.topicLinkCount, 0),
+    lifecycleCoverage: average(reports.map((report) => report.sessionMap.lifecycleCoverage)),
+    unlinkedCandidateCount: reports.reduce((sum, report) => sum + report.sessionMap.unlinkedCandidateCount, 0),
+    wasteSignalCounts: countBy(reports.flatMap((report) => report.sessionMap.wasteSignals)),
   };
 }
 
 function average(values) {
   if (values.length === 0) return 1;
   return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(3));
+}
+
+function countBy(values) {
+  return values.reduce((counts, value) => {
+    counts[value] = (counts[value] ?? 0) + 1;
+    return counts;
+  }, {});
 }

@@ -18,6 +18,7 @@ export interface SessionCompactionInput {
     maxCandidates?: number;
     staleRules?: SessionCompactionStaleRule[];
 }
+export type SessionLifecyclePhase = "session_start" | "pre_compact" | "candidate_distilled" | "topic_linked" | "session_map_ready" | "session_end";
 export interface CompactedMemoryCandidate {
     id: string;
     kind: MemoryKind;
@@ -28,6 +29,55 @@ export interface CompactedMemoryCandidate {
     salience: number;
     reasons: string[];
     stale?: boolean;
+}
+export interface SessionTopicLink {
+    id: string;
+    topicPath: string[];
+    candidateIds: string[];
+    sourceEventIds: string[];
+    firstObservedAt: string;
+    lastObservedAt: string;
+    salience: number;
+    reasons: string[];
+}
+export interface SessionLifecycleEvent {
+    id: string;
+    phase: SessionLifecyclePhase;
+    observedAt: string;
+    sourceEventIds: string[];
+    candidateIds: string[];
+    topicIds: string[];
+    counters: Record<string, number>;
+    warnings: string[];
+}
+export interface SessionMapTelemetry {
+    counters: {
+        inputEvents: number;
+        statementsInspected: number;
+        durableStatements: number;
+        duplicateCandidateMerges: number;
+        redactionCount: number;
+        skippedFullyPrivate: number;
+        skippedNoise: number;
+        outputCandidates: number;
+        topicLinks: number;
+        linkedCandidates: number;
+        unlinkedCandidates: number;
+        staleCandidates: number;
+    };
+    wasteSignals: string[];
+    warnings: string[];
+}
+export interface SessionMap {
+    id: string;
+    sessionId: string;
+    source: SessionSource;
+    startedAt: string;
+    endedAt?: string;
+    candidateIds: string[];
+    topicLinks: SessionTopicLink[];
+    lifecycleEvents: SessionLifecycleEvent[];
+    telemetry: SessionMapTelemetry;
 }
 export interface SessionCompactionMetrics {
     inputEvents: number;
@@ -43,6 +93,7 @@ export interface SessionCompactionResult {
     source: SessionSource;
     candidates: CompactedMemoryCandidate[];
     metrics: SessionCompactionMetrics;
+    sessionMap: SessionMap;
 }
 export interface SessionCompactionStaleRule {
     id: string;
