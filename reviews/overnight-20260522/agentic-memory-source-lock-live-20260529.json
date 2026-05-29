@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "agentic-memory-source-lock-check",
-  "generatedAt": "2026-05-29T22:25:43.045Z",
+  "generatedAt": "2026-05-29T22:25:24.967Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
-  "liveChecksRequested": false,
+  "liveChecksRequested": true,
   "publicBenchmarkClaimsAllowed": false,
   "countsAsBenchmarkScore": false,
   "sourceLockReadyForMaterialization": false,
@@ -57,17 +57,17 @@
   "proofChecks": [
     {
       "field": "repoCommit",
-      "provided": false,
+      "provided": true,
       "kind": "git-commit",
       "reason": "Pin the exact benchmark harness revision before comparing scores.",
-      "valueHash": null
+      "valueHash": "sha256:11bf5666eaac2576fe87d3fdfcd1b7fa7fe2e835b3feb0bdbcbd721779b335f6"
     },
     {
       "field": "datasetRevision",
-      "provided": false,
+      "provided": true,
       "kind": "revision-id",
       "reason": "Pin the public dataset snapshot without committing raw rows.",
-      "valueHash": null
+      "valueHash": "sha256:43eb8790db2b1afe40c4f6e4ea57d9d3dd167a88ce5a63b39f17005aabb5e282"
     },
     {
       "field": "leaderboardTier",
@@ -146,14 +146,87 @@
     {
       "name": "required-proof-fields",
       "ok": true
+    },
+    {
+      "name": "repository-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "dataset-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "leaderboard-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "paper-live-source-reachable",
+      "ok": true
+    },
+    {
+      "name": "live-source-snapshot",
+      "ok": true
     }
   ],
-  "liveChecks": [],
-  "liveSourceSnapshot": null,
+  "liveChecks": [
+    {
+      "role": "repository",
+      "host": "github.com",
+      "urlHash": "sha256:000b85cb4b1625ffd55b24c8ac8c584611921ba6a5c42db41d7fdccda03eea55",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "role": "dataset",
+      "host": "huggingface.co",
+      "urlHash": "sha256:bd7f7eb2884fd183c9a7cf67c6905596c2271651e5fbfdf87c20111c9fdd58cd",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "role": "leaderboard",
+      "host": "xiaowu0162.github.io",
+      "urlHash": "sha256:73910430aef56148dcb0ed25a30c0f6b46ea50fb635ffddc69371e1ceac5b219",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "role": "paper",
+      "host": "arxiv.org",
+      "urlHash": "sha256:1c5d49ed3f6734bac1134bbdf9354fa6c274f87c7fdbc5939c8f0bb0cb8ffeb8",
+      "ok": true,
+      "status": 200
+    }
+  ],
+  "liveSourceSnapshot": {
+    "ok": true,
+    "checkedAt": "2026-05-29T22:25:24.311Z",
+    "repoHost": "github.com",
+    "datasetHost": "huggingface.co",
+    "repoCommit": "8e8b92a3cece71af6af0d3aa2d7957df49dd9f65",
+    "datasetRevision": "f152293e235517d504809563c833d7190b8c713b",
+    "repoContentsHash": "sha256:3d09d12e19ae6331d90eb9396c8e53285ad5b679a79ef267f610e029afc8a911",
+    "datasetSiblingsHash": "sha256:8c412be7d7c772cb91cfed53043c7882a77271a4a913380f13fcd42438b503c8",
+    "repoEntryCount": 11,
+    "datasetSiblingCount": 41,
+    "requiredRepoEntriesPresent": [
+      "README.md",
+      "LICENSE",
+      "data",
+      "evaluation",
+      "leaderboard",
+      "memory_modules"
+    ],
+    "requiredDatasetEntriesPresent": [
+      "README.md",
+      "DATA_CARD.md",
+      "SCHEMA.md",
+      "LICENSE"
+    ],
+    "errors": []
+  },
   "failedChecks": [],
   "blockersBeforeRun": [
-    "missing-repoCommit",
-    "missing-datasetRevision",
     "missing-leaderboardTier",
     "missing-questionIdsHash",
     "missing-answerLabelsHash",

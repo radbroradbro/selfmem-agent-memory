@@ -199,6 +199,8 @@ const requiredFiles = [
   `${reviewDir}/agentic-memory-target-watch-20260529.md`,
   `${reviewDir}/agentic-memory-source-lock-20260529.json`,
   `${reviewDir}/agentic-memory-source-lock-20260529.md`,
+  `${reviewDir}/agentic-memory-source-lock-live-20260529.json`,
+  `${reviewDir}/agentic-memory-source-lock-live-20260529.md`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-full-slice-evidence.md`,
   `${reviewDir}/public-longmemeval-full-run-target.json`,
@@ -1828,6 +1830,7 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(publicTargets, /benchmark:agentic-watch/);
   assert.match(publicTargets, /benchmark:agentic-source-lock/);
   assert.match(publicTargets, /sourceLockReadyForMaterialization/);
+  assert.match(publicTargets, /agentic-memory-source-lock-live-20260529\.json/);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /personalAgentDefaultArm: cloud-voyage4-voyage/);
   assert.match(providerMatrix, /methodologyRefinementDefaultArm: local-apple-qwen3-0_6b/);
@@ -1880,6 +1883,8 @@ check("fresh agentic memory source-lock contract passes", () => {
   const markdown = run("node", ["packages/bench/agentic-memory-source-lock-check.mjs", "--format", "markdown"]).stdout;
   const evidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.json"), "utf8"));
   const evidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-source-lock-20260529.md"), "utf8");
+  const liveEvidence = JSON.parse(readFileSync(join(root, reviewDir, "agentic-memory-source-lock-live-20260529.json"), "utf8"));
+  const liveEvidenceMarkdown = readFileSync(join(root, reviewDir, "agentic-memory-source-lock-live-20260529.md"), "utf8");
   const report = JSON.parse(result.stdout);
   for (const item of [report, evidence]) {
     assert.equal(item.ok, true);
@@ -1898,10 +1903,24 @@ check("fresh agentic memory source-lock contract passes", () => {
     assert.ok(item.blockersBeforeRun?.includes("missing-judgeModel"));
     assert.deepEqual(item.failedChecks, []);
   }
+  assert.equal(liveEvidence.ok, true);
+  assert.equal(liveEvidence.mode, "agentic-memory-source-lock-check");
+  assert.equal(liveEvidence.liveChecksRequested, true);
+  assert.equal(liveEvidence.liveSourceSnapshot?.ok, true);
+  assert.match(liveEvidence.liveSourceSnapshot?.repoCommit ?? "", /^[a-f0-9]{40}$/);
+  assert.match(liveEvidence.liveSourceSnapshot?.datasetRevision ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "repoCommit")?.provided, true);
+  assert.equal(liveEvidence.proofChecks?.find((proof) => proof.field === "datasetRevision")?.provided, true);
+  assert.equal(liveEvidence.sourceLockReadyForMaterialization, false);
+  assert.ok(liveEvidence.blockersBeforeRun?.includes("missing-trajectoryIngestContractHash"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-repoCommit"));
+  assert.ok(!liveEvidence.blockersBeforeRun?.includes("missing-datasetRevision"));
   assert.match(markdown, /Agentic Memory Source Lock Check/);
   assert.match(evidenceMarkdown, /Source-lock ready for materialization: false/);
   assert.match(evidenceMarkdown, /trajectoryIngestContractHash: missing/);
-  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
+  assert.match(liveEvidenceMarkdown, /repoCommit: provided/);
+  assert.match(liveEvidenceMarkdown, /datasetRevision: provided/);
+  for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown, JSON.stringify(liveEvidence), liveEvidenceMarkdown]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }

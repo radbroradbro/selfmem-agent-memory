@@ -131,7 +131,8 @@ const supplied = {
 const liveChecks = live
   ? await Promise.all(Object.entries(contract.sourceUrls).map(([role, url]) => checkUrl(role, url)))
   : [];
-const report = buildReport({ contract, supplied, liveChecks });
+const liveSourceSnapshot = live ? await fetchLiveSourceSnapshot(contract) : null;
+const report = buildReport({ contract, supplied: applyLiveProofs(supplied, liveSourceSnapshot), liveChecks, liveSourceSnapshot });
 const jsonText = `${JSON.stringify(report, null, 2)}\n`;
 const markdownText = `${renderMarkdown(report)}\n`;
 assertSafePublicText(jsonText, "agentic memory source-lock report");
@@ -142,7 +143,7 @@ if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
 if (strict && !report.ok) process.exit(1);
 
-function buildReport({ contract: value, supplied: proof, liveChecks }) {
+function buildReport({ contract: value, supplied: proof, liveChecks, liveSourceSnapshot }) {
   const structuralChecks = [
     check("target-is-longmemeval-v2", value.id === "longmemeval-v2"),
     check("source-url-count", Object.keys(value.sourceUrls).length === 4),
@@ -154,6 +155,7 @@ function buildReport({ contract: value, supplied: proof, liveChecks }) {
     for (const item of liveChecks) {
       structuralChecks.push(check(`${item.role}-live-source-reachable`, item.ok));
     }
+    structuralChecks.push(check("live-source-snapshot", liveSourceSnapshot?.ok === true));
   }
 
   const proofChecks = value.requiredProofFields.map((field) => {
@@ -198,6 +200,7 @@ function buildReport({ contract: value, supplied: proof, liveChecks }) {
     proofChecks,
     structuralChecks,
     liveChecks,
+    liveSourceSnapshot,
     failedChecks: structuralFailures,
     blockersBeforeRun: blockers,
     nextActions: ready
@@ -220,6 +223,78 @@ function buildReport({ contract: value, supplied: proof, liveChecks }) {
       sourceLockOnly: true,
     },
   };
+}
+
+function applyLiveProofs(proof, snapshot) {
+  if (!snapshot?.ok) return proof;
+  return {
+    ...proof,
+    repoCommit: proof.repoCommit || snapshot.repoCommit || "",
+    datasetRevision: proof.datasetRevision || snapshot.datasetRevision || "",
+  };
+}
+
+async function fetchLiveSourceSnapshot(value) {
+  const checkedAt = new Date().toISOString();
+  const repo = await fetchJson("https://api.github.com/repos/xiaowu0162/LongMemEval-V2/commits/main");
+  const repoRoot = await fetchJson("https://api.github.com/repos/xiaowu0162/LongMemEval-V2/contents?ref=main");
+  const dataset = await fetchJson("https://huggingface.co/api/datasets/xiaowu0162/longmemeval-v2");
+  const repoNames = Array.isArray(repoRoot.data) ? repoRoot.data.map((item) => String(item.name ?? "")).filter(Boolean).sort() : [];
+  const datasetSiblings = Array.isArray(dataset.data?.siblings)
+    ? dataset.data.siblings.map((item) => String(item.rfilename ?? "")).filter(Boolean).sort()
+    : [];
+  const requiredRepoEntries = ["README.md", "LICENSE", "data", "evaluation", "leaderboard", "memory_modules"];
+  const requiredDatasetEntries = ["README.md", "DATA_CARD.md", "SCHEMA.md", "LICENSE"];
+  const repoCommit = String(repo.data?.sha ?? "");
+  const datasetRevision = String(dataset.data?.sha ?? "");
+  const ok =
+    repo.ok &&
+    dataset.ok &&
+    commitPattern.test(repoCommit) &&
+    commitPattern.test(datasetRevision) &&
+    requiredRepoEntries.every((entry) => repoNames.includes(entry)) &&
+    requiredDatasetEntries.every((entry) => datasetSiblings.includes(entry));
+  return {
+    ok,
+    checkedAt,
+    repoHost: urlHost(value.sourceUrls.repository),
+    datasetHost: urlHost(value.sourceUrls.dataset),
+    repoCommit,
+    datasetRevision,
+    repoContentsHash: `sha256:${stableHash(repoNames.join("\n"))}`,
+    datasetSiblingsHash: `sha256:${stableHash(datasetSiblings.join("\n"))}`,
+    repoEntryCount: repoNames.length,
+    datasetSiblingCount: datasetSiblings.length,
+    requiredRepoEntriesPresent: requiredRepoEntries.filter((entry) => repoNames.includes(entry)),
+    requiredDatasetEntriesPresent: requiredDatasetEntries.filter((entry) => datasetSiblings.includes(entry)),
+    errors: [repo, repoRoot, dataset]
+      .filter((item) => !item.ok)
+      .map((item) => ({ role: item.role, status: item.status, error: item.error ?? null })),
+  };
+}
+
+async function fetchJson(url) {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        accept: "application/json",
+        "user-agent": "recallweave-source-lock-check",
+      },
+      redirect: "follow",
+    });
+    if (!response.ok) {
+      return { role: urlHost(url), ok: false, status: response.status, data: null };
+    }
+    return { role: urlHost(url), ok: true, status: response.status, data: await response.json() };
+  } catch (error) {
+    return {
+      role: urlHost(url),
+      ok: false,
+      status: null,
+      data: null,
+      error: String(error?.name ?? "fetch-error"),
+    };
+  }
 }
 
 function proofProvided(field, value) {

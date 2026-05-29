@@ -309,6 +309,9 @@ revision, tier, question-id hash, label hash, scoring-code hash, leaderboard-row
 hash, trajectory-ingest contract hash, reader model, and judge model. If those
 fields are missing, the report should stay green as a contract check but
 `sourceLockReadyForMaterialization` stays false.
+Use `benchmark:agentic-source-lock -- --live` for a public-safe source snapshot:
+it verifies source reachability and captures the current public repo and dataset
+revisions, counts, and hashes without downloading or committing raw rows.
 
 | Benchmark | Why it fits RecallWeave | Current use |
 | --- | --- | --- |
@@ -668,12 +671,16 @@ fields are missing, the report should stay green as a contract check but
   source-locked.
 - Current LongMemEval-V2 source-lock contract:
   `reviews/overnight-20260522/agentic-memory-source-lock-20260529.json`.
-  It is intentionally blocked for materialization until exact public revisions,
-  hashes, tier, reader model, judge model, and the trajectory-to-session/wiki
-  ingest contract are supplied. This is the next benchmark lane for checking
-  whether session maps, wiki topics, and vectorized full-session retrieval help
-  real agent-work memory, not a replacement for the current LongMemEval-S SOTA
-  lane.
+  Its live public-safe snapshot is
+  `reviews/overnight-20260522/agentic-memory-source-lock-live-20260529.json`.
+  The live snapshot pins the current GitHub commit and Hugging Face dataset
+  revision without committing benchmark rows. It is intentionally still blocked
+  for materialization until tier, question-id hash, label hash, scoring-code
+  hash, leaderboard-row hash, reader model, judge model, and the
+  trajectory-to-session/wiki ingest contract are supplied. This is the next
+  benchmark lane for checking whether session maps, wiki topics, and vectorized
+  full-session retrieval help real agent-work memory, not a replacement for the
+  current LongMemEval-S SOTA lane.
 - Reported provider scores are useful objective targets, but they are weaker
   than same-harness head-to-head runs. Every target row must keep its source URL
   and date checked.
