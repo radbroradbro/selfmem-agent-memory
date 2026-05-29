@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "mode": "local-embedding-4b-runtime-findings",
+  "status": "BLOCKED_FOR_INTERACTIVE_FULL_SHARD_EXPORT",
+  "generatedAt": "2026-05-29T05:56:33Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawBenchmarkTextIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawAnswerIncluded": false,
+  "privatePathsIncluded": false,
+  "countsAsAnswerQualityEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "shard": {
+    "id": "shard-017",
+    "queryOffset": 400,
+    "maxQueries": 25
+  },
+  "strategyUnderTest": "local-apple-qwen3-4b-local-rerank",
+  "acceptedScoreChanged": false,
+  "findings": [
+    {
+      "id": "metal-runtime-blocked",
+      "status": "blocked",
+      "summary": "The Qwen3 Embedding 4B Metal-backed local sidecar closed the embedding connection during synthetic durability probes and the shard response export.",
+      "evidence": [
+        "local-embedding-4b-durability-smoke-shard017-conservative-20260529.json",
+        "local-embedding-4b-nocache-durability-smoke-shard017-20260529.json"
+      ],
+      "interpretation": "Runtime instability only; do not score as model quality."
+    },
+    {
+      "id": "cpu-runtime-ready",
+      "status": "ready",
+      "summary": "CPU-only Qwen3 Embedding 4B with 4096 context passed 16, 128, 512, and 700 token synthetic embedding probes with 2560-dimensional vectors.",
+      "evidence": [
+        "local-embedding-4b-cpu4096-durability-smoke-shard017-20260529.json"
+      ],
+      "interpretation": "Usable for overnight/local methodology refinement, but not an interactive default."
+    },
+    {
+      "id": "cpu-runtime-too-slow-interactive",
+      "status": "blocked",
+      "summary": "The CPU-only full shard response export was stopped after making slow progress; only the previously completed BM25, full-hybrid, and query-expanded response arms were preserved.",
+      "evidence": [
+        "answer-quality-local-full-shard-017-4b-rerank-arm-export-preflight-20260529.json"
+      ],
+      "interpretation": "Run CPU-only 4B as an overnight method lane or reduce to a canary before committing full-shard time."
+    },
+    {
+      "id": "cloud-provider-env-blocked",
+      "status": "blocked",
+      "summary": "The same shell could not see Gemini, NVIDIA, or Voyage credentials during provider preflight.",
+      "evidence": [
+        "provider-challenger-preflight-shard017-20260529.json"
+      ],
+      "interpretation": "Provider challenger lanes are method-ready but cannot run until credentials are passed via environment variables or private key files outside the repository."
+    }
+  ],
+  "nextRecommendedLanes": [
+    "Use direct Gemini Embedding 2 and NVIDIA Nemotron provider arms when credentials are visible.",
+    "Keep Voyage as the cloud default baseline when quota is available.",
+    "Use CPU-only Qwen3 Embedding 4B only for overnight local experiments or small canaries.",
+    "Do not merge CPU-only 4B results into the accepted 0.6B local-full aggregate without separate lane labeling."
+  ]
+}

@@ -59,6 +59,7 @@ const retrievalStrategies = [
   "local-apple-qwen3-0_6b",
   "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
+  "local-apple-qwen3-4b-local-rerank",
 ];
 const rankingStrategy = normalizeStrategy(args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "jaccard");
 const contextTokenBudget = optionalPositiveInt(
@@ -1186,6 +1187,7 @@ function isProviderStrategy(strategy) {
     "local-apple-qwen3-0_6b",
     "local-apple-qwen3-0_6b-local-rerank",
     "local-apple-qwen3-4b",
+    "local-apple-qwen3-4b-local-rerank",
   ].includes(strategy);
 }
 
@@ -2241,6 +2243,14 @@ function localAppleStrategyConfig(strategy = rankingStrategy) {
       model: "Qwen/Qwen3-Embedding-4B-GGUF",
       dimensions: 2560,
       denseCandidateLimit: 120,
+    },
+    "local-apple-qwen3-4b-local-rerank": {
+      model: "Qwen/Qwen3-Embedding-4B-GGUF",
+      dimensions: 2560,
+      rerankMode: "sidecar",
+      rerankModel: "Qwen/Qwen3-Reranker-0.6B",
+      denseCandidateLimit: 120,
+      rerankCandidateLimit: 12,
     },
   };
   return configs[strategy] ?? null;

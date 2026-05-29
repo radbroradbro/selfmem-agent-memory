@@ -35,6 +35,7 @@ const knownStrategies = new Set([
   "local-apple-qwen3-0_6b",
   "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
+  "local-apple-qwen3-4b-local-rerank",
 ]);
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -135,7 +136,7 @@ function requiredProvidersForStrategy(strategy) {
     strategy === "cloud-voyage4-lite-voyage-lite"
   ) return ["voyage"];
   if (strategy.startsWith("cloud-nvidia-")) return ["nvidia"];
-  if (strategy === "local-apple-qwen3-0_6b-local-rerank") return ["local-apple", "local-rerank"];
+  if (strategy === "local-apple-qwen3-0_6b-local-rerank" || strategy === "local-apple-qwen3-4b-local-rerank") return ["local-apple", "local-rerank"];
   if (strategy === "local-apple-qwen3-0_6b" || strategy === "local-apple-qwen3-4b") return ["local-apple"];
   return [];
 }

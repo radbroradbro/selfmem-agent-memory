@@ -50,6 +50,7 @@ const knownStrategies = new Set([
   "local-apple-qwen3-0_6b",
   "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
+  "local-apple-qwen3-4b-local-rerank",
 ]);
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
@@ -242,7 +243,9 @@ function strategyCoverage(items) {
     hasWikiAmplification: items.some((item) => item.startsWith("wiki-")),
     hasVoyageProvider: items.some((item) => item.startsWith("cloud-voyage")),
     hasNvidiaOrGeminiProvider: items.some((item) => item.startsWith("cloud-nvidia") || item.startsWith("cloud-gemini")),
-    hasLocalApple: items.some((item) => item === "local-apple-qwen3-0_6b" || item === "local-apple-qwen3-4b"),
+    hasLocalApple: items.some((item) =>
+      ["local-apple-qwen3-0_6b", "local-apple-qwen3-0_6b-local-rerank", "local-apple-qwen3-4b", "local-apple-qwen3-4b-local-rerank"].includes(item),
+    ),
     hasLocalRerank: items.some((item) => item.endsWith("-local-rerank")),
     strategyCount: items.length,
   };
@@ -281,10 +284,40 @@ function buildExecutionLanes(items, scope) {
       queryExpansionSotaEligible: false,
     },
     {
+      id: "local-apple-scaled-challenger",
+      label: "Scaled local Apple challenger lane",
+      strategies: [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "local-apple-qwen3-4b",
+        "local-apple-qwen3-4b-local-rerank",
+      ],
+      operatorUse: "Use as an overnight/local methodology challenger when the 4B runtime is stable; do not merge it into the 0.6B accepted lane.",
+      acceptedByFullShardIntake: false,
+      canReachFullSotaGateAfterShardIntake: false,
+      queryExpansionPolicy: "Local or deterministic query expansion must be reported separately from cloud expansion.",
+      queryExpansionEvidenceRequirement: "local-model-or-deterministic-diagnostic",
+      queryExpansionDiagnosticFallbackAllowed: true,
+      queryExpansionSotaEligible: false,
+    },
+    {
       id: "voyage-minimum-challenger",
       label: "Voyage minimum challenger lane",
       strategies: ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage-lite-rerank"],
       operatorUse: "Use when Voyage quota is available to unblock the same-data Voyage answer-quality comparison.",
+      acceptedByFullShardIntake: false,
+      canReachFullSotaGateAfterShardIntake: false,
+      queryExpansionPolicy: "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      queryExpansionEvidenceRequirement: "not-required",
+      queryExpansionDiagnosticFallbackAllowed: false,
+      queryExpansionSotaEligible: false,
+    },
+    {
+      id: "gemini2-minimum-challenger",
+      label: "Gemini Embedding 2 minimum challenger lane",
+      strategies: ["bm25-lite", "full-hybrid-rerank", "cloud-gemini2-embed-rerank-proxy"],
+      operatorUse: "Use with direct Gemini API credentials to test Gemini Embedding 2 without spending Voyage rerank quota.",
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
       queryExpansionPolicy: "No separate query-expansion claim unless a query-expansion arm is included and scored.",
@@ -424,7 +457,7 @@ function requiredProvidersForStrategy(strategy) {
   if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-gemini2-voyage-rerank") return ["gemini", "voyage"];
   if (strategy.startsWith("cloud-nvidia-")) return ["nvidia"];
   if (strategy === "local-apple-qwen3-0_6b" || strategy === "local-apple-qwen3-4b") return ["local-apple"];
-  if (strategy === "local-apple-qwen3-0_6b-local-rerank") return ["local-apple", "local-rerank"];
+  if (strategy === "local-apple-qwen3-0_6b-local-rerank" || strategy === "local-apple-qwen3-4b-local-rerank") return ["local-apple", "local-rerank"];
   return [];
 }
 

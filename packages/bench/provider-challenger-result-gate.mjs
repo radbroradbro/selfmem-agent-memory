@@ -90,8 +90,8 @@ function buildGateReport({ loaded, target, targetRaw }) {
   const strategyNames = strategies.map((item) => item.strategy).filter(Boolean);
   const providerArms = strategies.filter((item) => isRequiredProviderArm(item.strategy));
   const voyageArm = strategies.find((item) => item.strategy === "cloud-voyage4-voyage" || item.strategy === "cloud-voyage4-voyage-lite-rerank" || item.strategy === "cloud-voyage4-lite-voyage-lite");
-  const nonVoyageArm = strategies.find((item) => item.strategy === "cloud-gemini-voyage-rerank" || String(item.strategy ?? "").startsWith("cloud-nvidia-"));
-  const localAppleArm = strategies.find((item) => item.strategy === "local-apple-qwen3-0_6b" || item.strategy === "local-apple-qwen3-4b");
+  const nonVoyageArm = strategies.find((item) => isGeminiArm(item.strategy) || String(item.strategy ?? "").startsWith("cloud-nvidia-"));
+  const localAppleArm = strategies.find((item) => isLocalAppleArm(item.strategy));
   const checks = {
     resultExists: loaded.exists,
     modeRecognized: providerGateMode || answerQualityMode,
@@ -233,16 +233,29 @@ function isRequiredProviderArm(strategy) {
     strategy === "cloud-voyage4-voyage" ||
     strategy === "cloud-voyage4-voyage-lite-rerank" ||
     strategy === "cloud-voyage4-lite-voyage-lite" ||
-    strategy === "cloud-gemini-voyage-rerank" ||
+    isGeminiArm(strategy) ||
     String(strategy ?? "").startsWith("cloud-nvidia-") ||
+    isLocalAppleArm(strategy)
+  );
+}
+
+function isGeminiArm(strategy) {
+  return String(strategy ?? "").startsWith("cloud-gemini");
+}
+
+function isLocalAppleArm(strategy) {
+  return (
     strategy === "local-apple-qwen3-0_6b" ||
-    strategy === "local-apple-qwen3-4b"
+    strategy === "local-apple-qwen3-0_6b-local-rerank" ||
+    strategy === "local-apple-qwen3-4b" ||
+    strategy === "local-apple-qwen3-4b-local-rerank"
   );
 }
 
 function providersForStrategyName(strategy) {
   if (String(strategy ?? "").startsWith("cloud-nvidia-")) return ["nvidia"];
-  if (strategy === "cloud-gemini-voyage-rerank") return ["gemini", "voyage"];
+  if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-gemini2-voyage-rerank") return ["gemini", "voyage"];
+  if (isGeminiArm(strategy)) return ["gemini"];
   if (String(strategy ?? "").startsWith("cloud-voyage")) return ["voyage"];
   if (String(strategy ?? "").startsWith("local-apple-")) return ["local-apple"];
   return [];

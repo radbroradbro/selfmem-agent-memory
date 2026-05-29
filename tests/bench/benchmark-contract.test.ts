@@ -1,8 +1,12 @@
 import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const script = "packages/bench/public-benchmark-strategy-compare.mjs";
 const preflightScript = "packages/bench/provider-benchmark-live-preflight.mjs";
+const resultGateScript = "packages/bench/provider-challenger-result-gate.mjs";
 
 describe("public benchmark comparison contract", () => {
   it("reports provider promotion from provider-backed arms, not the local hybrid control", () => {
@@ -61,6 +65,59 @@ describe("public benchmark comparison contract", () => {
     expect(apple.provider.embedDimensions).toBe(1024);
     expect(apple.provider.rerankModel).toBe("Qwen/Qwen3-Reranker-0.6B");
     expect(apple.provider.rerankCalls).toBeGreaterThan(0);
+  });
+
+  it("keeps the scaled local reranker sidecar arm explicit", () => {
+    const report = runReport([
+      "--gate",
+      "provider",
+      "--fixture",
+      "--format",
+      "json",
+      "--strategies",
+      "bm25-lite,full-hybrid-rerank,local-apple-qwen3-4b-local-rerank",
+    ]);
+
+    const apple = report.strategies.find((item: { strategy: string }) => item.strategy === "local-apple-qwen3-4b-local-rerank");
+    expect(apple.provider.providers).toEqual(["local-apple", "local-rerank"]);
+    expect(apple.provider.embedModel).toBe("Qwen/Qwen3-Embedding-4B-GGUF");
+    expect(apple.provider.embedDimensions).toBe(2560);
+    expect(apple.provider.rerankModel).toBe("Qwen/Qwen3-Reranker-0.6B");
+    expect(apple.provider.rerankCalls).toBeGreaterThan(0);
+  });
+
+  it("counts direct Gemini Embedding 2 as a non-Voyage provider challenger", () => {
+    const compare = runRaw([
+      "--gate",
+      "provider",
+      "--fixture",
+      "--format",
+      "json",
+      "--strategies",
+      "bm25-lite,full-hybrid-rerank,cloud-voyage4-lite-voyage-lite,cloud-gemini2-embed-rerank-proxy,local-apple-qwen3-0_6b",
+    ]);
+    expect(compare.status, `${compare.stdout}\n${compare.stderr}`).toBe(0);
+
+    const tempDir = mkdtempSync(join(tmpdir(), "recallweave-provider-gate-"));
+    try {
+      const resultPath = join(tempDir, "provider-result.json");
+      writeFileSync(resultPath, compare.stdout);
+      const gate = spawnSync(process.execPath, [resultGateScript, "--result", resultPath, "--format", "json"], {
+        cwd: new URL("../..", import.meta.url),
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      expect(gate.status, `${gate.stdout}\n${gate.stderr}`).toBe(0);
+
+      const report = JSON.parse(gate.stdout);
+      expect(report.checks.nvidiaOrGeminiProviderArmPresent).toBe(true);
+      expect(report.checks.providerArmsPresent).toBe(true);
+      expect(report.result.providerArms.map((item: { strategy: string }) => item.strategy)).toContain("cloud-gemini2-embed-rerank-proxy");
+      expect(report.blockers).not.toContain("missing-nvidia-or-gemini-provider-arm");
+      expect(report.blockers).not.toContain("missing-provider-challenger-arms");
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   it("blocks provider gates without both lexical and full-hybrid controls", () => {
