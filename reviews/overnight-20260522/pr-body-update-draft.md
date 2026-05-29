@@ -85,6 +85,13 @@ Live status:
   until local or cloud model-backed query expansion, exact target answer/judge
   model matching, all provider/local arms, shard intake, reviewers, UI/docs,
   owner approval, and real canary evidence pass.
+- Adds direct Gemini Embedding 2 to the full 500-query accepted SOTA shard
+  strategy set as `cloud-gemini2-embed-rerank-proxy`, plus a standalone Gemini
+  minimum challenger lane. This is harness/readiness progress only: live Gemini
+  scoring still requires env-only Gemini credentials, explicit public-data and
+  provider-call consent, answer-quality scoring, shard intake, reviewers,
+  UI/docs refresh, owner approval, and real canary evidence before any public
+  memory-system claim.
 - Adds `benchmark:answer-quality:accepted-lane-doctor`, a no-call launch doctor
   for the only full-shard lane accepted by the SOTA intake. It confirms the raw
   full benchmark inputs are retained privately and ready, then blocks shard
@@ -265,15 +272,20 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-- `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`.
+- `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.
+- GitHub Actions run `26623522779`: passed CI after adding direct Gemini
+  Embedding 2 to the full accepted SOTA shard strategy set and adding a
+  standalone Gemini minimum challenger lane. This is harness/readiness progress
+  only: live Gemini scoring remains blocked until env-only Gemini credentials
+  are visible to the benchmark process. Cloud Voyage remains the Codex/personal
+  memory default; local Apple Silicon remains the high-volume
+  methodology-refinement lane.
+- Previous verified PR branch head before the direct Gemini full-shard arm:
+  `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`.
 - GitHub Actions run `26622358308`: passed CI after adding the scaled local
   benchmark challenger lane, Brain UI runtime evidence, bounded GitHub
   live-sync retry handling, and the matching post-baseline public-evidence
-  guard update. Direct Gemini Embedding 2 is wired as a same-data provider
-  challenger, but live Gemini runs remain blocked until env-only Gemini
-  credentials are visible to the benchmark process. Cloud Voyage remains the
-  Codex/personal memory default; local Apple Silicon remains the high-volume
-  methodology-refinement lane.
+  guard update.
 - Previous verified PR branch head before the scaled local challenger and
   GitHub sync retry hardening:
   `147a9ca1c00a89f89ee03706db8699b7be86f50d`.
@@ -370,15 +382,20 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`.
+- `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.
+- GitHub Actions run `26623522779`: passed CI with release checks, live GitHub
+  sync, secret scan, and private-path scan green. The checked-in evidence now
+  includes direct Gemini Embedding 2 in the full accepted SOTA shard strategy
+  set, the standalone Gemini minimum challenger lane, current Brain UI runtime
+  evidence, and bounded GitHub live-sync retry handling. It keeps cloud Voyage
+  as the actual Codex/personal memory default, keeps local Apple Silicon as the
+  high-volume methodology lane, and preserves launch, production rollout, and
+  full-SOTA blockers.
+- Previous verified code/product baseline before the direct Gemini full-shard
+  arm:
+  `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`.
 - GitHub Actions run `26622358308`: passed CI with release checks, live GitHub
-  sync, benchmark-contract tests, secret scan, and private-path scan green. The
-  checked-in evidence includes the scaled local benchmark challenger lane,
-  current Brain UI runtime evidence, and bounded GitHub live-sync retry
-  handling. It keeps cloud Voyage as the actual Codex/personal memory default,
-  keeps local Apple Silicon as the high-volume methodology lane, treats direct
-  Gemini Embedding 2 as a credential-gated same-data challenger, and preserves
-  launch, production rollout, and full-SOTA blockers.
+  sync, benchmark-contract tests, secret scan, and private-path scan green.
 - Previous verified code/product baseline before the scaled local challenger
   and GitHub sync retry hardening:
   `147a9ca1c00a89f89ee03706db8699b7be86f50d`.

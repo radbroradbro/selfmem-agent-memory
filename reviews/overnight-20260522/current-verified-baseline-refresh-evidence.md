@@ -19,30 +19,29 @@ scaffolded and fixture-covered, but not live-tested until a local embedding
 endpoint is configured. The current verified product evidence now includes live
 local Apple provider runs for Qwen3 Embedding 0.6B and Qwen3 Embedding 4B on
 the same public LongMemEval-S retrieval-proxy target.
-The latest verified branch-head refresh adds the scaled local-full answer
-quality challenger lane, keeps direct Gemini Embedding 2 wired as a same-data
-provider challenger pending env-only credentials, records current Brain UI
-runtime evidence, and hardens GitHub live-sync retry behavior without changing
-benchmark scoring or launch claims.
+The latest verified branch-head refresh adds direct Gemini Embedding 2 to the
+full accepted SOTA shard strategy set, keeps Gemini scoring blocked until
+env-only credentials are visible to the benchmark process, records current Brain
+UI runtime evidence, and preserves the launch/SOTA blockers.
 
 ## Latest Observed PR Branch Head
 
-- Commit: `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`
-- Commit title: `Document GitHub sync retry hardening`
-- GitHub Actions run: `26622358308`
+- Commit: `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`
+- Commit title: `Add direct Gemini full-shard benchmark arm`
+- GitHub Actions run: `26623522779`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
 This does not change the approved runtime canary adapter/report commit. It
-updates the current PR-head evidence, records the scaled local challenger and
-Brain UI runtime evidence, and keeps GitHub live-sync retry hardening as
-runtime hygiene only.
+updates the current PR-head evidence, records direct Gemini as a full-shard
+benchmark arm, and keeps the result as harness/readiness evidence only until a
+live same-data Gemini run is scored.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`
-- Commit title: `Document GitHub sync retry hardening`
-- GitHub Actions run: `26622358308`
+- Commit: `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`
+- Commit title: `Add direct Gemini full-shard benchmark arm`
+- GitHub Actions run: `26623522779`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -60,11 +59,8 @@ The following checks passed on or against the latest verified PR branch head
 before this baseline refresh:
 
 - `npm exec --yes pnpm@10.23.0 -- release:check`
-- `GITHUB_ACTIONS=true CI=true npm exec --yes pnpm@10.23.0 -- release:check`
-- `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
-- `git diff --check`
-- `npm exec --yes pnpm@10.23.0 -- vitest run tests/bench/benchmark-contract.test.ts`
+- `npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor`
 - `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the 30-query
   LongMemEval-S target with BM25, full-hybrid, and Voyage provider arms
 - `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the same
@@ -75,7 +71,7 @@ before this baseline refresh:
   local Apple arms
 - Targeted public docs/evidence secret and private-path scan
 - Stale local model server check
-- GitHub Actions run `26622358308`
+- GitHub Actions run `26623522779`
 
 ## Canary Handoff Artifact
 
@@ -114,6 +110,10 @@ The benchmark lane remains conservative:
   test one provider family without requiring every provider's credentials.
   Live provider runs remain opt-in and blocked by preflight until consent flags
   and env-only provider readiness are present.
+- The full 500-query SOTA shard plan now includes
+  `cloud-gemini2-embed-rerank-proxy` in the accepted strategy set and exposes a
+  standalone Gemini minimum challenger lane. This is runnable only when a
+  private Gemini key file or equivalent env-only Gemini credential is present.
 - The benchmark runner now enforces the comparison contract directly: provider
   gates require `bm25-lite`, `full-hybrid-rerank`, and at least one
   provider-backed arm, while hybrid gates require `bm25-lite` and at least one

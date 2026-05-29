@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-29T06:44:53Z",
+  "generatedAt": "2026-05-29T07:14:30Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "5e5cf716d83c39dcaeef34ea1bbb77ca36869927",
-    "ciRunId": 26622358308,
+    "headSha": "9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed",
+    "ciRunId": 26623522779,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_scaled_local_benchmark_challenger_lane_brain_ui_runtime_evidence_github_sync_retry_hardening_and_guard_paths",
+    "localSmoke": "release_check_covers_direct_gemini_full_shard_provider_arm_scaled_local_benchmark_challenger_lane_brain_ui_runtime_evidence_github_sync_retry_hardening_and_guard_paths",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding the scaled local benchmark challenger lane, Brain UI runtime evidence, bounded GitHub live-sync retry handling, and the matching public-evidence guard update. Direct Gemini Embedding 2 remains wired as a same-data provider challenger but is blocked until env-only Gemini credentials are visible to the benchmark process. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, hosted Supermemory search disabled for isolated methodology benchmark loops unless an explicit hosted-baseline parity lane is running, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, owner approval, and full local/provider shard coverage pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, diff check, secret scan, private-path scan, and GitHub Actions run 26622358308 passed."
+    "note": "Latest inspected code/product baseline after adding the direct Gemini Embedding 2 full-shard provider arm, the standalone Gemini minimum challenger lane, the scaled local benchmark challenger lane, Brain UI runtime evidence, bounded GitHub live-sync retry handling, and the matching public-evidence guard updates. Direct Gemini Embedding 2 is now part of the full accepted SOTA shard strategy set, but live Gemini scoring remains blocked until env-only Gemini credentials are visible to the benchmark process. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, hosted Supermemory search disabled for isolated methodology benchmark loops unless an explicit hosted-baseline parity lane is running, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, owner approval, and full local/provider shard coverage pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, diff check, secret scan, private-path scan, and GitHub Actions run 26623522779 passed."
   },
   "releaseStateGuard": {
     "enabled": true,

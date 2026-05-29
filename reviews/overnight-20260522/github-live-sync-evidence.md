@@ -8,6 +8,17 @@ Date: 2026-05-23
   not change benchmark scoring, provider defaults, launch status, or public
   memory-system claims.
 - PR #5 was refreshed again on 2026-05-29 after GitHub Actions run
+  `26623522779` passed on
+  `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`, promoting the direct Gemini
+  Embedding 2 full-shard benchmark arm as the latest verified code/product
+  baseline while preserving launch, production rollout, full-SOTA, and
+  real-canary blockers. Live sync passed with PR body hash
+  `83f44c5bbcee9321f5e8b46df3c4c587d4209911501376472a3dd2aa3db1e35e`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`, and
+  issue body hash
+  `1b702f8118354977d5d3859ce80fc4f4f9f8a51c0471d0e9aa541aec7cc80216`.
+- PR #5 was refreshed again on 2026-05-29 after GitHub Actions run
   `26622358308` passed on
   `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`, promoting that commit as the
   latest verified code/product baseline while preserving launch, production
