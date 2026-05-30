@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "agentic-memory-provider-autoresearch-plan",
-  "generatedAt": "2026-05-29T23:00:03.980Z",
+  "generatedAt": "2026-05-30T20:13:51.894Z",
   "metricsOnly": true,
   "publicSafe": true,
   "callsProviderApis": false,
@@ -44,9 +44,10 @@
       "role": "prod-default-and-quality-challenger",
       "embedModel": "voyage-4",
       "rerankModel": "rerank-2.5-or-lite",
-      "safeRpmCap": 3,
+      "costClass": "free-tier-or-trial-when-account-allows",
+      "safeRpmCap": 10,
       "higherCapWhenDashboardConfirms": 60,
-      "freeTierNote": "Use low-RPM free-trial pacing unless the dashboard confirms higher basic limits."
+      "freeTierNote": "Use free-tier/trial pacing when available; keep Voyage as personal/prod default unless a same-data challenger wins."
     },
     {
       "family": "gemini",
@@ -54,6 +55,7 @@
       "role": "free-tier-embedding-challenger",
       "embedModel": "gemini-embedding-001-or-gemini-embedding",
       "rerankModel": "proxy-or-voyage-rerank",
+      "costClass": "free-tier",
       "safeRpmCap": 20,
       "publishedFreeTierRpm": 100,
       "publishedFreeTierRpd": 1000,
@@ -65,9 +67,25 @@
       "role": "free-nim-retrieval-challenger",
       "embedModel": "nvidia/llama-nemotron-embed-vl-1b-v2",
       "rerankModel": "nvidia/llama-nemotron-rerank-vl-1b-v2",
-      "safeRpmCap": 10,
-      "upperRpmCapByUserBudget": 20,
-      "freeTierNote": "Use low pacing and retry budget even if the account advertises a higher per-model cap."
+      "costClass": "zero-dollar-free-nim",
+      "safeRpmCap": 30,
+      "upperRpmCapByUserBudget": 40,
+      "freeTierNote": "Primary no-spend cloud lane; run aggressively within the free 40 RPM budget and back off only on 429/error telemetry."
+    },
+    {
+      "family": "openrouter",
+      "harnessArm": "openrouter-free-query-expansion",
+      "role": "zero-dollar-query-expansion-and-reviewer-fallback",
+      "embedModel": "nvidia/llama-nemotron-embed-vl-1b-v2:free when exposed by OpenRouter",
+      "rerankModel": "not-primary-free-rerank",
+      "queryExpansionModels": [
+        "moonshotai/kimi-k2.6:free",
+        "qwen/qwen3-next-80b-a3b-instruct:free"
+      ],
+      "costClass": "zero-dollar-free-routes",
+      "safeRpmCap": 20,
+      "upperRpmCapByUserBudget": 40,
+      "freeTierNote": "Use for query expansion, critic/reviewer, and fallback generation; do not treat it as the primary rerank lane unless a free rerank endpoint is actually available."
     },
     {
       "family": "local-apple",
@@ -89,6 +107,13 @@
     ],
     "concurrentProviderFamiliesAllowed": true,
     "maxConcurrentProviderFamilies": 3,
+    "zeroDollarProviderFamiliesPreferred": [
+      "nvidia",
+      "openrouter",
+      "gemini",
+      "voyage"
+    ],
+    "zeroDollarProviderPolicy": "Treat zero-dollar and free-tier APIs as quota-limited lanes, not spend-limited lanes; pace requests and retry safely, but keep running useful waves while credentials and public-data consent are present.",
     "scheduleStyle": "completion-waves",
     "publicClaimRequiresFullRun": true,
     "publicClaimRequiresReviewerIntake": true,
@@ -145,6 +170,7 @@
         "cloud-voyage4-voyage",
         "cloud-gemini2-embed-rerank-proxy",
         "cloud-nvidia-nemotron-vl-1b",
+        "openrouter-free-query-expansion",
         "local-apple-qwen3-4b-local-rerank"
       ],
       "requiredBeforeProviderSpend": true,

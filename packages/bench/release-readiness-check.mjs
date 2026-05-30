@@ -2065,7 +2065,10 @@ check("fresh agentic provider autoresearch plan passes", () => {
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "voyage"));
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "gemini"));
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "nvidia"));
+    assert.ok(item.providerMatrix?.some((provider) => provider.family === "openrouter"));
     assert.ok(item.providerMatrix?.some((provider) => provider.family === "local-apple"));
+    assert.ok(item.runPolicy?.zeroDollarProviderFamiliesPreferred?.includes("nvidia"));
+    assert.ok(item.runPolicy?.zeroDollarProviderFamiliesPreferred?.includes("openrouter"));
     assert.ok(item.phases?.some((phase) => phase.id === "source-lock-closeout" && phase.status === "ready"));
     assert.ok(item.phases?.some((phase) => phase.id === "cloud-challenger-run" && phase.status === "ready"));
     assert.ok(item.phases?.some((phase) => phase.id === "answer-quality-and-review" && phase.status === "ready"));

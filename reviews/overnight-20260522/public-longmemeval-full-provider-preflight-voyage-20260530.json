@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "provider-benchmark-live-preflight",
+  "status": "READY_FOR_LIVE_PROVIDER_BENCHMARK",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "publicSafe": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "printsCredentials": false,
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "querySelectionPolicyHash": "sha256:7c7203f171c153f286f2551ceed694abc479631c4abeb24779662986b46669f8",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
+  },
+  "strategies": [
+    "cloud-voyage4-voyage-lite-rerank"
+  ],
+  "requiredProviders": [
+    "voyage"
+  ],
+  "providerCallsEnabled": true,
+  "publicDataConfirmed": true,
+  "credentialPresence": {
+    "voyage": {
+      "present": true,
+      "keyCount": 8,
+      "envNames": [
+        "VOYAGE_API_KEY",
+        "VOYAGE_API_KEYS",
+        "VOYAGE_API_KEY_FILE",
+        "VOYAGE_API_KEYS_FILE"
+      ]
+    }
+  },
+  "missingCredentialProviders": [],
+  "singleProviderArmReady": true,
+  "liveRunAllowed": true,
+  "blockers": [],
+  "nextActions": [
+    "Run benchmark:public-provider with --live against the source-locked target.",
+    "Keep reports metrics-only until MemoryBench answer-quality or another end-to-end memory score is run."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+    "VOYAGE_API_KEY=<env-only-voyage-key>",
+    "VOYAGE_API_KEYS_FILE=<optional-private-voyage-key-file>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --strategies cloud-voyage4-voyage-lite-rerank"
+  ]
+}

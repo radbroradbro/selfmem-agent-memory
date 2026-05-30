@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-provider-wave-partial",
+  "status": "PARTIAL_PROVIDER_WAVE_COMPLETED_WITH_PROVIDER_RATE_LIMITS",
+  "generatedAt": "2026-05-30T21:10:30.635Z",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "target": "public-longmemeval-full-run-target",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "supermemorySearchDisabled": true,
+  "querySelection": {
+    "queryOffset": 0,
+    "maxQueries": 50,
+    "completeDataset": false,
+    "contextTokenBudget": 1600,
+    "retrievalLimit": 10,
+    "maxMemoryBytes": 300000000
+  },
+  "providerCandidateLimits": {
+    "denseCandidateLimit": 30,
+    "rerankCandidateLimit": 15
+  },
+  "completedArms": [
+    {
+      "strategy": "bm25-lite",
+      "responseCount": 50,
+      "querySelection": {
+        "startIndex": 0,
+        "endIndexExclusive": 50,
+        "totalQueryCount": 500,
+        "responseCount": 50,
+        "requestedLimit": 50,
+        "completeDataset": false
+      },
+      "metrics": {
+        "quality": 0.0164,
+        "pAt1": 0.032,
+        "recallAt5": 0.0098,
+        "recallAt10": 0.0098,
+        "ndcgAt10": 0.0141,
+        "latencyP50Ms": 0,
+        "latencyP95Ms": 1033,
+        "contextTokensAvg": 160
+      },
+      "provider": {
+        "providerStrategy": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0,
+        "embedModel": null,
+        "rerankModel": null
+      },
+      "responsesHash": "sha256:f7d7e1a9e70a9e5a557d6ced844ef136c3271aac0872d919cb0b1808d60ad2dc",
+      "resultHash": "sha256:e375420095ca7be6bd8399047666c2ef1fbd32936ee473544453fd41a8864f2b",
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 50,
+      "querySelection": {
+        "startIndex": 0,
+        "endIndexExclusive": 50,
+        "totalQueryCount": 500,
+        "responseCount": 50,
+        "requestedLimit": 50,
+        "completeDataset": false
+      },
+      "metrics": {
+        "quality": 0.0157,
+        "pAt1": 0.032,
+        "recallAt5": 0.0088,
+        "recallAt10": 0.0088,
+        "ndcgAt10": 0.0132,
+        "latencyP50Ms": 0,
+        "latencyP95Ms": 4019,
+        "contextTokensAvg": 160
+      },
+      "provider": {
+        "providerStrategy": false,
+        "providerCallsMade": 0,
+        "providerMockCalls": 0,
+        "embeddingCalls": 0,
+        "rerankCalls": 0,
+        "documentCountSent": 0,
+        "queryCountSent": 0,
+        "providerKeyCounts": {},
+        "keyCountAvailable": 0,
+        "embedModel": null,
+        "rerankModel": null
+      },
+      "responsesHash": "sha256:454c316330d9a0dbd105e2c284254324dea4378e3ecff7364692a5d64a335a6e",
+      "resultHash": "sha256:496e0cbfa980ff672050108de014ab3aeeffc75b3772b3a21f49547a26451d61",
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    },
+    {
+      "strategy": "cloud-nvidia-nemotron-vl-1b",
+      "responseCount": 50,
+      "querySelection": {
+        "startIndex": 0,
+        "endIndexExclusive": 50,
+        "totalQueryCount": 500,
+        "responseCount": 50,
+        "requestedLimit": 50,
+        "completeDataset": false
+      },
+      "metrics": {
+        "quality": 0.0045,
+        "pAt1": 0.008,
+        "recallAt5": 0.003,
+        "recallAt10": 0.003,
+        "ndcgAt10": 0.004,
+        "latencyP50Ms": 0,
+        "latencyP95Ms": 6594,
+        "contextTokensAvg": 160
+      },
+      "provider": {
+        "providerStrategy": true,
+        "providerCallsMade": 150,
+        "providerMockCalls": 0,
+        "embeddingCalls": 100,
+        "rerankCalls": 50,
+        "documentCountSent": 2250,
+        "queryCountSent": 50,
+        "providerKeyCounts": {
+          "nvidia": 1
+        },
+        "keyCountAvailable": 1,
+        "embedModel": "nvidia/llama-nemotron-embed-vl-1b-v2",
+        "rerankModel": "nvidia/llama-nemotron-rerank-vl-1b-v2"
+      },
+      "responsesHash": "sha256:d112673098df2b9d5272fec977bfc50949223f638005ab598418e2caf888ede1",
+      "resultHash": "sha256:af3fea529edf569a7adadfeae793ad7f331d998ecc28779b1c55b7f289176de1",
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0
+    }
+  ],
+  "failedArms": [
+    {
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "provider": "gemini",
+      "failureClass": "provider-429-rate-or-quota-limit"
+    },
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "provider": "voyage",
+      "failureClass": "provider-429-rate-or-quota-limit"
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "metrics": {
+      "quality": 0.0164,
+      "pAt1": 0.032,
+      "recallAt5": 0.0098,
+      "recallAt10": 0.0098,
+      "ndcgAt10": 0.0141,
+      "latencyP50Ms": 0,
+      "latencyP95Ms": 1033,
+      "contextTokensAvg": 160
+    }
+  },
+  "control": {
+    "strategy": "bm25-lite",
+    "metrics": {
+      "quality": 0.0164,
+      "pAt1": 0.032,
+      "recallAt5": 0.0098,
+      "recallAt10": 0.0098,
+      "ndcgAt10": 0.0141,
+      "latencyP50Ms": 0,
+      "latencyP95Ms": 1033,
+      "contextTokensAvg": 160
+    }
+  },
+  "findings": [
+    "BM25 remained the retrieval-proxy winner on this 50-question slice.",
+    "NVIDIA completed 50 provider-backed queries but underperformed BM25 and full-hybrid on this slice.",
+    "Gemini and Voyage reached provider 429 limits before producing complete slice results; they should be rerun with stricter pacing, smaller waves, or quota-separated keys.",
+    "This is retrieval-proxy methodology evidence only, not MemoryBench answer-quality or SOTA proof."
+  ],
+  "nextActions": [
+    "Run a narrower NVIDIA follow-up varying dense/rerank candidate limits before promotion.",
+    "Rerun Gemini and Voyage as smaller paced waves after quota cooldown or with confirmed per-key quota separation.",
+    "Use answer-quality scoring only after response arms complete and the answer/judge endpoint policy is set."
+  ],
+  "safety": {
+    "publicSafe": true,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  }
+}

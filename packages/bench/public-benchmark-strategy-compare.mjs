@@ -17,6 +17,8 @@ const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_B
 const allowSoloSmoke = Boolean(args.allowSoloSmoke) || process.env.RECALLWEAVE_ALLOW_SOLO_BENCHMARK_SMOKE === "1";
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 1600, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
+const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
+const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
 
 const retrievalStrategies = [
@@ -78,6 +80,8 @@ for (const strategy of strategies) {
     String(contextTokenBudget),
     "--limit",
     String(limit),
+    ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
+    ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
     "--output",
     responsePath,
   ];
@@ -164,6 +168,11 @@ const report = {
     queryCount: input.queryCount,
     expectedResultRefCount: input.expectedResultRefCount,
     haystackSessionCount: input.haystackSessionCount,
+    requestedQuerySelection: {
+      queryOffset,
+      maxQueries,
+      completeDataset: queryOffset === 0 && !maxQueries,
+    },
   },
   strategies: results,
   winner: bestStrategy(results),
@@ -599,6 +608,17 @@ function splitList(value) {
 function positiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
+  return number;
+}
+
+function optionalPositiveInt(value, label) {
+  if (value === null || value === undefined || value === "") return null;
+  return positiveInt(value, label);
+}
+
+function optionalNonNegativeInt(value, label) {
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
   return number;
 }
 

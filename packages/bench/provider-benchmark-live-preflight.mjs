@@ -146,10 +146,14 @@ function providerKeyCount(provider) {
 }
 
 function providerKeys(provider) {
-  return [
+  return uniqueProviderKeys([
     ...providerValueEnvNames(provider).flatMap((name) => splitList(process.env[name] ?? "")),
     ...providerKeyFileEnvNames(provider).flatMap(keysFromPrivateFileEnv),
-  ];
+  ]);
+}
+
+function uniqueProviderKeys(keys) {
+  return [...new Set(keys.map((key) => String(key ?? "").trim()).filter(Boolean))];
 }
 
 function providerEnvNames(provider) {

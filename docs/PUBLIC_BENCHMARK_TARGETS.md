@@ -168,6 +168,50 @@ The local quality winner is whichever arm wins the same-data memory benchmark.
 MTEB v2 chooses the candidate list; it does not override a RecallWeave
 LongMemEval or MemoryBench loss.
 
+## Zero-Dollar Provider Waves
+
+Free APIs are not spend lanes. Treat NVIDIA NIM free routes and OpenRouter free
+routes as zero-dollar, quota-limited mass-experiment lanes once env-only
+credentials are visible to the benchmark process. The guardrails are privacy,
+rate limits, retries, and source-lock consistency, not cost avoidance.
+
+Current provider roles:
+
+- NVIDIA: primary zero-dollar cloud retrieval challenger. Use Nemotron
+  embedding/rerank arms continuously within the free RPM envelope, with paced
+  completion waves and 429/error backoff.
+- OpenRouter free: query expansion, critic/reviewer, and fallback generation
+  lane. Use free models such as Kimi/Qwen-style long-context routes for method
+  exploration when they are available; do not treat OpenRouter as the primary
+  reranker unless a free rerank endpoint is actually exposed.
+- Gemini Embedding 2 / AI Studio: free-tier embedding challenger. Use it for
+  same-data embedding arms and compare against NVIDIA, Voyage, BM25, and local
+  Apple controls.
+- Voyage: personal/prod default and quality challenger. Use free/trial quota
+  when available, but do not let Voyage rate limits block NVIDIA/OpenRouter
+  mass testing.
+
+The loop should run these in completion waves, not one-off canaries:
+
+1. Start with no-spend controls: BM25, current hybrid, local Apple, and NVIDIA
+   if its key is available.
+2. Add OpenRouter free query expansion/reviewer variants where query expansion
+   is part of the hypothesis.
+3. Add Gemini Embedding 2 and Voyage challengers on the same rows as quota
+   allows.
+4. Promote only arms that win on source-locked answer-quality shards, not on
+   component benchmarks or fixture ties.
+
+Provider keys must stay env-only or in private key files outside the repo. The
+public artifacts may say which provider family was used, the paced RPM cap, the
+error/retry class, and aggregate scores; they must not print keys, raw prompts,
+raw benchmark text, raw memories, or private paths.
+
+For operator safety, remember that `--limit` in the retrieval harness means
+retrieved memories per question. Use `--max-queries` and `--query-offset` for
+small smoke waves; omit `--max-queries` only when intentionally running the full
+source-locked question set.
+
 ## Full Benchmark Gate
 
 The current 30-query LongMemEval-S run is a canary. It is enough to find method

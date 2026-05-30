@@ -10,9 +10,10 @@
 
 ## Provider Matrix
 
-- voyage: cloud-voyage4-voyage; embed=voyage-4; rerank=rerank-2.5-or-lite; cap=3
+- voyage: cloud-voyage4-voyage; embed=voyage-4; rerank=rerank-2.5-or-lite; cap=10
 - gemini: cloud-gemini2-embed-rerank-proxy; embed=gemini-embedding-001-or-gemini-embedding; rerank=proxy-or-voyage-rerank; cap=20
-- nvidia: cloud-nvidia-nemotron-vl-1b; embed=nvidia/llama-nemotron-embed-vl-1b-v2; rerank=nvidia/llama-nemotron-rerank-vl-1b-v2; cap=10
+- nvidia: cloud-nvidia-nemotron-vl-1b; embed=nvidia/llama-nemotron-embed-vl-1b-v2; rerank=nvidia/llama-nemotron-rerank-vl-1b-v2; cap=30
+- openrouter: openrouter-free-query-expansion; embed=nvidia/llama-nemotron-embed-vl-1b-v2:free when exposed by OpenRouter; rerank=not-primary-free-rerank; cap=20
 - local-apple: local-apple-qwen3-4b-local-rerank; embed=qwen3-embedding-local; rerank=qwen3-reranker-local; cap=local
 
 ## Watchdog

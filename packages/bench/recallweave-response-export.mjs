@@ -1258,7 +1258,7 @@ function providerEnvHint(provider) {
 }
 
 function providerKeyCount(provider) {
-  return providerKeys(provider).length;
+  return uniqueProviderKeys(providerKeys(provider)).length;
 }
 
 function providerKeys(provider) {
@@ -1332,10 +1332,14 @@ function providerKeysFromFiles(...envNames) {
 }
 
 function chooseProviderKey(provider, seed) {
-  const keys = providerKeys(provider);
+  const keys = uniqueProviderKeys(providerKeys(provider));
   assert.ok(keys.length > 0, `${provider} provider key missing`);
   const index = Number.parseInt(stableHash(seed).slice(0, 8), 16) % keys.length;
   return keys[index];
+}
+
+function uniqueProviderKeys(keys) {
+  return [...new Set(keys.map((key) => String(key ?? "").trim()).filter(Boolean))];
 }
 
 async function voyageEmbed(texts, inputType, options = {}) {

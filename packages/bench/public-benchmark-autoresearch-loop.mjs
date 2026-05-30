@@ -34,6 +34,8 @@ const budgets = splitList(args.contextTokenBudgets ?? process.env.RECALLWEAVE_PU
 const limits = splitList(args.limits ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_LIMITS ?? "5,10").map((value) =>
   positiveInt(value, "limit"),
 );
+const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
+const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
 
 const retrievalStrategies = [
@@ -93,6 +95,8 @@ for (const arm of arms) {
       String(arm.contextTokenBudget),
       "--limit",
       String(arm.limit),
+      ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
+      ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
       "--max-memory-bytes",
       String(maxMemoryBytes),
       "--output",
@@ -181,6 +185,11 @@ const report = {
     queryCount: input.queryCount,
     expectedResultRefCount: input.expectedResultRefCount,
     haystackSessionCount: input.haystackSessionCount,
+    requestedQuerySelection: {
+      queryOffset,
+      maxQueries,
+      completeDataset: queryOffset === 0 && !maxQueries,
+    },
   },
   loop: {
     hypothesis:
@@ -470,6 +479,17 @@ function splitList(value) {
 function positiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
+  return number;
+}
+
+function optionalPositiveInt(value, label) {
+  if (value === null || value === undefined || value === "") return null;
+  return positiveInt(value, label);
+}
+
+function optionalNonNegativeInt(value, label) {
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
   return number;
 }
 

@@ -654,10 +654,9 @@ function inspectQueryExpansionReadiness(lane) {
 function inspectProviderReadiness(provider) {
   const valueEnvNames = providerValueEnvNames(provider);
   const keyFileEnvNames = providerKeyFileEnvNames(provider);
-  const valueKeyCount = valueEnvNames.flatMap((name) => splitEnvList(process.env[name] ?? "")).length;
+  const valueKeys = valueEnvNames.flatMap((name) => splitEnvList(process.env[name] ?? ""));
   const fileStates = keyFileEnvNames.map(inspectProviderKeyFileEnv);
-  const fileKeyCount = fileStates.reduce((count, state) => count + state.keyCount, 0);
-  const keyCount = valueKeyCount + fileKeyCount;
+  const keyCount = uniqueProviderKeys([...valueKeys, ...fileStates.flatMap((state) => state.keys ?? [])]).length;
   return {
     ready: keyCount > 0,
     keyCount,
@@ -672,13 +671,18 @@ function inspectProviderReadiness(provider) {
 
 function inspectProviderKeyFileEnv(envName) {
   const value = process.env[envName];
-  if (!value) return { envName, configured: false, keyCount: 0, issue: null };
+  if (!value) return { envName, configured: false, keyCount: 0, issue: null, keys: [] };
   const resolved = resolve(String(value));
-  if (!existsSync(resolved)) return { envName, configured: true, keyCount: 0, issue: "file-missing" };
-  if (!statSync(resolved).isFile()) return { envName, configured: true, keyCount: 0, issue: "not-a-file" };
-  if (!isOutsideRepo(resolved)) return { envName, configured: true, keyCount: 0, issue: "file-inside-repository" };
+  if (!existsSync(resolved)) return { envName, configured: true, keyCount: 0, issue: "file-missing", keys: [] };
+  if (!statSync(resolved).isFile()) return { envName, configured: true, keyCount: 0, issue: "not-a-file", keys: [] };
+  if (!isOutsideRepo(resolved)) return { envName, configured: true, keyCount: 0, issue: "file-inside-repository", keys: [] };
   const fileRaw = readFileSync(resolved, "utf8");
-  return { envName, configured: true, keyCount: splitEnvList(fileRaw).length, issue: null };
+  const keys = splitEnvList(fileRaw);
+  return { envName, configured: true, keyCount: uniqueProviderKeys(keys).length, issue: null, keys };
+}
+
+function uniqueProviderKeys(keys) {
+  return [...new Set(keys.map((key) => String(key ?? "").trim()).filter(Boolean))];
 }
 
 function providerValueEnvNames(provider) {
