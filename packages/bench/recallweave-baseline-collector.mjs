@@ -25,6 +25,8 @@ const responsesPath = resolveInputPath(
 const outputPath = args.output ?? process.env.RECALLWEAVE_RESULT_OUTPUT_JSON ?? null;
 const retrievalMode = String(args.retrievalMode ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_MODE ?? "hybrid-local-first");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
+const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
+const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const runAt = new Date().toISOString();
 const runId =
   args.runId ??
@@ -65,12 +67,20 @@ for (const query of queries) {
   assert.ok(typeof query.q === "string" && query.q.trim(), `query ${query.id} needs q`);
   assert.ok(queryExpectedRefCount(query) > 0, `query ${query.id} needs at least one expectedResultId or expectedResultHash`);
 }
-const querySetEvidence = summarizeQuerySetEvidence(queries);
+const querySelection = selectQueries(queries);
+const querySetEvidence = summarizeQuerySetEvidence(querySelection.queries);
 
 const responsesEnvelope = loadResponses(responsesPath, { fixture: fixtureRequested, allowRawResponseText });
 const responses = responsesEnvelope.responses;
+if (responsesEnvelope.queryShard?.selectedQueryIdHash) {
+  assert.equal(
+    responsesEnvelope.queryShard.selectedQueryIdHash,
+    querySelection.selectedQueryIdHash,
+    "responses query shard must match collector query selection",
+  );
+}
 const privacy = privacyFromEnvelope(responsesEnvelope, fixtureRequested);
-const scored = queries.map((query) => scoreQuery(query, responses.get(query.id) ?? emptyResponse(), { fixture: fixtureRequested, allowRawResponseText }));
+const scored = querySelection.queries.map((query) => scoreQuery(query, responses.get(query.id) ?? emptyResponse(), { fixture: fixtureRequested, allowRawResponseText }));
 const aggregate = aggregateScores(scored);
 const head = git(["rev-parse", "HEAD"]);
 const branch = git(["branch", "--show-current"]);
@@ -114,7 +124,15 @@ const result = {
   rawTranscriptIncluded: privacy.rawTranscriptIncluded,
   rawPromptIncluded: privacy.rawPromptIncluded,
   rawAnswerIncluded: privacy.rawAnswerIncluded,
-  queryCount: queries.length,
+  queryCount: querySelection.queries.length,
+  totalQueryCount: querySelection.totalQueryCount,
+  querySelection: {
+    startIndex: querySelection.startIndex,
+    endIndexExclusive: querySelection.endIndexExclusive,
+    requestedLimit: maxQueries,
+    completeDataset: querySelection.startIndex === 0 && querySelection.endIndexExclusive === querySelection.totalQueryCount,
+    selectedQueryIdHash: querySelection.selectedQueryIdHash,
+  },
   querySetEvidence,
   retrievalConfig: {
     source: fixtureRequested ? "fixture" : "recallweave-response-export",
@@ -404,6 +422,33 @@ function positiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
   return number;
+}
+
+function optionalPositiveInt(value, label) {
+  if (value == null || value === "" || value === false) return null;
+  return positiveInt(value, label);
+}
+
+function optionalNonNegativeInt(value, label) {
+  if (value == null || value === "" || value === false) return 0;
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
+  return number;
+}
+
+function selectQueries(inputQueries) {
+  const totalQueryCount = inputQueries.length;
+  assert.ok(queryOffset <= totalQueryCount, `query offset ${queryOffset} exceeds query count ${totalQueryCount}`);
+  const endIndexExclusive = maxQueries ? Math.min(totalQueryCount, queryOffset + maxQueries) : totalQueryCount;
+  const selected = inputQueries.slice(queryOffset, endIndexExclusive);
+  assert.ok(selected.length > 0, "selected query shard is empty");
+  return {
+    queries: selected,
+    totalQueryCount,
+    startIndex: queryOffset,
+    endIndexExclusive,
+    selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => shortHash(query.id)).join("\n"))}`,
+  };
 }
 
 function requiredNumber(value, label) {

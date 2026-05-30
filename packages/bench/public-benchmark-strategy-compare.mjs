@@ -20,7 +20,7 @@ const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RE
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
-const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
+const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
 const providerTimeoutMs =
   optionalPositiveInt(args.providerTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ??
@@ -113,6 +113,8 @@ async function runStrategyArm(strategy) {
     responsePath,
     "--retrieval-mode",
     `strategy:${strategy}`,
+    ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
+    ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
     "--output",
     resultPath,
   ];
@@ -133,6 +135,10 @@ async function runStrategyArm(strategy) {
     assert.equal(result.publicBenchmarkClaimsAllowed, false);
     assert.equal(result.privacyLeakCount, 0);
     assert.equal(result.redactionFailureCount, 0);
+    if (response.queryShard?.selectedQueryIdHash) {
+      assert.equal(result.querySelection?.selectedQueryIdHash, response.queryShard.selectedQueryIdHash, "scored query shard must match exported query shard");
+      assert.equal(result.queryCount, response.queryShard.responseCount, "scored query count must match exported response count");
+    }
     return { result: {
       strategy,
       querySetHash: result.querySetHash,
@@ -271,7 +277,7 @@ async function liveInput(runRootPath) {
   const memoriesPath = resolveInputPath(args.memories ?? args.memoriesJsonl ?? process.env.RECALLWEAVE_BASELINE_MEMORIES_JSONL ?? null);
   if (querySetPath && memoriesPath) return inputFromPrivateFiles(querySetPath, memoriesPath, null);
 
-  const target = resolveInputPath(args.target ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_TARGET ?? "reviews/overnight-20260522/public-longmemeval-run-target.json");
+  const target = resolveInputPath(args.target ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_TARGET ?? "reviews/overnight-20260522/public-longmemeval-full-run-target.json");
   const materializerReportPath = resolve(runRootPath, "materialize-report.json");
   runNode([
     "packages/bench/public-benchmark-materialize-run.mjs",
@@ -588,8 +594,11 @@ function classifyFailure(text) {
   if (/\bstatus 429\b/.test(value) || value.includes("rate limit") || value.includes("quota")) return "provider-rate-limit";
   if (value.includes("aborterror") || value.includes("timeout") || value.includes("timed out") || value.includes("etimedout")) return "provider-timeout";
   if (value.includes("sigterm") || value.includes("sigkill")) return "arm-terminated";
+  if (value.includes("memories file too large")) return "memory-size-limit";
   if (/\bstatus 5\d\d\b/.test(value)) return "provider-server-error";
-  if (value.includes("requires recallweave_provider_benchmark_calls")) return "provider-env-not-enabled";
+  if (value.includes("requires recallweave_provider_benchmark_calls") || value.includes("requires recallweave_provider_benchmark_public_data")) {
+    return "provider-env-not-enabled";
+  }
   if (value.includes("provider key missing") || value.includes("requires gemini") || value.includes("requires voyage") || value.includes("requires nvidia")) {
     return "provider-credentials-missing";
   }

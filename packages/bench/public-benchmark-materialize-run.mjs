@@ -21,7 +21,7 @@ const targetPath = resolveInputPath(
   args.target ??
     args.targetFile ??
     process.env.RECALLWEAVE_PUBLIC_BENCHMARK_TARGET ??
-    (fixtureRequested ? null : "reviews/overnight-20260522/public-longmemeval-run-target.json"),
+    (fixtureRequested ? null : "reviews/overnight-20260522/public-longmemeval-full-run-target.json"),
 );
 const sourceLockPath = resolveInputPath(
   args.sourceLock ??

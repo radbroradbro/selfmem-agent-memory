@@ -155,8 +155,8 @@ OpenAI-compatible interface and let the canary decide.
 | `cloud-gemini-voyage-rerank` | `gemini-embedding-001`, default 1536 dims | `rerank-2.5` | Gemini embedding challenger with Voyage rerank held constant. |
 | `cloud-gemini2-embed-rerank-proxy` | `gemini-embedding-2`, default 1536 dims | Local deterministic rerank proxy | Current Gemini multimodal embedding challenger without a second paid reranker. |
 | `cloud-gemini2-voyage-rerank` | `gemini-embedding-2`, default 1536 dims | `rerank-2.5` | Current Gemini multimodal embedding challenger with Voyage rerank held constant. |
-| `cloud-nvidia-nv-embed-v1-mistral-rerank` | `nvidia/nv-embed-v1` | `nvidia/rerank-qa-mistral-4b` | Default NVIDIA hosted smoke lane because both endpoint names are visible as hosted NIM endpoints in the operator UI. |
-| `cloud-nvidia-embedcode-7b-mistral-rerank` | `nvidia/nv-embedcode-7b-v1` | `nvidia/rerank-qa-mistral-4b` | Code-memory NVIDIA challenger using the same hosted reranker. |
+| `cloud-nvidia-nv-embed-v1-mistral-rerank` | `nvidia/nv-embed-v1` | `nv-rerank-qa-mistral-4b:1` via `/v1/retrieval/nvidia/reranking` | Default NVIDIA hosted smoke lane because both endpoint names are visible as hosted NIM endpoints in the operator UI. |
+| `cloud-nvidia-embedcode-7b-mistral-rerank` | `nvidia/nv-embedcode-7b-v1` | `nv-rerank-qa-mistral-4b:1` via `/v1/retrieval/nvidia/reranking` | Code-memory NVIDIA challenger using the same hosted reranker. |
 | `cloud-nvidia-retriever-500m` | `nvidia/llama-nemotron-embed-1b-v2` | `nvidia/llama-3.2-nemoretriever-500m-rerank-v2` | Historical latency challenger; keep available as an explicit opt-in arm. |
 | `cloud-nvidia-nemotron-1b` | `nvidia/llama-nemotron-embed-1b-v2` | `nvidia/llama-nemotron-rerank-1b-v2` | Historical text retrieval challenger; keep available as an explicit opt-in arm. |
 | `cloud-nvidia-nemotron-vl-1b` | `nvidia/llama-nemotron-embed-vl-1b-v2` | `nvidia/llama-nemotron-rerank-vl-1b-v2` | Partner/downloadable VL challenger; not assumed paid, but gated by operational smoke before large loops. |
@@ -209,7 +209,8 @@ local Apple Silicon arms:
   fusion, then Voyage `rerank-2.5`.
 - `cloud-nvidia-nv-embed-v1-mistral-rerank`: budgeted BM25 preselect,
   NVIDIA `nv-embed-v1` embeddings, sparse+dense+graph+temporal fusion, then
-  `rerank-qa-mistral-4b`. This is the default NVIDIA operational lane.
+  `nv-rerank-qa-mistral-4b:1` through NVIDIA's shared reranking route. This is
+  the default NVIDIA operational lane.
 - `cloud-nvidia-embedcode-7b-mistral-rerank`: same shape, but with
   `nv-embedcode-7b-v1` for code-memory slices.
 - Older NVIDIA arms remain available as explicit challengers when a tiny

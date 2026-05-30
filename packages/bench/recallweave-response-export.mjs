@@ -73,7 +73,9 @@ const maxMemoryBytes =
   5_000_000;
 const generatedAt = new Date().toISOString();
 const providerBenchmarkCallsAllowed = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_CALLS === "1";
-const providerBenchmarkPublicData = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1";
+const providerBenchmarkPublicData =
+  process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1" ||
+  process.env.RECALLWEAVE_PROVIDER_PUBLIC_DATA_CONFIRMED === "1";
 const providerLastRequestAt = new Map();
 
 const secretPattern =
@@ -2188,12 +2190,14 @@ function nvidiaStrategyConfig(strategy) {
     },
     "cloud-nvidia-nv-embed-v1-mistral-rerank": {
       embedModel: "nvidia/nv-embed-v1",
-      rerankModel: "nvidia/rerank-qa-mistral-4b",
+      rerankModel: "nv-rerank-qa-mistral-4b:1",
+      rerankEndpoint: "https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking",
       freeEndpointOnly: true,
     },
     "cloud-nvidia-embedcode-7b-mistral-rerank": {
       embedModel: "nvidia/nv-embedcode-7b-v1",
-      rerankModel: "nvidia/rerank-qa-mistral-4b",
+      rerankModel: "nv-rerank-qa-mistral-4b:1",
+      rerankEndpoint: "https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking",
       freeEndpointOnly: true,
     },
   };
@@ -2214,6 +2218,7 @@ function nvidiaEmbeddingEndpoint() {
 
 function nvidiaRerankEndpoint(config) {
   if (process.env.NVIDIA_RERANK_ENDPOINT) return String(process.env.NVIDIA_RERANK_ENDPOINT);
+  if (config.rerankEndpoint) return config.rerankEndpoint;
   return `https://ai.api.nvidia.com/v1/retrieval/${nvidiaRerankModel(config)}/reranking`;
 }
 
