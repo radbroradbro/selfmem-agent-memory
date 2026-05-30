@@ -1340,10 +1340,12 @@ function providerKeysFromFiles(...envNames) {
   });
 }
 
-function chooseProviderKey(provider, seed) {
+function chooseProviderKey(provider, seed, attempt = 1) {
   const keys = uniqueProviderKeys(providerKeys(provider));
   assert.ok(keys.length > 0, `${provider} provider key missing`);
-  const index = Number.parseInt(stableHash(seed).slice(0, 8), 16) % keys.length;
+  const startIndex = Number.parseInt(stableHash(seed).slice(0, 8), 16) % keys.length;
+  const attemptOffset = Math.max(0, optionalPositiveInt(attempt, "provider key attempt") - 1);
+  const index = (startIndex + attemptOffset) % keys.length;
   return keys[index];
 }
 
@@ -1524,7 +1526,7 @@ async function geminiPost(path, body, options = {}) {
     body,
     headers: ({ attempt }) => ({
       "content-type": "application/json",
-      "x-goog-api-key": chooseProviderKey("gemini", `${seed}:attempt:${attempt}`),
+      "x-goog-api-key": chooseProviderKey("gemini", seed, attempt),
     }),
   });
 }
@@ -1537,7 +1539,7 @@ async function voyagePost(path, body, options = {}) {
     body,
     headers: ({ attempt }) => ({
       "content-type": "application/json",
-      authorization: `Bearer ${chooseProviderKey("voyage", `${seed}:attempt:${attempt}`)}`,
+      authorization: `Bearer ${chooseProviderKey("voyage", seed, attempt)}`,
     }),
   });
 }
@@ -1550,7 +1552,7 @@ async function nvidiaPost(url, body, options = {}) {
     body,
     headers: ({ attempt }) => ({
       "content-type": "application/json",
-      authorization: `Bearer ${chooseProviderKey("nvidia", `${seed}:attempt:${attempt}`)}`,
+      authorization: `Bearer ${chooseProviderKey("nvidia", seed, attempt)}`,
     }),
   });
 }
