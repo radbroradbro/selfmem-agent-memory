@@ -13,6 +13,7 @@ const format = String(args.format ?? "json").toLowerCase();
 const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_REPORT ?? null;
 const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_AUTORESEARCH_MARKDOWN ?? null;
 const allowSoloSmoke = Boolean(args.allowSoloSmoke) || process.env.RECALLWEAVE_ALLOW_SOLO_BENCHMARK_SMOKE === "1";
+const allowPartial = Boolean(args.allowPartial) || process.env.RECALLWEAVE_PUBLIC_BENCHMARK_ALLOW_PARTIAL === "1";
 const defaultAutoresearchStrategies = [
   "jaccard",
   "bm25-lite",
@@ -37,6 +38,7 @@ const limits = splitList(args.limits ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
+const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
 
 const retrievalStrategies = [
   "jaccard",
@@ -71,6 +73,8 @@ const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
+const privatePathOutputPattern =
+  /(\/Users\/[^\s"'`]+|\/Volumes\/[^\s"'`]+|\/private\/[^\s"'`]+|\/var\/folders\/[^\s"'`]+|\/tmp\/[^\s"'`]+|\/home\/[^\s"'`]+|[A-Za-z]:\\Users\\[^\s"'`]+|\.hermes\/profiles[^\s"'`]*|\.openclaw[^\s"'`]*)/gi;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
@@ -80,74 +84,82 @@ const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-autoresearch-loop-"))
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
 const arms = buildArms({ strategies, budgets, limits });
 const results = [];
+const failedArms = [];
 
 for (const arm of arms) {
   const label = `${arm.strategy}-b${arm.contextTokenBudget}-k${arm.limit}`;
   const responsePath = resolve(runRoot, `${label}-responses.json`);
   const resultPath = resolve(runRoot, `${label}-result.json`);
-  runNode(
-    [
-      "packages/bench/recallweave-response-export.mjs",
-      ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath, "--memories", input.memoriesPath, "--preserve-ids"]),
-      "--strategy",
-      arm.strategy,
-      "--context-token-budget",
-      String(arm.contextTokenBudget),
-      "--limit",
-      String(arm.limit),
-      ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
-      ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
-      "--max-memory-bytes",
-      String(maxMemoryBytes),
-      "--output",
-      responsePath,
-    ],
-    { live: !fixtureRequested },
-  );
-  runNode(
-    [
-      "packages/bench/recallweave-baseline-collector.mjs",
-      ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath]),
-      "--responses",
-      responsePath,
-      "--retrieval-mode",
-      `strategy:${arm.strategy}`,
-      "--limit",
-      String(arm.limit),
-      "--output",
-      resultPath,
-    ],
-    {
-      live: !fixtureRequested,
-      env: {
-        RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
-        RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
+  try {
+    runNode(
+      [
+        "packages/bench/recallweave-response-export.mjs",
+        ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath, "--memories", input.memoriesPath, "--preserve-ids"]),
+        "--strategy",
+        arm.strategy,
+        "--context-token-budget",
+        String(arm.contextTokenBudget),
+        "--limit",
+        String(arm.limit),
+        ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
+        ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
+        "--max-memory-bytes",
+        String(maxMemoryBytes),
+        "--output",
+        responsePath,
+      ],
+      { live: !fixtureRequested },
+    );
+    runNode(
+      [
+        "packages/bench/recallweave-baseline-collector.mjs",
+        ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath]),
+        "--responses",
+        responsePath,
+        "--retrieval-mode",
+        `strategy:${arm.strategy}`,
+        "--limit",
+        String(arm.limit),
+        "--output",
+        resultPath,
+      ],
+      {
+        live: !fixtureRequested,
+        env: {
+          RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
+          RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
+        },
       },
-    },
-  );
-  const response = JSON.parse(readFileSync(responsePath, "utf8"));
-  const result = JSON.parse(readFileSync(resultPath, "utf8"));
-  assert.equal(result.retrievalProxyOnly, true);
-  assert.equal(result.memoryBenchAnswerQuality, false);
-  assert.equal(result.publicBenchmarkClaimsAllowed, false);
-  assert.equal(result.privacyLeakCount, 0);
-  assert.equal(result.redactionFailureCount, 0);
-  results.push({
-    armId: label,
-    strategy: arm.strategy,
-    contextTokenBudget: arm.contextTokenBudget,
-    limit: arm.limit,
-    querySetHash: result.querySetHash,
-    responsesHash: `sha256:${fileHash(responsePath)}`,
-    resultHash: `sha256:${fileHash(resultPath)}`,
-    rankingStrategy: response.source?.rankingStrategy ?? result.retrievalConfig?.rankingStrategy ?? null,
-    metrics: result.metrics,
-    contextBudget: result.retrievalConfig?.contextBudget ?? null,
-    privacyLeakCount: result.privacyLeakCount,
-    redactionFailureCount: result.redactionFailureCount,
-  });
+    );
+    const response = JSON.parse(readFileSync(responsePath, "utf8"));
+    const result = JSON.parse(readFileSync(resultPath, "utf8"));
+    assert.equal(result.retrievalProxyOnly, true);
+    assert.equal(result.memoryBenchAnswerQuality, false);
+    assert.equal(result.publicBenchmarkClaimsAllowed, false);
+    assert.equal(result.privacyLeakCount, 0);
+    assert.equal(result.redactionFailureCount, 0);
+    results.push({
+      armId: label,
+      strategy: arm.strategy,
+      contextTokenBudget: arm.contextTokenBudget,
+      limit: arm.limit,
+      querySetHash: result.querySetHash,
+      responsesHash: `sha256:${fileHash(responsePath)}`,
+      resultHash: `sha256:${fileHash(resultPath)}`,
+      rankingStrategy: response.source?.rankingStrategy ?? result.retrievalConfig?.rankingStrategy ?? null,
+      queryShard: response.queryShard ?? null,
+      metrics: result.metrics,
+      contextBudget: result.retrievalConfig?.contextBudget ?? null,
+      privacyLeakCount: result.privacyLeakCount,
+      redactionFailureCount: result.redactionFailureCount,
+    });
+  } catch (error) {
+    if (!allowPartial) throw error;
+    failedArms.push(armFailureSummary(label, arm, error));
+  }
 }
 
+assert.ok(results.length > 0, "autoresearch loop produced no completed arms");
 const querySetHashes = new Set(results.map((item) => item.querySetHash));
 assert.equal(querySetHashes.size, 1, "all autoresearch arms must use the same query set");
 if (input.collectorCompatibleQuerySetHash) {
@@ -159,7 +171,8 @@ const winner = sorted[0] ?? null;
 const baseline = results.find((item) => item.strategy === "jaccard" && item.contextTokenBudget === 1600 && item.limit === 10) ?? null;
 const report = {
   schemaVersion: 1,
-  ok: true,
+  ok: failedArms.length === 0,
+  status: failedArms.length === 0 ? "COMPLETED" : "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
   mode: "public-benchmark-autoresearch-loop",
   fixtureOnly: fixtureRequested,
   benchmark: input.benchmark,
@@ -175,6 +188,7 @@ const report = {
   rawMemoryIncluded: false,
   rawTranscriptIncluded: false,
   rawPrivateOutputPathIncluded: false,
+  partialResultsAllowed: allowPartial,
   generatedAt: new Date().toISOString(),
   input: {
     source: input.source,
@@ -190,16 +204,20 @@ const report = {
       maxQueries,
       completeDataset: queryOffset === 0 && !maxQueries,
     },
+    selectedQueryCount: results[0]?.queryShard?.responseCount ?? null,
   },
   loop: {
     hypothesis:
       "A local hybrid recall family must beat or materially improve on the BM25 lexical control on source-locked LongMemEval recall before any default promotion; provider-backed arms remain a separate opt-in gate.",
     armCount: results.length,
+    requestedArmCount: arms.length,
+    failedArmCount: failedArms.length,
     variables: {
       strategies,
       contextTokenBudgets: budgets,
       limits,
       maxMemoryBytes,
+      armTimeoutMs,
     },
     keepDecision: winner ? `Use ${winner.strategy} with budget ${winner.contextTokenBudget} and limit ${winner.limit} for the next canary arm.` : "No winning arm.",
     rollbackPlan: "Fall back to the previous checked-in retrieval-proxy result and keep publicBenchmarkClaimsAllowed=false.",
@@ -207,6 +225,7 @@ const report = {
   baseline: summarizeArm(baseline),
   winner: summarizeArm(winner),
   arms: results.map(summarizeArm),
+  failedArms,
   safety: {
     publicSafe: true,
     metricsOnly: true,
@@ -257,6 +276,7 @@ function comparisonContract(strategyNames, options = {}) {
   return {
     soloRunsAreSmokeOnly: true,
     allowSoloSmoke: Boolean(options.allowSoloSmoke),
+    partialResultsAllowed: allowPartial,
     sameDataControlsRequired: !options.allowSoloSmoke,
     bm25ControlRequired: !options.allowSoloSmoke,
     bm25ControlPresent: strategySet.has("bm25-lite"),
@@ -316,19 +336,23 @@ function summarizeArm(item) {
 }
 
 function renderMarkdown(value) {
-  return [
+  const lines = [
     "# Public Benchmark Autoresearch Loop",
     "",
     `- OK: ${value.ok}`,
+    `- Status: ${value.status}`,
     `- Fixture only: ${value.fixtureOnly}`,
     `- Benchmark: ${value.benchmark}`,
     `- Retrieval proxy only: ${value.retrievalProxyOnly}`,
     `- MemoryBench answer quality: ${value.memoryBenchAnswerQuality}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
+    `- Partial results allowed: ${value.partialResultsAllowed}`,
     `- Solo smoke only: ${value.comparisonContract.soloRunsAreSmokeOnly}`,
     `- Same-data controls required: ${value.comparisonContract.sameDataControlsRequired}`,
     `- Query set hash: ${value.input.querySetHash}`,
-    `- Arm count: ${value.loop.armCount}`,
+    `- Selected query count: ${value.input.selectedQueryCount ?? "unknown"}`,
+    `- Completed arm count: ${value.loop.armCount}`,
+    `- Failed arm count: ${value.loop.failedArmCount}`,
     `- Winner: ${value.winner?.armId ?? "none"}`,
     "",
     "## Top Arms",
@@ -343,6 +367,18 @@ function renderMarkdown(value) {
           `| ${item.armId} | ${item.metrics.quality} | ${item.metrics.pAt1} | ${item.metrics.recallAt5} | ${item.metrics.recallAt10} | ${item.metrics.ndcgAt10} | ${item.metrics.contextTokensAvg} | ${item.metrics.latencyP50Ms} |`,
       ),
     "",
+  ];
+  if (value.failedArms.length) {
+    lines.push(
+      "## Failed Arms",
+      "",
+      "| Arm | Strategy | Failure class | Retryable/provider limit |",
+      "| --- | --- | --- | ---: |",
+      ...value.failedArms.map((item) => `| ${item.armId} | ${item.strategy} | ${item.failureClass} | ${item.retryableProviderLimit} |`),
+      "",
+    );
+  }
+  lines.push(
     "## Decision",
     "",
     `- ${value.loop.keepDecision}`,
@@ -350,7 +386,8 @@ function renderMarkdown(value) {
     `- Raw answers included: ${value.rawAnswersIncluded}`,
     `- Raw memory included: ${value.rawMemoryIncluded}`,
     `- Private output path included: ${value.rawPrivateOutputPathIncluded}`,
-  ].join("\n");
+  );
+  return lines.join("\n");
 }
 
 function compareSummaries(left, right) {
@@ -436,12 +473,52 @@ function runNode(argv, options = {}) {
       SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
       ...(options.env ?? {}),
     },
+    ...(armTimeoutMs ? { timeout: armTimeoutMs, killSignal: "SIGTERM" } : {}),
     stdio: ["ignore", "pipe", "pipe"],
   });
-  if (result.status !== 0) throw new Error(`node ${argv.join(" ")} failed\n${result.stdout}\n${result.stderr}`);
+  if (result.error?.code === "ETIMEDOUT") {
+    throw new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`);
+  }
+  if (result.signal) {
+    throw new Error(`node ${argv.join(" ")} terminated by signal ${result.signal}`);
+  }
+  if (result.status !== 0) throw new Error(sanitizeFailureText(`node ${argv.join(" ")} failed\n${result.stdout}\n${result.stderr}`));
   assertSafePublicText(result.stdout, "child stdout");
   assertSafePublicText(result.stderr, "child stderr");
   return result;
+}
+
+function armFailureSummary(armId, arm, error) {
+  const text = sanitizeFailureText(error?.message ?? error ?? "");
+  const failureClass = classifyFailure(text);
+  const summary = {
+    armId,
+    strategy: arm.strategy,
+    contextTokenBudget: arm.contextTokenBudget,
+    limit: arm.limit,
+    failureClass,
+    retryableProviderLimit: failureClass === "provider-rate-limit",
+  };
+  assertSafePublicText(JSON.stringify(summary), "autoresearch arm failure summary");
+  return summary;
+}
+
+function classifyFailure(text) {
+  const value = String(text ?? "").toLowerCase();
+  if (/\bstatus 429\b/.test(value) || value.includes("rate limit") || value.includes("quota")) return "provider-rate-limit";
+  if (value.includes("aborterror") || value.includes("timeout") || value.includes("timed out") || value.includes("etimedout")) return "provider-timeout";
+  if (value.includes("sigterm") || value.includes("sigkill")) return "arm-terminated";
+  if (/\bstatus 5\d\d\b/.test(value)) return "provider-server-error";
+  if (value.includes("requires recallweave_provider_benchmark_calls")) return "provider-env-not-enabled";
+  if (value.includes("provider key missing") || value.includes("requires gemini") || value.includes("requires voyage") || value.includes("requires nvidia")) {
+    return "provider-credentials-missing";
+  }
+  if (value.includes("privacy") || value.includes("contains a key-shaped secret") || value.includes("private path")) return "public-safety-check-failed";
+  return "autoresearch-arm-failed";
+}
+
+function sanitizeFailureText(text) {
+  return String(text).replace(privatePathOutputPattern, "<private-path>");
 }
 
 function assertSafePublicText(text, label) {

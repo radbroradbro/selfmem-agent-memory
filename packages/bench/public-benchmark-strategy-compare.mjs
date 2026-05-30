@@ -15,11 +15,13 @@ const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC
 const gate = normalizeGate(args.gate ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_GATE ?? "strategy");
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_STRATEGIES ?? defaultStrategies(gate));
 const allowSoloSmoke = Boolean(args.allowSoloSmoke) || process.env.RECALLWEAVE_ALLOW_SOLO_BENCHMARK_SMOKE === "1";
+const allowPartial = Boolean(args.allowPartial) || process.env.RECALLWEAVE_PUBLIC_BENCHMARK_ALLOW_PARTIAL === "1";
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 1600, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
+const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
 
 const retrievalStrategies = [
   "jaccard",
@@ -67,6 +69,7 @@ assertGateContract(gate, strategies, { allowSoloSmoke });
 const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-strategy-compare-"));
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
 const results = [];
+const failedStrategies = [];
 
 for (const strategy of strategies) {
   const responsePath = resolve(runRoot, `${strategy}-responses.json`);
@@ -85,7 +88,6 @@ for (const strategy of strategies) {
     "--output",
     responsePath,
   ];
-  runNode(exportArgs, { live: !fixtureRequested });
   const collectArgs = [
     "packages/bench/recallweave-baseline-collector.mjs",
     ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath]),
@@ -96,42 +98,50 @@ for (const strategy of strategies) {
     "--output",
     resultPath,
   ];
-  runNode(collectArgs, {
-    live: !fixtureRequested,
-    env: {
-      RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
-      RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
-    },
-  });
-  const response = JSON.parse(readFileSync(responsePath, "utf8"));
-  const result = JSON.parse(readFileSync(resultPath, "utf8"));
-  assert.equal(result.retrievalProxyOnly, true);
-  assert.equal(result.memoryBenchAnswerQuality, false);
-  assert.equal(result.publicBenchmarkClaimsAllowed, false);
-  assert.equal(result.privacyLeakCount, 0);
-  assert.equal(result.redactionFailureCount, 0);
-  results.push({
-    strategy,
-    querySetHash: result.querySetHash,
-    responsesHash: `sha256:${fileHash(responsePath)}`,
-    resultHash: `sha256:${fileHash(resultPath)}`,
-    rankingStrategy: response.source?.rankingStrategy ?? null,
-    provider: response.source?.provider ?? null,
-    metrics: result.metrics,
-    contextBudget: result.retrievalConfig?.contextBudget ?? null,
-    privacyLeakCount: result.privacyLeakCount,
-    redactionFailureCount: result.redactionFailureCount,
-    resultFingerprints: (result.resultFingerprints ?? []).map((item) => ({
-      queryIdHash: item.queryIdHash,
-      topResultIdHash: item.topResultIdHash,
-      pAt1: item.pAt1,
-      recallAt5: item.recallAt5,
-      recallAt10: item.recallAt10,
-      ndcgAt10: item.ndcgAt10,
-    })),
-  });
+  try {
+    runNode(exportArgs, { live: !fixtureRequested });
+    runNode(collectArgs, {
+      live: !fixtureRequested,
+      env: {
+        RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
+        RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
+      },
+    });
+    const response = JSON.parse(readFileSync(responsePath, "utf8"));
+    const result = JSON.parse(readFileSync(resultPath, "utf8"));
+    assert.equal(result.retrievalProxyOnly, true);
+    assert.equal(result.memoryBenchAnswerQuality, false);
+    assert.equal(result.publicBenchmarkClaimsAllowed, false);
+    assert.equal(result.privacyLeakCount, 0);
+    assert.equal(result.redactionFailureCount, 0);
+    results.push({
+      strategy,
+      querySetHash: result.querySetHash,
+      responsesHash: `sha256:${fileHash(responsePath)}`,
+      resultHash: `sha256:${fileHash(resultPath)}`,
+      rankingStrategy: response.source?.rankingStrategy ?? null,
+      provider: response.source?.provider ?? null,
+      queryShard: response.queryShard ?? null,
+      metrics: result.metrics,
+      contextBudget: result.retrievalConfig?.contextBudget ?? null,
+      privacyLeakCount: result.privacyLeakCount,
+      redactionFailureCount: result.redactionFailureCount,
+      resultFingerprints: (result.resultFingerprints ?? []).map((item) => ({
+        queryIdHash: item.queryIdHash,
+        topResultIdHash: item.topResultIdHash,
+        pAt1: item.pAt1,
+        recallAt5: item.recallAt5,
+        recallAt10: item.recallAt10,
+        ndcgAt10: item.ndcgAt10,
+      })),
+    });
+  } catch (error) {
+    if (!allowPartial) throw error;
+    failedStrategies.push(strategyFailureSummary(strategy, error));
+  }
 }
 
+assert.ok(results.length > 0, "strategy comparison produced no completed arms");
 const querySetHashes = new Set(results.map((item) => item.querySetHash));
 assert.equal(querySetHashes.size, 1, "all strategies must use the same query set");
 if (input.collectorCompatibleQuerySetHash) {
@@ -141,7 +151,8 @@ if (input.collectorCompatibleQuerySetHash) {
 const promotion = promotionDecision(gate, results);
 const report = {
   schemaVersion: 1,
-  ok: true,
+  ok: failedStrategies.length === 0,
+  status: failedStrategies.length === 0 ? "COMPLETED" : "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
   mode: gate === "provider" ? "public-benchmark-provider-gate" : gate === "hybrid" ? "public-benchmark-hybrid-gate" : "public-benchmark-strategy-compare",
   gate,
   fixtureOnly: fixtureRequested,
@@ -158,6 +169,7 @@ const report = {
   rawMemoryIncluded: false,
   rawTranscriptIncluded: false,
   rawPrivateOutputPathIncluded: false,
+  partialResultsAllowed: allowPartial,
   generatedAt: new Date().toISOString(),
   input: {
     source: input.source,
@@ -173,8 +185,11 @@ const report = {
       maxQueries,
       completeDataset: queryOffset === 0 && !maxQueries,
     },
+    selectedQueryCount: results[0]?.queryShard?.responseCount ?? null,
+    armTimeoutMs,
   },
   strategies: results,
+  failedStrategies,
   winner: bestStrategy(results),
   control: summarizeNamedStrategy(results, "bm25-lite"),
   promotion,
@@ -400,20 +415,23 @@ function renderMarkdown(value) {
   const decisionLabel = value.gate === "provider" ? "Provider arm decision" : "Hybrid decision";
   const decision = value.promotion ?? value.hybridPromotion;
   const decisionReason = decision.reason;
-  return [
+  const lines = [
     "# Public Benchmark Strategy Compare",
     "",
     `- OK: ${value.ok}`,
+    `- Status: ${value.status}`,
     `- Gate: ${value.gate}`,
     `- Fixture only: ${value.fixtureOnly}`,
     `- Benchmark: ${value.benchmark}`,
     `- Retrieval proxy only: ${value.retrievalProxyOnly}`,
     `- MemoryBench answer quality: ${value.memoryBenchAnswerQuality}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
+    `- Partial results allowed: ${value.partialResultsAllowed}`,
     `- Solo smoke only: ${value.comparisonContract.soloRunsAreSmokeOnly}`,
     `- Same-data controls required: ${value.comparisonContract.sameDataControlsRequired}`,
     `- Query set hash: ${value.input.querySetHash}`,
     `- Query count: ${value.input.queryCount}`,
+    `- Selected query count: ${value.input.selectedQueryCount ?? "unknown"}`,
     `- Expected result refs: ${value.input.expectedResultRefCount}`,
     `- Winner: ${value.winner?.strategy ?? "none"}`,
     `- ${promotionLabel}: ${value.gate === "provider" ? Boolean(decision.promoteProvider) : Boolean(decision.promoteHybrid)}`,
@@ -427,6 +445,18 @@ function renderMarkdown(value) {
       `| ${item.strategy} | ${item.provider?.modelArm ?? "none"} | ${item.metrics.quality} | ${item.metrics.pAt1} | ${item.metrics.recallAt5} | ${item.metrics.recallAt10} | ${item.metrics.ndcgAt10} | ${item.metrics.latencyP50Ms} |`,
     ),
     "",
+  ];
+  if (value.failedStrategies.length) {
+    lines.push(
+      "## Failed Arms",
+      "",
+      "| Strategy | Failure class | Retryable/provider limit |",
+      "| --- | --- | ---: |",
+      ...value.failedStrategies.map((item) => `| ${item.strategy} | ${item.failureClass} | ${item.retryableProviderLimit} |`),
+      "",
+    );
+  }
+  lines.push(
     "## Safety",
     "",
     `- Raw questions included: ${value.rawQuestionsIncluded}`,
@@ -434,7 +464,8 @@ function renderMarkdown(value) {
     `- Raw memory included: ${value.rawMemoryIncluded}`,
     `- Raw transcript included: ${value.rawTranscriptIncluded}`,
     `- Private output path included: ${value.rawPrivateOutputPathIncluded}`,
-  ].join("\n");
+  );
+  return lines.join("\n");
 }
 
 function defaultStrategies(value) {
@@ -500,6 +531,7 @@ function comparisonContract(value, strategyNames, options = {}) {
   return {
     soloRunsAreSmokeOnly: true,
     allowSoloSmoke: Boolean(options.allowSoloSmoke),
+    partialResultsAllowed: allowPartial,
     sameDataControlsRequired: !options.allowSoloSmoke,
     bm25ControlRequired: !options.allowSoloSmoke,
     bm25ControlPresent: strategySet.has("bm25-lite"),
@@ -512,6 +544,32 @@ function comparisonContract(value, strategyNames, options = {}) {
     actualBenchmarkTargetRequiredForClaims: true,
     publicClaimsAllowedByThisReport: false,
   };
+}
+
+function strategyFailureSummary(strategy, error) {
+  const text = sanitizeFailureText(error?.message ?? error ?? "");
+  const failureClass = classifyFailure(text);
+  const summary = {
+    strategy,
+    failureClass,
+    retryableProviderLimit: failureClass === "provider-rate-limit",
+  };
+  assertSafePublicText(JSON.stringify(summary), "strategy failure summary");
+  return summary;
+}
+
+function classifyFailure(text) {
+  const value = String(text ?? "").toLowerCase();
+  if (/\bstatus 429\b/.test(value) || value.includes("rate limit") || value.includes("quota")) return "provider-rate-limit";
+  if (value.includes("aborterror") || value.includes("timeout") || value.includes("timed out") || value.includes("etimedout")) return "provider-timeout";
+  if (value.includes("sigterm") || value.includes("sigkill")) return "arm-terminated";
+  if (/\bstatus 5\d\d\b/.test(value)) return "provider-server-error";
+  if (value.includes("requires recallweave_provider_benchmark_calls")) return "provider-env-not-enabled";
+  if (value.includes("provider key missing") || value.includes("requires gemini") || value.includes("requires voyage") || value.includes("requires nvidia")) {
+    return "provider-credentials-missing";
+  }
+  if (value.includes("privacy") || value.includes("contains a key-shaped secret") || value.includes("private path")) return "public-safety-check-failed";
+  return "strategy-arm-failed";
 }
 
 function isHybridFamilyStrategy(strategy) {
@@ -559,8 +617,15 @@ function runNode(argv, options = {}) {
         : {}),
       ...(options.env ?? {}),
     },
+    ...(armTimeoutMs ? { timeout: armTimeoutMs, killSignal: "SIGTERM" } : {}),
     stdio: ["ignore", "pipe", "pipe"],
   });
+  if (result.error?.code === "ETIMEDOUT") {
+    throw new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`);
+  }
+  if (result.signal) {
+    throw new Error(`node ${argv.join(" ")} terminated by signal ${result.signal}`);
+  }
   if (result.status !== 0) {
     throw new Error(sanitizeFailureText(`node ${argv.join(" ")} failed\n${result.stdout}\n${result.stderr}`));
   }
