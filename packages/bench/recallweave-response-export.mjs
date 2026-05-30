@@ -56,6 +56,8 @@ const retrievalStrategies = [
   "cloud-nvidia-nemotron-vl-1b",
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
+  "cloud-nvidia-nv-embed-v1-mistral-rerank",
+  "cloud-nvidia-embedcode-7b-mistral-rerank",
   "local-apple-qwen3-0_6b",
   "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
@@ -176,6 +178,9 @@ const result = {
     memoriesFileName: basename(effectiveMemoriesPath),
     preserveIds,
     rankingStrategy,
+    benchmarkArmIdHash: process.env.RECALLWEAVE_BENCHMARK_ARM_ID ? shortHash(process.env.RECALLWEAVE_BENCHMARK_ARM_ID) : null,
+    benchmarkContainerTagHash: process.env.RECALLWEAVE_BENCHMARK_ARM_CONTAINER_TAG ? shortHash(process.env.RECALLWEAVE_BENCHMARK_ARM_CONTAINER_TAG) : null,
+    localEmbeddingCachePathHash: process.env.SELFMEM_LOCAL_EMBED_CACHE_PATH ? `sha256:${stableHash(process.env.SELFMEM_LOCAL_EMBED_CACHE_PATH)}` : null,
     provider: providerStats.summary(),
   },
   privacyLeakCount: 0,
@@ -1196,6 +1201,8 @@ function isProviderStrategy(strategy) {
     "cloud-nvidia-nemotron-vl-1b",
     "cloud-nvidia-e5-mistral",
     "cloud-nvidia-code",
+    "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "cloud-nvidia-embedcode-7b-mistral-rerank",
     "local-apple-qwen3-0_6b",
     "local-apple-qwen3-0_6b-local-rerank",
     "local-apple-qwen3-4b",
@@ -1508,41 +1515,41 @@ async function localAppleRerank(query, candidates, options = {}) {
 }
 
 async function geminiPost(path, body, options = {}) {
-  const key = chooseProviderKey("gemini", options.seed ?? path);
+  const seed = options.seed ?? path;
   return providerPostJson({
     provider: "gemini",
     url: `https://generativelanguage.googleapis.com/v1beta/${path}`,
     body,
-    headers: {
+    headers: ({ attempt }) => ({
       "content-type": "application/json",
-      "x-goog-api-key": key,
-    },
+      "x-goog-api-key": chooseProviderKey("gemini", `${seed}:attempt:${attempt}`),
+    }),
   });
 }
 
 async function voyagePost(path, body, options = {}) {
-  const key = chooseProviderKey("voyage", options.seed ?? path);
+  const seed = options.seed ?? path;
   return providerPostJson({
     provider: "voyage",
     url: `https://api.voyageai.com${path}`,
     body,
-    headers: {
+    headers: ({ attempt }) => ({
       "content-type": "application/json",
-      authorization: `Bearer ${key}`,
-    },
+      authorization: `Bearer ${chooseProviderKey("voyage", `${seed}:attempt:${attempt}`)}`,
+    }),
   });
 }
 
 async function nvidiaPost(url, body, options = {}) {
-  const key = chooseProviderKey("nvidia", options.seed ?? url);
+  const seed = options.seed ?? url;
   return providerPostJson({
     provider: "nvidia",
     url,
     body,
-    headers: {
+    headers: ({ attempt }) => ({
       "content-type": "application/json",
-      authorization: `Bearer ${key}`,
-    },
+      authorization: `Bearer ${chooseProviderKey("nvidia", `${seed}:attempt:${attempt}`)}`,
+    }),
   });
 }
 
@@ -1555,9 +1562,10 @@ async function providerPostJson({ provider, url, body, headers }) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
+      const requestHeaders = typeof headers === "function" ? headers({ attempt }) : headers;
       const response = await fetch(url, {
         method: "POST",
-        headers,
+        headers: requestHeaders,
         body: JSON.stringify(body),
         signal: controller.signal,
       });
@@ -2177,6 +2185,16 @@ function nvidiaStrategyConfig(strategy) {
     "cloud-nvidia-code": {
       embedModel: "nvidia/nv-embedcode-7b-v1",
       rerankModel: "nvidia/llama-nemotron-rerank-1b-v2",
+    },
+    "cloud-nvidia-nv-embed-v1-mistral-rerank": {
+      embedModel: "nvidia/nv-embed-v1",
+      rerankModel: "nvidia/rerank-qa-mistral-4b",
+      freeEndpointOnly: true,
+    },
+    "cloud-nvidia-embedcode-7b-mistral-rerank": {
+      embedModel: "nvidia/nv-embedcode-7b-v1",
+      rerankModel: "nvidia/rerank-qa-mistral-4b",
+      freeEndpointOnly: true,
     },
   };
   return configs[strategy] ?? null;

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -39,6 +39,18 @@ const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAV
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
 const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
+const includesProviderBackedStrategies = strategies.some((strategy) => strategy.startsWith("cloud-") || strategy.startsWith("local-apple-"));
+const providerTimeoutMs =
+  optionalPositiveInt(args.providerTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ??
+  (!fixtureRequested && includesProviderBackedStrategies ? 45_000 : 0);
+const providerRetryAttempts =
+  optionalPositiveInt(args.providerRetryAttempts ?? process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ??
+  (!fixtureRequested && includesProviderBackedStrategies ? 2 : 0);
+const parallelArms = optionalPositiveInt(args.parallelArms ?? process.env.RECALLWEAVE_BENCHMARK_PARALLEL_ARMS ?? null, "parallel arms") ?? 1;
+const isolateArms =
+  Boolean(args.isolateArms) ||
+  process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS === "1" ||
+  (!fixtureRequested && includesProviderBackedStrategies && process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS !== "0");
 
 const retrievalStrategies = [
   "jaccard",
@@ -67,6 +79,8 @@ const retrievalStrategies = [
   "cloud-nvidia-nemotron-vl-1b",
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
+  "cloud-nvidia-nv-embed-v1-mistral-rerank",
+  "cloud-nvidia-embedcode-7b-mistral-rerank",
   "local-apple-qwen3-0_6b",
 ];
 const secretPattern =
@@ -86,12 +100,19 @@ const arms = buildArms({ strategies, budgets, limits });
 const results = [];
 const failedArms = [];
 
-for (const arm of arms) {
+const armOutcomes = await mapLimit(arms, parallelArms, runAutoresearchArm);
+for (const outcome of armOutcomes) {
+  if (outcome.result) results.push(outcome.result);
+  if (outcome.failure) failedArms.push(outcome.failure);
+}
+
+async function runAutoresearchArm(arm) {
   const label = `${arm.strategy}-b${arm.contextTokenBudget}-k${arm.limit}`;
   const responsePath = resolve(runRoot, `${label}-responses.json`);
   const resultPath = resolve(runRoot, `${label}-result.json`);
+  const armContext = armRunContext(label, runRoot);
   try {
-    runNode(
+    await runNodeAsync(
       [
         "packages/bench/recallweave-response-export.mjs",
         ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath, "--memories", input.memoriesPath, "--preserve-ids"]),
@@ -108,9 +129,9 @@ for (const arm of arms) {
         "--output",
         responsePath,
       ],
-      { live: !fixtureRequested },
+      { live: !fixtureRequested, env: armContext.env },
     );
-    runNode(
+    await runNodeAsync(
       [
         "packages/bench/recallweave-baseline-collector.mjs",
         ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath]),
@@ -126,6 +147,7 @@ for (const arm of arms) {
       {
         live: !fixtureRequested,
         env: {
+          ...armContext.env,
           RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
           RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
         },
@@ -138,7 +160,7 @@ for (const arm of arms) {
     assert.equal(result.publicBenchmarkClaimsAllowed, false);
     assert.equal(result.privacyLeakCount, 0);
     assert.equal(result.redactionFailureCount, 0);
-    results.push({
+    return { result: {
       armId: label,
       strategy: arm.strategy,
       contextTokenBudget: arm.contextTokenBudget,
@@ -147,15 +169,16 @@ for (const arm of arms) {
       responsesHash: `sha256:${fileHash(responsePath)}`,
       resultHash: `sha256:${fileHash(resultPath)}`,
       rankingStrategy: response.source?.rankingStrategy ?? result.retrievalConfig?.rankingStrategy ?? null,
+      armIsolation: armContext.summary,
       queryShard: response.queryShard ?? null,
       metrics: result.metrics,
       contextBudget: result.retrievalConfig?.contextBudget ?? null,
       privacyLeakCount: result.privacyLeakCount,
       redactionFailureCount: result.redactionFailureCount,
-    });
+    } };
   } catch (error) {
     if (!allowPartial) throw error;
-    failedArms.push(armFailureSummary(label, arm, error));
+    return { failure: armFailureSummary(label, arm, error) };
   }
 }
 
@@ -218,6 +241,10 @@ const report = {
       limits,
       maxMemoryBytes,
       armTimeoutMs,
+      providerTimeoutMs,
+      providerRetryAttempts,
+      parallelArms,
+      isolateArms,
     },
     keepDecision: winner ? `Use ${winner.strategy} with budget ${winner.contextTokenBudget} and limit ${winner.limit} for the next canary arm.` : "No winning arm.",
     rollbackPlan: "Fall back to the previous checked-in retrieval-proxy result and keep publicBenchmarkClaimsAllowed=false.",
@@ -328,6 +355,7 @@ function summarizeArm(item) {
     contextTokenBudget: item.contextTokenBudget,
     limit: item.limit,
     rankingStrategy: item.rankingStrategy,
+    armIsolation: item.armIsolation,
     metrics: item.metrics,
     contextBudget: item.contextBudget,
     privacyLeakCount: item.privacyLeakCount,
@@ -468,7 +496,15 @@ function runNode(argv, options = {}) {
     encoding: "utf8",
     env: {
       ...process.env,
-      ...(options.live ? { RECALLWEAVE_BASELINE_LIVE: "1", RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1" } : {}),
+      ...(options.live
+        ? {
+            RECALLWEAVE_BASELINE_LIVE: "1",
+            RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+            RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES: String(maxMemoryBytes),
+            ...(providerTimeoutMs ? { RECALLWEAVE_PROVIDER_TIMEOUT_MS: String(providerTimeoutMs) } : {}),
+            ...(providerRetryAttempts ? { RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS: String(providerRetryAttempts) } : {}),
+          }
+        : {}),
       RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
       SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
       ...(options.env ?? {}),
@@ -488,16 +524,128 @@ function runNode(argv, options = {}) {
   return result;
 }
 
+function runNodeAsync(argv, options = {}) {
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn(process.execPath, argv, {
+      cwd: root,
+      env: {
+        ...process.env,
+        ...(options.live
+          ? {
+              RECALLWEAVE_BASELINE_LIVE: "1",
+              RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+              RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES: String(maxMemoryBytes),
+              ...(providerTimeoutMs ? { RECALLWEAVE_PROVIDER_TIMEOUT_MS: String(providerTimeoutMs) } : {}),
+              ...(providerRetryAttempts ? { RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS: String(providerRetryAttempts) } : {}),
+            }
+          : {}),
+        RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
+        SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
+        ...(options.env ?? {}),
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    let timedOut = false;
+    const timeout = armTimeoutMs
+      ? setTimeout(() => {
+          timedOut = true;
+          child.kill("SIGTERM");
+        }, armTimeoutMs)
+      : null;
+    child.stdout?.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr?.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", (error) => {
+      if (timeout) clearTimeout(timeout);
+      reject(error);
+    });
+    child.on("close", (status, signal) => {
+      if (timeout) clearTimeout(timeout);
+      if (timedOut) {
+        reject(new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`));
+        return;
+      }
+      if (signal) {
+        reject(new Error(`node ${argv.join(" ")} terminated by signal ${signal}`));
+        return;
+      }
+      if (status !== 0) {
+        reject(new Error(sanitizeFailureText(`node ${argv.join(" ")} failed\n${stdout}\n${stderr}`)));
+        return;
+      }
+      try {
+        assertSafePublicText(stdout, "child stdout");
+        assertSafePublicText(stderr, "child stderr");
+        resolvePromise({ stdout, stderr, status, signal });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+}
+
+async function mapLimit(items, limit, worker) {
+  const workerCount = Math.max(1, Math.min(limit, items.length));
+  const outputs = new Array(items.length);
+  let nextIndex = 0;
+  await Promise.all(
+    Array.from({ length: workerCount }, async () => {
+      while (nextIndex < items.length) {
+        const index = nextIndex;
+        nextIndex += 1;
+        outputs[index] = await worker(items[index]);
+      }
+    }),
+  );
+  return outputs;
+}
+
+function armRunContext(label, runRootPath) {
+  if (!isolateArms) return { env: {}, summary: { isolated: false } };
+  const armId = sanitizeFileSegment(label);
+  const cachePath = resolve(runRootPath, "arm-caches", `${armId}-local-apple-embeddings.jsonl`);
+  mkdirSync(dirname(cachePath), { recursive: true });
+  const containerTag = `selfmem-bench-${shortHash(`${label}:${runRootPath}`)}`;
+  return {
+    env: {
+      RECALLWEAVE_BENCHMARK_ARM_ID: armId,
+      RECALLWEAVE_BENCHMARK_ARM_CONTAINER_TAG: containerTag,
+      SELFMEM_LOCAL_EMBED_CACHE_PATH: cachePath,
+    },
+    summary: {
+      isolated: true,
+      armIdHash: shortHash(armId),
+      containerTagHash: shortHash(containerTag),
+      localEmbeddingCachePathHash: `sha256:${stableHash(cachePath)}`,
+    },
+  };
+}
+
+function sanitizeFileSegment(value) {
+  return String(value ?? "arm")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120) || "arm";
+}
+
 function armFailureSummary(armId, arm, error) {
   const text = sanitizeFailureText(error?.message ?? error ?? "");
-  const failureClass = classifyFailure(text);
+  let failureClass = classifyFailure(text);
+  if (failureClass === "provider-timeout" && !isProviderBackedStrategy(arm.strategy)) failureClass = "arm-timeout";
   const summary = {
     armId,
     strategy: arm.strategy,
     contextTokenBudget: arm.contextTokenBudget,
     limit: arm.limit,
     failureClass,
-    retryableProviderLimit: failureClass === "provider-rate-limit",
+    retryableProviderLimit: isProviderBackedStrategy(arm.strategy) && ["provider-rate-limit", "provider-timeout"].includes(failureClass),
   };
   assertSafePublicText(JSON.stringify(summary), "autoresearch arm failure summary");
   return summary;
@@ -584,6 +732,10 @@ function fileHash(path) {
 
 function stableHash(value) {
   return createHash("sha256").update(String(value)).digest("hex");
+}
+
+function shortHash(value) {
+  return stableHash(String(value)).slice(0, 16);
 }
 
 function parseArgs(argv) {

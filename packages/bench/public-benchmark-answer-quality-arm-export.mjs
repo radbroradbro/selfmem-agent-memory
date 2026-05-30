@@ -72,6 +72,8 @@ const retrievalStrategies = new Set([
   "cloud-nvidia-nemotron-vl-1b",
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
+  "cloud-nvidia-nv-embed-v1-mistral-rerank",
+  "cloud-nvidia-embedcode-7b-mistral-rerank",
   "local-apple-qwen3-0_6b",
   "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
@@ -470,7 +472,7 @@ function defaultStrategies() {
     "full-hybrid-rerank",
     "query-expanded-full-hybrid-rerank",
     "cloud-voyage4-voyage-lite-rerank",
-    "cloud-nvidia-nemotron-1b",
+    "cloud-nvidia-nv-embed-v1-mistral-rerank",
     "local-apple-qwen3-0_6b",
     "local-apple-qwen3-0_6b-local-rerank",
   ];

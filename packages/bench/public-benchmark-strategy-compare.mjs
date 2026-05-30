@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -22,6 +22,15 @@ const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAV
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 5_000_000, "max memory bytes");
 const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
+const providerTimeoutMs =
+  optionalPositiveInt(args.providerTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ??
+  (!fixtureRequested && gate === "provider" ? 45_000 : 0);
+const providerRetryAttempts =
+  optionalPositiveInt(args.providerRetryAttempts ?? process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ??
+  (!fixtureRequested && gate === "provider" ? 2 : 0);
+const parallelArms = optionalPositiveInt(args.parallelArms ?? process.env.RECALLWEAVE_BENCHMARK_PARALLEL_ARMS ?? null, "parallel arms") ?? 1;
+const isolateArms =
+  Boolean(args.isolateArms) || process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS === "1" || (!fixtureRequested && gate === "provider" && process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS !== "0");
 
 const retrievalStrategies = [
   "jaccard",
@@ -50,6 +59,8 @@ const retrievalStrategies = [
   "cloud-nvidia-nemotron-vl-1b",
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
+  "cloud-nvidia-nv-embed-v1-mistral-rerank",
+  "cloud-nvidia-embedcode-7b-mistral-rerank",
   "local-apple-qwen3-0_6b",
   "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",
@@ -71,9 +82,16 @@ const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
 const results = [];
 const failedStrategies = [];
 
-for (const strategy of strategies) {
+const armOutcomes = await mapLimit(strategies, parallelArms, runStrategyArm);
+for (const outcome of armOutcomes) {
+  if (outcome.result) results.push(outcome.result);
+  if (outcome.failure) failedStrategies.push(outcome.failure);
+}
+
+async function runStrategyArm(strategy) {
   const responsePath = resolve(runRoot, `${strategy}-responses.json`);
   const resultPath = resolve(runRoot, `${strategy}-result.json`);
+  const armContext = armRunContext(strategy, runRoot);
   const exportArgs = [
     "packages/bench/recallweave-response-export.mjs",
     ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath, "--memories", input.memoriesPath, "--preserve-ids"]),
@@ -99,10 +117,11 @@ for (const strategy of strategies) {
     resultPath,
   ];
   try {
-    runNode(exportArgs, { live: !fixtureRequested });
-    runNode(collectArgs, {
+    await runNodeAsync(exportArgs, { live: !fixtureRequested, env: armContext.env });
+    await runNodeAsync(collectArgs, {
       live: !fixtureRequested,
       env: {
+        ...armContext.env,
         RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
         RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
       },
@@ -114,13 +133,14 @@ for (const strategy of strategies) {
     assert.equal(result.publicBenchmarkClaimsAllowed, false);
     assert.equal(result.privacyLeakCount, 0);
     assert.equal(result.redactionFailureCount, 0);
-    results.push({
+    return { result: {
       strategy,
       querySetHash: result.querySetHash,
       responsesHash: `sha256:${fileHash(responsePath)}`,
       resultHash: `sha256:${fileHash(resultPath)}`,
       rankingStrategy: response.source?.rankingStrategy ?? null,
       provider: response.source?.provider ?? null,
+      armIsolation: armContext.summary,
       queryShard: response.queryShard ?? null,
       metrics: result.metrics,
       contextBudget: result.retrievalConfig?.contextBudget ?? null,
@@ -134,25 +154,26 @@ for (const strategy of strategies) {
         recallAt10: item.recallAt10,
         ndcgAt10: item.ndcgAt10,
       })),
-    });
+    } };
   } catch (error) {
     if (!allowPartial) throw error;
-    failedStrategies.push(strategyFailureSummary(strategy, error));
+    return { failure: strategyFailureSummary(strategy, error) };
   }
 }
 
-assert.ok(results.length > 0, "strategy comparison produced no completed arms");
+assert.ok(results.length > 0 || failedStrategies.length > 0, "strategy comparison produced no completed or failed arms");
 const querySetHashes = new Set(results.map((item) => item.querySetHash));
-assert.equal(querySetHashes.size, 1, "all strategies must use the same query set");
-if (input.collectorCompatibleQuerySetHash) {
+if (results.length > 0) assert.equal(querySetHashes.size, 1, "all strategies must use the same query set");
+if (results.length > 0 && input.collectorCompatibleQuerySetHash) {
   assert.equal(results[0].querySetHash, input.collectorCompatibleQuerySetHash, "strategy run must bind to materialized query set");
 }
 
 const promotion = promotionDecision(gate, results);
+const status = results.length === 0 ? "FAILED_ALL_ARMS" : failedStrategies.length === 0 ? "COMPLETED" : "PARTIAL_COMPLETED_WITH_ARM_FAILURES";
 const report = {
   schemaVersion: 1,
   ok: failedStrategies.length === 0,
-  status: failedStrategies.length === 0 ? "COMPLETED" : "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+  status,
   mode: gate === "provider" ? "public-benchmark-provider-gate" : gate === "hybrid" ? "public-benchmark-hybrid-gate" : "public-benchmark-strategy-compare",
   gate,
   fixtureOnly: fixtureRequested,
@@ -174,7 +195,7 @@ const report = {
   input: {
     source: input.source,
     datasetSlice: input.datasetSlice,
-    querySetHash: results[0].querySetHash,
+    querySetHash: results[0]?.querySetHash ?? input.collectorCompatibleQuerySetHash ?? null,
     collectorCompatibleQuerySetHash: input.collectorCompatibleQuerySetHash ?? null,
     materializerHash: input.materializerHash ?? null,
     queryCount: input.queryCount,
@@ -187,6 +208,10 @@ const report = {
     },
     selectedQueryCount: results[0]?.queryShard?.responseCount ?? null,
     armTimeoutMs,
+    providerTimeoutMs,
+    providerRetryAttempts,
+    parallelArms,
+    isolateArms,
   },
   strategies: results,
   failedStrategies,
@@ -481,9 +506,8 @@ function defaultStrategies(value) {
       "cloud-gemini-voyage-rerank",
       "cloud-gemini2-embed-rerank-proxy",
       "cloud-gemini2-voyage-rerank",
-      "cloud-nvidia-retriever-500m",
-      "cloud-nvidia-nemotron-1b",
-      "cloud-nvidia-e5-mistral",
+      "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "cloud-nvidia-embedcode-7b-mistral-rerank",
       "local-apple-qwen3-0_6b",
     ].join(",");
   }
@@ -548,11 +572,12 @@ function comparisonContract(value, strategyNames, options = {}) {
 
 function strategyFailureSummary(strategy, error) {
   const text = sanitizeFailureText(error?.message ?? error ?? "");
-  const failureClass = classifyFailure(text);
+  let failureClass = classifyFailure(text);
+  if (failureClass === "provider-timeout" && !isProviderBackedStrategy(strategy)) failureClass = "arm-timeout";
   const summary = {
     strategy,
     failureClass,
-    retryableProviderLimit: failureClass === "provider-rate-limit",
+    retryableProviderLimit: isProviderBackedStrategy(strategy) && ["provider-rate-limit", "provider-timeout"].includes(failureClass),
   };
   assertSafePublicText(JSON.stringify(summary), "strategy failure summary");
   return summary;
@@ -613,6 +638,8 @@ function runNode(argv, options = {}) {
             RECALLWEAVE_BASELINE_LIVE: "1",
             RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
             RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES: String(maxMemoryBytes),
+            ...(providerTimeoutMs ? { RECALLWEAVE_PROVIDER_TIMEOUT_MS: String(providerTimeoutMs) } : {}),
+            ...(providerRetryAttempts ? { RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS: String(providerRetryAttempts) } : {}),
           }
         : {}),
       ...(options.env ?? {}),
@@ -632,6 +659,115 @@ function runNode(argv, options = {}) {
   assertSafePublicText(result.stdout, "child stdout");
   assertSafePublicText(result.stderr, "child stderr");
   return result;
+}
+
+function runNodeAsync(argv, options = {}) {
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn(process.execPath, argv, {
+      cwd: root,
+      env: {
+        ...process.env,
+        ...(options.live
+          ? {
+              RECALLWEAVE_BASELINE_LIVE: "1",
+              RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+              RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES: String(maxMemoryBytes),
+              ...(providerTimeoutMs ? { RECALLWEAVE_PROVIDER_TIMEOUT_MS: String(providerTimeoutMs) } : {}),
+              ...(providerRetryAttempts ? { RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS: String(providerRetryAttempts) } : {}),
+            }
+          : {}),
+        ...(options.env ?? {}),
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    let timedOut = false;
+    const timeout = armTimeoutMs
+      ? setTimeout(() => {
+          timedOut = true;
+          child.kill("SIGTERM");
+        }, armTimeoutMs)
+      : null;
+    child.stdout?.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr?.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", (error) => {
+      if (timeout) clearTimeout(timeout);
+      reject(error);
+    });
+    child.on("close", (status, signal) => {
+      if (timeout) clearTimeout(timeout);
+      if (timedOut) {
+        reject(new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`));
+        return;
+      }
+      if (signal) {
+        reject(new Error(`node ${argv.join(" ")} terminated by signal ${signal}`));
+        return;
+      }
+      if (status !== 0) {
+        reject(new Error(sanitizeFailureText(`node ${argv.join(" ")} failed\n${stdout}\n${stderr}`)));
+        return;
+      }
+      try {
+        assertSafePublicText(stdout, "child stdout");
+        assertSafePublicText(stderr, "child stderr");
+        resolvePromise({ stdout, stderr, status, signal });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+}
+
+async function mapLimit(items, limit, worker) {
+  const workerCount = Math.max(1, Math.min(limit, items.length));
+  const outputs = new Array(items.length);
+  let nextIndex = 0;
+  await Promise.all(
+    Array.from({ length: workerCount }, async () => {
+      while (nextIndex < items.length) {
+        const index = nextIndex;
+        nextIndex += 1;
+        outputs[index] = await worker(items[index]);
+      }
+    }),
+  );
+  return outputs;
+}
+
+function armRunContext(label, runRootPath) {
+  if (!isolateArms) return { env: {}, summary: { isolated: false } };
+  const armId = sanitizeFileSegment(label);
+  const cachePath = resolve(runRootPath, "arm-caches", `${armId}-local-apple-embeddings.jsonl`);
+  mkdirSync(dirname(cachePath), { recursive: true });
+  const containerTag = `selfmem-bench-${shortHash(`${label}:${runRootPath}`)}`;
+  return {
+    env: {
+      RECALLWEAVE_BENCHMARK_ARM_ID: armId,
+      RECALLWEAVE_BENCHMARK_ARM_CONTAINER_TAG: containerTag,
+      SELFMEM_LOCAL_EMBED_CACHE_PATH: cachePath,
+    },
+    summary: {
+      isolated: true,
+      armIdHash: shortHash(armId),
+      containerTagHash: shortHash(containerTag),
+      localEmbeddingCachePathHash: `sha256:${stableHash(cachePath)}`,
+    },
+  };
+}
+
+function sanitizeFileSegment(value) {
+  return String(value ?? "arm")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120) || "arm";
 }
 
 function sanitizeFailureText(text) {
@@ -701,6 +837,10 @@ function fileHash(path) {
 
 function stableHash(value) {
   return createHash("sha256").update(String(value)).digest("hex");
+}
+
+function shortHash(value) {
+  return stableHash(String(value)).slice(0, 16);
 }
 
 function parseArgs(argv) {

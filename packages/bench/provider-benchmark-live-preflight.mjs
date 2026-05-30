@@ -13,7 +13,7 @@ const requireReady = Boolean(args.requireReady);
 const strategies = splitList(
   args.strategies ??
     process.env.RECALLWEAVE_PUBLIC_PROVIDER_PREFLIGHT_STRATEGIES ??
-    "bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-gemini2-embed-rerank-proxy,cloud-gemini2-voyage-rerank,cloud-nvidia-retriever-500m,cloud-nvidia-nemotron-1b,cloud-nvidia-e5-mistral,local-apple-qwen3-0_6b",
+    "bm25-lite,full-hybrid-rerank,cloud-voyage-rerank-only,cloud-voyage4-voyage,cloud-gemini-embed-rerank-proxy,cloud-gemini-voyage-rerank,cloud-gemini2-embed-rerank-proxy,cloud-gemini2-voyage-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank,cloud-nvidia-embedcode-7b-mistral-rerank,local-apple-qwen3-0_6b",
 );
 
 const knownStrategies = new Set([
@@ -32,6 +32,8 @@ const knownStrategies = new Set([
   "cloud-nvidia-nemotron-vl-1b",
   "cloud-nvidia-e5-mistral",
   "cloud-nvidia-code",
+  "cloud-nvidia-nv-embed-v1-mistral-rerank",
+  "cloud-nvidia-embedcode-7b-mistral-rerank",
   "local-apple-qwen3-0_6b",
   "local-apple-qwen3-0_6b-local-rerank",
   "local-apple-qwen3-4b",

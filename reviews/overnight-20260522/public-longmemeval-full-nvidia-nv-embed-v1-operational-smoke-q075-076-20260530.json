@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "status": "FAILED_ALL_ARMS",
+  "mode": "public-benchmark-provider-gate",
+  "gate": "provider",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "comparisonContract": {
+    "soloRunsAreSmokeOnly": true,
+    "allowSoloSmoke": true,
+    "partialResultsAllowed": true,
+    "sameDataControlsRequired": false,
+    "bm25ControlRequired": false,
+    "bm25ControlPresent": false,
+    "hybridFamilyRequired": false,
+    "hybridFamilyPresent": false,
+    "fullHybridControlRequired": true,
+    "fullHybridControlPresent": false,
+    "providerArmRequired": true,
+    "providerArmPresent": true,
+    "actualBenchmarkTargetRequiredForClaims": true,
+    "publicClaimsAllowedByThisReport": false
+  },
+  "publicSafe": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "partialResultsAllowed": true,
+  "generatedAt": "2026-05-30T22:31:55.745Z",
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "querySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "collectorCompatibleQuerySetHash": "sha256:04e10ea57d93b48fe6a7182b30920fe93676d597b91e19c6f7db4f29cbacfa95",
+    "materializerHash": "sha256:220564c62d907835d3f33f4be979ff2ea431853ff85bd138a1cb698ce9f97d00",
+    "queryCount": 500,
+    "expectedResultRefCount": 1896,
+    "haystackSessionCount": 19195,
+    "requestedQuerySelection": {
+      "queryOffset": 75,
+      "maxQueries": 1,
+      "completeDataset": false
+    },
+    "selectedQueryCount": null,
+    "armTimeoutMs": 60000,
+    "providerTimeoutMs": 15000,
+    "providerRetryAttempts": 1,
+    "parallelArms": 1,
+    "isolateArms": true
+  },
+  "strategies": [],
+  "failedStrategies": [
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    }
+  ],
+  "winner": null,
+  "control": null,
+  "promotion": {
+    "kind": "provider",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Missing bm25-lite control, full-hybrid-rerank control, or provider-backed arm."
+  },
+  "hybridPromotion": {
+    "kind": "provider",
+    "promoteProvider": false,
+    "promoteHybrid": false,
+    "reason": "Missing bm25-lite control, full-hybrid-rerank control, or provider-backed arm."
+  },
+  "safety": {
+    "publicSafe": true,
+    "metricsOnly": true,
+    "privateInputsStoredOutsideRepository": true,
+    "printsCredentials": false
+  },
+  "nextActions": [
+    "Keep provider-backed arms opt-in until the operator sets provider-call and public-data environment guards.",
+    "Compare Voyage, Gemini, NVIDIA, and local Apple Silicon provider arms against bm25-lite on the same source-locked data before any default promotion.",
+    "Do not turn provider-backed retrieval-proxy metrics into MemoryBench answer-quality claims."
+  ]
+}

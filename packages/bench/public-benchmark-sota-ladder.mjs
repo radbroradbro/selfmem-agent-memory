@@ -70,6 +70,8 @@ const requiredArms = [
     status: hasAnyMemoryStrategy(rows, [
       "cloud-nvidia-retriever-500m",
       "cloud-nvidia-nemotron-1b",
+      "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "cloud-nvidia-embedcode-7b-mistral-rerank",
       "cloud-nvidia-e5-mistral",
       "cloud-gemini-embed-rerank-proxy",
       "cloud-gemini-voyage-rerank",
@@ -82,6 +84,8 @@ const requiredArms = [
           [
             "cloud-nvidia-retriever-500m",
             "cloud-nvidia-nemotron-1b",
+            "cloud-nvidia-nv-embed-v1-mistral-rerank",
+            "cloud-nvidia-embedcode-7b-mistral-rerank",
             "cloud-nvidia-e5-mistral",
             "cloud-gemini-embed-rerank-proxy",
             "cloud-gemini-voyage-rerank",

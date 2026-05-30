@@ -14,7 +14,7 @@ const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPa
 const format = String(args.format ?? "json").toLowerCase();
 const sameDataStrategies = splitList(
   args.strategies ??
-    "bm25-lite,dense-proxy,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini2-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank",
+    "bm25-lite,dense-proxy,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini2-voyage-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank",
 );
 const providerPreflightStrategies = sameDataStrategies.filter((strategy) => providerPreflightStrategy(strategy));
 const minimumVoyageAnswerQualityStrategies = ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-lite-voyage-lite"];

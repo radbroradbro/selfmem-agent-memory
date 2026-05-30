@@ -131,10 +131,10 @@ function runPreflight({ targetPath, strategies }) {
 
 function defaultStrategies(provider) {
   if (provider === "voyage") return "bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage";
-  if (provider === "nvidia") return "bm25-lite,full-hybrid-rerank,cloud-nvidia-nemotron-1b";
+  if (provider === "nvidia") return "bm25-lite,full-hybrid-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank,cloud-nvidia-nemotron-vl-1b";
   if (provider === "gemini") return "bm25-lite,full-hybrid-rerank,cloud-gemini2-voyage-rerank";
   if (provider === "local-apple") return "bm25-lite,full-hybrid-rerank,local-apple-qwen3-0_6b";
-  return "bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini2-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b";
+  return "bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini2-voyage-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank,local-apple-qwen3-0_6b";
 }
 
 function providerArmStrategy(strategy) {

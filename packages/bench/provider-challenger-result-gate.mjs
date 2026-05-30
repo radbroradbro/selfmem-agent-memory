@@ -47,7 +47,7 @@ function loadResult() {
         "--gate",
         "provider",
         "--strategies",
-        "bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b",
+        "bm25-lite,full-hybrid-rerank,cloud-voyage4-voyage,cloud-gemini-voyage-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank,local-apple-qwen3-0_6b",
       ],
       { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
     );

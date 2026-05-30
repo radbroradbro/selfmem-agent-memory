@@ -208,10 +208,10 @@ function buildProviderMatrix() {
     },
     {
       family: "nvidia",
-      harnessArm: "cloud-nvidia-nemotron-vl-1b",
+      harnessArm: "cloud-nvidia-nv-embed-v1-mistral-rerank",
       role: "free-nim-retrieval-challenger",
-      embedModel: "nvidia/llama-nemotron-embed-vl-1b-v2",
-      rerankModel: "nvidia/llama-nemotron-rerank-vl-1b-v2",
+      embedModel: "nvidia/nv-embed-v1",
+      rerankModel: "nvidia/rerank-qa-mistral-4b",
       costClass: "zero-dollar-free-nim",
       safeRpmCap: 30,
       upperRpmCapByUserBudget: 40,

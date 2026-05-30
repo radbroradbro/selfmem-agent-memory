@@ -3068,13 +3068,13 @@ check("fresh public benchmark target check passes", () => {
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini-voyage-rerank" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini2-embed-rerank-proxy" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-gemini2-voyage-rerank" && item.provider?.fixtureProviderMock === true));
-  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-nvidia-nemotron-1b" && item.provider?.fixtureProviderMock === true));
+  assert.ok(providerFixture.strategies?.some((item) => item.strategy === "cloud-nvidia-nv-embed-v1-mistral-rerank" && item.provider?.fixtureProviderMock === true));
   assert.ok(providerFixture.strategies?.some((item) => item.strategy === "local-apple-qwen3-0_6b" && item.provider?.fixtureProviderMock === true));
   assert.match(providerMarkdown, /Gate: provider/);
   assert.match(providerMarkdown, /cloud-voyage4-voyage/);
   assert.match(providerMarkdown, /cloud-gemini-voyage-rerank/);
   assert.match(providerMarkdown, /cloud-gemini2-voyage-rerank/);
-  assert.match(providerMarkdown, /cloud-nvidia-nemotron-1b/);
+  assert.match(providerMarkdown, /cloud-nvidia-nv-embed-v1-mistral-rerank/);
   assert.match(providerMarkdown, /local-apple-qwen3-0_6b/);
   assert.equal(autoresearchFixture.ok, true);
   assert.equal(autoresearchFixture.mode, "public-benchmark-autoresearch-loop");
