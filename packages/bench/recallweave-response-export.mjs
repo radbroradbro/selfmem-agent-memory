@@ -305,11 +305,11 @@ function memoryFeatureProfile(strategy) {
       metadata: true,
       tokens: true,
       tokenSet: true,
-      bigramSet: true,
-      semanticVector: true,
+      bigramSet: false,
+      semanticVector: false,
       topicTermSet: true,
-      roleCoverage: true,
-      dateMs: true,
+      roleCoverage: false,
+      dateMs: false,
       wikiSignals: true,
     };
   }
@@ -478,56 +478,62 @@ async function rankQueryExpandedFullHybridRerank(query, candidates, options = {}
 }
 
 function rankWikiTitleAmplifiedHybrid(query, candidates) {
+  const pool = rankWikiCandidatePool(query, candidates, wikiCandidateLimit());
   const firstStage = fuseRankedChannels(
-    candidates,
+    pool,
     [
-      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryTextValue(query), candidates) },
-      { name: "wiki-title", weight: 0.95, ranked: rankWikiTitleProxy(query, candidates) },
-      { name: "wiki-dense", weight: 0.7, ranked: rankWikiAmplifiedDenseProxy(query, candidates) },
-      { name: "metadata", weight: metadataWeight(query), ranked: rankMetadataAlignment(query, candidates) },
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryTextValue(query), pool) },
+      { name: "wiki-title", weight: 0.95, ranked: rankWikiTitleProxy(query, pool) },
+      { name: "wiki-dense", weight: 0.7, ranked: rankWikiAmplifiedDenseProxy(query, pool) },
+      { name: "metadata", weight: metadataWeight(query), ranked: rankMetadataAlignment(query, pool) },
     ],
     { scoreScale: 10 },
   );
-  return wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.12, subtopicWeight: 0.04 });
+  const ranked = wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.12, subtopicWeight: 0.04 });
+  return [...ranked, ...candidatesNotIn(pool, candidates)].sort(byScoreThenId);
 }
 
 function rankWikiSubtopicAmplifiedHybrid(query, candidates) {
+  const pool = rankWikiCandidatePool(query, candidates, wikiCandidateLimit());
   const firstStage = fuseRankedChannels(
-    candidates,
+    pool,
     [
-      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryTextValue(query), candidates) },
-      { name: "wiki-title", weight: 0.75, ranked: rankWikiTitleProxy(query, candidates) },
-      { name: "wiki-subtopic", weight: 1, ranked: rankWikiSubtopicProxy(query, candidates) },
-      { name: "graph", weight: 0.65, ranked: rankGraphProxy(query, candidates) },
-      { name: "wiki-dense", weight: 0.55, ranked: rankWikiAmplifiedDenseProxy(query, candidates) },
+      { name: "sparse", weight: 1, ranked: rankBm25Lite(queryTextValue(query), pool) },
+      { name: "wiki-title", weight: 0.75, ranked: rankWikiTitleProxy(query, pool) },
+      { name: "wiki-subtopic", weight: 1, ranked: rankWikiSubtopicProxy(query, pool) },
+      { name: "graph", weight: 0.65, ranked: rankGraphProxy(query, pool) },
+      { name: "wiki-dense", weight: 0.55, ranked: rankWikiAmplifiedDenseProxy(query, pool) },
     ],
     { scoreScale: 10 },
   );
-  return wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.06, subtopicWeight: 0.14 });
+  const ranked = wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.06, subtopicWeight: 0.14 });
+  return [...ranked, ...candidatesNotIn(pool, candidates)].sort(byScoreThenId);
 }
 
 function rankWikiSummarySessionHybrid(query, candidates) {
+  const pool = rankWikiCandidatePool(query, candidates, wikiCandidateLimit());
   const summaryStage = fuseRankedChannels(
-    candidates,
+    pool,
     [
-      { name: "summary-bm25", weight: 1, ranked: rankBm25Lite(queryTextValue(query), candidates) },
-      { name: "wiki-title", weight: 0.9, ranked: rankWikiTitleProxy(query, candidates) },
-      { name: "wiki-subtopic", weight: 0.72, ranked: rankWikiSubtopicProxy(query, candidates) },
-      { name: "metadata", weight: metadataWeight(query), ranked: rankMetadataAlignment(query, candidates) },
+      { name: "summary-bm25", weight: 1, ranked: rankBm25Lite(queryTextValue(query), pool) },
+      { name: "wiki-title", weight: 0.9, ranked: rankWikiTitleProxy(query, pool) },
+      { name: "wiki-subtopic", weight: 0.72, ranked: rankWikiSubtopicProxy(query, pool) },
+      { name: "metadata", weight: metadataWeight(query), ranked: rankMetadataAlignment(query, pool) },
     ],
     { scoreScale: 10 },
   );
   const sessionWeight = fullSessionContextWeight(query);
   const firstStage = fuseRankedChannels(
-    candidates,
+    pool,
     [
       { name: "condensed-summary", weight: 1.15, ranked: summaryStage },
-      { name: "related-session-vector", weight: sessionWeight, ranked: rankDenseProxy(queryTextValue(query), candidates) },
-      { name: "session-graph", weight: sessionWeight * 0.65, ranked: rankGraphProxy(query, candidates) },
+      { name: "related-session-vector", weight: sessionWeight, ranked: rankDenseProxy(queryTextValue(query), pool) },
+      { name: "session-graph", weight: sessionWeight * 0.65, ranked: rankGraphProxy(query, pool) },
     ],
     { scoreScale: 10 },
   );
-  return wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.08, subtopicWeight: 0.1 });
+  const ranked = wikiAwareRerankProxy(query, firstStage, { titleWeight: 0.08, subtopicWeight: 0.1 });
+  return [...ranked, ...candidatesNotIn(pool, candidates)].sort(byScoreThenId);
 }
 
 async function queryExpansionText(query, options = {}) {
@@ -647,6 +653,27 @@ function rankProviderHybridCandidatePool(query, candidates, limit) {
     { scoreScale: 8 },
   );
   const lexicalFloor = Math.max(1, Math.ceil(cap * 0.5));
+  return uniqueRankedCandidates([...sparse.slice(0, lexicalFloor), ...fused], cap);
+}
+
+function rankWikiCandidatePool(query, candidates, limit) {
+  const cap = Math.max(1, Math.min(Number(limit), candidates.length));
+  const queryText = queryTextValue(query);
+  const sparse = rankBm25Lite(queryText, candidates);
+  const title = rankWikiTitleProxy(query, candidates);
+  const subtopic = rankWikiSubtopicProxy(query, candidates);
+  const metadata = rankMetadataAlignment(query, candidates);
+  const fused = fuseRankedChannels(
+    candidates,
+    [
+      { name: "sparse", weight: 1, ranked: sparse },
+      { name: "wiki-title", weight: 0.8, ranked: title },
+      { name: "wiki-subtopic", weight: 0.72, ranked: subtopic },
+      { name: "metadata", weight: metadataWeight(query), ranked: metadata },
+    ],
+    { scoreScale: 8 },
+  );
+  const lexicalFloor = Math.max(1, Math.ceil(cap * 0.4));
   return uniqueRankedCandidates([...sparse.slice(0, lexicalFloor), ...fused], cap);
 }
 
@@ -2627,6 +2654,10 @@ function providerCandidateLimit(envName, fallback) {
   return optionalPositiveInt(process.env[envName] ?? null, envName) ?? fallback;
 }
 
+function wikiCandidateLimit() {
+  return optionalPositiveInt(process.env.RECALLWEAVE_WIKI_CANDIDATE_LIMIT ?? null, "wiki candidate limit") ?? 240;
+}
+
 function batchProviderInputs(items, options = {}) {
   const maxCount = Math.max(1, Number(options.maxCount ?? 32));
   const maxEstimatedTokens = Math.max(1, Number(options.maxEstimatedTokens ?? 60_000));
@@ -2701,10 +2732,8 @@ function topicTerms(text) {
 function attachWikiSignals(candidate, metadata) {
   const titleText = wikiTitleText(candidate, metadata);
   const subtopicText = wikiSubtopicText(candidate, metadata);
-  const amplifiedText = wikiAmplifiedText(candidate, metadata);
   candidate.wikiTitleTokens = amplifiedTokens(titleText, 3);
   candidate.wikiSubtopicTokens = topicTerms(subtopicText);
-  candidate.wikiAmplifiedVector = hashedSemanticVector(amplifiedText);
 }
 
 function wikiTitleText(candidate, metadata = candidate.metadata ?? {}) {

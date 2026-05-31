@@ -353,12 +353,19 @@ function isCloudProviderStrategy(strategy) {
 
 function armTimeoutForStrategy(strategy) {
   if (armTimeoutMs) return armTimeoutMs;
-  if (fixtureRequested || !isCloudProviderStrategy(strategy)) return 0;
-  if (providerArmTimeoutMs) return providerArmTimeoutMs;
-  if (!providerTimeoutMs || !maxQueries) return 0;
-  const attempts = Math.max(1, providerRetryAttempts + 1);
-  const computed = maxQueries * attempts * providerTimeoutMs + 90_000;
-  return Math.max(120_000, Math.min(20 * 60_000, computed));
+  if (fixtureRequested) return 0;
+  if (isCloudProviderStrategy(strategy)) {
+    if (providerArmTimeoutMs) return providerArmTimeoutMs;
+    if (!providerTimeoutMs || !maxQueries) return 0;
+    const attempts = Math.max(1, providerRetryAttempts + 1);
+    const computed = maxQueries * attempts * providerTimeoutMs + 90_000;
+    return Math.max(120_000, Math.min(20 * 60_000, computed));
+  }
+  if (maxQueries && isHybridFamilyStrategy(strategy)) {
+    const computed = maxQueries * 20_000 + 60_000;
+    return Math.max(90_000, Math.min(10 * 60_000, computed));
+  }
+  return 0;
 }
 
 function compareArms(left, right) {

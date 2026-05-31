@@ -1136,6 +1136,11 @@ the remaining bounded slots from a sparse+dense+graph+temporal hybrid ranking
 before Gemini, NVIDIA, Voyage, or the local Apple embedding sidecar scores the
 documents. This keeps provider calls capped while avoiding an all-BM25 gate
 that would prevent dense models from rescuing graph/temporal candidates.
+Wiki title/subtopic/session amplification arms use the same discipline: a
+bounded wiki candidate pool keeps a lexical floor, then fuses title, subtopic,
+and metadata signals before expensive wiki-aware dense/rerank scoring runs.
+The default pool cap is controlled by `RECALLWEAVE_WIKI_CANDIDATE_LIMIT`
+and defaults to 240 candidates.
 
 Benchmark arms also carry per-arm isolation metadata. Provider-gate live runs
 default to isolated arm IDs, hashed container tags, and separate local embedding
@@ -1147,7 +1152,11 @@ Cloud provider arms have an additional watchdog. Operators may set
 only fresh cloud challenger arms; otherwise small live provider slices with
 `--max-queries` derive a bounded timeout from the provider request timeout and
 retry count. This is intentionally narrower than `--arm-timeout-ms`, which
-still applies to every arm, including BM25 and full-hybrid controls.
+still applies to every arm, including BM25 and full-hybrid controls. Small live
+hybrid-family slices also derive a bounded arm timeout when `--max-queries` is
+set, so query-expansion and wiki title/subtopic/session amplification can fail
+as explicit arm-timeout evidence instead of silently consuming a benchmark
+loop.
 
 Public GitHub benchmark scores are allowed only after a real matched canary win
 with two independent reviewer approvals recorded by `baseline:reviewer-intake`.
