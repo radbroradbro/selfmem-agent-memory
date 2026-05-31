@@ -22,6 +22,7 @@ const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAV
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
+const providerArmTimeoutMs = optionalPositiveInt(args.providerArmTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_ARM_TIMEOUT_MS ?? null, "provider arm timeout") ?? 0;
 const providerTimeoutMs =
   optionalPositiveInt(args.providerTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ??
   (!fixtureRequested && gate === "provider" ? 45_000 : 0);
@@ -98,7 +99,8 @@ async function runStrategyArm(strategy) {
 
   const responsePath = resolve(runRoot, `${strategy}-responses.json`);
   const resultPath = resolve(runRoot, `${strategy}-result.json`);
-  const armContext = armRunContext(strategy, runRoot);
+  const effectiveArmTimeoutMs = armTimeoutForStrategy(strategy);
+  const armContext = armRunContext(strategy, runRoot, effectiveArmTimeoutMs);
   const exportArgs = [
     "packages/bench/recallweave-response-export.mjs",
     ...(fixtureRequested ? ["--fixture"] : ["--live", "--queryset", input.querySetPath, "--memories", input.memoriesPath, "--preserve-ids"]),
@@ -126,7 +128,7 @@ async function runStrategyArm(strategy) {
     resultPath,
   ];
   try {
-    await runNodeAsync(exportArgs, { live: !fixtureRequested, env: armContext.env });
+    await runNodeAsync(exportArgs, { live: !fixtureRequested, env: armContext.env, timeoutMs: effectiveArmTimeoutMs });
     await runNodeAsync(collectArgs, {
       live: !fixtureRequested,
       env: {
@@ -134,6 +136,7 @@ async function runStrategyArm(strategy) {
         RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
         RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
       },
+      timeoutMs: effectiveArmTimeoutMs,
     });
     const response = JSON.parse(readFileSync(responsePath, "utf8"));
     const result = JSON.parse(readFileSync(resultPath, "utf8"));
@@ -221,6 +224,7 @@ const report = {
     },
     selectedQueryCount: results[0]?.queryShard?.responseCount ?? null,
     armTimeoutMs,
+    providerArmTimeoutMs,
     providerTimeoutMs,
     providerRetryAttempts,
     parallelArms,
@@ -753,6 +757,20 @@ function isProviderBackedStrategy(strategy) {
   return strategy.startsWith("cloud-") || strategy.startsWith("local-apple-");
 }
 
+function isCloudProviderStrategy(strategy) {
+  return strategy.startsWith("cloud-");
+}
+
+function armTimeoutForStrategy(strategy) {
+  if (armTimeoutMs) return armTimeoutMs;
+  if (fixtureRequested || !isCloudProviderStrategy(strategy)) return 0;
+  if (providerArmTimeoutMs) return providerArmTimeoutMs;
+  if (!providerTimeoutMs || !maxQueries) return 0;
+  const attempts = Math.max(1, providerRetryAttempts + 1);
+  const computed = maxQueries * attempts * providerTimeoutMs + 90_000;
+  return Math.max(120_000, Math.min(20 * 60_000, computed));
+}
+
 function normalizeGate(value) {
   const gate = String(value ?? "strategy").trim().toLowerCase();
   assert.ok(["strategy", "hybrid", "provider"].includes(gate), `unknown benchmark gate: ${gate}`);
@@ -764,6 +782,7 @@ function round(value) {
 }
 
 function runNode(argv, options = {}) {
+  const timeoutMs = options.timeoutMs ?? armTimeoutMs;
   const result = spawnSync(process.execPath, argv, {
     cwd: root,
     encoding: "utf8",
@@ -780,11 +799,11 @@ function runNode(argv, options = {}) {
         : {}),
       ...(options.env ?? {}),
     },
-    ...(armTimeoutMs ? { timeout: armTimeoutMs, killSignal: "SIGTERM" } : {}),
+    ...(timeoutMs ? { timeout: timeoutMs, killSignal: "SIGTERM" } : {}),
     stdio: ["ignore", "pipe", "pipe"],
   });
   if (result.error?.code === "ETIMEDOUT") {
-    throw new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`);
+    throw new Error(`node ${argv.join(" ")} timed out after ${timeoutMs}ms`);
   }
   if (result.signal) {
     throw new Error(`node ${argv.join(" ")} terminated by signal ${result.signal}`);
@@ -799,6 +818,7 @@ function runNode(argv, options = {}) {
 
 function runNodeAsync(argv, options = {}) {
   return new Promise((resolvePromise, reject) => {
+    const timeoutMs = options.timeoutMs ?? armTimeoutMs;
     const child = spawn(process.execPath, argv, {
       cwd: root,
       env: {
@@ -819,11 +839,11 @@ function runNodeAsync(argv, options = {}) {
     let stdout = "";
     let stderr = "";
     let timedOut = false;
-    const timeout = armTimeoutMs
+    const timeout = timeoutMs
       ? setTimeout(() => {
           timedOut = true;
           child.kill("SIGTERM");
-        }, armTimeoutMs)
+        }, timeoutMs)
       : null;
     child.stdout?.on("data", (chunk) => {
       stdout += chunk.toString();
@@ -838,7 +858,7 @@ function runNodeAsync(argv, options = {}) {
     child.on("close", (status, signal) => {
       if (timeout) clearTimeout(timeout);
       if (timedOut) {
-        reject(new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`));
+        reject(new Error(`node ${argv.join(" ")} timed out after ${timeoutMs}ms`));
         return;
       }
       if (signal) {
@@ -876,7 +896,7 @@ async function mapLimit(items, limit, worker) {
   return outputs;
 }
 
-function armRunContext(label, runRootPath) {
+function armRunContext(label, runRootPath, effectiveArmTimeoutMs = 0) {
   const baseEnv = {
     RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
     SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
@@ -887,6 +907,7 @@ function armRunContext(label, runRootPath) {
       summary: {
         isolated: false,
         supermemorySearchDisabled: true,
+        effectiveArmTimeoutMs,
       },
     };
   }
@@ -904,6 +925,7 @@ function armRunContext(label, runRootPath) {
     summary: {
       isolated: true,
       supermemorySearchDisabled: true,
+      effectiveArmTimeoutMs,
       armIdHash: shortHash(armId),
       containerTagHash: shortHash(containerTag),
       localEmbeddingCachePathHash: `sha256:${stableHash(cachePath)}`,

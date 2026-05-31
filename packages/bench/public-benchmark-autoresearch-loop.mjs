@@ -39,6 +39,7 @@ const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAV
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
+const providerArmTimeoutMs = optionalPositiveInt(args.providerArmTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_ARM_TIMEOUT_MS ?? null, "provider arm timeout") ?? 0;
 const includesProviderBackedStrategies = strategies.some((strategy) => strategy.startsWith("cloud-") || strategy.startsWith("local-apple-"));
 const providerTimeoutMs =
   optionalPositiveInt(args.providerTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ??
@@ -110,7 +111,8 @@ async function runAutoresearchArm(arm) {
   const label = `${arm.strategy}-b${arm.contextTokenBudget}-k${arm.limit}`;
   const responsePath = resolve(runRoot, `${label}-responses.json`);
   const resultPath = resolve(runRoot, `${label}-result.json`);
-  const armContext = armRunContext(label, runRoot);
+  const effectiveArmTimeoutMs = armTimeoutForStrategy(arm.strategy);
+  const armContext = armRunContext(label, runRoot, effectiveArmTimeoutMs);
   try {
     await runNodeAsync(
       [
@@ -129,7 +131,7 @@ async function runAutoresearchArm(arm) {
         "--output",
         responsePath,
       ],
-      { live: !fixtureRequested, env: armContext.env },
+      { live: !fixtureRequested, env: armContext.env, timeoutMs: effectiveArmTimeoutMs },
     );
     await runNodeAsync(
       [
@@ -153,6 +155,7 @@ async function runAutoresearchArm(arm) {
           RECALLWEAVE_BASELINE_JUDGE_MODEL: input.judgeModel,
           RECALLWEAVE_BASELINE_ANSWER_MODEL: input.answerModel,
         },
+        timeoutMs: effectiveArmTimeoutMs,
       },
     );
     const response = JSON.parse(readFileSync(responsePath, "utf8"));
@@ -247,6 +250,7 @@ const report = {
       limits,
       maxMemoryBytes,
       armTimeoutMs,
+      providerArmTimeoutMs,
       providerTimeoutMs,
       providerRetryAttempts,
       parallelArms,
@@ -341,6 +345,20 @@ function isHybridFamilyStrategy(strategy) {
 
 function isProviderBackedStrategy(strategy) {
   return strategy.startsWith("cloud-") || strategy.startsWith("local-apple-");
+}
+
+function isCloudProviderStrategy(strategy) {
+  return strategy.startsWith("cloud-");
+}
+
+function armTimeoutForStrategy(strategy) {
+  if (armTimeoutMs) return armTimeoutMs;
+  if (fixtureRequested || !isCloudProviderStrategy(strategy)) return 0;
+  if (providerArmTimeoutMs) return providerArmTimeoutMs;
+  if (!providerTimeoutMs || !maxQueries) return 0;
+  const attempts = Math.max(1, providerRetryAttempts + 1);
+  const computed = maxQueries * attempts * providerTimeoutMs + 90_000;
+  return Math.max(120_000, Math.min(20 * 60_000, computed));
 }
 
 function compareArms(left, right) {
@@ -497,6 +515,7 @@ function inputFromPrivateFiles(querySetPath, memoriesPath, materializer) {
 }
 
 function runNode(argv, options = {}) {
+  const timeoutMs = options.timeoutMs ?? armTimeoutMs;
   const result = spawnSync(process.execPath, argv, {
     cwd: root,
     encoding: "utf8",
@@ -515,11 +534,11 @@ function runNode(argv, options = {}) {
       SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
       ...(options.env ?? {}),
     },
-    ...(armTimeoutMs ? { timeout: armTimeoutMs, killSignal: "SIGTERM" } : {}),
+    ...(timeoutMs ? { timeout: timeoutMs, killSignal: "SIGTERM" } : {}),
     stdio: ["ignore", "pipe", "pipe"],
   });
   if (result.error?.code === "ETIMEDOUT") {
-    throw new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`);
+    throw new Error(`node ${argv.join(" ")} timed out after ${timeoutMs}ms`);
   }
   if (result.signal) {
     throw new Error(`node ${argv.join(" ")} terminated by signal ${result.signal}`);
@@ -532,6 +551,7 @@ function runNode(argv, options = {}) {
 
 function runNodeAsync(argv, options = {}) {
   return new Promise((resolvePromise, reject) => {
+    const timeoutMs = options.timeoutMs ?? armTimeoutMs;
     const child = spawn(process.execPath, argv, {
       cwd: root,
       env: {
@@ -554,11 +574,11 @@ function runNodeAsync(argv, options = {}) {
     let stdout = "";
     let stderr = "";
     let timedOut = false;
-    const timeout = armTimeoutMs
+    const timeout = timeoutMs
       ? setTimeout(() => {
           timedOut = true;
           child.kill("SIGTERM");
-        }, armTimeoutMs)
+        }, timeoutMs)
       : null;
     child.stdout?.on("data", (chunk) => {
       stdout += chunk.toString();
@@ -573,7 +593,7 @@ function runNodeAsync(argv, options = {}) {
     child.on("close", (status, signal) => {
       if (timeout) clearTimeout(timeout);
       if (timedOut) {
-        reject(new Error(`node ${argv.join(" ")} timed out after ${armTimeoutMs}ms`));
+        reject(new Error(`node ${argv.join(" ")} timed out after ${timeoutMs}ms`));
         return;
       }
       if (signal) {
@@ -611,8 +631,8 @@ async function mapLimit(items, limit, worker) {
   return outputs;
 }
 
-function armRunContext(label, runRootPath) {
-  if (!isolateArms) return { env: {}, summary: { isolated: false } };
+function armRunContext(label, runRootPath, effectiveArmTimeoutMs = 0) {
+  if (!isolateArms) return { env: {}, summary: { isolated: false, effectiveArmTimeoutMs } };
   const armId = sanitizeFileSegment(label);
   const cachePath = resolve(runRootPath, "arm-caches", `${armId}-local-apple-embeddings.jsonl`);
   mkdirSync(dirname(cachePath), { recursive: true });
@@ -625,6 +645,7 @@ function armRunContext(label, runRootPath) {
     },
     summary: {
       isolated: true,
+      effectiveArmTimeoutMs,
       armIdHash: shortHash(armId),
       containerTagHash: shortHash(containerTag),
       localEmbeddingCachePathHash: `sha256:${stableHash(cachePath)}`,

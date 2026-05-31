@@ -1135,6 +1135,12 @@ default to isolated arm IDs, hashed container tags, and separate local embedding
 caches, and every child arm disables hosted Supermemory search by environment.
 That lets a slow or rate-limited provider arm fail or pause without changing the
 same-data controls or leaking an old hosted memory state into the benchmark.
+Cloud provider arms have an additional watchdog. Operators may set
+`--provider-arm-timeout-ms` or `RECALLWEAVE_PROVIDER_ARM_TIMEOUT_MS` to bound
+only fresh cloud challenger arms; otherwise small live provider slices with
+`--max-queries` derive a bounded timeout from the provider request timeout and
+retry count. This is intentionally narrower than `--arm-timeout-ms`, which
+still applies to every arm, including BM25 and full-hybrid controls.
 
 Public GitHub benchmark scores are allowed only after a real matched canary win
 with two independent reviewer approvals recorded by `baseline:reviewer-intake`.
