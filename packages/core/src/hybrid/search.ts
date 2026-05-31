@@ -284,6 +284,8 @@ function safeString(value: unknown): string | undefined {
 const CONTEXT_METADATA_KEYS = [
   "origin",
   "kind",
+  "atomicKind",
+  "confidence",
   "scope",
   "sourceKind",
   "sourceId",
@@ -308,6 +310,16 @@ const CONTEXT_METADATA_KEYS = [
   "sourceContentHash",
   "sourceEstimatedTokens",
   "parentSessionId",
+  "legacyAtomicId",
+  "validFrom",
+  "validUntil",
+  "supersedes",
+  "supersededBy",
+  "contradictedBy",
+  "lifecycleStatus",
+  "atomicSubjectKey",
+  "entities",
+  "topics",
   "chunkIndex",
   "chunkCount",
   "atomicFactIndex",
@@ -347,7 +359,13 @@ function assignDefined(target: Record<string, unknown>, values: Record<string, u
   }
 }
 
-function safeMetadataValue(value: unknown): string | number | boolean | undefined {
+function safeMetadataValue(value: unknown): string | number | boolean | string[] | undefined {
+  if (Array.isArray(value)) {
+    const safeItems = value
+      .map((item) => safeMetadataValue(item))
+      .filter((item): item is string => typeof item === "string");
+    return safeItems.length > 0 ? safeItems.slice(0, 12) : undefined;
+  }
   if (typeof value === "number") return Number.isFinite(value) ? value : undefined;
   if (typeof value === "boolean") return value;
   if (typeof value !== "string") return undefined;

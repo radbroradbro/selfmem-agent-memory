@@ -235,6 +235,32 @@ describe("public benchmark comparison contract", () => {
     }
   });
 
+  it("links atomic updates to superseded facts with stable content-derived ids", () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        materializeScript,
+        "--atomic-lifecycle-smoke",
+        "--memory-method",
+        "atomic-memory-v1",
+      ],
+      {
+        cwd: new URL("../..", import.meta.url),
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("atomic-lifecycle-smoke");
+    expect(report.stableContentIds).toBe(true);
+    expect(report.linkedSupersedesCount).toBe(2);
+    expect(report.supersededCount).toBe(2);
+    expect(report.currentAtomId).toMatch(/#atom-[a-f0-9]{16}$/);
+    expect(report.currentAtomId).not.toContain("#atom-001-");
+    expect(report.currentTruth).toContain("SQLite");
+  });
+
   it("dedupes atomic facts by rehydrated source before exporting top-k", () => {
     const result = spawnSync(process.execPath, [responseExportScript, "--rehydrated-atomic-dedupe-smoke"], {
       cwd: new URL("../..", import.meta.url),

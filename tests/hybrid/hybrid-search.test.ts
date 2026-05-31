@@ -153,6 +153,60 @@ describe("hybrid search runtime context", () => {
     expect(JSON.stringify(result.context)).not.toMatch(/AIzaA/);
   });
 
+  it("groups current atomic truth ahead of superseded atomic history", async () => {
+    const result = await searchHybrid({
+      query: "What is my latest favorite database?",
+      topK: 2,
+      ranker: (_query, candidates) => candidates.sort((left, right) => right.score - left.score),
+      rankerMode: "fixture-current-truth",
+      sources: [
+        makeStaticHybridSource({
+          id: "atomic",
+          origin: "local",
+          candidates: [
+            {
+              id: "session-a#atom-old",
+              origin: "local",
+              score: 0.9,
+              text: "Atomic fact: My favorite database is Postgres.",
+              metadata: {
+                kind: "atomic_memory",
+                atomicKind: "preference",
+                confidence: "high",
+                lifecycleStatus: "superseded",
+                validFrom: "2026-05-01",
+                validUntil: "2026-05-03",
+                supersededBy: "session-c#atom-current",
+              },
+            },
+            {
+              id: "session-c#atom-current",
+              origin: "local",
+              score: 1,
+              text: "Atomic fact: I changed my mind; my favorite database is SQLite now.",
+              metadata: {
+                kind: "atomic_memory",
+                atomicKind: "update",
+                confidence: "high",
+                lifecycleStatus: "current",
+                validFrom: "2026-05-03",
+                supersedes: ["session-a#atom-old"],
+              },
+            },
+          ],
+        }),
+      ],
+    });
+
+    expect(result.context.text).toContain("Current truth:");
+    expect(result.context.text).toContain("update: I changed my mind; my favorite database is SQLite now.");
+    expect(result.context.text).toContain("Superseded or historical facts:");
+    expect(result.context.text).toContain("preference: My favorite database is Postgres.");
+    expect(result.context.text).toContain("status=current");
+    expect(result.context.text).toContain("status=superseded");
+    expect(result.context.text.indexOf("SQLite")).toBeLessThan(result.context.text.indexOf("Postgres"));
+  });
+
   it("preserves safe metadata source ids when the candidate field is absent", async () => {
     const result = await searchHybrid({
       query: "What status should the source ledger show?",

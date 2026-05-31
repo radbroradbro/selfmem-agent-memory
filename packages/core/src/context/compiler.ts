@@ -14,6 +14,12 @@ export interface ContextFact {
   text: string;
   sourceId: string;
   confidence: "high" | "medium" | "low";
+  atomicKind?: string;
+  lifecycleStatus?: "current" | "superseded" | "tombstone" | "historical";
+  supersedes?: string[];
+  supersededBy?: string;
+  validFrom?: string;
+  validUntil?: string;
 }
 
 export interface CompiledContext {
@@ -92,11 +98,73 @@ function extractFacts(
   text: string,
   metadata?: Record<string, unknown>,
 ): ContextFact[] {
+  const atomicFact = extractAtomicMemoryFact(intent, sourceId, text, metadata);
+  if (atomicFact) return [atomicFact];
   if (intent === "event-count") return extractEventFacts(sourceId, text);
   if (intent === "current-state") return extractCurrentStateFacts(sourceId, text);
   if (intent === "temporal") return extractTemporalFacts(query, sourceId, text, metadata);
   if (intent === "preference") return extractPreferenceFacts(sourceId, text);
   return [];
+}
+
+function extractAtomicMemoryFact(
+  intent: ContextIntent,
+  sourceId: string,
+  text: string,
+  metadata?: Record<string, unknown>,
+): ContextFact | null {
+  if (metadata?.kind !== "atomic_memory") return null;
+  const atomicKind = safeMetadataString(metadata.atomicKind) ?? "fact";
+  const confidence = safeConfidence(metadata.confidence);
+  const lifecycleStatus = safeLifecycleStatus(metadata.lifecycleStatus, atomicKind);
+  const factText = extractAtomicFactText(text) ?? trimSentence(text, 220);
+  const fact: ContextFact = {
+    kind: contextIntentForAtomicKind(atomicKind, intent),
+    text: `${atomicKind}: ${factText}`,
+    sourceId,
+    confidence,
+    atomicKind,
+    lifecycleStatus,
+  };
+  const supersedes = safeMetadataStringArray(metadata.supersedes);
+  const supersededBy = safeMetadataString(metadata.supersededBy);
+  const validFrom = safeMetadataString(metadata.validFrom);
+  const validUntil = safeMetadataString(metadata.validUntil);
+  if (supersedes.length > 0) fact.supersedes = supersedes;
+  if (supersededBy) fact.supersededBy = supersededBy;
+  if (validFrom) fact.validFrom = validFrom;
+  if (validUntil) fact.validUntil = validUntil;
+  return fact;
+}
+
+function extractAtomicFactText(text: string): string | null {
+  const match = text.match(/(?:^|\n)Atomic fact:\s*([^\n]+)/i);
+  return match?.[1]?.trim() || null;
+}
+
+function contextIntentForAtomicKind(atomicKind: string, fallback: ContextIntent): ContextIntent {
+  if (atomicKind === "preference") return "preference";
+  if (atomicKind === "update" || atomicKind === "tombstone" || atomicKind === "decision") return "current-state";
+  if (atomicKind === "task" || atomicKind === "procedure" || atomicKind === "bug") return "current-state";
+  return fallback;
+}
+
+function safeConfidence(value: unknown): ContextFact["confidence"] {
+  return value === "high" || value === "medium" || value === "low" ? value : "medium";
+}
+
+function safeLifecycleStatus(value: unknown, atomicKind: string): NonNullable<ContextFact["lifecycleStatus"]> {
+  if (value === "current" || value === "superseded" || value === "tombstone" || value === "historical") return value;
+  return atomicKind === "tombstone" ? "tombstone" : "current";
+}
+
+function safeMetadataString(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function safeMetadataStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => safeMetadataString(item)).filter((item): item is string => Boolean(item));
 }
 
 function extractEventFacts(sourceId: string, text: string): ContextFact[] {
@@ -197,8 +265,15 @@ function renderTypedContext(input: {
   facts: ContextFact[];
   evidence: CompiledContext["evidence"];
 }): string {
+  const currentFacts = input.facts.filter((fact) => !isHistoricalFact(fact));
+  const historicalFacts = input.facts.filter((fact) => isHistoricalFact(fact));
   const factLines = input.facts.length > 0
-    ? input.facts.map((fact, index) => `${index + 1}. ${fact.text} [${fact.sourceId}]`).join("\n")
+    ? [
+      "Current truth:",
+      currentFacts.length > 0 ? renderFactList(currentFacts) : "No current facts extracted.",
+      historicalFacts.length > 0 ? "\nSuperseded or historical facts:" : null,
+      historicalFacts.length > 0 ? renderFactList(historicalFacts) : null,
+    ].filter((value): value is string => Boolean(value)).join("\n")
     : "No derived facts extracted.";
 
   const evidenceLines = input.evidence.length > 0
@@ -220,6 +295,28 @@ Evidence:
 ${evidenceLines}`;
 }
 
+function isHistoricalFact(fact: ContextFact): boolean {
+  return fact.lifecycleStatus === "superseded" || fact.lifecycleStatus === "tombstone" || Boolean(fact.supersededBy);
+}
+
+function renderFactList(facts: ContextFact[]): string {
+  return facts.map((fact, index) => {
+    const lifecycle = renderFactLifecycle(fact);
+    return `${index + 1}. ${fact.text} [${fact.sourceId}]${lifecycle}`;
+  }).join("\n");
+}
+
+function renderFactLifecycle(fact: ContextFact): string {
+  const fields = [
+    fact.lifecycleStatus ? `status=${fact.lifecycleStatus}` : null,
+    fact.validFrom ? `validFrom=${fact.validFrom}` : null,
+    fact.validUntil ? `validUntil=${fact.validUntil}` : null,
+    fact.supersededBy ? `supersededBy=${fact.supersededBy}` : null,
+    fact.supersedes && fact.supersedes.length > 0 ? `supersedes=${fact.supersedes.join(",")}` : null,
+  ].filter((value): value is string => Boolean(value));
+  return fields.length > 0 ? ` (${fields.join(" ")})` : "";
+}
+
 function renderEvidenceProvenance(metadata?: Record<string, unknown>): string {
   if (!metadata) return "";
   const fields = [
@@ -232,6 +329,12 @@ function renderEvidenceProvenance(metadata?: Record<string, unknown>): string {
     ["source", metadata.sourceId ?? metadata.sourceChunkId],
     ["parent", metadata.parentSessionId],
     ["rehydrate", metadata.rehydrateId],
+    ["atomic", metadata.atomicKind],
+    ["status", metadata.lifecycleStatus],
+    ["validFrom", metadata.validFrom],
+    ["validUntil", metadata.validUntil],
+    ["supersededBy", metadata.supersededBy],
+    ["confidence", metadata.confidence],
   ]
     .map(([label, value]) => safeProvenanceField(label as string, value))
     .filter((value): value is string => Boolean(value));

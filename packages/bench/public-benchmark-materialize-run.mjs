@@ -55,6 +55,11 @@ const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
+if (args.atomicLifecycleSmoke === true) {
+  runAtomicLifecycleSmoke();
+  process.exit(0);
+}
+
 mkdirSync(privateOutputDir, { recursive: true, mode: 0o700 });
 assertOutsideRepo(privateOutputDir, "private output directory");
 
@@ -327,7 +332,9 @@ function writePrivateBenchmarkInputs(options) {
   const materializerHash =
     memoryMethod === "session-v1"
       ? `sha256:${stableHash("public-benchmark-materialize-run:v1")}`
-      : `sha256:${stableHash(`public-benchmark-materialize-run:v1:${memoryMethod}`)}`;
+      : memoryMethod === "atomic-memory-v1"
+        ? `sha256:${stableHash("public-benchmark-materialize-run:v2:atomic-lifecycle")}`
+        : `sha256:${stableHash(`public-benchmark-materialize-run:v1:${memoryMethod}`)}`;
   const redactionStats = {
     keyShapedTokenRedactionCount: 0,
     privateTagRedactionCount: 0,
@@ -366,6 +373,8 @@ function writePrivateBenchmarkInputs(options) {
       .map((content) => `sha256:${stableHash(normalizeText(content))}`);
     answerContentHashesByQuery.set(String(row.question_id), [...new Set(hashes)]);
   }
+
+  const atomicLifecycle = applyAtomicLifecycleLinks(memoryMap);
 
   const queries = options.selected.map((row) => {
     const answerSessionIds = asArray(row.answer_session_ids).map((item) => String(item)).filter(Boolean);
@@ -483,6 +492,7 @@ function writePrivateBenchmarkInputs(options) {
       scoringCodeHash: options.scoringCodeHash,
       materializerHash,
       memoryMethod,
+      atomicLifecycle,
     },
     publicReportOnlyContainsHashesAndCounts: true,
   };
@@ -525,6 +535,7 @@ function writePrivateBenchmarkInputs(options) {
       contextualSourceChunkCount: memories.filter((item) => item.metadata?.kind === "contextual_source_chunk").length,
       contextualIndexMemoryCount: memories.filter((item) => item.metadata?.kind === "contextual_index").length,
       atomicMemoryCount: memories.filter((item) => item.metadata?.kind === "atomic_memory").length,
+      atomicLifecycle,
       rawSessionMemoryCount: memories.filter((item) => item.metadata?.kind === "raw_session").length,
       expectedResultRefCount: expectedRefs,
       redactionStats,
@@ -809,69 +820,97 @@ function atomicMemoryRecordsForChunk(input) {
   const source = contextualSourceChunkRecord({ ...input, terms, title, eventDate });
   const sourceContentHash = `sha256:${stableHash(normalizeText(source.content))}`;
   const facts = atomicFactLines(input.chunkLines);
+  const atomIds = [...new Set(facts.map((fact) => atomicMemoryId(input, fact)))];
   return [
     {
       ...source,
       metadata: {
         ...source.metadata,
         retrievalRole: "source",
-        indexedBy: facts.map((_, factIndex) => atomicMemoryId(input, factIndex)),
+        indexedBy: atomIds,
       },
     },
-    ...facts.map((fact, factIndex) => ({
-      id: atomicMemoryId(input, factIndex),
-      content: atomicMemoryContent({
-        sessionId: input.sessionId,
-        date: input.date,
-        eventDate,
-        title,
-        terms,
-        fact,
-        factIndex,
-        factCount: facts.length,
-        chunkIndex: input.index,
-        chunkCount: input.chunks.length,
-        sourceChunkId: source.id,
-      }),
-      metadata: {
-        benchmark: "longmemeval",
-        source: "MemoryBench LongMemEval-S cleaned",
-        kind: "atomic_memory",
-        retrievalRole: "index",
-        sourceChunkId: source.id,
-        rehydrateId: source.id,
-        sourceContentHash,
-        sourceEstimatedTokens: estimateTokens(source.content),
-        parentSessionId: input.sessionId,
-        date: input.date,
-        documentDate: input.date,
-        eventDate,
-        title,
-        topic: terms.slice(0, 5).join(" "),
-        topicPath: "Benchmarks / LongMemEval-S / atomic-memory",
-        subtopic: terms.join(" "),
-        subtopicPath: `${input.date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "atomic memory"}`,
-        chunkIndex: input.index,
-        chunkCount: input.chunks.length,
-        atomicFactIndex: factIndex,
-        atomicFactCount: facts.length,
-        sourceRetention: "private-source-chunk",
-      },
-    })),
+    ...facts.map((fact, factIndex) => {
+      const atom = classifyAtomicFact(fact, terms);
+      const atomId = atomicMemoryId(input, fact);
+      return {
+        id: atomId,
+        content: atomicMemoryContent({
+          sessionId: input.sessionId,
+          date: input.date,
+          eventDate,
+          title,
+          terms,
+          fact,
+          factIndex,
+          factCount: facts.length,
+          chunkIndex: input.index,
+          chunkCount: input.chunks.length,
+          sourceChunkId: source.id,
+          atomicKind: atom.kind,
+          confidence: atom.confidence,
+          atomicSubjectKey: atom.subjectKey,
+        }),
+        metadata: {
+          benchmark: "longmemeval",
+          source: "MemoryBench LongMemEval-S cleaned",
+          kind: "atomic_memory",
+          atomicKind: atom.kind,
+          confidence: atom.confidence,
+          retrievalRole: "index",
+          sourceChunkId: source.id,
+          rehydrateId: source.id,
+          sourceContentHash,
+          sourceEstimatedTokens: estimateTokens(source.content),
+          parentSessionId: input.sessionId,
+          legacyAtomicId: atomicMemoryLegacyId(input, factIndex),
+          date: input.date,
+          documentDate: input.date,
+          eventDate,
+          validFrom: eventDate ?? input.date ?? null,
+          validUntil: null,
+          supersedes: [],
+          contradictedBy: [],
+          supersededBy: null,
+          lifecycleStatus: atom.kind === "tombstone" ? "tombstone" : "current",
+          atomicSubjectKey: atom.subjectKey,
+          entities: atom.entities,
+          topics: terms.slice(0, 8),
+          title,
+          topic: terms.slice(0, 5).join(" "),
+          topicPath: "Benchmarks / LongMemEval-S / atomic-memory",
+          subtopic: terms.join(" "),
+          subtopicPath: `${input.date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "atomic memory"}`,
+          chunkIndex: input.index,
+          chunkCount: input.chunks.length,
+          atomicFactIndex: factIndex,
+          atomicFactCount: facts.length,
+          sourceRetention: "private-source-chunk",
+        },
+      };
+    }),
   ];
 }
 
-function atomicMemoryId(input, factIndex) {
+function atomicMemoryId(input, fact) {
+  const factHash = shortHash(`${input.sessionId}\n${normalizeText(fact)}`);
+  return `${input.sessionId}#atom-${factHash}`;
+}
+
+function atomicMemoryLegacyId(input, factIndex) {
   return `${input.sessionId}#atom-${String(input.index + 1).padStart(3, "0")}-${String(factIndex + 1).padStart(2, "0")}`;
 }
 
 function atomicMemoryContent(input) {
   return [
     `Atomic memory: ${input.title}`,
+    `Atomic kind: ${input.atomicKind}`,
+    `Confidence: ${input.confidence}`,
     input.date ? `Document date: ${input.date}` : null,
     input.eventDate ? `Event date: ${input.eventDate}` : null,
     `Topic: ${input.terms.slice(0, 5).join(" ") || "source session"}`,
     `Subtopic: ${input.terms.join(" ") || "source chunk"}`,
+    `Subject key: ${input.atomicSubjectKey}`,
     `Session: ${input.sessionId}`,
     `Source chunk: ${input.sourceChunkId}`,
     `Chunk: ${input.chunkIndex + 1}/${input.chunkCount}`,
@@ -896,6 +935,166 @@ function atomicFactLines(lines) {
     if (facts.length >= 8) break;
   }
   return facts.length ? facts : ["Source chunk contains benchmark memory context."];
+}
+
+function classifyAtomicFact(fact, terms = []) {
+  const lower = normalizeText(fact);
+  const kind = atomicKindForText(lower);
+  return {
+    kind,
+    confidence: atomicConfidence(kind, lower),
+    subjectKey: atomicSubjectKey(lower, kind, terms),
+    entities: atomicEntities(fact),
+  };
+}
+
+function atomicKindForText(lower) {
+  if (/\b(forget|delete|remove|ignore previous|disregard previous|no longer need|cancel)\b/.test(lower)) return "tombstone";
+  if (/\b(actually|changed my mind|instead|now|latest|updated?|replace(?:d|s)?|switch(?:ed)?|supersede(?:d|s)?|no longer|not anymore)\b/.test(lower)) return "update";
+  if (/\b(prefer|preference|favorite|favourite|like|want|rather|default)\b/.test(lower)) return "preference";
+  if (/\b(decided|decision|selected|chose|approved|ship|merge|release)\b/.test(lower)) return "decision";
+  if (/\b(how to|steps?|procedure|run|command|workflow|use .* to|must run)\b/.test(lower)) return "procedure";
+  if (/\b(bug|error|fail(?:ed|ing)?|crash(?:ed|es)?|blocker|regression|timeout|429)\b/.test(lower)) return "bug";
+  if (/\b(todo|next step|need to|should|must|follow up|remaining)\b/.test(lower)) return "task";
+  if (/\b(brother|company|client|lawyer|partner|agent|team|works? with|connected to|related to)\b/.test(lower)) return "relationship";
+  return "fact";
+}
+
+function atomicConfidence(kind, lower) {
+  if (kind === "update" || kind === "tombstone") return "high";
+  if (/\b(i am|i'm|my |we |we're|we are|the user|default is|favorite|prefer)\b/.test(lower)) return "high";
+  return "medium";
+}
+
+function atomicSubjectKey(lower, kind, terms = []) {
+  const favorite = lower.match(/\bfavou?rite\s+([a-z0-9][a-z0-9 _/-]{1,48}?)(?:\s+(?:is|=|:|to|was|became)\b|$)/);
+  if (favorite?.[1]) return `preference:favorite:${normalizeSubject(favorite[1])}`;
+  const prefer = lower.match(/\bprefer(?:ence|red)?\s+(?:for\s+)?([a-z0-9][a-z0-9 _/-]{1,48}?)(?:\s+(?:is|=|:|to|over|now|instead)\b|$)/);
+  if (prefer?.[1]) return `preference:${normalizeSubject(prefer[1])}`;
+  const defaultMatch = lower.match(/\b(?:default|selected)\s+([a-z0-9][a-z0-9 _/-]{1,48}?)(?:\s+(?:is|=|:|to|now|instead)\b|$)/);
+  if (defaultMatch?.[1]) return `${kind}:default:${normalizeSubject(defaultMatch[1])}`;
+  const cleaned = lower
+    .replace(/\b(actually|changed my mind|instead|now|latest|updated?|replace(?:d|s)?|switch(?:ed)?|supersede(?:d|s)?|no longer|not anymore|forget|delete|remove|ignore previous|disregard previous)\b/g, " ")
+    .replace(/\b(is|was|are|were|to|from|with|the|a|an|my|our|user|assistant)\b/g, " ");
+  const selectedTerms = salientTerms(`${cleaned} ${terms.join(" ")}`, 6);
+  return `${kind}:${selectedTerms.join("-") || shortHash(lower)}`;
+}
+
+function normalizeSubject(value) {
+  const subject = normalizeText(value)
+    .replace(/\b(the|a|an|my|our|user|assistant|current|latest|new|old|previous)\b/g, " ")
+    .replace(/[^a-z0-9_/-]+/g, " ")
+    .replace(/\s+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+  return subject || "unknown";
+}
+
+function atomicEntities(text) {
+  const entities = new Set();
+  for (const match of String(text).matchAll(/\b[A-Z][A-Za-z0-9_-]{2,}(?:\s+[A-Z][A-Za-z0-9_-]{2,}){0,3}\b/g)) {
+    const value = match[0].trim();
+    if (!/^(User|Assistant|System|Message|Source|Atomic|Session|Chunk)$/i.test(value)) entities.add(value);
+  }
+  return [...entities].slice(0, 8);
+}
+
+function applyAtomicLifecycleLinks(memoryMap) {
+  const atoms = [...memoryMap.values()]
+    .filter((record) => record.metadata?.kind === "atomic_memory")
+    .sort((left, right) => atomicSortKey(left).localeCompare(atomicSortKey(right)));
+  const activeBySubject = new Map();
+  let linkedSupersedesCount = 0;
+  let supersededCount = 0;
+  let tombstoneCount = 0;
+  for (const atom of atoms) {
+    const metadata = atom.metadata ?? {};
+    const subjectKey = typeof metadata.atomicSubjectKey === "string" ? metadata.atomicSubjectKey : null;
+    if (!subjectKey) continue;
+    const previous = activeBySubject.get(subjectKey) ?? [];
+    const atomicKind = String(metadata.atomicKind ?? "");
+    const supersedesPrevious = atomicKind === "update" || atomicKind === "tombstone";
+    if (supersedesPrevious && previous.length > 0) {
+      metadata.supersedes = uniqueStrings([...(Array.isArray(metadata.supersedes) ? metadata.supersedes : []), ...previous]);
+      linkedSupersedesCount += previous.length;
+      for (const previousId of previous) {
+        const prior = memoryMap.get(previousId);
+        if (!prior?.metadata) continue;
+        prior.metadata.supersededBy = atom.id;
+        prior.metadata.validUntil = metadata.validFrom ?? metadata.eventDate ?? metadata.date ?? null;
+        prior.metadata.lifecycleStatus = "superseded";
+        prior.metadata.contradictedBy = uniqueStrings([...(Array.isArray(prior.metadata.contradictedBy) ? prior.metadata.contradictedBy : []), atom.id]);
+        supersededCount += 1;
+      }
+    }
+    if (atomicKind === "tombstone") {
+      metadata.lifecycleStatus = "tombstone";
+      activeBySubject.set(subjectKey, []);
+      tombstoneCount += 1;
+    } else {
+      activeBySubject.set(subjectKey, [atom.id]);
+    }
+  }
+  return {
+    atomCount: atoms.length,
+    subjectCount: activeBySubject.size,
+    linkedSupersedesCount,
+    supersededCount,
+    tombstoneCount,
+    stableContentIds: true,
+  };
+}
+
+function atomicSortKey(record) {
+  const metadata = record.metadata ?? {};
+  return [
+    metadata.validFrom ?? metadata.eventDate ?? metadata.date ?? "",
+    metadata.parentSessionId ?? "",
+    String(record.id ?? ""),
+  ].join("\u0000");
+}
+
+function uniqueStrings(values) {
+  return [...new Set(values.map((value) => String(value ?? "").trim()).filter(Boolean))];
+}
+
+function runAtomicLifecycleSmoke() {
+  assert.equal(memoryMethod, "atomic-memory-v1", "--atomic-lifecycle-smoke requires --memory-method atomic-memory-v1");
+  const memoryMap = new Map();
+  const sessions = [
+    ["session-a", "2026-05-01", ["User: My favorite database is Postgres."]],
+    ["session-b", "2026-05-02", ["User: Actually, my favorite database is MySQL now."]],
+    ["session-c", "2026-05-03", ["User: I changed my mind; my favorite database is SQLite now."]],
+  ];
+  for (const [sessionId, date, lines] of sessions) {
+    const records = memoryRecordsForSession({
+      sessionId,
+      date,
+      content: lines.join("\n"),
+      messageLines: lines,
+    });
+    for (const record of records) memoryMap.set(record.id, record);
+  }
+  const stats = applyAtomicLifecycleLinks(memoryMap);
+  const atoms = [...memoryMap.values()].filter((record) => record.metadata?.kind === "atomic_memory");
+  const current = atoms.filter((record) => record.metadata?.lifecycleStatus === "current");
+  const superseded = atoms.filter((record) => record.metadata?.lifecycleStatus === "superseded");
+  assert.equal(atoms.length, 3);
+  assert.equal(current.length, 1);
+  assert.equal(superseded.length, 2);
+  assert.equal(current[0]?.metadata?.atomicKind, "update");
+  assert.equal(current[0]?.metadata?.supersedes?.length, 1);
+  assert.ok(atoms.every((record) => !String(record.id).includes("#atom-001-")));
+  process.stdout.write(`${JSON.stringify({
+    ok: true,
+    mode: "atomic-lifecycle-smoke",
+    atomCount: atoms.length,
+    currentAtomId: current[0]?.id,
+    stableContentIds: stats.stableContentIds,
+    linkedSupersedesCount: stats.linkedSupersedesCount,
+    supersededCount: stats.supersededCount,
+    currentTruth: current[0]?.content,
+  }, null, 2)}\n`);
 }
 
 function contextualIndexContent(input) {
@@ -1013,6 +1212,12 @@ function renderMarkdown(value) {
     `- Haystack session count: ${value.selection.haystackSessionCount}`,
     `- Memory record count: ${value.selection.memoryRecordCount}`,
     `- Contextual source chunk count: ${value.selection.contextualSourceChunkCount}`,
+    `- Contextual index memory count: ${value.selection.contextualIndexMemoryCount}`,
+    `- Atomic memory count: ${value.selection.atomicMemoryCount}`,
+    value.selection.atomicLifecycle
+      ? `- Atomic lifecycle: ${value.selection.atomicLifecycle.supersededCount} superseded, ${value.selection.atomicLifecycle.linkedSupersedesCount} supersede links, stable content IDs ${value.selection.atomicLifecycle.stableContentIds}`
+      : null,
+    `- Raw session memory count: ${value.selection.rawSessionMemoryCount}`,
     `- Expected result ref count: ${value.selection.expectedResultRefCount}`,
     `- Query set hash: ${value.selection.querySetHash}`,
     `- Collector-compatible query set hash: ${value.selection.collectorCompatibleQuerySetHash}`,
@@ -1050,7 +1255,7 @@ function renderMarkdown(value) {
     "## Next Actions",
     "",
     ...value.nextActions.map((item) => `- ${item}`),
-  ].join("\n");
+  ].filter((line) => line !== null).join("\n");
 }
 
 function publicSafety() {

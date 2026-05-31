@@ -203,6 +203,8 @@ function safeString(value) {
 const CONTEXT_METADATA_KEYS = [
     "origin",
     "kind",
+    "atomicKind",
+    "confidence",
     "scope",
     "sourceKind",
     "sourceId",
@@ -227,6 +229,16 @@ const CONTEXT_METADATA_KEYS = [
     "sourceContentHash",
     "sourceEstimatedTokens",
     "parentSessionId",
+    "legacyAtomicId",
+    "validFrom",
+    "validUntil",
+    "supersedes",
+    "supersededBy",
+    "contradictedBy",
+    "lifecycleStatus",
+    "atomicSubjectKey",
+    "entities",
+    "topics",
     "chunkIndex",
     "chunkCount",
     "atomicFactIndex",
@@ -266,6 +278,12 @@ function assignDefined(target, values) {
     }
 }
 function safeMetadataValue(value) {
+    if (Array.isArray(value)) {
+        const safeItems = value
+            .map((item) => safeMetadataValue(item))
+            .filter((item) => typeof item === "string");
+        return safeItems.length > 0 ? safeItems.slice(0, 12) : undefined;
+    }
     if (typeof value === "number")
         return Number.isFinite(value) ? value : undefined;
     if (typeof value === "boolean")
