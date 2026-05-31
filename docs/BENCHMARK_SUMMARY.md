@@ -30,6 +30,23 @@ according to the response export result budget before building the answer
 prompt. Do not treat previous title/wiki amplification failures as final until
 the same answer-quality shard is rerun across both memory methods.
 
+The 2026-05-31 follow-up made the full-target materializer shardable with
+`--query-offset` and `--max-queries`. A live 3-query full-target diagnostic
+proved the sharded private files stay small enough for rapid provider loops:
+`contextual-source-chunk-v1` produced 1,064 contextual chunks and a roughly
+2.4 MB private memories file for the first three target queries. The matching
+NVIDIA diagnostic is checked in at
+`reviews/overnight-20260522/nvidia-contextual-method-shard-20260531.json`.
+It is retrieval-proxy method-debug evidence only, not answer-quality or SOTA
+evidence. On that tiny shard, `session-v1` plus `bm25-lite` led at 0.5117
+quality. `contextual-source-chunk-v1` plus `bm25-lite` reached 0.2459, and
+`contextual-source-chunk-v1` plus `cloud-nvidia-nv-embed-v1-mistral-rerank`
+reached 0.1096. The same NVIDIA arm scored 0.0000 on `session-v1`, so treat
+that as a likely adapter, rerank parsing, scoring, or tiny-shard integration
+risk rather than a stable provider-quality verdict. The next useful method
+change is an atomic/contextual index layer that ranks high-signal summaries
+while rehydrating source chunks, followed by a larger same-data shard.
+
 ## Operating Provider Policy
 
 For actual Codex and personal memory usage, the default provider arm is the
@@ -40,6 +57,17 @@ vectorized-session comparisons, lifecycle-hook experiments, plugin capability
 loops, and no-spend/offline fallback. A local arm should not replace the
 personal cloud default unless it wins a same-data answer-quality benchmark
 against Voyage or the owner explicitly changes the policy.
+
+For benchmark methodology refinement, NVIDIA is now the preferred cheap cloud
+challenger lane when a local full run would create avoidable unified-memory
+pressure. Reports must name the exact NVIDIA strategy and model pair. The
+current tested pair is `nvidia/nv-embed-v1` for embeddings and
+`nv-rerank-qa-mistral-4b:1` for rerank, behind the
+`cloud-nvidia-nv-embed-v1-mistral-rerank` strategy. Gemini Embedding 2 and
+Voyage remain valid provider challengers when their rate limits allow it.
+Alibaba/Qwen cloud keys are not yet part of the checked-in harness contract,
+so they must be added as a separate provider arm before they can count in the
+same evidence ladder.
 
 Hosted Supermemory search is disabled for methodology refinement runs unless
 the command is explicitly a hosted-baseline parity run. The production bridge

@@ -42,6 +42,11 @@ const contextualChunkChars = positiveInt(
   args.contextualChunkChars ?? process.env.RECALLWEAVE_CONTEXTUAL_MEMORY_CHUNK_CHARS ?? 1800,
   "contextual chunk chars",
 );
+const materializeMaxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_MATERIALIZE_MAX_QUERIES ?? null, "materialize max queries");
+const materializeQueryOffset = optionalNonNegativeInt(
+  args.queryOffset ?? process.env.RECALLWEAVE_MATERIALIZE_QUERY_OFFSET ?? 0,
+  "materialize query offset",
+);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -91,7 +96,20 @@ async function liveMaterialize() {
   assert.match(String(target.benchmark.datasetRevision ?? ""), new RegExp(escapeRegExp(datasetHash)), "target datasetRevision must include dataset hash");
   const dataset = JSON.parse(rawText);
   assert.ok(Array.isArray(dataset), "LongMemEval dataset must be a JSON array");
-  const selected = selectSlice(dataset, policy.types, { perType: policy.perType, limit: policy.limit, selection: policy.selection });
+  const targetSelected = selectSlice(dataset, policy.types, { perType: policy.perType, limit: policy.limit, selection: policy.selection });
+  const targetSelectedIds = targetSelected.map((item) => String(item.question_id));
+  const targetSelectedQuestionIdsHash = `sha256:${stableHash(targetSelectedIds.join("\n"))}`;
+  const targetLabelPayload = targetSelected.map((item) => ({
+    questionId: String(item.question_id),
+    questionType: String(item.question_type),
+    answer: String(item.answer ?? ""),
+  }));
+  const targetAnswerLabelsHash = `sha256:${stableHash(canonicalJson(targetLabelPayload))}`;
+  assert.equal(targetSelectedQuestionIdsHash, sourceLock.nextTargetRecommendation?.selectedQuestionIdsHash ?? targetSelectedQuestionIdsHash);
+  assert.equal(targetAnswerLabelsHash, target.benchmark.answerLabelsHash, "target answer label hash must match target");
+
+  const shard = materializationShard(targetSelected);
+  const selected = shard.selected;
   const selectedIds = selected.map((item) => String(item.question_id));
   const selectedQuestionIdsHash = `sha256:${stableHash(selectedIds.join("\n"))}`;
   const labelPayload = selected.map((item) => ({
@@ -100,8 +118,6 @@ async function liveMaterialize() {
     answer: String(item.answer ?? ""),
   }));
   const answerLabelsHash = `sha256:${stableHash(canonicalJson(labelPayload))}`;
-  assert.equal(selectedQuestionIdsHash, sourceLock.nextTargetRecommendation?.selectedQuestionIdsHash ?? selectedQuestionIdsHash);
-  assert.equal(answerLabelsHash, target.benchmark.answerLabelsHash, "selected answer label hash must match target");
 
   const materialized = writePrivateBenchmarkInputs({
     fixtureOnly: false,
@@ -110,12 +126,15 @@ async function liveMaterialize() {
     answerModel: target.benchmark.answerModel,
     selected,
     target,
+    materializationShard: shard,
     rawDatasetText: rawText,
     rawDatasetByteSize: rawBuffer.byteLength,
     rawDatasetItemCount: dataset.length,
     datasetHash,
     selectedQuestionIdsHash,
+    targetSelectedQuestionIdsHash,
     answerLabelsHash,
+    targetAnswerLabelsHash,
     scoringCodeHash: target.benchmark.scoringCodeHash,
   });
 
@@ -155,6 +174,7 @@ async function liveMaterialize() {
       limit,
       retrievalStrategy,
       memoryMethod,
+      materializationShard: shard.summary,
     },
     selection: materialized.selection,
     sourceRetention: materialized.sourceRetention,
@@ -170,7 +190,7 @@ async function liveMaterialize() {
 }
 
 function fixtureMaterialize() {
-  const selected = [
+  const targetSelected = [
     {
       question_id: "fixture-user",
       question_type: "single-session-user",
@@ -215,9 +235,17 @@ function fixtureMaterialize() {
       scoringCodeHash: "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
     },
   };
+  const shard = materializationShard(targetSelected);
+  const selected = shard.selected;
   const selectedQuestionIdsHash = `sha256:${stableHash(selected.map((item) => item.question_id).join("\n"))}`;
-  const rawDatasetText = JSON.stringify(selected, null, 2);
+  const targetSelectedQuestionIdsHash = `sha256:${stableHash(targetSelected.map((item) => item.question_id).join("\n"))}`;
+  const rawDatasetText = JSON.stringify(targetSelected, null, 2);
   const answerLabelsHash = `sha256:${stableHash(canonicalJson(selected.map((item) => ({
+    questionId: item.question_id,
+    questionType: item.question_type,
+    answer: item.answer,
+  }))))}`;
+  const targetAnswerLabelsHash = `sha256:${stableHash(canonicalJson(targetSelected.map((item) => ({
     questionId: item.question_id,
     questionType: item.question_type,
     answer: item.answer,
@@ -229,12 +257,15 @@ function fixtureMaterialize() {
     answerModel: target.benchmark.answerModel,
     selected,
     target,
+    materializationShard: shard,
     rawDatasetText,
     rawDatasetByteSize: Buffer.byteLength(rawDatasetText, "utf8"),
-    rawDatasetItemCount: selected.length,
+    rawDatasetItemCount: targetSelected.length,
     datasetHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     selectedQuestionIdsHash,
+    targetSelectedQuestionIdsHash,
     answerLabelsHash,
+    targetAnswerLabelsHash,
     scoringCodeHash: target.benchmark.scoringCodeHash,
   });
   return {
@@ -260,7 +291,7 @@ function fixtureMaterialize() {
       datasetHost: "fixture",
       datasetHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
       datasetByteSize: 1024,
-      datasetItemCount: 2,
+      datasetItemCount: targetSelected.length,
     },
     target: {
       targetIdHash: shortHash(target.targetId),
@@ -273,6 +304,7 @@ function fixtureMaterialize() {
       limit,
       retrievalStrategy,
       memoryMethod,
+      materializationShard: materialized.selection.materializationShard,
     },
     selection: materialized.selection,
     sourceRetention: materialized.sourceRetention,
@@ -363,10 +395,13 @@ function writePrivateBenchmarkInputs(options) {
       targetIdHash: shortHash(options.target.targetId),
       datasetHash: options.datasetHash,
       selectedQuestionIdsHash: options.selectedQuestionIdsHash,
+      targetSelectedQuestionIdsHash: options.targetSelectedQuestionIdsHash,
       answerLabelsHash: options.answerLabelsHash,
+      targetAnswerLabelsHash: options.targetAnswerLabelsHash,
       scoringCodeHash: options.scoringCodeHash,
       materializerHash,
       memoryMethod,
+      materializationShard: options.materializationShard?.summary ?? null,
     },
     queries,
   };
@@ -376,7 +411,9 @@ function writePrivateBenchmarkInputs(options) {
     benchmark: "longmemeval",
     datasetSlice: options.datasetSlice,
     answerLabelsHash: options.answerLabelsHash,
+    targetAnswerLabelsHash: options.targetAnswerLabelsHash,
     scoringCodeHash: options.scoringCodeHash,
+    materializationShard: options.materializationShard?.summary ?? null,
     labels: options.selected.map((row) => ({
       queryId: queryIdFor(row),
       questionId: String(row.question_id),
@@ -428,12 +465,14 @@ function writePrivateBenchmarkInputs(options) {
       hash: selectedRawRowsHash,
       rowCount: options.selected.length,
       selectedQuestionIdsHash: options.selectedQuestionIdsHash,
+      targetSelectedQuestionIdsHash: options.targetSelectedQuestionIdsHash,
       rawTextPrivate: true,
     },
     derivedInputs: {
       querySetHash,
       memoriesFileHash,
       answerLabelsHash: options.answerLabelsHash,
+      targetAnswerLabelsHash: options.targetAnswerLabelsHash,
       scoringCodeHash: options.scoringCodeHash,
       materializerHash,
       memoryMethod,
@@ -467,9 +506,12 @@ function writePrivateBenchmarkInputs(options) {
       selectedCount: options.selected.length,
       questionTypeCount: new Set(options.selected.map((item) => String(item.question_type))).size,
       selectedQuestionIdsHash: options.selectedQuestionIdsHash,
+      targetSelectedQuestionIdsHash: options.targetSelectedQuestionIdsHash,
       answerLabelsHash: options.answerLabelsHash,
+      targetAnswerLabelsHash: options.targetAnswerLabelsHash,
       materializerHash,
       memoryMethod,
+      materializationShard: options.materializationShard?.summary ?? null,
       queryCount: queries.length,
       haystackSessionCount: sessionContentById.size,
       memoryRecordCount: memories.length,
@@ -558,6 +600,26 @@ function selectSlice(dataset, questionTypes, options) {
   }
   assert.equal(selected.length, Math.min(options.limit, questionTypes.length * options.perType), "slice selection did not produce the expected count");
   return selected;
+}
+
+function materializationShard(selected) {
+  const totalQueryCount = selected.length;
+  assert.ok(materializeQueryOffset <= totalQueryCount, `materialize query offset ${materializeQueryOffset} exceeds selected query count ${totalQueryCount}`);
+  const endIndexExclusive = materializeMaxQueries
+    ? Math.min(totalQueryCount, materializeQueryOffset + materializeMaxQueries)
+    : totalQueryCount;
+  const shardSelected = selected.slice(materializeQueryOffset, endIndexExclusive);
+  assert.ok(shardSelected.length > 0, "materialized query shard is empty");
+  const summary = {
+    applied: materializeQueryOffset > 0 || materializeMaxQueries != null,
+    startIndex: materializeQueryOffset,
+    endIndexExclusive,
+    totalQueryCount,
+    selectedCount: shardSelected.length,
+    requestedLimit: materializeMaxQueries,
+    selectedQuestionIdsHash: `sha256:${stableHash(shardSelected.map((item) => String(item.question_id)).join("\n"))}`,
+  };
+  return { ...summary, selected: shardSelected, summary };
 }
 
 function parseQuestionIdPolicy(value) {
@@ -753,6 +815,7 @@ function renderMarkdown(value) {
     `- Claim tier: ${value.claimTier}`,
     `- Dataset hash: ${value.source.datasetHash}`,
     `- Memory method: ${value.selection.memoryMethod}`,
+    `- Materialization shard: ${value.selection.materializationShard?.applied ? `${value.selection.materializationShard.startIndex}-${value.selection.materializationShard.endIndexExclusive}` : "full"}`,
     `- Query count: ${value.selection.queryCount}`,
     `- Haystack session count: ${value.selection.haystackSessionCount}`,
     `- Memory record count: ${value.selection.memoryRecordCount}`,
@@ -937,6 +1000,18 @@ function shortHash(value) {
 function positiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
+  return number;
+}
+
+function optionalPositiveInt(value, label) {
+  if (value == null || value === "") return null;
+  return positiveInt(value, label);
+}
+
+function optionalNonNegativeInt(value, label) {
+  if (value == null || value === "") return 0;
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
   return number;
 }
 

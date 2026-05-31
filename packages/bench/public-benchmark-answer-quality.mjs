@@ -145,9 +145,8 @@ async function liveRun() {
   const labelsByQueryId = labelsByQuery(answerLabels);
   const querySelection = selectQueries(querySet.queries ?? []);
   const expectedAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
-  assert.equal(answerLabels.answerLabelsHash, expectedAnswerLabelsHash, "private answer-label hash must match target");
+  assertAnswerLabelsMatchTarget({ answerLabels, querySet, expectedAnswerLabelsHash });
   assert.equal(answerLabels.scoringCodeHash, target.benchmark?.scoringCodeHash, "private scoring-code hash must match target");
-  assert.equal(querySet.authoring?.answerLabelsHash, expectedAnswerLabelsHash, "query-set answer-label hash must match target");
   assert.equal(querySet.authoring?.scoringCodeHash, target.benchmark?.scoringCodeHash, "query-set scoring-code hash must match target");
 
   let providerCalls = 0;
@@ -211,6 +210,16 @@ function liveArmSpecs() {
         return { strategy: match[1], responsesPath };
       }),
   );
+}
+
+function assertAnswerLabelsMatchTarget({ answerLabels, querySet, expectedAnswerLabelsHash }) {
+  const directMatch = answerLabels.answerLabelsHash === expectedAnswerLabelsHash && querySet.authoring?.answerLabelsHash === expectedAnswerLabelsHash;
+  const shardMatch =
+    answerLabels.targetAnswerLabelsHash === expectedAnswerLabelsHash
+    && querySet.authoring?.targetAnswerLabelsHash === expectedAnswerLabelsHash
+    && answerLabels.materializationShard?.applied === true
+    && querySet.authoring?.materializationShard?.applied === true;
+  assert.ok(directMatch || shardMatch, "private answer-label hash or materialized shard parent hash must match target");
 }
 
 function scoreArm({ strategy, responses, querySelection, queries, memories, labelsByQueryId, fixture }) {
