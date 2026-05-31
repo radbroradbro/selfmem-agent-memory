@@ -158,8 +158,8 @@
 ## Provider Wave Intake
 - Status: READY_PROVIDER_WAVE_INTAKE
 - Evidence ready: true
-- Reports: 13
-- Completed reports: 3
+- Reports: 14
+- Completed reports: 4
 - Partial reports: 10
 - All waves include BM25: true
 - All waves include full hybrid: true

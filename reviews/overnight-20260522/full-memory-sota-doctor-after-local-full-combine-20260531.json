@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-31T14:13:58.266Z",
+  "generatedAt": "2026-05-31T14:26:32.824Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -377,7 +377,7 @@
     "providerWaveIntake": {
       "path": "reviews/overnight-20260522/provider-wave-intake-20260531.json",
       "exists": true,
-      "hash": "sha256:333849414807af8ab7986172dc5a198bc3506146c708d61bd7d9acf13a41d630",
+      "hash": "sha256:451f35e85059dfb331eb0396bdb1043aa3428b8ce135a60134ba74fb7cd41a74",
       "mode": "provider-wave-intake",
       "status": "READY_PROVIDER_WAVE_INTAKE"
     },
@@ -1156,8 +1156,8 @@
     "publicBenchmarkClaimsAllowed": false,
     "countsAsFullMemorySotaEvidence": false,
     "countsAsEndToEndMemoryBenchmark": false,
-    "reportCount": 13,
-    "completedReportCount": 3,
+    "reportCount": 14,
+    "completedReportCount": 4,
     "partialReportCount": 10,
     "allHaveBm25": true,
     "allHaveFullHybrid": true,
@@ -1200,7 +1200,7 @@
       },
       {
         "provider": "nvidia",
-        "completedArmCount": 6,
+        "completedArmCount": 7,
         "failedArmCount": 4,
         "bestStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
         "bestQuality": 0.1575

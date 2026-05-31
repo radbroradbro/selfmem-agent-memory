@@ -332,51 +332,63 @@ function buildNextRunPlan({ providers, controls, providerGateReports }) {
 }
 
 function buildRepairSlices(providerGateReports) {
-  const bySlice = new Map();
+  const byQuery = new Map();
   for (const item of providerGateReports) {
     const selection = item.json.input?.requestedQuerySelection ?? {};
     const queryOffset = Number(selection.queryOffset ?? NaN);
-    const maxQueries = Number(selection.maxQueries ?? NaN);
-    if (!Number.isFinite(queryOffset) || !Number.isFinite(maxQueries)) continue;
-    const key = `${queryOffset}-${queryOffset + maxQueries}`;
-    const state = bySlice.get(key) ?? {
-      queryOffset,
-      maxQueries,
-      range: key,
-      completedProviders: new Set(),
-      failedProviders: new Set(),
-      failureClasses: new Set(),
-    };
+    const selectedQueryCount = Number(item.json.input?.selectedQueryCount ?? selection.maxQueries ?? NaN);
+    if (!Number.isFinite(queryOffset) || !Number.isFinite(selectedQueryCount) || selectedQueryCount <= 0) continue;
+    const queryIndexes = Array.from({ length: selectedQueryCount }, (_, index) => queryOffset + index);
     for (const strategy of providerStrategies(item.json)) {
       for (const provider of arrayOf(strategy.provider?.providers).length ? strategy.provider.providers : [providerFamilyForStrategy(strategy.strategy)]) {
-        if (provider) state.completedProviders.add(provider);
+        if (!provider) continue;
+        for (const queryIndex of queryIndexes) queryRepairState(byQuery, queryIndex).completedProviders.add(provider);
       }
     }
     for (const failure of arrayOf(item.json.failedStrategies)) {
       const provider = providerFamilyForStrategy(failure.strategy);
       if (!provider) continue;
-      state.failedProviders.add(provider);
-      state.failureClasses.add(`${provider}:${failure.failureClass ?? "unknown"}`);
+      for (const queryIndex of queryIndexes) {
+        const state = queryRepairState(byQuery, queryIndex);
+        state.failedProviders.add(provider);
+        state.failureClasses.add(`${provider}:${failure.failureClass ?? "unknown"}`);
+      }
     }
-    bySlice.set(key, state);
   }
-  return [...bySlice.values()]
+  return [...byQuery.values()]
     .map((state) => {
       const missingProviders = ["nvidia", "gemini", "voyage"].filter((provider) => !state.completedProviders.has(provider));
+      const unresolvedFailedProviders = [...state.failedProviders].filter((provider) => !state.completedProviders.has(provider));
       return {
         queryOffset: state.queryOffset,
-        maxQueries: Math.min(state.maxQueries, 2),
+        maxQueries: 1,
         range: state.range,
         completedProviders: [...state.completedProviders].sort(),
         missingProviders,
-        failedProviders: [...state.failedProviders].sort(),
-        failureClasses: [...state.failureClasses].sort(),
+        failedProviders: unresolvedFailedProviders.sort(),
+        failureClasses: [...state.failureClasses]
+          .filter((item) => missingProviders.includes(String(item).split(":")[0]))
+          .sort(),
         recommendedStrategies: missingProviders.map(providerDefaultStrategy),
       };
     })
     .filter((slice) => slice.missingProviders.length > 0)
-    .sort((a, b) => b.failedProviders.length - a.failedProviders.length || a.queryOffset - b.queryOffset)
+    .sort((a, b) => b.missingProviders.length - a.missingProviders.length || b.failedProviders.length - a.failedProviders.length || a.queryOffset - b.queryOffset)
     .slice(0, 6);
+}
+
+function queryRepairState(map, queryOffset) {
+  const key = String(queryOffset);
+  if (!map.has(key)) {
+    map.set(key, {
+      queryOffset,
+      range: `${queryOffset}-${queryOffset + 1}`,
+      completedProviders: new Set(),
+      failedProviders: new Set(),
+      failureClasses: new Set(),
+    });
+  }
+  return map.get(key);
 }
 
 function providerDefaultStrategy(provider) {
