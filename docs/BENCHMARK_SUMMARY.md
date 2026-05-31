@@ -58,6 +58,29 @@ This is method plumbing evidence only. The next benchmark gate is same-shard
 retrieval and answer-quality comparison against `session-v1`,
 `contextual-source-chunk-v1`, BM25-lite, and provider-backed arms.
 
+That same-shard retrieval-proxy method ladder is now repeatable with:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-method-ladder -- --live \
+  --query-offset 0 \
+  --max-queries 10 \
+  --context-token-budget 800 \
+  --limit 5
+```
+
+The first checked-in report is
+`reviews/overnight-20260522/memory-method-ladder-10q-20260531.json`, with a
+markdown companion at
+`reviews/overnight-20260522/memory-method-ladder-10q-20260531.md`. It used the
+same raw 10-question selection for all methods. On this retrieval-proxy ladder,
+`session-v1` plus `bm25-lite` still wins overall at 0.2772 quality and P@1
+0.6. Among chunked methods, `contextual-index-source-chunk-v1` plus
+`full-hybrid-rerank` is best at 0.2114 quality and P@1 0.5, improving over
+`contextual-source-chunk-v1` plus `full-hybrid-rerank` at 0.2003. This supports
+testing the contextual index on answer-quality shards, but does not justify
+promotion yet because retrieval-proxy scoring is sensitive to session-vs-chunk
+expected-reference granularity.
+
 ## Operating Provider Policy
 
 For actual Codex and personal memory usage, the default provider arm is the

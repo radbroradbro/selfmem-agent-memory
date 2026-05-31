@@ -100,6 +100,7 @@
     "benchmark:public-provider": "node packages/bench/public-benchmark-strategy-compare.mjs --gate provider --context-token-budget 800 --limit 5",
     "benchmark:provider-wave-intake": "node packages/bench/provider-wave-intake.mjs",
     "benchmark:public-autoresearch": "node packages/bench/public-benchmark-autoresearch-loop.mjs",
+    "benchmark:public-method-ladder": "node packages/bench/public-benchmark-memory-method-ladder.mjs",
     "benchmark:agentic-watch": "node packages/bench/agentic-memory-target-watch.mjs",
     "benchmark:agentic-ingest-contract": "node packages/bench/agentic-memory-ingest-contract.mjs",
     "benchmark:agentic-source-lock": "node packages/bench/agentic-memory-source-lock-check.mjs",
