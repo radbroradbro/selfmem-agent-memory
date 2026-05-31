@@ -3969,6 +3969,10 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(providerWaveIntakeReport.providerHybridContract?.providerOnlyDenseClaimsAllowed, false);
   assert.equal(providerWaveIntakeReport.providerHybridContract?.allProviderWavesMeetHybridControlContract, true);
   assert.equal(providerWaveIntakeReport.providerHybridContract?.answerQualityStillRequiredForMemoryClaims, true);
+  assert.equal(providerWaveIntakeReport.nextRunPlan?.status, "READY_PROVIDER_REPAIR_WAVES");
+  assert.equal(providerWaveIntakeReport.nextRunPlan?.recommendedExecution, "single-provider-single-slice");
+  assert.equal(providerWaveIntakeReport.nextRunPlan?.avoidConcurrentProviderArms, true);
+  assert.ok(providerWaveIntakeReport.nextRunPlan?.repairSlices?.length > 0);
   assert.ok(providerWaveIntakeReport.providers?.completedProviderFamilies?.includes("gemini"));
   assert.ok(providerWaveIntakeReport.providers?.completedProviderFamilies?.includes("nvidia"));
   assert.ok(providerWaveIntakeReport.providers?.completedProviderFamilies?.includes("voyage"));
@@ -3977,11 +3981,14 @@ check("fresh public benchmark target check passes", () => {
   assert.match(providerWaveIntakeEvidence, /All waves include full hybrid: true/);
   assert.match(providerWaveIntakeEvidence, /Provider Hybrid Contract/);
   assert.match(providerWaveIntakeEvidence, /Provider-only dense claims allowed: false/);
+  assert.match(providerWaveIntakeEvidence, /Next Run Plan/);
+  assert.match(providerWaveIntakeEvidence, /Recommended execution: single-provider-single-slice/);
   assert.match(providerWaveIntakeEvidence, /Counts as full memory SOTA evidence: false/);
   assert.equal(providerWaveIntakeFresh.ok, true);
   assert.equal(providerWaveIntakeFresh.controls?.allHaveBm25, true);
   assert.equal(providerWaveIntakeFresh.controls?.allHaveFullHybrid, true);
   assert.equal(providerWaveIntakeFresh.providerHybridContract?.allProviderWavesMeetHybridControlContract, true);
+  assert.equal(providerWaveIntakeFresh.nextRunPlan?.status, "READY_PROVIDER_REPAIR_WAVES");
   assert.equal(providerWaveIntakeFresh.publicBenchmarkClaimsAllowed, false);
   assert.equal(expandedProviderLivePreflightReport.ok, true);
   assert.equal(expandedProviderLivePreflightReport.mode, "provider-benchmark-live-preflight");
@@ -6343,6 +6350,8 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /All waves include BM25: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /All waves include full hybrid: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Completed provider families: gemini, nvidia, voyage/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Repair wave status: READY_PROVIDER_REPAIR_WAVES/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Recommended repair execution: single-provider-single-slice/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));

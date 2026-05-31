@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-31T14:05:56.827Z",
+  "generatedAt": "2026-05-31T14:13:58.266Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -377,7 +377,7 @@
     "providerWaveIntake": {
       "path": "reviews/overnight-20260522/provider-wave-intake-20260531.json",
       "exists": true,
-      "hash": "sha256:f31d68b84ce5ec92f28bfaa42fdc55f619d6ffbc3d6c21327c5ddd7444884ccb",
+      "hash": "sha256:333849414807af8ab7986172dc5a198bc3506146c708d61bd7d9acf13a41d630",
       "mode": "provider-wave-intake",
       "status": "READY_PROVIDER_WAVE_INTAKE"
     },
@@ -1167,6 +1167,29 @@
       "voyage"
     ],
     "retryableProviderLimitObserved": true,
+    "nextRunPlan": {
+      "status": "READY_PROVIDER_REPAIR_WAVES",
+      "recommendedExecution": "single-provider-single-slice",
+      "avoidConcurrentProviderArms": true,
+      "repairSliceCount": 6,
+      "providerPriorities": [
+        {
+          "provider": "nvidia",
+          "retryPriority": "high-free-lane",
+          "recommendedWaveSize": 1
+        },
+        {
+          "provider": "gemini",
+          "retryPriority": "medium-rate-limit-repair",
+          "recommendedWaveSize": 2
+        },
+        {
+          "provider": "voyage",
+          "retryPriority": "medium-rate-limit-repair",
+          "recommendedWaveSize": 2
+        }
+      ]
+    },
     "bestProviderRows": [
       {
         "provider": "gemini",

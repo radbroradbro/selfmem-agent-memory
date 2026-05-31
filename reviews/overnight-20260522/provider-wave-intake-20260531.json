@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "provider-wave-intake",
   "status": "READY_PROVIDER_WAVE_INTAKE",
-  "generatedAt": "2026-05-31T12:50:16.810Z",
+  "generatedAt": "2026-05-31T14:12:40.944Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -524,6 +524,231 @@
       "latencyDeltaVsBm25": 0
     }
   ],
+  "nextRunPlan": {
+    "status": "READY_PROVIDER_REPAIR_WAVES",
+    "claimBoundary": "Provider repair waves are retrieval/provider-gate evidence only. They must be followed by accepted answer-quality scoring before memory or SOTA claims.",
+    "controlsReady": true,
+    "recommendedExecution": "single-provider-single-slice",
+    "avoidConcurrentProviderArms": true,
+    "providerPlans": [
+      {
+        "provider": "nvidia",
+        "status": "has-completed-canary",
+        "completedArmCount": 6,
+        "failedArmCount": 4,
+        "retryableFailureCount": 3,
+        "bestStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "bestQuality": 0.1575,
+        "recommendedWaveSize": 1,
+        "retryPriority": "high-free-lane",
+        "env": {
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS": "1",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA": "1",
+          "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE": "key",
+          "RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS": "2",
+          "RECALLWEAVE_PROVIDER_TIMEOUT_MS": "180000",
+          "RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT": "16",
+          "RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT": "8",
+          "NVIDIA_PROVIDER_MIN_INTERVAL_MS": "1750"
+        },
+        "reason": "NVIDIA is the best zero-dollar repair lane so far: completed=6, failed=4; prefer tiny single-slice retries with a strict per-key pace."
+      },
+      {
+        "provider": "gemini",
+        "status": "has-completed-canary",
+        "completedArmCount": 3,
+        "failedArmCount": 6,
+        "retryableFailureCount": 5,
+        "bestStrategy": "cloud-gemini2-embed-rerank-proxy",
+        "bestQuality": 0.1575,
+        "recommendedWaveSize": 2,
+        "retryPriority": "medium-rate-limit-repair",
+        "env": {
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS": "1",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA": "1",
+          "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE": "key",
+          "RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS": "2",
+          "RECALLWEAVE_PROVIDER_TIMEOUT_MS": "180000",
+          "RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT": "16",
+          "RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT": "8",
+          "GEMINI_PROVIDER_MIN_INTERVAL_MS": "1500"
+        },
+        "reason": "Gemini has completed canaries but still shows timeout/rate-limit pressure: completed=3, failed=6; keep candidate pools capped."
+      },
+      {
+        "provider": "voyage",
+        "status": "has-completed-canary",
+        "completedArmCount": 1,
+        "failedArmCount": 5,
+        "retryableFailureCount": 5,
+        "bestStrategy": "cloud-voyage4-voyage-lite-rerank",
+        "bestQuality": 0,
+        "recommendedWaveSize": 2,
+        "retryPriority": "medium-rate-limit-repair",
+        "env": {
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS": "1",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA": "1",
+          "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE": "key",
+          "RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS": "2",
+          "RECALLWEAVE_PROVIDER_TIMEOUT_MS": "180000",
+          "RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT": "16",
+          "RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT": "8",
+          "VOYAGE_PROVIDER_MIN_INTERVAL_MS": "1500"
+        },
+        "reason": "Voyage remains the personal/prod default, but the provider-wave evidence shows rate limits: completed=1, failed=5; retry in smaller waves before using it for same-data answer quality."
+      }
+    ],
+    "repairSlices": [
+      {
+        "queryOffset": 50,
+        "maxQueries": 2,
+        "range": "50-75",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "nvidia",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:strategy-arm-failed",
+          "nvidia:strategy-arm-failed",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 85,
+        "maxQueries": 2,
+        "range": "85-90",
+        "completedProviders": [],
+        "missingProviders": [
+          "nvidia",
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "nvidia",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:provider-rate-limit",
+          "gemini:provider-timeout",
+          "nvidia:provider-timeout",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 75,
+        "maxQueries": 2,
+        "range": "75-78",
+        "completedProviders": [
+          "gemini",
+          "nvidia"
+        ],
+        "missingProviders": [
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:provider-rate-limit",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 78,
+        "maxQueries": 2,
+        "range": "78-83",
+        "completedProviders": [
+          "voyage"
+        ],
+        "missingProviders": [
+          "nvidia",
+          "gemini"
+        ],
+        "failedProviders": [
+          "gemini",
+          "nvidia"
+        ],
+        "failureClasses": [
+          "gemini:provider-timeout",
+          "nvidia:provider-timeout"
+        ],
+        "recommendedStrategies": [
+          "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "cloud-gemini2-embed-rerank-proxy"
+        ]
+      },
+      {
+        "queryOffset": 83,
+        "maxQueries": 1,
+        "range": "83-84",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "nvidia"
+        ],
+        "failureClasses": [
+          "gemini:provider-timeout",
+          "nvidia:provider-timeout"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 83,
+        "maxQueries": 2,
+        "range": "83-85",
+        "completedProviders": [
+          "gemini"
+        ],
+        "missingProviders": [
+          "nvidia",
+          "voyage"
+        ],
+        "failedProviders": [],
+        "failureClasses": [],
+        "recommendedStrategies": [
+          "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      }
+    ],
+    "stopRules": [
+      "stop-provider-after-3-consecutive-rate-limits",
+      "stop-provider-after-2-timeouts-on-the-same-slice",
+      "keep-bm25-and-full-hybrid-controls-on-every-slice",
+      "do-not-count-provider-gate-results-as-answer-quality"
+    ]
+  },
   "blockers": [
     "retryable-provider-limit-or-timeout-observed"
   ],

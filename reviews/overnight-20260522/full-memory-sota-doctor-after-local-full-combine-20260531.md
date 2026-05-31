@@ -165,6 +165,10 @@
 - All waves include full hybrid: true
 - Completed provider families: gemini, nvidia, voyage
 - Retryable provider limit observed: true
+- Repair wave status: READY_PROVIDER_REPAIR_WAVES
+- Repair slices: 6
+- Recommended repair execution: single-provider-single-slice
+- Avoid concurrent provider arms: true
 - Counts as full memory SOTA evidence: false
 - Counts as end-to-end memory benchmark: false
 - Best provider rows: gemini:cloud-gemini2-embed-rerank-proxy:0.1575, nvidia:cloud-nvidia-nv-embed-v1-mistral-rerank:0.1575, voyage:cloud-voyage4-voyage-lite-rerank:0

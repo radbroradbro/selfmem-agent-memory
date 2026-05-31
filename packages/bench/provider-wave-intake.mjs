@@ -23,6 +23,7 @@ assert.ok(providerGateReports.length > 0, "no public-benchmark-provider-gate rep
 const providers = summarizeProviders(providerGateReports);
 const controls = summarizeControls(providerGateReports);
 const providerHybridContract = buildProviderHybridContract(controls);
+const nextRunPlan = buildNextRunPlan({ providers, controls, providerGateReports });
 const completedReports = providerGateReports.filter((item) => item.json.status === "COMPLETED");
 const partialReports = providerGateReports.filter((item) => item.json.status === "PARTIAL_COMPLETED_WITH_ARM_FAILURES");
 const failedReports = providerGateReports.filter((item) => item.json.status === "FAILED_ALL_ARMS");
@@ -101,6 +102,7 @@ const report = {
     qualityDeltaVsBm25: promotion.qualityDeltaVsBm25 ?? null,
     latencyDeltaVsBm25: promotion.latencyDeltaVsBm25 ?? null,
   })),
+  nextRunPlan,
   blockers,
   nextActions: nextActions({ providers, providerFailures, controls }),
 };
@@ -290,6 +292,131 @@ function nextActions({ providers, providerFailures, controls }) {
   return actions;
 }
 
+function buildNextRunPlan({ providers, controls, providerGateReports }) {
+  const repairSlices = buildRepairSlices(providerGateReports);
+  const rowsByProvider = new Map(providers.rows.map((row) => [row.provider, row]));
+  const providerOrder = ["nvidia", "gemini", "voyage"];
+  const providerPlans = providerOrder.map((provider) => {
+    const row = rowsByProvider.get(provider) ?? {};
+    return {
+      provider,
+      status: Number(row.completedArmCount ?? 0) > 0 ? "has-completed-canary" : "needs-first-completed-canary",
+      completedArmCount: Number(row.completedArmCount ?? 0),
+      failedArmCount: Number(row.failedArmCount ?? 0),
+      retryableFailureCount: Number(row.retryableFailureCount ?? 0),
+      bestStrategy: row.bestStrategy ?? providerDefaultStrategy(provider),
+      bestQuality: row.bestQuality ?? null,
+      recommendedWaveSize: provider === "nvidia" ? 1 : 2,
+      retryPriority: retryPriority(provider, row),
+      env: providerEnvRecommendations(provider),
+      reason: providerReason(provider, row),
+    };
+  });
+  const controlsReady = controls.allHaveBm25 && controls.allHaveFullHybrid;
+  return {
+    status: repairSlices.length && controlsReady ? "READY_PROVIDER_REPAIR_WAVES" : "BLOCKED_PROVIDER_REPAIR_WAVES",
+    claimBoundary:
+      "Provider repair waves are retrieval/provider-gate evidence only. They must be followed by accepted answer-quality scoring before memory or SOTA claims.",
+    controlsReady,
+    recommendedExecution: "single-provider-single-slice",
+    avoidConcurrentProviderArms: true,
+    providerPlans,
+    repairSlices,
+    stopRules: [
+      "stop-provider-after-3-consecutive-rate-limits",
+      "stop-provider-after-2-timeouts-on-the-same-slice",
+      "keep-bm25-and-full-hybrid-controls-on-every-slice",
+      "do-not-count-provider-gate-results-as-answer-quality",
+    ],
+  };
+}
+
+function buildRepairSlices(providerGateReports) {
+  const bySlice = new Map();
+  for (const item of providerGateReports) {
+    const selection = item.json.input?.requestedQuerySelection ?? {};
+    const queryOffset = Number(selection.queryOffset ?? NaN);
+    const maxQueries = Number(selection.maxQueries ?? NaN);
+    if (!Number.isFinite(queryOffset) || !Number.isFinite(maxQueries)) continue;
+    const key = `${queryOffset}-${queryOffset + maxQueries}`;
+    const state = bySlice.get(key) ?? {
+      queryOffset,
+      maxQueries,
+      range: key,
+      completedProviders: new Set(),
+      failedProviders: new Set(),
+      failureClasses: new Set(),
+    };
+    for (const strategy of providerStrategies(item.json)) {
+      for (const provider of arrayOf(strategy.provider?.providers).length ? strategy.provider.providers : [providerFamilyForStrategy(strategy.strategy)]) {
+        if (provider) state.completedProviders.add(provider);
+      }
+    }
+    for (const failure of arrayOf(item.json.failedStrategies)) {
+      const provider = providerFamilyForStrategy(failure.strategy);
+      if (!provider) continue;
+      state.failedProviders.add(provider);
+      state.failureClasses.add(`${provider}:${failure.failureClass ?? "unknown"}`);
+    }
+    bySlice.set(key, state);
+  }
+  return [...bySlice.values()]
+    .map((state) => {
+      const missingProviders = ["nvidia", "gemini", "voyage"].filter((provider) => !state.completedProviders.has(provider));
+      return {
+        queryOffset: state.queryOffset,
+        maxQueries: Math.min(state.maxQueries, 2),
+        range: state.range,
+        completedProviders: [...state.completedProviders].sort(),
+        missingProviders,
+        failedProviders: [...state.failedProviders].sort(),
+        failureClasses: [...state.failureClasses].sort(),
+        recommendedStrategies: missingProviders.map(providerDefaultStrategy),
+      };
+    })
+    .filter((slice) => slice.missingProviders.length > 0)
+    .sort((a, b) => b.failedProviders.length - a.failedProviders.length || a.queryOffset - b.queryOffset)
+    .slice(0, 6);
+}
+
+function providerDefaultStrategy(provider) {
+  if (provider === "gemini") return "cloud-gemini2-embed-rerank-proxy";
+  if (provider === "voyage") return "cloud-voyage4-voyage-lite-rerank";
+  return "cloud-nvidia-nv-embed-v1-mistral-rerank";
+}
+
+function retryPriority(provider, row = {}) {
+  const completed = Number(row.completedArmCount ?? 0);
+  const retryable = Number(row.retryableFailureCount ?? 0);
+  if (provider === "nvidia" && completed > 0) return "high-free-lane";
+  if (completed === 0) return "high-needs-first-clean-wave";
+  if (retryable > completed) return "medium-rate-limit-repair";
+  return "medium-expand-if-stable";
+}
+
+function providerReason(provider, row = {}) {
+  const completed = Number(row.completedArmCount ?? 0);
+  const failed = Number(row.failedArmCount ?? 0);
+  if (provider === "nvidia") return `NVIDIA is the best zero-dollar repair lane so far: completed=${completed}, failed=${failed}; prefer tiny single-slice retries with a strict per-key pace.`;
+  if (provider === "gemini") return `Gemini has completed canaries but still shows timeout/rate-limit pressure: completed=${completed}, failed=${failed}; keep candidate pools capped.`;
+  return `Voyage remains the personal/prod default, but the provider-wave evidence shows rate limits: completed=${completed}, failed=${failed}; retry in smaller waves before using it for same-data answer quality.`;
+}
+
+function providerEnvRecommendations(provider) {
+  const shared = {
+    RECALLWEAVE_PROVIDER_BENCHMARK_CALLS: "1",
+    RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA: "1",
+    RECALLWEAVE_PROVIDER_THROTTLE_SCOPE: "key",
+    RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS: "2",
+    RECALLWEAVE_PROVIDER_TIMEOUT_MS: "180000",
+    RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT: "16",
+    RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT: "8",
+  };
+  if (provider === "nvidia") return { ...shared, NVIDIA_PROVIDER_MIN_INTERVAL_MS: "1750" };
+  if (provider === "gemini") return { ...shared, GEMINI_PROVIDER_MIN_INTERVAL_MS: "1500" };
+  return { ...shared, VOYAGE_PROVIDER_MIN_INTERVAL_MS: "1500" };
+}
+
 function renderMarkdown(value) {
   return [
     "# Provider Wave Intake",
@@ -319,6 +446,21 @@ function renderMarkdown(value) {
     ...value.providers.rows.map((row) =>
       `- ${row.provider}: completed=${row.completedArmCount}, failed=${row.failedArmCount}, queries=${row.completedQueryCount}, calls=${row.providerCallCount}, docsSent=${row.documentCountSent}, best=${row.bestStrategy ?? "n/a"}:${row.bestQuality ?? "n/a"}, failures=${row.failureClasses.join(", ") || "none"}`,
     ),
+    "",
+    "## Next Run Plan",
+    `- Status: ${value.nextRunPlan.status}`,
+    `- Recommended execution: ${value.nextRunPlan.recommendedExecution}`,
+    `- Avoid concurrent provider arms: ${value.nextRunPlan.avoidConcurrentProviderArms}`,
+    ...value.nextRunPlan.providerPlans.map((plan) =>
+      `- ${plan.provider}: priority=${plan.retryPriority}, waveSize=${plan.recommendedWaveSize}, best=${plan.bestStrategy}:${plan.bestQuality ?? "n/a"}, ${plan.reason}`,
+    ),
+    "",
+    "## Repair Slices",
+    ...(value.nextRunPlan.repairSlices.length
+      ? value.nextRunPlan.repairSlices.map((slice) =>
+          `- q${slice.range}: maxQueries=${slice.maxQueries}, missing=${slice.missingProviders.join(", ")}, strategies=${slice.recommendedStrategies.join(", ")}`,
+        )
+      : ["- none"]),
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),

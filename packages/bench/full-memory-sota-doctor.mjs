@@ -1418,6 +1418,17 @@ function inspectProviderWaveIntake(providerWaveIntake) {
     allHaveFullHybrid: Boolean(providerWaveIntake?.controls?.allHaveFullHybrid),
     completedProviderFamilies: completedFamilies,
     retryableProviderLimitObserved: arrayOf(providerWaveIntake?.blockers).includes("retryable-provider-limit-or-timeout-observed"),
+    nextRunPlan: {
+      status: providerWaveIntake?.nextRunPlan?.status ?? null,
+      recommendedExecution: providerWaveIntake?.nextRunPlan?.recommendedExecution ?? null,
+      avoidConcurrentProviderArms: Boolean(providerWaveIntake?.nextRunPlan?.avoidConcurrentProviderArms),
+      repairSliceCount: arrayOf(providerWaveIntake?.nextRunPlan?.repairSlices).length,
+      providerPriorities: arrayOf(providerWaveIntake?.nextRunPlan?.providerPlans).map((plan) => ({
+        provider: plan.provider,
+        retryPriority: plan.retryPriority,
+        recommendedWaveSize: Number(plan.recommendedWaveSize ?? 0),
+      })),
+    },
     bestProviderRows: rows.map((row) => ({
       provider: row.provider,
       completedArmCount: Number(row.completedArmCount ?? 0),
@@ -1674,6 +1685,10 @@ function renderMarkdown(value) {
     `- All waves include full hybrid: ${value.providerWaveState.allHaveFullHybrid}`,
     `- Completed provider families: ${value.providerWaveState.completedProviderFamilies.join(", ") || "none"}`,
     `- Retryable provider limit observed: ${value.providerWaveState.retryableProviderLimitObserved}`,
+    `- Repair wave status: ${value.providerWaveState.nextRunPlan.status ?? "n/a"}`,
+    `- Repair slices: ${value.providerWaveState.nextRunPlan.repairSliceCount}`,
+    `- Recommended repair execution: ${value.providerWaveState.nextRunPlan.recommendedExecution ?? "n/a"}`,
+    `- Avoid concurrent provider arms: ${value.providerWaveState.nextRunPlan.avoidConcurrentProviderArms}`,
     `- Counts as full memory SOTA evidence: ${value.providerWaveState.countsAsFullMemorySotaEvidence}`,
     `- Counts as end-to-end memory benchmark: ${value.providerWaveState.countsAsEndToEndMemoryBenchmark}`,
     `- Best provider rows: ${value.providerWaveState.bestProviderRows.map((row) => `${row.provider}:${row.bestStrategy ?? "n/a"}:${row.bestQuality ?? "n/a"}`).join(", ") || "none"}`,
