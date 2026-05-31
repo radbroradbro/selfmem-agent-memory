@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-31T12:56:39.318Z",
+  "generatedAt": "2026-05-31T13:16:24.120Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -335,7 +335,7 @@
     "sotaOperatorPacket": {
       "path": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
       "exists": true,
-      "hash": "sha256:0992a62542861e8cc2a226ce6cb1fa1f259387f913296887ad422ebb18f4c5ec",
+      "hash": "sha256:e587c885d2c1534450df91f85da8a4542e7ac767500a65a951f82d719a23a1d9",
       "mode": "public-benchmark-sota-operator-packet",
       "status": "BLOCKED_SOTA_OPERATOR_INPUTS"
     },
@@ -1801,14 +1801,14 @@
       "nvidia-minimum-challenger"
     ],
     "commandSource": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
-    "commandCount": 22,
+    "commandCount": 24,
     "firstCommands": [
       "export RECALLWEAVE_SOTA_OUTPUT_DIR=\"<private-output-dir-outside-repo>\"",
       "export RECALLWEAVE_MEMORYBENCH_BASE_URL=\"<openai-compatible-answer-and-judge-url>\"",
       "export RECALLWEAVE_MEMORYBENCH_API_KEY=\"<env-only-if-cloud-endpoint>\"",
       "export RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=\"gpt-4o\"",
       "export RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=\"gpt-4o\"",
-      "export GEMINI_API_KEYS_FILE=\"<private-file-outside-repo-when-gemini-arm-runs>\""
+      "export RECALLWEAVE_PROVIDER_THROTTLE_SCOPE=\"key\""
     ],
     "requiredAfterShardRuns": [
       "benchmark:answer-quality:shard-workorder",

@@ -27,7 +27,19 @@
 - Provider challengers are hybrid context arms: true
 - Provider-only dense claims allowed: false
 - Provider challenger controls present: true
-- Cloud provider strategies: cloud-nvidia-nv-embed-v1-mistral-rerank, cloud-voyage4-voyage-lite-rerank
+- Cloud provider strategies: cloud-gemini2-embed-rerank-proxy, cloud-nvidia-nv-embed-v1-mistral-rerank, cloud-voyage4-voyage-lite-rerank
+
+## Provider Execution Policy
+- Throttle scope: provider
+- Key-scoped throttle enabled: false
+- Retry attempts: 4
+- Timeout ms: 60000
+- Global min interval ms: 0
+- gemini: minIntervalMs=0
+- local-apple: minIntervalMs=0
+- local-rerank: minIntervalMs=0
+- nvidia: minIntervalMs=0
+- voyage: minIntervalMs=0
 
 ## Local Embedding Durability
 - Applicable: true
@@ -40,6 +52,7 @@
 - bm25-lite: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - query-expanded-full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- cloud-gemini2-embed-rerank-proxy: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - cloud-voyage4-voyage-lite-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - cloud-nvidia-nv-embed-v1-mistral-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - local-apple-qwen3-0_6b: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
@@ -60,6 +73,7 @@
 --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json
 --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json
 --arm query-expanded-full-hybrid-rerank=<private-output-dir>/query-expanded-full-hybrid-rerank-responses.private.json
+--arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/cloud-gemini2-embed-rerank-proxy-responses.private.json
 --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/cloud-voyage4-voyage-lite-rerank-responses.private.json
 --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json
 --arm local-apple-qwen3-0_6b=<private-output-dir>/local-apple-qwen3-0_6b-responses.private.json

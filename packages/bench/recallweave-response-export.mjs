@@ -1185,6 +1185,7 @@ function createProviderStats(options = {}) {
     embedDimensions: providerStrategy ? embedDimensionsForStrategy(options.strategy) : null,
     rerankModel: providerStrategy ? rerankModelForStrategy(options.strategy) : null,
     fixtureProviderMock: providerStrategy && options.fixtureRequested,
+    providerThrottle: providerThrottlePolicy(providerNames),
   };
   return {
     recordMockCall(kind) {
@@ -1246,6 +1247,33 @@ function createProviderStats(options = {}) {
         keyCountAvailable: providerNames.length ? Math.min(...providerNames.map((provider) => providerKeyCount(provider))) : 0,
       };
     },
+  };
+}
+
+function providerThrottlePolicy(providerNames = []) {
+  const scope = providerThrottleScope();
+  return {
+    scope,
+    keyScopedThrottleEnabled: scope === "key",
+    retryAttempts: optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ?? 4,
+    timeoutMs: optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000,
+    globalMinIntervalMs: optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0,
+    providers: Object.fromEntries(
+      providerNames.map((provider) => {
+        const throttleKey = providerThrottleKey(provider);
+        return [
+          provider,
+          {
+            minIntervalMs:
+              optionalPositiveInt(
+                process.env[`${throttleKey.toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`] ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null,
+                "provider min interval",
+              ) ?? 0,
+            keyCount: providerKeyCount(provider),
+          },
+        ];
+      }),
+    ),
   };
 }
 
@@ -1623,11 +1651,11 @@ async function providerPostJson({ provider, url, body, headers }) {
   const attempts = optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ?? 4;
   let lastStatus = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    await waitProviderTurn(provider);
+    const requestHeaders = typeof headers === "function" ? headers({ attempt }) : headers;
+    await waitProviderTurn(provider, requestHeaders);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const requestHeaders = typeof headers === "function" ? headers({ attempt }) : headers;
       const response = await fetch(url, {
         method: "POST",
         headers: requestHeaders,
@@ -1657,7 +1685,7 @@ async function queryExpansionPost(plan, body) {
   if (plan.apiKey) headers.authorization = `Bearer ${plan.apiKey}`;
   let lastStatus = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    await waitProviderTurn(plan.provider);
+    await waitProviderTurn(plan.provider, headers);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -1681,9 +1709,9 @@ async function queryExpansionPost(plan, body) {
   throw new Error(`query expansion request failed with status ${lastStatus ?? "unknown"}`);
 }
 
-async function waitProviderTurn(provider) {
-  const providerKey = providerThrottleKey(provider);
-  const providerSpecific = process.env[`${providerKey.toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`];
+async function waitProviderTurn(provider, requestHeaders = null) {
+  const providerKey = providerThrottleSlot(provider, requestHeaders);
+  const providerSpecific = process.env[`${providerThrottleKey(provider).toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`];
   const intervalMs = optionalPositiveInt(providerSpecific ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0;
   if (!intervalMs) return;
   const now = Date.now();
@@ -1691,6 +1719,26 @@ async function waitProviderTurn(provider) {
   const waitMs = Math.max(0, previous + intervalMs - now);
   if (waitMs > 0) await sleep(waitMs);
   providerLastRequestAt.set(providerKey, Date.now());
+}
+
+function providerThrottleSlot(provider, requestHeaders = null) {
+  const providerKey = providerThrottleKey(provider);
+  if (providerThrottleScope() !== "key") return providerKey;
+  const credentialHash = providerCredentialHash(requestHeaders);
+  return credentialHash ? `${providerKey}:key:${credentialHash}` : providerKey;
+}
+
+function providerThrottleScope() {
+  const value = String(process.env.RECALLWEAVE_PROVIDER_THROTTLE_SCOPE ?? "provider").trim().toLowerCase();
+  return value === "key" || value === "per-key" || value === "credential" ? "key" : "provider";
+}
+
+function providerCredentialHash(requestHeaders = null) {
+  if (!requestHeaders || typeof requestHeaders !== "object") return null;
+  const authorization = requestHeaders.authorization ?? requestHeaders.Authorization;
+  const googleKey = requestHeaders["x-goog-api-key"] ?? requestHeaders["X-Goog-Api-Key"];
+  const value = String(authorization ?? googleKey ?? "").trim();
+  return value ? shortHash(value) : null;
 }
 
 function providerThrottleKey(provider) {

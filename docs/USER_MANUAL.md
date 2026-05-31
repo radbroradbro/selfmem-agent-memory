@@ -67,7 +67,10 @@ local writes only
 ```
 
 Multiple Voyage keys may be configured locally for rate-limit rotation. Rotation
-is a runtime credential setting, not repository data.
+is a runtime credential setting, not repository data. For benchmark waves with
+several private key files, set `RECALLWEAVE_PROVIDER_THROTTLE_SCOPE=key` to pace
+requests by rotated credential; leave it unset to pace conservatively by
+provider.
 
 The intended local mode for 24GB-class Apple Silicon machines is:
 

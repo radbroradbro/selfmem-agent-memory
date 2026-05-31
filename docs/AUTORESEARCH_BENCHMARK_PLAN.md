@@ -270,7 +270,9 @@ command templates name only the provider being tested. A provider credential
 can also come from a private key-file env var such as `VOYAGE_API_KEYS_FILE` or
 `NVIDIA_API_KEYS_FILE`; the file must live outside the repository and is never
 printed. They are the preferred path for rate-limit-safe iteration before the
-full multi-provider matrix.
+full multi-provider matrix. When several keys are available for the same
+provider, `RECALLWEAVE_PROVIDER_THROTTLE_SCOPE=key` enables per-key pacing while
+keeping public reports limited to counts and timing policy.
 For the stronger 30-question slice, use
 `reviews/overnight-20260522/public-longmemeval-expanded-run-target.json`; its
 checked-in provider preflight is

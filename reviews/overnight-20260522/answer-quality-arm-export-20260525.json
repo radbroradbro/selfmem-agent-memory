@@ -25,7 +25,7 @@
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
   "printsCredentials": false,
-  "generatedAt": "2026-05-31T12:50:39.300Z",
+  "generatedAt": "2026-05-31T13:12:57.195Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
     "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
@@ -70,6 +70,30 @@
     "supermemorySearchDisabled": true,
     "providerCallsEnabled": false,
     "providerPublicDataConfirmed": false,
+    "providerExecutionPolicy": {
+      "throttleScope": "provider",
+      "keyScopedThrottleEnabled": false,
+      "retryAttempts": 4,
+      "timeoutMs": 60000,
+      "globalMinIntervalMs": 0,
+      "providers": {
+        "gemini": {
+          "minIntervalMs": 0
+        },
+        "local-apple": {
+          "minIntervalMs": 0
+        },
+        "local-rerank": {
+          "minIntervalMs": 0
+        },
+        "nvidia": {
+          "minIntervalMs": 0
+        },
+        "voyage": {
+          "minIntervalMs": 0
+        }
+      }
+    },
     "queryExpansionReady": false,
     "localQueryExpansionEndpointPresent": false,
     "valuePrinted": false
@@ -89,7 +113,7 @@
     "hasProviderChallenger": true,
     "hasLocalApple": true,
     "hasLocalRerank": true,
-    "strategyCount": 7
+    "strategyCount": 8
   },
   "providerHybridContract": {
     "bm25LexicalFloorRequired": true,
@@ -100,6 +124,7 @@
     "providerChallengerPresent": true,
     "providerChallengerControlsPresent": true,
     "cloudProviderStrategies": [
+      "cloud-gemini2-embed-rerank-proxy",
       "cloud-nvidia-nv-embed-v1-mistral-rerank",
       "cloud-voyage4-voyage-lite-rerank"
     ]
@@ -130,6 +155,16 @@
       "exported": false,
       "pathLabel": "external-private-response-file",
       "plannedName": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "queryShard": {
+        "startIndex": 0,
+        "maxQueries": null
+      }
+    },
+    {
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "exported": false,
+      "pathLabel": "external-private-response-file",
+      "plannedName": "cloud-gemini2-embed-rerank-proxy-responses.private.json",
       "queryShard": {
         "startIndex": 0,
         "maxQueries": null
@@ -190,6 +225,7 @@
     "--arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json",
     "--arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json",
     "--arm query-expanded-full-hybrid-rerank=<private-output-dir>/query-expanded-full-hybrid-rerank-responses.private.json",
+    "--arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/cloud-gemini2-embed-rerank-proxy-responses.private.json",
     "--arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/cloud-voyage4-voyage-lite-rerank-responses.private.json",
     "--arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json",
     "--arm local-apple-qwen3-0_6b=<private-output-dir>/local-apple-qwen3-0_6b-responses.private.json",

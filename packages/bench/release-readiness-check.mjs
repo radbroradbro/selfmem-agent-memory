@@ -3139,7 +3139,11 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(armExport.providerHybridContract?.providerChallengersAreHybridContextArms, true);
     assert.equal(armExport.providerHybridContract?.providerOnlyDenseClaimsAllowed, false);
     assert.equal(armExport.providerHybridContract?.providerChallengerControlsPresent, true);
+    assert.equal(armExport.env?.providerExecutionPolicy?.throttleScope, "provider");
+    assert.equal(armExport.env?.providerExecutionPolicy?.keyScopedThrottleEnabled, false);
+    assert.equal(armExport.env?.providerExecutionPolicy?.providers?.gemini?.minIntervalMs, 0);
     assert.ok(armExport.providerHybridContract?.cloudProviderStrategies?.includes("cloud-nvidia-nv-embed-v1-mistral-rerank"));
+    assert.ok(armExport.providerHybridContract?.cloudProviderStrategies?.includes("cloud-gemini2-embed-rerank-proxy"));
     assert.ok(armExport.blockers.includes("private-queryset-missing"));
     assert.ok(armExport.blockers.includes("private-response-output-dir-missing"));
     assert.ok(armExport.blockers.includes("RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed"));
@@ -3148,6 +3152,7 @@ check("fresh public benchmark target check passes", () => {
   }
   assert.match(answerQualityArmExportMarkdownFresh, /Answer-Quality Response Arm Export/);
   assert.match(answerQualityArmExportMarkdownFresh, /Provider Hybrid Contract/);
+  assert.match(answerQualityArmExportMarkdownFresh, /Provider Execution Policy/);
   assert.match(answerQualityArmExportMarkdownEvidence, /BLOCKED_RESPONSE_ARM_EXPORT_ENV/);
   assert.equal(answerQualityArmExportFixture.status, "EXPORTED_RESPONSE_ARMS");
   assert.equal(answerQualityArmExportFixture.fixtureOnly, true);
@@ -3157,9 +3162,10 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(answerQualityArmExportFixture.countsAsFullMemorySotaEvidence, false);
   assert.equal(answerQualityArmExportFixture.callsProviderApis, false);
   assert.equal(answerQualityArmExportFixture.rawPrivateOutputPathIncluded, false);
-  assert.ok(answerQualityArmExportFixture.arms?.length >= 7);
+  assert.ok(answerQualityArmExportFixture.arms?.length >= 8);
   assert.ok(answerQualityArmExportFixture.arms?.every((item) => item.queryShard?.completeDataset === true));
   assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "query-expanded-full-hybrid-rerank"));
+  assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "cloud-gemini2-embed-rerank-proxy" && item.providerMockCalls > 0));
   assert.ok(answerQualityArmExportFixture.arms?.some((item) => item.strategy === "cloud-voyage4-voyage-lite-rerank" && item.providerMockCalls > 0));
   assert.ok(answerQualityArmExportFixture.arms?.every((item) => item.privacyLeakCount === 0 && item.redactionFailureCount === 0));
   for (const reviewerIntake of [memoryScoreReviewerIntakeFresh]) {

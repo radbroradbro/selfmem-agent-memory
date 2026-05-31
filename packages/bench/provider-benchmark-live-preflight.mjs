@@ -65,6 +65,7 @@ const credentialPresence = Object.fromEntries(
     },
   ]),
 );
+const providerExecutionPolicy = buildProviderExecutionPolicy(requiredProviders);
 const missingCredentialProviders = requiredProviders.filter((provider) => !credentialPresence[provider]?.present);
 const blockers = [
   !targetOk ? "target-not-public-longmemeval-run-only" : null,
@@ -104,6 +105,7 @@ const report = {
   providerCallsEnabled,
   publicDataConfirmed,
   credentialPresence,
+  providerExecutionPolicy,
   missingCredentialProviders,
   singleProviderArmReady: requiredProviders.length === 1,
   liveRunAllowed: ready,
@@ -192,6 +194,8 @@ function liveCommandTemplate({ requiredProviders, strategies, targetPath }) {
   return [
     "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
     "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+    "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE=key",
+    "RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS=<optional-provider-or-key-paced-ms>",
     ...requiredProviders.flatMap(providerEnvTemplateLines),
     [
       "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live",
@@ -208,6 +212,57 @@ function providerEnvTemplateLines(provider) {
   if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL=<env-only-local-apple-server-url>"];
   if (provider === "local-rerank") return ["SELFMEM_LOCAL_RERANK_ENDPOINT=<env-only-local-rerank-endpoint>"];
   return [];
+}
+
+function buildProviderExecutionPolicy(providers) {
+  const throttleScope = providerThrottleScope();
+  return {
+    throttleScope,
+    keyScopedThrottleEnabled: throttleScope === "key",
+    retryAttempts: positiveIntOrDefault(process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS, 4),
+    timeoutMs: positiveIntOrDefault(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS, 60_000),
+    globalMinIntervalMs: positiveIntOrDefault(process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS, 0),
+    providers: Object.fromEntries(
+      providers.map((provider) => {
+        const throttleKey = providerThrottleKey(provider);
+        return [
+          provider,
+          {
+            minIntervalMs: positiveIntOrDefault(
+              process.env[`${throttleKey.toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`] ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS,
+              0,
+            ),
+            keyCount: providerKeyCount(provider),
+          },
+        ];
+      }),
+    ),
+  };
+}
+
+function providerThrottleScope() {
+  const value = String(process.env.RECALLWEAVE_PROVIDER_THROTTLE_SCOPE ?? "provider").trim().toLowerCase();
+  return value === "key" || value === "per-key" || value === "credential" ? "key" : "provider";
+}
+
+function providerThrottleKey(provider) {
+  const normalized = String(provider ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (normalized.startsWith("nvidia")) return "nvidia";
+  if (normalized.startsWith("gemini")) return "gemini";
+  if (normalized.startsWith("voyage")) return "voyage";
+  if (normalized.startsWith("local")) return "local";
+  return normalized.replace(/-/g, "_") || "provider";
+}
+
+function positiveIntOrDefault(value, fallback) {
+  if (value == null || value === "") return fallback;
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, "provider execution policy values must be non-negative integers");
+  return number;
 }
 
 function toMarkdown(value) {
@@ -230,6 +285,17 @@ function toMarkdown(value) {
     `- Provider calls enabled: ${value.providerCallsEnabled}`,
     `- Public data confirmed: ${value.publicDataConfirmed}`,
     ...Object.entries(value.credentialPresence).map(([provider, state]) => `- ${provider}: ${state.present ? "present" : "missing"} (${state.envNames.join(", ")})`),
+    "",
+    "## Provider Execution Policy",
+    "",
+    `- Throttle scope: ${value.providerExecutionPolicy.throttleScope}`,
+    `- Key-scoped throttle enabled: ${value.providerExecutionPolicy.keyScopedThrottleEnabled}`,
+    `- Retry attempts: ${value.providerExecutionPolicy.retryAttempts}`,
+    `- Timeout ms: ${value.providerExecutionPolicy.timeoutMs}`,
+    `- Global min interval ms: ${value.providerExecutionPolicy.globalMinIntervalMs}`,
+    ...Object.entries(value.providerExecutionPolicy.providers).map(
+      ([provider, state]) => `- ${provider}: minIntervalMs=${state.minIntervalMs}, keyCount=${state.keyCount}`,
+    ),
     "",
     "## Blockers",
     "",

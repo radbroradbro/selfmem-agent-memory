@@ -165,6 +165,8 @@ function buildOperatorFlow({ provider, targetPath, strategies }) {
         "RECALLWEAVE_PROVIDER_OUTPUT_DIR=<private-output-dir-outside-repo>",
         "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
         "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+        "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE=key",
+        "RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS=<optional-provider-or-key-paced-ms>",
         ...providerLines,
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider:preflight --",
@@ -181,6 +183,8 @@ function buildOperatorFlow({ provider, targetPath, strategies }) {
         "RECALLWEAVE_PROVIDER_OUTPUT_DIR=<private-output-dir-outside-repo>",
         "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=1",
         "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=1",
+        "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE=key",
+        "RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS=<optional-provider-or-key-paced-ms>",
         ...providerLines,
         [
           "npm exec --yes pnpm@10.23.0 -- benchmark:public-provider -- --live",

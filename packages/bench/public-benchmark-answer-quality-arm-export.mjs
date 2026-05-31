@@ -368,10 +368,77 @@ function envReadiness(items) {
     supermemorySearchDisabled: true,
     providerCallsEnabled: truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS"),
     providerPublicDataConfirmed: truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA"),
+    providerExecutionPolicy: buildProviderExecutionPolicy(items),
     queryExpansionReady: !items.includes("query-expanded-full-hybrid-rerank") || localQueryExpansionReady || cloudQueryExpansionReady || fixtureRequested,
     localQueryExpansionEndpointPresent: localQueryExpansionReady,
     valuePrinted: false,
   };
+}
+
+function buildProviderExecutionPolicy(items) {
+  const providers = [...new Set(items.flatMap(requiredProvidersForStrategy))].sort();
+  const throttleScope = providerThrottleScope();
+  return {
+    throttleScope,
+    keyScopedThrottleEnabled: throttleScope === "key",
+    retryAttempts: positiveIntOrDefault(process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS, 4),
+    timeoutMs: positiveIntOrDefault(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS, 60_000),
+    globalMinIntervalMs: positiveIntOrDefault(process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS, 0),
+    providers: Object.fromEntries(
+      providers.map((provider) => {
+        const throttleKey = providerThrottleKey(provider);
+        return [
+          provider,
+          {
+            minIntervalMs: positiveIntOrDefault(
+              process.env[`${throttleKey.toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`] ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS,
+              0,
+            ),
+          },
+        ];
+      }),
+    ),
+  };
+}
+
+function requiredProvidersForStrategy(strategy) {
+  if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini2-embed-rerank-proxy") return ["gemini"];
+  if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-gemini2-voyage-rerank") return ["gemini", "voyage"];
+  if (
+    strategy === "cloud-voyage-rerank-only" ||
+    strategy === "cloud-voyage4-voyage" ||
+    strategy === "cloud-voyage4-voyage-lite-rerank" ||
+    strategy === "cloud-voyage4-lite-voyage-lite"
+  ) return ["voyage"];
+  if (strategy.startsWith("cloud-nvidia-")) return ["nvidia"];
+  if (strategy === "local-apple-qwen3-0_6b-local-rerank" || strategy === "local-apple-qwen3-4b-local-rerank") return ["local-apple", "local-rerank"];
+  if (strategy === "local-apple-qwen3-0_6b" || strategy === "local-apple-qwen3-4b") return ["local-apple"];
+  return [];
+}
+
+function providerThrottleScope() {
+  const value = String(process.env.RECALLWEAVE_PROVIDER_THROTTLE_SCOPE ?? "provider").trim().toLowerCase();
+  return value === "key" || value === "per-key" || value === "credential" ? "key" : "provider";
+}
+
+function providerThrottleKey(provider) {
+  const normalized = String(provider ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (normalized.startsWith("nvidia")) return "nvidia";
+  if (normalized.startsWith("gemini")) return "gemini";
+  if (normalized.startsWith("voyage")) return "voyage";
+  if (normalized.startsWith("local")) return "local";
+  return normalized.replace(/-/g, "_") || "provider";
+}
+
+function positiveIntOrDefault(value, fallback) {
+  if (value == null || value === "") return fallback;
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number >= 0, "provider execution policy values must be non-negative integers");
+  return number;
 }
 
 function inspectLocalEmbeddingDurability(coverageValue) {
@@ -488,6 +555,7 @@ function defaultStrategies() {
     "bm25-lite",
     "full-hybrid-rerank",
     "query-expanded-full-hybrid-rerank",
+    "cloud-gemini2-embed-rerank-proxy",
     "cloud-voyage4-voyage-lite-rerank",
     "cloud-nvidia-nv-embed-v1-mistral-rerank",
     "local-apple-qwen3-0_6b",
@@ -631,6 +699,16 @@ function renderMarkdown(value) {
     `- Provider-only dense claims allowed: ${value.providerHybridContract.providerOnlyDenseClaimsAllowed}`,
     `- Provider challenger controls present: ${value.providerHybridContract.providerChallengerControlsPresent}`,
     `- Cloud provider strategies: ${value.providerHybridContract.cloudProviderStrategies.join(", ") || "none"}`,
+    "",
+    "## Provider Execution Policy",
+    `- Throttle scope: ${value.env.providerExecutionPolicy.throttleScope}`,
+    `- Key-scoped throttle enabled: ${value.env.providerExecutionPolicy.keyScopedThrottleEnabled}`,
+    `- Retry attempts: ${value.env.providerExecutionPolicy.retryAttempts}`,
+    `- Timeout ms: ${value.env.providerExecutionPolicy.timeoutMs}`,
+    `- Global min interval ms: ${value.env.providerExecutionPolicy.globalMinIntervalMs}`,
+    ...Object.entries(value.env.providerExecutionPolicy.providers).map(
+      ([provider, state]) => `- ${provider}: minIntervalMs=${state.minIntervalMs}`,
+    ),
     "",
     "## Local Embedding Durability",
     `- Applicable: ${value.localEmbeddingDurability.applicable}`,
