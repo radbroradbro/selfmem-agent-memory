@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-memory-method-ladder",
+  "generatedAt": "2026-05-31T16:33:11.821Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "retrievalProxyOnly": true,
+  "memoryBenchAnswerQuality": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "benchmark": "longmemeval",
+  "fixtureOnly": false,
+  "executeRequested": false,
+  "readyForExecution": false,
+  "readiness": {
+    "ready": false,
+    "blockers": [
+      "answer-quality-call-consent-missing",
+      "public-data-consent-missing",
+      "no-raw-output-guard-missing",
+      "openai-compatible-base-url-missing",
+      "answer-model-missing",
+      "judge-model-missing"
+    ],
+    "callsAllowed": false,
+    "publicDataConfirmed": false,
+    "noRawOutputGuard": false,
+    "baseUrlPresent": false,
+    "endpointLabel": null,
+    "endpointIsLocal": false,
+    "answerModelPresent": false,
+    "judgeModelPresent": false,
+    "cloudApiKeyPresent": null
+  },
+  "claimBoundary": "answer-quality method-ladder workorder only; response arms are exported but no model-scored answer-quality calls were made",
+  "claimScope": "local-full",
+  "modelMatchPolicy": "local-diagnostic-allowed",
+  "queryShard": {
+    "startIndex": 0,
+    "endIndexExclusive": 3,
+    "requestedLimit": 3,
+    "sameRawQuerySelectionAcrossMethods": true,
+    "selectedQuestionIdsHash": "sha256:e71a5dd2675a606477878bdab9edc3fd718bd8af4b34ea3fc04e00ea1e546f74"
+  },
+  "contextTokenBudget": 800,
+  "limit": 5,
+  "methods": [
+    "session-v1",
+    "contextual-source-chunk-v1",
+    "contextual-index-source-chunk-v1"
+  ],
+  "strategies": [
+    "bm25-lite",
+    "full-hybrid-rerank"
+  ],
+  "materializations": [
+    {
+      "method": "session-v1",
+      "selectedQuestionIdsHash": "sha256:e71a5dd2675a606477878bdab9edc3fd718bd8af4b34ea3fc04e00ea1e546f74",
+      "queryCount": 3,
+      "haystackSessionCount": 146,
+      "memoryRecordCount": 146,
+      "contextualSourceChunkCount": 0,
+      "contextualIndexMemoryCount": 0,
+      "expectedResultRefCount": 12,
+      "querySetHash": "sha256:47e1e43a8f91b84bf86f0ea54c07426c0e4f2ae8d6676cc2a4d9678a238d59ed",
+      "collectorCompatibleQuerySetHash": "sha256:82544e2c66d29969f618d2c257c7bf4b5f4a5c102ea10b41f56d5ea4864328fc",
+      "memoriesFileHash": "sha256:b3f515c6c5ab35bf343206d9a762fc1905aca756ebb0e031f4c1d9b3ad8c08eb",
+      "answerLabelsFileHash": "sha256:f875876fa572c89fe57f0a31c93dc2294480f0889ec1905ba780504e8521f319"
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "selectedQuestionIdsHash": "sha256:e71a5dd2675a606477878bdab9edc3fd718bd8af4b34ea3fc04e00ea1e546f74",
+      "queryCount": 3,
+      "haystackSessionCount": 146,
+      "memoryRecordCount": 1064,
+      "contextualSourceChunkCount": 1064,
+      "contextualIndexMemoryCount": 0,
+      "expectedResultRefCount": 61,
+      "querySetHash": "sha256:69b30df08c359ca9edaa983f876c1c85c48979f678746392b6236564953ff145",
+      "collectorCompatibleQuerySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+      "memoriesFileHash": "sha256:2347a3e37f984e38131d7bdb002507921b248a9ab7ecc16fc6cd1cd55c7fb4e1",
+      "answerLabelsFileHash": "sha256:f875876fa572c89fe57f0a31c93dc2294480f0889ec1905ba780504e8521f319"
+    },
+    {
+      "method": "contextual-index-source-chunk-v1",
+      "selectedQuestionIdsHash": "sha256:e71a5dd2675a606477878bdab9edc3fd718bd8af4b34ea3fc04e00ea1e546f74",
+      "queryCount": 3,
+      "haystackSessionCount": 146,
+      "memoryRecordCount": 2128,
+      "contextualSourceChunkCount": 1064,
+      "contextualIndexMemoryCount": 1064,
+      "expectedResultRefCount": 61,
+      "querySetHash": "sha256:3bf5454ae53ca3c3ea7f2c5efa305819324fafc3b2602644a73c81a9186414f4",
+      "collectorCompatibleQuerySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+      "memoriesFileHash": "sha256:bb302f9a70837bacf29b4162b2be5748340659a70470d5350169faabd920758a",
+      "answerLabelsFileHash": "sha256:f875876fa572c89fe57f0a31c93dc2294480f0889ec1905ba780504e8521f319"
+    }
+  ],
+  "responseArms": [
+    {
+      "method": "session-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 3,
+      "querySetHash": "sha256:82544e2c66d29969f618d2c257c7bf4b5f4a5c102ea10b41f56d5ea4864328fc",
+      "responsesHash": "sha256:9055a468751ba63b04fa27a4b468c9ebc4b74873769b86159fcbd18689ff0934",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "session-or-memory",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "session-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 3,
+      "querySetHash": "sha256:82544e2c66d29969f618d2c257c7bf4b5f4a5c102ea10b41f56d5ea4864328fc",
+      "responsesHash": "sha256:5845ae2f945d332c2c842678226745062e79630ffa641f0e042867354cd25c5a",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "session-or-memory",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 3,
+      "querySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+      "responsesHash": "sha256:52d77e2e0cf27c64b7e212e4df3cb73b4572ddfd9c345465b07d4ceecda42009",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 3,
+      "querySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+      "responsesHash": "sha256:9042bbde039ab9f43335f1600489a26ae6afcd204287506faf818dee1f9399a8",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "contextual-index-source-chunk-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 3,
+      "querySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+      "responsesHash": "sha256:167ba713ceac688d86bdab8a47b8458142e59c233be65b8983c86df2529a8074",
+      "skippedSourceOnly": 1064,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "contextual-index-source-chunk-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 3,
+      "querySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+      "responsesHash": "sha256:295cefb2c82f201eab325ab50b24206b6df16e37af229c6106dd6b6379b25cfa",
+      "skippedSourceOnly": 1064,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    }
+  ],
+  "answerQualityReports": [],
+  "winner": null,
+  "nextActions": [
+    "Start a local OpenAI-compatible answer/judge endpoint or provide an approved cloud endpoint through env-only secrets.",
+    "Set RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1, and RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1.",
+    "Re-run this command with --execute to score the exported same-shard arms."
+  ]
+}

@@ -81,6 +81,29 @@ testing the contextual index on answer-quality shards, but does not justify
 promotion yet because retrieval-proxy scoring is sensitive to session-vs-chunk
 expected-reference granularity.
 
+The answer-quality follow-up is now also codified as a workorder/executor:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:method-ladder -- --live \
+  --query-offset 0 \
+  --max-queries 3 \
+  --context-token-budget 800 \
+  --limit 5
+```
+
+The checked-in workorder is
+`reviews/overnight-20260522/answer-quality-method-ladder-workorder-3q-20260531.json`,
+with markdown at
+`reviews/overnight-20260522/answer-quality-method-ladder-workorder-3q-20260531.md`.
+It materialized `session-v1`, `contextual-source-chunk-v1`, and
+`contextual-index-source-chunk-v1` on the same raw 3-question selection and
+exported BM25-lite plus full-hybrid response arms for each method. It did not
+run answer-quality model calls because no OpenAI-compatible answer/judge
+endpoint or model-call consent env was present. To execute the same prepared
+gate, start the approved local or cloud endpoint, set the explicit
+answer-quality/public-data/no-raw-output env gates, and rerun the command with
+`--execute`.
+
 ## Operating Provider Policy
 
 For actual Codex and personal memory usage, the default provider arm is the

@@ -109,6 +109,7 @@
     "benchmark:answer-quality:arms": "node packages/bench/public-benchmark-answer-quality-arm-export.mjs",
     "benchmark:answer-quality:preflight": "node packages/bench/public-benchmark-answer-quality-preflight.mjs",
     "benchmark:answer-quality": "node packages/bench/public-benchmark-answer-quality.mjs",
+    "benchmark:answer-quality:method-ladder": "node packages/bench/public-benchmark-answer-quality-method-ladder.mjs",
     "benchmark:answer-quality:combine": "node packages/bench/public-benchmark-answer-quality-combine.mjs",
     "benchmark:answer-quality:shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
     "benchmark:answer-quality:local-shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs --claim-scope local-full",
