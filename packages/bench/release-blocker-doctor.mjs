@@ -16,6 +16,7 @@ const requiredBlockers = [
   "fresh-real-container-canary-not-current",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
+  "full-memory-sota-doctor-after-local-full-combine-20260531.json",
   "full-memory-sota-doctor-after-shard-020-20260529.json",
   "full-memory-sota-doctor-after-shard-019-20260529.json",
   "full-memory-sota-doctor-after-shard-018-20260529.json",
@@ -32,6 +33,7 @@ const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-20260527.json",
 );
 const fullMemorySotaDoctorMarkdown = preferReviewFile(
+  "full-memory-sota-doctor-after-local-full-combine-20260531.md",
   "full-memory-sota-doctor-after-shard-020-20260529.md",
   "full-memory-sota-doctor-after-shard-019-20260529.md",
   "full-memory-sota-doctor-after-shard-018-20260529.md",
@@ -435,7 +437,16 @@ assert.equal(fullMemorySotaDoctor.localFullLaneState?.acceptedShardCount, 20);
 assert.equal(fullMemorySotaDoctor.localFullLaneState?.missingShardCount, 0);
 assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId, null);
 assert.equal(fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange, null);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.combinedScore?.evidenceReady, true);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.combinedScore?.winnerStrategy, "local-apple-qwen3-0_6b-local-rerank");
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.combinedScore?.winnerAnswerQuality, 24.9);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.combinedScore?.bm25AnswerQuality, 22.162);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.evidenceReady, true);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.countsAsLocalFullBenchmarkEvidence, true);
+assert.equal(fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.countsAsFullMemorySotaEvidence, false);
 assert.match(fullMemorySotaDoctorText, /Next local-full shard: n\/a \(n\/a\)/);
+assert.match(fullMemorySotaDoctorText, /Combined score winner: local-apple-qwen3-0_6b-local-rerank/);
+assert.match(fullMemorySotaDoctorText, /Memory score gate status: READY_LOCAL_FULL_MEMORY_SCORE/);
 assert.match(fullMemorySotaDoctorText, /Counts as full memory SOTA evidence: false/i);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
@@ -783,6 +794,14 @@ console.log(
           nextLocalFullShardRange: fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange,
           localFullPendingShardCount: fullMemorySotaDoctor.localFullLaneState?.missingShardCount,
           localFullAcceptedShardCount: fullMemorySotaDoctor.localFullLaneState?.acceptedShardCount,
+          localFullCombinedScoreReady: fullMemorySotaDoctor.localFullLaneState?.combinedScore?.evidenceReady,
+          localFullCombinedWinner: fullMemorySotaDoctor.localFullLaneState?.combinedScore?.winnerStrategy,
+          localFullCombinedAnswerQuality: fullMemorySotaDoctor.localFullLaneState?.combinedScore?.winnerAnswerQuality,
+          localFullCombinedBm25AnswerQuality: fullMemorySotaDoctor.localFullLaneState?.combinedScore?.bm25AnswerQuality,
+          localFullMemoryScoreGateStatus: fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.status,
+          localFullMemoryScoreGateReady: fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.evidenceReady,
+          localFullMemoryScoreCountsAsLocalFullEvidence: fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.countsAsLocalFullBenchmarkEvidence,
+          localFullMemoryScoreCountsAsSotaEvidence: fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.countsAsFullMemorySotaEvidence,
           localEmbeddingRuntimeReady: fullMemorySotaDoctor.localFullLaneState?.localEmbeddingRuntimeReady,
           localEmbeddingDurabilityReady: fullMemorySotaDoctor.localFullLaneState?.localEmbeddingDurabilityReady,
         },

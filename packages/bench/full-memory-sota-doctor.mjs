@@ -61,6 +61,16 @@ const files = {
     "local-full-shard-performance-report-20260527.json",
     "local-full-shard-performance-report-20260526.json",
   ),
+  localFullCombinedScore: preferReviewFile(
+    "end-to-end-memory-score-local-full-combined-20260531.json",
+    "end-to-end-memory-score-local-full-combined-20260529.json",
+    "end-to-end-memory-score-local-full-combined.json",
+  ),
+  localFullMemoryScoreGate: preferReviewFile(
+    "end-to-end-memory-score-local-full-gate-20260531.json",
+    "end-to-end-memory-score-local-full-combined-gate-20260529.json",
+    "end-to-end-memory-score-local-full-gate.json",
+  ),
   localFullResumeEnvDoctor: preferReviewFile(
     "local-full-shard-003-resume-env-doctor-20260527.json",
     "local-full-shard-002-resume-env-doctor-20260526.json",
@@ -131,6 +141,8 @@ const localFullShardIntakeSelection = selectPreferredLocalFullShardIntake([
 ]);
 const localFullShardIntake = localFullShardIntakeSelection.json;
 const localFullPerformanceReport = evidence.localFullPerformanceReport.json;
+const localFullCombinedScoreEvidence = evidence.localFullCombinedScore;
+const localFullMemoryScoreGateEvidence = evidence.localFullMemoryScoreGate;
 const localFullResumeEnvDoctor = evidence.localFullResumeEnvDoctor.json;
 const localFullResumeCommandSecurity = evidence.localFullResumeCommandSecurity.json;
 const localFullResumeResultDoctor = evidence.localFullResumeResultDoctor.json;
@@ -161,6 +173,8 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullShardIntake,
   localFullShardIntakePath: localFullShardIntakeSelection.path,
   localFullPerformanceReport,
+  localFullCombinedScoreEvidence,
+  localFullMemoryScoreGateEvidence,
   localFullResumeEnvDoctor,
   localFullResumeCommandSecurity,
   localFullResumeResultDoctor,
@@ -201,6 +215,11 @@ const gates = [
     "local-full-performance-snapshot",
     localFullLaneState.performanceReport.evidenceReady,
     localFullLaneState.performanceReport.evidenceBlockers,
+  ),
+  gate(
+    "local-full-combined-memory-score",
+    localFullLaneState.memoryScoreGate.evidenceReady,
+    localFullLaneState.memoryScoreGate.evidenceBlockers,
   ),
   gate(
     "local-full-resume-env",
@@ -419,6 +438,8 @@ function inspectLocalFullLaneState({
   localFullShardIntake,
   localFullShardIntakePath,
   localFullPerformanceReport,
+  localFullCombinedScoreEvidence,
+  localFullMemoryScoreGateEvidence,
   localFullResumeEnvDoctor,
   localFullResumeCommandSecurity,
   localFullResumeResultDoctor,
@@ -437,6 +458,11 @@ function inspectLocalFullLaneState({
     localFullShardIntake,
     localFullAcceptedLaneLaunchDoctor,
   });
+  const combinedScoreState = inspectLocalFullCombinedScore(localFullCombinedScoreEvidence, {
+    localFullShardPlan,
+    localFullShardIntake,
+  });
+  const memoryScoreGateState = inspectLocalFullMemoryScoreGate(localFullMemoryScoreGateEvidence, combinedScoreState);
   const nextPendingShardId = localFullCompleteCoverage
     ? null
     : (performanceReportState.nextPendingShardId ?? localFullAcceptedLaneLaunchDoctor?.shardProgress?.firstPendingShardId ?? null);
@@ -543,6 +569,8 @@ function inspectLocalFullLaneState({
     launchAcceptedShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.acceptedShardCount ?? 0),
     launchPendingShardCount: Number(localFullAcceptedLaneLaunchDoctor?.shardProgress?.pendingShardCount ?? 0),
     performanceReport: performanceReportState,
+    combinedScore: combinedScoreState,
+    memoryScoreGate: memoryScoreGateState,
     resumeEnv: inspectLocalFullResumeEnvDoctor(localFullResumeEnvDoctor),
     resumeCommandSecurity: inspectLocalFullResumeCommandSecurity(localFullResumeCommandSecurity),
     resumeResult: {
@@ -586,6 +614,8 @@ function inspectLocalFullLaneState({
       ...arrayOf(localFullShardIntake?.blockers),
       ...activeRuntimeBlockerIds,
       ...performanceReportState.blockers,
+      ...combinedScoreState.blockers,
+      ...memoryScoreGateState.blockers,
       ...localEmbeddingRuntimeBlockers,
       ...localEmbeddingDurabilityBlockers,
     ],
@@ -712,6 +742,136 @@ function inspectLocalFullPerformanceReport(
     publicBenchmarkClaimsAllowed: Boolean(performanceReport?.publicBenchmarkClaimsAllowed),
     blockers: arrayOf(performanceReport?.blockers),
   };
+}
+
+function inspectLocalFullCombinedScore(combinedScoreEvidence, { localFullShardPlan, localFullShardIntake }) {
+  const combinedScore = combinedScoreEvidence?.json;
+  const expectedAcceptedShardCount = Number(localFullShardIntake?.intake?.acceptedShardCount ?? 0);
+  const expectedAcceptedQueryCount = arrayOf(localFullShardIntake?.acceptedShards).reduce(
+    (total, shard) => total + Number(shard?.scoredQueryCount ?? 0),
+    0,
+  );
+  const expectedQueryCount = Number(localFullShardPlan?.runPlan?.queryCount ?? 0);
+  const coverage = combinedScore?.input?.queryShard ?? combinedScore?.sourceLock?.queryShardCoverage ?? {};
+  const strategies = arrayOf(combinedScore?.strategies).map((item) => item.strategy).filter(Boolean);
+  const safe =
+    combinedScore?.mode === "public-benchmark-answer-quality" &&
+    combinedScore?.combineMode === "query-shard-answer-quality-union" &&
+    combinedScore?.fixtureOnly === false &&
+    combinedScore?.metricsOnly === true &&
+    combinedScore?.publicSafe === true &&
+    combinedScore?.retrievalProxyOnly === false &&
+    combinedScore?.memoryBenchAnswerQuality === true &&
+    combinedScore?.publicBenchmarkClaimsAllowed === false &&
+    combinedScore?.rawQuestionIdsIncluded === false &&
+    combinedScore?.rawQuestionsIncluded === false &&
+    combinedScore?.rawAnswersIncluded === false &&
+    combinedScore?.rawMemoryIncluded === false &&
+    combinedScore?.rawTranscriptIncluded === false &&
+    combinedScore?.rawPromptIncluded === false &&
+    combinedScore?.scoringPolicy?.claimScope === "local-full" &&
+    combinedScore?.scoringPolicy?.countsAsLocalFullBenchmarkEvidence === true &&
+    combinedScore?.scoringPolicy?.countsAsFullMemorySotaEvidence === false;
+  const coverageReady =
+    coverage?.complete === true &&
+    coverage?.completeDataset === true &&
+    Number(coverage?.inputShardCount ?? 0) === expectedAcceptedShardCount &&
+    Number(coverage?.scoredQueryCount ?? 0) === expectedAcceptedQueryCount &&
+    Number(coverage?.totalQueryCount ?? 0) === expectedQueryCount;
+  const requiredStrategies = [
+    "bm25-lite",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank",
+  ];
+  const missingStrategies = requiredStrategies.filter((strategy) => !strategies.includes(strategy));
+  const blockers = [
+    !combinedScore ? "local-full-combined-score-missing" : null,
+    !safe ? "local-full-combined-score-unsafe-or-wrong-mode" : null,
+    !coverageReady ? "local-full-combined-score-coverage-mismatch" : null,
+    missingStrategies.length ? "local-full-combined-score-missing-required-strategies" : null,
+    combinedScore?.winner?.strategy !== "local-apple-qwen3-0_6b-local-rerank"
+      ? "local-full-combined-score-winner-unexpected"
+      : null,
+  ].filter(Boolean);
+  return {
+    path: combinedScoreEvidence?.path ?? files.localFullCombinedScore,
+    hash: combinedScoreEvidence?.hash ?? null,
+    status: blockers.length === 0 ? "READY_LOCAL_FULL_COMBINED_SCORE" : "BLOCKED_LOCAL_FULL_COMBINED_SCORE",
+    evidenceReady: blockers.length === 0,
+    evidenceBlockers: blockers,
+    safe,
+    coverageReady,
+    combineMode: combinedScore?.combineMode ?? null,
+    claimScope: combinedScore?.scoringPolicy?.claimScope ?? null,
+    acceptedShardCount: Number(coverage?.inputShardCount ?? 0),
+    scoredQueryCount: Number(coverage?.scoredQueryCount ?? 0),
+    totalQueryCount: Number(coverage?.totalQueryCount ?? 0),
+    winnerStrategy: combinedScore?.winner?.strategy ?? null,
+    winnerAnswerQuality: combinedScore?.winner?.answerQuality ?? null,
+    bm25AnswerQuality: strategyMetric(combinedScore, "bm25-lite", "answerQuality"),
+    fullHybridAnswerQuality: strategyMetric(combinedScore, "full-hybrid-rerank", "answerQuality"),
+    queryExpandedAnswerQuality: strategyMetric(combinedScore, "query-expanded-full-hybrid-rerank", "answerQuality"),
+    localAppleBaseAnswerQuality: strategyMetric(combinedScore, "local-apple-qwen3-0_6b", "answerQuality"),
+    localAppleRerankAnswerQuality: strategyMetric(combinedScore, "local-apple-qwen3-0_6b-local-rerank", "answerQuality"),
+    strategies,
+    missingStrategies,
+    blockers,
+  };
+}
+
+function inspectLocalFullMemoryScoreGate(memoryScoreGateEvidence, combinedScoreState) {
+  const gateReport = memoryScoreGateEvidence?.json;
+  const resultHashMatches =
+    !combinedScoreState.hash ||
+    !gateReport?.result?.hash ||
+    gateReport.result.hash === combinedScoreState.hash;
+  const safe =
+    gateReport?.mode === "end-to-end-memory-score-gate" &&
+    gateReport?.status === "READY_LOCAL_FULL_MEMORY_SCORE" &&
+    gateReport?.claimScope === "local-full" &&
+    gateReport?.metricsOnly === true &&
+    gateReport?.publicSafe === true &&
+    gateReport?.callsProviderApis === false &&
+    gateReport?.sendsBenchmarkTextToProvider === false &&
+    gateReport?.publicBenchmarkClaimsAllowed === false &&
+    gateReport?.countsAsEndToEndMemoryBenchmark === true &&
+    gateReport?.countsAsLocalFullBenchmarkEvidence === true &&
+    gateReport?.countsAsFullMemorySotaEvidence === false &&
+    gateReport?.checks?.sourceLockedTarget === true &&
+    gateReport?.checks?.privacyLeakCountersClear === true &&
+    gateReport?.blockers?.length === 0;
+  const blockers = [
+    !gateReport ? "local-full-memory-score-gate-missing" : null,
+    !safe ? "local-full-memory-score-gate-not-ready" : null,
+    !resultHashMatches ? "local-full-memory-score-gate-result-hash-mismatch" : null,
+  ].filter(Boolean);
+  return {
+    path: memoryScoreGateEvidence?.path ?? files.localFullMemoryScoreGate,
+    hash: memoryScoreGateEvidence?.hash ?? null,
+    status: gateReport?.status ?? null,
+    evidenceReady: blockers.length === 0,
+    evidenceBlockers: blockers,
+    safe,
+    resultHashMatches,
+    countsAsEndToEndMemoryBenchmark: Boolean(gateReport?.countsAsEndToEndMemoryBenchmark),
+    countsAsLocalFullBenchmarkEvidence: Boolean(gateReport?.countsAsLocalFullBenchmarkEvidence),
+    countsAsFullMemorySotaEvidence: Boolean(gateReport?.countsAsFullMemorySotaEvidence),
+    reason: gateReport?.reason ?? null,
+    observedScore: gateReport?.reportedTargetComparison?.observed?.score ?? null,
+    reportedTargetScore: gateReport?.reportedTargetComparison?.primaryTarget?.score ?? null,
+    scoreDelta: gateReport?.reportedTargetComparison?.scoreDelta ?? null,
+    answerModel: gateReport?.result?.answerModel ?? null,
+    judgeModel: gateReport?.result?.judgeModel ?? null,
+    blockers,
+  };
+}
+
+function strategyMetric(report, strategy, metric) {
+  const row = arrayOf(report?.strategies).find((item) => item.strategy === strategy);
+  const value = row?.metrics?.[metric];
+  return Number.isFinite(Number(value)) ? Number(value) : null;
 }
 
 function inspectLocalFullResumeEnvDoctor(envDoctor) {
@@ -1254,6 +1414,17 @@ function renderMarkdown(value) {
     `- Performance best strategy: ${value.localFullLaneState.performanceReport.bestStrategy ?? "n/a"}`,
     `- Performance best answer quality: ${value.localFullLaneState.performanceReport.bestAnswerQuality ?? "n/a"}`,
     `- Performance counts as SOTA evidence: ${value.localFullLaneState.performanceReport.countsAsFullMemorySotaEvidence}`,
+    `- Combined score status: ${value.localFullLaneState.combinedScore.status}`,
+    `- Combined score ready: ${value.localFullLaneState.combinedScore.evidenceReady}`,
+    `- Combined score winner: ${value.localFullLaneState.combinedScore.winnerStrategy ?? "n/a"}`,
+    `- Combined score answer quality: ${value.localFullLaneState.combinedScore.winnerAnswerQuality ?? "n/a"}`,
+    `- Combined score BM25 answer quality: ${value.localFullLaneState.combinedScore.bm25AnswerQuality ?? "n/a"}`,
+    `- Memory score gate status: ${value.localFullLaneState.memoryScoreGate.status ?? "n/a"}`,
+    `- Memory score gate ready: ${value.localFullLaneState.memoryScoreGate.evidenceReady}`,
+    `- Memory score gate counts as local-full evidence: ${value.localFullLaneState.memoryScoreGate.countsAsLocalFullBenchmarkEvidence}`,
+    `- Memory score gate counts as SOTA evidence: ${value.localFullLaneState.memoryScoreGate.countsAsFullMemorySotaEvidence}`,
+    `- Memory score gate observed score: ${value.localFullLaneState.memoryScoreGate.observedScore ?? "n/a"}`,
+    `- Memory score gate reported target score: ${value.localFullLaneState.memoryScoreGate.reportedTargetScore ?? "n/a"}`,
     `- Resume env ready for missing-arm export: ${value.localFullLaneState.resumeEnv.readyForMissingArmExport}`,
     `- Resume env ready for missing-arm export except env: ${value.localFullLaneState.resumeEnv.readyForMissingArmExportExceptEnv}`,
     `- Resume env ready for command materialization: ${value.localFullLaneState.resumeEnv.readyForCommandMaterialization}`,

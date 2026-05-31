@@ -292,6 +292,10 @@ const requiredFiles = [
   `${reviewDir}/end-to-end-memory-score-local-full-combined-20260529.md`,
   `${reviewDir}/end-to-end-memory-score-local-full-combined-gate-20260529.json`,
   `${reviewDir}/end-to-end-memory-score-local-full-combined-gate-20260529.md`,
+  `${reviewDir}/end-to-end-memory-score-local-full-combined-20260531.json`,
+  `${reviewDir}/end-to-end-memory-score-local-full-combined-20260531.md`,
+  `${reviewDir}/end-to-end-memory-score-local-full-gate-20260531.json`,
+  `${reviewDir}/end-to-end-memory-score-local-full-gate-20260531.md`,
   `${reviewDir}/local-embedding-runtime-doctor-shard020-20260529.json`,
   `${reviewDir}/local-embedding-runtime-doctor-shard020-20260529.md`,
   `${reviewDir}/local-embedding-durability-smoke-shard020-20260529.json`,
@@ -382,6 +386,8 @@ const requiredFiles = [
   `${reviewDir}/full-memory-sota-doctor-20260526.md`,
   `${reviewDir}/full-memory-sota-doctor-20260527.json`,
   `${reviewDir}/full-memory-sota-doctor-20260527.md`,
+  `${reviewDir}/full-memory-sota-doctor-after-local-full-combine-20260531.json`,
+  `${reviewDir}/full-memory-sota-doctor-after-local-full-combine-20260531.md`,
   `${reviewDir}/full-memory-sota-doctor-after-shard-020-20260529.json`,
   `${reviewDir}/full-memory-sota-doctor-after-shard-020-20260529.md`,
   `${reviewDir}/full-memory-sota-doctor-after-shard-019-20260529.json`,
@@ -2898,10 +2904,10 @@ check("fresh public benchmark target check passes", () => {
   const fullMemorySotaDoctorFresh = JSON.parse(run("node", ["packages/bench/full-memory-sota-doctor.mjs"]).stdout);
   const fullMemorySotaDoctorMarkdownFresh = run("node", ["packages/bench/full-memory-sota-doctor.mjs", "--format", "markdown"]).stdout;
   const fullMemorySotaDoctorEvidence = JSON.parse(
-    readFileSync(join(root, reviewDir, "full-memory-sota-doctor-after-shard-020-20260529.json"), "utf8"),
+    readFileSync(join(root, reviewDir, "full-memory-sota-doctor-after-local-full-combine-20260531.json"), "utf8"),
   );
   const fullMemorySotaDoctorMarkdownEvidence = readFileSync(
-    join(root, reviewDir, "full-memory-sota-doctor-after-shard-020-20260529.md"),
+    join(root, reviewDir, "full-memory-sota-doctor-after-local-full-combine-20260531.md"),
     "utf8",
   );
   const providerOperatorPacket = JSON.parse(run("node", ["packages/bench/provider-benchmark-operator-packet.mjs", "--provider", "voyage"]).stdout);
@@ -5865,9 +5871,12 @@ check("fresh public benchmark target check passes", () => {
       nextPendingShardRange: null,
       bestAnswerQuality: 24.9,
       bestDeltaVsBm25: 2.738,
+      bm25AnswerQuality: 22.162,
       localAppleBaseAnswerQuality: 20.67,
       localAppleRerankAnswerQuality: 24.9,
       localAppleRerankDeltaVsBase: 4.23,
+      reportedTargetScore: 85.2,
+      reportedTargetDelta: -60.3,
       intakePathPattern: /answer-quality-local-full-shard-intake-after-shard-020-20260529\.json$/,
     };
     assert.equal(doctorReport.mode, "full-memory-sota-doctor");
@@ -5959,6 +5968,28 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.publicBenchmarkClaimsAllowed, false);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.blockers?.includes("local-full-coverage-incomplete"), false);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.blockers?.includes("local-full-shard-003-scoring-env-missing"), false);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.status, "READY_LOCAL_FULL_COMBINED_SCORE");
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.evidenceReady, true);
+    assert.deepEqual(doctorReport.localFullLaneState?.combinedScore?.evidenceBlockers, []);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.safe, true);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.coverageReady, true);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.claimScope, "local-full");
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.acceptedShardCount, expectedLocalFull.acceptedShardCount);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.scoredQueryCount, expectedLocalFull.acceptedQueryCount);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.totalQueryCount, 500);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.winnerStrategy, "local-apple-qwen3-0_6b-local-rerank");
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.winnerAnswerQuality, expectedLocalFull.bestAnswerQuality);
+    assert.equal(doctorReport.localFullLaneState?.combinedScore?.bm25AnswerQuality, expectedLocalFull.bm25AnswerQuality);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.status, "READY_LOCAL_FULL_MEMORY_SCORE");
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.evidenceReady, true);
+    assert.deepEqual(doctorReport.localFullLaneState?.memoryScoreGate?.evidenceBlockers, []);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.safe, true);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.countsAsEndToEndMemoryBenchmark, true);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.countsAsLocalFullBenchmarkEvidence, true);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.countsAsFullMemorySotaEvidence, false);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.observedScore, expectedLocalFull.bestAnswerQuality);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.reportedTargetScore, expectedLocalFull.reportedTargetScore);
+    assert.equal(doctorReport.localFullLaneState?.memoryScoreGate?.scoreDelta, expectedLocalFull.reportedTargetDelta);
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.status, "READY_LOCAL_FULL_SHARD_RESUME_ENV");
     assert.equal(doctorReport.localFullLaneState?.resumeEnv?.evidenceReady, true);
     assert.deepEqual(doctorReport.localFullLaneState?.resumeEnv?.evidenceBlockers, []);
@@ -6054,6 +6085,7 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-runtime" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-embedding-durability" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-performance-snapshot" && item.status === "pass"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-combined-memory-score" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-resume-env" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-resume-command-security" && item.status === "pass"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "local-full-resume-result" && item.status === "pass"));
@@ -6088,7 +6120,12 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance coverage: 100%/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance best strategy: local-apple-qwen3-0_6b-local-rerank/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Performance counts as SOTA evidence: false/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Combined score winner: local-apple-qwen3-0_6b-local-rerank/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Combined score answer quality: 24\.9/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Memory score gate status: READY_LOCAL_FULL_MEMORY_SCORE/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Memory score gate counts as SOTA evidence: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-performance-snapshot: pass/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-combined-memory-score: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /local-full-resume-env: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Resume env ready for missing-arm export except env: true/);
@@ -8037,6 +8074,14 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.fullMemorySotaDoctor.nextLocalFullShardRange, null);
   assert.equal(report.checks.fullMemorySotaDoctor.localFullPendingShardCount, 0);
   assert.equal(report.checks.fullMemorySotaDoctor.localFullAcceptedShardCount, 20);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullCombinedScoreReady, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullCombinedWinner, "local-apple-qwen3-0_6b-local-rerank");
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullCombinedAnswerQuality, 24.9);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullCombinedBm25AnswerQuality, 22.162);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullMemoryScoreGateStatus, "READY_LOCAL_FULL_MEMORY_SCORE");
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullMemoryScoreGateReady, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullMemoryScoreCountsAsLocalFullEvidence, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.localFullMemoryScoreCountsAsSotaEvidence, false);
   assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingRuntimeReady, true);
   assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingDurabilityReady, true);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.status, "READY_FOR_BASELINE_REVIEW");
