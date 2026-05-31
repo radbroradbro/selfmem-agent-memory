@@ -63,7 +63,7 @@ npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown
 After at least 15 minutes of real use following the deterministic drill, collect strict-real metrics and package the returned evidence from the mapped live container.
 
 ```bash
-bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 97461318ab6e112de0eac816e1feba600099a448 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ### collect-from-redacted-export
@@ -71,7 +71,7 @@ bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rol
 Use only if the agent cannot collect from its live container but can provide a redacted diagnostic export.
 
 ```bash
-bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 97461318ab6e112de0eac816e1feba600099a448 --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --canary-since "$FRESH_WINDOW_START" --canary-diagnostic-zip <redacted-diagnostic.zip> --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ### diagnose-if-failed
@@ -87,7 +87,7 @@ npm exec --yes pnpm@10.23.0 -- canary:diagnose -- --report /tmp/recallweave-cana
 Package a passing strict-real canary. This remains one-agent evidence only.
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --strict-real --expected-commit 97461318ab6e112de0eac816e1feba600099a448 --output /tmp/recallweave-canary-evidence-packet.zip
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --strict-real --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ### package-failing-diagnostic
@@ -95,7 +95,7 @@ npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary
 Package diagnosis when strict intake fails. This does not count as rollout evidence.
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --diagnosis /tmp/recallweave-canary-diagnosis.json --expected-commit 97461318ab6e112de0eac816e1feba600099a448 --output /tmp/recallweave-canary-evidence-packet.zip
+npm exec --yes pnpm@10.23.0 -- canary:packet -- --report /tmp/recallweave-canary-report.json --intake /tmp/recallweave-canary-intake.json --diagnosis /tmp/recallweave-canary-diagnosis.json --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --output /tmp/recallweave-canary-evidence-packet.zip
 ```
 
 ## Pass Criteria
