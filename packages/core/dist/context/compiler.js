@@ -152,9 +152,9 @@ function renderTypedContext(input) {
         : "No derived facts extracted.";
     const evidenceLines = input.evidence.length > 0
         ? input.evidence.map((item, index) => {
-            const date = typeof item.metadata?.date === "string" ? ` date=${item.metadata.date}` : "";
+            const provenance = renderEvidenceProvenance(item.metadata);
             const score = typeof item.score === "number" ? ` score=${item.score.toFixed(3)}` : "";
-            return `### Evidence ${index + 1}: ${item.id}${date}${score}\n${item.quote}`;
+            return `### Evidence ${index + 1}: ${item.id}${provenance}${score}\n${item.quote}`;
         }).join("\n\n")
         : "No retrieved evidence.";
     return `RecallWeave shadow context
@@ -166,6 +166,41 @@ ${factLines}
 
 Evidence:
 ${evidenceLines}`;
+}
+function renderEvidenceProvenance(metadata) {
+    if (!metadata)
+        return "";
+    const fields = [
+        ["date", metadata.date],
+        ["event", metadata.eventDate],
+        ["kind", metadata.kind],
+        ["role", metadata.retrievalRole],
+        ["title", metadata.title],
+        ["topic", metadata.topic],
+        ["source", metadata.sourceId ?? metadata.sourceChunkId],
+        ["parent", metadata.parentSessionId],
+        ["rehydrate", metadata.rehydrateId],
+    ]
+        .map(([label, value]) => safeProvenanceField(label, value))
+        .filter((value) => Boolean(value));
+    return fields.length ? ` ${fields.join(" ")}` : "";
+}
+function safeProvenanceField(label, value) {
+    if (typeof value === "number")
+        return Number.isFinite(value) ? `${label}=${value}` : null;
+    if (typeof value === "boolean")
+        return `${label}=${value}`;
+    if (typeof value !== "string")
+        return null;
+    const redacted = redactPrivate(value).text.trim();
+    if (!redacted || redacted.includes("[REDACTED"))
+        return null;
+    if (/(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/|\/home\/|[A-Za-z]:\\Users\\)/i.test(redacted)) {
+        return null;
+    }
+    const compact = redacted.replace(/\s+/g, "_");
+    const truncated = compact.length > 80 ? `${compact.slice(0, 77)}...` : compact;
+    return `${label}=${truncated}`;
 }
 function dedupeFacts(facts) {
     const seen = new Set();

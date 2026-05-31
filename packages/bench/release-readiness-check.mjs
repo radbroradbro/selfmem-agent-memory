@@ -10635,6 +10635,8 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "packages/adapters/openclaw/selfmem_canary/index.mjs" ||
     file === "packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs" ||
     file === "packages/brain-ui/fixtures/model-matrix.json" ||
+    file === "packages/brain-ui/fixtures/benchmark-summary.json" ||
+    file === "packages/brain-ui/fixtures/release-readiness.json" ||
     file === "packages/brain-ui/fixtures/session-compaction-local-audit.json" ||
     file === "packages/brain-ui/interaction-smoke.mjs" ||
     file === "packages/brain-ui/smoke.mjs" ||
@@ -10647,14 +10649,25 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "packages/core/dist/compaction/session.d.ts.map" ||
     file === "packages/core/dist/compaction/session.js" ||
     file === "packages/core/dist/compaction/session.js.map" ||
+    file === "packages/core/dist/context/compiler.d.ts" ||
+    file === "packages/core/dist/context/compiler.d.ts.map" ||
+    file === "packages/core/dist/context/compiler.js" ||
+    file === "packages/core/dist/context/compiler.js.map" ||
+    file === "packages/core/dist/hybrid/search.d.ts" ||
+    file === "packages/core/dist/hybrid/search.d.ts.map" ||
+    file === "packages/core/dist/hybrid/search.js" ||
+    file === "packages/core/dist/hybrid/search.js.map" ||
     file === "packages/core/dist/nucleus/index.d.ts" ||
     file === "packages/core/dist/nucleus/index.d.ts.map" ||
     file === "packages/core/dist/nucleus/index.js" ||
     file === "packages/core/dist/nucleus/index.js.map" ||
     file === "packages/core/src/compaction/session.ts" ||
+    file === "packages/core/src/context/compiler.ts" ||
+    file === "packages/core/src/hybrid/search.ts" ||
     file === "packages/core/src/nucleus/index.ts" ||
     file.startsWith("packages/bench/") ||
     file.startsWith("tests/bench/") ||
+    file === "tests/hybrid/hybrid-search.test.ts" ||
     file === "tests/compaction/session-compaction.test.ts" ||
     file === "tests/nucleus/nucleus-snapshot.test.ts" ||
     file === "plugins/selfmem-fallback/scripts/selfmem_update.py"

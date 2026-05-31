@@ -54,13 +54,7 @@ export async function searchHybrid(input) {
             id: candidate.id,
             text: candidate.text,
             score: candidate.score,
-            metadata: {
-                origin: candidate.origin,
-                containerTag: candidate.containerTag,
-                remoteSystem: candidate.remoteSystem,
-                remoteId: candidate.remoteId,
-                normalizedHash: candidate.normalizedHash,
-            },
+            metadata: contextMetadata(candidate),
         })),
         ...(input.contextBudgetTokens !== undefined ? { budgetTokens: input.contextBudgetTokens } : {}),
     };
@@ -110,6 +104,86 @@ function lexicalScore(queryTokens, text) {
             score += 1;
     }
     return score;
+}
+const CONTEXT_METADATA_KEYS = [
+    "origin",
+    "kind",
+    "scope",
+    "sourceKind",
+    "sourceId",
+    "containerTag",
+    "remoteSystem",
+    "remoteId",
+    "normalizedHash",
+    "observedAt",
+    "createdAt",
+    "updatedAt",
+    "date",
+    "documentDate",
+    "eventDate",
+    "title",
+    "topic",
+    "topicPath",
+    "subtopic",
+    "subtopicPath",
+    "retrievalRole",
+    "sourceChunkId",
+    "rehydrateId",
+    "sourceContentHash",
+    "sourceEstimatedTokens",
+    "parentSessionId",
+    "chunkIndex",
+    "chunkCount",
+    "atomicFactIndex",
+    "atomicFactCount",
+];
+function contextMetadata(candidate) {
+    const merged = {
+        ...(candidate.metadata ?? {}),
+    };
+    assignDefined(merged, {
+        origin: candidate.origin,
+        scope: candidate.scope,
+        sourceKind: candidate.sourceKind,
+        sourceId: candidate.sourceId,
+        containerTag: candidate.containerTag,
+        remoteSystem: candidate.remoteSystem,
+        remoteId: candidate.remoteId,
+        normalizedHash: candidate.normalizedHash,
+        observedAt: candidate.observedAt,
+        createdAt: candidate.createdAt,
+        updatedAt: candidate.updatedAt,
+    });
+    if (candidate.kind && merged.kind === undefined)
+        merged.kind = candidate.kind;
+    const output = {};
+    for (const key of CONTEXT_METADATA_KEYS) {
+        const value = safeMetadataValue(merged[key]);
+        if (value !== undefined)
+            output[key] = value;
+    }
+    return output;
+}
+function assignDefined(target, values) {
+    for (const [key, value] of Object.entries(values)) {
+        if (value !== undefined && value !== null)
+            target[key] = value;
+    }
+}
+function safeMetadataValue(value) {
+    if (typeof value === "number")
+        return Number.isFinite(value) ? value : undefined;
+    if (typeof value === "boolean")
+        return value;
+    if (typeof value !== "string")
+        return undefined;
+    const redacted = redactPrivate(value).text.trim();
+    if (!redacted || redacted.includes("[REDACTED"))
+        return undefined;
+    if (/(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|\/tmp\/|\/home\/|[A-Za-z]:\\Users\\)/i.test(redacted)) {
+        return undefined;
+    }
+    return redacted.length > 180 ? `${redacted.slice(0, 177)}...` : redacted;
 }
 function sanitizeError(message) {
     return message
