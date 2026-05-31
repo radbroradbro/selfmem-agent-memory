@@ -543,6 +543,13 @@ answer-quality consent, exact `gpt-4o` answer/judge target matching, local
 Apple and local rerank endpoints, Voyage/NVIDIA credentials, and model-backed
 query expansion are present. It calls no providers, sends no benchmark text,
 prints no env values or private paths, and does not count as SOTA evidence.
+The env-loaded follow-up at
+`reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-provider-env-20260531.json`
+shows the cloud side of that gate can be satisfied without exposing secrets:
+Gemini, NVIDIA, and Voyage key-file readiness are all true, and model-backed
+query expansion is available. The accepted lane still blocks on the local Apple
+embedding endpoint, local rerank endpoint, exact answer/judge runtime, returned
+shard results, and final SOTA/claim gates.
 The release-check temp cleanup is now scoped to stale
 `recallweave-release-check-root-*` directories only. It explicitly preserves
 benchmark materialization roots and pointer files such as

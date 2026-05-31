@@ -4304,6 +4304,46 @@ check("fresh public benchmark target check passes", () => {
   assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Accepted Lane Launch Doctor/);
   assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Ready for first accepted shard run: false/);
   assert.match(acceptedLaneLaunchDoctorMarkdownEvidence, /Query expansion requirement: local-or-cloud-model-required/);
+  {
+    const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-accepted-lane-provider-env-"));
+    const voyageKeys = join(tempRoot, "voyage.keys");
+    const geminiKeys = join(tempRoot, "gemini.keys");
+    const nvidiaKeys = join(tempRoot, "nvidia.keys");
+    writeFileSync(voyageKeys, "fixture-voyage-key\n", { encoding: "utf8", mode: 0o600 });
+    writeFileSync(geminiKeys, "fixture-gemini-key\n", { encoding: "utf8", mode: 0o600 });
+    writeFileSync(nvidiaKeys, "fixture-nvidia-key\n", { encoding: "utf8", mode: 0o600 });
+    const providerEnvLaunchDoctor = JSON.parse(
+      run("node", ["packages/bench/full-shard-accepted-lane-launch-doctor.mjs"], {
+        env: {
+          ...process.env,
+          RECALLWEAVE_BASELINE_LIVE: "1",
+          RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+          RECALLWEAVE_PROVIDER_BENCHMARK_CALLS: "1",
+          RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA: "1",
+          RECALLWEAVE_QUERY_EXPANSION_CALLS: "1",
+          RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA: "1",
+          VOYAGE_API_KEYS_FILE: voyageKeys,
+          GEMINI_API_KEYS_FILE: geminiKeys,
+          NVIDIA_API_KEYS_FILE: nvidiaKeys,
+        },
+      }).stdout,
+    );
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.responseArmExport?.liveExportEnabled, true);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.responseArmExport?.noRawTextConfirmed, true);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.gemini?.ready, true);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.nvidia?.ready, true);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.voyage?.ready, true);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, true);
+    assert.equal(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "response-export-consent"), false);
+    assert.equal(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "gemini-readiness"), false);
+    assert.equal(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "nvidia-readiness"), false);
+    assert.equal(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "voyage-readiness"), false);
+    assert.ok(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-apple-readiness"));
+    assert.ok(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-rerank-readiness"));
+    assert.ok(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "answer-quality-scoring"));
+    assert.doesNotMatch(JSON.stringify(providerEnvLaunchDoctor), secretPattern);
+    assert.doesNotMatch(JSON.stringify(providerEnvLaunchDoctor), privatePathPattern);
+  }
   for (const launchDoctor of [localAcceptedLaneLaunchDoctorFresh, localAcceptedLaneLaunchDoctorEvidence]) {
     assert.equal(launchDoctor.mode, "full-shard-accepted-lane-launch-doctor");
     assert.equal(launchDoctor.status, "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH");

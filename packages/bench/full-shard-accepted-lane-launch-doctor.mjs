@@ -250,7 +250,12 @@ function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
     if (!ready) needs.push({ id, envNames, note, valuePrinted: false });
   };
   push("private-input-dir", privateInputDoctorReport.readyForAnswerQualityShardRun === true, ["--private-input-dir"], "outside-repository full benchmark private inputs");
-  push("response-export-consent", lane.responseArmExport?.ready === true, ["RECALLWEAVE_BASELINE_LIVE", "RECALLWEAVE_BASELINE_NO_RAW_TEXT"], "live response export with no raw text output");
+  push(
+    "response-export-consent",
+    lane.responseArmExport?.liveExportEnabled === true && lane.responseArmExport?.noRawTextConfirmed === true,
+    ["RECALLWEAVE_BASELINE_LIVE", "RECALLWEAVE_BASELINE_NO_RAW_TEXT"],
+    "live response export with no raw text output",
+  );
   for (const provider of arrayOf(lane.providerRequirements)) {
     const readiness = lane.providerReadiness?.[provider] ?? {};
     push(
