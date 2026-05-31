@@ -1323,7 +1323,7 @@ function providerThrottlePolicy(providerNames = []) {
     keyScopedThrottleEnabled: scope === "key",
     retryAttempts: optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ?? 4,
     timeoutMs: optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_TIMEOUT_MS ?? null, "provider timeout") ?? 60_000,
-    globalMinIntervalMs: optionalPositiveInt(process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0,
+    globalMinIntervalMs: optionalNonNegativeInt(process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0,
     providers: Object.fromEntries(
       providerNames.map((provider) => {
         const throttleKey = providerThrottleKey(provider);
@@ -1331,7 +1331,7 @@ function providerThrottlePolicy(providerNames = []) {
           provider,
           {
             minIntervalMs:
-              optionalPositiveInt(
+              optionalNonNegativeInt(
                 process.env[`${throttleKey.toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`] ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null,
                 "provider min interval",
               ) ?? 0,
@@ -1786,7 +1786,7 @@ async function queryExpansionPost(plan, body) {
 async function waitProviderTurn(provider, requestHeaders = null) {
   const providerKey = providerThrottleSlot(provider, requestHeaders);
   const providerSpecific = process.env[`${providerThrottleKey(provider).toUpperCase()}_PROVIDER_MIN_INTERVAL_MS`];
-  const intervalMs = optionalPositiveInt(providerSpecific ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0;
+  const intervalMs = optionalNonNegativeInt(providerSpecific ?? process.env.RECALLWEAVE_PROVIDER_MIN_INTERVAL_MS ?? null, "provider min interval") ?? 0;
   if (!intervalMs) return;
   const now = Date.now();
   const previous = providerLastRequestAt.get(providerKey) ?? 0;

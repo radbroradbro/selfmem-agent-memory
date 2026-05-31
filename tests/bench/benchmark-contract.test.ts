@@ -234,6 +234,59 @@ describe("public benchmark comparison contract", () => {
     expect(report.keepsBestAtomicFactPerRehydratedSource).toBe(true);
     expect(report.resultIdsAreUnique).toBe(true);
   });
+
+  it("forwards live materialization shard controls into provider runs", () => {
+    const result = runRaw([
+      "--live-materialize-args-smoke",
+      "--memory-method",
+      "atomic-memory-v1",
+      "--max-queries",
+      "3",
+      "--query-offset",
+      "2",
+      "--context-token-budget",
+      "800",
+      "--limit",
+      "5",
+    ]);
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("live-materialize-args-smoke");
+    expect(report.forwardsMemoryMethod).toBe(true);
+    expect(report.forwardsShardSelection).toBe(true);
+    expect(report.forwardsContextBudget).toBe(true);
+    expect(report.forwardsLimit).toBe(true);
+  });
+
+  it("accepts zero as an explicit provider throttle interval", () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        responseExportScript,
+        "--fixture",
+        "--strategy",
+        "cloud-voyage4-lite-voyage-lite",
+        "--context-token-budget",
+        "800",
+        "--limit",
+        "5",
+        "--max-queries",
+        "1",
+      ],
+      {
+        cwd: new URL("../..", import.meta.url),
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          VOYAGE_PROVIDER_MIN_INTERVAL_MS: "0",
+        },
+      },
+    );
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.source.provider.providerThrottle.providers.voyage.minIntervalMs).toBe(0);
+  });
 });
 
 function runReport(args: string[]) {

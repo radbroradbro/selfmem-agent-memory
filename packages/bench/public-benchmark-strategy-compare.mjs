@@ -21,6 +21,7 @@ const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RE
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 10, "limit");
 const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAVE_BASELINE_MAX_QUERIES ?? null, "max queries");
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
+const memoryMethod = String(args.memoryMethod ?? process.env.RECALLWEAVE_MEMORYBENCH_MEMORY_METHOD ?? "session-v1").trim() || "session-v1";
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 const armTimeoutMs = optionalPositiveInt(args.armTimeoutMs ?? process.env.RECALLWEAVE_BENCHMARK_ARM_TIMEOUT_MS ?? null, "arm timeout") ?? 0;
 const providerArmTimeoutMs = optionalPositiveInt(args.providerArmTimeoutMs ?? process.env.RECALLWEAVE_PROVIDER_ARM_TIMEOUT_MS ?? null, "provider arm timeout") ?? 0;
@@ -82,6 +83,11 @@ if (args.promotionGateSmoke === true) {
   process.exit(0);
 }
 
+if (args.liveMaterializeArgsSmoke === true) {
+  runLiveMaterializeArgsSmoke();
+  process.exit(0);
+}
+
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
 assertGateContract(gate, strategies, { allowSoloSmoke });
 
@@ -116,6 +122,8 @@ async function runStrategyArm(strategy) {
     String(contextTokenBudget),
     "--limit",
     String(limit),
+    "--max-memory-bytes",
+    String(maxMemoryBytes),
     ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
     ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
     "--output",
@@ -316,22 +324,34 @@ async function liveInput(runRootPath) {
 
   const target = resolveInputPath(args.target ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_TARGET ?? "reviews/overnight-20260522/public-longmemeval-full-run-target.json");
   const materializerReportPath = resolve(runRootPath, "materialize-report.json");
-  runNode([
-    "packages/bench/public-benchmark-materialize-run.mjs",
-    "--live",
-    "--target",
-    target,
-    "--private-output-dir",
-    runRootPath,
-    "--output",
-    materializerReportPath,
-  ]);
+  runNode(liveMaterializeArgs({ target, runRootPath, materializerReportPath }));
   const materializer = JSON.parse(readFileSync(materializerReportPath, "utf8"));
   return inputFromPrivateFiles(
     resolve(runRootPath, "longmemeval-queryset.private.json"),
     resolve(runRootPath, "longmemeval-memories.private.jsonl"),
     materializer,
   );
+}
+
+function liveMaterializeArgs({ target, runRootPath, materializerReportPath }) {
+  return [
+    "packages/bench/public-benchmark-materialize-run.mjs",
+    "--live",
+    "--target",
+    target,
+    "--memory-method",
+    memoryMethod,
+    "--private-output-dir",
+    runRootPath,
+    "--context-token-budget",
+    String(contextTokenBudget),
+    "--limit",
+    String(limit),
+    ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
+    ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
+    "--output",
+    materializerReportPath,
+  ];
 }
 
 function inputFromPrivateFiles(querySetPath, memoriesPath, materializer) {
@@ -672,6 +692,33 @@ function runPromotionGateSmoke() {
       providerBestHybridStrategyTracksControl: true,
       pairedDeltasPresent: true,
       bootstrapCiPresent: true,
+    })}\n`,
+  );
+}
+
+function runLiveMaterializeArgsSmoke() {
+  const argv = liveMaterializeArgs({
+    target: "target.json",
+    runRootPath: "run-root",
+    materializerReportPath: "materialize-report.json",
+  });
+  const flagValue = (flag) => {
+    const index = argv.indexOf(flag);
+    return index >= 0 ? argv[index + 1] : null;
+  };
+  assert.equal(flagValue("--memory-method"), memoryMethod);
+  assert.equal(flagValue("--context-token-budget"), String(contextTokenBudget));
+  assert.equal(flagValue("--limit"), String(limit));
+  if (maxQueries) assert.equal(flagValue("--max-queries"), String(maxQueries));
+  if (queryOffset) assert.equal(flagValue("--query-offset"), String(queryOffset));
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "live-materialize-args-smoke",
+      forwardsMemoryMethod: true,
+      forwardsShardSelection: Boolean(maxQueries || queryOffset),
+      forwardsContextBudget: true,
+      forwardsLimit: true,
     })}\n`,
   );
 }
