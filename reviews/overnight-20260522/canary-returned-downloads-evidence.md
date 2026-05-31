@@ -31,25 +31,27 @@ node --check packages/bench/canary-returned-downloads.mjs
 node packages/bench/canary-returned-downloads.mjs --skip-defaults
 node packages/bench/canary-returned-downloads.mjs --skip-defaults --input-root <mixed-temp-folder> --iterations 1
 node packages/bench/canary-returned-downloads.mjs --skip-defaults --input-root <mixed-temp-folder> --require-found
-node packages/bench/canary-returned-downloads.mjs --output <metrics-json> --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output <metrics-json>
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --output <metrics-json> --findings-output <findings-md>
+node packages/bench/canary-returned-downloads.mjs --expected-commit <approved-commit> --output <metrics-json> --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit <approved-commit> --output <metrics-json>
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --expected-commit <approved-commit> --output <metrics-json> --findings-output <findings-md>
 ```
 
 ## Current Local Inbox Scan
 
 - Status: `AWAITING_RETURNED_PRODUCTION_CANARY`.
+- Expected report commit:
+  `97461318ab6e112de0eac816e1feba600099a448`.
 - Production evidence packets: 0.
 - Returned evidence packets: 0.
 - Handoff packets: 1.
 - Diagnostic bundles: 10.
-- Unknown packets: 22.
+- Unknown packets: 23.
 - Unreadable packets: 0.
 - Downloads scan:
-  - candidates: 19.
+  - candidates: 20.
   - handoff packets: 1.
   - diagnostics: 6.
-  - unknown: 12.
+  - unknown: 13.
   - unreadable: 0.
 - Telegram Desktop scan:
   - candidates: 14.

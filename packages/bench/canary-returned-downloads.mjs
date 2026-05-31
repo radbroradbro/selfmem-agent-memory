@@ -12,6 +12,7 @@ const requireFound = Boolean(args.requireFound);
 const outputPath = args.output ? resolvePath(args.output) : null;
 const findingsOutputPath = args.findingsOutput ? resolvePath(args.findingsOutput) : null;
 const inputRoots = normalizeInputRoots(args);
+const expectedCommit = normalizedExpectedCommit(args.expectedCommit || process.env.RECALLWEAVE_CANARY_EXPECTED_COMMIT || "");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -29,6 +30,7 @@ if (inputRoots.length > 0) {
   if (args.iterations) watchArgs.push("--iterations", String(args.iterations));
   if (args.intervalMs) watchArgs.push("--interval-ms", String(args.intervalMs));
   if (requireFound) watchArgs.push("--require-found");
+  if (expectedCommit) watchArgs.push("--expected-commit", expectedCommit);
 
   const run = spawnSync("node", watchArgs, {
     cwd: root,
@@ -69,6 +71,9 @@ const output = {
   discoveredRootCount: inputRoots.length,
   rootLabels: inputRoots.map((inputRoot) => safeRootLabel(inputRoot)),
   rootLabelsHash: sha256(inputRoots.map((inputRoot) => safeRootLabel(inputRoot)).join("\n")),
+  sourceControl: {
+    expectedCommit: expectedCommit || null,
+  },
   status,
   counts: noDefaultInboxes
     ? {
@@ -92,6 +97,7 @@ const output = {
         publicLaunchAllowed: Boolean(watchReport.publicLaunchAllowed),
         fleetRolloutAllowed: Boolean(watchReport.fleetRolloutAllowed),
         iterationsCompleted: Number(watchReport.iterationsCompleted ?? 0),
+        sourceControl: watchReport.sourceControl ?? null,
         counts: watchReport.counts,
         latestScans: (watchReport.latestScans ?? []).map((scan) => ({
           rootLabel: scan.rootLabel,
@@ -220,6 +226,7 @@ function toMarkdown(report) {
     "## Scope",
     "",
     "This note is metrics-only. It records the standard inbox scan without raw memories, prompts, transcripts, answers, credentials, private local paths, or private container names.",
+    report.sourceControl?.expectedCommit ? `Expected report commit: \`${report.sourceControl.expectedCommit}\`.` : null,
     "",
     "## Inbox Labels",
     "",
@@ -294,6 +301,13 @@ function formatSampleIds(triage) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function normalizedExpectedCommit(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  assert.match(text, /^[a-f0-9]{7,40}$/i, "--expected-commit must be a git SHA prefix or full SHA");
+  return text.toLowerCase();
 }
 
 function assertSafeText(text, label) {

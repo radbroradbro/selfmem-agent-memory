@@ -331,20 +331,24 @@ be run without typing private folder paths:
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --output /tmp/recallweave-returned-downloads.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
 ```
 
+Add `--expected-commit <approved-commit>` when the scan is being used for
+release evidence so returned packets are checked against the approved adapter
+commit by the wrapped watcher.
+
 For release evidence, require a strict production canary:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /path/to/returned-canary-evidence-packet.zip --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root ~/Downloads --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-inbox.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root ~/Downloads --include-all-zips --require-found --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-watch.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit <approved-commit> --output /tmp/recallweave-returned-downloads.json
 ```
 
 For overnight supervision on the maintainer machine, use the 12-hour standard
 inbox watcher:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --output /tmp/recallweave-returned-downloads-watch.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-watch-findings.md
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --expected-commit <approved-commit> --output /tmp/recallweave-returned-downloads-watch.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-watch-findings.md
 ```
 
 This intake command does not read raw memories. It accepts only the metrics-only

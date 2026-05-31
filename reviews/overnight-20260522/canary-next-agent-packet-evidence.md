@@ -168,6 +168,57 @@ The lower-level `canary:batch-audit` path now also emits a metrics-only empty
 folder report with `inputCount: 0`, `parsedInputCount: 0`, and
 `countsAsRealRolloutEvidence: false` instead of throwing.
 
+## Current 2026-05-31 Handoff Refresh
+
+The controller regenerated the OpenClaw handoff packet from the current
+worktree head after the local-full benchmark ledger refresh. This refresh keeps
+the one-agent canary contract tied to the current adapter/report commit instead
+of the older May 25 handoff commit.
+
+Command:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --host openclaw --allow-failed-inputs --require-ready --expected-commit 97461318ab6e112de0eac816e1feba600099a448 --output <sendable-packet.zip>
+```
+
+Result:
+
+- Packet label: `recallweave-openclaw-next-agent-canary-20260531-SEND-THIS-ONE-9746131.zip`.
+- Packet SHA256:
+  `a8dee19226d6225063b9a334ada003bfd0d7abdc3de052ed56636757f564b350`.
+- Packet generated from controller commit:
+  `97461318ab6e112de0eac816e1feba600099a448`.
+- Approved adapter commit:
+  `97461318ab6e112de0eac816e1feba600099a448`.
+- Expected returned report commit:
+  `97461318ab6e112de0eac816e1feba600099a448`.
+- Mode: `canary-next-agent-handoff-packet`.
+- Public safe: true.
+- Metrics only: true.
+- Public launch allowed: false.
+- Fleet rollout allowed: false.
+- Host: OpenClaw.
+- Status: `READY_FOR_ONE_AGENT_FRESH_CANARY`.
+- One-agent canary allowed: true.
+- Ready for live handoff: true.
+- `--require-ready` result: passed for the non-fixture OpenClaw handoff packet.
+- Selected candidate label: `bundle_8e90781bb060a889`.
+- Failed checks:
+  - `adapter-contract`
+  - `store-latency-instrumented`
+  - `store-p95`
+- Recall p95: 1567.346 ms.
+- Store p95: 0 ms.
+- Store latency samples: 0.
+- Privacy leak count: 0.
+- Packet entries:
+  - `README.md`
+  - `manifest.json`
+  - `next-agent-plan.json`
+  - `next-agent-plan.md`
+  - `strict-real-canary-drill.md`
+  - `strict-real-operator-packet.md`
+
 ## Interpretation
 
 This packet does not close the real-container rollout blocker by itself. It

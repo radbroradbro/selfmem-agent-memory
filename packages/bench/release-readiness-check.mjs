@@ -7537,6 +7537,7 @@ check("fresh returned downloads scanner passes", () => {
     const badPacketPath = join(tempRoot, "selfmem-bad-return.zip");
     const outputPath = join(tempRoot, "returned-downloads.json");
     const findingsPath = join(tempRoot, "returned-downloads-findings.md");
+    const expectedCommit = "0123456789abcdef0123456789abcdef01234567";
     writeFileSync(badPacketPath, "not a zip");
     run("node", [
       "packages/bench/canary-next-agent-packet.mjs",
@@ -7553,6 +7554,8 @@ check("fresh returned downloads scanner passes", () => {
       "--skip-defaults",
       "--input-root",
       tempRoot,
+      "--expected-commit",
+      expectedCommit,
       "--iterations",
       "1",
       "--output",
@@ -7565,6 +7568,8 @@ check("fresh returned downloads scanner passes", () => {
       "--skip-defaults",
       "--input-root",
       tempRoot,
+      "--expected-commit",
+      expectedCommit,
       "--require-found",
     ], {
       cwd: root,
@@ -7589,6 +7594,8 @@ check("fresh returned downloads scanner passes", () => {
     assert.equal(downloadsReport.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
     assert.equal(downloadsReport.defaultInboxScan, false);
     assert.equal(downloadsReport.metricsOnly, true);
+    assert.equal(downloadsReport.sourceControl.expectedCommit, expectedCommit);
+    assert.equal(downloadsReport.returnedWatch?.sourceControl?.expectedCommit, expectedCommit);
     assert.equal(downloadsReport.counts.handoffPackets, 1);
     assert.equal(downloadsReport.counts.unknownPackets, 1);
     assert.equal(downloadsReport.counts.unreadablePackets, 1);
@@ -7601,6 +7608,7 @@ check("fresh returned downloads scanner passes", () => {
     assert.equal(outputReport.mode, "canary-returned-downloads");
     assert.match(findings, /Returned Downloads Findings/);
     assert.match(findings, /Production evidence packets: 0/);
+    assert.match(findings, new RegExp(`Expected report commit: \`${expectedCommit}\``));
     assert.match(findings, /Safe Triage/);
     assert.match(findings, /zip-[a-f0-9]{12}/);
     assert.notEqual(requiredRun.status, 0, "downloads scanner must fail closed with --require-found when no production canary exists");

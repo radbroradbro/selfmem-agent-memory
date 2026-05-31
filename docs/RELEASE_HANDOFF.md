@@ -1156,13 +1156,16 @@ workspace:
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads -- --output /tmp/recallweave-returned-downloads.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-findings.md
 ```
 
+For release evidence, pass `--expected-commit <approved-commit>` here too; the
+Downloads scanner forwards it into the underlying returned-watch/intake flow.
+
 For a release-blocking check, require production-grade evidence:
 
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet <returned-canary-evidence-packet.zip> --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-intake.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-inbox.json
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <folder-of-agent-zips> --include-all-zips --require-found --expected-commit <approved-commit> --output /tmp/recallweave-returned-canary-watch.json
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit <approved-commit> --output /tmp/recallweave-returned-downloads.json
 ```
 
 For overnight supervision on the maintainer machine, use the 12-hour standard
@@ -1171,7 +1174,7 @@ requires production-grade evidence, and exits nonzero if no returned production
 packet appears:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --output /tmp/recallweave-returned-downloads-watch.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-watch-findings.md
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:watch12h -- --expected-commit <approved-commit> --output /tmp/recallweave-returned-downloads-watch.json --findings-output reviews/overnight-20260522/next-agent-workspace/returned-downloads-watch-findings.md
 ```
 
 The command fails closed unless the returned packet is non-fixture,

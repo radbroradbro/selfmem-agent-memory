@@ -1,20 +1,20 @@
 # Paste-Ready OpenClaw Canary Handoff
 
-Use this with exactly one OpenClaw agent. Attach the zip named below in the same message, plus the send instructions and checksum note. This is a fresh canary window, not a fleet rollout.
+Use this with exactly one OpenClaw agent. Attach the zip named below in the
+same message, plus the checksum note. This is a fresh canary window, not a
+fleet rollout.
 
-Send files:
+Send file:
 
-- `recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip`
-- `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
-- `recallweave-SEND-THIS-ONE-checksum.txt`
+- `recallweave-openclaw-next-agent-canary-20260531-SEND-THIS-ONE-9746131.zip`
 
 Packet:
 
-- Zip: `recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip`
-- SHA256: `cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a`
-- Packet generated from controller commit: `f21a7e751ddcd0b9e64a96d682a3fa0940c17c11`
-- Approved adapter commit: `18d606aff589986b4d8b416a686bedb7ff1506d2`
-- Expected report commit: `18d606aff589986b4d8b416a686bedb7ff1506d2`
+- Zip: `recallweave-openclaw-next-agent-canary-20260531-SEND-THIS-ONE-9746131.zip`
+- SHA256: `a8dee19226d6225063b9a334ada003bfd0d7abdc3de052ed56636757f564b350`
+- Packet generated from controller commit: `97461318ab6e112de0eac816e1feba600099a448`
+- Approved adapter commit: `97461318ab6e112de0eac816e1feba600099a448`
+- Expected report commit: `97461318ab6e112de0eac816e1feba600099a448`
 
 Paste:
 
@@ -25,8 +25,8 @@ Important: this packet is for one fresh canary window only. Do not roll it out t
 For this one selected OpenClaw agent, RecallWeave/selfmem should become the native/default memory slot during the canary window. Do not leave it installed as shadow-only or manual-only.
 The `selfmem_canary` label is a compatibility/plugin id, not a request to keep it non-default.
 Hosted Supermemory remains read-through/history only. New memory writes during this canary should land locally in RecallWeave/selfmem.
-Commit note: this packet was generated from controller commit f21a7e751ddcd0b9e64a96d682a3fa0940c17c11, but the approved adapter/report commit for this canary is 18d606aff589986b4d8b416a686bedb7ff1506d2. If a newer adapter commit should count, regenerate the packet first.
-The returned canary evidence must report commit 18d606aff589986b4d8b416a686bedb7ff1506d2 or it will count as diagnostic only.
+The packet was generated from controller commit 97461318ab6e112de0eac816e1feba600099a448, and the approved adapter/report commit for this canary is also 97461318ab6e112de0eac816e1feba600099a448.
+The returned canary evidence must report commit 97461318ab6e112de0eac816e1feba600099a448 or it will count as diagnostic only.
 
 Do this in order:
 
@@ -54,4 +54,7 @@ The run only counts if strict-real intake passes from a non-fixture post-update 
 If strict intake fails, run the diagnosis command and return the metrics-only diagnosis plus the evidence packet. A failed canary is still useful, but it is not production rollout evidence.
 ```
 
-Controller note: the selected prior diagnostic was privacy-clean and had lifecycle coverage, hybrid search, local writes, hosted read-through, and recall p95 `1567.346 ms`. It failed only because the old window lacked the current adapter contract and positive store latency samples.
+Controller note: the selected prior diagnostic was privacy-clean and had
+lifecycle coverage, hybrid search, local writes, hosted read-through, and recall
+p95 `1567.346 ms`. It failed only because the old window lacked the current
+adapter contract and positive store latency samples.
