@@ -7,6 +7,18 @@ Date: 2026-05-23
   is CI/runtime hygiene for the existing public-safe PR/issue sync gate; it does
   not change benchmark scoring, provider defaults, launch status, or public
   memory-system claims.
+- PR #5 was refreshed again on 2026-05-31 after GitHub Actions run
+  `26713721189` passed on
+  `03dcf629dd17fe18a64e10b1cd76a68636d8aa0d`, promoting provider
+  key-scoped pacing, accepted full-shard arm coverage, and provider hybrid
+  contract evidence as the latest verified code/product baseline while
+  preserving launch, production rollout, full-SOTA, and real-canary blockers.
+  Live sync passed with PR body hash
+  `5ef1015424c7eccfd282a8eaaff291ef4a44ab77ef26a9b554033c62c9ce1b7d`,
+  issue title hash
+  `e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c`, and
+  issue body hash
+  `1b702f8118354977d5d3859ce80fc4f4f9f8a51c0471d0e9aa541aec7cc80216`.
 - PR #5 was refreshed again on 2026-05-29 after GitHub Actions run
   `26623522779` passed on
   `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`, promoting the direct Gemini

@@ -19,29 +19,29 @@ scaffolded and fixture-covered, but not live-tested until a local embedding
 endpoint is configured. The current verified product evidence now includes live
 local Apple provider runs for Qwen3 Embedding 0.6B and Qwen3 Embedding 4B on
 the same public LongMemEval-S retrieval-proxy target.
-The latest verified branch-head refresh adds direct Gemini Embedding 2 to the
-full accepted SOTA shard strategy set, keeps Gemini scoring blocked until
-env-only credentials are visible to the benchmark process, records current Brain
-UI runtime evidence, and preserves the launch/SOTA blockers.
+The latest verified branch-head refresh adds provider key-scoped pacing for
+rotated benchmark credentials, keeps provider challenger lanes as
+BM25/full-hybrid context arms, records accepted full-shard arm coverage, and
+preserves the launch/SOTA blockers.
 
 ## Latest Observed PR Branch Head
 
-- Commit: `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`
-- Commit title: `Add direct Gemini full-shard benchmark arm`
-- GitHub Actions run: `26623522779`
+- Commit: `03dcf629dd17fe18a64e10b1cd76a68636d8aa0d`
+- Commit title: `Harden provider key pacing and accepted arms`
+- GitHub Actions run: `26713721189`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
 This does not change the approved runtime canary adapter/report commit. It
-updates the current PR-head evidence, records direct Gemini as a full-shard
-benchmark arm, and keeps the result as harness/readiness evidence only until a
-live same-data Gemini run is scored.
+updates the current PR-head evidence, records provider key-scoped pacing and
+accepted full-shard arm coverage, and keeps the result as harness/readiness
+evidence only until live same-data provider runs are scored.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`
-- Commit title: `Add direct Gemini full-shard benchmark arm`
-- GitHub Actions run: `26623522779`
+- Commit: `03dcf629dd17fe18a64e10b1cd76a68636d8aa0d`
+- Commit title: `Harden provider key pacing and accepted arms`
+- GitHub Actions run: `26713721189`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -71,7 +71,7 @@ before this baseline refresh:
   local Apple arms
 - Targeted public docs/evidence secret and private-path scan
 - Stale local model server check
-- GitHub Actions run `26623522779`
+- GitHub Actions run `26713721189`
 
 ## Canary Handoff Artifact
 

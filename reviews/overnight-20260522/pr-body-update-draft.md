@@ -272,7 +272,16 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-- `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.
+- `03dcf629dd17fe18a64e10b1cd76a68636d8aa0d`.
+- GitHub Actions run `26713721189`: passed CI after adding provider
+  key-scoped pacing for rotated benchmark credentials, accepted full-shard arm
+  coverage, and provider hybrid contract evidence. Provider challenger lanes
+  remain BM25/full-hybrid context arms rather than provider-dense-only
+  comparisons. This is harness/readiness progress only; it does not authorize
+  public SOTA claims or production rollout.
+- Previous verified PR branch head before provider key-scoped pacing and
+  accepted-arm hardening:
+  `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.
 - GitHub Actions run `26623522779`: passed CI after adding direct Gemini
   Embedding 2 to the full accepted SOTA shard strategy set and adding a
   standalone Gemini minimum challenger lane. This is harness/readiness progress
@@ -382,15 +391,22 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.
-- GitHub Actions run `26623522779`: passed CI with release checks, live GitHub
-  sync, secret scan, and private-path scan green. The checked-in evidence now
-  includes direct Gemini Embedding 2 in the full accepted SOTA shard strategy
-  set, the standalone Gemini minimum challenger lane, current Brain UI runtime
-  evidence, and bounded GitHub live-sync retry handling. It keeps cloud Voyage
-  as the actual Codex/personal memory default, keeps local Apple Silicon as the
+- `03dcf629dd17fe18a64e10b1cd76a68636d8aa0d`.
+- GitHub Actions run `26713721189`: passed CI with release checks, secret
+  scan, and private-path scan green. The checked-in evidence now includes
+  provider key-scoped pacing for rotated credentials, accepted full-shard arm
+  coverage, and provider hybrid contract evidence. It keeps cloud Voyage as the
+  actual Codex/personal memory default, keeps local Apple Silicon as the
   high-volume methodology lane, and preserves launch, production rollout, and
   full-SOTA blockers.
+- Previous verified code/product baseline before provider key-scoped pacing
+  and accepted-arm hardening:
+  `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.
+- GitHub Actions run `26623522779`: passed CI with release checks, live GitHub
+  sync, secret scan, and private-path scan green. The checked-in evidence
+  includes direct Gemini Embedding 2 in the full accepted SOTA shard strategy
+  set, the standalone Gemini minimum challenger lane, current Brain UI runtime
+  evidence, and bounded GitHub live-sync retry handling.
 - Previous verified code/product baseline before the direct Gemini full-shard
   arm:
   `5e5cf716d83c39dcaeef34ea1bbb77ca36869927`.
