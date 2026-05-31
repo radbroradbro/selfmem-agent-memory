@@ -32,6 +32,9 @@ const providerRetryAttempts =
   optionalPositiveInt(args.providerRetryAttempts ?? process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ??
   (!fixtureRequested && gate === "provider" ? 2 : 0);
 const parallelArms = optionalPositiveInt(args.parallelArms ?? process.env.RECALLWEAVE_BENCHMARK_PARALLEL_ARMS ?? null, "parallel arms") ?? 1;
+const promotionMinPairedQueryCount =
+  optionalPositiveInt(args.promotionMinPairedQueryCount ?? process.env.RECALLWEAVE_PROMOTION_MIN_PAIRED_QUERY_COUNT ?? null, "promotion min paired query count") ??
+  30;
 const reuseControlReportPaths = splitList(args.reuseControlReport ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_REUSE_CONTROL_REPORT ?? "").map(resolveInputPath);
 const isolateArms =
   Boolean(args.isolateArms) || process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS === "1" || (!fixtureRequested && gate === "provider" && process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS !== "0");
@@ -574,27 +577,56 @@ function providerPromotionDecision(items) {
   const qualityBeatsBothControls = providerQuality > qualityFloor;
   const qualityTiesBothControls = providerQuality === qualityFloor;
   const latencyImproves = providerLatency <= latencyFloor * 0.85;
-  const promoteProvider = qualityBeatsBothControls || (qualityTiesBothControls && latencyImproves);
   const bestProviderItem = providerItems.find((item) => item.strategy === bestProvider.strategy) ?? null;
   const pairedDeltaVsBm25 = pairedQualityDelta(bestProviderItem, control);
   const pairedDeltaVsFullHybrid = pairedQualityDelta(bestProviderItem, fullHybridControl);
+  const directionalWin = qualityBeatsBothControls || (qualityTiesBothControls && latencyImproves);
+  const confidenceGate = promotionConfidenceGate([pairedDeltaVsBm25, pairedDeltaVsFullHybrid], {
+    minPairedQueryCount: promotionMinPairedQueryCount,
+  });
+  const promoteProvider = directionalWin && confidenceGate.passes;
   return {
     kind: "provider",
     bestProviderStrategy: bestProvider.strategy,
     bestHybridStrategy: fullHybridControl.strategy,
     promoteProvider,
     promoteHybrid: promoteProvider,
-    reason: qualityBeatsBothControls
-      ? "Best provider-backed arm beats both bm25-lite and full-hybrid-rerank on retrieval-proxy quality."
-      : qualityTiesBothControls && latencyImproves
-        ? "Best provider-backed arm ties the strongest control and improves p50 latency by at least 15%."
-        : "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.",
+    directionalWin,
+    reason: providerPromotionReason({ qualityBeatsBothControls, qualityTiesBothControls, latencyImproves, confidenceGate }),
     qualityDeltaVsBm25: round(providerQuality - controlQuality),
     qualityDeltaVsFullHybrid: round(providerQuality - fullHybridQuality),
     latencyDeltaVsBm25: round(providerLatency - controlLatency),
     latencyDeltaVsFullHybrid: round(providerLatency - fullHybridLatency),
     pairedDeltaVsBm25,
     pairedDeltaVsFullHybrid,
+    confidenceGate,
+  };
+}
+
+function providerPromotionReason({ qualityBeatsBothControls, qualityTiesBothControls, latencyImproves, confidenceGate }) {
+  const directional = qualityBeatsBothControls
+    ? "Best provider-backed arm beats both bm25-lite and full-hybrid-rerank on retrieval-proxy quality."
+    : qualityTiesBothControls && latencyImproves
+      ? "Best provider-backed arm ties the strongest control and improves p50 latency by at least 15%."
+      : null;
+  if (!directional) return "Keep bm25-lite and full-hybrid-rerank as controls; provider-backed arm has not earned promotion on this slice.";
+  if (!confidenceGate.passes) return `${directional} Directional only: promotion blocked until paired-query floor and bootstrap confidence gates pass.`;
+  return `${directional} Promotion confidence gate passed.`;
+}
+
+function promotionConfidenceGate(deltas, options = {}) {
+  const minPairedQueryCount = Number(options.minPairedQueryCount ?? 30);
+  const checks = deltas.map((delta) => ({
+    candidateStrategy: delta?.candidateStrategy ?? null,
+    controlStrategy: delta?.controlStrategy ?? null,
+    pairedQueryCount: Number(delta?.pairedQueryCount ?? 0),
+    ci95: delta?.ci95 ?? null,
+    ciLowerAboveZero: Number(delta?.ci95?.lower ?? -Infinity) > 0,
+  }));
+  return {
+    minPairedQueryCount,
+    checks,
+    passes: checks.length > 0 && checks.every((check) => check.pairedQueryCount >= minPairedQueryCount && check.ciLowerAboveZero),
   };
 }
 
@@ -675,16 +707,27 @@ function promotionDecision(value, items) {
 }
 
 function runPromotionGateSmoke() {
+  const passingQualities = Array.from({ length: promotionMinPairedQueryCount }, (_, index) => 0.72 + (index % 3) * 0.01);
+  const controlQualities = Array.from({ length: promotionMinPairedQueryCount }, () => 0.45);
+  const hybridQualities = Array.from({ length: promotionMinPairedQueryCount }, () => 0.5);
   const providerDecision = providerPromotionDecision([
+    promotionSmokeItem("bm25-lite", controlQualities, 4),
+    promotionSmokeItem("full-hybrid-rerank", hybridQualities, 5),
+    promotionSmokeItem("cloud-voyage4-lite-voyage-lite", passingQualities, 6),
+  ]);
+  const tinyShardDecision = providerPromotionDecision([
     promotionSmokeItem("bm25-lite", [0.45, 0.45, 0.45], 4),
     promotionSmokeItem("full-hybrid-rerank", [0.5, 0.5, 0.5], 5),
     promotionSmokeItem("cloud-voyage4-lite-voyage-lite", [0.8, 0.75, 0.7], 6),
   ]);
   assert.equal(providerDecision.bestProviderStrategy, "cloud-voyage4-lite-voyage-lite");
   assert.equal(providerDecision.bestHybridStrategy, "full-hybrid-rerank");
-  assert.equal(providerDecision.pairedDeltaVsBm25?.pairedQueryCount, 3);
-  assert.equal(providerDecision.pairedDeltaVsFullHybrid?.pairedQueryCount, 3);
+  assert.equal(providerDecision.pairedDeltaVsBm25?.pairedQueryCount, promotionMinPairedQueryCount);
+  assert.equal(providerDecision.pairedDeltaVsFullHybrid?.pairedQueryCount, promotionMinPairedQueryCount);
   assert.ok(providerDecision.pairedDeltaVsBm25?.ci95?.lower > 0);
+  assert.equal(providerDecision.promoteProvider, true);
+  assert.equal(tinyShardDecision.directionalWin, true);
+  assert.equal(tinyShardDecision.promoteProvider, false);
   process.stdout.write(
     `${JSON.stringify({
       ok: true,
@@ -692,6 +735,7 @@ function runPromotionGateSmoke() {
       providerBestHybridStrategyTracksControl: true,
       pairedDeltasPresent: true,
       bootstrapCiPresent: true,
+      promotionQueryFloorEnforced: true,
     })}\n`,
   );
 }
@@ -746,7 +790,7 @@ function promotionSmokeItem(strategy, qualities, latencyP50Ms) {
 }
 
 function renderMarkdown(value) {
-  const promotionLabel = value.gate === "provider" ? "Provider arm beats control" : "Hybrid promotion";
+  const promotionLabel = value.gate === "provider" ? "Provider arm promoted" : "Hybrid promotion";
   const decisionLabel = value.gate === "provider" ? "Provider arm decision" : "Hybrid decision";
   const decision = value.promotion ?? value.hybridPromotion;
   const decisionReason = decision.reason;

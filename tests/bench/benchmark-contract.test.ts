@@ -29,9 +29,14 @@ describe("public benchmark comparison contract", () => {
     expect(report.promotion.kind).toBe("provider");
     expect(report.promotion.bestProviderStrategy).toBe("cloud-voyage4-lite-voyage-lite");
     expect(report.promotion.bestHybridStrategy).toBe("full-hybrid-rerank");
+    expect(report.promotion.directionalWin).toBe(false);
+    expect(report.promotion.promoteProvider).toBe(false);
+    expect(report.promotion.confidenceGate.minPairedQueryCount).toBe(30);
+    expect(report.promotion.confidenceGate.passes).toBe(false);
     expect(report.promotion.pairedDeltaVsBm25.pairedQueryCount).toBe(3);
     expect(report.promotion.pairedDeltaVsFullHybrid.pairedQueryCount).toBe(3);
     expect(report.promotion.reason).toMatch(/provider-backed arm/i);
+    expect(report.promotion.reason).toMatch(/not earned promotion/i);
     expect(report.promotion.reason).not.toMatch(/hybrid-family arm/i);
     expect(report.providerBudget.mode).toBe("no-spend-free-tier");
     expect(report.providerBudget.maxPaidUsd).toBe(0);
@@ -39,6 +44,15 @@ describe("public benchmark comparison contract", () => {
     expect(report.providerBudget.requiredProvidersWithinAllowed).toBe(true);
     expect(report.providerBudget.paidProviderRequestedInNoSpendMode).toBe(false);
     expect(report.providerBudget.fallbackPolicy.crossProviderFallbackEnabled).toBe(false);
+  });
+
+  it("blocks tiny provider wins from promotion until the paired-query confidence gate passes", () => {
+    const result = runRaw(["--promotion-gate-smoke"]);
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("promotion-gate-smoke");
+    expect(report.bootstrapCiPresent).toBe(true);
+    expect(report.promotionQueryFloorEnforced).toBe(true);
   });
 
   it("labels the scaled Apple Silicon arm separately from the 0.6B default", () => {
@@ -233,6 +247,32 @@ describe("public benchmark comparison contract", () => {
     expect(report.rankingIdsStayAtomic).toBe(true);
     expect(report.keepsBestAtomicFactPerRehydratedSource).toBe(true);
     expect(report.resultIdsAreUnique).toBe(true);
+  });
+
+  it("keeps provider rerank scores rank-position normalized ahead of unranked tails", () => {
+    const result = spawnSync(process.execPath, [responseExportScript, "--provider-rerank-cascade-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("provider-rerank-cascade-smoke");
+    expect(report.providerRankedDocsOutrankTail).toBe(true);
+    expect(report.supportsNegativeRawScores).toBe(true);
+  });
+
+  it("parses NVIDIA rerank ranking/logit responses without letting negative logits invert rank", () => {
+    const result = spawnSync(process.execPath, [responseExportScript, "--nvidia-adapter-parser-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("nvidia-adapter-parser-smoke");
+    expect(report.acceptsRankingsLogitShape).toBe(true);
+    expect(report.negativeLogitsPreserveProviderRank).toBe(true);
   });
 
   it("forwards live materialization shard controls into provider runs", () => {
