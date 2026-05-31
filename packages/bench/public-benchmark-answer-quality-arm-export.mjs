@@ -94,6 +94,7 @@ assertSafePublicText(targetRaw, "benchmark target");
 const target = JSON.parse(targetRaw);
 const targetOk = target.fixtureOnly === false && target.benchmark?.family === "longmemeval" && target.claimTier === "run-only";
 const coverage = strategyCoverage(strategies);
+const providerHybridContract = buildProviderHybridContract(strategies, coverage);
 const env = envReadiness(strategies);
 const input = inspectInputs();
 const privateDir = inspectPrivateOutputDir();
@@ -184,6 +185,7 @@ const report = {
   env,
   localEmbeddingDurability,
   strategyCoverage: coverage,
+  providerHybridContract,
   arms: exportRows,
   blockers: preflightBlockers,
   answerQualityArmArgs: answerQualityArmArgs(strategies),
@@ -334,6 +336,21 @@ function strategyCoverage(items) {
     ),
     hasLocalRerank: items.some((item) => item.endsWith("-local-rerank")),
     strategyCount: items.length,
+  };
+}
+
+function buildProviderHybridContract(items, coverageValue) {
+  const cloudProviderStrategies = items.filter((strategy) => strategy.startsWith("cloud-")).sort();
+  const providerChallengerPresent = cloudProviderStrategies.length > 0;
+  return {
+    bm25LexicalFloorRequired: true,
+    fullHybridControlRequired: true,
+    sameShardControlsRequired: true,
+    providerChallengersAreHybridContextArms: true,
+    providerOnlyDenseClaimsAllowed: false,
+    providerChallengerPresent,
+    providerChallengerControlsPresent: !providerChallengerPresent || (coverageValue.hasBm25Lite && coverageValue.hasFullHybridRerank),
+    cloudProviderStrategies,
   };
 }
 
@@ -605,6 +622,15 @@ function renderMarkdown(value) {
     `- Provider challenger: ${value.strategyCoverage.hasProviderChallenger}`,
     `- Local Apple: ${value.strategyCoverage.hasLocalApple}`,
     `- Local rerank: ${value.strategyCoverage.hasLocalRerank}`,
+    "",
+    "## Provider Hybrid Contract",
+    `- BM25 lexical floor required: ${value.providerHybridContract.bm25LexicalFloorRequired}`,
+    `- Full hybrid control required: ${value.providerHybridContract.fullHybridControlRequired}`,
+    `- Same-shard controls required: ${value.providerHybridContract.sameShardControlsRequired}`,
+    `- Provider challengers are hybrid context arms: ${value.providerHybridContract.providerChallengersAreHybridContextArms}`,
+    `- Provider-only dense claims allowed: ${value.providerHybridContract.providerOnlyDenseClaimsAllowed}`,
+    `- Provider challenger controls present: ${value.providerHybridContract.providerChallengerControlsPresent}`,
+    `- Cloud provider strategies: ${value.providerHybridContract.cloudProviderStrategies.join(", ") || "none"}`,
     "",
     "## Local Embedding Durability",
     `- Applicable: ${value.localEmbeddingDurability.applicable}`,

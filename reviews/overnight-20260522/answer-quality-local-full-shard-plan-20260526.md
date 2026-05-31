@@ -22,6 +22,15 @@
 - Local Apple: true
 - Local rerank: true
 
+## Provider Hybrid Contract
+- BM25 lexical floor required: true
+- Full hybrid control required: true
+- Same-shard controls required: true
+- Provider challengers are hybrid context arms: true
+- Provider-only dense claims allowed: false
+- Provider challenger controls present: true
+- Cloud provider strategies: none
+
 ## Execution Lanes
 - deterministic-control-proxy: ready; intake-compatible=false; providers=none
   - Run-path and shard-integrity proof only. This does not score local or provider model quality.
@@ -31,8 +40,16 @@
   - Use first when validating the no-spend local method before cloud challenger spend.
   - query-expansion=local-model-or-deterministic-diagnostic
   - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
+- local-apple-scaled-challenger: missing; intake-compatible=false; providers=local-apple, local-rerank
+  - Use as an overnight/local methodology challenger when the 4B runtime is stable; do not merge it into the 0.6B accepted lane.
+  - query-expansion=local-model-or-deterministic-diagnostic
+  - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
 - voyage-minimum-challenger: missing; intake-compatible=false; providers=voyage
   - Use when Voyage quota is available to unblock the same-data Voyage answer-quality comparison.
+  - query-expansion=not-required
+  - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
+- gemini2-minimum-challenger: missing; intake-compatible=false; providers=gemini
+  - Use with direct Gemini API credentials to test Gemini Embedding 2 without spending Voyage rerank quota.
   - query-expansion=not-required
   - diagnostic subset only; full-shard intake rejects it as strategy-set mismatch
 - nvidia-minimum-challenger: missing; intake-compatible=false; providers=nvidia

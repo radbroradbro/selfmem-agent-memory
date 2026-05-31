@@ -22,6 +22,7 @@ assert.ok(providerGateReports.length > 0, "no public-benchmark-provider-gate rep
 
 const providers = summarizeProviders(providerGateReports);
 const controls = summarizeControls(providerGateReports);
+const providerHybridContract = buildProviderHybridContract(controls);
 const completedReports = providerGateReports.filter((item) => item.json.status === "COMPLETED");
 const partialReports = providerGateReports.filter((item) => item.json.status === "PARTIAL_COMPLETED_WITH_ARM_FAILURES");
 const failedReports = providerGateReports.filter((item) => item.json.status === "FAILED_ALL_ARMS");
@@ -92,6 +93,7 @@ const report = {
     })),
   },
   controls,
+  providerHybridContract,
   providers,
   providerFailures,
   providerPromotions: providerPromotions.map((promotion) => ({
@@ -148,6 +150,18 @@ function summarizeControls(items) {
     allHaveBm25: rows.every((row) => row.hasBm25),
     allHaveFullHybrid: rows.every((row) => row.hasFullHybrid),
     rows,
+  };
+}
+
+function buildProviderHybridContract(controls) {
+  return {
+    bm25LexicalFloorRequired: true,
+    fullHybridControlRequired: true,
+    sameDataControlsRequired: true,
+    providerChallengersAreHybridContextArms: true,
+    providerOnlyDenseClaimsAllowed: false,
+    allProviderWavesMeetHybridControlContract: controls.allHaveBm25 && controls.allHaveFullHybrid,
+    answerQualityStillRequiredForMemoryClaims: true,
   };
 }
 
@@ -291,6 +305,15 @@ function renderMarkdown(value) {
     "## Controls",
     `- All waves include BM25: ${value.controls.allHaveBm25}`,
     `- All waves include full hybrid: ${value.controls.allHaveFullHybrid}`,
+    "",
+    "## Provider Hybrid Contract",
+    `- BM25 lexical floor required: ${value.providerHybridContract.bm25LexicalFloorRequired}`,
+    `- Full hybrid control required: ${value.providerHybridContract.fullHybridControlRequired}`,
+    `- Same-data controls required: ${value.providerHybridContract.sameDataControlsRequired}`,
+    `- Provider challengers are hybrid context arms: ${value.providerHybridContract.providerChallengersAreHybridContextArms}`,
+    `- Provider-only dense claims allowed: ${value.providerHybridContract.providerOnlyDenseClaimsAllowed}`,
+    `- All provider waves meet hybrid control contract: ${value.providerHybridContract.allProviderWavesMeetHybridControlContract}`,
+    `- Answer quality still required for memory claims: ${value.providerHybridContract.answerQualityStillRequiredForMemoryClaims}`,
     "",
     "## Providers",
     ...value.providers.rows.map((row) =>

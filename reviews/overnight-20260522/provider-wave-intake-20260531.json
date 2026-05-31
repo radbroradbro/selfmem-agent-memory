@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "provider-wave-intake",
   "status": "READY_PROVIDER_WAVE_INTAKE",
-  "generatedAt": "2026-05-31T12:04:49.080Z",
+  "generatedAt": "2026-05-31T12:50:16.810Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -303,6 +303,15 @@
         "failedProviderArmCount": 1
       }
     ]
+  },
+  "providerHybridContract": {
+    "bm25LexicalFloorRequired": true,
+    "fullHybridControlRequired": true,
+    "sameDataControlsRequired": true,
+    "providerChallengersAreHybridContextArms": true,
+    "providerOnlyDenseClaimsAllowed": false,
+    "allProviderWavesMeetHybridControlContract": true,
+    "answerQualityStillRequiredForMemoryClaims": true
   },
   "providers": {
     "completedProviderFamilies": [

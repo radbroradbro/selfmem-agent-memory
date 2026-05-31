@@ -31,7 +31,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-27T00:12:02.889Z",
+  "generatedAt": "2026-05-31T12:50:16.564Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
     "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
@@ -74,6 +74,18 @@
     "hasLocalApple": true,
     "hasLocalRerank": true,
     "strategyCount": 5
+  },
+  "providerHybridContract": {
+    "bm25LexicalFloorRequired": true,
+    "fullHybridControlRequired": true,
+    "sameShardControlsRequired": true,
+    "providerChallengersAreHybridContextArms": true,
+    "providerOnlyDenseClaimsAllowed": false,
+    "providerChallengerPresent": false,
+    "providerChallengerControlsPresent": true,
+    "cloudProviderStrategies": [],
+    "localAppleIsSeparateLocalProviderLane": true,
+    "acceptedLaneMustScoreControlsAndProvidersTogether": false
   },
   "coverageRequirements": {
     "targetIsLongMemEvalRunOnly": true,
@@ -229,6 +241,55 @@
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
     },
     {
+      "id": "local-apple-scaled-challenger",
+      "label": "Scaled local Apple challenger lane",
+      "operatorUse": "Use as an overnight/local methodology challenger when the 4B runtime is stable; do not merge it into the 0.6B accepted lane.",
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "query-expanded-full-hybrid-rerank",
+        "local-apple-qwen3-4b",
+        "local-apple-qwen3-4b-local-rerank"
+      ],
+      "strategyCount": 5,
+      "missingStrategies": [
+        "local-apple-qwen3-4b",
+        "local-apple-qwen3-4b-local-rerank"
+      ],
+      "coverageReady": false,
+      "providerRequirements": [
+        "local-apple",
+        "local-rerank"
+      ],
+      "consentRequirements": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1"
+      ],
+      "answerQualityEndpoint": {
+        "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        "answerModel": "<local-answer-model>",
+        "judgeModel": "<local-judge-model>",
+        "targetAnswerModel": "gpt-4o",
+        "targetJudgeModel": "gpt-4o",
+        "requiredAnswerModel": null,
+        "requiredJudgeModel": null,
+        "modelMatchPolicy": "local-diagnostic-allowed",
+        "exactTargetModelsRequired": false,
+        "localDiagnosticModelAllowed": true
+      },
+      "acceptedByFullShardIntake": false,
+      "canReachFullSotaGateAfterShardIntake": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "queryExpansionPolicy": "Local or deterministic query expansion must be reported separately from cloud expansion.",
+      "queryExpansionEvidenceRequirement": "local-model-or-deterministic-diagnostic",
+      "queryExpansionDiagnosticFallbackAllowed": true,
+      "queryExpansionSotaEligible": false,
+      "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
+    },
+    {
       "id": "voyage-minimum-challenger",
       "label": "Voyage minimum challenger lane",
       "operatorUse": "Use when Voyage quota is available to unblock the same-data Voyage answer-quality comparison.",
@@ -274,17 +335,62 @@
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
     },
     {
+      "id": "gemini2-minimum-challenger",
+      "label": "Gemini Embedding 2 minimum challenger lane",
+      "operatorUse": "Use with direct Gemini API credentials to test Gemini Embedding 2 without spending Voyage rerank quota.",
+      "strategies": [
+        "bm25-lite",
+        "full-hybrid-rerank",
+        "cloud-gemini2-embed-rerank-proxy"
+      ],
+      "strategyCount": 3,
+      "missingStrategies": [
+        "cloud-gemini2-embed-rerank-proxy"
+      ],
+      "coverageReady": false,
+      "providerRequirements": [
+        "gemini"
+      ],
+      "consentRequirements": [
+        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1"
+      ],
+      "answerQualityEndpoint": {
+        "baseUrlEnv": "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "apiKeyEnv": "RECALLWEAVE_MEMORYBENCH_API_KEY",
+        "answerModel": "<local-answer-model>",
+        "judgeModel": "<local-judge-model>",
+        "targetAnswerModel": "gpt-4o",
+        "targetJudgeModel": "gpt-4o",
+        "requiredAnswerModel": null,
+        "requiredJudgeModel": null,
+        "modelMatchPolicy": "local-diagnostic-allowed",
+        "exactTargetModelsRequired": false,
+        "localDiagnosticModelAllowed": true
+      },
+      "acceptedByFullShardIntake": false,
+      "canReachFullSotaGateAfterShardIntake": false,
+      "countsAsFullMemorySotaEvidence": false,
+      "publicBenchmarkClaimsAllowed": false,
+      "queryExpansionPolicy": "No separate query-expansion claim unless a query-expansion arm is included and scored.",
+      "queryExpansionEvidenceRequirement": "not-required",
+      "queryExpansionDiagnosticFallbackAllowed": false,
+      "queryExpansionSotaEligible": false,
+      "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
+    },
+    {
       "id": "nvidia-minimum-challenger",
       "label": "NVIDIA minimum challenger lane",
       "operatorUse": "Use for an NVIDIA challenger comparison without spending Voyage quota.",
       "strategies": [
         "bm25-lite",
         "full-hybrid-rerank",
-        "cloud-nvidia-nemotron-1b"
+        "cloud-nvidia-nv-embed-v1-mistral-rerank"
       ],
       "strategyCount": 3,
       "missingStrategies": [
-        "cloud-nvidia-nemotron-1b"
+        "cloud-nvidia-nv-embed-v1-mistral-rerank"
       ],
       "coverageReady": false,
       "providerRequirements": [

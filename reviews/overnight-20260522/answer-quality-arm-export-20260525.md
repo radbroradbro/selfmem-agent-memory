@@ -20,12 +20,28 @@
 - Local Apple: true
 - Local rerank: true
 
+## Provider Hybrid Contract
+- BM25 lexical floor required: true
+- Full hybrid control required: true
+- Same-shard controls required: true
+- Provider challengers are hybrid context arms: true
+- Provider-only dense claims allowed: false
+- Provider challenger controls present: true
+- Cloud provider strategies: cloud-nvidia-nv-embed-v1-mistral-rerank, cloud-voyage4-voyage-lite-rerank
+
+## Local Embedding Durability
+- Applicable: true
+- Required: false
+- Ready: n/a
+- Report present: false
+- Report: n/a
+
 ## Arms
 - bm25-lite: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - query-expanded-full-hybrid-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - cloud-voyage4-voyage-lite-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
-- cloud-nvidia-nemotron-1b: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
+- cloud-nvidia-nv-embed-v1-mistral-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - local-apple-qwen3-0_6b: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 - local-apple-qwen3-0_6b-local-rerank: exported=false, responses=0, providerCalls=0, queryExpansionCalls=0, shard=0-n/a
 
@@ -45,7 +61,7 @@
 --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json
 --arm query-expanded-full-hybrid-rerank=<private-output-dir>/query-expanded-full-hybrid-rerank-responses.private.json
 --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/cloud-voyage4-voyage-lite-rerank-responses.private.json
---arm cloud-nvidia-nemotron-1b=<private-output-dir>/cloud-nvidia-nemotron-1b-responses.private.json
+--arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json
 --arm local-apple-qwen3-0_6b=<private-output-dir>/local-apple-qwen3-0_6b-responses.private.json
 --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/local-apple-qwen3-0_6b-local-rerank-responses.private.json
 ```
@@ -53,5 +69,6 @@
 ## Next Actions
 - Materialize the source-locked LongMemEval target into a private directory outside the repository.
 - Set RECALLWEAVE_BASELINE_LIVE=1 and RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 for live exports.
+- Run benchmark:local-embedding:durability before exporting local Apple embedding arms.
 - Enable provider or local endpoint consent only for the arms being tested.
 - Keep BM25, full-hybrid, query-expansion, provider, local Apple, and local rerank arms on the same data.

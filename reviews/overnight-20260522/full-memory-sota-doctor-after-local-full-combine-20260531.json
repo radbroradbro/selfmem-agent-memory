@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-31T12:40:37.131Z",
+  "generatedAt": "2026-05-31T12:56:39.318Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -48,14 +48,14 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:991fde6cd4eabfa19e4abd18fa69e42f43f13959f27c57bd9c0a66b41732b182",
+      "hash": "sha256:2ec190d728b75504b17674c9d5bd20ca0119a49d552d38f3704324ceca83fd77",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
       "exists": true,
-      "hash": "sha256:99543578972eee549dc79af0b3a1b68e1750aad12e19d9320315a8b437ee2737",
+      "hash": "sha256:7a716e8e00b1ec16137739d38c4206e685960e481641fc5ce99291fc18da1c44",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
@@ -335,7 +335,7 @@
     "sotaOperatorPacket": {
       "path": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
       "exists": true,
-      "hash": "sha256:2e2a06a3f61da6cd4874dd215cd286295d05bd2ace00f3967abce43cd2c92626",
+      "hash": "sha256:0992a62542861e8cc2a226ce6cb1fa1f259387f913296887ad422ebb18f4c5ec",
       "mode": "public-benchmark-sota-operator-packet",
       "status": "BLOCKED_SOTA_OPERATOR_INPUTS"
     },
@@ -370,7 +370,7 @@
     "providerWaveIntake": {
       "path": "reviews/overnight-20260522/provider-wave-intake-20260531.json",
       "exists": true,
-      "hash": "sha256:2fb40014de481cd21ae4bea0aecb69970453011a94946ab2fb2139f920ac76ab",
+      "hash": "sha256:f31d68b84ce5ec92f28bfaa42fdc55f619d6ffbc3d6c21327c5ddd7444884ccb",
       "mode": "provider-wave-intake",
       "status": "READY_PROVIDER_WAVE_INTAKE"
     },
@@ -674,7 +674,7 @@
       "query-expanded-full-hybrid-rerank",
       "cloud-gemini2-embed-rerank-proxy",
       "cloud-voyage4-voyage-lite-rerank",
-      "cloud-nvidia-nemotron-1b",
+      "cloud-nvidia-nv-embed-v1-mistral-rerank",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
     ],
@@ -1466,7 +1466,7 @@
       "query-expanded-full-hybrid-rerank",
       "cloud-gemini2-embed-rerank-proxy",
       "cloud-voyage4-voyage-lite-rerank",
-      "cloud-nvidia-nemotron-1b",
+      "cloud-nvidia-nv-embed-v1-mistral-rerank",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
     ],
@@ -1700,7 +1700,7 @@
         "strategies": [
           "bm25-lite",
           "full-hybrid-rerank",
-          "cloud-nvidia-nemotron-1b"
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
         ],
         "strategyCount": 3,
         "missingStrategies": [],
@@ -1746,7 +1746,7 @@
           "query-expanded-full-hybrid-rerank",
           "cloud-gemini2-embed-rerank-proxy",
           "cloud-voyage4-voyage-lite-rerank",
-          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank",
           "local-apple-qwen3-0_6b",
           "local-apple-qwen3-0_6b-local-rerank"
         ],

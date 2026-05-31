@@ -6,6 +6,7 @@
   "fixtureOnly": false,
   "executesExports": false,
   "writesPrivateResponseFiles": false,
+  "reusesExistingPrivateResponseFiles": false,
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -24,7 +25,7 @@
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
   "printsCredentials": false,
-  "generatedAt": "2026-05-26T00:48:38.272Z",
+  "generatedAt": "2026-05-31T12:50:39.300Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json",
     "hash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
@@ -57,14 +58,29 @@
     "queryOffset": 0,
     "maxQueries": null
   },
+  "limits": {
+    "contextTokenBudget": 800,
+    "limit": 5,
+    "maxMemoryBytes": null
+  },
   "env": {
     "liveExportEnabled": false,
     "noRawTextConfirmed": false,
+    "supermemorySearchPolicy": "disabled-for-benchmark-methodology",
+    "supermemorySearchDisabled": true,
     "providerCallsEnabled": false,
     "providerPublicDataConfirmed": false,
     "queryExpansionReady": false,
     "localQueryExpansionEndpointPresent": false,
     "valuePrinted": false
+  },
+  "localEmbeddingDurability": {
+    "applicable": true,
+    "required": false,
+    "ready": null,
+    "reportPresent": false,
+    "valuePrinted": false,
+    "blockers": []
   },
   "strategyCoverage": {
     "hasBm25Lite": true,
@@ -74,6 +90,19 @@
     "hasLocalApple": true,
     "hasLocalRerank": true,
     "strategyCount": 7
+  },
+  "providerHybridContract": {
+    "bm25LexicalFloorRequired": true,
+    "fullHybridControlRequired": true,
+    "sameShardControlsRequired": true,
+    "providerChallengersAreHybridContextArms": true,
+    "providerOnlyDenseClaimsAllowed": false,
+    "providerChallengerPresent": true,
+    "providerChallengerControlsPresent": true,
+    "cloudProviderStrategies": [
+      "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "cloud-voyage4-voyage-lite-rerank"
+    ]
   },
   "arms": [
     {
@@ -117,10 +146,10 @@
       }
     },
     {
-      "strategy": "cloud-nvidia-nemotron-1b",
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
       "exported": false,
       "pathLabel": "external-private-response-file",
-      "plannedName": "cloud-nvidia-nemotron-1b-responses.private.json",
+      "plannedName": "cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json",
       "queryShard": {
         "startIndex": 0,
         "maxQueries": null
@@ -162,13 +191,14 @@
     "--arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json",
     "--arm query-expanded-full-hybrid-rerank=<private-output-dir>/query-expanded-full-hybrid-rerank-responses.private.json",
     "--arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/cloud-voyage4-voyage-lite-rerank-responses.private.json",
-    "--arm cloud-nvidia-nemotron-1b=<private-output-dir>/cloud-nvidia-nemotron-1b-responses.private.json",
+    "--arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json",
     "--arm local-apple-qwen3-0_6b=<private-output-dir>/local-apple-qwen3-0_6b-responses.private.json",
     "--arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/local-apple-qwen3-0_6b-local-rerank-responses.private.json"
   ],
   "nextActions": [
     "Materialize the source-locked LongMemEval target into a private directory outside the repository.",
     "Set RECALLWEAVE_BASELINE_LIVE=1 and RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 for live exports.",
+    "Run benchmark:local-embedding:durability before exporting local Apple embedding arms.",
     "Enable provider or local endpoint consent only for the arms being tested.",
     "Keep BM25, full-hybrid, query-expansion, provider, local Apple, and local rerank arms on the same data."
   ]

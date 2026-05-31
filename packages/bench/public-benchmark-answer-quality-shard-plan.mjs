@@ -77,6 +77,7 @@ const contextTokenBudget = positiveInt(args.contextTokenBudget ?? materialize.ta
 const limit = positiveInt(args.limit ?? materialize.target?.limit ?? target.benchmark?.limit ?? 5, "limit");
 const shards = buildShards(queryCount, shardSize, { targetHash });
 const coverage = strategyCoverage(strategies);
+const providerHybridContract = buildProviderHybridContract(strategies, coverage, claimScope);
 const executionLanes = buildExecutionLanes(strategies, claimScope);
 const privateOutputRoles = new Map((materialize.privateOutputs?.files ?? []).map((file) => [file.role, file]));
 const checks = {
@@ -162,6 +163,7 @@ const report = {
     privateOutputRoles: [...privateOutputRoles.keys()].sort(),
   },
   strategyCoverage: coverage,
+  providerHybridContract,
   coverageRequirements: Object.fromEntries(requiredChecks.map((key) => [key, true])),
   runPlan: {
     claimScope,
@@ -251,6 +253,27 @@ function strategyCoverage(items) {
     hasLocalRerank: items.some((item) => item.endsWith("-local-rerank")),
     strategyCount: items.length,
   };
+}
+
+function buildProviderHybridContract(items, coverageValue, scope) {
+  const cloudProviderStrategies = items.filter(isCloudProviderStrategy).sort();
+  const providerChallengerPresent = coverageValue.hasVoyageProvider || coverageValue.hasNvidiaOrGeminiProvider;
+  return {
+    bm25LexicalFloorRequired: true,
+    fullHybridControlRequired: true,
+    sameShardControlsRequired: true,
+    providerChallengersAreHybridContextArms: true,
+    providerOnlyDenseClaimsAllowed: false,
+    providerChallengerPresent,
+    providerChallengerControlsPresent: !providerChallengerPresent || (coverageValue.hasBm25Lite && coverageValue.hasFullHybridRerank),
+    cloudProviderStrategies,
+    localAppleIsSeparateLocalProviderLane: coverageValue.hasLocalApple,
+    acceptedLaneMustScoreControlsAndProvidersTogether: scope === "full-sota",
+  };
+}
+
+function isCloudProviderStrategy(strategy) {
+  return strategy.startsWith("cloud-voyage") || strategy.startsWith("cloud-gemini") || strategy.startsWith("cloud-nvidia");
 }
 
 function buildExecutionLanes(items, scope) {
@@ -686,6 +709,15 @@ function renderMarkdown(value) {
     `- NVIDIA or Gemini provider: ${value.strategyCoverage.hasNvidiaOrGeminiProvider}`,
     `- Local Apple: ${value.strategyCoverage.hasLocalApple}`,
     `- Local rerank: ${value.strategyCoverage.hasLocalRerank}`,
+    "",
+    "## Provider Hybrid Contract",
+    `- BM25 lexical floor required: ${value.providerHybridContract.bm25LexicalFloorRequired}`,
+    `- Full hybrid control required: ${value.providerHybridContract.fullHybridControlRequired}`,
+    `- Same-shard controls required: ${value.providerHybridContract.sameShardControlsRequired}`,
+    `- Provider challengers are hybrid context arms: ${value.providerHybridContract.providerChallengersAreHybridContextArms}`,
+    `- Provider-only dense claims allowed: ${value.providerHybridContract.providerOnlyDenseClaimsAllowed}`,
+    `- Provider challenger controls present: ${value.providerHybridContract.providerChallengerControlsPresent}`,
+    `- Cloud provider strategies: ${value.providerHybridContract.cloudProviderStrategies.join(", ") || "none"}`,
     "",
     "## Execution Lanes",
     ...value.executionLanes.flatMap((lane) => [

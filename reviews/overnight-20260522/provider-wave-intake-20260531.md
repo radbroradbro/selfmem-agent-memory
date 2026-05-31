@@ -12,6 +12,15 @@
 - All waves include BM25: true
 - All waves include full hybrid: true
 
+## Provider Hybrid Contract
+- BM25 lexical floor required: true
+- Full hybrid control required: true
+- Same-data controls required: true
+- Provider challengers are hybrid context arms: true
+- Provider-only dense claims allowed: false
+- All provider waves meet hybrid control contract: true
+- Answer quality still required for memory claims: true
+
 ## Providers
 - gemini: completed=3, failed=6, queries=8, calls=20, docsSent=118, best=cloud-gemini2-embed-rerank-proxy:0.1575, failures=provider-rate-limit, provider-timeout, strategy-arm-failed
 - nvidia: completed=6, failed=4, queries=10, calls=180, docsSent=1452, best=cloud-nvidia-nv-embed-v1-mistral-rerank:0.1575, failures=provider-timeout, strategy-arm-failed
