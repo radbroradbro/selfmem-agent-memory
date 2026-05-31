@@ -99,6 +99,7 @@ const files = {
   combinedCanary: `${reviewDir}/end-to-end-memory-score-combined-20260525.json`,
   liveLocalCanary: `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
   liveProviderCanary: `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
+  providerWaveIntake: `${reviewDir}/provider-wave-intake-20260531.json`,
   voyageRateLimit: `${reviewDir}/voyage-provider-rate-limit-20260525.json`,
   reviewerIntake: `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
   uiEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
@@ -160,6 +161,7 @@ const sotaLadder = evidence.sotaLadder.json;
 const sotaOperatorPacket = evidence.sotaOperatorPacket.json;
 const endToEndGate = evidence.endToEndGate.json;
 const combinedCanary = evidence.combinedCanary.json;
+const providerWaveIntake = evidence.providerWaveIntake.json;
 const voyageRateLimit = evidence.voyageRateLimit.json;
 const reviewerIntake = evidence.reviewerIntake.json;
 const uiEvidence = evidence.uiEvidence.json;
@@ -184,6 +186,7 @@ const localFullLaneState = inspectLocalFullLaneState({
   localFullAcceptedLaneLaunchDoctor,
 });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
+const providerWaveState = inspectProviderWaveIntake(providerWaveIntake);
 const reviewerState = inspectReviewerState(reviewerIntake);
 const docState = inspectDocs(evidence);
 
@@ -237,6 +240,7 @@ const gates = [
     localFullLaneState.resumeResult.evidenceBlockers,
   ),
   gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
+  gate("provider-wave-intake", providerWaveState.evidenceReady, providerWaveState.evidenceBlockers),
   gate("same-data-provider-arms", !arrayOf(sotaLadder?.blockers).includes("missing-voyage-answer-quality-same-data-result"), [
     "missing-voyage-answer-quality-same-data-result",
   ]),
@@ -283,6 +287,7 @@ const report = {
     retrievalProxyOnlyIsNotEnough: true,
     componentBenchmarksAreModelSelectionOnly: true,
     benchmarkHarnessSourceOnlyIsNotAScore: true,
+    providerWavesAreRetrievalGateOnly: true,
     fullMemoryAnswerQualityRequired: true,
     sameDataExternalTargetRequired: true,
     sameAnswerAndJudgeModelRequired: true,
@@ -322,6 +327,7 @@ const report = {
   shardState,
   localFullLaneState,
   currentCanary,
+  providerWaveState,
   reviewerState,
   docState,
   gates,
@@ -1244,6 +1250,62 @@ function inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, vo
   };
 }
 
+function inspectProviderWaveIntake(providerWaveIntake) {
+  const rows = arrayOf(providerWaveIntake?.providers?.rows);
+  const completedFamilies = arrayOf(providerWaveIntake?.providers?.completedProviderFamilies);
+  const controlsReady =
+    providerWaveIntake?.controls?.allHaveBm25 === true &&
+    providerWaveIntake?.controls?.allHaveFullHybrid === true;
+  const coreFamiliesReady = ["gemini", "nvidia", "voyage"].every((provider) => completedFamilies.includes(provider));
+  const publicSafe =
+    providerWaveIntake?.metricsOnly === true &&
+    providerWaveIntake?.publicSafe === true &&
+    providerWaveIntake?.callsProviderApis === false &&
+    providerWaveIntake?.publicBenchmarkClaimsAllowed === false &&
+    providerWaveIntake?.countsAsFullMemorySotaEvidence === false &&
+    providerWaveIntake?.countsAsEndToEndMemoryBenchmark === false &&
+    providerWaveIntake?.rawQuestionsIncluded === false &&
+    providerWaveIntake?.rawAnswersIncluded === false &&
+    providerWaveIntake?.rawMemoryIncluded === false &&
+    providerWaveIntake?.rawTranscriptIncluded === false &&
+    providerWaveIntake?.rawPrivateOutputPathIncluded === false;
+  const evidenceBlockers = [
+    providerWaveIntake?.mode !== "provider-wave-intake" ? "provider-wave-intake-mode-mismatch" : null,
+    providerWaveIntake?.status !== "READY_PROVIDER_WAVE_INTAKE" ? "provider-wave-intake-not-ready" : null,
+    !publicSafe ? "provider-wave-intake-not-public-safe" : null,
+    !controlsReady ? "provider-wave-intake-missing-bm25-or-full-hybrid-control" : null,
+    !coreFamiliesReady ? "provider-wave-intake-missing-core-provider-family" : null,
+  ].filter(Boolean);
+  return {
+    path: files.providerWaveIntake,
+    status: providerWaveIntake?.status ?? null,
+    evidenceReady: evidenceBlockers.length === 0,
+    metricsOnly: Boolean(providerWaveIntake?.metricsOnly),
+    publicSafe,
+    callsProviderApis: Boolean(providerWaveIntake?.callsProviderApis),
+    sendsBenchmarkTextToProvider: Boolean(providerWaveIntake?.sendsBenchmarkTextToProvider),
+    publicBenchmarkClaimsAllowed: Boolean(providerWaveIntake?.publicBenchmarkClaimsAllowed),
+    countsAsFullMemorySotaEvidence: Boolean(providerWaveIntake?.countsAsFullMemorySotaEvidence),
+    countsAsEndToEndMemoryBenchmark: Boolean(providerWaveIntake?.countsAsEndToEndMemoryBenchmark),
+    reportCount: Number(providerWaveIntake?.input?.reportCount ?? 0),
+    completedReportCount: Number(providerWaveIntake?.input?.completedReportCount ?? 0),
+    partialReportCount: Number(providerWaveIntake?.input?.partialReportCount ?? 0),
+    allHaveBm25: Boolean(providerWaveIntake?.controls?.allHaveBm25),
+    allHaveFullHybrid: Boolean(providerWaveIntake?.controls?.allHaveFullHybrid),
+    completedProviderFamilies: completedFamilies,
+    retryableProviderLimitObserved: arrayOf(providerWaveIntake?.blockers).includes("retryable-provider-limit-or-timeout-observed"),
+    bestProviderRows: rows.map((row) => ({
+      provider: row.provider,
+      completedArmCount: Number(row.completedArmCount ?? 0),
+      failedArmCount: Number(row.failedArmCount ?? 0),
+      bestStrategy: row.bestStrategy ?? null,
+      bestQuality: row.bestQuality ?? null,
+    })),
+    evidenceBlockers,
+    claimBoundary: providerWaveIntake?.claimBoundary ?? null,
+  };
+}
+
 function inspectReviewerState(reviewerIntake) {
   const blockers = reviewerIntake?.blockers ?? ["memory-score-reviewer-intake-missing"];
   return {
@@ -1356,6 +1418,7 @@ function renderMarkdown(value) {
     `- Current score delta vs reported target: ${value.currentCanary.scoreDelta ?? "n/a"}`,
     `- Reported target source evidence checked at: ${value.reportedTargets.sourceEvidenceCheckedAt ?? "n/a"}`,
     `- Benchmark harness source locks: ${value.reportedTargets.benchmarkHarnessTargetCount}`,
+    `- Provider wave intake status: ${value.providerWaveState.status ?? "n/a"}`,
     "",
     "## Gates",
     ...value.gates.map((item) => `- ${item.id}: ${item.status}${item.blockers.length ? ` (${item.blockers.join(", ")})` : ""}`),
@@ -1468,6 +1531,20 @@ function renderMarkdown(value) {
     `- Cloud provider blocker count: ${value.localFullLaneState.cloudProviderBlockerCount}`,
     `- Operator inputs needed: ${value.localFullLaneState.operatorInputCount}`,
     `- Counts as full memory SOTA evidence: ${value.localFullLaneState.countsAsFullMemorySotaEvidence}`,
+    "",
+    "## Provider Wave Intake",
+    `- Status: ${value.providerWaveState.status ?? "n/a"}`,
+    `- Evidence ready: ${value.providerWaveState.evidenceReady}`,
+    `- Reports: ${value.providerWaveState.reportCount}`,
+    `- Completed reports: ${value.providerWaveState.completedReportCount}`,
+    `- Partial reports: ${value.providerWaveState.partialReportCount}`,
+    `- All waves include BM25: ${value.providerWaveState.allHaveBm25}`,
+    `- All waves include full hybrid: ${value.providerWaveState.allHaveFullHybrid}`,
+    `- Completed provider families: ${value.providerWaveState.completedProviderFamilies.join(", ") || "none"}`,
+    `- Retryable provider limit observed: ${value.providerWaveState.retryableProviderLimitObserved}`,
+    `- Counts as full memory SOTA evidence: ${value.providerWaveState.countsAsFullMemorySotaEvidence}`,
+    `- Counts as end-to-end memory benchmark: ${value.providerWaveState.countsAsEndToEndMemoryBenchmark}`,
+    `- Best provider rows: ${value.providerWaveState.bestProviderRows.map((row) => `${row.provider}:${row.bestStrategy ?? "n/a"}:${row.bestQuality ?? "n/a"}`).join(", ") || "none"}`,
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),

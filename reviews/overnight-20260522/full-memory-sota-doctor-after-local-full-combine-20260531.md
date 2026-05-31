@@ -9,6 +9,7 @@
 - Current score delta vs reported target: -42.0333
 - Reported target source evidence checked at: 2026-05-26
 - Benchmark harness source locks: 1
+- Provider wave intake status: READY_PROVIDER_WAVE_INTAKE
 
 ## Gates
 - source-locked-full-target: pass
@@ -28,6 +29,7 @@
 - local-full-resume-command-security: pass
 - local-full-resume-result: pass
 - full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
+- provider-wave-intake: pass
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
 - full-score-result-gate: blocked (reported-target-judge-model-does-not-match-result, missing-full-or-officially-comparable-memory-benchmark-run, best-end-to-end-score-below-primary-reported-memory-target)
 - reported-target-beaten: blocked (best-end-to-end-score-below-reported-supermemory-target)
@@ -143,6 +145,20 @@
 - Cloud provider blocker count: 0
 - Operator inputs needed: 5
 - Counts as full memory SOTA evidence: false
+
+## Provider Wave Intake
+- Status: READY_PROVIDER_WAVE_INTAKE
+- Evidence ready: true
+- Reports: 13
+- Completed reports: 3
+- Partial reports: 10
+- All waves include BM25: true
+- All waves include full hybrid: true
+- Completed provider families: gemini, nvidia, voyage
+- Retryable provider limit observed: true
+- Counts as full memory SOTA evidence: false
+- Counts as end-to-end memory benchmark: false
+- Best provider rows: gemini:cloud-gemini2-embed-rerank-proxy:0.1575, nvidia:cloud-nvidia-nv-embed-v1-mistral-rerank:0.1575, voyage:cloud-voyage4-voyage-lite-rerank:0
 
 ## Blockers
 - RECALLWEAVE_BASELINE_LIVE-not-enabled

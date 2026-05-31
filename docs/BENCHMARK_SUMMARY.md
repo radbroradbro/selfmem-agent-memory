@@ -830,7 +830,11 @@ The provider-wave intake now consolidates those May 30-31 cloud waves in
 on the same slices, while Gemini, NVIDIA, and Voyage all had at least one
 completed provider-family wave. The intake is metrics-only, calls no provider
 APIs itself, and explicitly does not count as answer-quality, MemoryBench, or
-full-memory SOTA evidence.
+full-memory SOTA evidence. The full-memory SOTA doctor now consumes this intake
+as a `provider-wave-intake` pass gate while preserving the broader
+`BLOCKED_FULL_MEMORY_SOTA_EVIDENCE` state until accepted answer-quality shards,
+matching answer/judge models, reviewer approvals, UI/docs refresh, owner
+approval, and a real canary are all present.
 
 The same path also has a public-safe operator packet:
 `reviews/overnight-20260522/public-longmemeval-expanded-provider-operator-packet.md`.

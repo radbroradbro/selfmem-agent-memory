@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-31T09:00:24.970Z",
+  "generatedAt": "2026-05-31T12:14:18.141Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -23,6 +23,7 @@
     "retrievalProxyOnlyIsNotEnough": true,
     "componentBenchmarksAreModelSelectionOnly": true,
     "benchmarkHarnessSourceOnlyIsNotAScore": true,
+    "providerWavesAreRetrievalGateOnly": true,
     "fullMemoryAnswerQualityRequired": true,
     "sameDataExternalTargetRequired": true,
     "sameAnswerAndJudgeModelRequired": true,
@@ -366,6 +367,13 @@
       "mode": "public-benchmark-answer-quality",
       "status": null
     },
+    "providerWaveIntake": {
+      "path": "reviews/overnight-20260522/provider-wave-intake-20260531.json",
+      "exists": true,
+      "hash": "sha256:2fb40014de481cd21ae4bea0aecb69970453011a94946ab2fb2139f920ac76ab",
+      "mode": "provider-wave-intake",
+      "status": "READY_PROVIDER_WAVE_INTAKE"
+    },
     "voyageRateLimit": {
       "path": "reviews/overnight-20260522/voyage-provider-rate-limit-20260525.json",
       "exists": true,
@@ -397,7 +405,7 @@
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:b72fa21d975c786df6045fbb25c154c4fb81933c46833e0e34e6173a7006f4b2",
+      "hash": "sha256:35642cde45807a285104f3cfb8756c673d612e462d1b5b09766891a1a027d818",
       "mode": null,
       "status": null
     },
@@ -1117,6 +1125,54 @@
     "voyageStatus": "BLOCKED_VOYAGE_RATE_LIMIT",
     "voyageHttpStatus": 429
   },
+  "providerWaveState": {
+    "path": "reviews/overnight-20260522/provider-wave-intake-20260531.json",
+    "status": "READY_PROVIDER_WAVE_INTAKE",
+    "evidenceReady": true,
+    "metricsOnly": true,
+    "publicSafe": true,
+    "callsProviderApis": false,
+    "sendsBenchmarkTextToProvider": true,
+    "publicBenchmarkClaimsAllowed": false,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsEndToEndMemoryBenchmark": false,
+    "reportCount": 13,
+    "completedReportCount": 3,
+    "partialReportCount": 10,
+    "allHaveBm25": true,
+    "allHaveFullHybrid": true,
+    "completedProviderFamilies": [
+      "gemini",
+      "nvidia",
+      "voyage"
+    ],
+    "retryableProviderLimitObserved": true,
+    "bestProviderRows": [
+      {
+        "provider": "gemini",
+        "completedArmCount": 3,
+        "failedArmCount": 6,
+        "bestStrategy": "cloud-gemini2-embed-rerank-proxy",
+        "bestQuality": 0.1575
+      },
+      {
+        "provider": "nvidia",
+        "completedArmCount": 6,
+        "failedArmCount": 4,
+        "bestStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "bestQuality": 0.1575
+      },
+      {
+        "provider": "voyage",
+        "completedArmCount": 1,
+        "failedArmCount": 5,
+        "bestStrategy": "cloud-voyage4-voyage-lite-rerank",
+        "bestQuality": 0
+      }
+    ],
+    "evidenceBlockers": [],
+    "claimBoundary": "Provider wave intake summarizes retrieval/provider-gate canaries only. It does not count as answer-quality, MemoryBench, or full-memory SOTA evidence."
+  },
   "reviewerState": {
     "path": "reviews/overnight-20260522/memory-score-reviewer-intake-20260525.json",
     "status": "BLOCKED_MEMORY_SCORE_REVIEWERS",
@@ -1285,6 +1341,11 @@
         "query-expansion-local-endpoint-or-cloud-consent-missing",
         "voyage-credentials-missing"
       ]
+    },
+    {
+      "id": "provider-wave-intake",
+      "status": "pass",
+      "blockers": []
     },
     {
       "id": "same-data-provider-arms",

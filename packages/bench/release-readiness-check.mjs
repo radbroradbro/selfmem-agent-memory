@@ -5916,6 +5916,15 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.benchmarkContract?.retrievalProxyOnlyIsNotEnough, true);
     assert.equal(doctorReport.benchmarkContract?.componentBenchmarksAreModelSelectionOnly, true);
     assert.equal(doctorReport.benchmarkContract?.benchmarkHarnessSourceOnlyIsNotAScore, true);
+    assert.equal(doctorReport.benchmarkContract?.providerWavesAreRetrievalGateOnly, true);
+    assert.equal(doctorReport.providerWaveState?.evidenceReady, true);
+    assert.equal(doctorReport.providerWaveState?.allHaveBm25, true);
+    assert.equal(doctorReport.providerWaveState?.allHaveFullHybrid, true);
+    assert.equal(doctorReport.providerWaveState?.countsAsFullMemorySotaEvidence, false);
+    assert.equal(doctorReport.providerWaveState?.countsAsEndToEndMemoryBenchmark, false);
+    assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("gemini"));
+    assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("nvidia"));
+    assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("voyage"));
     assert.equal(doctorReport.reportedTargets?.sourceEvidenceCheckedAt, "2026-05-26");
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetsSourceLocked, true);
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetCount, 1);
@@ -6189,6 +6198,11 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Historical next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding runtime ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding durability ready: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Provider Wave Intake/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /provider-wave-intake: pass/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /All waves include BM25: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /All waves include full hybrid: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Completed provider families: gemini, nvidia, voyage/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
@@ -8117,6 +8131,11 @@ check("fresh release blocker doctor passes", () => {
   assert.equal(report.checks.fullMemorySotaDoctor.localFullMemoryScoreCountsAsSotaEvidence, false);
   assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingRuntimeReady, true);
   assert.equal(report.checks.fullMemorySotaDoctor.localEmbeddingDurabilityReady, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.providerWaveIntakeReady, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.providerWaveAllHaveBm25, true);
+  assert.equal(report.checks.fullMemorySotaDoctor.providerWaveAllHaveFullHybrid, true);
+  assert.deepEqual(report.checks.fullMemorySotaDoctor.providerWaveCompletedFamilies, ["gemini", "nvidia", "voyage"]);
+  assert.equal(report.checks.fullMemorySotaDoctor.providerWaveCountsAsSotaEvidence, false);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.status, "READY_FOR_BASELINE_REVIEW");
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.callsHostedProvider, true);
   assert.equal(report.checks.hostedBaselineLiveBudgetedRun.recallWeaveWin, true);

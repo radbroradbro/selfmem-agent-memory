@@ -444,9 +444,17 @@ assert.equal(fullMemorySotaDoctor.localFullLaneState?.combinedScore?.bm25AnswerQ
 assert.equal(fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.evidenceReady, true);
 assert.equal(fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.countsAsLocalFullBenchmarkEvidence, true);
 assert.equal(fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.countsAsFullMemorySotaEvidence, false);
+assert.equal(fullMemorySotaDoctor.providerWaveState?.evidenceReady, true);
+assert.equal(fullMemorySotaDoctor.providerWaveState?.allHaveBm25, true);
+assert.equal(fullMemorySotaDoctor.providerWaveState?.allHaveFullHybrid, true);
+assert.equal(fullMemorySotaDoctor.providerWaveState?.countsAsFullMemorySotaEvidence, false);
+assert.equal(fullMemorySotaDoctor.providerWaveState?.countsAsEndToEndMemoryBenchmark, false);
 assert.match(fullMemorySotaDoctorText, /Next local-full shard: n\/a \(n\/a\)/);
 assert.match(fullMemorySotaDoctorText, /Combined score winner: local-apple-qwen3-0_6b-local-rerank/);
 assert.match(fullMemorySotaDoctorText, /Memory score gate status: READY_LOCAL_FULL_MEMORY_SCORE/);
+assert.match(fullMemorySotaDoctorText, /Provider Wave Intake/);
+assert.match(fullMemorySotaDoctorText, /All waves include BM25: true/);
+assert.match(fullMemorySotaDoctorText, /All waves include full hybrid: true/);
 assert.match(fullMemorySotaDoctorText, /Counts as full memory SOTA evidence: false/i);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
@@ -804,6 +812,11 @@ console.log(
           localFullMemoryScoreCountsAsSotaEvidence: fullMemorySotaDoctor.localFullLaneState?.memoryScoreGate?.countsAsFullMemorySotaEvidence,
           localEmbeddingRuntimeReady: fullMemorySotaDoctor.localFullLaneState?.localEmbeddingRuntimeReady,
           localEmbeddingDurabilityReady: fullMemorySotaDoctor.localFullLaneState?.localEmbeddingDurabilityReady,
+          providerWaveIntakeReady: fullMemorySotaDoctor.providerWaveState?.evidenceReady,
+          providerWaveAllHaveBm25: fullMemorySotaDoctor.providerWaveState?.allHaveBm25,
+          providerWaveAllHaveFullHybrid: fullMemorySotaDoctor.providerWaveState?.allHaveFullHybrid,
+          providerWaveCompletedFamilies: fullMemorySotaDoctor.providerWaveState?.completedProviderFamilies,
+          providerWaveCountsAsSotaEvidence: fullMemorySotaDoctor.providerWaveState?.countsAsFullMemorySotaEvidence,
         },
         githubLiveSync: {
           ok: githubLiveSync.ok,
