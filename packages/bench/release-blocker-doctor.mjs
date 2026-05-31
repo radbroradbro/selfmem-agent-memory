@@ -103,6 +103,7 @@ const requiredFiles = {
   canaryNextAgentPlan: "canary-next-agent-plan-evidence.md",
   realDiagnosticsPostwatchEvidence: "real-diagnostics-postwatch-evidence.md",
   realDiagnosticsPostwatchReturnedWatch: "real-diagnostics-postwatch-returned-watch.json",
+  returnedDownloadsCurrentScan: "returned-downloads-current-scan.json",
   realDiagnosticsPostwatchBatchAudit: "real-diagnostics-postwatch-batch-audit.json",
   realDiagnosticsPostwatchNextAgentPlan: "real-diagnostics-postwatch-next-agent-plan.json",
   realDiagnosticsPostwatchNextAgentPlanMarkdown: "real-diagnostics-postwatch-next-agent-plan.md",
@@ -184,6 +185,7 @@ const canaryBatchAuditText = readFileSync(join(root, reviewDir, "canary-diagnost
 const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
 const realDiagnosticsPostwatchEvidenceText = readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-evidence.md"), "utf8");
 const realDiagnosticsPostwatchReturnedWatch = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-returned-watch.json"), "utf8"));
+const returnedDownloadsCurrentScan = JSON.parse(readFileSync(join(root, reviewDir, "returned-downloads-current-scan.json"), "utf8"));
 const realDiagnosticsPostwatchBatchAudit = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-batch-audit.json"), "utf8"));
 const realDiagnosticsPostwatchNextAgentPlan = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-next-agent-plan.json"), "utf8"));
 const benchmarkSummaryText = readFileSync(join(root, "docs/BENCHMARK_SUMMARY.md"), "utf8");
@@ -510,10 +512,22 @@ const approvedRuntimeCanaryBaseline =
 const approvedAdapterCommit =
   approvedRuntimeCanaryBaseline?.expectedReportCommit ?? approvedRuntimeCanaryBaseline?.headSha ?? "";
 assert.match(approvedAdapterCommit, /^[a-f0-9]{40}$/);
+const returnedDownloadsExpectedCommit = validCommitOrNull(returnedDownloadsCurrentScan.sourceControl?.expectedCommit);
+const postwatchPlanExpectedCommit = validCommitOrNull(expectedCommitFromCommandPlan(realDiagnosticsPostwatchNextAgentPlan.commandPlan));
+if (returnedDownloadsExpectedCommit && postwatchPlanExpectedCommit) {
+  assert.equal(
+    returnedDownloadsExpectedCommit,
+    postwatchPlanExpectedCommit,
+    "returned-downloads scan and postwatch handoff plan disagree on current canary expected commit",
+  );
+}
+const currentReturnedCanaryExpectedCommit =
+  returnedDownloadsExpectedCommit ?? postwatchPlanExpectedCommit ?? approvedAdapterCommit;
+assert.match(currentReturnedCanaryExpectedCommit, /^[a-f0-9]{40}$/);
 
 const realCanaryNextAction = realDiagnosticsPostwatchNextAgentPlan.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"
-  ? `Send the generated postwatch OpenClaw next-agent handoff packet to exactly one selected agent, apply the current adapter, follow the strict-real drill for a fresh 15-minute runtime window, then verify the returned metrics-only packet with \`canary:returned-inbox -- --require-production-canary --expected-commit ${approvedAdapterCommit}\` or \`canary:returned-packet -- --require-production-canary --expected-commit ${approvedAdapterCommit}\`. Use \`canary:returned-workspace\` to convert the returned packet into public-safe markdown findings.`
-  : `Run \`canary:batch-audit\` on redacted returned diagnostics, use \`canary:next-agent\` and \`canary:next-agent-packet -- --allow-failed-inputs --require-ready\` to pick one privacy-clean Hermes/OpenClaw target from a mixed folder, apply the current adapter, follow \`canary:drill\` during the fresh window, then collect a fresh strict-real canary window and verify the returned metrics-only packet with \`canary:returned-inbox -- --require-production-canary --expected-commit ${approvedAdapterCommit}\` or \`canary:returned-packet -- --require-production-canary --expected-commit ${approvedAdapterCommit}\`. Use \`canary:returned-workspace\` to fill the next-agent markdown workspace.`;
+  ? `Send the generated postwatch OpenClaw next-agent handoff packet to exactly one selected agent, apply the current adapter, follow the strict-real drill for a fresh 15-minute runtime window, then verify the returned metrics-only packet with \`canary:returned-inbox -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\` or \`canary:returned-packet -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\`. Use \`canary:returned-workspace\` to convert the returned packet into public-safe markdown findings.`
+  : `Run \`canary:batch-audit\` on redacted returned diagnostics, use \`canary:next-agent\` and \`canary:next-agent-packet -- --allow-failed-inputs --require-ready\` to pick one privacy-clean Hermes/OpenClaw target from a mixed folder, apply the current adapter, follow \`canary:drill\` during the fresh window, then collect a fresh strict-real canary window and verify the returned metrics-only packet with \`canary:returned-inbox -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\` or \`canary:returned-packet -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\`. Use \`canary:returned-workspace\` to fill the next-agent markdown workspace.`;
 const nextLocalFullShard = fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId ?? "the next pending shard";
 const nextLocalFullRange = fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange ?? "unknown range";
 const fullMemorySotaNextAction =
@@ -571,6 +585,12 @@ console.log(
       latestVerifiedCodeBaseline: releaseState.latestVerifiedCodeBaseline,
       latestVerifiedRepositoryHead: releaseState.latestVerifiedRepositoryHead ?? null,
       approvedRuntimeCanaryBaseline,
+      currentReturnedCanaryExpectedCommit,
+      currentReturnedCanaryExpectedCommitSources: {
+        returnedDownloadsCurrentScan: returnedDownloadsExpectedCommit,
+        realDiagnosticsPostwatchNextAgentPlan: postwatchPlanExpectedCommit,
+        fallbackApprovedAdapterCommit: approvedAdapterCommit,
+      },
       reviewers: reviewerReport,
       blockers: blockerReport,
       checks: {
@@ -695,6 +715,9 @@ console.log(
         realDiagnosticsPostwatch: {
           returnedWatchStatus: realDiagnosticsPostwatchReturnedWatch.status,
           productionEvidencePackets: realDiagnosticsPostwatchReturnedWatch.counts?.productionEvidencePackets,
+          returnedDownloadsExpectedCommit,
+          postwatchPlanExpectedCommit,
+          currentReturnedCanaryExpectedCommit,
           diagnosticInputCount: realDiagnosticsPostwatchBatchAudit.inputCount,
           parsedInputCount: realDiagnosticsPostwatchBatchAudit.parsedInputCount,
           strictRealPassCount: realDiagnosticsPostwatchBatchAudit.strictRealPassCount,
@@ -799,11 +822,11 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown --output /tmp/recallweave-canary-drill.md",
         "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --output /tmp/recallweave-canary-batch-audit.json",
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-canary-next-agent-plan.json",
-        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --require-ready --expected-commit ${approvedAdapterCommit} --output /tmp/recallweave-next-agent-handoff.zip`,
-        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --expected-commit ${approvedAdapterCommit} --output /tmp/recallweave-next-agent-handoff.zip`,
-        `npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --expected-commit ${approvedAdapterCommit} --output /tmp/recallweave-returned-canary-inbox.json`,
+        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --require-ready --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-next-agent-handoff.zip`,
+        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-next-agent-handoff.zip`,
+        `npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-returned-canary-inbox.json`,
         "npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json",
-        `npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /tmp/recallweave-canary-evidence-packet.zip --require-production-canary --expected-commit ${approvedAdapterCommit} --output /tmp/recallweave-returned-canary-intake.json`,
+        `npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /tmp/recallweave-canary-evidence-packet.zip --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-returned-canary-intake.json`,
         "npm exec --yes pnpm@10.23.0 -- canary:returned-workspace -- --packet /tmp/recallweave-canary-evidence-packet.zip --workspace reviews/overnight-20260522/next-agent-workspace --output /tmp/recallweave-returned-workspace.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 npm exec --yes pnpm@10.23.0 -- baseline:collect -- --live --output /tmp/recallweave-hosted-baseline-result.json",
         "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET=1600 npm exec --yes pnpm@10.23.0 -- baseline:export:recallweave -- --live --container-dir <local-recallweave-container-dir> --context-token-budget 1600 --output /tmp/recallweave-search-responses.json",
@@ -862,6 +885,20 @@ function run(command, args) {
 
 function truncate(text) {
   return String(text ?? "").trim().slice(0, 240);
+}
+
+function validCommitOrNull(value) {
+  const text = String(value ?? "");
+  return /^[a-f0-9]{40}$/.test(text) ? text : null;
+}
+
+function expectedCommitFromCommandPlan(commandPlan) {
+  if (!Array.isArray(commandPlan)) return null;
+  for (const item of commandPlan) {
+    const match = String(item?.command ?? "").match(/--expected-commit\s+([a-f0-9]{40})\b/);
+    if (match) return match[1];
+  }
+  return null;
 }
 
 function preferReviewFile(...names) {
