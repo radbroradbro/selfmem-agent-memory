@@ -5,7 +5,7 @@ Generated: 2026-05-31
 ## Scope
 
 - Current branch: `feat/nucleus-wiki-native-contract`.
-- Local commit: `cfa418e Add atomic memory benchmark gate`.
+- Local commit: `8223ee9 Add atomic memory benchmark gate`.
 - Slice: provider rerank/query-expansion P0 corrections, runtime ranker hook, `atomic-memory-v1`, DeepSeek Flash answer-quality smoke, Brain UI benchmark dashboard update, and public-safe evidence.
 
 ## Gate Detection
@@ -47,4 +47,4 @@ Not complete for public launch:
 - Atomic memory evidence is a 3-query model-challenger smoke only.
 - Same-data full provider/atomic answer-quality wave is still missing.
 - Two independent memory-score reviewer approvals are still missing.
-- Branch is local and ahead of its upstream by one commit; it has not been pushed in this pass.
+- Branch is clean and current with `origin/feat/nucleus-wiki-native-contract` as of the post-compaction verification pass.
