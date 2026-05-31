@@ -805,6 +805,24 @@ provider's env variable, so a Voyage test is not blocked by missing NVIDIA,
 Gemini, or local Apple readiness, and an NVIDIA test is not blocked by missing
 Voyage, Gemini, or local Apple readiness.
 
+The 2026-05-31 provider mitigation checks show the practical shape for slow
+cloud endpoints. After the larger q078-q083 wave timed out on Gemini and
+NVIDIA, two smaller same-data control runs capped the provider candidate window
+and completed without arm failures:
+
+- `public-longmemeval-full-provider-wave-q083-085-gemini2-mitigated-20260531`
+  sent 2 queries and 16 documents to Gemini Embedding 2, completed 4 provider
+  calls, and tied BM25/full-hybrid at quality 0.0. BM25 stayed fastest.
+- `public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531`
+  sent 1 query and 8 documents to NVIDIA `nv-embed-v1` plus
+  `nv-rerank-qa-mistral-4b:1`, completed 3 provider calls, and tied
+  BM25/full-hybrid at quality 0.0. BM25 stayed fastest.
+
+These are operational reachability checks, not promotion evidence. They imply
+future cloud-provider loops should use provider-specific slices, capped dense
+and rerank candidate limits, and reusable same-data controls before scaling to
+larger answer-quality shards.
+
 The same path also has a public-safe operator packet:
 `reviews/overnight-20260522/public-longmemeval-expanded-provider-operator-packet.md`.
 Generate it with:
