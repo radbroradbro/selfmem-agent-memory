@@ -37,6 +37,11 @@ const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?
 const retrievalStrategy = normalizeRetrievalStrategy(
   args.strategy ?? process.env.RECALLWEAVE_BASELINE_RETRIEVAL_STRATEGY ?? "bm25-lite",
 );
+const memoryMethod = normalizeMemoryMethod(args.memoryMethod ?? process.env.RECALLWEAVE_MEMORYBENCH_MEMORY_METHOD ?? "session-v1");
+const contextualChunkChars = positiveInt(
+  args.contextualChunkChars ?? process.env.RECALLWEAVE_CONTEXTUAL_MEMORY_CHUNK_CHARS ?? 1800,
+  "contextual chunk chars",
+);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -149,6 +154,7 @@ async function liveMaterialize() {
       contextTokenBudget,
       limit,
       retrievalStrategy,
+      memoryMethod,
     },
     selection: materialized.selection,
     sourceRetention: materialized.sourceRetention,
@@ -266,6 +272,7 @@ function fixtureMaterialize() {
       contextTokenBudget,
       limit,
       retrievalStrategy,
+      memoryMethod,
     },
     selection: materialized.selection,
     sourceRetention: materialized.sourceRetention,
@@ -280,9 +287,14 @@ function fixtureMaterialize() {
 }
 
 function writePrivateBenchmarkInputs(options) {
-  const sessionMap = new Map();
+  const sessionContentById = new Map();
+  const memoryMap = new Map();
+  const chunkIdsBySessionId = new Map();
   const answerContentHashesByQuery = new Map();
-  const materializerHash = `sha256:${stableHash("public-benchmark-materialize-run:v1")}`;
+  const materializerHash =
+    memoryMethod === "session-v1"
+      ? `sha256:${stableHash("public-benchmark-materialize-run:v1")}`
+      : `sha256:${stableHash(`public-benchmark-materialize-run:v1:${memoryMethod}`)}`;
   const redactionStats = {
     keyShapedTokenRedactionCount: 0,
     privateTagRedactionCount: 0,
@@ -292,26 +304,29 @@ function writePrivateBenchmarkInputs(options) {
     const sessions = asArray(row.haystack_sessions);
     const dates = asArray(row.haystack_dates);
     sessionIds.forEach((sessionId, index) => {
-      if (!requiredString(sessionId) || sessionMap.has(sessionId)) return;
-      const content = formatSessionContent({
+      if (!requiredString(sessionId) || sessionContentById.has(sessionId)) return;
+      const formatted = formatSessionLines({
         sessionId,
         date: dates[index],
         messages: sessions[index],
         redactionStats,
       });
-      sessionMap.set(sessionId, {
-        id: sessionId,
+      const content = formatted.lines.join("\n");
+      sessionContentById.set(sessionId, content);
+      const records = memoryRecordsForSession({
+        sessionId,
+        date: dates[index],
         content,
-        metadata: {
-          benchmark: "longmemeval",
-          questionType: String(row.question_type),
-          source: "MemoryBench LongMemEval-S cleaned",
-          date: requiredString(dates[index]) ? String(dates[index]) : null,
-        },
+        messageLines: formatted.messageLines,
       });
+      chunkIdsBySessionId.set(
+        sessionId,
+        records.filter((record) => record.metadata?.kind === "contextual_source_chunk").map((record) => record.id),
+      );
+      for (const record of records) memoryMap.set(record.id, record);
     });
     const hashes = asArray(row.answer_session_ids)
-      .map((sessionId) => sessionMap.get(String(sessionId))?.content)
+      .map((sessionId) => sessionContentById.get(String(sessionId)))
       .filter(Boolean)
       .map((content) => `sha256:${stableHash(normalizeText(content))}`);
     answerContentHashesByQuery.set(String(row.question_id), [...new Set(hashes)]);
@@ -319,10 +334,14 @@ function writePrivateBenchmarkInputs(options) {
 
   const queries = options.selected.map((row) => {
     const answerSessionIds = asArray(row.answer_session_ids).map((item) => String(item)).filter(Boolean);
+    const expectedResultIds =
+      memoryMethod === "contextual-source-chunk-v1"
+        ? answerSessionIds.flatMap((sessionId) => chunkIdsBySessionId.get(sessionId) ?? [sessionId])
+        : answerSessionIds;
     return {
       id: queryIdFor(row),
       q: String(row.question),
-      expectedResultIds: answerSessionIds,
+      expectedResultIds,
       expectedResultHashes: answerContentHashesByQuery.get(String(row.question_id)) ?? [],
       metadata: {
         benchmark: "longmemeval",
@@ -347,6 +366,7 @@ function writePrivateBenchmarkInputs(options) {
       answerLabelsHash: options.answerLabelsHash,
       scoringCodeHash: options.scoringCodeHash,
       materializerHash,
+      memoryMethod,
     },
     queries,
   };
@@ -365,7 +385,7 @@ function writePrivateBenchmarkInputs(options) {
     })),
   };
   const collectorQuerySetPayload = collectorQuerySetHashPayload(querySet);
-  const memories = [...sessionMap.values()].sort((left, right) => left.id.localeCompare(right.id));
+  const memories = [...memoryMap.values()].sort((left, right) => left.id.localeCompare(right.id));
   const querySetPath = resolve(privateOutputDir, "longmemeval-queryset.private.json");
   const memoriesPath = resolve(privateOutputDir, "longmemeval-memories.private.jsonl");
   const answerLabelsPath = resolve(privateOutputDir, "longmemeval-answer-labels.private.json");
@@ -394,6 +414,7 @@ function writePrivateBenchmarkInputs(options) {
     fixtureOnly: options.fixtureOnly,
     benchmark: "longmemeval",
     datasetSlice: options.datasetSlice,
+    memoryMethod,
     rawDataset: {
       fileName: basename(rawDatasetPath),
       hash: rawDatasetHash,
@@ -415,6 +436,7 @@ function writePrivateBenchmarkInputs(options) {
       answerLabelsHash: options.answerLabelsHash,
       scoringCodeHash: options.scoringCodeHash,
       materializerHash,
+      memoryMethod,
     },
     publicReportOnlyContainsHashesAndCounts: true,
   };
@@ -434,6 +456,8 @@ function writePrivateBenchmarkInputs(options) {
       "The public report contains only hashes, counts, file roles, and file names.",
       "Use the command templates in the public materialize report to run response export and scoring.",
       "",
+      `Memory method: ${memoryMethod}`,
+      "",
     ].join("\n"),
   );
 
@@ -445,8 +469,12 @@ function writePrivateBenchmarkInputs(options) {
       selectedQuestionIdsHash: options.selectedQuestionIdsHash,
       answerLabelsHash: options.answerLabelsHash,
       materializerHash,
+      memoryMethod,
       queryCount: queries.length,
-      haystackSessionCount: memories.length,
+      haystackSessionCount: sessionContentById.size,
+      memoryRecordCount: memories.length,
+      contextualSourceChunkCount: memories.filter((item) => item.metadata?.kind === "contextual_source_chunk").length,
+      rawSessionMemoryCount: memories.filter((item) => item.metadata?.kind === "raw_session").length,
       expectedResultRefCount: expectedRefs,
       redactionStats,
       querySetHash,
@@ -559,17 +587,142 @@ function parseQuestionIdPolicy(value) {
 }
 
 function formatSessionContent(input) {
+  return formatSessionLines(input).lines.join("\n");
+}
+
+function formatSessionLines(input) {
   const messages = asArray(input.messages);
   const lines = [];
+  const messageLines = [];
   if (requiredString(input.date)) lines.push(`Date: ${String(input.date)}`);
   lines.push(`Session: ${input.sessionId}`);
   for (const message of messages) {
     if (!message || typeof message !== "object") continue;
     const role = String(message.role ?? "message").trim() || "message";
     const content = redactPrivateBenchmarkText(message.content, input.redactionStats);
-    if (content) lines.push(`${titleCase(role)}: ${content}`);
+    if (content) {
+      const line = `${titleCase(role)}: ${content}`;
+      lines.push(line);
+      messageLines.push(line);
+    }
   }
-  return lines.join("\n");
+  return { lines, messageLines };
+}
+
+function memoryRecordsForSession(input) {
+  const date = requiredString(input.date) ? String(input.date) : null;
+  if (memoryMethod === "session-v1") {
+    return [
+      {
+        id: input.sessionId,
+        content: input.content,
+        metadata: {
+          benchmark: "longmemeval",
+          source: "MemoryBench LongMemEval-S cleaned",
+          date,
+          kind: "raw_session",
+        },
+      },
+    ];
+  }
+
+  const chunks = chunkSessionLines(input.messageLines.length > 0 ? input.messageLines : [input.content]);
+  return chunks.map((chunkLines, index) => {
+    const chunkText = chunkLines.join("\n");
+    const terms = salientTerms(chunkText, 12);
+    const title = terms.length > 0 ? terms.slice(0, 6).join(" ") : `session ${shortHash(input.sessionId)}`;
+    const eventDate = firstDateLikeText(chunkText) ?? date;
+    return {
+      id: `${input.sessionId}#chunk-${String(index + 1).padStart(3, "0")}`,
+      content: [
+        `Contextual memory: ${title}`,
+        date ? `Document date: ${date}` : null,
+        eventDate ? `Event date: ${eventDate}` : null,
+        `Session: ${input.sessionId}`,
+        `Chunk: ${index + 1}/${chunks.length}`,
+        "Source excerpt:",
+        chunkText,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      metadata: {
+        benchmark: "longmemeval",
+        source: "MemoryBench LongMemEval-S cleaned",
+        kind: "contextual_source_chunk",
+        parentSessionId: input.sessionId,
+        date,
+        documentDate: date,
+        eventDate,
+        title,
+        topic: terms.slice(0, 5).join(" "),
+        topicPath: "Benchmarks / LongMemEval-S / source-session",
+        subtopic: terms.join(" "),
+        subtopicPath: `${date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "source chunk"}`,
+        chunkIndex: index,
+        chunkCount: chunks.length,
+        sourceRetention: "private-source-chunk",
+      },
+    };
+  });
+}
+
+function chunkSessionLines(lines) {
+  const chunks = [];
+  let current = [];
+  let size = 0;
+  for (const line of lines) {
+    const text = String(line);
+    if (current.length > 0 && size + text.length + 1 > contextualChunkChars) {
+      chunks.push(current);
+      current = [];
+      size = 0;
+    }
+    current.push(text);
+    size += text.length + 1;
+  }
+  if (current.length > 0) chunks.push(current);
+  return chunks.length > 0 ? chunks : [lines.map((line) => String(line)).filter(Boolean)];
+}
+
+function salientTerms(text, limit) {
+  const stop = new Set([
+    "about",
+    "after",
+    "assistant",
+    "before",
+    "could",
+    "from",
+    "have",
+    "message",
+    "should",
+    "that",
+    "their",
+    "there",
+    "this",
+    "user",
+    "what",
+    "when",
+    "where",
+    "which",
+    "with",
+    "would",
+  ]);
+  const counts = new Map();
+  for (const token of normalizeText(text).match(/[a-z0-9][a-z0-9_-]{2,}/g) ?? []) {
+    if (stop.has(token)) continue;
+    counts.set(token, (counts.get(token) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, limit)
+    .map(([token]) => token);
+}
+
+function firstDateLikeText(text) {
+  const iso = String(text).match(/\b20\d{2}-\d{2}-\d{2}\b/);
+  if (iso) return iso[0];
+  const named = String(text).match(/\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+\d{1,2}(?:,\s*20\d{2})?\b/i);
+  return named ? named[0] : null;
 }
 
 function runCommandTemplates(privateOutputs) {
@@ -599,8 +752,11 @@ function renderMarkdown(value) {
     `- Benchmark: ${value.benchmark}`,
     `- Claim tier: ${value.claimTier}`,
     `- Dataset hash: ${value.source.datasetHash}`,
+    `- Memory method: ${value.selection.memoryMethod}`,
     `- Query count: ${value.selection.queryCount}`,
     `- Haystack session count: ${value.selection.haystackSessionCount}`,
+    `- Memory record count: ${value.selection.memoryRecordCount}`,
+    `- Contextual source chunk count: ${value.selection.contextualSourceChunkCount}`,
     `- Expected result ref count: ${value.selection.expectedResultRefCount}`,
     `- Query set hash: ${value.selection.querySetHash}`,
     `- Collector-compatible query set hash: ${value.selection.collectorCompatibleQuerySetHash}`,
@@ -788,6 +944,12 @@ function normalizeRetrievalStrategy(value) {
   const strategy = String(value ?? "").trim().toLowerCase();
   assert.ok(["jaccard", "bm25-lite", "hybrid-v1"].includes(strategy), `unknown retrieval strategy: ${strategy}`);
   return strategy;
+}
+
+function normalizeMemoryMethod(value) {
+  const method = String(value ?? "").trim().toLowerCase();
+  assert.ok(["session-v1", "contextual-source-chunk-v1"].includes(method), `unknown memory method: ${method}`);
+  return method;
 }
 
 function resolveInputPath(value) {

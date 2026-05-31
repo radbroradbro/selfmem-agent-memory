@@ -594,8 +594,18 @@ function fixtureJudge(candidateAnswer, expectedAnswer) {
 
 function contextFor(response, index) {
   return (response.results ?? [])
-    .map((result) => index.byId.get(String(result.id ?? "")) ?? index.byHash.get(String(result.contentHash ?? "")))
+    .map((result) => contextItemForResult(result, index))
     .filter(Boolean);
+}
+
+function contextItemForResult(result, index) {
+  const memory = index.byId.get(String(result.id ?? "")) ?? index.byHash.get(String(result.contentHash ?? ""));
+  if (!memory) return null;
+  const estimatedTokens = Number(result.estimatedTokens ?? 0);
+  if (!Number.isFinite(estimatedTokens) || estimatedTokens <= 0) return memory;
+  const maxChars = Math.max(1, Math.round(estimatedTokens * 4));
+  if (memory.content.length <= maxChars) return memory;
+  return { ...memory, content: memory.content.slice(0, maxChars) };
 }
 
 function boundedContext(items) {

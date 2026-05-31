@@ -17,6 +17,19 @@ system RecallWeave is trying to be. It is the floor. If BM25-lite wins, the
 benchmark found a gap in hybrid weighting, embeddings, reranking, chunking,
 query expansion, graph use, or temporal handling.
 
+The 2026-05-31 methodology audit found one important harness gap: the original
+LongMemEval materializer wrote each haystack session as one searchable memory.
+That is not close enough to a Supermemory-style memory path where concise
+contextual memories point back to original source chunks. The materializer now
+has an opt-in `contextual-source-chunk-v1` memory method. It keeps raw rows and
+full source retention private, but emits private contextual source chunks with
+document/event date, topic, subtopic, parent-session, and chunk metadata for
+same-data retrieval arms. The old `session-v1` path remains available as a
+control. The answer-quality scorer also now truncates rehydrated memory content
+according to the response export result budget before building the answer
+prompt. Do not treat previous title/wiki amplification failures as final until
+the same answer-quality shard is rerun across both memory methods.
+
 ## Operating Provider Policy
 
 For actual Codex and personal memory usage, the default provider arm is the
