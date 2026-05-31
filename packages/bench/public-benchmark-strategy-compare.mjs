@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSy
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildProviderBudgetContract, providersForBenchmarkStrategy } from "./provider-budget-contract.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
@@ -191,6 +192,14 @@ if (results.length > 0 && input.collectorCompatibleQuerySetHash) {
 
 const promotion = promotionDecision(gate, results);
 const status = results.length === 0 ? "FAILED_ALL_ARMS" : failedStrategies.length === 0 ? "COMPLETED" : "PARTIAL_COMPLETED_WITH_ARM_FAILURES";
+const providerBudget = buildProviderBudgetContract({
+  root,
+  benchmarkKind: gate === "provider" ? "public-benchmark-provider-gate" : "public-benchmark-strategy-compare",
+  fixtureOnly: fixtureRequested,
+  providerCallsEnabled: process.env.RECALLWEAVE_PROVIDER_BENCHMARK_CALLS === "1",
+  publicDataConfirmed: process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1",
+  requiredProviders: [...new Set(strategies.flatMap(providersForBenchmarkStrategy))].sort(),
+});
 const report = {
   schemaVersion: 1,
   ok: failedStrategies.length === 0,
@@ -204,6 +213,7 @@ const report = {
   memoryBenchAnswerQuality: false,
   publicBenchmarkClaimsAllowed: false,
   comparisonContract: comparisonContract(gate, strategies, { allowSoloSmoke }),
+  providerBudget,
   publicSafe: true,
   rawQuestionIdsIncluded: false,
   rawQuestionsIncluded: false,

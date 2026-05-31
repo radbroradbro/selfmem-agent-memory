@@ -31,6 +31,12 @@ describe("public benchmark comparison contract", () => {
     expect(report.promotion.pairedDeltaVsFullHybrid.pairedQueryCount).toBe(3);
     expect(report.promotion.reason).toMatch(/provider-backed arm/i);
     expect(report.promotion.reason).not.toMatch(/hybrid-family arm/i);
+    expect(report.providerBudget.mode).toBe("no-spend-free-tier");
+    expect(report.providerBudget.maxPaidUsd).toBe(0);
+    expect(report.providerBudget.requiredProviders).toEqual(["voyage"]);
+    expect(report.providerBudget.requiredProvidersWithinAllowed).toBe(true);
+    expect(report.providerBudget.paidProviderRequestedInNoSpendMode).toBe(false);
+    expect(report.providerBudget.fallbackPolicy.crossProviderFallbackEnabled).toBe(false);
   });
 
   it("labels the scaled Apple Silicon arm separately from the 0.6B default", () => {

@@ -22,6 +22,7 @@ assert.ok(providerGateReports.length > 0, "no public-benchmark-provider-gate rep
 
 const providers = summarizeProviders(providerGateReports);
 const controls = summarizeControls(providerGateReports);
+const providerBudget = summarizeProviderBudgetContracts(providerGateReports);
 const providerHybridContract = buildProviderHybridContract(controls);
 const nextRunPlan = buildNextRunPlan({ providers, controls, providerGateReports });
 const completedReports = providerGateReports.filter((item) => item.json.status === "COMPLETED");
@@ -94,6 +95,7 @@ const report = {
     })),
   },
   controls,
+  providerBudget,
   providerHybridContract,
   providers,
   providerFailures,
@@ -104,7 +106,7 @@ const report = {
   })),
   nextRunPlan,
   blockers,
-  nextActions: nextActions({ providers, providerFailures, controls }),
+  nextActions: nextActions({ providers, providerFailures, controls, providerBudget }),
 };
 
 const serialized = `${JSON.stringify(report, null, 2)}\n`;
@@ -274,10 +276,13 @@ function reportIsPublicSafe(report) {
   );
 }
 
-function nextActions({ providers, providerFailures, controls }) {
+function nextActions({ providers, providerFailures, controls, providerBudget }) {
   const actions = [];
   if (!controls.allHaveBm25 || !controls.allHaveFullHybrid) {
     actions.push("Reject provider waves that do not include bm25-lite and full-hybrid-rerank controls on the same query slice.");
+  }
+  if (providerBudget.reportsMissingBudgetContract > 0) {
+    actions.push("Re-run legacy provider wave reports under the provider budget contract before using them for default promotion.");
   }
   const retryProviders = [...new Set(providerFailures.filter((failure) => failure.retryableProviderLimit).map((failure) => providerFamilyForStrategy(failure.strategy)).filter(Boolean))];
   if (retryProviders.length) {
@@ -290,6 +295,37 @@ function nextActions({ providers, providerFailures, controls }) {
   }
   actions.push("Keep these provider waves separate from answer-quality and full-SOTA evidence until response arms are scored by the accepted answer-quality shard ladder.");
   return actions;
+}
+
+function summarizeProviderBudgetContracts(items) {
+  const rows = items.map((item) => {
+    const budget = item.json.providerBudget ?? null;
+    return {
+      path: displayPath(item.path),
+      present: Boolean(budget),
+      mode: budget?.mode ?? null,
+      noSpendMode: budget?.noSpendMode ?? null,
+      maxPaidUsd: budget?.maxPaidUsd ?? null,
+      requiredProviders: arrayOf(budget?.requiredProviders),
+      requiredProvidersWithinAllowed: budget?.requiredProvidersWithinAllowed ?? null,
+      paidProviderRequestedInNoSpendMode: budget?.paidProviderRequestedInNoSpendMode ?? null,
+      blockers: arrayOf(budget?.blockers),
+    };
+  });
+  const presentRows = rows.filter((row) => row.present);
+  return {
+    contractRequiredForNewProviderWaves: true,
+    reportCount: rows.length,
+    reportsWithBudgetContract: presentRows.length,
+    reportsMissingBudgetContract: rows.length - presentRows.length,
+    allReportsHaveBudgetContract: rows.length > 0 && rows.every((row) => row.present),
+    allBudgetedReportsNoSpend: presentRows.length > 0 && presentRows.every((row) => row.noSpendMode === true && Number(row.maxPaidUsd ?? NaN) === 0),
+    allBudgetedReportsWithinAllowedProviders: presentRows.every((row) => row.requiredProvidersWithinAllowed === true),
+    anyPaidProviderRequestedInNoSpendMode: presentRows.some((row) => row.paidProviderRequestedInNoSpendMode === true),
+    maxPaidUsdMax: presentRows.length ? Math.max(...presentRows.map((row) => Number(row.maxPaidUsd ?? 0))) : null,
+    requiredProviders: [...new Set(presentRows.flatMap((row) => row.requiredProviders))].sort(),
+    rows,
+  };
 }
 
 function buildNextRunPlan({ providers, controls, providerGateReports }) {
@@ -444,6 +480,14 @@ function renderMarkdown(value) {
     "## Controls",
     `- All waves include BM25: ${value.controls.allHaveBm25}`,
     `- All waves include full hybrid: ${value.controls.allHaveFullHybrid}`,
+    "",
+    "## Provider Budget Contract",
+    `- Contract required for new provider waves: ${value.providerBudget.contractRequiredForNewProviderWaves}`,
+    `- Reports with budget contract: ${value.providerBudget.reportsWithBudgetContract}/${value.providerBudget.reportCount}`,
+    `- Reports missing budget contract: ${value.providerBudget.reportsMissingBudgetContract}`,
+    `- Budgeted reports no-spend: ${value.providerBudget.allBudgetedReportsNoSpend}`,
+    `- Budgeted reports within allowed providers: ${value.providerBudget.allBudgetedReportsWithinAllowedProviders}`,
+    `- Paid provider requested in no-spend mode: ${value.providerBudget.anyPaidProviderRequestedInNoSpendMode}`,
     "",
     "## Provider Hybrid Contract",
     `- BM25 lexical floor required: ${value.providerHybridContract.bm25LexicalFloorRequired}`,

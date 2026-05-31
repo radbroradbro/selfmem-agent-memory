@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "provider-wave-intake",
   "status": "READY_PROVIDER_WAVE_INTAKE",
-  "generatedAt": "2026-05-31T15:05:57.802Z",
+  "generatedAt": "2026-05-31T18:26:52.903Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -385,6 +385,207 @@
         "hasFullHybrid": true,
         "providerArmCount": 1,
         "failedProviderArmCount": 0
+      }
+    ]
+  },
+  "providerBudget": {
+    "contractRequiredForNewProviderWaves": true,
+    "reportCount": 17,
+    "reportsWithBudgetContract": 0,
+    "reportsMissingBudgetContract": 17,
+    "allReportsHaveBudgetContract": false,
+    "allBudgetedReportsNoSpend": false,
+    "allBudgetedReportsWithinAllowedProviders": true,
+    "anyPaidProviderRequestedInNoSpendMode": false,
+    "maxPaidUsdMax": null,
+    "requiredProviders": [],
+    "rows": [
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q050-075-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-gemini-nvidia-slicefixed-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q078-083-cloud-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-085-gemini2-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-hybrid-pool-cloud-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-voyage-hybrid-pool-solo-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-gemini2-hybrid-pool-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-nvidia-hybrid-pool-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-gemini2-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-voyage-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q086-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q087-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q088-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
       }
     ]
   },
@@ -846,6 +1047,7 @@
     "retryable-provider-limit-or-timeout-observed"
   ],
   "nextActions": [
+    "Re-run legacy provider wave reports under the provider budget contract before using them for default promotion.",
     "Retry voyage, gemini, nvidia with provider-specific slices, capped dense/rerank candidates, and explicit provider arm timeout.",
     "Keep these provider waves separate from answer-quality and full-SOTA evidence until response arms are scored by the accepted answer-quality shard ladder."
   ]

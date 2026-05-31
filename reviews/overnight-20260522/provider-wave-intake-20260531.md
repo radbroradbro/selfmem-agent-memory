@@ -12,6 +12,14 @@
 - All waves include BM25: true
 - All waves include full hybrid: true
 
+## Provider Budget Contract
+- Contract required for new provider waves: true
+- Reports with budget contract: 0/17
+- Reports missing budget contract: 17
+- Budgeted reports no-spend: false
+- Budgeted reports within allowed providers: true
+- Paid provider requested in no-spend mode: false
+
 ## Provider Hybrid Contract
 - BM25 lexical floor required: true
 - Full hybrid control required: true
@@ -46,5 +54,6 @@
 - retryable-provider-limit-or-timeout-observed
 
 ## Next Actions
+- Re-run legacy provider wave reports under the provider budget contract before using them for default promotion.
 - Retry voyage, gemini, nvidia with provider-specific slices, capped dense/rerank candidates, and explicit provider arm timeout.
 - Keep these provider waves separate from answer-quality and full-SOTA evidence until response arms are scored by the accepted answer-quality shard ladder.

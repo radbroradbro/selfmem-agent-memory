@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildProviderBudgetContract } from "./provider-budget-contract.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
@@ -55,6 +56,14 @@ const targetOk = target.fixtureOnly === false && target.benchmark?.family === "l
 const providerCallsEnabled = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_CALLS === "1";
 const publicDataConfirmed = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1";
 const requiredProviders = [...new Set(strategies.flatMap(requiredProvidersForStrategy))].sort();
+const providerBudget = buildProviderBudgetContract({
+  root,
+  benchmarkKind: "provider-benchmark-live-preflight",
+  fixtureOnly: false,
+  providerCallsEnabled,
+  publicDataConfirmed,
+  requiredProviders,
+});
 const credentialPresence = Object.fromEntries(
   requiredProviders.map((provider) => [
     provider,
@@ -72,6 +81,7 @@ const blockers = [
   !providerCallsEnabled ? "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled" : null,
   !publicDataConfirmed ? "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed" : null,
   ...missingCredentialProviders.map((provider) => `${provider}-credentials-missing`),
+  ...providerBudget.blockers,
 ].filter(Boolean);
 const ready = blockers.length === 0;
 
@@ -104,6 +114,7 @@ const report = {
   requiredProviders,
   providerCallsEnabled,
   publicDataConfirmed,
+  providerBudget,
   credentialPresence,
   providerExecutionPolicy,
   missingCredentialProviders,
@@ -296,6 +307,16 @@ function toMarkdown(value) {
     ...Object.entries(value.providerExecutionPolicy.providers).map(
       ([provider, state]) => `- ${provider}: minIntervalMs=${state.minIntervalMs}, keyCount=${state.keyCount}`,
     ),
+    "",
+    "## Provider Budget Contract",
+    "",
+    `- Mode: ${value.providerBudget.mode}`,
+    `- Max paid USD: ${value.providerBudget.maxPaidUsd}`,
+    `- Required providers: ${value.providerBudget.requiredProviders.join(", ") || "none"}`,
+    `- Required providers within allowed set: ${value.providerBudget.requiredProvidersWithinAllowed}`,
+    `- Paid provider requested in no-spend mode: ${value.providerBudget.paidProviderRequestedInNoSpendMode}`,
+    `- Cross-provider fallback enabled: ${value.providerBudget.fallbackPolicy.crossProviderFallbackEnabled}`,
+    `- Cache provider outputs before full wave: ${value.providerBudget.cachePolicy.reuseCachedProviderOutputsBeforeFullWave}`,
     "",
     "## Blockers",
     "",
