@@ -1120,6 +1120,22 @@ Query expansion stays off unless it enters as one isolated methodology change
 and beats the no-expansion run without exact-identifier, privacy, or latency
 regressions.
 
+Provider and model refinement waves may reuse same-data controls with
+`--reuse-control-report <report.json>` after a prior public-safe report has
+already run `bm25-lite` and `full-hybrid-rerank` on the same query set, shard,
+and context budget. Reuse is limited to those two deterministic controls; the
+provider, local-model, query-expansion, title-amplification, or subtopic arm
+must still run fresh. The runner refuses reuse when the collector-compatible
+query-set hash, fixture/live mode, query count, shard offset, requested shard
+size, or context budget differ. This is an operational speedup for
+autoresearch loops, not independent evidence.
+
+Benchmark arms also carry per-arm isolation metadata. Provider-gate live runs
+default to isolated arm IDs, hashed container tags, and separate local embedding
+caches, and every child arm disables hosted Supermemory search by environment.
+That lets a slow or rate-limited provider arm fail or pause without changing the
+same-data controls or leaking an old hosted memory state into the benchmark.
+
 Public GitHub benchmark scores are allowed only after a real matched canary win
 with two independent reviewer approvals recorded by `baseline:reviewer-intake`.
 A canary win may justify a full benchmark; it does not prove general SOTA

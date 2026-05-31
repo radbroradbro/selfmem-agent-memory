@@ -29,6 +29,7 @@ const providerRetryAttempts =
   optionalPositiveInt(args.providerRetryAttempts ?? process.env.RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS ?? null, "provider retry attempts") ??
   (!fixtureRequested && gate === "provider" ? 2 : 0);
 const parallelArms = optionalPositiveInt(args.parallelArms ?? process.env.RECALLWEAVE_BENCHMARK_PARALLEL_ARMS ?? null, "parallel arms") ?? 1;
+const reuseControlReportPaths = splitList(args.reuseControlReport ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_REUSE_CONTROL_REPORT ?? "").map(resolveInputPath);
 const isolateArms =
   Boolean(args.isolateArms) || process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS === "1" || (!fixtureRequested && gate === "provider" && process.env.RECALLWEAVE_BENCHMARK_ISOLATE_ARMS !== "0");
 
@@ -79,16 +80,22 @@ assertGateContract(gate, strategies, { allowSoloSmoke });
 
 const runRoot = mkdtempSync(resolve(tmpdir(), "recallweave-strategy-compare-"));
 const input = fixtureRequested ? fixtureInput() : await liveInput(runRoot);
+const reusableControls = loadReusableControls(input, reuseControlReportPaths);
 const results = [];
 const failedStrategies = [];
+const reusedControls = [];
 
 const armOutcomes = await mapLimit(strategies, parallelArms, runStrategyArm);
 for (const outcome of armOutcomes) {
   if (outcome.result) results.push(outcome.result);
   if (outcome.failure) failedStrategies.push(outcome.failure);
+  if (outcome.reusedControl) reusedControls.push(outcome.reusedControl);
 }
 
 async function runStrategyArm(strategy) {
+  const reused = reusableControls.get(strategy);
+  if (reused) return { result: reused.result, reusedControl: reused.summary };
+
   const responsePath = resolve(runRoot, `${strategy}-responses.json`);
   const resultPath = resolve(runRoot, `${strategy}-result.json`);
   const armContext = armRunContext(strategy, runRoot);
@@ -218,7 +225,14 @@ const report = {
     providerRetryAttempts,
     parallelArms,
     isolateArms,
+    controlReuse: {
+      enabled: reuseControlReportPaths.length > 0,
+      requestedReportCount: reuseControlReportPaths.length,
+      reusedStrategyCount: reusedControls.length,
+      reusedStrategies: reusedControls.map((item) => item.strategy),
+    },
   },
+  reusedControls,
   strategies: results,
   failedStrategies,
   winner: bestStrategy(results),
@@ -258,17 +272,21 @@ if (markdownOutputPath) writePublicOutput(markdownOutputPath, `${renderMarkdown(
 process.stdout.write(serialized);
 
 function fixtureInput() {
+  const querySetPath = resolve(root, "packages/bench/fixtures/hosted-baseline-queryset.fixture.json");
+  const querySet = JSON.parse(readFileSync(querySetPath, "utf8"));
+  const queries = Array.isArray(querySet.queries) ? querySet.queries : [];
   return {
     benchmark: "longmemeval",
     source: "fixture",
     datasetSlice: "fixture-memory-canary-slice",
-    querySetPath: resolve(root, "packages/bench/fixtures/hosted-baseline-queryset.fixture.json"),
+    querySetPath,
     memoriesPath: resolve(root, "packages/bench/fixtures/recallweave-local-container.fixture/local-memories.fixture.jsonl"),
     judgeModel: "fixture-judge",
     answerModel: "fixture-answer",
-    queryCount: 3,
-    expectedResultRefCount: 3,
+    queryCount: queries.length,
+    expectedResultRefCount: queries.reduce((sum, query) => sum + arrayLength(query.expectedResultIds) + arrayLength(query.expectedResultHashes), 0),
     haystackSessionCount: 6,
+    collectorCompatibleQuerySetHash: collectorCompatibleQuerySetHash(querySet),
   };
 }
 
@@ -321,9 +339,107 @@ function inputFromPrivateFiles(querySetPath, memoriesPath, materializer) {
     queryCount: queries.length,
     expectedResultRefCount,
     haystackSessionCount: materializer?.selection?.haystackSessionCount ?? lineCount(memoriesPath),
-    collectorCompatibleQuerySetHash: materializer?.selection?.collectorCompatibleQuerySetHash ?? null,
+    collectorCompatibleQuerySetHash: materializer?.selection?.collectorCompatibleQuerySetHash ?? collectorCompatibleQuerySetHash(querySet),
     materializerHash: materializer ? `sha256:${stableHash(JSON.stringify(materializer))}` : null,
   };
+}
+
+function collectorCompatibleQuerySetHash(querySet) {
+  return `sha256:${stableHash(JSON.stringify({
+    schemaVersion: querySet.schemaVersion ?? 1,
+    datasetSlice: querySet.datasetSlice ?? null,
+    queries: (querySet.queries ?? []).map((query) => ({
+      id: query.id,
+      q: query.q,
+      expectedResultIds: query.expectedResultIds ?? [],
+      expectedResultHashes: query.expectedResultHashes ?? [],
+    })),
+  }))}`;
+}
+
+function loadReusableControls(currentInput, paths) {
+  const reusable = new Map();
+  for (const path of paths) {
+    assert.ok(path, "reuse control report path is required");
+    assert.ok(existsSync(path), `reuse control report missing: ${displayPath(path)}`);
+    assert.ok(statSync(path).isFile(), `reuse control report must be a file: ${displayPath(path)}`);
+    const reportText = readFileSync(path, "utf8");
+    assertSafePublicText(reportText, "reuse control report");
+    const report = JSON.parse(reportText);
+    assertReusableReportContract(report, currentInput, path);
+    for (const item of report.strategies ?? []) {
+      if (!isReusableControlStrategy(item?.strategy)) continue;
+      if (!strategies.includes(item.strategy)) continue;
+      assertReusableControlResult(item, currentInput, report, path);
+      if (!reusable.has(item.strategy)) {
+        reusable.set(item.strategy, {
+          result: {
+            ...item,
+            reusedControl: true,
+            reuse: {
+              sourceReportHash: `sha256:${stableHash(reportText)}`,
+              sourceReportPath: displayPath(path),
+              sourceGeneratedAt: report.generatedAt ?? null,
+            },
+          },
+          summary: {
+            strategy: item.strategy,
+            sourceReportHash: `sha256:${stableHash(reportText)}`,
+            sourceReportPath: displayPath(path),
+            sourceGeneratedAt: report.generatedAt ?? null,
+            queryShard: item.queryShard ?? null,
+          },
+        });
+      }
+    }
+  }
+  return reusable;
+}
+
+function assertReusableReportContract(report, currentInput, path) {
+  assert.equal(report.metricsOnly, true, `reuse control report must be metrics-only: ${displayPath(path)}`);
+  assert.equal(report.retrievalProxyOnly, true, `reuse control report must be retrieval-proxy only: ${displayPath(path)}`);
+  assert.equal(report.memoryBenchAnswerQuality, false, `reuse control report must not be answer-quality evidence: ${displayPath(path)}`);
+  assert.equal(report.publicBenchmarkClaimsAllowed, false, `reuse control report must not allow public claims: ${displayPath(path)}`);
+  assert.equal(report.publicSafe, true, `reuse control report must be public safe: ${displayPath(path)}`);
+  assert.equal(report.rawQuestionsIncluded, false, `reuse control report must not include raw questions: ${displayPath(path)}`);
+  assert.equal(report.rawAnswersIncluded, false, `reuse control report must not include raw answers: ${displayPath(path)}`);
+  assert.equal(report.rawMemoryIncluded, false, `reuse control report must not include raw memory: ${displayPath(path)}`);
+  assert.equal(report.rawTranscriptIncluded, false, `reuse control report must not include raw transcript: ${displayPath(path)}`);
+  assert.equal(report.rawPrivateOutputPathIncluded, false, `reuse control report must not include private output paths: ${displayPath(path)}`);
+  assert.equal(report.fixtureOnly, fixtureRequested, `reuse control report fixture/live mode must match: ${displayPath(path)}`);
+  assert.equal(report.benchmark, currentInput.benchmark, `reuse control report benchmark must match: ${displayPath(path)}`);
+  const reportQuerySetHash = report.input?.querySetHash ?? report.input?.collectorCompatibleQuerySetHash ?? null;
+  const currentQuerySetHash = currentInput.collectorCompatibleQuerySetHash ?? null;
+  assert.ok(currentQuerySetHash, `current input query-set hash missing: ${displayPath(path)}`);
+  assert.ok(reportQuerySetHash, `reuse control report query-set hash missing: ${displayPath(path)}`);
+  assert.equal(reportQuerySetHash, currentQuerySetHash, `reuse control report query-set hash must match: ${displayPath(path)}`);
+  assert.equal(Number(report.input?.queryCount ?? 0), currentInput.queryCount, `reuse control report query count must match: ${displayPath(path)}`);
+}
+
+function assertReusableControlResult(item, currentInput, report, path) {
+  assert.ok(item && typeof item === "object", `reuse control result must be an object: ${displayPath(path)}`);
+  assert.ok(isReusableControlStrategy(item.strategy), `cannot reuse non-control strategy: ${item.strategy}`);
+  assert.equal(item.privacyLeakCount, 0, `reuse control result must have zero privacy leaks: ${item.strategy}`);
+  assert.equal(item.redactionFailureCount, 0, `reuse control result must have zero redaction failures: ${item.strategy}`);
+  assert.equal(item.querySetHash, report.input?.querySetHash ?? report.input?.collectorCompatibleQuerySetHash, `reuse control query-set hash must match report: ${item.strategy}`);
+  const shard = item.queryShard ?? {};
+  assert.equal(shard.totalQueryCount, currentInput.queryCount, `reuse control shard total must match current input: ${item.strategy}`);
+  assert.equal(shard.startIndex, queryOffset, `reuse control shard offset must match: ${item.strategy}`);
+  const selectedQueryCount = Number(report.input?.selectedQueryCount ?? 0);
+  assert.ok(selectedQueryCount > 0, `reuse control selected query count missing: ${item.strategy}`);
+  assert.equal(shard.responseCount, selectedQueryCount, `reuse control selected query count must match source report: ${item.strategy}`);
+  assert.ok(shard.selectedQueryIdHash, `reuse control selected query hash missing: ${item.strategy}`);
+  const requested = report.input?.requestedQuerySelection ?? {};
+  assert.equal(requested.queryOffset, queryOffset, `reuse control report requested offset must match: ${item.strategy}`);
+  assert.equal(requested.maxQueries ?? null, maxQueries ?? null, `reuse control report requested max queries must match: ${item.strategy}`);
+  assert.equal(item.contextBudget?.applied, true, `reuse control must include an applied context budget: ${item.strategy}`);
+  assert.equal(item.contextBudget?.tokenBudget, contextTokenBudget, `reuse control context budget must match: ${item.strategy}`);
+  assertSafePublicText(JSON.stringify(item), `reuse control result ${item.strategy}`);
+}
+
+function isReusableControlStrategy(strategy) {
+  return strategy === "bm25-lite" || strategy === "full-hybrid-rerank";
 }
 
 function bestStrategy(items) {
@@ -463,6 +579,7 @@ function renderMarkdown(value) {
     `- Query set hash: ${value.input.querySetHash}`,
     `- Query count: ${value.input.queryCount}`,
     `- Selected query count: ${value.input.selectedQueryCount ?? "unknown"}`,
+    `- Reused control strategies: ${value.input.controlReuse.reusedStrategies.length ? value.input.controlReuse.reusedStrategies.join(", ") : "none"}`,
     `- Expected result refs: ${value.input.expectedResultRefCount}`,
     `- Winner: ${value.winner?.strategy ?? "none"}`,
     `- ${promotionLabel}: ${value.gate === "provider" ? Boolean(decision.promoteProvider) : Boolean(decision.promoteHybrid)}`,
@@ -477,6 +594,16 @@ function renderMarkdown(value) {
     ),
     "",
   ];
+  if (value.reusedControls.length) {
+    lines.push(
+      "## Reused Controls",
+      "",
+      "| Strategy | Source report | Source report hash |",
+      "| --- | --- | --- |",
+      ...value.reusedControls.map((item) => `| ${item.strategy} | ${item.sourceReportPath} | ${item.sourceReportHash} |`),
+      "",
+    );
+  }
   if (value.failedStrategies.length) {
     lines.push(
       "## Failed Arms",
@@ -750,19 +877,33 @@ async function mapLimit(items, limit, worker) {
 }
 
 function armRunContext(label, runRootPath) {
-  if (!isolateArms) return { env: {}, summary: { isolated: false } };
+  const baseEnv = {
+    RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
+    SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
+  };
+  if (!isolateArms) {
+    return {
+      env: baseEnv,
+      summary: {
+        isolated: false,
+        supermemorySearchDisabled: true,
+      },
+    };
+  }
   const armId = sanitizeFileSegment(label);
   const cachePath = resolve(runRootPath, "arm-caches", `${armId}-local-apple-embeddings.jsonl`);
   mkdirSync(dirname(cachePath), { recursive: true });
   const containerTag = `selfmem-bench-${shortHash(`${label}:${runRootPath}`)}`;
   return {
     env: {
+      ...baseEnv,
       RECALLWEAVE_BENCHMARK_ARM_ID: armId,
       RECALLWEAVE_BENCHMARK_ARM_CONTAINER_TAG: containerTag,
       SELFMEM_LOCAL_EMBED_CACHE_PATH: cachePath,
     },
     summary: {
       isolated: true,
+      supermemorySearchDisabled: true,
       armIdHash: shortHash(armId),
       containerTagHash: shortHash(containerTag),
       localEmbeddingCachePathHash: `sha256:${stableHash(cachePath)}`,
