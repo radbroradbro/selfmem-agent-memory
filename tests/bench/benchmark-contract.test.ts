@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -230,6 +230,11 @@ describe("public benchmark comparison contract", () => {
       expect(report.selection.memoryMethod).toBe("atomic-memory-v1");
       expect(report.selection.atomicMemoryCount).toBeGreaterThan(report.selection.contextualSourceChunkCount);
       expect(report.selection.expectedResultRefCount).toBeGreaterThan(0);
+      expect(report.selection.redactionStats.keyShapedTokenRedactionCount).toBeGreaterThan(0);
+      const memories = readFileSync(join(tempDir, "longmemeval-memories.private.jsonl"), "utf8");
+      const fixtureKeyShapedToken = ["sk", "1234567890abcdef1234567890abcdef"].join("-");
+      expect(memories).toContain("[redacted-key-shaped-token]");
+      expect(memories).not.toContain(fixtureKeyShapedToken);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

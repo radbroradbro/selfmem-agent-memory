@@ -54,6 +54,16 @@ const secretPatternGlobal = new RegExp(secretPattern.source, "g");
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
+const provenanceMetadataKeys = new Set([
+  "parentSessionId",
+  "sourceChunkId",
+  "rehydrateId",
+  "indexedBy",
+  "supersedes",
+  "contradictedBy",
+  "supersededBy",
+  "legacyAtomicId",
+]);
 
 if (args.atomicLifecycleSmoke === true) {
   runAtomicLifecycleSmoke();
@@ -195,6 +205,7 @@ async function liveMaterialize() {
 }
 
 function fixtureMaterialize() {
+  const fixtureKeyShapedToken = ["sk", "1234567890abcdef1234567890abcdef"].join("-");
   const targetSelected = [
     {
       question_id: "fixture-user",
@@ -211,7 +222,7 @@ function fixtureMaterialize() {
         ],
         [
           { role: "user", content: "What color is the demo button?" },
-          { role: "assistant", content: "The demo button is blue." },
+          { role: "assistant", content: `The demo button is blue; ignore leaked token ${fixtureKeyShapedToken}.` },
         ],
       ],
     },
@@ -438,7 +449,7 @@ function writePrivateBenchmarkInputs(options) {
     })),
   };
   const collectorQuerySetPayload = collectorQuerySetHashPayload(querySet);
-  const memories = [...memoryMap.values()].sort((left, right) => left.id.localeCompare(right.id));
+  const memories = sanitizeMemoryRecords([...memoryMap.values()].sort((left, right) => left.id.localeCompare(right.id)), redactionStats);
   const querySetPath = resolve(privateOutputDir, "longmemeval-queryset.private.json");
   const memoriesPath = resolve(privateOutputDir, "longmemeval-memories.private.jsonl");
   const answerLabelsPath = resolve(privateOutputDir, "longmemeval-answer-labels.private.json");
@@ -1288,6 +1299,43 @@ function assertNoUnsafePrivateText(text, label) {
 function assertNoPattern(text, pattern, message) {
   pattern.lastIndex = 0;
   if (pattern.test(String(text))) throw new Error(message);
+}
+
+function sanitizeMemoryRecords(records, redactionStats) {
+  const sanitized = records.map((record) => sanitizeMemoryRecord(record, redactionStats));
+  const sourceContentById = new Map(sanitized.map((record) => [record.id, String(record.content ?? "")]));
+  for (const record of sanitized) {
+    const metadata = record.metadata;
+    if (!metadata || typeof metadata !== "object") continue;
+    const sourceChunkId = typeof metadata.sourceChunkId === "string" ? metadata.sourceChunkId : null;
+    const sourceContent = sourceChunkId ? sourceContentById.get(sourceChunkId) : null;
+    if (sourceContent != null && typeof metadata.sourceContentHash === "string") {
+      metadata.sourceContentHash = `sha256:${stableHash(normalizeText(sourceContent))}`;
+    }
+    if (sourceContent != null && typeof metadata.sourceEstimatedTokens === "number") {
+      metadata.sourceEstimatedTokens = estimateTokens(sourceContent);
+    }
+  }
+  return sanitized;
+}
+
+function sanitizeMemoryRecord(record, redactionStats) {
+  return {
+    ...record,
+    content: redactPrivateBenchmarkText(record.content, redactionStats),
+    metadata: sanitizeMemoryMetadata(record.metadata, redactionStats),
+  };
+}
+
+function sanitizeMemoryMetadata(value, redactionStats, key = "") {
+  if (value == null) return value;
+  if (provenanceMetadataKeys.has(key)) return value;
+  if (typeof value === "string") return redactPrivateBenchmarkText(value, redactionStats);
+  if (Array.isArray(value)) return value.map((item) => sanitizeMemoryMetadata(item, redactionStats, key));
+  if (typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([entryKey, entryValue]) => [entryKey, sanitizeMemoryMetadata(entryValue, redactionStats, entryKey)]),
+  );
 }
 
 function writePrivateFile(path, text) {
