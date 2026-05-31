@@ -377,6 +377,10 @@ const requiredFiles = [
   `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.md`,
   `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
   `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.md`,
+  `${reviewDir}/full-shard-accepted-lane-launch-doctor-provider-env-20260531.json`,
+  `${reviewDir}/full-shard-accepted-lane-launch-doctor-provider-env-20260531.md`,
+  `${reviewDir}/full-shard-accepted-lane-launch-doctor-consented-provider-env-20260531.json`,
+  `${reviewDir}/full-shard-accepted-lane-launch-doctor-consented-provider-env-20260531.md`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   `${reviewDir}/answer-quality-full-shard-workorder-20260525.md`,
   `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
@@ -6088,7 +6092,13 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("nvidia-credentials-missing"), false);
     assert.ok(doctorReport.shardState?.supersededProviderCredentialBlockers?.includes("voyage-credentials-missing"));
     assert.ok(doctorReport.shardState?.supersededProviderCredentialBlockers?.includes("nvidia-credentials-missing"));
-    assert.ok(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+    assert.equal(
+      doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"),
+      false,
+    );
+    assert.ok(
+      doctorReport.shardState?.supersededAcceptedLaneBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"),
+    );
     assert.equal(doctorReport.localFullLaneState?.intakeStatus, "READY_TO_COMBINE_FULL_ANSWER_QUALITY_SHARDS");
     assert.equal(doctorReport.localFullLaneState?.readyForShardCombine, true);
     assert.equal(doctorReport.localFullLaneState?.acceptedShardCount, expectedLocalFull.acceptedShardCount);
@@ -6266,6 +6276,7 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.blockers?.includes("shard-results-missing"));
     assert.equal(doctorReport.blockers?.includes("voyage-credentials-missing"), false);
     assert.equal(doctorReport.blockers?.includes("nvidia-credentials-missing"), false);
+    assert.equal(doctorReport.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"), false);
     assert.ok(doctorReport.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
     assert.ok(!doctorReport.blockers?.includes("private-dir-not-provided"));
     assert.equal(doctorReport.blockers?.includes("shard-002-result-missing"), false);

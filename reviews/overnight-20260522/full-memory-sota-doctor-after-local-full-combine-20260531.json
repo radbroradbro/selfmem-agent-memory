@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-31T13:46:54.309Z",
+  "generatedAt": "2026-05-31T14:05:56.827Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -298,9 +298,9 @@
       "status": "READY_FULL_SHARD_PRIVATE_INPUTS"
     },
     "acceptedLaneLaunchDoctor": {
-      "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-provider-env-20260531.json",
+      "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-consented-provider-env-20260531.json",
       "exists": true,
-      "hash": "sha256:3aa1007e561c7fb68480f84c813c2823ff5002136ce950bd9d61a115c7379034",
+      "hash": "sha256:fb7c41c670768a4c6eedb8f4d2a9ab54cb91096bb8e3810cd12dc36a2bd2a832",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -576,7 +576,7 @@
     "blockers": []
   },
   "acceptedLaneLaunchState": {
-    "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-provider-env-20260531.json",
+    "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-consented-provider-env-20260531.json",
     "noEnvPath": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
     "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
     "readyForFirstAcceptedShardRun": false,
@@ -614,9 +614,6 @@
     "pendingShardCount": 20,
     "firstPendingShardId": "shard-001",
     "blockers": [
-      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
       "answer-model-missing",
       "judge-model-missing",
       "local-apple-credentials-missing",
@@ -751,6 +748,17 @@
     "fullSotaLaneReadyForResponseArmExport": false,
     "fullSotaLaneReadyForAnswerQualityScoring": false,
     "fullSotaLaneEnvironmentBlockers": [
+      "answer-model-missing",
+      "judge-model-missing",
+      "local-apple-credentials-missing",
+      "local-rerank-credentials-missing",
+      "openai-compatible-base-url-missing"
+    ],
+    "supersededProviderCredentialBlockers": [
+      "nvidia-credentials-missing",
+      "voyage-credentials-missing"
+    ],
+    "supersededAcceptedLaneBlockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
       "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
       "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
@@ -758,35 +766,18 @@
       "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
       "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
       "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-      "answer-model-missing",
-      "judge-model-missing",
-      "local-apple-credentials-missing",
-      "local-rerank-credentials-missing",
-      "openai-compatible-base-url-missing",
       "query-expansion-local-endpoint-or-cloud-consent-missing"
-    ],
-    "supersededProviderCredentialBlockers": [
-      "nvidia-credentials-missing",
-      "voyage-credentials-missing"
     ],
     "blockers": [
       "answer-quality-shard-runs-pending",
       "shard-results-missing",
       "answer-quality-shards-missing",
       "full-shard-coverage-incomplete",
-      "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-      "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
-      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-      "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-      "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
       "answer-model-missing",
       "judge-model-missing",
       "local-apple-credentials-missing",
       "local-rerank-credentials-missing",
-      "openai-compatible-base-url-missing",
-      "query-expansion-local-endpoint-or-cloud-consent-missing"
+      "openai-compatible-base-url-missing"
     ]
   },
   "localFullLaneState": {
@@ -1078,32 +1069,29 @@
     "countsAsFullMemorySotaEvidence": false,
     "publicBenchmarkClaimsAllowed": false,
     "envBlockers": [
+      "answer-model-missing",
+      "judge-model-missing",
+      "local-apple-credentials-missing",
+      "local-rerank-credentials-missing",
+      "openai-compatible-base-url-missing"
+    ],
+    "supersededProviderCredentialBlockers": [],
+    "supersededAcceptedLaneBlockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
       "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
       "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
       "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
       "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-      "answer-model-missing",
-      "judge-model-missing",
-      "local-apple-credentials-missing",
-      "local-rerank-credentials-missing",
-      "openai-compatible-base-url-missing",
       "query-expansion-local-endpoint-or-cloud-consent-missing"
     ],
     "blockers": [],
     "shardIntakeBlockers": [],
     "launchBlockers": [
-      "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-      "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
-      "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-      "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
       "answer-model-missing",
       "judge-model-missing",
       "local-apple-credentials-missing",
       "local-rerank-credentials-missing",
       "openai-compatible-base-url-missing",
-      "query-expansion-local-endpoint-or-cloud-consent-missing",
       "local-apple-endpoint-missing",
       "local-rerank-endpoint-missing",
       "accepted-lane-response-export-not-ready",
@@ -1252,9 +1240,6 @@
       "id": "accepted-sota-lane-launch-readiness",
       "status": "blocked",
       "blockers": [
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
         "answer-model-missing",
         "judge-model-missing",
         "local-apple-credentials-missing",
@@ -1293,17 +1278,11 @@
       "id": "local-full-launch-readiness",
       "status": "blocked",
       "blockers": [
-        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
         "answer-model-missing",
         "judge-model-missing",
         "local-apple-credentials-missing",
         "local-rerank-credentials-missing",
         "openai-compatible-base-url-missing",
-        "query-expansion-local-endpoint-or-cloud-consent-missing",
         "local-apple-endpoint-missing",
         "local-rerank-endpoint-missing",
         "accepted-lane-response-export-not-ready",
@@ -1359,19 +1338,11 @@
         "shard-results-missing",
         "answer-quality-shards-missing",
         "full-shard-coverage-incomplete",
-        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-        "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-        "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
         "answer-model-missing",
         "judge-model-missing",
         "local-apple-credentials-missing",
         "local-rerank-credentials-missing",
-        "openai-compatible-base-url-missing",
-        "query-expansion-local-endpoint-or-cloud-consent-missing"
+        "openai-compatible-base-url-missing"
       ]
     },
     {
@@ -1427,9 +1398,6 @@
     }
   ],
   "blockers": [
-    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
-    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
     "answer-model-missing",
     "judge-model-missing",
     "local-apple-credentials-missing",
@@ -1442,16 +1410,11 @@
     "full-answer-quality-shard-results-not-returned",
     "full-memory-sota-score-not-proven",
     "public-sota-claim-not-allowed",
-    "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-    "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
-    "query-expansion-local-endpoint-or-cloud-consent-missing",
     "local-full-answer-quality-shard-results-not-returned",
     "answer-quality-shard-runs-pending",
     "shard-results-missing",
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete",
-    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
     "missing-voyage-answer-quality-same-data-result",
     "reported-target-judge-model-does-not-match-result",
     "missing-full-or-officially-comparable-memory-benchmark-run",

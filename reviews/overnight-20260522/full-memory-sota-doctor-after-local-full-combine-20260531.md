@@ -15,12 +15,12 @@
 - source-locked-full-target: pass
 - raw-source-retention: pass
 - full-shard-private-inputs: pass
-- accepted-sota-lane-launch-readiness: blocked (RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, local-apple-endpoint-missing, local-rerank-endpoint-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, full-answer-quality-shard-results-not-returned, full-memory-sota-score-not-proven, public-sota-claim-not-allowed)
+- accepted-sota-lane-launch-readiness: blocked (answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, local-apple-endpoint-missing, local-rerank-endpoint-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, full-answer-quality-shard-results-not-returned, full-memory-sota-score-not-proven, public-sota-claim-not-allowed)
 - accepted-lane-cloud-provider-env: pass
 - full-shard-control-preflight: pass
 - bm25-is-control-only: pass
 - local-full-benchmark-lane: pass
-- local-full-launch-readiness: blocked (RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, local-apple-endpoint-missing, local-rerank-endpoint-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, local-full-answer-quality-shard-results-not-returned)
+- local-full-launch-readiness: blocked (answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, local-apple-endpoint-missing, local-rerank-endpoint-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, local-full-answer-quality-shard-results-not-returned)
 - local-embedding-runtime: pass
 - local-embedding-durability: pass
 - local-full-shard-intake: pass
@@ -29,7 +29,7 @@
 - local-full-resume-env: pass
 - local-full-resume-command-security: pass
 - local-full-resume-result: pass
-- full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing)
+- full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing)
 - provider-wave-intake: pass
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
 - full-score-result-gate: blocked (reported-target-judge-model-does-not-match-result, missing-full-or-officially-comparable-memory-benchmark-run, best-end-to-end-score-below-primary-reported-memory-target)
@@ -170,9 +170,6 @@
 - Best provider rows: gemini:cloud-gemini2-embed-rerank-proxy:0.1575, nvidia:cloud-nvidia-nv-embed-v1-mistral-rerank:0.1575, voyage:cloud-voyage4-voyage-lite-rerank:0
 
 ## Blockers
-- RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled
-- RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed
-- RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed
 - answer-model-missing
 - judge-model-missing
 - local-apple-credentials-missing
@@ -185,16 +182,11 @@
 - full-answer-quality-shard-results-not-returned
 - full-memory-sota-score-not-proven
 - public-sota-claim-not-allowed
-- RECALLWEAVE_BASELINE_LIVE-not-enabled
-- RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed
-- query-expansion-local-endpoint-or-cloud-consent-missing
 - local-full-answer-quality-shard-results-not-returned
 - answer-quality-shard-runs-pending
 - shard-results-missing
 - answer-quality-shards-missing
 - full-shard-coverage-incomplete
-- RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled
-- RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed
 - missing-voyage-answer-quality-same-data-result
 - reported-target-judge-model-does-not-match-result
 - missing-full-or-officially-comparable-memory-benchmark-run

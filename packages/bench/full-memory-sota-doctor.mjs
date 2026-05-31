@@ -90,6 +90,7 @@ const files = {
   localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
   acceptedLaneLaunchDoctor: preferReviewFile(
+    "full-shard-accepted-lane-launch-doctor-consented-provider-env-20260531.json",
     "full-shard-accepted-lane-launch-doctor-provider-env-20260531.json",
     "full-shard-accepted-lane-launch-doctor-20260526.json",
   ),
@@ -194,6 +195,7 @@ const localFullLaneState = inspectLocalFullLaneState({
   localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
   localFullAcceptedLaneLaunchDoctor,
+  acceptedLaneLaunchState,
 });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
 const providerWaveState = inspectProviderWaveIntake(providerWaveIntake);
@@ -469,6 +471,7 @@ function inspectShardState({ shardPlan, shardWorkorder, shardIntake, acceptedLan
     fullSotaLaneReadyForAnswerQualityScoring: Boolean(fullSotaLane?.readyForAnswerQualityScoring),
     fullSotaLaneEnvironmentBlockers: fullSotaLaneEnvironmentBlockers.activeBlockers,
     supersededProviderCredentialBlockers: shardBlockers.supersededProviderCredentialBlockers,
+    supersededAcceptedLaneBlockers: shardBlockers.supersededAcceptedLaneBlockers,
     blockers: shardBlockers.activeBlockers,
   };
 }
@@ -488,9 +491,16 @@ function inspectLocalFullLaneState({
   localEmbeddingRuntimeDoctor,
   localEmbeddingDurabilitySmoke,
   localFullAcceptedLaneLaunchDoctor,
+  acceptedLaneLaunchState,
 }) {
   const acceptedLane = arrayOf(localFullShardWorkorder?.executionLaneReadiness).find((lane) => lane.acceptedByFullShardIntake === true);
-  const envBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
+  const rawEnvBlockers = arrayOf(localFullShardWorkorder?.acceptedLaneEnvironmentBlockers ?? acceptedLane?.blockers);
+  const envBlockerFilter = filterSupersededProviderCredentialBlockers(rawEnvBlockers, acceptedLaneLaunchState);
+  const envBlockers = envBlockerFilter.activeBlockers;
+  const launchBlockerFilter = filterSupersededProviderCredentialBlockers(
+    arrayOf(localFullAcceptedLaneLaunchDoctor?.blockers),
+    acceptedLaneLaunchState,
+  );
   const runtimeBlockerReports = arrayOf(localFullShardRuntimeBlockers).filter(Boolean);
   const localFullCompleteCoverage = Boolean(localFullShardIntake?.intake?.completeCoverage);
   const acceptedShardIds = new Set(arrayOf(localFullShardIntake?.acceptedShards).map((shard) => String(shard?.shardId ?? "")));
@@ -650,6 +660,11 @@ function inspectLocalFullLaneState({
     countsAsFullMemorySotaEvidence: false,
     publicBenchmarkClaimsAllowed: false,
     envBlockers,
+    supersededProviderCredentialBlockers: envBlockerFilter.supersededProviderCredentialBlockers,
+    supersededAcceptedLaneBlockers: [...new Set([
+      ...envBlockerFilter.supersededAcceptedLaneBlockers,
+      ...launchBlockerFilter.supersededAcceptedLaneBlockers,
+    ])],
     blockers,
     shardIntakeBlockers: [
       ...arrayOf(localFullShardIntake?.blockers),
@@ -660,7 +675,7 @@ function inspectLocalFullLaneState({
       ...localEmbeddingRuntimeBlockers,
       ...localEmbeddingDurabilityBlockers,
     ],
-    launchBlockers: arrayOf(localFullAcceptedLaneLaunchDoctor?.blockers),
+    launchBlockers: launchBlockerFilter.activeBlockers,
   };
 }
 
@@ -1244,17 +1259,33 @@ function inspectAcceptedLaneLaunchState(launchDoctorReport, options = {}) {
 function filterSupersededProviderCredentialBlockers(blockers, acceptedLaneLaunchState) {
   const readyFamilies = new Set(arrayOf(acceptedLaneLaunchState?.providerCredentialFamiliesReady));
   const cloudCredentialBlockers = new Set(["gemini-credentials-missing", "nvidia-credentials-missing", "voyage-credentials-missing"]);
+  const currentAcceptedLaneBlockers = new Set(arrayOf(acceptedLaneLaunchState?.blockers));
+  const acceptedLaneRefreshBlockers = new Set([
+    "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+    "query-expansion-local-endpoint-or-cloud-consent-missing",
+  ]);
   const supersededProviderCredentialBlockers = [];
+  const supersededAcceptedLaneBlockers = [];
   const activeBlockers = [];
   for (const blocker of blockers) {
     const value = String(blocker ?? "");
     const provider = value.replace("-credentials-missing", "");
-    const isSuperseded =
+    const providerCredentialSuperseded =
       acceptedLaneLaunchState?.providerCredentialEvidenceReady === true &&
       cloudCredentialBlockers.has(value) &&
       readyFamilies.has(provider);
-    if (isSuperseded) {
+    const acceptedLaneRefreshSuperseded =
+      acceptedLaneRefreshBlockers.has(value) && acceptedLaneLaunchState?.status && !currentAcceptedLaneBlockers.has(value);
+    if (providerCredentialSuperseded) {
       supersededProviderCredentialBlockers.push(value);
+    } else if (acceptedLaneRefreshSuperseded) {
+      supersededAcceptedLaneBlockers.push(value);
     } else if (value) {
       activeBlockers.push(value);
     }
@@ -1263,6 +1294,7 @@ function filterSupersededProviderCredentialBlockers(blockers, acceptedLaneLaunch
     originalBlockerCount: blockers.length,
     activeBlockers,
     supersededProviderCredentialBlockers,
+    supersededAcceptedLaneBlockers,
   };
 }
 
