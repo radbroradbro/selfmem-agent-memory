@@ -44,6 +44,12 @@ const intakePath = resolveInputPath(
 const wikiFixturePath = resolveInputPath(
   args.wikiFixture ?? `${reviewDir}/public-longmemeval-wiki-amplification-fixture-20260526.json`,
 );
+const wikiRetrievalPath = resolveInputPath(
+  args.wikiRetrieval ?? `${reviewDir}/public-longmemeval-wiki-amplification-q075-078-20260531.json`,
+);
+const providerSlicePath = resolveInputPath(
+  args.providerSlice ?? `${reviewDir}/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json`,
+);
 const hostedBaselinePath = resolveInputPath(args.hostedBaseline ?? `${reviewDir}/hosted-baseline-live-budgeted-run.json`);
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
@@ -55,10 +61,14 @@ assert.ok(["json", "markdown", "wiki"].includes(format), "--format must be json,
 const performanceState = loadRequiredJson(performancePath, "local-full performance report");
 const intakeState = loadRequiredJson(intakePath, "local-full shard intake");
 const wikiFixtureState = loadOptionalJson(wikiFixturePath, "wiki amplification fixture");
+const wikiRetrievalState = loadOptionalJson(wikiRetrievalPath, "wiki amplification retrieval slice");
+const providerSliceState = loadOptionalJson(providerSlicePath, "provider retrieval slice");
 const hostedBaselineState = loadOptionalJson(hostedBaselinePath, "hosted baseline report");
 const performance = performanceState.json;
 const intake = intakeState.json;
 const wikiFixture = wikiFixtureState.json;
+const wikiRetrieval = wikiRetrievalState.json;
+const providerSlice = providerSliceState.json;
 const hostedBaseline = hostedBaselineState.json;
 const strategyByName = new Map(arrayOf(performance.strategySummaries).map((strategy) => [strategy.strategy, strategy]));
 const bm25 = strategyByName.get("bm25-lite") ?? null;
@@ -69,6 +79,8 @@ const localRerank = strategyByName.get("local-apple-qwen3-0_6b-local-rerank") ??
 const best = performance.bestAnswerQuality ?? bestBy(arrayOf(performance.strategySummaries), (strategy) => Number(strategy.answerQuality ?? 0));
 const coverage = performance.coverage ?? {};
 const wikiPromotion = wikiFixture?.hybridPromotion ?? wikiFixture?.promotion ?? null;
+const wikiRetrievalPromotion = wikiRetrieval?.hybridPromotion ?? wikiRetrieval?.promotion ?? null;
+const providerPromotion = providerSlice?.providerPromotion ?? providerSlice?.promotion ?? null;
 const hosted = hostedBaseline?.evidence?.hosted ?? null;
 const recallWeaveHostedComparison = hostedBaseline?.evidence?.recallWeave ?? null;
 
@@ -101,6 +113,8 @@ const ledger = {
     performance: evidenceRef(performanceState),
     intake: evidenceRef(intakeState),
     wikiFixture: wikiFixtureState.present ? evidenceRef(wikiFixtureState) : null,
+    wikiRetrieval: wikiRetrievalState.present ? evidenceRef(wikiRetrievalState) : null,
+    providerSlice: providerSliceState.present ? evidenceRef(providerSliceState) : null,
     hostedBaseline: hostedBaselineState.present ? evidenceRef(hostedBaselineState) : null,
   },
   coverage: {
@@ -240,12 +254,30 @@ function buildTopics() {
     {
       id: "wiki-amplification-unproven",
       title: "Wiki title and subtopic amplification are wired but unproven",
-      status: wikiFixtureOnly ? "fixture-only" : "needs-real-shard-check",
-      evidence: wikiFixture
-        ? `wiki fixture query count ${wikiFixture.input?.queryCount ?? "n/a"}; winner ${wikiFixture.winner?.strategy ?? "n/a"}; quality delta vs BM25 ${wikiPromotion?.qualityDeltaVsBm25 ?? "n/a"}.`
-        : "No wiki amplification fixture was found.",
-      decision: "Do not promote title or subtopic boost from a fixture tie.",
-      nextAction: "Run a local-wiki shard plan or retrieval-proxy stress slice that includes wiki-title and wiki-subtopic arms.",
+      status:
+        wikiRetrieval?.ok === true
+          ? wikiRetrievalPromotion?.promoteHybrid
+            ? "positive-retrieval-signal"
+            : "retrieval-proxy-not-promoted"
+          : wikiFixtureOnly
+            ? "fixture-only"
+            : "needs-real-shard-check",
+      evidence: summarizeWikiEvidence(),
+      decision: "Do not promote title or subtopic boost until it wins accepted answer-quality shards, not just fixture or retrieval-proxy checks.",
+      nextAction: "Keep wiki title/subtopic/session arms benchmark-gated; use the bounded-pool q075 slice as runtime evidence, not promotion evidence.",
+    },
+    {
+      id: "cloud-provider-hybrid-slice",
+      title: "Cloud provider arms are hybrid challengers, not pure vector replacements",
+      status:
+        providerSlice?.ok === true
+          ? providerPromotion?.promoteProvider
+            ? "positive-retrieval-signal"
+            : "retrieval-proxy-not-promoted"
+          : "missing-provider-slice",
+      evidence: summarizeProviderEvidence(),
+      decision: "Keep Gemini/NVIDIA/Voyage/local provider arms behind the BM25-plus-hybrid candidate pool and require same-data answer-quality wins before promotion.",
+      nextAction: "Run provider challengers one provider at a time on larger or accepted answer-quality slices; keep Voyage rate-limit evidence separate from quality evidence.",
     },
     {
       id: "hosted-supermemory-boundary",
@@ -272,6 +304,29 @@ function strategyScore(strategy) {
     answerLatencyP50Ms: Number(strategy.answerLatencyP50Ms ?? 0),
     deltaVsBm25: deltaVsBm25(strategy),
   };
+}
+
+function summarizeWikiEvidence() {
+  if (wikiRetrieval?.ok === true) {
+    const rows = arrayOf(wikiRetrieval.strategies)
+      .filter((item) => String(item.strategy ?? "").startsWith("wiki-") || item.strategy === "bm25-lite" || item.strategy === "full-hybrid-rerank")
+      .map((item) => `${item.strategy}=${item.metrics?.quality ?? "n/a"}`)
+      .join("; ");
+    return `q075-q078 retrieval slice completed; winner ${wikiRetrieval.winner?.strategy ?? "n/a"}; promote=${Boolean(wikiRetrievalPromotion?.promoteHybrid)}; ${rows}.`;
+  }
+  if (wikiFixture) {
+    return `wiki fixture query count ${wikiFixture.input?.queryCount ?? "n/a"}; winner ${wikiFixture.winner?.strategy ?? "n/a"}; quality delta vs BM25 ${wikiPromotion?.qualityDeltaVsBm25 ?? "n/a"}.`;
+  }
+  return "No wiki amplification evidence was found.";
+}
+
+function summarizeProviderEvidence() {
+  if (providerSlice?.ok !== true) return "No current provider retrieval slice was found.";
+  const rows = arrayOf(providerSlice.strategies)
+    .filter((item) => item.provider?.providerStrategy === true || item.provider?.modelArm)
+    .map((item) => `${item.strategy}=${item.metrics?.quality ?? "n/a"}`)
+    .join("; ");
+  return `q075-q078 provider retrieval slice completed; winner ${providerSlice.winner?.strategy ?? "n/a"}; promote=${Boolean(providerPromotion?.promoteProvider)}; ${rows || "no provider rows"}.`;
 }
 
 function deltaVsBm25(strategy) {
@@ -324,6 +379,8 @@ function renderWikiPage(value) {
     "sources:",
     `  - ${JSON.stringify(value.sourceEvidence.performance.path)}`,
     `  - ${JSON.stringify(value.sourceEvidence.intake.path)}`,
+    ...(value.sourceEvidence.wikiRetrieval ? [`  - ${JSON.stringify(value.sourceEvidence.wikiRetrieval.path)}`] : []),
+    ...(value.sourceEvidence.providerSlice ? [`  - ${JSON.stringify(value.sourceEvidence.providerSlice.path)}`] : []),
     "confidence: 0.7",
     "version: 1",
     "provenance:",
