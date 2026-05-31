@@ -50,6 +50,9 @@ const wikiRetrievalPath = resolveInputPath(
 const providerSlicePath = resolveInputPath(
   args.providerSlice ?? `${reviewDir}/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json`,
 );
+const providerOperationalPath = resolveInputPath(
+  args.providerOperational ?? `${reviewDir}/public-longmemeval-provider-wave-q085-090-cloud-20260531.json`,
+);
 const hostedBaselinePath = resolveInputPath(args.hostedBaseline ?? `${reviewDir}/hosted-baseline-live-budgeted-run.json`);
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolveInputPath(args.markdownOutput ?? args.markdown) : null;
@@ -63,12 +66,14 @@ const intakeState = loadRequiredJson(intakePath, "local-full shard intake");
 const wikiFixtureState = loadOptionalJson(wikiFixturePath, "wiki amplification fixture");
 const wikiRetrievalState = loadOptionalJson(wikiRetrievalPath, "wiki amplification retrieval slice");
 const providerSliceState = loadOptionalJson(providerSlicePath, "provider retrieval slice");
+const providerOperationalState = loadOptionalJson(providerOperationalPath, "provider operational slice");
 const hostedBaselineState = loadOptionalJson(hostedBaselinePath, "hosted baseline report");
 const performance = performanceState.json;
 const intake = intakeState.json;
 const wikiFixture = wikiFixtureState.json;
 const wikiRetrieval = wikiRetrievalState.json;
 const providerSlice = providerSliceState.json;
+const providerOperational = providerOperationalState.json;
 const hostedBaseline = hostedBaselineState.json;
 const strategyByName = new Map(arrayOf(performance.strategySummaries).map((strategy) => [strategy.strategy, strategy]));
 const bm25 = strategyByName.get("bm25-lite") ?? null;
@@ -115,6 +120,7 @@ const ledger = {
     wikiFixture: wikiFixtureState.present ? evidenceRef(wikiFixtureState) : null,
     wikiRetrieval: wikiRetrievalState.present ? evidenceRef(wikiRetrievalState) : null,
     providerSlice: providerSliceState.present ? evidenceRef(providerSliceState) : null,
+    providerOperational: providerOperationalState.present ? evidenceRef(providerOperationalState) : null,
     hostedBaseline: hostedBaselineState.present ? evidenceRef(hostedBaselineState) : null,
   },
   coverage: {
@@ -280,6 +286,14 @@ function buildTopics() {
       nextAction: "Run provider challengers one provider at a time on larger or accepted answer-quality slices; keep Voyage rate-limit evidence separate from quality evidence.",
     },
     {
+      id: "cloud-provider-operational-blocked",
+      title: "Latest cloud provider q085-q090 wave is operationally blocked",
+      status: providerOperational?.status === "PARTIAL_COMPLETED_WITH_ARM_FAILURES" ? "provider-lane-blocked" : "not-recorded",
+      evidence: summarizeProviderOperationalEvidence(),
+      decision: "Do not read provider rate limits or timeouts as retrieval-quality losses. Treat them as cloud-lane operational blockers until a provider arm returns a scored row.",
+      nextAction: "Retry one provider at a time with bounded candidate and batch settings, or keep method refinement on local/BM25 lanes until provider calls are reliable.",
+    },
+    {
       id: "hosted-supermemory-boundary",
       title: "Hosted Supermemory comparison is separate from local-full methodology",
       status: hostedBaseline ? "canary-boundary-recorded" : "not-recorded",
@@ -327,6 +341,17 @@ function summarizeProviderEvidence() {
     .map((item) => `${item.strategy}=${item.metrics?.quality ?? "n/a"}`)
     .join("; ");
   return `q075-q078 provider retrieval slice completed; winner ${providerSlice.winner?.strategy ?? "n/a"}; promote=${Boolean(providerPromotion?.promoteProvider)}; ${rows || "no provider rows"}.`;
+}
+
+function summarizeProviderOperationalEvidence() {
+  if (!providerOperational) return "No q085-q090 provider operational evidence was found.";
+  const requested = providerOperational.input?.requestedQuerySelection ?? {};
+  const failed = arrayOf(providerOperational.failedStrategies)
+    .map((item) => `${item.strategy}:${item.failureClass}`)
+    .join("; ");
+  const completed = arrayOf(providerOperational.strategies).map((item) => item.strategy).join(", ");
+  const winner = providerOperational.winner?.strategy ?? "n/a";
+  return `q${requested.queryOffset ?? "?"}-q${Number(requested.queryOffset ?? 0) + Number(requested.maxQueries ?? 0)} status ${providerOperational.status}; completed rows ${completed || "none"}; failed provider arms ${failed || "none"}; winner among completed rows ${winner}.`;
 }
 
 function deltaVsBm25(strategy) {

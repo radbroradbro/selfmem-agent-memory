@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "local-full-benchmark-topic-ledger",
   "status": "COMPLETE_LOCAL_FULL_TOPIC_LEDGER",
-  "generatedAt": "2026-05-31T04:32:20.244Z",
+  "generatedAt": "2026-05-31T05:32:13.166Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -43,6 +43,10 @@
     "providerSlice": {
       "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
       "hash": "sha256:3535d89b7d1c4df78ea6717d22967ef36135984c81909cb2c70e769b8cefa86e"
+    },
+    "providerOperational": {
+      "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+      "hash": "sha256:16deeb5a21eac7b5e1e5f0f4b8c16b2dbcf3b121a161464c58e5f71d1e899d07"
     },
     "hostedBaseline": {
       "path": "reviews/overnight-20260522/hosted-baseline-live-budgeted-run.json",
@@ -171,6 +175,14 @@
       "evidence": "q075-q078 provider retrieval slice completed; winner bm25-lite; promote=false; cloud-gemini2-embed-rerank-proxy=0.1575; cloud-nvidia-nv-embed-v1-mistral-rerank=0.1575.",
       "decision": "Keep Gemini/NVIDIA/Voyage/local provider arms behind the BM25-plus-hybrid candidate pool and require same-data answer-quality wins before promotion.",
       "nextAction": "Run provider challengers one provider at a time on larger or accepted answer-quality slices; keep Voyage rate-limit evidence separate from quality evidence."
+    },
+    {
+      "id": "cloud-provider-operational-blocked",
+      "title": "Latest cloud provider q085-q090 wave is operationally blocked",
+      "status": "provider-lane-blocked",
+      "evidence": "q85-q90 status PARTIAL_COMPLETED_WITH_ARM_FAILURES; completed rows bm25-lite, full-hybrid-rerank; failed provider arms cloud-gemini2-embed-rerank-proxy:provider-rate-limit; cloud-voyage4-voyage-lite-rerank:provider-rate-limit; cloud-nvidia-nv-embed-v1-mistral-rerank:provider-timeout; winner among completed rows bm25-lite.",
+      "decision": "Do not read provider rate limits or timeouts as retrieval-quality losses. Treat them as cloud-lane operational blockers until a provider arm returns a scored row.",
+      "nextAction": "Retry one provider at a time with bounded candidate and batch settings, or keep method refinement on local/BM25 lanes until provider calls are reliable."
     },
     {
       "id": "hosted-supermemory-boundary",

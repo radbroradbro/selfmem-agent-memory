@@ -76,6 +76,13 @@ Current best local strategy: local-apple-qwen3-0_6b-local-rerank (24.9).
 - Decision: Keep Gemini/NVIDIA/Voyage/local provider arms behind the BM25-plus-hybrid candidate pool and require same-data answer-quality wins before promotion.
 - Next action: Run provider challengers one provider at a time on larger or accepted answer-quality slices; keep Voyage rate-limit evidence separate from quality evidence.
 
+### Latest cloud provider q085-q090 wave is operationally blocked
+
+- Status: provider-lane-blocked
+- Evidence: q85-q90 status PARTIAL_COMPLETED_WITH_ARM_FAILURES; completed rows bm25-lite, full-hybrid-rerank; failed provider arms cloud-gemini2-embed-rerank-proxy:provider-rate-limit; cloud-voyage4-voyage-lite-rerank:provider-rate-limit; cloud-nvidia-nv-embed-v1-mistral-rerank:provider-timeout; winner among completed rows bm25-lite.
+- Decision: Do not read provider rate limits or timeouts as retrieval-quality losses. Treat them as cloud-lane operational blockers until a provider arm returns a scored row.
+- Next action: Retry one provider at a time with bounded candidate and batch settings, or keep method refinement on local/BM25 lanes until provider calls are reliable.
+
 ### Hosted Supermemory comparison is separate from local-full methodology
 
 - Status: canary-boundary-recorded
