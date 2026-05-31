@@ -10,6 +10,8 @@ This note records a runtime parity hardening step after the GPT-5.5 Pro review p
 - The compiled context evidence header now includes safe provenance cues: date, event date, memory kind, retrieval role, title, topic, source, parent session, and rehydrate id.
 - Metadata values are redacted, private-path filtered, and truncated before they can enter the compiled context.
 - Safe `metadata.sourceId` values are preserved when the candidate lacks a top-level `sourceId`, preventing atomic/source ids from being erased during runtime assembly.
+- Atomic/index hits now rehydrate their linked source chunk into compiled context when the source chunk is present in the normalized candidate pool, while keeping the atomic id as the ranked result and citation.
+- Runtime trace now reports context rehydration counts so missing source chunks can be spotted as methodology/runtime drift instead of being mistaken for model quality.
 - The release readiness post-baseline guard now explicitly recognizes the runtime context/provenance files and the focused hybrid regression test while public launch remains blocked.
 
 ## Reviewer Route
@@ -22,15 +24,18 @@ This note records a runtime parity hardening step after the GPT-5.5 Pro review p
 
 - `npm exec --yes pnpm@10.23.0 -- build`
 - `npm exec --yes pnpm@10.23.0 -- test -- tests/hybrid/hybrid-search.test.ts --runInBand`
-  - Passed 8 files / 40 tests.
+  - Passed 8 files / 42 tests after the source-rehydration regression cases.
 - `npm exec --yes pnpm@10.23.0 -- typecheck`
 - `node packages/bench/release-readiness-check.mjs`
+- `node packages/bench/goal-completion-audit.mjs`
+- `node packages/bench/release-blocker-doctor.mjs`
 
 ## Claim Boundary
 
 Allowed claim:
 
 - The runtime context path now preserves sanitized atomic/source provenance for answer assembly, so benchmark materialization evidence is less likely to be lost before the answer model sees it.
+- Atomic/index retrieval can now use concise searchable memories for ranking while rehydrating the linked source chunk for answer context when that source chunk is available locally.
 
 Disallowed claims:
 

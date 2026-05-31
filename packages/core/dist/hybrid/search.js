@@ -48,14 +48,10 @@ export async function searchHybrid(input) {
     const searchableCandidates = distillation?.memories.length ? distillation.memories : deduped.candidates;
     const ranker = input.ranker ?? ((query, candidates, options) => rerankLexically(query, candidates).slice(0, options.topK));
     const ranked = (await ranker(redacted.text, searchableCandidates, { topK })).slice(0, topK);
+    const contextRehydration = rehydrateContextCandidates(ranked, deduped.candidates);
     const contextInput = {
         query: redacted.text,
-        candidates: ranked.map((candidate) => ({
-            id: candidate.id,
-            text: candidate.text,
-            score: candidate.score,
-            metadata: contextMetadata(candidate),
-        })),
+        candidates: contextRehydration.candidates,
         ...(input.contextBudgetTokens !== undefined ? { budgetTokens: input.contextBudgetTokens } : {}),
     };
     const context = compileTypedContext(contextInput);
@@ -73,6 +69,10 @@ export async function searchHybrid(input) {
                 mode: input.rankerMode ?? "lexical",
                 candidateCount: searchableCandidates.length,
                 selectedCount: ranked.length,
+            },
+            context: {
+                rehydratedAtomicCount: contextRehydration.rehydratedAtomicCount,
+                missingSourceCount: contextRehydration.missingSourceCount,
             },
             ...(distillation ? { distillation: distillation.trace } : {}),
         },
@@ -104,6 +104,101 @@ function lexicalScore(queryTokens, text) {
             score += 1;
     }
     return score;
+}
+function rehydrateContextCandidates(ranked, searchableCandidates) {
+    const sources = sourceCandidateIndex(searchableCandidates);
+    let rehydratedAtomicCount = 0;
+    let missingSourceCount = 0;
+    const candidates = ranked.map((candidate) => {
+        const metadata = contextMetadata(candidate);
+        const rehydrateId = sourceRehydrateId(candidate);
+        if (!rehydrateId) {
+            return {
+                id: candidate.id,
+                text: candidate.text,
+                score: candidate.score,
+                metadata,
+            };
+        }
+        const source = sources.get(rehydrateId);
+        if (!source || source.id === candidate.id) {
+            missingSourceCount += 1;
+            return {
+                id: candidate.id,
+                text: candidate.text,
+                score: candidate.score,
+                metadata,
+            };
+        }
+        rehydratedAtomicCount += 1;
+        return {
+            id: candidate.id,
+            text: rehydratedContextText(candidate, source),
+            score: candidate.score,
+            metadata,
+        };
+    });
+    return {
+        candidates,
+        rehydratedAtomicCount,
+        missingSourceCount,
+    };
+}
+function sourceCandidateIndex(candidates) {
+    const index = new Map();
+    for (const candidate of candidates) {
+        if (!isSourceCandidate(candidate))
+            continue;
+        for (const key of sourceCandidateKeys(candidate)) {
+            if (!index.has(key))
+                index.set(key, candidate);
+        }
+    }
+    return index;
+}
+function sourceCandidateKeys(candidate) {
+    return [
+        candidate.id,
+        candidate.sourceId,
+        safeString(candidate.metadata?.sourceId),
+        safeString(candidate.metadata?.sourceChunkId),
+        safeString(candidate.metadata?.rehydrateId),
+    ].filter((value) => Boolean(value));
+}
+function isSourceCandidate(candidate) {
+    const role = safeString(candidate.metadata?.retrievalRole);
+    const kind = safeString(candidate.metadata?.kind ?? candidate.kind);
+    return role === "source" || kind === "contextual_source_chunk";
+}
+function sourceRehydrateId(candidate) {
+    if (!isIndexCandidate(candidate))
+        return null;
+    return safeString(candidate.metadata?.rehydrateId)
+        ?? safeString(candidate.metadata?.sourceChunkId)
+        ?? null;
+}
+function isIndexCandidate(candidate) {
+    const role = safeString(candidate.metadata?.retrievalRole);
+    const kind = safeString(candidate.metadata?.kind ?? candidate.kind);
+    return role === "index" || kind === "atomic_memory" || kind === "contextual_index";
+}
+function rehydratedContextText(candidate, source) {
+    const atomic = candidate.text.trim();
+    const sourceText = source.text.trim();
+    if (!atomic)
+        return sourceText;
+    if (!sourceText)
+        return atomic;
+    return [
+        "Atomic match:",
+        atomic,
+        "",
+        "Rehydrated source chunk:",
+        sourceText,
+    ].join("\n");
+}
+function safeString(value) {
+    return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined;
 }
 const CONTEXT_METADATA_KEYS = [
     "origin",

@@ -29,6 +29,10 @@ export interface HybridSearchTrace {
         candidateCount: number;
         selectedCount: number;
     };
+    context: {
+        rehydratedAtomicCount: number;
+        missingSourceCount: number;
+    };
     distillation?: DistillationTrace;
 }
 export interface HybridSearchResult {
