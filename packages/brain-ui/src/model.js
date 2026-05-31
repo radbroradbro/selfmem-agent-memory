@@ -457,6 +457,11 @@ function buildBenchmarkDashboard(report = {}) {
   const rawSerialized = JSON.stringify(report ?? {});
   const aggregate = report?.aggregate ?? {};
   const thresholds = report?.thresholds ?? {};
+  const memoryBenchmark = report?.memoryBenchmark ?? {};
+  const localFull = memoryBenchmark?.localFull ?? {};
+  const providerWaves = memoryBenchmark?.providerWaves ?? {};
+  const sotaGate = memoryBenchmark?.sotaGate ?? {};
+  const atomicMethodSmoke = memoryBenchmark?.atomicMethodSmoke ?? {};
   const scenarios = Array.isArray(report?.scenarios)
     ? report.scenarios.map((scenario, index) => ({
         id: safeExportText(scenario?.id ?? `scenario:${index}`),
@@ -468,6 +473,14 @@ function buildBenchmarkDashboard(report = {}) {
         noiseReductionRatio: numeric(scenario?.noiseReductionRatio),
         outputCandidates: numeric(scenario?.outputCandidates),
         failures: safeStringList(scenario?.failures),
+      }))
+    : [];
+  const memoryStrategies = Array.isArray(memoryBenchmark?.strategies)
+    ? memoryBenchmark.strategies.map((strategy, index) => ({
+        id: safeExportText(strategy?.id ?? `strategy:${index}`),
+        answerQuality: numeric(strategy?.answerQuality),
+        correctRate: score(strategy?.correctRate),
+        p50LatencyMs: numeric(strategy?.p50LatencyMs),
       }))
     : [];
   const privacyLeakCount = numeric(aggregate.privacyLeakCount) + (containsPrivateLikeText(rawSerialized) ? 1 : 0);
@@ -511,6 +524,57 @@ function buildBenchmarkDashboard(report = {}) {
     verdict: thresholdFailures.length === 0 ? "PASS" : "FAIL",
     thresholdFailures,
     scenarios,
+    memoryBenchmark: {
+      generatedAt: safeOptionalTimestamp(memoryBenchmark?.generatedAt),
+      claimScope: safeExportText(memoryBenchmark?.claimScope ?? ""),
+      status: safeExportText(memoryBenchmark?.status ?? ""),
+      benchmark: safeExportText(memoryBenchmark?.benchmark ?? ""),
+      answerModel: safeExportText(memoryBenchmark?.answerModel ?? ""),
+      judgeModel: safeExportText(memoryBenchmark?.judgeModel ?? ""),
+      localFull: {
+        scoredQueries: numeric(localFull?.scoredQueries),
+        totalQueries: numeric(localFull?.totalQueries),
+        acceptedShards: numeric(localFull?.acceptedShards),
+        totalShards: numeric(localFull?.totalShards),
+        bestStrategy: safeExportText(localFull?.bestStrategy ?? ""),
+        bestAnswerQuality: numeric(localFull?.bestAnswerQuality),
+        bm25AnswerQuality: numeric(localFull?.bm25AnswerQuality),
+        deltaVsBm25: numeric(localFull?.deltaVsBm25),
+        p50LatencyMs: numeric(localFull?.p50LatencyMs),
+        publicBenchmarkClaimsAllowed: localFull?.publicBenchmarkClaimsAllowed === true,
+        countsAsFullMemorySotaEvidence: localFull?.countsAsFullMemorySotaEvidence === true,
+      },
+      strategies: memoryStrategies,
+      providerWaves: {
+        status: safeExportText(providerWaves?.status ?? ""),
+        reports: numeric(providerWaves?.reports),
+        completedReports: numeric(providerWaves?.completedReports),
+        partialReports: numeric(providerWaves?.partialReports),
+        bestZeroDollarLane: safeExportText(providerWaves?.bestZeroDollarLane ?? ""),
+        blockers: safeStringList(providerWaves?.blockers),
+      },
+      sotaGate: {
+        status: safeExportText(sotaGate?.status ?? ""),
+        primaryReportedTarget: safeExportText(sotaGate?.primaryReportedTarget ?? ""),
+        primaryReportedScore: numeric(sotaGate?.primaryReportedScore),
+        scoreDelta: numeric(sotaGate?.scoreDelta),
+        blockers: safeStringList(sotaGate?.blockers),
+      },
+      atomicMethodSmoke: {
+        status: safeExportText(atomicMethodSmoke?.status ?? ""),
+        claimScope: safeExportText(atomicMethodSmoke?.claimScope ?? ""),
+        method: safeExportText(atomicMethodSmoke?.method ?? ""),
+        answerModel: safeExportText(atomicMethodSmoke?.answerModel ?? ""),
+        judgeModel: safeExportText(atomicMethodSmoke?.judgeModel ?? ""),
+        scoredQueries: numeric(atomicMethodSmoke?.scoredQueries),
+        totalQueries: numeric(atomicMethodSmoke?.totalQueries),
+        answerQuality: numeric(atomicMethodSmoke?.answerQuality),
+        correctRate: score(atomicMethodSmoke?.correctRate),
+        bestStrategy: safeExportText(atomicMethodSmoke?.bestStrategy ?? ""),
+        gateStatus: safeExportText(atomicMethodSmoke?.gateStatus ?? ""),
+        blockers: safeStringList(atomicMethodSmoke?.blockers),
+      },
+    },
     caveats: safeStringList(report?.caveats),
   };
 }

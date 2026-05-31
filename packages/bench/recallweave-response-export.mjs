@@ -89,6 +89,16 @@ if (args.queryExpansionParserSmoke === true) {
   process.exit(0);
 }
 
+if (args.providerRerankCascadeSmoke === true) {
+  runProviderRerankCascadeSmoke();
+  process.exit(0);
+}
+
+if (args.nvidiaAdapterParserSmoke === true) {
+  runNvidiaAdapterParserSmoke();
+  process.exit(0);
+}
+
 assert.ok(querySetPath, "query set is required. Pass --queryset or RECALLWEAVE_BASELINE_QUERYSET");
 assert.ok(existsSync(querySetPath), `query set missing: ${displayPath(querySetPath)}`);
 assert.ok(statSync(querySetPath).size > 0, `query set empty: ${displayPath(querySetPath)}`);
@@ -482,10 +492,38 @@ function rankMetadataAwareFullHybridRerank(query, candidates) {
 }
 
 async function rankQueryExpandedFullHybridRerank(query, candidates, options = {}) {
-  const expansion = await queryExpansionText(query, options);
-  const expanded = { ...query, q: expansion.expandedQuery };
-  const firstStage = rankSparseDenseGraphTemporal(expanded, candidates);
-  return rerankProxy(expanded, firstStage);
+  const expansionMode = queryExpansionMode();
+  if (expansionMode === "off") {
+    options.providerStats?.recordQueryExpansionFallback("disabled-by-mode");
+    return rankFullHybridRerank(query, candidates);
+  }
+  const expansion = await queryExpansionText(query, { ...options, queryExpansionMode: expansionMode });
+  const queryText = queryTextValue(query);
+  const originalStage = rankSparseDenseGraphTemporal(query, candidates);
+  const rewriteQueries = expansion.rewrites.length
+    ? expansion.rewrites
+    : normalizeText(expansion.expandedQuery) !== normalizeText(queryText)
+    ? [expansion.expandedQuery]
+    : [];
+  if (rewriteQueries.length === 0) return rerankProxy(query, originalStage);
+  const rewriteStage = fuseRankedChannels(
+    candidates,
+    rewriteQueries.map((rewrite, index) => ({
+      name: `query-expansion-${index + 1}`,
+      weight: 1,
+      ranked: rankSparseDenseGraphTemporal({ ...query, q: rewrite }, candidates),
+    })),
+    { scoreScale: 8 },
+  );
+  const firstStage = fuseRankedChannels(
+    candidates,
+    [
+      { name: "original-query", weight: 1, ranked: originalStage },
+      { name: "query-expansion-aux", weight: queryExpansionAuxWeight(), ranked: rewriteStage },
+    ],
+    { scoreScale: 10 },
+  );
+  return rerankProxy(query, firstStage);
 }
 
 function rankWikiTitleAmplifiedHybrid(query, candidates) {
@@ -549,9 +587,26 @@ function rankWikiSummarySessionHybrid(query, candidates) {
 
 async function queryExpansionText(query, options = {}) {
   const queryText = queryTextValue(query);
+  const mode = options.queryExpansionMode ?? queryExpansionMode();
+  if (mode === "off") {
+    options.providerStats?.recordQueryExpansionFallback("disabled-by-mode");
+    return {
+      mode: "off",
+      expandedQuery: queryText,
+      rewrites: [],
+    };
+  }
+  if (mode === "planner") {
+    options.providerStats?.recordQueryExpansionFallback("planner-deterministic-proxy");
+    return {
+      mode: "planner-deterministic-proxy",
+      expandedQuery: expandQuery(queryText),
+      rewrites: [],
+    };
+  }
   const plans = queryExpansionPlans(options);
   if (plans.length === 0) {
-    options.providerStats?.recordQueryExpansionFallback("deterministic-proxy-not-configured");
+    options.providerStats?.recordQueryExpansionFallback("provider-not-configured");
     return {
       mode: "deterministic-proxy",
       expandedQuery: expandQuery(queryText),
@@ -576,11 +631,12 @@ async function queryExpansionText(query, options = {}) {
     for (const plan of plans) {
       let rewrites = [];
       try {
-        if (plan.provider === "local-openai-compatible") {
-          rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-        } else if (plan.provider === "nvidia-openai-compatible") {
-          rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
-        } else if (plan.provider === "openrouter-openai-compatible") {
+        if (
+          plan.provider === "local-openai-compatible" ||
+          plan.provider === "nvidia-openai-compatible" ||
+          plan.provider === "openrouter-openai-compatible" ||
+          plan.provider === "deepseek-openai-compatible"
+        ) {
           rewrites = await openAiCompatibleQueryExpansion(plan, attemptRequest);
         } else if (plan.provider === "gemini") {
           rewrites = await geminiQueryExpansion(plan, attemptRequest);
@@ -598,15 +654,6 @@ async function queryExpansionText(query, options = {}) {
       }
     }
     if (sanitized.length > 0) break;
-  }
-
-  if (sanitized.length === 0 && queryExpansionProviderFallbackAllowed()) {
-    options.providerStats?.recordQueryExpansionFallback("provider-no-usable-rewrites");
-    return {
-      mode: "deterministic-proxy",
-      expandedQuery: expandQuery(queryText),
-      rewrites: [],
-    };
   }
 
   if (sanitized.length === 0 && queryExpansionProviderFallbackAllowed()) {
@@ -647,7 +694,7 @@ async function rankCloudVoyageRerankOnly(query, candidates, options = {}) {
   }
   assertProviderBenchmarkAllowed(options.strategy);
   const ranked = await voyageRerank(queryText, firstStage, { providerStats: options.providerStats, model: config.rerankModel });
-  return [...ranked, ...candidatesNotIn(firstStage, candidates)].sort(byScoreThenId);
+  return appendRankedTail(ranked, firstStage, candidates);
 }
 
 function rankProviderHybridCandidatePool(query, candidates, limit) {
@@ -723,7 +770,7 @@ async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
       ],
       { scoreScale: 8 },
     );
-    return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+    return appendRankedTail(providerMockRerank(query, fused), densePool, candidates);
   }
   assertProviderBenchmarkAllowed(options.strategy);
   const queryVector = (await voyageEmbed([queryText], "query", { providerStats: options.providerStats, model: config.embedModel }))[0];
@@ -742,7 +789,7 @@ async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
     { scoreScale: 8 },
   ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", config.rerankCandidateLimit));
   const reranked = await voyageRerank(queryText, fused, { providerStats: options.providerStats, model: config.rerankModel });
-  return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  return appendRankedTail(reranked, densePool, candidates);
 }
 
 async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) {
@@ -763,7 +810,7 @@ async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) 
       ],
       { scoreScale: 8 },
     );
-    return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+    return appendRankedTail(rerankProxy(query, fused), densePool, candidates);
   }
   assertProviderBenchmarkAllowed(options.strategy);
   const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats, model: config.embedModel }))[0];
@@ -784,7 +831,7 @@ async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) 
     ],
     { scoreScale: 8 },
   );
-  return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  return appendRankedTail(rerankProxy(query, fused), densePool, candidates);
 }
 
 async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
@@ -806,7 +853,7 @@ async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
       ],
       { scoreScale: 8 },
     ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
-    return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+    return appendRankedTail(providerMockRerank(query, fused), densePool, candidates);
   }
   assertProviderBenchmarkAllowed(options.strategy);
   const queryVector = (await geminiEmbed([queryText], "query", { providerStats: options.providerStats, model: config.embedModel }))[0];
@@ -828,7 +875,7 @@ async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
     { scoreScale: 8 },
   ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
   const reranked = await voyageRerank(queryText, fused, { providerStats: options.providerStats });
-  return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  return appendRankedTail(reranked, densePool, candidates);
 }
 
 async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
@@ -850,7 +897,7 @@ async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
       ],
       { scoreScale: 8 },
     ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
-    return [...providerMockRerank(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+    return appendRankedTail(providerMockRerank(query, fused), densePool, candidates);
   }
   assertProviderBenchmarkAllowed(options.strategy);
   const queryVector = (await nvidiaEmbed([queryText], "query", config, { providerStats: options.providerStats }))[0];
@@ -869,7 +916,7 @@ async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
     { scoreScale: 8 },
   ).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT", 60));
   const reranked = await nvidiaRerank(queryText, fused, config, { providerStats: options.providerStats });
-  return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  return appendRankedTail(reranked, densePool, candidates);
 }
 
 async function rankLocalAppleQwen(query, candidates, options = {}) {
@@ -895,7 +942,7 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
       { scoreScale: 8 },
     );
     const reranked = config?.rerankMode === "sidecar" ? providerMockRerank(query, fused) : rerankProxy(query, fused);
-    return [...reranked, ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+    return appendRankedTail(reranked, densePool, candidates);
   }
   assertProviderBenchmarkAllowed(options.strategy);
   const queryVector = (await localAppleEmbed([queryText], { providerStats: options.providerStats }))[0];
@@ -916,9 +963,9 @@ async function rankLocalAppleQwen(query, candidates, options = {}) {
   if (config?.rerankMode === "sidecar") {
     const rerankLimit = providerCandidateLimit("SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT", config.rerankCandidateLimit ?? 30);
     const reranked = await localAppleRerank(queryText, fused.slice(0, rerankLimit), { providerStats: options.providerStats, model: config.rerankModel });
-    return [...reranked, ...candidatesNotIn(fused.slice(0, rerankLimit), candidates)].sort(byScoreThenId);
+    return appendRankedTail(reranked, fused.slice(0, rerankLimit), candidates);
   }
-  return [...rerankProxy(query, fused), ...candidatesNotIn(densePool, candidates)].sort(byScoreThenId);
+  return appendRankedTail(rerankProxy(query, fused), densePool, candidates);
 }
 
 async function localAppleEmbedCandidates(candidates, options = {}) {
@@ -1226,10 +1273,11 @@ function createProviderStats(options = {}) {
       stats.queryExpansionElapsedMsTotal += Math.max(0, Number(elapsedMs ?? 0));
     },
     recordQueryExpansionFallback(reason) {
+      const reasonText = String(reason ?? "not-configured");
       stats.queryExpansionFallbacks += 1;
-      stats.queryExpansionMode = "deterministic-proxy";
+      stats.queryExpansionMode = reasonText.includes("disabled-by-mode") ? "off" : "deterministic-proxy";
       stats.queryExpansionProvider = "local-deterministic";
-      stats.queryExpansionModel = String(reason ?? "not-configured");
+      stats.queryExpansionModel = reasonText;
     },
     recordLocalEmbeddingCacheLoad({ enabled, entriesLoaded = 0, readErrors = 0 } = {}) {
       stats.localEmbeddingCacheEnabled = Boolean(enabled);
@@ -1361,6 +1409,7 @@ function providerEnvHint(provider) {
   if (provider === "gemini") return "GEMINI_API_KEY, GEMINI_API_KEYS, GOOGLE_API_KEY, GOOGLE_API_KEYS, AI_STUDIO_API_KEY, AI_STUDIO_API_KEYS, or matching *_FILE vars";
   if (provider === "voyage") return "VOYAGE_API_KEY, VOYAGE_API_KEYS, VOYAGE_API_KEY_FILE, or VOYAGE_API_KEYS_FILE";
   if (provider === "nvidia") return "NVIDIA_API_KEY, NVIDIA_API_KEYS, NVAPI_KEY, NVAPI_KEYS, or matching *_FILE vars";
+  if (provider === "deepseek") return "DEEPSEEK_API_KEY, DEEPSEEK_API_KEYS, DEEPSEEK_API_KEY_FILE, or DEEPSEEK_API_KEYS_FILE";
   if (provider === "local-apple") return "SELFMEM_LOCAL_EMBED_BASE_URL";
   if (provider === "local-rerank") return "SELFMEM_LOCAL_RERANK_ENDPOINT or SELFMEM_LOCAL_RERANK_BASE_URL";
   return `${provider.toUpperCase()} provider credentials`;
@@ -1416,6 +1465,13 @@ function providerKeys(provider) {
       ...splitProviderKeys(process.env.OPENROUTER_API_KEYS),
       ...splitProviderKeys(process.env.OPENROUTER_API_KEY),
       ...providerKeysFromFiles("OPENROUTER_API_KEYS_FILE", "OPENROUTER_API_KEY_FILE"),
+    ];
+  }
+  if (provider === "deepseek") {
+    return [
+      ...splitProviderKeys(process.env.DEEPSEEK_API_KEYS),
+      ...splitProviderKeys(process.env.DEEPSEEK_API_KEY),
+      ...providerKeysFromFiles("DEEPSEEK_API_KEYS_FILE", "DEEPSEEK_API_KEY_FILE"),
     ];
   }
   return [];
@@ -1499,7 +1555,7 @@ async function voyageRerank(query, candidates, options = {}) {
     .map((item, rank) => {
       const candidate = candidates[item.index];
       assert.ok(candidate, "Voyage rerank returned an invalid document index");
-      return { ...candidate, score: round(Number(item.score ?? 0) + reciprocalRankBoost(rank + 1)) };
+      return { ...candidate, score: providerRerankCascadeScore(rank + 1, item.score), providerRawRerankScore: finiteNumberOrDefault(item.score, 0) };
     })
     .sort(byScoreThenId);
 }
@@ -1571,7 +1627,7 @@ async function nvidiaRerank(query, candidates, config, options = {}) {
     .map((item, rank) => {
       const candidate = candidates[item.index];
       assert.ok(candidate, "NVIDIA rerank returned an invalid document index");
-      return { ...candidate, score: round(Number(item.score ?? 0) + reciprocalRankBoost(rank + 1)) };
+      return { ...candidate, score: providerRerankCascadeScore(rank + 1, item.score), providerRawRerankScore: finiteNumberOrDefault(item.score, 0) };
     })
     .sort(byScoreThenId);
 }
@@ -1613,7 +1669,7 @@ async function localAppleRerank(query, candidates, options = {}) {
     .map((item, rank) => {
       const candidate = candidates[item.index];
       assert.ok(candidate, "local Apple rerank returned an invalid document index");
-      return { ...candidate, score: round(Number(item.score ?? 0) + reciprocalRankBoost(rank + 1)) };
+      return { ...candidate, score: providerRerankCascadeScore(rank + 1, item.score), providerRawRerankScore: finiteNumberOrDefault(item.score, 0) };
     })
     .sort(byScoreThenId);
 }
@@ -1759,6 +1815,7 @@ function providerThrottleKey(provider) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
   if (normalized.startsWith("nvidia")) return "nvidia";
+  if (normalized.startsWith("deepseek")) return "deepseek";
   if (normalized.startsWith("openrouter")) return "openrouter";
   if (normalized.startsWith("gemini")) return "gemini";
   if (normalized.startsWith("voyage")) return "voyage";
@@ -1788,6 +1845,7 @@ function providerDisplayName(provider) {
   if (provider === "gemini") return "Gemini";
   if (provider === "voyage") return "Voyage";
   if (provider === "nvidia") return "NVIDIA";
+  if (provider === "deepseek" || String(provider ?? "").startsWith("deepseek")) return "DeepSeek";
   return String(provider ?? "provider");
 }
 
@@ -1876,7 +1934,7 @@ async function localAppleRerankPost(body) {
 }
 
 async function openAiCompatibleQueryExpansion(plan, request) {
-  const response = await queryExpansionPost(plan, {
+  const body = {
     model: plan.model,
     temperature: queryExpansionTemperature(),
     max_tokens: queryExpansionMaxOutputTokens(),
@@ -1892,7 +1950,11 @@ async function openAiCompatibleQueryExpansion(plan, request) {
         ].join("\n"),
       },
     ],
-  });
+  };
+  if (plan.provider === "deepseek-openai-compatible") {
+    body.thinking = { type: "disabled" };
+  }
+  const response = await queryExpansionPost(plan, body);
   return rewritesFromQueryExpansionText(chatCompletionText(response));
 }
 
@@ -2162,22 +2224,28 @@ function runQueryExpansionParserSmoke() {
   const originalEnv = snapshotEnv([
     "SELFMEM_QUERY_EXPANSION_BASE_URL",
     "SELFMEM_QUERY_EXPANSION_MODEL",
+    "SELFMEM_QUERY_EXPANSION_MODE",
+    "RECALLWEAVE_QUERY_EXPANSION_MODE",
     "RECALLWEAVE_QUERY_EXPANSION_CALLS",
     "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA",
     "RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER",
     "NVIDIA_API_KEY",
     "OPENROUTER_API_KEY",
+    "DEEPSEEK_API_KEY",
     "OPENROUTER_QUERY_EXPANSION_MODEL",
     "OPENROUTER_FALLBACK_QUERY_EXPANSION_MODEL",
   ]);
   try {
     delete process.env.SELFMEM_QUERY_EXPANSION_BASE_URL;
     delete process.env.SELFMEM_QUERY_EXPANSION_MODEL;
+    delete process.env.SELFMEM_QUERY_EXPANSION_MODE;
+    delete process.env.RECALLWEAVE_QUERY_EXPANSION_MODE;
     process.env.RECALLWEAVE_QUERY_EXPANSION_CALLS = "1";
     process.env.RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA = "1";
-    process.env.RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER = "openrouter,nvidia";
+    process.env.RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER = "openrouter,nvidia,deepseek";
     process.env.OPENROUTER_API_KEY = "fixture-openrouter-key";
     process.env.NVIDIA_API_KEY = "fixture-nvidia-key";
+    process.env.DEEPSEEK_API_KEY = "fixture-deepseek-key";
     process.env.OPENROUTER_QUERY_EXPANSION_MODEL = "moonshotai/kimi-k2.6:free";
     process.env.OPENROUTER_FALLBACK_QUERY_EXPANSION_MODEL = "qwen/qwen3-next-80b-a3b-instruct:free";
     const plans = queryExpansionPlans();
@@ -2186,6 +2254,12 @@ function runQueryExpansionParserSmoke() {
     assert.equal(plans[1]?.provider, "openrouter-openai-compatible");
     assert.equal(plans[1]?.model, "qwen/qwen3-next-80b-a3b-instruct:free");
     assert.equal(plans[2]?.provider, "nvidia-openai-compatible");
+    assert.equal(plans[3]?.provider, "deepseek-openai-compatible");
+    assert.equal(queryExpansionMode(), "off");
+    process.env.RECALLWEAVE_QUERY_EXPANSION_MODE = "planner";
+    assert.equal(queryExpansionMode(), "planner");
+    process.env.RECALLWEAVE_QUERY_EXPANSION_MODE = "rewrites";
+    assert.equal(queryExpansionMode(), "rewrites");
   } finally {
     restoreEnv(originalEnv);
   }
@@ -2197,6 +2271,65 @@ function runQueryExpansionParserSmoke() {
       acceptsJsonArrayPerLine: true,
       acceptsPlainLines: true,
       providerOrderFallbackSmoke: true,
+      defaultMode: "off",
+    })}\n`,
+  );
+}
+
+function runProviderRerankCascadeSmoke() {
+  const candidates = [
+    { outputId: "candidate-a", text: "contains the known answer", score: 0 },
+    { outputId: "candidate-b", text: "near miss", score: 0 },
+    { outputId: "candidate-c", text: "unranked tail with zero score", score: 0 },
+  ];
+  const ranked = [
+    { ...candidates[0], score: providerRerankCascadeScore(1, -99) },
+    { ...candidates[1], score: providerRerankCascadeScore(2, -100) },
+  ].sort(byScoreThenId);
+  const combined = appendRankedTail(ranked, candidates.slice(0, 2), candidates);
+  assert.deepEqual(
+    combined.map((candidate) => candidate.outputId),
+    ["candidate-a", "candidate-b", "candidate-c"],
+  );
+  assert.ok(combined[1].score > combined[2].score, "provider-ranked document must outrank unranked zero-score tail");
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "provider-rerank-cascade-smoke",
+      providerRankedDocsOutrankTail: true,
+      supportsNegativeRawScores: true,
+    })}\n`,
+  );
+}
+
+function runNvidiaAdapterParserSmoke() {
+  const candidates = [
+    { outputId: "wrong", text: "not it", score: 0 },
+    { outputId: "answer", text: "known answer passage", score: 0 },
+    { outputId: "tail", text: "unranked tail", score: 0 },
+  ];
+  const response = {
+    rankings: [
+      { index: 1, logit: -3.5 },
+      { index: 0, logit: -9.25 },
+    ],
+  };
+  const scores = rerankScoresFromNvidiaResponse(response);
+  const ranked = scores.map((item, rank) => {
+    const candidate = candidates[item.index];
+    assert.ok(candidate, "NVIDIA parser returned an invalid document index");
+    return { ...candidate, score: providerRerankCascadeScore(rank + 1, item.score) };
+  });
+  const combined = appendRankedTail(ranked, candidates.slice(0, 2), candidates);
+  assert.equal(combined[0].outputId, "answer");
+  assert.equal(combined[1].outputId, "wrong");
+  assert.equal(combined[2].outputId, "tail");
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "nvidia-adapter-parser-smoke",
+      acceptsRankingsLogitShape: true,
+      negativeLogitsPreserveProviderRank: true,
     })}\n`,
   );
 }
@@ -2405,6 +2538,17 @@ function queryExpansionPlans(options = {}) {
           apiKey: chooseProviderKey("openrouter", "query-expansion-fallback"),
         });
       }
+    } else if (provider === "deepseek" && providerKeyCount("deepseek") > 0) {
+      plans.push({
+        mode: "mixed-local-cloud",
+        provider: "deepseek-openai-compatible",
+        endpoint: openAiCompatibleChatEndpoint(process.env.DEEPSEEK_QUERY_EXPANSION_BASE_URL ?? process.env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com"),
+        model:
+          nonEmptyEnv("DEEPSEEK_QUERY_EXPANSION_MODEL", "RECALLWEAVE_DEEPSEEK_QUERY_EXPANSION_MODEL") ??
+          nonEmptyEnv("DEEPSEEK_FLASH_MODEL") ??
+          "deepseek-v4-flash",
+        apiKey: chooseProviderKey("deepseek", "query-expansion"),
+      });
     }
   }
   return plans;
@@ -2419,17 +2563,18 @@ function nonEmptyEnv(...names) {
 }
 
 function queryExpansionProviderOrder() {
-  const value = process.env.RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER ?? process.env.SELFMEM_QUERY_EXPANSION_PROVIDER_ORDER ?? "nvidia,gemini,openrouter";
+  const value = process.env.RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER ?? process.env.SELFMEM_QUERY_EXPANSION_PROVIDER_ORDER ?? "deepseek,nvidia,gemini,openrouter";
   const providers = splitProviderKeys(value)
     .map((provider) => provider.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
     .map((provider) => {
       if (provider.startsWith("nvidia")) return "nvidia";
       if (provider.startsWith("gemini") || provider.startsWith("google") || provider.startsWith("ai-studio")) return "gemini";
       if (provider.startsWith("openrouter")) return "openrouter";
+      if (provider.startsWith("deepseek")) return "deepseek";
       return provider;
     })
-    .filter((provider) => ["nvidia", "gemini", "openrouter"].includes(provider));
-  return [...new Set(providers)].length ? [...new Set(providers)] : ["nvidia", "gemini", "openrouter"];
+    .filter((provider) => ["deepseek", "nvidia", "gemini", "openrouter"].includes(provider));
+  return [...new Set(providers)].length ? [...new Set(providers)] : ["deepseek", "nvidia", "gemini", "openrouter"];
 }
 
 function openAiCompatibleChatEndpoint(baseUrl) {
@@ -2456,6 +2601,21 @@ function queryExpansionMaxAttempts() {
 
 function queryExpansionProviderFallbackAllowed() {
   return process.env.SELFMEM_QUERY_EXPANSION_ALLOW_PROVIDER_FALLBACK === "1";
+}
+
+function queryExpansionAuxWeight() {
+  const value = finiteNumberOrDefault(process.env.RECALLWEAVE_QUERY_EXPANSION_AUX_WEIGHT ?? process.env.SELFMEM_QUERY_EXPANSION_AUX_WEIGHT, 0.2);
+  return Math.max(0, Math.min(1, value));
+}
+
+function queryExpansionMode() {
+  const value = String(process.env.RECALLWEAVE_QUERY_EXPANSION_MODE ?? process.env.SELFMEM_QUERY_EXPANSION_MODE ?? "off")
+    .trim()
+    .toLowerCase();
+  if (["0", "false", "no", "disabled"].includes(value)) return "off";
+  if (["1", "true", "yes", "enabled", "provider", "providers", "cloud", "llm", "rewrite"].includes(value)) return "rewrites";
+  assert.ok(["off", "planner", "rewrites"].includes(value), `unsupported query expansion mode: ${value}`);
+  return value;
 }
 
 function queryExpansionFailureClass(error) {
@@ -2743,6 +2903,17 @@ function providerMockRerank(query, candidates) {
     ...candidate,
     score: round(candidate.score + reciprocalRankBoost(index + 1) + deterministicNoise(`${queryTextValue(query)}:${candidate.outputId}`) * 0.01),
   })).sort(byScoreThenId);
+}
+
+function providerRerankCascadeScore(rank, rawScore = 0) {
+  const rankValue = Math.max(1, finiteNumberOrDefault(rank, 1));
+  const boundedRawTieBreaker = Math.max(-1, Math.min(1, finiteNumberOrDefault(rawScore, 0))) / 1_000;
+  return round(1_000_000 - rankValue + boundedRawTieBreaker);
+}
+
+function appendRankedTail(ranked, selected, allCandidates) {
+  const tail = candidatesNotIn(selected, allCandidates).map((candidate) => ({ ...candidate, score: -1_000 }));
+  return [...ranked, ...tail].sort(byScoreThenId);
 }
 
 function deterministicNoise(value) {

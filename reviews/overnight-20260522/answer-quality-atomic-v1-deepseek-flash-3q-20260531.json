@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality",
+  "claimScope": "model-challenger",
+  "fixtureOnly": false,
+  "benchmark": "longmemeval",
+  "metricsOnly": true,
+  "publicSafe": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "readyForEndToEndMemoryScoreGate": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "callsProviderApis": true,
+  "sendsBenchmarkTextToProvider": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "generatedAt": "2026-05-31T18:00:12.353Z",
+  "target": {
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "judgeModel": "gpt-4o",
+    "answerModel": "gpt-4o"
+  },
+  "input": {
+    "source": "materialized-source-locked-longmemeval",
+    "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "querySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+    "materializerHash": "sha256:2518c535b701e7fa1be5bedb430672a7532f22e1afd500f731c1732cc97e6763",
+    "memoriesHash": "sha256:15231f5a9b17ce9499238ead09962b1d6cdcb2a6c1f9546db11bb12aa3cd7df6",
+    "answerLabelsHash": "sha256:0f85c1350ff6c601d1b8f3f5b8df8bb194ff8723041a47e363435863cc0b7ecc",
+    "targetAnswerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "materializationShard": {
+      "applied": true,
+      "startIndex": 0,
+      "endIndexExclusive": 3,
+      "totalQueryCount": 500,
+      "selectedCount": 3,
+      "requestedLimit": 3,
+      "selectedQuestionIdsHash": "sha256:e71a5dd2675a606477878bdab9edc3fd718bd8af4b34ea3fc04e00ea1e546f74"
+    },
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "datasetSlice": "longmemeval-s-cleaned-full-500-2026-05-25",
+    "queryCount": 3,
+    "totalQueryCount": 3,
+    "scoredQueryCount": 3,
+    "queryOffset": 0,
+    "queryLimit": null,
+    "scoredQueryStart": 0,
+    "scoredQueryEndExclusive": 3,
+    "queryShard": {
+      "startIndex": 0,
+      "endIndexExclusive": 3,
+      "totalQueryCount": 3,
+      "scoredQueryCount": 3,
+      "requestedLimit": null,
+      "completeDataset": true,
+      "rangeHash": "sha256:2500e1a008ffb9aef2778466c33e0b9913cb616065b8fc92042102e83f7734ce",
+      "selectedQueryIdHash": "sha256:91fa788becb0a827efdbea9bc69b55823e307f2a9c35398d0a0f95fdc887d321"
+    }
+  },
+  "provider": {
+    "answerModel": "deepseek-v4-flash",
+    "judgeModel": "deepseek-v4-flash",
+    "answerQualityCallsAllowed": true,
+    "publicDataConfirmed": true,
+    "callsMade": 12,
+    "callTimeoutMs": 120000,
+    "continueOnCallError": false,
+    "disableJsonResponseFormat": false,
+    "endpointLabel": "https://api.deepseek.com",
+    "endpointIsLocal": false
+  },
+  "scoringPolicy": {
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "exactTargetModelsRequired": false,
+    "localDiagnosticModelAllowed": false,
+    "challengerModelAllowed": true,
+    "localDiagnosticEndpointSatisfied": false,
+    "modelMismatchAllowed": true,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsLocalFullBenchmarkEvidence": false,
+    "countsAsModelChallengerBenchmarkEvidence": true
+  },
+  "metrics": {
+    "answerQuality": 66.6667,
+    "memoryScore": 66.6667,
+    "longmemevalScore": 66.6667,
+    "quality": 0.6667,
+    "judgeCorrectRate": 0.6667,
+    "answerLatencyP50Ms": 3339,
+    "answerLatencyP95Ms": 3583,
+    "contextTokensAvg": 801
+  },
+  "strategies": [
+    {
+      "strategy": "bm25-lite",
+      "metrics": {
+        "answerQuality": 66.6667,
+        "memoryScore": 66.6667,
+        "longmemevalScore": 66.6667,
+        "quality": 0.6667,
+        "judgeCorrectRate": 0.6667,
+        "answerLatencyP50Ms": 3339,
+        "answerLatencyP95Ms": 3583,
+        "contextTokensAvg": 801
+      },
+      "provider": {
+        "answerCalls": 3,
+        "judgeCalls": 3,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 120000,
+        "continueOnCallError": false,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 3,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:0d1bc54b855bcc96373faf19588ac56b91a37ccbfd9eaac1a8255e28f9eeebd3",
+          "judgeDecisionHash": "sha256:c0f1a2918e835c24b6531ff31aa1137daeedbf47484663c933dcf17ac899ee66",
+          "contextResultCount": 4,
+          "responseTotal": 4,
+          "elapsedMs": 2910,
+          "contextTokens": 801,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1da92c311551a547",
+          "queryHash": "fba2d6c19a241e2c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:26656faa146a01f01a3268029d3f54b2010f8bd47c2343920e6e2a5aa11e1dc4",
+          "contextResultCount": 5,
+          "responseTotal": 5,
+          "elapsedMs": 3339,
+          "contextTokens": 801,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:fa15a95c7963483c32191034c694c093be9332c5061ea5bbe54ecca16e89fcd2",
+          "judgeDecisionHash": "sha256:c0f1a2918e835c24b6531ff31aa1137daeedbf47484663c933dcf17ac899ee66",
+          "contextResultCount": 5,
+          "responseTotal": 5,
+          "elapsedMs": 3583,
+          "contextTokens": 800,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "metrics": {
+        "answerQuality": 66.6667,
+        "memoryScore": 66.6667,
+        "longmemevalScore": 66.6667,
+        "quality": 0.6667,
+        "judgeCorrectRate": 0.6667,
+        "answerLatencyP50Ms": 3650,
+        "answerLatencyP95Ms": 4376,
+        "contextTokensAvg": 800
+      },
+      "provider": {
+        "answerCalls": 3,
+        "judgeCalls": 3,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "callTimeoutMs": 120000,
+        "continueOnCallError": false,
+        "fixtureJudge": false
+      },
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "scoredQueryCount": 3,
+      "resultFingerprints": [
+        {
+          "queryIdHash": "3d6e37516f59af91",
+          "queryHash": "0915113b6d7294ca",
+          "candidateAnswerHash": "sha256:0d1bc54b855bcc96373faf19588ac56b91a37ccbfd9eaac1a8255e28f9eeebd3",
+          "judgeDecisionHash": "sha256:7f25ea63f193dab33035a8819a1e2e0ce4748cf7ead72d1890b9f47cba96ab64",
+          "contextResultCount": 5,
+          "responseTotal": 5,
+          "elapsedMs": 3142,
+          "contextTokens": 800,
+          "score": 100,
+          "correct": true
+        },
+        {
+          "queryIdHash": "1da92c311551a547",
+          "queryHash": "fba2d6c19a241e2c",
+          "candidateAnswerHash": "sha256:b23a6a8439c0dde5515893e7c90c1e3233b8616e634470f20dc4928bcf3609bc",
+          "judgeDecisionHash": "sha256:472a07bf57aee44afb8bea7f8aae5e7dbb94e39042e84aee44403880a7ea62db",
+          "contextResultCount": 4,
+          "responseTotal": 4,
+          "elapsedMs": 3650,
+          "contextTokens": 800,
+          "score": 0,
+          "correct": false
+        },
+        {
+          "queryIdHash": "83e8550a52300471",
+          "queryHash": "1475d8cea39740e5",
+          "candidateAnswerHash": "sha256:8815645089c5b3d4a3d0701c80de3e23fac9dc8fde06970c255ed7906fa4debf",
+          "judgeDecisionHash": "sha256:157b0e170c0379608888456b9646bb325acc6bc9ddd15812a27581adbfc43c56",
+          "contextResultCount": 4,
+          "responseTotal": 4,
+          "elapsedMs": 4376,
+          "contextTokens": 799,
+          "score": 100,
+          "correct": true
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "strategy": "bm25-lite",
+    "answerQuality": 66.6667,
+    "judgeCorrectRate": 0.6667,
+    "answerLatencyP50Ms": 3339
+  },
+  "reviewerApprovalCount": 0,
+  "privacyLeakCount": 0,
+  "redactionFailureCount": 0,
+  "safety": {
+    "metricsOnly": true,
+    "publicSafe": true,
+    "rawQuestionsIncluded": false,
+    "rawAnswersIncluded": false,
+    "rawMemoryIncluded": false,
+    "rawTranscriptIncluded": false,
+    "privateInputsStoredOutsideRepository": true
+  },
+  "nextActions": [
+    "Run benchmark:memory-score:result-gate with this result.",
+    "Send the exact metrics-only packet to independent reviewers before public benchmark wording changes."
+  ]
+}

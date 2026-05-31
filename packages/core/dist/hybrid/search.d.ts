@@ -24,6 +24,11 @@ export interface HybridSearchTrace {
         reviewCandidates: DedupeResult["reviewCandidates"];
         skippedUnsafe: number;
     };
+    ranking: {
+        mode: string;
+        candidateCount: number;
+        selectedCount: number;
+    };
     distillation?: DistillationTrace;
 }
 export interface HybridSearchResult {
@@ -31,6 +36,9 @@ export interface HybridSearchResult {
     context: ReturnType<typeof compileTypedContext>;
     trace: HybridSearchTrace;
 }
+export type HybridRanker = (query: string, candidates: NormalizedHybridCandidate[], options: {
+    topK: number;
+}) => Promise<NormalizedHybridCandidate[]> | NormalizedHybridCandidate[];
 export declare function searchHybrid(input: {
     query: string;
     sources: HybridSearchSource[];
@@ -39,6 +47,8 @@ export declare function searchHybrid(input: {
     distill?: boolean;
     compactWriter?: CompactWriter;
     distillationMaxMemories?: number;
+    ranker?: HybridRanker;
+    rankerMode?: string;
 }): Promise<HybridSearchResult>;
 export declare function makeStaticHybridSource(input: {
     id: string;

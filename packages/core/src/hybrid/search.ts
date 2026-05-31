@@ -26,6 +26,11 @@ export interface HybridSearchTrace {
     reviewCandidates: DedupeResult["reviewCandidates"];
     skippedUnsafe: number;
   };
+  ranking: {
+    mode: string;
+    candidateCount: number;
+    selectedCount: number;
+  };
   distillation?: DistillationTrace;
 }
 
@@ -35,6 +40,12 @@ export interface HybridSearchResult {
   trace: HybridSearchTrace;
 }
 
+export type HybridRanker = (
+  query: string,
+  candidates: NormalizedHybridCandidate[],
+  options: { topK: number },
+) => Promise<NormalizedHybridCandidate[]> | NormalizedHybridCandidate[];
+
 export async function searchHybrid(input: {
   query: string;
   sources: HybridSearchSource[];
@@ -43,6 +54,8 @@ export async function searchHybrid(input: {
   distill?: boolean;
   compactWriter?: CompactWriter;
   distillationMaxMemories?: number;
+  ranker?: HybridRanker;
+  rankerMode?: string;
 }): Promise<HybridSearchResult> {
   const redacted = redactPrivate(input.query);
   if (redacted.fullyPrivate) {
@@ -85,7 +98,8 @@ export async function searchHybrid(input: {
     })
     : undefined;
   const searchableCandidates = distillation?.memories.length ? distillation.memories : deduped.candidates;
-  const ranked = rerankLexically(redacted.text, searchableCandidates).slice(0, topK);
+  const ranker = input.ranker ?? ((query, candidates, options) => rerankLexically(query, candidates).slice(0, options.topK));
+  const ranked = (await ranker(redacted.text, searchableCandidates, { topK })).slice(0, topK);
   const contextInput = {
     query: redacted.text,
     candidates: ranked.map((candidate) => ({
@@ -113,6 +127,11 @@ export async function searchHybrid(input: {
         groups: deduped.groups,
         reviewCandidates: deduped.reviewCandidates,
         skippedUnsafe: deduped.skippedUnsafe,
+      },
+      ranking: {
+        mode: input.rankerMode ?? "lexical",
+        candidateCount: searchableCandidates.length,
+        selectedCount: ranked.length,
       },
       ...(distillation ? { distillation: distillation.trace } : {}),
     },
@@ -156,5 +175,9 @@ function sanitizeError(message: string): string {
   return message
     .replace(/sm_[A-Za-z0-9_-]{20,}/g, "[REDACTED_SUPERMEMORY_KEY]")
     .replace(/pa-[A-Za-z0-9_-]{20,}/g, "[REDACTED_VOYAGE_KEY]")
+    .replace(/AIza[A-Za-z0-9_-]{20,}/g, "[REDACTED_GOOGLE_KEY]")
+    .replace(/nvapi-[A-Za-z0-9_-]{20,}/g, "[REDACTED_NVIDIA_KEY]")
+    .replace(/jina_[A-Za-z0-9_-]{20,}/g, "[REDACTED_JINA_KEY]")
+    .replace(/sk-(?:proj-)?[A-Za-z0-9_-]{20,}/g, "[REDACTED_API_KEY]")
     .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, "Bearer [REDACTED]");
 }

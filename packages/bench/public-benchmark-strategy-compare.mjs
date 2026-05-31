@@ -76,6 +76,11 @@ const privatePathOutputPattern =
   /(\/Users\/[^\s"'`]+|\/Volumes\/[^\s"'`]+|\/private\/[^\s"'`]+|\/var\/folders\/[^\s"'`]+|\/tmp\/[^\s"'`]+|\/home\/[^\s"'`]+|[A-Za-z]:\\Users\\[^\s"'`]+|\.hermes\/profiles[^\s"'`]*|\.openclaw[^\s"'`]*)/gi;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
+if (args.promotionGateSmoke === true) {
+  runPromotionGateSmoke();
+  process.exit(0);
+}
+
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
 assertGateContract(gate, strategies, { allowSoloSmoke });
 
@@ -499,6 +504,7 @@ function hybridPromotionDecision(items) {
   const qualityBeats = hybridQuality > controlQuality;
   const qualityTies = hybridQuality === controlQuality;
   const latencyImproves = hybridLatency <= controlLatency * 0.85;
+  const pairedDeltaVsBm25 = pairedQualityDelta(hybridItems.find((item) => item.strategy === bestHybrid.strategy), control);
   return {
     kind: "hybrid",
     bestHybridStrategy: bestHybrid.strategy,
@@ -510,6 +516,7 @@ function hybridPromotionDecision(items) {
         : "Keep bm25-lite as control/fallback; hybrid-family arm has not earned promotion on this slice.",
     qualityDeltaVsBm25: round(hybridQuality - controlQuality),
     latencyDeltaVsBm25: round(hybridLatency - controlLatency),
+    pairedDeltaVsBm25,
   };
 }
 
@@ -538,10 +545,13 @@ function providerPromotionDecision(items) {
   const qualityTiesBothControls = providerQuality === qualityFloor;
   const latencyImproves = providerLatency <= latencyFloor * 0.85;
   const promoteProvider = qualityBeatsBothControls || (qualityTiesBothControls && latencyImproves);
+  const bestProviderItem = providerItems.find((item) => item.strategy === bestProvider.strategy) ?? null;
+  const pairedDeltaVsBm25 = pairedQualityDelta(bestProviderItem, control);
+  const pairedDeltaVsFullHybrid = pairedQualityDelta(bestProviderItem, fullHybridControl);
   return {
     kind: "provider",
     bestProviderStrategy: bestProvider.strategy,
-    bestHybridStrategy: bestProvider.strategy,
+    bestHybridStrategy: fullHybridControl.strategy,
     promoteProvider,
     promoteHybrid: promoteProvider,
     reason: qualityBeatsBothControls
@@ -553,12 +563,129 @@ function providerPromotionDecision(items) {
     qualityDeltaVsFullHybrid: round(providerQuality - fullHybridQuality),
     latencyDeltaVsBm25: round(providerLatency - controlLatency),
     latencyDeltaVsFullHybrid: round(providerLatency - fullHybridLatency),
+    pairedDeltaVsBm25,
+    pairedDeltaVsFullHybrid,
+  };
+}
+
+function pairedQualityDelta(candidate, control) {
+  if (!candidate || !control) return null;
+  const controlByQuery = new Map((control.resultFingerprints ?? []).map((item) => [item.queryIdHash, item]));
+  const diffs = [];
+  for (const item of candidate.resultFingerprints ?? []) {
+    const controlItem = controlByQuery.get(item.queryIdHash);
+    if (!controlItem) continue;
+    diffs.push(queryFingerprintQuality(item) - queryFingerprintQuality(controlItem));
+  }
+  if (diffs.length === 0) {
+    return {
+      candidateStrategy: candidate.strategy,
+      controlStrategy: control.strategy,
+      pairedQueryCount: 0,
+      mean: null,
+      ci95: null,
+      ciExcludesZero: false,
+    };
+  }
+  const mean = average(diffs);
+  const ci95 = bootstrapMeanCi(diffs, `${candidate.strategy}:${control.strategy}:${diffs.length}`);
+  return {
+    candidateStrategy: candidate.strategy,
+    controlStrategy: control.strategy,
+    pairedQueryCount: diffs.length,
+    mean: round(mean),
+    ci95,
+    ciExcludesZero: Boolean(ci95 && (ci95.lower > 0 || ci95.upper < 0)),
+  };
+}
+
+function queryFingerprintQuality(item) {
+  return (
+    Number(item?.pAt1 ?? 0) +
+    Number(item?.recallAt5 ?? 0) +
+    Number(item?.recallAt10 ?? 0) +
+    Number(item?.ndcgAt10 ?? 0)
+  ) / 4;
+}
+
+function bootstrapMeanCi(values, seedText, iterations = 500) {
+  const clean = values.map(Number).filter(Number.isFinite);
+  if (clean.length === 0) return null;
+  if (clean.length === 1) return { lower: round(clean[0]), upper: round(clean[0]), iterations: 0 };
+  const random = seededRandom(seedText);
+  const means = [];
+  for (let index = 0; index < iterations; index += 1) {
+    let sum = 0;
+    for (let draw = 0; draw < clean.length; draw += 1) {
+      sum += clean[Math.floor(random() * clean.length)];
+    }
+    means.push(sum / clean.length);
+  }
+  means.sort((left, right) => left - right);
+  return {
+    lower: round(means[Math.floor((iterations - 1) * 0.025)]),
+    upper: round(means[Math.ceil((iterations - 1) * 0.975)]),
+    iterations,
+  };
+}
+
+function seededRandom(seedText) {
+  let state = Number.parseInt(stableHash(seedText).slice(0, 8), 16) || 1;
+  return () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 0x100000000;
   };
 }
 
 function promotionDecision(value, items) {
   if (value === "provider") return providerPromotionDecision(items);
   return hybridPromotionDecision(items);
+}
+
+function runPromotionGateSmoke() {
+  const providerDecision = providerPromotionDecision([
+    promotionSmokeItem("bm25-lite", [0.45, 0.45, 0.45], 4),
+    promotionSmokeItem("full-hybrid-rerank", [0.5, 0.5, 0.5], 5),
+    promotionSmokeItem("cloud-voyage4-lite-voyage-lite", [0.8, 0.75, 0.7], 6),
+  ]);
+  assert.equal(providerDecision.bestProviderStrategy, "cloud-voyage4-lite-voyage-lite");
+  assert.equal(providerDecision.bestHybridStrategy, "full-hybrid-rerank");
+  assert.equal(providerDecision.pairedDeltaVsBm25?.pairedQueryCount, 3);
+  assert.equal(providerDecision.pairedDeltaVsFullHybrid?.pairedQueryCount, 3);
+  assert.ok(providerDecision.pairedDeltaVsBm25?.ci95?.lower > 0);
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "promotion-gate-smoke",
+      providerBestHybridStrategyTracksControl: true,
+      pairedDeltasPresent: true,
+      bootstrapCiPresent: true,
+    })}\n`,
+  );
+}
+
+function promotionSmokeItem(strategy, qualities, latencyP50Ms) {
+  const averageQuality = average(qualities);
+  return {
+    strategy,
+    metrics: {
+      quality: round(averageQuality),
+      pAt1: round(averageQuality),
+      recallAt5: round(averageQuality),
+      recallAt10: round(averageQuality),
+      ndcgAt10: round(averageQuality),
+      latencyP50Ms,
+    },
+    resultFingerprints: qualities.map((quality, index) => ({
+      queryIdHash: `query-${index}`,
+      pAt1: quality,
+      recallAt5: quality,
+      recallAt10: quality,
+      ndcgAt10: quality,
+    })),
+  };
 }
 
 function renderMarkdown(value) {
@@ -786,6 +913,11 @@ function normalizeGate(value) {
 
 function round(value) {
   return Number(Number(value).toFixed(4));
+}
+
+function average(values) {
+  const clean = values.map(Number).filter(Number.isFinite);
+  return clean.length ? clean.reduce((sum, value) => sum + value, 0) / clean.length : 0;
 }
 
 function runNode(argv, options = {}) {

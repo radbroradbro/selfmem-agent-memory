@@ -198,6 +198,14 @@ try {
   assert.equal(benchmarkSummary.aggregate.exactIdentifierAccuracy, 1);
   assert.ok(benchmarkSummary.aggregate.averageNoiseReductionRatio >= 0.2);
   assert.ok(benchmarkSummary.scenarios.every((scenario) => scenario.passed));
+  assert.equal(benchmarkSummary.memoryBenchmark?.localFull?.scoredQueries, 500);
+  assert.equal(benchmarkSummary.memoryBenchmark?.localFull?.totalQueries, 500);
+  assert.equal(benchmarkSummary.memoryBenchmark?.localFull?.bestStrategy, "local-apple-qwen3-0_6b-local-rerank");
+  assert.equal(benchmarkSummary.memoryBenchmark?.sotaGate?.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
+  assert.equal(benchmarkSummary.memoryBenchmark?.providerWaves?.bestZeroDollarLane, "nvidia");
+  assert.equal(benchmarkSummary.memoryBenchmark?.atomicMethodSmoke?.method, "atomic-memory-v1");
+  assert.equal(benchmarkSummary.memoryBenchmark?.atomicMethodSmoke?.scoredQueries, 3);
+  assert.equal(benchmarkSummary.memoryBenchmark?.atomicMethodSmoke?.gateStatus, "BLOCKED_END_TO_END_MEMORY_SCORE");
   assert.equal(canaryRollout.mode, "one-agent-canary-rollout");
   assert.equal(canaryRollout.writesRealFiles, false);
   assert.equal(canaryRollout.metricsOnly, true);
@@ -231,6 +239,7 @@ try {
   assert.ok(modelMatrix.localLane.runtime.includes("llama.cpp"));
   assert.ok(modelMatrix.arms.some((arm) => arm.id === "cloud-nvidia-nemotron-1b"));
   assert.ok(modelMatrix.arms.some((arm) => arm.id === "local-apple-qwen3-0_6b-local-rerank"));
+  assert.ok(modelMatrix.arms.some((arm) => arm.id === "atomic-memory-v1-deepseek-flash-smoke"));
   assert.ok(modelMatrix.gates.some((gate) => gate.includes("matched source-locked canary")));
   assert.equal(promptContextPreview.ok, true);
   assert.equal(promptContextPreview.mode, "prompt-context-preview");
@@ -249,8 +258,11 @@ try {
   assert.equal(releaseReadiness.safetyBoundary.commitsRawTranscripts, false);
   assert.equal(releaseReadiness.safetyBoundary.commitsCredentials, false);
   assert.equal(releaseReadiness.safetyBoundary.enablesHostedWriteBack, false);
-  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion, "success");
+  assert.ok(["success", "local"].includes(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion));
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.localReleaseCheck, "passed");
   assert.ok(releaseReadiness.provenPreviewSurfaces.includes("brain-ui-prompt-context-preview"));
+  assert.ok(releaseReadiness.provenPreviewSurfaces.includes("local-full-500-query-diagnostic-score"));
+  assert.ok(releaseReadiness.provenPreviewSurfaces.includes("atomic-memory-v1-answer-quality-smoke"));
   assert.ok(releaseReadiness.remainingBlockers.includes("human-public-launch-approval-required"));
   assert.ok(releaseReadiness.manualActions.length >= 4);
   assert.equal(localAudit.ok, true);

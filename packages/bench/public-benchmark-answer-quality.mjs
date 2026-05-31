@@ -317,6 +317,8 @@ function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memorie
       materializerHash,
       memoriesHash,
       answerLabelsHash,
+      targetAnswerLabelsHash: querySet.authoring?.targetAnswerLabelsHash ?? null,
+      materializationShard: querySet.authoring?.materializationShard ?? null,
       scoringCodeHash: target.benchmark?.scoringCodeHash ?? null,
       datasetSlice: querySet.datasetSlice ?? null,
       queryCount: querySelection.totalQueryCount,

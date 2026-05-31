@@ -1004,9 +1004,14 @@ function renderSessionCompactionAudit() {
 
 function renderBenchmarkDashboard() {
   const packet = buildBenchmarkDashboard(state.benchmarkSummary);
+  const memory = packet.memoryBenchmark ?? {};
+  const localFull = memory.localFull ?? {};
+  const providerWaves = memory.providerWaves ?? {};
+  const sotaGate = memory.sotaGate ?? {};
+  const atomicMethodSmoke = memory.atomicMethodSmoke ?? {};
   benchmarkStatus.textContent = packet.verdict;
   benchmarkStatus.dataset.verdict = packet.verdict;
-  benchmarkSummary.replaceChildren(
+  const summaryStats = [
     stat("Scenarios", `${packet.aggregate.passedScenarios}/${packet.suite.scenarioCount}`),
     stat("Failures", packet.aggregate.failedScenarios),
     stat("Leaks", packet.aggregate.privacyLeakCount),
@@ -1015,7 +1020,24 @@ function renderBenchmarkDashboard() {
     stat("Term cov", `${Math.round(packet.aggregate.averageRequiredTermCoverage * 100)}%`),
     stat("Noise", `${Math.round(packet.aggregate.averageNoiseReductionRatio * 100)}%`),
     stat("Candidates", packet.aggregate.totalOutputCandidates),
-  );
+  ];
+  if (localFull.totalQueries > 0) {
+    summaryStats.push(
+      stat("Local full", `${localFull.bestAnswerQuality.toFixed(1)}%`),
+      stat("Coverage", `${localFull.scoredQueries}/${localFull.totalQueries}`),
+      stat("Delta BM25", `${localFull.deltaVsBm25 >= 0 ? "+" : ""}${localFull.deltaVsBm25.toFixed(2)}`),
+      stat("SOTA gate", sotaGate.status ? humanLabel(sotaGate.status) : "Blocked"),
+      stat("Provider waves", `${providerWaves.completedReports}/${providerWaves.reports}`),
+      stat("Best free lane", providerWaves.bestZeroDollarLane || "n/a"),
+    );
+  }
+  if (atomicMethodSmoke.scoredQueries > 0) {
+    summaryStats.push(
+      stat("Atomic smoke", `${atomicMethodSmoke.answerQuality.toFixed(1)}%`),
+      stat("Atomic coverage", `${atomicMethodSmoke.scoredQueries}/${atomicMethodSmoke.totalQueries}`),
+    );
+  }
+  benchmarkSummary.replaceChildren(...summaryStats);
 
   benchmarkScenarios.replaceChildren();
   for (const scenario of packet.scenarios) {
@@ -1030,9 +1052,46 @@ function renderBenchmarkDashboard() {
     item.append(strong, span, small);
     benchmarkScenarios.append(item);
   }
+  for (const strategy of memory.strategies ?? []) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    const isBest = strategy.id === localFull.bestStrategy;
+    item.dataset.status = isBest ? "pass" : "neutral";
+    strong.textContent = isBest ? "leader" : "arm";
+    span.textContent = humanLabel(strategy.id);
+    small.textContent = `${strategy.answerQuality.toFixed(3)} answer quality | ${Math.round(strategy.correctRate * 100)}% judged correct | ${Math.round(strategy.p50LatencyMs)} ms p50`;
+    item.append(strong, span, small);
+    benchmarkScenarios.append(item);
+  }
+  if (atomicMethodSmoke.scoredQueries > 0) {
+    const item = document.createElement("li");
+    const strong = document.createElement("strong");
+    const span = document.createElement("span");
+    const small = document.createElement("small");
+    item.dataset.status = atomicMethodSmoke.gateStatus?.includes("BLOCKED") ? "neutral" : "pass";
+    strong.textContent = "smoke";
+    span.textContent = `${humanLabel(atomicMethodSmoke.method)} via ${humanLabel(atomicMethodSmoke.bestStrategy)}`;
+    small.textContent = `${atomicMethodSmoke.answerQuality.toFixed(3)} answer quality | ${Math.round(atomicMethodSmoke.correctRate * 100)}% judged correct | ${atomicMethodSmoke.scoredQueries}/${atomicMethodSmoke.totalQueries} shard | ${humanLabel(atomicMethodSmoke.gateStatus || "blocked")}`;
+    item.append(strong, span, small);
+    benchmarkScenarios.append(item);
+  }
 
   benchmarkCaveats.replaceChildren();
-  for (const caveat of packet.caveats) {
+  const caveats = [...packet.caveats];
+  if (localFull.totalQueries > 0) {
+    caveats.push(
+      `${memory.benchmark} local-full score is diagnostic evidence only; public SOTA claims stay blocked.`,
+      `${sotaGate.primaryReportedTarget || "reported target"} remains blocked by ${sotaGate.blockers.length} active gate items.`,
+    );
+  }
+  if (atomicMethodSmoke.scoredQueries > 0) {
+    caveats.push(
+      `${humanLabel(atomicMethodSmoke.method)} ${atomicMethodSmoke.claimScope || "challenger"} smoke covers ${atomicMethodSmoke.scoredQueries}/${atomicMethodSmoke.totalQueries} questions only and does not count as production or SOTA evidence.`,
+    );
+  }
+  for (const caveat of caveats) {
     const item = document.createElement("li");
     const strong = document.createElement("strong");
     const span = document.createElement("span");

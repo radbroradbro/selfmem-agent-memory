@@ -524,6 +524,7 @@ function writePrivateBenchmarkInputs(options) {
       memoryRecordCount: memories.length,
       contextualSourceChunkCount: memories.filter((item) => item.metadata?.kind === "contextual_source_chunk").length,
       contextualIndexMemoryCount: memories.filter((item) => item.metadata?.kind === "contextual_index").length,
+      atomicMemoryCount: memories.filter((item) => item.metadata?.kind === "atomic_memory").length,
       rawSessionMemoryCount: memories.filter((item) => item.metadata?.kind === "raw_session").length,
       expectedResultRefCount: expectedRefs,
       redactionStats,
@@ -701,6 +702,10 @@ function memoryRecordsForSession(input) {
     return chunks.map((chunkLines, index) => contextualSourceChunkRecord({ ...input, chunkLines, index, chunks, date }));
   }
 
+  if (memoryMethod === "atomic-memory-v1") {
+    return chunks.flatMap((chunkLines, index) => atomicMemoryRecordsForChunk({ ...input, chunkLines, index, chunks, date }));
+  }
+
   return chunks.flatMap((chunkLines, index) => {
     const chunkText = chunkLines.join("\n");
     const terms = salientTerms(chunkText, 12);
@@ -794,6 +799,97 @@ function contextualSourceChunkRecord(input) {
         sourceRetention: "private-source-chunk",
       },
   };
+}
+
+function atomicMemoryRecordsForChunk(input) {
+  const chunkText = input.chunkLines.join("\n");
+  const terms = input.terms ?? salientTerms(chunkText, 16);
+  const title = terms.length > 0 ? terms.slice(0, 6).join(" ") : `session ${shortHash(input.sessionId)}`;
+  const eventDate = firstDateLikeText(chunkText) ?? input.date;
+  const source = contextualSourceChunkRecord({ ...input, terms, title, eventDate });
+  const sourceContentHash = `sha256:${stableHash(normalizeText(source.content))}`;
+  const atomId = `${input.sessionId}#atom-${String(input.index + 1).padStart(3, "0")}`;
+  const facts = atomicFactLines(input.chunkLines);
+  return [
+    {
+      ...source,
+      metadata: {
+        ...source.metadata,
+        retrievalRole: "source",
+        indexedBy: atomId,
+      },
+    },
+    {
+      id: atomId,
+      content: atomicMemoryContent({
+        sessionId: input.sessionId,
+        date: input.date,
+        eventDate,
+        title,
+        terms,
+        facts,
+        chunkIndex: input.index,
+        chunkCount: input.chunks.length,
+        sourceChunkId: source.id,
+      }),
+      metadata: {
+        benchmark: "longmemeval",
+        source: "MemoryBench LongMemEval-S cleaned",
+        kind: "atomic_memory",
+        retrievalRole: "index",
+        sourceChunkId: source.id,
+        rehydrateId: source.id,
+        sourceContentHash,
+        sourceEstimatedTokens: estimateTokens(source.content),
+        parentSessionId: input.sessionId,
+        date: input.date,
+        documentDate: input.date,
+        eventDate,
+        title,
+        topic: terms.slice(0, 5).join(" "),
+        topicPath: "Benchmarks / LongMemEval-S / atomic-memory",
+        subtopic: terms.join(" "),
+        subtopicPath: `${input.date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "atomic memory"}`,
+        chunkIndex: input.index,
+        chunkCount: input.chunks.length,
+        atomicFactCount: facts.length,
+        sourceRetention: "private-source-chunk",
+      },
+    },
+  ];
+}
+
+function atomicMemoryContent(input) {
+  return [
+    `Atomic memory: ${input.title}`,
+    input.date ? `Document date: ${input.date}` : null,
+    input.eventDate ? `Event date: ${input.eventDate}` : null,
+    `Topic: ${input.terms.slice(0, 5).join(" ") || "source session"}`,
+    `Subtopic: ${input.terms.join(" ") || "source chunk"}`,
+    `Session: ${input.sessionId}`,
+    `Source chunk: ${input.sourceChunkId}`,
+    `Chunk: ${input.chunkIndex + 1}/${input.chunkCount}`,
+    "Facts:",
+    ...input.facts.map((fact) => `- ${fact}`),
+    `Key terms: ${input.terms.join(", ")}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function atomicFactLines(lines) {
+  const facts = [];
+  for (const line of lines) {
+    const cleaned = String(line ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!cleaned) continue;
+    const withoutRole = cleaned.replace(/^(User|Assistant|System|Message):\s*/i, "");
+    if (!withoutRole) continue;
+    facts.push(withoutRole.slice(0, 260));
+    if (facts.length >= 8) break;
+  }
+  return facts.length ? facts : ["Source chunk contains benchmark memory context."];
 }
 
 function contextualIndexContent(input) {
@@ -1118,12 +1214,12 @@ function normalizeRetrievalStrategy(value) {
 
 function normalizeMemoryMethod(value) {
   const method = String(value ?? "").trim().toLowerCase();
-  assert.ok(["session-v1", "contextual-source-chunk-v1", "contextual-index-source-chunk-v1"].includes(method), `unknown memory method: ${method}`);
+  assert.ok(["session-v1", "contextual-source-chunk-v1", "contextual-index-source-chunk-v1", "atomic-memory-v1"].includes(method), `unknown memory method: ${method}`);
   return method;
 }
 
 function usesContextualChunkRefs() {
-  return memoryMethod === "contextual-source-chunk-v1" || memoryMethod === "contextual-index-source-chunk-v1";
+  return memoryMethod === "contextual-source-chunk-v1" || memoryMethod === "contextual-index-source-chunk-v1" || memoryMethod === "atomic-memory-v1";
 }
 
 function resolveInputPath(value) {

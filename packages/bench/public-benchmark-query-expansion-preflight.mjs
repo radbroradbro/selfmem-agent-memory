@@ -27,6 +27,7 @@ const cloudEnv = {
   nvidia: providerPresence(["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVAPI_KEY", "NVAPI_KEYS", "NVIDIA_API_KEY_FILE", "NVIDIA_API_KEYS_FILE", "NVAPI_KEY_FILE", "NVAPI_KEYS_FILE"]),
   gemini: providerPresence(["GEMINI_API_KEY", "GEMINI_API_KEYS", "GOOGLE_API_KEY", "GOOGLE_API_KEYS", "AI_STUDIO_API_KEY", "AI_STUDIO_API_KEYS", "GEMINI_API_KEY_FILE", "GEMINI_API_KEYS_FILE"]),
   openrouter: providerPresence(["OPENROUTER_API_KEY", "OPENROUTER_API_KEYS", "OPENROUTER_API_KEY_FILE", "OPENROUTER_API_KEYS_FILE"]),
+  deepseek: providerPresence(["DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS", "DEEPSEEK_API_KEY_FILE", "DEEPSEEK_API_KEYS_FILE"]),
 };
 const consent = {
   providerCalls: truthyEnv("RECALLWEAVE_QUERY_EXPANSION_CALLS") || truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS"),
@@ -58,7 +59,12 @@ const implementationContract = {
   liveQueryExpansionPlanPresent: /function queryExpansionPlan\(/.test(implementationText),
   openAiCompatibleQueryExpansionPresent: /function openAiCompatibleQueryExpansion\(/.test(implementationText),
   geminiQueryExpansionPresent: /function geminiQueryExpansion\(/.test(implementationText),
-  deterministicFallbackPresent: /recordQueryExpansionFallback\("deterministic-proxy-not-configured"\)/.test(implementationText),
+  deterministicFallbackPresent:
+    /recordQueryExpansionFallback\("deterministic-proxy-not-configured"\)/.test(implementationText) ||
+    (/recordQueryExpansionFallback\("provider-not-configured"\)/.test(implementationText) &&
+      /recordQueryExpansionFallback\("planner-deterministic-proxy"\)/.test(implementationText)),
+  defaultModeOffPresent: /function queryExpansionMode\(\)/.test(implementationText) && /"off"\)/.test(implementationText),
+  auxiliaryRewriteLanePresent: /query-expansion-aux/.test(implementationText) && /queryExpansionAuxWeight/.test(implementationText),
   metricsOnlyStatsPresent: /queryExpansionOnlyCurrentQuerySent/.test(implementationText) && /queryExpansionStoredMemoriesSent/.test(implementationText),
 };
 implementationContract.liveLlmExpansionWiringPresent =
@@ -77,7 +83,7 @@ const selectedMode = pureLocalReady
     : "BLOCKED_QUERY_EXPANSION_ENV";
 
 const candidatePolicy = {
-  currentAsOf: "2026-05-25",
+  currentAsOf: "2026-05-31",
   defaultState: "off",
   pureLocalCandidates: [
     {
@@ -111,6 +117,12 @@ const candidatePolicy = {
       role: "cloud query expansion challenger if NVIDIA is unavailable",
       sourceUse: "default-cloud-configured",
       env: ["RECALLWEAVE_QUERY_EXPANSION_CALLS", "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA", "GEMINI_API_KEY or GEMINI_API_KEY_FILE"],
+    },
+    {
+      family: "DeepSeek direct",
+      role: "cheap/high-context query expansion and reviewer fallback without consuming NVIDIA hosted capacity",
+      sourceUse: "provider-plan-configured",
+      env: ["RECALLWEAVE_QUERY_EXPANSION_CALLS", "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA", "DEEPSEEK_API_KEY or DEEPSEEK_API_KEYS_FILE"],
     },
   ],
   labelRule: "A run with cloud query expansion must be reported as mixed local-plus-cloud, never as pure local.",
@@ -216,13 +228,38 @@ function envPresence(name) {
 
 function providerPresence(names) {
   const presentNames = names.filter((name) => envPresence(name).present);
+  const keyCount = uniqueStrings(names.flatMap((name) => providerKeyValues(name))).length;
   return {
-    present: presentNames.length > 0,
-    keyCount: presentNames.length,
+    present: keyCount > 0,
+    keyCount,
     envNames: names,
     presentEnvNames: presentNames,
     valuesPrinted: false,
   };
+}
+
+function providerKeyValues(name) {
+  const value = process.env[name];
+  if (!value || !String(value).trim()) return [];
+  if (/_(?:KEYS?_)?FILE$/i.test(name) || /_FILES$/i.test(name)) {
+    return splitProviderValues(value).flatMap((file) => {
+      const resolved = resolve(file);
+      if (!existsSync(resolved)) return [];
+      return splitProviderValues(readFileSync(resolved, "utf8"));
+    });
+  }
+  return splitProviderValues(value);
+}
+
+function splitProviderValues(value) {
+  return String(value ?? "")
+    .split(/[,\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function uniqueStrings(values) {
+  return [...new Set(values.map((value) => String(value ?? "").trim()).filter(Boolean))];
 }
 
 function truthyEnv(name) {

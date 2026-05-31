@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "release-readiness-console",
-  "generatedAt": "2026-05-22T18:15:34.000Z",
+  "generatedAt": "2026-05-31T07:12:17.768Z",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
   "repository": "example/recallweave",
@@ -13,9 +13,9 @@
     "mergeable": true
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "e043d6b122773b7dabbe09a5aabfd34649b197dc",
-    "ciRunId": 26304465466,
-    "ciConclusion": "success",
+    "headSha": "b65d9d2",
+    "ciRunId": null,
+    "ciConclusion": "local",
     "localReleaseCheck": "passed",
     "secretScan": "zero_hits"
   },
@@ -47,20 +47,26 @@
     "brain-ui-session-compaction-audit",
     "brain-ui-prompt-context-preview",
     "brain-ui-research-source-lock",
-    "selfmem-update"
+    "selfmem-update",
+    "local-full-500-query-diagnostic-score",
+    "provider-wave-intake-dashboard",
+    "answer-quality-method-ladder-workorder",
+    "atomic-memory-v1-answer-quality-smoke"
   ],
   "remainingBlockers": [
-    "claude-reviewer-route-blocked",
-    "github-pr-body-update-blocked",
-    "github-issue-create-blocked",
+    "full-memory-sota-benchmark-gate",
+    "atomic-memory-v1-full-answer-quality-wave-missing",
+    "same-data-voyage-answer-quality-missing",
+    "two-independent-memory-score-reviewers-missing",
+    "docs-release-notes-and-ui-evidence-refresh-after-full-result",
     "human-public-launch-approval-required",
-    "hosted-supermemory-baseline-not-current"
+    "real-container-production-rollout-required"
   ],
   "manualActions": [
-    "Log in Claude CLI or accept the blocked reviewer route.",
-    "Paste the prepared PR body update manually.",
-    "Create the blocker issue from the checked draft.",
-    "Approve public visibility only after the final release gate stays green.",
-    "Run a one-agent canary before wider rollout."
+    "Run the full answer-quality provider lane with the accepted strategy set.",
+    "Collect two independent memory-score reviewer approvals.",
+    "Refresh release notes and UI evidence after the full result is accepted.",
+    "Approve public visibility only after the full SOTA gate stays green.",
+    "Run a real-container production canary before wider rollout."
   ]
 }

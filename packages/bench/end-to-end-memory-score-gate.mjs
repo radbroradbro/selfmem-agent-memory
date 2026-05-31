@@ -182,6 +182,12 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
   const resultTargetHash = result?.target?.hash ?? result?.input?.targetHash ?? result?.sourceLock?.targetHash ?? null;
   const resultScoringHash = result?.scoringCodeHash ?? result?.input?.scoringCodeHash ?? result?.target?.scoringCodeHash ?? null;
   const resultAnswerLabelsHash = result?.answerLabelsHash ?? result?.input?.answerLabelsHash ?? result?.target?.answerLabelsHash ?? null;
+  const resultTargetAnswerLabelsHash = result?.targetAnswerLabelsHash ?? result?.input?.targetAnswerLabelsHash ?? null;
+  const resultMaterializationShard = result?.materializationShard ?? result?.input?.materializationShard ?? null;
+  const resultAnswerLabelsMatchTarget =
+    Boolean(targetAnswerLabelsHash) &&
+    (resultAnswerLabelsHash === targetAnswerLabelsHash ||
+      (resultTargetAnswerLabelsHash === targetAnswerLabelsHash && resultMaterializationShard?.applied === true));
   const resultAnswerModel = extractActualAnswerModel(result);
   const resultJudgeModel = extractActualJudgeModel(result);
   const modelMatchPolicy = String(result?.scoringPolicy?.modelMatchPolicy ?? (isLocalFull ? "local-diagnostic-allowed" : "exact-target-required"));
@@ -257,7 +263,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       typeof (result?.input?.materializerHash ?? result?.materializerHash) === "string" &&
       String(result?.input?.materializerHash ?? result?.materializerHash).startsWith("sha256:"),
     scoringCodeHashMatches: Boolean(targetScoringHash) && resultScoringHash === targetScoringHash,
-    answerLabelsHashMatches: Boolean(targetAnswerLabelsHash) && resultAnswerLabelsHash === targetAnswerLabelsHash,
+    answerLabelsHashMatches: resultAnswerLabelsMatchTarget,
     answerModelPresent: typeof resultAnswerModel === "string" && resultAnswerModel.length > 0,
     judgeModelPresent: typeof resultJudgeModel === "string" && resultJudgeModel.length > 0,
     answerModelMatchesTarget: Boolean(targetAnswerModel) && resultAnswerModel === targetAnswerModel,
@@ -428,6 +434,8 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       materializerHash: result?.input?.materializerHash ?? result?.materializerHash ?? null,
       scoringCodeHash: resultScoringHash,
       answerLabelsHash: resultAnswerLabelsHash,
+      targetAnswerLabelsHash: resultTargetAnswerLabelsHash,
+      materializationShard: resultMaterializationShard,
       answerModel: resultAnswerModel,
       judgeModel: resultJudgeModel,
       scoredQueryCount: fullBenchmarkPolicy.currentAnswerQualityQueryCount,

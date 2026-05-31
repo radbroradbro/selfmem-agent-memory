@@ -9,7 +9,7 @@ const preflightScript = "packages/bench/provider-benchmark-live-preflight.mjs";
 const resultGateScript = "packages/bench/provider-challenger-result-gate.mjs";
 
 describe("public benchmark comparison contract", () => {
-  it("reports provider promotion from provider-backed arms, not the local hybrid control", () => {
+  it("reports provider promotion separately from the local hybrid control", () => {
     const report = runReport([
       "--gate",
       "provider",
@@ -26,7 +26,9 @@ describe("public benchmark comparison contract", () => {
     expect(report.comparisonContract.providerArmPresent).toBe(true);
     expect(report.promotion.kind).toBe("provider");
     expect(report.promotion.bestProviderStrategy).toBe("cloud-voyage4-lite-voyage-lite");
-    expect(report.promotion.bestHybridStrategy).toBe("cloud-voyage4-lite-voyage-lite");
+    expect(report.promotion.bestHybridStrategy).toBe("full-hybrid-rerank");
+    expect(report.promotion.pairedDeltaVsBm25.pairedQueryCount).toBe(3);
+    expect(report.promotion.pairedDeltaVsFullHybrid.pairedQueryCount).toBe(3);
     expect(report.promotion.reason).toMatch(/provider-backed arm/i);
     expect(report.promotion.reason).not.toMatch(/hybrid-family arm/i);
   });

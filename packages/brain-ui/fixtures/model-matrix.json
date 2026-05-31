@@ -3,7 +3,7 @@
   "mode": "model-autoresearch-matrix",
   "writesRealFiles": false,
   "metricsOnly": true,
-  "generatedAt": "2026-05-22T18:41:56.000Z",
+  "generatedAt": "2026-05-31T07:12:17.768Z",
   "defaults": {
     "cloudArm": "cloud-voyage4-voyage",
     "localArm": "local-apple-qwen3-0_6b",
@@ -14,7 +14,7 @@
     "label": "Apple Silicon local",
     "targetHardware": "Apple Silicon 24GB unified memory",
     "embedder": "Qwen3-Embedding-0.6B-GGUF",
-    "reranker": "RecallWeave deterministic rerank proxy",
+    "reranker": "Qwen3-Reranker-0.6B sidecar challenger",
     "runtime": "llama.cpp with Metal",
     "sourcePolicy": "Hugging Face or official model-card artifacts only",
     "staleProcessPolicy": "Stop only RecallWeave-owned model processes; block when ownership is unclear.",
@@ -22,12 +22,20 @@
   },
   "arms": [
     {
+      "id": "atomic-memory-v1-deepseek-flash-smoke",
+      "lane": "methodology",
+      "embedder": "BM25 lexical floor over atomic memories",
+      "reranker": "RecallWeave full-hybrid-rerank challenger",
+      "status": "bounded-model-challenger-smoke",
+      "purpose": "Validates atomic-memory-v1 end-to-end answer-quality wiring on a 3-query public-data shard with DeepSeek V4 Flash; not public SOTA evidence."
+    },
+    {
       "id": "cloud-voyage4-voyage",
       "lane": "cloud",
       "embedder": "voyage-4-large",
       "reranker": "rerank-2.5",
-      "status": "default-cloud-canary",
-      "purpose": "First cloud quality proof for text and code memory."
+      "status": "personal-default",
+      "purpose": "Default personal/prod cloud path; retrieval-proxy canaries beat BM25, but answer-quality same-data provider proof is still required."
     },
     {
       "id": "cloud-gemini2-cohere4pro",
@@ -42,8 +50,8 @@
       "lane": "cloud",
       "embedder": "nvidia/llama-nemotron-embed-1b-v2",
       "reranker": "nvidia/llama-nemotron-rerank-1b-v2",
-      "status": "challenger",
-      "purpose": "NVIDIA NIM text retrieval latency and quality comparison."
+      "status": "zero-dollar-repair-lane",
+      "purpose": "NVIDIA NIM text retrieval comparison; provider-wave intake currently makes NVIDIA the preferred free repair lane."
     },
     {
       "id": "cloud-nvidia-nemotron-vl-1b",
@@ -66,8 +74,8 @@
       "lane": "local",
       "embedder": "Qwen3-Embedding-0.6B-GGUF",
       "reranker": "Qwen3-Reranker-0.6B sidecar",
-      "status": "method-challenger",
-      "purpose": "First local method challenger: keep the measured 0.6B embedding lane and swap only the final reranker."
+      "status": "local-full-diagnostic-leader",
+      "purpose": "Current 500-query local-full diagnostic leader at 24.9 answer quality, +2.738 versus BM25; not SOTA evidence."
     },
     {
       "id": "local-apple-qwen3-4b",
@@ -81,13 +89,14 @@
   "gates": [
     "Query expansion stays off until a matched source-locked canary proves better quality.",
     "Public scores require same dataset slice, query set, judge, answer model, scoring code, privacy scan, and reviewer sign-off.",
-    "Claude Opus 4.7 and a separate Codex GPT-5.5 review must approve autoresearch setup before implementation changes.",
+    "Claude Opus and a separate GPT-5.5 Pro review should challenge the autoresearch setup before promotion claims.",
     "Local latency runs must start from a clean RecallWeave-owned model runtime.",
     "Provider credentials stay in local environment variables only."
   ],
   "blockers": [
-    "claude-reviewer-route-blocked",
-    "hosted-supermemory-baseline-not-current",
+    "full-memory-sota-benchmark-gate",
+    "same-data-voyage-answer-quality-missing",
+    "two-independent-memory-score-reviewers-missing",
     "human-public-launch-approval-required"
   ]
 }

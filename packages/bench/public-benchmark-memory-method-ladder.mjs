@@ -16,7 +16,9 @@ const targetPath = resolveInputPath(
   args.target ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_TARGET ?? "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
 );
 const methods = splitList(
-  args.methods ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_MEMORY_METHODS ?? "session-v1,contextual-source-chunk-v1,contextual-index-source-chunk-v1",
+  args.methods ??
+    process.env.RECALLWEAVE_PUBLIC_BENCHMARK_MEMORY_METHODS ??
+    "session-v1,contextual-source-chunk-v1,contextual-index-source-chunk-v1,atomic-memory-v1",
 );
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_METHOD_STRATEGIES ?? "bm25-lite,full-hybrid-rerank");
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 800, "context token budget");
@@ -25,7 +27,7 @@ const maxQueries = optionalPositiveInt(args.maxQueries ?? process.env.RECALLWEAV
 const queryOffset = optionalNonNegativeInt(args.queryOffset ?? process.env.RECALLWEAVE_BASELINE_QUERY_OFFSET ?? 0, "query offset");
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
 
-const memoryMethods = ["session-v1", "contextual-source-chunk-v1", "contextual-index-source-chunk-v1"];
+const memoryMethods = ["session-v1", "contextual-source-chunk-v1", "contextual-index-source-chunk-v1", "atomic-memory-v1"];
 const retrievalStrategies = ["bm25-lite", "full-hybrid-rerank"];
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -185,6 +187,7 @@ function materializationSummary(method, materialize) {
     memoryRecordCount: materialize.selection?.memoryRecordCount ?? null,
     contextualSourceChunkCount: materialize.selection?.contextualSourceChunkCount ?? null,
     contextualIndexMemoryCount: materialize.selection?.contextualIndexMemoryCount ?? null,
+    atomicMemoryCount: materialize.selection?.atomicMemoryCount ?? null,
     expectedResultRefCount: materialize.selection?.expectedResultRefCount ?? null,
     querySetHash: materialize.selection?.querySetHash ?? null,
     collectorCompatibleQuerySetHash: materialize.selection?.collectorCompatibleQuerySetHash ?? null,
@@ -223,6 +226,9 @@ function interpretation(input) {
   if (input.bestChunk?.method === "contextual-index-source-chunk-v1") {
     return "The contextual index is the best chunked method on this ladder. It may deserve a larger answer-quality shard before promotion.";
   }
+  if (input.bestChunk?.method === "atomic-memory-v1") {
+    return "The atomic memory method is the best chunked method on this ladder. It should be promoted only through paired answer-quality scoring because its source rehydration path differs from plain chunks.";
+  }
   return "A chunked method won the retrieval-proxy ladder, but answer-quality scoring is still required before promotion.";
 }
 
@@ -248,11 +254,11 @@ function renderMarkdown(value) {
     "",
     "## Materialization",
     "",
-    "| Method | Queries | Sessions | Records | Source chunks | Index records | Expected refs |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+    "| Method | Queries | Sessions | Records | Source chunks | Index records | Atomic records | Expected refs |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ...value.materializations.map(
       (item) =>
-        `| ${item.method} | ${item.queryCount} | ${item.haystackSessionCount} | ${item.memoryRecordCount} | ${item.contextualSourceChunkCount} | ${item.contextualIndexMemoryCount} | ${item.expectedResultRefCount} |`,
+        `| ${item.method} | ${item.queryCount} | ${item.haystackSessionCount} | ${item.memoryRecordCount} | ${item.contextualSourceChunkCount} | ${item.contextualIndexMemoryCount} | ${item.atomicMemoryCount} | ${item.expectedResultRefCount} |`,
     ),
     "",
     "## Interpretation",
