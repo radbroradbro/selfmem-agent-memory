@@ -1,0 +1,75 @@
+{
+  "ok": true,
+  "mode": "current-head-browser-ui-evidence",
+  "capturedAt": "2026-05-31T00:07:41.061Z",
+  "url": "http://127.0.0.1:4189/",
+  "title": "RecallWeave Brain",
+  "browserRoute": "chrome-extension-fallback-because-iab-unavailable",
+  "screenshots": {
+    "overview": "reviews/overnight-20260522/ui-evidence/brain-ui-20260530-current-head-overview.png",
+    "searchLifecycle": "reviews/overnight-20260522/ui-evidence/brain-ui-20260530-current-head-search-lifecycle.png",
+    "lifecycleDetail": "reviews/overnight-20260522/ui-evidence/brain-ui-20260530-current-head-lifecycle-detail.png"
+  },
+  "overview": {
+    "title": "RecallWeave Brain",
+    "headings": [
+      "Container",
+      "Update Flow",
+      "Nucleus",
+      "Timeline",
+      "RecallWeave Index",
+      "Provenance",
+      "Lifecycle Trail",
+      "Nucleus Snapshot",
+      "Research Lineage",
+      "Research Source Lock",
+      "Model Matrix",
+      "Compaction Audit",
+      "Benchmark Dashboard",
+      "Canary Rollout",
+      "Context Preview",
+      "Release Readiness",
+      "Lifecycle Policy",
+      "Review Queue",
+      "Wiki Vault Preview",
+      "Vault Sync Report",
+      "Local Audit Preflight",
+      "Derived Doc Editor"
+    ],
+    "nodeCount": 9,
+    "edgeCount": 9,
+    "lifecycleCards": 2,
+    "hasSearchInput": true,
+    "hasLifecycleTrail": true,
+    "hasContextPreview": true,
+    "hasBenchmarkDashboard": true,
+    "hasReleaseReadiness": true,
+    "hasPrivateLikeText": false
+  },
+  "interaction": {
+    "searchFacts": {
+      "hasPrivateLikeText": false,
+      "includesLifecycleTrail": true,
+      "includesPreCompress": true,
+      "lifecycleCards": 2,
+      "nodeCount": 1,
+      "searchValue": "pre-compression",
+      "selectedTitle": "Container",
+      "visibleNodeText": [
+        "lifecycle eventHermes pre-compression checkpoint preserved compact evidence"
+      ]
+    },
+    "detailFacts": {
+      "detailText": "Nucleus Hybrid recall, lifecycle, wiki sync, and research lineage in one inspectable map. fixture-safe evidence All Neighborhood Jump lifecycle event | Hermes pre-compression checkpoint preserved compact evidence Center 1/1 nodes | 1 links lifecycle eventHermes pre-compression checkpoint preserved compact evidence Timeline chronological derived events 08:07lifecycle eventHermes pre-compression checkpoint preserved compact evidence",
+      "hasPrivateLikeText": false,
+      "hasProvenance": true,
+      "lifecycleCards": 2,
+      "selectedHeading": "Hermes pre-compression checkpoint preserved compact evidence"
+    }
+  },
+  "console": {
+    "warningOrErrorCount": 0,
+    "warningsOrErrors": []
+  },
+  "publicSafe": true
+}
