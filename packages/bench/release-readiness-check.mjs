@@ -118,6 +118,7 @@ const requiredFiles = [
   "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
+  "packages/bench/provider-wave-intake.mjs",
   "packages/bench/agentic-memory-target-watch.mjs",
   "packages/bench/agentic-memory-ingest-contract.mjs",
   "packages/bench/agentic-memory-source-lock-check.mjs",
@@ -191,6 +192,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-voyage-evidence.md`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia.json`,
   `${reviewDir}/public-longmemeval-expanded-provider-live-preflight-nvidia-evidence.md`,
+  `${reviewDir}/provider-wave-intake-20260531.json`,
+  `${reviewDir}/provider-wave-intake-20260531.md`,
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-preflight.json`,
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-preflight.md`,
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider.json`,
@@ -791,6 +794,7 @@ const requiredScripts = [
   "benchmark:public-provider:preflight",
   "benchmark:public-provider:packet",
   "benchmark:public-provider",
+  "benchmark:provider-wave-intake",
   "benchmark:public-autoresearch",
   "benchmark:agentic-watch",
   "benchmark:agentic-ingest-contract",
@@ -2341,6 +2345,9 @@ check("fresh public benchmark target check passes", () => {
   const providerLivePreflightReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-provider-live-preflight.json"), "utf8"));
   const providerLivePreflightEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-provider-live-preflight-evidence.md"), "utf8");
   const providerLivePreflightFresh = JSON.parse(run("node", ["packages/bench/provider-benchmark-live-preflight.mjs"]).stdout);
+  const providerWaveIntakeReport = JSON.parse(readFileSync(join(root, reviewDir, "provider-wave-intake-20260531.json"), "utf8"));
+  const providerWaveIntakeEvidence = readFileSync(join(root, reviewDir, "provider-wave-intake-20260531.md"), "utf8");
+  const providerWaveIntakeFresh = JSON.parse(run("node", ["packages/bench/provider-wave-intake.mjs"]).stdout);
   const expandedSliceReport = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-slice-evidence.json"), "utf8"));
   const expandedSliceEvidence = readFileSync(join(root, reviewDir, "public-longmemeval-expanded-slice-evidence.md"), "utf8");
   const expandedRunTarget = JSON.parse(readFileSync(join(root, reviewDir, "public-longmemeval-expanded-run-target.json"), "utf8"));
@@ -3926,6 +3933,28 @@ check("fresh public benchmark target check passes", () => {
   assert.match(providerLivePreflightEvidence, /cloud-gemini2-voyage-rerank/);
   assert.match(providerLivePreflightEvidence, /cloud-nvidia-nemotron-1b/);
   assert.match(providerLivePreflightEvidence, /local-apple-qwen3-0_6b/);
+  assert.equal(providerWaveIntakeReport.ok, true);
+  assert.equal(providerWaveIntakeReport.mode, "provider-wave-intake");
+  assert.equal(providerWaveIntakeReport.status, "READY_PROVIDER_WAVE_INTAKE");
+  assert.equal(providerWaveIntakeReport.metricsOnly, true);
+  assert.equal(providerWaveIntakeReport.publicSafe, true);
+  assert.equal(providerWaveIntakeReport.callsProviderApis, false);
+  assert.equal(providerWaveIntakeReport.publicBenchmarkClaimsAllowed, false);
+  assert.equal(providerWaveIntakeReport.countsAsFullMemorySotaEvidence, false);
+  assert.equal(providerWaveIntakeReport.countsAsEndToEndMemoryBenchmark, false);
+  assert.equal(providerWaveIntakeReport.controls?.allHaveBm25, true);
+  assert.equal(providerWaveIntakeReport.controls?.allHaveFullHybrid, true);
+  assert.ok(providerWaveIntakeReport.providers?.completedProviderFamilies?.includes("gemini"));
+  assert.ok(providerWaveIntakeReport.providers?.completedProviderFamilies?.includes("nvidia"));
+  assert.ok(providerWaveIntakeReport.providers?.completedProviderFamilies?.includes("voyage"));
+  assert.match(providerWaveIntakeEvidence, /Provider Wave Intake/);
+  assert.match(providerWaveIntakeEvidence, /All waves include BM25: true/);
+  assert.match(providerWaveIntakeEvidence, /All waves include full hybrid: true/);
+  assert.match(providerWaveIntakeEvidence, /Counts as full memory SOTA evidence: false/);
+  assert.equal(providerWaveIntakeFresh.ok, true);
+  assert.equal(providerWaveIntakeFresh.controls?.allHaveBm25, true);
+  assert.equal(providerWaveIntakeFresh.controls?.allHaveFullHybrid, true);
+  assert.equal(providerWaveIntakeFresh.publicBenchmarkClaimsAllowed, false);
   assert.equal(expandedProviderLivePreflightReport.ok, true);
   assert.equal(expandedProviderLivePreflightReport.mode, "provider-benchmark-live-preflight");
   assert.equal(expandedProviderLivePreflightReport.status, "BLOCKED_PROVIDER_ENV");
@@ -6539,6 +6568,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(liveHybridReview, secretPattern);
   assert.doesNotMatch(JSON.stringify(providerGateFixtureReport), secretPattern);
   assert.doesNotMatch(providerGateFixtureEvidence, secretPattern);
+  assert.doesNotMatch(JSON.stringify(providerWaveIntakeReport), secretPattern);
+  assert.doesNotMatch(providerWaveIntakeEvidence, secretPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), secretPattern);
   assert.doesNotMatch(JSON.stringify(expandedAutoresearchReport), secretPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, secretPattern);
@@ -6573,6 +6604,8 @@ check("fresh public benchmark target check passes", () => {
   assert.doesNotMatch(liveHybridReview, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(providerGateFixtureReport), privatePathPattern);
   assert.doesNotMatch(providerGateFixtureEvidence, privatePathPattern);
+  assert.doesNotMatch(JSON.stringify(providerWaveIntakeReport), privatePathPattern);
+  assert.doesNotMatch(providerWaveIntakeEvidence, privatePathPattern);
   assert.doesNotMatch(JSON.stringify(liveAutoresearchReport), privatePathPattern);
   assert.doesNotMatch(JSON.stringify(expandedAutoresearchReport), privatePathPattern);
   assert.doesNotMatch(liveAutoresearchEvidence, privatePathPattern);

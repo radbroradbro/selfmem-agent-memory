@@ -823,6 +823,15 @@ future cloud-provider loops should use provider-specific slices, capped dense
 and rerank candidate limits, and reusable same-data controls before scaling to
 larger answer-quality shards.
 
+The provider-wave intake now consolidates those May 30-31 cloud waves in
+`reviews/overnight-20260522/provider-wave-intake-20260531.json` and
+`reviews/overnight-20260522/provider-wave-intake-20260531.md`. It confirms all
+13 provider-wave reports kept both `bm25-lite` and `full-hybrid-rerank` controls
+on the same slices, while Gemini, NVIDIA, and Voyage all had at least one
+completed provider-family wave. The intake is metrics-only, calls no provider
+APIs itself, and explicitly does not count as answer-quality, MemoryBench, or
+full-memory SOTA evidence.
+
 The same path also has a public-safe operator packet:
 `reviews/overnight-20260522/public-longmemeval-expanded-provider-operator-packet.md`.
 Generate it with:
