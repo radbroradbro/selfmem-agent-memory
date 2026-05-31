@@ -200,6 +200,8 @@ const requiredFiles = [
   `${reviewDir}/public-longmemeval-provider-wave-q086-nvidia-repair-20260531.md`,
   `${reviewDir}/public-longmemeval-provider-wave-q087-nvidia-repair-20260531.json`,
   `${reviewDir}/public-longmemeval-provider-wave-q087-nvidia-repair-20260531.md`,
+  `${reviewDir}/public-longmemeval-provider-wave-q088-nvidia-repair-20260531.json`,
+  `${reviewDir}/public-longmemeval-provider-wave-q088-nvidia-repair-20260531.md`,
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-preflight.json`,
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider-preflight.md`,
   `${reviewDir}/public-longmemeval-expanded-voyage-latency-live-provider.json`,
@@ -3995,8 +3997,13 @@ check("fresh public benchmark target check passes", () => {
     ),
   );
   assert.ok(
+    providerWaveIntakeReport.input?.evidence?.some((item) =>
+      /public-longmemeval-provider-wave-q088-nvidia-repair-20260531\.json$/.test(item.path ?? ""),
+    ),
+  );
+  assert.ok(
     providerWaveIntakeReport.providers?.rows?.some(
-      (row) => row.provider === "nvidia" && row.completedArmCount >= 9 && row.completedQueryCount >= 13,
+      (row) => row.provider === "nvidia" && row.completedArmCount >= 10 && row.completedQueryCount >= 14,
     ),
   );
   assert.ok(providerWaveIntakeReport.providers?.completedProviderFamilies?.includes("gemini"));
