@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-05-31T13:16:24.120Z",
+  "generatedAt": "2026-05-31T13:46:54.309Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -298,6 +298,13 @@
       "status": "READY_FULL_SHARD_PRIVATE_INPUTS"
     },
     "acceptedLaneLaunchDoctor": {
+      "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-provider-env-20260531.json",
+      "exists": true,
+      "hash": "sha256:3aa1007e561c7fb68480f84c813c2823ff5002136ce950bd9d61a115c7379034",
+      "mode": "full-shard-accepted-lane-launch-doctor",
+      "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
+    },
+    "acceptedLaneLaunchDoctorNoEnv": {
       "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
       "hash": "sha256:4b6b5ee23fa050aa4d750020deed21de7ea0d08855f335734964f998c9abc4c7",
@@ -398,7 +405,7 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:b14328474af525c57abb469d58f985f6886a43a7f9d47d52d4d555176fc5fe36",
+      "hash": "sha256:d63f0f107cc00c6574524461399bdefb7e655255ef6e7be9abc1628ae4b52b49",
       "mode": null,
       "status": null
     },
@@ -569,38 +576,52 @@
     "blockers": []
   },
   "acceptedLaneLaunchState": {
-    "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
+    "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-provider-env-20260531.json",
+    "noEnvPath": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
     "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
     "readyForFirstAcceptedShardRun": false,
     "readyForAcceptedShardIntake": false,
     "readyForPublicSotaClaim": false,
     "acceptedLaneId": "full-sota-accepted-shards",
+    "selectedProviderEnvEvidence": true,
+    "providerEnvEvidenceUsed": true,
+    "providerCredentialFamiliesReady": [
+      "gemini",
+      "nvidia",
+      "voyage"
+    ],
+    "providerCredentialFamiliesBlocked": [],
+    "providerKeyCounts": {
+      "gemini": 6,
+      "nvidia": 1,
+      "voyage": 8
+    },
+    "providerCredentialEvidenceReady": true,
+    "providerCredentialEvidenceBlockers": [],
+    "noEnvProviderCredentialBlockers": [
+      "gemini-credentials-missing",
+      "nvidia-credentials-missing",
+      "voyage-credentials-missing"
+    ],
+    "envProviderCredentialBlockers": [],
     "queryExpansionRequirement": "local-or-cloud-model-required",
-    "queryExpansionModelBacked": false,
-    "queryExpansionSotaEligible": false,
+    "queryExpansionModelBacked": true,
+    "queryExpansionSotaEligible": true,
     "responseExportReady": false,
     "answerQualityScoringReady": false,
     "privateInputsReady": true,
-    "operatorInputCount": 9,
+    "operatorInputCount": 3,
     "pendingShardCount": 20,
     "firstPendingShardId": "shard-001",
     "blockers": [
-      "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-      "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
       "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
       "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
       "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-      "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-      "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
       "answer-model-missing",
-      "gemini-credentials-missing",
       "judge-model-missing",
       "local-apple-credentials-missing",
       "local-rerank-credentials-missing",
-      "nvidia-credentials-missing",
       "openai-compatible-base-url-missing",
-      "query-expansion-local-endpoint-or-cloud-consent-missing",
-      "voyage-credentials-missing",
       "local-apple-endpoint-missing",
       "local-rerank-endpoint-missing",
       "accepted-lane-response-export-not-ready",
@@ -609,6 +630,12 @@
       "full-memory-sota-score-not-proven",
       "public-sota-claim-not-allowed"
     ]
+  },
+  "sotaOperatorPacketState": {
+    "path": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
+    "originalBlockerCount": 12,
+    "activeBlockerCount": 12,
+    "supersededProviderCredentialBlockers": []
   },
   "controlPreflightState": {
     "path": "reviews/overnight-20260522/full-shard-control-answer-quality-preflight-20260526.json",
@@ -735,9 +762,11 @@
       "judge-model-missing",
       "local-apple-credentials-missing",
       "local-rerank-credentials-missing",
-      "nvidia-credentials-missing",
       "openai-compatible-base-url-missing",
-      "query-expansion-local-endpoint-or-cloud-consent-missing",
+      "query-expansion-local-endpoint-or-cloud-consent-missing"
+    ],
+    "supersededProviderCredentialBlockers": [
+      "nvidia-credentials-missing",
       "voyage-credentials-missing"
     ],
     "blockers": [
@@ -756,10 +785,8 @@
       "judge-model-missing",
       "local-apple-credentials-missing",
       "local-rerank-credentials-missing",
-      "nvidia-credentials-missing",
       "openai-compatible-base-url-missing",
-      "query-expansion-local-endpoint-or-cloud-consent-missing",
-      "voyage-credentials-missing"
+      "query-expansion-local-endpoint-or-cloud-consent-missing"
     ]
   },
   "localFullLaneState": {
@@ -1225,22 +1252,14 @@
       "id": "accepted-sota-lane-launch-readiness",
       "status": "blocked",
       "blockers": [
-        "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-        "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
         "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
         "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
         "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-        "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-        "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
         "answer-model-missing",
-        "gemini-credentials-missing",
         "judge-model-missing",
         "local-apple-credentials-missing",
         "local-rerank-credentials-missing",
-        "nvidia-credentials-missing",
         "openai-compatible-base-url-missing",
-        "query-expansion-local-endpoint-or-cloud-consent-missing",
-        "voyage-credentials-missing",
         "local-apple-endpoint-missing",
         "local-rerank-endpoint-missing",
         "accepted-lane-response-export-not-ready",
@@ -1249,6 +1268,11 @@
         "full-memory-sota-score-not-proven",
         "public-sota-claim-not-allowed"
       ]
+    },
+    {
+      "id": "accepted-lane-cloud-provider-env",
+      "status": "pass",
+      "blockers": []
     },
     {
       "id": "full-shard-control-preflight",
@@ -1346,10 +1370,8 @@
         "judge-model-missing",
         "local-apple-credentials-missing",
         "local-rerank-credentials-missing",
-        "nvidia-credentials-missing",
         "openai-compatible-base-url-missing",
-        "query-expansion-local-endpoint-or-cloud-consent-missing",
-        "voyage-credentials-missing"
+        "query-expansion-local-endpoint-or-cloud-consent-missing"
       ]
     },
     {
@@ -1405,22 +1427,14 @@
     }
   ],
   "blockers": [
-    "RECALLWEAVE_BASELINE_LIVE-not-enabled",
-    "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
     "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
     "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
     "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
     "answer-model-missing",
-    "gemini-credentials-missing",
     "judge-model-missing",
     "local-apple-credentials-missing",
     "local-rerank-credentials-missing",
-    "nvidia-credentials-missing",
     "openai-compatible-base-url-missing",
-    "query-expansion-local-endpoint-or-cloud-consent-missing",
-    "voyage-credentials-missing",
     "local-apple-endpoint-missing",
     "local-rerank-endpoint-missing",
     "accepted-lane-response-export-not-ready",
@@ -1428,11 +1442,16 @@
     "full-answer-quality-shard-results-not-returned",
     "full-memory-sota-score-not-proven",
     "public-sota-claim-not-allowed",
+    "RECALLWEAVE_BASELINE_LIVE-not-enabled",
+    "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
+    "query-expansion-local-endpoint-or-cloud-consent-missing",
     "local-full-answer-quality-shard-results-not-returned",
     "answer-quality-shard-runs-pending",
     "shard-results-missing",
     "answer-quality-shards-missing",
     "full-shard-coverage-incomplete",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
+    "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
     "missing-voyage-answer-quality-same-data-result",
     "reported-target-judge-model-does-not-match-result",
     "missing-full-or-officially-comparable-memory-benchmark-run",

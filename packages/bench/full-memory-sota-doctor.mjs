@@ -89,7 +89,11 @@ const files = {
   ),
   localFullAcceptedLaneLaunchDoctor: `${reviewDir}/local-full-accepted-lane-launch-doctor-20260526.json`,
   privateInputDoctor: `${reviewDir}/full-shard-private-input-doctor-current.json`,
-  acceptedLaneLaunchDoctor: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
+  acceptedLaneLaunchDoctor: preferReviewFile(
+    "full-shard-accepted-lane-launch-doctor-provider-env-20260531.json",
+    "full-shard-accepted-lane-launch-doctor-20260526.json",
+  ),
+  acceptedLaneLaunchDoctorNoEnv: `${reviewDir}/full-shard-accepted-lane-launch-doctor-20260526.json`,
   controlPreflight: `${reviewDir}/full-shard-control-answer-quality-preflight-20260526.json`,
   shardWorkorder: `${reviewDir}/answer-quality-full-shard-workorder-20260525.json`,
   shardIntake: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
@@ -154,6 +158,7 @@ const localEmbeddingDurabilitySmoke = evidence.localEmbeddingDurabilitySmoke.jso
 const localFullAcceptedLaneLaunchDoctor = evidence.localFullAcceptedLaneLaunchDoctor.json;
 const privateInputDoctor = evidence.privateInputDoctor.json;
 const acceptedLaneLaunchDoctor = evidence.acceptedLaneLaunchDoctor.json;
+const acceptedLaneLaunchDoctorNoEnv = evidence.acceptedLaneLaunchDoctorNoEnv.json;
 const controlPreflight = evidence.controlPreflight.json;
 const shardWorkorder = evidence.shardWorkorder.json;
 const shardIntake = evidence.shardIntake.json;
@@ -168,7 +173,12 @@ const uiEvidence = evidence.uiEvidence.json;
 
 const rawRetention = inspectRawSourceRetention(fullMaterialize);
 const controlPreflightState = inspectControlPreflightState(controlPreflight);
-const shardState = inspectShardState({ shardPlan, shardWorkorder, shardIntake });
+const acceptedLaneLaunchState = inspectAcceptedLaneLaunchState(acceptedLaneLaunchDoctor, {
+  evidencePath: evidence.acceptedLaneLaunchDoctor.path,
+  noEnvReport: acceptedLaneLaunchDoctorNoEnv,
+  noEnvPath: evidence.acceptedLaneLaunchDoctorNoEnv.path,
+});
+const shardState = inspectShardState({ shardPlan, shardWorkorder, shardIntake, acceptedLaneLaunchState });
 const localFullLaneState = inspectLocalFullLaneState({
   localFullShardPlan,
   localFullShardWorkorder,
@@ -189,6 +199,10 @@ const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, revie
 const providerWaveState = inspectProviderWaveIntake(providerWaveIntake);
 const reviewerState = inspectReviewerState(reviewerIntake);
 const docState = inspectDocs(evidence);
+const sotaOperatorPacketBlockers = filterSupersededProviderCredentialBlockers(
+  arrayOf(sotaOperatorPacket?.blockers),
+  acceptedLaneLaunchState,
+);
 
 const gates = [
   gate("source-locked-full-target", fullTarget?.fixtureOnly === false && Number(fullMaterialize?.selection?.queryCount ?? 0) === 500, [
@@ -205,6 +219,11 @@ const gates = [
   gate("accepted-sota-lane-launch-readiness", acceptedLaneLaunchDoctor?.launchGate?.readyForFirstAcceptedShardRun === true, acceptedLaneLaunchDoctor?.blockers ?? [
     "accepted-sota-lane-launch-doctor-not-ready",
   ]),
+  gate(
+    "accepted-lane-cloud-provider-env",
+    acceptedLaneLaunchState.providerCredentialEvidenceReady,
+    acceptedLaneLaunchState.providerCredentialEvidenceBlockers,
+  ),
   gate("full-shard-control-preflight", controlPreflightState.sameDataShardReady, controlPreflightState.blockers),
   gate("bm25-is-control-only", sotaOperatorPacket?.sameDataContract?.bm25LexicalFloorRequired === true, [
     "bm25-control-contract-missing",
@@ -258,7 +277,7 @@ const gates = [
 const blockers = [
   ...new Set([
     ...gates.flatMap((item) => (item.status === "pass" ? [] : item.blockers)),
-    ...arrayOf(sotaOperatorPacket?.blockers),
+    ...sotaOperatorPacketBlockers.activeBlockers,
   ]),
 ].filter(Boolean);
 
@@ -322,7 +341,13 @@ const report = {
   reportedTargets: inspectReportedTargets(sotaLadder),
   rawSourceRetention: rawRetention,
   privateInputState: inspectPrivateInputState(privateInputDoctor),
-  acceptedLaneLaunchState: inspectAcceptedLaneLaunchState(acceptedLaneLaunchDoctor),
+  acceptedLaneLaunchState,
+  sotaOperatorPacketState: {
+    path: files.sotaOperatorPacket,
+    originalBlockerCount: sotaOperatorPacketBlockers.originalBlockerCount,
+    activeBlockerCount: sotaOperatorPacketBlockers.activeBlockers.length,
+    supersededProviderCredentialBlockers: sotaOperatorPacketBlockers.supersededProviderCredentialBlockers,
+  },
   controlPreflightState,
   shardState,
   localFullLaneState,
@@ -403,9 +428,22 @@ function inspectReportedTargets(sotaLadderReport) {
   };
 }
 
-function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
+function inspectShardState({ shardPlan, shardWorkorder, shardIntake, acceptedLaneLaunchState }) {
   const executionLaneReadiness = arrayOf(shardWorkorder?.executionLaneReadiness);
   const fullSotaLane = executionLaneReadiness.find((lane) => lane.laneId === "full-sota-accepted-shards");
+  const rawFullSotaLaneEnvironmentBlockers = arrayOf(fullSotaLane?.blockers);
+  const fullSotaLaneEnvironmentBlockers = filterSupersededProviderCredentialBlockers(
+    rawFullSotaLaneEnvironmentBlockers,
+    acceptedLaneLaunchState,
+  );
+  const shardBlockers = filterSupersededProviderCredentialBlockers(
+    [
+      ...arrayOf(shardWorkorder?.blockers),
+      ...arrayOf(shardIntake?.blockers),
+      ...rawFullSotaLaneEnvironmentBlockers,
+    ],
+    acceptedLaneLaunchState,
+  );
   return {
     planStatus: shardPlan?.status ?? null,
     workorderStatus: shardWorkorder?.status ?? null,
@@ -429,12 +467,9 @@ function inspectShardState({ shardPlan, shardWorkorder, shardIntake }) {
     })),
     fullSotaLaneReadyForResponseArmExport: Boolean(fullSotaLane?.readyForResponseArmExport),
     fullSotaLaneReadyForAnswerQualityScoring: Boolean(fullSotaLane?.readyForAnswerQualityScoring),
-    fullSotaLaneEnvironmentBlockers: fullSotaLane?.blockers ?? [],
-    blockers: [
-      ...arrayOf(shardWorkorder?.blockers),
-      ...arrayOf(shardIntake?.blockers),
-      ...arrayOf(fullSotaLane?.blockers),
-    ],
+    fullSotaLaneEnvironmentBlockers: fullSotaLaneEnvironmentBlockers.activeBlockers,
+    supersededProviderCredentialBlockers: shardBlockers.supersededProviderCredentialBlockers,
+    blockers: shardBlockers.activeBlockers,
   };
 }
 
@@ -1153,14 +1188,46 @@ function inspectPrivateInputState(privateInputDoctorReport) {
   };
 }
 
-function inspectAcceptedLaneLaunchState(launchDoctorReport) {
+function inspectAcceptedLaneLaunchState(launchDoctorReport, options = {}) {
+  const evidencePath = options.evidencePath ?? files.acceptedLaneLaunchDoctor;
+  const providerReadiness = launchDoctorReport?.acceptedLane?.providerReadiness ?? {};
+  const providerFamilies = ["gemini", "nvidia", "voyage"];
+  const providerCredentialFamiliesReady = providerFamilies.filter((provider) => providerReadiness?.[provider]?.ready === true);
+  const providerCredentialFamiliesBlocked = providerFamilies.filter((provider) => providerReadiness?.[provider]?.ready !== true);
+  const providerKeyCounts = Object.fromEntries(
+    providerFamilies.map((provider) => [provider, Number(providerReadiness?.[provider]?.keyCount ?? 0)]),
+  );
+  const noEnvBlockers = arrayOf(options.noEnvReport?.blockers);
+  const envBlockers = arrayOf(launchDoctorReport?.blockers);
+  const selectedProviderEnvEvidence = String(evidencePath).includes("provider-env");
+  const providerEnvEvidenceUsed = selectedProviderEnvEvidence && Object.keys(providerReadiness).length > 0;
+  const envProviderCredentialBlockers = envBlockers.filter((item) =>
+    ["gemini-credentials-missing", "nvidia-credentials-missing", "voyage-credentials-missing"].includes(item),
+  );
+  const providerCredentialEvidenceBlockers = [
+    !providerEnvEvidenceUsed ? "accepted-lane-provider-env-evidence-not-selected" : null,
+    ...providerCredentialFamiliesBlocked.map((provider) => `${provider}-credentials-missing`),
+    ...envProviderCredentialBlockers,
+  ].filter(Boolean);
   return {
-    path: files.acceptedLaneLaunchDoctor,
+    path: evidencePath,
+    noEnvPath: options.noEnvPath ?? null,
     status: launchDoctorReport?.status ?? null,
     readyForFirstAcceptedShardRun: Boolean(launchDoctorReport?.launchGate?.readyForFirstAcceptedShardRun),
     readyForAcceptedShardIntake: Boolean(launchDoctorReport?.launchGate?.readyForAcceptedShardIntake),
     readyForPublicSotaClaim: Boolean(launchDoctorReport?.launchGate?.readyForPublicSotaClaim),
     acceptedLaneId: launchDoctorReport?.acceptedLane?.laneId ?? null,
+    selectedProviderEnvEvidence,
+    providerEnvEvidenceUsed,
+    providerCredentialFamiliesReady,
+    providerCredentialFamiliesBlocked,
+    providerKeyCounts,
+    providerCredentialEvidenceReady: providerCredentialEvidenceBlockers.length === 0,
+    providerCredentialEvidenceBlockers,
+    noEnvProviderCredentialBlockers: noEnvBlockers.filter((item) =>
+      ["gemini-credentials-missing", "nvidia-credentials-missing", "voyage-credentials-missing"].includes(item),
+    ),
+    envProviderCredentialBlockers,
     queryExpansionRequirement: launchDoctorReport?.acceptedLane?.queryExpansion?.evidenceRequirement ?? null,
     queryExpansionModelBacked: Boolean(launchDoctorReport?.acceptedLane?.queryExpansion?.modelBackedReady),
     queryExpansionSotaEligible: Boolean(launchDoctorReport?.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence),
@@ -1171,6 +1238,31 @@ function inspectAcceptedLaneLaunchState(launchDoctorReport) {
     pendingShardCount: Number(launchDoctorReport?.shardProgress?.pendingShardCount ?? 0),
     firstPendingShardId: launchDoctorReport?.shardProgress?.firstPendingShardId ?? null,
     blockers: launchDoctorReport?.blockers ?? [],
+  };
+}
+
+function filterSupersededProviderCredentialBlockers(blockers, acceptedLaneLaunchState) {
+  const readyFamilies = new Set(arrayOf(acceptedLaneLaunchState?.providerCredentialFamiliesReady));
+  const cloudCredentialBlockers = new Set(["gemini-credentials-missing", "nvidia-credentials-missing", "voyage-credentials-missing"]);
+  const supersededProviderCredentialBlockers = [];
+  const activeBlockers = [];
+  for (const blocker of blockers) {
+    const value = String(blocker ?? "");
+    const provider = value.replace("-credentials-missing", "");
+    const isSuperseded =
+      acceptedLaneLaunchState?.providerCredentialEvidenceReady === true &&
+      cloudCredentialBlockers.has(value) &&
+      readyFamilies.has(provider);
+    if (isSuperseded) {
+      supersededProviderCredentialBlockers.push(value);
+    } else if (value) {
+      activeBlockers.push(value);
+    }
+  }
+  return {
+    originalBlockerCount: blockers.length,
+    activeBlockers,
+    supersededProviderCredentialBlockers,
   };
 }
 
@@ -1439,6 +1531,14 @@ function renderMarkdown(value) {
     "## Accepted Lane Launch",
     `- Status: ${value.acceptedLaneLaunchState.status}`,
     `- Ready for first accepted shard run: ${value.acceptedLaneLaunchState.readyForFirstAcceptedShardRun}`,
+    `- Selected provider-env evidence: ${value.acceptedLaneLaunchState.selectedProviderEnvEvidence}`,
+    `- Provider env evidence used: ${value.acceptedLaneLaunchState.providerEnvEvidenceUsed}`,
+    `- Provider credential evidence ready: ${value.acceptedLaneLaunchState.providerCredentialEvidenceReady}`,
+    `- Provider credential families ready: ${value.acceptedLaneLaunchState.providerCredentialFamiliesReady.join(", ") || "none"}`,
+    `- Provider credential families blocked: ${value.acceptedLaneLaunchState.providerCredentialFamiliesBlocked.join(", ") || "none"}`,
+    `- Provider key counts: gemini=${value.acceptedLaneLaunchState.providerKeyCounts.gemini}, nvidia=${value.acceptedLaneLaunchState.providerKeyCounts.nvidia}, voyage=${value.acceptedLaneLaunchState.providerKeyCounts.voyage}`,
+    `- Provider credential evidence blockers: ${value.acceptedLaneLaunchState.providerCredentialEvidenceBlockers.join(", ") || "none"}`,
+    `- Superseded operator credential blockers: ${value.sotaOperatorPacketState.supersededProviderCredentialBlockers.join(", ") || "none"}`,
     `- Query expansion requirement: ${value.acceptedLaneLaunchState.queryExpansionRequirement ?? "n/a"}`,
     `- Query expansion model-backed: ${value.acceptedLaneLaunchState.queryExpansionModelBacked}`,
     `- Response export ready: ${value.acceptedLaneLaunchState.responseExportReady}`,

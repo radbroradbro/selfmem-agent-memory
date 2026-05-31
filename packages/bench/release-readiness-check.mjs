@@ -6050,6 +6050,18 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.privateInputState?.filesHashMatched, 6);
     assert.equal(doctorReport.privateInputState?.maxMemoryBytes, 300000000);
     assert.ok(doctorReport.gates?.some((item) => item.id === "full-shard-private-inputs" && item.status === "pass"));
+    assert.ok(doctorReport.gates?.some((item) => item.id === "accepted-lane-cloud-provider-env" && item.status === "pass"));
+    assert.equal(doctorReport.acceptedLaneLaunchState?.selectedProviderEnvEvidence, true);
+    assert.equal(doctorReport.acceptedLaneLaunchState?.providerEnvEvidenceUsed, true);
+    assert.equal(doctorReport.acceptedLaneLaunchState?.providerCredentialEvidenceReady, true);
+    assert.deepEqual(doctorReport.acceptedLaneLaunchState?.providerCredentialFamiliesReady, ["gemini", "nvidia", "voyage"]);
+    assert.deepEqual(doctorReport.acceptedLaneLaunchState?.providerCredentialFamiliesBlocked, []);
+    assert.deepEqual(doctorReport.acceptedLaneLaunchState?.providerCredentialEvidenceBlockers, []);
+    assert.deepEqual(doctorReport.acceptedLaneLaunchState?.noEnvProviderCredentialBlockers, [
+      "gemini-credentials-missing",
+      "nvidia-credentials-missing",
+      "voyage-credentials-missing",
+    ]);
     assert.ok(doctorReport.gates?.some((item) => item.id === "full-shard-control-preflight" && item.status === "pass"));
     assert.equal(doctorReport.controlPreflightState?.sameDataShardReady, true);
     assert.equal(doctorReport.controlPreflightState?.liveAnswerQualityCanRun, false);
@@ -6072,7 +6084,10 @@ check("fresh public benchmark target check passes", () => {
           lane.readyForAnswerQualityScoring === false,
       ),
     );
-    assert.ok(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("voyage-credentials-missing"));
+    assert.equal(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("voyage-credentials-missing"), false);
+    assert.equal(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("nvidia-credentials-missing"), false);
+    assert.ok(doctorReport.shardState?.supersededProviderCredentialBlockers?.includes("voyage-credentials-missing"));
+    assert.ok(doctorReport.shardState?.supersededProviderCredentialBlockers?.includes("nvidia-credentials-missing"));
     assert.ok(doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
     assert.equal(doctorReport.localFullLaneState?.intakeStatus, "READY_TO_COMBINE_FULL_ANSWER_QUALITY_SHARDS");
     assert.equal(doctorReport.localFullLaneState?.readyForShardCombine, true);
@@ -6249,7 +6264,8 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.gates?.some((item) => item.id === "full-shard-results" && item.status === "blocked"));
     assert.ok(doctorReport.gates?.some((item) => item.id === "owner-and-real-canary" && item.status === "blocked"));
     assert.ok(doctorReport.blockers?.includes("shard-results-missing"));
-    assert.ok(doctorReport.blockers?.includes("voyage-credentials-missing"));
+    assert.equal(doctorReport.blockers?.includes("voyage-credentials-missing"), false);
+    assert.equal(doctorReport.blockers?.includes("nvidia-credentials-missing"), false);
     assert.ok(doctorReport.blockers?.includes("missing-voyage-answer-quality-same-data-result"));
     assert.ok(!doctorReport.blockers?.includes("private-dir-not-provided"));
     assert.equal(doctorReport.blockers?.includes("shard-002-result-missing"), false);
