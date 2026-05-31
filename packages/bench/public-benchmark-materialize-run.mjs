@@ -322,6 +322,7 @@ function writePrivateBenchmarkInputs(options) {
   const sessionContentById = new Map();
   const memoryMap = new Map();
   const chunkIdsBySessionId = new Map();
+  const chunkHashesBySessionId = new Map();
   const answerContentHashesByQuery = new Map();
   const materializerHash =
     memoryMethod === "session-v1"
@@ -351,9 +352,11 @@ function writePrivateBenchmarkInputs(options) {
         content,
         messageLines: formatted.messageLines,
       });
-      chunkIdsBySessionId.set(
+      const sourceChunks = records.filter((record) => record.metadata?.kind === "contextual_source_chunk");
+      chunkIdsBySessionId.set(sessionId, sourceChunks.map((record) => record.id));
+      chunkHashesBySessionId.set(
         sessionId,
-        records.filter((record) => record.metadata?.kind === "contextual_source_chunk").map((record) => record.id),
+        sourceChunks.map((record) => `sha256:${stableHash(normalizeText(record.content))}`),
       );
       for (const record of records) memoryMap.set(record.id, record);
     });
@@ -366,15 +369,19 @@ function writePrivateBenchmarkInputs(options) {
 
   const queries = options.selected.map((row) => {
     const answerSessionIds = asArray(row.answer_session_ids).map((item) => String(item)).filter(Boolean);
-    const expectedResultIds =
-      memoryMethod === "contextual-source-chunk-v1"
+    const expectedResultIds = usesContextualChunkRefs()
         ? answerSessionIds.flatMap((sessionId) => chunkIdsBySessionId.get(sessionId) ?? [sessionId])
         : answerSessionIds;
+    const expectedChunkHashes = answerSessionIds.flatMap((sessionId) => chunkHashesBySessionId.get(sessionId) ?? []);
     return {
       id: queryIdFor(row),
       q: String(row.question),
       expectedResultIds,
-      expectedResultHashes: answerContentHashesByQuery.get(String(row.question_id)) ?? [],
+      expectedResultHashes: usesContextualChunkRefs()
+        ? expectedResultIds.length > 0
+          ? []
+          : expectedChunkHashes
+        : answerContentHashesByQuery.get(String(row.question_id)) ?? [],
       metadata: {
         benchmark: "longmemeval",
         questionType: String(row.question_type),
@@ -516,6 +523,7 @@ function writePrivateBenchmarkInputs(options) {
       haystackSessionCount: sessionContentById.size,
       memoryRecordCount: memories.length,
       contextualSourceChunkCount: memories.filter((item) => item.metadata?.kind === "contextual_source_chunk").length,
+      contextualIndexMemoryCount: memories.filter((item) => item.metadata?.kind === "contextual_index").length,
       rawSessionMemoryCount: memories.filter((item) => item.metadata?.kind === "raw_session").length,
       expectedResultRefCount: expectedRefs,
       redactionStats,
@@ -689,19 +697,80 @@ function memoryRecordsForSession(input) {
   }
 
   const chunks = chunkSessionLines(input.messageLines.length > 0 ? input.messageLines : [input.content]);
-  return chunks.map((chunkLines, index) => {
+  if (memoryMethod === "contextual-source-chunk-v1") {
+    return chunks.map((chunkLines, index) => contextualSourceChunkRecord({ ...input, chunkLines, index, chunks, date }));
+  }
+
+  return chunks.flatMap((chunkLines, index) => {
     const chunkText = chunkLines.join("\n");
     const terms = salientTerms(chunkText, 12);
     const title = terms.length > 0 ? terms.slice(0, 6).join(" ") : `session ${shortHash(input.sessionId)}`;
     const eventDate = firstDateLikeText(chunkText) ?? date;
-    return {
-      id: `${input.sessionId}#chunk-${String(index + 1).padStart(3, "0")}`,
+    const source = contextualSourceChunkRecord({ ...input, chunkLines, index, chunks, date, terms, title, eventDate });
+    const sourceContentHash = `sha256:${stableHash(normalizeText(source.content))}`;
+    const indexId = `${input.sessionId}#index-${String(index + 1).padStart(3, "0")}`;
+    return [
+      {
+        ...source,
+        metadata: {
+          ...source.metadata,
+          retrievalRole: "source",
+          indexedBy: indexId,
+        },
+      },
+      {
+        id: indexId,
+        content: contextualIndexContent({
+          sessionId: input.sessionId,
+          date,
+          eventDate,
+          title,
+          terms,
+          chunkLines,
+          chunkIndex: index,
+          chunkCount: chunks.length,
+          sourceChunkId: source.id,
+        }),
+        metadata: {
+          benchmark: "longmemeval",
+          source: "MemoryBench LongMemEval-S cleaned",
+          kind: "contextual_index",
+          retrievalRole: "index",
+          sourceChunkId: source.id,
+          rehydrateId: source.id,
+          sourceContentHash,
+          sourceEstimatedTokens: estimateTokens(source.content),
+          parentSessionId: input.sessionId,
+          date,
+          documentDate: date,
+          eventDate,
+          title,
+          topic: terms.slice(0, 5).join(" "),
+          topicPath: "Benchmarks / LongMemEval-S / atomic-index",
+          subtopic: terms.join(" "),
+          subtopicPath: `${date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "source chunk"}`,
+          chunkIndex: index,
+          chunkCount: chunks.length,
+          sourceRetention: "private-source-chunk",
+        },
+      },
+    ];
+  });
+}
+
+function contextualSourceChunkRecord(input) {
+  const chunkText = input.chunkLines.join("\n");
+  const terms = input.terms ?? salientTerms(chunkText, 12);
+  const title = input.title ?? (terms.length > 0 ? terms.slice(0, 6).join(" ") : `session ${shortHash(input.sessionId)}`);
+  const eventDate = input.eventDate ?? firstDateLikeText(chunkText) ?? input.date;
+  return {
+    id: `${input.sessionId}#chunk-${String(input.index + 1).padStart(3, "0")}`,
       content: [
         `Contextual memory: ${title}`,
-        date ? `Document date: ${date}` : null,
+        input.date ? `Document date: ${input.date}` : null,
         eventDate ? `Event date: ${eventDate}` : null,
         `Session: ${input.sessionId}`,
-        `Chunk: ${index + 1}/${chunks.length}`,
+        `Chunk: ${input.index + 1}/${input.chunks.length}`,
         "Source excerpt:",
         chunkText,
       ]
@@ -712,20 +781,42 @@ function memoryRecordsForSession(input) {
         source: "MemoryBench LongMemEval-S cleaned",
         kind: "contextual_source_chunk",
         parentSessionId: input.sessionId,
-        date,
-        documentDate: date,
+        date: input.date,
+        documentDate: input.date,
         eventDate,
         title,
         topic: terms.slice(0, 5).join(" "),
         topicPath: "Benchmarks / LongMemEval-S / source-session",
         subtopic: terms.join(" "),
-        subtopicPath: `${date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "source chunk"}`,
-        chunkIndex: index,
-        chunkCount: chunks.length,
+        subtopicPath: `${input.date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "source chunk"}`,
+        chunkIndex: input.index,
+        chunkCount: input.chunks.length,
         sourceRetention: "private-source-chunk",
       },
-    };
-  });
+  };
+}
+
+function contextualIndexContent(input) {
+  const roleSummary = input.chunkLines
+    .slice(0, 6)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .map((line) => line.slice(0, 220))
+    .join(" | ");
+  return [
+    `Atomic contextual index: ${input.title}`,
+    input.date ? `Document date: ${input.date}` : null,
+    input.eventDate ? `Event date: ${input.eventDate}` : null,
+    `Topic: ${input.terms.slice(0, 5).join(" ") || "source session"}`,
+    `Subtopic: ${input.terms.join(" ") || "source chunk"}`,
+    `Session: ${input.sessionId}`,
+    `Source chunk: ${input.sourceChunkId}`,
+    `Chunk: ${input.chunkIndex + 1}/${input.chunkCount}`,
+    `Index summary: ${roleSummary}`,
+    `Key terms: ${input.terms.join(", ")}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 function chunkSessionLines(lines) {
@@ -997,6 +1088,10 @@ function shortHash(value) {
   return stableHash(String(value)).slice(0, 16);
 }
 
+function estimateTokens(text) {
+  return Math.max(1, Math.ceil(String(text ?? "").length / 4));
+}
+
 function positiveInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
@@ -1023,8 +1118,12 @@ function normalizeRetrievalStrategy(value) {
 
 function normalizeMemoryMethod(value) {
   const method = String(value ?? "").trim().toLowerCase();
-  assert.ok(["session-v1", "contextual-source-chunk-v1"].includes(method), `unknown memory method: ${method}`);
+  assert.ok(["session-v1", "contextual-source-chunk-v1", "contextual-index-source-chunk-v1"].includes(method), `unknown memory method: ${method}`);
   return method;
+}
+
+function usesContextualChunkRefs() {
+  return memoryMethod === "contextual-source-chunk-v1" || memoryMethod === "contextual-index-source-chunk-v1";
 }
 
 function resolveInputPath(value) {

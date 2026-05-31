@@ -43,9 +43,20 @@ quality. `contextual-source-chunk-v1` plus `bm25-lite` reached 0.2459, and
 `contextual-source-chunk-v1` plus `cloud-nvidia-nv-embed-v1-mistral-rerank`
 reached 0.1096. The same NVIDIA arm scored 0.0000 on `session-v1`, so treat
 that as a likely adapter, rerank parsing, scoring, or tiny-shard integration
-risk rather than a stable provider-quality verdict. The next useful method
-change is an atomic/contextual index layer that ranks high-signal summaries
-while rehydrating source chunks, followed by a larger same-data shard.
+risk rather than a stable provider-quality verdict.
+
+The next method prototype is now wired as
+`contextual-index-source-chunk-v1`; see
+`reviews/overnight-20260522/contextual-index-source-chunk-smoke-20260531.json`.
+This method ranks compact deterministic contextual index records while keeping
+the private source chunks available for answer rehydration. The fixture smoke
+proved source-only records are skipped during ranking, exported result IDs
+point back to source chunks, and contextual expected refs use chunk IDs without
+double-counting matching hashes. A live 3-query materialization produced 1,064
+source chunks and 1,064 searchable index records from 146 haystack sessions.
+This is method plumbing evidence only. The next benchmark gate is same-shard
+retrieval and answer-quality comparison against `session-v1`,
+`contextual-source-chunk-v1`, BM25-lite, and provider-backed arms.
 
 ## Operating Provider Policy
 

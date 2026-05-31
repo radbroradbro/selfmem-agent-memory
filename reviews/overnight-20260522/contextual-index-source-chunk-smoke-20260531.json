@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "contextual-index-source-chunk-smoke",
+  "generatedAt": "2026-05-31T16:14:48.391Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "benchmark": "longmemeval",
+  "method": {
+    "id": "contextual-index-source-chunk-v1",
+    "purpose": "Rank compact deterministic contextual index records while rehydrating the private source chunk for downstream answer quality.",
+    "sourceRecordsSearchable": false,
+    "indexRecordsSearchable": true,
+    "responseResultIdMode": "source-chunk",
+    "expectedReferenceMode": "source-chunk",
+    "claimBoundary": "method smoke only; not answer-quality or SOTA evidence"
+  },
+  "fixtureSmoke": {
+    "ok": true,
+    "sourceChunks": 3,
+    "indexRecords": 3,
+    "skippedSourceOnly": 3,
+    "resultIdMode": "source-chunk",
+    "expectedIdMode": "source-chunk",
+    "expectedRefCount": 2,
+    "expectedHashCount": 0,
+    "collectorAccepted": true
+  },
+  "liveMaterializationSmoke": {
+    "ok": true,
+    "fixtureOnly": false,
+    "claimTier": "run-only",
+    "targetFileHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "sourceLockHash": "sha256:dae7e055cfa65b82e9ee1d03a8cab874839c740789a4a19d2b1501ae454824e4",
+    "datasetHash": "sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "materializationShard": {
+      "applied": true,
+      "startIndex": 0,
+      "endIndexExclusive": 3,
+      "totalQueryCount": 500,
+      "selectedCount": 3,
+      "requestedLimit": 3,
+      "selectedQuestionIdsHash": "sha256:e71a5dd2675a606477878bdab9edc3fd718bd8af4b34ea3fc04e00ea1e546f74"
+    },
+    "selection": {
+      "queryCount": 3,
+      "haystackSessionCount": 146,
+      "memoryRecordCount": 2128,
+      "contextualSourceChunkCount": 1064,
+      "contextualIndexMemoryCount": 1064,
+      "rawSessionMemoryCount": 0,
+      "expectedResultRefCount": 61,
+      "keyShapedTokenRedactionCount": 0,
+      "privateTagRedactionCount": 0,
+      "querySetHash": "sha256:3bf5454ae53ca3c3ea7f2c5efa305819324fafc3b2602644a73c81a9186414f4",
+      "collectorCompatibleQuerySetHash": "sha256:78c5653dd9e49a0d222af17ec486acf81145e03acfd54e8d50a1517c6588d0f6",
+      "memoriesFileHash": "sha256:bb302f9a70837bacf29b4162b2be5748340659a70470d5350169faabd920758a"
+    }
+  },
+  "nextGate": [
+    "Run same-shard retrieval proxy with bm25-lite and provider arms.",
+    "Run answer-quality scoring before any method promotion.",
+    "Compare against session-v1 and contextual-source-chunk-v1 on the same shard."
+  ]
+}

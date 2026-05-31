@@ -199,6 +199,7 @@ const result = {
     candidates: loaded.candidates.length,
     skippedInvalid: loaded.skippedInvalid,
     skippedFullyPrivate: loaded.skippedFullyPrivate,
+    skippedSourceOnly: loaded.skippedSourceOnly,
     redactionCount: loaded.redactionCount,
     keyRedactionCount: loaded.keyRedactionCount,
   },
@@ -226,6 +227,7 @@ function loadMemories(inputPath, options) {
   let parsed = 0;
   let skippedInvalid = 0;
   let skippedFullyPrivate = 0;
+  let skippedSourceOnly = 0;
   let redactionCount = 0;
   let keyRedactionCount = 0;
 
@@ -233,6 +235,11 @@ function loadMemories(inputPath, options) {
     try {
       const item = JSON.parse(line);
       parsed += 1;
+      const rawMetadata = item?.metadata && typeof item.metadata === "object" ? item.metadata : {};
+      if (rawMetadata.retrievalRole === "source") {
+        skippedSourceOnly += 1;
+        return;
+      }
       const text = extractMemoryText(item);
       if (!text.trim()) {
         skippedInvalid += 1;
@@ -248,13 +255,16 @@ function loadMemories(inputPath, options) {
       const sourceId = safeScalar(item.id ?? item.memory_id ?? item.memoryId ?? item.sourceId ?? `line-${index + 1}`);
       const metadata = options.features.metadata ? sanitizeMetadata(item.metadata) : {};
       const tokens = options.features.tokens ? tokenize(redacted.text) : null;
-      const contentHash = `sha256:${stableHash(normalizeText(redacted.text))}`;
+      const ownContentHash = `sha256:${stableHash(normalizeText(redacted.text))}`;
+      const rehydrateId = safeOptionalScalar(rawMetadata.rehydrateId ?? rawMetadata.sourceChunkId);
+      const sourceContentHash = safeOptionalSha256(rawMetadata.sourceContentHash);
+      const sourceEstimatedTokens = optionalPositiveNumber(rawMetadata.sourceEstimatedTokens);
       const candidate = {
         sourceId,
-        outputId: options.preserveIds ? sourceId : `memory:${shortHash(sourceId)}`,
+        outputId: options.preserveIds && rehydrateId ? rehydrateId : options.preserveIds ? sourceId : `memory:${shortHash(rehydrateId ?? sourceId)}`,
         text: redacted.text,
-        contentHash,
-        estimatedTokens: estimateTokens(redacted.text),
+        contentHash: sourceContentHash ?? ownContentHash,
+        estimatedTokens: sourceEstimatedTokens ?? estimateTokens(redacted.text),
         metadata,
         baseScore: finiteNumberOrDefault(item.score ?? item.similarity ?? item.confidence, 0),
       };
@@ -278,6 +288,7 @@ function loadMemories(inputPath, options) {
     candidates,
     skippedInvalid,
     skippedFullyPrivate,
+    skippedSourceOnly,
     redactionCount,
     keyRedactionCount,
   };
@@ -3024,6 +3035,24 @@ function safeScalar(value) {
   assert.doesNotMatch(text, secretPattern, "memory id contains a key-shaped secret");
   assert.doesNotMatch(text, privatePathPattern, "memory id contains a private path");
   return text.slice(0, 160);
+}
+
+function safeOptionalScalar(value) {
+  if (value == null || value === "") return null;
+  return safeScalar(value);
+}
+
+function safeOptionalSha256(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return null;
+  assert.match(text, /^sha256:[a-f0-9]{64}$/i, "source content hash must be sha256");
+  return text;
+}
+
+function optionalPositiveNumber(value) {
+  if (value == null || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : null;
 }
 
 function sanitizeMetadata(metadata) {
