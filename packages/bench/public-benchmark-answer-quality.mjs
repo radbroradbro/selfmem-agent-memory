@@ -41,6 +41,11 @@ const secretPattern =
 const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\/|[A-Za-z]:\\Users\\)/;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
+if (args.deepseekThinkingSmoke === true) {
+  runDeepSeekThinkingSmoke();
+  process.exit(0);
+}
+
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(
   ["full-sota", "local-full", "model-challenger"].includes(claimScope),
@@ -491,18 +496,7 @@ async function callJudgeModel({ query, expectedAnswer, candidateAnswer }) {
 }
 
 async function callOpenAiCompatible({ model, system, prompt, jsonMode = false }) {
-  const body = {
-    model,
-    messages: [
-      { role: "system", content: system },
-      { role: "user", content: prompt },
-    ],
-    temperature: 0,
-    max_tokens: maxOutputTokens,
-    chat_template_kwargs: { enable_thinking: false, preserve_thinking: false },
-    stream: false,
-  };
-  if (jsonMode && !disableJsonResponseFormat) body.response_format = { type: "json_object" };
+  const body = openAiCompatibleRequestBody({ model, system, prompt, jsonMode, endpoint: baseUrl });
   const headers = { "Content-Type": "application/json" };
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
   const response = await fetch(chatCompletionsUrl(baseUrl), {
@@ -519,6 +513,63 @@ async function callOpenAiCompatible({ model, system, prompt, jsonMode = false })
   assert.ok(content, "model endpoint returned empty content");
   assertNoUnsafePrompt(content, "model content");
   return content;
+}
+
+function openAiCompatibleRequestBody({ model, system, prompt, jsonMode = false, endpoint = "" }) {
+  const body = {
+    model,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0,
+    max_tokens: maxOutputTokens,
+    chat_template_kwargs: { enable_thinking: false, preserve_thinking: false },
+    stream: false,
+  };
+  if (isDeepSeekModelOrEndpoint(model, endpoint)) body.thinking = { type: "disabled" };
+  if (jsonMode && !disableJsonResponseFormat) body.response_format = { type: "json_object" };
+  return body;
+}
+
+function isDeepSeekModelOrEndpoint(model, endpoint) {
+  const modelText = String(model ?? "").toLowerCase();
+  const endpointText = String(endpoint ?? "").toLowerCase();
+  return modelText.includes("deepseek") || endpointText.includes("deepseek");
+}
+
+function runDeepSeekThinkingSmoke() {
+  const byModel = openAiCompatibleRequestBody({
+    model: "deepseek-v4-flash",
+    system: "system",
+    prompt: "prompt",
+    endpoint: "https://example.test",
+  });
+  const byEndpoint = openAiCompatibleRequestBody({
+    model: "other-model",
+    system: "system",
+    prompt: "prompt",
+    endpoint: "https://api.deepseek.com",
+  });
+  const normal = openAiCompatibleRequestBody({
+    model: "other-model",
+    system: "system",
+    prompt: "prompt",
+    endpoint: "https://example.test",
+  });
+  assert.deepEqual(byModel.thinking, { type: "disabled" });
+  assert.deepEqual(byEndpoint.thinking, { type: "disabled" });
+  assert.equal(normal.thinking, undefined);
+  assert.deepEqual(byModel.chat_template_kwargs, { enable_thinking: false, preserve_thinking: false });
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "deepseek-thinking-smoke",
+      disablesByModel: true,
+      disablesByEndpoint: true,
+      leavesNonDeepSeekUnchanged: true,
+    })}\n`,
+  );
 }
 
 function normalizeJudge(text) {

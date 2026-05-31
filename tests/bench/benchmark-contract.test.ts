@@ -8,6 +8,7 @@ const script = "packages/bench/public-benchmark-strategy-compare.mjs";
 const preflightScript = "packages/bench/provider-benchmark-live-preflight.mjs";
 const resultGateScript = "packages/bench/provider-challenger-result-gate.mjs";
 const materializeScript = "packages/bench/public-benchmark-materialize-run.mjs";
+const answerQualityScript = "packages/bench/public-benchmark-answer-quality.mjs";
 const responseExportScript = "packages/bench/recallweave-response-export.mjs";
 
 describe("public benchmark comparison contract", () => {
@@ -304,6 +305,20 @@ describe("public benchmark comparison contract", () => {
     expect(report.mode).toBe("nvidia-adapter-parser-smoke");
     expect(report.acceptsRankingsLogitShape).toBe(true);
     expect(report.negativeLogitsPreserveProviderRank).toBe(true);
+  });
+
+  it("disables DeepSeek thinking in answer-quality OpenAI-compatible calls", () => {
+    const result = spawnSync(process.execPath, [answerQualityScript, "--deepseek-thinking-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("deepseek-thinking-smoke");
+    expect(report.disablesByModel).toBe(true);
+    expect(report.disablesByEndpoint).toBe(true);
+    expect(report.leavesNonDeepSeekUnchanged).toBe(true);
   });
 
   it("forwards live materialization shard controls into provider runs", () => {

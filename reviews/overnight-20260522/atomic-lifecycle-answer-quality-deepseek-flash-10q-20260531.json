@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-memory-method-ladder",
+  "generatedAt": "2026-05-31T22:07:43.101Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "retrievalProxyOnly": false,
+  "memoryBenchAnswerQuality": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "benchmark": "longmemeval",
+  "fixtureOnly": false,
+  "executeRequested": true,
+  "readyForExecution": true,
+  "readiness": {
+    "ready": true,
+    "blockers": [],
+    "callsAllowed": true,
+    "publicDataConfirmed": true,
+    "noRawOutputGuard": true,
+    "baseUrlPresent": true,
+    "endpointLabel": "https://api.deepseek.com",
+    "endpointIsLocal": false,
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "cloudApiKeyPresent": true
+  },
+  "claimBoundary": "same-shard answer-quality method diagnostic; not production or SOTA evidence without the normal gates",
+  "claimScope": "model-challenger",
+  "modelMatchPolicy": "challenger-model-allowed",
+  "queryShard": {
+    "startIndex": 0,
+    "endIndexExclusive": 10,
+    "requestedLimit": 10,
+    "sameRawQuerySelectionAcrossMethods": true,
+    "selectedQuestionIdsHash": "sha256:ed13f4d2e2ce11d4bb3750559a5799e4d10e2c045209de28196f5ac2245360f0"
+  },
+  "contextTokenBudget": 800,
+  "limit": 5,
+  "methods": [
+    "session-v1",
+    "atomic-memory-v1"
+  ],
+  "strategies": [
+    "bm25-lite",
+    "full-hybrid-rerank"
+  ],
+  "materializations": [
+    {
+      "method": "session-v1",
+      "selectedQuestionIdsHash": "sha256:ed13f4d2e2ce11d4bb3750559a5799e4d10e2c045209de28196f5ac2245360f0",
+      "queryCount": 10,
+      "haystackSessionCount": 494,
+      "memoryRecordCount": 494,
+      "contextualSourceChunkCount": 0,
+      "contextualIndexMemoryCount": 0,
+      "atomicMemoryCount": 0,
+      "expectedResultRefCount": 36,
+      "querySetHash": "sha256:1364c48e803f0542f28bbf887365701f53b3fdb5efd7467105a74d4b50d9fcb1",
+      "collectorCompatibleQuerySetHash": "sha256:ac09f8a59c4916d3f6f014f497f7aaba41b17d155ceb5b089f0cb500f25d4f05",
+      "memoriesFileHash": "sha256:a6de49d5e1667c5bd1289f500efb73c194c06ef169f2afe821584a921185359b",
+      "answerLabelsFileHash": "sha256:8c4560c337bcd23dccbcbc3d4ec572d36c47dc2d373c129b0d586f359fc8ae71"
+    },
+    {
+      "method": "atomic-memory-v1",
+      "selectedQuestionIdsHash": "sha256:ed13f4d2e2ce11d4bb3750559a5799e4d10e2c045209de28196f5ac2245360f0",
+      "queryCount": 10,
+      "haystackSessionCount": 494,
+      "memoryRecordCount": 8455,
+      "contextualSourceChunkCount": 3562,
+      "contextualIndexMemoryCount": 0,
+      "atomicMemoryCount": 4893,
+      "expectedResultRefCount": 192,
+      "querySetHash": "sha256:2b4a1f0fc068b400923c268e83f4b480e64a59674d909b4f991b11575f963597",
+      "collectorCompatibleQuerySetHash": "sha256:12b89e120e32b5df717bf155abd4640f9d3ab2f800090e13096f933a12e2df57",
+      "memoriesFileHash": "sha256:3c18336fec6f300b55bdec1ac1a3b780ef38dabae16df150dc2875172187ca75",
+      "answerLabelsFileHash": "sha256:8c4560c337bcd23dccbcbc3d4ec572d36c47dc2d373c129b0d586f359fc8ae71"
+    }
+  ],
+  "responseArms": [
+    {
+      "method": "session-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 10,
+      "querySetHash": "sha256:ac09f8a59c4916d3f6f014f497f7aaba41b17d155ceb5b089f0cb500f25d4f05",
+      "responsesHash": "sha256:57e7b29854d7b1dc346923bb1182b9158456312177fe90fd10f1cc805498263e",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "session-or-memory",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "session-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 10,
+      "querySetHash": "sha256:ac09f8a59c4916d3f6f014f497f7aaba41b17d155ceb5b089f0cb500f25d4f05",
+      "responsesHash": "sha256:60031514936e50a55d562569d0883c3cbedc6566f05f95028cbe7d230379b987",
+      "skippedSourceOnly": 0,
+      "resultIdMode": "session-or-memory",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "atomic-memory-v1",
+      "strategy": "bm25-lite",
+      "responseCount": 10,
+      "querySetHash": "sha256:12b89e120e32b5df717bf155abd4640f9d3ab2f800090e13096f933a12e2df57",
+      "responsesHash": "sha256:fc1c1fd749b3f1004c7cbf94a879252d2bb8194203310372798f8f9ca234eebb",
+      "skippedSourceOnly": 3562,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "bm25-lite",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    },
+    {
+      "method": "atomic-memory-v1",
+      "strategy": "full-hybrid-rerank",
+      "responseCount": 10,
+      "querySetHash": "sha256:12b89e120e32b5df717bf155abd4640f9d3ab2f800090e13096f933a12e2df57",
+      "responsesHash": "sha256:e6085aeaa718d53d9ed73248850465ad17d4b54818b440b61141f72e791d41a6",
+      "skippedSourceOnly": 3562,
+      "resultIdMode": "source-chunk-or-mixed",
+      "provider": {
+        "strategy": "full-hybrid-rerank",
+        "providerCallsMade": 0,
+        "modelArm": null
+      }
+    }
+  ],
+  "answerQualityReports": [
+    {
+      "method": "session-v1",
+      "reportHash": "sha256:50beffb16e29414d1f6197471284185f2d23b0b8af2ab9c476209319a4f818ff",
+      "readyForEndToEndMemoryScoreGate": true,
+      "claimScope": "model-challenger",
+      "modelMatchPolicy": "challenger-model-allowed",
+      "countsAsLocalFullBenchmarkEvidence": false,
+      "countsAsModelChallengerBenchmarkEvidence": true,
+      "callsMade": 40,
+      "endpointLabel": "https://api.deepseek.com",
+      "winner": {
+        "strategy": "bm25-lite",
+        "answerQuality": 10,
+        "judgeCorrectRate": 0.1,
+        "answerLatencyP50Ms": 1838
+      },
+      "metrics": {
+        "answerQuality": 10,
+        "memoryScore": 10,
+        "longmemevalScore": 10,
+        "quality": 0.1,
+        "judgeCorrectRate": 0.1,
+        "answerLatencyP50Ms": 1838,
+        "answerLatencyP95Ms": 2149,
+        "contextTokensAvg": 800
+      },
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 10,
+          "judgeCorrectRate": 0.1,
+          "answerLatencyP50Ms": 1838,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 10,
+          "judgeCorrectRate": 0.1,
+          "answerLatencyP50Ms": 1930,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        }
+      ]
+    },
+    {
+      "method": "atomic-memory-v1",
+      "reportHash": "sha256:2aa605ea49c97c380363f069c43d227d8002d29d7a06c530fd81eaca28cbf9fd",
+      "readyForEndToEndMemoryScoreGate": true,
+      "claimScope": "model-challenger",
+      "modelMatchPolicy": "challenger-model-allowed",
+      "countsAsLocalFullBenchmarkEvidence": false,
+      "countsAsModelChallengerBenchmarkEvidence": true,
+      "callsMade": 40,
+      "endpointLabel": "https://api.deepseek.com",
+      "winner": {
+        "strategy": "bm25-lite",
+        "answerQuality": 35,
+        "judgeCorrectRate": 0.3,
+        "answerLatencyP50Ms": 1940
+      },
+      "metrics": {
+        "answerQuality": 35,
+        "memoryScore": 35,
+        "longmemevalScore": 35,
+        "quality": 0.35,
+        "judgeCorrectRate": 0.3,
+        "answerLatencyP50Ms": 1940,
+        "answerLatencyP95Ms": 3111,
+        "contextTokensAvg": 758
+      },
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 35,
+          "judgeCorrectRate": 0.3,
+          "answerLatencyP50Ms": 1940,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 25,
+          "judgeCorrectRate": 0.2,
+          "answerLatencyP50Ms": 1796,
+          "answerFailures": 0,
+          "judgeFailures": 0
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "method": "atomic-memory-v1",
+    "reportHash": "sha256:2aa605ea49c97c380363f069c43d227d8002d29d7a06c530fd81eaca28cbf9fd",
+    "readyForEndToEndMemoryScoreGate": true,
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "countsAsLocalFullBenchmarkEvidence": false,
+    "countsAsModelChallengerBenchmarkEvidence": true,
+    "callsMade": 40,
+    "endpointLabel": "https://api.deepseek.com",
+    "winner": {
+      "strategy": "bm25-lite",
+      "answerQuality": 35,
+      "judgeCorrectRate": 0.3,
+      "answerLatencyP50Ms": 1940
+    },
+    "metrics": {
+      "answerQuality": 35,
+      "memoryScore": 35,
+      "longmemevalScore": 35,
+      "quality": 0.35,
+      "judgeCorrectRate": 0.3,
+      "answerLatencyP50Ms": 1940,
+      "answerLatencyP95Ms": 3111,
+      "contextTokensAvg": 758
+    },
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 35,
+        "judgeCorrectRate": 0.3,
+        "answerLatencyP50Ms": 1940,
+        "answerFailures": 0,
+        "judgeFailures": 0
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 25,
+        "judgeCorrectRate": 0.2,
+        "answerLatencyP50Ms": 1796,
+        "answerFailures": 0,
+        "judgeFailures": 0
+      }
+    ]
+  },
+  "nextActions": [
+    "Use this diagnostic only to decide whether contextual-index-source-chunk-v1 deserves a larger accepted shard.",
+    "Run the standard result gate and reviewer intake before any public benchmark claim."
+  ]
+}
