@@ -808,7 +808,6 @@ function atomicMemoryRecordsForChunk(input) {
   const eventDate = firstDateLikeText(chunkText) ?? input.date;
   const source = contextualSourceChunkRecord({ ...input, terms, title, eventDate });
   const sourceContentHash = `sha256:${stableHash(normalizeText(source.content))}`;
-  const atomId = `${input.sessionId}#atom-${String(input.index + 1).padStart(3, "0")}`;
   const facts = atomicFactLines(input.chunkLines);
   return [
     {
@@ -816,18 +815,20 @@ function atomicMemoryRecordsForChunk(input) {
       metadata: {
         ...source.metadata,
         retrievalRole: "source",
-        indexedBy: atomId,
+        indexedBy: facts.map((_, factIndex) => atomicMemoryId(input, factIndex)),
       },
     },
-    {
-      id: atomId,
+    ...facts.map((fact, factIndex) => ({
+      id: atomicMemoryId(input, factIndex),
       content: atomicMemoryContent({
         sessionId: input.sessionId,
         date: input.date,
         eventDate,
         title,
         terms,
-        facts,
+        fact,
+        factIndex,
+        factCount: facts.length,
         chunkIndex: input.index,
         chunkCount: input.chunks.length,
         sourceChunkId: source.id,
@@ -852,11 +853,16 @@ function atomicMemoryRecordsForChunk(input) {
         subtopicPath: `${input.date ?? "undated"} / ${terms.slice(0, 6).join(" ") || "atomic memory"}`,
         chunkIndex: input.index,
         chunkCount: input.chunks.length,
+        atomicFactIndex: factIndex,
         atomicFactCount: facts.length,
         sourceRetention: "private-source-chunk",
       },
-    },
+    })),
   ];
+}
+
+function atomicMemoryId(input, factIndex) {
+  return `${input.sessionId}#atom-${String(input.index + 1).padStart(3, "0")}-${String(factIndex + 1).padStart(2, "0")}`;
 }
 
 function atomicMemoryContent(input) {
@@ -869,8 +875,8 @@ function atomicMemoryContent(input) {
     `Session: ${input.sessionId}`,
     `Source chunk: ${input.sourceChunkId}`,
     `Chunk: ${input.chunkIndex + 1}/${input.chunkCount}`,
-    "Facts:",
-    ...input.facts.map((fact) => `- ${fact}`),
+    `Atomic fact: ${input.fact}`,
+    `Atomic fact index: ${input.factIndex + 1}/${input.factCount}`,
     `Key terms: ${input.terms.join(", ")}`,
   ]
     .filter(Boolean)

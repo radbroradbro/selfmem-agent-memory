@@ -7,6 +7,8 @@ import { describe, expect, it } from "vitest";
 const script = "packages/bench/public-benchmark-strategy-compare.mjs";
 const preflightScript = "packages/bench/provider-benchmark-live-preflight.mjs";
 const resultGateScript = "packages/bench/provider-challenger-result-gate.mjs";
+const materializeScript = "packages/bench/public-benchmark-materialize-run.mjs";
+const responseExportScript = "packages/bench/recallweave-response-export.mjs";
 
 describe("public benchmark comparison contract", () => {
   it("reports provider promotion separately from the local hybrid control", () => {
@@ -186,6 +188,51 @@ describe("public benchmark comparison contract", () => {
 
     expect(result.status).not.toBe(0);
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/local-rerank-credentials-missing/);
+  });
+
+  it("materializes atomic memory as separate fact records with source rehydration", () => {
+    const tempDir = mkdtempSync(join(tmpdir(), "recallweave-atomic-materialize-"));
+    try {
+      const result = spawnSync(
+        process.execPath,
+        [
+          materializeScript,
+          "--fixture",
+          "--memory-method",
+          "atomic-memory-v1",
+          "--private-output-dir",
+          tempDir,
+          "--format",
+          "json",
+        ],
+        {
+          cwd: new URL("../..", import.meta.url),
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+        },
+      );
+      expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+      const report = JSON.parse(result.stdout);
+      expect(report.selection.memoryMethod).toBe("atomic-memory-v1");
+      expect(report.selection.atomicMemoryCount).toBeGreaterThan(report.selection.contextualSourceChunkCount);
+      expect(report.selection.expectedResultRefCount).toBeGreaterThan(0);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("dedupes atomic facts by rehydrated source before exporting top-k", () => {
+    const result = spawnSync(process.execPath, [responseExportScript, "--rehydrated-atomic-dedupe-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("rehydrated-atomic-dedupe-smoke");
+    expect(report.rankingIdsStayAtomic).toBe(true);
+    expect(report.keepsBestAtomicFactPerRehydratedSource).toBe(true);
+    expect(report.resultIdsAreUnique).toBe(true);
   });
 });
 

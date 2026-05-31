@@ -99,6 +99,11 @@ if (args.nvidiaAdapterParserSmoke === true) {
   process.exit(0);
 }
 
+if (args.rehydratedAtomicDedupeSmoke === true) {
+  runRehydratedAtomicDedupeSmoke();
+  process.exit(0);
+}
+
 assert.ok(querySetPath, "query set is required. Pass --queryset or RECALLWEAVE_BASELINE_QUERYSET");
 assert.ok(existsSync(querySetPath), `query set missing: ${displayPath(querySetPath)}`);
 assert.ok(statSync(querySetPath).size > 0, `query set empty: ${displayPath(querySetPath)}`);
@@ -140,7 +145,7 @@ const responses = {};
 const contextBudgetStats = [];
 for (const query of querySelection.queries) {
   const startedAt = performance.now();
-  const ranked = (await rankCandidates(query, loaded.candidates, { strategy: rankingStrategy, fixtureRequested, providerStats })).slice(0, limit);
+  const ranked = dedupeRankedResultIds(await rankCandidates(query, loaded.candidates, { strategy: rankingStrategy, fixtureRequested, providerStats })).slice(0, limit);
   const budgeted = applyContextBudget(ranked, { contextTokenBudget });
   contextBudgetStats.push({ queryIdHash: shortHash(query.id), ...budgeted.stats });
   responses[query.id] = {
@@ -149,7 +154,7 @@ for (const query of querySelection.queries) {
     totalBeforeBudget: ranked.length,
     contextBudget: budgeted.stats,
     results: budgeted.results.map((candidate) => ({
-      id: candidate.outputId,
+      id: candidate.resultId ?? candidate.outputId,
       contentHash: candidate.contentHash,
       score: candidate.score,
       estimatedTokens: candidate.contextEstimatedTokens,
@@ -269,9 +274,11 @@ function loadMemories(inputPath, options) {
       const rehydrateId = safeOptionalScalar(rawMetadata.rehydrateId ?? rawMetadata.sourceChunkId);
       const sourceContentHash = safeOptionalSha256(rawMetadata.sourceContentHash);
       const sourceEstimatedTokens = optionalPositiveNumber(rawMetadata.sourceEstimatedTokens);
+      const outputId = options.preserveIds ? sourceId : `memory:${shortHash(sourceId)}`;
       const candidate = {
         sourceId,
-        outputId: options.preserveIds && rehydrateId ? rehydrateId : options.preserveIds ? sourceId : `memory:${shortHash(rehydrateId ?? sourceId)}`,
+        outputId,
+        resultId: options.preserveIds && rehydrateId ? rehydrateId : outputId,
         text: redacted.text,
         contentHash: sourceContentHash ?? ownContentHash,
         estimatedTokens: sourceEstimatedTokens ?? estimateTokens(redacted.text),
@@ -2334,6 +2341,30 @@ function runNvidiaAdapterParserSmoke() {
   );
 }
 
+function runRehydratedAtomicDedupeSmoke() {
+  const ranked = dedupeRankedResultIds([
+    { sourceId: "session#atom-001-01", outputId: "session#atom-001-01", resultId: "session#chunk-001", contentHash: "sha256:source", score: 0.8 },
+    { sourceId: "session#atom-001-02", outputId: "session#atom-001-02", resultId: "session#chunk-001", contentHash: "sha256:source", score: 0.95 },
+    { sourceId: "session#atom-002-01", outputId: "session#atom-002-01", resultId: "session#chunk-002", contentHash: "sha256:source-2", score: 0.7 },
+  ]);
+  assert.deepEqual(
+    ranked.map((candidate) => candidate.resultId),
+    ["session#chunk-001", "session#chunk-002"],
+  );
+  assert.equal(ranked[0].sourceId, "session#atom-001-02");
+  assert.equal(ranked[0].outputId, "session#atom-001-02");
+  assert.equal(ranked[0].contentHash, "sha256:source");
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "rehydrated-atomic-dedupe-smoke",
+      rankingIdsStayAtomic: true,
+      keepsBestAtomicFactPerRehydratedSource: true,
+      resultIdsAreUnique: true,
+    })}\n`,
+  );
+}
+
 function snapshotEnv(names) {
   return Object.fromEntries(names.map((name) => [name, process.env[name]]));
 }
@@ -3094,6 +3125,17 @@ function reciprocalRankBoost(rank) {
 
 function byScoreThenId(left, right) {
   return right.score - left.score || left.outputId.localeCompare(right.outputId);
+}
+
+function dedupeRankedResultIds(candidates) {
+  const bestByResultId = new Map();
+  for (const candidate of candidates) {
+    const resultId = String(candidate?.resultId ?? candidate?.outputId ?? "");
+    if (!resultId) continue;
+    const current = bestByResultId.get(resultId);
+    if (!current || byScoreThenId(candidate, current) < 0) bestByResultId.set(resultId, candidate);
+  }
+  return [...bestByResultId.values()].sort(byScoreThenId);
 }
 
 function queryTextValue(query) {
