@@ -63,6 +63,16 @@
       "completedReports": 7,
       "partialReports": 10,
       "bestZeroDollarLane": "nvidia",
+      "budgetContract": {
+        "contractRequiredForNewProviderWaves": true,
+        "reportsWithBudgetContract": 0,
+        "reportsMissingBudgetContract": 17,
+        "allBudgetedReportsNoSpend": false,
+        "allBudgetedReportsWithinAllowedProviders": true,
+        "anyPaidProviderRequestedInNoSpendMode": false,
+        "maxPaidUsdMax": 0,
+        "defaultPromotionBlockedUntilRerun": true
+      },
       "blockers": [
         "retryable-provider-limit-or-timeout-observed"
       ]

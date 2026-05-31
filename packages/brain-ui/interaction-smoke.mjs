@@ -318,7 +318,9 @@ try {
   assert.ok(modelMatrix.arms.some((arm) => arm.id === "local-apple-qwen3-0_6b-local-rerank" && arm.lane === "local"));
   assert.ok(modelMatrix.gates.some((gate) => gate.includes("same dataset slice")));
   assert.ok(modelMatrix.gates.some((gate) => gate.includes("Provider credentials")));
-  assert.ok(modelMatrix.blockers.includes("hosted-supermemory-baseline-not-current"));
+  assert.ok(modelMatrix.blockers.includes("full-memory-sota-benchmark-gate"));
+  assert.ok(modelMatrix.blockers.includes("same-data-voyage-answer-quality-missing"));
+  assert.ok(modelMatrix.blockers.includes("two-independent-memory-score-reviewers-missing"));
   assert.doesNotMatch(JSON.stringify(modelMatrix), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const promptContext = buildPromptContextPreview(fixture, promptContextFixture);
@@ -344,8 +346,8 @@ try {
   assert.equal(releaseReadiness.publicLaunchVerdict, "FAIL");
   assert.equal(releaseReadiness.productionReady, false);
   assert.equal(releaseReadiness.pullRequest.number, 5);
-  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.shortSha, "e043d6b");
-  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion, "success");
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.shortSha, "0ce7388");
+  assert.equal(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion, "local");
   assert.equal(releaseReadiness.latestVerifiedCodeBaseline.secretScan, "zero_hits");
   assert.equal(releaseReadiness.latestDocumentationBaseline.ciConclusion, "success");
   assert.equal(releaseReadiness.safetySummary.fixtureOnly, true);
@@ -353,9 +355,14 @@ try {
   assert.equal(releaseReadiness.safetySummary.credentialSafe, true);
   assert.equal(releaseReadiness.safetySummary.hostedWriteBackDisabled, true);
   assert.equal(releaseReadiness.safetySummary.privacyLeakCount, 0);
+  assert.equal(releaseReadiness.providerBudgetContract.status, "NEEDS_RERUN_UNDER_CONTRACT");
+  assert.equal(releaseReadiness.providerBudgetContract.reportsWithBudgetContract, 0);
+  assert.equal(releaseReadiness.providerBudgetContract.defaultPromotionBlockedUntilRerun, true);
   assert.ok(releaseReadiness.surfaces.includes("brain-ui-prompt-context-preview"));
+  assert.ok(releaseReadiness.surfaces.includes("provider-budget-contract-dashboard"));
   assert.ok(releaseReadiness.blockers.includes("human-public-launch-approval-required"));
-  assert.ok(releaseReadiness.manualActions.some((action) => action.includes("one-agent canary")));
+  assert.ok(releaseReadiness.blockers.includes("provider-waves-need-budget-contract-rerun-before-default-promotion"));
+  assert.ok(releaseReadiness.manualActions.some((action) => action.includes("real-container production canary")));
   assert.doesNotMatch(JSON.stringify(releaseReadiness), /<private>|pa-|AIza|sm_|nvapi-|jina_|ghp_|github_pat_/);
 
   const policyDraft = buildLifecyclePolicyDraft(fixture, {

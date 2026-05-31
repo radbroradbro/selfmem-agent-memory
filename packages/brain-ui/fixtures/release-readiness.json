@@ -13,7 +13,7 @@
     "mergeable": true
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "b65d9d2",
+    "headSha": "0ce738855846add4e0e1aa3de9e050349361593b",
     "ciRunId": null,
     "ciConclusion": "local",
     "localReleaseCheck": "passed",
@@ -30,6 +30,16 @@
     "commitsRawTranscripts": false,
     "commitsCredentials": false,
     "enablesHostedWriteBack": false
+  },
+  "providerBudgetContract": {
+    "status": "NEEDS_RERUN_UNDER_CONTRACT",
+    "mode": "no-spend-free-tier",
+    "maxPaidUsd": 0,
+    "reports": 17,
+    "reportsWithBudgetContract": 0,
+    "reportsMissingBudgetContract": 17,
+    "crossProviderFallbackEnabled": false,
+    "defaultPromotionBlockedUntilRerun": true
   },
   "provenPreviewSurfaces": [
     "nucleus-index",
@@ -50,6 +60,7 @@
     "selfmem-update",
     "local-full-500-query-diagnostic-score",
     "provider-wave-intake-dashboard",
+    "provider-budget-contract-dashboard",
     "answer-quality-method-ladder-workorder",
     "atomic-memory-v1-answer-quality-smoke"
   ],
@@ -57,6 +68,7 @@
     "full-memory-sota-benchmark-gate",
     "atomic-memory-v1-full-answer-quality-wave-missing",
     "same-data-voyage-answer-quality-missing",
+    "provider-waves-need-budget-contract-rerun-before-default-promotion",
     "two-independent-memory-score-reviewers-missing",
     "docs-release-notes-and-ui-evidence-refresh-after-full-result",
     "human-public-launch-approval-required",
@@ -64,6 +76,7 @@
   ],
   "manualActions": [
     "Run the full answer-quality provider lane with the accepted strategy set.",
+    "Rerun provider-wave repair slices under the no-spend provider budget contract before default promotion.",
     "Collect two independent memory-score reviewer approvals.",
     "Refresh release notes and UI evidence after the full result is accepted.",
     "Approve public visibility only after the full SOTA gate stays green.",

@@ -203,6 +203,9 @@ try {
   assert.equal(benchmarkSummary.memoryBenchmark?.localFull?.bestStrategy, "local-apple-qwen3-0_6b-local-rerank");
   assert.equal(benchmarkSummary.memoryBenchmark?.sotaGate?.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
   assert.equal(benchmarkSummary.memoryBenchmark?.providerWaves?.bestZeroDollarLane, "nvidia");
+  assert.equal(benchmarkSummary.memoryBenchmark?.providerWaves?.budgetContract?.reportsWithBudgetContract, 0);
+  assert.equal(benchmarkSummary.memoryBenchmark?.providerWaves?.budgetContract?.reportsMissingBudgetContract, 17);
+  assert.equal(benchmarkSummary.memoryBenchmark?.providerWaves?.budgetContract?.defaultPromotionBlockedUntilRerun, true);
   assert.equal(benchmarkSummary.memoryBenchmark?.atomicMethodSmoke?.method, "atomic-memory-v1");
   assert.equal(benchmarkSummary.memoryBenchmark?.atomicMethodSmoke?.scoredQueries, 3);
   assert.equal(benchmarkSummary.memoryBenchmark?.atomicMethodSmoke?.gateStatus, "BLOCKED_END_TO_END_MEMORY_SCORE");
@@ -258,11 +261,17 @@ try {
   assert.equal(releaseReadiness.safetyBoundary.commitsRawTranscripts, false);
   assert.equal(releaseReadiness.safetyBoundary.commitsCredentials, false);
   assert.equal(releaseReadiness.safetyBoundary.enablesHostedWriteBack, false);
+  assert.equal(releaseReadiness.providerBudgetContract.status, "NEEDS_RERUN_UNDER_CONTRACT");
+  assert.equal(releaseReadiness.providerBudgetContract.maxPaidUsd, 0);
+  assert.equal(releaseReadiness.providerBudgetContract.reportsWithBudgetContract, 0);
+  assert.equal(releaseReadiness.providerBudgetContract.defaultPromotionBlockedUntilRerun, true);
   assert.ok(["success", "local"].includes(releaseReadiness.latestVerifiedCodeBaseline.ciConclusion));
   assert.equal(releaseReadiness.latestVerifiedCodeBaseline.localReleaseCheck, "passed");
   assert.ok(releaseReadiness.provenPreviewSurfaces.includes("brain-ui-prompt-context-preview"));
   assert.ok(releaseReadiness.provenPreviewSurfaces.includes("local-full-500-query-diagnostic-score"));
   assert.ok(releaseReadiness.provenPreviewSurfaces.includes("atomic-memory-v1-answer-quality-smoke"));
+  assert.ok(releaseReadiness.provenPreviewSurfaces.includes("provider-budget-contract-dashboard"));
+  assert.ok(releaseReadiness.remainingBlockers.includes("provider-waves-need-budget-contract-rerun-before-default-promotion"));
   assert.ok(releaseReadiness.remainingBlockers.includes("human-public-launch-approval-required"));
   assert.ok(releaseReadiness.manualActions.length >= 4);
   assert.equal(localAudit.ok, true);

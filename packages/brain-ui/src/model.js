@@ -460,6 +460,7 @@ function buildBenchmarkDashboard(report = {}) {
   const memoryBenchmark = report?.memoryBenchmark ?? {};
   const localFull = memoryBenchmark?.localFull ?? {};
   const providerWaves = memoryBenchmark?.providerWaves ?? {};
+  const providerBudgetContract = providerWaves?.budgetContract ?? {};
   const sotaGate = memoryBenchmark?.sotaGate ?? {};
   const atomicMethodSmoke = memoryBenchmark?.atomicMethodSmoke ?? {};
   const scenarios = Array.isArray(report?.scenarios)
@@ -551,6 +552,28 @@ function buildBenchmarkDashboard(report = {}) {
         completedReports: numeric(providerWaves?.completedReports),
         partialReports: numeric(providerWaves?.partialReports),
         bestZeroDollarLane: safeExportText(providerWaves?.bestZeroDollarLane ?? ""),
+        budgetContract: {
+          contractRequiredForNewProviderWaves: booleanSetting(
+            providerBudgetContract.contractRequiredForNewProviderWaves,
+            true,
+          ),
+          reportsWithBudgetContract: numeric(providerBudgetContract?.reportsWithBudgetContract),
+          reportsMissingBudgetContract: numeric(providerBudgetContract?.reportsMissingBudgetContract),
+          allBudgetedReportsNoSpend: booleanSetting(providerBudgetContract?.allBudgetedReportsNoSpend, false),
+          allBudgetedReportsWithinAllowedProviders: booleanSetting(
+            providerBudgetContract?.allBudgetedReportsWithinAllowedProviders,
+            true,
+          ),
+          anyPaidProviderRequestedInNoSpendMode: booleanSetting(
+            providerBudgetContract?.anyPaidProviderRequestedInNoSpendMode,
+            false,
+          ),
+          maxPaidUsdMax: numeric(providerBudgetContract?.maxPaidUsdMax),
+          defaultPromotionBlockedUntilRerun: booleanSetting(
+            providerBudgetContract?.defaultPromotionBlockedUntilRerun,
+            false,
+          ),
+        },
         blockers: safeStringList(providerWaves?.blockers),
       },
       sotaGate: {
@@ -736,6 +759,7 @@ function buildReleaseReadinessConsole(packet = {}) {
   const codeBaseline = packet?.latestVerifiedCodeBaseline ?? {};
   const documentationBaseline = packet?.latestDocumentationBaseline ?? {};
   const safetyBoundary = packet?.safetyBoundary ?? {};
+  const providerBudgetContract = packet?.providerBudgetContract ?? {};
   const blockers = safeStringList(packet?.remainingBlockers);
   const manualActions = safeStringList(packet?.manualActions);
   const surfaces = safeStringList(packet?.provenPreviewSurfaces);
@@ -768,7 +792,7 @@ function buildReleaseReadinessConsole(packet = {}) {
       headSha: safeCommitSha(codeBaseline.headSha),
       shortSha: shortSha(codeBaseline.headSha),
       ciRunId: numeric(codeBaseline.ciRunId),
-      ciConclusion: safeChoice(codeBaseline.ciConclusion ?? "unknown", ["success", "failure", "cancelled", "skipped", "unknown"], "unknown"),
+      ciConclusion: safeChoice(codeBaseline.ciConclusion ?? "unknown", ["success", "failure", "cancelled", "skipped", "local", "unknown"], "unknown"),
       localReleaseCheck: safeChoice(codeBaseline.localReleaseCheck ?? "unknown", ["passed", "failed", "unknown"], "unknown"),
       secretScan: safeChoice(codeBaseline.secretScan ?? "unknown", ["zero_hits", "hits", "unknown"], "unknown"),
     },
@@ -776,9 +800,22 @@ function buildReleaseReadinessConsole(packet = {}) {
       headSha: safeCommitSha(documentationBaseline.headSha),
       shortSha: shortSha(documentationBaseline.headSha),
       ciRunId: numeric(documentationBaseline.ciRunId),
-      ciConclusion: safeChoice(documentationBaseline.ciConclusion ?? "unknown", ["success", "failure", "cancelled", "skipped", "unknown"], "unknown"),
+      ciConclusion: safeChoice(documentationBaseline.ciConclusion ?? "unknown", ["success", "failure", "cancelled", "skipped", "local", "unknown"], "unknown"),
     },
     safetyBoundary: safetyFlags,
+    providerBudgetContract: {
+      status: safeExportText(providerBudgetContract?.status ?? ""),
+      mode: safeExportText(providerBudgetContract?.mode ?? "no-spend-free-tier"),
+      maxPaidUsd: numeric(providerBudgetContract?.maxPaidUsd),
+      reports: numeric(providerBudgetContract?.reports),
+      reportsWithBudgetContract: numeric(providerBudgetContract?.reportsWithBudgetContract),
+      reportsMissingBudgetContract: numeric(providerBudgetContract?.reportsMissingBudgetContract),
+      crossProviderFallbackEnabled: booleanSetting(providerBudgetContract?.crossProviderFallbackEnabled, false),
+      defaultPromotionBlockedUntilRerun: booleanSetting(
+        providerBudgetContract?.defaultPromotionBlockedUntilRerun,
+        false,
+      ),
+    },
     safetySummary: {
       fixtureOnly: safetyFlags.usesFixtureUiEvidence === true,
       rawMemorySafe: safetyFlags.commitsRawMemories === false && safetyFlags.commitsRawTranscripts === false,

@@ -100,6 +100,9 @@ assert.equal(fixture.roots.container.writeMode, "local-only");
 assert.equal(fixture.roots.container.privacyLeakCount, 0);
 assert.equal(releaseReadiness.productionReady, false);
 assert.equal(releaseReadiness.safetyBoundary.enablesHostedWriteBack, false);
+assert.equal(releaseReadiness.providerBudgetContract.status, "NEEDS_RERUN_UNDER_CONTRACT");
+assert.equal(releaseReadiness.providerBudgetContract.reportsWithBudgetContract, 0);
+assert.equal(releaseReadiness.providerBudgetContract.defaultPromotionBlockedUntilRerun, true);
 assert.equal(promptContext.safety.privacyLeakCount, 0);
 assert.equal(sessionCompactionAudit.ok, true);
 assert.equal(sessionCompactionAudit.metricsOnly, true);
@@ -123,6 +126,12 @@ const report = {
   releaseVerdict: releaseReadiness.publicLaunchVerdict,
   productionReady: releaseReadiness.productionReady,
   hostedWriteBackEnabled: releaseReadiness.safetyBoundary.enablesHostedWriteBack,
+  providerBudgetContract: {
+    status: releaseReadiness.providerBudgetContract.status,
+    reportsWithBudgetContract: releaseReadiness.providerBudgetContract.reportsWithBudgetContract,
+    reportsMissingBudgetContract: releaseReadiness.providerBudgetContract.reportsMissingBudgetContract,
+    defaultPromotionBlockedUntilRerun: releaseReadiness.providerBudgetContract.defaultPromotionBlockedUntilRerun,
+  },
   privacyLeakCount: fixture.roots.container.privacyLeakCount + promptContext.safety.privacyLeakCount,
   sessionCompactionMap: {
     topicLinkCount: sessionCompactionAudit.sessionMap.topicLinkCount,

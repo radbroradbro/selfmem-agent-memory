@@ -1007,6 +1007,7 @@ function renderBenchmarkDashboard() {
   const memory = packet.memoryBenchmark ?? {};
   const localFull = memory.localFull ?? {};
   const providerWaves = memory.providerWaves ?? {};
+  const providerBudgetContract = providerWaves.budgetContract ?? {};
   const sotaGate = memory.sotaGate ?? {};
   const atomicMethodSmoke = memory.atomicMethodSmoke ?? {};
   benchmarkStatus.textContent = packet.verdict;
@@ -1029,6 +1030,8 @@ function renderBenchmarkDashboard() {
       stat("SOTA gate", sotaGate.status ? humanLabel(sotaGate.status) : "Blocked"),
       stat("Provider waves", `${providerWaves.completedReports}/${providerWaves.reports}`),
       stat("Best free lane", providerWaves.bestZeroDollarLane || "n/a"),
+      stat("Budget contract", `${providerBudgetContract.reportsWithBudgetContract}/${providerWaves.reports}`),
+      stat("Default promo", providerBudgetContract.defaultPromotionBlockedUntilRerun ? "blocked" : "review"),
     );
   }
   if (atomicMethodSmoke.scoredQueries > 0) {
@@ -1235,6 +1238,8 @@ function renderReleaseReadiness() {
     stat("Leaks", packet.safetySummary.privacyLeakCount),
     stat("Fixture", packet.safetySummary.fixtureOnly ? "yes" : "no"),
     stat("Hosted writes", packet.safetySummary.hostedWriteBackDisabled ? "off" : "review"),
+    stat("Provider budget", `${packet.providerBudgetContract.reportsWithBudgetContract}/${packet.providerBudgetContract.reports}`),
+    stat("Default promo", packet.providerBudgetContract.defaultPromotionBlockedUntilRerun ? "blocked" : "review"),
   );
 
   releaseReadinessSurfaces.replaceChildren();
