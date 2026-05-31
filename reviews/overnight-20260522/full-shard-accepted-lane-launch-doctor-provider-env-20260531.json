@@ -4,7 +4,7 @@
   "mode": "full-shard-accepted-lane-launch-doctor",
   "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
   "claimScope": "full-sota",
-  "generatedAt": "2026-05-31T12:31:13.970Z",
+  "generatedAt": "2026-05-31T12:39:37.847Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -48,6 +48,7 @@
     "privateInputsReady": true,
     "acceptedLaneReadyForResponseArmExport": false,
     "acceptedLaneReadyForAnswerQualityScoring": false,
+    "localRuntimeReadyForResponseArmExport": false,
     "shardResultsReturned": false,
     "fullMemorySotaScoreProven": false,
     "publicSotaClaimAllowed": false
@@ -266,6 +267,54 @@
         "printsEnvValues": false
       }
     },
+    "localRuntimeHealth": {
+      "timeoutMs": 1500,
+      "endpointValuesPrinted": false,
+      "readyForResponseArmExport": false,
+      "endpoints": {
+        "local-apple": {
+          "provider": "local-apple",
+          "required": true,
+          "configured": false,
+          "localOnly": false,
+          "checked": false,
+          "reachable": false,
+          "ready": false,
+          "httpStatus": null,
+          "status": "missing",
+          "envNames": [
+            "SELFMEM_LOCAL_EMBED_BASE_URL"
+          ],
+          "endpointValuePrinted": false,
+          "blockers": [
+            "local-apple-endpoint-missing"
+          ]
+        },
+        "local-rerank": {
+          "provider": "local-rerank",
+          "required": true,
+          "configured": false,
+          "localOnly": false,
+          "checked": false,
+          "reachable": false,
+          "ready": false,
+          "httpStatus": null,
+          "status": "missing",
+          "envNames": [
+            "SELFMEM_LOCAL_RERANK_ENDPOINT",
+            "SELFMEM_LOCAL_RERANK_BASE_URL"
+          ],
+          "endpointValuePrinted": false,
+          "blockers": [
+            "local-rerank-endpoint-missing"
+          ]
+        }
+      },
+      "blockers": [
+        "local-apple-endpoint-missing",
+        "local-rerank-endpoint-missing"
+      ]
+    },
     "blockerCount": 8,
     "blockers": [
       "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
@@ -338,6 +387,8 @@
     "local-apple-credentials-missing",
     "local-rerank-credentials-missing",
     "openai-compatible-base-url-missing",
+    "local-apple-endpoint-missing",
+    "local-rerank-endpoint-missing",
     "accepted-lane-response-export-not-ready",
     "accepted-lane-answer-quality-scoring-not-ready",
     "full-answer-quality-shard-results-not-returned",

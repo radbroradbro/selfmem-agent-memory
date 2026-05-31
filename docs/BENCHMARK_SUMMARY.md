@@ -542,7 +542,9 @@ keeps the private inputs marked ready while blocking the accepted
 answer-quality consent, exact `gpt-4o` answer/judge target matching, local
 Apple and local rerank endpoints, Voyage/NVIDIA credentials, and model-backed
 query expansion are present. It calls no providers, sends no benchmark text,
-prints no env values or private paths, and does not count as SOTA evidence.
+prints no env values or private paths, checks that local endpoints are actually
+reachable before treating them as launch-ready, and does not count as SOTA
+evidence.
 The env-loaded follow-up at
 `reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-provider-env-20260531.json`
 shows the cloud side of that gate can be satisfied without exposing secrets:

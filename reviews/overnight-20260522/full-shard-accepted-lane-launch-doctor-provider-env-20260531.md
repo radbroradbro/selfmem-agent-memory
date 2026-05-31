@@ -29,6 +29,16 @@
 - Answer model target: gpt-4o
 - Judge model target: gpt-4o
 
+## Local Runtime Health
+- Ready for response-arm export: false
+- Local Apple required: true
+- Local Apple configured: false
+- Local Apple reachable: false
+- Local rerank required: true
+- Local rerank configured: false
+- Local rerank reachable: false
+- Endpoint values printed: false
+
 ## Operator Inputs Needed
 - local-apple-readiness: SELFMEM_LOCAL_EMBED_BASE_URL
 - local-rerank-readiness: SELFMEM_LOCAL_RERANK_ENDPOINT, SELFMEM_LOCAL_RERANK_BASE_URL
@@ -43,6 +53,8 @@
 - local-apple-credentials-missing
 - local-rerank-credentials-missing
 - openai-compatible-base-url-missing
+- local-apple-endpoint-missing
+- local-rerank-endpoint-missing
 - accepted-lane-response-export-not-ready
 - accepted-lane-answer-quality-scoring-not-ready
 - full-answer-quality-shard-results-not-returned

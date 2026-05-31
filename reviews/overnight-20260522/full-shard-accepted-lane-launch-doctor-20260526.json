@@ -4,7 +4,7 @@
   "mode": "full-shard-accepted-lane-launch-doctor",
   "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
   "claimScope": "full-sota",
-  "generatedAt": "2026-05-26T20:51:43.564Z",
+  "generatedAt": "2026-05-31T12:40:08.270Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -23,7 +23,7 @@
   "publicBenchmarkClaimsAllowed": false,
   "plan": {
     "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
-    "hash": "sha256:5f976e72553346b172e05b9bf91736642628137000282b65ce92a67545de94d6",
+    "hash": "sha256:991fde6cd4eabfa19e4abd18fa69e42f43f13959f27c57bd9c0a66b41732b182",
     "claimScope": "full-sota",
     "queryCount": 500,
     "shardCount": 20,
@@ -34,7 +34,9 @@
     "diagnosticLaneIds": [
       "deterministic-control-proxy",
       "local-apple-no-spend",
+      "local-apple-scaled-challenger",
       "voyage-minimum-challenger",
+      "gemini2-minimum-challenger",
       "nvidia-minimum-challenger"
     ]
   },
@@ -46,6 +48,7 @@
     "privateInputsReady": true,
     "acceptedLaneReadyForResponseArmExport": false,
     "acceptedLaneReadyForAnswerQualityScoring": false,
+    "localRuntimeReadyForResponseArmExport": false,
     "shardResultsReturned": false,
     "fullMemorySotaScoreProven": false,
     "publicSotaClaimAllowed": false
@@ -74,12 +77,14 @@
       "bm25-lite",
       "full-hybrid-rerank",
       "query-expanded-full-hybrid-rerank",
+      "cloud-gemini2-embed-rerank-proxy",
       "cloud-voyage4-voyage-lite-rerank",
       "cloud-nvidia-nemotron-1b",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
     ],
     "providerRequirements": [
+      "gemini",
       "local-apple",
       "local-rerank",
       "nvidia",
@@ -105,6 +110,7 @@
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
         "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
         "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
+        "gemini-credentials-missing",
         "local-apple-credentials-missing",
         "local-rerank-credentials-missing",
         "nvidia-credentials-missing",
@@ -171,6 +177,30 @@
       ]
     },
     "providerReadiness": {
+      "gemini": {
+        "ready": false,
+        "keyCount": 0,
+        "valueEnvNames": [
+          "GEMINI_API_KEY",
+          "GEMINI_API_KEYS",
+          "GOOGLE_API_KEY",
+          "GOOGLE_API_KEYS",
+          "AI_STUDIO_API_KEY",
+          "AI_STUDIO_API_KEYS"
+        ],
+        "keyFileEnvNames": [
+          "GEMINI_API_KEY_FILE",
+          "GEMINI_API_KEYS_FILE",
+          "GOOGLE_API_KEY_FILE",
+          "GOOGLE_API_KEYS_FILE",
+          "AI_STUDIO_API_KEY_FILE",
+          "AI_STUDIO_API_KEYS_FILE"
+        ],
+        "configuredValueEnvNames": [],
+        "configuredKeyFileEnvNames": [],
+        "keyFileIssues": [],
+        "printsEnvValues": false
+      },
       "local-apple": {
         "ready": false,
         "keyCount": 0,
@@ -233,7 +263,55 @@
         "printsEnvValues": false
       }
     },
-    "blockerCount": 15,
+    "localRuntimeHealth": {
+      "timeoutMs": 1500,
+      "endpointValuesPrinted": false,
+      "readyForResponseArmExport": false,
+      "endpoints": {
+        "local-apple": {
+          "provider": "local-apple",
+          "required": true,
+          "configured": false,
+          "localOnly": false,
+          "checked": false,
+          "reachable": false,
+          "ready": false,
+          "httpStatus": null,
+          "status": "missing",
+          "envNames": [
+            "SELFMEM_LOCAL_EMBED_BASE_URL"
+          ],
+          "endpointValuePrinted": false,
+          "blockers": [
+            "local-apple-endpoint-missing"
+          ]
+        },
+        "local-rerank": {
+          "provider": "local-rerank",
+          "required": true,
+          "configured": false,
+          "localOnly": false,
+          "checked": false,
+          "reachable": false,
+          "ready": false,
+          "httpStatus": null,
+          "status": "missing",
+          "envNames": [
+            "SELFMEM_LOCAL_RERANK_ENDPOINT",
+            "SELFMEM_LOCAL_RERANK_BASE_URL"
+          ],
+          "endpointValuePrinted": false,
+          "blockers": [
+            "local-rerank-endpoint-missing"
+          ]
+        }
+      },
+      "blockers": [
+        "local-apple-endpoint-missing",
+        "local-rerank-endpoint-missing"
+      ]
+    },
+    "blockerCount": 16,
     "blockers": [
       "RECALLWEAVE_BASELINE_LIVE-not-enabled",
       "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
@@ -243,6 +321,7 @@
       "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
       "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
       "answer-model-missing",
+      "gemini-credentials-missing",
       "judge-model-missing",
       "local-apple-credentials-missing",
       "local-rerank-credentials-missing",
@@ -273,6 +352,25 @@
         "RECALLWEAVE_BASELINE_NO_RAW_TEXT"
       ],
       "note": "live response export with no raw text output",
+      "valuePrinted": false
+    },
+    {
+      "id": "gemini-readiness",
+      "envNames": [
+        "GEMINI_API_KEY",
+        "GEMINI_API_KEYS",
+        "GOOGLE_API_KEY",
+        "GOOGLE_API_KEYS",
+        "AI_STUDIO_API_KEY",
+        "AI_STUDIO_API_KEYS",
+        "GEMINI_API_KEY_FILE",
+        "GEMINI_API_KEYS_FILE",
+        "GOOGLE_API_KEY_FILE",
+        "GOOGLE_API_KEYS_FILE",
+        "AI_STUDIO_API_KEY_FILE",
+        "AI_STUDIO_API_KEYS_FILE"
+      ],
+      "note": "gemini endpoint or credential readiness",
       "valuePrinted": false
     },
     {
@@ -353,8 +451,8 @@
     }
   ],
   "nextCommands": {
-    "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url> SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model> SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit> SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS=<safe-local-embedding-batch-token-limit> SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit> SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1 SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url> SELFMEM_LOCAL_RERANK_MODEL=<local-rerank-model> SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=<local-rerank-candidate-limit> SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-001 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset 0 --max-queries 25 --require-local-embedding-durability --local-embedding-durability-report reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
-    "answerQuality": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope full-sota --model-match-policy exact-target-required --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 0 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-001/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-001/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-001/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-001/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-001/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-001/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-001/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-001.json --markdown-output <public-review-dir>/answer-quality-shard-001.md",
+    "responseArmExport": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url> SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model> SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit> SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS=<safe-local-embedding-batch-token-limit> SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit> SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1 SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url> SELFMEM_LOCAL_RERANK_MODEL=<local-rerank-model> SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=<local-rerank-candidate-limit> SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/shard-001 --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-gemini2-embed-rerank-proxy,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nemotron-1b,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset 0 --max-queries 25 --require-local-embedding-durability --local-embedding-durability-report reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
+    "answerQuality": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope full-sota --model-match-policy exact-target-required --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset 0 --max-queries 25 --arm bm25-lite=<private-output-dir>/arms/shard-001/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/shard-001/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/shard-001/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/arms/shard-001/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/shard-001/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nemotron-1b=<private-output-dir>/arms/shard-001/cloud-nvidia-nemotron-1b-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/shard-001/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/shard-001/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-shard-001.json --markdown-output <public-review-dir>/answer-quality-shard-001.md",
     "workorderRefresh": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-workorder",
     "shardIntakeAfterAllShards": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-intake --input <public-review-dir>/answer-quality-shard-001.json,<public-review-dir>/answer-quality-shard-002.json,<public-review-dir>/answer-quality-shard-003.json,<public-review-dir>/answer-quality-shard-004.json,<public-review-dir>/answer-quality-shard-005.json,<public-review-dir>/answer-quality-shard-006.json,<public-review-dir>/answer-quality-shard-007.json,<public-review-dir>/answer-quality-shard-008.json,<public-review-dir>/answer-quality-shard-009.json,<public-review-dir>/answer-quality-shard-010.json,<public-review-dir>/answer-quality-shard-011.json,<public-review-dir>/answer-quality-shard-012.json,<public-review-dir>/answer-quality-shard-013.json,<public-review-dir>/answer-quality-shard-014.json,<public-review-dir>/answer-quality-shard-015.json,<public-review-dir>/answer-quality-shard-016.json,<public-review-dir>/answer-quality-shard-017.json,<public-review-dir>/answer-quality-shard-018.json,<public-review-dir>/answer-quality-shard-019.json,<public-review-dir>/answer-quality-shard-020.json --output <public-review-dir>/answer-quality-full-shard-intake.json --markdown-output <public-review-dir>/answer-quality-full-shard-intake.md --require-ready"
   },
@@ -367,6 +465,7 @@
     "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
     "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
     "answer-model-missing",
+    "gemini-credentials-missing",
     "judge-model-missing",
     "local-apple-credentials-missing",
     "local-rerank-credentials-missing",
@@ -374,6 +473,8 @@
     "openai-compatible-base-url-missing",
     "query-expansion-local-endpoint-or-cloud-consent-missing",
     "voyage-credentials-missing",
+    "local-apple-endpoint-missing",
+    "local-rerank-endpoint-missing",
     "accepted-lane-response-export-not-ready",
     "accepted-lane-answer-quality-scoring-not-ready",
     "full-answer-quality-shard-results-not-returned",

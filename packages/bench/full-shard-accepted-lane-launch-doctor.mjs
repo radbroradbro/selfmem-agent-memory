@@ -55,7 +55,8 @@ assert.ok(acceptedLane, "accepted full-shard intake lane missing");
 
 const firstWorkorder = workorder.workorders?.[0] ?? null;
 const privateInputReady = privateInputDoctor.readyForAnswerQualityShardRun === true;
-const acceptedLaneReadyForExport = acceptedLane.readyForResponseArmExport === true;
+const localRuntimeHealth = await inspectAcceptedLaneLocalRuntime(acceptedLane);
+const acceptedLaneReadyForExport = acceptedLane.readyForResponseArmExport === true && localRuntimeHealth.readyForResponseArmExport === true;
 const acceptedLaneReadyForScoring = acceptedLane.readyForAnswerQualityScoring === true;
 const readyForFirstAcceptedShardRun = privateInputReady && acceptedLaneReadyForExport && acceptedLaneReadyForScoring;
 const readyForAcceptedShardIntake = readyForFirstAcceptedShardRun && workorder.readyForShardIntake === true;
@@ -68,6 +69,7 @@ const readyForLocalFullBenchmarkResult = !isFullSota && readyForAcceptedShardInt
 const blockers = unique([
   ...arrayOf(privateInputDoctor.blockers),
   ...arrayOf(acceptedLane.blockers),
+  ...arrayOf(localRuntimeHealth.blockers),
   !privateInputReady ? "full-shard-private-inputs-not-ready" : null,
   !acceptedLaneReadyForExport ? "accepted-lane-response-export-not-ready" : null,
   !acceptedLaneReadyForScoring ? "accepted-lane-answer-quality-scoring-not-ready" : null,
@@ -125,6 +127,7 @@ const report = {
     privateInputsReady: privateInputReady,
     acceptedLaneReadyForResponseArmExport: acceptedLaneReadyForExport,
     acceptedLaneReadyForAnswerQualityScoring: acceptedLaneReadyForScoring,
+    localRuntimeReadyForResponseArmExport: localRuntimeHealth.readyForResponseArmExport,
     shardResultsReturned: workorder.readyForShardIntake === true,
     fullMemorySotaScoreProven: sotaDoctor?.countsAsFullMemorySotaEvidence === true,
     publicSotaClaimAllowed: sotaDoctor?.publicBenchmarkClaimsAllowed === true,
@@ -160,6 +163,7 @@ const report = {
     answerQuality: sanitizeAnswerQualityReadiness(acceptedLane.answerQuality),
     queryExpansion: acceptedLane.queryExpansion,
     providerReadiness: acceptedLane.providerReadiness,
+    localRuntimeHealth,
     blockerCount: arrayOf(acceptedLane.blockers).length,
     blockers: arrayOf(acceptedLane.blockers),
   },
@@ -177,7 +181,7 @@ const report = {
     firstPendingShardRange:
       firstWorkorder == null ? null : `${firstWorkorder.startIndex}-${firstWorkorder.endIndexExclusive}`,
   },
-  operatorInputsNeeded: operatorInputsNeeded(acceptedLane, privateInputDoctor, { isFullSota }),
+  operatorInputsNeeded: operatorInputsNeeded(acceptedLane, privateInputDoctor, { isFullSota, localRuntimeHealth }),
   nextCommands: {
     responseArmExport: firstWorkorder?.commands?.responseArmExport ?? null,
     answerQuality: firstWorkorder?.commands?.answerQuality ?? null,
@@ -244,6 +248,185 @@ function sanitizeAnswerQualityReadiness(value) {
   };
 }
 
+async function inspectAcceptedLaneLocalRuntime(lane) {
+  const providers = new Set(arrayOf(lane.providerRequirements));
+  const timeoutMs = positiveInt(process.env.RECALLWEAVE_ACCEPTED_LANE_LOCAL_HEALTH_TIMEOUT_MS ?? 1_500, "local health timeout ms");
+  const localApple = await inspectLocalEndpoint({
+    provider: "local-apple",
+    required: providers.has("local-apple"),
+    envNames: ["SELFMEM_LOCAL_EMBED_BASE_URL"],
+    value: process.env.SELFMEM_LOCAL_EMBED_BASE_URL,
+    pathKind: "models",
+    timeoutMs,
+  });
+  const localRerank = await inspectLocalEndpoint({
+    provider: "local-rerank",
+    required: providers.has("local-rerank"),
+    envNames: ["SELFMEM_LOCAL_RERANK_ENDPOINT", "SELFMEM_LOCAL_RERANK_BASE_URL"],
+    value: localRerankHealthSource(),
+    pathKind: "healthz",
+    timeoutMs,
+  });
+  const endpoints = {
+    "local-apple": localApple,
+    "local-rerank": localRerank,
+  };
+  const blockers = [localApple, localRerank]
+    .filter((item) => item.required && !item.ready)
+    .flatMap((item) => item.blockers);
+  return {
+    timeoutMs,
+    endpointValuesPrinted: false,
+    readyForResponseArmExport: blockers.length === 0,
+    endpoints,
+    blockers: unique(blockers),
+  };
+}
+
+async function inspectLocalEndpoint({ provider, required, envNames, value, pathKind, timeoutMs }) {
+  const configured = String(value ?? "").trim().length > 0;
+  const localOnly = configured ? isLocalUrl(value) : false;
+  if (!required) {
+    return endpointState({ provider, required, configured, localOnly, checked: false, reachable: true, status: "not-required" });
+  }
+  if (!configured) {
+    return endpointState({
+      provider,
+      required,
+      configured,
+      localOnly,
+      checked: false,
+      reachable: false,
+      status: "missing",
+      blockers: [`${provider}-endpoint-missing`],
+      envNames,
+    });
+  }
+  if (!localOnly) {
+    return endpointState({
+      provider,
+      required,
+      configured,
+      localOnly,
+      checked: false,
+      reachable: false,
+      status: "not-local",
+      blockers: [`${provider}-endpoint-not-local`],
+      envNames,
+    });
+  }
+  const healthUrl = healthProbeUrl(value, pathKind);
+  try {
+    const response = await fetch(healthUrl, {
+      method: "GET",
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if (!response.ok) {
+      return endpointState({
+        provider,
+        required,
+        configured,
+        localOnly,
+        checked: true,
+        reachable: false,
+        httpStatus: response.status,
+        status: "non-200",
+        blockers: [`${provider}-endpoint-non-200`],
+        envNames,
+      });
+    }
+    return endpointState({
+      provider,
+      required,
+      configured,
+      localOnly,
+      checked: true,
+      reachable: true,
+      httpStatus: response.status,
+      status: "ready",
+      envNames,
+    });
+  } catch (error) {
+    const timeout = error?.name === "TimeoutError" || error?.name === "AbortError";
+    return endpointState({
+      provider,
+      required,
+      configured,
+      localOnly,
+      checked: true,
+      reachable: false,
+      httpStatus: null,
+      status: timeout ? "timeout" : "fetch-failed",
+      blockers: [timeout ? `${provider}-endpoint-timeout` : `${provider}-endpoint-fetch-failed`],
+      envNames,
+    });
+  }
+}
+
+function endpointState({
+  provider,
+  required,
+  configured,
+  localOnly,
+  checked,
+  reachable,
+  httpStatus = null,
+  status,
+  blockers = [],
+  envNames = [],
+}) {
+  return {
+    provider,
+    required: Boolean(required),
+    configured: Boolean(configured),
+    localOnly: Boolean(localOnly),
+    checked: Boolean(checked),
+    reachable: Boolean(reachable),
+    ready: !required || (Boolean(configured) && Boolean(localOnly) && Boolean(reachable)),
+    httpStatus,
+    status,
+    envNames,
+    endpointValuePrinted: false,
+    blockers,
+  };
+}
+
+function localRerankHealthSource() {
+  const directEndpoint = String(process.env.SELFMEM_LOCAL_RERANK_ENDPOINT ?? "").trim();
+  if (directEndpoint) return directEndpoint;
+  const baseUrl = String(process.env.SELFMEM_LOCAL_RERANK_BASE_URL ?? "").trim();
+  if (!baseUrl) return "";
+  return `${baseUrl.replace(/\/+$/, "")}/rerank`;
+}
+
+function healthProbeUrl(value, pathKind) {
+  const url = new URL(String(value));
+  if (pathKind === "models") {
+    const basePath = url.pathname.replace(/\/+$/, "");
+    url.pathname = `${basePath}/models`.replace(/\/+/g, "/");
+    url.search = "";
+    return url.toString();
+  }
+  url.pathname = "/healthz";
+  url.search = "";
+  return url.toString();
+}
+
+function isLocalUrl(value) {
+  try {
+    const url = new URL(String(value));
+    return ["127.0.0.1", "localhost", "::1", "[::1]"].includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function positiveInt(value, label) {
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
+  return number;
+}
+
 function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
   const needs = [];
   const push = (id, ready, envNames, note) => {
@@ -258,9 +441,10 @@ function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
   );
   for (const provider of arrayOf(lane.providerRequirements)) {
     const readiness = lane.providerReadiness?.[provider] ?? {};
+    const endpointHealth = options.localRuntimeHealth?.endpoints?.[provider] ?? {};
     push(
       `${provider}-readiness`,
-      readiness.ready === true,
+      readiness.ready === true && (provider.startsWith("local-") ? endpointHealth.ready === true : true),
       [...arrayOf(readiness.valueEnvNames), ...arrayOf(readiness.keyFileEnvNames)],
       `${provider} endpoint or credential readiness`,
     );
@@ -382,6 +566,16 @@ function renderMarkdown(value) {
     `- Diagnostic fallback allowed: ${value.acceptedLane.queryExpansion.diagnosticFallbackAllowed}`,
     `- Answer model target: ${value.acceptedLane.answerQuality.targetAnswerModel ?? "n/a"}`,
     `- Judge model target: ${value.acceptedLane.answerQuality.targetJudgeModel ?? "n/a"}`,
+    "",
+    "## Local Runtime Health",
+    `- Ready for response-arm export: ${value.acceptedLane.localRuntimeHealth.readyForResponseArmExport}`,
+    `- Local Apple required: ${value.acceptedLane.localRuntimeHealth.endpoints["local-apple"].required}`,
+    `- Local Apple configured: ${value.acceptedLane.localRuntimeHealth.endpoints["local-apple"].configured}`,
+    `- Local Apple reachable: ${value.acceptedLane.localRuntimeHealth.endpoints["local-apple"].reachable}`,
+    `- Local rerank required: ${value.acceptedLane.localRuntimeHealth.endpoints["local-rerank"].required}`,
+    `- Local rerank configured: ${value.acceptedLane.localRuntimeHealth.endpoints["local-rerank"].configured}`,
+    `- Local rerank reachable: ${value.acceptedLane.localRuntimeHealth.endpoints["local-rerank"].reachable}`,
+    `- Endpoint values printed: ${value.acceptedLane.localRuntimeHealth.endpointValuesPrinted}`,
     "",
     "## Operator Inputs Needed",
     ...(value.operatorInputsNeeded.length

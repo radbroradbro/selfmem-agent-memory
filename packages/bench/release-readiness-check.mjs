@@ -4334,6 +4334,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.nvidia?.ready, true);
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.voyage?.ready, true);
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, true);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.localRuntimeHealth?.readyForResponseArmExport, false);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpointValuesPrinted, false);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpoints?.["local-apple"]?.configured, false);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpoints?.["local-rerank"]?.configured, false);
     assert.equal(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "response-export-consent"), false);
     assert.equal(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "gemini-readiness"), false);
     assert.equal(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "nvidia-readiness"), false);
@@ -4343,6 +4347,36 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(providerEnvLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "answer-quality-scoring"));
     assert.doesNotMatch(JSON.stringify(providerEnvLaunchDoctor), secretPattern);
     assert.doesNotMatch(JSON.stringify(providerEnvLaunchDoctor), privatePathPattern);
+    const staleLocalEndpointLaunchDoctor = JSON.parse(
+      run("node", ["packages/bench/full-shard-accepted-lane-launch-doctor.mjs"], {
+        env: {
+          ...process.env,
+          RECALLWEAVE_BASELINE_LIVE: "1",
+          RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+          RECALLWEAVE_PROVIDER_BENCHMARK_CALLS: "1",
+          RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA: "1",
+          RECALLWEAVE_QUERY_EXPANSION_CALLS: "1",
+          RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA: "1",
+          RECALLWEAVE_ACCEPTED_LANE_LOCAL_HEALTH_TIMEOUT_MS: "100",
+          VOYAGE_API_KEYS_FILE: voyageKeys,
+          GEMINI_API_KEYS_FILE: geminiKeys,
+          NVIDIA_API_KEYS_FILE: nvidiaKeys,
+          SELFMEM_LOCAL_EMBED_BASE_URL: "http://127.0.0.1:9/v1",
+          SELFMEM_LOCAL_RERANK_ENDPOINT: "http://127.0.0.1:9/v1/rerank",
+        },
+      }).stdout,
+    );
+    assert.equal(staleLocalEndpointLaunchDoctor.acceptedLane?.providerReadiness?.["local-apple"]?.ready, true);
+    assert.equal(staleLocalEndpointLaunchDoctor.acceptedLane?.providerReadiness?.["local-rerank"]?.ready, true);
+    assert.equal(staleLocalEndpointLaunchDoctor.acceptedLane?.localRuntimeHealth?.readyForResponseArmExport, false);
+    assert.equal(staleLocalEndpointLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpoints?.["local-apple"]?.configured, true);
+    assert.equal(staleLocalEndpointLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpoints?.["local-apple"]?.reachable, false);
+    assert.equal(staleLocalEndpointLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpoints?.["local-rerank"]?.configured, true);
+    assert.equal(staleLocalEndpointLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpoints?.["local-rerank"]?.reachable, false);
+    assert.ok(staleLocalEndpointLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-apple-readiness"));
+    assert.ok(staleLocalEndpointLaunchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-rerank-readiness"));
+    assert.doesNotMatch(JSON.stringify(staleLocalEndpointLaunchDoctor), secretPattern);
+    assert.doesNotMatch(JSON.stringify(staleLocalEndpointLaunchDoctor), privatePathPattern);
   }
   for (const launchDoctor of [localAcceptedLaneLaunchDoctorFresh, localAcceptedLaneLaunchDoctorEvidence]) {
     assert.equal(launchDoctor.mode, "full-shard-accepted-lane-launch-doctor");
