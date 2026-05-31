@@ -633,11 +633,44 @@ async function rankCloudVoyageRerankOnly(query, candidates, options = {}) {
   return [...ranked, ...candidatesNotIn(firstStage, candidates)].sort(byScoreThenId);
 }
 
+function rankProviderHybridCandidatePool(query, candidates, limit) {
+  const cap = Math.max(1, Math.min(Number(limit), candidates.length));
+  const queryText = queryTextValue(query);
+  const sparse = rankBm25Lite(queryText, candidates);
+  const hybrid = rankSparseDenseGraphTemporal(query, candidates);
+  const fused = fuseRankedChannels(
+    candidates,
+    [
+      { name: "sparse", weight: 1, ranked: sparse },
+      { name: "full-hybrid-proxy", weight: 0.85, ranked: hybrid },
+    ],
+    { scoreScale: 8 },
+  );
+  const lexicalFloor = Math.max(1, Math.ceil(cap * 0.5));
+  return uniqueRankedCandidates([...sparse.slice(0, lexicalFloor), ...fused], cap);
+}
+
+function uniqueRankedCandidates(candidates, limit) {
+  const selected = [];
+  const seen = new Set();
+  for (const candidate of candidates) {
+    if (seen.has(candidate.outputId)) continue;
+    seen.add(candidate.outputId);
+    selected.push(candidate);
+    if (selected.length >= limit) break;
+  }
+  return selected;
+}
+
 async function rankCloudVoyage4Voyage(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
   const config = voyageStrategyConfig(options.strategy);
   assert.ok(config?.mode === "embed-rerank", `invalid Voyage embed/rerank strategy: ${options.strategy}`);
-  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", config.denseCandidateLimit));
+  const densePool = rankProviderHybridCandidatePool(
+    query,
+    candidates,
+    providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", config.denseCandidateLimit),
+  );
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("voyage-embedding");
     options.providerStats?.recordMockCall("voyage-rerank");
@@ -678,7 +711,7 @@ async function rankCloudGeminiEmbedRerankProxy(query, candidates, options = {}) 
   const queryText = queryTextValue(query);
   const config = geminiStrategyConfig(options.strategy);
   assert.ok(config?.rerankMode === "proxy", `invalid Gemini proxy strategy: ${options.strategy}`);
-  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  const densePool = rankProviderHybridCandidatePool(query, candidates, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("gemini-embedding");
     const dense = rankDenseProxy(queryText, densePool);
@@ -720,7 +753,7 @@ async function rankCloudGeminiVoyageRerank(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
   const config = geminiStrategyConfig(options.strategy);
   assert.ok(config?.rerankMode === "voyage", `invalid Gemini plus Voyage strategy: ${options.strategy}`);
-  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  const densePool = rankProviderHybridCandidatePool(query, candidates, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("gemini-embedding");
     options.providerStats?.recordMockCall("voyage-rerank");
@@ -764,7 +797,7 @@ async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
   const config = nvidiaStrategyConfig(options.strategy);
   assert.ok(config, `unknown NVIDIA strategy: ${options.strategy}`);
-  const densePool = rankBm25Lite(queryText, candidates).slice(0, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
+  const densePool = rankProviderHybridCandidatePool(query, candidates, providerCandidateLimit("RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT", 120));
   if (options.fixtureRequested) {
     options.providerStats?.recordMockCall("nvidia-embedding");
     options.providerStats?.recordMockCall("nvidia-rerank");
@@ -804,8 +837,9 @@ async function rankCloudNvidiaHybrid(query, candidates, options = {}) {
 async function rankLocalAppleQwen(query, candidates, options = {}) {
   const queryText = queryTextValue(query);
   const config = localAppleStrategyConfig(options.strategy);
-  const densePool = rankBm25Lite(queryText, candidates).slice(
-    0,
+  const densePool = rankProviderHybridCandidatePool(
+    query,
+    candidates,
     providerCandidateLimit("SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT", config?.denseCandidateLimit ?? 120),
   );
   if (options.fixtureRequested) {

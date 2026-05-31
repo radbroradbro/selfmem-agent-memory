@@ -1130,6 +1130,13 @@ query-set hash, fixture/live mode, query count, shard offset, requested shard
 size, or context budget differ. This is an operational speedup for
 autoresearch loops, not independent evidence.
 
+Provider and local embedding arms are hybrid challengers, not pure vector
+search. The dense/rerank candidate pool keeps a BM25 lexical floor, then fills
+the remaining bounded slots from a sparse+dense+graph+temporal hybrid ranking
+before Gemini, NVIDIA, Voyage, or the local Apple embedding sidecar scores the
+documents. This keeps provider calls capped while avoiding an all-BM25 gate
+that would prevent dense models from rescuing graph/temporal candidates.
+
 Benchmark arms also carry per-arm isolation metadata. Provider-gate live runs
 default to isolated arm IDs, hashed container tags, and separate local embedding
 caches, and every child arm disables hosted Supermemory search by environment.

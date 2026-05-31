@@ -1,13 +1,14 @@
 # Brain UI Current-Head Live Evidence
 
-Date: 2026-05-22
+Date: 2026-05-31
 
 Scope:
 
 - Fresh in-app browser render of the Brain UI on the current PR head.
 - Local URL: `http://127.0.0.1:4189/`
-- Head checked: `8777290169f598ff9172e889e927858b3956f764`
-- GitHub Actions CI run already passing for that head: `26316074705`
+- Head checked: `8ad7728d31d6b66cbd325b69ecedd49ede45e0cb`
+- Local release gate was rerun after the provider-arm watchdog update and
+  passed before this browser refresh.
 
 Evidence:
 
@@ -40,8 +41,8 @@ Checks:
 
 Boundary:
 
-- This is fixture-only browser evidence.
+- This is fixture-only browser evidence from the self-hosted local Brain UI.
 - It does not read local user memories, raw transcripts, private diagnostics,
   provider keys, or hosted Supermemory data.
 - It strengthens the current-head UI evidence. It does not approve public
-  launch or replace the blocked Claude review.
+  launch, prove SOTA memory performance, or replace owner approval.
