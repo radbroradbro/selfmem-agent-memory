@@ -701,6 +701,36 @@ failures. It preserved the same measured quality as `cloud-voyage4-voyage`
 while cutting p50 latency from 6659 ms to 1988 ms. Use it as the next cloud
 canary default, not as a final MemoryBench or SOTA claim.
 
+The June 1 whole-harness correction is now checked in. Do not treat the
+75-query BM25/materialization lane as product progress, and do not launch
+another monolithic 500-query provider job as the next step. The monolithic
+attempts at
+`reviews/overnight-20260522/provider-runs/full-system-contextual-provider-500q-20260601.json`
+and
+`reviews/overnight-20260522/provider-runs/full-system-contextual-provider-500q-max2gb-20260601.json`
+are runtime/methodology blockers only: memory-size and arm-timeout behavior
+prevented a quality verdict.
+
+The current product-loop path is integrated, same-data, and sharded. Run the
+whole harness by query shard, keep BM25 only as the lexical floor, include
+full hybrid plus provider/vector/rerank arms, then combine public-safe shard
+reports with:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy:combine -- \
+  --reports <comma-separated-shard-reports>
+```
+
+The first corrected 5-query integrated canary is
+`reviews/overnight-20260522/provider-runs/whole-harness-live-5q-contextual-20260601.json`;
+the combined public-safe report is
+`reviews/overnight-20260522/provider-runs/whole-harness-live-5q-contextual-combined-20260601.json`.
+It covers only 1 percent of the full 500-query target, so it is directional
+evidence only. On the completed arms, NVIDIA
+`cloud-nvidia-nv-embed-v1-mistral-rerank` led that slice, while Voyage hit a
+provider rate limit. Next agents should expand this same integrated shard path
+instead of spending more time on standalone BM25 lanes.
+
 Do not use the provider gate on private agent memories unless the operator has
 separately approved sending that text to the provider.
 

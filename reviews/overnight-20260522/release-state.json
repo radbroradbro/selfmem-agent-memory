@@ -127,6 +127,7 @@
       "packages/bench/public-benchmark-sota-operator-packet.mjs",
       "packages/bench/full-memory-sota-doctor.mjs",
       "packages/bench/public-benchmark-strategy-compare.mjs",
+      "packages/bench/public-benchmark-strategy-shard-combine.mjs",
       "packages/bench/public-benchmark-target-author.mjs",
       "packages/bench/public-benchmark-target-check.mjs",
       "packages/bench/public-benchmark-reported-targets.mjs",

@@ -104,6 +104,44 @@ gate, start the approved local or cloud endpoint, set the explicit
 answer-quality/public-data/no-raw-output env gates, and rerun the command with
 `--execute`.
 
+## June 1 Whole-Harness Correction
+
+The benchmark progress bar is now the integrated memory system, not a longer
+BM25 or single-component lane. The current public-safe whole-harness path is:
+materialize the same source-locked target, run BM25 as the lexical floor,
+run full hybrid, query-expanded hybrid, and provider/vector/rerank arms on the
+same rows, then combine non-overlapping shard reports with:
+
+```bash
+npm exec --yes pnpm@10.23.0 -- benchmark:public-strategy:combine -- \
+  --reports <comma-separated-shard-reports>
+```
+
+The June 1 monolithic 500-query provider attempts are checked in only as
+runtime/methodology blockers:
+
+- `reviews/overnight-20260522/provider-runs/full-system-contextual-provider-500q-20260601.json`
+- `reviews/overnight-20260522/provider-runs/full-system-contextual-provider-500q-max2gb-20260601.json`
+
+Those reports failed from memory-size/arm-timeout behavior and must not be
+used as model-quality evidence. The checked-in integrated 5-query canary
+demonstrates the corrected same-data route and the shard-combine reporter:
+
+- `reviews/overnight-20260522/provider-runs/whole-harness-live-5q-contextual-20260601.json`
+- `reviews/overnight-20260522/provider-runs/whole-harness-live-5q-contextual-combined-20260601.json`
+
+That canary is still only 1 percent coverage of the 500-query target. On the
+completed same-data arms, NVIDIA `cloud-nvidia-nv-embed-v1-mistral-rerank`
+led the slice at quality 0.4289, BM25 scored 0.3656, full hybrid scored
+0.3265, query-expanded hybrid scored 0.3265, and Gemini proxy scored 0.3145.
+Voyage hit a provider rate limit in that partial run. Treat this as a useful
+directional canary and a product-loop correction, not as SOTA or public
+superiority proof.
+
+Next benchmark work should shard the whole harness and combine shard reports.
+Do not spend another long run on BM25-only scoring unless it is a tiny canary
+to prove the source lock or harness still executes.
+
 ## Operating Provider Policy
 
 For actual Codex and personal memory usage, the default provider arm is the
