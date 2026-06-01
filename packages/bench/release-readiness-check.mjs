@@ -703,6 +703,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-release-readiness.png`,
   `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-current-head-live.png`,
+  `${reviewDir}/ui-evidence/brain-ui-20260601-current-head-browser-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-20260601-current-head-filtered-retrieval.jpg`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
   `${reviewDir}/ui-evidence/brain-ui-review-queue-dom-evidence.json`,
@@ -1480,6 +1482,36 @@ check("dom evidence is sane", () => {
       assert.equal(value, true, `current-head browser evidence missing ${name}`);
     }
   }
+
+  const currentHeadJuneEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-20260601-current-head-browser-evidence.json"), "utf8"),
+  );
+  assert.equal(currentHeadJuneEvidence.mode, "current-head-live-browser-ui-evidence");
+  assert.match(currentHeadJuneEvidence.gitHead ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(currentHeadJuneEvidence.branch, "feat/nucleus-wiki-native-contract");
+  assert.equal(currentHeadJuneEvidence.sourceUrl, "http://127.0.0.1:4189/");
+  assert.equal(currentHeadJuneEvidence.screenshot, "reviews/overnight-20260522/ui-evidence/brain-ui-20260601-current-head-filtered-retrieval.jpg");
+  assert.equal(currentHeadJuneEvidence.page?.title, "RecallWeave Brain");
+  assert.equal(currentHeadJuneEvidence.page?.searchValue, "native memory");
+  assert.equal(currentHeadJuneEvidence.page?.selectedHeading, "Retrieval trace for native memory optimization");
+  assert.ok(currentHeadJuneEvidence.page?.statusText?.includes("2/2 nodes | 2 links"));
+  assert.ok(currentHeadJuneEvidence.page?.statusText?.includes("12 files compiled. Lint clean."));
+  for (const [name, value] of Object.entries(currentHeadJuneEvidence.page?.visibleChecks ?? {})) {
+    assert.equal(value, true, `2026-06-01 current-head browser evidence missing ${name}`);
+  }
+  assert.equal(currentHeadJuneEvidence.page?.privateLeakChecks?.keyShapeVisible, false);
+  assert.equal(currentHeadJuneEvidence.page?.privateLeakChecks?.privatePathVisible, false);
+  assert.equal(currentHeadJuneEvidence.consoleErrorCount, 0);
+  assert.equal(currentHeadJuneEvidence.publicSafety?.fixtureOnly, true);
+  assert.equal(currentHeadJuneEvidence.publicSafety?.writesRealFilesVisibleAsFalse, true);
+  assert.equal(currentHeadJuneEvidence.publicSafety?.noKeyShapedVisibleText, true);
+  assert.equal(currentHeadJuneEvidence.publicSafety?.noPrivatePathVisibleText, true);
+  const currentHeadJuneScreenshot = readFileSync(
+    join(root, reviewDir, "ui-evidence/brain-ui-20260601-current-head-filtered-retrieval.jpg"),
+  );
+  assert.equal(currentHeadJuneScreenshot[0], 0xff);
+  assert.equal(currentHeadJuneScreenshot[1], 0xd8);
+  assert.equal(currentHeadJuneScreenshot[2], 0xff);
 
   const policyEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json"), "utf8"),
