@@ -1,10 +1,10 @@
-defaultCloudArm: cloud-voyage4-voyage
+defaultCloudArm: cloud-voyage4-lite-voyage-lite
 defaultLocalArm: local-apple-qwen3-0_6b
 
 usagePolicy:
-  personalAgentDefaultArm: cloud-voyage4-voyage
+  personalAgentDefaultArm: cloud-voyage4-lite-voyage-lite
   methodologyRefinementDefaultArm: local-apple-qwen3-0_6b
-  rationale: "Use the Voyage cloud arm for actual Codex/personal memory by default. Use local arms for high-volume methodology refinement, plugin benchmark loops, private/offline sweeps, and no-spend question-set experimentation."
+  rationale: "Use the Voyage lite embedding plus lite rerank cloud arm for actual Codex/personal memory by default. Use local arms for high-volume methodology refinement, plugin benchmark loops, private/offline sweeps, and no-spend question-set experimentation."
   localPromotionRule: "Do not promote a local arm to the personal default unless it wins a same-data answer-quality benchmark against the cloud default or the owner explicitly changes the policy."
 
 fallbackPolicy:
@@ -85,7 +85,27 @@ arms:
     rerankModel: rerank-2.5
     keyRotationEnv: VOYAGE_API_KEYS
     singleKeyEnv: VOYAGE_API_KEY
-    purpose: default text/code memory arm with same-provider embedding and rerank
+    purpose: quality challenger text/code memory arm with same-provider embedding and rerank
+
+  cloud-voyage4-voyage-lite-rerank:
+    embedder: voyage
+    embedModel: voyage-4-large
+    dimensions: 1024
+    reranker: voyage
+    rerankModel: rerank-2.5-lite
+    keyRotationEnv: VOYAGE_API_KEYS
+    singleKeyEnv: VOYAGE_API_KEY
+    purpose: quality embedding with low-cost same-provider rerank challenger
+
+  cloud-voyage4-lite-voyage-lite:
+    embedder: voyage
+    embedModel: voyage-4-lite
+    dimensions: 1024
+    reranker: voyage
+    rerankModel: rerank-2.5-lite
+    keyRotationEnv: VOYAGE_API_KEYS
+    singleKeyEnv: VOYAGE_API_KEY
+    purpose: default low-cost personal cloud memory arm with same-provider embedding and rerank
 
   cloud-gemini2-pinecone:
     embedder: gemini

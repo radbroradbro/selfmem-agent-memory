@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "provider-adapter-registry-check",
   "status": "READY_PROVIDER_ADAPTER_REGISTRY",
-  "generatedAt": "2026-06-01T13:45:48.089Z",
+  "generatedAt": "2026-06-01T20:45:43.501Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -11,9 +11,9 @@
   "storesCredentials": false,
   "input": {
     "path": "configs/provider-adapter-registry.json",
-    "hash": "sha256:412f54fca3d8ce0fa4293b43a432933dfd299b9bbecb9f8c3066bf59b077a67c"
+    "hash": "sha256:b89829827d6b0377f6eb850ccba4cceb363243aa21cdee9b563eaec6a6c4805d"
   },
-  "personalProductionDefaultArm": "cloud-voyage4-voyage",
+  "personalProductionDefaultArm": "cloud-voyage4-lite-voyage-lite",
   "methodologyDefault": {
     "memoryMethod": "contextual-source-chunk-v1",
     "firstStage": "bm25-lite",

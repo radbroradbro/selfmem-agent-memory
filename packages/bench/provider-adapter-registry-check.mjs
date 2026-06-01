@@ -38,7 +38,9 @@ function buildReport(value, rawText) {
     value.mode !== "provider-adapter-registry" ? "unexpected-mode" : null,
     value.publicSafe !== true ? "registry-not-public-safe" : null,
     value.storesCredentials !== false ? "registry-must-not-store-credentials" : null,
-    value.personalProductionDefaultArm !== "cloud-voyage4-voyage" ? "personal-production-default-not-voyage" : null,
+    value.personalProductionDefaultArm !== "cloud-voyage4-lite-voyage-lite"
+      ? "personal-production-default-not-voyage-lite"
+      : null,
     value.methodologyDefault?.memoryMethod !== "contextual-source-chunk-v1" ? "methodology-default-materializer-not-contextual-source-chunk" : null,
     value.methodologyDefault?.firstStage !== "bm25-lite" ? "methodology-default-first-stage-not-bm25" : null,
     value.methodologyDefault?.queryExpansionDefaultEnabled !== false ? "query-expansion-not-default-off" : null,

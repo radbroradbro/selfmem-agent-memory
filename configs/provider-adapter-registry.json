@@ -6,7 +6,7 @@
   "metricsOnly": true,
   "storesCredentials": false,
   "printsCredentials": false,
-  "personalProductionDefaultArm": "cloud-voyage4-voyage",
+  "personalProductionDefaultArm": "cloud-voyage4-lite-voyage-lite",
   "methodologyDefault": {
     "memoryMethod": "contextual-source-chunk-v1",
     "firstStage": "bm25-lite",

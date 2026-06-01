@@ -200,7 +200,7 @@ const report = {
   nextActions: ready
     ? [
         "Run shard-scoped materialization before each response arm export so provider and local arms load only the shard-local private corpus.",
-        "Run response arm exports shard-by-shard with explicit provider and query-expansion consent.",
+        "Run response arm exports shard-by-shard with explicit provider-call consent; add query expansion only as a labeled ablation.",
         "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
         answerQualityScoringAction(claimScope),
         "Combine the full query-shard result set, then run the memory-score gate and reviewer intake on the combined metrics-only packet.",
@@ -286,12 +286,12 @@ function buildExecutionLanes(items, scope) {
     {
       id: "deterministic-control-proxy",
       label: "Deterministic control/proxy lane",
-      strategies: ["bm25-lite", "full-hybrid-rerank", "query-expanded-full-hybrid-rerank"],
+      strategies: ["bm25-lite", "full-hybrid-rerank"],
       operatorUse: "Run-path and shard-integrity proof only. This does not score local or provider model quality.",
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
-      queryExpansionPolicy: "Deterministic fallback only; does not count as large-model query-expansion evidence.",
-      queryExpansionEvidenceRequirement: "deterministic-fallback-only",
+      queryExpansionPolicy: "Query expansion is excluded by default and may be added only as a labeled ablation lane.",
+      queryExpansionEvidenceRequirement: "not-required",
       queryExpansionDiagnosticFallbackAllowed: true,
       queryExpansionSotaEligible: false,
     },
@@ -301,15 +301,14 @@ function buildExecutionLanes(items, scope) {
       strategies: [
         "bm25-lite",
         "full-hybrid-rerank",
-        "query-expanded-full-hybrid-rerank",
         "local-apple-qwen3-0_6b",
         "local-apple-qwen3-0_6b-local-rerank",
       ],
       operatorUse: "Use first when validating the no-spend local method before cloud challenger spend.",
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
-      queryExpansionPolicy: "Local or deterministic query expansion must be reported separately from cloud expansion.",
-      queryExpansionEvidenceRequirement: "local-model-or-deterministic-diagnostic",
+      queryExpansionPolicy: "Query expansion is off by default; score it only as a same-shard ablation when explicitly requested.",
+      queryExpansionEvidenceRequirement: "not-required",
       queryExpansionDiagnosticFallbackAllowed: true,
       queryExpansionSotaEligible: false,
     },
@@ -319,22 +318,21 @@ function buildExecutionLanes(items, scope) {
       strategies: [
         "bm25-lite",
         "full-hybrid-rerank",
-        "query-expanded-full-hybrid-rerank",
         "local-apple-qwen3-4b",
         "local-apple-qwen3-4b-local-rerank",
       ],
       operatorUse: "Use as an overnight/local methodology challenger when the 4B runtime is stable; do not merge it into the 0.6B accepted lane.",
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
-      queryExpansionPolicy: "Local or deterministic query expansion must be reported separately from cloud expansion.",
-      queryExpansionEvidenceRequirement: "local-model-or-deterministic-diagnostic",
+      queryExpansionPolicy: "Query expansion is off by default; score it only as a same-shard ablation when explicitly requested.",
+      queryExpansionEvidenceRequirement: "not-required",
       queryExpansionDiagnosticFallbackAllowed: true,
       queryExpansionSotaEligible: false,
     },
     {
       id: "voyage-minimum-challenger",
       label: "Voyage minimum challenger lane",
-      strategies: ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-voyage-lite-rerank"],
+      strategies: ["bm25-lite", "full-hybrid-rerank", "cloud-voyage4-lite-voyage-lite"],
       operatorUse: "Use when Voyage quota is available to unblock the same-data Voyage answer-quality comparison.",
       acceptedByFullShardIntake: false,
       canReachFullSotaGateAfterShardIntake: false,
@@ -378,8 +376,8 @@ function buildExecutionLanes(items, scope) {
             acceptedByFullShardIntake: true,
             canReachFullSotaGateAfterShardIntake: false,
             queryExpansionPolicy:
-              "Query expansion, local Apple, and local rerank arms must all be present on the same shards; cloud query expansion is allowed only when explicitly labeled.",
-            queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
+              "Local Apple and local rerank arms must be present on the same shards; query expansion is optional and must be labeled as an ablation.",
+            queryExpansionEvidenceRequirement: "not-required",
             queryExpansionDiagnosticFallbackAllowed: false,
             queryExpansionSotaEligible: false,
           },
@@ -395,8 +393,8 @@ function buildExecutionLanes(items, scope) {
               acceptedByFullShardIntake: true,
               canReachFullSotaGateAfterShardIntake: false,
               queryExpansionPolicy:
-                "Query expansion and cloud provider challengers must be present on the same shards when included in the challenger set.",
-              queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
+                "Cloud provider challengers must be present on the same shards; query expansion is optional and must be labeled as an ablation.",
+              queryExpansionEvidenceRequirement: "not-required",
               queryExpansionDiagnosticFallbackAllowed: false,
               queryExpansionSotaEligible: false,
             },
@@ -409,8 +407,9 @@ function buildExecutionLanes(items, scope) {
             operatorUse: "Only this lane has the complete strategy set expected by shard intake and combine.",
             acceptedByFullShardIntake: true,
             canReachFullSotaGateAfterShardIntake: true,
-            queryExpansionPolicy: "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
-            queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
+            queryExpansionPolicy:
+              "Local rerank, local Apple, and provider challengers must all be present on the same shards; query expansion is optional and must be labeled as an ablation.",
+            queryExpansionEvidenceRequirement: "not-required",
             queryExpansionDiagnosticFallbackAllowed: false,
             queryExpansionSotaEligible: true,
           },
@@ -486,7 +485,6 @@ function requiredChecksForClaimScope(scope) {
     "judgeModelPresent",
     "bm25ControlPresent",
     "fullHybridControlPresent",
-    "queryExpansionPresent",
     "localApplePresent",
     "localRerankPresent",
     "shardCoverageComplete",
@@ -584,7 +582,7 @@ function responseArmExportTemplate() {
     ...providerEnv,
     ...localAppleEnv,
     ...localRerankEnv,
-    ...queryExpansionEnv,
+    ...(coverage.hasQueryExpansion ? queryExpansionEnv : []),
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute",
     `--target ${displayPath(targetPath)}`,
     "--queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json",
@@ -720,12 +718,12 @@ function resultClaimAction(scope) {
 
 function missingLaneAction(scope) {
   if (scope === "model-challenger") {
-    return "Include BM25, full-hybrid, query expansion, Voyage, NVIDIA, and Gemini challenger arms without requiring local Apple sidecars.";
+    return "Include BM25, full-hybrid, Voyage lite/lite, NVIDIA, and Gemini challenger arms without requiring local Apple sidecars. Add query expansion only as a labeled ablation.";
   }
   if (scope === "local-full") {
-    return "Include BM25, full-hybrid, model-backed query expansion, local Apple, and local rerank arms.";
+    return "Include BM25, full-hybrid, local Apple, and local rerank arms. Add query expansion only as a labeled ablation.";
   }
-  return "Include BM25, full-hybrid, query expansion, Voyage, NVIDIA or Gemini, local Apple, and local rerank arms.";
+  return "Include BM25, full-hybrid, Voyage lite/lite, NVIDIA or Gemini, local Apple, and local rerank arms. Add query expansion only as a labeled ablation.";
 }
 
 function scoringPolicyForClaimScope(scope) {
@@ -760,25 +758,24 @@ function defaultStrategies(scope) {
   const local = [
     "bm25-lite",
     "full-hybrid-rerank",
-    "query-expanded-full-hybrid-rerank",
     "local-apple-qwen3-0_6b",
     "local-apple-qwen3-0_6b-local-rerank",
   ];
   if (scope === "local-full") return local;
   if (scope === "model-challenger") {
     return [
-      ...local.slice(0, 3),
+      ...local.slice(0, 2),
       "cloud-gemini2-embed-rerank-proxy",
-      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-voyage4-lite-voyage-lite",
       "cloud-nvidia-nv-embed-v1-mistral-rerank",
     ];
   }
   return [
-    ...local.slice(0, 3),
+    ...local.slice(0, 2),
     "cloud-gemini2-embed-rerank-proxy",
-    "cloud-voyage4-voyage-lite-rerank",
+    "cloud-voyage4-lite-voyage-lite",
     "cloud-nvidia-nv-embed-v1-mistral-rerank",
-    ...local.slice(3),
+    ...local.slice(2),
   ];
 }
 

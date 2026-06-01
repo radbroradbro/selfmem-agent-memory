@@ -1,4 +1,4 @@
-providerArm: cloud-voyage4-voyage
+providerArm: cloud-voyage4-lite-voyage-lite
 storage:
   rawStore: sqlite
   vectorStore: sqlite-vec
@@ -24,12 +24,12 @@ providers:
   voyage:
     apiKeyEnv: VOYAGE_API_KEY
     apiKeysEnv: VOYAGE_API_KEYS
-    embeddingModel: voyage-4-large
+    embeddingModel: voyage-4-lite
     embeddingDimensions: 1024
     embeddingInputTypes:
       query: query
       document: document
-    rerankModel: rerank-2.5
+    rerankModel: rerank-2.5-lite
     keyRotation:
       enabled: true
       strategy: round_robin

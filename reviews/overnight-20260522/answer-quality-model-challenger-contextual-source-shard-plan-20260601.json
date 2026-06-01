@@ -32,7 +32,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-06-01T15:34:28.464Z",
+  "generatedAt": "2026-06-01T20:48:50.907Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
     "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
@@ -68,13 +68,13 @@
   "strategyCoverage": {
     "hasBm25Lite": true,
     "hasFullHybridRerank": true,
-    "hasQueryExpansion": true,
+    "hasQueryExpansion": false,
     "hasWikiAmplification": false,
     "hasVoyageProvider": true,
     "hasNvidiaOrGeminiProvider": true,
     "hasLocalApple": false,
     "hasLocalRerank": false,
-    "strategyCount": 6
+    "strategyCount": 5
   },
   "providerHybridContract": {
     "bm25LexicalFloorRequired": true,
@@ -87,7 +87,7 @@
     "cloudProviderStrategies": [
       "cloud-gemini2-embed-rerank-proxy",
       "cloud-nvidia-nv-embed-v1-mistral-rerank",
-      "cloud-voyage4-voyage-lite-rerank"
+      "cloud-voyage4-lite-voyage-lite"
     ],
     "localAppleIsSeparateLocalProviderLane": false,
     "acceptedLaneMustScoreControlsAndProvidersTogether": true
@@ -113,7 +113,6 @@
     "judgeModelPresent": true,
     "bm25ControlPresent": true,
     "fullHybridControlPresent": true,
-    "queryExpansionPresent": true,
     "shardCoverageComplete": true,
     "voyageProviderPresent": true,
     "nvidiaOrGeminiProviderPresent": true
@@ -140,13 +139,12 @@
     "shardCount": 20,
     "contextTokenBudget": 800,
     "limit": 5,
-    "maxMemoryBytes": 400000000,
+    "maxMemoryBytes": 300000000,
     "strategies": [
       "bm25-lite",
       "full-hybrid-rerank",
-      "query-expanded-full-hybrid-rerank",
       "cloud-gemini2-embed-rerank-proxy",
-      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-voyage4-lite-voyage-lite",
       "cloud-nvidia-nv-embed-v1-mistral-rerank"
     ],
     "privateInputDirectoryLabel": "<private-output-dir>",
@@ -154,9 +152,9 @@
     "publicOutputDirectoryLabel": "<public-review-dir>",
     "materializeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --memory-method contextual-source-chunk-v1 --private-output-dir <private-output-dir> --output <public-review-dir>/public-longmemeval-full-materialize-run.json --markdown-output <public-review-dir>/public-longmemeval-full-materialize-run-evidence.md",
     "shardMaterializeTemplate": "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --memory-method contextual-source-chunk-v1 --context-token-budget 800 --limit 5 --query-offset {startIndex} --max-queries {queryCount} --private-output-dir <private-output-dir>/shards/{shardId}/materialized --output <public-review-dir>/public-longmemeval-model-challenger-materialize-{shardId}.json --markdown-output <public-review-dir>/public-longmemeval-model-challenger-materialize-{shardId}.md",
-    "responseArmExportTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/shards/{shardId}/arms --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-gemini2-embed-rerank-proxy,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 400000000 --query-offset 0 --max-queries {queryCount}",
-    "preflightTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=challenger-model-allowed RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<challenger-answer-model> RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<challenger-judge-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --claim-scope model-challenger --model-match-policy challenger-model-allowed --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json --query-offset 0 --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/shards/{shardId}/arms/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/shards/{shardId}/arms/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --output <public-review-dir>/answer-quality-model-challenger-preflight-{shardId}.json --markdown-output <public-review-dir>/answer-quality-model-challenger-preflight-{shardId}.md",
-    "answerQualityTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=challenger-model-allowed RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<challenger-answer-model> RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<challenger-judge-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope model-challenger --model-match-policy challenger-model-allowed --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json --query-offset 0 --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/shards/{shardId}/arms/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/shards/{shardId}/arms/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --output <public-review-dir>/answer-quality-model-challenger-{shardId}.json --markdown-output <public-review-dir>/answer-quality-model-challenger-{shardId}.md",
+    "responseArmExportTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/shards/{shardId}/arms --strategies bm25-lite,full-hybrid-rerank,cloud-gemini2-embed-rerank-proxy,cloud-voyage4-lite-voyage-lite,cloud-nvidia-nv-embed-v1-mistral-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset 0 --max-queries {queryCount}",
+    "preflightTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=challenger-model-allowed RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<challenger-answer-model> RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<challenger-judge-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --claim-scope model-challenger --model-match-policy challenger-model-allowed --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json --query-offset 0 --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/shards/{shardId}/arms/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/shards/{shardId}/arms/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-lite-voyage-lite=<private-output-dir>/shards/{shardId}/arms/cloud-voyage4-lite-voyage-lite-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --output <public-review-dir>/answer-quality-model-challenger-preflight-{shardId}.json --markdown-output <public-review-dir>/answer-quality-model-challenger-preflight-{shardId}.md",
+    "answerQualityTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=challenger-model-allowed RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<challenger-answer-model> RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<challenger-judge-model> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope model-challenger --model-match-policy challenger-model-allowed --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json --query-offset 0 --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/shards/{shardId}/arms/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/shards/{shardId}/arms/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-lite-voyage-lite=<private-output-dir>/shards/{shardId}/arms/cloud-voyage4-lite-voyage-lite-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --output <public-review-dir>/answer-quality-model-challenger-{shardId}.json --markdown-output <public-review-dir>/answer-quality-model-challenger-{shardId}.md",
     "combineCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-model-challenger-shard-001.json,<public-review-dir>/answer-quality-model-challenger-shard-002.json,<public-review-dir>/answer-quality-model-challenger-shard-003.json,<public-review-dir>/answer-quality-model-challenger-shard-004.json,<public-review-dir>/answer-quality-model-challenger-shard-005.json,<public-review-dir>/answer-quality-model-challenger-shard-006.json,<public-review-dir>/answer-quality-model-challenger-shard-007.json,<public-review-dir>/answer-quality-model-challenger-shard-008.json,<public-review-dir>/answer-quality-model-challenger-shard-009.json,<public-review-dir>/answer-quality-model-challenger-shard-010.json,<public-review-dir>/answer-quality-model-challenger-shard-011.json,<public-review-dir>/answer-quality-model-challenger-shard-012.json,<public-review-dir>/answer-quality-model-challenger-shard-013.json,<public-review-dir>/answer-quality-model-challenger-shard-014.json,<public-review-dir>/answer-quality-model-challenger-shard-015.json,<public-review-dir>/answer-quality-model-challenger-shard-016.json,<public-review-dir>/answer-quality-model-challenger-shard-017.json,<public-review-dir>/answer-quality-model-challenger-shard-018.json,<public-review-dir>/answer-quality-model-challenger-shard-019.json,<public-review-dir>/answer-quality-model-challenger-shard-020.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-model-challenger-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-model-challenger-combined.md",
     "resultGateCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --claim-scope model-challenger --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-model-challenger-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-model-challenger.json --require-ready",
     "reviewerIntakeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-model-challenger-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-model-challenger.json"
@@ -168,10 +166,9 @@
       "operatorUse": "Run-path and shard-integrity proof only. This does not score local or provider model quality.",
       "strategies": [
         "bm25-lite",
-        "full-hybrid-rerank",
-        "query-expanded-full-hybrid-rerank"
+        "full-hybrid-rerank"
       ],
-      "strategyCount": 3,
+      "strategyCount": 2,
       "missingStrategies": [],
       "coverageReady": true,
       "providerRequirements": [],
@@ -198,8 +195,8 @@
       "canReachFullSotaGateAfterShardIntake": false,
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
-      "queryExpansionPolicy": "Deterministic fallback only; does not count as large-model query-expansion evidence.",
-      "queryExpansionEvidenceRequirement": "deterministic-fallback-only",
+      "queryExpansionPolicy": "Query expansion is excluded by default and may be added only as a labeled ablation lane.",
+      "queryExpansionEvidenceRequirement": "not-required",
       "queryExpansionDiagnosticFallbackAllowed": true,
       "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
@@ -211,11 +208,10 @@
       "strategies": [
         "bm25-lite",
         "full-hybrid-rerank",
-        "query-expanded-full-hybrid-rerank",
         "local-apple-qwen3-0_6b",
         "local-apple-qwen3-0_6b-local-rerank"
       ],
-      "strategyCount": 5,
+      "strategyCount": 4,
       "missingStrategies": [
         "local-apple-qwen3-0_6b",
         "local-apple-qwen3-0_6b-local-rerank"
@@ -248,8 +244,8 @@
       "canReachFullSotaGateAfterShardIntake": false,
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
-      "queryExpansionPolicy": "Local or deterministic query expansion must be reported separately from cloud expansion.",
-      "queryExpansionEvidenceRequirement": "local-model-or-deterministic-diagnostic",
+      "queryExpansionPolicy": "Query expansion is off by default; score it only as a same-shard ablation when explicitly requested.",
+      "queryExpansionEvidenceRequirement": "not-required",
       "queryExpansionDiagnosticFallbackAllowed": true,
       "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
@@ -261,11 +257,10 @@
       "strategies": [
         "bm25-lite",
         "full-hybrid-rerank",
-        "query-expanded-full-hybrid-rerank",
         "local-apple-qwen3-4b",
         "local-apple-qwen3-4b-local-rerank"
       ],
-      "strategyCount": 5,
+      "strategyCount": 4,
       "missingStrategies": [
         "local-apple-qwen3-4b",
         "local-apple-qwen3-4b-local-rerank"
@@ -298,8 +293,8 @@
       "canReachFullSotaGateAfterShardIntake": false,
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
-      "queryExpansionPolicy": "Local or deterministic query expansion must be reported separately from cloud expansion.",
-      "queryExpansionEvidenceRequirement": "local-model-or-deterministic-diagnostic",
+      "queryExpansionPolicy": "Query expansion is off by default; score it only as a same-shard ablation when explicitly requested.",
+      "queryExpansionEvidenceRequirement": "not-required",
       "queryExpansionDiagnosticFallbackAllowed": true,
       "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
@@ -311,7 +306,7 @@
       "strategies": [
         "bm25-lite",
         "full-hybrid-rerank",
-        "cloud-voyage4-voyage-lite-rerank"
+        "cloud-voyage4-lite-voyage-lite"
       ],
       "strategyCount": 3,
       "missingStrategies": [],
@@ -443,12 +438,11 @@
       "strategies": [
         "bm25-lite",
         "full-hybrid-rerank",
-        "query-expanded-full-hybrid-rerank",
         "cloud-gemini2-embed-rerank-proxy",
-        "cloud-voyage4-voyage-lite-rerank",
+        "cloud-voyage4-lite-voyage-lite",
         "cloud-nvidia-nv-embed-v1-mistral-rerank"
       ],
-      "strategyCount": 6,
+      "strategyCount": 5,
       "missingStrategies": [],
       "coverageReady": true,
       "providerRequirements": [
@@ -479,8 +473,8 @@
       "canReachFullSotaGateAfterShardIntake": false,
       "countsAsFullMemorySotaEvidence": false,
       "publicBenchmarkClaimsAllowed": false,
-      "queryExpansionPolicy": "Query expansion and cloud provider challengers must be present on the same shards when included in the challenger set.",
-      "queryExpansionEvidenceRequirement": "local-or-cloud-model-required",
+      "queryExpansionPolicy": "Cloud provider challengers must be present on the same shards; query expansion is optional and must be labeled as an ablation.",
+      "queryExpansionEvidenceRequirement": "not-required",
       "queryExpansionDiagnosticFallbackAllowed": false,
       "queryExpansionSotaEligible": false,
       "shardIntakeCompatibility": "accepted for this model-challenger benchmark plan only; full-SOTA intake still requires the exact-target provider comparison plan"
@@ -749,7 +743,7 @@
     "judgeModelPresent": true,
     "bm25ControlPresent": true,
     "fullHybridControlPresent": true,
-    "queryExpansionPresent": true,
+    "queryExpansionPresent": false,
     "voyageProviderPresent": true,
     "nvidiaOrGeminiProviderPresent": true,
     "localApplePresent": false,
@@ -759,7 +753,7 @@
   "blockers": [],
   "nextActions": [
     "Run shard-scoped materialization before each response arm export so provider and local arms load only the shard-local private corpus.",
-    "Run response arm exports shard-by-shard with explicit provider and query-expansion consent.",
+    "Run response arm exports shard-by-shard with explicit provider-call consent; add query expansion only as a labeled ablation.",
     "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
     "Run answer-quality scoring for each shard with the declared challenger answer and judge models.",
     "Combine the full query-shard result set, then run the memory-score gate and reviewer intake on the combined metrics-only packet.",

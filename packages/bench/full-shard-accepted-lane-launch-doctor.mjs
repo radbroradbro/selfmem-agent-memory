@@ -502,21 +502,21 @@ function launchDoctorNextActions({ readyForFirstAcceptedShardRun, isFullSota, is
   }
   if (isFullSota) {
     return [
-      "Satisfy the private-input doctor, accepted-lane model/provider readiness, answer-quality endpoint, and query-expansion evidence requirements.",
-      "Use local query expansion when available; use cloud query expansion only with explicit public-data and provider-call consent.",
+      "Satisfy the private-input doctor, accepted-lane model/provider readiness, and answer-quality endpoint requirements.",
+      "Keep query expansion as a labeled ablation unless the accepted lane explicitly includes it.",
       "Do not substitute diagnostic BM25/control lanes for the accepted full-SOTA lane.",
     ];
   }
   if (isModelChallenger) {
     return [
-      "Satisfy the private-input doctor, cloud provider credentials, challenger answer-quality endpoint, and model-backed query-expansion requirements.",
-      "Use cloud query expansion only with explicit public-data and provider-call consent.",
+      "Satisfy the private-input doctor, cloud provider credentials, and challenger answer-quality endpoint requirements.",
+      "Keep query expansion as a labeled ablation unless the accepted lane explicitly includes it.",
       "Do not claim public SOTA from this lane; exact-target full-SOTA evidence remains a separate gate.",
     ];
   }
   return [
-    "Satisfy the private-input doctor, local embedding, local rerank, answer-quality endpoint, and model-backed query-expansion requirements.",
-    "Use local query expansion when available; use cloud query expansion only with explicit public-data and provider-call consent.",
+    "Satisfy the private-input doctor, local embedding, local rerank, and answer-quality endpoint requirements.",
+    "Keep query expansion as a labeled ablation unless the accepted lane explicitly includes it.",
     "Do not substitute BM25, deterministic expansion, or provider-only lanes for the accepted local-full lane.",
   ];
 }

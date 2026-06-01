@@ -45,7 +45,7 @@ providerCallPolicy:
     searchDisabledForMethodologyBenchmarks: true
     enableOnlyForHostedBaselineParity: true
   selfmemCloud:
-    defaultArm: "cloud-voyage4-voyage"
+    defaultArm: "cloud-voyage4-lite-voyage-lite"
     mayUseEnvCredentialsOnly: true
     keyRotation:
       enabledWhenMultipleEnvKeysPresent: true

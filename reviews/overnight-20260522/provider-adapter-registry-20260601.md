@@ -1,7 +1,7 @@
 # Provider Adapter Registry
 
 - Status: READY_PROVIDER_ADAPTER_REGISTRY
-- Personal default arm: cloud-voyage4-voyage
+- Personal default arm: cloud-voyage4-lite-voyage-lite
 - Methodology default: contextual-source-chunk-v1 + bm25-lite
 - Present families: voyage, gemini, nvidia, local-apple, openrouter, deepseek, jina, alibaba, zeroentropy
 - Missing families: none

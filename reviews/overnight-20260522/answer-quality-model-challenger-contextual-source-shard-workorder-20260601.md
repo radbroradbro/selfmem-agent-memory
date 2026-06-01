@@ -7,31 +7,12 @@
 - Accepted shards: 0
 - Pending shards: 20
 - Rejected results: 0
-- Workorders emitted: 20
+- Workorders emitted: 1
 - Runtime blocker reports: 0
 - Runtime resume plans: 0
 
 ## Workorders
 - shard-001: 0-25
-- shard-002: 25-50
-- shard-003: 50-75
-- shard-004: 75-100
-- shard-005: 100-125
-- shard-006: 125-150
-- shard-007: 150-175
-- shard-008: 175-200
-- shard-009: 200-225
-- shard-010: 225-250
-- shard-011: 250-275
-- shard-012: 275-300
-- shard-013: 300-325
-- shard-014: 325-350
-- shard-015: 350-375
-- shard-016: 375-400
-- shard-017: 400-425
-- shard-018: 425-450
-- shard-019: 450-475
-- shard-020: 475-500
 
 ## Runtime Resume Plans
 - none
@@ -48,15 +29,15 @@
 ## Execution Lane Readiness
 - deterministic-control-proxy: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=challenger-model-allowed; scoring-policy-ready=false
-  - query-expansion=deterministic-fallback-only; model-backed=false; fallback-allowed=true
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, openai-compatible-base-url-missing
 - local-apple-no-spend: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=challenger-model-allowed; scoring-policy-ready=false
-  - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, lane-strategy-coverage-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
 - local-apple-scaled-challenger: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=challenger-model-allowed; scoring-policy-ready=false
-  - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, lane-strategy-coverage-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
 - voyage-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=challenger-model-allowed; scoring-policy-ready=false
@@ -72,8 +53,8 @@
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, nvidia-credentials-missing, openai-compatible-base-url-missing
 - model-challenger-accepted-shards: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=challenger-model-allowed; scoring-policy-ready=false
-  - query-expansion=local-or-cloud-model-required; model-backed=false; fallback-allowed=false
-  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, gemini-credentials-missing, judge-model-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, gemini-credentials-missing, judge-model-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, voyage-credentials-missing
 
 ## Blockers
 - answer-quality-shard-runs-pending
