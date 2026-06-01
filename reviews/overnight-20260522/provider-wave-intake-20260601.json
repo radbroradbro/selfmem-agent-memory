@@ -1,0 +1,1362 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "provider-wave-intake",
+  "status": "READY_PROVIDER_WAVE_INTAKE",
+  "generatedAt": "2026-06-01T19:48:01.647Z",
+  "reviewDir": "reviews/overnight-20260522",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": true,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "countsAsEndToEndMemoryBenchmark": false,
+  "claimBoundary": "Provider wave intake summarizes retrieval/provider-gate canaries only. It does not count as answer-quality, MemoryBench, or full-memory SOTA evidence.",
+  "input": {
+    "reportCount": 19,
+    "completedReportCount": 9,
+    "partialReportCount": 10,
+    "failedReportCount": 0,
+    "evidence": [
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q050-075-20260530.json",
+        "hash": "sha256:f7ff1c3c585482a2066a743c226e4c8ac1cf89109ee12eba9d29dbbb07794c84",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-30T21:51:39.365Z",
+        "queryOffset": 50,
+        "maxQueries": 25,
+        "selectedQueryCount": null,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nemotron-vl-1b"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-gemini-nvidia-slicefixed-20260530.json",
+        "hash": "sha256:a8b1fd78ecf97df7948a0e453f3a9961be5c064041343e9f9f3a63dabad799b5",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-30T23:26:41.032Z",
+        "queryOffset": 75,
+        "maxQueries": 3,
+        "selectedQueryCount": 3,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+        "hash": "sha256:3535d89b7d1c4df78ea6717d22967ef36135984c81909cb2c70e769b8cefa86e",
+        "status": "COMPLETED",
+        "generatedAt": "2026-05-30T23:44:51.878Z",
+        "queryOffset": 75,
+        "maxQueries": 3,
+        "selectedQueryCount": 3,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q078-083-cloud-20260530.json",
+        "hash": "sha256:f12488a9253ab6ca98a522f3f37b157c2b41c5213d1f573576af3ee3fb76a74c",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T00:44:53.190Z",
+        "queryOffset": 78,
+        "maxQueries": 5,
+        "selectedQueryCount": 5,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-085-gemini2-mitigated-20260531.json",
+        "hash": "sha256:03a419c3897990fe59fb47dd3381f705bb8fb0f82fed2758fe2f6b0e7ea50bf9",
+        "status": "COMPLETED",
+        "generatedAt": "2026-05-31T01:33:09.425Z",
+        "queryOffset": 83,
+        "maxQueries": 2,
+        "selectedQueryCount": 2,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-gemini2-embed-rerank-proxy"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+        "hash": "sha256:7436ed29744e3700c0feacf4ba3f2c189aee5ba262ee5b7eaf71c5202dfe079e",
+        "status": "COMPLETED",
+        "generatedAt": "2026-05-31T01:43:51.389Z",
+        "queryOffset": 83,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-hybrid-pool-cloud-20260531.json",
+        "hash": "sha256:f15f7ad9907924471dca6082f6448383a0ed8fc8469b14ba028f40754712cf31",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T03:19:32.661Z",
+        "queryOffset": 75,
+        "maxQueries": 3,
+        "selectedQueryCount": 3,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-voyage-hybrid-pool-solo-20260531.json",
+        "hash": "sha256:fd9f70ad8fd2516485eb19cf121f23052fd0898f3bf67b6e5f3e9039cb415616",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T03:23:38.339Z",
+        "queryOffset": 75,
+        "maxQueries": 3,
+        "selectedQueryCount": 3,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-gemini2-hybrid-pool-20260531.json",
+        "hash": "sha256:bf08499ca04733dee2b5a033fae21cc4ca89be5a8a883bfab268286ca72efa96",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T03:02:52.472Z",
+        "queryOffset": 83,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-nvidia-hybrid-pool-20260531.json",
+        "hash": "sha256:d0b28d0c1f34d1b0dc5c922fcd30966f3e813f5399130561b12b09f2a98a2bcf",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T02:59:25.758Z",
+        "queryOffset": 83,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+        "hash": "sha256:16deeb5a21eac7b5e1e5f0f4b8c16b2dbcf3b121a161464c58e5f71d1e899d07",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T05:22:17.262Z",
+        "queryOffset": 85,
+        "maxQueries": 5,
+        "selectedQueryCount": 5,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-gemini2-mitigated-20260531.json",
+        "hash": "sha256:ad4475ba88a759a32731ba507c9bdfa7b5e1c5904a2792a7857e55809ebd0570",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T05:30:56.619Z",
+        "queryOffset": 85,
+        "maxQueries": 5,
+        "selectedQueryCount": 5,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-voyage-mitigated-20260531.json",
+        "hash": "sha256:816e92d299b8a9d05ad3d7b0c92d68ffab2d242d4b5cfb38829c61fa92df5008",
+        "status": "PARTIAL_COMPLETED_WITH_ARM_FAILURES",
+        "generatedAt": "2026-05-31T05:26:22.152Z",
+        "queryOffset": 85,
+        "maxQueries": 5,
+        "selectedQueryCount": 5,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-nvidia-repair-20260531.json",
+        "hash": "sha256:e7dba6d3f07604a1438a40080a1772fdb8c10e8d09c942c2ca58bf00b96e1a53",
+        "status": "COMPLETED",
+        "generatedAt": "2026-05-31T14:24:15.664Z",
+        "queryOffset": 85,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q086-nvidia-repair-20260531.json",
+        "hash": "sha256:ab792feda25e95bdd8b049dfb87a68898d9727d57d4fe1954297693f377d2b13",
+        "status": "COMPLETED",
+        "generatedAt": "2026-05-31T14:44:26.799Z",
+        "queryOffset": 86,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q087-nvidia-repair-20260531.json",
+        "hash": "sha256:199b02d269dc7a70d1c687f79b48f081c498621cb85059d197a3dd7006c810c7",
+        "status": "COMPLETED",
+        "generatedAt": "2026-05-31T14:55:16.404Z",
+        "queryOffset": 87,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q088-nvidia-repair-20260531.json",
+        "hash": "sha256:265369cdbb178dde926cdce0ee71ecc14382ed220d8a786b8e303bc5737f4335",
+        "status": "COMPLETED",
+        "generatedAt": "2026-05-31T15:05:20.719Z",
+        "queryOffset": 88,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q089-nvidia-repair-20260601.json",
+        "hash": "sha256:8cad9cb34c043e49978f4a60d09c26b40e079eaea8dec576d08a0c78bd52772c",
+        "status": "COMPLETED",
+        "generatedAt": "2026-06-01T19:46:43.056Z",
+        "queryOffset": 89,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q090-nvidia-repair-20260601.json",
+        "hash": "sha256:e0f2859c7f5aaf082aed77b29e42ff90bcda5f5b057a8d8399b380ece4288be5",
+        "status": "COMPLETED",
+        "generatedAt": "2026-06-01T19:47:50.648Z",
+        "queryOffset": 90,
+        "maxQueries": 1,
+        "selectedQueryCount": 1,
+        "strategies": [
+          "bm25-lite",
+          "full-hybrid-rerank",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      }
+    ]
+  },
+  "controls": {
+    "allHaveBm25": true,
+    "allHaveFullHybrid": true,
+    "rows": [
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q050-075-20260530.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 2,
+        "failedProviderArmCount": 3
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-gemini-nvidia-slicefixed-20260530.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 1
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 2,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q078-083-cloud-20260530.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 2
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-085-gemini2-mitigated-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-hybrid-pool-cloud-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 2,
+        "failedProviderArmCount": 1
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-voyage-hybrid-pool-solo-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 0,
+        "failedProviderArmCount": 1
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-gemini2-hybrid-pool-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 0,
+        "failedProviderArmCount": 1
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-nvidia-hybrid-pool-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 0,
+        "failedProviderArmCount": 1
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 0,
+        "failedProviderArmCount": 3
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-gemini2-mitigated-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 0,
+        "failedProviderArmCount": 1
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-voyage-mitigated-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 0,
+        "failedProviderArmCount": 1
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-nvidia-repair-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q086-nvidia-repair-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q087-nvidia-repair-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q088-nvidia-repair-20260531.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q089-nvidia-repair-20260601.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q090-nvidia-repair-20260601.json",
+        "hasBm25": true,
+        "hasFullHybrid": true,
+        "providerArmCount": 1,
+        "failedProviderArmCount": 0
+      }
+    ]
+  },
+  "providerBudget": {
+    "contractRequiredForNewProviderWaves": true,
+    "reportCount": 19,
+    "reportsWithBudgetContract": 2,
+    "reportsMissingBudgetContract": 17,
+    "allReportsHaveBudgetContract": false,
+    "allBudgetedReportsNoSpend": true,
+    "allBudgetedReportsWithinAllowedProviders": true,
+    "anyPaidProviderRequestedInNoSpendMode": false,
+    "maxPaidUsdMax": 0,
+    "requiredProviders": [
+      "nvidia"
+    ],
+    "rows": [
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q050-075-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-gemini-nvidia-slicefixed-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-keyrotation-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q078-083-cloud-20260530.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-085-gemini2-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q083-nvidia-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-hybrid-pool-cloud-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-voyage-hybrid-pool-solo-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-gemini2-hybrid-pool-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-nvidia-hybrid-pool-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-gemini2-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-voyage-mitigated-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q086-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q087-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q088-nvidia-repair-20260531.json",
+        "present": false,
+        "mode": null,
+        "noSpendMode": null,
+        "maxPaidUsd": null,
+        "requiredProviders": [],
+        "requiredProvidersWithinAllowed": null,
+        "paidProviderRequestedInNoSpendMode": null,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q089-nvidia-repair-20260601.json",
+        "present": true,
+        "mode": "no-spend-free-tier",
+        "noSpendMode": true,
+        "maxPaidUsd": 0,
+        "requiredProviders": [
+          "nvidia"
+        ],
+        "requiredProvidersWithinAllowed": true,
+        "paidProviderRequestedInNoSpendMode": false,
+        "blockers": []
+      },
+      {
+        "path": "reviews/overnight-20260522/public-longmemeval-provider-wave-q090-nvidia-repair-20260601.json",
+        "present": true,
+        "mode": "no-spend-free-tier",
+        "noSpendMode": true,
+        "maxPaidUsd": 0,
+        "requiredProviders": [
+          "nvidia"
+        ],
+        "requiredProvidersWithinAllowed": true,
+        "paidProviderRequestedInNoSpendMode": false,
+        "blockers": []
+      }
+    ]
+  },
+  "providerHybridContract": {
+    "bm25LexicalFloorRequired": true,
+    "fullHybridControlRequired": true,
+    "sameDataControlsRequired": true,
+    "providerChallengersAreHybridContextArms": true,
+    "providerOnlyDenseClaimsAllowed": false,
+    "allProviderWavesMeetHybridControlContract": true,
+    "answerQualityStillRequiredForMemoryClaims": true
+  },
+  "providers": {
+    "completedProviderFamilies": [
+      "gemini",
+      "nvidia",
+      "voyage"
+    ],
+    "failedProviderFamilies": [
+      "gemini",
+      "nvidia",
+      "voyage"
+    ],
+    "rows": [
+      {
+        "provider": "gemini",
+        "completedArmCount": 3,
+        "failedArmCount": 6,
+        "retryableFailureCount": 5,
+        "completedQueryCount": 8,
+        "providerCallCount": 20,
+        "embeddingCallCount": 20,
+        "rerankCallCount": 0,
+        "documentCountSent": 118,
+        "queryCountSent": 8,
+        "bestStrategy": "cloud-gemini2-embed-rerank-proxy",
+        "bestQuality": 0.1575,
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy"
+        ],
+        "models": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "gemini-embedding-2",
+          "local-deterministic-rerank-proxy"
+        ],
+        "queryRanges": [
+          "75-78",
+          "83-85"
+        ],
+        "failureClasses": [
+          "provider-rate-limit",
+          "provider-timeout",
+          "strategy-arm-failed"
+        ]
+      },
+      {
+        "provider": "nvidia",
+        "completedArmCount": 12,
+        "failedArmCount": 4,
+        "retryableFailureCount": 3,
+        "completedQueryCount": 16,
+        "providerCallCount": 198,
+        "embeddingCallCount": 132,
+        "rerankCallCount": 66,
+        "documentCountSent": 1638,
+        "queryCountSent": 66,
+        "bestStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "bestQuality": 0.4387,
+        "strategies": [
+          "cloud-nvidia-e5-mistral",
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nemotron-vl-1b",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ],
+        "models": [
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nemotron-vl-1b",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "nv-rerank-qa-mistral-4b:1",
+          "nvidia/llama-nemotron-embed-1b-v2",
+          "nvidia/llama-nemotron-embed-vl-1b-v2",
+          "nvidia/llama-nemotron-rerank-1b-v2",
+          "nvidia/llama-nemotron-rerank-vl-1b-v2",
+          "nvidia/nv-embed-v1"
+        ],
+        "queryRanges": [
+          "75-78",
+          "83-84",
+          "85-86",
+          "86-87",
+          "87-88",
+          "88-89",
+          "89-90",
+          "90-91"
+        ],
+        "failureClasses": [
+          "provider-timeout",
+          "strategy-arm-failed"
+        ]
+      },
+      {
+        "provider": "voyage",
+        "completedArmCount": 1,
+        "failedArmCount": 5,
+        "retryableFailureCount": 5,
+        "completedQueryCount": 5,
+        "providerCallCount": 20,
+        "embeddingCallCount": 15,
+        "rerankCallCount": 5,
+        "documentCountSent": 225,
+        "queryCountSent": 5,
+        "bestStrategy": "cloud-voyage4-voyage-lite-rerank",
+        "bestQuality": 0,
+        "strategies": [
+          "cloud-voyage4-voyage-lite-rerank"
+        ],
+        "models": [
+          "cloud-voyage4-voyage-lite-rerank",
+          "rerank-2.5-lite",
+          "voyage-4-large"
+        ],
+        "queryRanges": [
+          "78-83"
+        ],
+        "failureClasses": [
+          "provider-rate-limit"
+        ]
+      }
+    ]
+  },
+  "providerFailures": [
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q050-075-20260530.json",
+      "strategy": "cloud-nvidia-e5-mistral",
+      "failureClass": "strategy-arm-failed",
+      "retryableProviderLimit": false
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q050-075-20260530.json",
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "failureClass": "strategy-arm-failed",
+      "retryableProviderLimit": false
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q050-075-20260530.json",
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q075-078-gemini-nvidia-slicefixed-20260530.json",
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q078-083-cloud-20260530.json",
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-full-provider-wave-q078-083-cloud-20260530.json",
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-hybrid-pool-cloud-20260531.json",
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q075-078-voyage-hybrid-pool-solo-20260531.json",
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-gemini2-hybrid-pool-20260531.json",
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q083-nvidia-hybrid-pool-20260531.json",
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-cloud-20260531.json",
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-gemini2-mitigated-20260531.json",
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "failureClass": "provider-timeout",
+      "retryableProviderLimit": true
+    },
+    {
+      "evidencePath": "reviews/overnight-20260522/public-longmemeval-provider-wave-q085-090-voyage-mitigated-20260531.json",
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "failureClass": "provider-rate-limit",
+      "retryableProviderLimit": true
+    }
+  ],
+  "failureTaxonomy": {
+    "requiredBeforePromotion": true,
+    "allFailuresClassified": true,
+    "observedFailureCount": 15,
+    "retryableProviderLimitCount": 13,
+    "promotionBlockedByRetryableProviderLimits": true,
+    "classes": [
+      {
+        "failureClass": "provider-rate-limit",
+        "count": 7,
+        "retryableProviderLimitCount": 7,
+        "providers": [
+          "gemini",
+          "voyage"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ],
+        "dispositions": [
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "failureClass": "provider-timeout",
+        "count": 6,
+        "retryableProviderLimitCount": 6,
+        "providers": [
+          "gemini",
+          "nvidia"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ],
+        "dispositions": [
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "failureClass": "strategy-arm-failed",
+        "count": 2,
+        "retryableProviderLimitCount": 0,
+        "providers": [
+          "gemini",
+          "nvidia"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-nvidia-e5-mistral"
+        ],
+        "dispositions": [
+          "investigate-before-promotion"
+        ]
+      }
+    ],
+    "providers": [
+      {
+        "provider": "gemini",
+        "failureCount": 6,
+        "retryableProviderLimitCount": 5,
+        "failureClasses": [
+          "provider-rate-limit",
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy"
+        ],
+        "dispositions": [
+          "investigate-before-promotion",
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "provider": "voyage",
+        "failureCount": 5,
+        "retryableProviderLimitCount": 5,
+        "failureClasses": [
+          "provider-rate-limit"
+        ],
+        "strategies": [
+          "cloud-voyage4-voyage-lite-rerank"
+        ],
+        "dispositions": [
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "provider": "nvidia",
+        "failureCount": 4,
+        "retryableProviderLimitCount": 3,
+        "failureClasses": [
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "strategies": [
+          "cloud-nvidia-e5-mistral",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ],
+        "dispositions": [
+          "investigate-before-promotion",
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      }
+    ]
+  },
+  "latencyCostQuotaLedger": {
+    "requiredBeforePromotion": true,
+    "publicSafeMetricsOnly": true,
+    "costModel": "no-spend-ledger-from-provider-budget-contract-and-call-counts",
+    "estimatedPaidUsd": 0,
+    "maxPaidUsdMax": 0,
+    "allReportsHaveBudgetContract": false,
+    "allBudgetedReportsNoSpend": true,
+    "anyPaidProviderRequestedInNoSpendMode": false,
+    "promotionReady": false,
+    "promotionBlockers": [
+      "legacy-provider-waves-missing-budget-contract"
+    ],
+    "rows": [
+      {
+        "provider": "gemini",
+        "completedArmCount": 3,
+        "failedArmCount": 6,
+        "retryableProviderLimitCount": 5,
+        "completedQueryCount": 8,
+        "providerCallCount": 20,
+        "embeddingCallCount": 20,
+        "rerankCallCount": 0,
+        "documentCountSent": 118,
+        "queryCountSent": 8,
+        "latencyP50MsMedian": 9246,
+        "latencyP95MsMedian": 11706,
+        "latencyP50MsMax": 11092,
+        "latencyP95MsMax": 53821,
+        "contextTokensAvgMedian": 1600,
+        "keyCountAvailableMax": 6,
+        "throttleScopes": [],
+        "retryAttemptsMax": null,
+        "timeoutMsMax": null,
+        "globalMinIntervalMsMax": null,
+        "providerMinIntervalMsMax": null,
+        "failureClasses": [
+          "provider-rate-limit",
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "models": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "gemini-embedding-2",
+          "local-deterministic-rerank-proxy"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy"
+        ]
+      },
+      {
+        "provider": "nvidia",
+        "completedArmCount": 12,
+        "failedArmCount": 4,
+        "retryableProviderLimitCount": 3,
+        "completedQueryCount": 16,
+        "providerCallCount": 198,
+        "embeddingCallCount": 132,
+        "rerankCallCount": 66,
+        "documentCountSent": 1638,
+        "queryCountSent": 66,
+        "latencyP50MsMedian": 15778,
+        "latencyP95MsMedian": 17308.5,
+        "latencyP50MsMax": 23530,
+        "latencyP95MsMax": 31128,
+        "contextTokensAvgMedian": 800,
+        "keyCountAvailableMax": 1,
+        "throttleScopes": [
+          "key"
+        ],
+        "retryAttemptsMax": 2,
+        "timeoutMsMax": 180000,
+        "globalMinIntervalMsMax": 0,
+        "providerMinIntervalMsMax": 1750,
+        "failureClasses": [
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "models": [
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nemotron-vl-1b",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "nv-rerank-qa-mistral-4b:1",
+          "nvidia/llama-nemotron-embed-1b-v2",
+          "nvidia/llama-nemotron-embed-vl-1b-v2",
+          "nvidia/llama-nemotron-rerank-1b-v2",
+          "nvidia/llama-nemotron-rerank-vl-1b-v2",
+          "nvidia/nv-embed-v1"
+        ],
+        "strategies": [
+          "cloud-nvidia-e5-mistral",
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nemotron-vl-1b",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "provider": "voyage",
+        "completedArmCount": 1,
+        "failedArmCount": 5,
+        "retryableProviderLimitCount": 5,
+        "completedQueryCount": 5,
+        "providerCallCount": 20,
+        "embeddingCallCount": 15,
+        "rerankCallCount": 5,
+        "documentCountSent": 225,
+        "queryCountSent": 5,
+        "latencyP50MsMedian": 17651,
+        "latencyP95MsMedian": 241069,
+        "latencyP50MsMax": 17651,
+        "latencyP95MsMax": 241069,
+        "contextTokensAvgMedian": 800,
+        "keyCountAvailableMax": 8,
+        "throttleScopes": [],
+        "retryAttemptsMax": null,
+        "timeoutMsMax": null,
+        "globalMinIntervalMsMax": null,
+        "providerMinIntervalMsMax": null,
+        "failureClasses": [
+          "provider-rate-limit"
+        ],
+        "models": [
+          "cloud-voyage4-voyage-lite-rerank",
+          "rerank-2.5-lite",
+          "voyage-4-large"
+        ],
+        "strategies": [
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      }
+    ]
+  },
+  "providerPromotions": [
+    {
+      "bestProviderStrategy": "cloud-nvidia-nemotron-1b",
+      "qualityDeltaVsBm25": 0.0026,
+      "latencyDeltaVsBm25": 0
+    }
+  ],
+  "nextRunPlan": {
+    "status": "READY_PROVIDER_REPAIR_WAVES",
+    "claimBoundary": "Provider repair waves are retrieval/provider-gate evidence only. They must be followed by accepted answer-quality scoring before memory or SOTA claims.",
+    "controlsReady": true,
+    "recommendedExecution": "single-provider-single-slice",
+    "avoidConcurrentProviderArms": true,
+    "providerPlans": [
+      {
+        "provider": "nvidia",
+        "status": "has-completed-canary",
+        "completedArmCount": 12,
+        "failedArmCount": 4,
+        "retryableFailureCount": 3,
+        "bestStrategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+        "bestQuality": 0.4387,
+        "recommendedWaveSize": 1,
+        "retryPriority": "high-free-lane",
+        "env": {
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS": "1",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA": "1",
+          "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE": "key",
+          "RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS": "2",
+          "RECALLWEAVE_PROVIDER_TIMEOUT_MS": "180000",
+          "RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT": "16",
+          "RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT": "8",
+          "NVIDIA_PROVIDER_MIN_INTERVAL_MS": "1750"
+        },
+        "reason": "NVIDIA is the best zero-dollar repair lane so far: completed=12, failed=4; prefer tiny single-slice retries with a strict per-key pace."
+      },
+      {
+        "provider": "gemini",
+        "status": "has-completed-canary",
+        "completedArmCount": 3,
+        "failedArmCount": 6,
+        "retryableFailureCount": 5,
+        "bestStrategy": "cloud-gemini2-embed-rerank-proxy",
+        "bestQuality": 0.1575,
+        "recommendedWaveSize": 2,
+        "retryPriority": "medium-rate-limit-repair",
+        "env": {
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS": "1",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA": "1",
+          "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE": "key",
+          "RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS": "2",
+          "RECALLWEAVE_PROVIDER_TIMEOUT_MS": "180000",
+          "RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT": "16",
+          "RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT": "8",
+          "GEMINI_PROVIDER_MIN_INTERVAL_MS": "1500"
+        },
+        "reason": "Gemini has completed canaries but still shows timeout/rate-limit pressure: completed=3, failed=6; keep candidate pools capped."
+      },
+      {
+        "provider": "voyage",
+        "status": "has-completed-canary",
+        "completedArmCount": 1,
+        "failedArmCount": 5,
+        "retryableFailureCount": 5,
+        "bestStrategy": "cloud-voyage4-voyage-lite-rerank",
+        "bestQuality": 0,
+        "recommendedWaveSize": 2,
+        "retryPriority": "medium-rate-limit-repair",
+        "env": {
+          "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS": "1",
+          "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA": "1",
+          "RECALLWEAVE_PROVIDER_THROTTLE_SCOPE": "key",
+          "RECALLWEAVE_PROVIDER_RETRY_ATTEMPTS": "2",
+          "RECALLWEAVE_PROVIDER_TIMEOUT_MS": "180000",
+          "RECALLWEAVE_PROVIDER_DENSE_CANDIDATE_LIMIT": "16",
+          "RECALLWEAVE_PROVIDER_RERANK_CANDIDATE_LIMIT": "8",
+          "VOYAGE_PROVIDER_MIN_INTERVAL_MS": "1500"
+        },
+        "reason": "Voyage remains the personal/prod default, but the provider-wave evidence shows rate limits: completed=1, failed=5; retry in smaller waves before using it for same-data answer quality."
+      }
+    ],
+    "repairSlices": [
+      {
+        "queryOffset": 50,
+        "maxQueries": 1,
+        "range": "50-51",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:strategy-arm-failed",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 51,
+        "maxQueries": 1,
+        "range": "51-52",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:strategy-arm-failed",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 52,
+        "maxQueries": 1,
+        "range": "52-53",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:strategy-arm-failed",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 53,
+        "maxQueries": 1,
+        "range": "53-54",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:strategy-arm-failed",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 54,
+        "maxQueries": 1,
+        "range": "54-55",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:strategy-arm-failed",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      },
+      {
+        "queryOffset": 55,
+        "maxQueries": 1,
+        "range": "55-56",
+        "completedProviders": [
+          "nvidia"
+        ],
+        "missingProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failedProviders": [
+          "gemini",
+          "voyage"
+        ],
+        "failureClasses": [
+          "gemini:strategy-arm-failed",
+          "voyage:provider-rate-limit"
+        ],
+        "recommendedStrategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      }
+    ],
+    "stopRules": [
+      "stop-provider-after-3-consecutive-rate-limits",
+      "stop-provider-after-2-timeouts-on-the-same-slice",
+      "keep-bm25-and-full-hybrid-controls-on-every-slice",
+      "do-not-count-provider-gate-results-as-answer-quality"
+    ]
+  },
+  "blockers": [
+    "retryable-provider-limit-or-timeout-observed"
+  ],
+  "nextActions": [
+    "Re-run legacy provider wave reports under the provider budget contract before using them for default promotion.",
+    "Retry voyage, gemini, nvidia with provider-specific slices, capped dense/rerank candidates, and explicit provider arm timeout.",
+    "Keep these provider waves separate from answer-quality and full-SOTA evidence until response arms are scored by the accepted answer-quality shard ladder."
+  ]
+}

@@ -61,6 +61,15 @@ describe("public benchmark comparison contract", () => {
     expect(report.promotionQueryFloorEnforced).toBe(true);
   });
 
+  it("does not double-apply query selection after materialization sharding", () => {
+    const result = runRaw(["--materialized-shard-child-args-smoke", "--query-offset", "89", "--max-queries", "1"]);
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("materialized-shard-child-args-smoke");
+    expect(report.fullInputForwardsShardSelection).toBe(true);
+    expect(report.materializedShardSkipsChildShardSelection).toBe(true);
+  });
+
   it("labels the scaled Apple Silicon arm separately from the 0.6B default", () => {
     const report = runReport([
       "--gate",

@@ -91,6 +91,11 @@ if (args.liveMaterializeArgsSmoke === true) {
   process.exit(0);
 }
 
+if (args.materializedShardChildArgsSmoke === true) {
+  runMaterializedShardChildArgsSmoke();
+  process.exit(0);
+}
+
 for (const strategy of strategies) assert.ok(retrievalStrategies.includes(strategy), `unknown strategy: ${strategy}`);
 assertGateContract(gate, strategies, { allowSoloSmoke });
 
@@ -127,8 +132,7 @@ async function runStrategyArm(strategy) {
     String(limit),
     "--max-memory-bytes",
     String(maxMemoryBytes),
-    ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
-    ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
+    ...downstreamQuerySelectionArgs(input),
     "--output",
     responsePath,
   ];
@@ -139,8 +143,7 @@ async function runStrategyArm(strategy) {
     responsePath,
     "--retrieval-mode",
     `strategy:${strategy}`,
-    ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
-    ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
+    ...downstreamQuerySelectionArgs(input),
     "--output",
     resultPath,
   ];
@@ -367,6 +370,11 @@ function inputFromPrivateFiles(querySetPath, memoriesPath, materializer) {
   assertOutsideRepo(memoriesPath, "live memories file");
   const querySet = JSON.parse(readFileSync(querySetPath, "utf8"));
   const queries = Array.isArray(querySet.queries) ? querySet.queries : [];
+  const materializationShard = querySet.authoring?.materializationShard ?? materializer?.selection?.materializationShard ?? null;
+  const querySelectionAlreadyApplied = materializationShard?.applied === true;
+  const parentQueryCount = querySelectionAlreadyApplied
+    ? positiveInt(materializationShard.totalQueryCount ?? queries.length, "materialization shard total query count")
+    : queries.length;
   const expectedResultRefCount = queries.reduce(
     (sum, query) => sum + arrayLength(query.expectedResultIds) + arrayLength(query.expectedResultHashes),
     0,
@@ -379,12 +387,22 @@ function inputFromPrivateFiles(querySetPath, memoriesPath, materializer) {
     memoriesPath,
     judgeModel: String(querySet.judgeModel ?? args.judgeModel ?? "gpt-4o"),
     answerModel: String(querySet.answerModel ?? args.answerModel ?? "gpt-4o"),
-    queryCount: queries.length,
-    expectedResultRefCount,
+    queryCount: parentQueryCount,
+    expectedResultRefCount: materializer?.selection?.expectedResultRefCount ?? expectedResultRefCount,
     haystackSessionCount: materializer?.selection?.haystackSessionCount ?? lineCount(memoriesPath),
     collectorCompatibleQuerySetHash: materializer?.selection?.collectorCompatibleQuerySetHash ?? collectorCompatibleQuerySetHash(querySet),
     materializerHash: materializer ? `sha256:${stableHash(JSON.stringify(materializer))}` : null,
+    querySelectionAlreadyApplied,
+    materializationShard,
   };
+}
+
+function downstreamQuerySelectionArgs(input) {
+  if (input.querySelectionAlreadyApplied) return [];
+  return [
+    ...(maxQueries ? ["--max-queries", String(maxQueries)] : []),
+    ...(queryOffset ? ["--query-offset", String(queryOffset)] : []),
+  ];
 }
 
 function collectorCompatibleQuerySetHash(querySet) {
@@ -764,6 +782,22 @@ function runLiveMaterializeArgsSmoke() {
       forwardsShardSelection: Boolean(maxQueries || queryOffset),
       forwardsContextBudget: true,
       forwardsLimit: true,
+    })}\n`,
+  );
+}
+
+function runMaterializedShardChildArgsSmoke() {
+  const fullInputArgs = downstreamQuerySelectionArgs({ querySelectionAlreadyApplied: false });
+  const materializedInputArgs = downstreamQuerySelectionArgs({ querySelectionAlreadyApplied: true });
+  assert.ok(fullInputArgs.includes("--max-queries"), "full input should forward max query selection");
+  assert.ok(fullInputArgs.includes("--query-offset"), "full input should forward query offset selection");
+  assert.deepEqual(materializedInputArgs, [], "materialized query shards must not apply query selection twice");
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "materialized-shard-child-args-smoke",
+      fullInputForwardsShardSelection: true,
+      materializedShardSkipsChildShardSelection: true,
     })}\n`,
   );
 }
