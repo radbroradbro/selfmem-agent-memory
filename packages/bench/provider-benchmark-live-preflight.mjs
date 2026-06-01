@@ -24,6 +24,7 @@ const strategies = splitList(
 const knownStrategies = new Set([
   "bm25-lite",
   "full-hybrid-rerank",
+  "query-expanded-full-hybrid-rerank",
   "cloud-voyage-rerank-only",
   "cloud-voyage4-voyage",
   "cloud-voyage4-voyage-lite-rerank",
@@ -88,12 +89,14 @@ const credentialPresence = Object.fromEntries(
 );
 const providerExecutionPolicy = buildProviderExecutionPolicy(requiredProviders);
 const missingCredentialProviders = requiredProviders.filter((provider) => !credentialPresence[provider]?.present);
+const queryExpansion = buildQueryExpansionReadiness(strategies);
 const blockers = [
   !targetOk ? "target-not-public-longmemeval-run-only" : null,
   materializationContract.enabled && !materializationContract.ok ? "target-materialization-contract-failed" : null,
   !providerCallsEnabled ? "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled" : null,
   !publicDataConfirmed ? "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed" : null,
   ...missingCredentialProviders.map((provider) => `${provider}-credentials-missing`),
+  ...queryExpansion.blockers,
   ...providerBudget.blockers,
 ].filter(Boolean);
 const ready = blockers.length === 0;
@@ -130,6 +133,7 @@ const report = {
   providerCallsEnabled,
   publicDataConfirmed,
   providerBudget,
+  queryExpansion,
   credentialPresence,
   providerExecutionPolicy,
   missingCredentialProviders,
@@ -157,6 +161,7 @@ process.stdout.write(serialized);
 if (!report.ok) process.exitCode = 1;
 
 function requiredProvidersForStrategy(strategy) {
+  if (strategy === "query-expanded-full-hybrid-rerank") return [];
   if (strategy === "cloud-gemini-embed-rerank-proxy" || strategy === "cloud-gemini2-embed-rerank-proxy") return ["gemini"];
   if (strategy === "cloud-gemini-voyage-rerank" || strategy === "cloud-gemini2-voyage-rerank") return ["gemini", "voyage"];
   if (
@@ -194,6 +199,8 @@ function providerValueEnvNames(provider) {
   if (provider === "gemini") return ["GEMINI_API_KEY", "GEMINI_API_KEYS", "GOOGLE_API_KEY", "GOOGLE_API_KEYS", "AI_STUDIO_API_KEY", "AI_STUDIO_API_KEYS"];
   if (provider === "voyage") return ["VOYAGE_API_KEY", "VOYAGE_API_KEYS"];
   if (provider === "nvidia") return ["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVAPI_KEY", "NVAPI_KEYS"];
+  if (provider === "openrouter") return ["OPENROUTER_API_KEY", "OPENROUTER_API_KEYS"];
+  if (provider === "deepseek") return ["DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS"];
   if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL"];
   if (provider === "local-rerank") return ["SELFMEM_LOCAL_RERANK_ENDPOINT", "SELFMEM_LOCAL_RERANK_BASE_URL"];
   return [];
@@ -203,6 +210,8 @@ function providerKeyFileEnvNames(provider) {
   if (provider === "gemini") return ["GEMINI_API_KEY_FILE", "GEMINI_API_KEYS_FILE", "GOOGLE_API_KEY_FILE", "GOOGLE_API_KEYS_FILE", "AI_STUDIO_API_KEY_FILE", "AI_STUDIO_API_KEYS_FILE"];
   if (provider === "voyage") return ["VOYAGE_API_KEY_FILE", "VOYAGE_API_KEYS_FILE"];
   if (provider === "nvidia") return ["NVIDIA_API_KEY_FILE", "NVIDIA_API_KEYS_FILE", "NVAPI_KEY_FILE", "NVAPI_KEYS_FILE"];
+  if (provider === "openrouter") return ["OPENROUTER_API_KEY_FILE", "OPENROUTER_API_KEYS_FILE"];
+  if (provider === "deepseek") return ["DEEPSEEK_API_KEY_FILE", "DEEPSEEK_API_KEYS_FILE"];
   return [];
 }
 
@@ -282,6 +291,60 @@ function providerThrottleKey(provider) {
   if (normalized.startsWith("voyage")) return "voyage";
   if (normalized.startsWith("local")) return "local";
   return normalized.replace(/-/g, "_") || "provider";
+}
+
+function buildQueryExpansionReadiness(strategies) {
+  const requested = strategies.includes("query-expanded-full-hybrid-rerank");
+  const mode = queryExpansionMode();
+  const localConfigured = Boolean(process.env.SELFMEM_QUERY_EXPANSION_BASE_URL && process.env.SELFMEM_QUERY_EXPANSION_MODEL);
+  const cloudCallsAllowed = process.env.RECALLWEAVE_QUERY_EXPANSION_CALLS === "1" || providerCallsEnabled;
+  const publicDataAllowed = process.env.RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA === "1" || publicDataConfirmed;
+  const providerOrder = splitList(process.env.RECALLWEAVE_QUERY_EXPANSION_PROVIDER_ORDER ?? process.env.SELFMEM_QUERY_EXPANSION_PROVIDER_ORDER ?? "deepseek,nvidia,gemini,openrouter")
+    .map(normalizeQueryExpansionProvider)
+    .filter(Boolean);
+  const configuredProviders = providerOrder.filter((provider) => providerKeyCount(provider) > 0);
+  const unsupportedMode = mode === "unsupported";
+  const externalProviderRequired = requested && mode === "rewrites" && !localConfigured;
+  const blockers = [
+    requested && unsupportedMode ? "query-expansion-mode-unsupported" : null,
+    externalProviderRequired && !cloudCallsAllowed ? "RECALLWEAVE_QUERY_EXPANSION_CALLS-not-enabled" : null,
+    externalProviderRequired && !publicDataAllowed ? "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA-not-confirmed" : null,
+    externalProviderRequired && configuredProviders.length === 0 ? "query-expansion-provider-credentials-missing" : null,
+  ].filter(Boolean);
+  return {
+    requested,
+    mode,
+    externalProviderRequired,
+    localOpenAiCompatibleConfigured: localConfigured,
+    cloudCallsAllowed,
+    publicDataAllowed,
+    providerOrder,
+    configuredProviderFamilies: configuredProviders,
+    ready: !requested || (!unsupportedMode && (mode !== "rewrites" || localConfigured || (cloudCallsAllowed && publicDataAllowed && configuredProviders.length > 0))),
+    sendsOnlyCurrentQuery: true,
+    storedMemoriesSent: false,
+    blockers,
+  };
+}
+
+function normalizeQueryExpansionProvider(provider) {
+  const value = String(provider ?? "").trim().toLowerCase().replace(/_/g, "-");
+  if (!value) return "";
+  if (value.startsWith("nvidia") || value.startsWith("nvapi")) return "nvidia";
+  if (value.startsWith("gemini") || value.startsWith("google")) return "gemini";
+  if (value.startsWith("openrouter") || value.startsWith("open-router")) return "openrouter";
+  if (value.startsWith("deepseek")) return "deepseek";
+  return value;
+}
+
+function queryExpansionMode() {
+  const value = String(process.env.RECALLWEAVE_QUERY_EXPANSION_MODE ?? process.env.SELFMEM_QUERY_EXPANSION_MODE ?? "off")
+    .trim()
+    .toLowerCase();
+  if (["0", "false", "no", "disabled"].includes(value)) return "off";
+  if (["1", "true", "yes", "enabled", "provider", "providers", "cloud", "llm", "rewrite"].includes(value)) return "rewrites";
+  if (["off", "planner", "rewrites"].includes(value)) return value;
+  return "unsupported";
 }
 
 function runMaterializationContractCheck({ targetPath, memoryMethod }) {
@@ -368,6 +431,18 @@ function toMarkdown(value) {
     `- Provider calls enabled: ${value.providerCallsEnabled}`,
     `- Public data confirmed: ${value.publicDataConfirmed}`,
     ...Object.entries(value.credentialPresence).map(([provider, state]) => `- ${provider}: ${state.present ? "present" : "missing"} (${state.envNames.join(", ")})`),
+    "",
+    "## Query Expansion",
+    "",
+    `- Requested: ${value.queryExpansion.requested}`,
+    `- Mode: ${value.queryExpansion.mode}`,
+    `- External provider required: ${value.queryExpansion.externalProviderRequired}`,
+    `- Local OpenAI-compatible configured: ${value.queryExpansion.localOpenAiCompatibleConfigured}`,
+    `- Cloud calls allowed: ${value.queryExpansion.cloudCallsAllowed}`,
+    `- Public data allowed: ${value.queryExpansion.publicDataAllowed}`,
+    `- Configured provider families: ${value.queryExpansion.configuredProviderFamilies.join(", ") || "none"}`,
+    `- Sends only current query: ${value.queryExpansion.sendsOnlyCurrentQuery}`,
+    `- Stored memories sent: ${value.queryExpansion.storedMemoriesSent}`,
     "",
     "## Provider Execution Policy",
     "",
