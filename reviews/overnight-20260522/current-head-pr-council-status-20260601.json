@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-01T13:55:00.000Z",
+  "generatedAt": "2026-06-01T14:10:00.000Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,7 +10,8 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "8393f670ce38d50a9d0f998c43c908f08a20438e",
+  "head": "161d357c3aa9888749d5cde09500a71be2971d75",
+  "headAtEvidenceCapture": "161d357c3aa9888749d5cde09500a71be2971d75",
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
   "gateDetection": {
@@ -23,7 +24,7 @@
       "integration",
       "final"
     ],
-    "headRef": "8393f67"
+    "headRef": "161d357"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
@@ -79,7 +80,24 @@
       }
     ],
     "claudeReviewStatus": "blocked-budget-cap-exceeded-before-output",
-    "ghCliStatus": "unavailable-in-local-shell"
+    "ghCliStatus": "unavailable-in-local-shell-but-github-api-live-sync-passed",
+    "githubLiveSyncStatus": "pass",
+    "githubLiveSyncMode": "github-live-sync-check",
+    "pullRequestNumber": 5,
+    "issueNumber": 6,
+    "pullRequestOpen": true,
+    "issueOpen": true,
+    "pullRequestHeadMatches": true,
+    "pullRequestBodyMatchesDraft": true,
+    "issueTitleMatchesDraft": true,
+    "issueBodyMatchesDraft": true,
+    "liveUpdatedAt": {
+      "pullRequest": "2026-06-01T13:54:16Z",
+      "issue": "2026-05-26T06:38:57Z"
+    },
+    "remoteBranchHead": "161d357c3aa9888749d5cde09500a71be2971d75",
+    "remotePullRequestHead": "161d357c3aa9888749d5cde09500a71be2971d75",
+    "remotePullRequestMergeRef": "648962ac96e8a41ec971c2698a09ec5247bde1d3"
   },
   "evidence": {
     "brainUiEvidence": "reviews/overnight-20260522/ui-evidence/brain-ui-20260601-current-head-browser-evidence.json",
@@ -88,24 +106,27 @@
     "targetLockStatus": "READY_BENCHMARK_TARGET_LOCK",
     "providerAdapterRegistry": "reviews/overnight-20260522/provider-adapter-registry-20260601.json",
     "providerAdapterRegistryStatus": "READY_PROVIDER_ADAPTER_REGISTRY",
-    "methodLadderGate": "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json"
+    "methodLadderGate": "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
+    "githubLiveSync": "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
+    "githubLiveSyncStatus": "pass",
+    "remotePrHeadMatchesCurrentHead": true
   },
   "claimBoundary": {
     "currentStatus": "not-production-complete",
     "releaseVerdict": "hold-for-full-run-or-owner-approved-personal-canary",
-    "mayClaim": "current head has public-safe UI evidence, target lock, provider registry, paired 75Q method evidence, release gate alignment, and one successful DeepSeek final-gate review",
+    "mayClaim": "the evidence-capture head was live on PR #5, PR #5 and issue #6 matched checked-in public-safe drafts at capture time, and the branch has public-safe UI evidence, target lock, provider registry, paired 75Q method evidence, release gate alignment, and one successful DeepSeek final-gate review",
     "mayNotClaim": [
       "RecallWeave beats Supermemory",
       "RecallWeave is SOTA",
       "dry-run review packet is external approval",
-      "gh PR state was verified locally"
+      "PR merge/public launch is complete"
     ]
   },
   "nextActions": [
-    "Run release:check after this evidence lands.",
+    "Run release:check after this refreshed GitHub live-sync evidence lands.",
     "Use contextual-source-chunk-v1 plus bm25-lite as the next larger-slice challenger, not as a public default claim.",
     "Run provider canaries on the same materializer only, with BM25 retained as control.",
     "Add or run failure-taxonomy and cost-latency-quota reports before provider-arm promotion.",
-    "Use GitHub connector or another authenticated path to verify or update the PR because gh CLI is unavailable."
+    "Keep PR #5 and issue #6 open until full-run evidence or explicit owner-approved personal-canary scope supports merge."
   ]
 }

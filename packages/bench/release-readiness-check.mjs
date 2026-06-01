@@ -163,6 +163,8 @@ const requiredFiles = [
   `${reviewDir}/benchmark-target-lock-20260601.md`,
   `${reviewDir}/provider-adapter-registry-20260601.json`,
   `${reviewDir}/provider-adapter-registry-20260601.md`,
+  `${reviewDir}/github-live-sync-current-head-20260601.json`,
+  `${reviewDir}/github-live-sync-current-head-20260601.md`,
   `${reviewDir}/current-head-pr-council-status-20260601.json`,
   `${reviewDir}/current-head-pr-council-status-20260601.md`,
   `${reviewDir}/public-longmemeval-slice-evidence.json`,
@@ -1954,6 +1956,8 @@ check("benchmark target lock and provider registry stay conservative", () => {
   const providerRegistryFresh = JSON.parse(run("node", ["packages/bench/provider-adapter-registry-check.mjs"]).stdout);
   const targetLockEvidence = JSON.parse(readFileSync(join(root, reviewDir, "benchmark-target-lock-20260601.json"), "utf8"));
   const providerRegistryEvidence = JSON.parse(readFileSync(join(root, reviewDir, "provider-adapter-registry-20260601.json"), "utf8"));
+  const githubLiveSyncEvidence = JSON.parse(readFileSync(join(root, reviewDir, "github-live-sync-current-head-20260601.json"), "utf8"));
+  const githubLiveSyncMarkdown = readFileSync(join(root, reviewDir, "github-live-sync-current-head-20260601.md"), "utf8");
   const councilStatus = JSON.parse(readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.json"), "utf8"));
   const councilStatusMarkdown = readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.md"), "utf8");
 
@@ -1980,16 +1984,36 @@ check("benchmark target lock and provider registry stay conservative", () => {
   assert.equal(councilStatus.verification?.deepseekFinalGateVerdict, "CLEAN");
   assert.equal(councilStatus.verification?.deepseekReviewerModel, "deepseek-v4-pro");
   assert.equal(councilStatus.verification?.claudeReviewStatus, "blocked-budget-cap-exceeded-before-output");
-  assert.equal(councilStatus.verification?.ghCliStatus, "unavailable-in-local-shell");
+  assert.equal(councilStatus.verification?.ghCliStatus, "unavailable-in-local-shell-but-github-api-live-sync-passed");
+  assert.equal(councilStatus.verification?.githubLiveSyncStatus, "pass");
+  assert.equal(councilStatus.verification?.pullRequestOpen, true);
+  assert.equal(councilStatus.verification?.issueOpen, true);
+  assert.equal(councilStatus.verification?.pullRequestHeadMatches, true);
+  assert.equal(councilStatus.verification?.pullRequestBodyMatchesDraft, true);
+  assert.equal(councilStatus.verification?.issueBodyMatchesDraft, true);
+  assert.equal(councilStatus.evidence?.remotePrHeadMatchesCurrentHead, true);
   assert.equal(councilStatus.claimBoundary?.currentStatus, "not-production-complete");
   assert.ok(councilStatus.claimBoundary?.mayNotClaim?.includes("RecallWeave beats Supermemory"));
+  assert.ok(councilStatus.claimBoundary?.mayNotClaim?.includes("PR merge/public launch is complete"));
+  assert.equal(githubLiveSyncEvidence.mode, "github-live-sync-check");
+  assert.equal(githubLiveSyncEvidence.ok, true);
+  assert.equal(githubLiveSyncEvidence.livePrOpen, true);
+  assert.equal(githubLiveSyncEvidence.liveIssueOpen, true);
+  assert.equal(githubLiveSyncEvidence.livePrHeadMatches, true);
+  assert.equal(githubLiveSyncEvidence.prBodyMatches, true);
+  assert.equal(githubLiveSyncEvidence.issueBodyMatches, true);
+  assert.match(githubLiveSyncMarkdown, /GitHub Live Sync Current Head/);
+  assert.match(githubLiveSyncMarkdown, /PR body matches checked-in draft: true/);
   assert.match(councilStatusMarkdown, /DeepSeek final-gate review: CLEAN/);
+  assert.match(councilStatusMarkdown, /GitHub live sync: passed/);
   assert.match(councilStatusMarkdown, /not production complete/i);
-  for (const value of [targetLockFresh, providerRegistryFresh, targetLockEvidence, providerRegistryEvidence, councilStatus]) {
+  for (const value of [targetLockFresh, providerRegistryFresh, targetLockEvidence, providerRegistryEvidence, githubLiveSyncEvidence, councilStatus]) {
     const text = JSON.stringify(value);
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }
+  assert.doesNotMatch(githubLiveSyncMarkdown, secretPattern);
+  assert.doesNotMatch(githubLiveSyncMarkdown, absolutePrivatePathPattern);
   assert.doesNotMatch(councilStatusMarkdown, secretPattern);
   assert.doesNotMatch(councilStatusMarkdown, absolutePrivatePathPattern);
 });

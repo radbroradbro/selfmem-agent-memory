@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "mode": "github-live-sync-check",
+  "writesRealFiles": false,
+  "callsGitHubApi": true,
+  "repository": "radbroradbro/selfmem-agent-memory",
+  "pullRequest": 5,
+  "issueNumber": 6,
+  "reviewDir": "reviews/overnight-20260522",
+  "livePrOpen": true,
+  "liveIssueOpen": true,
+  "livePrHeadMatches": true,
+  "expectedHeadRef": "feat/nucleus-wiki-native-contract",
+  "prBodyMatches": true,
+  "issueTitleMatches": true,
+  "issueBodyMatches": true,
+  "prBodyHash": "5ef1015424c7eccfd282a8eaaff291ef4a44ab77ef26a9b554033c62c9ce1b7d",
+  "issueTitleHash": "e093f2ff3b75bc8883b03105411e42498d5eb5a4231b369634a83fddecc3fa3c",
+  "issueBodyHash": "1b702f8118354977d5d3859ce80fc4f4f9f8a51c0471d0e9aa541aec7cc80216",
+  "liveUpdatedAt": {
+    "pullRequest": "2026-06-01T13:54:16Z",
+    "issue": "2026-05-26T06:38:57Z"
+  },
+  "safety": {
+    "printsBodyText": false,
+    "printsCredentials": false,
+    "privateLeakCount": 0,
+    "hasSecretPattern": false,
+    "hasPrivatePathPattern": false
+  }
+}
