@@ -6,15 +6,15 @@ fleet rollout.
 
 Send file:
 
-- `recallweave-openclaw-next-agent-canary-20260531-SEND-THIS-ONE-225c8db.zip`
+- `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip`
 
 Packet:
 
-- Zip: `recallweave-openclaw-next-agent-canary-20260531-SEND-THIS-ONE-225c8db.zip`
-- SHA256: `b87cded800633164b86e1ff4fd72aa66f18a4d5a383cc30c424a975223add6d5`
-- Packet generated from controller commit: `225c8dbadbebfd2066caac326916676e648ad4b6`
-- Approved adapter commit: `225c8dbadbebfd2066caac326916676e648ad4b6`
-- Expected report commit: `225c8dbadbebfd2066caac326916676e648ad4b6`
+- Zip: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip`
+- SHA256: `950a3a87d0540d62b0c59837d77e71474d36c1cf7c1601ed53824441860f1bd6`
+- Packet generated from controller commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
+- Approved adapter commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
+- Expected report commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
 
 Paste:
 
@@ -25,8 +25,8 @@ Important: this packet is for one fresh canary window only. Do not roll it out t
 For this one selected OpenClaw agent, RecallWeave/selfmem should become the native/default memory slot during the canary window. Do not leave it installed as shadow-only or manual-only.
 The `selfmem_canary` label is a compatibility/plugin id, not a request to keep it non-default.
 Hosted Supermemory remains read-through/history only. New memory writes during this canary should land locally in RecallWeave/selfmem.
-The packet was generated from controller commit 225c8dbadbebfd2066caac326916676e648ad4b6, and the approved adapter/report commit for this canary is also 225c8dbadbebfd2066caac326916676e648ad4b6.
-The returned canary evidence must report commit 225c8dbadbebfd2066caac326916676e648ad4b6 or it will count as diagnostic only.
+The packet was generated from controller commit 32e240ff987c28a11925135a16eeff56ee15eab9, and the approved adapter/report commit for this canary is also 32e240ff987c28a11925135a16eeff56ee15eab9.
+The returned canary evidence must report commit 32e240ff987c28a11925135a16eeff56ee15eab9 or it will count as diagnostic only.
 
 Do this in order:
 

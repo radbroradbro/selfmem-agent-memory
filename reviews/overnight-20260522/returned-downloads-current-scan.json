@@ -1,12 +1,12 @@
 {
-  "ok": true,
+  "ok": false,
   "mode": "canary-returned-downloads",
   "defaultInboxScan": true,
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicLaunchAllowed": false,
   "fleetRolloutAllowed": false,
-  "requireFound": false,
+  "requireFound": true,
   "includeAllZips": true,
   "discoveredRootCount": 2,
   "rootLabels": [
@@ -15,7 +15,7 @@
   ],
   "rootLabelsHash": "ac42f650efe3265a41787e37ffbc0041327361fbcd401e445b8c4ed18b589bc7",
   "sourceControl": {
-    "expectedCommit": "225c8dbadbebfd2066caac326916676e648ad4b6"
+    "expectedCommit": "32e240ff987c28a11925135a16eeff56ee15eab9"
   },
   "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
   "counts": {
@@ -25,11 +25,11 @@
     "returnedEvidencePackets": 0,
     "handoffPackets": 1,
     "diagnosticBundles": 11,
-    "unknownPackets": 24,
+    "unknownPackets": 25,
     "unreadablePackets": 0
   },
   "returnedWatch": {
-    "ok": true,
+    "ok": false,
     "mode": "canary-returned-watch",
     "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
     "writesRealFiles": false,
@@ -38,7 +38,7 @@
     "fleetRolloutAllowed": false,
     "iterationsCompleted": 1,
     "sourceControl": {
-      "expectedCommit": "225c8dbadbebfd2066caac326916676e648ad4b6"
+      "expectedCommit": "32e240ff987c28a11925135a16eeff56ee15eab9"
     },
     "counts": {
       "scanCount": 2,
@@ -47,35 +47,35 @@
       "returnedEvidencePackets": 0,
       "handoffPackets": 1,
       "diagnosticBundles": 11,
-      "unknownPackets": 24,
+      "unknownPackets": 25,
       "unreadablePackets": 0
     },
     "latestScans": [
       {
         "rootLabel": "Downloads",
         "status": "HANDOFF_PACKETS_ONLY",
-        "candidateCount": 22,
-        "scannedZipCount": 22,
+        "candidateCount": 23,
+        "scannedZipCount": 23,
         "returnedEvidencePackets": 0,
         "productionEvidencePackets": 0,
         "handoffPackets": 1,
         "diagnosticBundles": 7,
         "unreadablePackets": 0,
-        "unknownPackets": 14,
+        "unknownPackets": 15,
         "labelMode": "hash-redacted",
         "triage": {
           "labelMode": "hash-redacted",
           "metricsOnly": true,
           "unknown": {
-            "count": 14,
+            "count": 15,
             "statusCounts": {
-              "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 14
+              "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 15
             },
             "failedCheckCounts": {
-              "not-canary-evidence-packet": 14
+              "not-canary-evidence-packet": 15
             },
             "reasonCounts": {
-              "zip does not contain the returned canary evidence packet contract": 14
+              "zip does not contain the returned canary evidence packet contract": 15
             },
             "sampleIds": [
               "zip-21bdd26b49f9",
@@ -139,7 +139,7 @@
       }
     ]
   },
-  "childExitStatus": 0,
+  "childExitStatus": 1,
   "parseError": null,
   "nextActions": [
     "Keep waiting for a returned metrics-only production canary evidence packet.",

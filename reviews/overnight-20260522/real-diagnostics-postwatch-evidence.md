@@ -1,7 +1,7 @@
 # Real Diagnostics Post-Watch Evidence
 
 Date: 2026-05-23
-Latest returned-watch refresh: 2026-05-31
+Latest returned-watch refresh: 2026-06-01
 
 ## Scope
 
@@ -15,14 +15,10 @@ answers, credentials, private labels, or local filesystem paths.
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <downloads-folder> --input-root <telegram-download-folder> --include-all-zips --iterations 1 --output reviews/overnight-20260522/real-diagnostics-postwatch-returned-watch.json
 npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <telegram-download-folder> --allow-failed-inputs --output reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json
-npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
-npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --require-ready --expected-commit 18d606aff589986b4d8b416a686bedb7ff1506d2 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --output reviews/overnight-20260522/returned-downloads-current-scan.json --findings-output reviews/overnight-20260522/returned-downloads-current-scan.md
-npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <downloads-folder> --input-root <telegram-download-folder> --include-all-zips --iterations 1 --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --output reviews/overnight-20260522/real-diagnostics-postwatch-returned-watch.json
-npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
-npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --host openclaw --allow-failed-inputs --require-ready --expected-commit 225c8dbadbebfd2066caac326916676e648ad4b6 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260531-SEND-THIS-ONE-225c8db.zip
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --host openclaw --allow-failed-inputs --require-ready --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output reviews/overnight-20260522/returned-downloads-current-scan.json --findings-output reviews/overnight-20260522/returned-downloads-current-scan.md
 ```
 
 ## Returned Watch Result
@@ -30,10 +26,10 @@ npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overn
 - Status: `AWAITING_RETURNED_PRODUCTION_CANARY`
 - Production canary packets: `0`
 - Returned evidence packets: `0`
-- Handoff packets: `2`
+- Handoff packets: `3`
 - Diagnostic bundles: `11`
 - Candidate labels: hash-redacted
-- Expected report commit: `225c8dbadbebfd2066caac326916676e648ad4b6`
+- Expected report commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
 
 This confirms the incoming folders contain useful diagnostics and handoff
 packets, but no strict returned production canary evidence yet.
@@ -56,14 +52,14 @@ and lacked store latency instrumentation.
 
 ## Fresh Canary Packet
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260531-SEND-THIS-ONE-225c8db.zip`
-- SHA-256: `b87cded800633164b86e1ff4fd72aa66f18a4d5a383cc30c424a975223add6d5`
+- Packet label: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip`
+- SHA-256: `950a3a87d0540d62b0c59837d77e71474d36c1cf7c1601ed53824441860f1bd6`
 - Packet generated from controller commit:
-  `225c8dbadbebfd2066caac326916676e648ad4b6`
+  `32e240ff987c28a11925135a16eeff56ee15eab9`
 - Approved adapter commit:
-  `225c8dbadbebfd2066caac326916676e648ad4b6`
+  `32e240ff987c28a11925135a16eeff56ee15eab9`
 - Expected report commit:
-  `225c8dbadbebfd2066caac326916676e648ad4b6`
+  `32e240ff987c28a11925135a16eeff56ee15eab9`
 - Entries:
   - `README.md`
   - `manifest.json`
