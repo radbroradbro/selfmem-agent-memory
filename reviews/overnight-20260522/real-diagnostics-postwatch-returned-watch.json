@@ -7,7 +7,7 @@
   "fleetRolloutAllowed": false,
   "requireFound": false,
   "sourceControl": {
-    "expectedCommit": "225c8dbadbebfd2066caac326916676e648ad4b6"
+    "expectedCommit": null
   },
   "iterationsRequested": 1,
   "iterationsCompleted": 1,
@@ -20,9 +20,9 @@
     "rootsWithProductionEvidence": 0,
     "productionEvidencePackets": 0,
     "returnedEvidencePackets": 0,
-    "handoffPackets": 2,
+    "handoffPackets": 1,
     "diagnosticBundles": 11,
-    "unknownPackets": 24,
+    "unknownPackets": 25,
     "unreadablePackets": 0
   },
   "latestScans": [
@@ -36,24 +36,24 @@
       "scannedZipCount": 23,
       "returnedEvidencePackets": 0,
       "productionEvidencePackets": 0,
-      "handoffPackets": 2,
+      "handoffPackets": 1,
       "diagnosticBundles": 7,
       "unreadablePackets": 0,
-      "unknownPackets": 14,
+      "unknownPackets": 15,
       "labelMode": "hash-redacted",
       "triage": {
         "labelMode": "hash-redacted",
         "metricsOnly": true,
         "unknown": {
-          "count": 14,
+          "count": 15,
           "statusCounts": {
-            "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 14
+            "UNKNOWN_ZIP_NOT_CANARY_EVIDENCE": 15
           },
           "failedCheckCounts": {
-            "not-canary-evidence-packet": 14
+            "not-canary-evidence-packet": 15
           },
           "reasonCounts": {
-            "zip does not contain the returned canary evidence packet contract": 14
+            "zip does not contain the returned canary evidence packet contract": 15
           },
           "sampleIds": [
             "zip-21bdd26b49f9",

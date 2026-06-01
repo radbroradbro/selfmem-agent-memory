@@ -15,10 +15,10 @@ answers, credentials, private labels, or local filesystem paths.
 ```bash
 npm exec --yes pnpm@10.23.0 -- canary:returned-watch -- --input-root <downloads-folder> --input-root <telegram-download-folder> --include-all-zips --iterations 1 --output reviews/overnight-20260522/real-diagnostics-postwatch-returned-watch.json
 npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <telegram-download-folder> --allow-failed-inputs --output reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json
-npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
-npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
-npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --host openclaw --allow-failed-inputs --require-ready --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit 32e240ff987c28a11925135a16eeff56ee15eab9 --output reviews/overnight-20260522/returned-downloads-current-scan.json --findings-output reviews/overnight-20260522/returned-downloads-current-scan.md
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format json --expected-commit 105b300436318de22b24d86782f402ed40a9f479 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.json
+npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --expected-commit 105b300436318de22b24d86782f402ed40a9f479 --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
+npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --host openclaw --allow-failed-inputs --require-ready --expected-commit 105b300436318de22b24d86782f402ed40a9f479 --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit 105b300436318de22b24d86782f402ed40a9f479 --output reviews/overnight-20260522/returned-downloads-current-scan.json --findings-output reviews/overnight-20260522/returned-downloads-current-scan.md
 ```
 
 ## Returned Watch Result
@@ -26,10 +26,10 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-co
 - Status: `AWAITING_RETURNED_PRODUCTION_CANARY`
 - Production canary packets: `0`
 - Returned evidence packets: `0`
-- Handoff packets: `3`
+- Handoff packets: `1`
 - Diagnostic bundles: `11`
 - Candidate labels: hash-redacted
-- Expected report commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
+- Expected report commit: `105b300436318de22b24d86782f402ed40a9f479`
 
 This confirms the incoming folders contain useful diagnostics and handoff
 packets, but no strict returned production canary evidence yet.
@@ -52,14 +52,14 @@ and lacked store latency instrumentation.
 
 ## Fresh Canary Packet
 
-- Packet label: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip`
-- SHA-256: `950a3a87d0540d62b0c59837d77e71474d36c1cf7c1601ed53824441860f1bd6`
+- Packet label: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip`
+- SHA-256: `edf5dbb3aba2803c25825781c160d46ea680c3223e4644a019ce864edf8b2f43`
 - Packet generated from controller commit:
-  `32e240ff987c28a11925135a16eeff56ee15eab9`
+  `105b300436318de22b24d86782f402ed40a9f479`
 - Approved adapter commit:
-  `32e240ff987c28a11925135a16eeff56ee15eab9`
+  `105b300436318de22b24d86782f402ed40a9f479`
 - Expected report commit:
-  `32e240ff987c28a11925135a16eeff56ee15eab9`
+  `105b300436318de22b24d86782f402ed40a9f479`
 - Entries:
   - `README.md`
   - `manifest.json`

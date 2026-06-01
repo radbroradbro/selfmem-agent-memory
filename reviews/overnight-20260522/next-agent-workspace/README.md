@@ -9,11 +9,11 @@ contents.
 
 ## Current Handoff
 
-- Packet: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip`.
-- SHA-256: `950a3a87d0540d62b0c59837d77e71474d36c1cf7c1601ed53824441860f1bd6`.
-- Packet generated from controller commit: `32e240ff987c28a11925135a16eeff56ee15eab9`.
-- Approved adapter commit: `32e240ff987c28a11925135a16eeff56ee15eab9`.
-- Expected report commit: `32e240ff987c28a11925135a16eeff56ee15eab9`.
+- Packet: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip`.
+- SHA-256: `edf5dbb3aba2803c25825781c160d46ea680c3223e4644a019ce864edf8b2f43`.
+- Packet generated from controller commit: `105b300436318de22b24d86782f402ed40a9f479`.
+- Approved adapter commit: `105b300436318de22b24d86782f402ed40a9f479`.
+- Expected report commit: `105b300436318de22b24d86782f402ed40a9f479`.
 - Host: OpenClaw.
 - Scope: one selected agent only.
 - Public launch allowed: no.

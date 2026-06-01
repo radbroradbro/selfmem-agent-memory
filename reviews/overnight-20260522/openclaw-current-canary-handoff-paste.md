@@ -1,20 +1,19 @@
 # Paste-Ready OpenClaw Canary Handoff
 
 Use this with exactly one OpenClaw agent. Attach the zip named below in the
-same message, plus the checksum note. This is a fresh canary window, not a
-fleet rollout.
+same message. This is a fresh canary window, not a fleet rollout.
 
 Send file:
 
-- `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip`
+- `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip`
 
 Packet:
 
-- Zip: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-32e240f.zip`
-- SHA256: `950a3a87d0540d62b0c59837d77e71474d36c1cf7c1601ed53824441860f1bd6`
-- Packet generated from controller commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
-- Approved adapter commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
-- Expected report commit: `32e240ff987c28a11925135a16eeff56ee15eab9`
+- Zip: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip`
+- SHA256: `edf5dbb3aba2803c25825781c160d46ea680c3223e4644a019ce864edf8b2f43`
+- Packet generated from controller commit: `105b300436318de22b24d86782f402ed40a9f479`
+- Approved adapter commit: `105b300436318de22b24d86782f402ed40a9f479`
+- Expected report commit: `105b300436318de22b24d86782f402ed40a9f479`
 
 Paste:
 
@@ -25,8 +24,8 @@ Important: this packet is for one fresh canary window only. Do not roll it out t
 For this one selected OpenClaw agent, RecallWeave/selfmem should become the native/default memory slot during the canary window. Do not leave it installed as shadow-only or manual-only.
 The `selfmem_canary` label is a compatibility/plugin id, not a request to keep it non-default.
 Hosted Supermemory remains read-through/history only. New memory writes during this canary should land locally in RecallWeave/selfmem.
-The packet was generated from controller commit 32e240ff987c28a11925135a16eeff56ee15eab9, and the approved adapter/report commit for this canary is also 32e240ff987c28a11925135a16eeff56ee15eab9.
-The returned canary evidence must report commit 32e240ff987c28a11925135a16eeff56ee15eab9 or it will count as diagnostic only.
+The packet was generated from controller commit 105b300436318de22b24d86782f402ed40a9f479, and the approved adapter/report commit for this canary is also 105b300436318de22b24d86782f402ed40a9f479.
+The returned canary evidence must report commit 105b300436318de22b24d86782f402ed40a9f479 or it will count as diagnostic only.
 
 Do this in order:
 
