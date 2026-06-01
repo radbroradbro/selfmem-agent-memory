@@ -31,6 +31,7 @@ const modelMatchPolicy = String(
   args.modelMatchPolicy ?? process.env.RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY ?? (claimScope === "local-full" ? "local-diagnostic-allowed" : "challenger-model-allowed"),
 ).trim();
 const maxMemoryBytes = positiveInt(args.maxMemoryBytes ?? process.env.RECALLWEAVE_BASELINE_MAX_MEMORY_BYTES ?? 300_000_000, "max memory bytes");
+const continueOnCallError = truthy(args.continueOnCallError ?? process.env.RECALLWEAVE_MEMORYBENCH_CONTINUE_ON_CALL_ERROR ?? "");
 
 const memoryMethods = ["session-v1", "contextual-source-chunk-v1", "contextual-index-source-chunk-v1", "atomic-memory-v1"];
 const retrievalStrategies = ["bm25-lite", "full-hybrid-rerank"];
@@ -39,6 +40,11 @@ const secretPattern =
 const privatePathPattern =
   /(\/Users\/[^/\s"]+|\/Volumes\/[^/\s"]+|\/private\/[^/\s"]+|\/var\/folders\/[^/\s"]+|\/tmp\/[^/\s"]+|\/home\/[^/\s"]+|[A-Za-z]:\\Users\\|\.hermes\/profiles|\.openclaw[^/\s"]*|memories\.jsonl|raw_events\.jsonl|lossless_context\.jsonl)/i;
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
+
+if (args.continueOnCallErrorSmoke === true) {
+  runContinueOnCallErrorSmoke();
+  process.exit(0);
+}
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(["full-sota", "local-full", "model-challenger"].includes(claimScope), "--claim-scope must be full-sota, local-full, or model-challenger");
@@ -124,25 +130,15 @@ for (const method of methods) {
     assert.equal(readiness.ready, true, `answer-quality method ladder cannot execute: ${readiness.blockers.join(", ")}`);
     const answerQualityPath = resolve(methodDir, "answer-quality.json");
     runNode(
-      [
-        "packages/bench/public-benchmark-answer-quality.mjs",
-        "--live",
-        "--target",
+      answerQualityCommandArgs({
         targetPath,
-        "--queryset",
-        resolve(methodDir, "longmemeval-queryset.private.json"),
-        "--memories",
-        resolve(methodDir, "longmemeval-memories.private.jsonl"),
-        "--answer-labels",
-        resolve(methodDir, "longmemeval-answer-labels.private.json"),
-        "--claim-scope",
+        methodDir,
         claimScope,
-        "--model-match-policy",
         modelMatchPolicy,
-        ...methodArmSpecs.flatMap((spec) => ["--arm", spec]),
-        "--output",
+        methodArmSpecs,
         answerQualityPath,
-      ],
+        continueOnCallError,
+      }),
       {
         SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
         RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
@@ -192,6 +188,7 @@ const report = {
   },
   contextTokenBudget,
   limit,
+  continueOnCallError,
   methods,
   strategies,
   materializations,
@@ -199,10 +196,7 @@ const report = {
   answerQualityReports,
   winner: bestExecuted,
   nextActions: execute
-    ? [
-        "Use this diagnostic only to decide whether contextual-index-source-chunk-v1 deserves a larger accepted shard.",
-        "Run the standard result gate and reviewer intake before any public benchmark claim.",
-      ]
+    ? methodComparisonNextActions(bestExecuted)
     : [
         "Start a local OpenAI-compatible answer/judge endpoint or provide an approved cloud endpoint through env-only secrets.",
         "Set RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1, and RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1.",
@@ -217,6 +211,16 @@ assertSafePublicText(markdownText, "answer-quality method ladder markdown");
 if (outputPath) writeOutput(resolveOutput(outputPath), jsonText);
 if (markdownOutputPath) writeOutput(resolveOutput(markdownOutputPath), markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
+
+function methodComparisonNextActions(bestExecuted) {
+  const method = bestExecuted?.method ?? "the winning memory method";
+  const strategy = bestExecuted?.winner?.strategy ?? "the winning retrieval strategy";
+  return [
+    `Treat ${method} with ${strategy} as the next larger-slice challenger, not as a production default yet.`,
+    "Promote only methods that beat session-v1 on the same raw query selection and retain their edge under failure-accounted answer-quality scoring.",
+    "Run the standard result gate and reviewer intake before any public benchmark claim.",
+  ];
+}
 
 function answerQualityReadiness() {
   const baseUrl = String(process.env.RECALLWEAVE_MEMORYBENCH_BASE_URL ?? "").trim();
@@ -247,6 +251,61 @@ function answerQualityReadiness() {
     judgeModelPresent: Boolean(judgeModel),
     cloudApiKeyPresent: cloudEndpoint ? Boolean(process.env.RECALLWEAVE_MEMORYBENCH_API_KEY) : null,
   };
+}
+
+function answerQualityCommandArgs(input) {
+  return [
+    "packages/bench/public-benchmark-answer-quality.mjs",
+    "--live",
+    "--target",
+    input.targetPath,
+    "--queryset",
+    resolve(input.methodDir, "longmemeval-queryset.private.json"),
+    "--memories",
+    resolve(input.methodDir, "longmemeval-memories.private.jsonl"),
+    "--answer-labels",
+    resolve(input.methodDir, "longmemeval-answer-labels.private.json"),
+    "--claim-scope",
+    input.claimScope,
+    "--model-match-policy",
+    input.modelMatchPolicy,
+    ...(input.continueOnCallError ? ["--continue-on-call-error"] : []),
+    ...input.methodArmSpecs.flatMap((spec) => ["--arm", spec]),
+    "--output",
+    input.answerQualityPath,
+  ];
+}
+
+function runContinueOnCallErrorSmoke() {
+  const forgiving = answerQualityCommandArgs({
+    targetPath: "/tmp/target.json",
+    methodDir: "/tmp/method",
+    claimScope: "model-challenger",
+    modelMatchPolicy: "challenger-model-allowed",
+    methodArmSpecs: ["bm25-lite=/tmp/bm25.json", "full-hybrid-rerank=/tmp/hybrid.json"],
+    answerQualityPath: "/tmp/answer-quality.json",
+    continueOnCallError: true,
+  });
+  const strict = answerQualityCommandArgs({
+    targetPath: "/tmp/target.json",
+    methodDir: "/tmp/method",
+    claimScope: "model-challenger",
+    modelMatchPolicy: "challenger-model-allowed",
+    methodArmSpecs: ["bm25-lite=/tmp/bm25.json"],
+    answerQualityPath: "/tmp/answer-quality.json",
+    continueOnCallError: false,
+  });
+  assert.equal(forgiving.includes("--continue-on-call-error"), true);
+  assert.equal(strict.includes("--continue-on-call-error"), false);
+  assert.equal(forgiving.filter((item) => item === "--arm").length, 2);
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "answer-quality-method-ladder-continue-on-call-error-smoke",
+      forwardsContinueOnCallError: true,
+      leavesStrictModeStrict: true,
+    })}\n`,
+  );
 }
 
 function materializationSummary(method, materialize) {
@@ -348,10 +407,12 @@ function renderMarkdown(value) {
     ),
   ];
   if (value.answerQualityReports.length > 0) {
-    lines.push("", "## Answer Quality", "", "| Method | Winner | Answer quality | Correct rate | Calls |", "| --- | --- | ---: | ---: | ---: |");
+    lines.push("", "## Answer Quality", "", "| Method | Winner | Answer quality | Correct rate | Calls | Answer failures | Judge failures |", "| --- | --- | ---: | ---: | ---: | ---: | ---: |");
     for (const item of value.answerQualityReports) {
+      const answerFailures = item.strategies.reduce((sum, strategy) => sum + Number(strategy.answerFailures ?? 0), 0);
+      const judgeFailures = item.strategies.reduce((sum, strategy) => sum + Number(strategy.judgeFailures ?? 0), 0);
       lines.push(
-        `| ${item.method} | ${item.winner?.strategy ?? "none"} | ${item.winner?.answerQuality ?? "n/a"} | ${item.winner?.judgeCorrectRate ?? "n/a"} | ${item.callsMade} |`,
+        `| ${item.method} | ${item.winner?.strategy ?? "none"} | ${item.winner?.answerQuality ?? "n/a"} | ${item.winner?.judgeCorrectRate ?? "n/a"} | ${item.callsMade} | ${answerFailures} | ${judgeFailures} |`,
       );
     }
   }
@@ -445,6 +506,10 @@ function optionalNonNegativeInt(value, label) {
   const number = Number(value);
   assert.ok(Number.isInteger(number) && number >= 0, `${label} must be a non-negative integer`);
   return number;
+}
+
+function truthy(value) {
+  return value === true || ["1", "true", "yes", "on"].includes(String(value ?? "").trim().toLowerCase());
 }
 
 function parseArgs(argv) {

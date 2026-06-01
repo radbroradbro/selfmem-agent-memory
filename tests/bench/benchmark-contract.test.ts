@@ -9,6 +9,7 @@ const preflightScript = "packages/bench/provider-benchmark-live-preflight.mjs";
 const resultGateScript = "packages/bench/provider-challenger-result-gate.mjs";
 const materializeScript = "packages/bench/public-benchmark-materialize-run.mjs";
 const answerQualityScript = "packages/bench/public-benchmark-answer-quality.mjs";
+const answerQualityMethodLadderScript = "packages/bench/public-benchmark-answer-quality-method-ladder.mjs";
 const responseExportScript = "packages/bench/recallweave-response-export.mjs";
 
 describe("public benchmark comparison contract", () => {
@@ -319,6 +320,19 @@ describe("public benchmark comparison contract", () => {
     expect(report.disablesByModel).toBe(true);
     expect(report.disablesByEndpoint).toBe(true);
     expect(report.leavesNonDeepSeekUnchanged).toBe(true);
+  });
+
+  it("forwards continue-on-call-error into answer-quality method ladders", () => {
+    const result = spawnSync(process.execPath, [answerQualityMethodLadderScript, "--continue-on-call-error-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("answer-quality-method-ladder-continue-on-call-error-smoke");
+    expect(report.forwardsContinueOnCallError).toBe(true);
+    expect(report.leavesStrictModeStrict).toBe(true);
   });
 
   it("forwards live materialization shard controls into provider runs", () => {
