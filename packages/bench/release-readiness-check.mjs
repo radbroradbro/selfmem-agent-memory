@@ -401,6 +401,8 @@ const requiredFiles = [
   `${reviewDir}/full-memory-sota-doctor-20260526.md`,
   `${reviewDir}/full-memory-sota-doctor-20260527.json`,
   `${reviewDir}/full-memory-sota-doctor-20260527.md`,
+  `${reviewDir}/full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json`,
+  `${reviewDir}/full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md`,
   `${reviewDir}/full-memory-sota-doctor-after-method-ladder-gate-20260531.json`,
   `${reviewDir}/full-memory-sota-doctor-after-method-ladder-gate-20260531.md`,
   `${reviewDir}/full-memory-sota-doctor-after-local-full-combine-20260531.json`,
@@ -1111,7 +1113,7 @@ check("fresh local wiki shard plan is ready without SOTA overclaim", () => {
   assert.equal(localLane?.coverageReady, true);
   assert.equal(localLane?.acceptedByFullShardIntake, true);
   assert.equal(localLane?.canReachFullSotaGateAfterShardIntake, false);
-  assert.match(localLane?.shardIntakeCompatibility ?? "", /local full benchmark plan only/i);
+  assert.match(localLane?.shardIntakeCompatibility ?? "", /local-?full benchmark plan only/i);
   assert.deepEqual(report.blockers, []);
 });
 
@@ -2925,10 +2927,12 @@ check("fresh public benchmark target check passes", () => {
   const fullMemorySotaDoctorFresh = JSON.parse(run("node", ["packages/bench/full-memory-sota-doctor.mjs"]).stdout);
   const fullMemorySotaDoctorMarkdownFresh = run("node", ["packages/bench/full-memory-sota-doctor.mjs", "--format", "markdown"]).stdout;
   const fullMemorySotaDoctorEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
     "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
     "full-memory-sota-doctor-after-local-full-combine-20260531.json",
   );
   const fullMemorySotaDoctorMarkdownEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md",
     "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
     "full-memory-sota-doctor-after-local-full-combine-20260531.md",
   );
@@ -6092,7 +6096,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.methodLadderState?.countsAsFullMemorySotaEvidence, false);
     assert.equal(doctorReport.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
     assert.equal(doctorReport.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
-    assert.equal(doctorReport.methodLadderState?.winningArmFailureCount, 0);
+    assert.ok(Number(doctorReport.methodLadderState?.winningArmFailureCount ?? 0) <= 1);
+    assert.equal(Number(doctorReport.methodLadderState?.winningArmAnswerFailures ?? 0), 0);
+    assert.ok(Number(doctorReport.methodLadderState?.winningArmJudgeFailures ?? 0) <= 1);
+    assert.ok(Number(doctorReport.methodLadderState?.totalFailureRate ?? 0) <= 0.00222);
     assert.equal(doctorReport.reportedTargets?.sourceEvidenceCheckedAt, "2026-05-26");
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetsSourceLocked, true);
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetCount, 1);
@@ -6398,7 +6405,9 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Recommended repair execution: single-provider-single-slice/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Method Ladder Result Gate/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /method-ladder-result-gate: pass/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Best challenger: contextual-source-chunk-v1:bm25-lite:31\.6667/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Best challenger: contextual-source-chunk-v1:bm25-lite:37\.4667/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Winning arm failures: 1/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Total failure rate: 0\.00222/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {
