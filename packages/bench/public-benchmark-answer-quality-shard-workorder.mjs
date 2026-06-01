@@ -526,6 +526,7 @@ function inspectAnswerQualityReadiness(lane) {
   const modelMatchPolicy = String(lane.answerQualityEndpoint?.modelMatchPolicy ?? "exact-target-required");
   const exactTargetModelsRequired = modelMatchPolicy === "exact-target-required";
   const localDiagnosticModelAllowed = modelMatchPolicy === "local-diagnostic-allowed";
+  const challengerModelAllowed = modelMatchPolicy === "challenger-model-allowed";
   const answerModelMatchesTarget = answerModel.present && targetAnswerModel.length > 0 && answerModel.value === targetAnswerModel;
   const judgeModelMatchesTarget = judgeModel.present && targetJudgeModel.length > 0 && judgeModel.value === targetJudgeModel;
   const baseUrlPresent = baseUrl.length > 0;
@@ -535,7 +536,9 @@ function inspectAnswerQualityReadiness(lane) {
   const localDiagnosticEndpointSatisfied = localDiagnosticModelAllowed && endpointIsLocal;
   const scoringModelPolicySatisfied = exactTargetModelsRequired
     ? answerModelMatchesTarget && judgeModelMatchesTarget
-    : answerModel.present && judgeModel.present && localDiagnosticEndpointSatisfied;
+    : challengerModelAllowed
+      ? answerModel.present && judgeModel.present
+      : answerModel.present && judgeModel.present && localDiagnosticEndpointSatisfied;
   const blockers = [
     !truthyEnv("RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS")
       ? "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled"
@@ -566,6 +569,7 @@ function inspectAnswerQualityReadiness(lane) {
     modelMatchPolicy,
     exactTargetModelsRequired,
     localDiagnosticModelAllowed,
+    challengerModelAllowed,
     localDiagnosticEndpointSatisfied,
     scoringModelPolicySatisfied,
     baseUrlPresent,
@@ -768,6 +772,12 @@ function scoringModelFailures(result, planValue) {
       !state.localDiagnosticEndpointSatisfied ? "local-diagnostic-scoring-policy-mismatch" : null,
     ].filter(Boolean);
   }
+  if (state.policy === "challenger-model-allowed") {
+    return [
+      !state.answerModelPresent ? "answer-model-missing" : null,
+      !state.judgeModelPresent ? "judge-model-missing" : null,
+    ].filter(Boolean);
+  }
   return [
     !state.answerModelPresent ? "answer-model-missing" : null,
     !state.judgeModelPresent ? "judge-model-missing" : null,
@@ -779,7 +789,7 @@ function scoringModelFailures(result, planValue) {
 function scoringModelsSatisfyPlan(result, planValue) {
   const policy = String(
     planValue.scoringPolicy?.modelMatchPolicy ??
-      (planValue.runPlan?.claimScope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required"),
+      defaultModelMatchPolicy(planValue.runPlan?.claimScope),
   );
   const answerModel = String(result.provider?.answerModel ?? "").trim();
   const judgeModel = String(result.provider?.judgeModel ?? "").trim();
@@ -801,6 +811,17 @@ function scoringModelsSatisfyPlan(result, planValue) {
       localDiagnosticEndpointSatisfied,
     };
   }
+  if (policy === "challenger-model-allowed") {
+    return {
+      policy,
+      ready: answerModelPresent && judgeModelPresent,
+      answerModelPresent,
+      judgeModelPresent,
+      answerModelMatchesTarget,
+      judgeModelMatchesTarget,
+      localDiagnosticEndpointSatisfied,
+    };
+  }
   return {
     policy,
     ready: answerModelMatchesTarget && judgeModelMatchesTarget,
@@ -810,6 +831,12 @@ function scoringModelsSatisfyPlan(result, planValue) {
     judgeModelMatchesTarget,
     localDiagnosticEndpointSatisfied,
   };
+}
+
+function defaultModelMatchPolicy(scope) {
+  if (scope === "local-full") return "local-diagnostic-allowed";
+  if (scope === "model-challenger") return "challenger-model-allowed";
+  return "exact-target-required";
 }
 
 function rangeKey(value) {

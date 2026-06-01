@@ -56,7 +56,10 @@ const knownStrategies = new Set([
 ]);
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
-assert.ok(["full-sota", "local-full"].includes(claimScope), "--claim-scope must be full-sota or local-full");
+assert.ok(
+  ["full-sota", "local-full", "model-challenger"].includes(claimScope),
+  "--claim-scope must be full-sota, local-full, or model-challenger",
+);
 assert.ok(existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `target empty: ${displayPath(targetPath)}`);
 assert.ok(existsSync(materializeReportPath), `materialize report missing: ${displayPath(materializeReportPath)}`);
@@ -195,17 +198,13 @@ const report = {
     ? [
         "Run response arm exports shard-by-shard with explicit provider and query-expansion consent.",
         "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
-        "Run answer-quality scoring for each shard with the target answer and judge models.",
+        answerQualityScoringAction(claimScope),
         "Combine the full query-shard result set, then run the memory-score gate and reviewer intake on the combined metrics-only packet.",
-        claimScope === "local-full"
-          ? "Treat the completed result as a full local benchmark result only; SOTA and public superiority claims still need the full provider/comparison lane."
-          : "Treat the completed result as SOTA-candidate evidence only after result gate, reviewer intake, UI/docs, owner approval, and real canary also pass.",
+        resultClaimAction(claimScope),
       ]
     : [
         "Regenerate the full LongMemEval-S materialization and preserve the private raw-source outputs outside the repository.",
-        claimScope === "local-full"
-          ? "Include BM25, full-hybrid, model-backed query expansion, local Apple, and local rerank arms."
-          : "Include BM25, full-hybrid, query expansion, Voyage, NVIDIA or Gemini, local Apple, and local rerank arms.",
+        missingLaneAction(claimScope),
         "Re-run this shard plan with --require-ready before starting the full answer-quality run.",
       ],
 };
@@ -268,7 +267,7 @@ function buildProviderHybridContract(items, coverageValue, scope) {
     providerChallengerControlsPresent: !providerChallengerPresent || (coverageValue.hasBm25Lite && coverageValue.hasFullHybridRerank),
     cloudProviderStrategies,
     localAppleIsSeparateLocalProviderLane: coverageValue.hasLocalApple,
-    acceptedLaneMustScoreControlsAndProvidersTogether: scope === "full-sota",
+    acceptedLaneMustScoreControlsAndProvidersTogether: scope === "full-sota" || scope === "model-challenger",
   };
 }
 
@@ -379,6 +378,23 @@ function buildExecutionLanes(items, scope) {
             queryExpansionSotaEligible: false,
           },
         ]
+      : scope === "model-challenger"
+        ? [
+            {
+              id: "model-challenger-accepted-shards",
+              label: "Full model-challenger shard-intake lane",
+              strategies: items,
+              operatorUse:
+                "Use this lane for a full same-data challenger-model run; it cannot support public SOTA claims against exact-target reports.",
+              acceptedByFullShardIntake: true,
+              canReachFullSotaGateAfterShardIntake: false,
+              queryExpansionPolicy:
+                "Query expansion and cloud provider challengers must be present on the same shards when included in the challenger set.",
+              queryExpansionEvidenceRequirement: "local-or-cloud-model-required",
+              queryExpansionDiagnosticFallbackAllowed: false,
+              queryExpansionSotaEligible: false,
+            },
+          ]
       : [
           {
             id: "full-sota-accepted-shards",
@@ -423,6 +439,7 @@ function buildExecutionLanes(items, scope) {
         modelMatchPolicy: scoringPolicy.modelMatchPolicy,
         exactTargetModelsRequired: scoringPolicy.exactTargetModelsRequired,
         localDiagnosticModelAllowed: scoringPolicy.localDiagnosticModelAllowed,
+        challengerModelAllowed: scoringPolicy.challengerModelAllowed,
       },
       acceptedByFullShardIntake: lane.acceptedByFullShardIntake,
       canReachFullSotaGateAfterShardIntake: lane.canReachFullSotaGateAfterShardIntake,
@@ -435,7 +452,7 @@ function buildExecutionLanes(items, scope) {
       shardIntakeCompatibility: lane.acceptedByFullShardIntake
         ? lane.canReachFullSotaGateAfterShardIntake
           ? "accepted only after every planned shard returns with this complete strategy set"
-          : "accepted for this local full benchmark plan only; full-SOTA intake still requires the provider comparison plan"
+          : `accepted for this ${scope} benchmark plan only; full-SOTA intake still requires the exact-target provider comparison plan`
         : "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch",
     };
   });
@@ -469,6 +486,12 @@ function requiredChecksForClaimScope(scope) {
     "shardCoverageComplete",
   ];
   if (scope === "local-full") return base;
+  if (scope === "model-challenger") {
+    return base.filter((key) => key !== "localApplePresent" && key !== "localRerankPresent").concat([
+      "voyageProviderPresent",
+      "nvidiaOrGeminiProviderPresent",
+    ]);
+  }
   return [...base, "voyageProviderPresent", "nvidiaOrGeminiProviderPresent"];
 }
 
@@ -652,15 +675,59 @@ function reviewerIntakeCommand() {
   ].join(" ");
 }
 
+function answerQualityScoringAction(scope) {
+  if (scope === "model-challenger") {
+    return "Run answer-quality scoring for each shard with the declared challenger answer and judge models.";
+  }
+  if (scope === "local-full") {
+    return "Run answer-quality scoring for each shard with the declared local diagnostic answer and judge models.";
+  }
+  return "Run answer-quality scoring for each shard with the exact target answer and judge models.";
+}
+
+function resultClaimAction(scope) {
+  if (scope === "model-challenger") {
+    return "Treat the completed result as challenger-model benchmark evidence only; public SOTA and production-replacement claims still require exact-target full-SOTA gates.";
+  }
+  if (scope === "local-full") {
+    return "Treat the completed result as a full local benchmark result only; SOTA and public superiority claims still need the full provider/comparison lane.";
+  }
+  return "Treat the completed result as SOTA-candidate evidence only after result gate, reviewer intake, UI/docs, owner approval, and real canary also pass.";
+}
+
+function missingLaneAction(scope) {
+  if (scope === "model-challenger") {
+    return "Include BM25, full-hybrid, query expansion, Voyage, NVIDIA, and Gemini challenger arms without requiring local Apple sidecars.";
+  }
+  if (scope === "local-full") {
+    return "Include BM25, full-hybrid, model-backed query expansion, local Apple, and local rerank arms.";
+  }
+  return "Include BM25, full-hybrid, query expansion, Voyage, NVIDIA or Gemini, local Apple, and local rerank arms.";
+}
+
 function scoringPolicyForClaimScope(scope) {
   const exactTargetModelsRequired = scope === "full-sota";
   const localDiagnosticModelAllowed = scope === "local-full";
+  const challengerModelAllowed = scope === "model-challenger";
   return {
-    modelMatchPolicy: exactTargetModelsRequired ? "exact-target-required" : "local-diagnostic-allowed",
+    modelMatchPolicy: exactTargetModelsRequired
+      ? "exact-target-required"
+      : challengerModelAllowed
+        ? "challenger-model-allowed"
+        : "local-diagnostic-allowed",
     exactTargetModelsRequired,
     localDiagnosticModelAllowed,
-    answerModelTemplate: exactTargetModelsRequired ? target.benchmark?.answerModel ?? "<target-answer-model>" : "<local-answer-model>",
-    judgeModelTemplate: exactTargetModelsRequired ? target.benchmark?.judgeModel ?? "<target-judge-model>" : "<local-judge-model>",
+    challengerModelAllowed,
+    answerModelTemplate: exactTargetModelsRequired
+      ? target.benchmark?.answerModel ?? "<target-answer-model>"
+      : challengerModelAllowed
+        ? "<challenger-answer-model>"
+        : "<local-answer-model>",
+    judgeModelTemplate: exactTargetModelsRequired
+      ? target.benchmark?.judgeModel ?? "<target-judge-model>"
+      : challengerModelAllowed
+        ? "<challenger-judge-model>"
+        : "<local-judge-model>",
     countsAsFullMemorySotaEvidence: false,
     publicBenchmarkClaimsAllowed: false,
   };
@@ -675,6 +742,14 @@ function defaultStrategies(scope) {
     "local-apple-qwen3-0_6b-local-rerank",
   ];
   if (scope === "local-full") return local;
+  if (scope === "model-challenger") {
+    return [
+      ...local.slice(0, 3),
+      "cloud-gemini2-embed-rerank-proxy",
+      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    ];
+  }
   return [
     ...local.slice(0, 3),
     "cloud-gemini2-embed-rerank-proxy",

@@ -286,6 +286,12 @@ function scoringModelFailures(result, planValue) {
       !state.localDiagnosticEndpointSatisfied ? "local-diagnostic-scoring-policy-mismatch" : null,
     ].filter(Boolean);
   }
+  if (state.policy === "challenger-model-allowed") {
+    return [
+      !state.answerModelPresent ? "answer-model-missing" : null,
+      !state.judgeModelPresent ? "judge-model-missing" : null,
+    ].filter(Boolean);
+  }
   return [
     !state.answerModelPresent ? "answer-model-missing" : null,
     !state.judgeModelPresent ? "judge-model-missing" : null,
@@ -295,7 +301,7 @@ function scoringModelFailures(result, planValue) {
 }
 
 function scoringModelsSatisfyPlan(result, planValue) {
-  const policy = String(planValue.scoringPolicy?.modelMatchPolicy ?? (planValue.runPlan?.claimScope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required"));
+  const policy = String(planValue.scoringPolicy?.modelMatchPolicy ?? defaultModelMatchPolicy(planValue.runPlan?.claimScope));
   const answerModel = String(result.provider?.answerModel ?? "").trim();
   const judgeModel = String(result.provider?.judgeModel ?? "").trim();
   const targetAnswerModel = String(planValue.target?.answerModel ?? "").trim();
@@ -316,6 +322,17 @@ function scoringModelsSatisfyPlan(result, planValue) {
       localDiagnosticEndpointSatisfied,
     };
   }
+  if (policy === "challenger-model-allowed") {
+    return {
+      policy,
+      ready: answerModelPresent && judgeModelPresent,
+      answerModelPresent,
+      judgeModelPresent,
+      answerModelMatchesTarget,
+      judgeModelMatchesTarget,
+      localDiagnosticEndpointSatisfied,
+    };
+  }
   return {
     policy,
     ready: answerModelMatchesTarget && judgeModelMatchesTarget,
@@ -325,6 +342,12 @@ function scoringModelsSatisfyPlan(result, planValue) {
     judgeModelMatchesTarget,
     localDiagnosticEndpointSatisfied,
   };
+}
+
+function defaultModelMatchPolicy(scope) {
+  if (scope === "local-full") return "local-diagnostic-allowed";
+  if (scope === "model-challenger") return "challenger-model-allowed";
+  return "exact-target-required";
 }
 
 function shardRange(result) {

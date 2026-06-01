@@ -441,12 +441,13 @@ function combineScoringPolicy(items) {
   const first = items[0].json;
   const policies = items.map((item) => item.json.scoringPolicy ?? {});
   const claimScope = first.claimScope ?? first.scoringPolicy?.claimScope ?? "full-sota";
-  const modelMatchPolicy = first.scoringPolicy?.modelMatchPolicy ?? (claimScope === "local-full" ? "local-diagnostic-allowed" : "exact-target-required");
+  const modelMatchPolicy = first.scoringPolicy?.modelMatchPolicy ?? defaultModelMatchPolicy(claimScope);
   return {
     claimScope,
     modelMatchPolicy,
     exactTargetModelsRequired: policies.every((policy) => policy.exactTargetModelsRequired === true),
     localDiagnosticModelAllowed: policies.some((policy) => policy.localDiagnosticModelAllowed === true),
+    challengerModelAllowed: policies.some((policy) => policy.challengerModelAllowed === true),
     localDiagnosticEndpointSatisfied: items.every(
       (item) => item.json.scoringPolicy?.localDiagnosticEndpointSatisfied === true || item.json.provider?.endpointIsLocal === true,
     ),
@@ -456,6 +457,12 @@ function combineScoringPolicy(items) {
       claimScope === "local-full" &&
       items.every((item) => item.json.scoringPolicy?.localDiagnosticEndpointSatisfied === true || item.json.provider?.endpointIsLocal === true),
   };
+}
+
+function defaultModelMatchPolicy(scope) {
+  if (scope === "local-full") return "local-diagnostic-allowed";
+  if (scope === "model-challenger") return "challenger-model-allowed";
+  return "exact-target-required";
 }
 
 function shardRange(json) {

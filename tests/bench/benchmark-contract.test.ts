@@ -11,6 +11,8 @@ const materializeScript = "packages/bench/public-benchmark-materialize-run.mjs";
 const answerQualityScript = "packages/bench/public-benchmark-answer-quality.mjs";
 const answerQualityMethodLadderScript = "packages/bench/public-benchmark-answer-quality-method-ladder.mjs";
 const answerQualityMethodLadderGateScript = "packages/bench/answer-quality-method-ladder-result-gate.mjs";
+const answerQualityShardPlanScript = "packages/bench/public-benchmark-answer-quality-shard-plan.mjs";
+const answerQualityShardWorkorderScript = "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs";
 const responseExportScript = "packages/bench/recallweave-response-export.mjs";
 
 describe("public benchmark comparison contract", () => {
@@ -334,6 +336,90 @@ describe("public benchmark comparison contract", () => {
     expect(report.mode).toBe("answer-quality-method-ladder-continue-on-call-error-smoke");
     expect(report.forwardsContinueOnCallError).toBe(true);
     expect(report.leavesStrictModeStrict).toBe(true);
+  });
+
+  it("supports same-data model-challenger shard plans without exact-target or local sidecar gates", () => {
+    const tempDir = mkdtempSync(join(tmpdir(), "recallweave-model-challenger-shards-"));
+    try {
+      const planPath = join(tempDir, "model-challenger-shard-plan.json");
+      const keyFiles = {
+        gemini: join(tempDir, "gemini.keys"),
+        nvidia: join(tempDir, "nvidia.keys"),
+        openrouter: join(tempDir, "openrouter.keys"),
+        voyage: join(tempDir, "voyage.keys"),
+      };
+      for (const [provider, path] of Object.entries(keyFiles)) writeFileSync(path, `${provider}-fixture-key\n`);
+
+      const planResult = spawnSync(
+        process.execPath,
+        [
+          answerQualityShardPlanScript,
+          "--claim-scope",
+          "model-challenger",
+          "--output",
+          planPath,
+          "--format",
+          "json",
+        ],
+        {
+          cwd: new URL("../..", import.meta.url),
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+        },
+      );
+      expect(planResult.status, `${planResult.stdout}\n${planResult.stderr}`).toBe(0);
+      const plan = JSON.parse(planResult.stdout);
+      const acceptedPlanLane = plan.executionLanes.find((lane: { acceptedByFullShardIntake: boolean }) => lane.acceptedByFullShardIntake);
+      expect(plan.claimScope).toBe("model-challenger");
+      expect(plan.scoringPolicy.modelMatchPolicy).toBe("challenger-model-allowed");
+      expect(plan.scoringPolicy.challengerModelAllowed).toBe(true);
+      expect(plan.runPlan.strategies).not.toContain("local-apple-qwen3-0_6b");
+      expect(acceptedPlanLane.id).toBe("model-challenger-accepted-shards");
+      expect(acceptedPlanLane.providerRequirements).toEqual(["gemini", "nvidia", "voyage"]);
+      expect(acceptedPlanLane.canReachFullSotaGateAfterShardIntake).toBe(false);
+
+      const workorderResult = spawnSync(
+        process.execPath,
+        [answerQualityShardWorkorderScript, "--plan", planPath, "--max-workorders", "1"],
+        {
+          cwd: new URL("../..", import.meta.url),
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+          env: {
+            ...process.env,
+            GEMINI_API_KEYS_FILE: keyFiles.gemini,
+            NVIDIA_API_KEYS_FILE: keyFiles.nvidia,
+            OPENROUTER_API_KEYS_FILE: keyFiles.openrouter,
+            VOYAGE_API_KEYS_FILE: keyFiles.voyage,
+            RECALLWEAVE_BASELINE_LIVE: "1",
+            RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+            RECALLWEAVE_PROVIDER_BENCHMARK_CALLS: "1",
+            RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA: "1",
+            RECALLWEAVE_QUERY_EXPANSION_CALLS: "1",
+            RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA: "1",
+            RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS: "1",
+            RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA: "1",
+            RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT: "1",
+            RECALLWEAVE_MEMORYBENCH_BASE_URL: "https://api.deepseek.com",
+            RECALLWEAVE_MEMORYBENCH_API_KEY: "fixture-answer-key",
+            RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL: "deepseek-v4-flash",
+            RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL: "deepseek-v4-flash",
+          },
+        },
+      );
+      expect(workorderResult.status, `${workorderResult.stdout}\n${workorderResult.stderr}`).toBe(0);
+      const workorder = JSON.parse(workorderResult.stdout);
+      const acceptedWorkorderLane = workorder.executionLaneReadiness.find((lane: { acceptedByFullShardIntake: boolean }) => lane.acceptedByFullShardIntake);
+      expect(acceptedWorkorderLane.readyForResponseArmExport).toBe(true);
+      expect(acceptedWorkorderLane.readyForAnswerQualityScoring).toBe(true);
+      expect(acceptedWorkorderLane.answerQuality.modelMatchPolicy).toBe("challenger-model-allowed");
+      expect(acceptedWorkorderLane.answerQuality.scoringModelPolicySatisfied).toBe(true);
+      expect(acceptedWorkorderLane.blockers).not.toContain("answer-model-does-not-match-target");
+      expect(acceptedWorkorderLane.blockers).not.toContain("local-apple-credentials-missing");
+      expect(acceptedWorkorderLane.blockers).not.toContain("local-rerank-credentials-missing");
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   it("retries transient dataset fetch failures during materialization", () => {

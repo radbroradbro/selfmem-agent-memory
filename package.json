@@ -113,6 +113,7 @@
     "benchmark:answer-quality:method-ladder:result-gate": "node packages/bench/answer-quality-method-ladder-result-gate.mjs",
     "benchmark:answer-quality:combine": "node packages/bench/public-benchmark-answer-quality-combine.mjs",
     "benchmark:answer-quality:shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
+    "benchmark:answer-quality:model-challenger-shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs --claim-scope model-challenger",
     "benchmark:answer-quality:local-shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs --claim-scope local-full",
     "benchmark:answer-quality:local-wiki-shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs --claim-scope local-full --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,wiki-title-amplified-hybrid,wiki-subtopic-amplified-hybrid,wiki-summary-session-hybrid,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank",
     "benchmark:answer-quality:shard-workorder": "node packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
