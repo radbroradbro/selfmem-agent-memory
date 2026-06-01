@@ -61,6 +61,8 @@ export function buildProviderBudgetContract({
     benchBudget: fileHashIfPresent(root, "configs/bench-budget.yaml"),
     providerMatrix: fileHashIfPresent(root, "configs/provider-matrix.yaml"),
     defaultCloud: fileHashIfPresent(root, "configs/default.cloud.yaml"),
+    providerAdapterRegistry: fileHashIfPresent(root, "configs/provider-adapter-registry.json"),
+    benchmarkTargetLock: fileHashIfPresent(root, "configs/benchmark-target-lock.json"),
   };
   const blockers = [
     unknownProviderFamiliesRequested.length ? "provider-family-not-allowed-by-budget-contract" : null,

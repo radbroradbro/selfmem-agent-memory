@@ -114,7 +114,9 @@ const requiredFiles = [
   "packages/bench/public-benchmark-slice-author.mjs",
   "packages/bench/public-benchmark-target-check.mjs",
   "packages/bench/public-benchmark-target-author.mjs",
+  "packages/bench/benchmark-target-lock-check.mjs",
   "packages/bench/public-benchmark-reported-targets.mjs",
+  "packages/bench/provider-adapter-registry-check.mjs",
   "packages/bench/public-benchmark-materialize-run.mjs",
   "packages/bench/public-benchmark-strategy-compare.mjs",
   "packages/bench/provider-benchmark-live-preflight.mjs",
@@ -157,6 +159,12 @@ const requiredFiles = [
   `${reviewDir}/public-memorybench-source-lock-checkout-evidence.json`,
   `${reviewDir}/reported-memory-targets-20260525.json`,
   `${reviewDir}/reported-memory-targets-20260525.md`,
+  `${reviewDir}/benchmark-target-lock-20260601.json`,
+  `${reviewDir}/benchmark-target-lock-20260601.md`,
+  `${reviewDir}/provider-adapter-registry-20260601.json`,
+  `${reviewDir}/provider-adapter-registry-20260601.md`,
+  `${reviewDir}/current-head-pr-council-status-20260601.json`,
+  `${reviewDir}/current-head-pr-council-status-20260601.md`,
   `${reviewDir}/public-longmemeval-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-slice-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-slice-review.md`,
@@ -1857,6 +1865,8 @@ check("model matrix and autoresearch gate stay conservative", () => {
   const publicTargets = readFileSync(join(root, "docs/PUBLIC_BENCHMARK_TARGETS.md"), "utf8");
   const providerMatrix = readFileSync(join(root, "configs/provider-matrix.yaml"), "utf8");
   const budget = readFileSync(join(root, "configs/bench-budget.yaml"), "utf8");
+  const targetLock = JSON.parse(readFileSync(join(root, "configs/benchmark-target-lock.json"), "utf8"));
+  const providerAdapterRegistry = JSON.parse(readFileSync(join(root, "configs/provider-adapter-registry.json"), "utf8"));
 
   assert.match(modelMatrix, /Qwen3-Embedding-0\.6B-GGUF/);
   assert.match(modelMatrix, /consumer-hardware floor/i);
@@ -1914,10 +1924,74 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(budget, /searchDisabledForMethodologyBenchmarks: true/);
   assert.match(budget, /enableOnlyForHostedBaselineParity: true/);
   assert.match(budget, /stopOnlyRecallWeaveOwnedProcesses: true/);
+  assert.equal(targetLock.primaryReportedMemoryTargetId, "supermemory-production-research-gemini-3-pro");
+  assert.equal(targetLock.primaryReportedMemoryTarget?.score, 85.2);
+  assert.equal(targetLock.comparisonContract?.fullRunRequiredForPublicClaim, true);
+  assert.equal(targetLock.comparisonContract?.reportedTargetsAreSourceLocksNotProofOfWin, true);
+  assert.ok(targetLock.currentRecallWeaveClaimBoundary?.mayNotClaim?.includes("RecallWeave beats Supermemory"));
+  assert.equal(providerAdapterRegistry.personalProductionDefaultArm, "cloud-voyage4-voyage");
+  assert.equal(providerAdapterRegistry.methodologyDefault?.memoryMethod, "contextual-source-chunk-v1");
+  assert.equal(providerAdapterRegistry.methodologyDefault?.firstStage, "bm25-lite");
+  assert.equal(providerAdapterRegistry.methodologyDefault?.queryExpansionDefaultEnabled, false);
+  assert.equal(providerAdapterRegistry.benchmarkRules?.sameMaterializerAcrossProviderArms, true);
+  assert.equal(providerAdapterRegistry.benchmarkRules?.failureTaxonomyRequiredBeforePromotion, true);
+  for (const family of ["voyage", "gemini", "nvidia", "local-apple", "openrouter", "deepseek", "jina", "alibaba", "zeroentropy"]) {
+    assert.ok(providerAdapterRegistry.adapters?.some((item) => item.family === family), `provider adapter registry missing ${family}`);
+  }
   for (const text of [modelMatrix, autoresearchPlan, publicTargets, providerMatrix, budget]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
   }
+  for (const value of [targetLock, providerAdapterRegistry]) {
+    const text = JSON.stringify(value);
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+});
+
+check("benchmark target lock and provider registry stay conservative", () => {
+  const targetLockFresh = JSON.parse(run("node", ["packages/bench/benchmark-target-lock-check.mjs"]).stdout);
+  const providerRegistryFresh = JSON.parse(run("node", ["packages/bench/provider-adapter-registry-check.mjs"]).stdout);
+  const targetLockEvidence = JSON.parse(readFileSync(join(root, reviewDir, "benchmark-target-lock-20260601.json"), "utf8"));
+  const providerRegistryEvidence = JSON.parse(readFileSync(join(root, reviewDir, "provider-adapter-registry-20260601.json"), "utf8"));
+  const councilStatus = JSON.parse(readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.json"), "utf8"));
+  const councilStatusMarkdown = readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.md"), "utf8");
+
+  for (const item of [targetLockFresh, targetLockEvidence]) {
+    assert.equal(item.mode, "benchmark-target-lock-check");
+    assert.equal(item.status, "READY_BENCHMARK_TARGET_LOCK");
+    assert.equal(item.primaryReportedMemoryTarget?.id, "supermemory-production-research-gemini-3-pro");
+    assert.equal(item.primaryReportedMemoryTarget?.score, 85.2);
+    assert.equal(item.comparisonContract?.reportedTargetsAreSourceLocksNotProofOfWin, true);
+    assert.ok(item.currentRecallWeaveClaimBoundary?.mayNotClaim?.includes("RecallWeave beats Supermemory"));
+  }
+  for (const item of [providerRegistryFresh, providerRegistryEvidence]) {
+    assert.equal(item.mode, "provider-adapter-registry-check");
+    assert.equal(item.status, "READY_PROVIDER_ADAPTER_REGISTRY");
+    assert.equal(item.personalProductionDefaultArm, "cloud-voyage4-voyage");
+    assert.equal(item.methodologyDefault?.memoryMethod, "contextual-source-chunk-v1");
+    assert.equal(item.methodologyDefault?.firstStage, "bm25-lite");
+    assert.equal(item.methodologyDefault?.queryExpansionDefaultEnabled, false);
+    assert.equal(item.benchmarkRules?.sameMaterializerAcrossProviderArms, true);
+    assert.equal(item.benchmarkRules?.keepBm25ControlInEveryProviderRun, true);
+  }
+  assert.equal(councilStatus.mode, "current-head-pr-council-status");
+  assert.equal(councilStatus.publicSafe, true);
+  assert.equal(councilStatus.verification?.deepseekFinalGateVerdict, "CLEAN");
+  assert.equal(councilStatus.verification?.deepseekReviewerModel, "deepseek-v4-pro");
+  assert.equal(councilStatus.verification?.claudeReviewStatus, "blocked-budget-cap-exceeded-before-output");
+  assert.equal(councilStatus.verification?.ghCliStatus, "unavailable-in-local-shell");
+  assert.equal(councilStatus.claimBoundary?.currentStatus, "not-production-complete");
+  assert.ok(councilStatus.claimBoundary?.mayNotClaim?.includes("RecallWeave beats Supermemory"));
+  assert.match(councilStatusMarkdown, /DeepSeek final-gate review: CLEAN/);
+  assert.match(councilStatusMarkdown, /not production complete/i);
+  for (const value of [targetLockFresh, providerRegistryFresh, targetLockEvidence, providerRegistryEvidence, councilStatus]) {
+    const text = JSON.stringify(value);
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, absolutePrivatePathPattern);
+  }
+  assert.doesNotMatch(councilStatusMarkdown, secretPattern);
+  assert.doesNotMatch(councilStatusMarkdown, absolutePrivatePathPattern);
 });
 
 check("fresh agentic memory target watch passes", () => {
@@ -10688,7 +10762,9 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === ".gitignore" ||
     file === ".env.example" ||
     file === "configs/bench-budget.yaml" ||
+    file === "configs/benchmark-target-lock.json" ||
     file === "configs/default.local.yaml" ||
+    file === "configs/provider-adapter-registry.json" ||
     file === "configs/provider-matrix.yaml" ||
     file === "package.json" ||
     file === "pnpm-lock.yaml" ||
