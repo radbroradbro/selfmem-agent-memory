@@ -116,20 +116,20 @@ workspace.
 
 The current selected-agent send set is:
 
-- `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip`
+- `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip`
 
 The current handoff packet remains the clearly named sendable packet:
 
 - Zip:
-  `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip`
+  `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip`
 - SHA-256:
-  `edf5dbb3aba2803c25825781c160d46ea680c3223e4644a019ce864edf8b2f43`
+  `a434cbebec609f3427ba9c42ec467b650d5f414040caef0b3141df182d8b4ff2`
 - Packet generated from controller commit:
-  `105b300436318de22b24d86782f402ed40a9f479`
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
 - Approved adapter commit:
-  `105b300436318de22b24d86782f402ed40a9f479`
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
 - Expected returned report commit:
-  `105b300436318de22b24d86782f402ed40a9f479`
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
 
 The returned packet must pass `canary:returned-packet` with
 `--require-production-canary` and the expected adapter commit before the real

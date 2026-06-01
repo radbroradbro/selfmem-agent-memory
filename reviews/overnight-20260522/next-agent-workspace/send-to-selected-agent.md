@@ -17,18 +17,18 @@ Purpose:
 - Return only metrics-only evidence.
 
 Send this current handoff zip with these instructions:
-- recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip
+- recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip
 
 Use the current handoff packet:
-- Zip: recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-105b300.zip
-- SHA-256: edf5dbb3aba2803c25825781c160d46ea680c3223e4644a019ce864edf8b2f43
-- Packet generated from controller commit: 105b300436318de22b24d86782f402ed40a9f479
-- Approved adapter commit: 105b300436318de22b24d86782f402ed40a9f479
-- Expected report commit: 105b300436318de22b24d86782f402ed40a9f479
+- Zip: recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip
+- SHA-256: a434cbebec609f3427ba9c42ec467b650d5f414040caef0b3141df182d8b4ff2
+- Packet generated from controller commit: 5ac6c50e845c4c8d8e5d358e604700e4163b7fea
+- Approved adapter commit: 5ac6c50e845c4c8d8e5d358e604700e4163b7fea
+- Expected report commit: 5ac6c50e845c4c8d8e5d358e604700e4163b7fea
 
 Commit note:
-- The packet was generated from controller commit 105b300436318de22b24d86782f402ed40a9f479.
-- The approved adapter/report commit for this canary is 105b300436318de22b24d86782f402ed40a9f479.
+- The packet was generated from controller commit 5ac6c50e845c4c8d8e5d358e604700e4163b7fea.
+- The approved adapter/report commit for this canary is 5ac6c50e845c4c8d8e5d358e604700e4163b7fea.
 - If a newer adapter commit should count, regenerate the packet first.
 
 Important naming note:
@@ -53,7 +53,7 @@ Run flow:
 
 5. Collect strict-real evidence from the fresh window.
 
-   bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 105b300436318de22b24d86782f402ed40a9f479 --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
+   bin/selfmem_update --host openclaw --repo <openclaw-checkout> --run-canary --rollback-tested --strict-real --expected-commit 5ac6c50e845c4c8d8e5d358e604700e4163b7fea --canary-since "$FRESH_WINDOW_START" --canary-output /tmp/recallweave-canary-report.json --canary-intake-output /tmp/recallweave-canary-intake.json --canary-diagnosis-output /tmp/recallweave-canary-diagnosis.json --canary-packet-output /tmp/recallweave-canary-evidence-packet.zip
 
 6. Return only:
 
@@ -85,5 +85,5 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-workspace -- --packet <returned-c
 If the packet lands in the standard local inboxes, run:
 
 ```bash
-npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit 105b300436318de22b24d86782f402ed40a9f479 --output /tmp/recallweave-returned-downloads.json
+npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit 5ac6c50e845c4c8d8e5d358e604700e4163b7fea --output /tmp/recallweave-returned-downloads.json
 ```

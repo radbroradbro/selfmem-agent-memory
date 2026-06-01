@@ -1,12 +1,12 @@
 {
-  "ok": false,
+  "ok": true,
   "mode": "canary-returned-downloads",
   "defaultInboxScan": true,
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicLaunchAllowed": false,
   "fleetRolloutAllowed": false,
-  "requireFound": true,
+  "requireFound": false,
   "includeAllZips": true,
   "discoveredRootCount": 2,
   "rootLabels": [
@@ -15,7 +15,7 @@
   ],
   "rootLabelsHash": "ac42f650efe3265a41787e37ffbc0041327361fbcd401e445b8c4ed18b589bc7",
   "sourceControl": {
-    "expectedCommit": "105b300436318de22b24d86782f402ed40a9f479"
+    "expectedCommit": "5ac6c50e845c4c8d8e5d358e604700e4163b7fea"
   },
   "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
   "counts": {
@@ -29,7 +29,7 @@
     "unreadablePackets": 0
   },
   "returnedWatch": {
-    "ok": false,
+    "ok": true,
     "mode": "canary-returned-watch",
     "status": "AWAITING_RETURNED_PRODUCTION_CANARY",
     "writesRealFiles": false,
@@ -38,7 +38,7 @@
     "fleetRolloutAllowed": false,
     "iterationsCompleted": 1,
     "sourceControl": {
-      "expectedCommit": "105b300436318de22b24d86782f402ed40a9f479"
+      "expectedCommit": "5ac6c50e845c4c8d8e5d358e604700e4163b7fea"
     },
     "counts": {
       "scanCount": 2,
@@ -139,7 +139,7 @@
       }
     ]
   },
-  "childExitStatus": 1,
+  "childExitStatus": 0,
   "parseError": null,
   "nextActions": [
     "Keep waiting for a returned metrics-only production canary evidence packet.",

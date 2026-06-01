@@ -11,7 +11,7 @@ Unreadable packets: 0
 ## Scope
 
 This note is metrics-only. It records the standard inbox scan without raw memories, prompts, transcripts, answers, credentials, private local paths, or private container names.
-Expected report commit: `105b300436318de22b24d86782f402ed40a9f479`.
+Expected report commit: `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
 
 ## Inbox Labels
 
