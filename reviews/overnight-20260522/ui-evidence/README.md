@@ -8,6 +8,14 @@
 
 ## Browser Evidence
 
+- Codex Browser captured a 2026-06-01 current-head live fixture flow after the
+  release-gate alignment. The flow searched `native memory`, selected the
+  retrieval trace node, and verified lifecycle trail, Nucleus snapshot,
+  research lineage, research source lock, wiki/vault compile status, container
+  health, update flow, zero console errors, and no private/key-shaped visible
+  text. Evidence lives at
+  `brain-ui-20260601-current-head-browser-evidence.json`, with screenshot
+  `brain-ui-20260601-current-head-filtered-retrieval.jpg`.
 - Computer Use opened the local fixture UI in Google Chrome.
 - Computer Use verified search/filter controls, graph nodes, node details,
   editable derived doc text area, and save status.
