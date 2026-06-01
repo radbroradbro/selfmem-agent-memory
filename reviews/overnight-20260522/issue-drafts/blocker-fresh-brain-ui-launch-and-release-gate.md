@@ -10,13 +10,21 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
+- `c986f86172803d501c0dadd03fed3daec8d75673`.
+- GitHub Actions run `26778768300` passed CI after refreshing the OpenClaw
+  canary handoff evidence to the provider-shard-fixed runtime commit. This does
+  not authorize public SOTA claims or production rollout.
+- Approved runtime canary/report commit:
+- `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+- GitHub Actions run `26778156742` passed CI after fixing the source-locked
+  provider shard repair path so materialized one-query provider repairs do not
+  double-apply parent offsets.
+- Previous verified PR branch head before the provider shard fix handoff refresh:
 - `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`.
-- GitHub Actions run `26769805087` passed CI after refreshing the current
+- GitHub Actions run `26769805087` passed CI after refreshing the previous
   OpenClaw next-agent canary handoff packet, moving superseded handoff zips out
   of the active Downloads root, and preserving the shard-scoped answer-quality
-  materialization evidence from the prior baseline. This does not change the
-  approved runtime canary adapter/report commit and does not authorize public
-  SOTA claims or production rollout.
+  materialization evidence from the prior baseline.
 - Previous verified PR branch head before the current OpenClaw handoff refresh:
 - `4c7e6559d63772c16a007122b2dc55c880e3e051`.
 - GitHub Actions run `26766964429` passed CI after adding shard-scoped
@@ -111,16 +119,19 @@ requirements are resolved.
   public LongMemEval-S retrieval-proxy target. Both local arms tied BM25
   quality on this slice; the 4B arm added latency and was not promoted.
 - Approved one-agent canary adapter/report commit:
-- `18d606aff589986b4d8b416a686bedb7ff1506d2`.
+- `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
 - Latest verified code/product baseline:
-- `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`.
-- GitHub Actions run `26769805087` passed CI with release checks, live GitHub
-  sync, release doctor, goal audit, secret scan, and private-path scan green.
-  The checked-in evidence now includes the current OpenClaw next-agent canary
-  handoff packet as the only active sendable handoff in Downloads, with
-  superseded handoff zips archived outside the active root. It preserves the
-  shard-scoped answer-quality materialization evidence from the prior baseline
-  and keeps launch, production rollout, and full-SOTA blockers open.
+- `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+- GitHub Actions run `26778156742` passed CI after fixing the source-locked
+  provider shard repair path. Local `release:check`, `goal:audit`,
+  `release:doctor`, secret scan, and private-path scan passed. The active
+  OpenClaw handoff packet now expects returned canary evidence to report
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
+- Latest verified repository evidence head:
+- `c986f86172803d501c0dadd03fed3daec8d75673`.
+- GitHub Actions run `26778768300` passed CI after refreshing the checked-in
+  OpenClaw handoff evidence around the `5ac6c50` packet. Launch, production
+  rollout, and full-SOTA blockers remain open.
 - The 75-question `contextual-source-chunk-v1:bm25-lite` result is a
   memory-method/materialization ablation gate, not the final whole-harness
   score. It is positive evidence that the new memory shape is retrievable under
@@ -650,16 +661,16 @@ requirements are resolved.
   latency evidence. The next canary must use a fresh patched runtime window,
   follow `canary:drill`, and pass strict intake.
 - Current one-agent handoff packet:
-  `recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip`, SHA256
-  `cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a`.
+  `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip`, SHA256
+  `a434cbebec609f3427ba9c42ec467b650d5f414040caef0b3141df182d8b4ff2`.
   Send it with `recallweave-SEND-THIS-ONE-openclaw-canary-instructions.md`
   and `recallweave-SEND-THIS-ONE-checksum.txt` so the selected agent can
   verify the exact packet before running it.
   Packet generated from controller commit
-  `f21a7e751ddcd0b9e64a96d682a3fa0940c17c11`; approved adapter/report
-  commit `18d606aff589986b4d8b416a686bedb7ff1506d2`.
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`; approved adapter/report
+  commit `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
   Returned canary reports must name commit
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`.
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
   If a newer adapter commit should count, regenerate the packet first.
   It was regenerated from the postwatch batch report with
   `--batch ... --require-ready`. The underlying batch used

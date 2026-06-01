@@ -8493,17 +8493,46 @@ check("fresh canary next-agent handoff packet passes", () => {
 });
 
 check("current canary handoff packet identity is consistent", () => {
+  const releaseState = JSON.parse(readFileSync(join(root, reviewDir, "release-state.json"), "utf8"));
   const packetEvidence = readFileSync(join(root, reviewDir, "canary-next-agent-packet-evidence.md"), "utf8");
   const planEvidence = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
   const diagnosticEvidence = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
+  const releaseHandoff = readFileSync(join(root, "docs/RELEASE_HANDOFF.md"), "utf8");
+  const postwatchEvidence = readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-evidence.md"), "utf8");
+  const handoffPaste = readFileSync(join(root, reviewDir, "openclaw-current-canary-handoff-paste.md"), "utf8");
+  const postwatchPlan = readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-next-agent-plan.md"), "utf8");
+  const nextAgentReadme = readFileSync(join(root, reviewDir, "next-agent-workspace/README.md"), "utf8");
+  const nextAgentInstructions = readFileSync(join(root, reviewDir, "next-agent-workspace/send-to-selected-agent.md"), "utf8");
   const prBodyDraft = readFileSync(join(root, reviewDir, "pr-body-update-draft.md"), "utf8");
   const issueDraft = readFileSync(join(root, reviewDir, "issue-drafts/blocker-fresh-brain-ui-launch-and-release-gate.md"), "utf8");
-  const identity = currentCanaryPacketIdentity(packetEvidence);
+  const identity = {
+    label: releaseState.approvedRuntimeCanaryBaseline?.packetLabel ?? "",
+    sha256: releaseState.approvedRuntimeCanaryBaseline?.packetSha256 ?? "",
+  };
+  const expectedCommit = releaseState.approvedRuntimeCanaryBaseline?.expectedReportCommit ?? "";
   assert.match(identity.label, /^recallweave-openclaw-next-agent-canary-\d{8}.*\.zip$/);
   assert.match(identity.sha256, /^[a-f0-9]{64}$/);
-  for (const text of [packetEvidence, planEvidence, diagnosticEvidence, prBodyDraft, issueDraft]) {
+  assert.match(expectedCommit, /^[a-f0-9]{40}$/);
+  for (const text of [
+    releaseHandoff,
+    postwatchEvidence,
+    handoffPaste,
+    nextAgentReadme,
+    nextAgentInstructions,
+    prBodyDraft,
+    issueDraft,
+  ]) {
     assert.match(text, new RegExp(escapeRegExp(identity.label)));
     assert.match(text, new RegExp(identity.sha256));
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  }
+  for (const text of [postwatchPlan, nextAgentInstructions, prBodyDraft, issueDraft]) {
+    assert.match(text, new RegExp(escapeRegExp(expectedCommit)));
+    assert.doesNotMatch(text, secretPattern);
+    assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  }
+  for (const text of [packetEvidence, planEvidence, diagnosticEvidence]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
   }
@@ -8592,7 +8621,7 @@ check("fresh release blocker doctor passes", () => {
   assert.match(currentReturnedCanaryExpectedCommit, /^[a-f0-9]{40}$/);
   assert.match(report.latestVerifiedRepositoryHead?.headSha ?? "", /^[a-f0-9]{40}$/);
   assert.notEqual(report.latestVerifiedRepositoryHead?.headSha, approvedAdapterCommit);
-  assert.notEqual(currentReturnedCanaryExpectedCommit, approvedAdapterCommit);
+  assert.equal(currentReturnedCanaryExpectedCommit, approvedAdapterCommit);
   assert.equal(report.checks.realDiagnosticsPostwatch.returnedDownloadsExpectedCommit, currentReturnedCanaryExpectedCommit);
   assert.equal(report.checks.realDiagnosticsPostwatch.postwatchPlanExpectedCommit, currentReturnedCanaryExpectedCommit);
   assert.match(benchmarkBlocker.nextAction, /full same-data answer-quality shard ladder/);

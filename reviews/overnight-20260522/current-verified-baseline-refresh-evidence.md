@@ -1,6 +1,6 @@
 # Current Verified Baseline Refresh Evidence
 
-Date: 2026-05-24
+Date: 2026-06-01
 
 ## Scope
 
@@ -28,12 +28,17 @@ canary handoff packet for the latest pushed branch head and moves superseded
 handoff zips out of the active Downloads root. This keeps the active handoff
 public-safe and current, but it does not change the approved runtime canary
 adapter/report commit and does not close launch, production, or SOTA blockers.
+The latest refresh promotes `5ac6c50` as the approved runtime canary baseline
+because it fixes the source-locked provider shard repair path and regenerates
+the current OpenClaw handoff packet around that runtime commit. The current
+repository head is `c986f86`, which only refreshes public-safe handoff evidence
+for that packet.
 
 ## Latest Observed PR Branch Head
 
-- Commit: `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`
-- Commit title: `Refresh current OpenClaw canary handoff`
-- GitHub Actions run: `26769805087`
+- Commit: `c986f86172803d501c0dadd03fed3daec8d75673`
+- Commit title: `canary: refresh handoff packet for provider shard fix`
+- GitHub Actions run: `26778768300`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -44,17 +49,17 @@ provider runs are scored and a real production canary is returned.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`
-- Commit title: `Refresh current OpenClaw canary handoff`
-- GitHub Actions run: `26769805087`
+- Commit: `c986f86172803d501c0dadd03fed3daec8d75673`
+- Commit title: `canary: refresh handoff packet for provider shard fix`
+- GitHub Actions run: `26778768300`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
 ## Approved Runtime Canary Baseline
 
-- Commit: `18d606aff589986b4d8b416a686bedb7ff1506d2`
-- Commit title: `fix: require native memory evidence`
-- GitHub Actions run: `26353888297`
+- Commit: `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
+- Commit title: `bench: fix provider shard repair path`
+- GitHub Actions run: `26778156742`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -69,20 +74,20 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - Targeted public docs/evidence secret and private-path scan
 - Stale local model server check
-- GitHub Actions run `26769805087`
+- GitHub Actions run `26778768300`
 
 ## Canary Handoff Artifact
 
 The current sendable OpenClaw one-agent canary handoff packet is:
 
-- Packet: `recallweave-openclaw-next-agent-canary-20260524-SEND-THIS-ONE-18d606a.zip`
-- SHA256: `f5aa0f89f250b695152218b542c9bf498de7e2b3b291ce6081451dfb23565cda`
+- Packet: `recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip`
+- SHA256: `a434cbebec609f3427ba9c42ec467b650d5f414040caef0b3141df182d8b4ff2`
 - Packet generated from controller commit:
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
 - Approved adapter commit:
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
 - Expected returned report commit:
-  `18d606aff589986b4d8b416a686bedb7ff1506d2`
+  `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
 - Zip integrity: passed.
 - Manifest confirms `READY_FOR_ONE_AGENT_FRESH_CANARY`,
   `oneAgentCanaryAllowed: true`, `publicLaunchAllowed: false`, and

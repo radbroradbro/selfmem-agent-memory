@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-01T17:22:18Z",
+  "generatedAt": "2026-06-01T20:05:19Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "3278fd10bd4bebba4d1cdccf86d33c138cc7026a",
-    "ciRunId": 26769805087,
+    "headSha": "5ac6c50e845c4c8d8e5d358e604700e4163b7fea",
+    "ciRunId": 26778156742,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_current_openclaw_canary_handoff_refresh_and_public_safe_evidence_guards",
+    "localSmoke": "release_check_covers_provider_shard_repair_and_current_openclaw_canary_handoff_contract",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after refreshing the current OpenClaw next-agent canary handoff packet, moving superseded handoff zips out of the active Downloads root, and preserving the shard-scoped answer-quality materialization evidence from the prior baseline. The 75-question contextual-source-chunk-v1 plus bm25-lite result is a memory-method/materialization ablation gate, not a whole-harness final score: it is positive evidence that the new memory shape is retrievable under a lexical control, but it is not evidence that the end-to-end harness is or is not SOTA. Provider/vector/rerank arms must still run on the same materialized slices with the BM25 floor retained before any end-to-end harness promotion. This is release/readiness hygiene only: it keeps the active handoff packet current and public-safe, but it does not assess public SOTA claims or authorize production rollout. Full-SOTA and public superiority claims remain unassessed and therefore blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, owner approval, and full local/provider shard coverage pass. MemoryBench/SOTA claims remain blocked for lack of whole-harness proof, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, goal:audit, release:doctor, secret scan, private-path scan, PR live sync, and GitHub Actions run 26769805087 passed."
+    "note": "Latest inspected code/product baseline after fixing the source-locked provider shard repair path. The benchmark harness no longer double-applies query selection after materialization sharding, so one-query provider repairs such as q089/q090 can run against the already-materialized shard instead of crashing on parent offsets. This is whole-harness run-path evidence, not a SOTA claim. Provider/vector/rerank arms must still compete on the same materialized slices with the BM25 floor retained before any end-to-end harness promotion. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, owner approval, and full local/provider shard coverage pass. Returned one-agent canary packets must report this approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, goal:audit, release:doctor, secret scan, private-path scan, and GitHub Actions run 26778156742 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -498,23 +498,23 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "3278fd10bd4bebba4d1cdccf86d33c138cc7026a",
-    "ciRunId": 26769805087,
+    "headSha": "c986f86172803d501c0dadd03fed3daec8d75673",
+    "ciRunId": 26778768300,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
     "localSmoke": "release_check_covers_current_openclaw_canary_handoff_refresh_and_public_safe_evidence_guards",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after refreshing the current OpenClaw next-agent canary handoff packet and preserving shard-scoped answer-quality materialization and parent-coordinate preservation for shard-local exports. GitHub Actions run 26769805087 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
+    "note": "Latest observed PR branch head after refreshing the OpenClaw next-agent canary handoff evidence to the provider-shard-fixed runtime commit. GitHub Actions run 26778768300 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
   },
   "approvedRuntimeCanaryBaseline": {
-    "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
-    "ciRunId": 26353888297,
+    "headSha": "5ac6c50e845c4c8d8e5d358e604700e4163b7fea",
+    "ciRunId": 26778156742,
     "ciConclusion": "success",
     "role": "approved-runtime-canary-adapter",
-    "expectedReportCommit": "18d606aff589986b4d8b416a686bedb7ff1506d2",
-    "packetLabel": "recallweave-openclaw-next-agent-canary-20260525-SEND-THIS-ONE-18d606a.zip",
-    "packetSha256": "cb03a1bf25772e2ee397b64f76fa7c485989dd1b3652a37ad8622f6d6ed0289a",
-    "note": "Returned one-agent runtime canary reports must name this approved adapter/report commit. The current handoff packet was regenerated locally from the current controller HEAD, but later docs, evidence, benchmark-gate, or packet-tooling commits do not change the canary expected commit unless the handoff packet is regenerated with a newer CI-verified adapter commit."
+    "expectedReportCommit": "5ac6c50e845c4c8d8e5d358e604700e4163b7fea",
+    "packetLabel": "recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip",
+    "packetSha256": "a434cbebec609f3427ba9c42ec467b650d5f414040caef0b3141df182d8b4ff2",
+    "note": "Returned one-agent runtime canary reports must name this approved adapter/report commit. The current handoff packet was regenerated from the provider-shard-fixed runtime commit, and later docs, evidence, benchmark-gate, or packet-tooling commits do not change the canary expected commit unless the handoff packet is regenerated with a newer CI-verified adapter commit."
   }
 }
