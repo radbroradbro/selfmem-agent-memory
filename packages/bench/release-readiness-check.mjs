@@ -1937,6 +1937,7 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.equal(providerAdapterRegistry.methodologyDefault?.queryExpansionDefaultEnabled, false);
   assert.equal(providerAdapterRegistry.benchmarkRules?.sameMaterializerAcrossProviderArms, true);
   assert.equal(providerAdapterRegistry.benchmarkRules?.failureTaxonomyRequiredBeforePromotion, true);
+  assert.equal(providerAdapterRegistry.benchmarkRules?.latencyCostQuotaLedgerRequiredBeforePromotion, true);
   for (const family of ["voyage", "gemini", "nvidia", "local-apple", "openrouter", "deepseek", "jina", "alibaba", "zeroentropy"]) {
     assert.ok(providerAdapterRegistry.adapters?.some((item) => item.family === family), `provider adapter registry missing ${family}`);
   }
@@ -4116,6 +4117,33 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(providerWaveIntakeReport.providerHybridContract?.providerOnlyDenseClaimsAllowed, false);
   assert.equal(providerWaveIntakeReport.providerHybridContract?.allProviderWavesMeetHybridControlContract, true);
   assert.equal(providerWaveIntakeReport.providerHybridContract?.answerQualityStillRequiredForMemoryClaims, true);
+  assert.equal(providerWaveIntakeReport.failureTaxonomy?.requiredBeforePromotion, true);
+  assert.equal(providerWaveIntakeReport.failureTaxonomy?.allFailuresClassified, true);
+  assert.ok(Number(providerWaveIntakeReport.failureTaxonomy?.observedFailureCount ?? 0) > 0);
+  assert.ok(Number(providerWaveIntakeReport.failureTaxonomy?.retryableProviderLimitCount ?? 0) > 0);
+  assert.equal(providerWaveIntakeReport.failureTaxonomy?.promotionBlockedByRetryableProviderLimits, true);
+  assert.ok(
+    providerWaveIntakeReport.failureTaxonomy?.classes?.some((item) => item.failureClass === "provider-rate-limit"),
+  );
+  assert.ok(
+    providerWaveIntakeReport.failureTaxonomy?.classes?.some((item) => item.failureClass === "provider-timeout"),
+  );
+  assert.equal(providerWaveIntakeReport.latencyCostQuotaLedger?.requiredBeforePromotion, true);
+  assert.equal(providerWaveIntakeReport.latencyCostQuotaLedger?.publicSafeMetricsOnly, true);
+  assert.equal(providerWaveIntakeReport.latencyCostQuotaLedger?.promotionReady, false);
+  assert.ok(
+    providerWaveIntakeReport.latencyCostQuotaLedger?.promotionBlockers?.includes("legacy-provider-waves-missing-budget-contract"),
+  );
+  assert.ok(
+    providerWaveIntakeReport.latencyCostQuotaLedger?.rows?.some(
+      (row) => row.provider === "nvidia" && row.providerCallCount > 0 && row.latencyP50MsMedian > 0,
+    ),
+  );
+  assert.ok(
+    providerWaveIntakeReport.latencyCostQuotaLedger?.rows?.some(
+      (row) => row.provider === "voyage" && row.retryableProviderLimitCount > 0,
+    ),
+  );
   assert.equal(providerWaveIntakeReport.nextRunPlan?.status, "READY_PROVIDER_REPAIR_WAVES");
   assert.equal(providerWaveIntakeReport.nextRunPlan?.recommendedExecution, "single-provider-single-slice");
   assert.equal(providerWaveIntakeReport.nextRunPlan?.avoidConcurrentProviderArms, true);
@@ -4153,6 +4181,9 @@ check("fresh public benchmark target check passes", () => {
   assert.match(providerWaveIntakeEvidence, /All waves include full hybrid: true/);
   assert.match(providerWaveIntakeEvidence, /Provider Hybrid Contract/);
   assert.match(providerWaveIntakeEvidence, /Provider-only dense claims allowed: false/);
+  assert.match(providerWaveIntakeEvidence, /Failure Taxonomy/);
+  assert.match(providerWaveIntakeEvidence, /Latency Cost Quota Ledger/);
+  assert.match(providerWaveIntakeEvidence, /Promotion ready: false/);
   assert.match(providerWaveIntakeEvidence, /Next Run Plan/);
   assert.match(providerWaveIntakeEvidence, /Recommended execution: single-provider-single-slice/);
   assert.match(providerWaveIntakeEvidence, /Counts as full memory SOTA evidence: false/);
@@ -4160,6 +4191,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(providerWaveIntakeFresh.controls?.allHaveBm25, true);
   assert.equal(providerWaveIntakeFresh.controls?.allHaveFullHybrid, true);
   assert.equal(providerWaveIntakeFresh.providerHybridContract?.allProviderWavesMeetHybridControlContract, true);
+  assert.equal(providerWaveIntakeFresh.failureTaxonomy?.allFailuresClassified, true);
+  assert.equal(providerWaveIntakeFresh.latencyCostQuotaLedger?.promotionReady, false);
   assert.equal(providerWaveIntakeFresh.nextRunPlan?.status, "READY_PROVIDER_REPAIR_WAVES");
   assert.equal(providerWaveIntakeFresh.publicBenchmarkClaimsAllowed, false);
   assert.equal(expandedProviderLivePreflightReport.ok, true);

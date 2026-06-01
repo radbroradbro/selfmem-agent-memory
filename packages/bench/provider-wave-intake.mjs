@@ -44,6 +44,8 @@ const providerFailures = providerGateReports.flatMap((item) =>
 const providerPromotions = providerGateReports
   .map((item) => item.json.promotion)
   .filter((promotion) => promotion?.kind === "provider" && promotion.promoteProvider === true);
+const failureTaxonomy = buildFailureTaxonomy(providerFailures);
+const latencyCostQuotaLedger = buildLatencyCostQuotaLedger({ providerGateReports, providerBudget });
 const blockers = [
   !publicSafe ? "provider-wave-report-not-public-safe" : null,
   !metricsOnly ? "provider-wave-report-not-metrics-only" : null,
@@ -99,6 +101,8 @@ const report = {
   providerHybridContract,
   providers,
   providerFailures,
+  failureTaxonomy,
+  latencyCostQuotaLedger,
   providerPromotions: providerPromotions.map((promotion) => ({
     bestProviderStrategy: promotion.bestProviderStrategy ?? null,
     qualityDeltaVsBm25: promotion.qualityDeltaVsBm25 ?? null,
@@ -328,6 +332,159 @@ function summarizeProviderBudgetContracts(items) {
   };
 }
 
+function buildFailureTaxonomy(providerFailures) {
+  const byClass = new Map();
+  const byProvider = new Map();
+  for (const failure of providerFailures) {
+    const failureClass = failure.failureClass ?? "unknown-provider-failure";
+    const provider = providerFamilyForStrategy(failure.strategy) ?? "unknown-provider";
+    const classState = byClass.get(failureClass) ?? {
+      failureClass,
+      count: 0,
+      retryableProviderLimitCount: 0,
+      providers: new Set(),
+      strategies: new Set(),
+      dispositions: new Set(),
+    };
+    classState.count += 1;
+    classState.retryableProviderLimitCount += failure.retryableProviderLimit ? 1 : 0;
+    classState.providers.add(provider);
+    classState.strategies.add(failure.strategy);
+    classState.dispositions.add(dispositionForFailure(failure));
+    byClass.set(failureClass, classState);
+
+    const providerState = byProvider.get(provider) ?? {
+      provider,
+      failureCount: 0,
+      retryableProviderLimitCount: 0,
+      failureClasses: new Set(),
+      strategies: new Set(),
+      dispositions: new Set(),
+    };
+    providerState.failureCount += 1;
+    providerState.retryableProviderLimitCount += failure.retryableProviderLimit ? 1 : 0;
+    providerState.failureClasses.add(failureClass);
+    providerState.strategies.add(failure.strategy);
+    providerState.dispositions.add(dispositionForFailure(failure));
+    byProvider.set(provider, providerState);
+  }
+  const classes = [...byClass.values()].map((item) => ({
+    failureClass: item.failureClass,
+    count: item.count,
+    retryableProviderLimitCount: item.retryableProviderLimitCount,
+    providers: [...item.providers].sort(),
+    strategies: [...item.strategies].filter(Boolean).sort(),
+    dispositions: [...item.dispositions].sort(),
+  })).sort((a, b) => b.count - a.count || a.failureClass.localeCompare(b.failureClass));
+  const providers = [...byProvider.values()].map((item) => ({
+    provider: item.provider,
+    failureCount: item.failureCount,
+    retryableProviderLimitCount: item.retryableProviderLimitCount,
+    failureClasses: [...item.failureClasses].sort(),
+    strategies: [...item.strategies].filter(Boolean).sort(),
+    dispositions: [...item.dispositions].sort(),
+  })).sort((a, b) => b.failureCount - a.failureCount || a.provider.localeCompare(b.provider));
+  return {
+    requiredBeforePromotion: true,
+    allFailuresClassified: providerFailures.every((failure) => Boolean(failure.failureClass)),
+    observedFailureCount: providerFailures.length,
+    retryableProviderLimitCount: providerFailures.filter((failure) => failure.retryableProviderLimit).length,
+    promotionBlockedByRetryableProviderLimits: providerFailures.some((failure) => failure.retryableProviderLimit),
+    classes,
+    providers,
+  };
+}
+
+function buildLatencyCostQuotaLedger({ providerGateReports, providerBudget }) {
+  const byProvider = new Map();
+  for (const item of providerGateReports) {
+    for (const strategy of providerStrategies(item.json)) {
+      const families = arrayOf(strategy.provider?.providers);
+      const providers = families.length ? families : [providerFamilyForStrategy(strategy.strategy)].filter(Boolean);
+      for (const provider of providers) {
+        const row = byProvider.get(provider) ?? emptyLatencyCostQuotaRow(provider);
+        const metrics = strategy.metrics ?? {};
+        row.completedArmCount += 1;
+        row.completedQueryCount += Number(strategy.queryShard?.responseCount ?? 0);
+        row.providerCallCount += Number(strategy.provider?.providerCallsMade ?? 0);
+        row.embeddingCallCount += Number(strategy.provider?.embeddingCalls ?? 0);
+        row.rerankCallCount += Number(strategy.provider?.rerankCalls ?? 0);
+        row.documentCountSent += Number(strategy.provider?.documentCountSent ?? 0);
+        row.queryCountSent += Number(strategy.provider?.queryCountSent ?? 0);
+        addFinite(row.latencyP50MsSamples, metrics.latencyP50Ms);
+        addFinite(row.latencyP95MsSamples, metrics.latencyP95Ms);
+        addFinite(row.contextTokensAvgSamples, metrics.contextTokensAvg);
+        addFinite(row.keyCountSamples, strategy.provider?.providerKeyCounts?.[provider]);
+        addFinite(row.keyCountSamples, strategy.provider?.keyCountAvailable);
+        const throttle = strategy.provider?.providerThrottle;
+        if (throttle) {
+          row.throttleScopes.add(throttle.scope);
+          addFinite(row.retryAttemptSamples, throttle.retryAttempts);
+          addFinite(row.timeoutMsSamples, throttle.timeoutMs);
+          addFinite(row.globalMinIntervalMsSamples, throttle.globalMinIntervalMs);
+          addFinite(row.providerMinIntervalMsSamples, throttle.providers?.[provider]?.minIntervalMs);
+        }
+        row.models.add(strategy.provider?.embedModel).add(strategy.provider?.rerankModel).add(strategy.provider?.modelArm);
+        row.strategies.add(strategy.strategy);
+        byProvider.set(provider, row);
+      }
+    }
+    for (const failure of arrayOf(item.json.failedStrategies)) {
+      const provider = providerFamilyForStrategy(failure.strategy);
+      if (!provider) continue;
+      const row = byProvider.get(provider) ?? emptyLatencyCostQuotaRow(provider);
+      row.failedArmCount += 1;
+      row.failureClasses.add(failure.failureClass ?? "unknown-provider-failure");
+      row.retryableProviderLimitCount += failure.retryableProviderLimit ? 1 : 0;
+      row.strategies.add(failure.strategy);
+      byProvider.set(provider, row);
+    }
+  }
+  const rows = [...byProvider.values()].map((row) => ({
+    provider: row.provider,
+    completedArmCount: row.completedArmCount,
+    failedArmCount: row.failedArmCount,
+    retryableProviderLimitCount: row.retryableProviderLimitCount,
+    completedQueryCount: row.completedQueryCount,
+    providerCallCount: row.providerCallCount,
+    embeddingCallCount: row.embeddingCallCount,
+    rerankCallCount: row.rerankCallCount,
+    documentCountSent: row.documentCountSent,
+    queryCountSent: row.queryCountSent,
+    latencyP50MsMedian: median(row.latencyP50MsSamples),
+    latencyP95MsMedian: median(row.latencyP95MsSamples),
+    latencyP50MsMax: maxOrNull(row.latencyP50MsSamples),
+    latencyP95MsMax: maxOrNull(row.latencyP95MsSamples),
+    contextTokensAvgMedian: median(row.contextTokensAvgSamples),
+    keyCountAvailableMax: maxOrNull(row.keyCountSamples),
+    throttleScopes: [...row.throttleScopes].filter(Boolean).sort(),
+    retryAttemptsMax: maxOrNull(row.retryAttemptSamples),
+    timeoutMsMax: maxOrNull(row.timeoutMsSamples),
+    globalMinIntervalMsMax: maxOrNull(row.globalMinIntervalMsSamples),
+    providerMinIntervalMsMax: maxOrNull(row.providerMinIntervalMsSamples),
+    failureClasses: [...row.failureClasses].filter(Boolean).sort(),
+    models: [...row.models].filter(Boolean).sort(),
+    strategies: [...row.strategies].filter(Boolean).sort(),
+  })).sort((a, b) => a.provider.localeCompare(b.provider));
+  return {
+    requiredBeforePromotion: true,
+    publicSafeMetricsOnly: true,
+    costModel: "no-spend-ledger-from-provider-budget-contract-and-call-counts",
+    estimatedPaidUsd: providerBudget.maxPaidUsdMax === 0 ? 0 : null,
+    maxPaidUsdMax: providerBudget.maxPaidUsdMax,
+    allReportsHaveBudgetContract: providerBudget.allReportsHaveBudgetContract,
+    allBudgetedReportsNoSpend: providerBudget.allBudgetedReportsNoSpend,
+    anyPaidProviderRequestedInNoSpendMode: providerBudget.anyPaidProviderRequestedInNoSpendMode,
+    promotionReady: providerBudget.allReportsHaveBudgetContract && providerBudget.allBudgetedReportsNoSpend && !providerBudget.anyPaidProviderRequestedInNoSpendMode,
+    promotionBlockers: [
+      !providerBudget.allReportsHaveBudgetContract ? "legacy-provider-waves-missing-budget-contract" : null,
+      !providerBudget.allBudgetedReportsNoSpend ? "budgeted-provider-waves-not-all-no-spend" : null,
+      providerBudget.anyPaidProviderRequestedInNoSpendMode ? "paid-provider-requested-in-no-spend-mode" : null,
+    ].filter(Boolean),
+    rows,
+  };
+}
+
 function buildNextRunPlan({ providers, controls, providerGateReports }) {
   const repairSlices = buildRepairSlices(providerGateReports);
   const rowsByProvider = new Map(providers.rows.map((row) => [row.provider, row]));
@@ -503,6 +660,34 @@ function renderMarkdown(value) {
       `- ${row.provider}: completed=${row.completedArmCount}, failed=${row.failedArmCount}, queries=${row.completedQueryCount}, calls=${row.providerCallCount}, docsSent=${row.documentCountSent}, best=${row.bestStrategy ?? "n/a"}:${row.bestQuality ?? "n/a"}, failures=${row.failureClasses.join(", ") || "none"}`,
     ),
     "",
+    "## Failure Taxonomy",
+    `- Required before promotion: ${value.failureTaxonomy.requiredBeforePromotion}`,
+    `- All failures classified: ${value.failureTaxonomy.allFailuresClassified}`,
+    `- Observed failures: ${value.failureTaxonomy.observedFailureCount}`,
+    `- Retryable provider-limit failures: ${value.failureTaxonomy.retryableProviderLimitCount}`,
+    `- Promotion blocked by retryable limits: ${value.failureTaxonomy.promotionBlockedByRetryableProviderLimits}`,
+    ...(value.failureTaxonomy.classes.length
+      ? value.failureTaxonomy.classes.map((item) =>
+          `- ${item.failureClass}: count=${item.count}, retryable=${item.retryableProviderLimitCount}, providers=${item.providers.join(", ")}, disposition=${item.dispositions.join(", ")}`,
+        )
+      : ["- none"]),
+    "",
+    "## Latency Cost Quota Ledger",
+    `- Required before promotion: ${value.latencyCostQuotaLedger.requiredBeforePromotion}`,
+    `- Cost model: ${value.latencyCostQuotaLedger.costModel}`,
+    `- Estimated paid USD: ${value.latencyCostQuotaLedger.estimatedPaidUsd ?? "unknown"}`,
+    `- All reports have budget contract: ${value.latencyCostQuotaLedger.allReportsHaveBudgetContract}`,
+    `- All budgeted reports no-spend: ${value.latencyCostQuotaLedger.allBudgetedReportsNoSpend}`,
+    `- Promotion ready: ${value.latencyCostQuotaLedger.promotionReady}`,
+    ...(value.latencyCostQuotaLedger.rows.length
+      ? value.latencyCostQuotaLedger.rows.map((row) =>
+          `- ${row.provider}: calls=${row.providerCallCount}, embed=${row.embeddingCallCount}, rerank=${row.rerankCallCount}, docs=${row.documentCountSent}, queries=${row.queryCountSent}, p50=${row.latencyP50MsMedian ?? "n/a"}, p95=${row.latencyP95MsMedian ?? "n/a"}, keyCount=${row.keyCountAvailableMax ?? "n/a"}, throttle=${row.providerMinIntervalMsMax ?? row.globalMinIntervalMsMax ?? "n/a"}, failures=${row.failureClasses.join(", ") || "none"}`,
+        )
+      : ["- none"]),
+    ...(value.latencyCostQuotaLedger.promotionBlockers.length
+      ? ["", "## Latency Cost Quota Promotion Blockers", ...value.latencyCostQuotaLedger.promotionBlockers.map((item) => `- ${item}`)]
+      : []),
+    "",
     "## Next Run Plan",
     `- Status: ${value.nextRunPlan.status}`,
     `- Recommended execution: ${value.nextRunPlan.recommendedExecution}`,
@@ -537,6 +722,59 @@ function maxNullable(current, next) {
   if (!Number.isFinite(nextNumber)) return current ?? null;
   if (!Number.isFinite(currentNumber)) return nextNumber;
   return Math.max(currentNumber, nextNumber);
+}
+
+function dispositionForFailure(failure) {
+  if (failure.retryableProviderLimit) return "retry-as-separate-provider-arm-with-smaller-slice";
+  if (String(failure.failureClass ?? "").includes("timeout")) return "retry-with-timeout-or-candidate-cap-adjustment";
+  if (String(failure.failureClass ?? "").includes("credential")) return "fix-env-before-rerun";
+  return "investigate-before-promotion";
+}
+
+function emptyLatencyCostQuotaRow(provider) {
+  return {
+    provider,
+    completedArmCount: 0,
+    failedArmCount: 0,
+    retryableProviderLimitCount: 0,
+    completedQueryCount: 0,
+    providerCallCount: 0,
+    embeddingCallCount: 0,
+    rerankCallCount: 0,
+    documentCountSent: 0,
+    queryCountSent: 0,
+    latencyP50MsSamples: [],
+    latencyP95MsSamples: [],
+    contextTokensAvgSamples: [],
+    keyCountSamples: [],
+    retryAttemptSamples: [],
+    timeoutMsSamples: [],
+    globalMinIntervalMsSamples: [],
+    providerMinIntervalMsSamples: [],
+    throttleScopes: new Set(),
+    failureClasses: new Set(),
+    models: new Set(),
+    strategies: new Set(),
+  };
+}
+
+function addFinite(values, value) {
+  const number = Number(value);
+  if (Number.isFinite(number)) values.push(number);
+}
+
+function median(values) {
+  const numbers = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (!numbers.length) return null;
+  const middle = Math.floor(numbers.length / 2);
+  const result = numbers.length % 2 ? numbers[middle] : (numbers[middle - 1] + numbers[middle]) / 2;
+  return Number(result.toFixed(4));
+}
+
+function maxOrNull(values) {
+  const numbers = values.filter(Number.isFinite);
+  if (!numbers.length) return null;
+  return Math.max(...numbers);
 }
 
 function splitList(value) {

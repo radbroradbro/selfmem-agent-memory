@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "provider-wave-intake",
   "status": "READY_PROVIDER_WAVE_INTAKE",
-  "generatedAt": "2026-05-31T18:26:52.903Z",
+  "generatedAt": "2026-06-01T14:44:29.371Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "metricsOnly": true,
@@ -806,6 +806,246 @@
       "retryableProviderLimit": true
     }
   ],
+  "failureTaxonomy": {
+    "requiredBeforePromotion": true,
+    "allFailuresClassified": true,
+    "observedFailureCount": 15,
+    "retryableProviderLimitCount": 13,
+    "promotionBlockedByRetryableProviderLimits": true,
+    "classes": [
+      {
+        "failureClass": "provider-rate-limit",
+        "count": 7,
+        "retryableProviderLimitCount": 7,
+        "providers": [
+          "gemini",
+          "voyage"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-voyage4-voyage-lite-rerank"
+        ],
+        "dispositions": [
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "failureClass": "provider-timeout",
+        "count": 6,
+        "retryableProviderLimitCount": 6,
+        "providers": [
+          "gemini",
+          "nvidia"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ],
+        "dispositions": [
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "failureClass": "strategy-arm-failed",
+        "count": 2,
+        "retryableProviderLimitCount": 0,
+        "providers": [
+          "gemini",
+          "nvidia"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "cloud-nvidia-e5-mistral"
+        ],
+        "dispositions": [
+          "investigate-before-promotion"
+        ]
+      }
+    ],
+    "providers": [
+      {
+        "provider": "gemini",
+        "failureCount": 6,
+        "retryableProviderLimitCount": 5,
+        "failureClasses": [
+          "provider-rate-limit",
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy"
+        ],
+        "dispositions": [
+          "investigate-before-promotion",
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "provider": "voyage",
+        "failureCount": 5,
+        "retryableProviderLimitCount": 5,
+        "failureClasses": [
+          "provider-rate-limit"
+        ],
+        "strategies": [
+          "cloud-voyage4-voyage-lite-rerank"
+        ],
+        "dispositions": [
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      },
+      {
+        "provider": "nvidia",
+        "failureCount": 4,
+        "retryableProviderLimitCount": 3,
+        "failureClasses": [
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "strategies": [
+          "cloud-nvidia-e5-mistral",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ],
+        "dispositions": [
+          "investigate-before-promotion",
+          "retry-as-separate-provider-arm-with-smaller-slice"
+        ]
+      }
+    ]
+  },
+  "latencyCostQuotaLedger": {
+    "requiredBeforePromotion": true,
+    "publicSafeMetricsOnly": true,
+    "costModel": "no-spend-ledger-from-provider-budget-contract-and-call-counts",
+    "estimatedPaidUsd": null,
+    "maxPaidUsdMax": null,
+    "allReportsHaveBudgetContract": false,
+    "allBudgetedReportsNoSpend": false,
+    "anyPaidProviderRequestedInNoSpendMode": false,
+    "promotionReady": false,
+    "promotionBlockers": [
+      "legacy-provider-waves-missing-budget-contract",
+      "budgeted-provider-waves-not-all-no-spend"
+    ],
+    "rows": [
+      {
+        "provider": "gemini",
+        "completedArmCount": 3,
+        "failedArmCount": 6,
+        "retryableProviderLimitCount": 5,
+        "completedQueryCount": 8,
+        "providerCallCount": 20,
+        "embeddingCallCount": 20,
+        "rerankCallCount": 0,
+        "documentCountSent": 118,
+        "queryCountSent": 8,
+        "latencyP50MsMedian": 9246,
+        "latencyP95MsMedian": 11706,
+        "latencyP50MsMax": 11092,
+        "latencyP95MsMax": 53821,
+        "contextTokensAvgMedian": 1600,
+        "keyCountAvailableMax": 6,
+        "throttleScopes": [],
+        "retryAttemptsMax": null,
+        "timeoutMsMax": null,
+        "globalMinIntervalMsMax": null,
+        "providerMinIntervalMsMax": null,
+        "failureClasses": [
+          "provider-rate-limit",
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "models": [
+          "cloud-gemini2-embed-rerank-proxy",
+          "gemini-embedding-2",
+          "local-deterministic-rerank-proxy"
+        ],
+        "strategies": [
+          "cloud-gemini2-embed-rerank-proxy"
+        ]
+      },
+      {
+        "provider": "nvidia",
+        "completedArmCount": 10,
+        "failedArmCount": 4,
+        "retryableProviderLimitCount": 3,
+        "completedQueryCount": 14,
+        "providerCallCount": 192,
+        "embeddingCallCount": 128,
+        "rerankCallCount": 64,
+        "documentCountSent": 1548,
+        "queryCountSent": 64,
+        "latencyP50MsMedian": 17308.5,
+        "latencyP95MsMedian": 17855.5,
+        "latencyP50MsMax": 23530,
+        "latencyP95MsMax": 31128,
+        "contextTokensAvgMedian": 800,
+        "keyCountAvailableMax": 1,
+        "throttleScopes": [
+          "key"
+        ],
+        "retryAttemptsMax": 2,
+        "timeoutMsMax": 180000,
+        "globalMinIntervalMsMax": 0,
+        "providerMinIntervalMsMax": 1750,
+        "failureClasses": [
+          "provider-timeout",
+          "strategy-arm-failed"
+        ],
+        "models": [
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nemotron-vl-1b",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank",
+          "nv-rerank-qa-mistral-4b:1",
+          "nvidia/llama-nemotron-embed-1b-v2",
+          "nvidia/llama-nemotron-embed-vl-1b-v2",
+          "nvidia/llama-nemotron-rerank-1b-v2",
+          "nvidia/llama-nemotron-rerank-vl-1b-v2",
+          "nvidia/nv-embed-v1"
+        ],
+        "strategies": [
+          "cloud-nvidia-e5-mistral",
+          "cloud-nvidia-nemotron-1b",
+          "cloud-nvidia-nemotron-vl-1b",
+          "cloud-nvidia-nv-embed-v1-mistral-rerank"
+        ]
+      },
+      {
+        "provider": "voyage",
+        "completedArmCount": 1,
+        "failedArmCount": 5,
+        "retryableProviderLimitCount": 5,
+        "completedQueryCount": 5,
+        "providerCallCount": 20,
+        "embeddingCallCount": 15,
+        "rerankCallCount": 5,
+        "documentCountSent": 225,
+        "queryCountSent": 5,
+        "latencyP50MsMedian": 17651,
+        "latencyP95MsMedian": 241069,
+        "latencyP50MsMax": 17651,
+        "latencyP95MsMax": 241069,
+        "contextTokensAvgMedian": 800,
+        "keyCountAvailableMax": 8,
+        "throttleScopes": [],
+        "retryAttemptsMax": null,
+        "timeoutMsMax": null,
+        "globalMinIntervalMsMax": null,
+        "providerMinIntervalMsMax": null,
+        "failureClasses": [
+          "provider-rate-limit"
+        ],
+        "models": [
+          "cloud-voyage4-voyage-lite-rerank",
+          "rerank-2.5-lite",
+          "voyage-4-large"
+        ],
+        "strategies": [
+          "cloud-voyage4-voyage-lite-rerank"
+        ]
+      }
+    ]
+  },
   "providerPromotions": [
     {
       "bestProviderStrategy": "cloud-nvidia-nemotron-1b",
