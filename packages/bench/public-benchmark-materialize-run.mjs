@@ -31,7 +31,7 @@ const sourceLockPath = resolveInputPath(
 );
 const outputPath = args.output ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_MATERIALIZE_REPORT ?? null;
 const markdownOutputPath = args.markdownOutput ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_MATERIALIZE_MARKDOWN ?? null;
-const privateOutputDir = resolvePrivateOutputDir(args.privateOutputDir ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_PRIVATE_OUTPUT_DIR);
+const privateOutputDirInput = args.privateOutputDir ?? process.env.RECALLWEAVE_PUBLIC_BENCHMARK_PRIVATE_OUTPUT_DIR;
 const contextTokenBudget = positiveInt(args.contextTokenBudget ?? process.env.RECALLWEAVE_BASELINE_CONTEXT_TOKEN_BUDGET ?? 800, "context token budget");
 const limit = positiveInt(args.limit ?? process.env.RECALLWEAVE_BASELINE_LIMIT ?? 5, "limit");
 const retrievalStrategy = normalizeRetrievalStrategy(
@@ -87,10 +87,16 @@ if (args.datasetFetchRetrySmoke === true) {
   process.exit(0);
 }
 
-mkdirSync(privateOutputDir, { recursive: true, mode: 0o700 });
-assertOutsideRepo(privateOutputDir, "private output directory");
-
-const report = fixtureRequested ? fixtureMaterialize() : await liveMaterialize();
+let report;
+if (args.contractCheck === true) {
+  assert.equal(fixtureRequested, false, "--contract-check requires --live");
+  report = await liveMaterializationContractCheck();
+} else {
+  const privateOutputDir = resolvePrivateOutputDir(privateOutputDirInput);
+  mkdirSync(privateOutputDir, { recursive: true, mode: 0o700 });
+  assertOutsideRepo(privateOutputDir, "private output directory");
+  report = fixtureRequested ? fixtureMaterialize(privateOutputDir) : await liveMaterialize(privateOutputDir);
+}
 const serialized = format === "markdown" ? `${renderMarkdown(report)}\n` : `${JSON.stringify(report, null, 2)}\n`;
 assertSafePublicText(serialized, "public benchmark materialize report");
 
@@ -98,7 +104,7 @@ if (outputPath) writePublicOutput(outputPath, `${JSON.stringify(report, null, 2)
 if (markdownOutputPath) writePublicOutput(markdownOutputPath, `${renderMarkdown(report)}\n`);
 process.stdout.write(serialized);
 
-async function liveMaterialize() {
+async function liveMaterialize(privateOutputDir) {
   assert.ok(targetPath, "--target is required for live materialization");
   assert.ok(existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
   assert.ok(existsSync(sourceLockPath), `source lock missing: ${displayPath(sourceLockPath)}`);
@@ -152,24 +158,27 @@ async function liveMaterialize() {
   }));
   const answerLabelsHash = `sha256:${stableHash(canonicalJson(labelPayload))}`;
 
-  const materialized = writePrivateBenchmarkInputs({
-    fixtureOnly: false,
-    datasetSlice: target.benchmark.split,
-    judgeModel: target.benchmark.judgeModel,
-    answerModel: target.benchmark.answerModel,
-    selected,
-    target,
-    materializationShard: shard,
-    rawDatasetText: rawText,
-    rawDatasetByteSize: rawBuffer.byteLength,
-    rawDatasetItemCount: dataset.length,
-    datasetHash,
-    selectedQuestionIdsHash,
-    targetSelectedQuestionIdsHash,
-    answerLabelsHash,
-    targetAnswerLabelsHash,
-    scoringCodeHash: target.benchmark.scoringCodeHash,
-  });
+  const materialized = writePrivateBenchmarkInputs(
+    {
+      fixtureOnly: false,
+      datasetSlice: target.benchmark.split,
+      judgeModel: target.benchmark.judgeModel,
+      answerModel: target.benchmark.answerModel,
+      selected,
+      target,
+      materializationShard: shard,
+      rawDatasetText: rawText,
+      rawDatasetByteSize: rawBuffer.byteLength,
+      rawDatasetItemCount: dataset.length,
+      datasetHash,
+      selectedQuestionIdsHash,
+      targetSelectedQuestionIdsHash,
+      answerLabelsHash,
+      targetAnswerLabelsHash,
+      scoringCodeHash: target.benchmark.scoringCodeHash,
+    },
+    privateOutputDir,
+  );
 
   return {
     schemaVersion: 1,
@@ -222,7 +231,98 @@ async function liveMaterialize() {
   };
 }
 
-function fixtureMaterialize() {
+async function liveMaterializationContractCheck() {
+  assert.ok(targetPath, "--target is required for live materialization contract checks");
+  assert.ok(existsSync(targetPath), `target missing: ${displayPath(targetPath)}`);
+  assert.ok(existsSync(sourceLockPath), `source lock missing: ${displayPath(sourceLockPath)}`);
+  const targetRaw = readFileSync(targetPath, "utf8");
+  const sourceLockRaw = readFileSync(sourceLockPath, "utf8");
+  const targetFileHash = `sha256:${stableHash(targetRaw)}`;
+  assertSafePublicText(targetRaw, displayPath(targetPath));
+  assertSafePublicText(sourceLockRaw, displayPath(sourceLockPath));
+  const target = JSON.parse(targetRaw);
+  const sourceLock = JSON.parse(sourceLockRaw);
+  assert.equal(target.fixtureOnly, false, "live target must not be fixture-only");
+  assert.equal(target.claimTier, "run-only", "materializer consumes run-only targets before comparison claims");
+  assert.equal(target.benchmarkType, "memory", "target must be a memory benchmark");
+  assert.equal(normalizeBenchmarkName(target.benchmark?.family ?? target.benchmark?.name), "longmemeval", "only LongMemEval materialization is implemented");
+  assert.ok(requiredSha256(target.benchmark?.answerLabelsHash), "target answerLabelsHash must be sha256");
+  assert.ok(requiredSha256(target.benchmark?.scoringCodeHash), "target scoringCodeHash must be sha256");
+  assert.ok(requiredString(target.benchmark?.questionIdPolicy), "target must use a deterministic questionIdPolicy");
+  assert.equal(target.publicBenchmarkClaimsAllowed, undefined, "target file must not embed benchmark-claim allowance");
+
+  const policy = parseQuestionIdPolicy(target.benchmark.questionIdPolicy);
+  const datasetSource = sourceLock.datasetSources?.longmemeval ?? {};
+  const datasetUrl = String(args.datasetUrl ?? datasetSource.datasetUrl ?? "");
+  assert.ok(requiredHttpsUrl(datasetUrl) || args.datasetFile, "--dataset-url, --dataset-file, or source-lock dataset URL is required");
+  const rawBuffer = await readDatasetBuffer(datasetUrl);
+  const rawText = rawBuffer.toString("utf8");
+  const datasetHash = `sha256:${stableHash(rawBuffer)}`;
+  assert.equal(datasetHash, policy.datasetHash, "dataset hash must match questionIdPolicy");
+  assert.match(String(target.benchmark.datasetRevision ?? ""), new RegExp(escapeRegExp(datasetHash)), "target datasetRevision must include dataset hash");
+  const dataset = JSON.parse(rawText);
+  assert.ok(Array.isArray(dataset), "LongMemEval dataset must be a JSON array");
+  const targetSelected = selectSlice(dataset, policy.types, { perType: policy.perType, limit: policy.limit, selection: policy.selection });
+  const targetSelectedIds = targetSelected.map((item) => String(item.question_id));
+  const targetSelectedQuestionIdsHash = `sha256:${stableHash(targetSelectedIds.join("\n"))}`;
+  const targetLabelPayload = targetSelected.map((item) => ({
+    questionId: String(item.question_id),
+    questionType: String(item.question_type),
+    answer: String(item.answer ?? ""),
+  }));
+  const targetAnswerLabelsHash = `sha256:${stableHash(canonicalJson(targetLabelPayload))}`;
+  assert.equal(targetSelectedQuestionIdsHash, sourceLock.nextTargetRecommendation?.selectedQuestionIdsHash ?? targetSelectedQuestionIdsHash);
+  assert.equal(targetAnswerLabelsHash, target.benchmark.answerLabelsHash, "target answer label hash must match target");
+
+  return {
+    schemaVersion: 1,
+    ok: true,
+    mode: "public-benchmark-materialize-contract-check",
+    fixtureOnly: false,
+    benchmark: "longmemeval",
+    claimTier: "run-only",
+    metricsOnly: true,
+    publicSafe: true,
+    writesPrivateFiles: false,
+    rawQuestionIdsIncluded: false,
+    rawQuestionsIncluded: false,
+    rawAnswersIncluded: false,
+    rawMemoryIncluded: false,
+    rawTranscriptIncluded: false,
+    rawPrivateOutputPathIncluded: false,
+    generatedAt: new Date().toISOString(),
+    source: {
+      memoryBenchCommit: sourceLock.source?.commit,
+      datasetHost: new URL(datasetUrl).host,
+      datasetHash,
+      datasetByteSize: rawBuffer.byteLength,
+      datasetItemCount: dataset.length,
+    },
+    target: {
+      targetIdHash: shortHash(target.targetId),
+      targetFileHash,
+      sourceLockHash: `sha256:${stableHash(sourceLockRaw)}`,
+      splitHash: shortHash(target.benchmark.split),
+      judgeModel: target.benchmark.judgeModel,
+      answerModel: target.benchmark.answerModel,
+      memoryMethod,
+    },
+    selection: {
+      selectedCount: targetSelected.length,
+      questionTypeCount: new Set(targetSelected.map((item) => String(item.question_type))).size,
+      targetSelectedQuestionIdsHash,
+      targetAnswerLabelsHash,
+      targetAnswerLabelCount: targetLabelPayload.length,
+    },
+    safety: publicSafety(),
+    nextActions: [
+      "Run the full materializer or provider strategy gate only after this contract check passes.",
+      "Treat a failed contract check as harness drift, not provider or model-quality evidence.",
+    ],
+  };
+}
+
+function fixtureMaterialize(privateOutputDir) {
   const fixtureKeyShapedToken = ["sk", "1234567890abcdef1234567890abcdef"].join("-");
   const targetSelected = [
     {
@@ -284,24 +384,27 @@ function fixtureMaterialize() {
     questionType: item.question_type,
     answer: item.answer,
   }))))}`;
-  const materialized = writePrivateBenchmarkInputs({
-    fixtureOnly: true,
-    datasetSlice: target.benchmark.split,
-    judgeModel: target.benchmark.judgeModel,
-    answerModel: target.benchmark.answerModel,
-    selected,
-    target,
-    materializationShard: shard,
-    rawDatasetText,
-    rawDatasetByteSize: Buffer.byteLength(rawDatasetText, "utf8"),
-    rawDatasetItemCount: targetSelected.length,
-    datasetHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    selectedQuestionIdsHash,
-    targetSelectedQuestionIdsHash,
-    answerLabelsHash,
-    targetAnswerLabelsHash,
-    scoringCodeHash: target.benchmark.scoringCodeHash,
-  });
+  const materialized = writePrivateBenchmarkInputs(
+    {
+      fixtureOnly: true,
+      datasetSlice: target.benchmark.split,
+      judgeModel: target.benchmark.judgeModel,
+      answerModel: target.benchmark.answerModel,
+      selected,
+      target,
+      materializationShard: shard,
+      rawDatasetText,
+      rawDatasetByteSize: Buffer.byteLength(rawDatasetText, "utf8"),
+      rawDatasetItemCount: targetSelected.length,
+      datasetHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      selectedQuestionIdsHash,
+      targetSelectedQuestionIdsHash,
+      answerLabelsHash,
+      targetAnswerLabelsHash,
+      scoringCodeHash: target.benchmark.scoringCodeHash,
+    },
+    privateOutputDir,
+  );
   return {
     schemaVersion: 1,
     ok: true,
@@ -352,7 +455,7 @@ function fixtureMaterialize() {
   };
 }
 
-function writePrivateBenchmarkInputs(options) {
+function writePrivateBenchmarkInputs(options, privateOutputDir) {
   const sessionContentById = new Map();
   const memoryMap = new Map();
   const chunkIdsBySessionId = new Map();

@@ -14,13 +14,13 @@
   "publicSliceRunReady": true,
   "targetReadyForCanary": false,
   "targetSummary": {
-    "targetIdHash": "535a72a0381811e2",
+    "targetIdHash": "a14ea3cb72865622",
     "benchmarkName": "LongMemEval",
     "benchmarkType": "memory",
     "claimTier": "run-only",
     "benchmarkFamily": "longmemeval",
     "sourceUrlHost": "github.com",
-    "checkedAt": "2026-05-24",
+    "checkedAt": "2026-06-01",
     "questionIdCount": 0,
     "usesQuestionIdPolicy": true,
     "componentEvidenceCount": 0,
@@ -29,12 +29,12 @@
     "reportedTargetReady": false
   },
   "hashes": {
-    "targetFileHash": "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c",
+    "targetFileHash": "sha256:ff2d46f0d29aa8cb4345848c6c07c6af7f74365b72698872aaf6239bff5cdef4",
     "datasetRevisionHash": "sha256:5a3e7ade2f6d181b",
-    "splitHash": "sha256:0ea1111ae68dab32",
+    "splitHash": "sha256:d21c0272053820be",
     "questionIdsHash": null,
     "questionIdPolicyHash": "sha256:b24524da13771152",
-    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "answerLabelsHash": "sha256:d3c1473f98dba689c34f022ad0ed88097fc1ec097364e10749ff78714af242dc",
     "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518"
   },
   "contract": {

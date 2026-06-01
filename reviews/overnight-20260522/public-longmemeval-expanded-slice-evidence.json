@@ -6,7 +6,7 @@
   "sourceName": "MemoryBench LongMemEval-S cleaned dataset",
   "sourceUrl": "https://github.com/supermemoryai/memorybench",
   "sourceCommit": "118209a746d97d0d85e5a7234267f0b6962857e9",
-  "checkedAt": "2026-05-24",
+  "checkedAt": "2026-06-01",
   "dataset": {
     "urlHost": "huggingface.co",
     "urlHash": "sha256:0f3681557c33a32488352d403d88015e86902893622310839f59a35d7d1dd94a",
@@ -15,7 +15,7 @@
     "itemCount": 500,
     "selectedCount": 30,
     "questionTypeCount": 6,
-    "selectedQuestionIdsHash": "sha256:94a21a5744089b9716874f8a4b5eb587a62c8e5671086021d38b5668ec0ce856",
+    "selectedQuestionIdsHash": "sha256:ab8c340732bd8b63ed4639071bb17756fae55bdda715a771a25c5f0bae97e672",
     "questionIdPolicy": "datasetHash=sha256:d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442; types=single-session-user,single-session-assistant,single-session-preference,multi-session,temporal-reasoning,knowledge-update; perType=5; limit=30; sort=question_id-ascending; selection=first-per-type-round-robin",
     "selectedTypeCounts": {
       "knowledge-update": 5,
@@ -27,7 +27,7 @@
     }
   },
   "labels": {
-    "answerLabelsHash": "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a",
+    "answerLabelsHash": "sha256:d3c1473f98dba689c34f022ad0ed88097fc1ec097364e10749ff78714af242dc",
     "answerLabelCount": 30,
     "answerLabelFields": [
       "question_id",

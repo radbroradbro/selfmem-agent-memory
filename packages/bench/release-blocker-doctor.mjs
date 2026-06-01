@@ -410,7 +410,11 @@ assert.equal(publicLongmemEvalExpandedProviderLivePreflightVoyage.liveRunAllowed
 assert.equal(publicLongmemEvalExpandedProviderLivePreflightVoyage.callsProviderApis, false);
 assert.equal(publicLongmemEvalExpandedProviderLivePreflightVoyage.sendsBenchmarkTextToProvider, false);
 assert.deepEqual(publicLongmemEvalExpandedProviderLivePreflightNvidia.requiredProviders, ["nvidia"]);
-assert.deepEqual(publicLongmemEvalExpandedProviderLivePreflightNvidia.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-nvidia-nemotron-1b"]);
+assert.deepEqual(publicLongmemEvalExpandedProviderLivePreflightNvidia.strategies, [
+  "bm25-lite",
+  "full-hybrid-rerank",
+  "cloud-nvidia-nv-embed-v1-mistral-rerank",
+]);
 assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.singleProviderArmReady, true);
 assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.liveRunAllowed, false);
 assert.equal(publicLongmemEvalExpandedProviderLivePreflightNvidia.callsProviderApis, false);

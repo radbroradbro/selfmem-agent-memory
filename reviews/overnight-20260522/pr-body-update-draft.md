@@ -272,13 +272,19 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-- `4c7e6559d63772c16a007122b2dc55c880e3e051`.
+- `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`.
+- GitHub Actions run `26769805087`: passed CI after refreshing the current
+  OpenClaw next-agent canary handoff packet, moving superseded handoff zips out
+  of the active Downloads root, and preserving the shard-scoped answer-quality
+  materialization evidence from the prior baseline. This is release/readiness
+  hygiene only; it keeps the active handoff public-safe and current, but it
+  does not authorize public SOTA claims or production rollout.
+- Previous verified PR branch head before the current OpenClaw canary handoff
+  refresh:
+  `4c7e6559d63772c16a007122b2dc55c880e3e051`.
 - GitHub Actions run `26766964429`: passed CI after adding shard-scoped
   answer-quality materialization, shard-local response/preflight/scoring paths,
-  and parent-coordinate preservation for public evidence. This is
-  harness/readiness progress only; it reduces full-corpus runtime pressure and
-  makes provider/local shard comparisons cleaner, but it does not authorize
-  public SOTA claims or production rollout.
+  and parent-coordinate preservation for public evidence.
 - Previous verified PR branch head before provider key-scoped pacing and
   accepted-arm hardening:
   `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.
@@ -391,14 +397,31 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 - Approved one-agent canary adapter/report commit:
   `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
-- `4c7e6559d63772c16a007122b2dc55c880e3e051`.
-- GitHub Actions run `26766964429`: passed CI with release checks, secret
-  scan, private-path scan, PR live sync, and goal audit green. The checked-in
-  evidence now includes shard-scoped answer-quality materialization so shard
-  runs load shard-local private corpora while preserving parent query
-  coordinates. It keeps cloud Voyage as the actual Codex/personal memory
-  default, keeps local Apple Silicon as the high-volume methodology lane, and
+- `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`.
+- GitHub Actions run `26769805087`: passed CI with release checks, secret
+  scan, private-path scan, PR live sync, release doctor, and goal audit green.
+  The checked-in evidence now includes the current OpenClaw next-agent canary
+  handoff packet as the only active sendable handoff in Downloads, with
+  superseded handoff zips archived outside the active root. It keeps cloud
+  Voyage as the actual Codex/personal memory default, keeps local Apple Silicon
+  as the high-volume methodology lane, preserves the shard-scoped
+  answer-quality materialization evidence from the prior baseline, and
   preserves launch, production rollout, and full-SOTA blockers.
+- Benchmark interpretation: the 75-question
+  `contextual-source-chunk-v1:bm25-lite` result is a memory-method and
+  materialization ablation gate, not the final whole-harness score. It is
+  positive evidence that the new memory shape is retrievable under a lexical
+  control; it is not evidence that the end-to-end harness is or is not SOTA.
+  The next promotion step must run the full harness on the same materialized
+  slices with the BM25 floor retained while Voyage/Gemini/NVIDIA/local vector
+  and rerank arms compete under the same corpus, chunking, answer, and judge
+  conditions.
+- Previous verified code/product baseline before the current OpenClaw canary
+  handoff refresh:
+  `4c7e6559d63772c16a007122b2dc55c880e3e051`.
+- GitHub Actions run `26766964429`: passed CI with shard-scoped answer-quality
+  materialization, shard-local response/preflight/scoring paths, and
+  parent-coordinate preservation for public evidence.
 - Previous verified code/product baseline before provider key-scoped pacing
   and accepted-arm hardening:
   `9a5095f34e3e2a2263d4e3d63a42bafffb1ddfed`.

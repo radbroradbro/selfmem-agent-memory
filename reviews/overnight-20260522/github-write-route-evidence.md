@@ -18,6 +18,12 @@ Verdict: resolved for PR body and blocker issue writes.
   - URL: https://github.com/radbroradbro/selfmem-agent-memory/pull/5
   - GitHub status: 200
   - The PR body was refreshed again on 2026-06-01 after GitHub Actions run
+    `26769805087` passed on `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`,
+    promoting the current OpenClaw next-agent canary handoff refresh as the
+    latest verified code/product baseline while preserving launch, production
+    rollout, full-SOTA, and real-canary blockers. Updated at:
+    2026-06-01T17:22:18Z.
+  - The PR body was refreshed again on 2026-06-01 after GitHub Actions run
     `26766964429` passed on `4c7e6559d63772c16a007122b2dc55c880e3e051`,
     promoting shard-scoped answer-quality materialization and parent-coordinate
     preserving shard-local response/preflight/scoring as the latest verified

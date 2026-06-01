@@ -10,6 +10,20 @@ requirements are resolved.
 ## Current Evidence
 
 - Latest verified PR branch head:
+- `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`.
+- GitHub Actions run `26769805087` passed CI after refreshing the current
+  OpenClaw next-agent canary handoff packet, moving superseded handoff zips out
+  of the active Downloads root, and preserving the shard-scoped answer-quality
+  materialization evidence from the prior baseline. This does not change the
+  approved runtime canary adapter/report commit and does not authorize public
+  SOTA claims or production rollout.
+- Previous verified PR branch head before the current OpenClaw handoff refresh:
+- `4c7e6559d63772c16a007122b2dc55c880e3e051`.
+- GitHub Actions run `26766964429` passed CI after adding shard-scoped
+  answer-quality materialization, shard-local response/preflight/scoring paths,
+  and parent-coordinate preservation for public evidence.
+- Previous verified PR branch head before shard-scoped answer-quality
+  materialization:
 - `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
 - GitHub Actions run `26435511093` passed CI after adding dedicated
   local-full shard workorder and intake scripts plus the blocked local-full
@@ -99,6 +113,29 @@ requirements are resolved.
 - Approved one-agent canary adapter/report commit:
 - `18d606aff589986b4d8b416a686bedb7ff1506d2`.
 - Latest verified code/product baseline:
+- `3278fd10bd4bebba4d1cdccf86d33c138cc7026a`.
+- GitHub Actions run `26769805087` passed CI with release checks, live GitHub
+  sync, release doctor, goal audit, secret scan, and private-path scan green.
+  The checked-in evidence now includes the current OpenClaw next-agent canary
+  handoff packet as the only active sendable handoff in Downloads, with
+  superseded handoff zips archived outside the active root. It preserves the
+  shard-scoped answer-quality materialization evidence from the prior baseline
+  and keeps launch, production rollout, and full-SOTA blockers open.
+- The 75-question `contextual-source-chunk-v1:bm25-lite` result is a
+  memory-method/materialization ablation gate, not the final whole-harness
+  score. It is positive evidence that the new memory shape is retrievable under
+  a lexical control; it is not evidence that the end-to-end harness is or is
+  not SOTA. End-to-end harness promotion still requires same-slice
+  provider/vector and rerank arms, with BM25 retained as the lexical floor and
+  control.
+- Previous verified code/product baseline before the current OpenClaw handoff
+  refresh:
+- `4c7e6559d63772c16a007122b2dc55c880e3e051`.
+- GitHub Actions run `26766964429` passed CI with shard-scoped answer-quality
+  materialization, shard-local response/preflight/scoring paths, and
+  parent-coordinate preservation for public evidence.
+- Previous verified code/product baseline before shard-scoped answer-quality
+  materialization:
 - `34ea0a379bfa69982ff79ea59de50b4b15411ed0`.
 - GitHub Actions run `26435511093` passed CI with release checks, live GitHub
   sync, goal audit, benchmark-contract tests, secret scan, and private-path scan

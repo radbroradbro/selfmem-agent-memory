@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, relative, resolve } from "node:path";
@@ -11,6 +12,9 @@ const targetPath = resolveInputPath(args.target ?? process.env.RECALLWEAVE_PUBLI
 const outputPath = args.output ? resolveInputPath(args.output) : null;
 const markdownOutputPath = args.markdownOutput ? resolveInputPath(args.markdownOutput) : null;
 const requireReady = Boolean(args.requireReady);
+const memoryMethod = String(args.memoryMethod ?? process.env.RECALLWEAVE_MEMORYBENCH_MEMORY_METHOD ?? "session-v1").trim() || "session-v1";
+const materializationContractCheckEnabled =
+  !Boolean(args.skipMaterializationContractCheck) && (requireReady || Boolean(args.materializationContractCheck));
 const strategies = splitList(
   args.strategies ??
     process.env.RECALLWEAVE_PUBLIC_PROVIDER_PREFLIGHT_STRATEGIES ??
@@ -53,6 +57,14 @@ const targetRaw = readFileSync(targetPath, "utf8");
 assertSafeText(targetRaw, "benchmark target");
 const target = JSON.parse(targetRaw);
 const targetOk = target.fixtureOnly === false && target.benchmark?.family === "longmemeval" && target.claimTier === "run-only";
+const materializationContract = materializationContractCheckEnabled && targetOk
+  ? runMaterializationContractCheck({ targetPath, memoryMethod })
+  : {
+      enabled: materializationContractCheckEnabled,
+      ok: !materializationContractCheckEnabled,
+      skipped: true,
+      reason: targetOk ? "not-requested" : "target-not-public-longmemeval-run-only",
+    };
 const providerCallsEnabled = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_CALLS === "1";
 const publicDataConfirmed = process.env.RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA === "1";
 const requiredProviders = [...new Set(strategies.flatMap(requiredProvidersForStrategy))].sort();
@@ -78,6 +90,7 @@ const providerExecutionPolicy = buildProviderExecutionPolicy(requiredProviders);
 const missingCredentialProviders = requiredProviders.filter((provider) => !credentialPresence[provider]?.present);
 const blockers = [
   !targetOk ? "target-not-public-longmemeval-run-only" : null,
+  materializationContract.enabled && !materializationContract.ok ? "target-materialization-contract-failed" : null,
   !providerCallsEnabled ? "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled" : null,
   !publicDataConfirmed ? "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed" : null,
   ...missingCredentialProviders.map((provider) => `${provider}-credentials-missing`),
@@ -110,6 +123,8 @@ const report = {
     answerLabelsHash: target.benchmark?.answerLabelsHash ?? null,
     scoringCodeHash: target.benchmark?.scoringCodeHash ?? null,
   },
+  memoryMethod,
+  materializationContract,
   strategies,
   requiredProviders,
   providerCallsEnabled,
@@ -269,6 +284,61 @@ function providerThrottleKey(provider) {
   return normalized.replace(/-/g, "_") || "provider";
 }
 
+function runMaterializationContractCheck({ targetPath, memoryMethod }) {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "packages/bench/public-benchmark-materialize-run.mjs",
+      "--live",
+      "--contract-check",
+      "--target",
+      targetPath,
+      "--memory-method",
+      memoryMethod,
+    ],
+    {
+      cwd: root,
+      env: process.env,
+      encoding: "utf8",
+      maxBuffer: 10 * 1024 * 1024,
+    },
+  );
+  if (result.status !== 0) {
+    return {
+      enabled: true,
+      ok: false,
+      status: result.status,
+      signal: result.signal ?? null,
+      stdoutHash: result.stdout ? `sha256:${sha256(result.stdout)}` : null,
+      stderrHash: result.stderr ? `sha256:${sha256(result.stderr)}` : null,
+      error: "materialization-contract-check-failed",
+    };
+  }
+  try {
+    const parsed = JSON.parse(result.stdout);
+    return {
+      enabled: true,
+      ok: parsed.ok === true && parsed.mode === "public-benchmark-materialize-contract-check",
+      status: result.status,
+      mode: parsed.mode,
+      targetFileHash: parsed.target?.targetFileHash ?? null,
+      datasetHash: parsed.source?.datasetHash ?? null,
+      selectedCount: parsed.selection?.selectedCount ?? null,
+      targetSelectedQuestionIdsHash: parsed.selection?.targetSelectedQuestionIdsHash ?? null,
+      targetAnswerLabelsHash: parsed.selection?.targetAnswerLabelsHash ?? null,
+    };
+  } catch {
+    return {
+      enabled: true,
+      ok: false,
+      status: result.status,
+      stdoutHash: result.stdout ? `sha256:${sha256(result.stdout)}` : null,
+      stderrHash: result.stderr ? `sha256:${sha256(result.stderr)}` : null,
+      error: "materialization-contract-check-json-parse-failed",
+    };
+  }
+}
+
 function positiveIntOrDefault(value, fallback) {
   if (value == null || value === "") return fallback;
   const number = Number(value);
@@ -286,6 +356,8 @@ function toMarkdown(value) {
     `Sends benchmark text to provider: ${value.sendsBenchmarkTextToProvider}`,
     `Target hash: ${value.target.hash}`,
     `Benchmark: ${value.target.benchmark}`,
+    `Memory method: ${value.memoryMethod}`,
+    `Materialization contract: ${value.materializationContract.ok ? "ok" : "blocked"}`,
     "",
     "## Strategies",
     "",

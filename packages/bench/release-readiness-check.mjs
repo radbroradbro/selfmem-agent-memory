@@ -3920,8 +3920,8 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(expandedSliceReport.dataset?.hash, liveMaterializeReport.source?.datasetHash);
   assert.equal(expandedSliceReport.dataset?.selectedCount, 30);
   assert.equal(expandedSliceReport.dataset?.questionTypeCount, 6);
-  assert.equal(expandedSliceReport.dataset?.selectedQuestionIdsHash, "sha256:94a21a5744089b9716874f8a4b5eb587a62c8e5671086021d38b5668ec0ce856");
-  assert.equal(expandedSliceReport.labels?.answerLabelsHash, "sha256:1463b12802582c0bf0dcf1ba9d080bb1bf0a85bad15fd7dd0f4e528342ebae9a");
+  assert.equal(expandedSliceReport.dataset?.selectedQuestionIdsHash, "sha256:ab8c340732bd8b63ed4639071bb17756fae55bdda715a771a25c5f0bae97e672");
+  assert.equal(expandedSliceReport.labels?.answerLabelsHash, "sha256:d3c1473f98dba689c34f022ad0ed88097fc1ec097364e10749ff78714af242dc");
   assert.equal(expandedSliceReport.publicSafety?.rawQuestionsIncluded, false);
   assert.match(expandedSliceEvidence, /Selected count: 30/);
   assert.equal(expandedRunTarget.claimTier, "run-only");
@@ -4088,16 +4088,15 @@ check("fresh public benchmark target check passes", () => {
     "cloud-gemini-voyage-rerank",
     "cloud-gemini2-embed-rerank-proxy",
     "cloud-gemini2-voyage-rerank",
-    "cloud-nvidia-retriever-500m",
-    "cloud-nvidia-nemotron-1b",
-    "cloud-nvidia-e5-mistral",
+    "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "cloud-nvidia-embedcode-7b-mistral-rerank",
     "local-apple-qwen3-0_6b",
   ]);
   assert.match(providerLivePreflightEvidence, /Provider Benchmark Live Preflight/);
   assert.match(providerLivePreflightEvidence, /Live run allowed: false/);
   assert.match(providerLivePreflightEvidence, /cloud-gemini-voyage-rerank/);
   assert.match(providerLivePreflightEvidence, /cloud-gemini2-voyage-rerank/);
-  assert.match(providerLivePreflightEvidence, /cloud-nvidia-nemotron-1b/);
+  assert.match(providerLivePreflightEvidence, /cloud-nvidia-nv-embed-v1-mistral-rerank/);
   assert.match(providerLivePreflightEvidence, /local-apple-qwen3-0_6b/);
   assert.equal(providerWaveIntakeReport.ok, true);
   assert.equal(providerWaveIntakeReport.mode, "provider-wave-intake");
@@ -4202,7 +4201,7 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(expandedProviderLivePreflightReport.callsProviderApis, false);
   assert.equal(expandedProviderLivePreflightReport.sendsBenchmarkTextToProvider, false);
   assert.equal(expandedProviderLivePreflightReport.target?.path, "reviews/overnight-20260522/public-longmemeval-expanded-run-target.json");
-  assert.equal(expandedProviderLivePreflightReport.target?.hash, "sha256:56438ca47ca525b75c7fac7b63f0f2bc30a4b244ddd270ed7fd8f492c6c9be0c");
+  assert.equal(expandedProviderLivePreflightReport.target?.hash, "sha256:ff2d46f0d29aa8cb4345848c6c07c6af7f74365b72698872aaf6239bff5cdef4");
   assert.equal(expandedProviderLivePreflightFresh.target?.hash, expandedProviderLivePreflightReport.target?.hash);
   assert.equal(expandedProviderLivePreflightFresh.status, "BLOCKED_PROVIDER_ENV");
   assert.equal(expandedProviderLivePreflightFresh.liveRunAllowed, false);
@@ -4222,7 +4221,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(expandedProviderLivePreflightEvidence, /Provider Benchmark Live Preflight/);
   assert.match(expandedProviderLivePreflightEvidence, /Live run allowed: false/);
   assert.match(expandedProviderLivePreflightEvidence, /cloud-voyage4-voyage/);
-  assert.match(expandedProviderLivePreflightEvidence, /cloud-nvidia-nemotron-1b/);
+  assert.match(expandedProviderLivePreflightEvidence, /cloud-nvidia-nv-embed-v1-mistral-rerank/);
   assert.match(expandedProviderLivePreflightEvidence, /local-apple-qwen3-0_6b/);
   assert.equal(expandedProviderLivePreflightVoyageReport.ok, true);
   assert.equal(expandedProviderLivePreflightVoyageReport.mode, "provider-benchmark-live-preflight");
@@ -6666,13 +6665,13 @@ check("fresh public benchmark target check passes", () => {
   assert.deepEqual(expandedProviderLivePreflightNvidiaReport.requiredProviders, ["nvidia"]);
   assert.deepEqual(expandedProviderLivePreflightNvidiaReport.missingCredentialProviders, ["nvidia"]);
   assert.equal(expandedProviderLivePreflightNvidiaReport.singleProviderArmReady, true);
-  assert.deepEqual(expandedProviderLivePreflightNvidiaReport.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-nvidia-nemotron-1b"]);
+  assert.deepEqual(expandedProviderLivePreflightNvidiaReport.strategies, ["bm25-lite", "full-hybrid-rerank", "cloud-nvidia-nv-embed-v1-mistral-rerank"]);
   assert.ok(expandedProviderLivePreflightNvidiaReport.blockers?.includes("nvidia-credentials-missing"));
   assert.ok(expandedProviderLivePreflightNvidiaReport.liveCommandTemplate?.some((line) => String(line).includes("NVIDIA_API_KEY=<env-only-nvidia-key>")));
   assert.ok(!expandedProviderLivePreflightNvidiaReport.liveCommandTemplate?.some((line) => String(line).includes("VOYAGE_API_KEY=<env-only-voyage-key>")));
   assert.ok(!expandedProviderLivePreflightNvidiaReport.liveCommandTemplate?.some((line) => String(line).includes("GEMINI_API_KEY=<env-only-gemini-key>")));
   assert.match(expandedProviderLivePreflightNvidiaEvidence, /Provider Benchmark Live Preflight/);
-  assert.match(expandedProviderLivePreflightNvidiaEvidence, /cloud-nvidia-nemotron-1b/);
+  assert.match(expandedProviderLivePreflightNvidiaEvidence, /cloud-nvidia-nv-embed-v1-mistral-rerank/);
   assert.match(expandedProviderLivePreflightNvidiaEvidence, /NVIDIA_API_KEY=<env-only-nvidia-key>/);
   assert.equal(providerOperatorPacket.ok, true);
   assert.equal(providerOperatorPacket.mode, "provider-benchmark-operator-packet");
