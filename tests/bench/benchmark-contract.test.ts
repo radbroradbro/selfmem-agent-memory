@@ -10,6 +10,7 @@ const resultGateScript = "packages/bench/provider-challenger-result-gate.mjs";
 const materializeScript = "packages/bench/public-benchmark-materialize-run.mjs";
 const answerQualityScript = "packages/bench/public-benchmark-answer-quality.mjs";
 const answerQualityMethodLadderScript = "packages/bench/public-benchmark-answer-quality-method-ladder.mjs";
+const answerQualityMethodLadderGateScript = "packages/bench/answer-quality-method-ladder-result-gate.mjs";
 const responseExportScript = "packages/bench/recallweave-response-export.mjs";
 
 describe("public benchmark comparison contract", () => {
@@ -333,6 +334,66 @@ describe("public benchmark comparison contract", () => {
     expect(report.mode).toBe("answer-quality-method-ladder-continue-on-call-error-smoke");
     expect(report.forwardsContinueOnCallError).toBe(true);
     expect(report.leavesStrictModeStrict).toBe(true);
+  });
+
+  it("gates answer-quality method ladders only when a challenger beats session-v1", () => {
+    const tempDir = mkdtempSync(join(tmpdir(), "recallweave-method-ladder-gate-"));
+    const resultPath = join(tempDir, "method-ladder.json");
+    writeFileSync(
+      resultPath,
+      JSON.stringify({
+        schemaVersion: 1,
+        ok: true,
+        mode: "answer-quality-memory-method-ladder",
+        publicSafe: true,
+        metricsOnly: true,
+        retrievalProxyOnly: false,
+        memoryBenchAnswerQuality: true,
+        publicBenchmarkClaimsAllowed: false,
+        rawQuestionIdsIncluded: false,
+        rawQuestionsIncluded: false,
+        rawAnswersIncluded: false,
+        rawMemoryIncluded: false,
+        rawTranscriptIncluded: false,
+        rawPrivateOutputPathIncluded: false,
+        benchmark: "longmemeval",
+        fixtureOnly: false,
+        executeRequested: true,
+        queryShard: {
+          sameRawQuerySelectionAcrossMethods: true,
+          selectedQuestionIdsHash: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+        answerQualityReports: [
+          {
+            method: "session-v1",
+            callsMade: 20,
+            winner: { strategy: "bm25-lite", answerQuality: 20, judgeCorrectRate: 0.2 },
+            strategies: [{ strategy: "bm25-lite", answerQuality: 20, judgeCorrectRate: 0.2, answerFailures: 0, judgeFailures: 0 }],
+          },
+          {
+            method: "contextual-source-chunk-v1",
+            callsMade: 20,
+            winner: { strategy: "bm25-lite", answerQuality: 35, judgeCorrectRate: 0.35 },
+            strategies: [{ strategy: "bm25-lite", answerQuality: 35, judgeCorrectRate: 0.35, answerFailures: 0, judgeFailures: 0 }],
+          },
+        ],
+      }),
+    );
+    const result = spawnSync(
+      process.execPath,
+      [answerQualityMethodLadderGateScript, "--result", resultPath, "--require-ready"],
+      {
+        cwd: new URL("../..", import.meta.url),
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.status).toBe("READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER");
+    expect(report.bestChallenger.method).toBe("contextual-source-chunk-v1");
+    expect(report.comparison.deltaVsBaseline).toBe(15);
+    rmSync(tempDir, { recursive: true, force: true });
   });
 
   it("forwards live materialization shard controls into provider runs", () => {
