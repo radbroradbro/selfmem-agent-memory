@@ -94,6 +94,11 @@ if (args.providerRerankCascadeSmoke === true) {
   process.exit(0);
 }
 
+if (args.temporalRankLargeSmoke === true) {
+  runTemporalRankLargeSmoke();
+  process.exit(0);
+}
+
 if (args.nvidiaAdapterParserSmoke === true) {
   runNvidiaAdapterParserSmoke();
   process.exit(0);
@@ -1024,9 +1029,7 @@ function fuseRankedChannels(candidates, channels, options = {}) {
 function rankTemporal(query, candidates) {
   const queryText = normalizeText(queryTextValue(query));
   const wantsTemporal = /\b(new|newer|latest|recent|recently|last|current|now|after|before|when|date|time|changed|updated|previous|earlier|first)\b/.test(queryText);
-  const dates = candidates.map((candidate) => candidate.dateMs).filter((value) => Number.isFinite(value));
-  const min = dates.length ? Math.min(...dates) : Date.now();
-  const max = dates.length ? Math.max(...dates) : Date.now();
+  const { min, max } = finiteMinMax(candidates.map((candidate) => candidate.dateMs), Date.now());
   const span = Math.max(1, max - min);
   return candidates
     .map((candidate) => {
@@ -2309,6 +2312,33 @@ function runProviderRerankCascadeSmoke() {
   );
 }
 
+function runTemporalRankLargeSmoke() {
+  const candidateCount = 150_000;
+  const base = Date.parse("2026-01-01T00:00:00.000Z");
+  const candidates = Array.from({ length: candidateCount }, (_, index) => ({
+    outputId: `candidate-${String(index).padStart(6, "0")}`,
+    text: `temporal candidate ${index}`,
+    dateMs: base + index,
+    baseScore: 0,
+    metadata: { questionType: index % 2 === 0 ? "temporal-reasoning" : "single-session" },
+  }));
+  const ranked = rankTemporal({ q: "What changed most recently?", metadata: { questionType: "temporal-reasoning" } }, candidates);
+  assert.equal(ranked.length, candidateCount);
+  assert.ok(Number(ranked[0]?.dateMs ?? 0) > base + candidateCount - 100, "top temporal candidate should come from the recent tail");
+  assert.equal(ranked[0]?.metadata?.questionType, "temporal-reasoning");
+  assert.ok(ranked[0]?.score > ranked.at(-1)?.score, "temporal rank should score recent matching candidates first");
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "temporal-rank-large-smoke",
+      candidateCount,
+      avoidsSpreadCallStackLimit: true,
+      topOutputId: ranked[0]?.outputId,
+      topFromRecentTail: true,
+    })}\n`,
+  );
+}
+
 function runNvidiaAdapterParserSmoke() {
   const candidates = [
     { outputId: "wrong", text: "not it", score: 0 },
@@ -3241,6 +3271,18 @@ function sumTokens(values) {
 function average(values) {
   const valid = values.filter((value) => Number.isFinite(value));
   return valid.length ? valid.reduce((sum, value) => sum + value, 0) / valid.length : 0;
+}
+
+function finiteMinMax(values, fallback) {
+  let min = Number.POSITIVE_INFINITY;
+  let max = Number.NEGATIVE_INFINITY;
+  for (const value of values) {
+    if (!Number.isFinite(value)) continue;
+    if (value < min) min = value;
+    if (value > max) max = value;
+  }
+  if (min === Number.POSITIVE_INFINITY) return { min: fallback, max: fallback };
+  return { min, max };
 }
 
 function safeScalar(value) {

@@ -40,6 +40,12 @@ const localEmbeddingDurabilityReportPath = resolveOptionalPath(
 const strategies = splitList(args.strategies ?? process.env.RECALLWEAVE_SOTA_ANSWER_QUALITY_STRATEGIES ?? defaultStrategies().join(","));
 const requireReady = Boolean(args.requireReady);
 const reuseExisting = Boolean(args.reuseExisting ?? process.env.RECALLWEAVE_RESPONSE_ARM_REUSE_EXISTING === "1");
+const claimScope = String(
+  args.claimScope ??
+    process.env.RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE ??
+    process.env.RECALLWEAVE_ANSWER_QUALITY_CLAIM_SCOPE ??
+    "full-sota",
+).trim();
 const benchmarkSupermemoryDisableEnv = {
   RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH: "1",
   SELFMEM_SUPERMEMORY_SEARCH_DISABLED: "1",
@@ -85,6 +91,10 @@ const privatePathPattern = /(?:\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\
 const privateTagPattern = /<private>[\s\S]*?(?:<\/private>|$)/gi;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
+assert.ok(
+  ["full-sota", "local-full", "model-challenger"].includes(claimScope),
+  "--claim-scope must be full-sota, local-full, or model-challenger",
+);
 assert.ok(existsSync(targetPath), `benchmark target missing: ${displayPath(targetPath)}`);
 assert.ok(statSync(targetPath).size > 0, `benchmark target empty: ${displayPath(targetPath)}`);
 for (const strategy of strategies) assert.ok(retrievalStrategies.has(strategy), `unknown strategy: ${strategy}`);
@@ -95,6 +105,7 @@ const target = JSON.parse(targetRaw);
 const targetOk = target.fixtureOnly === false && target.benchmark?.family === "longmemeval" && target.claimTier === "run-only";
 const coverage = strategyCoverage(strategies);
 const providerHybridContract = buildProviderHybridContract(strategies, coverage);
+const localSidecarsRequired = claimScope !== "model-challenger";
 const env = envReadiness(strategies);
 const input = inspectInputs();
 const privateDir = inspectPrivateOutputDir();
@@ -110,8 +121,8 @@ const preflightBlockers = [
   !coverage.hasFullHybridRerank ? "full-hybrid-rerank-arm-missing" : null,
   !coverage.hasQueryExpansion ? "query-expansion-arm-missing" : null,
   !coverage.hasProviderChallenger ? "provider-challenger-arm-missing" : null,
-  !coverage.hasLocalApple ? "local-apple-arm-missing" : null,
-  !coverage.hasLocalRerank ? "local-rerank-arm-missing" : null,
+  localSidecarsRequired && !coverage.hasLocalApple ? "local-apple-arm-missing" : null,
+  localSidecarsRequired && !coverage.hasLocalRerank ? "local-rerank-arm-missing" : null,
   coverage.hasProviderChallenger && !fixtureRequested && !env.providerCallsEnabled ? "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled" : null,
   coverage.hasProviderChallenger && !fixtureRequested && !env.providerPublicDataConfirmed
     ? "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"
@@ -156,6 +167,7 @@ const report = {
   rawPrivateOutputPathIncluded: false,
   printsCredentials: false,
   generatedAt: new Date().toISOString(),
+  claimScope,
   target: {
     path: displayPath(targetPath),
     hash: `sha256:${sha256(targetRaw)}`,
@@ -186,6 +198,14 @@ const report = {
   localEmbeddingDurability,
   strategyCoverage: coverage,
   providerHybridContract,
+  localSidecarContract: {
+    required: localSidecarsRequired,
+    reason: localSidecarsRequired
+      ? "full-sota and local-full exports keep local Apple/local-rerank controls on the same shard"
+      : "model-challenger exports isolate cloud/provider challenger arms without requiring local sidecars",
+    localApplePresent: coverage.hasLocalApple,
+    localRerankPresent: coverage.hasLocalRerank,
+  },
   arms: exportRows,
   blockers: preflightBlockers,
   answerQualityArmArgs: answerQualityArmArgs(strategies),
@@ -672,6 +692,7 @@ function renderMarkdown(value) {
     "# Answer-Quality Response Arm Export",
     "",
     `- Status: ${value.status}`,
+    `- Claim scope: ${value.claimScope}`,
     `- Fixture only: ${value.fixtureOnly}`,
     `- Executes exports: ${value.executesExports}`,
     `- Writes private response files: ${value.writesPrivateResponseFiles}`,
@@ -690,6 +711,7 @@ function renderMarkdown(value) {
     `- Provider challenger: ${value.strategyCoverage.hasProviderChallenger}`,
     `- Local Apple: ${value.strategyCoverage.hasLocalApple}`,
     `- Local rerank: ${value.strategyCoverage.hasLocalRerank}`,
+    `- Local sidecars required: ${value.localSidecarContract.required}`,
     "",
     "## Provider Hybrid Contract",
     `- BM25 lexical floor required: ${value.providerHybridContract.bm25LexicalFloorRequired}`,

@@ -555,6 +555,7 @@ function responseArmExportTemplate() {
     "RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs>",
   ];
   return [
+    `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
     "RECALLWEAVE_BASELINE_LIVE=1",
     "RECALLWEAVE_BASELINE_NO_RAW_TEXT=1",
     ...benchmarkSupermemoryDisableEnv,

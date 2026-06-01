@@ -13,6 +13,7 @@ const answerQualityMethodLadderScript = "packages/bench/public-benchmark-answer-
 const answerQualityMethodLadderGateScript = "packages/bench/answer-quality-method-ladder-result-gate.mjs";
 const answerQualityShardPlanScript = "packages/bench/public-benchmark-answer-quality-shard-plan.mjs";
 const answerQualityShardWorkorderScript = "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs";
+const answerQualityArmExportScript = "packages/bench/public-benchmark-answer-quality-arm-export.mjs";
 const responseExportScript = "packages/bench/recallweave-response-export.mjs";
 
 describe("public benchmark comparison contract", () => {
@@ -298,6 +299,20 @@ describe("public benchmark comparison contract", () => {
     expect(report.supportsNegativeRawScores).toBe(true);
   });
 
+  it("ranks large temporal candidate pools without spreading into Math.min/Math.max", () => {
+    const result = spawnSync(process.execPath, [responseExportScript, "--temporal-rank-large-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("temporal-rank-large-smoke");
+    expect(report.avoidsSpreadCallStackLimit).toBe(true);
+    expect(report.topFromRecentTail).toBe(true);
+    expect(report.candidateCount).toBe(150000);
+  });
+
   it("parses NVIDIA rerank ranking/logit responses without letting negative logits invert rank", () => {
     const result = spawnSync(process.execPath, [responseExportScript, "--nvidia-adapter-parser-smoke"], {
       cwd: new URL("../..", import.meta.url),
@@ -417,6 +432,47 @@ describe("public benchmark comparison contract", () => {
       expect(acceptedWorkorderLane.blockers).not.toContain("answer-model-does-not-match-target");
       expect(acceptedWorkorderLane.blockers).not.toContain("local-apple-credentials-missing");
       expect(acceptedWorkorderLane.blockers).not.toContain("local-rerank-credentials-missing");
+
+      const armExportDir = join(tempDir, "arms");
+      const armExportResult = spawnSync(
+        process.execPath,
+        [
+          answerQualityArmExportScript,
+          "--fixture",
+          "--claim-scope",
+          "model-challenger",
+          "--target",
+          "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+          "--queryset",
+          "packages/bench/fixtures/hosted-baseline-queryset.fixture.json",
+          "--memories",
+          "packages/bench/fixtures/recallweave-local-container.fixture/local-memories.fixture.jsonl",
+          "--private-output-dir",
+          armExportDir,
+          "--strategies",
+          "bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-gemini2-embed-rerank-proxy,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank",
+        ],
+        {
+          cwd: new URL("../..", import.meta.url),
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+          env: {
+            ...process.env,
+            RECALLWEAVE_BASELINE_LIVE: "1",
+            RECALLWEAVE_BASELINE_NO_RAW_TEXT: "1",
+            RECALLWEAVE_PROVIDER_BENCHMARK_CALLS: "1",
+            RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA: "1",
+            RECALLWEAVE_QUERY_EXPANSION_CALLS: "1",
+            RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA: "1",
+          },
+        },
+      );
+      expect(armExportResult.status, `${armExportResult.stdout}\n${armExportResult.stderr}`).toBe(0);
+      const armExport = JSON.parse(armExportResult.stdout);
+      expect(armExport.status).toBe("READY_TO_EXPORT_RESPONSE_ARMS");
+      expect(armExport.localSidecarContract.required).toBe(false);
+      expect(armExport.blockers).not.toContain("local-apple-arm-missing");
+      expect(armExport.blockers).not.toContain("local-rerank-arm-missing");
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
