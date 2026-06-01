@@ -16,6 +16,7 @@ const requiredBlockers = [
   "fresh-real-container-canary-not-current",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
   "full-memory-sota-doctor-after-local-full-combine-20260531.json",
   "full-memory-sota-doctor-after-shard-020-20260529.json",
   "full-memory-sota-doctor-after-shard-019-20260529.json",
@@ -33,6 +34,7 @@ const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-20260527.json",
 );
 const fullMemorySotaDoctorMarkdown = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
   "full-memory-sota-doctor-after-local-full-combine-20260531.md",
   "full-memory-sota-doctor-after-shard-020-20260529.md",
   "full-memory-sota-doctor-after-shard-019-20260529.md",
@@ -449,12 +451,20 @@ assert.equal(fullMemorySotaDoctor.providerWaveState?.allHaveBm25, true);
 assert.equal(fullMemorySotaDoctor.providerWaveState?.allHaveFullHybrid, true);
 assert.equal(fullMemorySotaDoctor.providerWaveState?.countsAsFullMemorySotaEvidence, false);
 assert.equal(fullMemorySotaDoctor.providerWaveState?.countsAsEndToEndMemoryBenchmark, false);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.evidenceReady, true);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsMethodLadderEvidence, true);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsFullMemorySotaEvidence, false);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
+assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
+assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmFailureCount, 0);
 assert.match(fullMemorySotaDoctorText, /Next local-full shard: n\/a \(n\/a\)/);
 assert.match(fullMemorySotaDoctorText, /Combined score winner: local-apple-qwen3-0_6b-local-rerank/);
 assert.match(fullMemorySotaDoctorText, /Memory score gate status: READY_LOCAL_FULL_MEMORY_SCORE/);
 assert.match(fullMemorySotaDoctorText, /Provider Wave Intake/);
 assert.match(fullMemorySotaDoctorText, /All waves include BM25: true/);
 assert.match(fullMemorySotaDoctorText, /All waves include full hybrid: true/);
+assert.match(fullMemorySotaDoctorText, /Method Ladder Result Gate/);
+assert.match(fullMemorySotaDoctorText, /Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite/);
 assert.match(fullMemorySotaDoctorText, /Counts as full memory SOTA evidence: false/i);
 
 const gitHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
@@ -550,7 +560,7 @@ const realCanaryNextAction = realDiagnosticsPostwatchNextAgentPlan.decision?.sta
 const nextLocalFullShard = fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId ?? "the next pending shard";
 const nextLocalFullRange = fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange ?? "unknown range";
 const fullMemorySotaNextAction =
-  `Complete the full same-data answer-quality shard ladder before any public SOTA or production-memory claim: the local-full diagnostic lane is complete, but the accepted full-SOTA lane still needs provider arms, exact answer/judge model matching, reviewer intake, UI/docs refresh, owner approval, and the real canary gate.`;
+  `Complete the full same-data answer-quality shard ladder before any public SOTA or production-memory claim, carrying the method-ladder challenger (${fullMemorySotaDoctor.methodLadderState?.nextLargerSliceChallenger ?? "contextual-source-chunk-v1:bm25-lite"}) into the next larger same-data answer-quality slice: the local-full diagnostic lane is complete, but the accepted full-SOTA lane still needs provider arms, exact answer/judge model matching, reviewer intake, UI/docs refresh, owner approval, and the real canary gate.`;
 
 const blockerReport = [
   {
@@ -817,6 +827,11 @@ console.log(
           providerWaveAllHaveFullHybrid: fullMemorySotaDoctor.providerWaveState?.allHaveFullHybrid,
           providerWaveCompletedFamilies: fullMemorySotaDoctor.providerWaveState?.completedProviderFamilies,
           providerWaveCountsAsSotaEvidence: fullMemorySotaDoctor.providerWaveState?.countsAsFullMemorySotaEvidence,
+          methodLadderReady: fullMemorySotaDoctor.methodLadderState?.evidenceReady,
+          methodLadderCountsAsMethodEvidence: fullMemorySotaDoctor.methodLadderState?.countsAsMethodLadderEvidence,
+          methodLadderCountsAsSotaEvidence: fullMemorySotaDoctor.methodLadderState?.countsAsFullMemorySotaEvidence,
+          methodLadderBestChallenger: fullMemorySotaDoctor.methodLadderState?.nextLargerSliceChallenger,
+          methodLadderDeltaVsBaseline: fullMemorySotaDoctor.methodLadderState?.deltaVsBaseline,
         },
         githubLiveSync: {
           ok: githubLiveSync.ok,

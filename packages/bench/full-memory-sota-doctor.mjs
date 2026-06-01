@@ -105,6 +105,7 @@ const files = {
   liveLocalCanary: `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
   liveProviderCanary: `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
   providerWaveIntake: `${reviewDir}/provider-wave-intake-20260531.json`,
+  methodLadderResultGate: `${reviewDir}/answer-quality-memory-method-ladder-30q-result-gate-20260531.json`,
   voyageRateLimit: `${reviewDir}/voyage-provider-rate-limit-20260525.json`,
   reviewerIntake: `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
   uiEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,
@@ -199,6 +200,7 @@ const localFullLaneState = inspectLocalFullLaneState({
 });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
 const providerWaveState = inspectProviderWaveIntake(providerWaveIntake);
+const methodLadderState = inspectMethodLadderResultGate(evidence.methodLadderResultGate);
 const reviewerState = inspectReviewerState(reviewerIntake);
 const docState = inspectDocs(evidence);
 const sotaOperatorPacketBlockers = filterSupersededProviderCredentialBlockers(
@@ -262,6 +264,7 @@ const gates = [
   ),
   gate("full-shard-results", shardState.readyForShardCombine, shardState.blockers),
   gate("provider-wave-intake", providerWaveState.evidenceReady, providerWaveState.evidenceBlockers),
+  gate("method-ladder-result-gate", methodLadderState.evidenceReady, methodLadderState.evidenceBlockers),
   gate("same-data-provider-arms", !arrayOf(sotaLadder?.blockers).includes("missing-voyage-answer-quality-same-data-result"), [
     "missing-voyage-answer-quality-same-data-result",
   ]),
@@ -355,6 +358,7 @@ const report = {
   localFullLaneState,
   currentCanary,
   providerWaveState,
+  methodLadderState,
   reviewerState,
   docState,
   gates,
@@ -1478,6 +1482,96 @@ function inspectDocs(loadedEvidence) {
   };
 }
 
+function inspectMethodLadderResultGate(loadedEvidence) {
+  const gateReport = loadedEvidence?.json;
+  const rows = arrayOf(gateReport?.rows);
+  const bestChallengerWinningArm = arrayOf(gateReport?.bestChallenger?.strategies).find(
+    (item) => item.strategy === gateReport?.bestChallenger?.winnerStrategy,
+  );
+  const safe =
+    gateReport?.mode === "answer-quality-method-ladder-result-gate" &&
+    gateReport?.status === "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER" &&
+    gateReport?.publicSafe === true &&
+    gateReport?.metricsOnly === true &&
+    gateReport?.callsProviderApis === false &&
+    gateReport?.sendsBenchmarkTextToProvider === false &&
+    gateReport?.publicBenchmarkClaimsAllowed === false &&
+    gateReport?.countsAsMethodLadderEvidence === true &&
+    gateReport?.countsAsFullMemorySotaEvidence === false &&
+    gateReport?.result?.fixtureOnly === false &&
+    gateReport?.result?.benchmark === "longmemeval" &&
+    gateReport?.result?.claimScope === "model-challenger" &&
+    gateReport?.result?.queryShard?.sameRawQuerySelectionAcrossMethods === true &&
+    typeof gateReport?.result?.queryShard?.selectedQuestionIdsHash === "string" &&
+    gateReport?.checks?.rawQuestionsExcluded === true &&
+    gateReport?.checks?.rawAnswersExcluded === true &&
+    gateReport?.checks?.rawMemoryExcluded === true &&
+    gateReport?.checks?.rawTranscriptExcluded === true &&
+    gateReport?.checks?.challengerBeatsBaseline === true &&
+    gateReport?.checks?.bestOverallIsChallenger === true &&
+    gateReport?.checks?.winnerArmFailureLimit === true &&
+    gateReport?.checks?.totalFailureRateLimit === true &&
+    gateReport?.checks?.privacyLeakCountersClear === true;
+  const winnerArmFailureCount = Number(gateReport?.comparison?.winnerArmFailures ?? 0);
+  const totalFailureRate = Number(gateReport?.result?.totalFailureRate ?? 1);
+  const evidenceBlockers = [
+    !gateReport ? "method-ladder-result-gate-missing" : null,
+    !safe ? "method-ladder-result-gate-unsafe-or-not-ready" : null,
+    gateReport?.baseline?.method !== gateReport?.thresholds?.baselineMethod ? "method-ladder-baseline-mismatch" : null,
+    gateReport?.bestChallenger?.method === gateReport?.baseline?.method ? "method-ladder-challenger-not-distinct" : null,
+    Number(gateReport?.comparison?.deltaVsBaseline ?? 0) < Number(gateReport?.thresholds?.minDelta ?? 1)
+      ? "method-ladder-delta-below-threshold"
+      : null,
+    winnerArmFailureCount > Number(gateReport?.thresholds?.maxWinnerArmFailures ?? 0)
+      ? "method-ladder-winner-arm-failures"
+      : null,
+    totalFailureRate > Number(gateReport?.thresholds?.maxTotalFailureRate ?? 0.01)
+      ? "method-ladder-total-failure-rate-too-high"
+      : null,
+    rows.length < 2 ? "method-ladder-too-few-methods" : null,
+  ].filter(Boolean);
+  return {
+    path: loadedEvidence?.path ?? files.methodLadderResultGate,
+    hash: loadedEvidence?.hash ?? null,
+    status: gateReport?.status ?? null,
+    evidenceReady: evidenceBlockers.length === 0,
+    evidenceBlockers,
+    publicSafe: Boolean(gateReport?.publicSafe),
+    metricsOnly: Boolean(gateReport?.metricsOnly),
+    countsAsMethodLadderEvidence: Boolean(gateReport?.countsAsMethodLadderEvidence),
+    countsAsFullMemorySotaEvidence: Boolean(gateReport?.countsAsFullMemorySotaEvidence),
+    publicBenchmarkClaimsAllowed: Boolean(gateReport?.publicBenchmarkClaimsAllowed),
+    benchmark: gateReport?.result?.benchmark ?? null,
+    claimScope: gateReport?.result?.claimScope ?? null,
+    queryCount: Number(gateReport?.result?.queryShard?.endIndexExclusive ?? 0) - Number(gateReport?.result?.queryShard?.startIndex ?? 0),
+    methodCount: Number(gateReport?.result?.methodCount ?? rows.length),
+    totalCalls: Number(gateReport?.result?.totalCalls ?? 0),
+    totalFailures: Number(gateReport?.result?.totalFailures ?? 0),
+    totalFailureRate,
+    baselineMethod: gateReport?.baseline?.method ?? null,
+    baselineWinnerStrategy: gateReport?.baseline?.winnerStrategy ?? null,
+    baselineAnswerQuality: gateReport?.baseline?.answerQuality ?? null,
+    bestChallengerMethod: gateReport?.bestChallenger?.method ?? null,
+    bestChallengerWinnerStrategy: gateReport?.bestChallenger?.winnerStrategy ?? null,
+    bestChallengerAnswerQuality: gateReport?.bestChallenger?.answerQuality ?? null,
+    deltaVsBaseline: gateReport?.comparison?.deltaVsBaseline ?? null,
+    winningArmFailureCount: winnerArmFailureCount,
+    winningArmAnswerFailures: Number(bestChallengerWinningArm?.answerFailures ?? 0),
+    winningArmJudgeFailures: Number(bestChallengerWinningArm?.judgeFailures ?? 0),
+    nextLargerSliceChallenger: gateReport?.bestChallenger?.method && gateReport?.bestChallenger?.winnerStrategy
+      ? `${gateReport.bestChallenger.method}:${gateReport.bestChallenger.winnerStrategy}`
+      : null,
+    nextActions: arrayOf(gateReport?.nextActions),
+    rows: rows.map((row) => ({
+      method: row.method ?? null,
+      winnerStrategy: row.winnerStrategy ?? null,
+      answerQuality: row.answerQuality ?? null,
+      answerFailures: Number(row.answerFailures ?? 0),
+      judgeFailures: Number(row.judgeFailures ?? 0),
+    })),
+  };
+}
+
 function gate(id, passed, blockers) {
   return {
     id,
@@ -1692,6 +1786,21 @@ function renderMarkdown(value) {
     `- Counts as full memory SOTA evidence: ${value.providerWaveState.countsAsFullMemorySotaEvidence}`,
     `- Counts as end-to-end memory benchmark: ${value.providerWaveState.countsAsEndToEndMemoryBenchmark}`,
     `- Best provider rows: ${value.providerWaveState.bestProviderRows.map((row) => `${row.provider}:${row.bestStrategy ?? "n/a"}:${row.bestQuality ?? "n/a"}`).join(", ") || "none"}`,
+    "",
+    "## Method Ladder Result Gate",
+    `- Status: ${value.methodLadderState.status ?? "n/a"}`,
+    `- Evidence ready: ${value.methodLadderState.evidenceReady}`,
+    `- Counts as method-ladder evidence: ${value.methodLadderState.countsAsMethodLadderEvidence}`,
+    `- Counts as full memory SOTA evidence: ${value.methodLadderState.countsAsFullMemorySotaEvidence}`,
+    `- Query count: ${value.methodLadderState.queryCount}`,
+    `- Method count: ${value.methodLadderState.methodCount}`,
+    `- Baseline: ${value.methodLadderState.baselineMethod ?? "n/a"}:${value.methodLadderState.baselineWinnerStrategy ?? "n/a"}:${value.methodLadderState.baselineAnswerQuality ?? "n/a"}`,
+    `- Best challenger: ${value.methodLadderState.bestChallengerMethod ?? "n/a"}:${value.methodLadderState.bestChallengerWinnerStrategy ?? "n/a"}:${value.methodLadderState.bestChallengerAnswerQuality ?? "n/a"}`,
+    `- Delta vs baseline: ${value.methodLadderState.deltaVsBaseline ?? "n/a"}`,
+    `- Winning arm failures: ${value.methodLadderState.winningArmFailureCount}`,
+    `- Total failure rate: ${value.methodLadderState.totalFailureRate}`,
+    `- Next larger-slice challenger: ${value.methodLadderState.nextLargerSliceChallenger ?? "n/a"}`,
+    `- Rows: ${value.methodLadderState.rows.map((row) => `${row.method}:${row.winnerStrategy ?? "n/a"}:${row.answerQuality ?? "n/a"}`).join(", ") || "none"}`,
     "",
     "## Blockers",
     ...(value.blockers.length ? value.blockers.map((item) => `- ${item}`) : ["- none"]),

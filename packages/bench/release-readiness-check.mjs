@@ -401,6 +401,8 @@ const requiredFiles = [
   `${reviewDir}/full-memory-sota-doctor-20260526.md`,
   `${reviewDir}/full-memory-sota-doctor-20260527.json`,
   `${reviewDir}/full-memory-sota-doctor-20260527.md`,
+  `${reviewDir}/full-memory-sota-doctor-after-method-ladder-gate-20260531.json`,
+  `${reviewDir}/full-memory-sota-doctor-after-method-ladder-gate-20260531.md`,
   `${reviewDir}/full-memory-sota-doctor-after-local-full-combine-20260531.json`,
   `${reviewDir}/full-memory-sota-doctor-after-local-full-combine-20260531.md`,
   `${reviewDir}/full-memory-sota-doctor-after-shard-020-20260529.json`,
@@ -2922,13 +2924,16 @@ check("fresh public benchmark target check passes", () => {
   );
   const fullMemorySotaDoctorFresh = JSON.parse(run("node", ["packages/bench/full-memory-sota-doctor.mjs"]).stdout);
   const fullMemorySotaDoctorMarkdownFresh = run("node", ["packages/bench/full-memory-sota-doctor.mjs", "--format", "markdown"]).stdout;
-  const fullMemorySotaDoctorEvidence = JSON.parse(
-    readFileSync(join(root, reviewDir, "full-memory-sota-doctor-after-local-full-combine-20260531.json"), "utf8"),
+  const fullMemorySotaDoctorEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
+    "full-memory-sota-doctor-after-local-full-combine-20260531.json",
   );
-  const fullMemorySotaDoctorMarkdownEvidence = readFileSync(
-    join(root, reviewDir, "full-memory-sota-doctor-after-local-full-combine-20260531.md"),
-    "utf8",
+  const fullMemorySotaDoctorMarkdownEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
+    "full-memory-sota-doctor-after-local-full-combine-20260531.md",
   );
+  const fullMemorySotaDoctorEvidence = JSON.parse(readFileSync(join(root, reviewDir, fullMemorySotaDoctorEvidencePath), "utf8"));
+  const fullMemorySotaDoctorMarkdownEvidence = readFileSync(join(root, reviewDir, fullMemorySotaDoctorMarkdownEvidencePath), "utf8");
   const providerOperatorPacket = JSON.parse(run("node", ["packages/bench/provider-benchmark-operator-packet.mjs", "--provider", "voyage"]).stdout);
   const providerOperatorPacketMarkdown = run("node", [
     "packages/bench/provider-benchmark-operator-packet.mjs",
@@ -6082,6 +6087,12 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("gemini"));
     assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("nvidia"));
     assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("voyage"));
+    assert.equal(doctorReport.methodLadderState?.evidenceReady, true);
+    assert.equal(doctorReport.methodLadderState?.countsAsMethodLadderEvidence, true);
+    assert.equal(doctorReport.methodLadderState?.countsAsFullMemorySotaEvidence, false);
+    assert.equal(doctorReport.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
+    assert.equal(doctorReport.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
+    assert.equal(doctorReport.methodLadderState?.winningArmFailureCount, 0);
     assert.equal(doctorReport.reportedTargets?.sourceEvidenceCheckedAt, "2026-05-26");
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetsSourceLocked, true);
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetCount, 1);
@@ -6385,6 +6396,10 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Completed provider families: gemini, nvidia, voyage/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Repair wave status: READY_PROVIDER_REPAIR_WAVES/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Recommended repair execution: single-provider-single-slice/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Method Ladder Result Gate/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /method-ladder-result-gate: pass/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Best challenger: contextual-source-chunk-v1:bm25-lite:31\.6667/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-provider-key-file-check-"));
@@ -10276,6 +10291,12 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`);
   return result;
+}
+
+function preferReviewFile(...names) {
+  const found = names.find((name) => existsSync(join(root, reviewDir, name)));
+  assert.ok(found, `none of the expected review files exist: ${names.join(", ")}`);
+  return found;
 }
 
 function cleanupStaleReleaseCheckTempRoots(roots, { maxAgeMs }) {
