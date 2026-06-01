@@ -31,27 +31,29 @@ adapter/report commit and does not close launch, production, or SOTA blockers.
 The latest refresh promotes `5ac6c50` as the approved runtime canary baseline
 because it fixes the source-locked provider shard repair path and regenerates
 the current OpenClaw handoff packet around that runtime commit. The current
-repository head is `c986f86`, which only refreshes public-safe handoff evidence
-for that packet.
+repository head is `5613051`, which promotes that provider-shard-fixed canary
+baseline into release-state and corrects the release gate without changing the
+approved runtime adapter/report commit.
 
 ## Latest Observed PR Branch Head
 
-- Commit: `c986f86172803d501c0dadd03fed3daec8d75673`
-- Commit title: `canary: refresh handoff packet for provider shard fix`
-- GitHub Actions run: `26778768300`
+- Commit: `5613051455f056f8161da8f9d4aac7c7aefe77cc`
+- Commit title: `release: promote provider shard canary baseline`
+- GitHub Actions run: `26779783551`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
 This does not change the approved runtime canary adapter/report commit. It
-updates the current PR-head evidence, records the active handoff refresh, and
-keeps the result as release/readiness evidence only until live same-data
-provider runs are scored and a real production canary is returned.
+updates the current PR-head evidence, records the provider-shard-fixed canary
+baseline promotion, and keeps the result as release/readiness evidence only
+until live same-data provider runs are scored and a real production canary is
+returned.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `c986f86172803d501c0dadd03fed3daec8d75673`
-- Commit title: `canary: refresh handoff packet for provider shard fix`
-- GitHub Actions run: `26778768300`
+- Commit: `5613051455f056f8161da8f9d4aac7c7aefe77cc`
+- Commit title: `release: promote provider shard canary baseline`
+- GitHub Actions run: `26779783551`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -74,7 +76,7 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - Targeted public docs/evidence secret and private-path scan
 - Stale local model server check
-- GitHub Actions run `26778768300`
+- GitHub Actions run `26779783551`
 
 ## Canary Handoff Artifact
 

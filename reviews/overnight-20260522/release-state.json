@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-01T20:05:19Z",
+  "generatedAt": "2026-06-01T20:25:07Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -498,14 +498,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "c986f86172803d501c0dadd03fed3daec8d75673",
-    "ciRunId": 26778768300,
+    "headSha": "5613051455f056f8161da8f9d4aac7c7aefe77cc",
+    "ciRunId": 26779783551,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_current_openclaw_canary_handoff_refresh_and_public_safe_evidence_guards",
+    "localSmoke": "release_check_covers_current_openclaw_canary_handoff_refresh_provider_shard_baseline_and_public_safe_evidence_guards",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after refreshing the OpenClaw next-agent canary handoff evidence to the provider-shard-fixed runtime commit. GitHub Actions run 26778768300 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
+    "note": "Latest observed PR branch head after promoting the provider-shard-fixed OpenClaw canary baseline into release-state and correcting the release gate so current packet identity comes from release-state while historical packet evidence stays historical. GitHub Actions run 26779783551 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "5ac6c50e845c4c8d8e5d358e604700e4163b7fea",

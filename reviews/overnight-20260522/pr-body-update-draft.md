@@ -272,11 +272,13 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
 ## Latest Verified Baseline
 
 - Latest verified PR branch head:
-- `c986f86172803d501c0dadd03fed3daec8d75673`.
-- GitHub Actions run `26778768300`: passed CI after refreshing the OpenClaw
-  canary handoff evidence to the provider-shard-fixed runtime commit. This is
-  release/readiness hygiene only; it keeps the active handoff public-safe and
-  current, but it does not authorize public SOTA claims or production rollout.
+- `5613051455f056f8161da8f9d4aac7c7aefe77cc`.
+- GitHub Actions run `26779783551`: passed CI after promoting the
+  provider-shard-fixed OpenClaw canary baseline into release-state and
+  correcting the release gate so current packet identity comes from
+  release-state. This is release/readiness hygiene only; it keeps the active
+  handoff public-safe and current, but it does not authorize public SOTA claims
+  or production rollout.
 - Approved runtime canary/report commit:
   `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
 - GitHub Actions run `26778156742`: passed CI after fixing the source-locked
@@ -414,10 +416,10 @@ The code, fixture UI, release gate, CI, and Claude Opus review are healthy enoug
   OpenClaw handoff packet now expects returned canary evidence to report
   `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
 - Latest verified repository evidence head:
-  `c986f86172803d501c0dadd03fed3daec8d75673`.
-- GitHub Actions run `26778768300`: passed CI after refreshing the checked-in
-  OpenClaw handoff evidence around the `5ac6c50` packet. This preserves launch,
-  production rollout, and full-SOTA blockers.
+  `5613051455f056f8161da8f9d4aac7c7aefe77cc`.
+- GitHub Actions run `26779783551`: passed CI after promoting the checked-in
+  provider-shard-fixed OpenClaw canary baseline and release-gate identity
+  contract. This preserves launch, production rollout, and full-SOTA blockers.
 - Benchmark interpretation: the 75-question
   `contextual-source-chunk-v1:bm25-lite` result is a memory-method and
   materialization ablation gate, not the final whole-harness score. It is
