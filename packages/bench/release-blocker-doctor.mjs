@@ -16,6 +16,7 @@ const requiredBlockers = [
   "fresh-real-container-canary-not-current",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
   "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.json",
   "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
   "full-memory-sota-doctor-after-local-full-combine-20260531.json",
@@ -35,6 +36,7 @@ const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-20260527.json",
 );
 const fullMemorySotaDoctorMarkdown = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md",
   "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.md",
   "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
   "full-memory-sota-doctor-after-local-full-combine-20260531.md",
@@ -458,7 +460,11 @@ assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsMethodLadderEvidenc
 assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsFullMemorySotaEvidence, false);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
 assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
-assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmFailureCount, 0);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.queryCount, 75);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmFailureCount, 1);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmJudgeFailures, 1);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmAnswerFailures, 0);
+assert.ok(fullMemorySotaDoctor.methodLadderState?.totalFailureRate <= 0.003);
 assert.match(fullMemorySotaDoctorText, /Next local-full shard: n\/a \(n\/a\)/);
 assert.match(fullMemorySotaDoctorText, /Combined score winner: local-apple-qwen3-0_6b-local-rerank/);
 assert.match(fullMemorySotaDoctorText, /Memory score gate status: READY_LOCAL_FULL_MEMORY_SCORE/);

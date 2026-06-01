@@ -106,6 +106,7 @@ const files = {
   liveProviderCanary: `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
   providerWaveIntake: `${reviewDir}/provider-wave-intake-20260531.json`,
   methodLadderResultGate: preferReviewFile(
+    "answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
     "answer-quality-memory-method-ladder-60q-result-gate-20260531.json",
     "answer-quality-memory-method-ladder-30q-result-gate-20260531.json",
   ),
