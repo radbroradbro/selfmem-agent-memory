@@ -19,6 +19,9 @@ const requirePairedBootstrap = Boolean(args.requirePairedBootstrap);
 const minPairedMeanDelta = Number(args.minPairedMeanDelta ?? minDelta);
 const minPairedBootstrapLowerBound = Number(args.minPairedBootstrapLowerBound ?? 0);
 const pairedBootstrapSamples = positiveInt(args.pairedBootstrapSamples ?? 1000, "--paired-bootstrap-samples");
+const promotionMinQueryCount = positiveInt(args.promotionMinQueryCount ?? 75, "--promotion-min-query-count");
+const promotionMaxWinnerArmFailures = Number(args.promotionMaxWinnerArmFailures ?? maxWinnerArmFailures);
+const promotionMaxTotalFailureRate = Number(args.promotionMaxTotalFailureRate ?? maxTotalFailureRate);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -32,6 +35,8 @@ assert.ok(Number.isFinite(maxWinnerArmFailures) && maxWinnerArmFailures >= 0, "-
 assert.ok(Number.isFinite(maxTotalFailureRate) && maxTotalFailureRate >= 0, "--max-total-failure-rate must be a non-negative number");
 assert.ok(Number.isFinite(minPairedMeanDelta), "--min-paired-mean-delta must be numeric");
 assert.ok(Number.isFinite(minPairedBootstrapLowerBound), "--min-paired-bootstrap-lower-bound must be numeric");
+assert.ok(Number.isFinite(promotionMaxWinnerArmFailures) && promotionMaxWinnerArmFailures >= 0, "--promotion-max-winner-arm-failures must be a non-negative number");
+assert.ok(Number.isFinite(promotionMaxTotalFailureRate) && promotionMaxTotalFailureRate >= 0, "--promotion-max-total-failure-rate must be a non-negative number");
 
 const loaded = loadResult();
 const report = buildGateReport({ loaded });
@@ -88,6 +93,7 @@ function buildGateReport({ loaded }) {
     challenger: bestChallenger,
     samples: pairedBootstrapSamples,
   });
+  const queryCount = Number(result?.queryShard?.endIndexExclusive ?? 0) - Number(result?.queryShard?.startIndex ?? 0);
 
   const checks = {
     resultExists: loaded.exists,
@@ -142,6 +148,15 @@ function buildGateReport({ loaded }) {
     !checks.pairedBootstrapMeanDelta ? "paired-bootstrap-mean-delta-below-threshold" : null,
     !checks.pairedBootstrapLowerBound ? "paired-bootstrap-lower-bound-below-threshold" : null,
   ].filter(Boolean);
+  const promotion = buildPromotionState({
+    blockers,
+    checks,
+    queryCount,
+    pairedBootstrap,
+    winnerArmFailures,
+    totalFailureRate,
+    bestChallenger,
+  });
 
   return {
     schemaVersion: 1,
@@ -171,6 +186,9 @@ function buildGateReport({ loaded }) {
       minPairedMeanDelta,
       minPairedBootstrapLowerBound,
       pairedBootstrapSamples,
+      promotionMinQueryCount,
+      promotionMaxWinnerArmFailures,
+      promotionMaxTotalFailureRate,
     },
     result: {
       source: loaded.source,
@@ -204,6 +222,7 @@ function buildGateReport({ loaded }) {
         : null,
       pairedBootstrap,
     },
+    promotion,
     rows,
     checks,
     blockers,
@@ -218,6 +237,73 @@ function buildGateReport({ loaded }) {
           "Carry session-v1, BM25, and full-hybrid controls forward so the next slice can confirm or reject this lift.",
           "Attach this gate report to the SOTA ladder packet as method-selection evidence only.",
         ],
+  };
+}
+
+function buildPromotionState({ blockers, checks, queryCount, pairedBootstrap, winnerArmFailures, totalFailureRate, bestChallenger }) {
+  const promotionChecks = {
+    methodEvidenceReady: blockers.length === 0,
+    queryCountMinimum: Number(queryCount) >= promotionMinQueryCount,
+    pairedBootstrapAvailable: pairedBootstrap.available === true,
+    pairedBootstrapMeanDelta: Number(pairedBootstrap.meanDelta ?? -Infinity) >= minPairedMeanDelta,
+    pairedBootstrapLowerBound: Number(pairedBootstrap.lowerBound95 ?? -Infinity) >= minPairedBootstrapLowerBound,
+    failureAccountedWinnerArm: Number(winnerArmFailures ?? Infinity) <= promotionMaxWinnerArmFailures,
+    failureAccountedTotalRate: Number(totalFailureRate ?? Infinity) <= promotionMaxTotalFailureRate,
+    sameShardAndPrivacyReady:
+      checks.sameRawQuerySelection === true &&
+      checks.privacyLeakCountersClear === true &&
+      checks.rawQuestionsExcluded === true &&
+      checks.rawAnswersExcluded === true &&
+      checks.rawMemoryExcluded === true &&
+      checks.rawTranscriptExcluded === true,
+  };
+  const promotionBlockers = [
+    !promotionChecks.methodEvidenceReady ? "method-ladder-evidence-not-ready" : null,
+    !promotionChecks.queryCountMinimum ? "promotion-query-count-below-minimum" : null,
+    !promotionChecks.pairedBootstrapAvailable ? "promotion-paired-bootstrap-missing" : null,
+    !promotionChecks.pairedBootstrapMeanDelta ? "promotion-paired-bootstrap-mean-delta-below-threshold" : null,
+    !promotionChecks.pairedBootstrapLowerBound ? "promotion-paired-bootstrap-lower-bound-below-threshold" : null,
+    !promotionChecks.failureAccountedWinnerArm ? "promotion-winner-arm-failure-limit-exceeded" : null,
+    !promotionChecks.failureAccountedTotalRate ? "promotion-total-failure-rate-limit-exceeded" : null,
+    !promotionChecks.sameShardAndPrivacyReady ? "promotion-same-shard-or-privacy-contract-not-ready" : null,
+  ].filter(Boolean);
+  const warnings = [
+    Number(winnerArmFailures ?? 0) > 0
+      ? "winner-arm-has-tolerated-call-failures; this remains challenger-only evidence"
+      : null,
+    "does-not-promote-production-default",
+    "does-not-count-as-full-memory-sota-evidence",
+  ].filter(Boolean);
+  return {
+    scope: "next-larger-slice-challenger-only",
+    status: promotionBlockers.length === 0
+      ? "READY_NEXT_LARGER_SLICE_CHALLENGER"
+      : "BLOCKED_NEXT_LARGER_SLICE_CHALLENGER",
+    readyForNextLargerSlice: promotionBlockers.length === 0,
+    productionDefaultAllowed: false,
+    publicSotaClaimAllowed: false,
+    challenger: bestChallenger?.method && bestChallenger?.winnerStrategy
+      ? `${bestChallenger.method}:${bestChallenger.winnerStrategy}`
+      : null,
+    checks: promotionChecks,
+    blockers: promotionBlockers,
+    warnings,
+    failureAccounting: {
+      winnerArmFailures,
+      totalFailureRate,
+      maxWinnerArmFailures: promotionMaxWinnerArmFailures,
+      maxTotalFailureRate: promotionMaxTotalFailureRate,
+    },
+    pairedBootstrap: {
+      requiredForPromotion: true,
+      available: pairedBootstrap.available,
+      commonQueryCount: pairedBootstrap.commonQueryCount,
+      meanDelta: pairedBootstrap.meanDelta,
+      lowerBound95: pairedBootstrap.lowerBound95,
+      upperBound95: pairedBootstrap.upperBound95,
+      minMeanDelta: minPairedMeanDelta,
+      minLowerBound: minPairedBootstrapLowerBound,
+    },
   };
 }
 
@@ -352,6 +438,20 @@ function renderMarkdown(value) {
     `- Paired bootstrap available: ${value.comparison.pairedBootstrap.available}`,
     `- Paired bootstrap mean delta: ${value.comparison.pairedBootstrap.meanDelta}`,
     `- Paired bootstrap 95% lower bound: ${value.comparison.pairedBootstrap.lowerBound95}`,
+    "",
+    "## Promotion Boundary",
+    "",
+    `- Status: ${value.promotion.status}`,
+    `- Scope: ${value.promotion.scope}`,
+    `- Ready for next larger slice: ${value.promotion.readyForNextLargerSlice}`,
+    `- Production default allowed: ${value.promotion.productionDefaultAllowed}`,
+    `- Public SOTA claim allowed: ${value.promotion.publicSotaClaimAllowed}`,
+    `- Challenger: ${value.promotion.challenger ?? "n/a"}`,
+    `- Bootstrap required for promotion: ${value.promotion.pairedBootstrap.requiredForPromotion}`,
+    `- Bootstrap common queries: ${value.promotion.pairedBootstrap.commonQueryCount ?? "n/a"}`,
+    `- Bootstrap lower bound: ${value.promotion.pairedBootstrap.lowerBound95 ?? "n/a"}`,
+    `- Promotion warnings: ${value.promotion.warnings.join("; ") || "none"}`,
+    `- Promotion blockers: ${value.promotion.blockers.join("; ") || "none"}`,
     "",
     "## Method Rows",
     "",

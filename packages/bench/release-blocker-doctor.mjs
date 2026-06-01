@@ -461,10 +461,17 @@ assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsFullMemorySotaEvide
 assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
 assert.equal(fullMemorySotaDoctor.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
 assert.equal(fullMemorySotaDoctor.methodLadderState?.queryCount, 75);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapAvailable, true);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapCommonQueryCount, 75);
+assert.ok(Number(fullMemorySotaDoctor.methodLadderState?.pairedBootstrapLowerBound95 ?? 0) >= 1);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmFailureCount, 1);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmJudgeFailures, 1);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.winningArmAnswerFailures, 0);
 assert.ok(fullMemorySotaDoctor.methodLadderState?.totalFailureRate <= 0.003);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.nextLargerSlicePromotionReady, true);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.promotionScope, "next-larger-slice-challenger-only");
+assert.equal(fullMemorySotaDoctor.methodLadderState?.productionDefaultAllowed, false);
+assert.equal(fullMemorySotaDoctor.methodLadderState?.publicSotaClaimAllowedByMethodLadder, false);
 assert.match(fullMemorySotaDoctorText, /Next local-full shard: n\/a \(n\/a\)/);
 assert.match(fullMemorySotaDoctorText, /Combined score winner: local-apple-qwen3-0_6b-local-rerank/);
 assert.match(fullMemorySotaDoctorText, /Memory score gate status: READY_LOCAL_FULL_MEMORY_SCORE/);
@@ -472,6 +479,9 @@ assert.match(fullMemorySotaDoctorText, /Provider Wave Intake/);
 assert.match(fullMemorySotaDoctorText, /All waves include BM25: true/);
 assert.match(fullMemorySotaDoctorText, /All waves include full hybrid: true/);
 assert.match(fullMemorySotaDoctorText, /Method Ladder Result Gate/);
+assert.match(fullMemorySotaDoctorText, /Paired bootstrap 95% lower bound: 8/);
+assert.match(fullMemorySotaDoctorText, /Next larger-slice promotion ready: true/);
+assert.match(fullMemorySotaDoctorText, /Production default allowed by method ladder: false/);
 assert.match(fullMemorySotaDoctorText, /Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite/);
 assert.match(fullMemorySotaDoctorText, /Counts as full memory SOTA evidence: false/i);
 

@@ -6259,10 +6259,18 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.methodLadderState?.countsAsFullMemorySotaEvidence, false);
     assert.equal(doctorReport.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
     assert.equal(doctorReport.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
+    assert.equal(doctorReport.methodLadderState?.pairedBootstrapAvailable, true);
+    assert.equal(doctorReport.methodLadderState?.pairedBootstrapCommonQueryCount, 75);
+    assert.ok(Number(doctorReport.methodLadderState?.pairedBootstrapLowerBound95 ?? 0) >= 1);
     assert.ok(Number(doctorReport.methodLadderState?.winningArmFailureCount ?? 0) <= 1);
     assert.equal(Number(doctorReport.methodLadderState?.winningArmAnswerFailures ?? 0), 0);
     assert.ok(Number(doctorReport.methodLadderState?.winningArmJudgeFailures ?? 0) <= 1);
     assert.ok(Number(doctorReport.methodLadderState?.totalFailureRate ?? 0) <= 0.00222);
+    assert.equal(doctorReport.methodLadderState?.nextLargerSlicePromotionReady, true);
+    assert.equal(doctorReport.methodLadderState?.promotionScope, "next-larger-slice-challenger-only");
+    assert.equal(doctorReport.methodLadderState?.productionDefaultAllowed, false);
+    assert.equal(doctorReport.methodLadderState?.publicSotaClaimAllowedByMethodLadder, false);
+    assert.ok(doctorReport.methodLadderState?.promotionWarnings.includes("winner-arm-has-tolerated-call-failures; this remains challenger-only evidence"));
     assert.equal(doctorReport.reportedTargets?.sourceEvidenceCheckedAt, "2026-05-26");
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetsSourceLocked, true);
     assert.equal(doctorReport.reportedTargets?.benchmarkHarnessTargetCount, 1);
@@ -6569,8 +6577,11 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Method Ladder Result Gate/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /method-ladder-result-gate: pass/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Best challenger: contextual-source-chunk-v1:bm25-lite:37\.4667/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Paired bootstrap 95% lower bound: 8/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Winning arm failures: 1/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Total failure rate: 0\.00222/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next larger-slice promotion ready: true/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Production default allowed by method ladder: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Raw Source Retention/);
   {

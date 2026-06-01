@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "answer-quality-method-ladder-result-gate",
   "status": "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER",
-  "generatedAt": "2026-06-01T05:49:00.278Z",
+  "generatedAt": "2026-06-01T14:59:12.681Z",
   "publicSafe": true,
   "metricsOnly": true,
   "callsProviderApis": false,
@@ -20,7 +20,10 @@
     "requirePairedBootstrap": true,
     "minPairedMeanDelta": 1,
     "minPairedBootstrapLowerBound": 1,
-    "pairedBootstrapSamples": 1000
+    "pairedBootstrapSamples": 1000,
+    "promotionMinQueryCount": 75,
+    "promotionMaxWinnerArmFailures": 1,
+    "promotionMaxTotalFailureRate": 0.01
   },
   "result": {
     "source": "result-file",
@@ -2407,6 +2410,46 @@
       "available": true,
       "baselineFingerprintCount": 75,
       "challengerFingerprintCount": 75,
+      "commonQueryCount": 75,
+      "meanDelta": 15.7333,
+      "lowerBound95": 8,
+      "upperBound95": 23.7333,
+      "minMeanDelta": 1,
+      "minLowerBound": 1
+    }
+  },
+  "promotion": {
+    "scope": "next-larger-slice-challenger-only",
+    "status": "READY_NEXT_LARGER_SLICE_CHALLENGER",
+    "readyForNextLargerSlice": true,
+    "productionDefaultAllowed": false,
+    "publicSotaClaimAllowed": false,
+    "challenger": "contextual-source-chunk-v1:bm25-lite",
+    "checks": {
+      "methodEvidenceReady": true,
+      "queryCountMinimum": true,
+      "pairedBootstrapAvailable": true,
+      "pairedBootstrapMeanDelta": true,
+      "pairedBootstrapLowerBound": true,
+      "failureAccountedWinnerArm": true,
+      "failureAccountedTotalRate": true,
+      "sameShardAndPrivacyReady": true
+    },
+    "blockers": [],
+    "warnings": [
+      "winner-arm-has-tolerated-call-failures; this remains challenger-only evidence",
+      "does-not-promote-production-default",
+      "does-not-count-as-full-memory-sota-evidence"
+    ],
+    "failureAccounting": {
+      "winnerArmFailures": 1,
+      "totalFailureRate": 0.00222,
+      "maxWinnerArmFailures": 1,
+      "maxTotalFailureRate": 0.01
+    },
+    "pairedBootstrap": {
+      "requiredForPromotion": true,
+      "available": true,
       "commonQueryCount": 75,
       "meanDelta": 15.7333,
       "lowerBound95": 8,

@@ -22,6 +22,20 @@
 - Paired bootstrap mean delta: 15.7333
 - Paired bootstrap 95% lower bound: 8
 
+## Promotion Boundary
+
+- Status: READY_NEXT_LARGER_SLICE_CHALLENGER
+- Scope: next-larger-slice-challenger-only
+- Ready for next larger slice: true
+- Production default allowed: false
+- Public SOTA claim allowed: false
+- Challenger: contextual-source-chunk-v1:bm25-lite
+- Bootstrap required for promotion: true
+- Bootstrap common queries: 75
+- Bootstrap lower bound: 8
+- Promotion warnings: winner-arm-has-tolerated-call-failures; this remains challenger-only evidence; does-not-promote-production-default; does-not-count-as-full-memory-sota-evidence
+- Promotion blockers: none
+
 ## Method Rows
 
 | Method | Winner | Answer quality | Calls | Answer failures | Judge failures |

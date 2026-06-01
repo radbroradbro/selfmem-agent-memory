@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-06-01T05:51:13.300Z",
+  "generatedAt": "2026-06-01T14:59:35.753Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -377,14 +377,14 @@
     "providerWaveIntake": {
       "path": "reviews/overnight-20260522/provider-wave-intake-20260531.json",
       "exists": true,
-      "hash": "sha256:c58bcc4cf9bc3658b637b9bf42c07e4443171382729d8e3b84e546ed4d273ca0",
+      "hash": "sha256:42ed87b247cbbf1ae72aef8da48ae26d9a2e049bd96c56bb138909c205541736",
       "mode": "provider-wave-intake",
       "status": "READY_PROVIDER_WAVE_INTAKE"
     },
     "methodLadderResultGate": {
       "path": "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
       "exists": true,
-      "hash": "sha256:2897a2b24addfa0aa02142db272541efde93e3b67d60820be620a10774ab8fd5",
+      "hash": "sha256:8a8d9e5de6ac3539c20fc3611da170b0b002ec1c23b57e9dd97d66db4b2bd168",
       "mode": "answer-quality-method-ladder-result-gate",
       "status": "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER"
     },
@@ -1225,7 +1225,7 @@
   },
   "methodLadderState": {
     "path": "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
-    "hash": "sha256:2897a2b24addfa0aa02142db272541efde93e3b67d60820be620a10774ab8fd5",
+    "hash": "sha256:8a8d9e5de6ac3539c20fc3611da170b0b002ec1c23b57e9dd97d66db4b2bd168",
     "status": "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER",
     "evidenceReady": true,
     "evidenceBlockers": [],
@@ -1248,9 +1248,25 @@
     "bestChallengerWinnerStrategy": "bm25-lite",
     "bestChallengerAnswerQuality": 37.4667,
     "deltaVsBaseline": 15.7334,
+    "pairedBootstrapAvailable": true,
+    "pairedBootstrapCommonQueryCount": 75,
+    "pairedBootstrapMeanDelta": 15.7333,
+    "pairedBootstrapLowerBound95": 8,
+    "pairedBootstrapUpperBound95": 23.7333,
     "winningArmFailureCount": 1,
     "winningArmAnswerFailures": 0,
     "winningArmJudgeFailures": 1,
+    "nextLargerSlicePromotionReady": true,
+    "promotionStatus": "READY_NEXT_LARGER_SLICE_CHALLENGER",
+    "promotionScope": "next-larger-slice-challenger-only",
+    "promotionWarnings": [
+      "winner-arm-has-tolerated-call-failures; this remains challenger-only evidence",
+      "does-not-promote-production-default",
+      "does-not-count-as-full-memory-sota-evidence"
+    ],
+    "promotionBlockers": [],
+    "productionDefaultAllowed": false,
+    "publicSotaClaimAllowedByMethodLadder": false,
     "nextLargerSliceChallenger": "contextual-source-chunk-v1:bm25-lite",
     "nextActions": [
       "Use contextual-source-chunk-v1 with bm25-lite as the next larger-slice challenger.",

@@ -1492,6 +1492,8 @@ function inspectMethodLadderResultGate(loadedEvidence) {
   const bestChallengerWinningArm = arrayOf(gateReport?.bestChallenger?.strategies).find(
     (item) => item.strategy === gateReport?.bestChallenger?.winnerStrategy,
   );
+  const promotion = gateReport?.promotion ?? {};
+  const pairedBootstrap = gateReport?.comparison?.pairedBootstrap ?? {};
   const safe =
     gateReport?.mode === "answer-quality-method-ladder-result-gate" &&
     gateReport?.status === "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER" &&
@@ -1515,7 +1517,13 @@ function inspectMethodLadderResultGate(loadedEvidence) {
     gateReport?.checks?.bestOverallIsChallenger === true &&
     gateReport?.checks?.winnerArmFailureLimit === true &&
     gateReport?.checks?.totalFailureRateLimit === true &&
-    gateReport?.checks?.privacyLeakCountersClear === true;
+    gateReport?.checks?.privacyLeakCountersClear === true &&
+    promotion.readyForNextLargerSlice === true &&
+    promotion.productionDefaultAllowed === false &&
+    promotion.publicSotaClaimAllowed === false &&
+    promotion.scope === "next-larger-slice-challenger-only" &&
+    promotion.pairedBootstrap?.requiredForPromotion === true &&
+    pairedBootstrap.available === true;
   const winnerArmFailureCount = Number(gateReport?.comparison?.winnerArmFailures ?? 0);
   const totalFailureRate = Number(gateReport?.result?.totalFailureRate ?? 1);
   const evidenceBlockers = [
@@ -1532,6 +1540,11 @@ function inspectMethodLadderResultGate(loadedEvidence) {
     totalFailureRate > Number(gateReport?.thresholds?.maxTotalFailureRate ?? 0.01)
       ? "method-ladder-total-failure-rate-too-high"
       : null,
+    promotion.readyForNextLargerSlice !== true ? "method-ladder-next-slice-promotion-not-ready" : null,
+    promotion.productionDefaultAllowed !== false ? "method-ladder-production-default-not-blocked" : null,
+    promotion.publicSotaClaimAllowed !== false ? "method-ladder-sota-claim-not-blocked" : null,
+    promotion.pairedBootstrap?.requiredForPromotion !== true ? "method-ladder-paired-bootstrap-not-required-for-promotion" : null,
+    pairedBootstrap.available !== true ? "method-ladder-paired-bootstrap-missing" : null,
     rows.length < 2 ? "method-ladder-too-few-methods" : null,
   ].filter(Boolean);
   return {
@@ -1559,9 +1572,21 @@ function inspectMethodLadderResultGate(loadedEvidence) {
     bestChallengerWinnerStrategy: gateReport?.bestChallenger?.winnerStrategy ?? null,
     bestChallengerAnswerQuality: gateReport?.bestChallenger?.answerQuality ?? null,
     deltaVsBaseline: gateReport?.comparison?.deltaVsBaseline ?? null,
+    pairedBootstrapAvailable: Boolean(pairedBootstrap.available),
+    pairedBootstrapCommonQueryCount: Number(pairedBootstrap.commonQueryCount ?? 0),
+    pairedBootstrapMeanDelta: pairedBootstrap.meanDelta ?? null,
+    pairedBootstrapLowerBound95: pairedBootstrap.lowerBound95 ?? null,
+    pairedBootstrapUpperBound95: pairedBootstrap.upperBound95 ?? null,
     winningArmFailureCount: winnerArmFailureCount,
     winningArmAnswerFailures: Number(bestChallengerWinningArm?.answerFailures ?? 0),
     winningArmJudgeFailures: Number(bestChallengerWinningArm?.judgeFailures ?? 0),
+    nextLargerSlicePromotionReady: Boolean(promotion.readyForNextLargerSlice),
+    promotionStatus: promotion.status ?? null,
+    promotionScope: promotion.scope ?? null,
+    promotionWarnings: arrayOf(promotion.warnings),
+    promotionBlockers: arrayOf(promotion.blockers),
+    productionDefaultAllowed: Boolean(promotion.productionDefaultAllowed),
+    publicSotaClaimAllowedByMethodLadder: Boolean(promotion.publicSotaClaimAllowed),
     nextLargerSliceChallenger: gateReport?.bestChallenger?.method && gateReport?.bestChallenger?.winnerStrategy
       ? `${gateReport.bestChallenger.method}:${gateReport.bestChallenger.winnerStrategy}`
       : null,
@@ -1801,8 +1826,17 @@ function renderMarkdown(value) {
     `- Baseline: ${value.methodLadderState.baselineMethod ?? "n/a"}:${value.methodLadderState.baselineWinnerStrategy ?? "n/a"}:${value.methodLadderState.baselineAnswerQuality ?? "n/a"}`,
     `- Best challenger: ${value.methodLadderState.bestChallengerMethod ?? "n/a"}:${value.methodLadderState.bestChallengerWinnerStrategy ?? "n/a"}:${value.methodLadderState.bestChallengerAnswerQuality ?? "n/a"}`,
     `- Delta vs baseline: ${value.methodLadderState.deltaVsBaseline ?? "n/a"}`,
+    `- Paired bootstrap available: ${value.methodLadderState.pairedBootstrapAvailable}`,
+    `- Paired bootstrap common queries: ${value.methodLadderState.pairedBootstrapCommonQueryCount}`,
+    `- Paired bootstrap mean delta: ${value.methodLadderState.pairedBootstrapMeanDelta ?? "n/a"}`,
+    `- Paired bootstrap 95% lower bound: ${value.methodLadderState.pairedBootstrapLowerBound95 ?? "n/a"}`,
     `- Winning arm failures: ${value.methodLadderState.winningArmFailureCount}`,
     `- Total failure rate: ${value.methodLadderState.totalFailureRate}`,
+    `- Next larger-slice promotion ready: ${value.methodLadderState.nextLargerSlicePromotionReady}`,
+    `- Promotion scope: ${value.methodLadderState.promotionScope ?? "n/a"}`,
+    `- Production default allowed by method ladder: ${value.methodLadderState.productionDefaultAllowed}`,
+    `- Public SOTA claim allowed by method ladder: ${value.methodLadderState.publicSotaClaimAllowedByMethodLadder}`,
+    `- Promotion warnings: ${value.methodLadderState.promotionWarnings.join("; ") || "none"}`,
     `- Next larger-slice challenger: ${value.methodLadderState.nextLargerSliceChallenger ?? "n/a"}`,
     `- Rows: ${value.methodLadderState.rows.map((row) => `${row.method}:${row.winnerStrategy ?? "n/a"}:${row.answerQuality ?? "n/a"}`).join(", ") || "none"}`,
     "",

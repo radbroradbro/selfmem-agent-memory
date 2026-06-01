@@ -184,8 +184,17 @@
 - Baseline: session-v1:full-hybrid-rerank:21.7333
 - Best challenger: contextual-source-chunk-v1:bm25-lite:37.4667
 - Delta vs baseline: 15.7334
+- Paired bootstrap available: true
+- Paired bootstrap common queries: 75
+- Paired bootstrap mean delta: 15.7333
+- Paired bootstrap 95% lower bound: 8
 - Winning arm failures: 1
 - Total failure rate: 0.00222
+- Next larger-slice promotion ready: true
+- Promotion scope: next-larger-slice-challenger-only
+- Production default allowed by method ladder: false
+- Public SOTA claim allowed by method ladder: false
+- Promotion warnings: winner-arm-has-tolerated-call-failures; this remains challenger-only evidence; does-not-promote-production-default; does-not-count-as-full-memory-sota-evidence
 - Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite
 - Rows: session-v1:full-hybrid-rerank:21.7333, contextual-source-chunk-v1:bm25-lite:37.4667, atomic-memory-v1:bm25-lite:33.0667
 
