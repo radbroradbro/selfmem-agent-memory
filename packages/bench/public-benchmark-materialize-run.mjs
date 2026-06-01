@@ -47,6 +47,18 @@ const materializeQueryOffset = optionalNonNegativeInt(
   args.queryOffset ?? process.env.RECALLWEAVE_MATERIALIZE_QUERY_OFFSET ?? 0,
   "materialize query offset",
 );
+const datasetFetchAttempts = positiveInt(
+  args.datasetFetchAttempts ?? process.env.RECALLWEAVE_MATERIALIZE_DATASET_FETCH_ATTEMPTS ?? 3,
+  "dataset fetch attempts",
+);
+const datasetFetchTimeoutMs = positiveInt(
+  args.datasetFetchTimeoutMs ?? process.env.RECALLWEAVE_MATERIALIZE_DATASET_FETCH_TIMEOUT_MS ?? 120_000,
+  "dataset fetch timeout ms",
+);
+const datasetFetchRetryDelayMs = optionalNonNegativeInt(
+  args.datasetFetchRetryDelayMs ?? process.env.RECALLWEAVE_MATERIALIZE_DATASET_FETCH_RETRY_DELAY_MS ?? 1_000,
+  "dataset fetch retry delay ms",
+);
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -67,6 +79,11 @@ const provenanceMetadataKeys = new Set([
 
 if (args.atomicLifecycleSmoke === true) {
   runAtomicLifecycleSmoke();
+  process.exit(0);
+}
+
+if (args.datasetFetchRetrySmoke === true) {
+  await runDatasetFetchRetrySmoke();
   process.exit(0);
 }
 
@@ -607,9 +624,59 @@ async function readDatasetBuffer(datasetUrl) {
     assertOutsideRepo(file, "live raw benchmark dataset file");
     return readFileSync(file);
   }
-  const response = await fetch(datasetUrl);
-  assert.ok(response.ok, `dataset fetch failed: ${response.status}`);
-  return Buffer.from(await response.arrayBuffer());
+  return fetchDatasetBufferWithRetries(datasetUrl, {
+    attempts: datasetFetchAttempts,
+    timeoutMs: datasetFetchTimeoutMs,
+    retryDelayMs: datasetFetchRetryDelayMs,
+    fetchFn: fetch,
+  });
+}
+
+async function fetchDatasetBufferWithRetries(datasetUrl, { attempts, timeoutMs, retryDelayMs, fetchFn }) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(datasetUrl, { timeoutMs, fetchFn });
+      if (!response.ok) {
+        const error = new Error(`dataset fetch failed: ${response.status}`);
+        error.statusCode = Number(response.status ?? 0);
+        throw error;
+      }
+      return Buffer.from(await response.arrayBuffer());
+    } catch (error) {
+      lastError = error;
+      if (attempt >= attempts || !retryableDatasetFetchError(error)) throw error;
+      await sleep(retryDelayMs);
+    }
+  }
+  throw lastError ?? new Error("dataset fetch failed");
+}
+
+async function fetchWithTimeout(datasetUrl, { timeoutMs, fetchFn }) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  timeout.unref?.();
+  try {
+    return await fetchFn(datasetUrl, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function retryableDatasetFetchError(error) {
+  const statusCode = Number(error?.statusCode ?? 0);
+  if (statusCode >= 500 || statusCode === 429) return true;
+  if (statusCode >= 400) return false;
+  const code = String(error?.code ?? error?.cause?.code ?? "");
+  if (["ETIMEDOUT", "ECONNRESET", "EAI_AGAIN", "UND_ERR_SOCKET"].includes(code)) return true;
+  const name = String(error?.name ?? "");
+  const message = String(error?.message ?? "");
+  return name === "AbortError" || /terminated|timeout|timed?out|socket|network/i.test(message);
+}
+
+async function sleep(ms) {
+  if (!ms) return;
+  await new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 }
 
 function selectSlice(dataset, questionTypes, options) {
@@ -1105,6 +1172,36 @@ function runAtomicLifecycleSmoke() {
     linkedSupersedesCount: stats.linkedSupersedesCount,
     supersededCount: stats.supersededCount,
     currentTruth: current[0]?.content,
+  }, null, 2)}\n`);
+}
+
+async function runDatasetFetchRetrySmoke() {
+  let calls = 0;
+  const buffer = await fetchDatasetBufferWithRetries("https://example.test/longmemeval.json", {
+    attempts: 2,
+    timeoutMs: 1_000,
+    retryDelayMs: 0,
+    fetchFn: async () => {
+      calls += 1;
+      if (calls === 1) {
+        const error = new TypeError("terminated");
+        error.cause = { code: "ETIMEDOUT" };
+        throw error;
+      }
+      return {
+        ok: true,
+        status: 200,
+        arrayBuffer: async () => new Uint8Array([111, 107]).buffer,
+      };
+    },
+  });
+  assert.equal(buffer.toString("utf8"), "ok");
+  assert.equal(calls, 2);
+  process.stdout.write(`${JSON.stringify({
+    ok: true,
+    mode: "dataset-fetch-retry-smoke",
+    calls,
+    retriesTerminatedTimeout: true,
   }, null, 2)}\n`);
 }
 

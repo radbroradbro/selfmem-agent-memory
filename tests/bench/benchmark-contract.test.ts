@@ -336,6 +336,19 @@ describe("public benchmark comparison contract", () => {
     expect(report.leavesStrictModeStrict).toBe(true);
   });
 
+  it("retries transient dataset fetch failures during materialization", () => {
+    const result = spawnSync(process.execPath, [materializeScript, "--dataset-fetch-retry-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("dataset-fetch-retry-smoke");
+    expect(report.calls).toBe(2);
+    expect(report.retriesTerminatedTimeout).toBe(true);
+  });
+
   it("gates answer-quality method ladders only when a challenger beats session-v1", () => {
     const tempDir = mkdtempSync(join(tmpdir(), "recallweave-method-ladder-gate-"));
     const resultPath = join(tempDir, "method-ladder.json");
@@ -368,6 +381,98 @@ describe("public benchmark comparison contract", () => {
             method: "session-v1",
             callsMade: 20,
             winner: { strategy: "bm25-lite", answerQuality: 20, judgeCorrectRate: 0.2 },
+            strategies: [{
+              strategy: "bm25-lite",
+              answerQuality: 20,
+              judgeCorrectRate: 0.2,
+              answerFailures: 0,
+              judgeFailures: 0,
+              resultFingerprints: [
+                { queryIdHash: "q1", score: 20, correct: false },
+                { queryIdHash: "q2", score: 20, correct: false },
+                { queryIdHash: "q3", score: 20, correct: false },
+              ],
+            }],
+          },
+          {
+            method: "contextual-source-chunk-v1",
+            callsMade: 20,
+            winner: { strategy: "bm25-lite", answerQuality: 35, judgeCorrectRate: 0.35 },
+            strategies: [{
+              strategy: "bm25-lite",
+              answerQuality: 35,
+              judgeCorrectRate: 0.35,
+              answerFailures: 0,
+              judgeFailures: 0,
+              resultFingerprints: [
+                { queryIdHash: "q1", score: 35, correct: false },
+                { queryIdHash: "q2", score: 35, correct: false },
+                { queryIdHash: "q3", score: 35, correct: false },
+              ],
+            }],
+          },
+        ],
+      }),
+    );
+    const result = spawnSync(
+      process.execPath,
+      [
+        answerQualityMethodLadderGateScript,
+        "--result",
+        resultPath,
+        "--require-ready",
+        "--require-paired-bootstrap",
+        "--paired-bootstrap-samples",
+        "100",
+      ],
+      {
+        cwd: new URL("../..", import.meta.url),
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.status).toBe("READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER");
+    expect(report.bestChallenger.method).toBe("contextual-source-chunk-v1");
+    expect(report.comparison.deltaVsBaseline).toBe(15);
+    expect(report.comparison.pairedBootstrap.available).toBe(true);
+    expect(report.comparison.pairedBootstrap.lowerBound95).toBe(15);
+    rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it("blocks paired-bootstrap method-ladder promotion when fingerprints are missing", () => {
+    const tempDir = mkdtempSync(join(tmpdir(), "recallweave-method-ladder-bootstrap-gate-"));
+    const resultPath = join(tempDir, "method-ladder.json");
+    writeFileSync(
+      resultPath,
+      JSON.stringify({
+        schemaVersion: 1,
+        ok: true,
+        mode: "answer-quality-memory-method-ladder",
+        publicSafe: true,
+        metricsOnly: true,
+        retrievalProxyOnly: false,
+        memoryBenchAnswerQuality: true,
+        publicBenchmarkClaimsAllowed: false,
+        rawQuestionIdsIncluded: false,
+        rawQuestionsIncluded: false,
+        rawAnswersIncluded: false,
+        rawMemoryIncluded: false,
+        rawTranscriptIncluded: false,
+        rawPrivateOutputPathIncluded: false,
+        benchmark: "longmemeval",
+        fixtureOnly: false,
+        executeRequested: true,
+        queryShard: {
+          sameRawQuerySelectionAcrossMethods: true,
+          selectedQuestionIdsHash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        },
+        answerQualityReports: [
+          {
+            method: "session-v1",
+            callsMade: 20,
+            winner: { strategy: "bm25-lite", answerQuality: 20, judgeCorrectRate: 0.2 },
             strategies: [{ strategy: "bm25-lite", answerQuality: 20, judgeCorrectRate: 0.2, answerFailures: 0, judgeFailures: 0 }],
           },
           {
@@ -381,7 +486,7 @@ describe("public benchmark comparison contract", () => {
     );
     const result = spawnSync(
       process.execPath,
-      [answerQualityMethodLadderGateScript, "--result", resultPath, "--require-ready"],
+      [answerQualityMethodLadderGateScript, "--result", resultPath, "--require-paired-bootstrap"],
       {
         cwd: new URL("../..", import.meta.url),
         encoding: "utf8",
@@ -390,9 +495,8 @@ describe("public benchmark comparison contract", () => {
     );
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
     const report = JSON.parse(result.stdout);
-    expect(report.status).toBe("READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER");
-    expect(report.bestChallenger.method).toBe("contextual-source-chunk-v1");
-    expect(report.comparison.deltaVsBaseline).toBe(15);
+    expect(report.status).toBe("BLOCKED_ANSWER_QUALITY_METHOD_LADDER_RESULT");
+    expect(report.blockers).toContain("paired-bootstrap-fingerprints-missing");
     rmSync(tempDir, { recursive: true, force: true });
   });
 

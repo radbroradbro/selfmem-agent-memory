@@ -364,6 +364,7 @@ function answerQualitySummary(input) {
       answerLatencyP50Ms: arm.metrics?.answerLatencyP50Ms ?? null,
       answerFailures: arm.provider?.answerFailures ?? 0,
       judgeFailures: arm.provider?.judgeFailures ?? 0,
+      resultFingerprints: Array.isArray(arm.resultFingerprints) ? arm.resultFingerprints : [],
     })),
   };
 }

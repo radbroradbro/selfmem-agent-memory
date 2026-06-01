@@ -105,7 +105,10 @@ const files = {
   liveLocalCanary: `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
   liveProviderCanary: `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
   providerWaveIntake: `${reviewDir}/provider-wave-intake-20260531.json`,
-  methodLadderResultGate: `${reviewDir}/answer-quality-memory-method-ladder-30q-result-gate-20260531.json`,
+  methodLadderResultGate: preferReviewFile(
+    "answer-quality-memory-method-ladder-60q-result-gate-20260531.json",
+    "answer-quality-memory-method-ladder-30q-result-gate-20260531.json",
+  ),
   voyageRateLimit: `${reviewDir}/voyage-provider-rate-limit-20260525.json`,
   reviewerIntake: `${reviewDir}/memory-score-reviewer-intake-20260525.json`,
   uiEvidence: `${reviewDir}/ui-evidence/brain-ui-current-head-live-evidence.json`,

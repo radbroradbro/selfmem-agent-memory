@@ -16,6 +16,7 @@ const requiredBlockers = [
   "fresh-real-container-canary-not-current",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.json",
   "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
   "full-memory-sota-doctor-after-local-full-combine-20260531.json",
   "full-memory-sota-doctor-after-shard-020-20260529.json",
@@ -34,6 +35,7 @@ const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-20260527.json",
 );
 const fullMemorySotaDoctorMarkdown = preferReviewFile(
+  "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.md",
   "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
   "full-memory-sota-doctor-after-local-full-combine-20260531.md",
   "full-memory-sota-doctor-after-shard-020-20260529.md",

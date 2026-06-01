@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-method-ladder-result-gate",
+  "status": "READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER",
+  "generatedAt": "2026-06-01T04:52:01.749Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "countsAsMethodLadderEvidence": true,
+  "countsAsFullMemorySotaEvidence": false,
+  "reason": "Same-shard answer-quality method ladder shows a non-session challenger beating the session baseline under failure-accounted scoring; full memory/SOTA claims still require the remaining gates.",
+  "thresholds": {
+    "baselineMethod": "session-v1",
+    "minDelta": 1,
+    "maxWinnerArmFailures": 0,
+    "maxTotalFailureRate": 0.01,
+    "requirePairedBootstrap": false,
+    "minPairedMeanDelta": 1,
+    "minPairedBootstrapLowerBound": 0,
+    "pairedBootstrapSamples": 1000
+  },
+  "result": {
+    "source": "result-file",
+    "hash": "sha256:1f571c8edff27d27c7519464d841c32ba7c803a864b8ce7a81ad78963f624717",
+    "fixtureOnly": false,
+    "mode": "answer-quality-memory-method-ladder",
+    "benchmark": "longmemeval",
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "queryShard": {
+      "startIndex": 0,
+      "endIndexExclusive": 60,
+      "requestedLimit": 60,
+      "sameRawQuerySelectionAcrossMethods": true,
+      "selectedQuestionIdsHash": "sha256:004d5635cc3002151186cbc7e21b7a19ae7b8c85f32f847d430275c6f7f7a206"
+    },
+    "continueOnCallError": true,
+    "methodCount": 3,
+    "totalCalls": 720,
+    "totalFailures": 0,
+    "totalFailureRate": 0
+  },
+  "baseline": {
+    "method": "session-v1",
+    "winnerStrategy": "full-hybrid-rerank",
+    "answerQuality": 22.1667,
+    "judgeCorrectRate": 0.2167,
+    "callsMade": 240,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 22.1667,
+        "judgeCorrectRate": 0.2167,
+        "answerLatencyP50Ms": 1886,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": []
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 22.1667,
+        "judgeCorrectRate": 0.2167,
+        "answerLatencyP50Ms": 1866,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": []
+      }
+    ]
+  },
+  "bestChallenger": {
+    "method": "contextual-source-chunk-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 37.5,
+    "judgeCorrectRate": 0.3667,
+    "callsMade": 240,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 37.5,
+        "judgeCorrectRate": 0.3667,
+        "answerLatencyP50Ms": 1917,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": []
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 31,
+        "judgeCorrectRate": 0.3,
+        "answerLatencyP50Ms": 1843,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": []
+      }
+    ]
+  },
+  "bestOverall": {
+    "method": "contextual-source-chunk-v1",
+    "winnerStrategy": "bm25-lite",
+    "answerQuality": 37.5,
+    "judgeCorrectRate": 0.3667,
+    "callsMade": 240,
+    "answerFailures": 0,
+    "judgeFailures": 0,
+    "privacyLeakCount": 0,
+    "redactionFailureCount": 0,
+    "strategies": [
+      {
+        "strategy": "bm25-lite",
+        "answerQuality": 37.5,
+        "judgeCorrectRate": 0.3667,
+        "answerLatencyP50Ms": 1917,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": []
+      },
+      {
+        "strategy": "full-hybrid-rerank",
+        "answerQuality": 31,
+        "judgeCorrectRate": 0.3,
+        "answerLatencyP50Ms": 1843,
+        "answerFailures": 0,
+        "judgeFailures": 0,
+        "resultFingerprints": []
+      }
+    ]
+  },
+  "comparison": {
+    "deltaVsBaseline": 15.3333,
+    "winnerArmFailures": 0,
+    "winningArm": {
+      "strategy": "bm25-lite",
+      "answerQuality": 37.5,
+      "judgeCorrectRate": 0.3667,
+      "answerFailures": 0,
+      "judgeFailures": 0
+    },
+    "pairedBootstrap": {
+      "required": false,
+      "available": false,
+      "baselineFingerprintCount": 0,
+      "challengerFingerprintCount": 0,
+      "commonQueryCount": 0,
+      "meanDelta": null,
+      "lowerBound95": null,
+      "upperBound95": null
+    }
+  },
+  "rows": [
+    {
+      "method": "session-v1",
+      "winnerStrategy": "full-hybrid-rerank",
+      "answerQuality": 22.1667,
+      "judgeCorrectRate": 0.2167,
+      "callsMade": 240,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 22.1667,
+          "judgeCorrectRate": 0.2167,
+          "answerLatencyP50Ms": 1886,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": []
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 22.1667,
+          "judgeCorrectRate": 0.2167,
+          "answerLatencyP50Ms": 1866,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": []
+        }
+      ]
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "winnerStrategy": "bm25-lite",
+      "answerQuality": 37.5,
+      "judgeCorrectRate": 0.3667,
+      "callsMade": 240,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 37.5,
+          "judgeCorrectRate": 0.3667,
+          "answerLatencyP50Ms": 1917,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": []
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 31,
+          "judgeCorrectRate": 0.3,
+          "answerLatencyP50Ms": 1843,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": []
+        }
+      ]
+    },
+    {
+      "method": "atomic-memory-v1",
+      "winnerStrategy": "bm25-lite",
+      "answerQuality": 35,
+      "judgeCorrectRate": 0.3333,
+      "callsMade": 240,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "privacyLeakCount": 0,
+      "redactionFailureCount": 0,
+      "strategies": [
+        {
+          "strategy": "bm25-lite",
+          "answerQuality": 35,
+          "judgeCorrectRate": 0.3333,
+          "answerLatencyP50Ms": 1951,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": []
+        },
+        {
+          "strategy": "full-hybrid-rerank",
+          "answerQuality": 28,
+          "judgeCorrectRate": 0.2667,
+          "answerLatencyP50Ms": 1945,
+          "answerFailures": 0,
+          "judgeFailures": 0,
+          "resultFingerprints": []
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "resultExists": true,
+    "modeRecognized": true,
+    "metricsOnly": true,
+    "publicSafe": true,
+    "fixtureOnlyFalse": true,
+    "executeRequested": true,
+    "answerQualityMode": true,
+    "publicClaimsDisabled": true,
+    "rawQuestionsExcluded": true,
+    "rawAnswersExcluded": true,
+    "rawMemoryExcluded": true,
+    "rawTranscriptExcluded": true,
+    "sameRawQuerySelection": true,
+    "querySelectionHashPresent": true,
+    "baselinePresent": true,
+    "challengerPresent": true,
+    "challengerBeatsBaseline": true,
+    "bestOverallIsChallenger": true,
+    "winnerArmFailureLimit": true,
+    "totalFailureRateLimit": true,
+    "privacyLeakCountersClear": true,
+    "pairedBootstrapAvailable": true,
+    "pairedBootstrapMeanDelta": true,
+    "pairedBootstrapLowerBound": true
+  },
+  "blockers": [],
+  "nextActions": [
+    "Use contextual-source-chunk-v1 with bm25-lite as the next larger-slice challenger.",
+    "Carry session-v1, BM25, and full-hybrid controls forward so the next slice can confirm or reject this lift.",
+    "Attach this gate report to the SOTA ladder packet as method-selection evidence only."
+  ]
+}

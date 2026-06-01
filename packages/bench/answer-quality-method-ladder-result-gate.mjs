@@ -15,6 +15,10 @@ const baselineMethod = String(args.baselineMethod ?? "session-v1");
 const minDelta = Number(args.minDelta ?? 1);
 const maxWinnerArmFailures = Number(args.maxWinnerArmFailures ?? 0);
 const maxTotalFailureRate = Number(args.maxTotalFailureRate ?? 0.01);
+const requirePairedBootstrap = Boolean(args.requirePairedBootstrap);
+const minPairedMeanDelta = Number(args.minPairedMeanDelta ?? minDelta);
+const minPairedBootstrapLowerBound = Number(args.minPairedBootstrapLowerBound ?? 0);
+const pairedBootstrapSamples = positiveInt(args.pairedBootstrapSamples ?? 1000, "--paired-bootstrap-samples");
 
 const secretPattern =
   /(pa-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{20,}|sm_[A-Za-z0-9_-]{20,}|nvapi-[A-Za-z0-9_-]{20,}|jina_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_-]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{20,}|[rs]k_(?:live|test)_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,})/;
@@ -26,6 +30,8 @@ assert.ok(["json", "markdown"].includes(format), "--format must be json or markd
 assert.ok(Number.isFinite(minDelta), "--min-delta must be numeric");
 assert.ok(Number.isFinite(maxWinnerArmFailures) && maxWinnerArmFailures >= 0, "--max-winner-arm-failures must be a non-negative number");
 assert.ok(Number.isFinite(maxTotalFailureRate) && maxTotalFailureRate >= 0, "--max-total-failure-rate must be a non-negative number");
+assert.ok(Number.isFinite(minPairedMeanDelta), "--min-paired-mean-delta must be numeric");
+assert.ok(Number.isFinite(minPairedBootstrapLowerBound), "--min-paired-bootstrap-lower-bound must be numeric");
 
 const loaded = loadResult();
 const report = buildGateReport({ loaded });
@@ -77,6 +83,11 @@ function buildGateReport({ loaded }) {
   const totalAttempts = totalCalls + totalFailures;
   const totalFailureRate = totalAttempts > 0 ? round(totalFailures / totalAttempts, 6) : null;
   const winnerArmFailures = Number(winningArm?.answerFailures ?? 0) + Number(winningArm?.judgeFailures ?? 0);
+  const pairedBootstrap = buildPairedBootstrapComparison({
+    baseline,
+    challenger: bestChallenger,
+    samples: pairedBootstrapSamples,
+  });
 
   const checks = {
     resultExists: loaded.exists,
@@ -100,6 +111,9 @@ function buildGateReport({ loaded }) {
     winnerArmFailureLimit: winnerArmFailures <= maxWinnerArmFailures,
     totalFailureRateLimit: totalFailureRate != null && totalFailureRate <= maxTotalFailureRate,
     privacyLeakCountersClear: rows.every((item) => item.privacyLeakCount === 0 && item.redactionFailureCount === 0),
+    pairedBootstrapAvailable: !requirePairedBootstrap || pairedBootstrap.available,
+    pairedBootstrapMeanDelta: !requirePairedBootstrap || Number(pairedBootstrap.meanDelta ?? -Infinity) >= minPairedMeanDelta,
+    pairedBootstrapLowerBound: !requirePairedBootstrap || Number(pairedBootstrap.lowerBound95 ?? -Infinity) >= minPairedBootstrapLowerBound,
   };
 
   const blockers = [
@@ -124,6 +138,9 @@ function buildGateReport({ loaded }) {
     !checks.winnerArmFailureLimit ? "winning-arm-has-too-many-call-failures" : null,
     !checks.totalFailureRateLimit ? "total-call-failure-rate-too-high" : null,
     !checks.privacyLeakCountersClear ? "privacy-or-redaction-counter-nonzero" : null,
+    !checks.pairedBootstrapAvailable ? "paired-bootstrap-fingerprints-missing" : null,
+    !checks.pairedBootstrapMeanDelta ? "paired-bootstrap-mean-delta-below-threshold" : null,
+    !checks.pairedBootstrapLowerBound ? "paired-bootstrap-lower-bound-below-threshold" : null,
   ].filter(Boolean);
 
   return {
@@ -150,6 +167,10 @@ function buildGateReport({ loaded }) {
       minDelta,
       maxWinnerArmFailures,
       maxTotalFailureRate,
+      requirePairedBootstrap,
+      minPairedMeanDelta,
+      minPairedBootstrapLowerBound,
+      pairedBootstrapSamples,
     },
     result: {
       source: loaded.source,
@@ -181,6 +202,7 @@ function buildGateReport({ loaded }) {
             judgeFailures: winningArm.judgeFailures,
           }
         : null,
+      pairedBootstrap,
     },
     rows,
     checks,
@@ -207,6 +229,7 @@ function normalizeMethodRow(item) {
     answerLatencyP50Ms: nullableNumber(strategy.answerLatencyP50Ms),
     answerFailures: Number(strategy.answerFailures ?? 0),
     judgeFailures: Number(strategy.judgeFailures ?? 0),
+    resultFingerprints: normalizeResultFingerprints(strategy.resultFingerprints),
   })) : [];
   return {
     method: item.method ?? null,
@@ -232,6 +255,78 @@ function armByName(row, strategyName) {
   return row?.strategies?.find((item) => item.strategy === strategyName) ?? null;
 }
 
+function buildPairedBootstrapComparison({ baseline, challenger, samples }) {
+  const baselineArm = armByName(baseline, baseline?.winnerStrategy);
+  const challengerArm = armByName(challenger, challenger?.winnerStrategy);
+  const baselineFingerprints = Array.isArray(baselineArm?.resultFingerprints) ? baselineArm.resultFingerprints : [];
+  const challengerFingerprints = Array.isArray(challengerArm?.resultFingerprints) ? challengerArm.resultFingerprints : [];
+  const challengerByQuery = new Map(challengerFingerprints.map((item) => [item.queryIdHash, item]));
+  const deltas = [];
+  for (const baselineItem of baselineFingerprints) {
+    const challengerItem = challengerByQuery.get(baselineItem.queryIdHash);
+    if (!challengerItem) continue;
+    if (!Number.isFinite(baselineItem.score) || !Number.isFinite(challengerItem.score)) continue;
+    deltas.push(round(challengerItem.score - baselineItem.score));
+  }
+  if (deltas.length === 0) {
+    return {
+      required: requirePairedBootstrap,
+      available: false,
+      baselineFingerprintCount: baselineFingerprints.length,
+      challengerFingerprintCount: challengerFingerprints.length,
+      commonQueryCount: 0,
+      meanDelta: null,
+      lowerBound95: null,
+      upperBound95: null,
+    };
+  }
+  const means = [];
+  const random = deterministicRandom(`${baseline?.method ?? "baseline"}:${challenger?.method ?? "challenger"}:${deltas.join(",")}`);
+  for (let sample = 0; sample < samples; sample += 1) {
+    let sum = 0;
+    for (let index = 0; index < deltas.length; index += 1) {
+      sum += deltas[Math.floor(random() * deltas.length)];
+    }
+    means.push(sum / deltas.length);
+  }
+  means.sort((left, right) => left - right);
+  return {
+    required: requirePairedBootstrap,
+    available: true,
+    baselineFingerprintCount: baselineFingerprints.length,
+    challengerFingerprintCount: challengerFingerprints.length,
+    commonQueryCount: deltas.length,
+    meanDelta: round(average(deltas)),
+    lowerBound95: round(means[Math.floor(0.025 * (means.length - 1))]),
+    upperBound95: round(means[Math.ceil(0.975 * (means.length - 1))]),
+    minMeanDelta: minPairedMeanDelta,
+    minLowerBound: minPairedBootstrapLowerBound,
+  };
+}
+
+function normalizeResultFingerprints(items) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((item) => ({
+      queryIdHash: typeof item?.queryIdHash === "string" ? item.queryIdHash : null,
+      score: nullableNumber(item?.score),
+      correct: typeof item?.correct === "boolean" ? item.correct : null,
+    }))
+    .filter((item) => item.queryIdHash && Number.isFinite(item.score));
+}
+
+function deterministicRandom(seedText) {
+  let seed = Number.parseInt(sha256(seedText).slice(0, 8), 16) || 1;
+  return () => {
+    seed = (1664525 * seed + 1013904223) >>> 0;
+    return seed / 0x100000000;
+  };
+}
+
+function average(values) {
+  return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+}
+
 function renderMarkdown(value) {
   const lines = [
     "# Answer-Quality Method-Ladder Result Gate",
@@ -254,6 +349,9 @@ function renderMarkdown(value) {
     "",
     `- Delta vs baseline: ${value.comparison.deltaVsBaseline}`,
     `- Winning arm failures: ${value.comparison.winnerArmFailures}`,
+    `- Paired bootstrap available: ${value.comparison.pairedBootstrap.available}`,
+    `- Paired bootstrap mean delta: ${value.comparison.pairedBootstrap.meanDelta}`,
+    `- Paired bootstrap 95% lower bound: ${value.comparison.pairedBootstrap.lowerBound95}`,
     "",
     "## Method Rows",
     "",
@@ -280,6 +378,12 @@ function rowLine(label, row) {
 function nullableNumber(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
+}
+
+function positiveInt(value, label) {
+  const number = Number(value);
+  assert.ok(Number.isInteger(number) && number > 0, `${label} must be a positive integer`);
+  return number;
 }
 
 function round(value, digits = 4) {
@@ -320,4 +424,3 @@ function parseArgs(argv) {
   }
   return parsed;
 }
-
