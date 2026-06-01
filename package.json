@@ -100,6 +100,7 @@
     "benchmark:public-provider:preflight": "node packages/bench/provider-benchmark-live-preflight.mjs",
     "benchmark:public-provider:packet": "node packages/bench/provider-benchmark-operator-packet.mjs",
     "benchmark:public-provider": "node packages/bench/public-benchmark-strategy-compare.mjs --gate provider --context-token-budget 800 --limit 5",
+    "benchmark:public-strategy:combine": "node packages/bench/public-benchmark-strategy-shard-combine.mjs",
     "benchmark:provider-wave-intake": "node packages/bench/provider-wave-intake.mjs",
     "benchmark:public-autoresearch": "node packages/bench/public-benchmark-autoresearch-loop.mjs",
     "benchmark:public-method-ladder": "node packages/bench/public-benchmark-memory-method-ladder.mjs",

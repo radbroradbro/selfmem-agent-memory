@@ -822,6 +822,7 @@ const requiredScripts = [
   "benchmark:public-provider:preflight",
   "benchmark:public-provider:packet",
   "benchmark:public-provider",
+  "benchmark:public-strategy:combine",
   "benchmark:provider-wave-intake",
   "benchmark:public-autoresearch",
   "benchmark:agentic-watch",

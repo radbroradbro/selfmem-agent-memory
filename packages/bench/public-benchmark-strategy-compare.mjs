@@ -186,6 +186,7 @@ async function runStrategyArm(strategy) {
         recallAt5: item.recallAt5,
         recallAt10: item.recallAt10,
         ndcgAt10: item.ndcgAt10,
+        latencyMs: item.latencyMs,
       })),
     } };
   } catch (error) {
@@ -248,7 +249,7 @@ const report = {
       maxQueries,
       completeDataset: queryOffset === 0 && !maxQueries,
     },
-    selectedQueryCount: results[0]?.queryShard?.responseCount ?? null,
+    selectedQueryCount: results[0]?.queryShard?.responseCount ?? selectedQueryCountFallback(input.queryCount),
     armTimeoutMs,
     providerArmTimeoutMs,
     providerTimeoutMs,
@@ -840,9 +841,9 @@ function renderMarkdown(value) {
     lines.push(
       "## Failed Arms",
       "",
-      "| Strategy | Failure class | Retryable/provider limit |",
-      "| --- | --- | ---: |",
-      ...value.failedStrategies.map((item) => `| ${item.strategy} | ${item.failureClass} | ${item.retryableProviderLimit} |`),
+      "| Strategy | Failure class | Summary | Retryable/provider limit |",
+      "| --- | --- | --- | ---: |",
+      ...value.failedStrategies.map((item) => `| ${item.strategy} | ${item.failureClass} | ${item.failureSummary ?? "n/a"} | ${item.retryableProviderLimit} |`),
       "",
     );
   }
@@ -942,6 +943,8 @@ function strategyFailureSummary(strategy, error) {
   const summary = {
     strategy,
     failureClass,
+    failureHash: `sha256:${stableHash(text)}`,
+    failureSummary: safeFailureSummaryLine(text),
     retryableProviderLimit: isProviderBackedStrategy(strategy) && ["provider-rate-limit", "provider-timeout"].includes(failureClass),
   };
   assertSafePublicText(JSON.stringify(summary), "strategy failure summary");
@@ -990,20 +993,41 @@ function isCloudProviderStrategy(strategy) {
 }
 
 function armTimeoutForStrategy(strategy) {
-  if (armTimeoutMs) return armTimeoutMs;
   if (fixtureRequested) return 0;
   if (isCloudProviderStrategy(strategy)) {
     if (providerArmTimeoutMs) return providerArmTimeoutMs;
+    if (armTimeoutMs) return armTimeoutMs;
     if (!providerTimeoutMs || !maxQueries) return 0;
     const attempts = Math.max(1, providerRetryAttempts + 1);
     const computed = maxQueries * attempts * providerTimeoutMs + 90_000;
     return Math.max(120_000, Math.min(20 * 60_000, computed));
   }
+  if (armTimeoutMs) return armTimeoutMs;
   if (maxQueries && isHybridFamilyStrategy(strategy)) {
     const computed = maxQueries * 20_000 + 60_000;
     return Math.max(90_000, Math.min(10 * 60_000, computed));
   }
   return 0;
+}
+
+function selectedQueryCountFallback(totalQueryCount) {
+  const total = Number(totalQueryCount ?? 0);
+  const start = Math.min(Math.max(0, Number(queryOffset ?? 0)), Math.max(0, total));
+  if (maxQueries) return Math.min(Number(maxQueries), Math.max(0, total - start));
+  return Math.max(0, total - start);
+}
+
+function safeFailureSummaryLine(text) {
+  const clean = sanitizeFailureText(text)
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .find((line) => !line.startsWith("{") && !line.startsWith("["));
+  return String(clean ?? "failure details unavailable")
+    .replace(secretPattern, "<secret>")
+    .replace(privatePathOutputPattern, "<private-path>")
+    .replaceAll("|", "/")
+    .slice(0, 240);
 }
 
 function normalizeGate(value) {
