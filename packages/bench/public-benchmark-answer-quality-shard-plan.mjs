@@ -72,6 +72,7 @@ assertSafePublicText(targetRaw, "target");
 assertSafePublicText(materializeRaw, "materialize report");
 const target = JSON.parse(targetRaw);
 const materialize = JSON.parse(materializeRaw);
+const memoryMethod = String(materialize.selection?.memoryMethod ?? materialize.target?.memoryMethod ?? "session-v1");
 const scoringPolicy = scoringPolicyForClaimScope(claimScope);
 const targetHash = `sha256:${sha256(targetRaw)}`;
 const materializeHash = `sha256:${sha256(materializeRaw)}`;
@@ -181,8 +182,10 @@ const report = {
     maxMemoryBytes,
     strategies,
     privateInputDirectoryLabel: "<private-output-dir>",
+    privateShardDirectoryLabel: "<private-output-dir>/shards/{shardId}",
     publicOutputDirectoryLabel: "<public-review-dir>",
     materializeCommand: materializeCommand(),
+    shardMaterializeTemplate: shardMaterializeTemplate(),
     responseArmExportTemplate: responseArmExportTemplate(),
     preflightTemplate: preflightTemplate(),
     answerQualityTemplate: answerQualityTemplate(),
@@ -196,6 +199,7 @@ const report = {
   blockers,
   nextActions: ready
     ? [
+        "Run shard-scoped materialization before each response arm export so provider and local arms load only the shard-local private corpus.",
         "Run response arm exports shard-by-shard with explicit provider and query-expansion consent.",
         "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
         answerQualityScoringAction(claimScope),
@@ -230,7 +234,9 @@ function buildShards(totalQueryCount, requestedShardSize, options) {
       endIndexExclusive,
       queryCount: endIndexExclusive - startIndex,
       rangeHash: `sha256:${sha256(JSON.stringify({ targetHash: options.targetHash, startIndex, endIndexExclusive, totalQueryCount }))}`,
-      armOutputDirectoryLabel: `<private-output-dir>/arms/${id}`,
+      privateShardDirectoryLabel: `<private-output-dir>/shards/${id}`,
+      materializedDirectoryLabel: `<private-output-dir>/shards/${id}/materialized`,
+      armOutputDirectoryLabel: `<private-output-dir>/shards/${id}/arms`,
       answerQualityOutputLabel: `<public-review-dir>/${resultPrefix}-${id}.json`,
       answerQualityMarkdownLabel: `<public-review-dir>/${resultPrefix}-${id}.md`,
     });
@@ -517,9 +523,25 @@ function materializeCommand() {
   return [
     "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
     `--target ${displayPath(targetPath)}`,
+    `--memory-method ${memoryMethod}`,
     "--private-output-dir <private-output-dir>",
     "--output <public-review-dir>/public-longmemeval-full-materialize-run.json",
     "--markdown-output <public-review-dir>/public-longmemeval-full-materialize-run-evidence.md",
+  ].join(" ");
+}
+
+function shardMaterializeTemplate() {
+  return [
+    "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live",
+    `--target ${displayPath(targetPath)}`,
+    `--memory-method ${memoryMethod}`,
+    `--context-token-budget ${contextTokenBudget}`,
+    `--limit ${limit}`,
+    "--query-offset {startIndex}",
+    "--max-queries {queryCount}",
+    "--private-output-dir <private-output-dir>/shards/{shardId}/materialized",
+    `--output <public-review-dir>/public-longmemeval-${claimScope}-materialize-{shardId}.json`,
+    `--markdown-output <public-review-dir>/public-longmemeval-${claimScope}-materialize-{shardId}.md`,
   ].join(" ");
 }
 
@@ -565,14 +587,14 @@ function responseArmExportTemplate() {
     ...queryExpansionEnv,
     "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute",
     `--target ${displayPath(targetPath)}`,
-    "--queryset <private-output-dir>/longmemeval-queryset.private.json",
-    "--memories <private-output-dir>/longmemeval-memories.private.jsonl",
-    "--private-output-dir <private-output-dir>/arms/{shardId}",
+    "--queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json",
+    "--memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl",
+    "--private-output-dir <private-output-dir>/shards/{shardId}/arms",
     `--strategies ${strategies.join(",")}`,
     `--context-token-budget ${contextTokenBudget}`,
     `--limit ${limit}`,
     `--max-memory-bytes ${maxMemoryBytes}`,
-    "--query-offset {startIndex}",
+    "--query-offset 0",
     "--max-queries {queryCount}",
     ...(coverage.hasLocalApple
       ? [
@@ -584,7 +606,7 @@ function responseArmExportTemplate() {
 }
 
 function answerQualityTemplate() {
-  const armArgs = strategies.map((strategy) => `--arm ${strategy}=<private-output-dir>/arms/{shardId}/${strategy}-responses.private.json`);
+  const armArgs = strategies.map((strategy) => `--arm ${strategy}=<private-output-dir>/shards/{shardId}/arms/${strategy}-responses.private.json`);
   return [
     `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
     `RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=${scoringPolicy.modelMatchPolicy}`,
@@ -600,10 +622,10 @@ function answerQualityTemplate() {
     `--claim-scope ${claimScope}`,
     `--model-match-policy ${scoringPolicy.modelMatchPolicy}`,
     `--target ${displayPath(targetPath)}`,
-    "--queryset <private-output-dir>/longmemeval-queryset.private.json",
-    "--memories <private-output-dir>/longmemeval-memories.private.jsonl",
-    "--answer-labels <private-output-dir>/longmemeval-answer-labels.private.json",
-    "--query-offset {startIndex}",
+    "--queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json",
+    "--memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl",
+    "--answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json",
+    "--query-offset 0",
     "--max-queries {queryCount}",
     ...armArgs,
     `--output <public-review-dir>/${resultPrefix}-{shardId}.json`,
@@ -612,7 +634,7 @@ function answerQualityTemplate() {
 }
 
 function preflightTemplate() {
-  const armArgs = strategies.map((strategy) => `--arm ${strategy}=<private-output-dir>/arms/{shardId}/${strategy}-responses.private.json`);
+  const armArgs = strategies.map((strategy) => `--arm ${strategy}=<private-output-dir>/shards/{shardId}/arms/${strategy}-responses.private.json`);
   return [
     `RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=${claimScope}`,
     `RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=${scoringPolicy.modelMatchPolicy}`,
@@ -628,10 +650,10 @@ function preflightTemplate() {
     `--claim-scope ${claimScope}`,
     `--model-match-policy ${scoringPolicy.modelMatchPolicy}`,
     `--target ${displayPath(targetPath)}`,
-    "--queryset <private-output-dir>/longmemeval-queryset.private.json",
-    "--memories <private-output-dir>/longmemeval-memories.private.jsonl",
-    "--answer-labels <private-output-dir>/longmemeval-answer-labels.private.json",
-    "--query-offset {startIndex}",
+    "--queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json",
+    "--memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl",
+    "--answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json",
+    "--query-offset 0",
     "--max-queries {queryCount}",
     ...armArgs,
     `--output <public-review-dir>/${resultPrefix}-preflight-{shardId}.json`,
@@ -808,6 +830,7 @@ function renderMarkdown(value) {
     "",
     "## Commands",
     "```bash",
+    value.runPlan.shardMaterializeTemplate,
     value.runPlan.responseArmExportTemplate,
     value.runPlan.preflightTemplate,
     value.runPlan.answerQualityTemplate,

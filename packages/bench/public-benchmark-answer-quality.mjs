@@ -148,7 +148,7 @@ async function liveRun() {
   const memories = loadMemories(memoriesPath);
   const armSpecs = liveArmSpecs();
   const labelsByQueryId = labelsByQuery(answerLabels);
-  const querySelection = selectQueries(querySet.queries ?? []);
+  const querySelection = selectQueries(querySet.queries ?? [], querySet.authoring?.materializationShard);
   const expectedAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
   assertAnswerLabelsMatchTarget({ answerLabels, querySet, expectedAnswerLabelsHash });
   assert.equal(answerLabels.scoringCodeHash, target.benchmark?.scoringCodeHash, "private scoring-code hash must match target");
@@ -283,7 +283,7 @@ async function scoreArmAsync({ strategy, responses, querySelection, queries, mem
 
 function buildReport({ fixtureOnly, inputSource, querySet, querySetHash, memoriesHash, answerLabelsHash, materializerHash, arms, provider }) {
   const bestArm = bestByAnswerQuality(arms);
-  const querySelection = selectQueries(querySet.queries ?? []);
+  const querySelection = selectQueries(querySet.queries ?? [], querySet.authoring?.materializationShard);
   const report = {
     schemaVersion: 1,
     ok: true,
@@ -439,26 +439,42 @@ function scoreFingerprint({ query, response, contextItems, candidateAnswer, judg
   };
 }
 
-function selectQueries(queries) {
+function selectQueries(queries, materializationShard = null) {
   const list = Array.isArray(queries) ? queries : [];
-  const totalQueryCount = list.length;
-  assert.ok(queryOffset <= totalQueryCount, `query offset ${queryOffset} exceeds query count ${totalQueryCount}`);
-  const endIndexExclusive = maxQueries ? Math.min(totalQueryCount, queryOffset + maxQueries) : totalQueryCount;
-  const selected = list.slice(queryOffset, endIndexExclusive);
+  const localTotalQueryCount = list.length;
+  assert.ok(queryOffset <= localTotalQueryCount, `query offset ${queryOffset} exceeds query count ${localTotalQueryCount}`);
+  const localEndIndexExclusive = maxQueries ? Math.min(localTotalQueryCount, queryOffset + maxQueries) : localTotalQueryCount;
+  const selected = list.slice(queryOffset, localEndIndexExclusive);
   assert.ok(selected.length > 0, "selected query shard is empty");
+  const parent = parentShardCoordinates(materializationShard, localTotalQueryCount);
+  const startIndex = parent.startIndex + queryOffset;
+  const endIndexExclusive = parent.startIndex + localEndIndexExclusive;
   return {
     queries: selected,
-    totalQueryCount,
-    startIndex: queryOffset,
+    totalQueryCount: parent.totalQueryCount,
+    startIndex,
     endIndexExclusive,
     rangeHash: `sha256:${stableHash(JSON.stringify({
       targetHash: `sha256:${stableHash(targetRaw)}`,
-      startIndex: queryOffset,
+      startIndex,
       endIndexExclusive,
-      totalQueryCount,
+      totalQueryCount: parent.totalQueryCount,
     }))}`,
     selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => shortHash(query.id)).join("\n"))}`,
   };
+}
+
+function parentShardCoordinates(materializationShard, localTotalQueryCount) {
+  if (!materializationShard || materializationShard.applied !== true) {
+    return { startIndex: 0, totalQueryCount: localTotalQueryCount };
+  }
+  const startIndex = Number(materializationShard.startIndex ?? 0);
+  const selectedCount = Number(materializationShard.selectedCount ?? localTotalQueryCount);
+  const totalQueryCount = Number(materializationShard.totalQueryCount ?? localTotalQueryCount);
+  assert.ok(Number.isInteger(startIndex) && startIndex >= 0, "materialization shard start index must be non-negative");
+  assert.ok(Number.isInteger(selectedCount) && selectedCount === localTotalQueryCount, "materialization shard selected count must match queryset length");
+  assert.ok(Number.isInteger(totalQueryCount) && totalQueryCount >= startIndex + localTotalQueryCount, "materialization shard total query count is invalid");
+  return { startIndex, totalQueryCount };
 }
 
 async function callAnswerModel({ query, contextItems }) {

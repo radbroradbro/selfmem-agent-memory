@@ -56,6 +56,10 @@ const targetShard = {
 };
 const targetShardSlug = String(targetShard.shardId ?? "shard-unknown");
 const missingArmStrategyArgument = missingStrategies.join(",");
+const missingArmResponseExportCommand = String(resumeWorkorder?.commands?.missingArmResponseExport ?? "");
+const shardMaterializeCommand = String(resumeWorkorder?.commands?.shardMaterialize ?? "");
+const usesShardLocalMaterialization = missingArmResponseExportCommand.includes(`/shards/${targetShardSlug}/materialized/`);
+const missingArmCommandQueryOffset = usesShardLocalMaterialization ? 0 : targetShard.queryOffset;
 const acceptedOrTargetShardCount = Math.max(Number(workorder.progress?.acceptedShardCount ?? 0) + 1, 1);
 const localShardIntakeInputs = Array.from({ length: acceptedOrTargetShardCount }, (_, index) => {
   const shardId = `shard-${String(index + 1).padStart(3, "0")}`;
@@ -79,7 +83,11 @@ const resumeReady = Boolean(
     durabilityReady.ready &&
     typeof resumeWorkorder?.commands?.missingArmResponseExport === "string" &&
     resumeWorkorder.commands.missingArmResponseExport.includes(`--strategies ${missingArmStrategyArgument}`) &&
-    resumeWorkorder.commands.missingArmResponseExport.includes(`--query-offset ${targetShard.queryOffset}`),
+    resumeWorkorder.commands.missingArmResponseExport.includes(`--query-offset ${missingArmCommandQueryOffset}`) &&
+    (!usesShardLocalMaterialization ||
+      (typeof resumeWorkorder?.commands?.shardMaterialize === "string" &&
+        resumeWorkorder.commands.shardMaterialize.includes(`--query-offset ${targetShard.queryOffset}`) &&
+        resumeWorkorder.commands.shardMaterialize.includes(`--max-queries ${targetShard.queryCount}`))),
 );
 
 const blockers = [
@@ -98,7 +106,18 @@ const blockers = [
   !runtimeDoctorReady.ready ? "local-embedding-runtime-not-ready" : null,
   !durabilityReady.ready ? "local-embedding-durability-smoke-not-ready" : null,
   typeof resumeWorkorder?.commands?.missingArmResponseExport !== "string" ? "missing-arm-export-command-missing" : null,
-  resumeWorkorder?.commands?.missingArmResponseExport && !resumeWorkorder.commands.missingArmResponseExport.includes(`--query-offset ${targetShard.queryOffset}`)
+  usesShardLocalMaterialization && typeof resumeWorkorder?.commands?.shardMaterialize !== "string" ? "shard-materialize-command-missing" : null,
+  usesShardLocalMaterialization &&
+  resumeWorkorder?.commands?.shardMaterialize &&
+  !resumeWorkorder.commands.shardMaterialize.includes(`--query-offset ${targetShard.queryOffset}`)
+    ? "shard-materialize-command-offset-mismatch"
+    : null,
+  usesShardLocalMaterialization &&
+  resumeWorkorder?.commands?.shardMaterialize &&
+  !resumeWorkorder.commands.shardMaterialize.includes(`--max-queries ${targetShard.queryCount}`)
+    ? "shard-materialize-command-size-mismatch"
+    : null,
+  resumeWorkorder?.commands?.missingArmResponseExport && !resumeWorkorder.commands.missingArmResponseExport.includes(`--query-offset ${missingArmCommandQueryOffset}`)
     ? "missing-arm-export-command-offset-mismatch"
     : null,
 ].filter(Boolean);
@@ -158,6 +177,12 @@ const report = {
     nextPendingShardRange: acceptedLaneDoctor.shardProgress?.firstPendingShardRange ?? `${targetShard.startIndex}-${targetShard.endIndexExclusive}`,
   },
   targetShard,
+  shardLocalResume: {
+    usesShardLocalMaterialization,
+    materializeCommandAvailable: typeof resumeWorkorder?.commands?.shardMaterialize === "string",
+    materializeQueryOffset: targetShard.queryOffset,
+    responseArmQueryOffset: missingArmCommandQueryOffset,
+  },
   resumeState: {
     sourceRuntimeBlockerHash: evidence.runtimeBlocker.hash,
     previousFailureClass: runtimeBlocker.failedArm?.failureClass ?? runtimeResume?.failureClass ?? null,
@@ -221,6 +246,7 @@ const report = {
       `--output ${reviewDir}/local-rerank-durability-smoke-20260526.json`,
       `--markdown-output ${reviewDir}/local-rerank-durability-smoke-20260526.md`,
     ].join(" ")),
+    shardMaterialize: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.shardMaterialize),
     missingArmResponseExport: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.missingArmResponseExport),
     preflight: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.preflight),
     answerQuality: withBenchmarkSupermemorySearchDisabled(resumeWorkorder?.commands?.answerQuality),
@@ -254,7 +280,7 @@ const report = {
         "Re-run the local rerank durability smoke with --require-ready so the sidecar proves bounded response-body completion before shard retry.",
         "Run the local-full shard resume env doctor against the outside-repository private directory.",
         "Run the local-full shard resume command materializer to write a private shell script outside the repository.",
-        "Review and run the generated private script so the missing-arm export, preflight, answer-quality scoring, and local shard intake use concrete private paths and endpoint values.",
+        "Review and run the generated private script so shard materialization, missing-arm export, preflight, answer-quality scoring, and local shard intake use concrete private paths and endpoint values.",
         `Run the local-full shard resume result doctor before accepting ${targetShardSlug} into the local-full intake trail.`,
         "Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted.",
       ]
@@ -387,6 +413,7 @@ function renderMarkdown(value) {
     `- Runtime doctor: ${value.commands.rerunRuntimeDoctor}`,
     `- Durability smoke: ${value.commands.rerunDurabilitySmoke}`,
     `- Local rerank durability smoke: ${value.commands.rerunLocalRerankDurabilitySmoke}`,
+    `- Shard materialize: ${value.commands.shardMaterialize ?? "n/a"}`,
     `- Missing-arm export: ${value.commands.missingArmResponseExport ?? "n/a"}`,
     `- Preflight: ${value.commands.preflight ?? "n/a"}`,
     `- Answer quality: ${value.commands.answerQuality ?? "n/a"}`,

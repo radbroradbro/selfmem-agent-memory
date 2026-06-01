@@ -8,7 +8,7 @@
 - Prints materialized commands: false
 - Prints env values: false
 - Prints private paths: false
-- Command count: 9
+- Command count: 10
 - Materialized command count: 0
 - Fresh local runtime guard order ready: true
 - First private command: rerunRuntimeDoctor
@@ -24,6 +24,7 @@
 - rerunDurabilitySmoke
 - rerunLocalRerankDurabilitySmoke
 - resumeEnvDoctor
+- shardMaterialize
 - missingArmResponseExport
 - preflight
 - answerQuality

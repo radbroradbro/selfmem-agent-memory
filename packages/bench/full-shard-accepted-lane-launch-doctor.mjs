@@ -196,6 +196,7 @@ const report = {
     localRuntimeHealth,
   }),
   nextCommands: {
+    shardMaterialize: firstWorkorder?.commands?.shardMaterialize ?? null,
     responseArmExport: firstWorkorder?.commands?.responseArmExport ?? null,
     answerQuality: firstWorkorder?.commands?.answerQuality ?? null,
     workorderRefresh: "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:shard-workorder",

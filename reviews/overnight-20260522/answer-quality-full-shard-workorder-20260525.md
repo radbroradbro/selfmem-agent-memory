@@ -39,9 +39,11 @@
 ## Execution Lanes
 - deterministic-control-proxy: ready=true; intake-compatible=false; providers=none
 - local-apple-no-spend: ready=true; intake-compatible=false; providers=local-apple, local-rerank
+- local-apple-scaled-challenger: ready=false; intake-compatible=false; providers=local-apple, local-rerank
 - voyage-minimum-challenger: ready=true; intake-compatible=false; providers=voyage
+- gemini2-minimum-challenger: ready=true; intake-compatible=false; providers=gemini
 - nvidia-minimum-challenger: ready=true; intake-compatible=false; providers=nvidia
-- full-sota-accepted-shards: ready=true; intake-compatible=true; providers=local-apple, local-rerank, nvidia, voyage
+- full-sota-accepted-shards: ready=true; intake-compatible=true; providers=gemini, local-apple, local-rerank, nvidia, voyage
 
 ## Execution Lane Readiness
 - deterministic-control-proxy: response-export=false; answer-quality=false; intake-candidate=false
@@ -52,10 +54,18 @@
   - scoring-policy=exact-target-required; scoring-policy-ready=false
   - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
+- local-apple-scaled-challenger: response-export=false; answer-quality=false; intake-candidate=false
+  - scoring-policy=exact-target-required; scoring-policy-ready=false
+  - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, lane-strategy-coverage-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
 - voyage-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=exact-target-required; scoring-policy-ready=false
   - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, openai-compatible-base-url-missing, voyage-credentials-missing
+- gemini2-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
+  - scoring-policy=exact-target-required; scoring-policy-ready=false
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, gemini-credentials-missing, judge-model-missing, openai-compatible-base-url-missing
 - nvidia-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=exact-target-required; scoring-policy-ready=false
   - query-expansion=not-required; model-backed=false; fallback-allowed=false
@@ -63,7 +73,7 @@
 - full-sota-accepted-shards: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=exact-target-required; scoring-policy-ready=false
   - query-expansion=local-or-cloud-model-required; model-backed=false; fallback-allowed=false
-  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, gemini-credentials-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing
 
 ## Blockers
 - answer-quality-shard-runs-pending

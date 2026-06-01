@@ -104,6 +104,7 @@ async function liveMaterialize() {
   assert.ok(existsSync(sourceLockPath), `source lock missing: ${displayPath(sourceLockPath)}`);
   const targetRaw = readFileSync(targetPath, "utf8");
   const sourceLockRaw = readFileSync(sourceLockPath, "utf8");
+  const targetFileHash = `sha256:${stableHash(targetRaw)}`;
   assertSafePublicText(targetRaw, displayPath(targetPath));
   assertSafePublicText(sourceLockRaw, displayPath(sourceLockPath));
   const target = JSON.parse(targetRaw);
@@ -140,7 +141,7 @@ async function liveMaterialize() {
   assert.equal(targetSelectedQuestionIdsHash, sourceLock.nextTargetRecommendation?.selectedQuestionIdsHash ?? targetSelectedQuestionIdsHash);
   assert.equal(targetAnswerLabelsHash, target.benchmark.answerLabelsHash, "target answer label hash must match target");
 
-  const shard = materializationShard(targetSelected);
+  const shard = materializationShard(targetSelected, { targetHash: targetFileHash });
   const selected = shard.selected;
   const selectedIds = selected.map((item) => String(item.question_id));
   const selectedQuestionIdsHash = `sha256:${stableHash(selectedIds.join("\n"))}`;
@@ -197,7 +198,7 @@ async function liveMaterialize() {
     },
     target: {
       targetIdHash: shortHash(target.targetId),
-      targetFileHash: `sha256:${stableHash(targetRaw)}`,
+      targetFileHash,
       sourceLockHash: `sha256:${stableHash(sourceLockRaw)}`,
       splitHash: shortHash(target.benchmark.split),
       judgeModel: target.benchmark.judgeModel,
@@ -700,7 +701,7 @@ function selectSlice(dataset, questionTypes, options) {
   return selected;
 }
 
-function materializationShard(selected) {
+function materializationShard(selected, options = {}) {
   const totalQueryCount = selected.length;
   assert.ok(materializeQueryOffset <= totalQueryCount, `materialize query offset ${materializeQueryOffset} exceeds selected query count ${totalQueryCount}`);
   const endIndexExclusive = materializeMaxQueries
@@ -715,6 +716,7 @@ function materializationShard(selected) {
     totalQueryCount,
     selectedCount: shardSelected.length,
     requestedLimit: materializeMaxQueries,
+    targetHash: options.targetHash ?? null,
     selectedQuestionIdsHash: `sha256:${stableHash(shardSelected.map((item) => String(item.question_id)).join("\n"))}`,
   };
   return { ...summary, selected: shardSelected, summary };

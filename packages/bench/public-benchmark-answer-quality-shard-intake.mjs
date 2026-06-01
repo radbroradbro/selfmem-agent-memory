@@ -161,8 +161,9 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
     }
     if (key) seen.add(key);
     if (result.target?.hash !== planValue.target?.hash) sameTarget = false;
+    const sourceCompatible = resultSourceCompatible(result, planValue);
     if (
-      result.input?.querySetHash !== planValue.materializeReport?.collectorCompatibleQuerySetHash ||
+      !sourceCompatible.querySet ||
       result.input?.materializerHash !== planValue.materializeReport?.materializerHash ||
       Number(result.input?.totalQueryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ||
       Number(result.input?.queryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0)
@@ -238,6 +239,7 @@ function evaluateShards({ plan: planValue, loaded: loadedItems }) {
 }
 
 function shardFailures({ item, result, range, expected, planValue, strategySetHash }) {
+  const sourceCompatible = resultSourceCompatible(result, planValue);
   const failures = [
     result.mode !== "public-benchmark-answer-quality" ? "not-answer-quality-report" : null,
     result.fixtureOnly !== false ? "fixture-result" : null,
@@ -251,9 +253,9 @@ function shardFailures({ item, result, range, expected, planValue, strategySetHa
     result.rawTranscriptIncluded !== false ? "raw-transcript-included" : null,
     result.target?.hash !== planValue.target?.hash ? "target-hash-mismatch" : null,
     result.input?.targetHash !== planValue.target?.hash ? "input-target-hash-mismatch" : null,
-    result.input?.answerLabelsHash !== planValue.target?.answerLabelsHash ? "answer-labels-hash-mismatch" : null,
+    !sourceCompatible.answerLabels ? "answer-labels-hash-mismatch" : null,
     result.input?.scoringCodeHash !== planValue.target?.scoringCodeHash ? "scoring-code-hash-mismatch" : null,
-    result.input?.querySetHash !== planValue.materializeReport?.collectorCompatibleQuerySetHash ? "query-set-hash-mismatch" : null,
+    !sourceCompatible.querySet ? "query-set-hash-mismatch" : null,
     result.input?.materializerHash !== planValue.materializeReport?.materializerHash ? "materializer-hash-mismatch" : null,
     Number(result.input?.totalQueryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "total-query-count-mismatch" : null,
     Number(result.input?.queryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "input-query-count-mismatch" : null,
@@ -274,6 +276,23 @@ function shardFailures({ item, result, range, expected, planValue, strategySetHa
   ].filter(Boolean);
   assert.doesNotMatch(JSON.stringify({ fileName: item.fileName, failures }), privatePathPattern);
   return failures;
+}
+
+function resultSourceCompatible(result, planValue) {
+  const input = result.input ?? {};
+  const shard = input.materializationShard ?? {};
+  const materializedShard = shard.applied === true;
+  const directAnswerLabels = input.answerLabelsHash === planValue.target?.answerLabelsHash;
+  const shardAnswerLabels = materializedShard && input.targetAnswerLabelsHash === planValue.target?.answerLabelsHash;
+  const directQuerySet = input.querySetHash === planValue.materializeReport?.collectorCompatibleQuerySetHash;
+  const shardQuerySet =
+    materializedShard &&
+    Number(shard.totalQueryCount ?? input.totalQueryCount ?? 0) === Number(planValue.runPlan?.queryCount ?? 0) &&
+    Number(shard.selectedCount ?? input.scoredQueryCount ?? 0) === Number(input.scoredQueryCount ?? 0);
+  return {
+    answerLabels: directAnswerLabels || shardAnswerLabels,
+    querySet: directQuerySet || shardQuerySet,
+  };
 }
 
 function scoringModelFailures(result, planValue) {

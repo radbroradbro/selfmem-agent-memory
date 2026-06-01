@@ -8,6 +8,7 @@
     "modelMatchPolicy": "exact-target-required",
     "exactTargetModelsRequired": true,
     "localDiagnosticModelAllowed": false,
+    "challengerModelAllowed": false,
     "answerModelTemplate": "gpt-4o",
     "judgeModelTemplate": "gpt-4o",
     "countsAsFullMemorySotaEvidence": false,
@@ -31,7 +32,7 @@
   "rawTranscriptIncluded": false,
   "rawPromptIncluded": false,
   "rawPrivateOutputPathIncluded": false,
-  "generatedAt": "2026-05-31T12:50:15.970Z",
+  "generatedAt": "2026-06-01T15:34:28.465Z",
   "target": {
     "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
     "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
@@ -125,6 +126,7 @@
       "modelMatchPolicy": "exact-target-required",
       "exactTargetModelsRequired": true,
       "localDiagnosticModelAllowed": false,
+      "challengerModelAllowed": false,
       "answerModelTemplate": "gpt-4o",
       "judgeModelTemplate": "gpt-4o",
       "countsAsFullMemorySotaEvidence": false,
@@ -152,11 +154,13 @@
       "local-apple-qwen3-0_6b-local-rerank"
     ],
     "privateInputDirectoryLabel": "<private-output-dir>",
+    "privateShardDirectoryLabel": "<private-output-dir>/shards/{shardId}",
     "publicOutputDirectoryLabel": "<public-review-dir>",
-    "materializeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --private-output-dir <private-output-dir> --output <public-review-dir>/public-longmemeval-full-materialize-run.json --markdown-output <public-review-dir>/public-longmemeval-full-materialize-run-evidence.md",
-    "responseArmExportTemplate": "RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url> SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model> SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit> SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS=<safe-local-embedding-batch-token-limit> SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit> SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1 SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url> SELFMEM_LOCAL_RERANK_MODEL=<local-rerank-model> SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=<local-rerank-candidate-limit> SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/arms/{shardId} --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-gemini2-embed-rerank-proxy,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset {startIndex} --max-queries {queryCount} --require-local-embedding-durability --local-embedding-durability-report reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
-    "preflightTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --claim-scope full-sota --model-match-policy exact-target-required --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset {startIndex} --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/arms/{shardId}/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/{shardId}/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/{shardId}/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/arms/{shardId}/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/{shardId}/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/arms/{shardId}/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-preflight-{shardId}.json --markdown-output <public-review-dir>/answer-quality-preflight-{shardId}.md",
-    "answerQualityTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope full-sota --model-match-policy exact-target-required --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/longmemeval-queryset.private.json --memories <private-output-dir>/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/longmemeval-answer-labels.private.json --query-offset {startIndex} --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/arms/{shardId}/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/arms/{shardId}/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/arms/{shardId}/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/arms/{shardId}/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/arms/{shardId}/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/arms/{shardId}/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/arms/{shardId}/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-{shardId}.json --markdown-output <public-review-dir>/answer-quality-{shardId}.md",
+    "materializeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --memory-method session-v1 --private-output-dir <private-output-dir> --output <public-review-dir>/public-longmemeval-full-materialize-run.json --markdown-output <public-review-dir>/public-longmemeval-full-materialize-run-evidence.md",
+    "shardMaterializeTemplate": "npm exec --yes pnpm@10.23.0 -- benchmark:public-materialize -- --live --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --memory-method session-v1 --context-token-budget 800 --limit 5 --query-offset {startIndex} --max-queries {queryCount} --private-output-dir <private-output-dir>/shards/{shardId}/materialized --output <public-review-dir>/public-longmemeval-full-sota-materialize-{shardId}.json --markdown-output <public-review-dir>/public-longmemeval-full-sota-materialize-{shardId}.md",
+    "responseArmExportTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota RECALLWEAVE_BASELINE_LIVE=1 RECALLWEAVE_BASELINE_NO_RAW_TEXT=1 RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_PROVIDER_BENCHMARK_CALLS=<1-when-provider-arms-run> RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA=<1-when-provider-arms-run> SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url> SELFMEM_LOCAL_EMBED_MODEL=<local-embedding-model> SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit> SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS=<safe-local-embedding-batch-token-limit> SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT=<safe-local-dense-candidate-limit> SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY=1 SELFMEM_LOCAL_RERANK_BASE_URL=<local-rerank-base-url> SELFMEM_LOCAL_RERANK_MODEL=<local-rerank-model> SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT=<local-rerank-candidate-limit> SELFMEM_QUERY_EXPANSION_BASE_URL=<local-query-expansion-base-url-if-used> SELFMEM_QUERY_EXPANSION_MODEL=<query-expansion-model-if-used> RECALLWEAVE_QUERY_EXPANSION_CALLS=<1-when-cloud-query-expansion-runs> RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA=<1-when-cloud-query-expansion-runs> npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:arms -- --live --execute --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --private-output-dir <private-output-dir>/shards/{shardId}/arms --strategies bm25-lite,full-hybrid-rerank,query-expanded-full-hybrid-rerank,cloud-gemini2-embed-rerank-proxy,cloud-voyage4-voyage-lite-rerank,cloud-nvidia-nv-embed-v1-mistral-rerank,local-apple-qwen3-0_6b,local-apple-qwen3-0_6b-local-rerank --context-token-budget 800 --limit 5 --max-memory-bytes 300000000 --query-offset 0 --max-queries {queryCount} --require-local-embedding-durability --local-embedding-durability-report reviews/overnight-20260522/local-embedding-durability-smoke-20260526.json",
+    "preflightTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:preflight -- --require-ready --claim-scope full-sota --model-match-policy exact-target-required --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json --query-offset 0 --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/shards/{shardId}/arms/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/shards/{shardId}/arms/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/shards/{shardId}/arms/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/shards/{shardId}/arms/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-preflight-{shardId}.json --markdown-output <public-review-dir>/answer-quality-preflight-{shardId}.md",
+    "answerQualityTemplate": "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=full-sota RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=exact-target-required RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1 SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1 RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1 RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url> RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint> RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=gpt-4o RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=gpt-4o npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope full-sota --model-match-policy exact-target-required --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/shards/{shardId}/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/shards/{shardId}/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/shards/{shardId}/materialized/longmemeval-answer-labels.private.json --query-offset 0 --max-queries {queryCount} --arm bm25-lite=<private-output-dir>/shards/{shardId}/arms/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/full-hybrid-rerank-responses.private.json --arm query-expanded-full-hybrid-rerank=<private-output-dir>/shards/{shardId}/arms/query-expanded-full-hybrid-rerank-responses.private.json --arm cloud-gemini2-embed-rerank-proxy=<private-output-dir>/shards/{shardId}/arms/cloud-gemini2-embed-rerank-proxy-responses.private.json --arm cloud-voyage4-voyage-lite-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-voyage4-voyage-lite-rerank-responses.private.json --arm cloud-nvidia-nv-embed-v1-mistral-rerank=<private-output-dir>/shards/{shardId}/arms/cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json --arm local-apple-qwen3-0_6b=<private-output-dir>/shards/{shardId}/arms/local-apple-qwen3-0_6b-responses.private.json --arm local-apple-qwen3-0_6b-local-rerank=<private-output-dir>/shards/{shardId}/arms/local-apple-qwen3-0_6b-local-rerank-responses.private.json --output <public-review-dir>/answer-quality-{shardId}.json --markdown-output <public-review-dir>/answer-quality-{shardId}.md",
     "combineCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:combine -- --input <public-review-dir>/answer-quality-shard-001.json,<public-review-dir>/answer-quality-shard-002.json,<public-review-dir>/answer-quality-shard-003.json,<public-review-dir>/answer-quality-shard-004.json,<public-review-dir>/answer-quality-shard-005.json,<public-review-dir>/answer-quality-shard-006.json,<public-review-dir>/answer-quality-shard-007.json,<public-review-dir>/answer-quality-shard-008.json,<public-review-dir>/answer-quality-shard-009.json,<public-review-dir>/answer-quality-shard-010.json,<public-review-dir>/answer-quality-shard-011.json,<public-review-dir>/answer-quality-shard-012.json,<public-review-dir>/answer-quality-shard-013.json,<public-review-dir>/answer-quality-shard-014.json,<public-review-dir>/answer-quality-shard-015.json,<public-review-dir>/answer-quality-shard-016.json,<public-review-dir>/answer-quality-shard-017.json,<public-review-dir>/answer-quality-shard-018.json,<public-review-dir>/answer-quality-shard-019.json,<public-review-dir>/answer-quality-shard-020.json --combine-mode shards --output <public-review-dir>/end-to-end-memory-score-full-combined.json --markdown-output <public-review-dir>/end-to-end-memory-score-full-combined.md",
     "resultGateCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --claim-scope full-sota --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer-approval-report <public-review-dir>/memory-score-reviewer-intake-full.json --require-ready",
     "reviewerIntakeCommand": "npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:reviewer-intake -- --result <public-review-dir>/end-to-end-memory-score-full-combined.json --reviewer <reviewer-a-json> --reviewer <reviewer-b-json> --output <public-review-dir>/memory-score-reviewer-intake-full.json"
@@ -191,7 +195,8 @@
         "requiredJudgeModel": "gpt-4o",
         "modelMatchPolicy": "exact-target-required",
         "exactTargetModelsRequired": true,
-        "localDiagnosticModelAllowed": false
+        "localDiagnosticModelAllowed": false,
+        "challengerModelAllowed": false
       },
       "acceptedByFullShardIntake": false,
       "canReachFullSotaGateAfterShardIntake": false,
@@ -237,7 +242,8 @@
         "requiredJudgeModel": "gpt-4o",
         "modelMatchPolicy": "exact-target-required",
         "exactTargetModelsRequired": true,
-        "localDiagnosticModelAllowed": false
+        "localDiagnosticModelAllowed": false,
+        "challengerModelAllowed": false
       },
       "acceptedByFullShardIntake": false,
       "canReachFullSotaGateAfterShardIntake": false,
@@ -286,7 +292,8 @@
         "requiredJudgeModel": "gpt-4o",
         "modelMatchPolicy": "exact-target-required",
         "exactTargetModelsRequired": true,
-        "localDiagnosticModelAllowed": false
+        "localDiagnosticModelAllowed": false,
+        "challengerModelAllowed": false
       },
       "acceptedByFullShardIntake": false,
       "canReachFullSotaGateAfterShardIntake": false,
@@ -329,7 +336,8 @@
         "requiredJudgeModel": "gpt-4o",
         "modelMatchPolicy": "exact-target-required",
         "exactTargetModelsRequired": true,
-        "localDiagnosticModelAllowed": false
+        "localDiagnosticModelAllowed": false,
+        "challengerModelAllowed": false
       },
       "acceptedByFullShardIntake": false,
       "canReachFullSotaGateAfterShardIntake": false,
@@ -372,7 +380,8 @@
         "requiredJudgeModel": "gpt-4o",
         "modelMatchPolicy": "exact-target-required",
         "exactTargetModelsRequired": true,
-        "localDiagnosticModelAllowed": false
+        "localDiagnosticModelAllowed": false,
+        "challengerModelAllowed": false
       },
       "acceptedByFullShardIntake": false,
       "canReachFullSotaGateAfterShardIntake": false,
@@ -415,7 +424,8 @@
         "requiredJudgeModel": "gpt-4o",
         "modelMatchPolicy": "exact-target-required",
         "exactTargetModelsRequired": true,
-        "localDiagnosticModelAllowed": false
+        "localDiagnosticModelAllowed": false,
+        "challengerModelAllowed": false
       },
       "acceptedByFullShardIntake": false,
       "canReachFullSotaGateAfterShardIntake": false,
@@ -467,7 +477,8 @@
         "requiredJudgeModel": "gpt-4o",
         "modelMatchPolicy": "exact-target-required",
         "exactTargetModelsRequired": true,
-        "localDiagnosticModelAllowed": false
+        "localDiagnosticModelAllowed": false,
+        "challengerModelAllowed": false
       },
       "acceptedByFullShardIntake": true,
       "canReachFullSotaGateAfterShardIntake": true,
@@ -487,7 +498,9 @@
       "endIndexExclusive": 25,
       "queryCount": 25,
       "rangeHash": "sha256:c1bfaf4b31bb2d306fd0b373c62dc9cfbb32df73ef58aa1cc983e45c35829b68",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-001",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-001",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-001/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-001/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-001.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-001.md"
     },
@@ -497,7 +510,9 @@
       "endIndexExclusive": 50,
       "queryCount": 25,
       "rangeHash": "sha256:71103d5a2daad08f0b08b4f93b9b1dda09760758eecc545a3d2ab25d55dd6d7e",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-002",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-002",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-002/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-002/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-002.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-002.md"
     },
@@ -507,7 +522,9 @@
       "endIndexExclusive": 75,
       "queryCount": 25,
       "rangeHash": "sha256:58db3648c91f8830588df1a55353107279ecfda54e6fa9a2d0ea7f57b304a1bb",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-003",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-003",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-003/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-003/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-003.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-003.md"
     },
@@ -517,7 +534,9 @@
       "endIndexExclusive": 100,
       "queryCount": 25,
       "rangeHash": "sha256:ad9d760a81aeb2e17edc40a6a73ff15805c1712fdf7f56c1ad1c17e52a29233a",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-004",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-004",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-004/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-004/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-004.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-004.md"
     },
@@ -527,7 +546,9 @@
       "endIndexExclusive": 125,
       "queryCount": 25,
       "rangeHash": "sha256:03066585a3187536499641dc1a094f2e9e8c9ecae0b0189f40b7763835ef51e7",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-005",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-005",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-005/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-005/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-005.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-005.md"
     },
@@ -537,7 +558,9 @@
       "endIndexExclusive": 150,
       "queryCount": 25,
       "rangeHash": "sha256:ea5c004f58402224c122911a95d5700afebadc6c037e8e99ac8773ac5939b517",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-006",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-006",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-006/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-006/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-006.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-006.md"
     },
@@ -547,7 +570,9 @@
       "endIndexExclusive": 175,
       "queryCount": 25,
       "rangeHash": "sha256:901380685743d928c30ed268165602ac6001c1ced378d789a2b11ed1ce9cda1c",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-007",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-007",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-007/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-007/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-007.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-007.md"
     },
@@ -557,7 +582,9 @@
       "endIndexExclusive": 200,
       "queryCount": 25,
       "rangeHash": "sha256:306f93768513b1328d3c84da6921b55853ab1cf72b7bae7fe7cedf186b9cba30",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-008",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-008",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-008/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-008/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-008.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-008.md"
     },
@@ -567,7 +594,9 @@
       "endIndexExclusive": 225,
       "queryCount": 25,
       "rangeHash": "sha256:a70c0cf325ce9ad211ab08b3449f1b70ac8c780d7d464523bc4e0494b3163606",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-009",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-009",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-009/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-009/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-009.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-009.md"
     },
@@ -577,7 +606,9 @@
       "endIndexExclusive": 250,
       "queryCount": 25,
       "rangeHash": "sha256:ced258f82d118a9ec9efd2fc6c99610371579814491cff593d3877e93651a622",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-010",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-010",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-010/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-010/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-010.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-010.md"
     },
@@ -587,7 +618,9 @@
       "endIndexExclusive": 275,
       "queryCount": 25,
       "rangeHash": "sha256:7db76ab4f8e8fca01c723389c68d1121f121dc511921dfd6ac95ad7d9844c026",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-011",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-011",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-011/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-011/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-011.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-011.md"
     },
@@ -597,7 +630,9 @@
       "endIndexExclusive": 300,
       "queryCount": 25,
       "rangeHash": "sha256:1be862918a3cc513ce05b63dfa918c411b1847ff2d535664a664107aa083ebc6",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-012",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-012",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-012/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-012/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-012.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-012.md"
     },
@@ -607,7 +642,9 @@
       "endIndexExclusive": 325,
       "queryCount": 25,
       "rangeHash": "sha256:3e28662567e36ed55c72ceec63d62d62a74094e01272786c749a6583b9da72fb",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-013",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-013",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-013/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-013/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-013.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-013.md"
     },
@@ -617,7 +654,9 @@
       "endIndexExclusive": 350,
       "queryCount": 25,
       "rangeHash": "sha256:873640630ac419aeb0cae04aa6f5801363eacb0199b0a32563baac154c6059b7",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-014",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-014",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-014/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-014/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-014.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-014.md"
     },
@@ -627,7 +666,9 @@
       "endIndexExclusive": 375,
       "queryCount": 25,
       "rangeHash": "sha256:1af1c6b26c7af96dfa777c818d9619dce29138c3a0e1d473cbcfbf1cf8f4bb2a",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-015",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-015",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-015/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-015/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-015.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-015.md"
     },
@@ -637,7 +678,9 @@
       "endIndexExclusive": 400,
       "queryCount": 25,
       "rangeHash": "sha256:d5a48a6900a8b84db02a4b22eed89deeff3d3b7412781e4a40a7800594d975ea",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-016",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-016",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-016/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-016/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-016.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-016.md"
     },
@@ -647,7 +690,9 @@
       "endIndexExclusive": 425,
       "queryCount": 25,
       "rangeHash": "sha256:f5eedb21035b1aebf63db723b3f51f9d63b50ba501b801e49a01f7c289a66716",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-017",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-017",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-017/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-017/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-017.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-017.md"
     },
@@ -657,7 +702,9 @@
       "endIndexExclusive": 450,
       "queryCount": 25,
       "rangeHash": "sha256:0d8f6d43931f116e3632322367a73c0d50d65b43e622c4d1018be580c253a71c",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-018",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-018",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-018/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-018/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-018.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-018.md"
     },
@@ -667,7 +714,9 @@
       "endIndexExclusive": 475,
       "queryCount": 25,
       "rangeHash": "sha256:48f3b938408d7530d2b423418288af1eb35eca6a5ea78487ab98c35b17667c90",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-019",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-019",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-019/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-019/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-019.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-019.md"
     },
@@ -677,7 +726,9 @@
       "endIndexExclusive": 500,
       "queryCount": 25,
       "rangeHash": "sha256:59f4ad0dc9bcc2d8101cae5659b52a82c6e17a2c23d0cebddcb5b7adc1652e76",
-      "armOutputDirectoryLabel": "<private-output-dir>/arms/shard-020",
+      "privateShardDirectoryLabel": "<private-output-dir>/shards/shard-020",
+      "materializedDirectoryLabel": "<private-output-dir>/shards/shard-020/materialized",
+      "armOutputDirectoryLabel": "<private-output-dir>/shards/shard-020/arms",
       "answerQualityOutputLabel": "<public-review-dir>/answer-quality-shard-020.json",
       "answerQualityMarkdownLabel": "<public-review-dir>/answer-quality-shard-020.md"
     }
@@ -712,9 +763,10 @@
   },
   "blockers": [],
   "nextActions": [
+    "Run shard-scoped materialization before each response arm export so provider and local arms load only the shard-local private corpus.",
     "Run response arm exports shard-by-shard with explicit provider and query-expansion consent.",
     "Run shard-aware answer-quality preflight for each shard before model-scored answer quality.",
-    "Run answer-quality scoring for each shard with the target answer and judge models.",
+    "Run answer-quality scoring for each shard with the exact target answer and judge models.",
     "Combine the full query-shard result set, then run the memory-score gate and reviewer intake on the combined metrics-only packet.",
     "Treat the completed result as SOTA-candidate evidence only after result gate, reviewer intake, UI/docs, owner approval, and real canary also pass."
   ]

@@ -341,6 +341,7 @@ function runtimeBlockerRow({ item, expectedShard, failures }) {
 }
 
 function candidateFailures({ item, range, expectedShard, planValue }) {
+  const sourceCompatible = resultSourceCompatible(item.json, planValue);
   return [
     item.json.mode !== "public-benchmark-answer-quality" ? "not-answer-quality-report" : null,
     item.json.fixtureOnly !== false ? "fixture-result" : null,
@@ -355,9 +356,9 @@ function candidateFailures({ item, range, expectedShard, planValue }) {
     item.json.rawTranscriptIncluded !== false ? "raw-transcript-included" : null,
     item.json.target?.hash !== planValue.target?.hash ? "target-hash-mismatch" : null,
     item.json.input?.targetHash !== planValue.target?.hash ? "input-target-hash-mismatch" : null,
-    item.json.input?.answerLabelsHash !== planValue.target?.answerLabelsHash ? "answer-labels-hash-mismatch" : null,
+    !sourceCompatible.answerLabels ? "answer-labels-hash-mismatch" : null,
     item.json.input?.scoringCodeHash !== planValue.target?.scoringCodeHash ? "scoring-code-hash-mismatch" : null,
-    item.json.input?.querySetHash !== planValue.materializeReport?.collectorCompatibleQuerySetHash ? "query-set-hash-mismatch" : null,
+    !sourceCompatible.querySet ? "query-set-hash-mismatch" : null,
     item.json.input?.materializerHash !== planValue.materializeReport?.materializerHash ? "materializer-hash-mismatch" : null,
     Number(item.json.input?.totalQueryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "total-query-count-mismatch" : null,
     Number(item.json.input?.queryCount ?? 0) !== Number(planValue.runPlan?.queryCount ?? 0) ? "input-query-count-mismatch" : null,
@@ -376,7 +377,28 @@ function candidateFailures({ item, range, expectedShard, planValue }) {
   ].filter(Boolean);
 }
 
+function resultSourceCompatible(result, planValue) {
+  const input = result.input ?? {};
+  const shard = input.materializationShard ?? {};
+  const materializedShard = shard.applied === true;
+  const directAnswerLabels = input.answerLabelsHash === planValue.target?.answerLabelsHash;
+  const shardAnswerLabels = materializedShard && input.targetAnswerLabelsHash === planValue.target?.answerLabelsHash;
+  const directQuerySet = input.querySetHash === planValue.materializeReport?.collectorCompatibleQuerySetHash;
+  const shardQuerySet =
+    materializedShard &&
+    Number(shard.totalQueryCount ?? input.totalQueryCount ?? 0) === Number(planValue.runPlan?.queryCount ?? 0) &&
+    Number(shard.selectedCount ?? input.scoredQueryCount ?? 0) === Number(input.scoredQueryCount ?? 0);
+  return {
+    answerLabels: directAnswerLabels || shardAnswerLabels,
+    querySet: directQuerySet || shardQuerySet,
+  };
+}
+
 function buildWorkorder(planValue, shard, runtimeResume) {
+  const shardMaterialize = replaceShardTokens(
+    planValue.runPlan?.shardMaterializeTemplate ?? planValue.runPlan?.materializeCommand ?? "",
+    shard,
+  );
   const responseArmExport = replaceShardTokens(planValue.runPlan?.responseArmExportTemplate ?? "", shard);
   const preflight = replaceShardTokens(planValue.runPlan?.preflightTemplate ?? "", shard);
   const answerQuality = replaceShardTokens(planValue.runPlan?.answerQualityTemplate ?? "", shard);
@@ -389,7 +411,9 @@ function buildWorkorder(planValue, shard, runtimeResume) {
     queryCount: shard.queryCount,
     expectedPublicResult: shard.answerQualityOutputLabel ?? `<public-review-dir>/answer-quality-${shard.id}.json`,
     expectedPublicMarkdown: shard.answerQualityMarkdownLabel ?? `<public-review-dir>/answer-quality-${shard.id}.md`,
-    expectedPrivateArmDirectory: `<private-output-dir>/arms/${shard.id}`,
+    expectedPrivateShardDirectory: `<private-output-dir>/shards/${shard.id}`,
+    expectedPrivateMaterializedDirectory: `<private-output-dir>/shards/${shard.id}/materialized`,
+    expectedPrivateArmDirectory: `<private-output-dir>/shards/${shard.id}/arms`,
     runtimeResume: runtimeResume
       ? {
           sourceFileName: runtimeResume.fileName,
@@ -409,6 +433,7 @@ function buildWorkorder(planValue, shard, runtimeResume) {
         }
       : null,
     commands: {
+      shardMaterialize,
       responseArmExport,
       missingArmResponseExport,
       preflight,

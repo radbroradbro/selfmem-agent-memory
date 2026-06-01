@@ -1079,7 +1079,7 @@ function inspectLocalFullResumeCommandSecurity(securityReport) {
     securityReport?.fixtureProbe?.secondCommandId === "rerunDurabilitySmoke" &&
     securityReport?.fixtureProbe?.thirdCommandId === "rerunLocalRerankDurabilitySmoke" &&
     securityReport?.fixtureProbe?.guardedCommandId === "missingArmResponseExport" &&
-    securityReport?.fixtureProbe?.materializedCommandCount === 9 &&
+    securityReport?.fixtureProbe?.materializedCommandCount === 10 &&
     securityReport?.fixtureProbe?.printsMaterializedCommands === false &&
     securityReport?.fixtureProbe?.printsPrivatePaths === false &&
     securityReport?.fixtureProbe?.printsEnvValues === false;

@@ -219,6 +219,7 @@ function inspectPrivateScriptOrder(privateScript) {
     "rerunDurabilitySmoke",
     "rerunLocalRerankDurabilitySmoke",
     "resumeEnvDoctor",
+    "shardMaterialize",
     "missingArmResponseExport",
   ];
   return {

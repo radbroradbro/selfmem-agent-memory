@@ -9,24 +9,29 @@
 - Current score delta vs reported target: -42.0333
 - Reported target source evidence checked at: 2026-05-26
 - Benchmark harness source locks: 1
+- Provider wave intake status: READY_PROVIDER_WAVE_INTAKE
 
 ## Gates
 - source-locked-full-target: pass
 - raw-source-retention: pass
 - full-shard-private-inputs: pass
-- accepted-sota-lane-launch-readiness: blocked (RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, full-answer-quality-shard-results-not-returned, full-memory-sota-score-not-proven, public-sota-claim-not-allowed)
+- accepted-sota-lane-launch-readiness: blocked (answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, local-apple-endpoint-missing, local-rerank-endpoint-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, full-answer-quality-shard-results-not-returned, full-memory-sota-score-not-proven, public-sota-claim-not-allowed)
+- accepted-lane-cloud-provider-env: pass
 - full-shard-control-preflight: pass
 - bm25-is-control-only: pass
 - local-full-benchmark-lane: pass
-- local-full-launch-readiness: blocked (RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, local-full-answer-quality-shard-results-not-returned)
+- local-full-launch-readiness: blocked (answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, local-apple-endpoint-missing, local-rerank-endpoint-missing, accepted-lane-response-export-not-ready, accepted-lane-answer-quality-scoring-not-ready, local-full-answer-quality-shard-results-not-returned)
 - local-embedding-runtime: pass
 - local-embedding-durability: pass
-- local-full-shard-intake: blocked (answer-quality-shards-missing, full-shard-coverage-incomplete, local-apple-embedding-server-socket-close, local-full-shard-002-incomplete, local-full-shard-coverage-incomplete, local-rerank-response-body-stall, local-full-shard-003-incomplete)
+- local-full-shard-intake: pass
 - local-full-performance-snapshot: pass
-- local-full-resume-env: blocked (local-full-resume-env-not-ready, local-full-resume-missing-arm-export-not-ready, local-full-resume-answer-quality-preflight-not-ready, local-full-resume-shard-answer-quality-not-ready, local-full-resume-local-shard-intake-not-ready, local-full-resume-command-materialization-not-ready, local-embedding-env-missing, local-rerank-env-missing, local-safety-env-missing, answer-quality-env-missing)
+- local-full-combined-memory-score: pass
+- local-full-resume-env: pass
 - local-full-resume-command-security: pass
 - local-full-resume-result: pass
-- full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, nvidia-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing, voyage-credentials-missing)
+- full-shard-results: blocked (answer-quality-shard-runs-pending, shard-results-missing, answer-quality-shards-missing, full-shard-coverage-incomplete, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing)
+- provider-wave-intake: pass
+- method-ladder-result-gate: pass
 - same-data-provider-arms: blocked (missing-voyage-answer-quality-same-data-result)
 - full-score-result-gate: blocked (reported-target-judge-model-does-not-match-result, missing-full-or-officially-comparable-memory-benchmark-run, best-end-to-end-score-below-primary-reported-memory-target)
 - reported-target-beaten: blocked (best-end-to-end-score-below-reported-supermemory-target)
@@ -50,11 +55,19 @@
 ## Accepted Lane Launch
 - Status: BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH
 - Ready for first accepted shard run: false
+- Selected provider-env evidence: true
+- Provider env evidence used: true
+- Provider credential evidence ready: true
+- Provider credential families ready: gemini, nvidia, voyage
+- Provider credential families blocked: none
+- Provider key counts: gemini=6, nvidia=1, voyage=8
+- Provider credential evidence blockers: none
+- Superseded operator credential blockers: none
 - Query expansion requirement: local-or-cloud-model-required
-- Query expansion model-backed: false
+- Query expansion model-backed: true
 - Response export ready: false
 - Answer-quality scoring ready: false
-- Operator inputs needed: 8
+- Operator inputs needed: 3
 
 ## Control Preflight
 - Status: BLOCKED_ANSWER_QUALITY_ENV
@@ -79,27 +92,38 @@
 - Shard count: 20
 - Ready for response export: false
 - Ready for first shard run: false
-- Intake status: BLOCKED_FULL_ANSWER_QUALITY_SHARDS
-- Ready for shard combine: false
-- Accepted local-full shards: 2
-- Missing local-full shards: 18
+- Intake status: READY_TO_COMBINE_FULL_ANSWER_QUALITY_SHARDS
+- Ready for shard combine: true
+- Accepted local-full shards: 20
+- Missing local-full shards: 0
 - Launch progress source: checked-in-progress-intake
-- Performance coverage: 10%
-- Performance best strategy: full-hybrid-rerank
-- Performance best answer quality: 25.52
+- Performance coverage: 100%
+- Performance best strategy: local-apple-qwen3-0_6b-local-rerank
+- Performance best answer quality: 24.9
 - Performance counts as SOTA evidence: false
-- Resume env ready for missing-arm export: false
+- Combined score status: READY_LOCAL_FULL_COMBINED_SCORE
+- Combined score ready: true
+- Combined score winner: local-apple-qwen3-0_6b-local-rerank
+- Combined score answer quality: 24.9
+- Combined score BM25 answer quality: 22.162
+- Memory score gate status: READY_LOCAL_FULL_MEMORY_SCORE
+- Memory score gate ready: true
+- Memory score gate counts as local-full evidence: true
+- Memory score gate counts as SOTA evidence: false
+- Memory score gate observed score: 24.9
+- Memory score gate reported target score: 85.2
+- Resume env ready for missing-arm export: true
 - Resume env ready for missing-arm export except env: true
-- Resume env ready for command materialization: false
+- Resume env ready for command materialization: true
 - Resume env private input files ready: true
 - Resume env completed private arm files ready: true
 - Resume env private directory provided: true
 - Resume env raw-source private audit ready: true
 - Resume env compressed default retrieval allowed: true
-- Resume env local execution env ready: false
-- Resume env local embedding env ready: false
-- Resume env local rerank env ready: false
-- Resume env answer-quality env ready: false
+- Resume env local execution env ready: true
+- Resume env local embedding env ready: true
+- Resume env local rerank env ready: true
+- Resume env answer-quality env ready: true
 - Resume command security ready: true
 - Resume command private file mode: 0700
 - Resume command first guard: rerunRuntimeDoctor
@@ -112,12 +136,18 @@
 - Resume result previous shard accepted: true
 - Resume result shard 002 present: false
 - Resume result shard 002 accepted: false
-- Next local-full shard: shard-003 (50-75)
-- Runtime-blocked local-full shards: 2
+- Next local-full shard: n/a (n/a)
+- Runtime-blocked local-full shards: 0
+- Historical runtime-blocked local-full shards: 2
+- Recovered runtime-blocked local-full shards: 2
+- Runtime recovery status: RETRIEVAL_AND_SCORING_READY
+- Runtime recovery retrieval recovered: true
+- Runtime recovery answer-quality env ready: true
 - Runtime blocker resume plans: 1
-- Next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank
-- Latest runtime-blocked shard: shard-003
-- Latest runtime-blocked arm: local-apple-qwen3-0_6b-local-rerank
+- Next shard missing resume arms: none
+- Historical next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank
+- Latest runtime-blocked shard: n/a
+- Latest runtime-blocked arm: n/a
 - Local embedding runtime status: READY_LOCAL_EMBEDDING_RUNTIME
 - Local embedding runtime ready: true
 - Local embedding durability status: READY_LOCAL_EMBEDDING_DURABILITY
@@ -126,47 +156,66 @@
 - Operator inputs needed: 5
 - Counts as full memory SOTA evidence: false
 
+## Provider Wave Intake
+- Status: READY_PROVIDER_WAVE_INTAKE
+- Evidence ready: true
+- Reports: 17
+- Completed reports: 7
+- Partial reports: 10
+- All waves include BM25: true
+- All waves include full hybrid: true
+- Completed provider families: gemini, nvidia, voyage
+- Retryable provider limit observed: true
+- Repair wave status: READY_PROVIDER_REPAIR_WAVES
+- Repair slices: 6
+- Recommended repair execution: single-provider-single-slice
+- Avoid concurrent provider arms: true
+- Counts as full memory SOTA evidence: false
+- Counts as end-to-end memory benchmark: false
+- Best provider rows: gemini:cloud-gemini2-embed-rerank-proxy:0.1575, nvidia:cloud-nvidia-nv-embed-v1-mistral-rerank:0.1575, voyage:cloud-voyage4-voyage-lite-rerank:0
+
+## Method Ladder Result Gate
+- Status: READY_ANSWER_QUALITY_METHOD_LADDER_CHALLENGER
+- Evidence ready: true
+- Counts as method-ladder evidence: true
+- Counts as full memory SOTA evidence: false
+- Query count: 75
+- Method count: 3
+- Baseline: session-v1:full-hybrid-rerank:21.7333
+- Best challenger: contextual-source-chunk-v1:bm25-lite:37.4667
+- Delta vs baseline: 15.7334
+- Paired bootstrap available: true
+- Paired bootstrap common queries: 75
+- Paired bootstrap mean delta: 15.7333
+- Paired bootstrap 95% lower bound: 8
+- Winning arm failures: 1
+- Total failure rate: 0.00222
+- Next larger-slice promotion ready: true
+- Promotion scope: next-larger-slice-challenger-only
+- Production default allowed by method ladder: false
+- Public SOTA claim allowed by method ladder: false
+- Promotion warnings: winner-arm-has-tolerated-call-failures; this remains challenger-only evidence; does-not-promote-production-default; does-not-count-as-full-memory-sota-evidence
+- Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite
+- Rows: session-v1:full-hybrid-rerank:21.7333, contextual-source-chunk-v1:bm25-lite:37.4667, atomic-memory-v1:bm25-lite:33.0667
+
 ## Blockers
-- RECALLWEAVE_BASELINE_LIVE-not-enabled
-- RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed
-- RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled
-- RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed
-- RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed
-- RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled
-- RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed
 - answer-model-missing
 - judge-model-missing
 - local-apple-credentials-missing
 - local-rerank-credentials-missing
-- nvidia-credentials-missing
 - openai-compatible-base-url-missing
-- query-expansion-local-endpoint-or-cloud-consent-missing
-- voyage-credentials-missing
+- local-apple-endpoint-missing
+- local-rerank-endpoint-missing
 - accepted-lane-response-export-not-ready
 - accepted-lane-answer-quality-scoring-not-ready
 - full-answer-quality-shard-results-not-returned
 - full-memory-sota-score-not-proven
 - public-sota-claim-not-allowed
 - local-full-answer-quality-shard-results-not-returned
-- answer-quality-shards-missing
-- full-shard-coverage-incomplete
-- local-apple-embedding-server-socket-close
-- local-full-shard-002-incomplete
-- local-full-shard-coverage-incomplete
-- local-rerank-response-body-stall
-- local-full-shard-003-incomplete
-- local-full-resume-env-not-ready
-- local-full-resume-missing-arm-export-not-ready
-- local-full-resume-answer-quality-preflight-not-ready
-- local-full-resume-shard-answer-quality-not-ready
-- local-full-resume-local-shard-intake-not-ready
-- local-full-resume-command-materialization-not-ready
-- local-embedding-env-missing
-- local-rerank-env-missing
-- local-safety-env-missing
-- answer-quality-env-missing
 - answer-quality-shard-runs-pending
 - shard-results-missing
+- answer-quality-shards-missing
+- full-shard-coverage-incomplete
 - missing-voyage-answer-quality-same-data-result
 - reported-target-judge-model-does-not-match-result
 - missing-full-or-officially-comparable-memory-benchmark-run
@@ -189,5 +238,5 @@
 
 ## Next Run
 - Primary stage: full-longmemeval-answer-quality-shards
-- Strategy set: bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, cloud-voyage4-voyage-lite-rerank, cloud-nvidia-nemotron-1b, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
+- Strategy set: bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, cloud-gemini2-embed-rerank-proxy, cloud-voyage4-voyage-lite-rerank, cloud-nvidia-nv-embed-v1-mistral-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
 - Required after shard runs: benchmark:answer-quality:shard-workorder; benchmark:local-embedding:runtime-doctor before local Apple embedding durability; benchmark:local-embedding:durability before local Apple response-arm export; benchmark:answer-quality:shard-intake --require-ready; benchmark:answer-quality:combine -- --combine-mode shards; benchmark:memory-score:reviewer-intake -- --strict-target; benchmark:memory-score:result-gate -- --require-ready; benchmark:sota-ladder; UI evidence, docs, release notes, owner approval, and real canary refresh

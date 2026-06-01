@@ -5,6 +5,7 @@
 - Ready for first accepted shard run: false
 - Ready for public SOTA claim: false
 - Ready for local-full benchmark result: false
+- Ready for model-challenger benchmark result: false
 - Counts as full memory SOTA evidence: false
 - Query count: 500
 - Shards: 20
@@ -26,8 +27,9 @@
 - Query expansion requirement: local-or-cloud-model-required
 - Query expansion model-backed: false
 - Diagnostic fallback allowed: false
-- Answer model target: gpt-4o
-- Judge model target: gpt-4o
+- Model match policy: local-diagnostic-allowed
+- Benchmark answer model target: gpt-4o
+- Benchmark judge model target: gpt-4o
 
 ## Local Runtime Health
 - Ready for response-arm export: false

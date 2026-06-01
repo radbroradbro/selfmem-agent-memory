@@ -4406,7 +4406,12 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(fullLane?.answerQualityEndpoint?.localDiagnosticModelAllowed, false);
     assert.equal(shardPlan.scoringPolicy?.modelMatchPolicy, "exact-target-required");
     assert.deepEqual(shardPlan.blockers, []);
-    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset \{startIndex\}/);
+    assert.match(shardPlan.runPlan?.shardMaterializeTemplate ?? "", /--query-offset \{startIndex\}/);
+    assert.match(shardPlan.runPlan?.shardMaterializeTemplate ?? "", /--max-queries \{queryCount\}/);
+    assert.match(shardPlan.runPlan?.shardMaterializeTemplate ?? "", /--private-output-dir <private-output-dir>\/shards\/\{shardId\}\/materialized/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--queryset <private-output-dir>\/shards\/\{shardId\}\/materialized\/longmemeval-queryset\.private\.json/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--private-output-dir <private-output-dir>\/shards\/\{shardId\}\/arms/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset 0/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--max-memory-bytes 300000000/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit>/);
@@ -4416,8 +4421,10 @@ check("fresh public benchmark target check passes", () => {
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--require-local-embedding-durability/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--local-embedding-durability-report reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /benchmark:answer-quality:preflight/);
-    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--query-offset \{startIndex\}/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--queryset <private-output-dir>\/shards\/\{shardId\}\/materialized\/longmemeval-queryset\.private\.json/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--query-offset 0/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--max-queries \{queryCount\}/);
+    assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /--query-offset 0/);
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /--max-queries \{queryCount\}/);
     assert.match(shardPlan.runPlan?.combineCommand ?? "", /--combine-mode shards/);
   }
@@ -4465,6 +4472,9 @@ check("fresh public benchmark target check passes", () => {
       "SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1",
     ]);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1/);
+    assert.match(shardPlan.runPlan?.shardMaterializeTemplate ?? "", /--query-offset \{startIndex\}/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--query-offset 0/);
+    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /<private-output-dir>\/shards\/\{shardId\}\/materialized/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_BASE_URL=<local-embedding-base-url>/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_MAX_TOKENS=<safe-local-embedding-max-token-limit>/);
@@ -4476,6 +4486,7 @@ check("fresh public benchmark target check passes", () => {
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_QUERY_EXPANSION_BASE_URL/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--claim-scope local-full/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--model-match-policy local-diagnostic-allowed/);
+    assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--query-offset 0/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1/);
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model>/);
@@ -4698,10 +4709,13 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_RERANK_BASE_URL"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--require-local-embedding-durability"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_QUERY_EXPANSION_BASE_URL"));
-    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--query-offset 50"));
+    assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("benchmark:public-materialize"));
+    assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("--query-offset 50"));
+    assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("/shards/shard-003/materialized"));
+    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--query-offset 0"));
     assert.doesNotMatch(launchDoctor.nextCommands?.responseArmExport ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
     assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("answer-quality-local-full-shard-003.json"));
-    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("--query-offset 50"));
+    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("--query-offset 0"));
   }
   assert.match(localAcceptedLaneLaunchDoctorMarkdownFresh, /Local-Full Accepted Lane Launch Doctor/);
   assert.match(localAcceptedLaneLaunchDoctorMarkdownFresh, /Claim scope: local-full/);
@@ -4955,9 +4969,15 @@ check("fresh public benchmark target check passes", () => {
     assert.deepEqual(workorder.workorders?.[0]?.runtimeResume?.missingStrategies, [
       "local-apple-qwen3-0_6b-local-rerank",
     ]);
+    assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /--query-offset 50/);
+    assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /--max-queries 25/);
+    assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /\/shards\/shard-003\/materialized/);
     assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /--strategies local-apple-qwen3-0_6b-local-rerank/);
-    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /--query-offset 50/);
+    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /\/shards\/shard-003\/materialized\/longmemeval-queryset\.private\.json/);
+    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /\/shards\/shard-003\/arms/);
+    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /--query-offset 0/);
     assert.match(workorder.workorders?.[0]?.commands?.preflight ?? "", /benchmark:answer-quality:preflight/);
+    assert.match(workorder.workorders?.[0]?.commands?.preflight ?? "", /--query-offset 0/);
   }
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.laneId, "local-full-accepted-shards");
   assert.equal(localFullAnswerQualityShardWorkorder.fullSotaLaneReadiness, null);
@@ -5006,6 +5026,14 @@ check("fresh public benchmark target check passes", () => {
     assert.deepEqual(resumePacket.localRuntime?.blockers, []);
     assert.deepEqual(resumePacket.blockers, []);
     assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--require-local-embedding-durability/);
+    if (resumePacket.commands?.shardMaterialize) {
+      assert.match(resumePacket.commands.shardMaterialize, /benchmark:public-materialize/);
+      assert.match(resumePacket.commands.shardMaterialize, /--query-offset \d+/);
+      assert.match(resumePacket.commands.shardMaterialize, /--max-queries 25/);
+      assert.match(resumePacket.commands.shardMaterialize, /\/shards\/shard-\d{3}\/materialized/);
+      assert.equal(resumePacket.shardLocalResume?.usesShardLocalMaterialization, true);
+      assert.equal(resumePacket.shardLocalResume?.responseArmQueryOffset, 0);
+    }
     assert.match(resumePacket.commands?.resumeEnvDoctor ?? "", /benchmark:answer-quality:local-shard-resume-env/);
     assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /benchmark:answer-quality:local-shard-resume-command/);
     assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /--private-command-output/);
@@ -5060,8 +5088,10 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullShardResumePacketFresh.resumeState?.missingArmCount, 1);
   assert.equal(localFullShardResumePacketFresh.resumeState?.previousFailureClass, "local-rerank-response-body-stall");
   assert.equal(localFullShardResumePacketFresh.resumeState?.publicSyntheticReproduced, false);
+  assert.match(localFullShardResumePacketFresh.commands?.shardMaterialize ?? "", /--query-offset 50/);
+  assert.match(localFullShardResumePacketFresh.commands?.shardMaterialize ?? "", /\/shards\/shard-003\/materialized/);
   assert.match(localFullShardResumePacketFresh.commands?.missingArmResponseExport ?? "", /--strategies local-apple-qwen3-0_6b-local-rerank/);
-  assert.match(localFullShardResumePacketFresh.commands?.missingArmResponseExport ?? "", /--query-offset 50/);
+  assert.match(localFullShardResumePacketFresh.commands?.missingArmResponseExport ?? "", /--query-offset 0/);
   assert.match(localFullShardResumePacketFresh.commands?.resumeEnvDoctor ?? "", /local-full-shard-003-resume-env-doctor-20260526\.json/);
   assert.match(localFullShardResumePacketFresh.commands?.resumeCommandMaterializer ?? "", /local-full-shard-003-resume-command-materializer-20260526\.json/);
   assert.match(localFullShardResumePacketFresh.commands?.resumeResultDoctor ?? "", /local-full-shard-003-resume-result-doctor-20260526\.json/);
@@ -5073,6 +5103,7 @@ check("fresh public benchmark target check passes", () => {
   ]);
   for (const command of [
     localFullShardResumePacketFresh.commands?.resumeEnvDoctor,
+    localFullShardResumePacketFresh.commands?.shardMaterialize,
     localFullShardResumePacketFresh.commands?.missingArmResponseExport,
     localFullShardResumePacketFresh.commands?.preflight,
     localFullShardResumePacketFresh.commands?.answerQuality,
@@ -5320,6 +5351,7 @@ check("fresh public benchmark target check passes", () => {
     "rerunDurabilitySmoke",
     "rerunLocalRerankDurabilitySmoke",
     "resumeEnvDoctor",
+    "shardMaterialize",
     "missingArmResponseExport",
     "preflight",
     "answerQuality",
@@ -5354,7 +5386,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.readyForMaterialization, false);
     assert.equal(materializer.writesRealPrivateCommandFile, false);
     assert.equal(materializer.privateCommandFile?.pathPrinted, false);
-    assert.equal(materializer.commandPlan?.commandCount, 9);
+    assert.equal(materializer.commandPlan?.commandCount, 10);
     assert.deepEqual(materializer.commandPlan?.commandIds, expectedResumePrivateScriptCommandOrder);
     assert.deepEqual(materializer.commandPlan?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
     assert.equal(materializer.commandPlan?.materializedCommandCount, 0);
@@ -5406,10 +5438,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(materializer.privateCommandFile?.outsideRepository, true);
     assert.equal(materializer.privateCommandFile?.mode, "0700");
     assert.match(materializer.privateCommandFile?.hash ?? "", /^sha256:[a-f0-9]{64}$/);
-    assert.equal(materializer.commandPlan?.commandCount, 9);
+    assert.equal(materializer.commandPlan?.commandCount, 10);
     assert.deepEqual(materializer.commandPlan?.commandIds, expectedResumePrivateScriptCommandOrder);
     assert.deepEqual(materializer.commandPlan?.privateScriptCommandOrder, expectedResumePrivateScriptCommandOrder);
-    assert.equal(materializer.commandPlan?.materializedCommandCount, 9);
+    assert.equal(materializer.commandPlan?.materializedCommandCount, 10);
     assert.equal(materializer.commandPlan?.commandsPrinted, false);
     assert.equal(materializer.guardPlan?.ready, true);
     assert.equal(materializer.guardPlan?.firstCommandId, "rerunRuntimeDoctor");
@@ -5446,8 +5478,13 @@ check("fresh public benchmark target check passes", () => {
   );
   assert.ok(
     localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 4. resumeEnvDoctor") <
-      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 5. missingArmResponseExport"),
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 5. shardMaterialize"),
   );
+  assert.ok(
+    localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 5. shardMaterialize") <
+      localFullShardResumeCommandMaterializerPrivateScript.indexOf("# 6. missingArmResponseExport"),
+  );
+  assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:public-materialize/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:local-rerank:durability/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /benchmark:answer-quality:arms/);
   assert.match(localFullShardResumeCommandMaterializerPrivateScript, /^export RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1$/m);
@@ -5522,7 +5559,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(securityDoctor.fixtureProbe?.secondCommandId, "rerunDurabilitySmoke");
     assert.equal(securityDoctor.fixtureProbe?.thirdCommandId, "rerunLocalRerankDurabilitySmoke");
     assert.equal(securityDoctor.fixtureProbe?.guardedCommandId, "missingArmResponseExport");
-    assert.equal(securityDoctor.fixtureProbe?.materializedCommandCount, 9);
+    assert.equal(securityDoctor.fixtureProbe?.materializedCommandCount, 10);
     assert.equal(securityDoctor.fixtureProbe?.printsMaterializedCommands, false);
     assert.equal(securityDoctor.fixtureProbe?.printsPrivatePaths, false);
     assert.equal(securityDoctor.fixtureProbe?.printsEnvValues, false);
@@ -6438,7 +6475,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.secondCommandId, "rerunDurabilitySmoke");
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.thirdCommandId, "rerunLocalRerankDurabilitySmoke");
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.guardedCommandId, "missingArmResponseExport");
-    assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.materializedCommandCount, 9);
+    assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.materializedCommandCount, 10);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.printsMaterializedCommands, false);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.printsPrivatePaths, false);
     assert.equal(doctorReport.localFullLaneState?.resumeCommandSecurity?.printsEnvValues, false);

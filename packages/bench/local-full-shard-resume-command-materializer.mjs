@@ -12,6 +12,7 @@ const privateScriptCommandOrder = [
   "rerunDurabilitySmoke",
   "rerunLocalRerankDurabilitySmoke",
   "resumeEnvDoctor",
+  "shardMaterialize",
   "missingArmResponseExport",
   "preflight",
   "answerQuality",
@@ -219,6 +220,7 @@ function inspectGuardOrder(commandIds) {
     "rerunDurabilitySmoke",
     "rerunLocalRerankDurabilitySmoke",
     "resumeEnvDoctor",
+    "shardMaterialize",
     "missingArmResponseExport",
   ];
   const missing = required.filter((id) => !Object.hasOwn(indexes, id));
@@ -254,6 +256,12 @@ function inspectGuardOrder(commandIds) {
     indexes.missingArmResponseExport != null &&
     indexes.resumeEnvDoctor != null &&
     indexes.missingArmResponseExport > indexes.resumeEnvDoctor;
+  const shardMaterializeAfterResumeEnv =
+    indexes.shardMaterialize != null && indexes.resumeEnvDoctor != null && indexes.shardMaterialize > indexes.resumeEnvDoctor;
+  const shardMaterializeBeforeMissingArm =
+    indexes.shardMaterialize != null &&
+    indexes.missingArmResponseExport != null &&
+    indexes.shardMaterialize < indexes.missingArmResponseExport;
   const startsWithFreshLocalRuntimeGuards =
     commandIds[0] === "rerunRuntimeDoctor" &&
     commandIds[1] === "rerunDurabilitySmoke" &&
@@ -267,6 +275,8 @@ function inspectGuardOrder(commandIds) {
     rerankDurabilityBeforeMissingArm &&
     resumeEnvAfterFreshGuards &&
     missingArmAfterResumeEnv &&
+    shardMaterializeAfterResumeEnv &&
+    shardMaterializeBeforeMissingArm &&
     startsWithFreshLocalRuntimeGuards;
   return {
     ready,
@@ -278,6 +288,8 @@ function inspectGuardOrder(commandIds) {
     rerankDurabilityBeforeMissingArm,
     resumeEnvAfterFreshGuards,
     missingArmAfterResumeEnv,
+    shardMaterializeAfterResumeEnv,
+    shardMaterializeBeforeMissingArm,
     missingRequiredCommandIds: missing,
     firstCommandId: commandIds[0] ?? null,
     secondCommandId: commandIds[1] ?? null,

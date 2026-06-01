@@ -4,7 +4,7 @@
   "mode": "local-full-shard-resume-command-materializer",
   "fixtureOnly": false,
   "status": "BLOCKED_LOCAL_FULL_RESUME_PRIVATE_COMMANDS",
-  "generatedAt": "2026-05-27T00:44:42.985Z",
+  "generatedAt": "2026-06-01T15:42:18.844Z",
   "reviewDir": "reviews/overnight-20260522",
   "writesRealFiles": true,
   "writesRealPrivateCommandFile": false,
@@ -48,7 +48,7 @@
   },
   "resumePacket": {
     "path": "reviews/overnight-20260522/local-full-shard-003-resume-packet-20260526.json",
-    "hash": "sha256:6f30f10c19b5f4f0929c48a0ca3c07723e459cae8f3c8dddb20896226eb020e9",
+    "hash": "sha256:c90dce0597f3b36921f1d900b23828acef7c04ad64cf53b9e872b9a90a5de52f",
     "status": "READY_FOR_LOCAL_FULL_SHARD_RESUME",
     "targetShard": {
       "shardId": "shard-003",
@@ -59,7 +59,7 @@
       "queryCount": 25,
       "expectedPublicResult": "<public-review-dir>/answer-quality-local-full-shard-003.json",
       "expectedPublicMarkdown": "<public-review-dir>/answer-quality-local-full-shard-003.md",
-      "expectedPrivateArmDirectoryLabel": "<private-output-dir>/arms/shard-003"
+      "expectedPrivateArmDirectoryLabel": "<private-output-dir>/shards/shard-003/arms"
     },
     "missingStrategies": [
       "local-apple-qwen3-0_6b-local-rerank"
@@ -72,12 +72,13 @@
     ]
   },
   "commandPlan": {
-    "commandCount": 9,
+    "commandCount": 10,
     "commandIds": [
       "rerunRuntimeDoctor",
       "rerunDurabilitySmoke",
       "rerunLocalRerankDurabilitySmoke",
       "resumeEnvDoctor",
+      "shardMaterialize",
       "missingArmResponseExport",
       "preflight",
       "answerQuality",
@@ -89,6 +90,7 @@
       "rerunDurabilitySmoke",
       "rerunLocalRerankDurabilitySmoke",
       "resumeEnvDoctor",
+      "shardMaterialize",
       "missingArmResponseExport",
       "preflight",
       "answerQuality",
@@ -133,6 +135,8 @@
     "rerankDurabilityBeforeMissingArm": true,
     "resumeEnvAfterFreshGuards": true,
     "missingArmAfterResumeEnv": true,
+    "shardMaterializeAfterResumeEnv": true,
+    "shardMaterializeBeforeMissingArm": true,
     "missingRequiredCommandIds": [],
     "firstCommandId": "rerunRuntimeDoctor",
     "secondCommandId": "rerunDurabilitySmoke",

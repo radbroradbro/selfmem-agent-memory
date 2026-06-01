@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-06-01T14:59:35.753Z",
+  "generatedAt": "2026-06-01T15:58:01.123Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -48,21 +48,21 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:2ec190d728b75504b17674c9d5bd20ca0119a49d552d38f3704324ceca83fd77",
+      "hash": "sha256:89f3679d5edea3ebc85a858eb67d480b8f6cc1c82c82792787193f714de4e9b4",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
       "exists": true,
-      "hash": "sha256:7a716e8e00b1ec16137739d38c4206e685960e481641fc5ce99291fc18da1c44",
+      "hash": "sha256:61fcfbecbc8e35466e002c07bb058cf4539041ff19c3d6dc951e88328e624714",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
       "exists": true,
-      "hash": "sha256:898373c62d88b0d1d4e3557f1d9ddde1d6d1256e7036db28d29678d2440a93d6",
+      "hash": "sha256:c55372a12fcb3e4da6b49213a02d4278fcb2f58787fcd4244058208bf9d613b9",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -244,7 +244,7 @@
     "localFullResumeCommandSecurity": {
       "path": "reviews/overnight-20260522/local-full-shard-003-resume-command-security-20260526.json",
       "exists": true,
-      "hash": "sha256:5fba81ba9343d1f4a4257b67882369f3ad30a03509eaaed8e731571b0a0ca68b",
+      "hash": "sha256:340b996943aff908758a73e108f26dd8928d518d18096665bd80574fe5c3b957",
       "mode": "local-full-shard-resume-command-security-doctor",
       "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY"
     },
@@ -286,7 +286,7 @@
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:b718cd0c3a38d175ebd8c28837c4c805b4126a72ab3fe42c3cfb5e9dfd08cc4d",
+      "hash": "sha256:aef5e90e84a3b5332d5cd23f1cf305ea40a7e814dcb68b332b9285c06eed0f3b",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -321,7 +321,7 @@
     "shardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
       "exists": true,
-      "hash": "sha256:9cdc33415b22b72333f765d05d93ac821c267f511dcaddd9cf77b678d7dee750",
+      "hash": "sha256:b219ed5ebec150ffc5a7bf8222b1070de36f4e5a0aafc159a6bce73016650386",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -731,7 +731,21 @@
         "blockerCount": 10
       },
       {
+        "laneId": "local-apple-scaled-challenger",
+        "acceptedByFullShardIntake": false,
+        "readyForResponseArmExport": false,
+        "readyForAnswerQualityScoring": false,
+        "blockerCount": 11
+      },
+      {
         "laneId": "voyage-minimum-challenger",
+        "acceptedByFullShardIntake": false,
+        "readyForResponseArmExport": false,
+        "readyForAnswerQualityScoring": false,
+        "blockerCount": 11
+      },
+      {
+        "laneId": "gemini2-minimum-challenger",
         "acceptedByFullShardIntake": false,
         "readyForResponseArmExport": false,
         "readyForAnswerQualityScoring": false,
@@ -749,7 +763,7 @@
         "acceptedByFullShardIntake": true,
         "readyForResponseArmExport": false,
         "readyForAnswerQualityScoring": false,
-        "blockerCount": 15
+        "blockerCount": 16
       }
     ],
     "fullSotaLaneReadyForResponseArmExport": false,
@@ -762,6 +776,7 @@
       "openai-compatible-base-url-missing"
     ],
     "supersededProviderCredentialBlockers": [
+      "gemini-credentials-missing",
       "nvidia-credentials-missing",
       "voyage-credentials-missing"
     ],
@@ -1002,7 +1017,7 @@
       "secondCommandId": "rerunDurabilitySmoke",
       "thirdCommandId": "rerunLocalRerankDurabilitySmoke",
       "guardedCommandId": "missingArmResponseExport",
-      "materializedCommandCount": 9,
+      "materializedCommandCount": 10,
       "printsMaterializedCommands": false,
       "printsPrivatePaths": false,
       "printsEnvValues": false,
@@ -1591,7 +1606,8 @@
           "requiredJudgeModel": "gpt-4o",
           "modelMatchPolicy": "exact-target-required",
           "exactTargetModelsRequired": true,
-          "localDiagnosticModelAllowed": false
+          "localDiagnosticModelAllowed": false,
+          "challengerModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1637,7 +1653,8 @@
           "requiredJudgeModel": "gpt-4o",
           "modelMatchPolicy": "exact-target-required",
           "exactTargetModelsRequired": true,
-          "localDiagnosticModelAllowed": false
+          "localDiagnosticModelAllowed": false,
+          "challengerModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1686,7 +1703,8 @@
           "requiredJudgeModel": "gpt-4o",
           "modelMatchPolicy": "exact-target-required",
           "exactTargetModelsRequired": true,
-          "localDiagnosticModelAllowed": false
+          "localDiagnosticModelAllowed": false,
+          "challengerModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1729,7 +1747,8 @@
           "requiredJudgeModel": "gpt-4o",
           "modelMatchPolicy": "exact-target-required",
           "exactTargetModelsRequired": true,
-          "localDiagnosticModelAllowed": false
+          "localDiagnosticModelAllowed": false,
+          "challengerModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1772,7 +1791,8 @@
           "requiredJudgeModel": "gpt-4o",
           "modelMatchPolicy": "exact-target-required",
           "exactTargetModelsRequired": true,
-          "localDiagnosticModelAllowed": false
+          "localDiagnosticModelAllowed": false,
+          "challengerModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1815,7 +1835,8 @@
           "requiredJudgeModel": "gpt-4o",
           "modelMatchPolicy": "exact-target-required",
           "exactTargetModelsRequired": true,
-          "localDiagnosticModelAllowed": false
+          "localDiagnosticModelAllowed": false,
+          "challengerModelAllowed": false
         },
         "acceptedByFullShardIntake": false,
         "canReachFullSotaGateAfterShardIntake": false,
@@ -1867,7 +1888,8 @@
           "requiredJudgeModel": "gpt-4o",
           "modelMatchPolicy": "exact-target-required",
           "exactTargetModelsRequired": true,
-          "localDiagnosticModelAllowed": false
+          "localDiagnosticModelAllowed": false,
+          "challengerModelAllowed": false
         },
         "acceptedByFullShardIntake": true,
         "canReachFullSotaGateAfterShardIntake": true,

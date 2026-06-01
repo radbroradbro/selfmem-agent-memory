@@ -289,30 +289,48 @@ function inspectPrivateJsonl(path, role) {
 
 function inspectQuerySet(value) {
   const querySetHash = `sha256:${stableHash(collectorQuerySetHashPayload(value))}`;
-  queryShardSelection = selectQueries(value.queries ?? []);
+  queryShardSelection = selectQueries(value.queries ?? [], value.authoring?.materializationShard);
   const expectedAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
   const expectedScoringCodeHash = target.benchmark?.scoringCodeHash ?? null;
+  const directTargetMatch =
+    value.authoring?.answerLabelsHash === expectedAnswerLabelsHash &&
+    value.authoring?.scoringCodeHash === expectedScoringCodeHash;
+  const shardTargetMatch =
+    value.authoring?.materializationShard?.applied === true &&
+    value.authoring?.targetAnswerLabelsHash === expectedAnswerLabelsHash &&
+    value.authoring?.scoringCodeHash === expectedScoringCodeHash;
   return {
     querySetHash,
-    queryCount: Number(value.queries?.length ?? 0),
+    queryCount: queryShardSelection.totalQueryCount,
+    localQueryCount: Number(value.queries?.length ?? 0),
     selectedQueryCount: queryShardSelection.ids.length,
     selectedQueryIdHash: queryShardSelection.selectedQueryIdHash,
     answerLabelsHash: value.authoring?.answerLabelsHash ?? null,
+    targetAnswerLabelsHash: value.authoring?.targetAnswerLabelsHash ?? null,
     scoringCodeHash: value.authoring?.scoringCodeHash ?? null,
-    matchesTarget:
-      value.authoring?.answerLabelsHash === expectedAnswerLabelsHash &&
-      value.authoring?.scoringCodeHash === expectedScoringCodeHash,
+    materializationShard: value.authoring?.materializationShard ?? null,
+    matchesTarget: directTargetMatch || shardTargetMatch,
   };
 }
 
 function inspectAnswerLabels(value) {
+  const expectedAnswerLabelsHash = target.benchmark?.answerLabelsHash ?? null;
+  const expectedScoringCodeHash = target.benchmark?.scoringCodeHash ?? null;
+  const directTargetMatch = value.answerLabelsHash === expectedAnswerLabelsHash && value.scoringCodeHash === expectedScoringCodeHash;
+  const shardTargetMatch =
+    value.materializationShard?.applied === true &&
+    value.targetAnswerLabelsHash === expectedAnswerLabelsHash &&
+    value.scoringCodeHash === expectedScoringCodeHash;
   return {
-    labelCount: Number(value.labels?.length ?? 0),
+    labelCount: value.materializationShard?.applied === true
+      ? Number(value.materializationShard.totalQueryCount ?? value.labels?.length ?? 0)
+      : Number(value.labels?.length ?? 0),
+    localLabelCount: Number(value.labels?.length ?? 0),
     answerLabelsHash: value.answerLabelsHash ?? null,
+    targetAnswerLabelsHash: value.targetAnswerLabelsHash ?? null,
     scoringCodeHash: value.scoringCodeHash ?? null,
-    matchesTarget:
-      value.answerLabelsHash === (target.benchmark?.answerLabelsHash ?? null) &&
-      value.scoringCodeHash === (target.benchmark?.scoringCodeHash ?? null),
+    materializationShard: value.materializationShard ?? null,
+    matchesTarget: directTargetMatch || shardTargetMatch,
   };
 }
 
@@ -478,17 +496,33 @@ function defaultModelMatchPolicy(scope) {
   return "exact-target-required";
 }
 
-function selectQueries(queries) {
-  const startIndex = Math.min(queryOffset, queries.length);
-  const endIndexExclusive = maxQueries ? Math.min(queries.length, startIndex + maxQueries) : queries.length;
-  const selected = queries.slice(startIndex, endIndexExclusive);
+function selectQueries(queries, materializationShard = null) {
+  const localStartIndex = Math.min(queryOffset, queries.length);
+  const localEndIndexExclusive = maxQueries ? Math.min(queries.length, localStartIndex + maxQueries) : queries.length;
+  const selected = queries.slice(localStartIndex, localEndIndexExclusive);
+  const parent = parentShardCoordinates(materializationShard, queries.length);
+  const startIndex = parent.startIndex + localStartIndex;
+  const endIndexExclusive = parent.startIndex + localEndIndexExclusive;
   return {
     startIndex,
     endIndexExclusive,
-    totalQueryCount: queries.length,
+    totalQueryCount: parent.totalQueryCount,
     ids: selected.map((query) => query.id),
     selectedQueryIdHash: `sha256:${stableHash(selected.map((query) => shortHash(query.id)).join("\n"))}`,
   };
+}
+
+function parentShardCoordinates(materializationShard, localTotalQueryCount) {
+  if (!materializationShard || materializationShard.applied !== true) {
+    return { startIndex: 0, totalQueryCount: localTotalQueryCount };
+  }
+  const startIndex = Number(materializationShard.startIndex ?? 0);
+  const selectedCount = Number(materializationShard.selectedCount ?? localTotalQueryCount);
+  const totalQueryCount = Number(materializationShard.totalQueryCount ?? localTotalQueryCount);
+  assert.ok(Number.isInteger(startIndex) && startIndex >= 0, "materialization shard start index must be non-negative");
+  assert.ok(Number.isInteger(selectedCount) && selectedCount === localTotalQueryCount, "materialization shard selected count must match queryset length");
+  assert.ok(Number.isInteger(totalQueryCount) && totalQueryCount >= startIndex + localTotalQueryCount, "materialization shard total query count is invalid");
+  return { startIndex, totalQueryCount };
 }
 
 function assertPrivateFile(path, label) {
