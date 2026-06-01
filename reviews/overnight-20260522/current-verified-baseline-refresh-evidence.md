@@ -19,29 +19,29 @@ scaffolded and fixture-covered, but not live-tested until a local embedding
 endpoint is configured. The current verified product evidence now includes live
 local Apple provider runs for Qwen3 Embedding 0.6B and Qwen3 Embedding 4B on
 the same public LongMemEval-S retrieval-proxy target.
-The latest verified branch-head refresh adds provider key-scoped pacing for
-rotated benchmark credentials, keeps provider challenger lanes as
-BM25/full-hybrid context arms, records accepted full-shard arm coverage, and
-preserves the launch/SOTA blockers.
+The latest verified branch-head refresh adds shard-scoped answer-quality
+materialization, shard-local response/preflight/scoring paths, and parent
+coordinate preservation for public evidence. This reduces full-corpus runtime
+pressure without changing launch/SOTA blockers.
 
 ## Latest Observed PR Branch Head
 
-- Commit: `03dcf629dd17fe18a64e10b1cd76a68636d8aa0d`
-- Commit title: `Harden provider key pacing and accepted arms`
-- GitHub Actions run: `26713721189`
+- Commit: `4c7e6559d63772c16a007122b2dc55c880e3e051`
+- Commit title: `Use shard-scoped materialization for answer-quality shards`
+- GitHub Actions run: `26766964429`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
 This does not change the approved runtime canary adapter/report commit. It
-updates the current PR-head evidence, records provider key-scoped pacing and
-accepted full-shard arm coverage, and keeps the result as harness/readiness
-evidence only until live same-data provider runs are scored.
+updates the current PR-head evidence, records shard-scoped answer-quality
+materialization, and keeps the result as harness/readiness evidence only until
+live same-data provider runs are scored.
 
 ## Latest Verified PR Branch Head
 
-- Commit: `03dcf629dd17fe18a64e10b1cd76a68636d8aa0d`
-- Commit title: `Harden provider key pacing and accepted arms`
-- GitHub Actions run: `26713721189`
+- Commit: `4c7e6559d63772c16a007122b2dc55c880e3e051`
+- Commit title: `Use shard-scoped materialization for answer-quality shards`
+- GitHub Actions run: `26766964429`
 - CI conclusion: `success`
 - PR branch: `feat/nucleus-wiki-native-contract`
 
@@ -61,17 +61,10 @@ before this baseline refresh:
 - `npm exec --yes pnpm@10.23.0 -- release:check`
 - `npm exec --yes pnpm@10.23.0 -- goal:audit`
 - `npm exec --yes pnpm@10.23.0 -- benchmark:sota-doctor`
-- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the 30-query
-  LongMemEval-S target with BM25, full-hybrid, and Voyage provider arms
-- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the same
-  30-query LongMemEval-S target with BM25, full-hybrid, and Qwen3 Embedding
-  0.6B local Apple arms
-- `npm exec --yes pnpm@10.23.0 -- benchmark:public-provider` on the same
-  30-query LongMemEval-S target with BM25, full-hybrid, and Qwen3 Embedding 4B
-  local Apple arms
+- `npm exec --yes pnpm@10.23.0 -- release:github-sync`
 - Targeted public docs/evidence secret and private-path scan
 - Stale local model server check
-- GitHub Actions run `26713721189`
+- GitHub Actions run `26766964429`
 
 ## Canary Handoff Artifact
 

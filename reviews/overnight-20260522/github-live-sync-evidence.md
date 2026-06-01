@@ -2,6 +2,14 @@
 
 Date: 2026-05-23
 
+- PR #5 was refreshed again on 2026-06-01 after GitHub Actions run
+  `26766964429` passed on
+  `4c7e6559d63772c16a007122b2dc55c880e3e051`, promoting
+  shard-scoped answer-quality materialization and parent-coordinate preserving
+  shard-local response/preflight/scoring as the latest verified
+  code/product baseline while preserving launch, production rollout,
+  full-SOTA, and real-canary blockers. Live sync passed against the checked-in
+  PR body and issue drafts without printing body text or credentials.
 - On 2026-05-29, `packages/bench/github-live-sync-check.mjs` was hardened with
   bounded retry/timeout handling for transient GitHub API fetch failures. This
   is CI/runtime hygiene for the existing public-safe PR/issue sync gate; it does

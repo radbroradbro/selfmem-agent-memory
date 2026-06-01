@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-31T13:25:33Z",
+  "generatedAt": "2026-06-01T16:13:42Z",
   "goalStatus": "active",
   "publicLaunchVerdict": "FAIL",
   "productionReady": false,
@@ -14,14 +14,14 @@
     "draft": false
   },
   "latestVerifiedCodeBaseline": {
-    "headSha": "03dcf629dd17fe18a64e10b1cd76a68636d8aa0d",
-    "ciRunId": 26713721189,
+    "headSha": "4c7e6559d63772c16a007122b2dc55c880e3e051",
+    "ciRunId": 26766964429,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_provider_key_scoped_pacing_accepted_full_shard_arms_provider_hybrid_contract_and_guard_paths",
+    "localSmoke": "release_check_covers_shard_scoped_materialization_answer_quality_paths_and_public_safe_evidence_guards",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest inspected code/product baseline after adding provider key-scoped pacing for rotated credentials, keeping accepted answer-quality exports aligned to the complete full-shard arm set, and tightening the provider hybrid contract evidence. Provider challenger lanes remain BM25/full-hybrid context arms rather than provider-dense-only comparisons. Current evidence keeps cloud Voyage as the actual Codex/personal memory default, local Apple Silicon as the high-volume methodology-refinement lane, hosted Supermemory search disabled for isolated methodology benchmark loops unless an explicit hosted-baseline parity lane is running, and hosted read-through/search available for production when configured and not disabled. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, owner approval, and full local/provider shard coverage pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, diff check, secret scan, private-path scan, and GitHub Actions run 26713721189 passed."
+    "note": "Latest inspected code/product baseline after shard-scoping answer-quality materialization so each shard loads a shard-local private corpus, while response export, preflight, and scoring run at shard-local offset 0 and preserve parent query coordinates for public evidence. This is harness/readiness progress only: it reduces full-corpus runtime pressure and makes provider/local shard comparisons cleaner, but it does not authorize public SOTA claims or production rollout. Full-SOTA and public superiority claims remain blocked until live export/no-raw-text consent, answer-quality consent, exact target answer/judge model matching, local/provider arms, model-backed query expansion, reviewers, UI/docs, owner approval, and full local/provider shard coverage pass. MemoryBench/SOTA claims remain blocked, returned one-agent canary packets must report the approved runtime adapter commit, and public launch stays blocked until owner approval and one real strict production canary. Local release:check, goal:audit, secret scan, private-path scan, PR live sync, and GitHub Actions run 26766964429 passed."
   },
   "releaseStateGuard": {
     "enabled": true,
@@ -497,14 +497,14 @@
     "enablesHostedWriteBack": false
   },
   "latestVerifiedRepositoryHead": {
-    "headSha": "03dcf629dd17fe18a64e10b1cd76a68636d8aa0d",
-    "ciRunId": 26713721189,
+    "headSha": "4c7e6559d63772c16a007122b2dc55c880e3e051",
+    "ciRunId": 26766964429,
     "ciConclusion": "success",
     "localReleaseCheck": "passed",
-    "localSmoke": "release_check_covers_provider_key_scoped_pacing_accepted_full_shard_arms_provider_hybrid_contract_and_guard_paths",
+    "localSmoke": "release_check_covers_shard_scoped_materialization_answer_quality_paths_and_public_safe_evidence_guards",
     "secretScan": "zero_hits",
     "privateNameScan": "zero_hits",
-    "note": "Latest observed PR branch head after adding provider key-scoped pacing for rotated benchmark credentials, accepted full-shard arm coverage, and provider hybrid contract evidence. GitHub Actions run 26713721189 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
+    "note": "Latest observed PR branch head after shard-scoped answer-quality materialization and parent-coordinate preservation for shard-local exports. GitHub Actions run 26766964429 passed. This branch-head verification does not change the approved runtime adapter/report commit for one-agent production canaries and does not authorize SOTA or launch claims."
   },
   "approvedRuntimeCanaryBaseline": {
     "headSha": "18d606aff589986b4d8b416a686bedb7ff1506d2",
