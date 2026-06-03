@@ -71,6 +71,30 @@ const scenarios = [
     ],
     maxContextItems: 0,
   },
+  {
+    id: "tiny-continuation-go-no-anchor-no-noise",
+    prompt: "go",
+    expected: [],
+    forbidden: [
+      ["canvas-source-rule", /\bCanvas\/course-material|professor-uploaded Canvas files|reconstructed book extracts\b/i],
+      ["recallweave-benchmark-rule", /\bRecallWeave|selfmem|benchmark|canary|BM25|provider arm|release blocker\b/i],
+      ["provider-key-fragment", /\b(api key|keys work with|raw key|credential)\b/i],
+      ["private-path", /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//i],
+    ],
+    maxContextItems: 0,
+  },
+  {
+    id: "tiny-continuation-question-no-anchor-no-noise",
+    prompt: "???",
+    expected: [],
+    forbidden: [
+      ["canvas-source-rule", /\bCanvas\/course-material|professor-uploaded Canvas files|reconstructed book extracts\b/i],
+      ["recallweave-benchmark-rule", /\bRecallWeave|selfmem|benchmark|canary|BM25|provider arm|release blocker\b/i],
+      ["provider-key-fragment", /\b(api key|keys work with|raw key|credential)\b/i],
+      ["private-path", /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//i],
+    ],
+    maxContextItems: 0,
+  },
 ];
 
 const report = live ? runLiveAudit() : runFixtureAudit();
@@ -115,6 +139,8 @@ function runFixtureAudit() {
       "- Decision: For answer-quality or benchmark actor/judge work, Codex CLI with local OAuth is the preferred default actor when usable. DeepSeek v4 Pro or Flash direct API and OpenRouter/NVIDIA models are fallback or auxiliary lanes when the Codex CLI route does not fit the autoresearch harness or API-shaped loop.",
     ].join("\n"),
     "unrelated-default-noise": "",
+    "tiny-continuation-go-no-anchor-no-noise": "",
+    "tiny-continuation-question-no-anchor-no-noise": "",
   };
   const scenarioReports = scenarios.map((scenario) => evaluateScenario(scenario, contexts[scenario.id] ?? ""));
   return buildReport({

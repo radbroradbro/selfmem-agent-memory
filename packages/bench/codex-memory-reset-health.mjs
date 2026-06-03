@@ -271,8 +271,8 @@ function buildDogfoodMonitor({ storeHealth, contextQuality, doctor }) {
   const eventMetrics = storeHealth.eventMetrics ?? {};
   const scenarioReports = Array.isArray(contextQuality.scenarios) ? contextQuality.scenarios : [];
   const failedScenarios = Array.isArray(contextQuality.failedScenarios) ? contextQuality.failedScenarios : [];
-  const quietPromptScenario = scenarioReports.find((scenario) => scenario.id === "unrelated-default-noise");
-  const taskScenarios = scenarioReports.filter((scenario) => scenario.id !== "unrelated-default-noise");
+  const quietProbeScenarios = scenarioReports.filter((scenario) => isQuietContextProbe(scenario));
+  const taskScenarios = scenarioReports.filter((scenario) => !isQuietContextProbe(scenario));
   const taskScenarioCount = taskScenarios.length;
   const taskScenarioPassCount = taskScenarios.filter((scenario) => scenario.ok === true).length;
   const taskLookupRelevantCount = taskScenarios.filter((scenario) => {
@@ -284,7 +284,8 @@ function buildDogfoodMonitor({ storeHealth, contextQuality, doctor }) {
       && expected.every(Boolean);
   }).length;
   const directLookupPassRate = ratio(taskLookupRelevantCount, taskScenarioCount);
-  const quietLookupEmpty = quietPromptScenario?.ok === true && Number(quietPromptScenario?.itemCount ?? 0) === 0;
+  const quietLookupEmptyCount = quietProbeScenarios.filter((scenario) => scenario.ok === true && Number(scenario.itemCount ?? 0) === 0).length;
+  const quietLookupEmpty = quietProbeScenarios.length > 0 && quietLookupEmptyCount === quietProbeScenarios.length;
   const severeNoiseClean =
     storeHealth.severeNoise.commandJsonMemoryCount === 0
     && storeHealth.severeNoise.functionCallMemoryCount === 0
@@ -359,7 +360,7 @@ function buildDogfoodMonitor({ storeHealth, contextQuality, doctor }) {
     usefulness: {
       contextQualityOk: contextQuality.ok === true,
       failedScenarios,
-      quietPromptHasNoContext: quietPromptScenario?.ok === true,
+      quietPromptHasNoContext: quietLookupEmpty,
       taskScenarioCount,
       taskScenarioPassCount,
       taskScenarioPassRate: ratio(taskScenarioPassCount, taskScenarioCount),
@@ -371,12 +372,19 @@ function buildDogfoodMonitor({ storeHealth, contextQuality, doctor }) {
       taskLookupScenarios: taskScenarioCount,
       taskLookupRelevantCount,
       taskLookupPassRate: directLookupPassRate,
+      quietLookupScenarios: quietProbeScenarios.length,
+      quietLookupEmptyCount,
       quietLookupEmpty,
       confusingLookupCount: failedScenarios.length,
       directLookupUsefulnessOk: directLookupPassRate === 1 && quietLookupEmpty === true && failedScenarios.length === 0,
     },
     relevance,
   };
+}
+
+function isQuietContextProbe(scenario) {
+  const expected = Object.values(scenario?.expectedMatched ?? {});
+  return Number(scenario?.maxContextItems ?? 5) === 0 && expected.length === 0;
 }
 
 function buildRelevanceHealth({
