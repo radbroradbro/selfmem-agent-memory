@@ -2,6 +2,7 @@
 
 Date: 2026-05-23
 Latest returned-watch refresh: 2026-06-01
+Latest returned-supervisor refresh: 2026-06-03
 
 ## Scope
 
@@ -19,6 +20,7 @@ npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20
 npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --format markdown --expected-commit 5ac6c50e845c4c8d8e5d358e604700e4163b7fea --output reviews/overnight-20260522/real-diagnostics-postwatch-next-agent-plan.md
 npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch reviews/overnight-20260522/real-diagnostics-postwatch-batch-audit.json --host openclaw --allow-failed-inputs --require-ready --expected-commit 5ac6c50e845c4c8d8e5d358e604700e4163b7fea --output <downloads-folder>/recallweave-openclaw-next-agent-canary-20260601-SEND-THIS-ONE-5ac6c50.zip
 npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-commit 5ac6c50e845c4c8d8e5d358e604700e4163b7fea --output reviews/overnight-20260522/returned-downloads-current-scan.json --findings-output reviews/overnight-20260522/returned-downloads-current-scan.md
+npm exec --yes pnpm@10.23.0 -- canary:returned-supervisor -- --include-all-zips --expected-commit 5ac6c50e845c4c8d8e5d358e604700e4163b7fea --output reviews/overnight-20260522/returned-canary-supervisor-current.json --findings-output reviews/overnight-20260522/returned-canary-supervisor-current.md
 ```
 
 ## Returned Watch Result
@@ -33,6 +35,22 @@ npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --expected-co
 
 This confirms the incoming folders contain useful diagnostics and handoff
 packets, but no strict returned production canary evidence yet.
+
+## Current Returned Supervisor Refresh
+
+- Status: `AWAITING_RETURNED_PRODUCTION_CANARY`
+- Scanned zips: `37`
+- Production canary packets: `0`
+- Returned evidence packets: `0`
+- Handoff packets: `1`
+- Diagnostic bundles: `11`
+- Unknown packets: `25`
+- Expected report commit: `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`
+
+This confirms the current inbox still has the request packet and diagnostic
+material, but no strict-real returned production canary packet. The blocker is
+therefore external to this repo until the selected OpenClaw agent runs the
+fresh 15-minute canary window and returns the metrics-only evidence packet.
 
 ## Diagnostic Batch Result
 

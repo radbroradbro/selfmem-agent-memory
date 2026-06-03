@@ -115,6 +115,8 @@ const requiredFiles = {
   realDiagnosticsPostwatchEvidence: "real-diagnostics-postwatch-evidence.md",
   realDiagnosticsPostwatchReturnedWatch: "real-diagnostics-postwatch-returned-watch.json",
   returnedDownloadsCurrentScan: "returned-downloads-current-scan.json",
+  returnedCanarySupervisorCurrent: "returned-canary-supervisor-current.json",
+  returnedCanarySupervisorCurrentMarkdown: "returned-canary-supervisor-current.md",
   realDiagnosticsPostwatchBatchAudit: "real-diagnostics-postwatch-batch-audit.json",
   realDiagnosticsPostwatchNextAgentPlan: "real-diagnostics-postwatch-next-agent-plan.json",
   realDiagnosticsPostwatchNextAgentPlanMarkdown: "real-diagnostics-postwatch-next-agent-plan.md",
@@ -199,6 +201,8 @@ const canaryNextAgentText = readFileSync(join(root, reviewDir, "canary-next-agen
 const realDiagnosticsPostwatchEvidenceText = readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-evidence.md"), "utf8");
 const realDiagnosticsPostwatchReturnedWatch = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-returned-watch.json"), "utf8"));
 const returnedDownloadsCurrentScan = JSON.parse(readFileSync(join(root, reviewDir, "returned-downloads-current-scan.json"), "utf8"));
+const returnedCanarySupervisorCurrent = JSON.parse(readFileSync(join(root, reviewDir, "returned-canary-supervisor-current.json"), "utf8"));
+const returnedCanarySupervisorCurrentText = readFileSync(join(root, reviewDir, "returned-canary-supervisor-current.md"), "utf8");
 const realDiagnosticsPostwatchBatchAudit = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-batch-audit.json"), "utf8"));
 const realDiagnosticsPostwatchNextAgentPlan = JSON.parse(readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-next-agent-plan.json"), "utf8"));
 const benchmarkSummaryText = readFileSync(join(root, "docs/BENCHMARK_SUMMARY.md"), "utf8");
@@ -372,6 +376,15 @@ assert.match(realDiagnosticsPostwatchEvidenceText, /READY_FOR_ONE_AGENT_FRESH_CA
 assert.equal(realDiagnosticsPostwatchReturnedWatch.mode, "canary-returned-watch");
 assert.equal(realDiagnosticsPostwatchReturnedWatch.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
 assert.equal(realDiagnosticsPostwatchReturnedWatch.counts?.productionEvidencePackets, 0);
+assert.equal(returnedCanarySupervisorCurrent.mode, "canary-returned-supervisor");
+assert.equal(returnedCanarySupervisorCurrent.status, "AWAITING_RETURNED_PRODUCTION_CANARY");
+assert.equal(returnedCanarySupervisorCurrent.counts?.productionEvidencePackets, 0);
+assert.equal(returnedCanarySupervisorCurrent.counts?.returnedEvidencePackets, 0);
+assert.equal(returnedCanarySupervisorCurrent.selectedProductionPacket, null);
+assert.equal(returnedCanarySupervisorCurrent.publicLaunchAllowed, false);
+assert.equal(returnedCanarySupervisorCurrent.fleetRolloutAllowed, false);
+assert.match(returnedCanarySupervisorCurrentText, /Production evidence packets:\s*0/i);
+assert.match(returnedCanarySupervisorCurrentText, /Send the current OpenClaw next-agent request packet/i);
 assert.equal(realDiagnosticsPostwatchBatchAudit.mode, "canary-diagnostic-batch-audit");
 assert.equal(realDiagnosticsPostwatchBatchAudit.metricsOnly, true);
 assert.equal(realDiagnosticsPostwatchBatchAudit.allowFailedInputs, true);
@@ -855,6 +868,9 @@ console.log(
         realDiagnosticsPostwatch: {
           returnedWatchStatus: realDiagnosticsPostwatchReturnedWatch.status,
           productionEvidencePackets: realDiagnosticsPostwatchReturnedWatch.counts?.productionEvidencePackets,
+          returnedSupervisorStatus: returnedCanarySupervisorCurrent.status,
+          returnedSupervisorCandidateZipCount: returnedCanarySupervisorCurrent.counts?.candidateZipCount,
+          returnedSupervisorProductionEvidencePackets: returnedCanarySupervisorCurrent.counts?.productionEvidencePackets,
           returnedDownloadsExpectedCommit,
           postwatchPlanExpectedCommit,
           currentReturnedCanaryExpectedCommit,
