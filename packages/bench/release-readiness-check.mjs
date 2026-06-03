@@ -179,6 +179,10 @@ const requiredFiles = [
   `${reviewDir}/benchmark-target-lock-20260601.md`,
   `${reviewDir}/provider-adapter-registry-20260601.json`,
   `${reviewDir}/provider-adapter-registry-20260601.md`,
+  `${reviewDir}/github-live-sync-current-head-20260603-dogfood-review.json`,
+  `${reviewDir}/github-live-sync-current-head-20260603-dogfood-review.md`,
+  `${reviewDir}/current-head-pr-council-status-20260603-dogfood-review.json`,
+  `${reviewDir}/current-head-pr-council-status-20260603-dogfood-review.md`,
   `${reviewDir}/github-live-sync-current-head-20260601.json`,
   `${reviewDir}/github-live-sync-current-head-20260601.md`,
   `${reviewDir}/current-head-pr-council-status-20260601.json`,
@@ -2348,10 +2352,26 @@ check("benchmark target lock and provider registry stay conservative", () => {
   const providerRegistryFresh = JSON.parse(run("node", ["packages/bench/provider-adapter-registry-check.mjs"]).stdout);
   const targetLockEvidence = JSON.parse(readFileSync(join(root, reviewDir, "benchmark-target-lock-20260601.json"), "utf8"));
   const providerRegistryEvidence = JSON.parse(readFileSync(join(root, reviewDir, "provider-adapter-registry-20260601.json"), "utf8"));
-  const githubLiveSyncEvidence = JSON.parse(readFileSync(join(root, reviewDir, "github-live-sync-current-head-20260601.json"), "utf8"));
-  const githubLiveSyncMarkdown = readFileSync(join(root, reviewDir, "github-live-sync-current-head-20260601.md"), "utf8");
-  const councilStatus = JSON.parse(readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.json"), "utf8"));
-  const councilStatusMarkdown = readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.md"), "utf8");
+  const githubLiveSyncEvidencePath = preferReviewFile(
+    "github-live-sync-current-head-20260603-dogfood-review.json",
+    "github-live-sync-current-head-20260601.json",
+  );
+  const githubLiveSyncMarkdownPath = preferReviewFile(
+    "github-live-sync-current-head-20260603-dogfood-review.md",
+    "github-live-sync-current-head-20260601.md",
+  );
+  const councilStatusPath = preferReviewFile(
+    "current-head-pr-council-status-20260603-dogfood-review.json",
+    "current-head-pr-council-status-20260601.json",
+  );
+  const councilStatusMarkdownPath = preferReviewFile(
+    "current-head-pr-council-status-20260603-dogfood-review.md",
+    "current-head-pr-council-status-20260601.md",
+  );
+  const githubLiveSyncEvidence = JSON.parse(readFileSync(join(root, reviewDir, githubLiveSyncEvidencePath), "utf8"));
+  const githubLiveSyncMarkdown = readFileSync(join(root, reviewDir, githubLiveSyncMarkdownPath), "utf8");
+  const councilStatus = JSON.parse(readFileSync(join(root, reviewDir, councilStatusPath), "utf8"));
+  const councilStatusMarkdown = readFileSync(join(root, reviewDir, councilStatusMarkdownPath), "utf8");
   const currentHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
   const liveGithubSync = JSON.parse(run("node", ["packages/bench/github-live-sync-check.mjs"]).stdout);
   const postReviewChangedFiles = run("git", ["diff", "--name-only", `${councilStatus.reviewedCodeHead}..HEAD`])

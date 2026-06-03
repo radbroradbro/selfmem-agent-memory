@@ -14,7 +14,8 @@ const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir()
 const defaultEvidencePath = join(root, reviewDir, "codex-memory-dogfood-evidence-current.json");
 const evidencePath = args.evidence ? resolve(String(args.evidence)) : defaultEvidencePath;
 const outputPath = args.output ? resolve(String(args.output)) : null;
-const markdownOutputPath = args.markdownOutput ?? args.markdown ? resolve(String(args.markdownOutput ?? args.markdown)) : null;
+const markdownOutput = args.markdownOutput ?? args.markdown;
+const markdownOutputPath = markdownOutput ? resolve(String(markdownOutput)) : null;
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(existsSync(evidencePath), `dogfood evidence missing: ${safePath(evidencePath)}`);
