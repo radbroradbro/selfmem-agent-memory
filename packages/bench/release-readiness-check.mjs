@@ -138,6 +138,9 @@ const requiredFiles = [
   "packages/bench/public-benchmark-answer-quality-arm-export.mjs",
   "packages/bench/public-benchmark-answer-quality-preflight.mjs",
   "packages/bench/public-benchmark-answer-quality.mjs",
+  "packages/bench/public-benchmark-answer-quality-method-ladder.mjs",
+  "packages/bench/answer-quality-method-ladder-combine.mjs",
+  "packages/bench/answer-quality-method-ladder-result-gate.mjs",
   "packages/bench/public-benchmark-answer-quality-combine.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
   "packages/bench/public-benchmark-answer-quality-shard-workorder.mjs",
@@ -425,6 +428,12 @@ const requiredFiles = [
   `${reviewDir}/full-memory-sota-doctor-20260526.md`,
   `${reviewDir}/full-memory-sota-doctor-20260527.json`,
   `${reviewDir}/full-memory-sota-doctor-20260527.md`,
+  `${reviewDir}/answer-quality-memory-method-ladder-100q-combined-deepseek-flash-20260603.json`,
+  `${reviewDir}/answer-quality-memory-method-ladder-100q-combined-deepseek-flash-20260603.md`,
+  `${reviewDir}/answer-quality-memory-method-ladder-100q-combined-result-gate-20260603.json`,
+  `${reviewDir}/answer-quality-memory-method-ladder-100q-combined-result-gate-20260603.md`,
+  `${reviewDir}/full-memory-sota-doctor-after-method-ladder-100q-combined-20260603.json`,
+  `${reviewDir}/full-memory-sota-doctor-after-method-ladder-100q-combined-20260603.md`,
   `${reviewDir}/full-memory-sota-doctor-after-model-challenger-local-arms-20260603.json`,
   `${reviewDir}/full-memory-sota-doctor-after-model-challenger-local-arms-20260603.md`,
   `${reviewDir}/full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json`,
@@ -3423,12 +3432,14 @@ check("fresh public benchmark target check passes", () => {
   const fullMemorySotaDoctorFresh = JSON.parse(run("node", ["packages/bench/full-memory-sota-doctor.mjs"]).stdout);
   const fullMemorySotaDoctorMarkdownFresh = run("node", ["packages/bench/full-memory-sota-doctor.mjs", "--format", "markdown"]).stdout;
   const fullMemorySotaDoctorEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-method-ladder-100q-combined-20260603.json",
     "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.json",
     "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
     "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
     "full-memory-sota-doctor-after-local-full-combine-20260531.json",
   );
   const fullMemorySotaDoctorMarkdownEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-method-ladder-100q-combined-20260603.md",
     "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.md",
     "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md",
     "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
@@ -6675,13 +6686,14 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.methodLadderState?.countsAsFullMemorySotaEvidence, false);
     assert.equal(doctorReport.methodLadderState?.bestChallengerMethod, "contextual-source-chunk-v1");
     assert.equal(doctorReport.methodLadderState?.bestChallengerWinnerStrategy, "bm25-lite");
+    assert.equal(doctorReport.methodLadderState?.queryCount, 100);
     assert.equal(doctorReport.methodLadderState?.pairedBootstrapAvailable, true);
-    assert.equal(doctorReport.methodLadderState?.pairedBootstrapCommonQueryCount, 75);
-    assert.ok(Number(doctorReport.methodLadderState?.pairedBootstrapLowerBound95 ?? 0) >= 1);
+    assert.equal(doctorReport.methodLadderState?.pairedBootstrapCommonQueryCount, 100);
+    assert.ok(Number(doctorReport.methodLadderState?.pairedBootstrapLowerBound95 ?? 0) >= 8.9);
     assert.ok(Number(doctorReport.methodLadderState?.winningArmFailureCount ?? 0) <= 1);
     assert.equal(Number(doctorReport.methodLadderState?.winningArmAnswerFailures ?? 0), 0);
     assert.ok(Number(doctorReport.methodLadderState?.winningArmJudgeFailures ?? 0) <= 1);
-    assert.ok(Number(doctorReport.methodLadderState?.totalFailureRate ?? 0) <= 0.00222);
+    assert.ok(Number(doctorReport.methodLadderState?.totalFailureRate ?? 0) <= 0.00125);
     assert.equal(doctorReport.methodLadderState?.nextLargerSlicePromotionReady, true);
     assert.equal(doctorReport.methodLadderState?.promotionScope, "next-larger-slice-challenger-only");
     assert.equal(doctorReport.methodLadderState?.productionDefaultAllowed, false);
@@ -7007,10 +7019,11 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Recommended repair execution: single-provider-single-slice/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Method Ladder Result Gate/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /method-ladder-result-gate: pass/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Best challenger: contextual-source-chunk-v1:bm25-lite:37\.4667/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Paired bootstrap 95% lower bound: 8/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Best challenger: contextual-source-chunk-v1:bm25-lite:37\.1/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Paired bootstrap common queries: 100/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Paired bootstrap 95% lower bound: 8\.9/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Winning arm failures: 1/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Total failure rate: 0\.00222/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Total failure rate: 0\.001248/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next larger-slice promotion ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Production default allowed by method ladder: false/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next larger-slice challenger: contextual-source-chunk-v1:bm25-lite/);
