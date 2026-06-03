@@ -202,18 +202,21 @@ Current provider roles:
   same-data embedding arms and compare against NVIDIA, Voyage, BM25, and local
   Apple controls.
 - Voyage: personal/prod default and quality challenger. Use free/trial quota
-  when available, but do not let Voyage rate limits block NVIDIA/OpenRouter
-  mass testing.
+  when available, but do not let Voyage rate limits block direct DeepSeek,
+  NVIDIA, or Gemini mass testing.
 
 The loop should run these in completion waves, not one-off canaries:
 
 1. Start with no-spend controls: BM25, current hybrid, local Apple, and NVIDIA
    if its key is available.
-2. Add OpenRouter free query expansion/reviewer variants where query expansion
-   is part of the hypothesis.
+2. Use direct DeepSeek Flash/Pro for model-challenger answer-quality or
+   reviewer-style loops when a cloud model route is needed.
 3. Add Gemini Embedding 2 and Voyage challengers on the same rows as quota
    allows.
-4. Promote only arms that win on source-locked answer-quality shards, not on
+4. Add OpenRouter only as a fallback/free exploration route for query expansion,
+   reviewer variants, or embedding experiments when the direct providers are not
+   the right fit.
+5. Promote only arms that win on source-locked answer-quality shards, not on
    component benchmarks or fixture ties.
 
 Provider keys must stay env-only or in private key files outside the repo. The

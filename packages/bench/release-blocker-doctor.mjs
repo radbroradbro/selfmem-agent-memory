@@ -17,6 +17,7 @@ const requiredBlockers = [
   "codex-memory-controlled-dogfood-active",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
+  "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.json",
   "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
   "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.json",
   "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
@@ -37,6 +38,7 @@ const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-20260527.json",
 );
 const fullMemorySotaDoctorMarkdown = preferReviewFile(
+  "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.md",
   "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md",
   "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.md",
   "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
@@ -502,6 +504,17 @@ assert.equal(fullMemorySotaDoctor.providerWaveState?.allHaveBm25, true);
 assert.equal(fullMemorySotaDoctor.providerWaveState?.allHaveFullHybrid, true);
 assert.equal(fullMemorySotaDoctor.providerWaveState?.countsAsFullMemorySotaEvidence, false);
 assert.equal(fullMemorySotaDoctor.providerWaveState?.countsAsEndToEndMemoryBenchmark, false);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.evidenceReady, true);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.benchmarkEvidenceReady, true);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.reportedScoreClaimReady, false);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.directDeepSeekScoring, true);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.answerModel, "deepseek-v4-flash");
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.judgeModel, "deepseek-v4-flash");
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.countsAsEndToEndMemoryBenchmark, true);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.countsAsFullMemorySotaEvidence, false);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.scoredQueryCount, 25);
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.bestArmStrategy, "cloud-voyage4-voyage-lite-rerank");
+assert.equal(fullMemorySotaDoctor.modelChallengerState?.bestArmAnswerQuality, 42);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.evidenceReady, true);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsMethodLadderEvidence, true);
 assert.equal(fullMemorySotaDoctor.methodLadderState?.countsAsFullMemorySotaEvidence, false);

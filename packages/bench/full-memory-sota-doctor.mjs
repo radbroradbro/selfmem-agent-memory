@@ -105,6 +105,17 @@ const files = {
   liveLocalCanary: `${reviewDir}/end-to-end-memory-score-live-local-20260525.json`,
   liveProviderCanary: `${reviewDir}/end-to-end-memory-score-live-provider-20260525.json`,
   providerWaveIntake: `${reviewDir}/provider-wave-intake-20260531.json`,
+  modelChallengerMemoryScoreGate: preferReviewFile(
+    "memory-score-model-challenger-contextual-source-shard-001-all-arms-local-deepseek-v4-flash-gate-20260603.json",
+    "memory-score-model-challenger-contextual-source-shard-001-with-dense-direct-deepseek-rerun-gate-20260603.json",
+    "memory-score-model-challenger-contextual-source-shard-001-with-dense-deepseek-v4-flash-result-gate-20260603.json",
+    "memory-score-model-challenger-contextual-source-shard-001-deepseek-v4-flash-result-gate-20260603.json",
+  ),
+  modelChallengerAnswerQuality: preferReviewFile(
+    "answer-quality-model-challenger-contextual-source-shard-001-all-arms-local-deepseek-v4-flash-20260603.json",
+    "answer-quality-model-challenger-contextual-source-shard-001-with-dense-deepseek-v4-flash-20260603.json",
+    "answer-quality-model-challenger-contextual-source-shard-001-deepseek-v4-flash-20260603.json",
+  ),
   methodLadderResultGate: preferReviewFile(
     "answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
     "answer-quality-memory-method-ladder-60q-result-gate-20260531.json",
@@ -204,6 +215,10 @@ const localFullLaneState = inspectLocalFullLaneState({
 });
 const currentCanary = inspectCurrentCanary({ combinedCanary, endToEndGate, reviewerIntake, voyageRateLimit });
 const providerWaveState = inspectProviderWaveIntake(providerWaveIntake);
+const modelChallengerState = inspectModelChallengerMemoryScore(
+  evidence.modelChallengerMemoryScoreGate,
+  evidence.modelChallengerAnswerQuality,
+);
 const methodLadderState = inspectMethodLadderResultGate(evidence.methodLadderResultGate);
 const reviewerState = inspectReviewerState(reviewerIntake);
 const docState = inspectDocs(evidence);
@@ -371,6 +386,7 @@ const report = {
   localFullLaneState,
   currentCanary,
   providerWaveState,
+  modelChallengerState,
   methodLadderState,
   reviewerState,
   docState,
@@ -1472,6 +1488,119 @@ function inspectReviewerState(reviewerIntake) {
   };
 }
 
+function inspectModelChallengerMemoryScore(gateEvidence, answerQualityEvidence) {
+  const gateReport = gateEvidence?.json;
+  const answerQuality = answerQualityEvidence?.json;
+  const result = gateReport?.result ?? {};
+  const resultArms = arrayOf(result.arms);
+  const answerQualityRows = arrayOf(answerQuality?.strategies)
+    .map((row) => ({
+      strategy: row.strategy ?? null,
+      answerQuality: row.metrics?.answerQuality ?? null,
+      judgeCorrectRate: row.metrics?.judgeCorrectRate ?? null,
+      answerFailures: Number(row.provider?.answerFailures ?? 0),
+      judgeFailures: Number(row.provider?.judgeFailures ?? 0),
+      scoredQueryCount: Number(row.scoredQueryCount ?? 0),
+    }))
+    .filter((row) => row.strategy)
+    .sort((left, right) => Number(right.answerQuality ?? -1) - Number(left.answerQuality ?? -1));
+  const requiredArms = [
+    "bm25-lite",
+    "dense-proxy",
+    "full-hybrid-rerank",
+    "query-expanded-full-hybrid-rerank",
+    "cloud-voyage4-voyage-lite-rerank",
+    "cloud-nvidia-nv-embed-v1-mistral-rerank",
+    "local-apple-qwen3-0_6b",
+    "local-apple-qwen3-0_6b-local-rerank",
+  ];
+  const missingRequiredArms = requiredArms.filter((arm) => !resultArms.includes(arm));
+  const safeBenchmarkEvidence =
+    gateReport?.mode === "end-to-end-memory-score-gate" &&
+    gateReport?.status === "READY_MODEL_CHALLENGER_MEMORY_SCORE" &&
+    gateReport?.claimScope === "model-challenger" &&
+    gateReport?.publicSafe === true &&
+    gateReport?.metricsOnly === true &&
+    gateReport?.callsProviderApis === false &&
+    gateReport?.sendsBenchmarkTextToProvider === false &&
+    gateReport?.publicBenchmarkClaimsAllowed === false &&
+    gateReport?.countsAsEndToEndMemoryBenchmark === true &&
+    gateReport?.countsAsLocalFullBenchmarkEvidence === false &&
+    gateReport?.countsAsFullMemorySotaEvidence === false &&
+    gateReport?.checks?.sourceLockedTarget === true &&
+    gateReport?.checks?.privacyLeakCountersClear === true &&
+    gateReport?.checks?.challengerModelScoringSatisfied === true &&
+    gateReport?.checks?.answerQualityMetricPresent === true &&
+    gateReport?.checks?.answerQualityMetricInRange === true &&
+    Number(result.scoredQueryCount ?? 0) > 0 &&
+    Number(result.totalQueryCount ?? 0) > 0 &&
+    missingRequiredArms.length === 0;
+  const evidenceBlockers = [
+    !gateReport ? "model-challenger-memory-score-gate-missing" : null,
+    gateReport?.mode !== "end-to-end-memory-score-gate" ? "model-challenger-gate-mode-unrecognized" : null,
+    gateReport?.status !== "READY_MODEL_CHALLENGER_MEMORY_SCORE" ? "model-challenger-gate-not-ready" : null,
+    gateReport?.claimScope !== "model-challenger" ? "model-challenger-claim-scope-mismatch" : null,
+    gateReport?.publicSafe !== true ? "model-challenger-gate-not-public-safe" : null,
+    gateReport?.metricsOnly !== true ? "model-challenger-gate-not-metrics-only" : null,
+    gateReport?.publicBenchmarkClaimsAllowed !== false ? "model-challenger-public-claims-not-disabled" : null,
+    gateReport?.countsAsEndToEndMemoryBenchmark !== true ? "model-challenger-not-end-to-end-memory-benchmark" : null,
+    gateReport?.countsAsFullMemorySotaEvidence !== false ? "model-challenger-counts-as-full-sota" : null,
+    gateReport?.checks?.sourceLockedTarget !== true ? "model-challenger-source-lock-not-proven" : null,
+    gateReport?.checks?.privacyLeakCountersClear !== true ? "model-challenger-privacy-counters-not-clear" : null,
+    gateReport?.checks?.challengerModelScoringSatisfied !== true ? "model-challenger-scoring-policy-not-satisfied" : null,
+    Number(result.scoredQueryCount ?? 0) <= 0 ? "model-challenger-scored-query-count-missing" : null,
+    missingRequiredArms.length > 0 ? `model-challenger-missing-arms:${missingRequiredArms.join(",")}` : null,
+  ].filter(Boolean);
+  const bestArm = answerQualityRows[0] ?? null;
+  return {
+    path: gateEvidence?.path ?? files.modelChallengerMemoryScoreGate,
+    hash: gateEvidence?.hash ?? null,
+    answerQualityPath: answerQualityEvidence?.path ?? files.modelChallengerAnswerQuality,
+    answerQualityHash: answerQualityEvidence?.hash ?? null,
+    status: gateReport?.status ?? null,
+    claimScope: gateReport?.claimScope ?? null,
+    benchmarkEvidenceReady: evidenceBlockers.length === 0 && safeBenchmarkEvidence,
+    evidenceReady: evidenceBlockers.length === 0 && safeBenchmarkEvidence,
+    evidenceBlockers,
+    publicSafe: Boolean(gateReport?.publicSafe),
+    metricsOnly: Boolean(gateReport?.metricsOnly),
+    publicBenchmarkClaimsAllowed: Boolean(gateReport?.publicBenchmarkClaimsAllowed),
+    countsAsEndToEndMemoryBenchmark: Boolean(gateReport?.countsAsEndToEndMemoryBenchmark),
+    countsAsModelChallengerReportedScoreEvidence: Boolean(gateReport?.countsAsModelChallengerReportedScoreEvidence),
+    countsAsLocalFullBenchmarkEvidence: Boolean(gateReport?.countsAsLocalFullBenchmarkEvidence),
+    countsAsFullMemorySotaEvidence: Boolean(gateReport?.countsAsFullMemorySotaEvidence),
+    benchmark: result.benchmark ?? null,
+    answerModel: result.answerModel ?? answerQuality?.provider?.answerModel ?? null,
+    judgeModel: result.judgeModel ?? answerQuality?.provider?.judgeModel ?? null,
+    endpointLabel: answerQuality?.provider?.endpointLabel ?? null,
+    directDeepSeekScoring: Boolean(answerQuality?.provider?.endpointLabel === "https://api.deepseek.com"),
+    answerQualityCalls: Number(answerQuality?.provider?.callsMade ?? 0),
+    scoredQueryCount: Number(result.scoredQueryCount ?? answerQuality?.input?.scoredQueryCount ?? 0),
+    totalQueryCount: Number(result.totalQueryCount ?? answerQuality?.input?.totalQueryCount ?? 0),
+    armCount: resultArms.length,
+    arms: resultArms,
+    bestArmStrategy: bestArm?.strategy ?? answerQuality?.winner?.strategy ?? null,
+    bestArmAnswerQuality: bestArm?.answerQuality ?? answerQuality?.winner?.answerQuality ?? result.answerQualityMetric?.value ?? null,
+    bm25AnswerQuality: answerQualityRows.find((row) => row.strategy === "bm25-lite")?.answerQuality ?? null,
+    fullHybridAnswerQuality: answerQualityRows.find((row) => row.strategy === "full-hybrid-rerank")?.answerQuality ?? null,
+    localDenseAnswerQuality: answerQualityRows.find((row) => row.strategy === "local-apple-qwen3-0_6b")?.answerQuality ?? null,
+    localRerankAnswerQuality: answerQualityRows.find((row) => row.strategy === "local-apple-qwen3-0_6b-local-rerank")?.answerQuality ?? null,
+    reportedScoreClaimReady: Boolean(gateReport?.modelChallengerClaim?.ready),
+    modelChallengerBlockers: arrayOf(gateReport?.modelChallengerBlockers),
+    fullSotaBlockers: arrayOf(gateReport?.fullSotaBlockers),
+    reportedTargetComparison: gateReport?.reportedTargetComparison ?? null,
+    claimStatement: gateReport?.modelChallengerClaim?.statement ?? null,
+    rows: answerQualityRows.map((row) => ({
+      strategy: row.strategy,
+      answerQuality: row.answerQuality,
+      judgeCorrectRate: row.judgeCorrectRate,
+      answerFailures: row.answerFailures,
+      judgeFailures: row.judgeFailures,
+      scoredQueryCount: row.scoredQueryCount,
+    })),
+  };
+}
+
 function inspectDocs(loadedEvidence) {
   const requiredPhrases = [
     [loadedEvidence.benchmarkDocs.text, /This is an execution\s+plan and harness upgrade, not a completed full-SOTA result/i],
@@ -1831,6 +1960,25 @@ function renderMarkdown(value) {
     `- Counts as full memory SOTA evidence: ${value.providerWaveState.countsAsFullMemorySotaEvidence}`,
     `- Counts as end-to-end memory benchmark: ${value.providerWaveState.countsAsEndToEndMemoryBenchmark}`,
     `- Best provider rows: ${value.providerWaveState.bestProviderRows.map((row) => `${row.provider}:${row.bestStrategy ?? "n/a"}:${row.bestQuality ?? "n/a"}`).join(", ") || "none"}`,
+    "",
+    "## Model Challenger Memory Score",
+    `- Status: ${value.modelChallengerState.status ?? "n/a"}`,
+    `- Benchmark evidence ready: ${value.modelChallengerState.benchmarkEvidenceReady}`,
+    `- Reported-score claim ready: ${value.modelChallengerState.reportedScoreClaimReady}`,
+    `- Counts as end-to-end memory benchmark: ${value.modelChallengerState.countsAsEndToEndMemoryBenchmark}`,
+    `- Counts as full memory SOTA evidence: ${value.modelChallengerState.countsAsFullMemorySotaEvidence}`,
+    `- Direct DeepSeek scoring: ${value.modelChallengerState.directDeepSeekScoring}`,
+    `- Answer model: ${value.modelChallengerState.answerModel ?? "n/a"}`,
+    `- Judge model: ${value.modelChallengerState.judgeModel ?? "n/a"}`,
+    `- Scored queries: ${value.modelChallengerState.scoredQueryCount} of ${value.modelChallengerState.totalQueryCount}`,
+    `- Arm count: ${value.modelChallengerState.armCount}`,
+    `- Best arm: ${value.modelChallengerState.bestArmStrategy ?? "n/a"}:${value.modelChallengerState.bestArmAnswerQuality ?? "n/a"}`,
+    `- BM25 control score: ${value.modelChallengerState.bm25AnswerQuality ?? "n/a"}`,
+    `- Full hybrid score: ${value.modelChallengerState.fullHybridAnswerQuality ?? "n/a"}`,
+    `- Local dense score: ${value.modelChallengerState.localDenseAnswerQuality ?? "n/a"}`,
+    `- Local rerank score: ${value.modelChallengerState.localRerankAnswerQuality ?? "n/a"}`,
+    `- Model-challenger blockers: ${value.modelChallengerState.modelChallengerBlockers.join("; ") || "none"}`,
+    `- Evidence blockers: ${value.modelChallengerState.evidenceBlockers.join("; ") || "none"}`,
     "",
     "## Method Ladder Result Gate",
     `- Status: ${value.methodLadderState.status ?? "n/a"}`,

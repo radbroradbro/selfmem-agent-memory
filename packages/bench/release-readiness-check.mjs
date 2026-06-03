@@ -425,6 +425,8 @@ const requiredFiles = [
   `${reviewDir}/full-memory-sota-doctor-20260526.md`,
   `${reviewDir}/full-memory-sota-doctor-20260527.json`,
   `${reviewDir}/full-memory-sota-doctor-20260527.md`,
+  `${reviewDir}/full-memory-sota-doctor-after-model-challenger-local-arms-20260603.json`,
+  `${reviewDir}/full-memory-sota-doctor-after-model-challenger-local-arms-20260603.md`,
   `${reviewDir}/full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json`,
   `${reviewDir}/full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md`,
   `${reviewDir}/full-memory-sota-doctor-after-method-ladder-gate-20260531.json`,
@@ -1244,12 +1246,12 @@ check("fresh Codex memory health gate passes for controlled dogfood", () => {
     "2",
   ]).stdout);
   assert.equal(shortWatch.ok, true);
-  assert.equal(shortWatch.graduationGate?.status, "READY_FOR_DOGFOOD_GRADUATION_REVIEW");
-  assert.equal(shortWatch.graduationGate?.readyForDogfoodGraduationReview, true);
+  assert.equal(shortWatch.graduationGate?.status, "MONITORING_INTERVALS_REQUIRED");
+  assert.equal(shortWatch.graduationGate?.readyForDogfoodGraduationReview, false);
   assert.equal(shortWatch.graduationGate?.publicLaunchAllowed, false);
   assert.equal(shortWatch.graduationGate?.countsAsBenchmarkEvidence, false);
   assert.equal(shortWatch.graduationGate?.cleanIterations, 2);
-  assert.deepEqual(shortWatch.graduationGate?.blockers, []);
+  assert.ok(shortWatch.graduationGate?.blockers?.includes("clean-iteration-count-too-low"));
   assert.equal(report.storeHealth?.severeNoise?.commandJsonMemoryCount, 0);
   assert.deepEqual(report.blockers, []);
   assert.equal(report.release?.blockedByDogfoodMode, true);
@@ -3421,11 +3423,13 @@ check("fresh public benchmark target check passes", () => {
   const fullMemorySotaDoctorFresh = JSON.parse(run("node", ["packages/bench/full-memory-sota-doctor.mjs"]).stdout);
   const fullMemorySotaDoctorMarkdownFresh = run("node", ["packages/bench/full-memory-sota-doctor.mjs", "--format", "markdown"]).stdout;
   const fullMemorySotaDoctorEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.json",
     "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
     "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
     "full-memory-sota-doctor-after-local-full-combine-20260531.json",
   );
   const fullMemorySotaDoctorMarkdownEvidencePath = preferReviewFile(
+    "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.md",
     "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md",
     "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
     "full-memory-sota-doctor-after-local-full-combine-20260531.md",
@@ -6655,6 +6659,17 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("gemini"));
     assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("nvidia"));
     assert.ok(doctorReport.providerWaveState?.completedProviderFamilies?.includes("voyage"));
+    assert.equal(doctorReport.modelChallengerState?.evidenceReady, true);
+    assert.equal(doctorReport.modelChallengerState?.benchmarkEvidenceReady, true);
+    assert.equal(doctorReport.modelChallengerState?.reportedScoreClaimReady, false);
+    assert.equal(doctorReport.modelChallengerState?.directDeepSeekScoring, true);
+    assert.equal(doctorReport.modelChallengerState?.answerModel, "deepseek-v4-flash");
+    assert.equal(doctorReport.modelChallengerState?.judgeModel, "deepseek-v4-flash");
+    assert.equal(doctorReport.modelChallengerState?.countsAsEndToEndMemoryBenchmark, true);
+    assert.equal(doctorReport.modelChallengerState?.countsAsFullMemorySotaEvidence, false);
+    assert.equal(doctorReport.modelChallengerState?.scoredQueryCount, 25);
+    assert.equal(doctorReport.modelChallengerState?.bestArmStrategy, "cloud-voyage4-voyage-lite-rerank");
+    assert.equal(doctorReport.modelChallengerState?.bestArmAnswerQuality, 42);
     assert.equal(doctorReport.methodLadderState?.evidenceReady, true);
     assert.equal(doctorReport.methodLadderState?.countsAsMethodLadderEvidence, true);
     assert.equal(doctorReport.methodLadderState?.countsAsFullMemorySotaEvidence, false);

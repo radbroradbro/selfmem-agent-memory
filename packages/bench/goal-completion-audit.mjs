@@ -139,6 +139,11 @@ const files = {
   answerQualityFullShardIntakeReport: `${reviewDir}/answer-quality-full-shard-intake-20260525.json`,
   answerQualityFullShardIntakeMarkdown: `${reviewDir}/answer-quality-full-shard-intake-20260525.md`,
   fullMemorySotaDoctorReport: preferReviewFile(
+    "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.json",
+    "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
+    "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.json",
+    "full-memory-sota-doctor-after-method-ladder-gate-20260531.json",
+    "full-memory-sota-doctor-after-local-full-combine-20260531.json",
     "full-memory-sota-doctor-after-shard-020-20260529.json",
     "full-memory-sota-doctor-after-shard-019-20260529.json",
     "full-memory-sota-doctor-after-shard-018-20260529.json",
@@ -155,6 +160,11 @@ const files = {
     "full-memory-sota-doctor-20260527.json",
   ),
   fullMemorySotaDoctorMarkdown: preferReviewFile(
+    "full-memory-sota-doctor-after-model-challenger-local-arms-20260603.md",
+    "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.md",
+    "full-memory-sota-doctor-after-method-ladder-60q-gate-20260601.md",
+    "full-memory-sota-doctor-after-method-ladder-gate-20260531.md",
+    "full-memory-sota-doctor-after-local-full-combine-20260531.md",
     "full-memory-sota-doctor-after-shard-020-20260529.md",
     "full-memory-sota-doctor-after-shard-019-20260529.md",
     "full-memory-sota-doctor-after-shard-018-20260529.md",

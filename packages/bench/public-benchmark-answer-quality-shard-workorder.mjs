@@ -638,7 +638,7 @@ function inspectQueryExpansionReadiness(lane) {
   const cloudCallsEnabled = truthyEnv("RECALLWEAVE_QUERY_EXPANSION_CALLS") || truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS");
   const publicDataConfirmed =
     truthyEnv("RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA") || truthyEnv("RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA");
-  const readyProviderKinds = ["nvidia", "gemini", "openrouter"].filter((provider) => inspectProviderReadiness(provider).ready);
+  const readyProviderKinds = ["deepseek", "nvidia", "gemini", "openrouter"].filter((provider) => inspectProviderReadiness(provider).ready);
   const cloudProviderReady = cloudCallsEnabled && publicDataConfirmed && readyProviderKinds.length > 0;
   const modelBackedReady = localReady || cloudProviderReady;
   const diagnosticFallbackAllowed = Boolean(lane.queryExpansionDiagnosticFallbackAllowed);
@@ -674,7 +674,7 @@ function inspectQueryExpansionReadiness(lane) {
     publicDataConfirmed,
     cloudProviderReady,
     readyProviderKinds,
-    defaultCloudProviderOrder: ["nvidia", "gemini", "openrouter"],
+    defaultCloudProviderOrder: ["deepseek", "nvidia", "gemini", "openrouter"],
     printsEnvValues: false,
     blockers,
   };
@@ -717,6 +717,7 @@ function uniqueProviderKeys(keys) {
 function providerValueEnvNames(provider) {
   if (provider === "gemini") return ["GEMINI_API_KEY", "GEMINI_API_KEYS", "GOOGLE_API_KEY", "GOOGLE_API_KEYS", "AI_STUDIO_API_KEY", "AI_STUDIO_API_KEYS"];
   if (provider === "voyage") return ["VOYAGE_API_KEY", "VOYAGE_API_KEYS"];
+  if (provider === "deepseek") return ["DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS"];
   if (provider === "nvidia") return ["NVIDIA_API_KEY", "NVIDIA_API_KEYS", "NVAPI_KEY", "NVAPI_KEYS"];
   if (provider === "openrouter") return ["OPENROUTER_API_KEY", "OPENROUTER_API_KEYS"];
   if (provider === "local-apple") return ["SELFMEM_LOCAL_EMBED_BASE_URL"];
@@ -727,6 +728,7 @@ function providerValueEnvNames(provider) {
 function providerKeyFileEnvNames(provider) {
   if (provider === "gemini") return ["GEMINI_API_KEY_FILE", "GEMINI_API_KEYS_FILE", "GOOGLE_API_KEY_FILE", "GOOGLE_API_KEYS_FILE", "AI_STUDIO_API_KEY_FILE", "AI_STUDIO_API_KEYS_FILE"];
   if (provider === "voyage") return ["VOYAGE_API_KEY_FILE", "VOYAGE_API_KEYS_FILE"];
+  if (provider === "deepseek") return ["DEEPSEEK_API_KEY_FILE", "DEEPSEEK_API_KEYS_FILE"];
   if (provider === "nvidia") return ["NVIDIA_API_KEY_FILE", "NVIDIA_API_KEYS_FILE", "NVAPI_KEY_FILE", "NVAPI_KEYS_FILE"];
   if (provider === "openrouter") return ["OPENROUTER_API_KEY_FILE", "OPENROUTER_API_KEYS_FILE"];
   return [];
