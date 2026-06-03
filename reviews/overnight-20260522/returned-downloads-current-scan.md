@@ -3,7 +3,7 @@
 Status: AWAITING_RETURNED_PRODUCTION_CANARY
 Production evidence packets: 0
 Returned evidence packets: 0
-Handoff packets: 1
+Canary request packets: 1
 Diagnostic bundles: 11
 Unknown packets: 25
 Unreadable packets: 0
@@ -35,7 +35,7 @@ Expected report commit: `5ac6c50e845c4c8d8e5d358e604700e4163b7fea`.
 ## Next Actions
 
 - Keep waiting for a returned metrics-only production canary evidence packet.
-- Do not count handoff packets, diagnostic bundles, or unknown zips as production canary evidence.
+- Do not count canary request packets, diagnostic bundles, or unknown zips as production canary evidence.
 - Run canary:returned-inbox with --expose-labels only for local operator-only file location.
 
 ## Release Meaning

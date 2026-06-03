@@ -143,7 +143,7 @@
   "parseError": null,
   "nextActions": [
     "Keep waiting for a returned metrics-only production canary evidence packet.",
-    "Do not count handoff packets, diagnostic bundles, or unknown zips as production canary evidence.",
+    "Do not count canary request packets, diagnostic bundles, or unknown zips as production canary evidence.",
     "Run canary:returned-inbox with --expose-labels only for local operator-only file location."
   ]
 }
