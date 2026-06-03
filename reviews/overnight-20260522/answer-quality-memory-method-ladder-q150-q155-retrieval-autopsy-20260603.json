@@ -1,0 +1,525 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-method-ladder-retrieval-autopsy",
+  "generatedAt": "2026-06-03T15:33:14.563Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "fixtureOnly": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "runsAnswerQualityScorer": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "benchmark": "longmemeval",
+  "target": {
+    "targetFileHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+  },
+  "queryShard": {
+    "startIndex": 150,
+    "endIndexExclusive": 155,
+    "requestedLimit": 5,
+    "sameRawQuerySelectionAcrossMethods": true
+  },
+  "contextTokenBudget": 800,
+  "limit": 5,
+  "maxMemoryBytes": 300000000,
+  "methods": [
+    "session-v1",
+    "contextual-source-chunk-v1"
+  ],
+  "strategies": [
+    "bm25-lite"
+  ],
+  "baselineMethod": "session-v1",
+  "thresholds": {
+    "minHitRateLift": 0.001
+  },
+  "status": "READY_RETRIEVAL_CHALLENGER_FOR_SCORING",
+  "countsAsRetrievalLayerEvidence": true,
+  "countsAsAnswerQualityEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "reason": "A non-session memory method retrieved expected support more often than the session baseline on the same raw query selection; answer-quality scoring is still required.",
+  "blockers": [],
+  "bestBaseline": {
+    "method": "session-v1",
+    "strategy": "bm25-lite",
+    "queryCount": 5,
+    "hitQueryCount": 3,
+    "missQueryCount": 2,
+    "hitRate": 0.6,
+    "meanReciprocalRank": 0.6,
+    "averageFirstHitRank": 1,
+    "rankBuckets": {
+      "rank1": 3,
+      "rank2to5": 0,
+      "rankAfter5": 0,
+      "miss": 2
+    },
+    "expectedRefCount": 16,
+    "averageResponseResultCount": 1
+  },
+  "bestChallenger": {
+    "method": "contextual-source-chunk-v1",
+    "strategy": "bm25-lite",
+    "queryCount": 5,
+    "hitQueryCount": 4,
+    "missQueryCount": 1,
+    "hitRate": 0.8,
+    "meanReciprocalRank": 0.8,
+    "averageFirstHitRank": 1,
+    "rankBuckets": {
+      "rank1": 4,
+      "rank2to5": 0,
+      "rankAfter5": 0,
+      "miss": 1
+    },
+    "expectedRefCount": 88,
+    "averageResponseResultCount": 4
+  },
+  "comparison": {
+    "hitRateLift": 0.2,
+    "paired": {
+      "pairCount": 5,
+      "bothHit": 3,
+      "baselineOnlyHit": 0,
+      "challengerOnlyHit": 1,
+      "bothMiss": 1,
+      "challengerBetterRank": 1,
+      "baselineBetterRank": 0,
+      "sameRankOrBothMiss": 4,
+      "pairs": [
+        {
+          "queryIdHash": "sha256:4c8f2730ce3cc21e",
+          "baselineFirstHitRank": null,
+          "challengerFirstHitRank": null,
+          "outcome": "both-miss"
+        },
+        {
+          "queryIdHash": "sha256:105d9d75bd95eb01",
+          "baselineFirstHitRank": null,
+          "challengerFirstHitRank": 1,
+          "outcome": "challenger-only-hit"
+        },
+        {
+          "queryIdHash": "sha256:af8624005b641336",
+          "baselineFirstHitRank": 1,
+          "challengerFirstHitRank": 1,
+          "outcome": "both-hit"
+        },
+        {
+          "queryIdHash": "sha256:b250d558a3617fba",
+          "baselineFirstHitRank": 1,
+          "challengerFirstHitRank": 1,
+          "outcome": "both-hit"
+        },
+        {
+          "queryIdHash": "sha256:3633dab7d4fb856d",
+          "baselineFirstHitRank": 1,
+          "challengerFirstHitRank": 1,
+          "outcome": "both-hit"
+        }
+      ]
+    }
+  },
+  "methodReports": [
+    {
+      "method": "session-v1",
+      "materialization": {
+        "ok": true,
+        "mode": "public-benchmark-materialize-run",
+        "fixtureOnly": false,
+        "targetFileHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+        "targetIdHash": "1abb3e0ccf1bcede",
+        "memoryMethod": "session-v1",
+        "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754",
+        "targetSelectedQuestionIdsHash": "sha256:702287feda46afbb122e7d61f8fb1530e6b571b8172e248376c4f887d0527f42",
+        "materializerHash": "sha256:f4af616c7b0de1fb4ad710ff9f26c331eb20472ee273914d8e08a7fe5673b0a0",
+        "materializationShard": {
+          "applied": true,
+          "startIndex": 150,
+          "endIndexExclusive": 155,
+          "totalQueryCount": 500,
+          "selectedCount": 5,
+          "requestedLimit": 5,
+          "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+          "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+        },
+        "queryCount": 5,
+        "memoryRecordCount": 232,
+        "haystackSessionCount": 232,
+        "contextualSourceChunkCount": 0,
+        "contextualIndexMemoryCount": 0,
+        "atomicMemoryCount": 0,
+        "rawSessionMemoryCount": 232,
+        "expectedResultRefCount": 16,
+        "querySetHash": "sha256:a50586c479e309c0f9cf70f516aca823749913e9a47f62196c2f8d9eb3fb5ac4",
+        "collectorCompatibleQuerySetHash": "sha256:4e62ce21e041794f591ec37f00af8bd267730e2d9248ec2902accf726b72bcbe",
+        "memoriesFileHash": "sha256:412192c414eddffd386365dfbcae7fd501582ab1ed68744b82ca801a0d6c6d50",
+        "answerLabelsFileHash": "sha256:6730957af7f6cad41518f82240d3828316aa4a82daf416eb5a7d79874a05183e",
+        "rawTextPubliclyIncluded": false,
+        "privateOutputPathIncluded": false
+      },
+      "memoryProfile": {
+        "fileName": "longmemeval-memories.private.jsonl",
+        "fileHash": "sha256:f2d4b285e3ff3221afc32202a2e813a9147ecb61a9b07fac8b83c99f849e674e",
+        "lineCount": 232,
+        "parsed": 232,
+        "byKind": {
+          "raw_session": 232
+        },
+        "byRetrievalRole": {
+          "candidate": 232
+        }
+      },
+      "arms": [
+        {
+          "method": "session-v1",
+          "strategy": "bm25-lite",
+          "queryCount": 5,
+          "hitQueryCount": 3,
+          "missQueryCount": 2,
+          "hitRate": 0.6,
+          "meanReciprocalRank": 0.6,
+          "averageFirstHitRank": 1,
+          "rankBuckets": {
+            "rank1": 3,
+            "rank2to5": 0,
+            "rankAfter5": 0,
+            "miss": 2
+          },
+          "expectedRefCount": 16,
+          "averageResponseResultCount": 1,
+          "response": {
+            "querySetHash": "sha256:4e62ce21e041794f591ec37f00af8bd267730e2d9248ec2902accf726b72bcbe",
+            "queryShard": {
+              "startIndex": 150,
+              "endIndexExclusive": 155,
+              "totalQueryCount": 500,
+              "responseCount": 5,
+              "requestedLimit": null,
+              "completeDataset": false,
+              "rangeHash": "sha256:70e269dc6d07ff5d7721c9fc93cd430ffb0ea536c9cc3a15e84fb5b83419b6f6",
+              "selectedQueryIdHash": "sha256:3ea4e723e48746d3da56971959e2f343dfe83d002956458136594772f90586a9"
+            },
+            "inputStats": {
+              "maxMemoryBytes": 300000000,
+              "featureProfile": {
+                "metadata": false,
+                "tokens": true,
+                "tokenSet": true,
+                "bigramSet": false,
+                "semanticVector": false,
+                "topicTermSet": false,
+                "roleCoverage": false,
+                "dateMs": false,
+                "wikiSignals": false
+              },
+              "linesRead": 232,
+              "parsed": 232,
+              "candidates": 232,
+              "skippedInvalid": 0,
+              "skippedFullyPrivate": 0,
+              "skippedSourceOnly": 0,
+              "redactionCount": 0,
+              "keyRedactionCount": 0
+            },
+            "contextBudget": {
+              "applied": true,
+              "tokenBudget": 800,
+              "strategy": "ranked-prefix-with-last-result-clipping",
+              "queryCount": 5,
+              "queriesClipped": 5,
+              "clippedResultCount": 5,
+              "skippedByBudgetCount": 20,
+              "fullCandidateTokensAvg": 17340,
+              "exportedContextTokensAvg": 800
+            },
+            "privacyLeakCount": 0,
+            "redactionFailureCount": 0,
+            "rawMemoryIncluded": false,
+            "rawPromptIncluded": false,
+            "rawAnswerIncluded": false,
+            "rawTranscriptIncluded": false
+          },
+          "queryOutcomes": [
+            {
+              "queryIdHash": "sha256:4c8f2730ce3cc21e",
+              "queryHash": "sha256:c9ffb16bd8ce9be7",
+              "expectedRefCount": 2,
+              "expectedIdRefCount": 1,
+              "expectedHashRefCount": 1,
+              "responseResultCount": 1,
+              "responseTotal": 1,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": null,
+              "hit": false,
+              "hitCount": 0,
+              "rankBucket": "miss"
+            },
+            {
+              "queryIdHash": "sha256:105d9d75bd95eb01",
+              "queryHash": "sha256:e46e10ac1aaa2919",
+              "expectedRefCount": 2,
+              "expectedIdRefCount": 1,
+              "expectedHashRefCount": 1,
+              "responseResultCount": 1,
+              "responseTotal": 1,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": null,
+              "hit": false,
+              "hitCount": 0,
+              "rankBucket": "miss"
+            },
+            {
+              "queryIdHash": "sha256:af8624005b641336",
+              "queryHash": "sha256:20debea01721fe36",
+              "expectedRefCount": 4,
+              "expectedIdRefCount": 2,
+              "expectedHashRefCount": 2,
+              "responseResultCount": 1,
+              "responseTotal": 1,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": 1,
+              "hit": true,
+              "hitCount": 1,
+              "rankBucket": "rank-1"
+            },
+            {
+              "queryIdHash": "sha256:b250d558a3617fba",
+              "queryHash": "sha256:7fc50bb80f9f5a5d",
+              "expectedRefCount": 4,
+              "expectedIdRefCount": 2,
+              "expectedHashRefCount": 2,
+              "responseResultCount": 1,
+              "responseTotal": 1,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": 1,
+              "hit": true,
+              "hitCount": 1,
+              "rankBucket": "rank-1"
+            },
+            {
+              "queryIdHash": "sha256:3633dab7d4fb856d",
+              "queryHash": "sha256:9a59dd7164b4d42f",
+              "expectedRefCount": 4,
+              "expectedIdRefCount": 2,
+              "expectedHashRefCount": 2,
+              "responseResultCount": 1,
+              "responseTotal": 1,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": 1,
+              "hit": true,
+              "hitCount": 1,
+              "rankBucket": "rank-1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "method": "contextual-source-chunk-v1",
+      "materialization": {
+        "ok": true,
+        "mode": "public-benchmark-materialize-run",
+        "fixtureOnly": false,
+        "targetFileHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+        "targetIdHash": "1abb3e0ccf1bcede",
+        "memoryMethod": "contextual-source-chunk-v1",
+        "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754",
+        "targetSelectedQuestionIdsHash": "sha256:702287feda46afbb122e7d61f8fb1530e6b571b8172e248376c4f887d0527f42",
+        "materializerHash": "sha256:94e14022b20d2669f6e88773cad5de2107c57a1dbacd1c806ae884f68b206a34",
+        "materializationShard": {
+          "applied": true,
+          "startIndex": 150,
+          "endIndexExclusive": 155,
+          "totalQueryCount": 500,
+          "selectedCount": 5,
+          "requestedLimit": 5,
+          "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+          "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+        },
+        "queryCount": 5,
+        "memoryRecordCount": 1749,
+        "haystackSessionCount": 232,
+        "contextualSourceChunkCount": 1749,
+        "contextualIndexMemoryCount": 0,
+        "atomicMemoryCount": 0,
+        "rawSessionMemoryCount": 0,
+        "expectedResultRefCount": 88,
+        "querySetHash": "sha256:914797b63cbc599ce1b0d0941e1d3b35555fdde76409441226ff023ced6c6dfc",
+        "collectorCompatibleQuerySetHash": "sha256:55b8e020fbd7dbeb6ebc77ff6535c99856fee7d8e33a1338c957c11ad9083dc3",
+        "memoriesFileHash": "sha256:e9a76cdec546c71b7665bb7b6ffc6e16f69e80856176db1bace11c20afc03ece",
+        "answerLabelsFileHash": "sha256:6730957af7f6cad41518f82240d3828316aa4a82daf416eb5a7d79874a05183e",
+        "rawTextPubliclyIncluded": false,
+        "privateOutputPathIncluded": false
+      },
+      "memoryProfile": {
+        "fileName": "longmemeval-memories.private.jsonl",
+        "fileHash": "sha256:df0d92917d4972b088b8c5c8b8f565c864fae5653e97da3c2fe191c16fe42966",
+        "lineCount": 1749,
+        "parsed": 1749,
+        "byKind": {
+          "contextual_source_chunk": 1749
+        },
+        "byRetrievalRole": {
+          "candidate": 1749
+        }
+      },
+      "arms": [
+        {
+          "method": "contextual-source-chunk-v1",
+          "strategy": "bm25-lite",
+          "queryCount": 5,
+          "hitQueryCount": 4,
+          "missQueryCount": 1,
+          "hitRate": 0.8,
+          "meanReciprocalRank": 0.8,
+          "averageFirstHitRank": 1,
+          "rankBuckets": {
+            "rank1": 4,
+            "rank2to5": 0,
+            "rankAfter5": 0,
+            "miss": 1
+          },
+          "expectedRefCount": 88,
+          "averageResponseResultCount": 4,
+          "response": {
+            "querySetHash": "sha256:55b8e020fbd7dbeb6ebc77ff6535c99856fee7d8e33a1338c957c11ad9083dc3",
+            "queryShard": {
+              "startIndex": 150,
+              "endIndexExclusive": 155,
+              "totalQueryCount": 500,
+              "responseCount": 5,
+              "requestedLimit": null,
+              "completeDataset": false,
+              "rangeHash": "sha256:70e269dc6d07ff5d7721c9fc93cd430ffb0ea536c9cc3a15e84fb5b83419b6f6",
+              "selectedQueryIdHash": "sha256:3ea4e723e48746d3da56971959e2f343dfe83d002956458136594772f90586a9"
+            },
+            "inputStats": {
+              "maxMemoryBytes": 300000000,
+              "featureProfile": {
+                "metadata": false,
+                "tokens": true,
+                "tokenSet": true,
+                "bigramSet": false,
+                "semanticVector": false,
+                "topicTermSet": false,
+                "roleCoverage": false,
+                "dateMs": false,
+                "wikiSignals": false
+              },
+              "linesRead": 1749,
+              "parsed": 1749,
+              "candidates": 1749,
+              "skippedInvalid": 0,
+              "skippedFullyPrivate": 0,
+              "skippedSourceOnly": 0,
+              "redactionCount": 0,
+              "keyRedactionCount": 0
+            },
+            "contextBudget": {
+              "applied": true,
+              "tokenBudget": 800,
+              "strategy": "ranked-prefix-with-last-result-clipping",
+              "queryCount": 5,
+              "queriesClipped": 3,
+              "clippedResultCount": 3,
+              "skippedByBudgetCount": 5,
+              "fullCandidateTokensAvg": 1190,
+              "exportedContextTokensAvg": 769
+            },
+            "privacyLeakCount": 0,
+            "redactionFailureCount": 0,
+            "rawMemoryIncluded": false,
+            "rawPromptIncluded": false,
+            "rawAnswerIncluded": false,
+            "rawTranscriptIncluded": false
+          },
+          "queryOutcomes": [
+            {
+              "queryIdHash": "sha256:4c8f2730ce3cc21e",
+              "queryHash": "sha256:c9ffb16bd8ce9be7",
+              "expectedRefCount": 12,
+              "expectedIdRefCount": 12,
+              "expectedHashRefCount": 0,
+              "responseResultCount": 3,
+              "responseTotal": 3,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": null,
+              "hit": false,
+              "hitCount": 0,
+              "rankBucket": "miss"
+            },
+            {
+              "queryIdHash": "sha256:105d9d75bd95eb01",
+              "queryHash": "sha256:e46e10ac1aaa2919",
+              "expectedRefCount": 10,
+              "expectedIdRefCount": 10,
+              "expectedHashRefCount": 0,
+              "responseResultCount": 4,
+              "responseTotal": 4,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": 1,
+              "hit": true,
+              "hitCount": 1,
+              "rankBucket": "rank-1"
+            },
+            {
+              "queryIdHash": "sha256:af8624005b641336",
+              "queryHash": "sha256:20debea01721fe36",
+              "expectedRefCount": 22,
+              "expectedIdRefCount": 22,
+              "expectedHashRefCount": 0,
+              "responseResultCount": 3,
+              "responseTotal": 3,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": 1,
+              "hit": true,
+              "hitCount": 3,
+              "rankBucket": "rank-1"
+            },
+            {
+              "queryIdHash": "sha256:b250d558a3617fba",
+              "queryHash": "sha256:7fc50bb80f9f5a5d",
+              "expectedRefCount": 22,
+              "expectedIdRefCount": 22,
+              "expectedHashRefCount": 0,
+              "responseResultCount": 5,
+              "responseTotal": 5,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": 1,
+              "hit": true,
+              "hitCount": 3,
+              "rankBucket": "rank-1"
+            },
+            {
+              "queryIdHash": "sha256:3633dab7d4fb856d",
+              "queryHash": "sha256:9a59dd7164b4d42f",
+              "expectedRefCount": 22,
+              "expectedIdRefCount": 22,
+              "expectedHashRefCount": 0,
+              "responseResultCount": 5,
+              "responseTotal": 5,
+              "responseTotalBeforeBudget": 5,
+              "firstHitRank": 1,
+              "hit": true,
+              "hitCount": 4,
+              "rankBucket": "rank-1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextActions": [
+    "Run a bounded answer-quality scorer on the same shard for the retrieval challenger before expanding the shard.",
+    "Promote only if the standard method-ladder result gate shows a non-session challenger beating session-v1."
+  ]
+}

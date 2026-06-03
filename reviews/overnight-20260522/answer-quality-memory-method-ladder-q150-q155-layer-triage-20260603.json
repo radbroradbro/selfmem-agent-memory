@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "answer-quality-method-ladder-layer-triage",
+  "generatedAt": "2026-06-03T15:36:00.000Z",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "publicBenchmarkClaimsAllowed": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "benchmark": "longmemeval",
+  "queryShard": {
+    "startIndex": 150,
+    "endIndexExclusive": 155,
+    "requestedLimit": 5,
+    "sameRawQuerySelectionAcrossMethods": true,
+    "selectedQuestionIdsHash": "sha256:ddb32756f7d605c4e301f2c70066b5e831c39bcdb28129642c9f87177df95754"
+  },
+  "evidence": {
+    "answerQualityMethodLadder": {
+      "path": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-direct-deepseek-flash-20260603.json",
+      "sha256": "8e5d420a449ad66f5f74b4d527d0e40403ff027fc5d63c2700006ee562016096",
+      "providerRoute": "direct-deepseek-flash",
+      "providerCalls": 20,
+      "answerFailures": 0,
+      "judgeFailures": 0,
+      "sessionV1Score": 20,
+      "contextualSourceChunkV1Score": 20
+    },
+    "methodResultGate": {
+      "path": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-method-result-gate-20260603.json",
+      "sha256": "a55114b4227984c758d2aaac95317891adc49dc576bb8c22006e84541200e34a",
+      "status": "BLOCKED_ANSWER_QUALITY_METHOD_LADDER_RESULT",
+      "blockers": [
+        "best-challenger-does-not-clear-baseline-delta",
+        "best-overall-method-is-still-baseline"
+      ]
+    },
+    "retrievalAutopsy": {
+      "path": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-retrieval-autopsy-20260603.json",
+      "sha256": "275d19958779d62751a2a90190068330932198c7d48d241f742e233d5d501a01",
+      "status": "READY_RETRIEVAL_CHALLENGER_FOR_SCORING",
+      "sessionV1HitRate": 0.6,
+      "contextualSourceChunkV1HitRate": 0.8,
+      "hitRateLift": 0.2,
+      "pairedOutcomes": {
+        "bothHit": 3,
+        "baselineOnlyHit": 0,
+        "challengerOnlyHit": 1,
+        "bothMiss": 1
+      }
+    }
+  },
+  "layerDiagnosis": {
+    "retrievalLayer": "contextual-source-chunk-v1 retrieved expected support more often than session-v1 on q150-q155",
+    "answerQualityLayer": "direct DeepSeek Flash answer-quality scoring did not reward the retrieval lift; both methods scored 20",
+    "gateConclusion": "method promotion remains blocked because the best challenger did not beat the session baseline",
+    "notTheNextLoop": [
+      "Do not expand a BM25-only control run just to collect more control bookkeeping.",
+      "Do not treat the q150-q155 retrieval lift as a production or benchmark claim."
+    ],
+    "nextLoop": [
+      "Run a bounded autoresearch loop on context selection and answer synthesis for the one challenger-only-hit query and the one both-miss query.",
+      "Compare context budget allocation, chunk rehydration, and answer prompt packaging before spending on a larger answer-quality shard.",
+      "Keep BM25/session as the floor/control; require a non-session challenger to clear both retrieval support and answer-quality gates before promotion."
+    ]
+  },
+  "status": "BLOCKED_FOR_METHOD_PROMOTION_BUT_READY_FOR_CONTEXT_SYNTHESIS_LOOP",
+  "countsAsRetrievalLayerEvidence": true,
+  "countsAsAnswerQualityEvidence": true,
+  "countsAsFullMemorySotaEvidence": false,
+  "countsAsProductionRolloutEvidence": false,
+  "releaseArtifactLeakScope": "Only checked-in or release-facing secret/private-path leaks are in scope here; local memory contents are not treated as a defect by this triage.",
+  "nextActions": [
+    "Add or run a targeted context-selection/synthesis diagnostic for q150-q155 instead of a wider BM25-only benchmark.",
+    "After a concrete context/synthesis change, rerun the same q150-q155 answer-quality method ladder and result gate.",
+    "Continue periodic memory dogfood monitoring for relevance/noise and explicit write/direct lookup usefulness."
+  ]
+}

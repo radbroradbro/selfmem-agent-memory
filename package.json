@@ -125,6 +125,7 @@
     "benchmark:answer-quality:method-ladder": "node packages/bench/public-benchmark-answer-quality-method-ladder.mjs",
     "benchmark:answer-quality:method-ladder:combine": "node packages/bench/answer-quality-method-ladder-combine.mjs",
     "benchmark:answer-quality:method-ladder:result-gate": "node packages/bench/answer-quality-method-ladder-result-gate.mjs",
+    "benchmark:answer-quality:method-ladder:retrieval-autopsy": "node packages/bench/answer-quality-method-ladder-retrieval-autopsy.mjs",
     "benchmark:answer-quality:combine": "node packages/bench/public-benchmark-answer-quality-combine.mjs",
     "benchmark:answer-quality:shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs",
     "benchmark:answer-quality:model-challenger-shard-plan": "node packages/bench/public-benchmark-answer-quality-shard-plan.mjs --claim-scope model-challenger",
