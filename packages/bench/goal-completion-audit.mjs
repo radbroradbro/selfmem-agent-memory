@@ -868,7 +868,7 @@ const requirements = [
     "packages/bench/baseline-evidence-packet-review.mjs",
     "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   ]),
-  incomplete("full-memory-sota-benchmark-gate", "Full same-data memory benchmark/SOTA gate remains incomplete until end-to-end answer quality, live query expansion, local reranker, provider challengers, reviewers, UI, docs, and owner approval all pass", [
+  incomplete("full-memory-sota-benchmark-gate", "Full same-data memory benchmark/SOTA gate remains incomplete until end-to-end answer quality, accepted local/provider response arms, exact answer/judge model matching, shard intake, reviewers, UI, docs, owner approval, and real canary evidence all pass; query expansion is a labeled ablation unless the accepted lane explicitly includes it", [
     files.benchmarkSotaReadiness,
     files.reportedMemoryTargetsReport,
     files.reportedMemoryTargetsMarkdown,

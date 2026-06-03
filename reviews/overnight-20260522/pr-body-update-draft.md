@@ -82,9 +82,10 @@ Live status:
   Deterministic query-expansion fallback is allowed only for diagnostic
   run-path evidence, `local-apple-no-spend` can report local-model expansion
   separately when configured, and `full-sota-accepted-shards` stays blocked
-  until local or cloud model-backed query expansion, exact target answer/judge
-  model matching, all provider/local arms, shard intake, reviewers, UI/docs,
-  owner approval, and real canary evidence pass.
+  until exact target answer/judge model matching, all accepted provider/local
+  arms, shard intake/scoring, reviewers, UI/docs, owner approval, and real
+  canary evidence pass. Query expansion is a labeled ablation unless the
+  accepted lane explicitly includes it.
 - Adds direct Gemini Embedding 2 to the full 500-query accepted SOTA shard
   strategy set as `cloud-gemini2-embed-rerank-proxy`, plus a standalone Gemini
   minimum challenger lane. This is harness/readiness progress only: live Gemini

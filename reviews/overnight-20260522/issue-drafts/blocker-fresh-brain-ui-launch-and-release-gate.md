@@ -89,28 +89,31 @@ requirements are resolved.
 - The full-shard workorder now makes query expansion lane-scoped. Deterministic
   fallback is allowed only for diagnostic run-path evidence, the local no-spend
   lane can report local-model expansion separately when configured, and
-  `full-sota-accepted-shards` remains blocked until model-backed query
-  expansion, exact target answer/judge model matching, and all full benchmark
-  evidence are present.
+  `full-sota-accepted-shards` remains blocked until exact target answer/judge
+  model matching, accepted local/provider arms, shard intake/scoring, and all
+  full benchmark evidence are present. Query expansion is a labeled ablation
+  unless the accepted lane explicitly includes it.
 - The accepted-lane launch doctor now makes that go/no-go state explicit
   without provider calls or raw benchmark text. It reports the private
   full-shard inputs ready, but keeps `full-sota-accepted-shards` blocked until
   live export/no-raw-text consent, answer-quality consent, exact target model
-  matching, local/provider arms, and model-backed query expansion are
-  configured.
+  matching, accepted local/provider arms, and shard intake/scoring are
+  configured and returned.
 - The local full benchmark lane is now separate from the provider/SOTA lane.
   `benchmark:answer-quality:local-shard-plan` accepts the same 500-query target
-  with BM25, full hybrid, model-backed query expansion, local Apple embedding,
-  and local rerank, without Voyage/NVIDIA blockers. A completed local-full run
-  can diagnose local model limits, but it still cannot authorize SOTA or launch
-  language. The local lane now has its own diagnostic scoring policy: local
+  with BM25, full hybrid, local Apple embedding, and local rerank, without
+  Voyage/NVIDIA blockers; query expansion is included only as an explicitly
+  labeled local arm or ablation. A completed local-full run can diagnose local
+  model limits, but it still cannot authorize SOTA or launch language. The
+  local lane now has its own diagnostic scoring policy: local
   answer/judge model names may differ from the target only on a local endpoint,
   and submitting that packet to the full-SOTA gate is rejected.
 - The local-full accepted-lane launch doctor now gives the first shard its own
   no-provider-call go/no-go report. It keeps private raw-source lineage private,
   reports missing local embedding, local rerank, answer-quality endpoint, and
-  model-backed query-expansion readiness, and avoids adding Voyage/NVIDIA or
-  public-SOTA blockers to the local-only path.
+  accepted-lane runtime readiness, and avoids adding Voyage/NVIDIA or
+  public-SOTA blockers to the local-only path unless that lane explicitly asks
+  for them.
 - The local-full shard workorder and intake now have dedicated scripts. The
   checked-in local intake report is blocked with zero accepted shards and twenty
   missing shards, so local-full combine/scoring claims cannot start until the

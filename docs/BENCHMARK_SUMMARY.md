@@ -565,8 +565,8 @@ diagnostics. `deterministic-control-proxy` may use deterministic query-expansion
 fallbacks and still remains non-counting. `local-apple-no-spend` may use a local
 query-expansion model when one is configured, or a deterministic diagnostic
 fallback when no local model is present; either way it is not full-SOTA
-evidence. Only `full-sota-accepted-shards` requires local or cloud model-backed
-query expansion before the accepted shard-intake path can open.
+evidence. `full-sota-accepted-shards` treats query expansion as a labeled arm
+or ablation; it is not required unless the accepted lane explicitly includes it.
 This is an execution plan and harness upgrade, not a completed full-SOTA result.
 The SOTA operator packet now treats that shard plan as the source of truth:
 each shard must export its own private response-arm files, run answer-quality
@@ -576,18 +576,19 @@ The shard planner now also has a `local-full` claim scope, exposed through
 `benchmark:answer-quality:local-shard-plan`. The checked-in local plan at
 `reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json`
 uses the same 500-query target and private raw-source-retaining materialization
-but requires only BM25, full hybrid, model-backed query expansion, local Apple
-embedding, and local rerank arms. Its workorder,
+but requires only BM25, full hybrid, local Apple embedding, and local rerank
+arms; query expansion is included only as an explicitly labeled local arm or
+ablation. Its workorder,
 `reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json`,
 is accepted for local full-benchmark intake and deliberately has no Voyage or
 NVIDIA blockers. It is still blocked on live/no-raw consent, answer-quality
-endpoint configuration, local Apple/local rerank endpoints, and model-backed
-query expansion. The regenerated response-arm commands now require explicit
+endpoint configuration, local Apple/local rerank endpoints, and returned shard
+scoring evidence. The regenerated response-arm commands now require explicit
 local embedding and local rerank endpoint placeholders plus the public-safe
 local embedding durability report, so shard retries cannot omit the local model
-sidecars or durability gate. A completed `local-full` run can diagnose whether the local
-method is model-size limited; it does not count as SOTA evidence or public
-superiority without the provider/SOTA comparison lane.
+sidecars or durability gate. A completed `local-full` run can diagnose whether
+the local method is model-size limited; it does not count as SOTA evidence or
+public superiority without the provider/SOTA comparison lane.
 The same workorder now consumes the accepted shard 001 result, the accepted
 shard 002 recovery result, and the shard 003 runtime-blocker report. It emits
 eighteen pending workorders, marks one runtime resume plan for shard 003, and
@@ -713,8 +714,10 @@ input doctor and shard workorder. Its checked-in evidence at
 keeps the private inputs marked ready while blocking the accepted
 `full-sota-accepted-shards` lane until live export/no-raw-text consent,
 answer-quality consent, exact `gpt-4o` answer/judge target matching, local
-Apple and local rerank endpoints, Voyage/NVIDIA credentials, and model-backed
-query expansion are present. It calls no providers, sends no benchmark text,
+Apple and local rerank endpoints, Voyage/NVIDIA credentials, and returned
+accepted-lane shard scoring evidence are present. Query expansion is reported
+only when the accepted lane explicitly includes it. It calls no providers,
+sends no benchmark text,
 prints no env values or private paths, checks that local endpoints are actually
 reachable before treating them as launch-ready, and does not count as SOTA
 evidence.
