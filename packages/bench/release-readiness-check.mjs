@@ -1208,6 +1208,14 @@ check("fresh Codex memory health gate passes for controlled dogfood", () => {
   assert.equal(monitor.autoFixesApplied, false);
   assert.equal(monitor.autoRecallExpansionAllowed, false);
   assert.match(monitor.fixPolicy, /noisy or confusing context/i);
+  assert.equal(monitor.graduationGate?.status, "MONITORING_INTERVALS_REQUIRED");
+  assert.equal(monitor.graduationGate?.readyForDogfoodGraduationReview, false);
+  assert.equal(monitor.graduationGate?.publicLaunchAllowed, false);
+  assert.equal(monitor.graduationGate?.countsAsBenchmarkEvidence, false);
+  assert.ok(
+    monitor.graduationGate?.blockers?.includes("watched-intervals-not-run"),
+    "one-shot dogfood monitor must not count as interval proof",
+  );
   assert.ok(
     monitor.iterations.every((iteration) => iteration.directLookup?.directLookupUsefulnessOk === true),
     "dogfood monitor must include direct lookup usefulness checks",
@@ -1221,6 +1229,25 @@ check("fresh Codex memory health gate passes for controlled dogfood", () => {
     "dogfood monitor must treat missing forced/periodic recall anchors as noise risk",
   );
   assert.deepEqual(monitor.blockers, []);
+  const shortWatch = JSON.parse(run("node", [
+    "packages/bench/codex-memory-dogfood-monitor.mjs",
+    "--phase",
+    "rewired",
+    "--watch",
+    "--interval-ms",
+    "1000",
+    "--max-iterations",
+    "2",
+    "--min-clean-iterations",
+    "2",
+  ]).stdout);
+  assert.equal(shortWatch.ok, true);
+  assert.equal(shortWatch.graduationGate?.status, "READY_FOR_DOGFOOD_GRADUATION_REVIEW");
+  assert.equal(shortWatch.graduationGate?.readyForDogfoodGraduationReview, true);
+  assert.equal(shortWatch.graduationGate?.publicLaunchAllowed, false);
+  assert.equal(shortWatch.graduationGate?.countsAsBenchmarkEvidence, false);
+  assert.equal(shortWatch.graduationGate?.cleanIterations, 2);
+  assert.deepEqual(shortWatch.graduationGate?.blockers, []);
   assert.equal(report.storeHealth?.severeNoise?.commandJsonMemoryCount, 0);
   assert.deepEqual(report.blockers, []);
   assert.equal(report.release?.blockedByDogfoodMode, true);

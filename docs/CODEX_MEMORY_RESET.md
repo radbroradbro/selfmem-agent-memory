@@ -64,6 +64,13 @@ Run the explicit periodic monitor during rewire dogfood:
 npm exec --yes pnpm@10.23.0 -- codex:memory-dogfood-monitor:watch
 ```
 
+The monitor has two proof levels. A one-shot run can prove current health and
+catch immediate noise, but it must report `MONITORING_INTERVALS_REQUIRED` for
+dogfood graduation. Graduation review requires watched rewired intervals; by
+default the watch command needs 12 clean iterations. Shorter watched runs may be
+used only as gate-smoke tests or diagnostics, not as a public release or
+benchmark claim.
+
 If the monitor reports noisy or confusing context, keep or turn automatic
 injection off, fix the ranking, write, dedupe, or pruning method, and rerun the
 monitor. Do not treat repeated noisy recall as an acceptable operator burden.

@@ -12,6 +12,7 @@ const strict = Boolean(args.strict);
 const watch = Boolean(args.watch);
 const intervalMs = Math.max(1000, Number(args.intervalMs ?? 60000));
 const maxIterations = Math.max(1, Number(args.maxIterations ?? (watch ? 12 : 1)));
+const minCleanIterations = Math.max(2, Number(args.minCleanIterations ?? 12));
 const phase = String(args.phase ?? "reset");
 const outputPath = args.output ? resolve(String(args.output)) : null;
 
@@ -52,6 +53,7 @@ for (let index = 0; index < maxIterations; index += 1) {
 }
 
 const failedIterations = iterations.filter((item) => !item.ok);
+const graduationGate = buildGraduationGate(iterations, { watch, intervalMs, minCleanIterations, phase });
 const report = {
   schemaVersion: 1,
   mode: "codex-memory-dogfood-monitor",
@@ -74,6 +76,7 @@ const report = {
   autoRecallExpansionAllowed: false,
   fixPolicy:
     "If monitoring detects noisy or confusing context, keep or turn automatic injection off, repair ranking/dedupe/write policy, rerun this monitor, and only then continue dogfood.",
+  graduationGate,
   iterations,
   blockers: unique(failedIterations.flatMap((item) => item.blockers)),
   nextActions: unique(failedIterations.flatMap((item) => item.nextActions)),
@@ -174,6 +177,37 @@ function evaluateHealth(health, { phase }) {
     relevance,
     blockers,
     nextActions,
+  };
+}
+
+function buildGraduationGate(iterations, { watch, intervalMs, minCleanIterations, phase }) {
+  const cleanIterations = iterations.filter((item) => item.ok === true);
+  const allClean = cleanIterations.length === iterations.length;
+  const enoughIterations = cleanIterations.length >= minCleanIterations;
+  const watchedIntervals = watch === true && iterations.length > 1;
+  const elapsedMs = watchedIntervals ? Math.max(0, iterations.length - 1) * intervalMs : 0;
+  const blockers = [
+    watchedIntervals ? null : "watched-intervals-not-run",
+    enoughIterations ? null : "clean-iteration-count-too-low",
+    allClean ? null : "monitor-iteration-blocked",
+    phase === "rewired" ? null : "rewired-phase-required",
+  ].filter(Boolean);
+  const ready = blockers.length === 0;
+  return {
+    status: ready ? "READY_FOR_DOGFOOD_GRADUATION_REVIEW" : "MONITORING_INTERVALS_REQUIRED",
+    readyForDogfoodGraduationReview: ready,
+    publicLaunchAllowed: false,
+    countsAsBenchmarkEvidence: false,
+    phase,
+    requiresWatch: true,
+    minCleanIterations,
+    observedIterations: iterations.length,
+    cleanIterations: cleanIterations.length,
+    elapsedMs,
+    allIterationsClean: allClean,
+    blockers,
+    policy:
+      "A one-shot monitor can prove current health, but dogfood graduation needs repeated clean watched intervals in the rewired lane.",
   };
 }
 
