@@ -52,6 +52,7 @@ const currentHeadSafeAfterReview =
   && onlyPublicEvidenceSinceReviewedCodeHead;
 const normalChecks = latestReview?.checks ?? [];
 const requiredCheckFailures = normalChecks.filter((check) => check.required === true && check.status === "fail");
+const githubLiveSyncStatus = githubLiveSync?.ok === true ? "pass" : "missing-or-failed";
 const githubLiveSyncStatusLabel = githubLiveSync?.ok === true ? "passed" : "missing-or-failed";
 
 const report = {
@@ -101,7 +102,7 @@ const report = {
     requiredCheckFailures,
     claudeReviewStatus: "blocked-budget-cap-exceeded-before-output",
     ghCliStatus: "unavailable-in-local-shell-but-github-api-live-sync-passed",
-    githubLiveSyncStatus: githubLiveSyncStatusLabel,
+    githubLiveSyncStatus,
     githubLiveSyncMode: githubLiveSync?.mode ?? "",
     pullRequestNumber: 5,
     issueNumber: 6,
@@ -135,7 +136,7 @@ const report = {
     providerAdapterRegistryStatus: readJsonOrNull(join(root, reviewDir, "provider-adapter-registry-20260601.json"))?.status ?? "",
     methodLadderGate: "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
     githubLiveSync: "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
-    githubLiveSyncStatus: githubLiveSyncStatusLabel,
+    githubLiveSyncStatus,
     remotePrHeadMatchesCurrentHead: remotePullRequestHead === head,
   },
   claimBoundary: {
@@ -269,7 +270,7 @@ function markdownReport(report) {
 - Post-review non-evidence files: ${report.postReviewChangePolicy.nonEvidenceFileCountSinceReviewedCodeHead}
 - Claude review: blocked because the local Claude CLI budget cap was exceeded before output.
 - Dry-run final packet: generated successfully but does not count as external approval.
-- GitHub live sync: ${report.verification.githubLiveSyncStatus}. PR #5 is open, issue #6 is open, the PR head branch matches \`${report.branch}\`, and live PR/issue text matches the checked-in public-safe drafts.
+- GitHub live sync: ${report.verification.githubLiveSyncStatus === "pass" ? "passed" : report.verification.githubLiveSyncStatus}. PR #5 is open, issue #6 is open, the PR head branch matches \`${report.branch}\`, and live PR/issue text matches the checked-in public-safe drafts.
 - Remote PR head at evidence capture: \`${report.verification.remotePullRequestHead}\`.
 - Remote branch head at evidence capture: \`${report.verification.remoteBranchHead}\`.
 
