@@ -8,7 +8,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
@@ -35,7 +35,14 @@ const postReviewChangedFiles = reviewedCodeHead
     .filter(Boolean)
   : [];
 const nonEvidencePostReviewFiles = postReviewChangedFiles.filter((file) => !isPublicEvidencePath(file));
-const githubLiveSync = readJsonOrNull(join(root, reviewDir, "github-live-sync-current-head-20260601.json"));
+const githubLiveSyncCandidates = [
+  join(root, reviewDir, "github-live-sync-current-head-20260603-dogfood-review.json"),
+  join(root, reviewDir, "github-live-sync-current-head-20260601.json"),
+];
+const githubLiveSyncEvidencePath =
+  githubLiveSyncCandidates.find((path) => existsSync(path)) ?? githubLiveSyncCandidates[0];
+const githubLiveSyncEvidence = relative(root, githubLiveSyncEvidencePath);
+const githubLiveSync = readJsonOrNull(githubLiveSyncEvidencePath);
 const remoteBranchHead = gitRemoteHead(`refs/heads/${branch}`);
 const remotePullRequestHead = gitRemoteHead("refs/pull/5/head");
 const remotePullRequestMergeRef = gitRemoteHead("refs/pull/5/merge");
@@ -135,7 +142,7 @@ const report = {
     providerAdapterRegistry: "reviews/overnight-20260522/provider-adapter-registry-20260601.json",
     providerAdapterRegistryStatus: readJsonOrNull(join(root, reviewDir, "provider-adapter-registry-20260601.json"))?.status ?? "",
     methodLadderGate: "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
-    githubLiveSync: "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
+    githubLiveSync: githubLiveSyncEvidence,
     githubLiveSyncStatus,
     remotePrHeadMatchesCurrentHead: remotePullRequestHead === head,
   },
