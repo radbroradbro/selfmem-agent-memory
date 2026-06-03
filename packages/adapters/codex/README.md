@@ -30,8 +30,9 @@ explicit writes in live work. It is not release approval and it is not a
 benchmark score.
 
 After automatic recall is rewired, keep running the same gate and inspect its
-`dogfoodMonitor` block. The monitor tracks noise, retrieval, write outcomes,
-and usefulness without printing raw memories or transcripts.
+`dogfoodMonitor` block. The monitor tracks noise, retrieval, direct lookup
+usefulness, write outcomes, and quiet-prompt behavior without printing raw
+memories or transcripts.
 
 For periodic rewire monitoring:
 

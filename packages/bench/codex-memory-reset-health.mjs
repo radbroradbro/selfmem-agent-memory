@@ -217,16 +217,22 @@ function inspectEventMetrics(events) {
 
 function buildDogfoodMonitor({ storeHealth, contextQuality }) {
   const eventMetrics = storeHealth.eventMetrics ?? {};
+  const scenarioReports = Array.isArray(contextQuality.scenarios) ? contextQuality.scenarios : [];
   const failedScenarios = Array.isArray(contextQuality.failedScenarios) ? contextQuality.failedScenarios : [];
-  const quietPromptScenario = Array.isArray(contextQuality.scenarios)
-    ? contextQuality.scenarios.find((scenario) => scenario.id === "unrelated-default-noise")
-    : null;
-  const taskScenarioCount = Array.isArray(contextQuality.scenarios)
-    ? contextQuality.scenarios.filter((scenario) => scenario.id !== "unrelated-default-noise").length
-    : 0;
-  const taskScenarioPassCount = Array.isArray(contextQuality.scenarios)
-    ? contextQuality.scenarios.filter((scenario) => scenario.id !== "unrelated-default-noise" && scenario.ok === true).length
-    : 0;
+  const quietPromptScenario = scenarioReports.find((scenario) => scenario.id === "unrelated-default-noise");
+  const taskScenarios = scenarioReports.filter((scenario) => scenario.id !== "unrelated-default-noise");
+  const taskScenarioCount = taskScenarios.length;
+  const taskScenarioPassCount = taskScenarios.filter((scenario) => scenario.ok === true).length;
+  const taskLookupRelevantCount = taskScenarios.filter((scenario) => {
+    const expected = Object.values(scenario.expectedMatched ?? {});
+    return scenario.ok === true
+      && Number(scenario.itemCount ?? 0) > 0
+      && Number(scenario.itemCount ?? 0) <= Number(scenario.maxContextItems ?? 5)
+      && expected.length > 0
+      && expected.every(Boolean);
+  }).length;
+  const directLookupPassRate = ratio(taskLookupRelevantCount, taskScenarioCount);
+  const quietLookupEmpty = quietPromptScenario?.ok === true && Number(quietPromptScenario?.itemCount ?? 0) === 0;
   const severeNoiseClean =
     storeHealth.severeNoise.privatePathMemoryCount === 0
     && storeHealth.severeNoise.secretShapedMemoryCount === 0
@@ -285,6 +291,17 @@ function buildDogfoodMonitor({ storeHealth, contextQuality }) {
       taskScenarioCount,
       taskScenarioPassCount,
       taskScenarioPassRate: ratio(taskScenarioPassCount, taskScenarioCount),
+    },
+    directLookup: {
+      mode: "context-quality-hash-only",
+      contextHashesOnly: true,
+      printsRawContext: false,
+      taskLookupScenarios: taskScenarioCount,
+      taskLookupRelevantCount,
+      taskLookupPassRate: directLookupPassRate,
+      quietLookupEmpty,
+      confusingLookupCount: failedScenarios.length,
+      directLookupUsefulnessOk: directLookupPassRate === 1 && quietLookupEmpty === true && failedScenarios.length === 0,
     },
   };
 }

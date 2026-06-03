@@ -8,6 +8,13 @@
 
 ## Browser Evidence
 
+- Codex Browser captured a 2026-06-03 current-head fixture overview after the
+  Codex memory reset/product-gate commit. Evidence lives at
+  `brain-ui-20260603-browser-evidence.json`, with full-page screenshot
+  `brain-ui-20260603-browser-overview.jpg`. It verifies the rendered Nucleus
+  graph, update flow, Nucleus snapshot, wiki/vault preview, vault sync report,
+  compaction audit, benchmark dashboard, context preview, release readiness
+  surface, fixture write-mode visibility, and zero console errors.
 - Codex Browser captured a 2026-06-01 current-head live fixture flow after the
   release-gate alignment. The flow searched `native memory`, selected the
   retrieval trace node, and verified lifecycle trail, Nucleus snapshot,

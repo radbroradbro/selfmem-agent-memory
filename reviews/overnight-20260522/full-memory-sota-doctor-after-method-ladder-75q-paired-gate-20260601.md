@@ -3,6 +3,13 @@
 - Status: BLOCKED_FULL_MEMORY_SOTA_EVIDENCE
 - Public benchmark claims allowed: false
 - Counts as full memory SOTA evidence: false
+- Primary score: whole-harness-agent-memory-answer-quality
+- Supermemory comparison surface: plugin-to-plugin-agent-memory-layer
+- Diagnostics are alternate scoreboards: false
+- Live plugin actor required: true
+- Explicit memory writes required: true
+- Post-boundary recall required: true
+- Isolated benchmark containers required: true
 - Full target query count: 500
 - Current canary query count: 30
 - Current best score: 43.1667
@@ -143,9 +150,9 @@
 - Runtime recovery status: RETRIEVAL_AND_SCORING_READY
 - Runtime recovery retrieval recovered: true
 - Runtime recovery answer-quality env ready: true
-- Runtime blocker resume plans: 1
+- Runtime blocker resume plans: 0
 - Next shard missing resume arms: none
-- Historical next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank
+- Historical next shard missing resume arms: none
 - Latest runtime-blocked shard: n/a
 - Latest runtime-blocked arm: n/a
 - Local embedding runtime status: READY_LOCAL_EMBEDDING_RUNTIME
@@ -153,7 +160,7 @@
 - Local embedding durability status: READY_LOCAL_EMBEDDING_DURABILITY
 - Local embedding durability ready: true
 - Cloud provider blocker count: 0
-- Operator inputs needed: 5
+- Operator inputs needed: 4
 - Counts as full memory SOTA evidence: false
 
 ## Provider Wave Intake
@@ -238,5 +245,5 @@
 
 ## Next Run
 - Primary stage: full-longmemeval-answer-quality-shards
-- Strategy set: bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, cloud-gemini2-embed-rerank-proxy, cloud-voyage4-voyage-lite-rerank, cloud-nvidia-nv-embed-v1-mistral-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
+- Strategy set: bm25-lite, full-hybrid-rerank, cloud-gemini2-embed-rerank-proxy, cloud-voyage4-lite-voyage-lite, cloud-nvidia-nv-embed-v1-mistral-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
 - Required after shard runs: benchmark:answer-quality:shard-workorder; benchmark:local-embedding:runtime-doctor before local Apple embedding durability; benchmark:local-embedding:durability before local Apple response-arm export; benchmark:answer-quality:shard-intake --require-ready; benchmark:answer-quality:combine -- --combine-mode shards; benchmark:memory-score:reviewer-intake -- --strict-target; benchmark:memory-score:result-gate -- --require-ready; benchmark:sota-ladder; UI evidence, docs, release notes, owner approval, and real canary refresh

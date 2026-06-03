@@ -42,6 +42,7 @@ for (let index = 0; index < maxIterations; index += 1) {
     retrieval: evaluation.retrieval,
     writes: evaluation.writes,
     usefulness: evaluation.usefulness,
+    directLookup: evaluation.directLookup,
     blockers: evaluation.blockers,
     nextActions: evaluation.nextActions,
   });
@@ -93,6 +94,7 @@ function evaluateHealth(health, { phase }) {
   const retrieval = dogfood.retrieval ?? {};
   const writes = dogfood.writes ?? {};
   const usefulness = dogfood.usefulness ?? {};
+  const directLookup = dogfood.directLookup ?? {};
   const blockers = [];
 
   if (dogfood.metricsOnly !== true) blockers.push("monitor-not-metrics-only");
@@ -103,6 +105,8 @@ function evaluateHealth(health, { phase }) {
   if (usefulness.contextQualityOk !== true) blockers.push("context-quality-failed");
   if (usefulness.quietPromptHasNoContext !== true) blockers.push("quiet-prompt-retrieved-context");
   if (Number(usefulness.taskScenarioPassRate ?? 0) < 1) blockers.push("task_context_scenario_incomplete");
+  if (directLookup.directLookupUsefulnessOk !== true) blockers.push("direct_lookup_usefulness_failed");
+  if (directLookup.quietLookupEmpty !== true) blockers.push("direct_lookup_noise_leaked");
   if (Number(writes.explicitStoreEvents ?? 0) === 0) blockers.push("explicit-write-not-observed");
   if (Number(writes.explicitStoreWriteRate ?? 0) < 0.95) blockers.push("explicit-write-rate-low");
 
@@ -127,6 +131,9 @@ function evaluateHealth(health, { phase }) {
   if (blockers.includes("explicit-write-not-observed") || blockers.includes("explicit-write-rate-low")) {
     nextActions.push("Fix explicit store/write tooling before relying on automatic transcript extraction.");
   }
+  if (blockers.includes("direct_lookup_usefulness_failed") || blockers.includes("direct_lookup_noise_leaked")) {
+    nextActions.push("Fix direct lookup/query policy so task prompts retrieve bounded useful context and unrelated prompts retrieve nothing.");
+  }
   if (blockers.includes("rewired-phase-recall-too-broad")) {
     nextActions.push("Tighten candidate limits, authority scoring, or domain filters before continuing live rewire.");
   }
@@ -141,6 +148,7 @@ function evaluateHealth(health, { phase }) {
     retrieval,
     writes,
     usefulness,
+    directLookup,
     blockers,
     nextActions,
   };

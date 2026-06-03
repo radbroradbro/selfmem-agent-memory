@@ -40,6 +40,9 @@ after any rewire to track:
   activity,
 - retrieval: recall run/skip rates, forced versus signal-triggered recall, and
   average match counts,
+- direct lookup: task prompts must retrieve bounded useful context while
+  unrelated prompts retrieve nothing; the report carries hashes and counts, not
+  raw retrieved memory,
 - writes: explicit store outcomes, duplicate suppression, rejected writes, and
   stop-time candidate/write rates,
 - usefulness: context-quality scenario pass rate, including unrelated prompts

@@ -3,7 +3,7 @@
   "ok": true,
   "mode": "full-memory-sota-doctor",
   "status": "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE",
-  "generatedAt": "2026-06-01T15:58:01.123Z",
+  "generatedAt": "2026-06-02T15:24:32.737Z",
   "reviewDir": "reviews/overnight-20260522",
   "metricsOnly": true,
   "publicSafe": true,
@@ -19,6 +19,15 @@
   "publicBenchmarkClaimsAllowed": false,
   "countsAsFullMemorySotaEvidence": false,
   "benchmarkContract": {
+    "primaryScoreName": "whole-harness-agent-memory-answer-quality",
+    "primaryScoreRequiresPluginActor": true,
+    "primaryScoreRequiresExplicitMemoryWrites": true,
+    "primaryScoreRequiresPostBoundaryRecall": true,
+    "primaryScoreRequiresSessionWikiTopicMaps": true,
+    "benchmarkContainersMustBeIsolatedFromLiveResearch": true,
+    "privateWorkspaceRequiredForRawResearchState": true,
+    "supermemoryComparisonSurface": "plugin-to-plugin-agent-memory-layer",
+    "diagnosticsAreNotAlternateScoreboards": true,
     "bm25IsLexicalFloorOnly": true,
     "retrievalProxyOnlyIsNotEnough": true,
     "componentBenchmarksAreModelSelectionOnly": true,
@@ -48,21 +57,21 @@
     "shardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-plan-20260525.json",
       "exists": true,
-      "hash": "sha256:89f3679d5edea3ebc85a858eb67d480b8f6cc1c82c82792787193f714de4e9b4",
+      "hash": "sha256:eb6af333954a7c530239504c7e86c8208f5fed9d98c6ec386f09c49033e8c3e0",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardPlan": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-plan-20260526.json",
       "exists": true,
-      "hash": "sha256:61fcfbecbc8e35466e002c07bb058cf4539041ff19c3d6dc951e88328e624714",
+      "hash": "sha256:e4403f2637743ab61bf321405b8d291fcafe53b6752a76950c6f2f0d2f5ec291",
       "mode": "public-benchmark-answer-quality-shard-plan",
       "status": "READY_FULL_ANSWER_QUALITY_SHARD_RUN"
     },
     "localFullShardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-local-full-shard-workorder-20260526.json",
       "exists": true,
-      "hash": "sha256:c55372a12fcb3e4da6b49213a02d4278fcb2f58787fcd4244058208bf9d613b9",
+      "hash": "sha256:4824d1f2e1144ba1fa6f4f463a205e3525085cb77afe5e3e05b8d99576bc2bec",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -244,7 +253,7 @@
     "localFullResumeCommandSecurity": {
       "path": "reviews/overnight-20260522/local-full-shard-003-resume-command-security-20260526.json",
       "exists": true,
-      "hash": "sha256:340b996943aff908758a73e108f26dd8928d518d18096665bd80574fe5c3b957",
+      "hash": "sha256:119e3677b9be48f4eeb067d18efda7f537462e523cac4139a1bf0145ba5e3c53",
       "mode": "local-full-shard-resume-command-security-doctor",
       "status": "READY_LOCAL_FULL_RESUME_COMMAND_SECURITY"
     },
@@ -286,7 +295,7 @@
     "localFullAcceptedLaneLaunchDoctor": {
       "path": "reviews/overnight-20260522/local-full-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:aef5e90e84a3b5332d5cd23f1cf305ea40a7e814dcb68b332b9285c06eed0f3b",
+      "hash": "sha256:490ae38b31755e8d2b30d01220d32699c3822a63f662edd87961adcfc906905b",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -307,7 +316,7 @@
     "acceptedLaneLaunchDoctorNoEnv": {
       "path": "reviews/overnight-20260522/full-shard-accepted-lane-launch-doctor-20260526.json",
       "exists": true,
-      "hash": "sha256:4b6b5ee23fa050aa4d750020deed21de7ea0d08855f335734964f998c9abc4c7",
+      "hash": "sha256:dfa1f112b58d56082ba736bcaffce841b0815a4591a5592a59fd777b5b0dcd8d",
       "mode": "full-shard-accepted-lane-launch-doctor",
       "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH"
     },
@@ -321,7 +330,7 @@
     "shardWorkorder": {
       "path": "reviews/overnight-20260522/answer-quality-full-shard-workorder-20260525.json",
       "exists": true,
-      "hash": "sha256:b219ed5ebec150ffc5a7bf8222b1070de36f4e5a0aafc159a6bce73016650386",
+      "hash": "sha256:7de140de1150aaa77a70ebb2d1af88b9deba104fc0792cfc3afe383b17122ae7",
       "mode": "public-benchmark-answer-quality-shard-workorder",
       "status": "PENDING_FULL_ANSWER_QUALITY_SHARD_RUNS"
     },
@@ -342,7 +351,7 @@
     "sotaOperatorPacket": {
       "path": "reviews/overnight-20260522/sota-ladder-full-target-operator-packet-20260525.json",
       "exists": true,
-      "hash": "sha256:e587c885d2c1534450df91f85da8a4542e7ac767500a65a951f82d719a23a1d9",
+      "hash": "sha256:2e24c5ce5debe1681b79263929ca97bcce48737c78dcda6699fc939051b0cec7",
       "mode": "public-benchmark-sota-operator-packet",
       "status": "BLOCKED_SOTA_OPERATOR_INPUTS"
     },
@@ -412,28 +421,28 @@
     "releaseNotes": {
       "path": "reviews/overnight-20260522/pr-body-update-draft.md",
       "exists": true,
-      "hash": "sha256:d63f0f107cc00c6574524461399bdefb7e655255ef6e7be9abc1628ae4b52b49",
+      "hash": "sha256:d7eb507502ae8e6afd1644a523e05cf0f0e82bdd0c398fe7d07f93feadf3d63e",
       "mode": null,
       "status": null
     },
     "benchmarkDocs": {
       "path": "docs/BENCHMARK_SUMMARY.md",
       "exists": true,
-      "hash": "sha256:5e59cd3c69ef84fb79b638f90d52ec3df4d51e39b012a0aa9153eb30116fb5d0",
+      "hash": "sha256:123756b2711a47cd50f027e85065768a17ba88e132bfa38d3ab8410bd4609213",
       "mode": null,
       "status": null
     },
     "targetDocs": {
       "path": "docs/PUBLIC_BENCHMARK_TARGETS.md",
       "exists": true,
-      "hash": "sha256:fe6054738e3a2f0421dd9b16543bf65b2a81bf06b62941107216970189d0376a",
+      "hash": "sha256:3baf8796343d81495384882746f2347075b4db6d434e546d92267defafbd5bc8",
       "mode": null,
       "status": null
     },
-    "releaseHandoff": {
-      "path": "docs/RELEASE_HANDOFF.md",
+    "updateFlow": {
+      "path": "docs/UPDATE_FLOW.md",
       "exists": true,
-      "hash": "sha256:06b9e80298a049cff9b3ecc8bf98ad38b7bd1518f37e46e366d3565e725fafb3",
+      "hash": "sha256:5a969ed08a691739927fa64870aabfce81d6eb4737dbef0525098f2ded08d15f",
       "mode": null,
       "status": null
     }
@@ -702,9 +711,8 @@
     "strategies": [
       "bm25-lite",
       "full-hybrid-rerank",
-      "query-expanded-full-hybrid-rerank",
       "cloud-gemini2-embed-rerank-proxy",
-      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-voyage4-lite-voyage-lite",
       "cloud-nvidia-nv-embed-v1-mistral-rerank",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
@@ -763,7 +771,7 @@
         "acceptedByFullShardIntake": true,
         "readyForResponseArmExport": false,
         "readyForAnswerQualityScoring": false,
-        "blockerCount": 16
+        "blockerCount": 15
       }
     ],
     "fullSotaLaneReadyForResponseArmExport": false,
@@ -787,8 +795,7 @@
       "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
       "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
       "RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled",
-      "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed",
-      "query-expansion-local-endpoint-or-cloud-consent-missing"
+      "RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed"
     ],
     "blockers": [
       "answer-quality-shard-runs-pending",
@@ -846,7 +853,6 @@
     "strategies": [
       "bm25-lite",
       "full-hybrid-rerank",
-      "query-expanded-full-hybrid-rerank",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
     ],
@@ -863,15 +869,13 @@
     "runtimeRecoveryAnswerQualityEnvReady": true,
     "runtimeRecoveryBlockers": [],
     "runtimeBlockerWorkorderInputCount": 1,
-    "runtimeBlockerResumeAvailableCount": 1,
+    "runtimeBlockerResumeAvailableCount": 0,
     "nextPendingShardResumeMissingStrategies": [],
-    "historicalNextPendingShardResumeMissingStrategies": [
-      "local-apple-qwen3-0_6b-local-rerank"
-    ],
+    "historicalNextPendingShardResumeMissingStrategies": [],
     "launchProgressSource": "checked-in-progress-intake",
     "launchProgressInputCount": 2,
-    "launchAcceptedShardCount": 2,
-    "launchPendingShardCount": 18,
+    "launchAcceptedShardCount": 0,
+    "launchPendingShardCount": 20,
     "performanceReport": {
       "path": "reviews/overnight-20260522/local-full-shard-performance-report-after-shard-020-20260529.json",
       "status": "COMPLETE_LOCAL_FULL_PERFORMANCE_SNAPSHOT",
@@ -1086,8 +1090,8 @@
         "missingArmCount": 1
       }
     ],
-    "operatorInputCount": 5,
-    "pendingShardCount": 18,
+    "operatorInputCount": 4,
+    "pendingShardCount": 20,
     "countsAsFullMemorySotaEvidence": false,
     "publicBenchmarkClaimsAllowed": false,
     "envBlockers": [
@@ -1103,8 +1107,7 @@
       "RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed",
       "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled",
       "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed",
-      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed",
-      "query-expansion-local-endpoint-or-cloud-consent-missing"
+      "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed"
     ],
     "blockers": [],
     "shardIntakeBlockers": [],
@@ -1569,9 +1572,8 @@
     "strategySet": [
       "bm25-lite",
       "full-hybrid-rerank",
-      "query-expanded-full-hybrid-rerank",
       "cloud-gemini2-embed-rerank-proxy",
-      "cloud-voyage4-voyage-lite-rerank",
+      "cloud-voyage4-lite-voyage-lite",
       "cloud-nvidia-nv-embed-v1-mistral-rerank",
       "local-apple-qwen3-0_6b",
       "local-apple-qwen3-0_6b-local-rerank"
@@ -1583,10 +1585,9 @@
         "operatorUse": "Run-path and shard-integrity proof only. This does not score local or provider model quality.",
         "strategies": [
           "bm25-lite",
-          "full-hybrid-rerank",
-          "query-expanded-full-hybrid-rerank"
+          "full-hybrid-rerank"
         ],
-        "strategyCount": 3,
+        "strategyCount": 2,
         "missingStrategies": [],
         "coverageReady": true,
         "providerRequirements": [],
@@ -1613,8 +1614,8 @@
         "canReachFullSotaGateAfterShardIntake": false,
         "countsAsFullMemorySotaEvidence": false,
         "publicBenchmarkClaimsAllowed": false,
-        "queryExpansionPolicy": "Deterministic fallback only; does not count as large-model query-expansion evidence.",
-        "queryExpansionEvidenceRequirement": "deterministic-fallback-only",
+        "queryExpansionPolicy": "Query expansion is excluded by default and may be added only as a labeled ablation lane.",
+        "queryExpansionEvidenceRequirement": "not-required",
         "queryExpansionDiagnosticFallbackAllowed": true,
         "queryExpansionSotaEligible": false,
         "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
@@ -1626,11 +1627,10 @@
         "strategies": [
           "bm25-lite",
           "full-hybrid-rerank",
-          "query-expanded-full-hybrid-rerank",
           "local-apple-qwen3-0_6b",
           "local-apple-qwen3-0_6b-local-rerank"
         ],
-        "strategyCount": 5,
+        "strategyCount": 4,
         "missingStrategies": [],
         "coverageReady": true,
         "providerRequirements": [
@@ -1660,8 +1660,8 @@
         "canReachFullSotaGateAfterShardIntake": false,
         "countsAsFullMemorySotaEvidence": false,
         "publicBenchmarkClaimsAllowed": false,
-        "queryExpansionPolicy": "Local or deterministic query expansion must be reported separately from cloud expansion.",
-        "queryExpansionEvidenceRequirement": "local-model-or-deterministic-diagnostic",
+        "queryExpansionPolicy": "Query expansion is off by default; score it only as a same-shard ablation when explicitly requested.",
+        "queryExpansionEvidenceRequirement": "not-required",
         "queryExpansionDiagnosticFallbackAllowed": true,
         "queryExpansionSotaEligible": false,
         "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
@@ -1673,11 +1673,10 @@
         "strategies": [
           "bm25-lite",
           "full-hybrid-rerank",
-          "query-expanded-full-hybrid-rerank",
           "local-apple-qwen3-4b",
           "local-apple-qwen3-4b-local-rerank"
         ],
-        "strategyCount": 5,
+        "strategyCount": 4,
         "missingStrategies": [
           "local-apple-qwen3-4b",
           "local-apple-qwen3-4b-local-rerank"
@@ -1710,8 +1709,8 @@
         "canReachFullSotaGateAfterShardIntake": false,
         "countsAsFullMemorySotaEvidence": false,
         "publicBenchmarkClaimsAllowed": false,
-        "queryExpansionPolicy": "Local or deterministic query expansion must be reported separately from cloud expansion.",
-        "queryExpansionEvidenceRequirement": "local-model-or-deterministic-diagnostic",
+        "queryExpansionPolicy": "Query expansion is off by default; score it only as a same-shard ablation when explicitly requested.",
+        "queryExpansionEvidenceRequirement": "not-required",
         "queryExpansionDiagnosticFallbackAllowed": true,
         "queryExpansionSotaEligible": false,
         "shardIntakeCompatibility": "diagnostic subset only; full-shard intake rejects it as strategy-set mismatch"
@@ -1723,7 +1722,7 @@
         "strategies": [
           "bm25-lite",
           "full-hybrid-rerank",
-          "cloud-voyage4-voyage-lite-rerank"
+          "cloud-voyage4-lite-voyage-lite"
         ],
         "strategyCount": 3,
         "missingStrategies": [],
@@ -1855,14 +1854,13 @@
         "strategies": [
           "bm25-lite",
           "full-hybrid-rerank",
-          "query-expanded-full-hybrid-rerank",
           "cloud-gemini2-embed-rerank-proxy",
-          "cloud-voyage4-voyage-lite-rerank",
+          "cloud-voyage4-lite-voyage-lite",
           "cloud-nvidia-nv-embed-v1-mistral-rerank",
           "local-apple-qwen3-0_6b",
           "local-apple-qwen3-0_6b-local-rerank"
         ],
-        "strategyCount": 8,
+        "strategyCount": 7,
         "missingStrategies": [],
         "coverageReady": true,
         "providerRequirements": [
@@ -1895,8 +1893,8 @@
         "canReachFullSotaGateAfterShardIntake": true,
         "countsAsFullMemorySotaEvidence": false,
         "publicBenchmarkClaimsAllowed": false,
-        "queryExpansionPolicy": "Query expansion, local rerank, local Apple, and provider challengers must all be present on the same shards.",
-        "queryExpansionEvidenceRequirement": "local-or-cloud-model-required",
+        "queryExpansionPolicy": "Local rerank, local Apple, and provider challengers must all be present on the same shards; query expansion is optional and must be labeled as an ablation.",
+        "queryExpansionEvidenceRequirement": "not-required",
         "queryExpansionDiagnosticFallbackAllowed": false,
         "queryExpansionSotaEligible": true,
         "shardIntakeCompatibility": "accepted only after every planned shard returns with this complete strategy set"

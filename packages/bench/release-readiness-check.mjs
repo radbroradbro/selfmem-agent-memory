@@ -725,6 +725,8 @@ const requiredFiles = [
   `${reviewDir}/ui-evidence/brain-ui-current-head-live.png`,
   `${reviewDir}/ui-evidence/brain-ui-20260601-current-head-browser-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-20260601-current-head-filtered-retrieval.jpg`,
+  `${reviewDir}/ui-evidence/brain-ui-20260603-browser-evidence.json`,
+  `${reviewDir}/ui-evidence/brain-ui-20260603-browser-overview.jpg`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json`,
   `${reviewDir}/ui-evidence/brain-ui-lifecycle-policy.png`,
   `${reviewDir}/ui-evidence/brain-ui-review-queue-dom-evidence.json`,
@@ -1165,6 +1167,11 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   assert.equal(report.dogfoodMonitor?.metricsOnly, true);
   assert.equal(report.dogfoodMonitor?.usefulness?.quietPromptHasNoContext, true);
   assert.equal(report.dogfoodMonitor?.usefulness?.contextQualityOk, true);
+  assert.equal(report.dogfoodMonitor?.directLookup?.directLookupUsefulnessOk, true);
+  assert.equal(report.dogfoodMonitor?.directLookup?.contextHashesOnly, true);
+  assert.equal(report.dogfoodMonitor?.directLookup?.printsRawContext, false);
+  assert.equal(report.dogfoodMonitor?.directLookup?.taskLookupPassRate, 1);
+  assert.equal(report.dogfoodMonitor?.directLookup?.quietLookupEmpty, true);
   assert.equal(report.dogfoodMonitor?.noise?.severeNoiseClean, true);
   const monitor = JSON.parse(run("node", ["packages/bench/codex-memory-dogfood-monitor.mjs", "--strict"]).stdout);
   assert.equal(monitor.ok, true);
@@ -1174,6 +1181,10 @@ check("fresh Codex memory reset-health gate passes for controlled dogfood", () =
   assert.equal(monitor.autoFixesApplied, false);
   assert.equal(monitor.autoRecallExpansionAllowed, false);
   assert.match(monitor.fixPolicy, /noisy or confusing context/i);
+  assert.ok(
+    monitor.iterations.every((iteration) => iteration.directLookup?.directLookupUsefulnessOk === true),
+    "dogfood monitor must include direct lookup usefulness checks",
+  );
   assert.deepEqual(monitor.blockers, []);
   assert.equal(report.storeHealth?.severeNoise?.commandJsonMemoryCount, 0);
   assert.equal(report.storeHealth?.severeNoise?.privatePathMemoryCount, 0);
@@ -1695,6 +1706,46 @@ check("dom evidence is sane", () => {
   assert.equal(currentHeadJuneScreenshot[0], 0xff);
   assert.equal(currentHeadJuneScreenshot[1], 0xd8);
   assert.equal(currentHeadJuneScreenshot[2], 0xff);
+
+  const currentHeadProductEvidence = JSON.parse(
+    readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-20260603-browser-evidence.json"), "utf8"),
+  );
+  assert.equal(currentHeadProductEvidence.ok, true);
+  assert.equal(currentHeadProductEvidence.mode, "brain-ui-browser-evidence");
+  assert.equal(currentHeadProductEvidence.publicSafe, true);
+  assert.equal(currentHeadProductEvidence.metricsOnly, true);
+  assert.equal(currentHeadProductEvidence.callsProviderApis, false);
+  assert.equal(currentHeadProductEvidence.rawMemoryIncluded, false);
+  assert.equal(currentHeadProductEvidence.rawTranscriptIncluded, false);
+  assert.equal(currentHeadProductEvidence.rawPromptIncluded, false);
+  assert.equal(
+    currentHeadProductEvidence.screenshot?.path,
+    "reviews/overnight-20260522/ui-evidence/brain-ui-20260603-browser-overview.jpg",
+  );
+  assert.equal(currentHeadProductEvidence.screenshot?.privatePathPrinted, false);
+  assert.equal(currentHeadProductEvidence.screenshot?.fullPage, true);
+  assert.equal(currentHeadProductEvidence.browser?.title, "RecallWeave Brain");
+  assert.equal(currentHeadProductEvidence.browser?.url, "http://127.0.0.1:4177/");
+  assert.equal(currentHeadProductEvidence.browser?.vaultStatus, "12 files compiled. Lint clean.");
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Agent update flow"));
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Nucleus graph"));
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Wiki Vault Preview"));
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Vault Sync Report"));
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Compaction Audit"));
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Benchmark Dashboard"));
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Context Preview"));
+  assert.ok(currentHeadProductEvidence.browser?.sectionLabels?.includes("Release Readiness"));
+  assert.equal(currentHeadProductEvidence.browser?.writesRealFilesClaimedByFixture, true);
+  assert.equal(currentHeadProductEvidence.console?.errorCount, 0);
+  for (const [name, value] of Object.entries(currentHeadProductEvidence.checks ?? {})) {
+    assert.equal(value, true, `2026-06-03 product browser evidence missing ${name}`);
+  }
+  const currentHeadProductScreenshot = readFileSync(
+    join(root, reviewDir, "ui-evidence/brain-ui-20260603-browser-overview.jpg"),
+  );
+  assert.equal(currentHeadProductScreenshot[0], 0xff);
+  assert.equal(currentHeadProductScreenshot[1], 0xd8);
+  assert.equal(currentHeadProductScreenshot[2], 0xff);
 
   const policyEvidence = JSON.parse(
     readFileSync(join(root, reviewDir, "ui-evidence/brain-ui-lifecycle-policy-dom-evidence.json"), "utf8"),
@@ -11215,6 +11266,8 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "configs/provider-matrix.yaml" ||
     file === "package.json" ||
     file === "pnpm-lock.yaml" ||
+    file === "packages/adapters/codex/README.md" ||
+    file === "packages/adapters/codex/selfmem-bridge.cjs" ||
     file === "packages/adapters/hermes/selfmem_canary/__init__.py" ||
     file === "packages/adapters/hermes/selfmem_canary_standalone_smoke.py" ||
     file === "packages/adapters/openclaw/selfmem_canary/index.mjs" ||
