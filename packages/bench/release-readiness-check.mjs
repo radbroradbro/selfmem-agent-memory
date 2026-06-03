@@ -489,6 +489,7 @@ const requiredFiles = [
   "packages/bench/release-blocker-doctor.mjs",
   "packages/bench/github-handoff-packet.mjs",
   "packages/bench/github-live-sync-check.mjs",
+  "packages/bench/current-head-pr-council-status.mjs",
   "packages/bench/goal-completion-audit.mjs",
   `${reviewDir}/kickoff.md`,
   `${reviewDir}/summary.md`,
@@ -2181,6 +2182,13 @@ check("benchmark target lock and provider registry stay conservative", () => {
   const githubLiveSyncMarkdown = readFileSync(join(root, reviewDir, "github-live-sync-current-head-20260601.md"), "utf8");
   const councilStatus = JSON.parse(readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.json"), "utf8"));
   const councilStatusMarkdown = readFileSync(join(root, reviewDir, "current-head-pr-council-status-20260601.md"), "utf8");
+  const currentHead = run("git", ["rev-parse", "HEAD"]).stdout.trim();
+  const liveGithubSync = JSON.parse(run("node", ["packages/bench/github-live-sync-check.mjs"]).stdout);
+  const postReviewChangedFiles = run("git", ["diff", "--name-only", `${councilStatus.reviewedCodeHead}..HEAD`])
+    .stdout.split(/\r?\n/)
+    .map((file) => file.trim())
+    .filter(Boolean);
+  const postReviewNonEvidenceFiles = postReviewChangedFiles.filter((file) => !isCouncilPostReviewEvidencePath(file));
 
   for (const item of [targetLockFresh, targetLockEvidence]) {
     assert.equal(item.mode, "benchmark-target-lock-check");
@@ -2202,6 +2210,13 @@ check("benchmark target lock and provider registry stay conservative", () => {
   }
   assert.equal(councilStatus.mode, "current-head-pr-council-status");
   assert.equal(councilStatus.publicSafe, true);
+  assert.match(councilStatus.reviewedCodeHead ?? "", /^[a-f0-9]{40}$/);
+  run("git", ["merge-base", "--is-ancestor", councilStatus.reviewedCodeHead, "HEAD"]);
+  assert.equal(councilStatus.verification?.reviewFreshForReviewedCodeHead, true);
+  assert.equal(councilStatus.verification?.reviewedCodeHeadMatchesReviewRun, true);
+  assert.equal(councilStatus.currentHeadSafeAfterReview, true);
+  assert.equal(councilStatus.postReviewChangePolicy?.onlyPublicEvidenceSinceReviewedCodeHead, true);
+  assert.deepEqual(postReviewNonEvidenceFiles, []);
   assert.equal(councilStatus.verification?.deepseekFinalGateVerdict, "CLEAN");
   assert.equal(councilStatus.verification?.deepseekReviewerModel, "deepseek-v4-pro");
   assert.equal(councilStatus.verification?.claudeReviewStatus, "blocked-budget-cap-exceeded-before-output");
@@ -2216,19 +2231,33 @@ check("benchmark target lock and provider registry stay conservative", () => {
   assert.equal(councilStatus.claimBoundary?.currentStatus, "not-production-complete");
   assert.ok(councilStatus.claimBoundary?.mayNotClaim?.includes("RecallWeave beats Supermemory"));
   assert.ok(councilStatus.claimBoundary?.mayNotClaim?.includes("PR merge/public launch is complete"));
+  assert.ok(councilStatus.claimBoundary?.mayNotClaim?.includes("stale council evidence applies to later substantive code changes"));
   assert.equal(githubLiveSyncEvidence.mode, "github-live-sync-check");
   assert.equal(githubLiveSyncEvidence.ok, true);
+  assert.match(githubLiveSyncEvidence.localHead ?? "", /^[a-f0-9]{40}$/);
+  assert.equal(githubLiveSyncEvidence.remoteBranchHeadMatchesCurrentHead, true);
+  assert.equal(githubLiveSyncEvidence.remotePullRequestHeadMatchesCurrentHead, true);
+  assert.equal(githubLiveSyncEvidence.livePrHeadShaMatchesCurrentHead, true);
   assert.equal(githubLiveSyncEvidence.livePrOpen, true);
   assert.equal(githubLiveSyncEvidence.liveIssueOpen, true);
   assert.equal(githubLiveSyncEvidence.livePrHeadMatches, true);
   assert.equal(githubLiveSyncEvidence.prBodyMatches, true);
   assert.equal(githubLiveSyncEvidence.issueBodyMatches, true);
+  assert.equal(liveGithubSync.localHead, currentHead);
+  assert.equal(liveGithubSync.remoteBranchHeadMatchesCurrentHead, true);
+  assert.equal(liveGithubSync.remotePullRequestHeadMatchesCurrentHead, true);
+  assert.equal(liveGithubSync.livePrHeadShaMatchesCurrentHead, true);
+  assert.equal(liveGithubSync.prBodyMatches, true);
+  assert.equal(liveGithubSync.issueBodyMatches, true);
   assert.match(githubLiveSyncMarkdown, /GitHub Live Sync Current Head/);
+  assert.match(githubLiveSyncMarkdown, /Remote PR head matches local head: true/);
   assert.match(githubLiveSyncMarkdown, /PR body matches checked-in draft: true/);
   assert.match(councilStatusMarkdown, /DeepSeek final-gate review: CLEAN/);
+  assert.match(councilStatusMarkdown, /Review run matches reviewed implementation head: true/);
+  assert.match(councilStatusMarkdown, /Post-review changes are public evidence only: true/);
   assert.match(councilStatusMarkdown, /GitHub live sync: passed/);
   assert.match(councilStatusMarkdown, /not production complete/i);
-  for (const value of [targetLockFresh, providerRegistryFresh, targetLockEvidence, providerRegistryEvidence, githubLiveSyncEvidence, councilStatus]) {
+  for (const value of [targetLockFresh, providerRegistryFresh, targetLockEvidence, providerRegistryEvidence, githubLiveSyncEvidence, liveGithubSync, councilStatus]) {
     const text = JSON.stringify(value);
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
@@ -11310,6 +11339,10 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "tests/nucleus/nucleus-snapshot.test.ts" ||
     file === "plugins/selfmem-fallback/scripts/selfmem_update.py"
   );
+}
+
+function isCouncilPostReviewEvidencePath(file) {
+  return file.startsWith("reviews/");
 }
 
 async function listFiles(directory) {

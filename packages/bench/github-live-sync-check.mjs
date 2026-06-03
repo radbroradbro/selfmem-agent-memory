@@ -7,6 +7,8 @@ import { readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
+const args = parseArgs(process.argv.slice(2));
+const format = String(args.format ?? "json");
 const reviewDir = process.env.RECALLWEAVE_REVIEW_DIR ?? (await latestReviewDir());
 const repository = "radbroradbro/selfmem-agent-memory";
 const pullRequest = 5;
@@ -51,6 +53,15 @@ const issueBodyMatches = liveIssueBody === expectedIssueBody;
 const livePrHeadMatches = prResponse.head?.ref === expectedHeadRef;
 const livePrOpen = prResponse.state === "open";
 const liveIssueOpen = issueResponse.state === "open";
+const localHead = gitStdout(["rev-parse", "HEAD"]);
+const localBranch = gitStdout(["rev-parse", "--abbrev-ref", "HEAD"]);
+const remoteBranchHead = gitRemoteHead(`refs/heads/${expectedHeadRef}`);
+const remotePullRequestHead = gitRemoteHead(`refs/pull/${pullRequest}/head`);
+const remotePullRequestMergeRef = gitRemoteHead(`refs/pull/${pullRequest}/merge`);
+const livePrHeadSha = String(prResponse.head?.sha ?? "");
+const remoteBranchHeadMatchesCurrentHead = remoteBranchHead === localHead;
+const remotePullRequestHeadMatchesCurrentHead = remotePullRequestHead === localHead;
+const livePrHeadShaMatchesCurrentHead = livePrHeadSha === localHead;
 
 assert.equal(prBodyMatches, true, "live PR body differs from checked-in draft");
 assert.equal(issueTitleMatches, true, "live issue title differs from checked-in draft");
@@ -58,6 +69,10 @@ assert.equal(issueBodyMatches, true, "live issue body differs from checked-in dr
 assert.equal(livePrHeadMatches, true, "live PR head ref differs from expected release branch");
 assert.equal(livePrOpen, true, "PR must remain open for release gating");
 assert.equal(liveIssueOpen, true, "blocker issue must remain open for release gating");
+assert.equal(localBranch, expectedHeadRef, "local branch differs from expected release branch");
+assert.equal(remoteBranchHeadMatchesCurrentHead, true, "remote branch head differs from local current HEAD");
+assert.equal(remotePullRequestHeadMatchesCurrentHead, true, "remote PR head differs from local current HEAD");
+assert.equal(livePrHeadShaMatchesCurrentHead, true, "GitHub API PR head sha differs from local current HEAD");
 
 const report = {
   ok: true,
@@ -68,10 +83,19 @@ const report = {
   pullRequest,
   issueNumber,
   reviewDir,
+  localHead,
+  localBranch,
   livePrOpen,
   liveIssueOpen,
   livePrHeadMatches,
+  livePrHeadSha,
   expectedHeadRef,
+  remoteBranchHead,
+  remotePullRequestHead,
+  remotePullRequestMergeRef,
+  remoteBranchHeadMatchesCurrentHead,
+  remotePullRequestHeadMatchesCurrentHead,
+  livePrHeadShaMatchesCurrentHead,
   prBodyMatches,
   issueTitleMatches,
   issueBodyMatches,
@@ -95,7 +119,12 @@ const serialized = JSON.stringify(report, null, 2);
 assert.doesNotMatch(serialized, secretPattern);
 assert.doesNotMatch(serialized, privatePathPattern);
 
-console.log(serialized);
+if (format === "markdown") {
+  console.log(markdownReport(report));
+} else {
+  assert.equal(format, "json", "format must be json or markdown");
+  console.log(serialized);
+}
 
 async function githubJson(apiPath) {
   const authHeader = gitCredentialAuthHeader();
@@ -137,6 +166,28 @@ function gitCredentialAuthHeader() {
   return token ? `Bearer ${token}` : null;
 }
 
+function gitStdout(args) {
+  const result = spawnSync("git", args, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `git ${args.join(" ")} failed\n${result.stderr}`);
+  return result.stdout.trim();
+}
+
+function gitRemoteHead(ref) {
+  const result = spawnSync("git", ["ls-remote", "origin", ref], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  assert.equal(result.status, 0, `git ls-remote origin ${ref} failed\n${result.stderr}`);
+  const sha = result.stdout.trim().split(/\s+/)[0] ?? "";
+  assert.match(sha, /^[a-f0-9]{40}$/, `missing remote sha for ${ref}`);
+  return sha;
+}
+
 function extractFencedMarkdown(text) {
   const match = text.match(/```markdown\n([\s\S]*?)\n```/);
   assert.ok(match, "PR body draft must contain a fenced markdown body");
@@ -169,6 +220,54 @@ function positiveInt(value, label) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
   assert.ok(Number.isInteger(parsed) && parsed > 0, `${label} must be a positive integer`);
   return parsed;
+}
+
+function parseArgs(argv) {
+  const parsed = {};
+  for (let index = 0; index < argv.length; index += 1) {
+    const item = argv[index];
+    if (!item.startsWith("--")) continue;
+    const key = item.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+    const next = argv[index + 1];
+    if (!next || next.startsWith("--")) parsed[key] = true;
+    else {
+      parsed[key] = next;
+      index += 1;
+    }
+  }
+  return parsed;
+}
+
+function markdownReport(report) {
+  return `# GitHub Live Sync Current Head
+
+- Repository: \`${report.repository}\`
+- Pull request: #${report.pullRequest}
+- Issue: #${report.issueNumber}
+- Local branch: \`${report.localBranch}\`
+- Local head at evidence capture: \`${report.localHead}\`
+- PR open: ${report.livePrOpen}
+- Issue open: ${report.liveIssueOpen}
+- PR head branch matches expected: ${report.livePrHeadMatches}
+- Remote branch head matches local head: ${report.remoteBranchHeadMatchesCurrentHead}
+- Remote PR head matches local head: ${report.remotePullRequestHeadMatchesCurrentHead}
+- GitHub API PR head SHA matches local head: ${report.livePrHeadShaMatchesCurrentHead}
+- PR body matches checked-in draft: ${report.prBodyMatches}
+- Issue title matches checked-in draft: ${report.issueTitleMatches}
+- Issue body matches checked-in draft: ${report.issueBodyMatches}
+- Branch head at evidence capture: \`${report.remoteBranchHead}\`
+- PR head at evidence capture: \`${report.remotePullRequestHead}\`
+- PR merge ref at evidence capture: \`${report.remotePullRequestMergeRef}\`
+- Live PR updated at: ${report.liveUpdatedAt.pullRequest}
+- Live issue updated at: ${report.liveUpdatedAt.issue}
+
+## Safety
+
+- The checker prints hashes and booleans only; it does not print PR body text, issue body text, credentials, raw memories, or benchmark text.
+- PR body hash: \`${report.prBodyHash}\`
+- Issue title hash: \`${report.issueTitleHash}\`
+- Issue body hash: \`${report.issueBodyHash}\`
+`;
 }
 
 async function latestReviewDir() {

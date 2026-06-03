@@ -86,6 +86,7 @@
       "packages/bench/fixtures/public-benchmark-target.fixture.json",
       "packages/bench/github-handoff-packet.mjs",
       "packages/bench/github-live-sync-check.mjs",
+      "packages/bench/current-head-pr-council-status.mjs",
       "packages/bench/goal-completion-audit.mjs",
       "packages/bench/hosted-baseline-local-mirror.mjs",
       "packages/bench/hosted-baseline-next-run.mjs",
