@@ -1,7 +1,7 @@
 # Current-Head PR and Council Status
 
 - Branch: `feat/nucleus-wiki-native-contract`
-- Head at evidence capture: `37b5bf60cb28848b4272a7492735666c3054ecd5`
+- Head at evidence capture: `2e9bbd5ec15c94935520f6e92093d5ea7aaed462`
 - Reviewed implementation head: `37b5bf60cb28848b4272a7492735666c3054ecd5`
 - Current head safe after review: true
 - Base: `origin/main` at `f4981733a39cf9f09f3f87cac04e9b76a896e38b`
@@ -14,13 +14,13 @@
 - Routed reviewer: anthropic using `claude-opus-4-7`; cross-vendor: true
 - Review run matches reviewed implementation head: true
 - Post-review changes are public evidence only: true
-- Post-review changed files: 0
+- Post-review changed files: 2
 - Post-review non-evidence files: 0
 - Claude review: blocked because the local Claude CLI budget cap was exceeded before output.
 - Dry-run final packet: generated successfully but does not count as external approval.
 - GitHub live sync: passed. PR #5 is open, issue #6 is open, the PR head branch matches `feat/nucleus-wiki-native-contract`, and live PR/issue text matches the checked-in public-safe drafts.
-- Remote PR head at evidence capture: `0946bd441b8d1d3a8895c9396a3c79ffbac57e9d`.
-- Remote branch head at evidence capture: `0946bd441b8d1d3a8895c9396a3c79ffbac57e9d`.
+- Remote PR head at evidence capture: `2e9bbd5ec15c94935520f6e92093d5ea7aaed462`.
+- Remote branch head at evidence capture: `2e9bbd5ec15c94935520f6e92093d5ea7aaed462`.
 
 ## Checks
 
