@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-01T14:10:00.000Z",
+  "generatedAt": "2026-06-03T01:04:21.206Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,12 +10,14 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "161d357c3aa9888749d5cde09500a71be2971d75",
-  "headAtEvidenceCapture": "161d357c3aa9888749d5cde09500a71be2971d75",
+  "head": "6366f335d9834170a89aaf62433553367c3e1e2c",
+  "headAtEvidenceCapture": "6366f335d9834170a89aaf62433553367c3e1e2c",
+  "reviewedCodeHead": "6366f335d9834170a89aaf62433553367c3e1e2c",
+  "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
   "gateDetection": {
-    "changedFileCount": 1363,
+    "changedFileCount": 1447,
     "requiredGates": [
       "security",
       "architecture",
@@ -24,61 +26,30 @@
       "integration",
       "final"
     ],
-    "headRef": "161d357"
+    "headRef": "6366f33"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "deepseekFinalGateVerdict": "CLEAN",
-    "deepseekReviewerVendor": "deepseek",
-    "deepseekReviewerModel": "deepseek-v4-pro",
-    "deepseekConfidence": "high",
-    "normalChecks": [
-      {
-        "name": "git status",
-        "status": "pass",
-        "summary": "passed"
-      },
-      {
-        "name": "lint",
-        "status": "not_applicable",
-        "summary": "script absent"
-      },
-      {
-        "name": "typecheck",
-        "status": "pass",
-        "summary": "passed"
-      },
-      {
-        "name": "unit tests",
-        "status": "pass",
-        "summary": "passed"
-      },
-      {
-        "name": "build",
-        "status": "pass",
-        "summary": "passed"
-      },
-      {
-        "name": "ruff",
-        "status": "not_applicable",
-        "summary": "tool absent"
-      },
-      {
-        "name": "pyright",
-        "status": "not_applicable",
-        "summary": "tool absent"
-      },
-      {
-        "name": "mypy",
-        "status": "not_applicable",
-        "summary": "tool absent"
-      },
-      {
-        "name": "python tests",
-        "status": "not_applicable",
-        "summary": "no Python test files detected"
-      }
-    ],
+    "reviewRunId": "20260603T010343Z-final-council-6366f33",
+    "reviewCreatedAt": "2026-06-03T01:04:08.197005Z",
+    "reviewHeadRef": "6366f33",
+    "reviewedCodeHeadMatchesReviewRun": true,
+    "reviewFreshForReviewedCodeHead": true,
+    "finalGateVerdict": "CLEAN",
+    "finalGateReviewerVendor": "council",
+    "finalGateReviewerModel": "anthropic:claude-opus-4-7+personas",
+    "finalGateConfidence": "medium",
+    "routedReviewerVendor": "anthropic",
+    "routedReviewerModel": "claude-opus-4-7",
+    "implementerVendor": "openai",
+    "implementerModel": "gpt-5.5",
+    "reviewerCrossVendor": true,
+    "deepseekFinalGateVerdict": "not-routed-this-run",
+    "deepseekReviewerVendor": "",
+    "deepseekReviewerModel": "",
+    "deepseekConfidence": "",
+    "normalChecks": [],
+    "requiredCheckFailures": [],
     "claudeReviewStatus": "blocked-budget-cap-exceeded-before-output",
     "ghCliStatus": "unavailable-in-local-shell-but-github-api-live-sync-passed",
     "githubLiveSyncStatus": "pass",
@@ -92,16 +63,26 @@
     "issueTitleMatchesDraft": true,
     "issueBodyMatchesDraft": true,
     "liveUpdatedAt": {
-      "pullRequest": "2026-06-01T13:54:16Z",
-      "issue": "2026-05-26T06:38:57Z"
+      "pullRequest": "2026-06-03T01:03:32Z",
+      "issue": "2026-06-01T20:31:49Z"
     },
-    "remoteBranchHead": "161d357c3aa9888749d5cde09500a71be2971d75",
-    "remotePullRequestHead": "161d357c3aa9888749d5cde09500a71be2971d75",
-    "remotePullRequestMergeRef": "648962ac96e8a41ec971c2698a09ec5247bde1d3"
+    "remoteBranchHead": "6366f335d9834170a89aaf62433553367c3e1e2c",
+    "remotePullRequestHead": "6366f335d9834170a89aaf62433553367c3e1e2c",
+    "remotePullRequestMergeRef": "6bea06698d3c17bd4f6e9695e728ac7466a8bd50",
+    "remoteBranchHeadMatchesCurrentHead": true,
+    "remotePullRequestHeadMatchesCurrentHead": true
+  },
+  "postReviewChangePolicy": {
+    "onlyPublicEvidenceSinceReviewedCodeHead": true,
+    "publicEvidencePathRule": "reviews/** only",
+    "changedFileCountSinceReviewedCodeHead": 0,
+    "nonEvidenceFileCountSinceReviewedCodeHead": 0,
+    "changedFilesSinceReviewedCodeHead": [],
+    "nonEvidenceFilesSinceReviewedCodeHead": []
   },
   "evidence": {
-    "brainUiEvidence": "reviews/overnight-20260522/ui-evidence/brain-ui-20260601-current-head-browser-evidence.json",
-    "brainUiGitHead": "5e55cb8b7231be4c43e7ba514c76a03722546304",
+    "brainUiEvidence": "reviews/overnight-20260522/ui-evidence/brain-ui-20260603-browser-evidence.json",
+    "brainUiGitHead": "bef6143935853eb01f48b04f1f65b774fa3ed6a1",
     "targetLock": "reviews/overnight-20260522/benchmark-target-lock-20260601.json",
     "targetLockStatus": "READY_BENCHMARK_TARGET_LOCK",
     "providerAdapterRegistry": "reviews/overnight-20260522/provider-adapter-registry-20260601.json",
@@ -114,19 +95,18 @@
   "claimBoundary": {
     "currentStatus": "not-production-complete",
     "releaseVerdict": "hold-for-full-run-or-owner-approved-personal-canary",
-    "mayClaim": "the evidence-capture head was live on PR #5, PR #5 and issue #6 matched checked-in public-safe drafts at capture time, and the branch has public-safe UI evidence, target lock, provider registry, paired 75Q method evidence, release gate alignment, and one successful DeepSeek final-gate review",
+    "mayClaim": "the reviewed implementation head has a fresh cross-vendor final-gate council review, any later commits are public evidence only, PR #5 and issue #6 matched checked-in public-safe drafts at capture time, and the branch keeps BM25 as floor/control instead of a research destination",
     "mayNotClaim": [
       "RecallWeave beats Supermemory",
       "RecallWeave is SOTA",
       "dry-run review packet is external approval",
-      "PR merge/public launch is complete"
+      "PR merge/public launch is complete",
+      "stale council evidence applies to later substantive code changes"
     ]
   },
   "nextActions": [
-    "Run release:check after this refreshed GitHub live-sync evidence lands.",
-    "Use contextual-source-chunk-v1 plus bm25-lite as the next larger-slice challenger, not as a public default claim.",
-    "Run provider canaries on the same materializer only, with BM25 retained as control.",
-    "Add or run failure-taxonomy and cost-latency-quota reports before provider-arm promotion.",
-    "Keep PR #5 and issue #6 open until full-run evidence or explicit owner-approved personal-canary scope supports merge."
+    "Keep current-head checks live in release:check so future code commits invalidate stale council evidence.",
+    "Use BM25 as the floor/control while improving hybrid/rerank/chunking/context policy on same-data whole-harness runs.",
+    "Keep the Codex memory dogfood monitor running for noise, usefulness, retrieval breadth, and explicit write/direct lookup behavior."
   ]
 }
