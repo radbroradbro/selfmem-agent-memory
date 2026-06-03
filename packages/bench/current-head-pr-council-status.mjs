@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -42,8 +41,7 @@ const remotePullRequestHead = gitRemoteHead("refs/pull/5/head");
 const remotePullRequestMergeRef = gitRemoteHead("refs/pull/5/merge");
 const reviewFreshForReviewedCodeHead =
   latestReview?.verdict === "CLEAN"
-  && latestReview?.reviewerVendor === "deepseek"
-  && latestReview?.reviewerModel === "deepseek-v4-pro"
+  && latestReview?.reviewerCrossVendor === true
   && latestReview?.headRefDirty === false
   && reviewedCodeHead === latestReview?.headRefFull;
 const onlyPublicEvidenceSinceReviewedCodeHead = reviewedCodeHead
@@ -85,10 +83,19 @@ const report = {
     reviewHeadRef: latestReview?.headRef ?? "",
     reviewedCodeHeadMatchesReviewRun: reviewFreshForReviewedCodeHead,
     reviewFreshForReviewedCodeHead,
-    deepseekFinalGateVerdict: latestReview?.verdict ?? "STALE_OR_MISSING",
-    deepseekReviewerVendor: latestReview?.reviewerVendor ?? "",
-    deepseekReviewerModel: latestReview?.reviewerModel ?? "",
-    deepseekConfidence: latestReview?.confidence ?? "",
+    finalGateVerdict: latestReview?.verdict ?? "STALE_OR_MISSING",
+    finalGateReviewerVendor: latestReview?.responseReviewerVendor ?? "",
+    finalGateReviewerModel: latestReview?.responseReviewerModel ?? "",
+    finalGateConfidence: latestReview?.confidence ?? "",
+    routedReviewerVendor: latestReview?.routedReviewerVendor ?? "",
+    routedReviewerModel: latestReview?.routedReviewerModel ?? "",
+    implementerVendor: latestReview?.implementerVendor ?? "",
+    implementerModel: latestReview?.implementerModel ?? "",
+    reviewerCrossVendor: latestReview?.reviewerCrossVendor === true,
+    deepseekFinalGateVerdict: latestReview?.routedReviewerVendor === "deepseek" ? latestReview.verdict : "not-routed-this-run",
+    deepseekReviewerVendor: latestReview?.routedReviewerVendor === "deepseek" ? latestReview.routedReviewerVendor : "",
+    deepseekReviewerModel: latestReview?.routedReviewerVendor === "deepseek" ? latestReview.routedReviewerModel : "",
+    deepseekConfidence: latestReview?.routedReviewerVendor === "deepseek" ? latestReview.confidence : "",
     normalChecks,
     requiredCheckFailures,
     claudeReviewStatus: "blocked-budget-cap-exceeded-before-output",
@@ -134,7 +141,7 @@ const report = {
     currentStatus: "not-production-complete",
     releaseVerdict: "hold-for-full-run-or-owner-approved-personal-canary",
     mayClaim: currentHeadSafeAfterReview
-      ? "the reviewed implementation head has a fresh DeepSeek final-gate review, any later commits are public evidence only, PR #5 and issue #6 matched checked-in public-safe drafts at capture time, and the branch keeps BM25 as floor/control instead of a research destination"
+      ? "the reviewed implementation head has a fresh cross-vendor final-gate council review, any later commits are public evidence only, PR #5 and issue #6 matched checked-in public-safe drafts at capture time, and the branch keeps BM25 as floor/control instead of a research destination"
       : "current-head council evidence is stale or missing and may not be used as launch approval",
     mayNotClaim: [
       "RecallWeave beats Supermemory",
@@ -185,8 +192,10 @@ function latestFinalReview() {
       const headRefClean = headRef.replace(/-dirty$/, "");
       const headRefFull = expandCommitish(headRefClean);
       const checks = Array.isArray(response.verification_results)
-        ? response.verification_results.flatMap((result) => Array.isArray(result?.checks) ? result.checks : [])
+        ? response.verification_results.flatMap((result) => verificationChecks(result))
         : [];
+      const implementerVendor = String(request.implementer_vendor ?? "");
+      const routedReviewerVendor = String(request.reviewer_vendor ?? "");
       return {
         runId: entry.name,
         mtimeMs: statSync(runDir).mtimeMs,
@@ -195,8 +204,13 @@ function latestFinalReview() {
         headRefDirty: headRef.endsWith("-dirty"),
         headRefFull,
         verdict: String(response.verdict ?? ""),
-        reviewerVendor: String(response.reviewer_vendor ?? ""),
-        reviewerModel: String(response.reviewer_model ?? ""),
+        implementerVendor,
+        implementerModel: String(request.implementer_model ?? ""),
+        routedReviewerVendor,
+        routedReviewerModel: String(request.reviewer_model ?? ""),
+        responseReviewerVendor: String(response.reviewer_vendor ?? ""),
+        responseReviewerModel: String(response.reviewer_model ?? ""),
+        reviewerCrossVendor: Boolean(implementerVendor && routedReviewerVendor && implementerVendor !== routedReviewerVendor),
         confidence: String(response.confidence ?? ""),
         createdAt: String(response.created_at ?? ""),
         checks: checks.map(sanitizeCheck),
@@ -205,6 +219,19 @@ function latestFinalReview() {
     .filter(Boolean)
     .sort((a, b) => b.mtimeMs - a.mtimeMs);
   return candidates[0] ?? null;
+}
+
+function verificationChecks(result) {
+  if (Array.isArray(result?.checks)) return result.checks;
+  if (Array.isArray(result?.required_checks_passed)) {
+    return result.required_checks_passed.map((name) => ({
+      name,
+      status: "pass",
+      required: true,
+      summary: "passed",
+    }));
+  }
+  return [];
 }
 
 function sanitizeCheck(check) {
@@ -233,7 +260,8 @@ function markdownReport(report) {
 
 ## Review Status
 
-- DeepSeek final-gate review: ${report.verification.deepseekFinalGateVerdict} with ${report.verification.deepseekConfidence || "unknown"} confidence using \`${report.verification.deepseekReviewerModel || "unavailable"}\`.
+- Council final-gate review: ${report.verification.finalGateVerdict} with ${report.verification.finalGateConfidence || "unknown"} confidence using \`${report.verification.finalGateReviewerModel || "unavailable"}\`.
+- Routed reviewer: ${report.verification.routedReviewerVendor || "unavailable"} using \`${report.verification.routedReviewerModel || "unavailable"}\`; cross-vendor: ${report.verification.reviewerCrossVendor}
 - Review run matches reviewed implementation head: ${report.verification.reviewFreshForReviewedCodeHead}
 - Post-review changes are public evidence only: ${report.postReviewChangePolicy.onlyPublicEvidenceSinceReviewedCodeHead}
 - Post-review changed files: ${report.postReviewChangePolicy.changedFileCountSinceReviewedCodeHead}

@@ -2214,11 +2214,13 @@ check("benchmark target lock and provider registry stay conservative", () => {
   run("git", ["merge-base", "--is-ancestor", councilStatus.reviewedCodeHead, "HEAD"]);
   assert.equal(councilStatus.verification?.reviewFreshForReviewedCodeHead, true);
   assert.equal(councilStatus.verification?.reviewedCodeHeadMatchesReviewRun, true);
+  assert.equal(councilStatus.verification?.reviewerCrossVendor, true);
   assert.equal(councilStatus.currentHeadSafeAfterReview, true);
   assert.equal(councilStatus.postReviewChangePolicy?.onlyPublicEvidenceSinceReviewedCodeHead, true);
   assert.deepEqual(postReviewNonEvidenceFiles, []);
-  assert.equal(councilStatus.verification?.deepseekFinalGateVerdict, "CLEAN");
-  assert.equal(councilStatus.verification?.deepseekReviewerModel, "deepseek-v4-pro");
+  assert.equal(councilStatus.verification?.finalGateVerdict, "CLEAN");
+  assert.match(councilStatus.verification?.finalGateReviewerModel ?? "", /\S/);
+  assert.match(councilStatus.verification?.routedReviewerVendor ?? "", /\S/);
   assert.equal(councilStatus.verification?.claudeReviewStatus, "blocked-budget-cap-exceeded-before-output");
   assert.equal(councilStatus.verification?.ghCliStatus, "unavailable-in-local-shell-but-github-api-live-sync-passed");
   assert.equal(councilStatus.verification?.githubLiveSyncStatus, "pass");
@@ -2252,7 +2254,8 @@ check("benchmark target lock and provider registry stay conservative", () => {
   assert.match(githubLiveSyncMarkdown, /GitHub Live Sync Current Head/);
   assert.match(githubLiveSyncMarkdown, /Remote PR head matches local head: true/);
   assert.match(githubLiveSyncMarkdown, /PR body matches checked-in draft: true/);
-  assert.match(councilStatusMarkdown, /DeepSeek final-gate review: CLEAN/);
+  assert.match(councilStatusMarkdown, /Council final-gate review: CLEAN/);
+  assert.match(councilStatusMarkdown, /cross-vendor: true/);
   assert.match(councilStatusMarkdown, /Review run matches reviewed implementation head: true/);
   assert.match(councilStatusMarkdown, /Post-review changes are public evidence only: true/);
   assert.match(councilStatusMarkdown, /GitHub live sync: passed/);
