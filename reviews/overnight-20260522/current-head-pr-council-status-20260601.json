@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T11:11:59.611Z",
+  "generatedAt": "2026-06-03T13:04:23.040Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,14 +10,14 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "2e9bbd5ec15c94935520f6e92093d5ea7aaed462",
-  "headAtEvidenceCapture": "2e9bbd5ec15c94935520f6e92093d5ea7aaed462",
-  "reviewedCodeHead": "37b5bf60cb28848b4272a7492735666c3054ecd5",
+  "head": "1a8f94e4a8f9011ad1bc0fc115ec4dc8d98af45f",
+  "headAtEvidenceCapture": "1a8f94e4a8f9011ad1bc0fc115ec4dc8d98af45f",
+  "reviewedCodeHead": "1a8f94e4a8f9011ad1bc0fc115ec4dc8d98af45f",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
   "gateDetection": {
-    "changedFileCount": 1454,
+    "changedFileCount": 1506,
     "requiredGates": [
       "security",
       "architecture",
@@ -26,19 +26,19 @@
       "integration",
       "final"
     ],
-    "headRef": "2e9bbd5"
+    "headRef": "1a8f94e"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T110922Z-final-council-37b5bf6",
-    "reviewCreatedAt": "2026-06-03T11:09:39.885556Z",
-    "reviewHeadRef": "37b5bf6",
+    "reviewRunId": "20260603T130346Z-final-council-1a8f94e",
+    "reviewCreatedAt": "2026-06-03T13:04:04.492511Z",
+    "reviewHeadRef": "1a8f94e",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
     "finalGateReviewerVendor": "council",
     "finalGateReviewerModel": "anthropic:claude-opus-4-7+personas",
-    "finalGateConfidence": "high",
+    "finalGateConfidence": "medium",
     "routedReviewerVendor": "anthropic",
     "routedReviewerModel": "claude-opus-4-7",
     "implementerVendor": "openai",
@@ -66,21 +66,18 @@
       "pullRequest": "2026-06-03T11:11:36Z",
       "issue": "2026-06-03T11:05:19Z"
     },
-    "remoteBranchHead": "2e9bbd5ec15c94935520f6e92093d5ea7aaed462",
-    "remotePullRequestHead": "2e9bbd5ec15c94935520f6e92093d5ea7aaed462",
-    "remotePullRequestMergeRef": "ab17c93e647b73623e4fa0b9423af2edfcd868e1",
+    "remoteBranchHead": "1a8f94e4a8f9011ad1bc0fc115ec4dc8d98af45f",
+    "remotePullRequestHead": "1a8f94e4a8f9011ad1bc0fc115ec4dc8d98af45f",
+    "remotePullRequestMergeRef": "44accaabbfb00683fd439ea891a8b923c5d06880",
     "remoteBranchHeadMatchesCurrentHead": true,
     "remotePullRequestHeadMatchesCurrentHead": true
   },
   "postReviewChangePolicy": {
     "onlyPublicEvidenceSinceReviewedCodeHead": true,
     "publicEvidencePathRule": "reviews/** only",
-    "changedFileCountSinceReviewedCodeHead": 2,
+    "changedFileCountSinceReviewedCodeHead": 0,
     "nonEvidenceFileCountSinceReviewedCodeHead": 0,
-    "changedFilesSinceReviewedCodeHead": [
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.json",
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.md"
-    ],
+    "changedFilesSinceReviewedCodeHead": [],
     "nonEvidenceFilesSinceReviewedCodeHead": []
   },
   "evidence": {
