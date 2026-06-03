@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "mode": "public-benchmark-answer-quality-preflight",
+  "status": "READY_FOR_LIVE_ANSWER_QUALITY",
+  "claimScope": "model-challenger",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "callsProviderApis": false,
+  "sendsBenchmarkTextToProvider": false,
+  "rawQuestionIdsIncluded": false,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "printsCredentials": false,
+  "generatedAt": "2026-06-03T11:31:10.462Z",
+  "target": {
+    "path": "reviews/overnight-20260522/public-longmemeval-full-run-target.json",
+    "hash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+    "fixtureOnly": false,
+    "benchmark": "longmemeval",
+    "claimTier": "run-only",
+    "answerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+    "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+    "answerModel": "gpt-4o",
+    "judgeModel": "gpt-4o"
+  },
+  "consent": {
+    "answerQualityCallsEnabled": true,
+    "publicDataConfirmed": true,
+    "noRawTextOutputConfirmed": true
+  },
+  "endpoint": {
+    "baseUrlPresent": true,
+    "endpointIsLocal": false,
+    "apiKeyPresent": true,
+    "valuePrinted": false
+  },
+  "models": {
+    "answerModelPresent": true,
+    "judgeModelPresent": true,
+    "answerModelMatchesTarget": false,
+    "judgeModelMatchesTarget": false,
+    "valuesPrinted": false
+  },
+  "scoringPolicy": {
+    "claimScope": "model-challenger",
+    "modelMatchPolicy": "challenger-model-allowed",
+    "exactTargetModelsRequired": false,
+    "localDiagnosticModelAllowed": false,
+    "challengerModelAllowed": true,
+    "localDiagnosticEndpointRequired": false,
+    "localDiagnosticEndpointSatisfied": false,
+    "modelMismatchAllowed": true,
+    "scoringModelPolicySatisfied": true,
+    "countsAsFullMemorySotaEvidence": false,
+    "countsAsLocalFullBenchmarkEvidence": false,
+    "countsAsModelChallengerBenchmarkEvidence": true
+  },
+  "privateInputs": {
+    "querySet": {
+      "role": "queryset",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-queryset.private.json",
+      "hash": "sha256:aa2a57379b706a61f7fe86e75a060a6e7347be4726589a96d5d18bdb1a4e51ac",
+      "querySetHash": "sha256:5976d43baf5e89376aa498ba00eda130a0b7c0c14e97bd8445d365b93486e318",
+      "queryCount": 500,
+      "localQueryCount": 25,
+      "selectedQueryCount": 25,
+      "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+      "answerLabelsHash": "sha256:f83c98d1c58cd0000466fd54a27248fb49571dd93bf33035ee0a3e7f09668d63",
+      "targetAnswerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "materializationShard": {
+        "applied": true,
+        "startIndex": 0,
+        "endIndexExclusive": 25,
+        "totalQueryCount": 500,
+        "selectedCount": 25,
+        "requestedLimit": 25,
+        "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+        "selectedQuestionIdsHash": "sha256:09e4c855b49d4f6c66782084d740a170989f559c54d115765e4939ceb2d6755a"
+      },
+      "matchesTarget": true
+    },
+    "memories": {
+      "role": "memories",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-memories.private.jsonl",
+      "hash": "sha256:60b92291f4dc426b9c9dc65fccdfd6aeb6fea21df0219b5eb33e71929df371a2",
+      "lineCount": 8707
+    },
+    "answerLabels": {
+      "role": "answer-labels",
+      "present": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "longmemeval-answer-labels.private.json",
+      "hash": "sha256:b23fa5efe23e2ef161e10830acf77d5105e6a9095e43bbe1b6f125213312d57f",
+      "labelCount": 500,
+      "localLabelCount": 25,
+      "answerLabelsHash": "sha256:f83c98d1c58cd0000466fd54a27248fb49571dd93bf33035ee0a3e7f09668d63",
+      "targetAnswerLabelsHash": "sha256:50a91736969984d01a67dfc20daf3f1e62ecfcd658b8f5bafb2513f1e60b6388",
+      "scoringCodeHash": "sha256:f9d889e173f83b68e64d7221121f51bb3cf289bb921aacf36d95080d4b0a9518",
+      "materializationShard": {
+        "applied": true,
+        "startIndex": 0,
+        "endIndexExclusive": 25,
+        "totalQueryCount": 500,
+        "selectedCount": 25,
+        "requestedLimit": 25,
+        "targetHash": "sha256:dcdd33ca5a4ad3154dc3cf0da74c10fc96a1864e8f8b6ce154aff5386bdfc23e",
+        "selectedQuestionIdsHash": "sha256:09e4c855b49d4f6c66782084d740a170989f559c54d115765e4939ceb2d6755a"
+      },
+      "matchesTarget": true
+    }
+  },
+  "queryShard": {
+    "requested": true,
+    "startIndex": 0,
+    "endIndexExclusive": 25,
+    "totalQueryCount": 500,
+    "selectedQueryCount": 25,
+    "selectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472"
+  },
+  "arms": [
+    {
+      "strategy": "bm25-lite",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "bm25-lite-responses.private.json",
+      "hash": "sha256:0f29380d8db45d2bf9cf3f2e1fc3d37180a87297e34db1348d0028c1a622a14c",
+      "querySetHash": "sha256:5976d43baf5e89376aa498ba00eda130a0b7c0c14e97bd8445d365b93486e318",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 0,
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "full-hybrid-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "full-hybrid-rerank-responses.private.json",
+      "hash": "sha256:d8adedaeda31b5756be3e2dc562331361a34b3c65d3de466020eabec0ecc1101",
+      "querySetHash": "sha256:5976d43baf5e89376aa498ba00eda130a0b7c0c14e97bd8445d365b93486e318",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 0,
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "query-expanded-full-hybrid-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "query-expanded-full-hybrid-rerank-responses.private.json",
+      "hash": "sha256:9d17d8b082cf798b939410992709efd361b889b3439ce84077a43b49be92b632",
+      "querySetHash": "sha256:5976d43baf5e89376aa498ba00eda130a0b7c0c14e97bd8445d365b93486e318",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 0,
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "cloud-gemini2-embed-rerank-proxy",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "cloud-gemini2-embed-rerank-proxy-responses.private.json",
+      "hash": "sha256:e2091a0751511fdb7b3728c2ac0951d61fdbd3e9f64c39c6c17195937460d191",
+      "querySetHash": "sha256:5976d43baf5e89376aa498ba00eda130a0b7c0c14e97bd8445d365b93486e318",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 0,
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "cloud-voyage4-voyage-lite-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "cloud-voyage4-voyage-lite-rerank-responses.private.json",
+      "hash": "sha256:003b2a823592d97cbd6ce6fd3ef51c51aeeb20abdc218dd722d2497062cd8099",
+      "querySetHash": "sha256:5976d43baf5e89376aa498ba00eda130a0b7c0c14e97bd8445d365b93486e318",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 0,
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
+      }
+    },
+    {
+      "strategy": "cloud-nvidia-nv-embed-v1-mistral-rerank",
+      "present": true,
+      "parseable": true,
+      "rawTextPrivate": true,
+      "pathLabel": "external-input",
+      "name": "cloud-nvidia-nv-embed-v1-mistral-rerank-responses.private.json",
+      "hash": "sha256:fe54b369e106e622202c09940cf5ad1a24ddf140a5460e2c81c830f86fd83863",
+      "querySetHash": "sha256:5976d43baf5e89376aa498ba00eda130a0b7c0c14e97bd8445d365b93486e318",
+      "responseCount": 25,
+      "querySetMatches": true,
+      "selectedShardCoverage": {
+        "ready": true,
+        "expectedResponseCount": 25,
+        "responseCount": 25,
+        "missingSelectedCount": 0,
+        "extraResponseCount": 0,
+        "responseStartIndex": 0,
+        "responseEndIndexExclusive": 25,
+        "responseSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "expectedSelectedQueryIdHash": "sha256:60f0e92d1e889c0f664043750e1e30dbe6e52aa1d5bc10fe1006bf4f82869472",
+        "selectedQueryIdHashMatches": true
+      }
+    }
+  ],
+  "requiredStrategyCoverage": {
+    "hasBm25Lite": true,
+    "hasFullHybridRerank": true,
+    "hasChallenger": true
+  },
+  "readiness": {
+    "envReady": true,
+    "privateInputsReady": true,
+    "armsReady": true,
+    "responseArmsCoverSelectedShard": true,
+    "sameDataReady": true,
+    "liveAnswerQualityCanRun": true,
+    "readyForEndToEndMemoryScoreGate": true,
+    "countsAsFullMemorySotaEvidence": false
+  },
+  "blockers": [],
+  "nextActions": [
+    "Run benchmark:answer-quality with --live against the private materialized inputs and response arm exports.",
+    "Attach the metrics-only result to benchmark:memory-score:result-gate --require-ready.",
+    "Treat this as a stronger-model reported-score comparison lane, not strict same-model SOTA evidence."
+  ],
+  "liveCommandTemplate": [
+    "RECALLWEAVE_MEMORYBENCH_CLAIM_SCOPE=model-challenger",
+    "RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY=challenger-model-allowed",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1",
+    "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA=1",
+    "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT=1",
+    "RECALLWEAVE_MEMORYBENCH_BASE_URL=<openai-compatible-base-url>",
+    "RECALLWEAVE_MEMORYBENCH_API_KEY=<env-only-if-cloud-endpoint>",
+    "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model>",
+    "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL=<local-judge-model>",
+    "npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality -- --live --claim-scope model-challenger --target reviews/overnight-20260522/public-longmemeval-full-run-target.json --queryset <private-output-dir>/materialized/longmemeval-queryset.private.json --memories <private-output-dir>/materialized/longmemeval-memories.private.jsonl --answer-labels <private-output-dir>/materialized/longmemeval-answer-labels.private.json --max-queries 25 --arm bm25-lite=<private-output-dir>/bm25-lite-responses.private.json --arm full-hybrid-rerank=<private-output-dir>/full-hybrid-rerank-responses.private.json --arm <provider-or-local-arm>=<private-output-dir>/<provider-or-local-arm>-responses.private.json --output <public-answer-quality-output.json>"
+  ]
+}
