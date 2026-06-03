@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T02:46:44.018Z",
+  "generatedAt": "2026-06-03T04:57:28.808Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,9 +10,9 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "20547b4777e3bf4b4465928829f0a3f6500712af",
-  "headAtEvidenceCapture": "20547b4777e3bf4b4465928829f0a3f6500712af",
-  "reviewedCodeHead": "20547b4777e3bf4b4465928829f0a3f6500712af",
+  "head": "cb9317fd2c56890efd0eb669694d98148596913d",
+  "headAtEvidenceCapture": "cb9317fd2c56890efd0eb669694d98148596913d",
+  "reviewedCodeHead": "cb9317fd2c56890efd0eb669694d98148596913d",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
@@ -26,29 +26,84 @@
       "integration",
       "final"
     ],
-    "headRef": "20547b4"
+    "headRef": "cb9317f"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T024615Z-final-council-20547b4",
-    "reviewCreatedAt": "2026-06-03T02:46:28.374561Z",
-    "reviewHeadRef": "20547b4",
+    "reviewRunId": "20260603T045503Z-final-council-cb9317f",
+    "reviewCreatedAt": "2026-06-03T04:55:59.497831Z",
+    "reviewHeadRef": "cb9317f",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
     "finalGateReviewerVendor": "council",
-    "finalGateReviewerModel": "anthropic:claude-opus-4-7+personas",
+    "finalGateReviewerModel": "google:gemini-2.5-flash+personas",
     "finalGateConfidence": "high",
-    "routedReviewerVendor": "anthropic",
-    "routedReviewerModel": "claude-opus-4-7",
-    "implementerVendor": "openai",
-    "implementerModel": "gpt-5.5",
+    "routedReviewerVendor": "google",
+    "routedReviewerModel": "gemini-3.2-flash-preview",
+    "implementerVendor": "anthropic",
+    "implementerModel": "claude-opus-4-7",
     "reviewerCrossVendor": true,
     "deepseekFinalGateVerdict": "not-routed-this-run",
     "deepseekReviewerVendor": "",
     "deepseekReviewerModel": "",
     "deepseekConfidence": "",
-    "normalChecks": [],
+    "normalChecks": [
+      {
+        "name": "git status",
+        "status": "pass",
+        "required": true,
+        "summary": "passed"
+      },
+      {
+        "name": "lint",
+        "status": "not_applicable",
+        "required": false,
+        "summary": "script absent"
+      },
+      {
+        "name": "typecheck",
+        "status": "pass",
+        "required": true,
+        "summary": "passed"
+      },
+      {
+        "name": "unit tests",
+        "status": "pass",
+        "required": true,
+        "summary": "passed"
+      },
+      {
+        "name": "build",
+        "status": "pass",
+        "required": true,
+        "summary": "passed"
+      },
+      {
+        "name": "ruff",
+        "status": "not_applicable",
+        "required": false,
+        "summary": "tool absent"
+      },
+      {
+        "name": "pyright",
+        "status": "not_applicable",
+        "required": false,
+        "summary": "tool absent"
+      },
+      {
+        "name": "mypy",
+        "status": "not_applicable",
+        "required": false,
+        "summary": "tool absent"
+      },
+      {
+        "name": "python tests",
+        "status": "not_applicable",
+        "required": false,
+        "summary": "no Python test files detected"
+      }
+    ],
     "requiredCheckFailures": [],
     "claudeReviewStatus": "blocked-budget-cap-exceeded-before-output",
     "ghCliStatus": "unavailable-in-local-shell-but-github-api-live-sync-passed",
@@ -63,12 +118,12 @@
     "issueTitleMatchesDraft": true,
     "issueBodyMatchesDraft": true,
     "liveUpdatedAt": {
-      "pullRequest": "2026-06-03T02:34:26Z",
+      "pullRequest": "2026-06-03T04:57:19Z",
       "issue": "2026-06-01T20:31:49Z"
     },
-    "remoteBranchHead": "20547b4777e3bf4b4465928829f0a3f6500712af",
-    "remotePullRequestHead": "20547b4777e3bf4b4465928829f0a3f6500712af",
-    "remotePullRequestMergeRef": "17327ee4367df775abe357a20f3383e7dd851cca",
+    "remoteBranchHead": "cb9317fd2c56890efd0eb669694d98148596913d",
+    "remotePullRequestHead": "cb9317fd2c56890efd0eb669694d98148596913d",
+    "remotePullRequestMergeRef": "753295d036b0ad3d0a80da2cb5a4b2f792fef1e0",
     "remoteBranchHeadMatchesCurrentHead": true,
     "remotePullRequestHeadMatchesCurrentHead": true
   },

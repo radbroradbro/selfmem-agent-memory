@@ -1,8 +1,8 @@
 # Current-Head PR and Council Status
 
 - Branch: `feat/nucleus-wiki-native-contract`
-- Head at evidence capture: `20547b4777e3bf4b4465928829f0a3f6500712af`
-- Reviewed implementation head: `20547b4777e3bf4b4465928829f0a3f6500712af`
+- Head at evidence capture: `cb9317fd2c56890efd0eb669694d98148596913d`
+- Reviewed implementation head: `cb9317fd2c56890efd0eb669694d98148596913d`
 - Current head safe after review: true
 - Base: `origin/main` at `f4981733a39cf9f09f3f87cac04e9b76a896e38b`
 - Changed files since base: 1452
@@ -10,8 +10,8 @@
 
 ## Review Status
 
-- Council final-gate review: CLEAN with high confidence using `anthropic:claude-opus-4-7+personas`.
-- Routed reviewer: anthropic using `claude-opus-4-7`; cross-vendor: true
+- Council final-gate review: CLEAN with high confidence using `google:gemini-2.5-flash+personas`.
+- Routed reviewer: google using `gemini-3.2-flash-preview`; cross-vendor: true
 - Review run matches reviewed implementation head: true
 - Post-review changes are public evidence only: true
 - Post-review changed files: 0
@@ -19,12 +19,20 @@
 - Claude review: blocked because the local Claude CLI budget cap was exceeded before output.
 - Dry-run final packet: generated successfully but does not count as external approval.
 - GitHub live sync: passed. PR #5 is open, issue #6 is open, the PR head branch matches `feat/nucleus-wiki-native-contract`, and live PR/issue text matches the checked-in public-safe drafts.
-- Remote PR head at evidence capture: `20547b4777e3bf4b4465928829f0a3f6500712af`.
-- Remote branch head at evidence capture: `20547b4777e3bf4b4465928829f0a3f6500712af`.
+- Remote PR head at evidence capture: `cb9317fd2c56890efd0eb669694d98148596913d`.
+- Remote branch head at evidence capture: `cb9317fd2c56890efd0eb669694d98148596913d`.
 
 ## Checks
 
-
+- git status: pass (passed)
+- lint: not_applicable (script absent)
+- typecheck: pass (passed)
+- unit tests: pass (passed)
+- build: pass (passed)
+- ruff: not_applicable (tool absent)
+- pyright: not_applicable (tool absent)
+- mypy: not_applicable (tool absent)
+- python tests: not_applicable (no Python test files detected)
 
 ## Evidence Added
 
