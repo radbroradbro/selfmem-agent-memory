@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T02:34:36.975Z",
+  "generatedAt": "2026-06-03T02:46:44.018Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,9 +10,9 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "bcd7c353c52cca6ab178afe23ce71859de264d55",
-  "headAtEvidenceCapture": "bcd7c353c52cca6ab178afe23ce71859de264d55",
-  "reviewedCodeHead": "bcd7c353c52cca6ab178afe23ce71859de264d55",
+  "head": "20547b4777e3bf4b4465928829f0a3f6500712af",
+  "headAtEvidenceCapture": "20547b4777e3bf4b4465928829f0a3f6500712af",
+  "reviewedCodeHead": "20547b4777e3bf4b4465928829f0a3f6500712af",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
@@ -26,13 +26,13 @@
       "integration",
       "final"
     ],
-    "headRef": "bcd7c35"
+    "headRef": "20547b4"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T023358Z-final-council-bcd7c35",
-    "reviewCreatedAt": "2026-06-03T02:34:15.293465Z",
-    "reviewHeadRef": "bcd7c35",
+    "reviewRunId": "20260603T024615Z-final-council-20547b4",
+    "reviewCreatedAt": "2026-06-03T02:46:28.374561Z",
+    "reviewHeadRef": "20547b4",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
@@ -66,9 +66,9 @@
       "pullRequest": "2026-06-03T02:34:26Z",
       "issue": "2026-06-01T20:31:49Z"
     },
-    "remoteBranchHead": "bcd7c353c52cca6ab178afe23ce71859de264d55",
-    "remotePullRequestHead": "bcd7c353c52cca6ab178afe23ce71859de264d55",
-    "remotePullRequestMergeRef": "8b60463687eae5756f50f4555372329fc45fcb62",
+    "remoteBranchHead": "20547b4777e3bf4b4465928829f0a3f6500712af",
+    "remotePullRequestHead": "20547b4777e3bf4b4465928829f0a3f6500712af",
+    "remotePullRequestMergeRef": "17327ee4367df775abe357a20f3383e7dd851cca",
     "remoteBranchHeadMatchesCurrentHead": true,
     "remotePullRequestHeadMatchesCurrentHead": true
   },

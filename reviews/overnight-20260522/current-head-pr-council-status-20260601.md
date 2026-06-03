@@ -1,8 +1,8 @@
 # Current-Head PR and Council Status
 
 - Branch: `feat/nucleus-wiki-native-contract`
-- Head at evidence capture: `bcd7c353c52cca6ab178afe23ce71859de264d55`
-- Reviewed implementation head: `bcd7c353c52cca6ab178afe23ce71859de264d55`
+- Head at evidence capture: `20547b4777e3bf4b4465928829f0a3f6500712af`
+- Reviewed implementation head: `20547b4777e3bf4b4465928829f0a3f6500712af`
 - Current head safe after review: true
 - Base: `origin/main` at `f4981733a39cf9f09f3f87cac04e9b76a896e38b`
 - Changed files since base: 1452
@@ -19,8 +19,8 @@
 - Claude review: blocked because the local Claude CLI budget cap was exceeded before output.
 - Dry-run final packet: generated successfully but does not count as external approval.
 - GitHub live sync: passed. PR #5 is open, issue #6 is open, the PR head branch matches `feat/nucleus-wiki-native-contract`, and live PR/issue text matches the checked-in public-safe drafts.
-- Remote PR head at evidence capture: `bcd7c353c52cca6ab178afe23ce71859de264d55`.
-- Remote branch head at evidence capture: `bcd7c353c52cca6ab178afe23ce71859de264d55`.
+- Remote PR head at evidence capture: `20547b4777e3bf4b4465928829f0a3f6500712af`.
+- Remote branch head at evidence capture: `20547b4777e3bf4b4465928829f0a3f6500712af`.
 
 ## Checks
 
