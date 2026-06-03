@@ -6,6 +6,46 @@ This repository includes metrics-only benchmark notes. It does not include agent
 
 RecallWeave is promising and operationally useful as a quota-safe local write lane. It is not proven generally superior to Supermemory. Earlier internal smoke numbers are useful engineering evidence, but the release branch removed benchmark-specific context shortcuts. A 2026-05-23 source-matched, budgeted live canary beat the selected hosted baseline on this small private slice, and two independent reviewers approved the metrics-only packet for owner review. That supports a narrow canary comparison only. Broad superiority language still needs a fuller benchmark and owner approval.
 
+The primary product score is one thing: an end-to-end agent-memory benchmark
+where the agent uses the current RecallWeave plugin/memory layer during the
+task, writes durable memories intentionally, retrieves through the same
+container contract after a session boundary, answers the source-locked
+benchmark questions, and passes the memory-score result gate. Supermemory is an
+agent memory layer, so the product-parity comparison must be plugin-to-plugin
+agent memory behavior, not a standalone retrieval script pretending to be the
+product.
+
+Everything else is diagnostic. BM25, provider/vector/rerank arms,
+retrieval-proxy ladders, method-ladder slices, UI fixture smokes, and component
+leaderboards can explain why the primary score moved. They are not alternate
+scoreboards. The current verified local-full answer-quality snapshot is
+`0.249` / `24.9%` on the local-full diagnostic lane, with
+`local-apple-qwen3-0_6b-local-rerank` as the best local strategy. That is a
+whole-target local diagnostic result, but it does not count as public SOTA
+evidence and it is not comparable to earlier `0.45` to `0.51`
+retrieval-proxy numbers.
+
+No public release should claim "validated replacement" status until the live
+Codex/Claude-style memory canary passes: current plugin installed, hosted
+Supermemory write-back disabled, explicit durable write available, benchmark
+and live research containers isolated, session/wiki/topic maps inspectable,
+post-boundary retrieval proven, and post-run log/noise/privacy health clean.
+Private research trees, raw transcripts, container maps, provider key files,
+and benchmark raw inputs belong in the local workspace, not in the public
+repository.
+
+June 2 reset boundary: the Codex bridge now has a local reset-health gate for
+the orchestrator workstation. Passing `codex:memory-reset-health` means the
+installed bridge is ready for controlled manual dogfood with automatic
+injection disabled; it does not count as benchmark evidence, SOTA evidence, or
+public release approval. The same report deliberately keeps release blocked
+while reset mode is active or while the tracked public review surface is too
+large. Whole-harness benchmark runs should resume only after the memory product
+itself is quiet and useful in live work. After any automatic-recall rewire,
+monitor the memory system through the reset-health `dogfoodMonitor` block:
+noise, retrieval, writes, and usefulness must be tracked continuously, because
+a canary that writes and recalls once can still hide clutter that hurts agents.
+
 Solo RecallWeave runs are smoke tests only. They can prove the harness runs,
 privacy holds, latency is measurable, and the adapter does not fall over. They
 do not prove memory quality. Quality evidence must compare RecallWeave against
@@ -374,20 +414,13 @@ npm exec --yes pnpm@10.23.0 -- benchmark:memory-score:result-gate -- --require-r
   --reviewer-approval-report <memory-score-reviewer-intake.json>
 ```
 
-There is now a separate `model-challenger` claim scope for the narrower claim:
+There is a separate `model-challenger` claim scope for a narrower future claim:
 RecallWeave, using a named stronger answer/judge model, beat a selected
-reported Supermemory row on the same source-locked benchmark target. This is
-not strict same-model SOTA evidence. It keeps the full-SOTA gate unchanged and
-requires the report to say exactly which model was used and which reported row
-was selected:
-
-```text
-RecallWeave ran LongMemEval-S answer-quality with deepseek-v4-pro and surpassed Supermemory's reported gpt-4o score (81.6 percent) with 82 percent, a +0.4 point delta.
-```
-
-That line is the intended model-challenger wording: "we ran with this model and
-surpassed their reported 4o score." It still stays separate from strict
-same-model SOTA unless the full-SOTA gate also passes.
+reported Supermemory row on the same source-locked benchmark target. No such
+model-challenger claim is currently ready. If it becomes ready, the generated
+result gate must name the actual answer model, judge model, selected reported
+row, score, and delta. It still stays separate from strict same-model SOTA
+unless the full-SOTA gate also passes.
 
 ```bash
 RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS=1 \
@@ -1111,8 +1144,8 @@ per-query repair queue with match counts and a recommended private repair
 action. It does not include raw query text, expected refs, memory text, or
 container labels.
 Use `baseline:operator-packet -- --source-gap <source-gap-report> --format
-markdown` to turn a blocked source-gap report into a paste-ready repair handoff.
-That handoff still shows only query hashes, match counts, and repair actions.
+markdown` to turn a blocked source-gap report into a paste-ready repair packet.
+That packet still shows only query hashes, match counts, and repair actions.
 
 The fixture command validates the expected result shape without counting as
 baseline evidence. The template command prints the live-result schema agents
@@ -1220,6 +1253,11 @@ Interpretation: retrieval can be strong while answer synthesis remains weak. The
 
 A stronger claim requires:
 
+- a live agent-memory canary where Codex/Claude-style agents use the current
+  plugin as the memory layer during the task, not merely a script-side retriever,
+- explicit durable writes during that live canary,
+- inspectable session/wiki/topic maps for the canary and benchmark containers,
+- benchmark containers isolated from live research memory containers,
 - a source-locked canary from a real benchmark or documented benchmark slice,
 - a RecallWeave win against the matched baseline,
 - the same memory set,

@@ -9,6 +9,15 @@ Use this checklist before making the repository public.
 - [ ] README names RecallWeave and explains the legacy `selfmem_canary` id.
 - [ ] Docs do not expose private agent names, raw memories, raw diagnostics, or
   credentials.
+- [ ] The public surface is compact: large review-evidence piles are collapsed,
+  moved out of the public tree, or represented by metrics-only summaries.
+- [ ] If the Codex bridge is still in reset mode, public release remains
+  blocked by `codex-memory-reset-mode-active`; `codex:memory-reset-health`
+  may allow controlled dogfood, but it is not launch approval.
+- [ ] Automatic Codex prompt injection is not re-enabled until controlled
+  dogfood proves unrelated prompts retrieve no memory, task prompts retrieve
+  directly relevant context only, explicit writes work, and post-boundary recall
+  is inspectable.
 - [ ] Benchmark notes are metrics-only and say public scores require a matched
   source-locked canary win, same judge/settings, zero privacy failures, and
   reviewer sign-off.
@@ -76,17 +85,19 @@ Use this checklist before making the repository public.
 - [ ] Docs clarity review completed.
 - [ ] Release claim review completed.
 - [ ] `pnpm release:doctor` shows
-  `full-memory-sota-benchmark-gate-incomplete` until the full same-data
-  answer-quality shard ladder, reviewer gate, owner approval, and real canary
-  are complete.
+  `codex-memory-reset-mode-active`,
+  `public-review-surface-collapse-required`, and
+  `full-memory-sota-benchmark-gate-incomplete` until controlled dogfood, public
+  surface cleanup, the full same-data answer-quality shard ladder, reviewer
+  gate, owner approval, and real canary are complete.
 - [ ] Any `CONCERNS` decision has an explicit acceptance note.
 - [ ] Public live-update draft says whether the release is production ready or
   alpha only.
 - [ ] Dummy-data demo storyboard exists and forbids private memory footage.
-- [ ] `docs/RELEASE_HANDOFF.md` has the current manual PR, blocked reviewer,
-  public visibility, and one-agent canary steps.
+- [ ] `docs/UPDATE_FLOW.md` documents the built-in update command,
+  public-safe verification, visibility criteria, and canary gate.
 - [ ] If GitHub automation cannot update the PR body or create blocker issues,
-  the owner has either completed the manual steps or accepted the missing
+  the owner has either completed the product update-flow steps or accepted the missing
   GitHub updates in writing.
 
 ## Publish

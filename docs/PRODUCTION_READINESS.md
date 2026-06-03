@@ -51,8 +51,22 @@ Before a public live update or release note:
 - multi-scenario compaction benchmark passes exact-identifier, stale/privacy,
   dedupe, and kind-coverage checks,
 - reviewer packet records which council routes actually ran.
-- release handoff states the manual PR update path, blocked reviewer choices,
-  public visibility criteria, and one-agent canary rollout path.
+- update-flow docs describe the built-in `selfmem_update` path, public-safe
+  verification, blocked reviewer choices, visibility criteria, and canary gate.
+- Codex reset-health passes on the workstation under review, with automatic
+  prompt injection disabled, native Codex memory disabled, hosted write-back
+  disabled, severe active-store noise at zero, and context-quality scenarios
+  passing without raw memory output.
+- controlled Codex dogfood proves the memory product is useful in live work:
+  unrelated prompts stay quiet, task-specific prompts retrieve only directly
+  relevant context, explicit writes are available, post-boundary recall works,
+  and wiki or topic updates are visible without private leakage.
+- Codex dogfood monitoring stays clean before and after any automatic recall
+  rewire: noise counts stay low, retrieval has bounded and relevant matches,
+  explicit writes and stop-time writes are visible, and usefulness checks pass.
+- the periodic Codex dogfood monitor runs during rewire dogfood and fails
+  closed if hooks inject confusing context; failures trigger method repair
+  before rollout or benchmark continuation.
 
 Run the repeatable gate:
 
@@ -110,6 +124,14 @@ Production readiness requires host-native behavior:
 
 RecallWeave should optimize each host's memory rhythm instead of forcing all
 hosts into the same generic lifecycle.
+
+For Codex, do not treat a green write/read canary as production evidence by
+itself. If the bridge is in reset mode, `codex:memory-reset-health` can clear
+manual dogfood, but public release remains blocked until controlled dogfood and
+release evidence prove the injected context helps rather than clutters the
+agent. After any rewire, inspect `dogfoodMonitor` instead of relying on a
+single canary: the monitor must show quiet unrelated prompts, useful retrieval,
+healthy write paths, and no severe noise.
 
 ## Hybrid Search
 

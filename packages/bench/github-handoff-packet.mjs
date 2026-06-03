@@ -27,7 +27,7 @@ const paths = {
   claudeBlocked: join(root, reviewDir, "claude-pr5-review-blocked.md"),
   claudeReview: join(root, reviewDir, "claude-pr5-review.md"),
   hostedBaselinePreflight: join(root, reviewDir, "hosted-baseline-preflight-evidence.md"),
-  releaseHandoff: join(root, "docs/RELEASE_HANDOFF.md"),
+  updateFlow: join(root, "docs/UPDATE_FLOW.md"),
 };
 
 for (const [name, path] of Object.entries(paths)) {
@@ -41,7 +41,7 @@ const issueBody = readFileSync(paths.issueDraft, "utf8");
 const githubWriteText = readFileSync(paths.githubWriteEvidence, "utf8");
 const claudeBlockedText = readFileSync(paths.claudeBlocked, "utf8");
 const claudeReviewText = readFileSync(paths.claudeReview, "utf8");
-const releaseHandoffText = readFileSync(paths.releaseHandoff, "utf8");
+const updateFlowText = readFileSync(paths.updateFlow, "utf8");
 
 const prBody = extractFencedMarkdown(prBodyDraftText);
 const issueTitle = extractIssueTitle(issueBody);
@@ -93,8 +93,8 @@ assert.match(githubWriteText, /PR #5 body updated/);
 assert.match(githubWriteText, /issues\/6/);
 assert.match(claudeBlockedText, /Not logged in/);
 assert.match(claudeReviewText, /Verdict:\s*CONCERNS/i);
-assert.match(releaseHandoffText, /Manual GitHub Steps/);
-assert.match(releaseHandoffText, /release:doctor/);
+assert.match(updateFlowText, /selfmem_update/);
+assert.match(updateFlowText, /npm run update:smoke/);
 assert.doesNotMatch(remoteUrl, /:\/\/[^/\s]+@/);
 assert.doesNotMatch(remoteUrl, /(ghp_|github_pat_|[?&]token=)/);
 
@@ -106,7 +106,7 @@ const statusComment = [
   `- Latest verified PR branch head: ${latestRepositoryHeadShort}, GitHub Actions run ${latestRepositoryHead?.ciRunId} passed.`,
   `- Approved one-agent canary adapter/report commit remains ${approvedCanaryHeadShort}.`,
   `- Prior verified code/product baseline: ${latestHeadShort}, GitHub Actions run ${latestCiRunId} passed.`,
-  "- PR #5 has been updated and release blocker issue #6 has been created. The generated handoff packet remains useful for auditing or refreshing those public-safe fields later.",
+  "- PR #5 has been updated and release blocker issue #6 has been created. The generated release update packet remains useful for auditing or refreshing those public-safe fields later.",
   "- Claude Opus review completed with CONCERNS. Remaining blockers: human public-launch approval required and one real-container canary still incomplete. The source-matched budgeted hosted canary is ready for owner review, but it does not authorize public launch or broad benchmark language.",
   "",
   "Do not treat green CI as public launch approval. The repo evidence is fixture-only and contains no raw memories, transcripts, credentials, or private diagnostics.",

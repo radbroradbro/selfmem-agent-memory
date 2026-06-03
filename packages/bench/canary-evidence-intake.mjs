@@ -42,36 +42,68 @@ const window = report.window ?? {};
 const adapter = report.adapter ?? {};
 const reportCommit = String(report.commit ?? "");
 const commitMatchesExpected = expectedCommit ? reportCommit === expectedCommit || reportCommit.startsWith(expectedCommit) : null;
+const host = String(agent.host ?? "");
+const isCodex = host === "codex";
+const hostedSupermemoryMode = String(provider.hostedSupermemoryMode ?? "");
+const nativeProof = Array.isArray(nativeMemory.proof) ? nativeMemory.proof : [];
+const profile = isCodex ? "codex-local-bridge" : "hybrid-agent-runtime";
+const adapterContractOk = isCodex
+  ? ["recallweave-codex-selfmem-bridge", "codex-selfmem-bridge", "recallweave-selfmem-canary"].includes(String(adapter.name ?? ""))
+    && adapter.strictCanaryContract === "v1"
+    && adapter.searchLatencyInstrumentation === true
+    && adapter.storeLatencyInstrumentation === true
+  : adapter.name === "recallweave-selfmem-canary"
+    && adapter.strictCanaryContract === "v1"
+    && adapter.searchLatencyInstrumentation === true
+    && adapter.storeLatencyInstrumentation === true;
+const hostedReadOnlyOk = isCodex
+  ? ["disabled", "read-through-only"].includes(hostedSupermemoryMode) && provider.hostedWriteBack === false
+  : hostedSupermemoryMode === "read-through-only";
+const nativeDefaultMemoryOk = isCodex
+  ? ["codex-selfmem-bridge", "selfmem_canary"].includes(String(nativeMemory.providerId ?? ""))
+    && nativeMemory.defaultActive === true
+    && nativeMemory.shadowOnly === false
+    && nativeMemory.newWrites === "local"
+    && nativeMemory.hostedWriteBack === false
+    && nativeProof.includes("explicit-native-default-config")
+    && nativeProof.includes("local-store-events-observed")
+    && (
+      nativeProof.includes("codex-user-prompt-submit-recall-hook")
+      || nativeProof.includes("before-prompt-lifecycle-fired")
+    )
+    && (
+      nativeProof.includes("codex-stop-flush-hook")
+      || nativeProof.includes("agent-end-lifecycle-fired")
+    )
+  : nativeMemory.providerId === "selfmem_canary"
+    && nativeMemory.defaultActive === true
+    && nativeMemory.shadowOnly === false
+    && nativeMemory.newWrites === "local"
+    && nativeMemory.hostedWriteBack === false
+    && nativeProof.includes("explicit-native-default-config")
+    && nativeProof.includes("before-prompt-lifecycle-fired")
+    && nativeProof.includes("local-store-events-observed");
+const searchCoverageOk = isCodex && hostedSupermemoryMode === "disabled"
+  ? quality.localRecallCovered === true || Number(counts.search) > 0
+  : quality.hybridSearchCovered === true;
+const lcmCoverageOk = isCodex
+  ? quality.lcmHookObserved === true
+    || Number(counts.preCompress) > 0
+    || (quality.lcmHookNotExposed === true && nativeProof.includes("codex-precompact-hook-not-exposed"))
+  : quality.lcmHookObserved === true || Number(counts.preCompress) > 0;
 
 const checks = [
   check("schema-version", report.schemaVersion === 1),
   check("mode", report.mode === "one-agent-canary-runtime-report"),
-  check("host", ["hermes", "openclaw", "codex", "claude-code"].includes(String(agent.host ?? ""))),
+  check("host", ["hermes", "openclaw", "codex", "claude-code"].includes(host)),
   check("identity-hash", /^agent_[a-f0-9]{8,}$/i.test(String(agent.agentIdentityHash ?? ""))),
   check("local-container-hash", /^container_[a-f0-9]{8,}$/i.test(String(agent.localContainerHash ?? ""))),
   check("source-container-hash", /^source_[a-f0-9]{8,}$/i.test(String(agent.sourceContainerHash ?? ""))),
-  check(
-    "adapter-contract",
-    adapter.name === "recallweave-selfmem-canary"
-      && adapter.strictCanaryContract === "v1"
-      && adapter.searchLatencyInstrumentation === true
-      && adapter.storeLatencyInstrumentation === true,
-  ),
+  check("adapter-contract", adapterContractOk),
   check("window-duration", Number(window.durationMinutes) >= 15),
   check("local-write-mode", provider.localWriteMode === "enabled"),
-  check("hosted-read-only", provider.hostedSupermemoryMode === "read-through-only"),
-  check(
-    "native-default-memory",
-    nativeMemory.providerId === "selfmem_canary"
-      && nativeMemory.defaultActive === true
-      && nativeMemory.shadowOnly === false
-      && nativeMemory.newWrites === "local"
-      && nativeMemory.hostedWriteBack === false
-      && Array.isArray(nativeMemory.proof)
-      && nativeMemory.proof.includes("explicit-native-default-config")
-      && nativeMemory.proof.includes("before-prompt-lifecycle-fired")
-      && nativeMemory.proof.includes("local-store-events-observed"),
-  ),
+  check("hosted-read-only", hostedReadOnlyOk),
+  check("native-default-memory", nativeDefaultMemoryOk),
   check("session-start", Number(counts.sessionStart) > 0),
   check("before-prompt-build", Number(counts.beforePromptBuild) > 0),
   check("agent-end", Number(counts.agentEnd) > 0),
@@ -87,9 +119,9 @@ const checks = [
   check("zero-result-rate", Number(quality.zeroResultRate) <= 0.25),
   check("write-success", Number(quality.writeSuccessRate) >= 0.95),
   check("lifecycle-covered", quality.lifecycleCovered === true),
-  check("hybrid-search-covered", quality.hybridSearchCovered === true),
+  check("hybrid-search-covered", searchCoverageOk),
   check("local-writes-observed", quality.localWritesObserved === true),
-  check("lcm-hook-observed", quality.lcmHookObserved === true || Number(counts.preCompress) > 0),
+  check("lcm-hook-observed", lcmCoverageOk),
   check("zero-privacy-leaks", Number(privacy.privacyLeakCount) === 0),
   check("zero-secret-hits", Number(privacy.secretPatternHits) === 0),
   check("no-raw-memory", privacy.rawMemoryIncluded === false),
@@ -117,6 +149,7 @@ const output = {
   strictRealPassed: strictReal ? !strictFailureReason : null,
   strictFailureReason,
   fixtureOnly,
+  profile,
   countsAsRealRolloutEvidence: !fixtureOnly && canaryPass,
   canaryPass,
   fleetRolloutAllowed: false,
@@ -136,11 +169,13 @@ const output = {
   },
   target: {
     host: agent.host,
+    profile,
     agentIdentityHash: agent.agentIdentityHash,
     localContainerHash: agent.localContainerHash,
     sourceContainerHash: agent.sourceContainerHash,
     providerMode: provider.mode,
     hostedSupermemoryMode: provider.hostedSupermemoryMode,
+    hostedWriteBack: provider.hostedWriteBack === true,
   },
   nativeMemory: {
     providerId: nativeMemory.providerId ?? null,
@@ -192,8 +227,10 @@ const output = {
     zeroResultRate: Number(quality.zeroResultRate ?? 1),
     writeSuccessRate: Number(quality.writeSuccessRate ?? 0),
     lcmHookObserved: Boolean(quality.lcmHookObserved),
+    lcmHookNotExposed: Boolean(quality.lcmHookNotExposed),
     lifecycleCovered: Boolean(quality.lifecycleCovered),
     hybridSearchCovered: Boolean(quality.hybridSearchCovered),
+    localRecallCovered: Boolean(quality.localRecallCovered),
     localWritesObserved: Boolean(quality.localWritesObserved),
     hostedReadThroughObserved: Boolean(quality.hostedReadThroughObserved),
   },

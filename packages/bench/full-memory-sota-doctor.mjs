@@ -116,7 +116,7 @@ const files = {
   releaseNotes: `${reviewDir}/pr-body-update-draft.md`,
   benchmarkDocs: "docs/BENCHMARK_SUMMARY.md",
   targetDocs: "docs/PUBLIC_BENCHMARK_TARGETS.md",
-  releaseHandoff: "docs/RELEASE_HANDOFF.md",
+  updateFlow: "docs/UPDATE_FLOW.md",
 };
 
 const evidence = Object.fromEntries(Object.entries(files).map(([key, file]) => [key, loadFile(file)]));
@@ -311,6 +311,15 @@ const report = {
   publicBenchmarkClaimsAllowed: blockers.length === 0,
   countsAsFullMemorySotaEvidence: blockers.length === 0,
   benchmarkContract: {
+    primaryScoreName: "whole-harness-agent-memory-answer-quality",
+    primaryScoreRequiresPluginActor: true,
+    primaryScoreRequiresExplicitMemoryWrites: true,
+    primaryScoreRequiresPostBoundaryRecall: true,
+    primaryScoreRequiresSessionWikiTopicMaps: true,
+    benchmarkContainersMustBeIsolatedFromLiveResearch: true,
+    privateWorkspaceRequiredForRawResearchState: true,
+    supermemoryComparisonSurface: "plugin-to-plugin-agent-memory-layer",
+    diagnosticsAreNotAlternateScoreboards: true,
     bm25IsLexicalFloorOnly: true,
     retrievalProxyOnlyIsNotEnough: true,
     componentBenchmarksAreModelSelectionOnly: true,
@@ -1467,7 +1476,7 @@ function inspectDocs(loadedEvidence) {
   const requiredPhrases = [
     [loadedEvidence.benchmarkDocs.text, /This is an execution\s+plan and harness upgrade, not a completed full-SOTA result/i],
     [loadedEvidence.targetDocs.text, /The full LongMemEval-S run-only target is now authored|full 500-row public set/i],
-    [loadedEvidence.releaseHandoff.text, /Do not use MemoryBench, LongMemEval, or SOTA wording/i],
+    [loadedEvidence.updateFlow.text, /same-data benchmark gates/i],
     [loadedEvidence.releaseNotes.text, /full-memory|SOTA|answer-quality/i],
   ];
   const missing = requiredPhrases
@@ -1670,6 +1679,13 @@ function renderMarkdown(value) {
     `- Status: ${value.status}`,
     `- Public benchmark claims allowed: ${value.publicBenchmarkClaimsAllowed}`,
     `- Counts as full memory SOTA evidence: ${value.countsAsFullMemorySotaEvidence}`,
+    `- Primary score: ${value.benchmarkContract.primaryScoreName}`,
+    `- Supermemory comparison surface: ${value.benchmarkContract.supermemoryComparisonSurface}`,
+    `- Diagnostics are alternate scoreboards: ${!value.benchmarkContract.diagnosticsAreNotAlternateScoreboards}`,
+    `- Live plugin actor required: ${value.benchmarkContract.primaryScoreRequiresPluginActor}`,
+    `- Explicit memory writes required: ${value.benchmarkContract.primaryScoreRequiresExplicitMemoryWrites}`,
+    `- Post-boundary recall required: ${value.benchmarkContract.primaryScoreRequiresPostBoundaryRecall}`,
+    `- Isolated benchmark containers required: ${value.benchmarkContract.benchmarkContainersMustBeIsolatedFromLiveResearch}`,
     `- Full target query count: ${value.fullTarget.queryCount}`,
     `- Current canary query count: ${value.currentCanary.queryCount}`,
     `- Current best score: ${value.currentCanary.score ?? "n/a"}`,

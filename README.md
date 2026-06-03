@@ -24,7 +24,7 @@ fallback path.
 
 RecallWeave is public alpha software.
 
-- Current native adapters: Hermes and OpenClaw.
+- Current native adapters: Hermes, OpenClaw, and the local Codex hook bridge.
 - Current runtime id: `selfmem_canary`, kept for compatibility with existing
   setup scripts and installed agents.
 - Current cloud-quality path: Voyage embeddings plus Voyage rerank when local
@@ -33,6 +33,10 @@ RecallWeave is public alpha software.
   arms through llama.cpp or a local OpenAI-compatible sidecar, with lexical
   recall as the no-credential fallback.
 - Current hosted bridge: read-only Supermemory search and export-cache search.
+- Current Codex bridge status: controlled reset/dogfood mode. Automatic Codex
+  prompt injection should stay disabled until `codex:memory-reset-health`,
+  quiet-prompt context checks, explicit writes, and post-boundary recall stay
+  clean in real use.
 
 `selfmem_canary` is a legacy compatibility id, not the product name. New docs,
 UI surfaces, and operator instructions should call the system RecallWeave and
@@ -57,6 +61,8 @@ metrics-only packet.
 
 - Native Hermes memory provider surface.
 - Native OpenClaw memory slot plugin.
+- Local Codex hook bridge for prompt-time recall, stop-time flush, and explicit
+  durable writes.
 - Local-only writes for new memories.
 - Optional hosted Supermemory read-through for old history.
 - Optional export-cache read-through when hosted quota is exhausted.
@@ -242,7 +248,8 @@ auth state, browser state, or provider keys.
 - [Operations guide](docs/OPERATIONS.md)
 - [Agent live-build guide](docs/AGENT_LIVE_BUILD_GUIDE.md)
 - [Maintainer review guide](docs/MAINTAINER_REVIEW_GUIDE.md)
-- [Release handoff](docs/RELEASE_HANDOFF.md)
+- [Update flow](docs/UPDATE_FLOW.md)
+- [Codex memory reset](docs/CODEX_MEMORY_RESET.md)
 - [GitHub rules](docs/GITHUB_RULES.md)
 - [Security model](docs/SECURITY_MODEL.md)
 - [Production readiness](docs/PRODUCTION_READINESS.md)

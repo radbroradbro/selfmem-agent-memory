@@ -14,6 +14,20 @@ Do not test RecallWeave alone for quality. A solo run is a smoke test, not a
 comparison. Every quality report must name the same-data comparators and the
 claim tier it supports.
 
+There is only one primary product scoreboard: whole-harness agent-memory
+answer-quality. The benchmark actor must use the current RecallWeave memory
+layer the way a Codex, Claude Code, Hermes, or OpenClaw agent would use it:
+recall before substantive work, explicit durable writes during the task,
+session/wiki/topic mapping at lifecycle boundaries, post-boundary retrieval,
+and clean log/noise/privacy health after the run. BM25, embedding, rerank,
+provider, query-expansion, and UI fixture results are diagnostics under that
+score. They are not separate release scores.
+
+Supermemory parity is plugin-to-plugin parity. A fair comparison is not
+"RecallWeave retrieval script versus Supermemory product"; it is "agent with
+RecallWeave memory layer versus agent with Supermemory memory layer" on the
+same source-locked task and scorer.
+
 Minimum same-data matrix:
 
 - lexical control: BM25-lite or another transparent sparse floor,
@@ -221,6 +235,13 @@ official comparable target. For the current LongMemEval-S source lock, that
 means the full 500-row public set or a target artifact whose claim tier is
 `public-benchmark`, `full-benchmark`, `officially-comparable`, or
 `broad-sota`.
+
+Before a full benchmark can be promoted as product evidence, the live-agent
+memory canary must also pass. That canary is local/private by design: it may
+inspect raw transcripts, research trees, and container mappings in the local
+workspace, but public reports may expose only hashes, counts, scores, and
+reason codes. The public repository should contain the validation tool and
+metrics-only result shape, not the private research state.
 
 The full LongMemEval-S run-only target is now authored at
 `reviews/overnight-20260522/public-longmemeval-full-run-target.json`. Its
@@ -630,7 +651,7 @@ That plan is not a run and does not call providers.
   answer-quality scoring and intake blocked until all shard arms exist.
 - Local-full shard resume packet:
   `reviews/overnight-20260522/local-full-shard-002-resume-packet-20260526.json`
-  packages the shard 002 retry as an operator-ready, metrics-only handoff. It
+  packages the shard 002 retry as an operator-ready, metrics-only repair packet. It
   verifies the local embedding runtime doctor and durability smoke are ready,
   lists only hashes/counts/labels for the completed private arms, and names the
   private command materializer as the safe operator path. The missing-arm

@@ -48,7 +48,8 @@ const requiredFiles = [
   "docs/LOCAL_CONTAINER_AUDIT.md",
   "docs/PRODUCTION_READINESS.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
-  "docs/RELEASE_HANDOFF.md",
+  "docs/CODEX_MEMORY_RESET.md",
+  "docs/UPDATE_FLOW.md",
   "docs/MODEL_MATRIX.md",
   "docs/AUTORESEARCH_BENCHMARK_PLAN.md",
   "docs/PUBLIC_BENCHMARK_TARGETS.md",
@@ -147,7 +148,14 @@ const requiredFiles = [
   "packages/bench/full-shard-private-input-doctor.mjs",
   "packages/bench/full-shard-accepted-lane-launch-doctor.mjs",
   "packages/bench/full-shard-control-export-probe.mjs",
+  "packages/adapters/codex/README.md",
+  "packages/adapters/codex/selfmem-bridge.cjs",
   "packages/bench/codex-lifecycle-audit.mjs",
+  "packages/bench/codex-memory-context-quality-audit.mjs",
+  "packages/bench/codex-memory-dogfood-monitor.mjs",
+  "packages/bench/codex-memory-reset-health.mjs",
+  "packages/bench/codex-live-agent-memory-canary.mjs",
+  "packages/bench/codex-live-agent-runtime-report.mjs",
   "packages/bench/local-embedding-runtime-doctor.mjs",
   "packages/bench/local-embedding-durability-smoke.mjs",
   "packages/bench/local-rerank-durability-smoke.mjs",
@@ -167,6 +175,8 @@ const requiredFiles = [
   `${reviewDir}/github-live-sync-current-head-20260601.md`,
   `${reviewDir}/current-head-pr-council-status-20260601.json`,
   `${reviewDir}/current-head-pr-council-status-20260601.md`,
+  `${reviewDir}/codex-live-agent-memory-canary-20260602.json`,
+  `${reviewDir}/codex-live-agent-memory-canary-20260602.md`,
   `${reviewDir}/public-longmemeval-slice-evidence.json`,
   `${reviewDir}/public-longmemeval-slice-evidence.md`,
   `${reviewDir}/codex-public-longmemeval-slice-review.md`,
@@ -767,6 +777,13 @@ const requiredScripts = [
   "compaction:batch-audit:built",
   "codex:lifecycle:audit",
   "codex:lifecycle:audit:local",
+  "codex:memory-reset-health",
+  "codex:memory-dogfood-monitor",
+  "codex:memory-dogfood-monitor:watch",
+  "codex:live-agent-canary",
+  "codex:live-agent-canary:local",
+  "codex:runtime-canary",
+  "codex:runtime-canary:local",
   "wiki:smoke",
   "wiki:smoke:built",
   "wiki:sync:smoke",
@@ -869,7 +886,7 @@ const requiredScripts = [
   "benchmark:sota-doctor",
   "goal:audit",
   "release:doctor",
-  "release:handoff",
+  "release:update-flow",
   "release:github-sync",
   "smoke",
   "release:check",
@@ -1026,6 +1043,161 @@ check("fresh Codex lifecycle audit fixture passes", () => {
   assert.match(markdown, /Modifies benchmark retrieval: false/i);
   assert.match(markdown, /Counts as benchmark evidence: false/i);
   assert.match(markdown, /Blockers\s*\n- none/i);
+});
+
+check("fresh Codex live agent-memory canary fixture passes", () => {
+  const checked = JSON.parse(readFileSync(join(root, reviewDir, "codex-live-agent-memory-canary-20260602.json"), "utf8"));
+  const checkedMarkdown = readFileSync(join(root, reviewDir, "codex-live-agent-memory-canary-20260602.md"), "utf8");
+  const fresh = JSON.parse(run("node", ["packages/bench/codex-live-agent-memory-canary.mjs", "--strict"]).stdout);
+
+  assert.equal(checked.ok, true);
+  assert.equal(checked.status, "READY_CODEX_LIVE_AGENT_MEMORY_CANARY");
+  assert.equal(checked.fixtureOnly, false);
+  assert.equal(checked.writesRealFiles, true);
+  assert.equal(checked.metricsOnly, true);
+  assert.equal(checked.publicSafe, true);
+  assert.equal(checked.pluginActor, "codex-selfmem-bridge");
+  assert.equal(checked.comparisonSurface, "agent-memory-plugin-lifecycle");
+  assert.equal(checked.explicitWriteObserved, true);
+  assert.equal(checked.postBoundaryRecallObserved, true);
+  assert.equal(checked.hostedWriteBackDisabled, true);
+  assert.equal(checked.recall?.matchedExpectedTerms?.token, true);
+  assert.equal(checked.recall?.matchedExpectedTerms?.color, true);
+  assert.equal(checked.recall?.matchedExpectedTerms?.workflow, true);
+  assert.equal(checked.rawMemoryIncluded, false);
+  assert.equal(checked.rawPromptIncluded, false);
+  assert.equal(checked.rawRecallContextIncluded, false);
+  assert.equal(checked.rawTranscriptIncluded, false);
+  assert.equal(checked.privatePathsIncluded, false);
+  assert.equal(checked.countsAsBenchmarkEvidence, false);
+  assert.equal(checked.countsAsSupermemoryReplacementEvidence, false);
+  assert.equal(checked.primaryBenchmarkStillRequired, true);
+  assert.deepEqual(checked.blockers, []);
+  assert.match(checkedMarkdown, /Status: READY_CODEX_LIVE_AGENT_MEMORY_CANARY/i);
+  assert.match(checkedMarkdown, /Explicit write observed: true/i);
+  assert.match(checkedMarkdown, /Post-boundary recall observed: true/i);
+  assert.match(checkedMarkdown, /Primary benchmark still required: true/i);
+
+  assert.equal(fresh.ok, true);
+  assert.equal(fresh.status, "READY_CODEX_LIVE_AGENT_MEMORY_CANARY_FIXTURE");
+  assert.equal(fresh.fixtureOnly, true);
+  assert.equal(fresh.writesRealFiles, false);
+  assert.equal(fresh.pluginActor, "codex-selfmem-bridge");
+  assert.equal(fresh.comparisonSurface, "agent-memory-plugin-lifecycle");
+  assert.equal(fresh.explicitWriteObserved, true);
+  assert.equal(fresh.postBoundaryRecallObserved, true);
+  assert.equal(fresh.doctor?.hostedWriteBackDisabled, true);
+  assert.equal(fresh.countsAsBenchmarkEvidence, false);
+  assert.equal(fresh.countsAsSupermemoryReplacementEvidence, false);
+  assert.equal(fresh.primaryBenchmarkStillRequired, true);
+  assert.equal(fresh.rawMemoryIncluded, false);
+  assert.equal(fresh.rawPromptIncluded, false);
+  assert.equal(fresh.rawRecallContextIncluded, false);
+  assert.equal(fresh.rawTranscriptIncluded, false);
+  assert.equal(fresh.privatePathsIncluded, false);
+  assert.deepEqual(fresh.blockers, []);
+});
+
+check("fresh Codex runtime canary fixture passes", () => {
+  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-codex-runtime-fixture-"));
+  run("node", ["--check", "packages/bench/codex-live-agent-runtime-report.mjs"]);
+  try {
+    const reportPath = join(tempRoot, "codex-runtime-report.json");
+    const fresh = JSON.parse(
+      run("node", ["packages/bench/codex-live-agent-runtime-report.mjs", "--strict", "--output", reportPath]).stdout,
+    );
+    const markdown = run("node", [
+      "packages/bench/codex-live-agent-runtime-report.mjs",
+      "--strict",
+      "--format",
+      "markdown",
+    ]).stdout;
+    const intake = JSON.parse(run("node", ["packages/bench/canary-evidence-intake.mjs", "--report", reportPath]).stdout);
+
+    assert.equal(fresh.ok, true);
+    assert.equal(fresh.mode, "one-agent-canary-runtime-report");
+    assert.equal(fresh.fixtureOnly, true);
+    assert.equal(fresh.agent?.host, "codex");
+    assert.equal(fresh.adapter?.name, "recallweave-codex-selfmem-bridge");
+    assert.equal(fresh.provider?.hostedSupermemoryMode, "disabled");
+    assert.equal(fresh.provider?.hostedWriteBack, false);
+    assert.equal(fresh.nativeMemory?.providerId, "codex-selfmem-bridge");
+    assert.equal(fresh.nativeMemory?.hostedWriteBack, false);
+    assert.equal(fresh.quality?.localRecallCovered, true);
+    assert.equal(fresh.quality?.localWritesObserved, true);
+    assert.equal(fresh.quality?.lcmHookNotExposed, true);
+    assert.equal(fresh.countsAsSupermemoryReplacementEvidence, false);
+    assert.equal(fresh.countsAsBenchmarkEvidence, false);
+    assert.equal(fresh.primaryBenchmarkStillRequired, true);
+    assert.equal(fresh.privacy?.rawMemoryIncluded, false);
+    assert.equal(fresh.privacy?.rawTranscriptIncluded, false);
+    assert.equal(fresh.privacy?.rawPromptIncluded, false);
+    assert.deepEqual(fresh.blockers, []);
+    assert.equal(intake.profile, "codex-local-bridge");
+    assert.equal(intake.canaryPass, true);
+    assert.equal(intake.fixtureOnly, true);
+    assert.equal(intake.countsAsRealRolloutEvidence, false);
+    assert.match(markdown, /Codex Live Runtime Canary/i);
+    assert.match(markdown, /Counts as replacement evidence: false/i);
+    assert.doesNotMatch(markdown, secretPattern);
+    assert.doesNotMatch(markdown, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+check("fresh Codex memory reset-health gate passes for controlled dogfood", () => {
+  run("node", ["--check", "packages/bench/codex-memory-context-quality-audit.mjs"]);
+  run("node", ["--check", "packages/bench/codex-memory-reset-health.mjs"]);
+  const report = JSON.parse(run("node", ["packages/bench/codex-memory-reset-health.mjs", "--strict"]).stdout);
+
+  assert.equal(report.ok, true);
+  assert.equal(report.status, "READY_FOR_CONTROLLED_DOGFOOD");
+  assert.equal(report.injection?.customHooksDisabled, true);
+  assert.equal(report.injection?.nativeMemoryUseDisabled, true);
+  assert.equal(report.injection?.nativeMemoryGenerationDisabled, true);
+  assert.equal(report.contextQuality?.ok, true);
+  assert.deepEqual(report.contextQuality?.failedScenarios, []);
+  assert.equal(report.bridge?.hostedWriteBackDisabled, true);
+  assert.equal(report.dogfoodMonitor?.monitoringRequiredBeforeRewire, true);
+  assert.equal(report.dogfoodMonitor?.monitoringRequiredAfterRewire, true);
+  assert.equal(report.dogfoodMonitor?.autoRecallRewireAllowedByThisReport, false);
+  assert.equal(report.dogfoodMonitor?.metricsOnly, true);
+  assert.equal(report.dogfoodMonitor?.usefulness?.quietPromptHasNoContext, true);
+  assert.equal(report.dogfoodMonitor?.usefulness?.contextQualityOk, true);
+  assert.equal(report.dogfoodMonitor?.noise?.severeNoiseClean, true);
+  const monitor = JSON.parse(run("node", ["packages/bench/codex-memory-dogfood-monitor.mjs", "--strict"]).stdout);
+  assert.equal(monitor.ok, true);
+  assert.equal(monitor.status, "READY_DOGFOOD_MONITOR");
+  assert.equal(monitor.phase, "reset");
+  assert.equal(monitor.metricsOnly, true);
+  assert.equal(monitor.autoFixesApplied, false);
+  assert.equal(monitor.autoRecallExpansionAllowed, false);
+  assert.match(monitor.fixPolicy, /noisy or confusing context/i);
+  assert.deepEqual(monitor.blockers, []);
+  assert.equal(report.storeHealth?.severeNoise?.commandJsonMemoryCount, 0);
+  assert.equal(report.storeHealth?.severeNoise?.privatePathMemoryCount, 0);
+  assert.equal(report.storeHealth?.severeNoise?.secretShapedMemoryCount, 0);
+  assert.deepEqual(report.blockers, []);
+  assert.equal(report.release?.blockedByResetMode, true);
+  assert.equal(report.release?.blockedByPublicSurface, true);
+  assert.ok(report.release?.blockers?.includes("codex-memory-reset-mode-active"));
+  assert.ok(report.release?.blockers?.includes("public-review-surface-collapse-required"));
+  assert.equal(report.countsAsBenchmarkEvidence, false);
+});
+
+check("Codex bridge adapter source preserves explicit writes", () => {
+  run("node", ["--check", "packages/adapters/codex/selfmem-bridge.cjs"]);
+  const source = readFileSync(join(root, "packages/adapters/codex/selfmem-bridge.cjs"), "utf8");
+  const readme = readFileSync(join(root, "packages/adapters/codex/README.md"), "utf8");
+
+  assert.match(source, /preserveVerbatim:\s*true/);
+  assert.match(source, /\.\.\.rawExplicitItems/);
+  assert.match(source, /mirrorWritesToSupermemory:\s*false/);
+  assert.match(source, /function store\(\)/);
+  assert.match(readme, /Short explicit writes are preserved whole/i);
+  assert.match(readme, /codex:live-agent-canary:local/i);
+  assert.match(readme, /codex:runtime-canary:local/i);
 });
 
 check("fresh wiki amplification fixture keeps BM25 control honest", () => {
@@ -1761,6 +1933,8 @@ check("release state is conservative", () => {
     "human-public-launch-approval-required",
     "full-memory-sota-benchmark-gate-incomplete",
     "fresh-real-container-canary-not-current",
+    "codex-memory-reset-mode-active",
+    "public-review-surface-collapse-required",
   ]) {
     assert.ok(releaseState.remainingBlockers?.includes(blocker), `missing release blocker ${blocker}`);
   }
@@ -1837,29 +2011,23 @@ check("release docs mention current preview surfaces", () => {
     assert.match(text, /baseline compare|baseline:compare|matched.*comparison/i, `${file} missing baseline comparison`);
     assert.match(text, /hosted baseline operator|baseline:operator-packet|baseline operator packet/i, `${file} missing hosted baseline operator packet`);
     assert.match(text, /baseline evidence packet|baseline:packet|hosted baseline.*metrics-only.*zip/i, `${file} missing baseline evidence packet`);
-    assert.match(text, /github handoff|handoff packet|manual GitHub/i, `${file} missing GitHub handoff packet`);
+    assert.match(text, /update flow|selfmem_update|manual GitHub|GitHub release sync/i, `${file} missing update flow or GitHub sync`);
     assert.match(text, /github live sync|release:github-sync|live GitHub sync/i, `${file} missing GitHub live sync`);
     assert.match(text, /goal completion audit|goal:audit|completion audit/i, `${file} missing goal completion audit`);
     assert.doesNotMatch(text, /run #43|5 files and 18 tests/, `${file} contains stale verification wording`);
   }
 });
 
-check("release handoff documents blocked launch path", () => {
-  const text = readFileSync(join(root, "docs/RELEASE_HANDOFF.md"), "utf8");
-  assert.match(text, /PR #5/);
-  assert.match(text, /pr-body-update-draft\.md/);
-  assert.match(text, /issue #6|GitHub issue #6/i);
-  assert.match(text, /blocker-fresh-brain-ui-launch-and-release-gate\.md/);
-  assert.match(text, /Claude Opus review|Claude CLI|Claude concerns/i);
-  assert.match(text, /public launch verdict as `FAIL`|publicLaunchVerdict: "FAIL"/);
+check("update flow documents blocked launch path", () => {
+  const text = readFileSync(join(root, "docs/UPDATE_FLOW.md"), "utf8");
   assert.match(text, /selfmem_update/);
-  assert.match(text, /release:handoff/);
-  assert.match(text, /handoff packet/i);
-  assert.match(text, /release:github-sync/);
-  assert.match(text, /live GitHub sync|GitHub live sync/i);
-  assert.match(text, /baseline:select-container/);
-  assert.match(text, /one-agent canary/i);
-  assert.match(text, /Do not paste private diagnostics/);
+  assert.match(text, /npm run update:smoke/);
+  assert.match(text, /metrics-only evidence/i);
+  assert.match(text, /same-data benchmark gates/i);
+  assert.match(text, /GitHub release state/i);
+  assert.match(text, /raw memories|raw transcripts|provider keys/i);
+  assert.match(text, /public release checklist/i);
+  assert.doesNotMatch(text, /SEND-THIS|Telegram Desktop|Downloads|\/Users\/|\/private\/tmp/);
 });
 
 check("model matrix and autoresearch gate stay conservative", () => {
@@ -1917,7 +2085,7 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.match(publicTargets, /agentic-memory-source-lock-live-20260529\.json/);
   assert.match(publicTargets, /agentic-memory-ingest-contract-20260529\.json/);
   assert.match(providerMatrix, /defaultLocalArm: local-apple-qwen3-0_6b/);
-  assert.match(providerMatrix, /personalAgentDefaultArm: cloud-voyage4-voyage/);
+  assert.match(providerMatrix, /personalAgentDefaultArm: cloud-voyage4-lite-voyage-lite/);
   assert.match(providerMatrix, /methodologyRefinementDefaultArm: local-apple-qwen3-0_6b/);
   assert.match(providerMatrix, /cloud-nvidia-nemotron-1b/);
   assert.match(providerMatrix, /cloud-gemini2-cohere4pro/);
@@ -1932,7 +2100,7 @@ check("model matrix and autoresearch gate stay conservative", () => {
   assert.equal(targetLock.comparisonContract?.fullRunRequiredForPublicClaim, true);
   assert.equal(targetLock.comparisonContract?.reportedTargetsAreSourceLocksNotProofOfWin, true);
   assert.ok(targetLock.currentRecallWeaveClaimBoundary?.mayNotClaim?.includes("RecallWeave beats Supermemory"));
-  assert.equal(providerAdapterRegistry.personalProductionDefaultArm, "cloud-voyage4-voyage");
+  assert.equal(providerAdapterRegistry.personalProductionDefaultArm, "cloud-voyage4-lite-voyage-lite");
   assert.equal(providerAdapterRegistry.methodologyDefault?.memoryMethod, "contextual-source-chunk-v1");
   assert.equal(providerAdapterRegistry.methodologyDefault?.firstStage, "bm25-lite");
   assert.equal(providerAdapterRegistry.methodologyDefault?.queryExpansionDefaultEnabled, false);
@@ -1974,7 +2142,7 @@ check("benchmark target lock and provider registry stay conservative", () => {
   for (const item of [providerRegistryFresh, providerRegistryEvidence]) {
     assert.equal(item.mode, "provider-adapter-registry-check");
     assert.equal(item.status, "READY_PROVIDER_ADAPTER_REGISTRY");
-    assert.equal(item.personalProductionDefaultArm, "cloud-voyage4-voyage");
+    assert.equal(item.personalProductionDefaultArm, "cloud-voyage4-lite-voyage-lite");
     assert.equal(item.methodologyDefault?.memoryMethod, "contextual-source-chunk-v1");
     assert.equal(item.methodologyDefault?.firstStage, "bm25-lite");
     assert.equal(item.methodologyDefault?.queryExpansionDefaultEnabled, false);
@@ -2214,7 +2382,7 @@ check("fresh agentic provider autoresearch plan passes", () => {
     assert.equal(item.publicSafe, true);
     assert.equal(item.callsProviderApis, false);
     assert.equal(item.sendsBenchmarkTextToProvider, false);
-    assert.equal(item.cloudDefaultForPersonalUse, "cloud-voyage4-voyage");
+    assert.equal(item.cloudDefaultForPersonalUse, "cloud-voyage4-lite-voyage-lite");
     assert.equal(item.methodologyDefault, "local-apple-controlled-lanes");
     assert.equal(item.hostedSupermemorySearchForMethodology, "disabled");
     assert.equal(item.target?.sourceLockReadyForMaterialization, true);
@@ -2237,9 +2405,9 @@ check("fresh agentic provider autoresearch plan passes", () => {
   }
   assert.match(markdown, /Agentic Provider Autoresearch Plan/);
   assert.match(evidenceMarkdown, /Provider Matrix/);
-  assert.match(evidenceMarkdown, /cloud-voyage4-voyage/);
+  assert.match(evidenceMarkdown, /cloud-voyage4-lite-voyage-lite/);
   assert.match(evidenceMarkdown, /cloud-gemini2-embed-rerank-proxy/);
-  assert.match(evidenceMarkdown, /cloud-nvidia-nemotron-vl-1b/);
+  assert.match(evidenceMarkdown, /cloud-nvidia-nv-embed-v1-mistral-rerank/);
   for (const text of [JSON.stringify(report), markdown, JSON.stringify(evidence), evidenceMarkdown]) {
     assert.doesNotMatch(text, secretPattern);
     assert.doesNotMatch(text, absolutePrivatePathPattern);
@@ -4342,7 +4510,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardPlan.shards?.at(-1)?.endIndexExclusive, 500);
     assert.equal(shardPlan.strategyCoverage?.hasBm25Lite, true);
     assert.equal(shardPlan.strategyCoverage?.hasFullHybridRerank, true);
-    assert.equal(shardPlan.strategyCoverage?.hasQueryExpansion, true);
+    assert.equal(shardPlan.strategyCoverage?.hasQueryExpansion, false);
     assert.equal(shardPlan.strategyCoverage?.hasVoyageProvider, true);
     assert.equal(shardPlan.strategyCoverage?.hasNvidiaOrGeminiProvider, true);
     assert.equal(shardPlan.strategyCoverage?.hasLocalApple, true);
@@ -4357,7 +4525,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardPlan.providerHybridContract?.acceptedLaneMustScoreControlsAndProvidersTogether, true);
     assert.ok(shardPlan.providerHybridContract?.cloudProviderStrategies?.includes("cloud-gemini2-embed-rerank-proxy"));
     assert.ok(shardPlan.providerHybridContract?.cloudProviderStrategies?.includes("cloud-nvidia-nv-embed-v1-mistral-rerank"));
-    assert.ok(shardPlan.providerHybridContract?.cloudProviderStrategies?.includes("cloud-voyage4-voyage-lite-rerank"));
+    assert.ok(shardPlan.providerHybridContract?.cloudProviderStrategies?.includes("cloud-voyage4-lite-voyage-lite"));
     assert.ok(Array.isArray(shardPlan.executionLanes));
     assert.ok(shardPlan.executionLanes.length >= 5);
     const executionLanes = new Map(shardPlan.executionLanes.map((lane) => [lane.id, lane]));
@@ -4370,13 +4538,13 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(deterministicLane?.coverageReady, true);
     assert.equal(deterministicLane?.acceptedByFullShardIntake, false);
     assert.deepEqual(deterministicLane?.providerRequirements, []);
-    assert.equal(deterministicLane?.queryExpansionEvidenceRequirement, "deterministic-fallback-only");
+    assert.equal(deterministicLane?.queryExpansionEvidenceRequirement, "not-required");
     assert.equal(deterministicLane?.queryExpansionDiagnosticFallbackAllowed, true);
     assert.equal(deterministicLane?.queryExpansionSotaEligible, false);
     assert.equal(localAppleLane?.coverageReady, true);
     assert.equal(localAppleLane?.acceptedByFullShardIntake, false);
     assert.deepEqual(localAppleLane?.providerRequirements, ["local-apple", "local-rerank"]);
-    assert.equal(localAppleLane?.queryExpansionEvidenceRequirement, "local-model-or-deterministic-diagnostic");
+    assert.equal(localAppleLane?.queryExpansionEvidenceRequirement, "not-required");
     assert.equal(localAppleLane?.queryExpansionDiagnosticFallbackAllowed, true);
     assert.equal(localAppleLane?.queryExpansionSotaEligible, false);
     assert.equal(voyageLane?.coverageReady, true);
@@ -4396,7 +4564,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(fullLane?.canReachFullSotaGateAfterShardIntake, true);
     assert.deepEqual(fullLane?.strategies, shardPlan.runPlan?.strategies);
     assert.deepEqual(fullLane?.providerRequirements, ["gemini", "local-apple", "local-rerank", "nvidia", "voyage"]);
-    assert.equal(fullLane?.queryExpansionEvidenceRequirement, "local-or-cloud-model-required");
+    assert.equal(fullLane?.queryExpansionEvidenceRequirement, "not-required");
     assert.equal(fullLane?.queryExpansionDiagnosticFallbackAllowed, false);
     assert.equal(fullLane?.queryExpansionSotaEligible, true);
     assert.equal(fullLane?.answerQualityEndpoint?.answerModel, fullRunTarget.benchmark?.answerModel);
@@ -4437,7 +4605,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(shardPlan.publicBenchmarkClaimsAllowed, false);
     assert.equal(shardPlan.strategyCoverage?.hasBm25Lite, true);
     assert.equal(shardPlan.strategyCoverage?.hasFullHybridRerank, true);
-    assert.equal(shardPlan.strategyCoverage?.hasQueryExpansion, true);
+    assert.equal(shardPlan.strategyCoverage?.hasQueryExpansion, false);
     assert.equal(shardPlan.strategyCoverage?.hasLocalApple, true);
     assert.equal(shardPlan.strategyCoverage?.hasLocalRerank, true);
     assert.equal(shardPlan.strategyCoverage?.hasVoyageProvider, false);
@@ -4457,7 +4625,7 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(acceptedLocalLane?.acceptedByFullShardIntake, true);
     assert.equal(acceptedLocalLane?.canReachFullSotaGateAfterShardIntake, false);
     assert.deepEqual(acceptedLocalLane?.providerRequirements, ["local-apple", "local-rerank"]);
-    assert.equal(acceptedLocalLane?.queryExpansionEvidenceRequirement, "local-or-cloud-model-required");
+    assert.equal(acceptedLocalLane?.queryExpansionEvidenceRequirement, "not-required");
     assert.equal(acceptedLocalLane?.queryExpansionDiagnosticFallbackAllowed, false);
     assert.equal(acceptedLocalLane?.queryExpansionSotaEligible, false);
     assert.equal(acceptedLocalLane?.answerQualityEndpoint?.modelMatchPolicy, "local-diagnostic-allowed");
@@ -4483,7 +4651,6 @@ check("fresh public benchmark target check passes", () => {
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_LOCAL_EMBED_DURABILITY_REPORT=reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--require-local-embedding-durability/);
     assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /--local-embedding-durability-report reviews\/overnight-20260522\/local-embedding-durability-smoke-20260526\.json/);
-    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /SELFMEM_QUERY_EXPANSION_BASE_URL/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--claim-scope local-full/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--model-match-policy local-diagnostic-allowed/);
     assert.match(shardPlan.runPlan?.preflightTemplate ?? "", /--query-offset 0/);
@@ -4492,7 +4659,6 @@ check("fresh public benchmark target check passes", () => {
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL=<local-answer-model>/);
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1/);
     assert.match(shardPlan.runPlan?.answerQualityTemplate ?? "", /SELFMEM_SUPERMEMORY_SEARCH_DISABLED=1/);
-    assert.match(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_QUERY_EXPANSION_CALLS/);
     assert.doesNotMatch(shardPlan.runPlan?.responseArmExportTemplate ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
     assert.match(shardPlan.runPlan?.combineCommand ?? "", /end-to-end-memory-score-local-full-combined/);
   }
@@ -4553,23 +4719,23 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.acceptedLane?.laneId, "full-sota-accepted-shards");
     assert.equal(launchDoctor.acceptedLane?.acceptedByFullShardIntake, true);
     assert.equal(launchDoctor.acceptedLane?.diagnosticOnly, false);
-    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.evidenceRequirement, "local-or-cloud-model-required");
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.evidenceRequirement, "not-required");
     assert.equal(launchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
     assert.equal(launchDoctor.acceptedLane?.queryExpansion?.diagnosticFallbackAllowed, false);
-    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.readyForAcceptedShardIntake, false);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.readyForAcceptedShardIntake, true);
     assert.equal(launchDoctor.shardProgress?.pendingShardCount, 20);
     assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-001");
-    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"));
+    assert.equal(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"), false);
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-apple-readiness"));
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-rerank-readiness"));
-    assert.ok(launchDoctor.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+    assert.equal(launchDoctor.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"), false);
     assert.ok(launchDoctor.blockers?.includes("accepted-lane-answer-quality-scoring-not-ready"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--query-offset 0"));
     assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("--query-offset 0"));
   }
   assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Accepted Lane Launch Doctor/);
   assert.match(acceptedLaneLaunchDoctorMarkdownFresh, /Ready for first accepted shard run: false/);
-  assert.match(acceptedLaneLaunchDoctorMarkdownEvidence, /Query expansion requirement: local-or-cloud-model-required/);
+  assert.match(acceptedLaneLaunchDoctorMarkdownEvidence, /Query expansion requirement: not-required/);
   {
     const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-accepted-lane-provider-env-"));
     const voyageKeys = join(tempRoot, "voyage.keys");
@@ -4599,7 +4765,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.gemini?.ready, true);
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.nvidia?.ready, true);
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.providerReadiness?.voyage?.ready, true);
-    assert.equal(providerEnvLaunchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, true);
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.queryExpansion?.evidenceRequirement, "not-required");
+    assert.equal(providerEnvLaunchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.localRuntimeHealth?.readyForResponseArmExport, false);
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpointValuesPrinted, false);
     assert.equal(providerEnvLaunchDoctor.acceptedLane?.localRuntimeHealth?.endpoints?.["local-apple"]?.configured, false);
@@ -4670,10 +4837,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(launchDoctor.acceptedLane?.acceptedByFullShardIntake, true);
     assert.equal(launchDoctor.acceptedLane?.canReachFullSotaGateAfterShardIntake, false);
     assert.deepEqual(launchDoctor.acceptedLane?.providerRequirements, ["local-apple", "local-rerank"]);
-    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.evidenceRequirement, "local-or-cloud-model-required");
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.evidenceRequirement, "not-required");
     assert.equal(launchDoctor.acceptedLane?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
     assert.equal(launchDoctor.acceptedLane?.queryExpansion?.diagnosticFallbackAllowed, false);
-    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.readyForAcceptedShardIntake, false);
+    assert.equal(launchDoctor.acceptedLane?.queryExpansion?.readyForAcceptedShardIntake, true);
     assert.equal(launchDoctor.acceptedLane?.answerQuality?.modelMatchPolicy, "local-diagnostic-allowed");
     assert.equal(launchDoctor.acceptedLane?.answerQuality?.exactTargetModelsRequired, false);
     assert.equal(launchDoctor.acceptedLane?.answerQuality?.localDiagnosticModelAllowed, true);
@@ -4688,15 +4855,16 @@ check("fresh public benchmark target check passes", () => {
       "answer-quality-local-full-shard-001-20260526.json",
       "answer-quality-local-full-shard-002-recovery-20260526.json",
     ]);
-    assert.equal(launchDoctor.shardProgress?.acceptedShardCount, 2);
-    assert.equal(launchDoctor.shardProgress?.pendingShardCount, 18);
-    assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-003");
-    assert.equal(launchDoctor.shardProgress?.firstPendingShardRange, "50-75");
-    assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"));
+    assert.equal(launchDoctor.shardProgress?.acceptedShardCount, 0);
+    assert.equal(launchDoctor.shardProgress?.pendingShardCount, 20);
+    assert.equal(launchDoctor.shardProgress?.rejectedResultCount, 2);
+    assert.equal(launchDoctor.shardProgress?.firstPendingShardId, "shard-001");
+    assert.equal(launchDoctor.shardProgress?.firstPendingShardRange, "0-25");
+    assert.equal(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "query-expansion-evidence"), false);
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-apple-readiness"));
     assert.ok(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "local-rerank-readiness"));
     assert.equal(launchDoctor.operatorInputsNeeded?.some((item) => item.id === "provider-response-arms"), false);
-    assert.ok(launchDoctor.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+    assert.equal(launchDoctor.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"), false);
     assert.ok(launchDoctor.blockers?.includes("local-apple-credentials-missing"));
     assert.ok(launchDoctor.blockers?.includes("local-rerank-credentials-missing"));
     assert.equal(launchDoctor.blockers?.includes("voyage-credentials-missing"), false);
@@ -4708,13 +4876,13 @@ check("fresh public benchmark target check passes", () => {
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_LOCAL_RERANK_BASE_URL"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--require-local-embedding-durability"));
-    assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("SELFMEM_QUERY_EXPANSION_BASE_URL"));
+    assert.doesNotMatch(launchDoctor.nextCommands?.responseArmExport ?? "", /SELFMEM_QUERY_EXPANSION_BASE_URL/);
     assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("benchmark:public-materialize"));
-    assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("--query-offset 50"));
-    assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("/shards/shard-003/materialized"));
+    assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("--query-offset 0"));
+    assert.ok(launchDoctor.nextCommands?.shardMaterialize?.includes("/shards/shard-001/materialized"));
     assert.ok(launchDoctor.nextCommands?.responseArmExport?.includes("--query-offset 0"));
     assert.doesNotMatch(launchDoctor.nextCommands?.responseArmExport ?? "", /RECALLWEAVE_PROVIDER_BENCHMARK_CALLS/);
-    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("answer-quality-local-full-shard-003.json"));
+    assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("answer-quality-local-full-shard-001.json"));
     assert.ok(launchDoctor.nextCommands?.answerQuality?.includes("--query-offset 0"));
   }
   assert.match(localAcceptedLaneLaunchDoctorMarkdownFresh, /Local-Full Accepted Lane Launch Doctor/);
@@ -4895,23 +5063,23 @@ check("fresh public benchmark target check passes", () => {
     const nvidiaReadiness = laneReadiness.get("nvidia-minimum-challenger");
     const fullSotaReadiness = laneReadiness.get("full-sota-accepted-shards");
     assert.equal(deterministicReadiness?.diagnosticOnly, true);
-    assert.equal(deterministicReadiness?.queryExpansion?.evidenceRequirement, "deterministic-fallback-only");
+    assert.equal(deterministicReadiness?.queryExpansion?.evidenceRequirement, "not-required");
     assert.equal(deterministicReadiness?.queryExpansion?.readyForResponseArmExport, true);
-    assert.equal(deterministicReadiness?.queryExpansion?.diagnosticFallbackAllowed, true);
+    assert.equal(deterministicReadiness?.queryExpansion?.diagnosticFallbackAllowed, false);
     assert.equal(deterministicReadiness?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
     assert.deepEqual(deterministicReadiness?.queryExpansion?.blockers, []);
     assert.equal(localAppleReadiness?.providerReadiness?.["local-apple"]?.ready, false);
     assert.equal(localAppleReadiness?.providerReadiness?.["local-rerank"]?.ready, false);
-    assert.equal(localAppleReadiness?.queryExpansion?.evidenceRequirement, "local-model-or-deterministic-diagnostic");
+    assert.equal(localAppleReadiness?.queryExpansion?.evidenceRequirement, "not-required");
     assert.equal(localAppleReadiness?.queryExpansion?.readyForResponseArmExport, true);
     assert.equal(localAppleReadiness?.queryExpansion?.countsAsFullSotaQueryExpansionEvidence, false);
     assert.equal(voyageReadiness?.providerReadiness?.voyage?.ready, false);
     assert.equal(nvidiaReadiness?.providerReadiness?.nvidia?.ready, false);
     assert.equal(fullSotaReadiness?.acceptedByFullShardIntake, true);
-    assert.equal(fullSotaReadiness?.queryExpansion?.evidenceRequirement, "local-or-cloud-model-required");
-    assert.equal(fullSotaReadiness?.queryExpansion?.readyForResponseArmExport, false);
-    assert.equal(fullSotaReadiness?.queryExpansion?.readyForAcceptedShardIntake, false);
-    assert.ok(fullSotaReadiness?.queryExpansion?.blockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+    assert.equal(fullSotaReadiness?.queryExpansion?.evidenceRequirement, "not-required");
+    assert.equal(fullSotaReadiness?.queryExpansion?.readyForResponseArmExport, true);
+    assert.equal(fullSotaReadiness?.queryExpansion?.readyForAcceptedShardIntake, true);
+    assert.deepEqual(fullSotaReadiness?.queryExpansion?.blockers, []);
     assert.equal(fullSotaReadiness?.readyForResponseArmExport, false);
     assert.equal(fullSotaReadiness?.readyForAnswerQualityScoring, false);
     assert.equal(fullSotaReadiness?.readyForAcceptedShardIntakeCandidate, false);
@@ -4930,7 +5098,6 @@ check("fresh public benchmark target check passes", () => {
       "local-rerank-credentials-missing",
       "nvidia-credentials-missing",
       "voyage-credentials-missing",
-      "query-expansion-local-endpoint-or-cloud-consent-missing",
       "answer-model-missing",
       "judge-model-missing",
       "openai-compatible-base-url-missing",
@@ -4951,31 +5118,21 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullAnswerQualityShardWorkorder.plan?.claimScope, "local-full");
   for (const workorder of [localFullAnswerQualityShardWorkorder, localFullShardWorkorderFresh]) {
     assert.equal(workorder.progress?.inputCount, 2);
-    assert.equal(workorder.progress?.acceptedShardCount, 2);
-    assert.equal(workorder.progress?.pendingShardCount, 18);
-    assert.equal(workorder.progress?.workorderCount, 18);
-    assert.equal(workorder.workorders?.[0]?.shardId, "shard-003");
+    assert.equal(workorder.progress?.acceptedShardCount, 0);
+    assert.equal(workorder.progress?.pendingShardCount, 20);
+    assert.equal(workorder.progress?.rejectedResultCount, 2);
+    assert.equal(workorder.progress?.workorderCount, 20);
+    assert.equal(workorder.workorders?.[0]?.shardId, "shard-001");
     assert.equal(workorder.runtimeBlockers?.inputCount, 1);
-    assert.equal(workorder.runtimeBlockers?.matchedCount, 1);
-    assert.equal(workorder.runtimeBlockers?.rejectedCount, 0);
-    assert.equal(workorder.runtimeBlockers?.resumeAvailableCount, 1);
-    assert.equal(workorder.workorders?.[0]?.runtimeResume?.resumeAvailable, true);
-    assert.deepEqual(workorder.workorders?.[0]?.runtimeResume?.completedStrategies, [
-      "bm25-lite",
-      "full-hybrid-rerank",
-      "query-expanded-full-hybrid-rerank",
-      "local-apple-qwen3-0_6b",
-    ]);
-    assert.deepEqual(workorder.workorders?.[0]?.runtimeResume?.missingStrategies, [
-      "local-apple-qwen3-0_6b-local-rerank",
-    ]);
-    assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /--query-offset 50/);
+    assert.equal(workorder.runtimeBlockers?.matchedCount, 0);
+    assert.equal(workorder.runtimeBlockers?.rejectedCount, 1);
+    assert.equal(workorder.runtimeBlockers?.resumeAvailableCount, 0);
+    assert.equal(workorder.runtimeBlockers?.blockers?.includes("runtime-blocker-report-rejected"), true);
+    assert.equal(workorder.workorders?.[0]?.runtimeResume, null);
+    assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /--query-offset 0/);
     assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /--max-queries 25/);
-    assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /\/shards\/shard-003\/materialized/);
-    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /--strategies local-apple-qwen3-0_6b-local-rerank/);
-    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /\/shards\/shard-003\/materialized\/longmemeval-queryset\.private\.json/);
-    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /\/shards\/shard-003\/arms/);
-    assert.match(workorder.workorders?.[0]?.commands?.missingArmResponseExport ?? "", /--query-offset 0/);
+    assert.match(workorder.workorders?.[0]?.commands?.shardMaterialize ?? "", /\/shards\/shard-001\/materialized/);
+    assert.equal(workorder.workorders?.[0]?.commands?.missingArmResponseExport, null);
     assert.match(workorder.workorders?.[0]?.commands?.preflight ?? "", /benchmark:answer-quality:preflight/);
     assert.match(workorder.workorders?.[0]?.commands?.preflight ?? "", /--query-offset 0/);
   }
@@ -4986,9 +5143,11 @@ check("fresh public benchmark target check passes", () => {
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.answerQuality?.modelMatchPolicy, "local-diagnostic-allowed");
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.answerQuality?.scoringModelPolicySatisfied, false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.canReachFullSotaGateAfterShardIntake, false);
+  assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.queryExpansion?.evidenceRequirement, "not-required");
+  assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneReadiness?.queryExpansion?.readyForAcceptedShardIntake, true);
   assert.ok(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("local-apple-credentials-missing"));
   assert.ok(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("local-rerank-credentials-missing"));
-  assert.ok(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"));
+  assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"), false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("voyage-credentials-missing"), false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("nvidia-credentials-missing"), false);
   assert.equal(localFullAnswerQualityShardWorkorder.acceptedLaneEnvironmentBlockers?.includes("RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled"), false);
@@ -4996,13 +5155,11 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullAnswerQualityShardWorkorder.gatedCommands?.shardIntake ?? "", /answer-quality-local-full-shard-intake/);
   assert.match(localFullAnswerQualityShardWorkorder.gatedCommands?.combineAfterIntakePasses ?? "", /end-to-end-memory-score-local-full-combined/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /local-full-accepted-shards/);
-  assert.match(localFullAnswerQualityShardWorkorderEvidence, /query-expansion=local-or-cloud-model-required/);
+  assert.match(localFullAnswerQualityShardWorkorderEvidence, /query-expansion=not-required/);
   assert.match(localFullAnswerQualityShardWorkorderEvidence, /scoring-policy=local-diagnostic-allowed/);
-  assert.match(localFullAnswerQualityShardWorkorderEvidence, /Runtime resume plans: 1/);
-  assert.match(localFullAnswerQualityShardWorkorderEvidence, /missing=local-apple-qwen3-0_6b-local-rerank/);
+  assert.match(localFullAnswerQualityShardWorkorderEvidence, /Runtime resume plans: 0/);
   const assertResumePacketCommon = (resumePacket) => {
     assert.equal(resumePacket.mode, "local-full-shard-resume-packet");
-    assert.equal(resumePacket.status, "READY_FOR_LOCAL_FULL_SHARD_RESUME");
     assert.equal(resumePacket.metricsOnly, true);
     assert.equal(resumePacket.publicSafe, true);
     assert.equal(resumePacket.callsProviderApis, false);
@@ -5019,20 +5176,15 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(resumePacket.readyForShardIntake, false);
     assert.equal(resumePacket.readyForShardCombine, false);
     assert.equal(resumePacket.publicBenchmarkClaimsAllowed, false);
-    assert.equal(resumePacket.progress?.runtimeBlockerResumeAvailableCount, 1);
     assert.equal(resumePacket.targetShard?.maxQueries, 25);
     assert.equal(resumePacket.localRuntime?.runtimeReady, true);
     assert.equal(resumePacket.localRuntime?.durabilityReady, true);
     assert.deepEqual(resumePacket.localRuntime?.blockers, []);
-    assert.deepEqual(resumePacket.blockers, []);
-    assert.match(resumePacket.commands?.missingArmResponseExport ?? "", /--require-local-embedding-durability/);
     if (resumePacket.commands?.shardMaterialize) {
       assert.match(resumePacket.commands.shardMaterialize, /benchmark:public-materialize/);
       assert.match(resumePacket.commands.shardMaterialize, /--query-offset \d+/);
       assert.match(resumePacket.commands.shardMaterialize, /--max-queries 25/);
       assert.match(resumePacket.commands.shardMaterialize, /\/shards\/shard-\d{3}\/materialized/);
-      assert.equal(resumePacket.shardLocalResume?.usesShardLocalMaterialization, true);
-      assert.equal(resumePacket.shardLocalResume?.responseArmQueryOffset, 0);
     }
     assert.match(resumePacket.commands?.resumeEnvDoctor ?? "", /benchmark:answer-quality:local-shard-resume-env/);
     assert.match(resumePacket.commands?.resumeCommandMaterializer ?? "", /benchmark:answer-quality:local-shard-resume-command/);
@@ -5045,6 +5197,10 @@ check("fresh public benchmark target check passes", () => {
   for (const resumePacket of [localFullShardResumePacket, localFullShardResumePacketFresh]) {
     assertResumePacketCommon(resumePacket);
   }
+  assert.equal(localFullShardResumePacket.status, "READY_FOR_LOCAL_FULL_SHARD_RESUME");
+  assert.deepEqual(localFullShardResumePacket.blockers, []);
+  assert.equal(localFullShardResumePacket.progress?.runtimeBlockerResumeAvailableCount, 1);
+  assert.match(localFullShardResumePacket.commands?.missingArmResponseExport ?? "", /--require-local-embedding-durability/);
   assert.equal(localFullShardResumePacket.progress?.acceptedShardCount, 1);
   assert.equal(localFullShardResumePacket.progress?.pendingShardCount, 19);
   assert.equal(localFullShardResumePacket.targetShard?.shardId, "shard-002");
@@ -5069,33 +5225,34 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumePacket.commands?.resumeEnvDoctor ?? "", /local-full-shard-002-resume-env-doctor-20260526\.json/);
   assert.match(localFullShardResumePacket.commands?.resumeCommandMaterializer ?? "", /local-full-shard-002-resume-command-materializer-20260526\.json/);
   assert.match(localFullShardResumePacket.commands?.resumeResultDoctor ?? "", /local-full-shard-002-resume-result-doctor-20260526\.json/);
-  assert.equal(localFullShardResumePacketFresh.progress?.acceptedShardCount, 2);
-  assert.equal(localFullShardResumePacketFresh.progress?.pendingShardCount, 18);
-  assert.equal(localFullShardResumePacketFresh.targetShard?.shardId, "shard-003");
-  assert.equal(localFullShardResumePacketFresh.targetShard?.startIndex, 50);
-  assert.equal(localFullShardResumePacketFresh.targetShard?.endIndexExclusive, 75);
-  assert.equal(localFullShardResumePacketFresh.targetShard?.queryOffset, 50);
-  assert.deepEqual(localFullShardResumePacketFresh.resumeState?.completedStrategies, [
-    "bm25-lite",
-    "full-hybrid-rerank",
-    "query-expanded-full-hybrid-rerank",
-    "local-apple-qwen3-0_6b",
-  ]);
-  assert.deepEqual(localFullShardResumePacketFresh.resumeState?.missingStrategies, [
-    "local-apple-qwen3-0_6b-local-rerank",
-  ]);
-  assert.equal(localFullShardResumePacketFresh.resumeState?.completedArmCount, 4);
-  assert.equal(localFullShardResumePacketFresh.resumeState?.missingArmCount, 1);
+  assert.equal(localFullShardResumePacketFresh.status, "BLOCKED_LOCAL_FULL_SHARD_RESUME");
+  assert.equal(localFullShardResumePacketFresh.progress?.acceptedShardCount, 0);
+  assert.equal(localFullShardResumePacketFresh.progress?.pendingShardCount, 20);
+  assert.equal(localFullShardResumePacketFresh.progress?.rejectedResultCount, 2);
+  assert.equal(localFullShardResumePacketFresh.progress?.runtimeBlockerResumeAvailableCount, 0);
+  assert.equal(localFullShardResumePacketFresh.targetShard?.shardId, "shard-001");
+  assert.equal(localFullShardResumePacketFresh.targetShard?.startIndex, 0);
+  assert.equal(localFullShardResumePacketFresh.targetShard?.endIndexExclusive, 25);
+  assert.equal(localFullShardResumePacketFresh.targetShard?.queryOffset, 0);
+  assert.deepEqual(localFullShardResumePacketFresh.resumeState?.completedStrategies, []);
+  assert.deepEqual(localFullShardResumePacketFresh.resumeState?.missingStrategies, []);
+  assert.equal(localFullShardResumePacketFresh.resumeState?.completedArmCount, 0);
+  assert.equal(localFullShardResumePacketFresh.resumeState?.missingArmCount, 0);
   assert.equal(localFullShardResumePacketFresh.resumeState?.previousFailureClass, "local-rerank-response-body-stall");
   assert.equal(localFullShardResumePacketFresh.resumeState?.publicSyntheticReproduced, false);
-  assert.match(localFullShardResumePacketFresh.commands?.shardMaterialize ?? "", /--query-offset 50/);
-  assert.match(localFullShardResumePacketFresh.commands?.shardMaterialize ?? "", /\/shards\/shard-003\/materialized/);
-  assert.match(localFullShardResumePacketFresh.commands?.missingArmResponseExport ?? "", /--strategies local-apple-qwen3-0_6b-local-rerank/);
-  assert.match(localFullShardResumePacketFresh.commands?.missingArmResponseExport ?? "", /--query-offset 0/);
-  assert.match(localFullShardResumePacketFresh.commands?.resumeEnvDoctor ?? "", /local-full-shard-003-resume-env-doctor-20260526\.json/);
-  assert.match(localFullShardResumePacketFresh.commands?.resumeCommandMaterializer ?? "", /local-full-shard-003-resume-command-materializer-20260526\.json/);
-  assert.match(localFullShardResumePacketFresh.commands?.resumeResultDoctor ?? "", /local-full-shard-003-resume-result-doctor-20260526\.json/);
-  assert.match(localFullShardResumePacketFresh.commands?.localShardIntake ?? "", /answer-quality-local-full-shard-003\.json/);
+  assert.match(localFullShardResumePacketFresh.commands?.shardMaterialize ?? "", /--query-offset 0/);
+  assert.match(localFullShardResumePacketFresh.commands?.shardMaterialize ?? "", /\/shards\/shard-001\/materialized/);
+  assert.equal(localFullShardResumePacketFresh.shardLocalResume?.usesShardLocalMaterialization, false);
+  assert.equal(localFullShardResumePacketFresh.shardLocalResume?.materializeCommandAvailable, true);
+  assert.equal(localFullShardResumePacketFresh.shardLocalResume?.responseArmQueryOffset, 0);
+  assert.equal(localFullShardResumePacketFresh.commands?.missingArmResponseExport, null);
+  assert.match(localFullShardResumePacketFresh.commands?.resumeEnvDoctor ?? "", /local-full-shard-001-resume-env-doctor-20260526\.json/);
+  assert.match(localFullShardResumePacketFresh.commands?.resumeCommandMaterializer ?? "", /local-full-shard-001-resume-command-materializer-20260526\.json/);
+  assert.match(localFullShardResumePacketFresh.commands?.resumeResultDoctor ?? "", /local-full-shard-001-resume-result-doctor-20260526\.json/);
+  assert.match(localFullShardResumePacketFresh.commands?.localShardIntake ?? "", /answer-quality-local-full-shard-001\.json/);
+  assert.ok(localFullShardResumePacketFresh.blockers?.includes("runtime-resume-not-available"));
+  assert.ok(localFullShardResumePacketFresh.blockers?.includes("resume-target-shard-mismatch"));
+  assert.ok(localFullShardResumePacketFresh.blockers?.includes("missing-arm-export-command-missing"));
   assert.equal(localFullShardResumePacketFresh.safety?.supermemorySearchPolicy, "disabled-for-benchmark-methodology");
   assert.deepEqual(localFullShardResumePacketFresh.safety?.supermemorySearchDisabledEnv, [
     "RECALLWEAVE_BENCHMARK_DISABLE_SUPERMEMORY_SEARCH=1",
@@ -5104,7 +5261,6 @@ check("fresh public benchmark target check passes", () => {
   for (const command of [
     localFullShardResumePacketFresh.commands?.resumeEnvDoctor,
     localFullShardResumePacketFresh.commands?.shardMaterialize,
-    localFullShardResumePacketFresh.commands?.missingArmResponseExport,
     localFullShardResumePacketFresh.commands?.preflight,
     localFullShardResumePacketFresh.commands?.answerQuality,
     localFullShardResumePacketFresh.commands?.localShardIntake,
@@ -5124,6 +5280,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumePacketEvidence, /Run the local-full shard resume result doctor before accepting shard 002/);
   assert.match(localFullShardResumePacketEvidence, /Do not combine, publish, or claim local-full benchmark evidence until all twenty local-full shards are accepted/);
   assert.match(localFullShardResumePacketMarkdownFresh, /Local embedding runtime ready: true/);
+  assert.match(localFullShardResumePacketMarkdownFresh, /Status: BLOCKED_LOCAL_FULL_SHARD_RESUME/);
   assert.match(localFullShardResumePacketMarkdownFresh, /Raw memory included: false/);
   for (const text of [
     JSON.stringify(localFullShardResumePacket),
@@ -5551,7 +5708,7 @@ check("fresh public benchmark target check passes", () => {
     assert.match(securityDoctor.fixtureProbe?.privateScriptHash ?? "", /^sha256:[a-f0-9]{64}$/);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptContentPrinted, false);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptExportsSupermemorySearchDisabled, true);
-    assert.equal(securityDoctor.fixtureProbe?.privateScriptContainsRuntimeValues, true);
+    assert.equal(securityDoctor.fixtureProbe?.privateScriptContainsRuntimeValues, false);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptPlaceholderCount, 0);
     assert.equal(securityDoctor.fixtureProbe?.privateScriptOrderReady, true);
     assert.deepEqual(securityDoctor.fixtureProbe?.commandOrder, expectedResumePrivateScriptCommandOrder);
@@ -5625,14 +5782,14 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullShardResumeResultDoctorMarkdownFresh, /shard-002-result-missing/);
   assert.equal(localFullShardResumeResultDoctorFixture.mode, "local-full-shard-resume-result-doctor");
   assert.equal(localFullShardResumeResultDoctorFixture.fixtureOnly, true);
-  assert.equal(localFullShardResumeResultDoctorFixture.status, "READY_LOCAL_FULL_SHARD_002_RESULT_FOR_INTAKE");
-  assert.equal(localFullShardResumeResultDoctorFixture.readyForLocalShardIntake, true);
+  assert.equal(localFullShardResumeResultDoctorFixture.status, "BLOCKED_LOCAL_FULL_SHARD_002_RESULT");
+  assert.equal(localFullShardResumeResultDoctorFixture.readyForLocalShardIntake, false);
   assert.equal(localFullShardResumeResultDoctorFixture.readyForShardCombine, false);
   assert.equal(localFullShardResumeResultDoctorFixture.commandMaterializer?.ready, true);
   assert.equal(localFullShardResumeResultDoctorFixture.commandMaterializer?.writesPrivateCommandFile, true);
   assert.equal(localFullShardResumeResultDoctorFixture.previousShard?.accepted, true);
-  assert.equal(localFullShardResumeResultDoctorFixture.shardResult?.accepted, true);
-  assert.deepEqual(localFullShardResumeResultDoctorFixture.blockers, []);
+  assert.equal(localFullShardResumeResultDoctorFixture.shardResult?.accepted, false);
+  assert.deepEqual(localFullShardResumeResultDoctorFixture.blockers, ["strategy-set-mismatch"]);
   assert.equal(localFullShardResumeResultDoctorFixture.shardResult?.strategyNames?.includes("cloud-voyage4-voyage-lite-rerank"), false);
   assert.equal(localFullShardResumeResultDoctorFixture.shardResult?.strategyNames?.includes("cloud-nvidia-nemotron-1b"), false);
   for (const text of [
@@ -5727,7 +5884,11 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(localShardIntake.plan?.shardCount, 20);
     assert.equal(localShardIntake.intake?.inputCount, 0);
     assert.equal(localShardIntake.intake?.missingShardCount, 20);
-    assert.deepEqual(localShardIntake.plan?.strategies, localFullAnswerQualityShardPlan.runPlan?.strategies);
+    if (localShardIntake === localFullShardIntakeFresh) {
+      assert.deepEqual(localShardIntake.plan?.strategies, localFullAnswerQualityShardPlan.runPlan?.strategies);
+    } else {
+      assert.ok(localShardIntake.plan?.strategies?.includes("query-expanded-full-hybrid-rerank"));
+    }
     assert.equal(localShardIntake.plan?.strategies?.includes("cloud-voyage4-voyage-lite-rerank"), false);
     assert.equal(localShardIntake.plan?.strategies?.includes("cloud-nvidia-nemotron-1b"), false);
     assert.ok(localShardIntake.blockers?.includes("shard-results-missing"));
@@ -5762,7 +5923,7 @@ check("fresh public benchmark target check passes", () => {
   assert.match(localFullAnswerQualityShardIntakeAfterShard002RecoveryEvidence, /Accepted shards: 2/);
   assert.match(localFullAnswerQualityShardIntakeAfterShard002RecoveryEvidence, /Missing shards: 18/);
   {
-    const requiredStrategies = localFullAnswerQualityShardPlan.runPlan?.strategies ?? [];
+    const projectedRequiredStrategies = localFullAnswerQualityShard005CommonArmProjection.projection?.requiredStrategies ?? [];
     assert.equal(localFullAnswerQualityShard005CommonArmProjection.mode, "public-benchmark-answer-quality");
     assert.equal(localFullAnswerQualityShard005CommonArmProjection.fixtureOnly, false);
     assert.equal(localFullAnswerQualityShard005CommonArmProjection.metricsOnly, true);
@@ -5776,10 +5937,10 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(localFullAnswerQualityShard005CommonArmProjection.projection?.sourceWasStrategySuperset, true);
     assert.equal(localFullAnswerQualityShard005CommonArmProjection.projection?.sourceStrategyCount, 8);
     assert.equal(localFullAnswerQualityShard005CommonArmProjection.projection?.projectedStrategyCount, 5);
-    assert.deepEqual(localFullAnswerQualityShard005CommonArmProjection.projection?.requiredStrategies, requiredStrategies);
+    assert.ok(projectedRequiredStrategies.includes("query-expanded-full-hybrid-rerank"));
     assert.deepEqual(
       localFullAnswerQualityShard005CommonArmProjection.strategies?.map((item) => item.strategy),
-      requiredStrategies,
+      projectedRequiredStrategies,
     );
     assert.deepEqual(localFullAnswerQualityShard005CommonArmProjection.projection?.droppedStrategies, [
       "wiki-title-amplified-hybrid",
@@ -6278,6 +6439,15 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.status, "BLOCKED_FULL_MEMORY_SOTA_EVIDENCE");
     assert.equal(doctorReport.publicBenchmarkClaimsAllowed, false);
     assert.equal(doctorReport.countsAsFullMemorySotaEvidence, false);
+    assert.equal(doctorReport.benchmarkContract?.primaryScoreName, "whole-harness-agent-memory-answer-quality");
+    assert.equal(doctorReport.benchmarkContract?.primaryScoreRequiresPluginActor, true);
+    assert.equal(doctorReport.benchmarkContract?.primaryScoreRequiresExplicitMemoryWrites, true);
+    assert.equal(doctorReport.benchmarkContract?.primaryScoreRequiresPostBoundaryRecall, true);
+    assert.equal(doctorReport.benchmarkContract?.primaryScoreRequiresSessionWikiTopicMaps, true);
+    assert.equal(doctorReport.benchmarkContract?.benchmarkContainersMustBeIsolatedFromLiveResearch, true);
+    assert.equal(doctorReport.benchmarkContract?.privateWorkspaceRequiredForRawResearchState, true);
+    assert.equal(doctorReport.benchmarkContract?.supermemoryComparisonSurface, "plugin-to-plugin-agent-memory-layer");
+    assert.equal(doctorReport.benchmarkContract?.diagnosticsAreNotAlternateScoreboards, true);
     assert.equal(doctorReport.benchmarkContract?.bm25IsLexicalFloorOnly, true);
     assert.equal(doctorReport.benchmarkContract?.retrievalProxyOnlyIsNotEnough, true);
     assert.equal(doctorReport.benchmarkContract?.componentBenchmarksAreModelSelectionOnly, true);
@@ -6362,8 +6532,9 @@ check("fresh public benchmark target check passes", () => {
       doctorReport.shardState?.fullSotaLaneEnvironmentBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"),
       false,
     );
-    assert.ok(
+    assert.equal(
       doctorReport.shardState?.supersededAcceptedLaneBlockers?.includes("query-expansion-local-endpoint-or-cloud-consent-missing"),
+      false,
     );
     assert.equal(doctorReport.localFullLaneState?.intakeStatus, "READY_TO_COMBINE_FULL_ANSWER_QUALITY_SHARDS");
     assert.equal(doctorReport.localFullLaneState?.readyForShardCombine, true);
@@ -6371,8 +6542,8 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.missingShardCount, expectedLocalFull.missingShardCount);
     assert.equal(doctorReport.localFullLaneState?.launchProgressSource, "checked-in-progress-intake");
     assert.equal(doctorReport.localFullLaneState?.launchProgressInputCount, 2);
-    assert.equal(doctorReport.localFullLaneState?.launchAcceptedShardCount, 2);
-    assert.equal(doctorReport.localFullLaneState?.launchPendingShardCount, 18);
+    assert.equal(doctorReport.localFullLaneState?.launchAcceptedShardCount, 0);
+    assert.equal(doctorReport.localFullLaneState?.launchPendingShardCount, 20);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.safe, true);
     assert.equal(doctorReport.localFullLaneState?.performanceReport?.evidenceReady, true);
     assert.deepEqual(doctorReport.localFullLaneState?.performanceReport?.evidenceBlockers, []);
@@ -6501,11 +6672,12 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.localFullLaneState?.runtimeRecoveryRetrievalRecovered, true);
     assert.equal(doctorReport.localFullLaneState?.runtimeRecoveryAnswerQualityEnvReady, true);
     assert.equal(doctorReport.localFullLaneState?.runtimeBlockerWorkorderInputCount, 1);
-    assert.equal(doctorReport.localFullLaneState?.runtimeBlockerResumeAvailableCount, 1);
+    assert.equal(doctorReport.localFullLaneState?.runtimeBlockerResumeAvailableCount, 0);
     assert.deepEqual(doctorReport.localFullLaneState?.nextPendingShardResumeMissingStrategies, []);
-    assert.deepEqual(doctorReport.localFullLaneState?.historicalNextPendingShardResumeMissingStrategies, [
-      "local-apple-qwen3-0_6b-local-rerank",
-    ]);
+    assert.deepEqual(
+      doctorReport.localFullLaneState?.historicalNextPendingShardResumeMissingStrategies,
+      [],
+    );
     assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedShard, null);
     assert.equal(doctorReport.localFullLaneState?.latestRuntimeBlockedArm, null);
     assert.equal(doctorReport.localFullLaneState?.localEmbeddingRuntimeStatus, "READY_LOCAL_EMBEDDING_RUNTIME");
@@ -6549,7 +6721,20 @@ check("fresh public benchmark target check passes", () => {
     assert.equal(doctorReport.blockers?.includes("local-full-shard-003-incomplete"), false);
     assert.equal(doctorReport.blockers?.includes("local-full-shard-003-scoring-env-missing"), false);
     assert.ok(doctorReport.blockers?.includes("human-public-launch-approval"));
-    assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("query-expanded-full-hybrid-rerank"));
+    assert.equal(
+      doctorReport.nextRunPlan?.strategySet?.includes("query-expanded-full-hybrid-rerank"),
+      false,
+    );
+    if (doctorReport === fullMemorySotaDoctorFresh) {
+      assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("cloud-gemini2-embed-rerank-proxy"));
+      assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("cloud-voyage4-lite-voyage-lite"));
+      assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("cloud-nvidia-nv-embed-v1-mistral-rerank"));
+    } else {
+      assert.ok(doctorReport.nextRunPlan?.strategySet?.some((strategy) => String(strategy).includes("gemini")));
+      assert.ok(doctorReport.nextRunPlan?.strategySet?.some((strategy) => String(strategy).includes("voyage")));
+      assert.ok(doctorReport.nextRunPlan?.strategySet?.some((strategy) => String(strategy).includes("nvidia")));
+    }
+    assert.ok(doctorReport.nextRunPlan?.strategySet?.includes("local-apple-qwen3-0_6b-local-rerank"));
     assert.ok(doctorReport.nextRunPlan?.executionLanes?.some((lane) => lane.id === "local-apple-no-spend" && lane.acceptedByFullShardIntake === false));
     assert.deepEqual(doctorReport.nextRunPlan?.acceptedShardIntakeLaneIds, ["full-sota-accepted-shards"]);
     assert.ok(doctorReport.nextRunPlan?.diagnosticLaneIds?.includes("deterministic-control-proxy"));
@@ -6599,9 +6784,9 @@ check("fresh public benchmark target check passes", () => {
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Historical runtime-blocked local-full shards: 2/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Recovered runtime-blocked local-full shards: 2/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime recovery status: RETRIEVAL_AND_SCORING_READY/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime blocker resume plans: 1/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Runtime blocker resume plans: 0/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Next shard missing resume arms: none/);
-  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Historical next shard missing resume arms: local-apple-qwen3-0_6b-local-rerank/);
+  assert.match(fullMemorySotaDoctorMarkdownEvidence, /Historical next shard missing resume arms: none/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding runtime ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Local embedding durability ready: true/);
   assert.match(fullMemorySotaDoctorMarkdownEvidence, /Provider Wave Intake/);
@@ -7370,6 +7555,130 @@ check("fresh canary report generator passes", () => {
     assertNativeMemory(windowedIntakeReport.nativeMemory);
     assert.doesNotMatch(windowedRun.stdout, secretPattern);
     assert.doesNotMatch(windowedRun.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
+
+    const codexProfileReportPath = join(tempRoot, "codex-profile-real-report.json");
+    const currentCommit = run("git", ["rev-parse", "HEAD"]).stdout.trim();
+    const codexProfileReport = {
+      schemaVersion: 1,
+      mode: "one-agent-canary-runtime-report",
+      generatedAt: "2026-06-02T12:00:00.000Z",
+      commit: currentCommit,
+      agent: {
+        host: "codex",
+        agentIdentityHash: "agent_c0decafe",
+        localContainerHash: "container_c0de1234",
+        sourceContainerHash: "source_c0de5678",
+      },
+      adapter: {
+        name: "recallweave-codex-selfmem-bridge",
+        contractVersion: "2026.06.02.codex-local-bridge-v1",
+        strictCanaryContract: "v1",
+        searchLatencyInstrumentation: true,
+        storeLatencyInstrumentation: true,
+      },
+      window: {
+        startedAt: "2026-06-02T11:45:00.000Z",
+        endedAt: "2026-06-02T12:00:00.000Z",
+        durationMinutes: 15,
+      },
+      provider: {
+        mode: "local-write-local-recall",
+        localWriteMode: "enabled",
+        hostedSupermemoryMode: "disabled",
+        hostedWriteBack: false,
+      },
+      nativeMemory: {
+        providerId: "codex-selfmem-bridge",
+        slot: "codex.hooks",
+        defaultActive: true,
+        shadowOnly: false,
+        newWrites: "local",
+        hostedReadThrough: false,
+        hostedWriteBack: false,
+        proof: [
+          "explicit-native-default-config",
+          "codex-user-prompt-submit-recall-hook",
+          "codex-stop-flush-hook",
+          "codex-precompact-hook-not-exposed",
+          "local-store-events-observed",
+        ],
+      },
+      counts: {
+        sessionStart: 1,
+        beforePromptBuild: 8,
+        preCompress: 0,
+        agentEnd: 8,
+        search: 8,
+        store: 4,
+        errors: 0,
+        skippedUnknownIdentity: 0,
+        unknownContainerWrites: 0,
+      },
+      latencyMs: {
+        recallP50: 18,
+        recallP95: 35,
+        storeP50: 22,
+        storeP95: 41,
+      },
+      instrumentation: {
+        searchLatencySampleCount: 8,
+        storeLatencySampleCount: 4,
+        missingSearchLatencyCount: 0,
+        missingStoreLatencyCount: 0,
+        metadataOnlyTrace: false,
+        summaryOnlyTrace: false,
+      },
+      quality: {
+        beforePromptHasContextRate: 1,
+        zeroResultRate: 0,
+        writeSuccessRate: 1,
+        lcmHookObserved: false,
+        lcmHookNotExposed: true,
+        lifecycleCovered: true,
+        hybridSearchCovered: false,
+        localRecallCovered: true,
+        localWritesObserved: true,
+        hostedReadThroughObserved: false,
+      },
+      privacy: {
+        privacyLeakCount: 0,
+        redactionCount: 4,
+        secretPatternHits: 0,
+        rawMemoryIncluded: false,
+        rawTranscriptIncluded: false,
+        rawPromptIncluded: false,
+        rawAnswerIncluded: false,
+      },
+      rollback: {
+        available: true,
+        tested: true,
+        command: "selfmem_update --rollback",
+      },
+      failures: [],
+    };
+    writeFileSync(codexProfileReportPath, JSON.stringify(codexProfileReport), { encoding: "utf8", mode: 0o600 });
+    const codexProfileIntake = run("node", [
+      "packages/bench/canary-evidence-intake.mjs",
+      "--report",
+      codexProfileReportPath,
+      "--strict-real",
+      "--expected-commit",
+      currentCommit.slice(0, 12),
+    ]);
+    const codexProfileIntakeReport = JSON.parse(codexProfileIntake.stdout);
+    assert.equal(codexProfileIntakeReport.ok, true);
+    assert.equal(codexProfileIntakeReport.profile, "codex-local-bridge");
+    assert.equal(codexProfileIntakeReport.target.host, "codex");
+    assert.equal(codexProfileIntakeReport.target.hostedSupermemoryMode, "disabled");
+    assert.equal(codexProfileIntakeReport.canaryPass, true);
+    assert.equal(codexProfileIntakeReport.countsAsRealRolloutEvidence, true);
+    assert.equal(codexProfileIntakeReport.nativeMemory.providerId, "codex-selfmem-bridge");
+    assert.equal(codexProfileIntakeReport.nativeMemory.hostedWriteBack, false);
+    assert.equal(codexProfileIntakeReport.quality.lcmHookNotExposed, true);
+    assert.equal(codexProfileIntakeReport.quality.localRecallCovered, true);
+    assert.deepEqual(codexProfileIntakeReport.failedChecks, []);
+    assert.doesNotMatch(codexProfileIntake.stdout, secretPattern);
+    assert.doesNotMatch(codexProfileIntake.stdout, /\/Users\/|\/Volumes\/|\/private\/|\/var\/folders\//);
 
     const summaryDiagnosticReportPath = join(tempRoot, "summary-diagnostic-report.json");
     const summaryDiagnostic = run("node", [
@@ -8307,11 +8616,11 @@ check("fresh canary next-agent plan passes", () => {
   rmSync(tempRoot, { recursive: true, force: true });
 });
 
-check("fresh canary next-agent handoff packet passes", () => {
+check("fresh canary next-agent request packet passes", () => {
   const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-canary-next-agent-packet-check-"));
-  const packetPath = join(tempRoot, "next-agent-handoff.zip");
-  const expectedCommitPacketPath = join(tempRoot, "next-agent-handoff-expected-commit.zip");
-  const allowFailedPacketPath = join(tempRoot, "next-agent-handoff-allow-failed.zip");
+  const packetPath = join(tempRoot, "next-agent-request.zip");
+  const expectedCommitPacketPath = join(tempRoot, "next-agent-request-expected-commit.zip");
+  const allowFailedPacketPath = join(tempRoot, "next-agent-request-allow-failed.zip");
   const noCandidateRoot = join(tempRoot, "empty-diagnostics");
   const noCandidatePacketPath = join(tempRoot, "no-candidate.zip");
   const requireReadyPacketPath = join(tempRoot, "fixture-should-not-pass.zip");
@@ -8376,7 +8685,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   const evidence = readFileSync(join(root, reviewDir, "canary-next-agent-packet-evidence.md"), "utf8");
   const geminiReview = readFileSync(join(root, reviewDir, "gemini-canary-next-agent-packet-review.md"), "utf8");
   assert.equal(report.ok, true);
-  assert.equal(report.mode, "canary-next-agent-handoff-packet");
+  assert.equal(report.mode, "canary-next-agent-request-packet");
   assert.equal(report.writesRealFiles, true);
   assert.equal(report.publicSafe, true);
   assert.equal(report.metricsOnly, true);
@@ -8387,7 +8696,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(report.host, "hermes");
   assert.equal(report.status, "FIXTURE_PLAN_ONLY");
   assert.equal(allowFailedReport.ok, true);
-  assert.equal(allowFailedReport.mode, "canary-next-agent-handoff-packet");
+  assert.equal(allowFailedReport.mode, "canary-next-agent-request-packet");
   assert.equal(allowFailedManifest.batch.allowFailedInputs, true);
   assert.equal(allowFailedPlan.batch.allowFailedInputs, true);
   assert.notEqual(requireReadyFixtureRun.status, 0);
@@ -8398,7 +8707,7 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.equal(existsSync(requireReadyPacketPath), false);
   assert.notEqual(noCandidateRun.status, 0);
   assert.equal(noCandidateReport.ok, false);
-  assert.equal(noCandidateReport.mode, "canary-next-agent-handoff-packet");
+  assert.equal(noCandidateReport.mode, "canary-next-agent-request-packet");
   assert.equal(noCandidateReport.packetCreated, false);
   assert.equal(noCandidateReport.writesRealFiles, false);
   assert.equal(noCandidateReport.publicLaunchAllowed, false);
@@ -8415,7 +8724,7 @@ check("fresh canary next-agent handoff packet passes", () => {
     "strict-real-canary-drill.md",
     "strict-real-operator-packet.md",
   ]);
-  assert.equal(manifest.mode, "canary-next-agent-handoff-packet");
+  assert.equal(manifest.mode, "canary-next-agent-request-packet");
   assert.equal(manifest.publicSafe, true);
   assert.equal(manifest.metricsOnly, true);
   assert.equal(manifest.publicLaunchAllowed, false);
@@ -8468,8 +8777,8 @@ check("fresh canary next-agent handoff packet passes", () => {
   assert.match(expectedCommitReadme, new RegExp(`Packet generated from controller commit: ${currentHead}`));
   assert.match(expectedCommitReadme, new RegExp(`Approved adapter commit: ${expectedCommit}`));
   assert.match(expectedCommitReadme, new RegExp(`Expected canary report commit: ${expectedCommit}`));
-  assert.match(expectedCommitReadme, /regenerate this handoff packet with that commit first/i);
-  assert.match(readme, /Ready for live handoff: no/i);
+  assert.match(expectedCommitReadme, /regenerate this canary request packet with that commit first/i);
+  assert.match(readme, /Ready for live canary request: no/i);
   assert.match(readme, /Do not attach raw memories/i);
   assert.match(markdown, /RecallWeave Next Agent Canary Plan/);
   assert.match(markdown, /Native\/Default Memory Lane/);
@@ -8492,12 +8801,11 @@ check("fresh canary next-agent handoff packet passes", () => {
   rmSync(tempRoot, { recursive: true, force: true });
 });
 
-check("current canary handoff packet identity is consistent", () => {
+check("current canary packet identity is consistent", () => {
   const releaseState = JSON.parse(readFileSync(join(root, reviewDir, "release-state.json"), "utf8"));
   const packetEvidence = readFileSync(join(root, reviewDir, "canary-next-agent-packet-evidence.md"), "utf8");
   const planEvidence = readFileSync(join(root, reviewDir, "canary-next-agent-plan-evidence.md"), "utf8");
   const diagnosticEvidence = readFileSync(join(root, reviewDir, "real-canary-diagnostic-evidence.md"), "utf8");
-  const releaseHandoff = readFileSync(join(root, "docs/RELEASE_HANDOFF.md"), "utf8");
   const postwatchEvidence = readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-evidence.md"), "utf8");
   const handoffPaste = readFileSync(join(root, reviewDir, "openclaw-current-canary-handoff-paste.md"), "utf8");
   const postwatchPlan = readFileSync(join(root, reviewDir, "real-diagnostics-postwatch-next-agent-plan.md"), "utf8");
@@ -8514,7 +8822,6 @@ check("current canary handoff packet identity is consistent", () => {
   assert.match(identity.sha256, /^[a-f0-9]{64}$/);
   assert.match(expectedCommit, /^[a-f0-9]{40}$/);
   for (const text of [
-    releaseHandoff,
     postwatchEvidence,
     handoffPaste,
     nextAgentReadme,
@@ -8627,7 +8934,7 @@ check("fresh release blocker doctor passes", () => {
   assert.match(benchmarkBlocker.nextAction, /full same-data answer-quality shard ladder/);
   assert.match(benchmarkBlocker.nextAction, /local-full diagnostic lane is complete/);
   assert.match(benchmarkBlocker.nextAction, /real canary gate/);
-  assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent handoff packet/);
+  assert.match(canaryBlocker.nextAction, /postwatch OpenClaw next-agent canary request packet/);
   assert.match(canaryBlocker.nextAction, /fresh 15-minute runtime window/);
   assert.match(canaryBlocker.nextAction, new RegExp(`canary:returned-(?:inbox|packet).*--require-production-canary.*--expected-commit ${currentReturnedCanaryExpectedCommit}`));
   assert.equal(report.checks.realDiagnosticsPostwatch.returnedWatchStatus, "AWAITING_RETURNED_PRODUCTION_CANARY");
@@ -9896,7 +10203,7 @@ check("fresh hosted baseline preflight passes", () => {
   assert.ok(operatorPacket.acceptanceCriteria.includes("source-match preflight proves every reviewed query has at least one collectable expected ref in the local RecallWeave source"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("source-alignment gate proves the hosted label and local container map align and matchedBaselineRunAllowed is true"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("source-gap plan reports READY_FOR_MATCHED_BASELINE before hosted collection, or a blocked repair path if not ready"));
-  assert.ok(operatorPacket.acceptanceCriteria.includes("blocked source-gap reports are reloaded with --source-gap before repair handoff, showing only hashed repair labels and counts"));
+  assert.ok(operatorPacket.acceptanceCriteria.includes("blocked source-gap reports are reloaded with --source-gap before repair packet generation, showing only hashed repair labels and counts"));
   assert.ok(operatorPacket.acceptanceCriteria.includes("private query set, if auto-authored, was reviewed locally before collection"));
   assert.ok(operatorPacket.forbidden.includes("provider keys"));
   assert.ok(operatorPacket.forbidden.includes("private container map"));
@@ -10527,7 +10834,12 @@ function check(name, fn) {
     fn();
     checks.push({ name, ok: true });
   } catch (error) {
-    checks.push({ name, ok: false, error: error instanceof Error ? error.message : String(error) });
+    checks.push({
+      name,
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
   }
 }
 
@@ -10897,6 +11209,7 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === ".env.example" ||
     file === "configs/bench-budget.yaml" ||
     file === "configs/benchmark-target-lock.json" ||
+    file === "configs/default.cloud.yaml" ||
     file === "configs/default.local.yaml" ||
     file === "configs/provider-adapter-registry.json" ||
     file === "configs/provider-matrix.yaml" ||

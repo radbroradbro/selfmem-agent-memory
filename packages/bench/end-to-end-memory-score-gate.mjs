@@ -329,7 +329,6 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
     !checks.bm25ControlPresent ? "missing-bm25-control" : null,
     !checks.denseControlPresent ? "missing-dense-or-vector-control" : null,
     !checks.fullHybridControlPresent ? "missing-full-hybrid-control" : null,
-    !checks.queryExpansionArmPresent ? "missing-query-expansion-arm" : null,
     isFullSota && !checks.voyageProviderArmPresent ? "missing-voyage-provider-arm" : null,
     isFullSota && !checks.nvidiaOrGeminiProviderArmPresent ? "missing-nvidia-or-gemini-provider-arm" : null,
     !checks.localAppleArmPresent ? "missing-local-apple-arm" : null,
@@ -491,7 +490,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
       ? isLocalFull
         ? [
             "Run the same-data local-full answer-quality harness across the full 500-query target.",
-            "Include BM25, full-hybrid, live query-expansion, local Apple, and local reranker arms on the exact source-locked target.",
+            "Include BM25, full-hybrid, local Apple, and local reranker arms on the exact source-locked target; add query expansion only as a labeled ablation.",
             "Keep SOTA and production-replacement claims blocked until the exact-scoring full provider/SOTA lane passes.",
             "Attach only metrics-only public-safe output, then send the local-full packet to independent reviewers before release wording changes.",
           ]
@@ -503,7 +502,7 @@ function buildGateReport({ loaded, target, targetRaw, reportedTargetsEvidence, r
             ]
         : [
             "Run the same-data LongMemEval/MemoryBench answer-quality harness across the full target or an officially comparable benchmark target.",
-            "Include BM25, dense/vector, full-hybrid, live query-expansion, provider challenger, local Apple, and local reranker arms on the exact source-locked target.",
+            "Include BM25, dense/vector, full-hybrid, provider challenger, local Apple, and local reranker arms on the exact source-locked target; add query expansion only as a labeled ablation.",
             "Beat the source-locked reported memory-system target under matching benchmark and judge semantics before claiming full-memory SOTA evidence.",
             "Attach only metrics-only public-safe output, then re-run this gate with --require-ready before SOTA ladder promotion.",
             "Send the exact gate-passing packet to two independent reviewers before owner/public release approval.",

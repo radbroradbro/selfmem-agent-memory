@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ok": true,
   "mode": "agentic-memory-provider-autoresearch-plan",
-  "generatedAt": "2026-05-30T20:13:51.894Z",
+  "generatedAt": "2026-06-02T15:24:32.682Z",
   "metricsOnly": true,
   "publicSafe": true,
   "callsProviderApis": false,
@@ -34,20 +34,39 @@
     "readerModel": true,
     "judgeModel": true
   },
-  "cloudDefaultForPersonalUse": "cloud-voyage4-voyage",
+  "cloudDefaultForPersonalUse": "cloud-voyage4-lite-voyage-lite",
   "methodologyDefault": "local-apple-controlled-lanes",
+  "primaryScoreContract": {
+    "scoreName": "whole-harness-agent-memory-answer-quality",
+    "supermemoryComparisonSurface": "plugin-to-plugin-agent-memory-layer",
+    "benchmarkActorMustUseCurrentPlugin": true,
+    "explicitDurableWritesRequired": true,
+    "postBoundaryRecallRequired": true,
+    "sessionWikiTopicMapsRequired": true,
+    "benchmarkContainersIsolatedFromLiveResearch": true,
+    "privateWorkspaceStoresRawResearchState": true,
+    "diagnosticScoresAreNotReleaseScores": true,
+    "diagnosticScoreTypes": [
+      "bm25-lexical-floor",
+      "retrieval-proxy",
+      "provider-vector-rerank-arm",
+      "component-leaderboard",
+      "ui-fixture-smoke",
+      "method-ladder-slice"
+    ]
+  },
   "hostedSupermemorySearchForMethodology": "disabled",
   "providerMatrix": [
     {
       "family": "voyage",
-      "harnessArm": "cloud-voyage4-voyage",
-      "role": "prod-default-and-quality-challenger",
-      "embedModel": "voyage-4",
-      "rerankModel": "rerank-2.5-or-lite",
+      "harnessArm": "cloud-voyage4-lite-voyage-lite",
+      "role": "prod-default-low-cost-and-quality-challenger",
+      "embedModel": "voyage-4-lite",
+      "rerankModel": "rerank-2.5-lite",
       "costClass": "free-tier-or-trial-when-account-allows",
       "safeRpmCap": 10,
       "higherCapWhenDashboardConfirms": 60,
-      "freeTierNote": "Use free-tier/trial pacing when available; keep Voyage as personal/prod default unless a same-data challenger wins."
+      "freeTierNote": "Use free-tier/trial pacing when available; keep Voyage-lite/lite as personal/prod default unless a same-data challenger wins."
     },
     {
       "family": "gemini",
@@ -63,10 +82,10 @@
     },
     {
       "family": "nvidia",
-      "harnessArm": "cloud-nvidia-nemotron-vl-1b",
+      "harnessArm": "cloud-nvidia-nv-embed-v1-mistral-rerank",
       "role": "free-nim-retrieval-challenger",
-      "embedModel": "nvidia/llama-nemotron-embed-vl-1b-v2",
-      "rerankModel": "nvidia/llama-nemotron-rerank-vl-1b-v2",
+      "embedModel": "nvidia/nv-embed-v1",
+      "rerankModel": "nvidia/rerank-qa-mistral-4b",
       "costClass": "zero-dollar-free-nim",
       "safeRpmCap": 30,
       "upperRpmCapByUserBudget": 40,
@@ -117,7 +136,9 @@
     "scheduleStyle": "completion-waves",
     "publicClaimRequiresFullRun": true,
     "publicClaimRequiresReviewerIntake": true,
-    "publicClaimRequiresZeroPrivacyFailures": true
+    "publicClaimRequiresZeroPrivacyFailures": true,
+    "memoryHealthGateRequiredBeforeEveryWave": true,
+    "longAgentWorkflowCanaryRequiredBeforeProdDefault": true
   },
   "watchdog": {
     "enabled": true,
@@ -127,8 +148,14 @@
     "stopArmIfErrorRateAbove": 0.05,
     "stopArmIfRateLimitRetryStreakAbove": 6,
     "stopArmIfLatencyExceedsBudgetMultiplier": 2,
+    "stopLoopIfMemoryHealthFails": true,
+    "stopLoopIfExplicitWriteUnavailable": true,
+    "stopLoopIfRecallContextIsNoise": true,
     "keepRunningIfArmIsWithinPointsOfLeader": 3,
     "reasonCodes": [
+      "agent-memory-health-failure",
+      "explicit-write-unavailable",
+      "recall-context-noisy",
       "quality-under-control",
       "privacy-failure",
       "provider-error-rate",
@@ -138,6 +165,45 @@
     ]
   },
   "phases": [
+    {
+      "id": "agent-memory-health-gate",
+      "status": "ready",
+      "purpose": "Before any score loop, prove the agent that runs the benchmark is using the current RecallWeave memory path, can explicitly write durable memories, and has clean enough logs for recall to be useful.",
+      "requiredBeforeProviderSpend": true,
+      "requiredBeforeScoreTrust": true,
+      "requiredChecks": [
+        "codex-lifecycle-audit --strict",
+        "explicit-memory-store-available",
+        "hosted-supermemory-write-back-disabled",
+        "benchmark-container-isolated-from-live-research-memory",
+        "session-wiki-topic-map-visible-for-run",
+        "post-boundary-retrieval-check",
+        "duplicate-memory-rate-at-or-below-0.02",
+        "unsafe-transcript-hit-count-zero-or-scrubbed-before-run",
+        "memory-write-error-rate-at-or-below-0.01",
+        "recall-context-sample-reviewed-for-usefulness"
+      ],
+      "blockers": []
+    },
+    {
+      "id": "long-agent-workflow-canary",
+      "status": "ready",
+      "purpose": "Run a multi-step Codex/Bob Code style workflow with RecallWeave enabled, explicit memory writes during the task, compaction/session continuity, and a post-run retrieval check.",
+      "requiredBeforeProviderSpend": false,
+      "countsAsProductReadinessEvidence": true,
+      "taskClasses": [
+        "repo implementation with later recall of design decisions",
+        "law/accounting research packet with topic and subtopic continuity",
+        "multi-agent handoff-free update flow where each agent reads the same container contract"
+      ],
+      "passCriteria": [
+        "the actor uses RecallWeave/selfmem recall before substantive phases",
+        "the actor stores at least three intentional durable memories with explicit store/write",
+        "the actor can retrieve those memories after a session boundary or compaction surrogate",
+        "the run finishes the user task without losing key constraints",
+        "the memory-health gate passes after the run"
+      ]
+    },
     {
       "id": "source-lock-closeout",
       "status": "ready",
@@ -167,9 +233,9 @@
       "status": "ready",
       "purpose": "Run the best local method against controlled NVIDIA, Gemini, and Voyage challengers on the same source-locked rows.",
       "arms": [
-        "cloud-voyage4-voyage",
+        "cloud-voyage4-lite-voyage-lite",
         "cloud-gemini2-embed-rerank-proxy",
-        "cloud-nvidia-nemotron-vl-1b",
+        "cloud-nvidia-nv-embed-v1-mistral-rerank",
         "openrouter-free-query-expansion",
         "local-apple-qwen3-4b-local-rerank"
       ],
@@ -187,7 +253,7 @@
   "nextActions": [
     "Materialize LongMemEval-V2 in an operator-private run directory, then start local-method-refinement waves.",
     "Run local-method-refinement waves first, then cloud challengers with NVIDIA, Gemini, Voyage, and local Apple controls on the same rows.",
-    "Keep Voyage as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
+    "Keep the Voyage-lite/lite arm as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
     "Do not enable hosted Supermemory search inside methodology runs; keep it as a separate parity lane."
   ]
 }

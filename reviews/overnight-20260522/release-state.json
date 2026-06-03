@@ -29,10 +29,11 @@
     "requiresConservativeVerdict": true,
     "allowsDocsOnlyCommitsAfterCodeBaseline": true,
     "enforcePostBaselinePublicEvidenceOnly": true,
-    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent handoff packets, empty or handoff-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, expected adapter commit binding for returned canary evidence, real-diagnostics postwatch next-agent handoff guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark source-lock validation, public LongMemEval slice materialization, public LongMemEval run-only target generation, public benchmark target validation, public benchmark target authoring, reported memory-target source-lock validation, public LongMemEval retrieval strategy comparison, public LongMemEval provider preflight, public LongMemEval expanded hybrid stress gate, public LongMemEval expanded provider preflight, public LongMemEval autoresearch loop, benchmark gate contract enforcement plus benchmark contract tests, private provider key-file readiness for env-only benchmark runs, provider benchmark operator packet generation for same-data live provider handoffs, provider budget contract surfaces, provider wave intake evidence gating, exact model-matrix metadata correction so the local Apple lane does not imply an untested local reranker, env-only local reranker sidecar gate coverage in the benchmark matrix and Brain UI smoke checks, full-memory SOTA ladder scaffolding, live query-expansion/local-rerank/provider-challenger result gates, end-to-end memory-score gating, public-safe answer-quality harness scaffolding, fail-closed answer-quality live preflight gating, fail-closed answer-quality response-arm export gating, fail-closed memory-score reviewer approval intake gating, answer-quality memory-method ladder workorder and result gating, full-shard private input doctor gating, full-shard accepted-lane launch doctor gating, local-full answer-quality shard plan/workorder gating, local-full accepted-lane launch doctor gating, local-full shard intake gating, local-full shard resume packet, env doctor, command materializer, command security doctor, result doctor, and performance report raw-source-retention and local durability freshness gating, local-full diagnostic scoring policy gating, local embedding runtime, launch diagnostic, and durability gating, full-shard deterministic control/proxy response export gating, env-only memory-score reviewer approval generation; env-only OpenAI-compatible reviewer wiring is locally gate-covered, canary packet commit-contract split between verified branch head and approved runtime adapter baseline, Codex lifecycle audit gating, wiki amplification benchmark arms, memory-method retrieval-proxy ladder gating, local-full wiki shard plan gating, Brain UI mobile overflow repair, hosted-memory-search disable switches for isolated benchmark methodology loops while keeping production read-through available, and strict local-full common-arm projection for expanded wiki shard reuse without counting diagnostic arms, session-map lifecycle telemetry, metrics-only topic-link/waste-signal auditing, Brain UI compaction-audit telemetry contract checks, runtime hybrid search public-surface wiring, runtime context provenance bridging, and hosted baseline target-lock/provider-registry contract enforcement while public launch remains blocked",
+    "allowedPostBaselineCodeReason": "hosted baseline source-gap planner, source-match private-path redaction, hashed repair queue, operator-packet source-gap repair reload, strict-real canary drill, mixed-folder next-agent request packets, empty or request-only canary batch fail-closed behavior, broad returned-inbox label redaction and watch supervision, returned downloads supervision, returned canary workspace generation, expected adapter commit binding for returned canary evidence, real-diagnostics postwatch next-agent canary request guidance, hosted baseline local mirror/source-matched run gating, local context-budget comparison gating, reviewed baseline owner-review packet gating, public benchmark source-lock validation, public LongMemEval slice materialization, public LongMemEval run-only target generation, public benchmark target validation, public benchmark target authoring, reported memory-target source-lock validation, public LongMemEval retrieval strategy comparison, public LongMemEval provider preflight, public LongMemEval expanded hybrid stress gate, public LongMemEval expanded provider preflight, public LongMemEval autoresearch loop, benchmark gate contract enforcement plus benchmark contract tests, private provider key-file readiness for env-only benchmark runs, provider benchmark operator packet generation for same-data live provider requests, provider budget contract surfaces, provider wave intake evidence gating, default cloud provider config alignment, exact model-matrix metadata correction so the local Apple lane does not imply an untested local reranker, env-only local reranker sidecar gate coverage in the benchmark matrix and Brain UI smoke checks, full-memory SOTA ladder scaffolding, live query-expansion/local-rerank/provider-challenger result gates, end-to-end memory-score gating, public-safe answer-quality harness scaffolding, fail-closed answer-quality live preflight gating, fail-closed answer-quality response-arm export gating, fail-closed memory-score reviewer approval intake gating, answer-quality memory-method ladder workorder and result gating, full-shard private input doctor gating, full-shard accepted-lane launch doctor gating, local-full answer-quality shard plan/workorder gating, local-full accepted-lane launch doctor gating, local-full shard intake gating, local-full shard resume packet, env doctor, command materializer, command security doctor, result doctor, and performance report raw-source-retention and local durability freshness gating, local-full diagnostic scoring policy gating, local embedding runtime, launch diagnostic, and durability gating, full-shard deterministic control/proxy response export gating, env-only memory-score reviewer approval generation; env-only OpenAI-compatible reviewer wiring is locally gate-covered, canary packet commit-contract split between verified branch head and approved runtime adapter baseline, Codex lifecycle audit gating, Codex live agent-memory bridge/canary proof for explicit local writes and post-boundary recall, wiki amplification benchmark arms, memory-method retrieval-proxy ladder gating, local-full wiki shard plan gating, Brain UI mobile overflow repair, hosted-memory-search disable switches for isolated benchmark methodology loops while keeping production read-through available, and strict local-full common-arm projection for expanded wiki shard reuse without counting diagnostic arms, session-map lifecycle telemetry, metrics-only topic-link/waste-signal auditing, Brain UI compaction-audit telemetry contract checks, runtime hybrid search public-surface wiring, runtime context provenance bridging, and hosted baseline target-lock/provider-registry contract enforcement while public launch remains blocked",
     "allowedPostBaselineCodePaths": [
       ".gitignore",
       ".env.example",
+      "configs/default.cloud.yaml",
       "configs/default.local.yaml",
       "configs/bench-budget.yaml",
       "configs/provider-matrix.yaml",
@@ -40,6 +41,9 @@
       "configs/provider-adapter-registry.json",
       "package.json",
       "pnpm-lock.yaml",
+      "docs/UPDATE_FLOW.md",
+      "packages/adapters/codex/README.md",
+      "packages/adapters/codex/selfmem-bridge.cjs",
       "packages/adapters/hermes/selfmem_canary/__init__.py",
       "packages/adapters/hermes/selfmem_canary_standalone_smoke.py",
       "packages/adapters/openclaw/selfmem_canary/index.mjs",
@@ -66,6 +70,9 @@
       "packages/bench/canary-next-agent-plan.mjs",
       "packages/bench/canary-operator-packet.mjs",
       "packages/bench/codex-lifecycle-audit.mjs",
+      "packages/bench/codex-memory-context-quality-audit.mjs",
+      "packages/bench/codex-memory-reset-health.mjs",
+      "packages/bench/codex-live-agent-memory-canary.mjs",
       "packages/bench/canary-returned-downloads.mjs",
       "packages/bench/canary-returned-inbox.mjs",
       "packages/bench/canary-returned-packet-intake.mjs",
@@ -232,6 +239,7 @@
     "canary-next-agent-plan",
     "canary-next-agent-handoff-packet",
     "fresh-canary-window-gate",
+    "codex-live-agent-memory-canary",
     "adapter-bounded-read-through",
     "adapter-store-latency-gate",
     "hosted-baseline-preflight",
@@ -488,7 +496,9 @@
   "remainingBlockers": [
     "human-public-launch-approval-required",
     "full-memory-sota-benchmark-gate-incomplete",
-    "fresh-real-container-canary-not-current"
+    "fresh-real-container-canary-not-current",
+    "codex-memory-reset-mode-active",
+    "public-review-surface-collapse-required"
   ],
   "safetyBoundary": {
     "usesFixtureUiEvidence": true,

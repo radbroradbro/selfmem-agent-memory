@@ -50,7 +50,7 @@ not a completed production rollout:
 
 Current preview surface names include: selected vault sync dry-run, selected vault sync apply, selected local-container browse, lifecycle policy, selected lifecycle policy apply, memory review queue, and selected review queue apply.
 Full preview/check surface inventory includes: selected vault sync dry-run, selected vault sync apply, selected local-container browse, lifecycle policy, selected lifecycle policy apply, memory review queue, selected review queue apply, selected local memory edit, edit overlay browse, local memory materialize, dynamic graph layout, graph navigation, compaction audit, benchmark dashboard, canary rollout, canary report generator, canary evidence intake, canary diagnose, operator packet, canary evidence packet, research source lock, model matrix, context preview, release readiness, and current-head live browser evidence.
-Operational evidence surfaces include: clean consumer smoke, release blocker doctor, hosted baseline preflight, hosted baseline collector, baseline compare, hosted baseline operator packet, baseline evidence packet, GitHub handoff packet, GitHub live sync, and goal completion audit.
+Operational evidence surfaces include: clean consumer smoke, release blocker doctor, hosted baseline preflight, hosted baseline collector, baseline compare, hosted baseline operator packet, baseline evidence packet, update flow release packet, GitHub live sync, and goal completion audit.
 
 ## Checks Run In This Gate
 
@@ -76,7 +76,7 @@ Passed in this sandbox:
   release docs, conservative release state, public benchmark source locks,
   local session audit, batch audit, static Brain UI evidence, local container
   audit smoke, adapter store-latency instrumentation, canary report/intake/
-  drill/packet/returned-packet gates, hosted-baseline preflight, GitHub handoff
+  drill/packet/returned-packet gates, hosted-baseline preflight, release update
   packet, goal audit, remote-token check, core dry-run pack, forbidden runtime
   file scan, secret scan, and public docs/evidence private-path scan.
 

@@ -14,6 +14,8 @@ const requiredBlockers = [
   "human-public-launch-approval-required",
   "full-memory-sota-benchmark-gate-incomplete",
   "fresh-real-container-canary-not-current",
+  "codex-memory-reset-mode-active",
+  "public-review-surface-collapse-required",
 ];
 const fullMemorySotaDoctorJson = preferReviewFile(
   "full-memory-sota-doctor-after-method-ladder-75q-paired-gate-20260601.json",
@@ -91,6 +93,8 @@ const requiredFiles = {
   hostedBaselineLiveBudgetedRun: "hosted-baseline-live-budgeted-run-evidence.md",
   hostedBaselineLiveBudgetedRunReport: "hosted-baseline-live-budgeted-run.json",
   hostedBaselineLiveBudgetedPacketReport: "hosted-baseline-live-budgeted-packet.json",
+  codexLiveAgentCanaryReport: "codex-live-agent-memory-canary-20260602.json",
+  codexLiveAgentCanaryMarkdown: "codex-live-agent-memory-canary-20260602.md",
   budgetedBaselineReviewerFindings: "reviewer-work/reviewer-findings.md",
   budgetedBaselineReviewerIntakeEvidence: "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md",
   budgetedBaselineReviewerIntakeReport: "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json",
@@ -115,7 +119,7 @@ const requiredFiles = {
   realDiagnosticsPostwatchBatchAudit: "real-diagnostics-postwatch-batch-audit.json",
   realDiagnosticsPostwatchNextAgentPlan: "real-diagnostics-postwatch-next-agent-plan.json",
   realDiagnosticsPostwatchNextAgentPlanMarkdown: "real-diagnostics-postwatch-next-agent-plan.md",
-  releaseHandoff: "../../docs/RELEASE_HANDOFF.md",
+  updateFlow: "../../docs/UPDATE_FLOW.md",
   benchmarkSummary: "../../docs/BENCHMARK_SUMMARY.md",
   publicBenchmarkTargets: "../../docs/PUBLIC_BENCHMARK_TARGETS.md",
   autoresearchBenchmarkPlan: "../../docs/AUTORESEARCH_BENCHMARK_PLAN.md",
@@ -180,6 +184,8 @@ const hostedBaselineLiveMirrorGateReviewText = readFileSync(join(root, reviewDir
 const hostedBaselineLiveBudgetedRunText = readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-run-evidence.md"), "utf8");
 const hostedBaselineLiveBudgetedRunReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-run.json"), "utf8"));
 const hostedBaselineLiveBudgetedPacketReport = JSON.parse(readFileSync(join(root, reviewDir, "hosted-baseline-live-budgeted-packet.json"), "utf8"));
+const codexLiveAgentCanaryText = readFileSync(join(root, reviewDir, "codex-live-agent-memory-canary-20260602.md"), "utf8");
+const codexLiveAgentCanaryReport = JSON.parse(readFileSync(join(root, reviewDir, "codex-live-agent-memory-canary-20260602.json"), "utf8"));
 const budgetedBaselineReviewerFindingsText = readFileSync(join(root, reviewDir, "reviewer-work/reviewer-findings.md"), "utf8");
 const budgetedBaselineReviewerIntakeText = readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md"), "utf8");
 const budgetedBaselineReviewerIntakeReport = JSON.parse(readFileSync(join(root, reviewDir, "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json"), "utf8"));
@@ -305,6 +311,30 @@ assert.equal(hostedBaselineLiveBudgetedPacketReport.strictReal, true);
 assert.equal(hostedBaselineLiveBudgetedPacketReport.strictRealPassed, true);
 assert.equal(hostedBaselineLiveBudgetedPacketReport.packagePassesStrictReal, true);
 assert.equal(hostedBaselineLiveBudgetedPacketReport.publicBenchmarkClaimsAllowed, false);
+assert.equal(codexLiveAgentCanaryReport.mode, "codex-live-agent-memory-canary");
+assert.equal(codexLiveAgentCanaryReport.status, "READY_CODEX_LIVE_AGENT_MEMORY_CANARY");
+assert.equal(codexLiveAgentCanaryReport.ok, true);
+assert.equal(codexLiveAgentCanaryReport.fixtureOnly, false);
+assert.equal(codexLiveAgentCanaryReport.writesRealFiles, true);
+assert.equal(codexLiveAgentCanaryReport.metricsOnly, true);
+assert.equal(codexLiveAgentCanaryReport.publicSafe, true);
+assert.equal(codexLiveAgentCanaryReport.rawMemoryIncluded, false);
+assert.equal(codexLiveAgentCanaryReport.rawRecallContextIncluded, false);
+assert.equal(codexLiveAgentCanaryReport.privatePathsIncluded, false);
+assert.equal(codexLiveAgentCanaryReport.callsHostedSupermemory, false);
+assert.equal(codexLiveAgentCanaryReport.countsAsBenchmarkEvidence, false);
+assert.equal(codexLiveAgentCanaryReport.countsAsSupermemoryReplacementEvidence, false);
+assert.equal(codexLiveAgentCanaryReport.primaryBenchmarkStillRequired, true);
+assert.equal(codexLiveAgentCanaryReport.hostedWriteBackDisabled, true);
+assert.equal(codexLiveAgentCanaryReport.explicitWriteObserved, true);
+assert.equal(codexLiveAgentCanaryReport.postBoundaryRecallObserved, true);
+assert.equal(codexLiveAgentCanaryReport.recall?.matchedExpectedTerms?.token, true);
+assert.equal(codexLiveAgentCanaryReport.recall?.matchedExpectedTerms?.color, true);
+assert.equal(codexLiveAgentCanaryReport.recall?.matchedExpectedTerms?.workflow, true);
+assert.equal(codexLiveAgentCanaryReport.doctor?.hostedWriteBackDisabled, true);
+assert.deepEqual(codexLiveAgentCanaryReport.blockers, []);
+assert.match(codexLiveAgentCanaryText, /Post-boundary recall observed: true/i);
+assert.match(codexLiveAgentCanaryText, /Counts as replacement evidence: false/i);
 assert.match(budgetedBaselineReviewerFindingsText, /Codex GPT-5\.5[\s\S]*approved/i);
 assert.match(budgetedBaselineReviewerFindingsText, /Gemini[\s\S]*approved/i);
 assert.match(budgetedBaselineReviewerIntakeText, /reviewerApprovalCount:\s*2/i);
@@ -548,6 +578,14 @@ assert.equal(githubLiveSync.ok, true);
 assert.equal(githubLiveSync.prBodyMatches, true);
 assert.equal(githubLiveSync.issueTitleMatches, true);
 assert.equal(githubLiveSync.issueBodyMatches, true);
+const codexMemoryResetHealth = JSON.parse(run("node", ["packages/bench/codex-memory-reset-health.mjs", "--strict"]).stdout);
+assert.equal(codexMemoryResetHealth.ok, true);
+assert.equal(codexMemoryResetHealth.status, "READY_FOR_CONTROLLED_DOGFOOD");
+assert.deepEqual(codexMemoryResetHealth.blockers, []);
+assert.equal(codexMemoryResetHealth.release?.blockedByResetMode, true);
+assert.equal(codexMemoryResetHealth.release?.blockedByPublicSurface, true);
+assert.ok(codexMemoryResetHealth.release?.blockers?.includes("codex-memory-reset-mode-active"));
+assert.ok(codexMemoryResetHealth.release?.blockers?.includes("public-review-surface-collapse-required"));
 
 const reviewerReport = [
   {
@@ -569,7 +607,7 @@ if (returnedDownloadsExpectedCommit && postwatchPlanExpectedCommit) {
   assert.equal(
     returnedDownloadsExpectedCommit,
     postwatchPlanExpectedCommit,
-    "returned-downloads scan and postwatch handoff plan disagree on current canary expected commit",
+    "returned-downloads scan and postwatch canary request plan disagree on current canary expected commit",
   );
 }
 const currentReturnedCanaryExpectedCommit =
@@ -577,7 +615,7 @@ const currentReturnedCanaryExpectedCommit =
 assert.match(currentReturnedCanaryExpectedCommit, /^[a-f0-9]{40}$/);
 
 const realCanaryNextAction = realDiagnosticsPostwatchNextAgentPlan.decision?.status === "READY_FOR_ONE_AGENT_FRESH_CANARY"
-  ? `Send the generated postwatch OpenClaw next-agent handoff packet to exactly one selected agent, apply the current adapter, follow the strict-real drill for a fresh 15-minute runtime window, then verify the returned metrics-only packet with \`canary:returned-inbox -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\` or \`canary:returned-packet -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\`. Use \`canary:returned-workspace\` to convert the returned packet into public-safe markdown findings.`
+  ? `Run the generated postwatch OpenClaw next-agent canary request packet against exactly one selected agent, apply the current adapter, follow the strict-real drill for a fresh 15-minute runtime window, then verify the returned metrics-only packet with \`canary:returned-inbox -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\` or \`canary:returned-packet -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\`. Use \`canary:returned-workspace\` to convert the returned packet into public-safe markdown findings.`
   : `Run \`canary:batch-audit\` on redacted returned diagnostics, use \`canary:next-agent\` and \`canary:next-agent-packet -- --allow-failed-inputs --require-ready\` to pick one privacy-clean Hermes/OpenClaw target from a mixed folder, apply the current adapter, follow \`canary:drill\` during the fresh window, then collect a fresh strict-real canary window and verify the returned metrics-only packet with \`canary:returned-inbox -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\` or \`canary:returned-packet -- --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit}\`. Use \`canary:returned-workspace\` to fill the next-agent markdown workspace.`;
 const nextLocalFullShard = fullMemorySotaDoctor.localFullLaneState?.nextPendingShardId ?? "the next pending shard";
 const nextLocalFullRange = fullMemorySotaDoctor.localFullLaneState?.nextPendingShardRange ?? "unknown range";
@@ -602,6 +640,18 @@ const blockerReport = [
     status: "incomplete",
     evidence: "real-diagnostics-postwatch-evidence.md",
     nextAction: realCanaryNextAction,
+  },
+  {
+    id: "codex-memory-reset-mode-active",
+    status: "blocked",
+    evidence: "docs/CODEX_MEMORY_RESET.md",
+    nextAction: "Keep unattended automation and automatic Codex memory injection off until controlled dogfood proves quiet prompt context, explicit writes, post-boundary recall, and store-noise health.",
+  },
+  {
+    id: "public-review-surface-collapse-required",
+    status: "blocked",
+    evidence: "packages/bench/codex-memory-reset-health.mjs",
+    nextAction: "Collapse or hide the large tracked review-evidence surface before public release so the repository presents compact product docs and metrics-only evidence.",
   },
 ];
 
@@ -715,6 +765,36 @@ console.log(
           privacyLeakCount: Number(hostedBaselineLiveBudgetedRunReport.evidence?.hosted?.privacyLeakCount ?? 0)
             + Number(hostedBaselineLiveBudgetedRunReport.evidence?.recallWeave?.privacyLeakCount ?? 0),
           strictRealPacket: hostedBaselineLiveBudgetedPacketReport.packagePassesStrictReal,
+        },
+        codexLiveAgentMemoryCanary: {
+          status: codexLiveAgentCanaryReport.status,
+          pluginActor: codexLiveAgentCanaryReport.pluginActor,
+          comparisonSurface: codexLiveAgentCanaryReport.comparisonSurface,
+          fixtureOnly: codexLiveAgentCanaryReport.fixtureOnly,
+          writesRealFiles: codexLiveAgentCanaryReport.writesRealFiles,
+          explicitWriteObserved: codexLiveAgentCanaryReport.explicitWriteObserved,
+          postBoundaryRecallObserved: codexLiveAgentCanaryReport.postBoundaryRecallObserved,
+          hostedWriteBackDisabled: codexLiveAgentCanaryReport.hostedWriteBackDisabled,
+          countsAsBenchmarkEvidence: codexLiveAgentCanaryReport.countsAsBenchmarkEvidence,
+          countsAsSupermemoryReplacementEvidence: codexLiveAgentCanaryReport.countsAsSupermemoryReplacementEvidence,
+          primaryBenchmarkStillRequired: codexLiveAgentCanaryReport.primaryBenchmarkStillRequired,
+          rawMemoryIncluded: codexLiveAgentCanaryReport.rawMemoryIncluded,
+          rawRecallContextIncluded: codexLiveAgentCanaryReport.rawRecallContextIncluded,
+          privatePathsIncluded: codexLiveAgentCanaryReport.privatePathsIncluded,
+          blockers: codexLiveAgentCanaryReport.blockers,
+        },
+        codexMemoryResetHealth: {
+          status: codexMemoryResetHealth.status,
+          controlledDogfoodReady: codexMemoryResetHealth.ok,
+          customHooksDisabled: codexMemoryResetHealth.injection?.customHooksDisabled,
+          nativeMemoryUseDisabled: codexMemoryResetHealth.injection?.nativeMemoryUseDisabled,
+          nativeMemoryGenerationDisabled: codexMemoryResetHealth.injection?.nativeMemoryGenerationDisabled,
+          contextQualityOk: codexMemoryResetHealth.contextQuality?.ok,
+          contextScenarioCount: codexMemoryResetHealth.contextQuality?.scenarioCount,
+          hostedWriteBackDisabled: codexMemoryResetHealth.bridge?.hostedWriteBackDisabled,
+          severeNoise: codexMemoryResetHealth.storeHealth?.severeNoise,
+          releaseBlockers: codexMemoryResetHealth.release?.blockers,
+          countsAsBenchmarkEvidence: codexMemoryResetHealth.countsAsBenchmarkEvidence,
         },
         budgetedBaselineReviewerIntake: {
           ok: budgetedBaselineReviewerIntakeReport.ok,
@@ -891,8 +971,8 @@ console.log(
         "npm exec --yes pnpm@10.23.0 -- canary:drill -- --host openclaw --format markdown --output /tmp/recallweave-canary-drill.md",
         "npm exec --yes pnpm@10.23.0 -- canary:batch-audit -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --output /tmp/recallweave-canary-batch-audit.json",
         "npm exec --yes pnpm@10.23.0 -- canary:next-agent -- --batch /tmp/recallweave-canary-batch-audit.json --output /tmp/recallweave-canary-next-agent-plan.json",
-        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --require-ready --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-next-agent-handoff.zip`,
-        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-next-agent-handoff.zip`,
+        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --batch /tmp/recallweave-canary-batch-audit.json --require-ready --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-next-agent-request.zip`,
+        `npm exec --yes pnpm@10.23.0 -- canary:next-agent-packet -- --input-root <redacted-diagnostics-folder> --allow-failed-inputs --require-ready --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-next-agent-request.zip`,
         `npm exec --yes pnpm@10.23.0 -- canary:returned-inbox -- --input-root <folder-of-agent-zips> --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-returned-canary-inbox.json`,
         "npm exec --yes pnpm@10.23.0 -- canary:returned-downloads:strict -- --output /tmp/recallweave-returned-downloads.json",
         `npm exec --yes pnpm@10.23.0 -- canary:returned-packet -- --packet /tmp/recallweave-canary-evidence-packet.zip --require-production-canary --expected-commit ${currentReturnedCanaryExpectedCommit} --output /tmp/recallweave-returned-canary-intake.json`,

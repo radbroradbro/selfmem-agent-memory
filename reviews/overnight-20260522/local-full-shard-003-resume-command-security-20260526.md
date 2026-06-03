@@ -23,6 +23,6 @@
 - none
 
 ## Next Actions
-- Use the checked materializer flow when generating a real private resume script outside the repository.
+- Use the checked materializer flow only when a current accepted-lane resume packet is ready.
 - Keep public reports limited to hashes, counts, labels, and booleans.
-- Run the resume result doctor before accepting shard 003 into local-full intake.
+- Run the resume result doctor before accepting any resumed shard into local-full intake.

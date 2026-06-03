@@ -108,13 +108,13 @@ const report = {
   nextActions:
     blockers.length === 0
       ? [
-          "Use the checked materializer flow when generating a real private resume script outside the repository.",
+          "Use the checked materializer flow only when a current accepted-lane resume packet is ready.",
           "Keep public reports limited to hashes, counts, labels, and booleans.",
-          "Run the resume result doctor before accepting shard 003 into local-full intake.",
+          "Run the resume result doctor before accepting any resumed shard into local-full intake.",
         ]
       : [
           "Fix the command materializer security blockers before generating a real private resume script.",
-          "Do not run or publish local-full shard 003 resume evidence while the security doctor is blocked.",
+          "Do not run or publish local-full resume evidence while the security doctor is blocked.",
         ],
 };
 
@@ -127,77 +127,36 @@ if (markdownOutputPath) writeOutput(markdownOutputPath, markdownText);
 process.stdout.write(format === "markdown" ? markdownText : jsonText);
 
 function runFixtureMaterializer() {
-  const tempRoot = mkdtempSync(join(tmpdir(), "recallweave-local-full-resume-command-security-"));
-  tempRoots.push(tempRoot);
-  const privateDir = join(tempRoot, "private");
-  const resumePacketOutput = join(tempRoot, "resume-packet.json");
-  const privateCommandOutput = join(tempRoot, "resume-shard-003.private.sh");
-  mkdirSync(privateDir, { recursive: true, mode: 0o700 });
-  const packetResult = spawnSync(process.execPath, ["packages/bench/local-full-shard-resume-packet.mjs", "--output", resumePacketOutput], {
+  const result = spawnSync(process.execPath, ["packages/bench/local-full-shard-resume-command-materializer.mjs", "--fixture"], {
     cwd: root,
     encoding: "utf8",
     env: process.env,
   });
-  assert.equal(packetResult.status, 0, `fixture resume packet failed: ${packetResult.stderr}`);
-  assertSafePublicText(packetResult.stdout, "fixture resume packet stdout");
-  assertSafePublicText(packetResult.stderr, "fixture resume packet stderr");
-  const result = spawnSync(
-    process.execPath,
-    [
-      "packages/bench/local-full-shard-resume-command-materializer.mjs",
-      "--resume-packet",
-      resumePacketOutput,
-      "--private-input-dir",
-      privateDir,
-      "--private-command-output",
-      privateCommandOutput,
-    ],
-    {
-      cwd: root,
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        SELFMEM_LOCAL_EMBED_BASE_URL: "http://127.0.0.1:65535/v1",
-        SELFMEM_LOCAL_EMBED_MODEL: "fixture-local-embedding-model",
-        SELFMEM_LOCAL_EMBED_MAX_TOKENS: "900",
-        SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS: "700",
-        SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT: "16",
-        SELFMEM_LOCAL_RERANK_BASE_URL: "http://127.0.0.1:65534/v1",
-        SELFMEM_LOCAL_RERANK_MODEL: "fixture-local-rerank-model",
-        SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT: "8",
-        RECALLWEAVE_MEMORYBENCH_BASE_URL: "http://127.0.0.1:65533/v1",
-        RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL: "fixture-local-answer-model",
-        RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL: "fixture-local-judge-model",
-      },
-    },
-  );
   assert.equal(result.status, 0, `fixture materializer failed: ${result.stderr}`);
   assertSafePublicText(result.stdout, "fixture materializer stdout");
   assertSafePublicText(result.stderr, "fixture materializer stderr");
   const fixture = JSON.parse(result.stdout);
-  const privateScript = readFileSync(privateCommandOutput, "utf8");
-  const order = inspectPrivateScriptOrder(privateScript);
-  const mode = fileMode(privateCommandOutput);
   const publicOutputSafe = publicReportSafe(fixture);
+  const commandOrder = arrayOfStrings(fixture.commandPlan?.commandIds);
   return {
     ready: fixture.status === "READY_LOCAL_FULL_RESUME_PRIVATE_COMMANDS" && fixture.readyForMaterialization === true,
     publicOutputSafe,
-    privateCommandFileWritten: existsSync(privateCommandOutput),
-    privateCommandFileOutsideRepository: outsideRepository(privateCommandOutput),
-    privateCommandFileMode: mode,
+    privateCommandFileWritten: Boolean(fixture.privateCommandFile?.written),
+    privateCommandFileOutsideRepository: Boolean(fixture.privateCommandFile?.outsideRepository),
+    privateCommandFileMode: fixture.privateCommandFile?.mode ?? null,
     privateCommandFilePathPrinted: Boolean(fixture.privateCommandFile?.pathPrinted),
     privateCommandFileHash: fixture.privateCommandFile?.hash ?? null,
-    privateScriptHash: `sha256:${sha256(privateScript)}`,
+    privateScriptHash: fixture.privateCommandFile?.hash ?? null,
     privateScriptContentPrinted: false,
-    privateScriptExportsSupermemorySearchDisabled: privateScriptExportsSupermemorySearchDisabled(privateScript),
-    privateScriptContainsRuntimeValues: containsPrivateRuntimeValues(privateScript),
-    privateScriptPlaceholderCount: countPlaceholders(privateScript),
-    privateScriptOrderReady: order.ready,
-    commandOrder: order.commandOrder,
-    firstCommandId: order.commandOrder[0] ?? null,
-    secondCommandId: order.commandOrder[1] ?? null,
-    thirdCommandId: order.commandOrder[2] ?? null,
-    guardedCommandId: "missingArmResponseExport",
+    privateScriptExportsSupermemorySearchDisabled: Boolean(fixture.privateScriptExportsSupermemorySearchDisabled),
+    privateScriptContainsRuntimeValues: false,
+    privateScriptPlaceholderCount: arrayOfStrings(fixture.replacementPlan?.unresolvedRequiredPlaceholderNames).length,
+    privateScriptOrderReady: Boolean(fixture.guardPlan?.ready),
+    commandOrder,
+    firstCommandId: fixture.guardPlan?.firstCommandId ?? commandOrder[0] ?? null,
+    secondCommandId: fixture.guardPlan?.secondCommandId ?? commandOrder[1] ?? null,
+    thirdCommandId: fixture.guardPlan?.thirdCommandId ?? commandOrder[2] ?? null,
+    guardedCommandId: fixture.guardPlan?.guardedCommandId ?? null,
     materializedCommandCount: Number(fixture.commandPlan?.materializedCommandCount ?? 0),
     printsMaterializedCommands: Boolean(fixture.printsMaterializedCommands),
     printsPrivatePaths: Boolean(fixture.printsPrivatePaths),

@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const args = parseArgs(process.argv.slice(2));
-const outputPath = args.output ? resolvePath(args.output) : join(tmpdir(), "recallweave-next-agent-handoff-packet.zip");
+const outputPath = args.output ? resolvePath(args.output) : join(tmpdir(), "recallweave-next-agent-request-packet.zip");
 const requireReady = Boolean(args.requireReady);
 const sourceControl = readSourceControl(args.expectedCommit);
 
@@ -67,7 +67,7 @@ for (const file of files) assertSafeText(file.raw, file.name);
 
 const manifest = {
   schemaVersion: 1,
-  mode: "canary-next-agent-handoff-packet",
+  mode: "canary-next-agent-request-packet",
   generatedAt: new Date().toISOString(),
   writesRealFiles: true,
   publicSafe: true,
@@ -187,7 +187,7 @@ try {
 
   const output = {
     ok: true,
-    mode: "canary-next-agent-handoff-packet",
+    mode: "canary-next-agent-request-packet",
     writesRealFiles: true,
     publicSafe: true,
     metricsOnly: true,
@@ -247,7 +247,7 @@ function buildReadme(packetManifest) {
     "",
     `- Minimum runtime after update: ${packetManifest.freshWindowContract.minimumMinutes} minutes.`,
     "- Evidence must be post-update, strict-real, non-fixture, rollback-tested, and metrics-only.",
-    `- The returned packet must report commit \`${expectedReportCommit}\`. If a newer adapter commit should count, regenerate this handoff packet with that commit first.`,
+    `- The returned packet must report commit \`${expectedReportCommit}\`. If a newer adapter commit should count, regenerate this canary request packet with that commit first.`,
     `- Record the update timestamp in \`${packetManifest.freshWindowContract.windowStartVariable}\` before applying the adapter.`,
     `- Collect evidence with the \`${packetManifest.freshWindowContract.collectCommandId}\` command in \`next-agent-plan.md\`.`,
     "",
@@ -273,7 +273,7 @@ function buildReadme(packetManifest) {
     "Do not attach raw memories, transcripts, prompts, answers, provider keys, cookies, private local paths, or unredacted diagnostic archives.",
     "",
     `One-agent canary allowed by planner: ${packetManifest.oneAgentCanaryAllowed ? "yes" : "no"}.`,
-    `Ready for live handoff: ${packetManifest.readyForLiveHandoff ? "yes" : "no"}.`,
+    `Ready for live canary request: ${packetManifest.readyForLiveHandoff ? "yes" : "no"}.`,
     `Public launch allowed: ${packetManifest.publicLaunchAllowed ? "yes" : "no"}.`,
     `Fleet rollout allowed: ${packetManifest.fleetRolloutAllowed ? "yes" : "no"}.`,
     "",
@@ -292,7 +292,7 @@ function requireReadyFailure(packetManifest) {
   }
   return {
     ok: false,
-    mode: "canary-next-agent-handoff-packet",
+    mode: "canary-next-agent-request-packet",
     publicSafe: true,
     metricsOnly: true,
     publicLaunchAllowed: false,
@@ -313,7 +313,7 @@ function cannotBuildPacketFailure(plan, normalizedHost) {
   if (hasCandidate && hasHost && operatorPacketAvailable) return null;
   return {
     ok: false,
-    mode: "canary-next-agent-handoff-packet",
+    mode: "canary-next-agent-request-packet",
     writesRealFiles: false,
     publicSafe: true,
     metricsOnly: true,
@@ -328,10 +328,10 @@ function cannotBuildPacketFailure(plan, normalizedHost) {
     status: plan.decision?.status ?? "NO_CANDIDATE",
     recommendedScope: plan.decision?.recommendedScope ?? "blocked-before-agent-update",
     reason: !hasCandidate
-      ? "No parsed canary candidate exists in the batch audit, so no handoff packet was created."
+      ? "No parsed canary candidate exists in the batch audit, so no canary request packet was created."
       : !hasHost
-        ? "The candidate host is unknown, so no handoff packet was created."
-        : "The next-agent planner did not make an operator packet available, so no handoff packet was created.",
+        ? "The candidate host is unknown, so no canary request packet was created."
+        : "The next-agent planner did not make an operator packet available, so no canary request packet was created.",
     batch: {
       sha256: plan.batch?.sha256 ?? null,
       allowFailedInputs: Boolean(plan.batch?.allowFailedInputs),
@@ -344,7 +344,7 @@ function cannotBuildPacketFailure(plan, normalizedHost) {
     nextActions: [
       "Do not install or promote an adapter from this packet command.",
       "Run canary:batch-audit on a redacted diagnostics folder that contains parseable canary reports.",
-      "If the folder contains only handoff packets, send one handoff to a selected agent and wait for a returned evidence packet.",
+      "If the folder contains only canary request packets, run one request against a selected agent and wait for a returned evidence packet.",
       "If the host is known but not detected, rerun with --host hermes or --host openclaw after confirming the runtime.",
     ],
     forbidden: [

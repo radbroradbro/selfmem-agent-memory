@@ -35,8 +35,11 @@ if (strict) {
   assert.equal(report.metricsOnly, true, jsonText);
   assert.equal(report.callsProviderApis, false, jsonText);
   assert.equal(report.sendsBenchmarkTextToProvider, false, jsonText);
-  assert.equal(report.cloudDefaultForPersonalUse, "cloud-voyage4-voyage");
+  assert.equal(report.cloudDefaultForPersonalUse, "cloud-voyage4-lite-voyage-lite");
   assert.equal(report.methodologyDefault, "local-apple-controlled-lanes");
+  assert.equal(report.primaryScoreContract?.scoreName, "whole-harness-agent-memory-answer-quality");
+  assert.equal(report.primaryScoreContract?.supermemoryComparisonSurface, "plugin-to-plugin-agent-memory-layer");
+  assert.equal(report.primaryScoreContract?.diagnosticScoresAreNotReleaseScores, true);
 }
 
 function loadSourceLock(path) {
@@ -65,7 +68,67 @@ function buildReport(lock) {
     .filter(([, provided]) => !provided)
     .map(([field]) => `missing-${field}`);
   const providerMatrix = buildProviderMatrix();
+  const primaryScoreContract = {
+    scoreName: "whole-harness-agent-memory-answer-quality",
+    supermemoryComparisonSurface: "plugin-to-plugin-agent-memory-layer",
+    benchmarkActorMustUseCurrentPlugin: true,
+    explicitDurableWritesRequired: true,
+    postBoundaryRecallRequired: true,
+    sessionWikiTopicMapsRequired: true,
+    benchmarkContainersIsolatedFromLiveResearch: true,
+    privateWorkspaceStoresRawResearchState: true,
+    diagnosticScoresAreNotReleaseScores: true,
+    diagnosticScoreTypes: [
+      "bm25-lexical-floor",
+      "retrieval-proxy",
+      "provider-vector-rerank-arm",
+      "component-leaderboard",
+      "ui-fixture-smoke",
+      "method-ladder-slice",
+    ],
+  };
   const phases = [
+    {
+      id: "agent-memory-health-gate",
+      status: "ready",
+      purpose:
+        "Before any score loop, prove the agent that runs the benchmark is using the current RecallWeave memory path, can explicitly write durable memories, and has clean enough logs for recall to be useful.",
+      requiredBeforeProviderSpend: true,
+      requiredBeforeScoreTrust: true,
+      requiredChecks: [
+        "codex-lifecycle-audit --strict",
+        "explicit-memory-store-available",
+        "hosted-supermemory-write-back-disabled",
+        "benchmark-container-isolated-from-live-research-memory",
+        "session-wiki-topic-map-visible-for-run",
+        "post-boundary-retrieval-check",
+        "duplicate-memory-rate-at-or-below-0.02",
+        "unsafe-transcript-hit-count-zero-or-scrubbed-before-run",
+        "memory-write-error-rate-at-or-below-0.01",
+        "recall-context-sample-reviewed-for-usefulness",
+      ],
+      blockers: [],
+    },
+    {
+      id: "long-agent-workflow-canary",
+      status: "ready",
+      purpose:
+        "Run a multi-step Codex/Bob Code style workflow with RecallWeave enabled, explicit memory writes during the task, compaction/session continuity, and a post-run retrieval check.",
+      requiredBeforeProviderSpend: false,
+      countsAsProductReadinessEvidence: true,
+      taskClasses: [
+        "repo implementation with later recall of design decisions",
+        "law/accounting research packet with topic and subtopic continuity",
+        "multi-agent handoff-free update flow where each agent reads the same container contract",
+      ],
+      passCriteria: [
+        "the actor uses RecallWeave/selfmem recall before substantive phases",
+        "the actor stores at least three intentional durable memories with explicit store/write",
+        "the actor can retrieve those memories after a session boundary or compaction surrogate",
+        "the run finishes the user task without losing key constraints",
+        "the memory-health gate passes after the run",
+      ],
+    },
     {
       id: "source-lock-closeout",
       status: missingBeforeFullRun.length ? "blocked" : "ready",
@@ -133,8 +196,9 @@ function buildReport(lock) {
       remainingSourceLockBlockers: blockers,
     },
     sourceLockProof,
-    cloudDefaultForPersonalUse: "cloud-voyage4-voyage",
+    cloudDefaultForPersonalUse: "cloud-voyage4-lite-voyage-lite",
     methodologyDefault: "local-apple-controlled-lanes",
+    primaryScoreContract,
     hostedSupermemorySearchForMethodology: "disabled",
     providerMatrix,
     runPolicy: {
@@ -150,6 +214,8 @@ function buildReport(lock) {
       publicClaimRequiresFullRun: true,
       publicClaimRequiresReviewerIntake: true,
       publicClaimRequiresZeroPrivacyFailures: true,
+      memoryHealthGateRequiredBeforeEveryWave: true,
+      longAgentWorkflowCanaryRequiredBeforeProdDefault: true,
     },
     watchdog: {
       enabled: true,
@@ -159,8 +225,14 @@ function buildReport(lock) {
       stopArmIfErrorRateAbove: 0.05,
       stopArmIfRateLimitRetryStreakAbove: 6,
       stopArmIfLatencyExceedsBudgetMultiplier: 2,
+      stopLoopIfMemoryHealthFails: true,
+      stopLoopIfExplicitWriteUnavailable: true,
+      stopLoopIfRecallContextIsNoise: true,
       keepRunningIfArmIsWithinPointsOfLeader: 3,
       reasonCodes: [
+        "agent-memory-health-failure",
+        "explicit-write-unavailable",
+        "recall-context-noisy",
         "quality-under-control",
         "privacy-failure",
         "provider-error-rate",
@@ -175,7 +247,7 @@ function buildReport(lock) {
         ? ["Close the remaining LongMemEval-V2 source-lock choices before spending provider calls on a public-comparable run."]
         : ["Materialize LongMemEval-V2 in an operator-private run directory, then start local-method-refinement waves."]),
       "Run local-method-refinement waves first, then cloud challengers with NVIDIA, Gemini, Voyage, and local Apple controls on the same rows.",
-      "Keep Voyage as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
+      "Keep the Voyage-lite/lite arm as the personal/prod default until a same-data cloud challenger beats it with lower cost or better answer quality.",
       "Do not enable hosted Supermemory search inside methodology runs; keep it as a separate parity lane.",
     ],
   };
@@ -185,14 +257,14 @@ function buildProviderMatrix() {
   return [
     {
       family: "voyage",
-      harnessArm: "cloud-voyage4-voyage",
-      role: "prod-default-and-quality-challenger",
-      embedModel: "voyage-4",
-      rerankModel: "rerank-2.5-or-lite",
+      harnessArm: "cloud-voyage4-lite-voyage-lite",
+      role: "prod-default-low-cost-and-quality-challenger",
+      embedModel: "voyage-4-lite",
+      rerankModel: "rerank-2.5-lite",
       costClass: "free-tier-or-trial-when-account-allows",
       safeRpmCap: 10,
       higherCapWhenDashboardConfirms: 60,
-      freeTierNote: "Use free-tier/trial pacing when available; keep Voyage as personal/prod default unless a same-data challenger wins.",
+      freeTierNote: "Use free-tier/trial pacing when available; keep Voyage-lite/lite as personal/prod default unless a same-data challenger wins.",
     },
     {
       family: "gemini",
@@ -255,6 +327,9 @@ function renderMarkdown(report) {
     `- Remaining source-lock blockers: ${report.target.remainingSourceLockBlockers.length ? report.target.remainingSourceLockBlockers.join(", ") : "none"}`,
     `- Personal/prod default: ${report.cloudDefaultForPersonalUse}`,
     `- Methodology default: ${report.methodologyDefault}`,
+    `- Primary score: ${report.primaryScoreContract.scoreName}`,
+    `- Supermemory comparison: ${report.primaryScoreContract.supermemoryComparisonSurface}`,
+    `- Diagnostics are release scores: ${!report.primaryScoreContract.diagnosticScoresAreNotReleaseScores}`,
     `- Calls provider APIs: ${report.callsProviderApis}`,
     "",
     "## Provider Matrix",

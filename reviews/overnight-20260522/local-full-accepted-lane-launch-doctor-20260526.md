@@ -12,7 +12,7 @@
 - Accepted lane: local-full-accepted-shards
 - Progress source: checked-in-progress-intake
 - Progress inputs: 2
-- Pending shards: 18
+- Pending shards: 20
 
 ## Gate
 - Private inputs ready: true
@@ -22,10 +22,10 @@
 - Full memory SOTA score proven: false
 
 ## Accepted Lane
-- Strategies: bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
+- Strategies: bm25-lite, full-hybrid-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
 - Providers: local-apple, local-rerank
-- Query expansion requirement: local-or-cloud-model-required
-- Query expansion model-backed: false
+- Query expansion requirement: not-required
+- Query expansion model-backed: undefined
 - Diagnostic fallback allowed: false
 - Model match policy: local-diagnostic-allowed
 - Benchmark answer model target: gpt-4o
@@ -46,7 +46,6 @@
 - local-apple-readiness: SELFMEM_LOCAL_EMBED_BASE_URL
 - local-rerank-readiness: SELFMEM_LOCAL_RERANK_ENDPOINT, SELFMEM_LOCAL_RERANK_BASE_URL
 - answer-quality-scoring: RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT, RECALLWEAVE_MEMORYBENCH_BASE_URL, RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL, RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL
-- query-expansion-evidence: SELFMEM_QUERY_EXPANSION_BASE_URL, SELFMEM_QUERY_EXPANSION_MODEL, RECALLWEAVE_QUERY_EXPANSION_CALLS, RECALLWEAVE_QUERY_EXPANSION_PUBLIC_DATA
 
 ## Blockers
 - RECALLWEAVE_BASELINE_LIVE-not-enabled
@@ -59,7 +58,6 @@
 - local-apple-credentials-missing
 - local-rerank-credentials-missing
 - openai-compatible-base-url-missing
-- query-expansion-local-endpoint-or-cloud-consent-missing
 - local-apple-endpoint-missing
 - local-rerank-endpoint-missing
 - accepted-lane-response-export-not-ready
@@ -67,6 +65,6 @@
 - local-full-answer-quality-shard-results-not-returned
 
 ## Next Actions
-- Satisfy the private-input doctor, local embedding, local rerank, answer-quality endpoint, and model-backed query-expansion requirements.
-- Use local query expansion when available; use cloud query expansion only with explicit public-data and provider-call consent.
+- Satisfy the private-input doctor, local embedding, local rerank, and answer-quality endpoint requirements.
+- Keep query expansion as a labeled ablation unless the accepted lane explicitly includes it.
 - Do not substitute BM25, deterministic expansion, or provider-only lanes for the accepted local-full lane.

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "mode": "codex-live-agent-memory-canary",
+  "status": "READY_CODEX_LIVE_AGENT_MEMORY_CANARY",
+  "ok": true,
+  "fixtureOnly": false,
+  "generatedAt": "2026-06-02T15:50:28.841Z",
+  "writesRealFiles": true,
+  "metricsOnly": true,
+  "publicSafe": true,
+  "rawMemoryIncluded": false,
+  "rawPromptIncluded": false,
+  "rawRecallContextIncluded": false,
+  "rawTranscriptIncluded": false,
+  "privatePathsIncluded": false,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "countsAsBenchmarkEvidence": false,
+  "countsAsSupermemoryReplacementEvidence": false,
+  "canaryEvidenceOnly": true,
+  "primaryBenchmarkStillRequired": true,
+  "pluginActor": "codex-selfmem-bridge",
+  "comparisonSurface": "agent-memory-plugin-lifecycle",
+  "hostedWriteBackDisabled": true,
+  "boundary": {
+    "type": "separate-process-explicit-store-to-forced-recall",
+    "writeStartedAt": "2026-06-02T15:50:28.581Z",
+    "writeEndedAt": "2026-06-02T15:50:28.637Z",
+    "recallStartedAt": "2026-06-02T15:50:28.637Z",
+    "recallEndedAt": "2026-06-02T15:50:28.767Z"
+  },
+  "bridge": {
+    "sourceHash": "sha256:aa3feb0bd7e2a4e2205d8d67e4c89e5e8aa849c49d62f671c702e0178b72580c",
+    "explicitStoreModeAvailable": true
+  },
+  "store": {
+    "exitStatus": 0,
+    "ok": true,
+    "written": 1,
+    "duplicateSuppressed": 0,
+    "rejected": 0,
+    "idCount": 1
+  },
+  "recall": {
+    "exitStatus": 0,
+    "hookContextReturned": true,
+    "matchedExpectedTerms": {
+      "token": true,
+      "color": true,
+      "workflow": true
+    },
+    "contextLength": 1697
+  },
+  "doctor": {
+    "exitStatus": 0,
+    "enabled": true,
+    "mode": "local-first-read-through",
+    "hostedWriteBackDisabled": true,
+    "liveSupermemorySearch": false,
+    "memories": 3144,
+    "events": 3584,
+    "transcripts": 2342,
+    "explicitStoreCount": 9,
+    "duplicateRate": 0,
+    "eventTypes": [
+      "explicit-store",
+      "prompt",
+      "recall-run",
+      "recall-skip",
+      "scrub",
+      "stop"
+    ]
+  },
+  "explicitWriteObserved": true,
+  "postBoundaryRecallObserved": true,
+  "blockers": []
+}

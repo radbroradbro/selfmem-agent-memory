@@ -17,7 +17,7 @@ const files = {
   completionAudit: `${reviewDir}/completion-audit.md`,
   productionReadiness: `${reviewDir}/production-readiness.md`,
   releaseReadiness: `${reviewDir}/release-readiness-evidence.md`,
-  releaseHandoff: "docs/RELEASE_HANDOFF.md",
+  updateFlow: "docs/UPDATE_FLOW.md",
   prBodyDraft: `${reviewDir}/pr-body-update-draft.md`,
   githubBlocked: `${reviewDir}/github-issue-create-blocked.md`,
   githubWriteEvidence: `${reviewDir}/github-write-route-evidence.md`,
@@ -67,6 +67,8 @@ const files = {
   hostedBaselineLiveBudgetedRunEvidence: `${reviewDir}/hosted-baseline-live-budgeted-run-evidence.md`,
   hostedBaselineLiveBudgetedRunReport: `${reviewDir}/hosted-baseline-live-budgeted-run.json`,
   hostedBaselineLiveBudgetedPacketReport: `${reviewDir}/hosted-baseline-live-budgeted-packet.json`,
+  codexLiveAgentCanaryReport: `${reviewDir}/codex-live-agent-memory-canary-20260602.json`,
+  codexLiveAgentCanaryMarkdown: `${reviewDir}/codex-live-agent-memory-canary-20260602.md`,
   budgetedBaselineReviewerFindings: `${reviewDir}/reviewer-work/reviewer-findings.md`,
   budgetedBaselineReviewerIntakeEvidence: `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-evidence.md`,
   budgetedBaselineReviewerIntakeReport: `${reviewDir}/reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json`,
@@ -202,6 +204,7 @@ const hostedBaselineLiveMirrorRun = JSON.parse(readFileSync(join(root, files.hos
 const hostedBaselineLiveMirrorPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveMirrorPacketReport), "utf8"));
 const hostedBaselineLiveBudgetedRun = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedRunReport), "utf8"));
 const hostedBaselineLiveBudgetedPacket = JSON.parse(readFileSync(join(root, files.hostedBaselineLiveBudgetedPacketReport), "utf8"));
+const codexLiveAgentCanary = JSON.parse(readFileSync(join(root, files.codexLiveAgentCanaryReport), "utf8"));
 const budgetedBaselineReviewerIntake = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewerIntakeReport), "utf8"));
 const budgetedBaselineReviewedComparison = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewedComparison), "utf8"));
 const budgetedBaselineReviewedPacketReview = JSON.parse(readFileSync(join(root, files.budgetedBaselineReviewedPacketReview), "utf8"));
@@ -264,6 +267,36 @@ assert.equal(hostedBaselineLiveDiscovery.privacyLeakCount, 0);
 assert.equal(hostedBaselineLiveDiscovery.redactionFailureCount, 0);
 assert.ok(Number(hostedBaselineLiveDiscovery.sourceStats?.documentsSeen) > 0);
 assert.ok(Number(hostedBaselineLiveDiscovery.containerCandidateCount) > 0);
+assert.equal(codexLiveAgentCanary.mode, "codex-live-agent-memory-canary");
+assert.equal(codexLiveAgentCanary.status, "READY_CODEX_LIVE_AGENT_MEMORY_CANARY");
+assert.equal(codexLiveAgentCanary.ok, true);
+assert.equal(codexLiveAgentCanary.fixtureOnly, false);
+assert.equal(codexLiveAgentCanary.writesRealFiles, true);
+assert.equal(codexLiveAgentCanary.metricsOnly, true);
+assert.equal(codexLiveAgentCanary.publicSafe, true);
+assert.equal(codexLiveAgentCanary.rawMemoryIncluded, false);
+assert.equal(codexLiveAgentCanary.rawPromptIncluded, false);
+assert.equal(codexLiveAgentCanary.rawRecallContextIncluded, false);
+assert.equal(codexLiveAgentCanary.rawTranscriptIncluded, false);
+assert.equal(codexLiveAgentCanary.privatePathsIncluded, false);
+assert.equal(codexLiveAgentCanary.callsHostedSupermemory, false);
+assert.equal(codexLiveAgentCanary.countsAsBenchmarkEvidence, false);
+assert.equal(codexLiveAgentCanary.countsAsSupermemoryReplacementEvidence, false);
+assert.equal(codexLiveAgentCanary.primaryBenchmarkStillRequired, true);
+assert.equal(codexLiveAgentCanary.pluginActor, "codex-selfmem-bridge");
+assert.equal(codexLiveAgentCanary.comparisonSurface, "agent-memory-plugin-lifecycle");
+assert.equal(codexLiveAgentCanary.hostedWriteBackDisabled, true);
+assert.equal(codexLiveAgentCanary.explicitWriteObserved, true);
+assert.equal(codexLiveAgentCanary.postBoundaryRecallObserved, true);
+assert.equal(codexLiveAgentCanary.recall?.matchedExpectedTerms?.token, true);
+assert.equal(codexLiveAgentCanary.recall?.matchedExpectedTerms?.color, true);
+assert.equal(codexLiveAgentCanary.recall?.matchedExpectedTerms?.workflow, true);
+assert.equal(codexLiveAgentCanary.doctor?.hostedWriteBackDisabled, true);
+assert.deepEqual(codexLiveAgentCanary.blockers, []);
+assert.match(texts.codexLiveAgentCanaryMarkdown, /Explicit write observed: true/i);
+assert.match(texts.codexLiveAgentCanaryMarkdown, /Post-boundary recall observed: true/i);
+assert.match(texts.codexLiveAgentCanaryMarkdown, /Counts as benchmark evidence: false/i);
+assert.match(texts.codexLiveAgentCanaryMarkdown, /Primary benchmark still required: true/i);
 assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.publicBenchmarkReady, true);
 assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.uniqueQueryCount, 8);
 assert.equal(hostedBaselineLiveQuerySet.querySetEvidence?.duplicateQueryCount, 0);
@@ -621,6 +654,13 @@ const requirements = [
     files.releaseState,
     files.summary,
   ]),
+  proven("codex-live-agent-memory-canary", "Codex bridge proves explicit local write plus post-boundary recall with public-safe metrics, while preserving benchmark and replacement blockers", [
+    "packages/adapters/codex/selfmem-bridge.cjs",
+    "packages/adapters/codex/README.md",
+    "packages/bench/codex-live-agent-memory-canary.mjs",
+    files.codexLiveAgentCanaryReport,
+    files.codexLiveAgentCanaryMarkdown,
+  ]),
   proven("safe-pr-implementation", "Safe PR-based implementation has an open mergeable PR and CI evidence", [
     files.prBodyDraft,
     files.completionAudit,
@@ -663,7 +703,7 @@ const requirements = [
     files.browserEvidence,
     `${reviewDir}/brain-ui-current-head-live-evidence.md`,
   ]),
-  proven("release-handoff-packet", "Manual GitHub handoff packet is generated, reviewed, and gate-covered", [
+  proven("release-update-packet", "Manual GitHub release update packet is generated, reviewed, and gate-covered", [
     "packages/bench/github-handoff-packet.mjs",
     files.handoffPacketEvidence,
     files.handoffPacketReview,
@@ -785,7 +825,7 @@ const requirements = [
     files.canaryReturnedPacketIntakeEvidence,
     files.canaryReturnedPacketIntakeReview,
   ]),
-  proven("canary-returned-inbox", "Returned one-agent canary evidence can be scanned from a mixed inbox while handoff packets and diagnostic bundles stay blocked from production evidence", [
+  proven("canary-returned-inbox", "Returned one-agent canary evidence can be scanned from a mixed inbox while canary request packets and diagnostic bundles stay blocked from production evidence", [
     "packages/bench/canary-returned-inbox.mjs",
     files.canaryReturnedInboxEvidence,
     files.canaryReturnedInboxReview,
@@ -950,7 +990,7 @@ const requirements = [
     `${reviewDir}/brain-ui-canary-rollout-evidence.md`,
     files.realCanaryDiagnosticEvidence,
     `${reviewDir}/returned-downloads-current-scan.md`,
-    "docs/RELEASE_HANDOFF.md",
+    "docs/UPDATE_FLOW.md",
   ]),
 ];
 

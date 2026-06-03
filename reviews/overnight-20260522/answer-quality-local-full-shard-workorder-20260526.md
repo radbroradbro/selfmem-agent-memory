@@ -4,14 +4,16 @@
 - Ready for shard intake: false
 - Ready for shard combine: false
 - Counts as full memory SOTA evidence: false
-- Accepted shards: 2
-- Pending shards: 18
-- Rejected results: 0
-- Workorders emitted: 18
+- Accepted shards: 0
+- Pending shards: 20
+- Rejected results: 2
+- Workorders emitted: 20
 - Runtime blocker reports: 1
-- Runtime resume plans: 1
+- Runtime resume plans: 0
 
 ## Workorders
+- shard-001: 0-25
+- shard-002: 25-50
 - shard-003: 50-75
 - shard-004: 75-100
 - shard-005: 100-125
@@ -32,7 +34,7 @@
 - shard-020: 475-500
 
 ## Runtime Resume Plans
-- shard-003: completed=bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, local-apple-qwen3-0_6b; missing=local-apple-qwen3-0_6b-local-rerank; failure=local-rerank-response-body-stall
+- none
 
 ## Execution Lanes
 - deterministic-control-proxy: ready=true; intake-compatible=false; providers=none
@@ -46,15 +48,15 @@
 ## Execution Lane Readiness
 - deterministic-control-proxy: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
-  - query-expansion=deterministic-fallback-only; model-backed=false; fallback-allowed=true
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, openai-compatible-base-url-missing
 - local-apple-no-spend: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
-  - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
 - local-apple-scaled-challenger: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
-  - query-expansion=local-model-or-deterministic-diagnostic; model-backed=false; fallback-allowed=true
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, lane-strategy-coverage-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
 - voyage-minimum-challenger: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
@@ -70,11 +72,12 @@
   - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, RECALLWEAVE_PROVIDER_BENCHMARK_CALLS-not-enabled, RECALLWEAVE_PROVIDER_BENCHMARK_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, lane-strategy-coverage-missing, nvidia-credentials-missing, openai-compatible-base-url-missing
 - local-full-accepted-shards: response-export=false; answer-quality=false; intake-candidate=false
   - scoring-policy=local-diagnostic-allowed; scoring-policy-ready=false
-  - query-expansion=local-or-cloud-model-required; model-backed=false; fallback-allowed=false
-  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing, query-expansion-local-endpoint-or-cloud-consent-missing
+  - query-expansion=not-required; model-backed=false; fallback-allowed=false
+  - blockers=RECALLWEAVE_BASELINE_LIVE-not-enabled, RECALLWEAVE_BASELINE_NO_RAW_TEXT-not-confirmed, RECALLWEAVE_MEMORYBENCH_ANSWER_QUALITY_CALLS-not-enabled, RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT-not-confirmed, RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA-not-confirmed, answer-model-missing, judge-model-missing, local-apple-credentials-missing, local-rerank-credentials-missing, openai-compatible-base-url-missing
 
 ## Blockers
 - answer-quality-shard-runs-pending
+- answer-quality-shard-results-rejected
 
 ## Gated Commands
 - Intake: npm exec --yes pnpm@10.23.0 -- benchmark:answer-quality:local-shard-intake --input <public-review-dir>/answer-quality-local-full-shard-001.json,<public-review-dir>/answer-quality-local-full-shard-002.json,<public-review-dir>/answer-quality-local-full-shard-003.json,<public-review-dir>/answer-quality-local-full-shard-004.json,<public-review-dir>/answer-quality-local-full-shard-005.json,<public-review-dir>/answer-quality-local-full-shard-006.json,<public-review-dir>/answer-quality-local-full-shard-007.json,<public-review-dir>/answer-quality-local-full-shard-008.json,<public-review-dir>/answer-quality-local-full-shard-009.json,<public-review-dir>/answer-quality-local-full-shard-010.json,<public-review-dir>/answer-quality-local-full-shard-011.json,<public-review-dir>/answer-quality-local-full-shard-012.json,<public-review-dir>/answer-quality-local-full-shard-013.json,<public-review-dir>/answer-quality-local-full-shard-014.json,<public-review-dir>/answer-quality-local-full-shard-015.json,<public-review-dir>/answer-quality-local-full-shard-016.json,<public-review-dir>/answer-quality-local-full-shard-017.json,<public-review-dir>/answer-quality-local-full-shard-018.json,<public-review-dir>/answer-quality-local-full-shard-019.json,<public-review-dir>/answer-quality-local-full-shard-020.json --output <public-review-dir>/answer-quality-local-full-shard-intake.json --markdown-output <public-review-dir>/answer-quality-local-full-shard-intake.md --require-ready
