@@ -120,7 +120,7 @@ assert.doesNotMatch(serialized, secretPattern);
 assert.doesNotMatch(serialized, privatePathPattern);
 
 if (format === "markdown") {
-  console.log(markdownReport(report));
+  process.stdout.write(markdownReport(report));
 } else {
   assert.equal(format, "json", "format must be json or markdown");
   console.log(serialized);

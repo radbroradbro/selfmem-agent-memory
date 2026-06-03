@@ -11306,6 +11306,7 @@ function isAllowedPostBaselineCodePath(file, allowedCodePaths) {
     file === "packages/adapters/openclaw/selfmem_canary_standalone_smoke.mjs" ||
     file === "packages/brain-ui/fixtures/model-matrix.json" ||
     file === "packages/brain-ui/fixtures/benchmark-summary.json" ||
+    file === "packages/brain-ui/fixtures/canary-rollout.json" ||
     file === "packages/brain-ui/fixtures/release-readiness.json" ||
     file === "packages/brain-ui/fixtures/session-compaction-local-audit.json" ||
     file === "packages/brain-ui/interaction-smoke.mjs" ||

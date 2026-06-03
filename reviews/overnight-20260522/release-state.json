@@ -161,6 +161,7 @@
       "packages/bench/session-compaction-local-batch-audit.mjs",
       "packages/bench/session-compaction-smoke.mjs",
       "packages/brain-ui/fixtures/benchmark-summary.json",
+      "packages/brain-ui/fixtures/canary-rollout.json",
       "packages/brain-ui/fixtures/release-readiness.json",
       "packages/brain-ui/fixtures/session-compaction-local-audit.json",
       "packages/brain-ui/src/app.js",

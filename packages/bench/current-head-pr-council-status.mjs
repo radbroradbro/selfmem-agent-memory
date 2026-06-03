@@ -52,6 +52,7 @@ const currentHeadSafeAfterReview =
   && onlyPublicEvidenceSinceReviewedCodeHead;
 const normalChecks = latestReview?.checks ?? [];
 const requiredCheckFailures = normalChecks.filter((check) => check.required === true && check.status === "fail");
+const githubLiveSyncStatusLabel = githubLiveSync?.ok === true ? "passed" : "missing-or-failed";
 
 const report = {
   schemaVersion: 1,
@@ -100,7 +101,7 @@ const report = {
     requiredCheckFailures,
     claudeReviewStatus: "blocked-budget-cap-exceeded-before-output",
     ghCliStatus: "unavailable-in-local-shell-but-github-api-live-sync-passed",
-    githubLiveSyncStatus: githubLiveSync?.ok === true ? "pass" : "missing-or-failed",
+    githubLiveSyncStatus: githubLiveSyncStatusLabel,
     githubLiveSyncMode: githubLiveSync?.mode ?? "",
     pullRequestNumber: 5,
     issueNumber: 6,
@@ -134,7 +135,7 @@ const report = {
     providerAdapterRegistryStatus: readJsonOrNull(join(root, reviewDir, "provider-adapter-registry-20260601.json"))?.status ?? "",
     methodLadderGate: "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
     githubLiveSync: "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
-    githubLiveSyncStatus: githubLiveSync?.ok === true ? "pass" : "missing-or-failed",
+    githubLiveSyncStatus: githubLiveSyncStatusLabel,
     remotePrHeadMatchesCurrentHead: remotePullRequestHead === head,
   },
   claimBoundary: {
