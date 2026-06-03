@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T10:23:13.950Z",
+  "generatedAt": "2026-06-03T10:57:06.036Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,9 +10,9 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
-  "headAtEvidenceCapture": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
-  "reviewedCodeHead": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
+  "head": "1593222fadff2742fdc5e5e3c53c07b9ee20fefd",
+  "headAtEvidenceCapture": "1593222fadff2742fdc5e5e3c53c07b9ee20fefd",
+  "reviewedCodeHead": "1593222fadff2742fdc5e5e3c53c07b9ee20fefd",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
@@ -26,84 +26,29 @@
       "integration",
       "final"
     ],
-    "headRef": "827da79"
+    "headRef": "1593222"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T095617Z-final-council-827da79",
-    "reviewCreatedAt": "2026-06-03T09:57:08.951912Z",
-    "reviewHeadRef": "827da79",
+    "reviewRunId": "20260603T105623Z-final-council-1593222",
+    "reviewCreatedAt": "2026-06-03T10:56:50.079088Z",
+    "reviewHeadRef": "1593222",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
     "finalGateReviewerVendor": "council",
-    "finalGateReviewerModel": "google:gemini-2.5-flash+personas",
+    "finalGateReviewerModel": "anthropic:claude-opus-4-7+personas",
     "finalGateConfidence": "high",
-    "routedReviewerVendor": "google",
-    "routedReviewerModel": "gemini-3.2-flash-preview",
-    "implementerVendor": "anthropic",
-    "implementerModel": "claude-opus-4-7",
+    "routedReviewerVendor": "anthropic",
+    "routedReviewerModel": "claude-opus-4-7",
+    "implementerVendor": "openai",
+    "implementerModel": "gpt-5.5",
     "reviewerCrossVendor": true,
     "deepseekFinalGateVerdict": "not-routed-this-run",
     "deepseekReviewerVendor": "",
     "deepseekReviewerModel": "",
     "deepseekConfidence": "",
-    "normalChecks": [
-      {
-        "name": "git status",
-        "status": "pass",
-        "required": true,
-        "summary": "passed"
-      },
-      {
-        "name": "lint",
-        "status": "not_applicable",
-        "required": false,
-        "summary": "script absent"
-      },
-      {
-        "name": "typecheck",
-        "status": "pass",
-        "required": true,
-        "summary": "passed"
-      },
-      {
-        "name": "unit tests",
-        "status": "pass",
-        "required": true,
-        "summary": "passed"
-      },
-      {
-        "name": "build",
-        "status": "pass",
-        "required": true,
-        "summary": "passed"
-      },
-      {
-        "name": "ruff",
-        "status": "not_applicable",
-        "required": false,
-        "summary": "tool absent"
-      },
-      {
-        "name": "pyright",
-        "status": "not_applicable",
-        "required": false,
-        "summary": "tool absent"
-      },
-      {
-        "name": "mypy",
-        "status": "not_applicable",
-        "required": false,
-        "summary": "tool absent"
-      },
-      {
-        "name": "python tests",
-        "status": "not_applicable",
-        "required": false,
-        "summary": "no Python test files detected"
-      }
-    ],
+    "normalChecks": [],
     "requiredCheckFailures": [],
     "claudeReviewStatus": "blocked-budget-cap-exceeded-before-output",
     "ghCliStatus": "unavailable-in-local-shell-but-github-api-live-sync-passed",
@@ -121,11 +66,11 @@
       "pullRequest": "2026-06-03T10:19:52Z",
       "issue": "2026-06-01T20:31:49Z"
     },
-    "remoteBranchHead": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
-    "remotePullRequestHead": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
-    "remotePullRequestMergeRef": "0ba974a11e3100ae89d9e3ef4191ba3d8d076812",
-    "remoteBranchHeadMatchesCurrentHead": true,
-    "remotePullRequestHeadMatchesCurrentHead": true
+    "remoteBranchHead": "e7e13ac61dd24b6a3a427e2dde8c3507a9cbf6cc",
+    "remotePullRequestHead": "e7e13ac61dd24b6a3a427e2dde8c3507a9cbf6cc",
+    "remotePullRequestMergeRef": "e1974d320255f028fa2bfb163ccf58611b94d6a0",
+    "remoteBranchHeadMatchesCurrentHead": false,
+    "remotePullRequestHeadMatchesCurrentHead": false
   },
   "postReviewChangePolicy": {
     "onlyPublicEvidenceSinceReviewedCodeHead": true,
@@ -145,7 +90,7 @@
     "methodLadderGate": "reviews/overnight-20260522/answer-quality-memory-method-ladder-75q-paired-tolerant-result-gate-20260601.json",
     "githubLiveSync": "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
     "githubLiveSyncStatus": "pass",
-    "remotePrHeadMatchesCurrentHead": true
+    "remotePrHeadMatchesCurrentHead": false
   },
   "claimBoundary": {
     "currentStatus": "not-production-complete",
