@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T04:57:58.046Z",
+  "generatedAt": "2026-06-03T10:23:13.950Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,14 +10,14 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "4917b52cd9f1ce45f25bf6e0bd64d9e51c5423c9",
-  "headAtEvidenceCapture": "4917b52cd9f1ce45f25bf6e0bd64d9e51c5423c9",
-  "reviewedCodeHead": "cb9317fd2c56890efd0eb669694d98148596913d",
+  "head": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
+  "headAtEvidenceCapture": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
+  "reviewedCodeHead": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
   "gateDetection": {
-    "changedFileCount": 1452,
+    "changedFileCount": 1454,
     "requiredGates": [
       "security",
       "architecture",
@@ -26,13 +26,13 @@
       "integration",
       "final"
     ],
-    "headRef": "4917b52"
+    "headRef": "827da79"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T045503Z-final-council-cb9317f",
-    "reviewCreatedAt": "2026-06-03T04:55:59.497831Z",
-    "reviewHeadRef": "cb9317f",
+    "reviewRunId": "20260603T095617Z-final-council-827da79",
+    "reviewCreatedAt": "2026-06-03T09:57:08.951912Z",
+    "reviewHeadRef": "827da79",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
@@ -118,26 +118,21 @@
     "issueTitleMatchesDraft": true,
     "issueBodyMatchesDraft": true,
     "liveUpdatedAt": {
-      "pullRequest": "2026-06-03T04:57:49Z",
+      "pullRequest": "2026-06-03T10:19:52Z",
       "issue": "2026-06-01T20:31:49Z"
     },
-    "remoteBranchHead": "4917b52cd9f1ce45f25bf6e0bd64d9e51c5423c9",
-    "remotePullRequestHead": "4917b52cd9f1ce45f25bf6e0bd64d9e51c5423c9",
-    "remotePullRequestMergeRef": "c20ecf3e33022cd6bd7240e900407f56da19be59",
+    "remoteBranchHead": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
+    "remotePullRequestHead": "827da79196b2b7a2a6c06f8f71bdf1af87e0e713",
+    "remotePullRequestMergeRef": "0ba974a11e3100ae89d9e3ef4191ba3d8d076812",
     "remoteBranchHeadMatchesCurrentHead": true,
     "remotePullRequestHeadMatchesCurrentHead": true
   },
   "postReviewChangePolicy": {
     "onlyPublicEvidenceSinceReviewedCodeHead": true,
     "publicEvidencePathRule": "reviews/** only",
-    "changedFileCountSinceReviewedCodeHead": 4,
+    "changedFileCountSinceReviewedCodeHead": 0,
     "nonEvidenceFileCountSinceReviewedCodeHead": 0,
-    "changedFilesSinceReviewedCodeHead": [
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.json",
-      "reviews/overnight-20260522/current-head-pr-council-status-20260601.md",
-      "reviews/overnight-20260522/github-live-sync-current-head-20260601.json",
-      "reviews/overnight-20260522/github-live-sync-current-head-20260601.md"
-    ],
+    "changedFilesSinceReviewedCodeHead": [],
     "nonEvidenceFilesSinceReviewedCodeHead": []
   },
   "evidence": {
