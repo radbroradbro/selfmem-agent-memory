@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "mode": "provider-route-diagnostic",
+  "generatedAt": "2026-06-03T15:16:19Z",
+  "ok": true,
+  "publicSafe": true,
+  "metricsOnly": true,
+  "credentialsIncluded": false,
+  "privatePathsIncluded": false,
+  "rawPromptsIncluded": false,
+  "rawBenchmarkTextIncluded": false,
+  "openRouterUsed": false,
+  "policy": {
+    "preferredNonOpenRouterRoute": "direct-deepseek",
+    "openRouterBoundary": "not used for scorer routing in this diagnostic",
+    "nvidiaBoundary": "usable for model listing with this local key state, but not usable as a chat scorer until tiny chat no longer times out"
+  },
+  "directDeepSeek": {
+    "status": "READY_DIRECT_DEEPSEEK_FLASH",
+    "baseUrlLabel": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash",
+    "credentialSource": "private-env key file, loaded in process only",
+    "credentialValueWritten": false,
+    "tinyChat": {
+      "ok": true,
+      "httpStatus": 200,
+      "contentHashPrefix": "728b392a299d"
+    },
+    "q150OneQuerySmoke": {
+      "ok": true,
+      "repoArtifactPreserved": false,
+      "queryOffset": 150,
+      "maxQueries": 1,
+      "providerCalls": 4,
+      "totalFailures": 0,
+      "resultUse": "route smoke only"
+    },
+    "q150ToQ155StrictSlice": {
+      "ok": true,
+      "resultPath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-direct-deepseek-flash-20260603.json",
+      "gatePath": "reviews/overnight-20260522/answer-quality-memory-method-ladder-q150-q155-method-result-gate-20260603.json",
+      "queryOffset": 150,
+      "maxQueries": 5,
+      "totalCalls": 20,
+      "totalFailures": 0,
+      "baselineMethod": "session-v1",
+      "baselineAnswerQuality": 20,
+      "challengerMethod": "contextual-source-chunk-v1",
+      "challengerAnswerQuality": 20,
+      "deltaVsBaseline": 0,
+      "promotionStatus": "blocked-baseline-control-not-beaten"
+    }
+  },
+  "nvidiaNim": {
+    "status": "BLOCKED_CHAT_TIMEOUT",
+    "baseUrlLabel": "https://integrate.api.nvidia.com/v1",
+    "modelsList": {
+      "ok": true,
+      "httpStatus": 200,
+      "modelCount": 119,
+      "deepseekModelsObserved": [
+        "deepseek-ai/deepseek-v4-flash",
+        "deepseek-ai/deepseek-v4-pro"
+      ]
+    },
+    "tinyChat": [
+      {
+        "model": "deepseek-ai/deepseek-v4-pro",
+        "ok": false,
+        "failureClass": "TimeoutError",
+        "timeoutSeconds": 60
+      },
+      {
+        "model": "deepseek-ai/deepseek-v4-flash",
+        "ok": false,
+        "failureClass": "TimeoutError",
+        "timeoutSeconds": 60
+      }
+    ],
+    "resultUse": "do not use NVIDIA NIM chat as the answer-quality scorer until a tiny chat canary passes"
+  },
+  "memoryRecallDuringTurn": {
+    "inSessionSupermemoryRecallAttempted": true,
+    "matchingMemoriesReturned": 0,
+    "randomBenchmarkOrCanaryContextInjected": false,
+    "resultUse": "supports current noise check; not a benchmark score"
+  },
+  "nextActions": [
+    "Use direct DeepSeek flash for bounded scorer diagnostics when a cloud challenger model is needed.",
+    "Do not use OpenRouter for this scorer lane unless explicitly selected as its own route.",
+    "Do not run a full q150-q200 method ladder from the q150-q155 slice alone because the five-query diagnostic tied the session baseline.",
+    "Continue periodic memory dogfood monitoring; benchmark and canary memories should remain task-scoped only."
+  ]
+}
