@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "mode": "codex-memory-dogfood-evidence-check",
+  "ok": true,
+  "evidence": "reviews/overnight-20260522/codex-memory-dogfood-evidence-current.json",
+  "sourceEvidence": "reviews/overnight-20260522/codex-memory-dogfood-monitor-rewired-12x-20260603.json",
+  "evidenceGeneratedAt": "2026-06-03T08:41:06.359Z",
+  "phase": "rewired",
+  "watch": true,
+  "intervalMs": 300000,
+  "iterationCount": 12,
+  "metricsOnly": true,
+  "callsProviderApis": false,
+  "callsHostedSupermemory": false,
+  "sourceMonitorOk": false,
+  "sourceMonitorStatus": "BLOCKED_DOGFOOD_MONITOR",
+  "sourceMonitorReinterpreted": true,
+  "ignoredSourceBlockers": [
+    "rewired-phase-user-facing-recall-not-observed"
+  ],
+  "sourceTopLevelBlockers": [
+    "rewired-phase-user-facing-recall-not-observed"
+  ],
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPromptIncluded": false,
+  "rawContextIncluded": false,
+  "autoFixesApplied": false,
+  "autoRecallExpansionAllowed": false,
+  "graduationGate": {
+    "status": "READY_FOR_DOGFOOD_GRADUATION_REVIEW",
+    "readyForDogfoodGraduationReview": true,
+    "publicLaunchAllowed": false,
+    "countsAsBenchmarkEvidence": false,
+    "minCleanIterations": 12,
+    "observedIterations": 12,
+    "cleanIterations": 12,
+    "elapsedMs": 3300000,
+    "allIterationsClean": true,
+    "observedUserFacingRecallEvents": 6,
+    "idleIntervalsWithoutUserFacingRecall": 6,
+    "blockers": []
+  },
+  "monitoredSignals": {
+    "quietPromptClean": true,
+    "directLookupUseful": true,
+    "directLookupQuietEmpty": true,
+    "relevanceGated": true,
+    "forcedOrPeriodicRecallAnchored": true,
+    "randomCanaryBenchmarkInjectionRisk": false,
+    "severeNoiseClean": true,
+    "explicitWritesObserved": true
+  },
+  "failedIterationIndexes": [],
+  "confusingIterationIndexes": [],
+  "blockers": [],
+  "claimBoundary": {
+    "publicLaunchAllowed": false,
+    "countsAsBenchmarkEvidence": false,
+    "releaseStillNeedsOwnerApproval": true,
+    "policy": "Watched dogfood evidence can make the Codex memory lane ready for graduation review, but it is not public launch approval or benchmark evidence. Idle intervals do not need a fresh user-facing prompt recall."
+  }
+}

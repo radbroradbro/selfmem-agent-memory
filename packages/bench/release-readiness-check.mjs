@@ -155,6 +155,7 @@ const requiredFiles = [
   "packages/adapters/codex/selfmem-bridge.cjs",
   "packages/bench/codex-lifecycle-audit.mjs",
   "packages/bench/codex-memory-context-quality-audit.mjs",
+  "packages/bench/codex-memory-dogfood-evidence-check.mjs",
   "packages/bench/codex-memory-dogfood-monitor.mjs",
   "packages/bench/codex-memory-reset-health.mjs",
   "packages/bench/codex-live-agent-memory-canary.mjs",
@@ -786,6 +787,7 @@ const requiredScripts = [
   "codex:memory-reset-health",
   "codex:memory-dogfood-monitor",
   "codex:memory-dogfood-monitor:watch",
+  "codex:memory-dogfood-evidence",
   "codex:live-agent-canary",
   "codex:live-agent-canary:local",
   "codex:runtime-canary",
@@ -1259,6 +1261,45 @@ check("fresh Codex memory health gate passes for controlled dogfood", () => {
   assert.ok(report.release?.blockers?.includes("codex-memory-controlled-dogfood-active"));
   assert.equal(report.release?.blockers?.includes("public-review-surface-collapse-required"), false);
   assert.equal(report.countsAsBenchmarkEvidence, false);
+});
+
+check("watched Codex dogfood interval evidence is graduation-review ready", () => {
+  run("node", ["--check", "packages/bench/codex-memory-dogfood-evidence-check.mjs"]);
+  const report = JSON.parse(run("node", ["packages/bench/codex-memory-dogfood-evidence-check.mjs", "--strict"]).stdout);
+
+  assert.equal(report.ok, true);
+  assert.equal(report.mode, "codex-memory-dogfood-evidence-check");
+  assert.equal(report.phase, "rewired");
+  assert.equal(report.watch, true);
+  assert.equal(report.metricsOnly, true);
+  assert.equal(report.callsProviderApis, false);
+  assert.equal(report.callsHostedSupermemory, false);
+  assert.equal(report.rawMemoryIncluded, false);
+  assert.equal(report.rawTranscriptIncluded, false);
+  assert.equal(report.rawPromptIncluded, false);
+  assert.equal(report.rawContextIncluded, false);
+  assert.equal(report.autoFixesApplied, false);
+  assert.equal(report.autoRecallExpansionAllowed, false);
+  assert.equal(report.graduationGate?.status, "READY_FOR_DOGFOOD_GRADUATION_REVIEW");
+  assert.equal(report.graduationGate?.readyForDogfoodGraduationReview, true);
+  assert.equal(report.graduationGate?.publicLaunchAllowed, false);
+  assert.equal(report.graduationGate?.countsAsBenchmarkEvidence, false);
+  assert.ok(Number(report.graduationGate?.minCleanIterations ?? 0) >= 12);
+  assert.ok(Number(report.graduationGate?.cleanIterations ?? 0) >= Number(report.graduationGate?.minCleanIterations ?? 12));
+  assert.deepEqual(report.graduationGate?.blockers, []);
+  assert.equal(report.monitoredSignals?.quietPromptClean, true);
+  assert.equal(report.monitoredSignals?.directLookupUseful, true);
+  assert.equal(report.monitoredSignals?.directLookupQuietEmpty, true);
+  assert.equal(report.monitoredSignals?.relevanceGated, true);
+  assert.equal(report.monitoredSignals?.forcedOrPeriodicRecallAnchored, true);
+  assert.equal(report.monitoredSignals?.randomCanaryBenchmarkInjectionRisk, false);
+  assert.equal(report.monitoredSignals?.severeNoiseClean, true);
+  assert.equal(report.monitoredSignals?.explicitWritesObserved, true);
+  assert.deepEqual(report.failedIterationIndexes, []);
+  assert.deepEqual(report.confusingIterationIndexes, []);
+  assert.deepEqual(report.blockers, []);
+  assert.equal(report.claimBoundary?.publicLaunchAllowed, false);
+  assert.equal(report.claimBoundary?.countsAsBenchmarkEvidence, false);
 });
 
 check("Codex bridge adapter source preserves explicit writes", () => {

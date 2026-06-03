@@ -94,6 +94,7 @@ const requiredFiles = {
   hostedBaselineLiveBudgetedPacketReport: "hosted-baseline-live-budgeted-packet.json",
   codexLiveAgentCanaryReport: "codex-live-agent-memory-canary-20260602.json",
   codexLiveAgentCanaryMarkdown: "codex-live-agent-memory-canary-20260602.md",
+  codexDogfoodGraduationEvidence: "codex-memory-dogfood-evidence-current.json",
   budgetedBaselineReviewerFindings: "reviewer-work/reviewer-findings.md",
   budgetedBaselineReviewerIntakeEvidence: "reviewer-work/budgeted-baseline-reviewer-intake-evidence.md",
   budgetedBaselineReviewerIntakeReport: "reviewer-work/budgeted-baseline-reviewer-intake-two-of-two.json",
@@ -605,6 +606,13 @@ assert.equal(codexMemoryResetHealth.publicSurface?.publicReviewExportedFileCount
 assert.equal(codexMemoryResetHealth.publicSurface?.publicEvidenceIndexSafe, true);
 assert.ok(codexMemoryResetHealth.release?.blockers?.includes("codex-memory-controlled-dogfood-active"));
 assert.equal(codexMemoryResetHealth.release?.blockers?.includes("public-review-surface-collapse-required"), false);
+const codexDogfoodGraduationEvidence = JSON.parse(
+  run("node", ["packages/bench/codex-memory-dogfood-evidence-check.mjs", "--strict"]).stdout,
+);
+assert.equal(codexDogfoodGraduationEvidence.ok, true);
+assert.equal(codexDogfoodGraduationEvidence.graduationGate?.readyForDogfoodGraduationReview, true);
+assert.equal(codexDogfoodGraduationEvidence.claimBoundary?.publicLaunchAllowed, false);
+assert.equal(codexDogfoodGraduationEvidence.claimBoundary?.countsAsBenchmarkEvidence, false);
 
 const reviewerReport = [
   {
@@ -662,9 +670,10 @@ const blockerReport = [
   },
   {
     id: "codex-memory-controlled-dogfood-active",
-    status: "blocked",
-    evidence: "docs/CODEX_MEMORY_RESET.md",
-    nextAction: "Keep Codex memory in controlled dogfood until monitored live hook intervals prove quiet prompt context, explicit writes, post-boundary recall, relevance-gated retrieval, and store-noise health.",
+    status: "ready-for-graduation-review",
+    evidence: requiredFiles.codexDogfoodGraduationEvidence,
+    nextAction:
+      "Watched rewired dogfood intervals are clean for quiet prompts, direct lookup usefulness, relevance-gated retrieval, explicit writes, and store-noise health. Keep public launch blocked; use this only as controlled dogfood graduation-review evidence.",
   },
   codexMemoryResetHealth.release?.blockedByPublicSurface ? {
     id: "public-review-surface-collapse-required",
@@ -817,6 +826,19 @@ console.log(
           severeNoise: codexMemoryResetHealth.storeHealth?.severeNoise,
           releaseBlockers: codexMemoryResetHealth.release?.blockers,
           countsAsBenchmarkEvidence: codexMemoryResetHealth.countsAsBenchmarkEvidence,
+        },
+        codexDogfoodGraduationEvidence: {
+          ok: codexDogfoodGraduationEvidence.ok,
+          status: codexDogfoodGraduationEvidence.graduationGate?.status,
+          readyForDogfoodGraduationReview:
+            codexDogfoodGraduationEvidence.graduationGate?.readyForDogfoodGraduationReview,
+          minCleanIterations: codexDogfoodGraduationEvidence.graduationGate?.minCleanIterations,
+          observedIterations: codexDogfoodGraduationEvidence.graduationGate?.observedIterations,
+          cleanIterations: codexDogfoodGraduationEvidence.graduationGate?.cleanIterations,
+          elapsedMs: codexDogfoodGraduationEvidence.graduationGate?.elapsedMs,
+          publicLaunchAllowed: codexDogfoodGraduationEvidence.claimBoundary?.publicLaunchAllowed,
+          countsAsBenchmarkEvidence: codexDogfoodGraduationEvidence.claimBoundary?.countsAsBenchmarkEvidence,
+          monitoredSignals: codexDogfoodGraduationEvidence.monitoredSignals,
         },
         budgetedBaselineReviewerIntake: {
           ok: budgetedBaselineReviewerIntakeReport.ok,

@@ -44,6 +44,7 @@
     "codex:memory-reset-health": "node packages/bench/codex-memory-reset-health.mjs --strict",
     "codex:memory-dogfood-monitor": "node packages/bench/codex-memory-dogfood-monitor.mjs --strict",
     "codex:memory-dogfood-monitor:watch": "node packages/bench/codex-memory-dogfood-monitor.mjs --watch --phase rewired --interval-ms 300000 --max-iterations 12",
+    "codex:memory-dogfood-evidence": "node packages/bench/codex-memory-dogfood-evidence-check.mjs --strict",
     "codex:live-agent-canary": "node packages/bench/codex-live-agent-memory-canary.mjs --strict",
     "codex:live-agent-canary:local": "node packages/bench/codex-live-agent-memory-canary.mjs --live --strict",
     "codex:runtime-canary": "node packages/bench/codex-live-agent-runtime-report.mjs --strict",

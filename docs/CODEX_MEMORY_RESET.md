@@ -71,6 +71,21 @@ default the watch command needs 12 clean iterations. Shorter watched runs may be
 used only as gate-smoke tests or diagnostics, not as a public release or
 benchmark claim.
 
+When a watched run is ready for dogfood graduation review, keep the full monitor
+output local and write a compact metrics-only evidence summary into the active
+review directory:
+
+```bash
+node packages/bench/codex-memory-dogfood-evidence-check.mjs \
+  --evidence /tmp/codex-memory-dogfood-monitor-current.json \
+  --output reviews/<review-dir>/codex-memory-dogfood-evidence-current.json \
+  --strict
+```
+
+That evidence may show the controlled Codex memory lane is ready for graduation
+review. It still does not authorize public launch, SOTA claims, or broader
+automatic recall rollout.
+
 If the monitor reports noisy or confusing context, keep or turn automatic
 injection off, fix the ranking, write, dedupe, or pruning method, and rerun the
 monitor. Do not treat repeated noisy recall as an acceptable operator burden.

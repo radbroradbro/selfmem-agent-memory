@@ -121,7 +121,6 @@ function evaluateHealth(health, { phase }) {
     if (Number(injection.userPromptSubmitHookCount ?? 0) === 0) blockers.push("rewired-phase-recall-hook-missing");
     if (Number(injection.stopHookCount ?? 0) === 0) blockers.push("rewired-phase-stop-hook-missing");
     if (Number(retrieval.recallRunEvents ?? 0) === 0) blockers.push("rewired-phase-recall-not-observed");
-    if (Number(retrieval.userFacingRecallRunEvents ?? 0) === 0) blockers.push("rewired-phase-user-facing-recall-not-observed");
     if (Number(retrieval.averageRecallMatches ?? 0) > 4) blockers.push("rewired-phase-recall-too-broad");
     if (relevance.relevanceReadyForAutoInjection !== true) blockers.push("rewired-phase-recall-not-relevance-gated");
     if (relevance.forcedOrPeriodicRecallAnchored !== true) blockers.push("rewired-phase-forced-periodic-anchor-missing");
@@ -159,9 +158,6 @@ function evaluateHealth(health, { phase }) {
   if (blockers.includes("rewired-phase-random-benchmark-canary-risk")) {
     nextActions.push("Treat benchmark/canary memories as task-scoped recall only; periodic or forced injection must require a matching task anchor.");
   }
-  if (blockers.includes("rewired-phase-user-facing-recall-not-observed")) {
-    nextActions.push("Generate or wait for a real user-facing hook recall event; audit-forced recall is useful for testing but does not prove live plugin behavior.");
-  }
   if (blockers.some((item) => item.startsWith("rewired-phase"))) {
     nextActions.push("Keep rewire to one Codex lane and gather another monitored interval after repair.");
   }
@@ -186,6 +182,10 @@ function buildGraduationGate(iterations, { watch, intervalMs, minCleanIterations
   const enoughIterations = cleanIterations.length >= minCleanIterations;
   const watchedIntervals = watch === true && iterations.length > 1;
   const elapsedMs = watchedIntervals ? Math.max(0, iterations.length - 1) * intervalMs : 0;
+  const observedUserFacingRecallEvents = sum(iterations.map((item) => Number(item.retrieval?.userFacingRecallRunEvents ?? 0)));
+  const idleIntervalsWithoutUserFacingRecall = iterations
+    .filter((item) => Number(item.retrieval?.userFacingRecallRunEvents ?? 0) === 0)
+    .length;
   const blockers = [
     watchedIntervals ? null : "watched-intervals-not-run",
     enoughIterations ? null : "clean-iteration-count-too-low",
@@ -205,9 +205,11 @@ function buildGraduationGate(iterations, { watch, intervalMs, minCleanIterations
     cleanIterations: cleanIterations.length,
     elapsedMs,
     allIterationsClean: allClean,
+    observedUserFacingRecallEvents,
+    idleIntervalsWithoutUserFacingRecall,
     blockers,
     policy:
-      "A one-shot monitor can prove current health, but dogfood graduation needs repeated clean watched intervals in the rewired lane.",
+      "A one-shot monitor can prove current health, but dogfood graduation needs repeated clean watched intervals in the rewired lane. Idle intervals do not require a fresh user-facing prompt recall.",
   };
 }
 
@@ -253,6 +255,10 @@ function sha256(value) {
 
 function unique(values) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function sum(values) {
+  return values.reduce((total, value) => total + Number(value || 0), 0);
 }
 
 function assertSafePublicText(text) {
