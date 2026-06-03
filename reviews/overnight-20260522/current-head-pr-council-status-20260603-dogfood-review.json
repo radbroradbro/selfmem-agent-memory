@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T14:04:24.703Z",
+  "generatedAt": "2026-06-03T14:41:13.119Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,14 +10,14 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "12f92cebba12283635365552ff6da435b518049a",
-  "headAtEvidenceCapture": "12f92cebba12283635365552ff6da435b518049a",
-  "reviewedCodeHead": "12f92cebba12283635365552ff6da435b518049a",
+  "head": "00529c23488b8b80a2872b6086c4dbd7c7043320",
+  "headAtEvidenceCapture": "00529c23488b8b80a2872b6086c4dbd7c7043320",
+  "reviewedCodeHead": "00529c23488b8b80a2872b6086c4dbd7c7043320",
   "currentHeadSafeAfterReview": true,
-  "baseRef": "a1f6f59",
-  "baseHead": "a1f6f598cc3e2e8f1aaca7626e44c44e8208b133",
+  "baseRef": "d4678af",
+  "baseHead": "d4678afb4bb9eec2a7107cb8ffad4bdcd786f4ea",
   "gateDetection": {
-    "changedFileCount": 2,
+    "changedFileCount": 16,
     "requiredGates": [
       "security",
       "architecture",
@@ -26,13 +26,13 @@
       "integration",
       "final"
     ],
-    "headRef": "12f92ce"
+    "headRef": "00529c2"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T140321Z-final-council-12f92ce",
-    "reviewCreatedAt": "2026-06-03T14:03:37.302650Z",
-    "reviewHeadRef": "12f92ce",
+    "reviewRunId": "20260603T143703Z-final-council-00529c2",
+    "reviewCreatedAt": "2026-06-03T14:37:18.947400Z",
+    "reviewHeadRef": "00529c2",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
@@ -63,12 +63,12 @@
     "issueTitleMatchesDraft": true,
     "issueBodyMatchesDraft": true,
     "liveUpdatedAt": {
-      "pullRequest": "2026-06-03T14:03:55Z",
+      "pullRequest": "2026-06-03T14:37:33Z",
       "issue": "2026-06-03T11:05:19Z"
     },
-    "remoteBranchHead": "12f92cebba12283635365552ff6da435b518049a",
-    "remotePullRequestHead": "12f92cebba12283635365552ff6da435b518049a",
-    "remotePullRequestMergeRef": "2600ed372a9f3ce3c2549d1af68f123eeb6778dd",
+    "remoteBranchHead": "00529c23488b8b80a2872b6086c4dbd7c7043320",
+    "remotePullRequestHead": "00529c23488b8b80a2872b6086c4dbd7c7043320",
+    "remotePullRequestMergeRef": "abd431b83023919c1b6c5b9cebb37695c6a7290c",
     "remoteBranchHeadMatchesCurrentHead": true,
     "remotePullRequestHeadMatchesCurrentHead": true
   },
