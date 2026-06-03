@@ -45,6 +45,10 @@ if (args.continueOnCallErrorSmoke === true) {
   runContinueOnCallErrorSmoke();
   process.exit(0);
 }
+if (args.sessionBaselineNextActionsSmoke === true) {
+  runSessionBaselineNextActionsSmoke();
+  process.exit(0);
+}
 
 assert.ok(["json", "markdown"].includes(format), "--format must be json or markdown");
 assert.ok(["full-sota", "local-full", "model-challenger"].includes(claimScope), "--claim-scope must be full-sota, local-full, or model-challenger");
@@ -215,6 +219,13 @@ process.stdout.write(format === "markdown" ? markdownText : jsonText);
 function methodComparisonNextActions(bestExecuted) {
   const method = bestExecuted?.method ?? "the winning memory method";
   const strategy = bestExecuted?.winner?.strategy ?? "the winning retrieval strategy";
+  if (method === "session-v1") {
+    return [
+      `Treat session-v1 with ${strategy} as a baseline/control winner for this slice, not as a challenger promotion.`,
+      "Do not combine or promote this slice unless the standard result gate proves a non-session challenger beats session-v1 under failure-accounted answer-quality scoring.",
+      "Check answer and judge failure counts before interpreting zero-score or baseline-winning slices as retrieval evidence.",
+    ];
+  }
   return [
     `Treat ${method} with ${strategy} as the next larger-slice challenger, not as a production default yet.`,
     "Promote only methods that beat session-v1 on the same raw query selection and retain their edge under failure-accounted answer-quality scoring.",
@@ -304,6 +315,24 @@ function runContinueOnCallErrorSmoke() {
       mode: "answer-quality-method-ladder-continue-on-call-error-smoke",
       forwardsContinueOnCallError: true,
       leavesStrictModeStrict: true,
+    })}\n`,
+  );
+}
+
+function runSessionBaselineNextActionsSmoke() {
+  const actions = methodComparisonNextActions({
+    method: "session-v1",
+    winner: { strategy: "bm25-lite" },
+  });
+  assert.equal(actions.some((item) => item.includes("baseline/control winner")), true);
+  assert.equal(actions.some((item) => item.includes("challenger promotion")), true);
+  assert.equal(actions.some((item) => item.includes("standard result gate")), true);
+  assert.equal(actions.some((item) => item.includes("next larger-slice challenger")), false);
+  process.stdout.write(
+    `${JSON.stringify({
+      ok: true,
+      mode: "answer-quality-method-ladder-session-baseline-next-actions-smoke",
+      baselineWinnerDoesNotPromoteChallenger: true,
     })}\n`,
   );
 }

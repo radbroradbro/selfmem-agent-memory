@@ -592,6 +592,18 @@ describe("public benchmark comparison contract", () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
+  it("does not describe a session-v1 method-ladder winner as a challenger promotion", () => {
+    const result = spawnSync(process.execPath, [answerQualityMethodLadderScript, "--session-baseline-next-actions-smoke"], {
+      cwd: new URL("../..", import.meta.url),
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.mode).toBe("answer-quality-method-ladder-session-baseline-next-actions-smoke");
+    expect(report.baselineWinnerDoesNotPromoteChallenger).toBe(true);
+  });
+
   it("blocks paired-bootstrap method-ladder promotion when fingerprints are missing", () => {
     const tempDir = mkdtempSync(join(tmpdir(), "recallweave-method-ladder-bootstrap-gate-"));
     const resultPath = join(tempDir, "method-ladder.json");

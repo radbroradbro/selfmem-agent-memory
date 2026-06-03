@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "mode": "answer-quality-memory-method-ladder-scorer-blocker",
+  "generatedAt": "2026-06-03T14:53:54Z",
+  "status": "BLOCKED_DIRECT_DEEPSEEK_AUTHENTICATION",
+  "publicSafe": true,
+  "metricsOnly": true,
+  "rawQuestionsIncluded": false,
+  "rawAnswersIncluded": false,
+  "rawMemoryIncluded": false,
+  "rawTranscriptIncluded": false,
+  "rawPrivateOutputPathIncluded": false,
+  "printsCredentials": false,
+  "claimScope": "model-challenger",
+  "modelMatchPolicy": "challenger-model-allowed",
+  "countsAsMethodLadderEvidence": false,
+  "countsAsFullMemorySotaEvidence": false,
+  "publicBenchmarkClaimsAllowed": false,
+  "queryShard": {
+    "startIndex": 150,
+    "endIndexExclusive": 200,
+    "requestedLimit": 50,
+    "sameRawQuerySelectionAcrossMethods": true,
+    "selectedQuestionIdsHash": "sha256:703cc7aa1a31c08f515f6d133919ec9dbb724304469f485348ebe5a3be90eade"
+  },
+  "scorerRoute": {
+    "provider": "direct-deepseek",
+    "baseUrl": "https://api.deepseek.com",
+    "answerModel": "deepseek-v4-flash",
+    "judgeModel": "deepseek-v4-flash",
+    "openRouterUsed": false,
+    "keyPrinted": false
+  },
+  "failedAttempt": {
+    "reportRejected": true,
+    "attemptedMethods": [
+      "session-v1",
+      "contextual-source-chunk-v1"
+    ],
+    "attemptedStrategies": [
+      "bm25-lite",
+      "full-hybrid-rerank"
+    ],
+    "attemptedAnswerCalls": 200,
+    "attemptedJudgeCalls": 0,
+    "answerFailures": 200,
+    "judgeFailures": 0,
+    "failureClass": "direct-deepseek-authentication-failed",
+    "failureEvidence": "one-query rerun without continue-on-call-error failed during answer scoring with HTTP 401 authentication failure",
+    "rawProviderResponseIncluded": false,
+    "keyFragmentIncluded": false
+  },
+  "blockers": [
+    "direct-deepseek-key-invalid",
+    "q150-q200-answer-quality-report-rejected-all-answer-calls-failed"
+  ],
+  "nextActions": [
+    "Do not combine the rejected q150-q200 attempt into the 150Q method-ladder result.",
+    "Refresh a valid direct DeepSeek scorer key or use another approved direct OpenAI-compatible route such as NVIDIA NIM before rerunning q150-q200.",
+    "Keep OpenRouter out of the answer-quality scorer route unless the owner explicitly asks for that spend path.",
+    "Rerun q150-q200 only after a one-query no-continue diagnostic succeeds with zero answer failures."
+  ]
+}
