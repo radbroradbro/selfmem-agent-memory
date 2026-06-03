@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "current-head-pr-council-status",
-  "generatedAt": "2026-06-03T02:14:04.398Z",
+  "generatedAt": "2026-06-03T02:34:36.975Z",
   "publicSafe": true,
   "metricsOnly": true,
   "rawQuestionsIncluded": false,
@@ -10,14 +10,14 @@
   "rawTranscriptIncluded": false,
   "printsCredentials": false,
   "branch": "feat/nucleus-wiki-native-contract",
-  "head": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
-  "headAtEvidenceCapture": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
-  "reviewedCodeHead": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
+  "head": "bcd7c353c52cca6ab178afe23ce71859de264d55",
+  "headAtEvidenceCapture": "bcd7c353c52cca6ab178afe23ce71859de264d55",
+  "reviewedCodeHead": "bcd7c353c52cca6ab178afe23ce71859de264d55",
   "currentHeadSafeAfterReview": true,
   "baseRef": "origin/main",
   "baseHead": "f4981733a39cf9f09f3f87cac04e9b76a896e38b",
   "gateDetection": {
-    "changedFileCount": 1450,
+    "changedFileCount": 1452,
     "requiredGates": [
       "security",
       "architecture",
@@ -26,19 +26,19 @@
       "integration",
       "final"
     ],
-    "headRef": "f1b64bc"
+    "headRef": "bcd7c35"
   },
   "verification": {
     "finalDryRunPacketBuilt": true,
-    "reviewRunId": "20260603T021133Z-final-council-f1b64bc",
-    "reviewCreatedAt": "2026-06-03T02:11:50.411827Z",
-    "reviewHeadRef": "f1b64bc",
+    "reviewRunId": "20260603T023358Z-final-council-bcd7c35",
+    "reviewCreatedAt": "2026-06-03T02:34:15.293465Z",
+    "reviewHeadRef": "bcd7c35",
     "reviewedCodeHeadMatchesReviewRun": true,
     "reviewFreshForReviewedCodeHead": true,
     "finalGateVerdict": "CLEAN",
     "finalGateReviewerVendor": "council",
     "finalGateReviewerModel": "anthropic:claude-opus-4-7+personas",
-    "finalGateConfidence": "low",
+    "finalGateConfidence": "high",
     "routedReviewerVendor": "anthropic",
     "routedReviewerModel": "claude-opus-4-7",
     "implementerVendor": "openai",
@@ -63,12 +63,12 @@
     "issueTitleMatchesDraft": true,
     "issueBodyMatchesDraft": true,
     "liveUpdatedAt": {
-      "pullRequest": "2026-06-03T02:11:09Z",
+      "pullRequest": "2026-06-03T02:34:26Z",
       "issue": "2026-06-01T20:31:49Z"
     },
-    "remoteBranchHead": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
-    "remotePullRequestHead": "f1b64bcf3e31d1f7c5502e933602872ac721bcf8",
-    "remotePullRequestMergeRef": "ecb7fc7471164aea7e4c3da178aad74569cd64a6",
+    "remoteBranchHead": "bcd7c353c52cca6ab178afe23ce71859de264d55",
+    "remotePullRequestHead": "bcd7c353c52cca6ab178afe23ce71859de264d55",
+    "remotePullRequestMergeRef": "8b60463687eae5756f50f4555372329fc45fcb62",
     "remoteBranchHeadMatchesCurrentHead": true,
     "remotePullRequestHeadMatchesCurrentHead": true
   },
