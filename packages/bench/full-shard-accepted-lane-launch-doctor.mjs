@@ -434,10 +434,15 @@ function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
   for (const provider of arrayOf(lane.providerRequirements)) {
     const readiness = lane.providerReadiness?.[provider] ?? {};
     const endpointHealth = options.localRuntimeHealth?.endpoints?.[provider] ?? {};
+    const envNames = unique([
+      ...arrayOf(readiness.valueEnvNames),
+      ...arrayOf(readiness.keyFileEnvNames),
+      ...localRuntimeEnvNames(provider),
+    ]);
     push(
       `${provider}-readiness`,
       readiness.ready === true && (provider.startsWith("local-") ? endpointHealth.ready === true : true),
-      [...arrayOf(readiness.valueEnvNames), ...arrayOf(readiness.keyFileEnvNames)],
+      envNames,
       `${provider} endpoint or credential readiness`,
     );
   }
@@ -455,8 +460,10 @@ function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
       "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
       "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT",
       "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+      "RECALLWEAVE_MEMORYBENCH_API_KEY",
       "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
       "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+      "RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY",
     ],
     "OpenAI-compatible answer and judge endpoint matching the target models",
   );
@@ -476,6 +483,29 @@ function operatorInputsNeeded(lane, privateInputDoctorReport, options) {
         : "model-backed query expansion for the accepted local-full lane",
   );
   return needs;
+}
+
+function localRuntimeEnvNames(provider) {
+  if (provider === "local-apple") {
+    return [
+      "SELFMEM_LOCAL_EMBED_BASE_URL",
+      "SELFMEM_LOCAL_EMBED_MODEL",
+      "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
+      "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+      "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT",
+      "SELFMEM_LOCAL_EMBED_DURABILITY_REPORT",
+      "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY",
+    ];
+  }
+  if (provider === "local-rerank") {
+    return [
+      "SELFMEM_LOCAL_RERANK_ENDPOINT",
+      "SELFMEM_LOCAL_RERANK_BASE_URL",
+      "SELFMEM_LOCAL_RERANK_MODEL",
+      "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT",
+    ];
+  }
+  return [];
 }
 
 function launchDoctorNextActions({ readyForFirstAcceptedShardRun, isFullSota, isLocalFull, isModelChallenger }) {

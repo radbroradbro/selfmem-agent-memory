@@ -4,7 +4,7 @@
   "mode": "full-shard-accepted-lane-launch-doctor",
   "status": "BLOCKED_ACCEPTED_LANE_SHARD_LAUNCH",
   "claimScope": "full-sota",
-  "generatedAt": "2026-06-03T10:39:53.150Z",
+  "generatedAt": "2026-06-03T10:50:56.887Z",
   "writesRealFiles": true,
   "metricsOnly": true,
   "publicSafe": true,
@@ -327,7 +327,13 @@
     {
       "id": "local-apple-readiness",
       "envNames": [
-        "SELFMEM_LOCAL_EMBED_BASE_URL"
+        "SELFMEM_LOCAL_EMBED_BASE_URL",
+        "SELFMEM_LOCAL_EMBED_MODEL",
+        "SELFMEM_LOCAL_EMBED_MAX_TOKENS",
+        "SELFMEM_LOCAL_EMBED_BATCH_MAX_TOKENS",
+        "SELFMEM_LOCAL_DENSE_CANDIDATE_LIMIT",
+        "SELFMEM_LOCAL_EMBED_DURABILITY_REPORT",
+        "RECALLWEAVE_REQUIRE_LOCAL_EMBED_DURABILITY"
       ],
       "note": "local-apple endpoint or credential readiness",
       "valuePrinted": false
@@ -336,7 +342,9 @@
       "id": "local-rerank-readiness",
       "envNames": [
         "SELFMEM_LOCAL_RERANK_ENDPOINT",
-        "SELFMEM_LOCAL_RERANK_BASE_URL"
+        "SELFMEM_LOCAL_RERANK_BASE_URL",
+        "SELFMEM_LOCAL_RERANK_MODEL",
+        "SELFMEM_LOCAL_RERANK_CANDIDATE_LIMIT"
       ],
       "note": "local-rerank endpoint or credential readiness",
       "valuePrinted": false
@@ -348,8 +356,10 @@
         "RECALLWEAVE_MEMORYBENCH_PUBLIC_DATA",
         "RECALLWEAVE_MEMORYBENCH_NO_RAW_TEXT_OUTPUT",
         "RECALLWEAVE_MEMORYBENCH_BASE_URL",
+        "RECALLWEAVE_MEMORYBENCH_API_KEY",
         "RECALLWEAVE_MEMORYBENCH_ANSWER_MODEL",
-        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL"
+        "RECALLWEAVE_MEMORYBENCH_JUDGE_MODEL",
+        "RECALLWEAVE_MEMORYBENCH_MODEL_MATCH_POLICY"
       ],
       "note": "OpenAI-compatible answer and judge endpoint matching the target models",
       "valuePrinted": false
