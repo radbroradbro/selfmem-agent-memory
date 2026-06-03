@@ -5,6 +5,7 @@
 - Ready for first accepted shard run: false
 - Ready for public SOTA claim: false
 - Ready for local-full benchmark result: false
+- Ready for model-challenger benchmark result: false
 - Counts as full memory SOTA evidence: false
 - Query count: 500
 - Shards: 20
@@ -21,13 +22,14 @@
 - Full memory SOTA score proven: false
 
 ## Accepted Lane
-- Strategies: bm25-lite, full-hybrid-rerank, query-expanded-full-hybrid-rerank, cloud-gemini2-embed-rerank-proxy, cloud-voyage4-voyage-lite-rerank, cloud-nvidia-nv-embed-v1-mistral-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
+- Strategies: bm25-lite, full-hybrid-rerank, cloud-gemini2-embed-rerank-proxy, cloud-voyage4-lite-voyage-lite, cloud-nvidia-nv-embed-v1-mistral-rerank, local-apple-qwen3-0_6b, local-apple-qwen3-0_6b-local-rerank
 - Providers: gemini, local-apple, local-rerank, nvidia, voyage
-- Query expansion requirement: local-or-cloud-model-required
-- Query expansion model-backed: true
+- Query expansion requirement: not-required
+- Query expansion model-backed: false
 - Diagnostic fallback allowed: false
-- Answer model target: gpt-4o
-- Judge model target: gpt-4o
+- Model match policy: exact-target-required
+- Benchmark answer model target: gpt-4o
+- Benchmark judge model target: gpt-4o
 
 ## Local Runtime Health
 - Ready for response-arm export: false
@@ -59,6 +61,6 @@
 - public-sota-claim-not-allowed
 
 ## Next Actions
-- Satisfy the private-input doctor, accepted-lane model/provider readiness, answer-quality endpoint, and query-expansion evidence requirements.
-- Use local query expansion when available; use cloud query expansion only with explicit public-data and provider-call consent.
+- Satisfy the private-input doctor, accepted-lane model/provider readiness, and answer-quality endpoint requirements.
+- Keep query expansion as a labeled ablation unless the accepted lane explicitly includes it.
 - Do not substitute diagnostic BM25/control lanes for the accepted full-SOTA lane.

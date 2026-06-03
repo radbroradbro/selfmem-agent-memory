@@ -608,7 +608,7 @@ function renderMarkdown(value) {
     `- Strategies: ${value.acceptedLane.strategies.join(", ")}`,
     `- Providers: ${value.acceptedLane.providerRequirements.join(", ")}`,
     `- Query expansion requirement: ${value.acceptedLane.queryExpansion.evidenceRequirement}`,
-    `- Query expansion model-backed: ${value.acceptedLane.queryExpansion.modelBackedReady}`,
+    `- Query expansion model-backed: ${value.acceptedLane.queryExpansion.modelBackedReady === true}`,
     `- Diagnostic fallback allowed: ${value.acceptedLane.queryExpansion.diagnosticFallbackAllowed}`,
     `- Model match policy: ${value.acceptedLane.answerQuality.modelMatchPolicy ?? "n/a"}`,
     `- Benchmark answer model target: ${value.acceptedLane.answerQuality.targetAnswerModel ?? "n/a"}`,
